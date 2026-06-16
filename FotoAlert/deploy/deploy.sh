@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # FotoAlert – Deploy-Script (läuft auf dem Hetzner-Server)
-# Aufgerufen von: Forgejo Actions via SSH
+# Aufgerufen von: GitHub Actions via SSH
 # =============================================================================
 set -euo pipefail
 

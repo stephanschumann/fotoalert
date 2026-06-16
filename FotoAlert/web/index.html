@@ -773,12 +773,12 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.3';
+const APP_VERSION = '1.4.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
 const CFG = {
-  api: localStorage.getItem('fa_api') || '',
+  api: localStorage.getItem('fa_api') ?? (location.hostname === 'localhost' ? 'http://localhost:8000' : ''),
   minScore: 0.35,  // Backend-Minimum; wird nicht mehr per Settings-Slider geändert
   notifyHigh: localStorage.getItem('fa_notify_high') !== 'false',
   notifyGolden: localStorage.getItem('fa_notify_golden') !== 'false',
