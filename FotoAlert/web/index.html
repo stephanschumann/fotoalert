@@ -773,7 +773,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.4';
+const APP_VERSION = '1.4.5';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2437,24 +2437,74 @@ const LocationDetail = {
       <div class="edit-form">
         <label>Name</label>
         <input class="input-field" id="edit-name" type="text" value="${loc.name.replace(/"/g,'&quot;')}">
+
+        <label>Motivname</label>
+        <input class="input-field" id="edit-subject-name" type="text"
+          value="${(loc.subject_name||'').replace(/"/g,'&quot;')}"
+          placeholder="z.B. Berliner Dom">
+
+        <label>Kategorie</label>
+        <select class="input-field" id="edit-category" style="appearance:auto">
+          ${[['SCHLOSS','Schloss & Historisch'],['SKYLINE','Skyline & Architektur'],
+             ['NATUR','Natur & Landschaft'],['WASSER','Wasser & Spiegelung'],
+             ['AUSSICHT','Aussichtspunkt'],['INDUSTRIE','Industrie & Urban'],
+             ['MILCHSTRASSE','Milchstraße & Astro']]
+            .map(([k,v]) => `<option value="${k}" ${(loc.category_key||'SKYLINE')===k?'selected':''}>${v}</option>`)
+            .join('')}
+        </select>
+
         <label>Beschreibung</label>
         <div class="geocode-row">
-          <textarea class="input-field" id="edit-desc" rows="3">${loc.description}</textarea>
+          <textarea class="input-field" id="edit-desc" rows="3">${loc.description||''}</textarea>
           <button class="geocode-btn" onclick="LocationDetail._geocodeDesc()" title="Beschreibung via Standort-Erkennung füllen">⊕</button>
         </div>
         <p id="edit-geocode-hint" style="font-size:11px;color:var(--muted);margin:-8px 0 12px">⊕ erkennt den Ortsnamen deines Standorts und generiert eine neue Beschreibung.</p>
-        <label style="margin-top:12px">📍 Fotograf-Standort (Koordinaten)</label>
+
+        <label style="margin-top:4px">📍 Fotograf-Standort (Koordinaten)</label>
         <input class="input-field" id="edit-obs-coords" type="text" inputmode="text"
           placeholder="52.40747, 13.09279" value="${obsVal}"
           oninput="LocationDetail._onEditObsInput()">
         <p id="edit-obs-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
+
         <label>🎯 Motiv (Koordinaten)</label>
         <input class="input-field" id="edit-subj-coords" type="text" inputmode="text"
           placeholder="52.51234, 13.40123" value="${subjVal}"
           oninput="LocationDetail._onEditSubjInput()">
         <p id="edit-subj-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
         <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;margin-bottom:16px;background:var(--surface)"></div>
-        <div class="edit-actions">
+
+        <label>Motivhöhe (m)</label>
+        <input class="input-field" id="edit-subject-height" type="number" min="0" step="0.5"
+          placeholder="z.B. 98 für den Berliner Dom"
+          value="${loc.subject_height_m != null ? loc.subject_height_m : ''}">
+
+        <label>Brennweiten-Empfehlungen (mm, kommagetrennt)</label>
+        <input class="input-field" id="edit-focal" type="text" inputmode="numeric"
+          placeholder="z.B. 200, 400, 600"
+          value="${(loc.focal_length_suggestions||[]).join(', ')}">
+
+        <label>Schwierigkeit</label>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          ${[['1','Einfach'],['2','Mittel'],['3','Anspruchsvoll']].map(([val,label]) => `
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;
+              padding:8px;border-radius:8px;border:1px solid ${String(loc.difficulty||2)===val?'var(--gold)':'var(--border)'};
+              background:${String(loc.difficulty||2)===val?'var(--gold-dim)':'transparent'};
+              font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;margin-bottom:0">
+              <input type="radio" name="edit-difficulty" value="${val}"
+                ${String(loc.difficulty||2)===val?'checked':''}
+                onchange="this.closest('.edit-form').querySelectorAll('[name=edit-difficulty]').forEach(r=>{
+                  r.closest('label').style.borderColor=r.checked?'var(--gold)':'var(--border)';
+                  r.closest('label').style.background=r.checked?'var(--gold-dim)':'transparent';
+                })">
+              ${label}
+            </label>`).join('')}
+        </div>
+
+        <label>Hinweise (Zugang, beste Jahreszeit etc.)</label>
+        <textarea class="input-field" id="edit-special-notes" rows="2"
+          placeholder="z.B. Parkgebühren, beste Zeit: April–August">${loc.special_notes||''}</textarea>
+
+        <div class="edit-actions" style="margin-top:8px">
           <button class="btn-secondary" style="flex:1" onclick="LocationDetail.open('${loc.id}')">Abbrechen</button>
           <button class="btn-primary" style="flex:2" onclick="LocationDetail.saveEdit('${loc.id}')">Speichern</button>
         </div>
@@ -2583,7 +2633,7 @@ const LocationDetail = {
     const description = document.getElementById('edit-desc').value.trim();
     if (!name) { toast('Name darf nicht leer sein'); return; }
 
-    // Parse coordinate fields
+    // Koordinaten parsen
     const obsRaw = document.getElementById('edit-obs-coords')?.value.trim();
     const subjRaw = document.getElementById('edit-subj-coords')?.value.trim();
     const obsCoords = obsRaw ? this._parseEditCoords(obsRaw) : null;
@@ -2591,7 +2641,21 @@ const LocationDetail = {
     if (obsRaw && !obsCoords) { toast('Ungültige Fotograf-Koordinaten'); return; }
     if (subjRaw && !subjCoords) { toast('Ungültige Motiv-Koordinaten'); return; }
 
-    const body = {name, description};
+    // Neue Felder einlesen
+    const subject_name = (document.getElementById('edit-subject-name')?.value || '').trim();
+    const category = document.getElementById('edit-category')?.value || '';
+    const special_notes = (document.getElementById('edit-special-notes')?.value || '').trim();
+    const heightRaw = (document.getElementById('edit-subject-height')?.value || '').trim();
+    const subject_height_m = heightRaw !== '' ? parseFloat(heightRaw) : null;
+    const focalRaw = (document.getElementById('edit-focal')?.value || '').trim();
+    const focal_length_suggestions = focalRaw
+      ? focalRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
+      : [];
+    const diffEl = document.querySelector('input[name="edit-difficulty"]:checked');
+    const difficulty = diffEl ? parseInt(diffEl.value, 10) : 2;
+
+    const body = {name, description, subject_name, category, special_notes, difficulty, focal_length_suggestions};
+    if (subject_height_m !== null && !isNaN(subject_height_m)) body.subject_height_m = subject_height_m;
     if (obsCoords) { body.observer_lat = obsCoords.lat; body.observer_lon = obsCoords.lon; }
     if (subjCoords) { body.subject_lat = subjCoords.lat; body.subject_lon = subjCoords.lon; }
 
@@ -2603,6 +2667,9 @@ const LocationDetail = {
       const loc = Locations.all.find(l => l.id === locId);
       if (loc) {
         loc.name = name; loc.description = description;
+        loc.subject_name = subject_name; loc.special_notes = special_notes;
+        loc.difficulty = difficulty; loc.focal_length_suggestions = focal_length_suggestions;
+        if (subject_height_m !== null && !isNaN(subject_height_m)) loc.subject_height_m = subject_height_m;
         if (obsCoords) { loc.observer_lat = obsCoords.lat; loc.observer_lon = obsCoords.lon; }
         if (subjCoords) { loc.subject_lat = subjCoords.lat; loc.subject_lon = subjCoords.lon; }
       }
