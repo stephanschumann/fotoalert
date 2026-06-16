@@ -17,8 +17,8 @@
 set -euo pipefail
 
 # ── Konfiguration ────────────────────────────────────────────────────────────
-DOMAIN="YOUR_DOMAIN"           # z.B. fotoalert.dedyn.io oder foto.example.de
-CODEBERG_USER="YOUR_USERNAME"  # dein GitHub-Benutzername
+DOMAIN="fotoalert.stephanschumann.com"
+CODEBERG_USER="stephanschumann"  # GitHub-Benutzername
 REPO_NAME="fotoalert"          # Name des Codeberg-Repositories
 APP_DIR="/opt/fotoalert/app"
 VENV_DIR="/opt/fotoalert/venv"
@@ -33,7 +33,8 @@ echo "Server: $(hostname)"
 # ── System-Updates ───────────────────────────────────────────────────────────
 apt-get update -qq
 apt-get upgrade -y -qq
-apt-get install -y -qq git python3 python3-pip python3-venv curl wget unzip
+apt-get install -y -qq git python3 python3-pip python3-venv curl wget unzip \
+    python3.12 python3.12-venv python3.12-dev
 
 # ── Caddy installieren (automatisches HTTPS via Let's Encrypt) ───────────────
 if ! command -v caddy &> /dev/null; then
@@ -75,8 +76,10 @@ else
 fi
 
 # ── Python venv + Dependencies ───────────────────────────────────────────────
-echo ">>> Python venv erstellen..."
-python3 -m venv "$VENV_DIR"
+echo ">>> Python venv erstellen (Python 3.12)..."
+# Ubuntu 26.04 hat Python 3.14 als Standard; astropy und pydantic-core
+# unterstützen 3.14 noch nicht – deshalb explizit 3.12 verwenden.
+python3.12 -m venv "$VENV_DIR"
 "$VENV_DIR/bin/pip" install --quiet --upgrade pip
 "$VENV_DIR/bin/pip" install --quiet -r "$APP_DIR/FotoAlert/backend/requirements.txt"
 echo ">>> Dependencies installiert."
