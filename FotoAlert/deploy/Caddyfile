@@ -1,0 +1,33 @@
+# FotoAlert – Caddy Reverse Proxy mit automatischem HTTPS
+# Let's Encrypt Zertifikat wird automatisch ausgestellt und erneuert.
+# Voraussetzung: DNS-Eintrag (A-Record) zeigt bereits auf diesen Server.
+
+YOUR_DOMAIN {
+    # HTTPS-Proxy zu FastAPI
+    reverse_proxy localhost:8000 {
+        # Timeout für lange Precompute-Anfragen
+        transport http {
+            read_timeout 120s
+        }
+    }
+
+    # Sicherheits-Header
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        # HSTS: Browser merkt sich HTTPS für 1 Jahr
+        Strict-Transport-Security "max-age=31536000"
+        # Service Worker darf nur von dieser Origin laden
+        -Server
+    }
+
+    # Logs
+    log {
+        output file /var/log/caddy/fotoalert.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+        format json
+    }
+}

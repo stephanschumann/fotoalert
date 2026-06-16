@@ -1,0 +1,3164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FotoAlert">
+  <meta name="theme-color" content="#f0a030">
+  <title>FotoAlert</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+  <style>
+    /* ── Design Tokens ────────────────────────────────────────────── */
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #141420;
+      --card:      #1c1c2a;
+      --border:    #2a2a3a;
+      --gold:      #f0a030;
+      --gold-dim:  rgba(240,160,48,.15);
+      --blue-h:    #5080f0;
+      --text:      #e8e8f4;
+      --muted:     #7878a0;
+      --green:     #4caf70;
+      --orange:    #f08030;
+      --red:       #e05050;
+      --radius:    14px;
+      --tab-h:     64px;
+      --safe-b:    env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ── Reset ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+    /* ── Layout ──────────────────────────────────────────────────── */
+    #app { display: flex; flex-direction: column; height: 100%; }
+
+    /* Header */
+    #header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 52px 16px 12px;
+      background: linear-gradient(180deg, var(--surface) 60%, transparent);
+      flex-shrink: 0; z-index: 10;
+    }
+    #header h1 { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: -.3px; }
+    #header .subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    #refresh-btn { background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 8px; border-radius: 50%; transition: color .2s; }
+    #refresh-btn:hover { color: var(--gold); }
+    #refresh-btn svg { width: 20px; height: 20px; }
+    #search-btn { background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 8px; border-radius: 50%; transition: color .2s; }
+    #search-btn:hover { color: var(--gold); }
+    #search-btn svg { width: 20px; height: 20px; }
+    /* Search bar overlay in header */
+    #search-bar {
+      display: none; align-items: center; gap: 8px;
+      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+      background: var(--surface); padding: 0 16px; z-index: 20;
+    }
+    #search-bar.open { display: flex; }
+    #search-input {
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px; color: var(--text);
+      font-size: 16px; outline: none;
+    }
+    #search-input:focus { border-color: var(--gold); }
+    #search-cancel { background: none; border: none; color: var(--gold);
+      font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; padding: 4px 0; }
+
+    /* Pages */
+    #pages { flex: 1; overflow: hidden; position: relative; }
+    .page { position: absolute; inset: 0; overflow-y: auto; padding-bottom: calc(var(--tab-h) + var(--safe-b) + 8px);
+      overscroll-behavior: contain; -webkit-overflow-scrolling: touch; opacity: 0;
+      pointer-events: none; transition: opacity .15s; }
+    .page.active { opacity: 1; pointer-events: auto; }
+
+    /* Tab Bar */
+    #tab-bar {
+      display: flex; background: var(--surface); border-top: 1px solid var(--border);
+      height: calc(var(--tab-h) + var(--safe-b)); padding-bottom: var(--safe-b);
+      flex-shrink: 0; z-index: 20;
+    }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; background: none; border: none;
+      color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 500;
+      letter-spacing: .3px; transition: color .15s; padding: 8px 0; }
+    .tab svg { width: 22px; height: 22px; }
+    .tab.active, .tab:hover { color: var(--gold); }
+    .tab#tab-add { color: var(--bg); }
+    .tab#tab-add .tab-icon-wrap {
+      background: var(--gold); border-radius: 50%; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: -6px;
+    }
+
+    /* ── Cards ───────────────────────────────────────────────────── */
+    .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border);
+      padding: 14px; margin: 6px 12px; cursor: pointer;
+      transition: border-color .2s, transform .1s; }
+    .card:active { transform: scale(.98); }
+    .card:hover { border-color: var(--gold); }
+
+    /* ── Opportunity Card ─────────────────────────────────────────── */
+    .opp-card { display: flex; gap: 12px; align-items: flex-start; }
+    .score-ring-wrap { flex-shrink: 0; width: 52px; height: 52px; position: relative; }
+    .score-ring-wrap svg { width: 52px; height: 52px; transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+    .score-ring-fg { fill: none; stroke-width: 4; stroke-linecap: round;
+      transition: stroke-dashoffset .6s ease; }
+    .score-label { position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; transform: none; }
+    .score-label span:first-child { font-size: 14px; font-weight: 800; line-height: 1; }
+    .score-label span:last-child  { font-size: 8px; color: var(--muted); }
+    .priority-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px;
+      border-radius: 50%; background: var(--gold); border: 2px solid var(--card);
+      display: none; }
+
+    .opp-body { flex: 1; min-width: 0; }
+    .opp-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .opp-icon { font-size: 13px; }
+    .opp-type { font-size: 11px; color: var(--muted); }
+    .opp-time { font-size: 11px; color: var(--text); margin-left: auto;
+      font-variant-numeric: tabular-nums; }
+    .opp-title { font-size: 14px; font-weight: 600; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .opp-location { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .opp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+    .tag-blue  { color: var(--blue-h); background: rgba(80,128,240,.15); }
+    .tag-gold  { color: var(--gold);   background: var(--gold-dim); }
+    .tag-warn  { color: var(--orange); background: rgba(240,128,48,.15); }
+    .tag-weather-unknown { color: var(--muted); background: var(--border); }
+
+    /* Section headers */
+    .section-head { display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px 4px; font-size: 12px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    .section-head svg { width: 13px; height: 13px; }
+
+    /* Alert banner */
+    #alert-banner { margin: 8px 12px; background: linear-gradient(135deg, rgba(240,160,48,.12), rgba(80,128,240,.08));
+      border: 1px solid rgba(240,160,48,.35); border-radius: var(--radius); padding: 12px 14px; }
+    #alert-banner h3 { font-size: 12px; font-weight: 700; color: var(--gold);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .alert-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .alert-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px; cursor: pointer; transition: border-color .15s; }
+    .alert-chip:hover { border-color: var(--gold); }
+    .alert-chip .chip-icon { font-size: 18px; margin-bottom: 4px; }
+    .alert-chip .chip-day  { font-size: 10px; color: var(--muted); }
+    .alert-chip .chip-name { font-size: 11px; font-weight: 600; max-width: 90px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Empty state */
+    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 32px; gap: 12px; color: var(--muted); text-align: center; }
+    .empty svg { width: 48px; height: 48px; opacity: .4; }
+
+    /* Loading spinner */
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Map Page ─────────────────────────────────────────────────── */
+    #page-map { padding: 0 !important; }
+    #map { width: 100%; height: 100%; }
+    .leaflet-container { background: #0d0d1a !important; }
+    .leaflet-tile { filter: brightness(.85) saturate(.7); }
+    /* Map layer toggle */
+    #map-layer-toggle { position: absolute; top: 12px; right: 12px; z-index: 1000;
+      display: flex; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; }
+    .map-layer-btn { background: none; border: none; color: var(--muted); font-size: 12px;
+      font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
+    .map-layer-btn.active { background: var(--gold); color: var(--bg); }
+
+    /* custom popup */
+    .leaflet-popup-content-wrapper { background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; }
+    .leaflet-popup-tip { background: var(--card); }
+    .map-popup h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--gold); }
+    .map-popup p  { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .map-popup .popup-btn { font-size: 11px; background: var(--gold-dim); color: var(--gold);
+      border: 1px solid var(--gold); border-radius: 6px; padding: 4px 10px; cursor: pointer;
+      display: inline-block; }
+
+    /* ── Detail Sheet ─────────────────────────────────────────────── */
+    #detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      z-index: 100; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #detail-overlay.open { opacity: 1; pointer-events: auto; }
+    #detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      max-height: 92vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
+      padding-bottom: calc(32px + var(--safe-b)); }
+    #detail-sheet.open { transform: translateY(0); }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px;
+      margin: 10px auto 0; }
+    .sheet-hero { padding: 20px 20px 0; }
+    .sheet-hero-type { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .sheet-hero-title { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+    .sheet-hero-loc { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .sheet-score-bar { display: flex; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .score-col { flex: 1; text-align: center; }
+    .score-col .sc-val { font-size: 20px; font-weight: 800; }
+    .score-col .sc-lbl { font-size: 10px; color: var(--muted); margin-top: 1px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .sc-info-btn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--muted); background: none; color: var(--muted); font-size: 9px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; }
+    .sc-info-btn:hover { border-color: var(--gold); color: var(--gold); }
+    /* Score-Info-Overlay */
+    #score-info-overlay { display: none; position: absolute; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(0,0,0,.55); padding: 20px; }
+    #score-info-overlay.open { display: flex; }
+    #score-info-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; max-width: 320px; width: 100%; position: relative; }
+    #score-info-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    #score-info-box p, #score-info-box li { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    #score-info-box ul { padding-left: 16px; margin-top: 6px; }
+    #score-info-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; padding: 0; }
+    .sheet-section { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+    .sheet-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted); margin-bottom: 0;
+      display: flex; align-items: center; gap: 6px; justify-content: space-between; cursor: pointer; user-select: none; }
+    .sec-chev { font-size: 10px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+    .section-body { overflow: hidden; max-height: 0; transition: max-height .25s ease; }
+    .section-body.open { max-height: 4000px; padding-top: 10px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; }
+    .info-row .ir-label { font-size: 13px; color: var(--muted); }
+    .info-row .ir-val   { font-size: 13px; font-weight: 600; }
+    .camera-card { background: var(--card); border-radius: 10px; padding: 12px;
+      border: 1px solid var(--border); }
+    .camera-card .cam-main { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .camera-card .cam-tip  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .cam-warning { color: var(--orange); font-weight: 600; margin-top: 6px; font-size: 12px; }
+    .time-window { display: flex; background: var(--card); border-radius: 10px;
+      padding: 12px; border: 1px solid var(--border); gap: 0; }
+    .tw-col { flex: 1; text-align: center; }
+    .tw-col:not(:last-child) { border-right: 1px solid var(--border); }
+    .tw-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+    .tw-time  { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .tw-optimal { color: var(--gold); }
+    .sheet-actions { padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .coords-grid { display: flex; flex-direction: column; gap: 10px; }
+    .coords-row { display: flex; align-items: center; gap: 8px; }
+    .coords-label { font-size: 12px; color: var(--muted); width: 130px; flex-shrink: 0; }
+    .coords-vals { font-size: 12px; font-family: monospace; color: var(--text); flex: 1; }
+    .coords-maps-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
+    .coords-sv-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid #3a7bd5; background: var(--card); color: #5b9cf6; cursor: pointer; }
+    .verified-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #4caf50; background: rgba(76,175,80,.12); border: 1px solid rgba(76,175,80,.3); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
+    .verified-badge-issue { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--red); background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.35); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
+    .tag-verified { background: rgba(76,175,80,.15); color: #4caf50; }
+    .tag-issue { background: rgba(224,80,80,.15); color: var(--red); }
+
+    /* ── Star Rating (US-24) ─────────────────────────────────────── */
+    .star-input { display: flex; gap: 6px; padding: 4px 0; }
+    .star-btn { font-size: 30px; cursor: pointer; color: var(--border);
+      transition: color .1s, transform .1s; user-select: none; line-height: 1; }
+    .star-btn.filled { color: var(--gold); }
+    .star-btn:hover { color: var(--gold); transform: scale(1.15); }
+    .star-display { display: inline-flex; gap: 1px; }
+    .star-display .s { font-size: 11px; }
+    .star-display .s.on  { color: var(--gold); }
+    .star-display .s.off { color: var(--border); }
+    /* ── Filter (US-32) ─────────────────────────────────────────── */
+    #filter-btn { background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 8px; border-radius: 50%; transition: color .2s; position: relative; }
+    #filter-btn:hover { color: var(--gold); }
+    #filter-btn svg { width: 20px; height: 20px; }
+    #filter-badge { position: absolute; top: 2px; right: 2px; background: var(--gold);
+      color: var(--bg); border-radius: 50%; width: 16px; height: 16px;
+      font-size: 10px; font-weight: 800; display: none; align-items: center;
+      justify-content: center; pointer-events: none; }
+    #filter-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      z-index: 104; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #filter-overlay.open { opacity: 1; pointer-events: auto; }
+    #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      max-height: 88vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
+      padding-bottom: calc(32px + var(--safe-b)); }
+    #filter-sheet.open { transform: translateY(0); }
+    .filter-header { display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px 8px; }
+    .filter-header h2 { font-size: 17px; font-weight: 700; }
+    .filter-section { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .filter-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted); margin-bottom: 10px; }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter-chip { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      cursor: pointer; transition: all .15s; user-select: none; }
+    .filter-chip.active { border-color: var(--gold); color: var(--gold);
+      background: var(--gold-dim); }
+    .filter-actions { padding: 14px 20px; display: flex; gap: 10px; }
+    .filter-slider-wrap { padding: 4px 0 2px; }
+    .filter-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+      border-radius: 2px; outline: none; cursor: pointer;
+      background: linear-gradient(to right, var(--gold) var(--pct, 0%), var(--border) var(--pct, 0%)); }
+    .filter-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%; background: var(--gold);
+      border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--gold); cursor: pointer; }
+    .filter-slider-labels { display: flex; justify-content: space-between;
+      font-size: 10px; color: var(--muted); margin-top: 6px; }
+    .filter-slider-val { font-size: 22px; font-weight: 800; color: var(--gold);
+      text-align: center; margin-bottom: 4px; letter-spacing: -1px; }
+    /* BUG-04: Dual-Handle Range-Slider */
+    .dual-range-wrap { padding: 4px 0 0; }
+    .dual-range-track { position: relative; height: 4px; background: var(--border);
+      border-radius: 2px; margin: 16px 0 8px; }
+    .dual-range-fill { position: absolute; top: 0; height: 100%;
+      background: var(--gold); border-radius: 2px; pointer-events: none; }
+    .dual-range-thumb { position: absolute; top: 50%; width: 22px; height: 22px;
+      background: var(--gold); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: grab; touch-action: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,.5), 0 0 0 3px rgba(240,160,48,.25);
+      z-index: 1; transition: box-shadow .15s; }
+    .dual-range-thumb:active { cursor: grabbing;
+      box-shadow: 0 1px 4px rgba(0,0,0,.5), 0 0 0 6px rgba(240,160,48,.35); }
+    .verify-form { background: var(--card); border: 1px solid rgba(76,175,80,.3); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .verify-issue-form { background: var(--card); border: 1px solid rgba(224,80,80,.3); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .issue-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .issue-chip { font-size: 12px; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; transition: all .15s; }
+    .issue-chip.selected { border-color: var(--red); color: var(--red); background: rgba(224,80,80,.1); }
+    .btn-issue { flex: 1; background: var(--red); color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .verify-form textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 10px; resize: vertical; min-height: 60px; font-family: inherit; }
+    .verify-form textarea::placeholder { color: var(--muted); }
+    .verify-form-actions { display: flex; gap: 8px; }
+    .btn-verify { flex: 1; background: #4caf50; color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-verify-cancel { flex: 0; background: var(--card); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    .btn-primary { background: var(--gold); color: var(--bg); border: none; border-radius: 12px;
+      padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity .15s; }
+    .btn-primary:hover { opacity: .9; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer;
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: border-color .15s; }
+    .btn-secondary:hover { border-color: var(--gold); }
+
+    /* ── Add Location Sheet ───────────────────────────────────────── */
+    #add-sheet { position: fixed; inset: 0; z-index: 110;
+      background: var(--surface); border-radius: 0;
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #add-sheet.open { transform: translateY(0); }
+    #add-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 109;
+      opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #add-overlay.open { opacity: 1; pointer-events: auto; }
+    .add-header { padding: 14px 20px 8px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .add-header h2 { font-size: 18px; font-weight: 800; }
+    .close-btn { background: var(--card); border: none; color: var(--muted); border-radius: 50%;
+      width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; }
+    .add-map-container { flex: 1; min-height: 0; position: relative; }
+    #add-map { width: 100%; height: 100%; }
+    /* Fadenkreuz beim Pin-Setzen, Grab beim Verschieben */
+    #add-map .leaflet-grab { cursor: crosshair; }
+    #add-map .leaflet-dragging .leaflet-grab { cursor: grabbing; }
+    .add-map-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.75); color: #fff; font-size: 11px;
+      padding: 4px 12px; border-radius: 20px; pointer-events: none; white-space: nowrap; z-index: 10; }
+    .map-mode-bar { display: flex; gap: 6px; padding: 6px 12px; background: var(--bg); flex-shrink: 0; }
+    .map-mode-btn { flex: 1; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .map-mode-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+    .add-form { padding: 12px 20px; overflow-y: auto; flex-shrink: 0; max-height: 42dvh;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+    .form-section { margin-bottom: 16px; }
+    .form-section label { display: block; font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .gps-row { display: flex; gap: 8px; }
+    .gps-display { flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 13px;
+      font-variant-numeric: tabular-nums; color: var(--muted); }
+    .gps-display.set { color: var(--text); border-color: var(--green); }
+    .gps-btn { background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+      border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; }
+    .input-field { width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 14px; color: var(--text);
+      outline: none; transition: border-color .2s; }
+    .input-field:focus { border-color: var(--gold); }
+    .input-row { display: flex; gap: 8px; }
+    .input-row .input-field { flex: 1; }
+    /* Location Edit Form */
+    .edit-form { padding: 16px 20px; }
+    .edit-form label { display: block; font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .edit-form .input-field { margin-bottom: 14px; }
+    textarea.input-field { resize: vertical; min-height: 80px; font-family: inherit; line-height: 1.5; }
+    .geocode-row { display: flex; gap: 8px; align-items: flex-start; }
+    .geocode-row textarea { flex: 1; }
+    .geocode-btn { background: var(--card); border: 1px solid var(--border); color: var(--muted);
+      border-radius: 10px; padding: 10px 12px; font-size: 16px; cursor: pointer;
+      transition: border-color .2s, color .2s; white-space: nowrap; flex-shrink: 0; margin-top: 0; }
+    .geocode-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .edit-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .coord-pair { display: flex; gap: 6px; }
+    .coord-pair .input-field { flex: 1; font-size: 12px; padding: 8px 10px; }
+    .coord-actions { display: flex; gap: 6px; margin-top: 6px; }
+    .paste-btn { background: var(--card); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: border-color .2s, color .2s; }
+    .paste-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .coord-error { font-size: 11px; color: #ff6b6b; margin-top: 4px; min-height: 14px; }
+    .preview-box { background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px; margin: 8px 0; }
+    .preview-box h4 { font-size: 12px; color: var(--muted); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+    .preview-stat { display: flex; justify-content: space-between;
+      padding: 4px 0; font-size: 13px; }
+    .preview-stat .ps-label { color: var(--muted); }
+    .preview-stat .ps-val   { font-weight: 700; }
+    .preview-alignments { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .align-row { display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .align-row:last-child { border-bottom: none; }
+    .align-row .ar-type { font-size: 12px; color: var(--gold); }
+    .align-row .ar-time { font-size: 12px; color: var(--muted); }
+    .align-row .ar-score { font-size: 11px; font-weight: 700; }
+
+    /* ── Feed-Modus Toggle ───────────────────────────────────────── */
+    .feed-mode-bar { display: flex; gap: 6px; padding: 10px 14px 6px;
+      background: var(--bg); position: sticky; top: 0; z-index: 5; }
+    .fmb-btn { flex: 1; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s; }
+    .fmb-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    /* ── Kalenderansicht ─────────────────────────────────────────── */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; }
+    .cal-nav-title { font-size: 15px; font-weight: 700; }
+    .cal-nav-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 5px 12px; font-size: 14px; cursor: pointer; }
+    .cal-status { padding: 6px 16px 2px; font-size: 11px; color: var(--muted); }
+    .cal-day-head { padding: 12px 16px 4px; font-size: 12px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+      border-top: 1px solid var(--border); margin-top: 4px; }
+    .cal-event { display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; transition: background .15s; }
+    .cal-event:active { background: var(--card); }
+    .cal-event-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+    .cal-event-body { flex: 1; min-width: 0; }
+    .cal-event-title { font-size: 13px; font-weight: 600; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; }
+    .cal-event-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .cal-event-score { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+    .cal-loading { display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 20px; gap: 12px; color: var(--muted); }
+
+    /* ── Locations Page ───────────────────────────────────────────── */
+    .loc-card { display: flex; gap: 12px; align-items: center; }
+    .loc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex;
+      align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .loc-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .loc-body p  { font-size: 12px; color: var(--muted); }
+    .loc-diff { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+      margin-left: auto; flex-shrink: 0; }
+    .diff-1 { color: var(--green);  background: rgba(76,175,112,.15); }
+    .diff-2 { color: var(--orange); background: rgba(240,128,48,.15); }
+    .diff-3 { color: var(--red);    background: rgba(224,80,80,.15); }
+
+    /* ── Location Detail Sheet ───────────────────────────────────── */
+    #loc-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      z-index: 102; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #loc-detail-overlay.open { opacity: 1; pointer-events: auto; }
+    #loc-detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 103;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      max-height: 92vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
+      padding-bottom: calc(32px + var(--safe-b)); }
+    #loc-detail-sheet.open { transform: translateY(0); }
+    .loc-impossible-warn { margin: 0 20px 4px; background: rgba(224,80,80,.1);
+      border: 1px solid rgba(224,80,80,.35); border-radius: 12px; padding: 12px 14px; }
+    .loc-impossible-warn p { font-size: 13px; color: var(--red); line-height: 1.5; }
+    .body-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .body-chip { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+    .body-chip.possible   { background: rgba(80,200,120,.15); color: #4ec87a; border: 1px solid rgba(80,200,120,.4); }
+    .body-chip.impossible { background: rgba(130,130,130,.1); color: var(--muted); border: 1px solid rgba(130,130,130,.25); text-decoration: line-through; }
+    .loc-next-event-row { display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; }
+    .loc-next-event-row:last-child { border-bottom: none; }
+    .loc-next-event-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+    .loc-next-event-body { flex: 1; min-width: 0; }
+    .loc-next-event-title { font-size: 13px; font-weight: 600; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; }
+    .loc-next-event-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .loc-next-event-score { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+    .loc-maps-btn { display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card); color: var(--gold); cursor: pointer; text-decoration: none; }
+
+    /* Search bar */
+    .search-wrap { padding: 8px 12px; position: sticky; top: 0; background: var(--bg); z-index: 5; }
+    .search-input { width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 14px 10px 36px; font-size: 14px; color: var(--text);
+      outline: none; transition: border-color .2s; }
+    .search-input:focus { border-color: var(--gold); }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none; }
+
+    /* ── Settings Page ────────────────────────────────────────────── */
+    .settings-section { padding: 12px 16px 4px; }
+    .settings-section h3 { font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .8px; padding: 0 4px; margin-bottom: 6px; }
+    .settings-group { background: var(--card); border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden; }
+    .settings-row { display: flex; align-items: center; padding: 13px 16px;
+      border-bottom: 1px solid var(--border); gap: 12px; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row .sr-label { flex: 1; }
+    .settings-row .sr-label span { display: block; font-size: 14px; font-weight: 500; }
+    .settings-row .sr-label small { font-size: 11px; color: var(--muted); }
+    .toggle { appearance: none; width: 44px; height: 26px; background: var(--border);
+      border-radius: 13px; cursor: pointer; position: relative; transition: background .2s;
+      flex-shrink: 0; }
+    .toggle:checked { background: var(--gold); }
+    .toggle::after { content: ''; position: absolute; width: 20px; height: 20px;
+      background: white; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; }
+    .toggle:checked::after { left: 21px; }
+    .range-row { flex-direction: column; align-items: stretch; gap: 6px; }
+    .range-row .range-label-row { display: flex; justify-content: space-between;
+      font-size: 13px; }
+    input[type="range"] { width: 100%; accent-color: var(--gold); }
+    .server-input { background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--text);
+      outline: none; width: 100%; }
+    .info-badge { font-size: 11px; color: var(--muted); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; }
+
+    /* ── Toast ─────────────────────────────────────────────────────── */
+    #toast { position: fixed; bottom: calc(var(--tab-h) + var(--safe-b) + 12px); left: 50%;
+      transform: translateX(-50%) translateY(10px); background: var(--card);
+      border: 1px solid var(--border); border-radius: 20px; padding: 8px 18px;
+      font-size: 13px; font-weight: 600; z-index: 200; opacity: 0; transition: all .25s;
+      white-space: nowrap; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Scrollbar (desktop) ─────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (min-width: 600px) {
+      #app { max-width: 480px; margin: 0 auto;
+        box-shadow: 0 0 80px rgba(0,0,0,.8); }
+      #header { padding-top: 20px; }
+      /* BUG-07: Sheets auf App-Breite zentrieren (kein translateX – translateY-Animation bleibt intakt) */
+      #detail-sheet, #loc-detail-sheet, #filter-sheet {
+        left: 50%; width: 480px; right: auto; margin-left: -240px;
+      }
+      #add-sheet {
+        left: 50%; width: 480px; right: auto; top: 0; bottom: 0; margin-left: -240px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <div id="header" style="position:relative">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#e8a020,#c45f00);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📷</div>
+      <div>
+        <h1>FotoAlert</h1>
+        <div class="subtitle" id="header-subtitle">Berlin &amp; Brandenburg</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:2px">
+      <button id="search-btn" title="Suchen" onclick="Search.open()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      <div style="position:relative;display:inline-flex">
+        <button id="filter-btn" title="Filter" onclick="FilterSheet.open()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+        </button>
+        <span id="filter-badge">0</span>
+      </div>
+      <button id="refresh-btn" title="Aktualisieren" onclick="App.refresh()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+      </button>
+    </div>
+    <!-- Search bar overlay -->
+    <div id="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18" style="color:var(--muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search-input" type="search" placeholder="Location suchen…"
+        oninput="Search.onInput(this.value)"
+        onkeydown="if(event.key==='Escape') Search.close()">
+      <button id="search-cancel" onclick="Search.close()">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div id="pages">
+    <!-- FEED -->
+    <div id="page-feed" class="page active">
+      <div class="feed-mode-bar">
+        <button class="fmb-btn active" id="fmb-feed" onclick="Feed.setMode('feed')">📋 14-Tage Feed</button>
+        <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')">📅 Jahreskalender</button>
+      </div>
+      <div id="feed-content"><div class="empty"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- MAP -->
+    <div id="page-map" class="page">
+      <div id="map"></div>
+      <div id="map-layer-toggle">
+        <button class="map-layer-btn active" onclick="MapView.setLayer('dark')">Nacht</button>
+        <button class="map-layer-btn" onclick="MapView.setLayer('standard')">Standard</button>
+        <button class="map-layer-btn" onclick="MapView.setLayer('satellite')">Satellit</button>
+      </div>
+    </div>
+
+    <!-- LOCATIONS -->
+    <div id="page-locations" class="page">
+      <div class="search-wrap">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="search" placeholder="Location suchen…" oninput="Locations.filter(this.value)">
+      </div>
+      <div id="locations-content"><div class="empty"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div id="settings-content"></div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div id="tab-bar">
+    <button class="tab active" id="tab-feed" onclick="App.nav('feed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>Chancen</span>
+    </button>
+    <button class="tab" id="tab-map" onclick="App.nav('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      <span>Karte</span>
+    </button>
+    <button class="tab" id="tab-add" onclick="AddLocation.open()">
+      <div class="tab-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <span style="color:var(--muted);margin-top:2px">Neu</span>
+    </button>
+    <button class="tab" id="tab-locations" onclick="App.nav('locations')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Locations</span>
+    </button>
+    <button class="tab" id="tab-settings" onclick="App.nav('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Einstellungen</span>
+    </button>
+  </div>
+</div>
+
+<!-- Detail Sheet -->
+<div id="detail-overlay" onclick="Detail.close()"></div>
+<div id="detail-sheet">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0">
+    <div class="sheet-handle" style="margin:0"></div>
+    <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- Add Location Sheet -->
+<div id="add-overlay" onclick="AddLocation.close()"></div>
+<div id="add-sheet">
+  <div class="add-header">
+    <div class="sheet-handle" style="margin:0"></div>
+    <h2>📍 Neue Location</h2>
+    <button class="close-btn" onclick="AddLocation.close()">✕</button>
+  </div>
+  <div class="add-map-container">
+    <div id="add-map"></div>
+    <div class="add-map-hint" id="add-map-hint">Modus wählen → dann auf Karte tippen</div>
+  </div>
+  <div class="map-mode-bar">
+    <button class="map-mode-btn active" id="mode-obs" onclick="AddLocation.setMapMode('obs')">📍 Mein Standort setzen</button>
+    <button class="map-mode-btn" id="mode-subj" onclick="AddLocation.setMapMode('subj')">🎯 Motiv setzen</button>
+  </div>
+  <div class="add-form">
+    <div class="form-section">
+      <label>Mein Standort (Fotograf)</label>
+      <input class="input-field" id="obs-coords" type="text" inputmode="text"
+        placeholder="z.B. 52.40747, 13.09279 oder 52°24'26"N 13°05'33"E"
+        oninput="AddLocation._onObsInput()" autocomplete="off">
+      <div class="coord-actions">
+        <button class="gps-btn" onclick="AddLocation.useMyLocation()">📍 GPS</button>
+        <button class="paste-btn" onclick="AddLocation._pasteCoords('obs')">📋 Einfügen</button>
+      </div>
+      <div class="coord-error" id="obs-error"></div>
+    </div>
+    <div class="form-section">
+      <label>Motiv (Gebäude / Landmark)</label>
+      <input class="input-field" id="subj-coords" type="text" inputmode="text"
+        placeholder="z.B. 52.51234, 13.40123 oder aus Google Maps einfügen"
+        oninput="AddLocation._onSubjInput()" autocomplete="off">
+      <div class="coord-actions">
+        <button class="paste-btn" onclick="AddLocation._pasteCoords('subj')">📋 Einfügen</button>
+      </div>
+      <div class="coord-error" id="subj-error"></div>
+    </div>
+    <div class="form-section">
+      <label>Name des Motivs</label>
+      <input class="input-field" id="subj-name" type="text" placeholder="z.B. Oberbaumbrücke Turm Nord">
+    </div>
+    <div class="form-section">
+      <label>Optionale Angaben</label>
+      <div class="input-row">
+        <input class="input-field" id="subj-height" type="number" placeholder="Höhe (m)" min="0">
+        <input class="input-field" id="subj-width"  type="number" placeholder="Breite (m)" min="0">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="AddLocation.preview()">Alignments berechnen ✦</button>
+    <div id="add-preview" style="margin-top:12px"></div>
+    <button class="btn-secondary" id="save-location-btn" style="display:none;margin-top:8px" onclick="AddLocation.save()">Location dauerhaft speichern</button>
+  </div>
+</div>
+
+<!-- Location Detail Sheet -->
+<div id="loc-detail-overlay" onclick="LocationDetail.close()"></div>
+<div id="loc-detail-sheet">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0">
+    <div class="sheet-handle" style="margin:0"></div>
+    <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="loc-detail-content"></div>
+</div>
+
+<!-- Filter Sheet (US-32) -->
+<div id="filter-overlay" onclick="FilterSheet.close()"></div>
+<div id="filter-sheet">
+  <div class="filter-header">
+    <h2>🎛 Filter</h2>
+    <button class="close-btn" onclick="FilterSheet.close()">✕</button>
+  </div>
+  <div id="filter-content"></div>
+  <div class="filter-actions">
+    <button class="btn-secondary" style="flex:1" onclick="FilterSheet.reset()">Alle zurücksetzen</button>
+    <button class="btn-primary" style="flex:2" onclick="FilterSheet.apply()">Anwenden</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+// VERSION  (Major.Feature.Fix)
+// ═══════════════════════════════════════════════════════
+// Major  → grundlegende App-Überarbeitung (v2, v3 …)
+// Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
+// Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
+const APP_VERSION = '1.4.2';
+
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const CFG = {
+  api: localStorage.getItem('fa_api') || 'http://localhost:8000',
+  minScore: 0.35,  // Backend-Minimum; wird nicht mehr per Settings-Slider geändert
+  notifyHigh: localStorage.getItem('fa_notify_high') !== 'false',
+  notifyGolden: localStorage.getItem('fa_notify_golden') !== 'false',
+  notifyMilky: localStorage.getItem('fa_notify_milky') === 'true',
+};
+
+// ═══════════════════════════════════════════════════════
+// API CLIENT
+// ═══════════════════════════════════════════════════════
+const API = {
+  async get(path) {
+    const r = await fetch(CFG.api + path);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
+  async post(path, body) {
+    const r = await fetch(CFG.api + path, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  },
+  async patch(path, body) {
+    const r = await fetch(CFG.api + path, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+const ICONS = {
+  'Goldene Stunde Abend':  '🌅', 'Goldene Stunde Morgen': '🌄',
+  'Blaue Stunde':          '🌙', 'Mondaufgang':           '🌕',
+  'Mond-Alignment':        '🌙', 'Sonnen-Alignment':      '☀️',
+  'Milchstraße':           '✨', 'Meteoritenschauer':     '💫',
+  'Sonnenfinsternis':      '🌑',
+};
+
+function scoreColor(s) {
+  return s >= .8 ? '#4caf70' : s >= .6 ? '#f0a030' : '#f08030';
+}
+
+function formatTime(iso, tz='Europe/Berlin') {
+  return new Date(iso).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit',timeZone:tz}) + ' Uhr';
+}
+function formatDate(iso, tz='Europe/Berlin') {
+  const d = new Date(iso);
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('de-DE',{timeZone:tz});
+  const dStr = d.toLocaleDateString('de-DE',{timeZone:tz});
+  if (dStr === todayStr) return 'Heute';
+  const tom = new Date(now); tom.setDate(tom.getDate()+1);
+  if (dStr === tom.toLocaleDateString('de-DE',{timeZone:tz})) return 'Morgen';
+  return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',timeZone:tz});
+}
+function pct(v) { return Math.round(v*100) + '%'; }
+
+// Sonnenaufgang / -untergang für Berlin (UTC-Stunden, Spencer-Approximation)
+// Genauigkeit ±2 min – ausreichend für Tageszeit-Filter
+function berlinSunTimes(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00Z');
+  const start = new Date(d.getUTCFullYear(), 0, 0);
+  const doy = Math.round((d - start) / 86400000); // day of year
+  const lat = 52.52, lng = 13.40;
+  const rad = x => x * Math.PI / 180;
+  // Deklination
+  const decl = -23.45 * Math.cos(rad(360 / 365 * (doy + 10)));
+  // Stundenwinkel bei Sonnenauf/-untergang (Refraktion -0.833°)
+  const cosH = (Math.sin(rad(-0.833)) - Math.sin(rad(lat)) * Math.sin(rad(decl))) /
+               (Math.cos(rad(lat)) * Math.cos(rad(decl)));
+  if (Math.abs(cosH) > 1) return null; // Polartag / Polarnacht
+  const H = Math.acos(cosH) * 180 / Math.PI; // Grad
+  // Zeitgleichung (Spencer, Minuten)
+  const B = rad(360 / 365 * (doy - 81));
+  const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  // Solarmittag in UTC-Minuten seit Mitternacht
+  const noon = 720 - 4 * lng - EoT;
+  return { sunrise: (noon - 4 * H) / 60, sunset: (noon + 4 * H) / 60 }; // UTC-Stunden
+}
+
+function toast(msg, ms=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ═══════════════════════════════════════════════════════
+// SCORE RING SVG
+// ═══════════════════════════════════════════════════════
+function scoreRing(score, priority=0) {
+  const r = 22, circ = 2*Math.PI*r, dash = circ * score, col = scoreColor(score);
+  const dot = priority >= 2 ? `<div class="priority-dot" style="display:block"></div>` : '';
+  return `<div class="score-ring-wrap">
+    <svg viewBox="0 0 52 52">
+      <circle class="score-ring-bg" cx="26" cy="26" r="${r}"/>
+      <circle class="score-ring-fg" cx="26" cy="26" r="${r}"
+        stroke="${col}" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="0"/>
+    </svg>
+    <div class="score-label">
+      <span style="color:${col}">${Math.round(score*100)}</span>
+      <span>%</span>
+    </div>${dot}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// OPPORTUNITY CARD
+// ═══════════════════════════════════════════════════════
+function oppCard(o) {
+  const icon = ICONS[o.event_type] || '📷';
+  const weatherTag = o.weather_score === 0
+    ? `<span class="tag tag-weather-unknown">Wetter unbekannt</span>`
+    : `<span class="tag tag-blue">☁ ${pct(o.weather_score)}</span>`;
+  const prio = o.alert_priority >= 2
+    ? `<span class="tag tag-gold">⭐ ${o.alert_priority >= 3 ? 'Außergewöhnlich' : 'Besonders'}</span>` : '';
+  const stativ = o.camera_hints?.[0]?.tripod_required
+    ? `<span class="tag tag-warn">Stativ</span>` : '';
+  const fl = o.camera_hints?.[0]?.focal_length_mm
+    ? `<span class="tag tag-blue">${o.camera_hints[0].focal_length_mm}mm</span>` : '';
+  const verified = Verify.getLast(o.location_id)
+    ? `<span class="tag tag-verified">✓ Geprüft</span>` : '';
+  const rated = Rating.feedTagHtml(o.location_id);
+
+  return `<div class="card" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+    <div class="opp-card">
+      ${scoreRing(o.overall_score, o.alert_priority)}
+      <div class="opp-body">
+        <div class="opp-meta">
+          <span class="opp-icon">${icon}</span>
+          <span class="opp-type">${o.event_type}</span>
+          <span class="opp-time">${formatTime(o.shoot_time)}</span>
+        </div>
+        <div class="opp-title">${o.title}</div>
+        <div class="opp-location">📍 ${o.location_name}</div>
+        <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${rated}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// FEED
+// ═══════════════════════════════════════════════════════
+const Feed = {
+  data: [],
+  mode: 'feed',  // 'feed' | 'calendar'
+  setMode(m) {
+    this.mode = m;
+    document.getElementById('fmb-feed').classList.toggle('active', m === 'feed');
+    document.getElementById('fmb-calendar').classList.toggle('active', m === 'calendar');
+    if (m === 'calendar') {
+      CalendarView.show();
+    } else {
+      this.render();
+    }
+  },
+  async load() {
+    // Nach dem Laden nur rendern wenn Feed-Mode aktiv ist
+    const renderIfFeedMode = () => { if (this.mode === 'feed') this.render(); };
+    const url = `/opportunities?min_score=${CFG.minScore}&days=14`;
+    const _showError = () => {
+      document.getElementById('feed-content').innerHTML =
+        `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        </svg><p>Backend nicht erreichbar.<br><small>${CFG.api}</small></p>
+        <button class="btn-primary" style="width:auto;padding:10px 20px" onclick="App.refresh()">Erneut versuchen</button></div>`;
+    };
+    try {
+      this.data = await API.get(url);
+      renderIfFeedMode();
+    } catch(e) {
+      // SW-Aktivierungs-Race: einmaliger Auto-Retry nach 2 s
+      setTimeout(async () => {
+        try {
+          this.data = await API.get(url);
+          renderIfFeedMode();
+        } catch { if (this.mode === 'feed') _showError(); }
+      }, 2000);
+    }
+  },
+  render() {
+    if (this.mode !== 'feed') return;  // Kein Feed-Render im Kalender-Modus
+    const el = document.getElementById('feed-content');
+    const data = Filter.apply(this.data);
+    const n = this.data.length, nf = data.length;
+    if (!data.length) {
+      const msg = Search.query
+        ? `Keine Chancen für „${Search.query}" gefunden.`
+        : n > 0
+          ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
+          : `Keine Chancen gefunden. Mindest-Score: ${pct(CFG.minScore)}`;
+      el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><p>${msg}</p></div>`;
+      return;
+    }
+
+    // High-priority alerts
+    const high = data.filter(o => o.alert_priority >= 2);
+    let html = '';
+    if (high.length) {
+      const chips = high.slice(0,6).map(o =>
+        `<div class="alert-chip" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+          <div class="chip-icon">${ICONS[o.event_type]||'📷'}</div>
+          <div class="chip-day">${formatDate(o.shoot_time)}</div>
+          <div class="chip-name">${o.location_name}</div>
+        </div>`).join('');
+      html += `<div id="alert-banner">
+        <h3>⭐ Besondere Ereignisse (${high.length})</h3>
+        <div class="alert-chips">${chips}</div>
+      </div>`;
+    }
+
+    // Group by day
+    const groups = {};
+    for (const o of data) {
+      const day = formatDate(o.shoot_time);
+      if (!groups[day]) groups[day] = [];
+      groups[day].push(o);
+    }
+
+    for (const [day, opps] of Object.entries(groups)) {
+      const isToday = day === 'Heute';
+      const icon = isToday ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>` :
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+      html += `<div class="section-head">${icon}${day} · ${opps.length} Chancen${n !== nf ? ' <span style="color:var(--muted);font-weight:400">(von '+n+' gefiltert)</span>' : ''}</div>`;
+      html += opps.map(oppCard).join('');
+    }
+
+    el.innerHTML = html;
+
+    // Update header
+    const today = data.filter(o => formatDate(o.shoot_time) === 'Heute');
+    const best = today.length ? Math.max(...today.map(o=>o.overall_score)) : null;
+    document.getElementById('header-subtitle').textContent =
+      best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Berlin & Brandenburg';
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// JAHRESKALENDER
+// ═══════════════════════════════════════════════════════
+const MONTHS_DE = ['Januar','Februar','März','April','Mai','Juni',
+                   'Juli','August','September','Oktober','November','Dezember'];
+const DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+
+const CalendarView = {
+  events: null,   // null = not loaded, [] = loaded (possibly empty)
+  _loading: false,
+  month: new Date().getMonth(),   // 0-based
+  year: new Date().getFullYear(),
+
+  async show() {
+    const el = document.getElementById('feed-content');
+    if (!this.events) {
+      if (this._loading) return;  // Verhindert doppelten Ladevorgang bei schnellem Tab-Wechsel
+      this._loading = true;
+      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird berechnet…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
+      await this.load();
+      this._loading = false;
+    }
+    if (Feed.mode === 'calendar') this.render();
+  },
+
+  async load(retries = 3) {
+    try {
+      const res = await API.get('/calendar');
+      if (res.status === 'calculating' && retries > 0) {
+        // Noch in Berechnung – max. 3× nach 5s nochmal probieren
+        await new Promise(r => setTimeout(r, 5000));
+        return this.load(retries - 1);
+      }
+      this.events = res.events || [];
+    } catch(e) {
+      this.events = [];
+      toast('Kalender konnte nicht geladen werden');
+    }
+  },
+
+  prev() {
+    if (this.month === 0) { this.month = 11; this.year--; }
+    else this.month--;
+    this.render();
+  },
+
+  next() {
+    if (this.month === 11) { this.month = 0; this.year++; }
+    else this.month++;
+    this.render();
+  },
+
+  render() {
+    const el = document.getElementById('feed-content');
+    if (!this.events) { return; }
+
+    // Filter auf aktuellen Monat
+    const rawMonth = this.events.filter(e => {
+      const d = new Date(e.shoot_time);
+      return d.getFullYear() === this.year && d.getMonth() === this.month;
+    });
+
+    // Deduplizierung: pro Location + EventType + Tag nur bestes Event (höchster Score)
+    const bestMap = new Map();
+    for (const e of rawMonth) {
+      const day = new Date(e.shoot_time).toISOString().slice(0, 10);
+      const key = `${e.location_id}|${e.event_type}|${day}`;
+      const existing = bestMap.get(key);
+      if (!existing || e.overall_score > existing.overall_score) {
+        bestMap.set(key, e);
+      }
+    }
+    let monthEvents = Array.from(bestMap.values());
+
+    // Alle aktiven Filter anwenden (Score, EventType, Tageszeit, Suche, …)
+    monthEvents = Filter.apply(monthEvents);
+
+    // Gruppieren nach Tag
+    const groups = {};
+    for (const e of monthEvents) {
+      const d = new Date(e.shoot_time);
+      const key = d.toISOString().slice(0, 10);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(e);
+    }
+
+    const totalYear = this.events.length;
+    const searchHint = Search.query ? ` · Suche: „${Search.query}"` : '';
+    let html = `
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="CalendarView.prev()">‹</button>
+        <span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span>
+        <button class="cal-nav-btn" onclick="CalendarView.next()">›</button>
+      </div>
+      <div class="cal-status">${monthEvents.length} Events · ${totalYear} im Jahreskalender · nur Astronomie${searchHint}</div>`;
+
+    if (!monthEvents.length) {
+      html += `<div class="empty" style="padding-top:40px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <p>${Search.query ? `Keine Events für „${Search.query}" im ${MONTHS_DE[this.month]}.` : `Keine Events im ${MONTHS_DE[this.month]}.`}</p>
+      </div>`;
+    } else {
+      for (const [dateKey, evts] of Object.entries(groups).sort()) {
+        const d = new Date(dateKey + 'T12:00:00');
+        const dayLabel = `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_DE[d.getMonth()]}`;
+        html += `<div class="cal-day-head">${dayLabel} · ${evts.length} Events</div>`;
+
+        for (const e of evts) {
+          const icon = ICONS[e.event_type] || '📷';
+          const t = new Date(e.shoot_time);
+          // +2h CEST Annäherung
+          const hh = String(t.getUTCHours() + 2).padStart(2,'0');
+          const mm = String(t.getUTCMinutes()).padStart(2,'0');
+          const prio = e.alert_priority >= 2 ? ' ⭐' : '';
+          const moonTxt = e.moon_phase ? ` · ${e.moon_phase}` : '';
+          html += `<div class="cal-event" onclick="Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')})">
+            <div class="cal-event-icon">${icon}</div>
+            <div class="cal-event-body">
+              <div class="cal-event-title">${e.title}${prio}</div>
+              <div class="cal-event-sub">${e.location_name} · ${hh}:${mm} Uhr${moonTxt}</div>
+            </div>
+            <div class="cal-event-score">${Math.round(e.overall_score * 100)}%</div>
+          </div>`;
+        }
+      }
+    }
+
+    el.innerHTML = html;
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// STANDORT-VERIFIKATION (US-23)
+// ═══════════════════════════════════════════════════════
+const Verify = {
+  _KEY: 'fotoalert_verifications',
+  _ISSUE_TYPES: ['Koordinaten falsch','Brennweite falsch','Zugang gesperrt','Sichtachse blockiert','Street View falsch','Motiv verändert','Sonstiges'],
+
+  // ── Datenzugriff ────────────────────────────────────────────────
+  getAll() {
+    try { return JSON.parse(localStorage.getItem(this._KEY) || '{}'); } catch { return {}; }
+  },
+  // Gibt Array aller Einträge zurück; migriert altes Einzelobjekt-Format
+  getList(locationId) {
+    const all = this.getAll();
+    const raw = all[locationId];
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    return [raw]; // Migration: altes Einzelobjekt → Array
+  },
+  getLast(locationId) {
+    const list = this.getList(locationId);
+    return list.length ? list[list.length - 1] : null;
+  },
+  append(locationId, locationName, comment, status, issueType) {
+    const all = this.getAll();
+    const list = this.getList(locationId);
+    list.push({ location_name: locationName, date: new Date().toISOString().slice(0,10),
+                comment: comment.trim(), status, issue_type: issueType });
+    all[locationId] = list;
+    localStorage.setItem(this._KEY, JSON.stringify(all));
+  },
+  removeLast(locationId) {
+    const all = this.getAll();
+    const list = this.getList(locationId);
+    if (!list.length) return;
+    list.pop();
+    if (list.length) all[locationId] = list; else delete all[locationId];
+    localStorage.setItem(this._KEY, JSON.stringify(all));
+  },
+  removeAll(locationId) {
+    const all = this.getAll();
+    delete all[locationId];
+    localStorage.setItem(this._KEY, JSON.stringify(all));
+  },
+
+  // ── Formatierung ────────────────────────────────────────────────
+  formatDate(isoDate) {
+    return new Date(isoDate).toLocaleDateString('de-DE', { day:'numeric', month:'short', year:'2-digit' });
+  },
+
+  // Badge für Event-Detail (zeigt letzten Eintrag, Rückwärtskompatibilität)
+  badgeHtml(locationId) {
+    const v = this.getLast(locationId);
+    if (!v) return '';
+    if (v.status === 'issue') {
+      const type = v.issue_type ? ` · ${v.issue_type}` : '';
+      const cmt  = v.comment ? ` – „${v.comment}"` : '';
+      return `<div class='verified-badge-issue'>⚠ Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt}</div>`;
+    }
+    const cmt = v.comment ? ` · „${v.comment}"` : '';
+    return `<div class='verified-badge'>✓ Vor Ort geprüft am ${this.formatDate(v.date)}${cmt}</div>`;
+  },
+
+  // Kompakter Card-Tag: zeigt letzten Status + Gesamtzähler
+  cardTagHtml(locationId) {
+    const list = this.getList(locationId);
+    if (!list.length) return '';
+    const nOk    = list.filter(v => v.status === 'ok').length;
+    const nIssue = list.filter(v => v.status === 'issue').length;
+    const last   = list[list.length - 1];
+    if (last.status === 'issue')
+      return `<span class='tag tag-issue'>⚠${nIssue > 1 ? ' ×'+nIssue : ''}${nOk ? ' · ✓×'+nOk : ''}</span>`;
+    return `<span class='tag tag-verified'>✓${nOk > 1 ? ' ×'+nOk : ''}${nIssue ? ' · ⚠×'+nIssue : ''}</span>`;
+  },
+
+  // Timeline-HTML für Location-Detail
+  _timelineHtml(locationId) {
+    const list = this.getList(locationId);
+    if (!list.length) return '<p style="font-size:12px;color:var(--muted)">Noch keine Verifikationen.</p>';
+
+    const nOk    = list.filter(v => v.status === 'ok').length;
+    const nIssue = list.filter(v => v.status === 'issue').length;
+
+    const summary = `<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;font-weight:600">
+      ${nOk    ? `<span style="color:#4caf50">✓ ${nOk} Positiv</span>` : ''}
+      ${nIssue ? `<span style="color:var(--red)">⚠ ${nIssue} Problem${nIssue>1?'e':''}</span>` : ''}
+    </div>`;
+
+    // Neueste zuerst
+    const rows = [...list].reverse().map(v => {
+      const isIssue = v.status === 'issue';
+      const icon  = isIssue ? '⚠' : '✓';
+      const color = isIssue ? 'var(--red)' : '#4caf50';
+      const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${v.issue_type}</span>` : '';
+      const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${v.comment}"</span>` : '';
+      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        <span style="color:${color};font-size:14px;flex-shrink:0;width:16px">${icon}</span>
+        <span style="font-size:12px;color:var(--muted);flex-shrink:0;width:72px">${this.formatDate(v.date)}</span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px">${type}${cmt}</div>
+      </div>`;
+    }).join('');
+
+    return summary + `<div style="border-top:1px solid var(--border)">${rows}</div>`;
+  },
+
+  // ── Positiv-Form (Event-Detail, bestehend) ──────────────────────
+  showForm(locationId, locationName) {
+    const formId = 'verify-form-' + locationId.replace(/[^a-z0-9]/gi, '_');
+    const el = document.getElementById(formId);
+    if (el) { el.remove(); return; }
+    const btn = document.getElementById('verify-btn-' + locationId.replace(/[^a-z0-9]/gi, '_'));
+    const form = document.createElement('div');
+    form.id = formId;
+    form.className = 'verify-form';
+    form.innerHTML = `
+      <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis (z.B. Zugang, Besonderheiten):</div>
+      <textarea id='verify-comment-${formId}' placeholder='z.B. Zugang ab Oktober gesperrt…'></textarea>
+      <div class='verify-form-actions'>
+        <button class='btn-verify' onclick='Verify.confirm("${locationId}","${locationName.replace(/'/g,"\\'")}","${formId}")'>✓ Bestätigen</button>
+        <button class='btn-verify-cancel' onclick='document.getElementById("${formId}").remove()'>Abbrechen</button>
+      </div>`;
+    btn.insertAdjacentElement('afterend', form);
+  },
+  confirm(locationId, locationName, formId) {
+    const comment = document.getElementById('verify-comment-' + formId)?.value || '';
+    this.append(locationId, locationName, comment, 'ok', null);
+    document.getElementById(formId)?.remove();
+    toast('✅ Standort als geprüft markiert');
+    setTimeout(() => Detail.close(), 800);
+  },
+
+  // ── Verifikations-UI für Location-Detail-Sheet ──────────────────
+  verifySection(locationId, locationName) {
+    const safeName = locationName.replace(/'/g, "\\'");
+    const sid = 'loc-verify-section-' + locationId.replace(/[^a-z0-9]/gi,'_');
+    const fid = 'loc-verify-form-' + locationId.replace(/[^a-z0-9]/gi,'_');
+    const hasEntries = this.getList(locationId).length > 0;
+    const resetBtn = hasEntries
+      ? `<button class='btn-verify-cancel' style='font-size:11px;padding:4px 10px' onclick='Verify.resetLastFromDetail("${locationId}","${safeName}")'>Letzten Eintrag löschen</button>`
+      : '';
+    return `
+      <div id="${sid}">
+        ${this._timelineHtml(locationId)}
+        <div style='display:flex;gap:8px;margin-top:10px'>
+          <button class='btn-verify' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocOkForm("${locationId}","${safeName}")'>✓ Vor Ort geprüft</button>
+          <button class='btn-issue' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocIssueForm("${locationId}","${safeName}")'>⚠ Problem melden</button>
+        </div>
+        ${resetBtn ? `<div style='margin-top:6px'>${resetBtn}</div>` : ''}
+        <div id="${fid}"></div>
+      </div>`;
+  },
+
+  showLocOkForm(locationId, locationName) {
+    const fid = 'loc-verify-form-' + locationId.replace(/[^a-z0-9]/gi, '_');
+    document.getElementById(fid).innerHTML = `
+      <div class='verify-form' style='margin-top:10px'>
+        <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis:</div>
+        <textarea id='${fid}-txt' placeholder='z.B. Zugang über Nordeingang…'></textarea>
+        <div class='verify-form-actions'>
+          <button class='btn-verify' onclick='Verify.saveLocOk("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>✓ Bestätigen</button>
+          <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
+        </div>
+      </div>`;
+  },
+
+  showLocIssueForm(locationId, locationName) {
+    const fid = 'loc-verify-form-' + locationId.replace(/[^a-z0-9]/gi, '_');
+    const chips = this._ISSUE_TYPES.map(t =>
+      `<span class='issue-chip' onclick='this.classList.toggle("selected")'>${t}</span>`
+    ).join('');
+    document.getElementById(fid).innerHTML = `
+      <div class='verify-issue-form' style='margin-top:10px'>
+        <div style='font-size:13px;font-weight:600;color:var(--red)'>Welches Problem liegt vor?</div>
+        <div class='issue-chips'>${chips}</div>
+        <textarea id='${fid}-txt' placeholder='Weitere Details (optional)…' style='background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;resize:vertical;min-height:56px;font-family:inherit'></textarea>
+        <div class='verify-form-actions'>
+          <button class='btn-issue' onclick='Verify.saveLocIssue("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>⚠ Problem speichern</button>
+          <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
+        </div>
+      </div>`;
+  },
+
+  saveLocOk(locationId, locationName, fid) {
+    const comment = document.getElementById(fid + '-txt')?.value || '';
+    this.append(locationId, locationName, comment, 'ok', null);
+    this._refreshSection(locationId, locationName);
+    toast('✅ Standort als geprüft markiert');
+  },
+
+  saveLocIssue(locationId, locationName, fid) {
+    const selected = [...document.querySelectorAll(`#${fid} .issue-chip.selected`)].map(c => c.textContent);
+    if (!selected.length) { toast('⚠ Bitte mindestens ein Problem auswählen'); return; }
+    const comment = document.getElementById(fid + '-txt')?.value || '';
+    this.append(locationId, locationName, comment, 'issue', selected.join(', '));
+    this._refreshSection(locationId, locationName);
+    toast('⚠ Problem gespeichert');
+  },
+
+  resetLastFromDetail(locationId, locationName) {
+    this.removeLast(locationId);
+    this._refreshSection(locationId, locationName);
+    toast('Letzter Eintrag gelöscht');
+  },
+
+  _refreshSection(locationId, locationName) {
+    const sid = 'loc-verify-section-' + locationId.replace(/[^a-z0-9]/gi, '_');
+    const el = document.getElementById(sid);
+    if (el) el.outerHTML = this.verifySection(locationId, locationName);
+    const cardTag = document.getElementById('loc-card-tag-' + locationId.replace(/[^a-z0-9]/gi, '_'));
+    if (cardTag) cardTag.innerHTML = this.cardTagHtml(locationId);
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// STAR RATING (US-24)
+// ═══════════════════════════════════════════════════════
+const Rating = {
+  _KEY: 'fotoalert_ratings',
+
+  getAll() {
+    try { return JSON.parse(localStorage.getItem(this._KEY) || '{}'); } catch { return {}; }
+  },
+  get(locationId) {
+    return this.getAll()[locationId] || null;
+  },
+  set(locationId, value) {
+    const all = this.getAll();
+    all[locationId] = value;
+    localStorage.setItem(this._KEY, JSON.stringify(all));
+  },
+  remove(locationId) {
+    const all = this.getAll();
+    delete all[locationId];
+    localStorage.setItem(this._KEY, JSON.stringify(all));
+  },
+
+  // ── Interaktive Sterne-Eingabe (für Location-Detail-Sheet) ──────
+  inputHtml(locationId) {
+    const current = this.get(locationId) || 0;
+    const safe = locationId.replace(/[^a-z0-9]/gi, '_');
+    const labels = ['','Schwach','Mäßig','Gut','Sehr gut','Exzellent'];
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="star-btn ${i <= current ? 'filled' : ''}"
+        onclick="Rating._set('${locationId}', ${i})"
+        title="${labels[i]}">★</span>`
+    ).join('');
+    const label = current
+      ? `<span style="font-size:13px;color:var(--gold);font-weight:600">${labels[current]}</span>`
+      : `<span style="font-size:12px;color:var(--muted)">Noch nicht bewertet – Stern tippen</span>`;
+    const clearBtn = current
+      ? `<button class="btn-verify-cancel" style="font-size:11px;padding:4px 10px;margin-top:8px"
+           onclick="Rating._clear('${locationId}')">Bewertung löschen</button>`
+      : '';
+    return `<div id="rating-section-${safe}">
+      <div class="star-input">${stars}</div>
+      <div style="margin-top:4px">${label}</div>
+      ${clearBtn}
+    </div>`;
+  },
+
+  // ── Kompakte Anzeige für Location-Card ──────────────────────────
+  displayHtml(locationId) {
+    const v = this.get(locationId);
+    if (!v) return '';
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="s ${i<=v?'on':'off'}">★</span>`
+    ).join('');
+    return `<span class="tag tag-gold" style="display:inline-flex;align-items:center;gap:1px;padding:2px 5px">
+      <span class="star-display">${stars}</span>
+    </span>`;
+  },
+
+  // ── Kompakte Anzeige für Feed-Card ──────────────────────────────
+  feedTagHtml(locationId) {
+    const v = this.get(locationId);
+    if (!v) return '';
+    return `<span class="tag tag-gold">⭐ ${'★'.repeat(v)}${'☆'.repeat(5-v)}</span>`;
+  },
+
+  _set(locationId, value) {
+    this.set(locationId, value);
+    this._refresh(locationId);
+    toast('⭐ Bewertung gespeichert');
+  },
+  _clear(locationId) {
+    this.remove(locationId);
+    this._refresh(locationId);
+    toast('Bewertung gelöscht');
+  },
+  _refresh(locationId) {
+    const safe = locationId.replace(/[^a-z0-9]/gi, '_');
+    // Sterne-Input im Detail-Sheet neu rendern
+    const section = document.getElementById('rating-section-' + safe);
+    if (section) section.outerHTML = this.inputHtml(locationId);
+    // Karten-Tag aktualisieren
+    const tag = document.getElementById('loc-rating-tag-' + safe);
+    if (tag) tag.innerHTML = this.displayHtml(locationId);
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// FILTER (US-32)
+// ═══════════════════════════════════════════════════════
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+const Filter = {
+  _KEY: 'fotoalert_filters',
+  _gps: null,
+
+  _defaults() {
+    return { eventTypes: [], tageszeit: [], difficulty: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
+  },
+
+  get state() {
+    try { return Object.assign(this._defaults(), JSON.parse(localStorage.getItem(this._KEY) || '{}')); }
+    catch { return this._defaults(); }
+  },
+
+  save(patch) {
+    const s = Object.assign(this.state, patch);
+    localStorage.setItem(this._KEY, JSON.stringify(s));
+    this._updateBadge();
+  },
+
+  reset() {
+    localStorage.removeItem(this._KEY);
+    this._gps = null;
+    this._updateBadge();
+  },
+
+  activeCount() {
+    const s = this.state;
+    return (s.eventTypes.length > 0 ? 1 : 0) +
+           (s.tageszeit.length > 0 ? 1 : 0) +
+           (s.difficulty.length > 0 ? 1 : 0) +
+           (s.minRating > 0 ? 1 : 0) +
+           (s.minScore > 0 ? 1 : 0) +
+           (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
+           (s.maxDistKm > 0 ? 1 : 0) +
+           (s.verification !== 'all' ? 1 : 0);
+  },
+
+  _updateBadge() {
+    const n = this.activeCount();
+    const badge = document.getElementById('filter-badge');
+    if (badge) { badge.textContent = n; badge.style.display = n > 0 ? 'flex' : 'none'; }
+    const btn = document.getElementById('filter-btn');
+    if (btn) btn.style.color = n > 0 ? 'var(--gold)' : '';
+  },
+
+  apply(data) {
+    const s = this.state;
+    return data.filter(o => {
+      if (s.eventTypes.length) {
+        // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
+        const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
+        const expanded = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
+        if (!expanded.includes(o.event_type)) return false;
+      }
+      if (s.tageszeit.length) {
+        // Exakte Skyfield-Zeiten aus dem Backend nutzen (pro Location/Datum berechnet)
+        // Fallback auf sunrise/sunset ± Margins wenn Detailfelder noch nicht im Cache
+        const tm = new Date(o.shoot_time).getTime();
+        let slot = 'nacht';
+        if (o.blue_hour_morning_start && o.golden_hour_morning_end) {
+          const bms = new Date(o.blue_hour_morning_start).getTime();
+          const gme = new Date(o.golden_hour_morning_end).getTime();
+          const gvs = o.golden_hour_evening_start ? new Date(o.golden_hour_evening_start).getTime() : null;
+          const bve = o.blue_hour_evening_end ? new Date(o.blue_hour_evening_end).getTime() : null;
+          if (tm >= bms && tm <= gme) slot = 'morgen';
+          else if (gvs && bve && tm >= gvs && tm <= bve) slot = 'abend';
+          else if (tm > gme && gvs && tm < gvs) slot = 'tag';
+          // vor bms oder nach bve → bleibt 'nacht'
+        } else if (o.sunrise_utc && o.sunset_utc) {
+          // Fallback: sunrise/sunset ± Margins (45 min blaue Stunde + 90 min goldene Stunde)
+          const sr = new Date(o.sunrise_utc).getTime();
+          const ss = new Date(o.sunset_utc).getTime();
+          if (tm >= sr - 45*60000 && tm <= sr + 90*60000) slot = 'morgen';
+          else if (tm >= ss - 90*60000 && tm <= ss + 45*60000) slot = 'abend';
+          else if (tm > sr + 90*60000 && tm < ss - 90*60000) slot = 'tag';
+        }
+        if (!s.tageszeit.includes(slot)) return false;
+      }
+      if (s.difficulty.length) {
+        const loc = (Locations.all || []).find(l => l.id === o.location_id);
+        if (loc && !s.difficulty.includes(loc.difficulty)) return false;
+      }
+      if (s.minRating > 0 && (Rating.get(o.location_id) || 0) < s.minRating) return false;
+      if (s.minScore > 0 && o.overall_score < s.minScore / 100) return false;
+      if (s.minFocal > 0 || s.maxFocal > 0) {
+        const hints = o.camera_hints || [];
+        if (s.minFocal > 0 && !hints.some(h => h.focal_length_mm >= s.minFocal)) return false;
+        if (s.maxFocal > 0 && !hints.some(h => h.focal_length_mm <= s.maxFocal)) return false;
+      }
+      if (s.maxDistKm > 0 && this._gps) {
+        const d = haversineKm(this._gps.lat, this._gps.lon, o.observer_lat, o.observer_lon);
+        if (d > s.maxDistKm) return false;
+      }
+      if (s.verification !== 'all') {
+        const last = Verify.getLast(o.location_id);
+        if (s.verification === 'verified'   && (!last || last.status !== 'ok'))    return false;
+        if (s.verification === 'unverified' && last)                                return false;
+        if (s.verification === 'issues'     && (!last || last.status !== 'issue')) return false;
+      }
+      // Textsuche (US-53) – AND mit allen anderen Filtern; sucht in Name, Titel und Event-Typ
+      if (Search.query) {
+        const q = Search.query;
+        const hay = [
+          (o.location_name || ''),
+          (o.title || ''),
+          (o.event_type || ''),
+        ].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  },
+
+  // Filtert Locations nach Schwierigkeit, Rating, Verifikation und (falls Feed geladen) minScore
+  applyToLocations(locs) {
+    const s = this.state;
+    return locs.filter(l => {
+      if (s.difficulty.length && !s.difficulty.includes(l.difficulty)) return false;
+      if (s.minRating > 0 && (Rating.get(l.id) || 0) < s.minRating) return false;
+      if (s.verification !== 'all') {
+        const last = Verify.getLast(l.id);
+        if (s.verification === 'verified'   && (!last || last.status !== 'ok'))    return false;
+        if (s.verification === 'unverified' && last)                                return false;
+        if (s.verification === 'issues'     && (!last || last.status !== 'issue')) return false;
+      }
+      if (s.minScore > 0 && Feed.data && Feed.data.length) {
+        // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
+        const hasEvent = Feed.data.some(e => e.location_id === l.id && e.overall_score >= s.minScore / 100);
+        if (!hasEvent) return false;
+      }
+      return true;
+    });
+  },
+
+  async requestGps() {
+    if (this._gps) return true;
+    return new Promise(resolve => {
+      if (!navigator.geolocation) { resolve(false); return; }
+      navigator.geolocation.getCurrentPosition(
+        p => { this._gps = {lat: p.coords.latitude, lon: p.coords.longitude}; resolve(true); },
+        () => { toast('📍 GPS nicht verfügbar'); resolve(false); },
+        {timeout: 8000}
+      );
+    });
+  },
+};
+
+const FilterSheet = {
+  // [value (muss = event_type aus Backend), label (Anzeige im Filter)]
+  _ET: [
+    ['Goldene Stunde', 'Goldene Stunde'],
+    ['Blaue Stunde',   'Blaue Stunde'],
+    ['Mondaufgang',           'Mondaufgang'],
+    ['Monduntergang',         'Monduntergang'],
+    ['Vollmond',              'Vollmond'],
+    ['Mond-Alignment',        'Mond-Alignment'],
+    ['Sonnen-Alignment',      'Sonnen-Alignment'],
+    ['Milchstraße',           'Milchstraße'],
+    ['Meteoritenschauer',     'Meteoritenschauer'],
+    ['Sonnenfinsternis',      'Sonnenfinsternis'],
+  ],
+
+  open() {
+    this._render();
+    document.getElementById('filter-overlay').classList.add('open');
+    document.getElementById('filter-sheet').classList.add('open');
+    // BUG-04: Dual-Handle Slider Events initialisieren (nach _render DOM aufgebaut)
+    requestAnimationFrame(() => this.initDualSlider());
+  },
+
+  initDualSlider() {
+    const track = document.getElementById('focal-track');
+    if (!track) return;
+    const thumbMin = document.getElementById('focal-thumb-min');
+    const thumbMax = document.getElementById('focal-thumb-max');
+    const fill     = document.getElementById('focal-fill');
+    const MAX_VAL  = 600, STEP = 25;
+
+    const toVal = pct => Math.round(Math.max(0, Math.min(1, pct)) * MAX_VAL / STEP) * STEP;
+    const toPct = v   => (v / MAX_VAL * 100).toFixed(2) + '%';
+
+    const updateUI = () => {
+      const mn = Filter.state.minFocal || 0;
+      const mx = Filter.state.maxFocal || MAX_VAL;
+      thumbMin.style.left = toPct(mn);
+      thumbMax.style.left = toPct(mx);
+      fill.style.left     = toPct(mn);
+      fill.style.width    = toPct(mx - mn);
+      FilterSheet._updateFocalLabel();
+      Filter._updateBadge();
+    };
+
+    const drag = (e, isMin) => {
+      e.preventDefault();
+      const rect = track.getBoundingClientRect();
+      const onMove = ev => {
+        const cx  = (ev.touches ? ev.touches[0] : ev).clientX;
+        const pct = (cx - rect.left) / rect.width;
+        const v   = toVal(pct);
+        if (isMin) {
+          const cur = Filter.state.maxFocal || MAX_VAL;
+          Filter.save({ minFocal: Math.min(v, cur - STEP) });
+        } else {
+          const cur = Filter.state.minFocal || 0;
+          Filter.save({ maxFocal: Math.max(v, cur + STEP) });
+        }
+        updateUI();
+        FilterSheet._applyLiveDebounced();  // Live-Vorschau beim Brennweiten-Drag
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend',  onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend',  onUp);
+    };
+
+    thumbMin.addEventListener('mousedown',  e => drag(e, true));
+    thumbMin.addEventListener('touchstart', e => drag(e, true),  { passive: false });
+    thumbMax.addEventListener('mousedown',  e => drag(e, false));
+    thumbMax.addEventListener('touchstart', e => drag(e, false), { passive: false });
+  },
+
+  close() {
+    document.getElementById('filter-overlay').classList.remove('open');
+    document.getElementById('filter-sheet').classList.remove('open');
+  },
+
+  // Sofortiges Re-Render des aktuellen Views ohne Sheet zu schließen
+  async _applyLive() {
+    const s = Filter.state;
+    if (s.maxDistKm > 0) await Filter.requestGps();
+    Filter._updateBadge();
+    if (App.current === 'locations') {
+      Locations.render(Filter.applyToLocations(Locations.all));
+    } else if (Feed.mode === 'feed') {
+      Feed.render();
+    } else if (Feed.mode === 'calendar') {
+      CalendarView.render();
+    }
+  },
+
+  // Debounced-Version für Slider (verhindert Flackern bei schnellem Ziehen)
+  _liveTimer: null,
+  _applyLiveDebounced() {
+    clearTimeout(this._liveTimer);
+    this._liveTimer = setTimeout(() => this._applyLive(), 150);
+  },
+
+  async apply() {
+    await this._applyLive();
+    this.close();
+  },
+
+  reset() {
+    Filter.reset();
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
+  _toggle(key, val) {
+    const s = Filter.state;
+    const arr = [...(s[key] || [])];
+    const idx = arr.indexOf(val);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+    Filter.save({[key]: arr});
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());  // Slider-DOM nach _render neu verdrahten
+    this._applyLive();
+  },
+
+  _set(key, val) {
+    Filter.save({[key]: val});
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());  // Slider-DOM nach _render neu verdrahten
+    this._applyLive();
+  },
+
+  _onScoreSlider(el) {
+    const v = parseInt(el.value);
+    el.style.setProperty('--pct', v + '%');
+    const lbl = document.getElementById('filter-score-val');
+    if (lbl) lbl.textContent = v === 0 ? 'Alle' : `≥ ${v} %`;
+    Filter.save({ minScore: v });
+    Filter._updateBadge();
+    this._applyLiveDebounced();  // Live-Vorschau während Slider-Zug
+  },
+
+  _onFocalSlider(el) {
+    const v = parseInt(el.value);
+    const pct = Math.round(v / 600 * 100);
+    el.style.setProperty('--pct', pct + '%');
+    Filter.save({ minFocal: v });
+    FilterSheet._updateFocalLabel();
+    Filter._updateBadge();
+  },
+
+  _onFocalMaxSlider(el) {
+    const v = parseInt(el.value);
+    const pct = Math.round(v / 600 * 100);
+    el.style.setProperty('--pct', pct + '%');
+    Filter.save({ maxFocal: v });
+    FilterSheet._updateFocalLabel();
+    Filter._updateBadge();
+  },
+
+  _updateFocalLabel() {
+    const lbl = document.getElementById('focal-val');
+    if (!lbl) return;
+    const mn = Filter.state.minFocal || 0;
+    const mx = Filter.state.maxFocal || 0;
+    if (!mn && !mx) lbl.textContent = 'Alle';
+    else if (mn && !mx) lbl.textContent = `≥ ${mn} mm`;
+    else if (!mn && mx) lbl.textContent = `≤ ${mx} mm`;
+    else lbl.textContent = `${mn}–${mx} mm`;
+  },
+
+  _render() {
+    const s = Filter.state;
+    const chip = (label, active, onclick) =>
+      `<span class="filter-chip${active ? ' active' : ''}" onclick="${onclick}">${label}</span>`;
+
+    const etChips = this._ET.map(([v, l]) =>
+      chip(`${ICONS[v] || '📷'} ${l}`, s.eventTypes.includes(v),
+        `FilterSheet._toggle('eventTypes','${v.replace(/'/g, "\\'")}')`)).join('');
+
+    const diffChips = [[1,'🟢 Einfach'],[2,'🟡 Mittel'],[3,'🔴 Anspruchsvoll']]
+      .map(([v,l]) => chip(l, s.difficulty.includes(v), `FilterSheet._toggle('difficulty',${v})`)).join('');
+
+    const ratingChips = [[0,'Alle'],[1,'≥ ★☆☆☆☆'],[2,'≥ ★★☆☆☆'],[3,'≥ ★★★☆☆'],[4,'≥ ★★★★☆'],[5,'★★★★★']]
+      .map(([v,l]) => chip(l, s.minRating===v, `FilterSheet._set('minRating',${v})`)).join('');
+
+    const distChips = [[0,'Alle'],[5,'< 5 km'],[15,'< 15 km'],[30,'< 30 km'],[50,'< 50 km']]
+      .map(([v,l]) => chip(l, s.maxDistKm===v, `FilterSheet._set('maxDistKm',${v})`)).join('');
+
+    const verChips = [['all','Alle'],['verified','✓ Geprüfte'],['unverified','Nicht geprüft'],['issues','⚠ Probleme']]
+      .map(([v,l]) => chip(l, s.verification===v, `FilterSheet._set('verification','${v}')`)).join('');
+
+    const gpsNote = s.maxDistKm > 0
+      ? '<p style="font-size:11px;color:var(--muted);margin-top:8px">📍 GPS wird beim Anwenden abgefragt</p>' : '';
+
+    const tzChips = [['morgen','🌄 Morgens'],['tag','☀️ Tagsüber'],['abend','🌇 Abends'],['nacht','🌙 Nacht']]
+      .map(([v,l]) => chip(l, s.tageszeit.includes(v), `FilterSheet._toggle('tageszeit','${v}')`)).join('');
+
+    const scoreLabel = s.minScore === 0 ? 'Alle' : `≥ ${s.minScore} %`;
+    const scorePct = s.minScore + '%';
+    const mn = s.minFocal || 0, mx = s.maxFocal || 0;
+    const focalLabel = (!mn && !mx) ? 'Alle Brennweiten' : (mn && !mx) ? `≥ ${mn} mm` : (!mn && mx) ? `≤ ${mx} mm` : `${mn}–${mx} mm`;
+    const focalMinPct = (mn / 600 * 100).toFixed(2) + '%';
+    const focalMaxPct = ((mx || 600) / 600 * 100).toFixed(2) + '%';
+    const focalRangePct = (((mx || 600) - mn) / 600 * 100).toFixed(2) + '%';
+
+    document.getElementById('filter-content').innerHTML =
+      `<div class="filter-section"><h4>📷 Eventtyp</h4><div class="filter-chips">${etChips}</div></div>` +
+      `<div class="filter-section"><h4>🕐 Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
+      `<div class="filter-section"><h4>🎯 Mindest-Wahrscheinlichkeit</h4>
+        <div class="filter-slider-val" id="filter-score-val">${scoreLabel}</div>
+        <div class="filter-slider-wrap">
+          <input type="range" class="filter-slider" id="score-slider"
+            min="0" max="100" step="5" value="${s.minScore}"
+            style="--pct:${scorePct}"
+            oninput="FilterSheet._onScoreSlider(this)">
+          <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+        </div>
+      </div>` +
+      `<div class="filter-section"><h4>🔭 Brennweite</h4>
+        <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
+        <div class="dual-range-wrap">
+          <div class="dual-range-track" id="focal-track">
+            <div class="dual-range-fill" id="focal-fill" style="left:${focalMinPct};width:${focalRangePct}"></div>
+            <div class="dual-range-thumb" id="focal-thumb-min" style="left:${focalMinPct}"></div>
+            <div class="dual-range-thumb" id="focal-thumb-max" style="left:${focalMaxPct}"></div>
+          </div>
+          <div class="filter-slider-labels"><span>0 mm</span><span>300 mm</span><span>600 mm</span></div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 600 mm = kein Limit</p>
+      </div>` +
+      `<div class="filter-section"><h4>🎯 Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
+      `<div class="filter-section"><h4>⭐ Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
+      `<div class="filter-section"><h4>📍 Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
+      `<div class="filter-section"><h4>✅ Verifikationsstatus</h4><div class="filter-chips">${verChips}</div></div>`;
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// DETAIL SHEET
+// ═══════════════════════════════════════════════════════
+const Sections = {
+  _key: 'fa_sec',
+  _def: {
+    ev_desc:true, ev_zeit:true, ev_wetter:false, ev_kamera:false,
+    ev_astro:false, ev_topo:false, ev_kompo:false, ev_fov:false, ev_coords:false,
+    loc_obs:true, loc_subj:true, loc_azimut:true, loc_links:false,
+    loc_fov:false, loc_events:true, loc_rating:false, loc_verify:false
+  },
+  _onOpen: {},
+  registerOnOpen(id, fn) { this._onOpen[id] = fn; },
+  isOpen(id) {
+    try { const s=JSON.parse(localStorage.getItem(this._key)||'{}'); return id in s ? s[id] : (this._def[id]??false); } catch { return this._def[id]??false; }
+  },
+  toggle(id) {
+    try {
+      const s=JSON.parse(localStorage.getItem(this._key)||'{}');
+      s[id] = !this.isOpen(id);
+      localStorage.setItem(this._key, JSON.stringify(s));
+      const body=document.getElementById('sb_'+id);
+      const chev=document.getElementById('sc_'+id);
+      if(body) body.classList.toggle('open', s[id]);
+      if(chev) chev.style.transform = s[id] ? 'rotate(0deg)' : 'rotate(-90deg)';
+      if(s[id] && this._onOpen[id]) setTimeout(this._onOpen[id], 50);
+    } catch {}
+  }
+};
+function mkSec(id, title, content) {
+  const open = Sections.isOpen(id);
+  return `<div class="sheet-section"><h4 onclick="Sections.toggle('${id}')"><span>${title}</span><span id="sc_${id}" class="sec-chev" style="transform:rotate(${open?'0':'-90'}deg)">▼</span></h4><div class="section-body ${open?'open':''}" id="sb_${id}">${content}</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// US-58 · Kamera-Sichtfeld-Visualisierung
+const CameraFOV = {
+  _sensors: {
+    fullframe:  { w:36,   h:24,   label:'Vollformat 36×24mm' },
+    apsc_canon: { w:22.3, h:14.9, label:'APS-C Canon 22.3×14.9mm' },
+    apsc_sony:  { w:23.5, h:15.6, label:'APS-C Sony/Nikon 23.5×15.6mm' },
+    mft:        { w:17.3, h:13.0, label:'Micro Four Thirds 17.3×13mm' },
+    one_inch:   { w:13.2, h:8.8,  label:'1"-Sensor 13.2×8.8mm' }
+  },
+  _maps: {},    // Leaflet-Map-Instanzen  { prefix: L.Map }
+  _cones: {},   // FOV-Polygon-Layer      { prefix: L.Polygon }
+  _data: {},    // Geodaten               { prefix: {obsLat,obsLon,subjLat,subjLon,distM} }
+
+  _getProfile() {
+    try { return Object.assign({sensor:'fullframe',fl:85,ori:'landscape'}, JSON.parse(localStorage.getItem('cameraProfile')||'{}')); }
+    catch { return {sensor:'fullframe',fl:85,ori:'landscape'}; }
+  },
+  _saveProfile(p) { try { localStorage.setItem('cameraProfile', JSON.stringify(p)); } catch {} },
+
+  _calcFOV(sensor, fl, ori) {
+    const s = this._sensors[sensor] || this._sensors.fullframe;
+    const dim = ori === 'portrait' ? s.h : s.w;
+    return 2 * Math.atan(dim / (2 * fl)) * (180 / Math.PI);
+  },
+
+  _bearing(lat1, lon1, lat2, lon2) {
+    const r = d => d * Math.PI / 180;
+    const dL = r(lon2 - lon1);
+    const y = Math.sin(dL) * Math.cos(r(lat2));
+    const x = Math.cos(r(lat1)) * Math.sin(r(lat2)) - Math.sin(r(lat1)) * Math.cos(r(lat2)) * Math.cos(dL);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  },
+
+  _destPoint(lat, lon, bearing, distM) {
+    const R = 6371000, d = distM / R;
+    const lat1 = lat * Math.PI / 180, brng = bearing * Math.PI / 180;
+    const lat2 = Math.asin(Math.sin(lat1)*Math.cos(d) + Math.cos(lat1)*Math.sin(d)*Math.cos(brng));
+    const lon2 = lon * Math.PI / 180 + Math.atan2(Math.sin(brng)*Math.sin(d)*Math.cos(lat1), Math.cos(d)-Math.sin(lat1)*Math.sin(lat2));
+    return [lat2 * 180/Math.PI, lon2 * 180/Math.PI];
+  },
+
+  panelHtml(prefix) {
+    const p = this._getProfile();
+    const opts = Object.entries(this._sensors).map(([k,v]) =>
+      `<option value="${k}"${p.sensor===k?' selected':''}>${v.label}</option>`).join('');
+    const d = this._data[prefix];
+    const hasSub = d && d.subjLat;
+    return `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+        <select id="fov_sensor_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;flex:1;min-width:140px">${opts}</select>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" id="fov_fl_${prefix}" min="8" max="1200" value="${p.fl}" oninput="CameraFOV.update('${prefix}')" style="width:58px;font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 6px;text-align:right">
+          <span style="font-size:12px;color:var(--muted)">mm</span>
+        </div>
+        <select id="fov_ori_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px">
+          <option value="landscape"${p.ori==='landscape'?' selected':''}>Querformat</option>
+          <option value="portrait"${p.ori==='portrait'?' selected':''}>Hochformat</option>
+        </select>
+      </div>
+      <div id="fov_info_${prefix}" style="font-size:12px;color:var(--muted);margin-bottom:8px">–</div>
+      ${hasSub ? `<div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>`
+               : `<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten – Karte nicht verfügbar.</p>`}`;
+  },
+
+  initMap(prefix, obsLat, obsLon, subjLat, subjLon, distM) {
+    this._data[prefix] = { obsLat, obsLon, subjLat, subjLon,
+      distM: distM || (subjLat ? haversineKm(obsLat, obsLon, subjLat, subjLon) * 1000 : 0) };
+    const mapId = `map_fov_${prefix}`;
+    if (!document.getElementById(mapId)) return;
+    // Destroy existing instance
+    if (this._maps[prefix]) { try { this._maps[prefix].remove(); } catch {} delete this._maps[prefix]; delete this._cones[prefix]; }
+    const map = L.map(mapId, { zoomControl:true, attributionControl:false });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+    this._maps[prefix] = map;
+    // Observer-Pin – identisch mit Setz-Karte (orange Kreis)
+    L.circleMarker([obsLat, obsLon], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5, weight:2}).addTo(map);
+    if (subjLat) {
+      // Motiv-Pin – identisch mit Setz-Karte (Standard-Leaflet-Marker)
+      L.marker([subjLat, subjLon]).addTo(map);
+      // Sichtachse
+      L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:'#E8A020', weight:1.5, dashArray:'6,4', opacity:0.7}).addTo(map);
+      map.fitBounds([[obsLat,obsLon],[subjLat,subjLon]], {padding:[30,30]});
+    } else {
+      map.setView([obsLat, obsLon], 15);
+    }
+    this._redrawCone(prefix);
+    this._updateInfo(prefix);
+  },
+
+  _redrawCone(prefix) {
+    const map = this._maps[prefix];
+    const d = this._data[prefix];
+    if (!map || !d || !d.subjLat) return;
+    if (this._cones[prefix]) { try { map.removeLayer(this._cones[prefix]); } catch {} }
+    const p = this._readInputs(prefix);
+    const fovDeg = this._calcFOV(p.sensor, p.fl, p.ori);
+    const bearing = this._bearing(d.obsLat, d.obsLon, d.subjLat, d.subjLon);
+    const half = fovDeg / 2;
+    const lPt = this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM);
+    const rPt = this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM);
+    this._cones[prefix] = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
+      color:'#E8A020', fillColor:'#E8A020', fillOpacity:0.13, weight:1.5
+    }).addTo(map);
+  },
+
+  _readInputs(prefix) {
+    const p = this._getProfile();
+    const sEl = document.getElementById(`fov_sensor_${prefix}`);
+    const fEl = document.getElementById(`fov_fl_${prefix}`);
+    const oEl = document.getElementById(`fov_ori_${prefix}`);
+    if (sEl) p.sensor = sEl.value;
+    if (fEl) { const v = parseInt(fEl.value); if (v >= 8 && v <= 1200) p.fl = v; }
+    if (oEl) p.ori = oEl.value;
+    return p;
+  },
+
+  _updateInfo(prefix) {
+    const d = this._data[prefix];
+    const el = document.getElementById(`fov_info_${prefix}`);
+    if (!el || !d || !d.subjLat) return;
+    const p = this._readInputs(prefix);
+    const fovDeg = this._calcFOV(p.sensor, p.fl, p.ori);
+    const imgW = d.distM * 2 * Math.tan((fovDeg / 2) * Math.PI / 180);
+    const fmtM = m => m >= 1000 ? (m/1000).toFixed(2)+' km' : Math.round(m)+' m';
+    el.innerHTML = `<span style="color:var(--gold);font-weight:600">FOV: ${fovDeg.toFixed(1)}°</span> &nbsp;·&nbsp; Bildbreite am Motiv: <span style="color:var(--gold);font-weight:600">${fmtM(imgW)}</span>`;
+  },
+
+  update(prefix) {
+    const p = this._readInputs(prefix);
+    this._saveProfile(p);
+    this._redrawCone(prefix);
+    this._updateInfo(prefix);
+  }
+};
+
+const Detail = {
+  open(o) {
+    if (typeof o === 'string') o = JSON.parse(o);
+    const icon = ICONS[o.event_type] || '📷';
+    const col = scoreColor(o.overall_score);
+
+    const hints = (o.camera_hints||[]).map(h => `
+      <div class="camera-card">
+        <div class="cam-main">${h.focal_length_mm}mm · ${h.aperture_suggestion} · ${h.shutter_suggestion} · ${h.iso_suggestion}</div>
+        ${h.tripod_required ? '<div class="cam-warning">⚠ Stativ erforderlich</div>' : ''}
+        ${h.extra_tip ? `<div class="cam-tip">${h.extra_tip}</div>` : ''}
+      </div>`).join('');
+
+    const astro = `
+      ${o.moon_phase ? `<div class="info-row"><span class="ir-label">Mondphase</span><span class="ir-val">🌙 ${o.moon_phase}${o.moon_illumination_pct ? ` (${Math.round(o.moon_illumination_pct)}%)` : ''}</span></div>` : ''}
+      ${o.celestial_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Himmelsobjekt</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>` : ''}
+      ${o.celestial_altitude != null ? `<div class="info-row"><span class="ir-label">Höhe Himmelsobjekt</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>` : ''}
+      ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
+      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">🌅 ${formatTime(o.sunrise_utc)}</span></div>` : ''}
+      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">🌇 ${formatTime(o.sunset_utc)}</span></div>` : ''}
+      ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">🌄 ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
+      ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">🌇 ${formatTime(o.golden_hour_evening_start)} – ${formatTime(o.blue_hour_evening_end)}</span></div>` : ''}
+    `;
+
+    const wLabel = o.weather_score === 0
+      ? '⏳ Wird 3 Tage vorher berechnet'
+      : o.weather_score >= 0.8 ? `✅ Ideal (${pct(o.weather_score)})`
+      : o.weather_score >= 0.6 ? `🟡 Gut (${pct(o.weather_score)})`
+      : o.weather_score >= 0.4 ? `🟠 Mäßig (${pct(o.weather_score)})`
+      : `🔴 Schwierig (${pct(o.weather_score)})`;
+    const wColor = o.weather_score === 0 ? 'var(--muted)'
+      : o.weather_score >= 0.6 ? 'var(--green)' : o.weather_score >= 0.4 ? 'var(--orange)' : 'var(--red)';
+    const weatherNote = `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div>`;
+
+    document.getElementById('detail-content').innerHTML = `
+      <div class="sheet-hero">
+        <div class="sheet-hero-type">${icon} ${o.event_type}</div>
+        <div class="sheet-hero-title">${o.title}</div>
+        <div class="sheet-hero-loc">📍 <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${o.location_name} →</button></div>
+        <div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>
+      </div>
+      <div class="sheet-score-bar">
+        <div class="score-col"><div class="sc-val" style="color:${col}">${Math.round(o.overall_score*100)}%</div><div class="sc-lbl">Gesamt <button class="sc-info-btn" onclick="ScoreInfo.show('gesamt')">i</button></div></div>
+        <div class="score-col"><div class="sc-val" style="color:var(--blue-h)">${Math.round(o.astronomy_score*100)}%</div><div class="sc-lbl">Astronomie <button class="sc-info-btn" onclick="ScoreInfo.show('astro')">i</button></div></div>
+        <div class="score-col"><div class="sc-val" style="color:${o.weather_score>0?scoreColor(o.weather_score):'var(--muted)'}">${o.weather_score > 0 ? Math.round(o.weather_score*100)+'%' : '–'}</div><div class="sc-lbl">Wetter <button class="sc-info-btn" onclick="ScoreInfo.show('wetter')">i</button></div></div>
+      </div>
+      <div id="score-info-overlay" onclick="if(event.target===this)ScoreInfo.close()">
+        <div id="score-info-box">
+          <button id="score-info-close" onclick="ScoreInfo.close()">×</button>
+          <div id="score-info-body"></div>
+        </div>
+      </div>
+      ${mkSec('ev_desc','📝 Beschreibung',`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
+      ${mkSec('ev_zeit','⏱ Zeitfenster (Ortszeit Berlin)',`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${(() => {
+        const wd = o.weather_details;
+        if (!wd) return mkSec('ev_wetter','🌤 Wetter',`<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">⏳ Verfügbar ab T-3 Tage</span></div>`);
+        const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
+        const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
+        const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
+          : wd.wind_speed_kmh < 20 ? 3 : wd.wind_speed_kmh < 29 ? 4 : wd.wind_speed_kmh < 39 ? 5
+          : wd.wind_speed_kmh < 50 ? 6 : wd.wind_speed_kmh < 62 ? 7 : 8;
+        const cloudLabel = wd.cloud_cover_pct < 20 ? 'Klar' : wd.cloud_cover_pct < 50 ? 'Leicht bewölkt'
+          : wd.cloud_cover_pct < 80 ? 'Bewölkt' : 'Bedeckt';
+        const cloudColor = wd.cloud_cover_pct < 50 ? 'var(--green)' : wd.cloud_cover_pct < 80 ? 'var(--orange)' : 'var(--red)';
+        const rainColor = wd.precipitation_prob_pct < 20 ? 'var(--green)' : wd.precipitation_prob_pct < 50 ? 'var(--orange)' : 'var(--red)';
+        const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label">⚠️ Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
+        const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
+        const wScore = wLabel;
+        return mkSec('ev_wetter','🌤 Wetter zum Shoot-Zeitpunkt',`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
+      })()}
+      ${hints ? mkSec('ev_kamera','📷 Kamera-Empfehlungen',hints) : ''}
+      ${mkSec('ev_astro','🔭 Astronomie',astro)}
+      ${(() => {
+        const hasSub = o.subject_lat && o.subject_lon;
+        const distKm = hasSub ? haversineKm(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null;
+        // elevation_difference_m direkt aus dem Event (seit v1.1.1), Fallback: Locations-Lookup
+        const elev = o.elevation_difference_m != null
+          ? o.elevation_difference_m
+          : ((Locations.all||[]).find(l => l.id === o.location_id)?.elevation_difference_m ?? null);
+        if (!distKm && (elev === null || Math.abs(elev) <= 2)) return '';
+        const distRow = distKm != null
+          ? `<div class="info-row">
+               <span class="ir-label">Entfernung zum Motiv</span>
+               <span class="ir-val">📏 ${distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(2) + ' km'}</span>
+             </div>` : '';
+        const elevRow = elev !== null && Math.abs(elev) > 2
+          ? `<div class="info-row">
+               <span class="ir-label">Niveaudifferenz</span>
+               <span class="ir-val" title="Topographiedaten EUDEM 25m">
+                 ${elev > 0 ? '+' : ''}${Math.round(elev)} m
+                 <span style="color:var(--muted);font-size:11px">${elev > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span>
+               </span>
+             </div>` : '';
+        return mkSec('ev_topo','📏 Standort &amp; Topographie',`${distRow}${elevRow}`);
+      })()}
+      ${(() => {
+        const ca = o.composition_analysis;
+        if (!ca) return '';
+        const deltaSign = ca.altitude_delta_deg > 0 ? '+' : '';
+        const azSign = ca.azimuth_delta_deg > 0 ? '+' : '';
+        // Hintergrundfarbe des Hauptlabels je nach Qualität
+        const isExact = Math.abs(ca.altitude_delta_deg) <= 0.5;
+        const isClose = !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
+        const labelBg = isExact ? 'background:rgba(232,160,32,.15);border:1px solid var(--gold);border-radius:8px;padding:8px 12px'
+                      : isClose ? 'background:rgba(100,200,100,.1);border:1px solid #4a4;border-radius:8px;padding:8px 12px'
+                      : 'background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px';
+        const fmtM = v => Math.abs(v) >= 1000 ? (v/1000).toFixed(2)+' km' : Math.abs(v).toFixed(0)+' m';
+        const vOff = ca.vertical_offset_m || 0;
+        const lOff = ca.lateral_offset_m || 0;
+        const vSign = vOff > 0 ? '+' : '';
+        const lDir  = lOff < 0 ? '← links' : lOff > 0 ? '→ rechts' : '';
+        const ratioBar = Math.min(100, Math.round((ca.size_ratio || 0) * 100));
+                return mkSec('ev_kompo','🎯 Kompositions-Analyse',`<div style="${labelBg};margin-bottom:10px">
+            <div style="font-size:14px;font-weight:600">${ca.altitude_label}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Höhe</div>
+          <div class="info-row">
+            <span class="ir-label">Motivspitze (scheinb.)</span>
+            <span class="ir-val">${ca.subject_apparent_elevation_deg.toFixed(2)}° Elevation</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Versatz über Motivspitze</span>
+            <span class="ir-val" style="${isExact ? 'color:var(--gold);font-weight:700' : ''}">
+              ${vSign}${fmtM(vOff)} &nbsp;<span style="color:var(--muted);font-size:11px">(${vSign}${ca.altitude_delta_deg.toFixed(2)}°)</span>
+            </span>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Seite</div>
+          <div class="info-row">
+            <span class="ir-label">Seitlicher Versatz</span>
+            <span class="ir-val">${fmtM(Math.abs(lOff))} ${lDir} &nbsp;<span style="color:var(--muted);font-size:11px">(${azSign}${ca.azimuth_delta_deg.toFixed(1)}°)</span></span>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Größenverhältnis</div>
+          <div class="info-row">
+            <span class="ir-label">${ca.body_name} (scheinb. Ø)</span>
+            <span class="ir-val">${fmtM(ca.body_apparent_diameter_m)}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Motiv</span>
+            <span class="ir-val">${ca.subject_height_m} m</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Verhältnis</span>
+            <span class="ir-val">${(ca.size_ratio * 100).toFixed(1)} %</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:3px;margin:6px 0 4px">
+            <div style="height:100%;width:${Math.min(100,ratioBar)}%;background:var(--gold);border-radius:3px"></div>
+          </div>
+          <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>
+          <p style="font-size:10px;color:var(--muted);margin-top:4px">
+            Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${(ca.moon_earth_distance_km/1000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}
+          </p>
+        </div>`);
+      })()}
+      ${(() => {
+        CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
+          distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
+        return mkSec('ev_fov','📐 Karte & Blickwinkel', CameraFOV.panelHtml('ev'));
+      })()}
+      ${mkSec('ev_coords','📍 Koordinaten',`
+        <div class="coords-grid">
+          <div class="coords-row">
+            <div class="coords-label">📷 Standort Fotograf</div>
+            <div class="coords-vals">${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}</div>
+            <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">
+              🗺 Maps
+            </button>
+            ${o.subject_azimuth != null ? `<button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth})'>👁 Street View</button>` : ''}
+          </div>
+          <div class="coords-row">
+            <div class="coords-label">🎯 Motiv</div>
+            <div class="coords-vals">${(o.subject_lat||0).toFixed(5)}, ${(o.subject_lon||0).toFixed(5)}</div>
+            <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.subject_lat||o.observer_lat}, ${o.subject_lon||o.observer_lon}, 'Motiv')">
+              🗺 Maps
+            </button>
+          </div>
+        </div>
+      `)}
+      <div class="sheet-actions">
+        <button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+          📅 Zum Kalender hinzufügen
+        </button>
+        <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
+          🔔 Erinnerung setzen (30 Min. vorher)
+        </button>
+        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${o.location_name.replace(/'/g,"\\'")}' )" style="background:var(--card);color:#4caf50;border:1px solid rgba(76,175,80,.4)">
+          ${Verify.getLast(o.location_id) ? '✓ Erneut prüfen / Kommentar ändern' : '📍 Vor Ort geprüft markieren'}
+        </button>
+      </div>
+    `;
+    document.getElementById('detail-overlay').classList.add('open');
+    document.getElementById('detail-sheet').classList.add('open');
+    // US-58: FOV-Karte wenn Sektion bereits offen (localStorage)
+    Sections.registerOnOpen('ev_fov', () => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0));
+    if (Sections.isOpen('ev_fov')) setTimeout(() => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0), 80);
+  },
+  close() {
+    document.getElementById('detail-overlay').classList.remove('open');
+    document.getElementById('detail-sheet').classList.remove('open');
+  },
+  addToCalendar(o) {
+    if (typeof o === 'string') o = JSON.parse(o);
+    const start = new Date(o.shoot_window_start);
+    const end   = new Date(o.shoot_window_end);
+    const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+    const hints = o.camera_hints?.[0];
+    const notes = hints
+      ? `Brennweite: ${hints.focal_length_mm}mm | ${hints.aperture_suggestion} | ${hints.shutter_suggestion}\\n${hints.extra_tip||''}`
+      : o.description;
+    const ics = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FotoAlert//DE',
+      'BEGIN:VEVENT',
+      `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+      `SUMMARY:📸 ${o.title}`,
+      `LOCATION:${o.location_name}`,
+      `DESCRIPTION:${notes.replace(/\n/g,'\\n')}`,
+      'END:VEVENT', 'END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], {type:'text/calendar'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `fotoalert_${o.id}.ics`;
+    a.click();
+    toast('📅 Kalenderdatei wird heruntergeladen');
+  },
+  setReminder(o) {
+    if (typeof o === 'string') o = JSON.parse(o);
+    if (!('Notification' in window)) { toast('Benachrichtigungen nicht unterstützt'); return; }
+    Notification.requestPermission().then(perm => {
+      if (perm !== 'granted') { toast('Bitte Benachrichtigungen erlauben'); return; }
+      const ms = new Date(o.shoot_time) - Date.now() - 30*60*1000;
+      if (ms < 0) { toast('Zeitpunkt liegt in der Vergangenheit'); return; }
+      setTimeout(() => {
+        new Notification(`📸 ${o.title}`, {
+          body: `Jetzt aufbrechen – optimale Aufnahmezeit in 30 Minuten bei ${o.location_name}`,
+          icon: '/icons/icon-192.png'
+        });
+      }, ms);
+      toast(`🔔 Erinnerung gesetzt für ${formatTime(o.shoot_time)}`);
+    });
+  },
+  openInMaps(lat, lon, label) {
+    window.open(`https://maps.apple.com/?ll=${lat},${lon}&q=${label}`, '_blank');
+  },
+  openStreetView(lat, lon, heading) {
+    // Google Maps URL API: map_action=pano navigiert direkt zum nächsten Street View Panorama
+    // Kein API-Key nötig, heading = Azimut der Sichtachse
+    const h = Math.round(heading);
+    const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}&heading=${h}&pitch=0&fov=75`;
+    window.open(url, '_blank');
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════
+const MapView = {
+  map: null, markers: [], currentLayer: null,
+  layers: {
+    dark:      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    standard:  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  },
+  async init() {
+    if (this.map) return;
+    this.map = L.map('map', { zoomControl: false }).setView([52.52, 13.40], 10);
+    this.currentLayer = L.tileLayer(this.layers.dark, {
+      attribution: '© OpenStreetMap, © CARTO', maxZoom: 19
+    }).addTo(this.map);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+    try { await this.loadMarkers(); } catch(e) {}
+  },
+  setLayer(name) {
+    if (!this.map) return;
+    if (this.currentLayer) this.map.removeLayer(this.currentLayer);
+    this.currentLayer = L.tileLayer(this.layers[name], { maxZoom: 19 }).addTo(this.map);
+    // Tile-Filter nur für dunkle Karte
+    document.querySelectorAll('.leaflet-tile').forEach(t => {
+      t.style.filter = name === 'dark' ? 'brightness(.85) saturate(.7)' : 'none';
+    });
+    document.querySelectorAll('.map-layer-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[onclick="MapView.setLayer('${name}')"]`).classList.add('active');
+  },
+  async loadMarkers() {
+    const locs = await API.get('/locations');
+    const catColor = { 'Schloss & Historisch':'#a070f0', 'Wasser & Spiegelung':'#5080f0',
+      'Natur & Landschaft':'#4caf70', 'Milchstraße & Astro':'#8060d0',
+      'Skyline & Architektur':'#f0a030', 'Aussichtspunkt':'#f08030', 'Industrie & Urban':'#f05050' };
+    for (const loc of locs) {
+      const col = catColor[loc.category] || '#f0a030';
+      const icon = L.divIcon({ className:'', html:
+        `<div style="width:28px;height:28px;background:${col};border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
+        iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-32]
+      });
+      const m = L.marker([loc.observer_lat, loc.observer_lon], {icon}).addTo(this.map);
+      m.bindPopup(`<div class="map-popup">
+        <h4>${loc.name}</h4>
+        <p>${loc.category}<br><small>${loc.description.slice(0,80)}…</small></p>
+        <span class="popup-btn" onclick="App.nav('locations')">Details →</span>
+      </div>`);
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// LOCATIONS
+// ═══════════════════════════════════════════════════════
+const Locations = {
+  all: [],
+  async load() {
+    this.all = await API.get('/locations');
+    this.render(Filter.applyToLocations(this.all));
+  },
+  filter(q) {
+    // Filter-Kriterien (Schwierigkeit, Rating, etc.) UND Textsuche kombinieren
+    let f = Filter.applyToLocations(this.all);
+    if (q) {
+      f = f.filter(l =>
+        l.name.toLowerCase().includes(q.toLowerCase()) ||
+        l.description.toLowerCase().includes(q.toLowerCase()) ||
+        l.category.toLowerCase().includes(q.toLowerCase())
+      );
+    }
+    this.render(f);
+  },
+  render(locs) {
+    const catIcon = { 'Schloss & Historisch':'🏰', 'Wasser & Spiegelung':'💧',
+      'Natur & Landschaft':'🌲', 'Milchstraße & Astro':'✨',
+      'Skyline & Architektur':'🏙', 'Aussichtspunkt':'🔭', 'Industrie & Urban':'🏭' };
+    const catBg = { 'Schloss & Historisch':'rgba(160,112,240,.2)',
+      'Wasser & Spiegelung':'rgba(80,128,240,.2)', 'Natur & Landschaft':'rgba(76,175,112,.2)',
+      'Milchstraße & Astro':'rgba(128,96,208,.2)', 'Skyline & Architektur':'rgba(240,160,48,.2)',
+      'Aussichtspunkt':'rgba(240,128,48,.2)', 'Industrie & Urban':'rgba(240,80,80,.2)' };
+    const diffLabel = {1:'Einfach',2:'Mittel',3:'Anspruchsvoll'};
+    const diffCls   = {1:'diff-1',2:'diff-2',3:'diff-3'};
+
+    const html = locs.map(l => {
+      const fls = l.focal_length_suggestions.slice(0,3).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
+      return `<div class="card" onclick="LocationDetail.open('${l.id}')">
+        <div class="loc-card">
+          <div class="loc-icon" style="background:${catBg[l.category]||'var(--border)'}">${catIcon[l.category]||'📍'}</div>
+          <div class="loc-body">
+            <h4>${l.name}</h4>
+            <p>${l.category}</p>
+          </div>
+          <span class="loc-diff ${diffCls[l.difficulty]||'diff-2'}">${diffLabel[l.difficulty]||'Mittel'}</span>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0;line-height:1.5">${l.description.slice(0,100)}…</p>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          ${fls}
+          <span id="loc-rating-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Rating.displayHtml(l.id)}</span>
+          <span id="loc-card-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Verify.cardTagHtml(l.id)}</span>
+        </div>
+        ${l.solar_alignment_note ? `<p style="font-size:11px;color:var(--gold);margin-top:6px">☀ ${l.solar_alignment_note}</p>` : ''}
+        ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px">🚶 ${l.access_note}</p>` : ''}
+      </div>`;
+    }).join('');
+    document.getElementById('locations-content').innerHTML = html || `<div class="empty"><p>Keine Locations gefunden.</p></div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// LOCATION DETAIL
+// ═══════════════════════════════════════════════════════
+const LocationDetail = {
+  _current: null,
+
+  async open(locId) {
+    if (!Locations.all.length) await API.get('/locations').then(d => { Locations.all = d; });
+    const loc = Locations.all.find(l => l.id === locId);
+    if (!loc) return;
+    this._current = loc;
+    document.getElementById('loc-detail-content').innerHTML = this._render(loc);
+    document.getElementById('loc-detail-overlay').classList.add('open');
+    document.getElementById('loc-detail-sheet').classList.add('open');
+    this._loadEvents(locId);
+    // US-58: FOV-Karte
+    const _fovArgs = [loc.observer_lat, loc.observer_lon, loc.subject_lat||null, loc.subject_lon||null, loc.distance_m||0];
+    Sections.registerOnOpen('loc_fov', () => CameraFOV.initMap('loc', ..._fovArgs));
+    if (Sections.isOpen('loc_fov')) setTimeout(() => CameraFOV.initMap('loc', ..._fovArgs), 80);
+  },
+
+  close() {
+    document.getElementById('loc-detail-overlay').classList.remove('open');
+    document.getElementById('loc-detail-sheet').classList.remove('open');
+    this._current = null;
+  },
+
+  openEdit() {
+    const loc = this._current;
+    if (!loc) return;
+    const obsVal = `${(loc.observer_lat||0).toFixed(6)}, ${(loc.observer_lon||0).toFixed(6)}`;
+    const subjVal = loc.subject_lat && loc.subject_lon
+      ? `${loc.subject_lat.toFixed(6)}, ${loc.subject_lon.toFixed(6)}` : '';
+    document.getElementById('loc-detail-content').innerHTML = `
+      <div class="sheet-hero" style="padding-bottom:8px">
+        <div class="sheet-hero-type" style="margin-bottom:4px">
+          <button onclick="LocationDetail.open('${loc.id}')" style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;padding:0">← Zurück</button>
+        </div>
+        <div class="sheet-hero-title" style="font-size:18px">Location bearbeiten</div>
+      </div>
+      <div class="edit-form">
+        <label>Name</label>
+        <input class="input-field" id="edit-name" type="text" value="${loc.name.replace(/"/g,'&quot;')}">
+        <label>Beschreibung</label>
+        <div class="geocode-row">
+          <textarea class="input-field" id="edit-desc" rows="3">${loc.description}</textarea>
+          <button class="geocode-btn" onclick="LocationDetail._geocodeDesc()" title="Beschreibung via Standort-Erkennung füllen">⊕</button>
+        </div>
+        <p id="edit-geocode-hint" style="font-size:11px;color:var(--muted);margin:-8px 0 12px">⊕ erkennt den Ortsnamen deines Standorts und generiert eine neue Beschreibung.</p>
+        <label style="margin-top:12px">📍 Fotograf-Standort (Koordinaten)</label>
+        <input class="input-field" id="edit-obs-coords" type="text" inputmode="text"
+          placeholder="52.40747, 13.09279" value="${obsVal}"
+          oninput="LocationDetail._onEditObsInput()">
+        <p id="edit-obs-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
+        <label>🎯 Motiv (Koordinaten)</label>
+        <input class="input-field" id="edit-subj-coords" type="text" inputmode="text"
+          placeholder="52.51234, 13.40123" value="${subjVal}"
+          oninput="LocationDetail._onEditSubjInput()">
+        <p id="edit-subj-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
+        <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;margin-bottom:16px;background:var(--surface)"></div>
+        <div class="edit-actions">
+          <button class="btn-secondary" style="flex:1" onclick="LocationDetail.open('${loc.id}')">Abbrechen</button>
+          <button class="btn-primary" style="flex:2" onclick="LocationDetail.saveEdit('${loc.id}')">Speichern</button>
+        </div>
+      </div>`;
+    // Init mini-map after DOM ready
+    requestAnimationFrame(() => LocationDetail._initEditMap());
+  },
+
+  _editMap: null, _editObsMarker: null, _editSubjMarker: null, _editLine: null,
+
+  _initEditMap() {
+    const loc = this._current;
+    const center = [loc.observer_lat, loc.observer_lon];
+    this._editMap = L.map('edit-mini-map', {zoomControl:true, attributionControl:false}).setView(center, 14);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {maxZoom:19}).addTo(this._editMap);
+    // Observer marker (draggable circle)
+    this._editObsMarker = L.circleMarker(center, {radius:10,color:'#f0a030',fillColor:'#f0a030',fillOpacity:.5,
+      draggable:true}).addTo(this._editMap);
+    // Workaround: use DivIcon draggable marker for obs
+    this._editObsM = L.marker(center, {draggable:true,
+      icon:L.divIcon({className:'', html:'<div style="width:22px;height:22px;border-radius:50%;background:#f0a030;opacity:.8;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>', iconAnchor:[11,11]})
+    }).addTo(this._editMap);
+    this._editObsM.on('dragend', e => {
+      const {lat, lng} = e.target.getLatLng();
+      document.getElementById('edit-obs-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      document.getElementById('edit-obs-error').textContent = '';
+      this._drawEditLine();
+    });
+    if (loc.subject_lat && loc.subject_lon) {
+      this._editSubjM = L.marker([loc.subject_lat, loc.subject_lon], {draggable:true}).addTo(this._editMap);
+      this._editSubjM.on('dragend', e => {
+        const {lat, lng} = e.target.getLatLng();
+        document.getElementById('edit-subj-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('edit-subj-error').textContent = '';
+        this._drawEditLine();
+      });
+    } else {
+      this._editSubjM = null;
+    }
+    this._editObsMarker.remove(); // Remove the non-draggable one
+    this._drawEditLine();
+  },
+
+  _drawEditLine() {
+    if (this._editLine) this._editLine.remove();
+    if (!this._editMap || !this._editObsM) return;
+    const obs = this._editObsM.getLatLng();
+    if (this._editSubjM) {
+      const subj = this._editSubjM.getLatLng();
+      this._editLine = L.polyline([[obs.lat,obs.lng],[subj.lat,subj.lng]],
+        {color:'#f0a030',weight:2,dashArray:'6 4',opacity:.7}).addTo(this._editMap);
+    }
+  },
+
+  _parseEditCoords(val) {
+    if (!val || !val.trim()) return null;
+    val = val.trim();
+    const dec = val.match(/(-?\d{1,3}\.?\d*)[,\s;]+(-?\d{1,3}\.?\d*)/);
+    if (dec) {
+      const lat = parseFloat(dec[1]), lon = parseFloat(dec[2]);
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return {lat, lon};
+    }
+    const dms = val.match(/(\d+)[°\s]+(\d+)['′\s]+(\d+\.?\d*)[″"'′\s]*([NSns])[,\s]+(\d+)[°\s]+(\d+)['′\s]+(\d+\.?\d*)[″"'′\s]*([EWew])/);
+    if (dms) {
+      let lat = +dms[1] + +dms[2]/60 + +dms[3]/3600;
+      if (/[Ss]/.test(dms[4])) lat = -lat;
+      let lon = +dms[5] + +dms[6]/60 + +dms[7]/3600;
+      if (/[Ww]/.test(dms[8])) lon = -lon;
+      return {lat, lon};
+    }
+    return null;
+  },
+
+  _onEditObsInput() {
+    const errEl = document.getElementById('edit-obs-error');
+    const coords = this._parseEditCoords(document.getElementById('edit-obs-coords').value);
+    if (!coords) { errEl.textContent = 'Ungültige Koordinaten'; return; }
+    errEl.textContent = '';
+    if (this._editObsM) { this._editObsM.setLatLng([coords.lat, coords.lon]); this._drawEditLine(); }
+  },
+
+  _onEditSubjInput() {
+    const errEl = document.getElementById('edit-subj-error');
+    const coords = this._parseEditCoords(document.getElementById('edit-subj-coords').value);
+    if (!coords) { errEl.textContent = 'Ungültige Koordinaten'; return; }
+    errEl.textContent = '';
+    if (this._editSubjM) { this._editSubjM.setLatLng([coords.lat, coords.lon]); this._drawEditLine(); }
+    else if (this._editMap) {
+      this._editSubjM = L.marker([coords.lat, coords.lon], {draggable:true}).addTo(this._editMap);
+      this._editSubjM.on('dragend', e => {
+        const {lat, lng} = e.target.getLatLng();
+        document.getElementById('edit-subj-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('edit-subj-error').textContent = '';
+        this._drawEditLine();
+      });
+      this._drawEditLine();
+    }
+  },
+
+  async _geocodeDesc() {
+    const loc = this._current;
+    if (!loc) return;
+    const btn = document.querySelector('.geocode-btn');
+    const hint = document.getElementById('edit-geocode-hint');
+    btn.textContent = '…'; btn.disabled = true;
+    hint.textContent = 'Ortsnamen wird ermittelt…';
+    try {
+      const data = await API.get(`/reverse-geocode?lat=${loc.observer_lat}&lon=${loc.observer_lon}`);
+      const place = data.place;
+      const dist = loc.distance_m;
+      const distTxt = dist >= 1000 ? `${(dist/1000).toFixed(1)} km` : `${Math.round(dist)} m`;
+      const desc = place
+        ? `Blick vom ${place} auf ${loc.subject_name}, ${distTxt} Entfernung.`
+        : `Sichtachse auf ${loc.subject_name}, ${distTxt} Entfernung.`;
+      document.getElementById('edit-desc').value = desc;
+      hint.textContent = place ? `✓ Ortsname erkannt: ${place}` : '✓ Kein Ortsname gefunden – Beschreibung ohne Ortsangabe generiert.';
+    } catch {
+      hint.textContent = '✗ Ortsname konnte nicht ermittelt werden.';
+    }
+    btn.textContent = '⊕'; btn.disabled = false;
+  },
+
+  async saveEdit(locId) {
+    const name = document.getElementById('edit-name').value.trim();
+    const description = document.getElementById('edit-desc').value.trim();
+    if (!name) { toast('Name darf nicht leer sein'); return; }
+
+    // Parse coordinate fields
+    const obsRaw = document.getElementById('edit-obs-coords')?.value.trim();
+    const subjRaw = document.getElementById('edit-subj-coords')?.value.trim();
+    const obsCoords = obsRaw ? this._parseEditCoords(obsRaw) : null;
+    const subjCoords = subjRaw ? this._parseEditCoords(subjRaw) : null;
+    if (obsRaw && !obsCoords) { toast('Ungültige Fotograf-Koordinaten'); return; }
+    if (subjRaw && !subjCoords) { toast('Ungültige Motiv-Koordinaten'); return; }
+
+    const body = {name, description};
+    if (obsCoords) { body.observer_lat = obsCoords.lat; body.observer_lon = obsCoords.lon; }
+    if (subjCoords) { body.subject_lat = subjCoords.lat; body.subject_lon = subjCoords.lon; }
+
+    const btn = document.querySelector('.edit-actions .btn-primary');
+    btn.textContent = 'Speichert…'; btn.disabled = true;
+    try {
+      await API.patch(`/locations/${locId}`, body);
+      // In-Memory lokale Liste aktualisieren
+      const loc = Locations.all.find(l => l.id === locId);
+      if (loc) {
+        loc.name = name; loc.description = description;
+        if (obsCoords) { loc.observer_lat = obsCoords.lat; loc.observer_lon = obsCoords.lon; }
+        if (subjCoords) { loc.subject_lat = subjCoords.lat; loc.subject_lon = subjCoords.lon; }
+      }
+      toast('✓ Location aktualisiert');
+      LocationDetail.open(locId);
+      Locations.render(Locations.all);
+    } catch(e) {
+      toast('Fehler: ' + e.message);
+      btn.textContent = 'Speichern'; btn.disabled = false;
+    }
+  },
+
+  _mapsUrl(lat, lon, label) {
+    return `https://maps.apple.com/?ll=${lat},${lon}&q=${encodeURIComponent(label)}`;
+  },
+  _googleMapsUrl(lat, lon) {
+    return `https://www.google.com/maps?q=${lat},${lon}`;
+  },
+
+  _render(loc) {
+    const catIcon = { 'Schloss & Historisch':'🏰', 'Wasser & Spiegelung':'💧',
+      'Natur & Landschaft':'🌲', 'Milchstraße & Astro':'✨',
+      'Skyline & Architektur':'🏙', 'Aussichtspunkt':'🔭', 'Industrie & Urban':'🏭' };
+    const diffLabel = {1:'Einfach', 2:'Mittel', 3:'Anspruchsvoll'};
+    const diffCls   = {1:'diff-1', 2:'diff-2', 3:'diff-3'};
+
+    const obsLat = loc.observer_lat.toFixed(5);
+    const obsLon = loc.observer_lon.toFixed(5);
+    const subjLat = loc.subject_lat ? loc.subject_lat.toFixed(5) : null;
+    const subjLon = loc.subject_lon ? loc.subject_lon.toFixed(5) : null;
+
+    const obsAppleUrl  = this._mapsUrl(loc.observer_lat, loc.observer_lon, 'Foto-Standort');
+    const obsGoogleUrl = this._googleMapsUrl(loc.observer_lat, loc.observer_lon);
+    const subjAppleUrl  = subjLat ? this._mapsUrl(loc.subject_lat, loc.subject_lon, loc.subject_name) : null;
+    const subjGoogleUrl = subjLat ? this._googleMapsUrl(loc.subject_lat, loc.subject_lon) : null;
+    const svHeading = loc.ideal_azimuth_range ? Math.round((loc.ideal_azimuth_range[0] + loc.ideal_azimuth_range[1]) / 2) : 0;
+    const svUrl = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${loc.observer_lat},${loc.observer_lon}&heading=${svHeading}&pitch=0&fov=75`;
+
+    const distTxt = loc.distance_m ? (loc.distance_m >= 1000 ? `${(loc.distance_m/1000).toFixed(1)} km` : `${Math.round(loc.distance_m)} m`) : '–';
+    const heightTxt = loc.subject_height_m ? `${loc.subject_height_m} m` : '–';
+    const azTxt = loc.ideal_azimuth_range ? `${loc.ideal_azimuth_range[0]}°–${loc.ideal_azimuth_range[1]}°` : '–';
+    const fls = (loc.focal_length_suggestions || []).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
+
+    // US-35: possible_bodies vom Backend (berechnet per observer_lat + ideal_azimuth_range)
+    const pb = Array.isArray(loc.possible_bodies) && loc.possible_bodies.length > 0
+      ? loc.possible_bodies : null; // null = unbekannt → alle anzeigen
+    const sunOk      = !pb || pb.includes('sun');
+    const moonOk     = !pb || pb.includes('moon');
+    const milkywayOk = !pb || pb.includes('milkyway');
+
+    const bodyChipsHtml = pb ? `<div class="body-chips">
+      ${sunOk      ? '<span class="body-chip possible">☀ Sonne</span>'       : '<span class="body-chip impossible">☀ Sonne</span>'}
+      ${moonOk     ? '<span class="body-chip possible">🌙 Mond</span>'        : '<span class="body-chip impossible">🌙 Mond</span>'}
+      ${milkywayOk ? '<span class="body-chip possible">🌌 Milchstraße</span>' : '<span class="body-chip impossible">🌌 Milchstraße</span>'}
+    </div>` : '';
+
+    const impossibleNames = [
+      !sunOk ? 'Sonne' : null,
+      !moonOk ? 'Mond' : null,
+      !milkywayOk ? 'Milchstraße' : null,
+    ].filter(Boolean);
+    const bodyWarn = pb && impossibleNames.length > 0 ? `
+      <div class="loc-impossible-warn" style="margin-top:10px">
+        <p>⚠️ <strong>${impossibleNames.join(' & ')} ${impossibleNames.length > 1 ? 'können' : 'kann'} hier nie in der Sichtachse erscheinen</strong><br>
+        Der Azimutbereich (${azTxt}) liegt außerhalb des astronomisch möglichen Auf-/Untergangsbereichs für ${impossibleNames.join(' & ')} – daher gibt es dafür keine Alignment-Events.</p>
+      </div>` : '';
+
+    return `
+      <div class="sheet-hero" style="padding-bottom:12px">
+        <div class="sheet-hero-type">
+          ${catIcon[loc.category]||'📍'} <span>${loc.category}</span>
+          <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto">${diffLabel[loc.difficulty]||'Mittel'}</span>
+          <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">✏️</button>
+        </div>
+        <div class="sheet-hero-title">${loc.name}</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${loc.description}</p>
+        ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
+      </div>
+
+      ${mkSec('loc_obs','📍 Fotograf-Standort',`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">🗺 Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">👁 Street View</a></div>`)}
+
+      ${mkSec('loc_subj',`🎯 Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">🗺 Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
+
+      ${mkSec('loc_azimut','🔭 Ausrichtung',`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px">☀ ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:#c0c8f8;margin-top:4px">🌙 ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px">🚶 ${loc.access_note}</p>` : ''}`)}
+
+      ${(() => {
+        CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
+        return mkSec('loc_fov','📐 Karte & Blickwinkel', CameraFOV.panelHtml('loc'));
+      })()}
+
+      ${loc.locationscout_url ? mkSec('loc_links','🔗 Links',`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">📷 Locationscout</a>`) : ''}
+
+      <div class="sheet-section" id="loc-events-section">
+        <h4 onclick="Sections.toggle('loc_events')" style="cursor:pointer;user-select:none;justify-content:space-between;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:0"><span>📅 Nächste Events</span><span id="sc_loc_events" class="sec-chev" style="transform:rotate(${Sections.isOpen('loc_events')?'0':'-90'}deg)">▼</span></h4>
+        <div class="section-body ${Sections.isOpen('loc_events')?'open':''}" id="sb_loc_events"><div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div></div>
+      </div>
+
+      ${mkSec('loc_rating','⭐ Bewertung',`${Rating.inputHtml(loc.id)}`)}
+
+      ${mkSec('loc_verify','✅ Verifikation',`${Verify.verifySection(loc.id, loc.name)}`)}
+    `;
+  },
+
+  async _loadEvents(locId) {
+    try {
+      const data = await API.get(`/opportunities?location_id=${locId}&days=30&min_score=0.3`);
+      const el = document.getElementById('loc-events-content');
+      if (!el) return;
+      if (!data || data.length === 0) {
+        el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Keine Events in den nächsten 30 Tagen.</p>';
+        return;
+      }
+      const eventIcon = e => {
+        const t = (e.event_type||'').toLowerCase();
+        if (t.includes('moon')) return '🌙';
+        if (t.includes('sun')||t.includes('sonn')) return '☀️';
+        if (t.includes('milch')||t.includes('milky')) return '🌌';
+        if (t.includes('gold')) return '🌅';
+        if (t.includes('blue')||t.includes('blau')) return '🌆';
+        return '✦';
+      };
+      const fmt = iso => {
+        const d = new Date(iso);
+        return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) + ' ' +
+               d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+      };
+      const rows = data.slice(0, 8).map(e => `
+        <div class="loc-next-event-row" onclick="LocationDetail.close();setTimeout(()=>Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')}),300)">
+          <div class="loc-next-event-icon">${eventIcon(e)}</div>
+          <div class="loc-next-event-body">
+            <div class="loc-next-event-title">${e.title}</div>
+            <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
+          </div>
+          <div class="loc-next-event-score">${Math.round((e.overall_score||0)*100)}%</div>
+        </div>`).join('');
+      el.innerHTML = rows;
+    } catch(err) {
+      const el = document.getElementById('loc-events-content');
+      if (el) el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Events konnten nicht geladen werden.</p>';
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// ADD LOCATION
+// ═══════════════════════════════════════════════════════
+const AddLocation = {
+  map: null, obsMarker: null, subjMarker: null,
+  obs: null, subj: null, previewData: null,
+  mapMode: 'obs',  // 'obs' | 'subj'
+
+  open() {
+    document.getElementById('add-overlay').classList.add('open');
+    document.getElementById('add-sheet').classList.add('open');
+    setTimeout(() => this.initMap(), 300);
+  },
+  close() {
+    document.getElementById('add-overlay').classList.remove('open');
+    document.getElementById('add-sheet').classList.remove('open');
+  },
+  setMapMode(mode) {
+    this.mapMode = mode;
+    document.getElementById('mode-obs').classList.toggle('active', mode === 'obs');
+    document.getElementById('mode-subj').classList.toggle('active', mode === 'subj');
+    const hints = {
+      obs:  '📍 Auf Karte tippen → Mein Standort setzen',
+      subj: '🎯 Auf Karte tippen → Motiv setzen',
+    };
+    document.getElementById('add-map-hint').textContent = hints[mode];
+  },
+  initMap() {
+    if (this.map) { this.map.invalidateSize(); return; }
+    this.map = L.map('add-map', {zoomControl:true}).setView([52.52,13.40], 13);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, attribution: 'Tiles &copy; Esri'}).addTo(this.map);
+    // Karte auf aktuelle User-Position zentrieren
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => this.map.setView([pos.coords.latitude, pos.coords.longitude], 14),
+        () => {}  // Fehler → Berlin-Fallback bleibt
+      );
+    }
+    this.map.on('click', e => {
+      if (this.mapMode === 'obs') {
+        this.setObserver(e.latlng.lat, e.latlng.lng);
+        // Auto-switch to subject mode after observer is set
+        if (!this.subj) this.setMapMode('subj');
+      } else {
+        this.setSubject(e.latlng.lat, e.latlng.lng);
+      }
+    });
+    this.setMapMode('obs');
+  },
+  useMyLocation() {
+    if (!navigator.geolocation) { toast('GPS nicht verfügbar'); return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.setObserver(pos.coords.latitude, pos.coords.longitude, true);
+      toast('📍 Dein Standort gesetzt');
+      if (!this.subj) this.setMapMode('subj');
+    }, () => toast('GPS-Fehler – bitte manuell auf Karte tippen'));
+  },
+  setObserver(lat, lng, flyTo = false) {
+    this.obs = {lat, lng};
+    const el = document.getElementById('obs-coords');
+    if (el) el.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    const errEl = document.getElementById('obs-error');
+    if (errEl) errEl.textContent = '';
+    if (this.obsMarker) this.obsMarker.remove();
+    this.obsMarker = L.circleMarker([lat,lng], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5}).addTo(this.map);
+    if (flyTo && this.map) this.map.setView([lat, lng], 14);
+    this.drawLine();
+  },
+  setSubject(lat, lng, flyTo = false) {
+    this.subj = {lat, lng};
+    const el = document.getElementById('subj-coords');
+    if (el) el.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    const errEl = document.getElementById('subj-error');
+    if (errEl) errEl.textContent = '';
+    if (this.subjMarker) this.subjMarker.remove();
+    this.subjMarker = L.marker([lat,lng]).addTo(this.map);
+    document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
+    if (flyTo && this.map) this.map.setView([lat, lng], 14);
+    this.drawLine();
+  },
+  _validateLatLon(lat, lon) {
+    if (isNaN(lat) || isNaN(lon)) return 'Ungültige Koordinaten';
+    if (lat < -90 || lat > 90) return 'Breitengrad muss zwischen −90° und +90° liegen';
+    if (lon < -180 || lon > 180) return 'Längengrad muss zwischen −180° und +180° liegen';
+    return null;
+  },
+  _parseCoords(text) {
+    if (!text) return null;
+    text = text.trim();
+    // Dezimalgrad: "52.51234, 13.40123" oder mit Tab/Leerzeichen
+    const dec = text.match(/(-?\d{1,3}\.?\d*)[,\s;]+(-?\d{1,3}\.?\d*)/);
+    if (dec) {
+      const lat = parseFloat(dec[1]), lon = parseFloat(dec[2]);
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return {lat, lon};
+    }
+    // DMS: "52°30'44.4"N, 13°24'4.4"E" – auch mit Gradzeichen, Apostroph, Anführungszeichen
+    const dms = text.match(/(\d+)[°\s]+(\d+)['′\s]+(\d+\.?\d*)[″"'′\s]*([NSns])[,\s]+(\d+)[°\s]+(\d+)['′\s]+(\d+\.?\d*)[″"'′\s]*([EWew])/);
+    if (dms) {
+      let lat = +dms[1] + +dms[2]/60 + +dms[3]/3600;
+      if (/[Ss]/.test(dms[4])) lat = -lat;
+      let lon = +dms[5] + +dms[6]/60 + +dms[7]/3600;
+      if (/[Ww]/.test(dms[8])) lon = -lon;
+      return {lat, lon};
+    }
+    return null;
+  },
+  async _pasteCoords(target) {
+    let text;
+    try {
+      text = await navigator.clipboard.readText();
+    } catch {
+      toast('Clipboard-Zugriff verweigert – Koordinaten manuell eingeben');
+      return;
+    }
+    const coords = this._parseCoords(text);
+    if (!coords) { toast('Keine Koordinaten erkannt (Dezimal oder DMS)'); return; }
+    if (target === 'obs') {
+      this.setObserver(coords.lat, coords.lon, true);
+      toast('📍 Standort aus Zwischenablage gesetzt');
+      if (!this.subj) this.setMapMode('subj');
+    } else {
+      this.setSubject(coords.lat, coords.lon, true);
+      toast('🎯 Motiv aus Zwischenablage gesetzt');
+    }
+  },
+  _onObsInput() {
+    const errEl = document.getElementById('obs-error');
+    const val = document.getElementById('obs-coords').value.trim();
+    if (!val) { errEl.textContent = ''; return; }
+    const coords = this._parseCoords(val);
+    if (!coords) { errEl.textContent = 'Ungültige Koordinaten – Dezimal (52.4, 13.1) oder DMS'; return; }
+    const err = this._validateLatLon(coords.lat, coords.lon);
+    if (err) { errEl.textContent = err; return; }
+    errEl.textContent = '';
+    this.obs = {lat: coords.lat, lng: coords.lon};
+    if (this.obsMarker) this.obsMarker.remove();
+    this.obsMarker = L.circleMarker([coords.lat, coords.lon], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5}).addTo(this.map);
+    this.drawLine();
+  },
+  _onSubjInput() {
+    const errEl = document.getElementById('subj-error');
+    const val = document.getElementById('subj-coords').value.trim();
+    if (!val) { errEl.textContent = ''; return; }
+    const coords = this._parseCoords(val);
+    if (!coords) { errEl.textContent = 'Ungültige Koordinaten – Dezimal (52.4, 13.1) oder DMS'; return; }
+    const err = this._validateLatLon(coords.lat, coords.lon);
+    if (err) { errEl.textContent = err; return; }
+    errEl.textContent = '';
+    this.subj = {lat: coords.lat, lng: coords.lon};
+    if (this.subjMarker) this.subjMarker.remove();
+    this.subjMarker = L.marker([coords.lat, coords.lon]).addTo(this.map);
+    document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
+    this.drawLine();
+  },
+  drawLine() {
+    if (this._line) this._line.remove();
+    if (this.obs && this.subj) {
+      this._line = L.polyline([[this.obs.lat,this.obs.lng],[this.subj.lat,this.subj.lng]],
+        {color:'#f0a030', weight:2, dashArray:'6 4', opacity:.7}).addTo(this.map);
+    }
+  },
+  async preview() {
+    if (!this.obs || !this.subj) { toast('Bitte Standort und Motiv setzen'); return; }
+    const btn = document.querySelector('[onclick="AddLocation.preview()"]');
+    btn.textContent = 'Berechne…'; btn.disabled = true;
+    try {
+      const body = {
+        observer_lat: this.obs.lat, observer_lon: this.obs.lng,
+        subject_lat:  this.subj.lat, subject_lon: this.subj.lng,
+        subject_name: document.getElementById('subj-name').value || 'Unbenannt',
+        subject_height_m: parseFloat(document.getElementById('subj-height').value) || 0,
+        subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
+        days: 14
+      };
+      this.previewData = await API.post('/preview-alignment', body);
+      this.renderPreview(this.previewData);
+    } catch(e) {
+      toast('Fehler: ' + e.message);
+    }
+    btn.textContent = 'Alignments berechnen ✦'; btn.disabled = false;
+  },
+  renderPreview(data) {
+    const {profile, alignments} = data;
+    const rows = alignments.slice(0,8).map(a => {
+      const icon = a.body === 'sun' ? '☀️' : '🌙';
+      return `<div class="align-row">
+        <span class="ar-type">${icon} ${a.alignment_type}</span>
+        <span class="ar-time">${formatDate(a.time)} ${formatTime(a.time)}</span>
+        <span class="ar-score" style="color:${scoreColor(a.quality_score)}">${Math.round(a.quality_score*100)}%</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('add-preview').innerHTML = `
+      <div class="preview-box">
+        <h4>Sichtachsen-Profil</h4>
+        <div class="preview-stat"><span class="ps-label">Azimut (Richtung)</span><span class="ps-val">${profile.azimuth_deg.toFixed(1)}°</span></div>
+        <div class="preview-stat"><span class="ps-label">Distanz</span><span class="ps-val">${Math.round(profile.ground_distance_m)} m</span></div>
+        <div class="preview-stat"><span class="ps-label">Höhenwinkel Spitze</span><span class="ps-val">${profile.angular_altitude_top_deg.toFixed(2)}°</span></div>
+        ${profile.angular_altitude_top_deg > 0 ? `<div class="preview-stat"><span class="ps-label">Empf. Brennweite</span><span class="ps-val">~${data.focal_length_mm}mm</span></div>` : ''}
+        ${alignments.length > 0 ? `<div class="preview-alignments"><strong style="font-size:12px;color:var(--muted)">Nächste Alignments (14 Tage)</strong>${rows}</div>` : '<p style="font-size:12px;color:var(--muted);margin-top:8px">Keine Alignments in den nächsten 14 Tagen.</p>'}
+      </div>`;
+    document.getElementById('save-location-btn').style.display = 'flex';
+  },
+  async save() {
+    if (!this.previewData) return;
+    try {
+      const body = {
+        observer_lat: this.obs.lat, observer_lon: this.obs.lng,
+        subject_lat:  this.subj.lat, subject_lon: this.subj.lng,
+        subject_name: document.getElementById('subj-name').value || 'Unbenannt',
+        subject_height_m: parseFloat(document.getElementById('subj-height').value) || 0,
+        subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
+        save: true
+      };
+      await API.post('/preview-alignment', body);
+      toast('✅ Location gespeichert!');
+      this.close();
+      await Locations.load();
+    } catch(e) { toast('Fehler beim Speichern: ' + e.message); }
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+const Settings = {
+  render() {
+    document.getElementById('settings-content').innerHTML = `
+      <div class="settings-section">
+        <h3>Benachrichtigungen</h3>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="sr-label"><span>Besondere Ereignisse</span><small>Score ≥ 2 · 14-Tage-Vorschau</small></div>
+            <input type="checkbox" class="toggle" ${CFG.notifyHigh?'checked':''} onchange="CFG.notifyHigh=this.checked;localStorage.setItem('fa_notify_high',this.checked)">
+          </div>
+          <div class="settings-row">
+            <div class="sr-label"><span>Goldene & Blaue Stunde</span><small>Tägliche Chancen</small></div>
+            <input type="checkbox" class="toggle" ${CFG.notifyGolden?'checked':''} onchange="CFG.notifyGolden=this.checked;localStorage.setItem('fa_notify_golden',this.checked)">
+          </div>
+          <div class="settings-row">
+            <div class="sr-label"><span>Milchstraße</span><small>Nur bei dunklen Locations</small></div>
+            <input type="checkbox" class="toggle" ${CFG.notifyMilky?'checked':''} onchange="CFG.notifyMilky=this.checked;localStorage.setItem('fa_notify_milky',this.checked)">
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Backend</h3>
+        <div class="settings-group">
+          <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:6px">
+            <span style="font-size:13px;font-weight:600">Server URL</span>
+            <input class="server-input" type="url" value="${CFG.api}"
+              onchange="CFG.api=this.value;localStorage.setItem('fa_api',this.value)">
+          </div>
+          <div class="settings-row">
+            <div class="sr-label"><span>Astronomie neu berechnen</span><small>Dauert 2–5 Minuten</small></div>
+            <button class="gps-btn" onclick="App.fullRefresh()">Jetzt</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Über FotoAlert</h3>
+        <div class="settings-group">
+          <div class="settings-row"><div class="sr-label"><span>Version</span></div><span class="info-badge">${APP_VERSION}</span></div>
+          <div class="settings-row"><div class="sr-label"><span>Daten</span><small>Open-Meteo · Skyfield · JPL DE421</small></div></div>
+          <div class="settings-row"><div class="sr-label"><span>App installieren</span><small>Safari → Teilen → Zum Home-Bildschirm</small></div></div>
+        </div>
+      </div>
+    `;
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// SCORE-INFO-OVERLAY (US-55)
+// ═══════════════════════════════════════════════════════
+const ScoreInfo = {
+  _texts: {
+    gesamt: {
+      title: '📊 Gesamt-Score',
+      html: `<p>Gewichteter Gesamtwert aus Astronomie und Wetter:</p>
+        <ul>
+          <li><b>Innerhalb 3 Tage:</b> Astronomie × 65 % + Wetter × 35 %</li>
+          <li><b>Weiter entfernt:</b> nur Astronomie-Score (Wetter noch unbekannt)</li>
+        </ul>
+        <p style="margin-top:8px">Ein hoher Score bedeutet: das Himmelsereignis ist astronomisch hochwertig <em>und</em> das Wetter vielversprechend.</p>`,
+    },
+    astro: {
+      title: '🔭 Astronomie-Score',
+      html: `<p>Bewertet die Qualität des Himmelsereignisses unabhängig vom Wetter:</p>
+        <ul>
+          <li><b>Goldene / Blaue Stunde:</b> Basis 0,80 · Bonus wenn Sonne im Sichtachsen-Azimut</li>
+          <li><b>Mond-Alignment:</b> 0,60–1,0 je nach Mondphase (Vollmond = optimal)</li>
+          <li><b>Präzises 3D-Alignment:</b> 0,95 (Kronentreffer) / 0,80 (knapp über) / 0,65 (Mitte)</li>
+          <li><b>Milchstraße:</b> abhängig von galaktischem Zentrum-Elevation + Mondlicht-Störung</li>
+        </ul>`,
+    },
+    wetter: {
+      title: '🌤 Wetter-Score',
+      html: `<p>Berechnet aus Open-Meteo-Stundendaten zum Shoot-Zeitpunkt:</p>
+        <ul>
+          <li><b>Wolken:</b> 20–50 % = ideal (1,0) · klar = 0,9 · bedeckt = 0,2</li>
+          <li><b>Cirrus-Bonus:</b> dünne Hochnebel-Schleier machen Sonnenuntergänge spektakulär</li>
+          <li><b>Regen:</b> &gt; 20 % Wahrsch. → Abzug · &gt; 0,5 mm → zusätzlicher Malus</li>
+          <li><b>Nebel:</b> Sichtweite &lt; 1 km → starker Abzug</li>
+        </ul>
+        <p style="margin-top:8px">Nur verfügbar für Ereignisse innerhalb der nächsten 3 Tage.</p>`,
+    },
+  },
+  show(key) {
+    const t = this._texts[key];
+    if (!t) return;
+    document.getElementById('score-info-body').innerHTML = `<h4>${t.title}</h4>${t.html}`;
+    document.getElementById('score-info-overlay').classList.add('open');
+  },
+  close() {
+    document.getElementById('score-info-overlay')?.classList.remove('open');
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// SEARCH (US-53)
+// ═══════════════════════════════════════════════════════
+const Search = {
+  _query: '',
+
+  get query() { return this._query; },
+
+  open() {
+    document.getElementById('search-bar').classList.add('open');
+    document.getElementById('search-input').focus();
+  },
+
+  close() {
+    this._query = '';
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-bar').classList.remove('open');
+    this._triggerRender();
+  },
+
+  onInput(val) {
+    this._query = val.trim().toLowerCase();
+    this._triggerRender();
+  },
+
+  _triggerRender() {
+    if (App.current === 'locations') Locations.filter(this._query);
+    else if (Feed.mode === 'calendar') CalendarView.render();
+    else Feed.render();
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// APP ROUTER
+// ═══════════════════════════════════════════════════════
+const App = {
+  current: 'feed',
+  nav(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-'+page).classList.add('active');
+    document.getElementById('tab-'+page)?.classList.add('active');
+    this.current = page;
+    if (page === 'map') MapView.init();
+    if (page === 'settings') Settings.render();
+    if (page === 'locations') { if (Locations.all.length) Locations.render(Filter.applyToLocations(Locations.all)); else Locations.load(); }
+  },
+  async refresh() {
+    // Header-Button: nur Wetter-Overlay neu laden (schnell, ~10s)
+    // Volle Vorberechnung (Astronomie) nur über Einstellungen
+    const btn = document.getElementById('refresh-btn');
+    btn.style.animation = 'spin .7s linear infinite';
+    try {
+      await API.post('/weather-refresh', {});
+      await new Promise(r => setTimeout(r, 12000)); // Wetter-Overlay braucht ~10s
+      await Feed.load();
+      toast('✅ Wetterdaten aktualisiert');
+    } catch(e) {
+      // Fallback: einfach neu laden ohne API-Call (falls Endpoint fehlt)
+      await Feed.load();
+      toast('✅ Feed aktualisiert');
+    }
+    btn.style.animation = '';
+  },
+  async fullRefresh() {
+    // Volle Vorberechnung (nur aus Einstellungen)
+    const btn = document.querySelector('[onclick="App.fullRefresh()"]');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Läuft…'; }
+    try {
+      await API.post('/refresh', {});
+      toast('⏳ Vorberechnung gestartet (~2–5 Min.) – danach Refresh drücken');
+    } catch(e) { toast('Fehler: ' + e.message); }
+    if (btn) { btn.disabled = false; btn.textContent = 'Jetzt'; }
+  },
+  async init() {
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+    // Filter-Badge initialisieren
+    Filter._updateBadge();
+    // Lade Feed
+    await Feed.load();
+    // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch
+    setTimeout(async () => {
+      await Feed.load();
+    }, 12000);
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════
+App.init();
+</script>
+</body>
+</html>

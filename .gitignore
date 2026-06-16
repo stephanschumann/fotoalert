@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtuelle Umgebung (lokal, nicht auf Server deployen)
+FotoAlert/backend/venv/
+
+# Persistente Daten – werden NICHT überschrieben beim Deployment
+# Diese Dateien leben auf dem Server und werden nie per git verwaltet
+FotoAlert/backend/data/cache/
+FotoAlert/backend/data/custom_locations.json
+FotoAlert/backend/data/location_overrides.json
+FotoAlert/backend/data/elevations.json
+
+# Skyfield-Ephemeridendatei (groß, lokal cachen)
+FotoAlert/backend/de421.bsp
+
+# Codeberg-spezifisch (nicht mehr verwendet, GitHub Actions wird genutzt)
+.forgejo/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+**/.DS_Store
+
+# Editoren
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Umgebungsvariablen
+.env
+.env.local
+*.env
+
+# Logs
+*.log
+logs/

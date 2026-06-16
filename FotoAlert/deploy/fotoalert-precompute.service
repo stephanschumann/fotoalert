@@ -1,0 +1,18 @@
+[Unit]
+Description=FotoAlert – Täglicher Precompute (14-Tage Feed + Wetter)
+After=network.target
+
+[Service]
+Type=oneshot
+User=fotoalert
+Group=fotoalert
+WorkingDirectory=__APP_DIR__/FotoAlert/backend
+ExecStart=__VENV_DIR__/bin/python3 precompute.py --feed-only
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fotoalert-precompute
+Environment=PYTHONUNBUFFERED=1
+
+# Timeout: Precompute darf max. 30 Minuten laufen
+TimeoutStartSec=1800

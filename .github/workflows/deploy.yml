@@ -1,0 +1,44 @@
+# FotoAlert – Automatisches Deployment via GitHub Actions
+# Trigger: Push auf den main-Branch
+#
+# Voraussetzung (einmalig in GitHub unter Settings → Secrets einrichten):
+#   DEPLOY_SSH_KEY  – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
+#   SERVER_IP       – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
+#   SERVER_USER     – SSH-Username auf dem Server (fotoalert)
+
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+  # Manueller Trigger: in GitHub unter Actions → Run workflow
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy FotoAlert
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: SSH-Key einrichten
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy auf Server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=30 \
+              "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}" \
+              "bash /opt/fotoalert/app/FotoAlert/deploy/deploy.sh"
+
+      - name: SSH-Key aufräumen
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

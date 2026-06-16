@@ -1,0 +1,29 @@
+[Unit]
+Description=FotoAlert PWA – FastAPI Backend
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=fotoalert
+Group=fotoalert
+WorkingDirectory=__APP_DIR__/FotoAlert/backend
+ExecStart=__VENV_DIR__/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1 --timeout-keep-alive 75
+Restart=always
+RestartSec=5
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fotoalert
+
+# Umgebung
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+# Sicherheit (minimal, App braucht Dateisystem-Zugriff)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

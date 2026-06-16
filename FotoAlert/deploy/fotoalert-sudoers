@@ -1,0 +1,5 @@
+# FotoAlert sudoers – Erlaubt dem fotoalert-User systemctl-Befehle ohne Passwort
+# Installieren mit: visudo -f /etc/sudoers.d/fotoalert
+# Oder: cp fotoalert-sudoers /etc/sudoers.d/fotoalert && chmod 440 /etc/sudoers.d/fotoalert
+
+fotoalert ALL=(ALL) NOPASSWD: /bin/systemctl restart fotoalert.service, /bin/systemctl status fotoalert.service, /bin/systemctl restart fotoalert.service
