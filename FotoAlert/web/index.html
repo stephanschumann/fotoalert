@@ -291,7 +291,8 @@
       padding-bottom: calc(32px + var(--safe-b)); }
     #filter-sheet.open { transform: translateY(0); }
     .filter-header { display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px 8px; }
+      padding: 14px 20px 8px; position: sticky; top: 0; background: var(--surface); z-index: 2;
+      border-radius: 22px 22px 0 0; }
     .filter-header h2 { font-size: 17px; font-weight: 700; }
     .filter-section { padding: 12px 20px; border-bottom: 1px solid var(--border); }
     .filter-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -359,7 +360,7 @@
     #add-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 109;
       opacity: 0; pointer-events: none; transition: opacity .25s; }
     #add-overlay.open { opacity: 1; pointer-events: auto; }
-    .add-header { padding: 14px 20px 8px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .add-header { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .add-header h2 { font-size: 18px; font-weight: 800; }
     .close-btn { background: var(--card); border: none; color: var(--muted); border-radius: 50%;
       width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
@@ -679,7 +680,7 @@
 <!-- Detail Sheet -->
 <div id="detail-overlay" onclick="Detail.close()"></div>
 <div id="detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;position:sticky;top:0;background:var(--surface);z-index:2;border-radius:22px 22px 0 0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -744,7 +745,7 @@
 <!-- Location Detail Sheet -->
 <div id="loc-detail-overlay" onclick="LocationDetail.close()"></div>
 <div id="loc-detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;position:sticky;top:0;background:var(--surface);z-index:2;border-radius:22px 22px 0 0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -777,7 +778,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.13';
+const APP_VERSION = '1.4.15';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1957,7 +1958,8 @@ const CameraFOV = {
         </select>
       </div>
       <div id="fov_info_${prefix}" style="font-size:12px;color:var(--muted);margin-bottom:8px">–</div>
-      ${hasSub ? `<div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>`
+      ${hasSub ? `<div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>
+      <div style="margin-top:6px">${MapMarkers.legendHtml()}</div>`
                : `<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten – Karte nicht verfügbar.</p>`}`;
   },
 
@@ -1971,11 +1973,11 @@ const CameraFOV = {
     const map = L.map(mapId, { zoomControl:true, attributionControl:false });
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
     this._maps[prefix] = map;
-    // Observer-Pin – identisch mit Setz-Karte (orange Kreis)
-    L.circleMarker([obsLat, obsLon], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5, weight:2}).addTo(map);
+    // Observer-Pin (MapMarkers-Standard, BUG-20)
+    L.marker([obsLat, obsLon], {icon: MapMarkers.observer()}).addTo(map);
     if (subjLat) {
-      // Motiv-Pin – identisch mit Setz-Karte (Standard-Leaflet-Marker)
-      L.marker([subjLat, subjLon]).addTo(map);
+      // Motiv-Pin (MapMarkers-Standard, BUG-20)
+      L.marker([subjLat, subjLon], {icon: MapMarkers.subject()}).addTo(map);
       // Sichtachse
       L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:'#E8A020', weight:1.5, dashArray:'6,4', opacity:0.7}).addTo(map);
       map.fitBounds([[obsLat,obsLon],[subjLat,subjLon]], {padding:[30,30]});
@@ -2186,7 +2188,7 @@ const Detail = {
           </div>
           <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>
           <p style="font-size:10px;color:var(--muted);margin-top:4px">
-            Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${(ca.moon_earth_distance_km/1000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}
+            Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}
           </p>
         </div>`);
       })()}
@@ -2290,6 +2292,66 @@ const Detail = {
 };
 
 // ═══════════════════════════════════════════════════════
+// MAP MARKERS – zentrale Marker-Definitionen (BUG-20)
+// ═══════════════════════════════════════════════════════
+const MapMarkers = {
+  /** Fotograf-Standort: oranges Dreieck-Pin */
+  observer() {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:22px;height:22px;background:#f0a030;border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
+      iconSize: [22, 22], iconAnchor: [11, 22], popupAnchor: [0, -26]
+    });
+  },
+  /** Fotograf draggable (Edit-Modus): gleiche Form, aber L.Marker */
+  observerDraggable(latlng) {
+    return L.marker(latlng, {
+      draggable: true,
+      icon: L.divIcon({
+        className: '',
+        html: `<div style="width:22px;height:22px;background:#f0a030;border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
+        iconSize: [22, 22], iconAnchor: [11, 22]
+      })
+    });
+  },
+  /** Motiv-Standort: gold Raute */
+  subject() {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:20px;height:20px;background:#E8A020;border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
+      iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -24]
+    });
+  },
+  /** Motiv draggable (Edit-Modus) */
+  subjectDraggable(latlng) {
+    return L.marker(latlng, {
+      draggable: true,
+      icon: L.divIcon({
+        className: '',
+        html: `<div style="width:20px;height:20px;background:#E8A020;border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
+        iconSize: [20, 20], iconAnchor: [10, 20]
+      })
+    });
+  },
+  /** Legende-HTML für FOV-Karte */
+  legendHtml() {
+    return `<div style="display:flex;gap:10px;align-items:center;font-size:11px;color:var(--muted)">
+      <span style="display:inline-flex;align-items:center;gap:4px">
+        <span style="display:inline-block;width:12px;height:12px;background:#f0a030;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1.5px solid #fff;flex-shrink:0"></span>
+        Fotograf
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:4px">
+        <span style="display:inline-block;width:12px;height:12px;background:#E8A020;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1.5px solid #fff;flex-shrink:0"></span>
+        Motiv
+      </span>
+    </div>`;
+  }
+};
+
 // MAP
 // ═══════════════════════════════════════════════════════
 const MapView = {
@@ -2525,13 +2587,9 @@ const LocationDetail = {
     this._editMap = L.map('edit-mini-map', {zoomControl:true, attributionControl:false}).setView(center, 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       {maxZoom:19}).addTo(this._editMap);
-    // Observer marker (draggable circle)
-    this._editObsMarker = L.circleMarker(center, {radius:10,color:'#f0a030',fillColor:'#f0a030',fillOpacity:.5,
-      draggable:true}).addTo(this._editMap);
-    // Workaround: use DivIcon draggable marker for obs
-    this._editObsM = L.marker(center, {draggable:true,
-      icon:L.divIcon({className:'', html:'<div style="width:22px;height:22px;border-radius:50%;background:#f0a030;opacity:.8;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>', iconAnchor:[11,11]})
-    }).addTo(this._editMap);
+    // Observer marker draggable (MapMarkers-Standard, BUG-20)
+    this._editObsMarker = null; // nicht mehr benötigt
+    this._editObsM = MapMarkers.observerDraggable(center).addTo(this._editMap);
     this._editObsM.on('dragend', e => {
       const {lat, lng} = e.target.getLatLng();
       document.getElementById('edit-obs-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -2539,7 +2597,7 @@ const LocationDetail = {
       this._drawEditLine();
     });
     if (loc.subject_lat && loc.subject_lon) {
-      this._editSubjM = L.marker([loc.subject_lat, loc.subject_lon], {draggable:true}).addTo(this._editMap);
+      this._editSubjM = MapMarkers.subjectDraggable([loc.subject_lat, loc.subject_lon]).addTo(this._editMap);
       this._editSubjM.on('dragend', e => {
         const {lat, lng} = e.target.getLatLng();
         document.getElementById('edit-subj-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -2549,7 +2607,7 @@ const LocationDetail = {
     } else {
       this._editSubjM = null;
     }
-    this._editObsMarker.remove(); // Remove the non-draggable one
+    // _editObsMarker wurde entfernt (BUG-20: nur noch _editObsM via MapMarkers)
     this._drawEditLine();
   },
 
@@ -2598,7 +2656,7 @@ const LocationDetail = {
     errEl.textContent = '';
     if (this._editSubjM) { this._editSubjM.setLatLng([coords.lat, coords.lon]); this._drawEditLine(); }
     else if (this._editMap) {
-      this._editSubjM = L.marker([coords.lat, coords.lon], {draggable:true}).addTo(this._editMap);
+      this._editSubjM = MapMarkers.subjectDraggable([coords.lat, coords.lon]).addTo(this._editMap);
       this._editSubjM.on('dragend', e => {
         const {lat, lng} = e.target.getLatLng();
         document.getElementById('edit-subj-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -2882,7 +2940,7 @@ const AddLocation = {
     const errEl = document.getElementById('obs-error');
     if (errEl) errEl.textContent = '';
     if (this.obsMarker) this.obsMarker.remove();
-    this.obsMarker = L.circleMarker([lat,lng], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5}).addTo(this.map);
+    this.obsMarker = L.marker([lat,lng], {icon: MapMarkers.observer()}).addTo(this.map);
     if (flyTo && this.map) this.map.setView([lat, lng], 14);
     this.drawLine();
   },
@@ -2893,7 +2951,7 @@ const AddLocation = {
     const errEl = document.getElementById('subj-error');
     if (errEl) errEl.textContent = '';
     if (this.subjMarker) this.subjMarker.remove();
-    this.subjMarker = L.marker([lat,lng]).addTo(this.map);
+    this.subjMarker = L.marker([lat,lng], {icon: MapMarkers.subject()}).addTo(this.map);
     document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
     if (flyTo && this.map) this.map.setView([lat, lng], 14);
     this.drawLine();
@@ -2954,7 +3012,7 @@ const AddLocation = {
     errEl.textContent = '';
     this.obs = {lat: coords.lat, lng: coords.lon};
     if (this.obsMarker) this.obsMarker.remove();
-    this.obsMarker = L.circleMarker([coords.lat, coords.lon], {radius:10, color:'#f0a030', fillColor:'#f0a030', fillOpacity:.5}).addTo(this.map);
+    this.obsMarker = L.marker([coords.lat, coords.lon], {icon: MapMarkers.observer()}).addTo(this.map);
     this.drawLine();
   },
   _onSubjInput() {
@@ -2968,7 +3026,7 @@ const AddLocation = {
     errEl.textContent = '';
     this.subj = {lat: coords.lat, lng: coords.lon};
     if (this.subjMarker) this.subjMarker.remove();
-    this.subjMarker = L.marker([coords.lat, coords.lon]).addTo(this.map);
+    this.subjMarker = L.marker([coords.lat, coords.lon], {icon: MapMarkers.subject()}).addTo(this.map);
     document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
     this.drawLine();
   },
