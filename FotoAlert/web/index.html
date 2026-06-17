@@ -9,7 +9,9 @@
   <meta name="theme-color" content="#f0a030">
   <title>FotoAlert</title>
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -311,7 +313,7 @@
     .filter-slider-val { font-size: 22px; font-weight: 800; color: var(--gold);
       text-align: center; margin-bottom: 4px; letter-spacing: -1px; }
     /* BUG-04: Dual-Handle Range-Slider */
-    .dual-range-wrap { padding: 4px 0 0; }
+    .dual-range-wrap { padding: 4px 11px 0; }
     .dual-range-track { position: relative; height: 4px; background: var(--border);
       border-radius: 2px; margin: 16px 0 8px; }
     .dual-range-fill { position: absolute; top: 0; height: 100%;
@@ -624,8 +626,8 @@
     <div id="page-map" class="page">
       <div id="map"></div>
       <div id="map-layer-toggle">
-        <button class="map-layer-btn active" onclick="MapView.setLayer('dark')">Nacht</button>
-        <button class="map-layer-btn" onclick="MapView.setLayer('standard')">Standard</button>
+        <button class="map-layer-btn" onclick="MapView.setLayer('dark')">Nacht</button>
+        <button class="map-layer-btn active" onclick="MapView.setLayer('standard')">Standard</button>
         <button class="map-layer-btn" onclick="MapView.setLayer('satellite')">Satellit</button>
       </div>
     </div>
@@ -773,7 +775,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.8';
+const APP_VERSION = '1.4.9';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2298,8 +2300,8 @@ const MapView = {
   async init() {
     if (this.map) return;
     this.map = L.map('map', { zoomControl: false }).setView([52.52, 13.40], 10);
-    this.currentLayer = L.tileLayer(this.layers.dark, {
-      attribution: '© OpenStreetMap, © CARTO', maxZoom: 19
+    this.currentLayer = L.tileLayer(this.layers.standard, {
+      attribution: '© OpenStreetMap', maxZoom: 19
     }).addTo(this.map);
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
     try { await this.loadMarkers(); } catch(e) {}
@@ -2331,7 +2333,7 @@ const MapView = {
       m.bindPopup(`<div class="map-popup">
         <h4>${loc.name}</h4>
         <p>${loc.category}<br><small>${loc.description.slice(0,80)}…</small></p>
-        <span class="popup-btn" onclick="App.nav('locations')">Details →</span>
+        <span class="popup-btn" onclick="LocationDetail.open('${loc.id}')">Details →</span>
       </div>`);
     }
   }
