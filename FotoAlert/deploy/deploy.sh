@@ -20,6 +20,11 @@ PREV_COMMIT=$(git rev-parse HEAD)
 echo "Aktueller Stand: $PREV_COMMIT"
 
 # ── 2. Neuesten Code holen ───────────────────────────────────────────────────
+# Alle lokalen Änderungen an Tracked-Files zurücksetzen (sw.js etc.).
+# Gitignored Dateien (custom_locations.json, cache/, location_overrides.json) bleiben unberührt.
+echo ">>> Lokale Änderungen zurücksetzen (git reset --hard HEAD)..."
+git reset --hard HEAD
+
 echo ">>> git pull..."
 git pull --ff-only origin main
 
@@ -29,6 +34,17 @@ if [ "$PREV_COMMIT" = "$NEW_COMMIT" ]; then
     exit 0
 fi
 echo "Neuer Stand: $NEW_COMMIT"
+
+# ── 2b. Nicht-öffentliche Dateien aus web/ entfernen ─────────────────────────
+# Diese Dateien sollen nie öffentlich über den Webserver erreichbar sein.
+WEB_DIR="$APP_DIR/FotoAlert/web"
+echo ">>> Nicht-öffentliche Dateien aus web/ entfernen..."
+rm -f "$WEB_DIR/kanban.html" \
+      "$WEB_DIR/BACKLOG.md"
+# Alle .md-Dateien und temporäre HTML-Dateien (außer index.html) entfernen
+find "$WEB_DIR" -maxdepth 1 -name "*.md" -delete
+find "$WEB_DIR" -maxdepth 1 -name "*.html" ! -name "index.html" -delete
+echo ">>> web/ bereinigt."
 
 # ── 3. Service Worker Cache-Name aktualisieren ───────────────────────────────
 # Jeder Deploy bekommt einen eindeutigen Timestamp-basierten Cache-Namen.
