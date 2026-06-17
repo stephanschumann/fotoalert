@@ -203,10 +203,10 @@
     #detail-overlay.open { opacity: 1; pointer-events: auto; }
     #detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
       background: var(--surface); border-radius: 22px 22px 0 0;
-      max-height: 92vh; overflow-y: auto;
-      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
-      padding-bottom: calc(32px + var(--safe-b)); }
+      max-height: 92vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #detail-sheet.open { transform: translateY(0); }
+    #detail-content { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
     .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px;
       margin: 10px auto 0; }
     .sheet-hero { padding: 20px 20px 0; }
@@ -286,13 +286,12 @@
     #filter-overlay.open { opacity: 1; pointer-events: auto; }
     #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
       background: var(--surface); border-radius: 22px 22px 0 0;
-      max-height: 88vh; overflow-y: auto;
-      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
-      padding-bottom: calc(32px + var(--safe-b)); }
+      max-height: 88vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #filter-sheet.open { transform: translateY(0); }
+    #filter-content { overflow-y: auto; flex: 1; min-height: 0; }
     .filter-header { display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px 8px; position: sticky; top: 0; background: var(--surface); z-index: 2;
-      border-radius: 22px 22px 0 0; }
+      padding: 14px 20px 8px; flex-shrink: 0; border-radius: 22px 22px 0 0; }
     .filter-header h2 { font-size: 17px; font-weight: 700; }
     .filter-section { padding: 12px 20px; border-bottom: 1px solid var(--border); }
     .filter-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -303,7 +302,7 @@
       cursor: pointer; transition: all .15s; user-select: none; }
     .filter-chip.active { border-color: var(--gold); color: var(--gold);
       background: var(--gold-dim); }
-    .filter-actions { padding: 14px 20px; display: flex; gap: 10px; }
+    .filter-actions { padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; flex-shrink: 0; }
     .filter-slider-wrap { padding: 4px 0 2px; }
     .filter-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
       border-radius: 2px; outline: none; cursor: pointer;
@@ -481,10 +480,10 @@
     #loc-detail-overlay.open { opacity: 1; pointer-events: auto; }
     #loc-detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 103;
       background: var(--surface); border-radius: 22px 22px 0 0;
-      max-height: 92vh; overflow-y: auto;
-      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1);
-      padding-bottom: calc(32px + var(--safe-b)); }
+      max-height: 92vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #loc-detail-sheet.open { transform: translateY(0); }
+    #loc-detail-content { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
     .loc-impossible-warn { margin: 0 20px 4px; background: rgba(224,80,80,.1);
       border: 1px solid rgba(224,80,80,.35); border-radius: 12px; padding: 12px 14px; }
     .loc-impossible-warn p { font-size: 13px; color: var(--red); line-height: 1.5; }
@@ -680,7 +679,7 @@
 <!-- Detail Sheet -->
 <div id="detail-overlay" onclick="Detail.close()"></div>
 <div id="detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;position:sticky;top:0;background:var(--surface);z-index:2;border-radius:22px 22px 0 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -745,7 +744,7 @@
 <!-- Location Detail Sheet -->
 <div id="loc-detail-overlay" onclick="LocationDetail.close()"></div>
 <div id="loc-detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;position:sticky;top:0;background:var(--surface);z-index:2;border-radius:22px 22px 0 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -778,7 +777,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.15';
+const APP_VERSION = '1.4.16';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2295,59 +2294,37 @@ const Detail = {
 // MAP MARKERS – zentrale Marker-Definitionen (BUG-20)
 // ═══════════════════════════════════════════════════════
 const MapMarkers = {
-  /** Fotograf-Standort: oranges Dreieck-Pin */
-  observer() {
+  _obsIcon() {
     return L.divIcon({
       className: '',
-      html: `<div style="width:22px;height:22px;background:#f0a030;border-radius:50% 50% 50% 0;
-        transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
-      iconSize: [22, 22], iconAnchor: [11, 22], popupAnchor: [0, -26]
+      html: '<span style="font-size:26px;line-height:1;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))">📍</span>',
+      iconSize: [26, 26], iconAnchor: [7, 26], popupAnchor: [0, -28]
     });
   },
-  /** Fotograf draggable (Edit-Modus): gleiche Form, aber L.Marker */
+  _subjIcon() {
+    return L.divIcon({
+      className: '',
+      html: '<span style="font-size:26px;line-height:1;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))">🎯</span>',
+      iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -16]
+    });
+  },
+  /** Fotograf-Standort: 📍 */
+  observer() { return this._obsIcon(); },
+  /** Fotograf draggable (Edit-Modus) */
   observerDraggable(latlng) {
-    return L.marker(latlng, {
-      draggable: true,
-      icon: L.divIcon({
-        className: '',
-        html: `<div style="width:22px;height:22px;background:#f0a030;border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
-        iconSize: [22, 22], iconAnchor: [11, 22]
-      })
-    });
+    return L.marker(latlng, { draggable: true, icon: this._obsIcon() });
   },
-  /** Motiv-Standort: gold Raute */
-  subject() {
-    return L.divIcon({
-      className: '',
-      html: `<div style="width:20px;height:20px;background:#E8A020;border-radius:50% 50% 50% 0;
-        transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
-      iconSize: [20, 20], iconAnchor: [10, 20], popupAnchor: [0, -24]
-    });
-  },
+  /** Motiv-Standort: 🎯 */
+  subject() { return this._subjIcon(); },
   /** Motiv draggable (Edit-Modus) */
   subjectDraggable(latlng) {
-    return L.marker(latlng, {
-      draggable: true,
-      icon: L.divIcon({
-        className: '',
-        html: `<div style="width:20px;height:20px;background:#E8A020;border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55)"></div>`,
-        iconSize: [20, 20], iconAnchor: [10, 20]
-      })
-    });
+    return L.marker(latlng, { draggable: true, icon: this._subjIcon() });
   },
   /** Legende-HTML für FOV-Karte */
   legendHtml() {
-    return `<div style="display:flex;gap:10px;align-items:center;font-size:11px;color:var(--muted)">
-      <span style="display:inline-flex;align-items:center;gap:4px">
-        <span style="display:inline-block;width:12px;height:12px;background:#f0a030;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1.5px solid #fff;flex-shrink:0"></span>
-        Fotograf
-      </span>
-      <span style="display:inline-flex;align-items:center;gap:4px">
-        <span style="display:inline-block;width:12px;height:12px;background:#E8A020;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1.5px solid #fff;flex-shrink:0"></span>
-        Motiv
-      </span>
+    return `<div style="display:flex;gap:12px;align-items:center;font-size:11px;color:var(--muted)">
+      <span>📍 Fotograf-Standort</span>
+      <span>🎯 Motiv</span>
     </div>`;
   }
 };
