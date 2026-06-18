@@ -132,32 +132,29 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 >
 > **Abhängigkeiten:** TASK-12[x], US-62
 
-### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[ ]`
-> **Problem:** Der Eventtyp-Filter (z.B. „Mond-Alignment") im Filterpanel hat keinen Effekt auf die Kartenansicht. Alle Location-Pins erscheinen unabhängig vom Filter.
->
-> **Lösungskonzept:** In der Kartenansicht wird der Filter semantisch neu interpretiert: nicht „zeige nur Events dieses Typs", sondern **„zeige nur Locations, für die dieser Eventtyp astronomisch möglich ist"** (standortbasierte Filterung).
->
-> **Technische Basis:** US-35[x] berechnet `possible_bodies` pro Location. Daraus folgt, welche Event-Typen an einem Ort prinzipiell möglich sind.
->
-> **Mapping Eventtyp → `possible_bodies`:**
->
-> | Eventtyp-Filter | Bedingung |
-> |---|---|
-> | Mond-Alignment | `"moon" in possible_bodies` |
-> | Sonnen-Alignment | `"sun" in possible_bodies` |
-> | Mondaufgang/-untergang | `"moon" in possible_bodies` |
-> | Sonnenaufgang/-untergang | `"sun" in possible_bodies` |
-> | Goldene/Blaue Stunde | alle Locations (Sonne immer vorhanden) |
->
-> **Wichtig:** Nur der Eventtyp-Filter ist in der Karte aktiv. Der Chancenwahrscheinlichkeits-Filter (%-Slider) wird in der Kartenansicht ausgegraut mit Hinweis „Nur in Listen-Ansicht verfügbar".
->
-> **Akzeptanzkriterien:**
-> - Eventtyp-Filter „Mond-Alignment": Karte zeigt nur Locations mit `"moon" in possible_bodies`
-> - Chancenwahrscheinlichkeits-Filter in Kartenansicht visuell ausgegraut, Tooltip „Nur in Listen-Ansicht verfügbar"
-> - Filter-Zustand bleibt beim Wechsel Karte ↔ Feed erhalten
-> - Kein Filter aktiv: alle Location-Pins sichtbar (wie bisher)
->
-> **Abhängigkeiten:** US-35[x], US-32[x]
+### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-18 |
+| **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 |
+
+**Root Cause:** `MapView.loadMarkers()` fügte alle Marker bedingungslos hinzu; `FilterSheet._applyLive()` hatte keinen `'map'`-Branch; kein Mechanismus zum Aus-/Einblenden von Markern.
+
+**Fix:** Feed-basiertes Filtering via `Feed.data` (14-Tage-Cache): `MapView.applyFilter()` baut ein `Set` aller `location_id`s die im Feed Events des gesuchten Typs haben → `addLayer()`/`removeLayer()` per Marker. Zusätzlich: Filter-Ergebniszähler im FilterSheet, Score-Slider in Kartenansicht ausgegraut.
+
+**Implementierung:**
+- `MapView.markers` als `{marker, loc}`-Array (statt nur Marker)
+- `MapView.applyFilter()` mit `ET_EXPAND`-Mapping (z.B. „Goldene Stunde" → Morgen+Abend)
+- `FilterSheet._applyLive()` mit Map-Branch
+- `FilterSheet._updateResultCount()` – zeigt „X von Y Locations/Chancen/Events sichtbar"
+- Score-Slider in Kartenansicht deaktiviert mit Hinweis
+
+**Abhängigkeiten:** US-35[x], US-32[x] · **Version:** v1.5.x
 
 ### BUG-14 · Jahres- & 14-Tage-Kalender leer nach Cron-Lauf `[ ]`
 > **Problem:** Am 2026-06-17 um 6:20 Uhr waren Jahreskalender und 14-Tage-Kalender nach dem Cron-Lauf komplett leer. Root Cause unbekannt.
@@ -483,7 +480,7 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 >
 > *Erweiterung von US-12 (einmaliger Import, erledigt) → jetzt als dauerhaftes Management-Tool*
 
-### US-34 · Job-Orchestrierung & Incremental Updates `[~]`
+### US-34 · Job-Orchestrierung & Incremental Updates `[x]`
 > **Als App-Host** möchte ich, dass alle Hintergrund-Jobs effizient und bedarfsgesteuert laufen und ich sie gezielt manuell anstoßen kann, um Rechenzeit zu sparen und stets aktuelle Daten zu haben.
 >
 > **Job-Typen und Strategien:**
@@ -589,7 +586,7 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 > **Abhängigkeiten:** TASK-13 (braucht Deploy-Ziel), US-39 (Rollback-Strategie baut hierauf auf)
 
 
-### TASK-15 · Jahreskalender-Cron-Zeit auf 0:01 Uhr ändern `[~]`
+### TASK-15 · Jahreskalender-Cron-Zeit auf 0:01 Uhr ändern `[x]`
 > **Als App-Host** möchte ich den Cron-Job für die Jahres- und 14-Tage-Kalenderberechnung auf 0:01 Uhr ändern, damit die Daten um Mitternacht aktualisiert werden (statt 5:30 Uhr morgens).
 >
 > **Akzeptanzkriterien:**

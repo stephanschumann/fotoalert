@@ -8,6 +8,7 @@ set -euo pipefail
 APP_DIR="/opt/fotoalert/app"
 VENV_DIR="/opt/fotoalert/venv"
 BACKEND_DIR="$APP_DIR/FotoAlert/backend"
+DEPLOY_DIR="$APP_DIR/FotoAlert/deploy"
 SW_FILE="$APP_DIR/FotoAlert/web/sw.js"
 HEALTH_URL="http://localhost:8000/health"
 ROLLBACK_COMMITS=1  # Wie viele Commits zurück beim Rollback
@@ -57,8 +58,17 @@ sed -i "s/const CACHE_NAME = 'fotoalert-[^']*'/const CACHE_NAME = 'fotoalert-$DE
 echo ">>> Dependencies prüfen..."
 "$VENV_DIR/bin/pip" install --quiet -r "$BACKEND_DIR/requirements.txt"
 
-# ── 5. Service neu starten ───────────────────────────────────────────────────
-echo ">>> Service neustarten..."
+# ── 5. systemd-Units aktualisieren ──────────────────────────────────────────
+# Timer-Datei aus Repo nach /etc/systemd/system/ kopieren (falls geändert).
+# Danach daemon-reload + Timer-Neustart, damit neue OnCalendar-Zeiten wirken.
+echo ">>> systemd-Units aktualisieren..."
+sudo cp "$DEPLOY_DIR/fotoalert-precompute.timer" /etc/systemd/system/fotoalert-precompute.timer
+sudo cp "$DEPLOY_DIR/fotoalert-precompute.service" /etc/systemd/system/fotoalert-precompute.service
+sudo systemctl daemon-reload
+sudo systemctl restart fotoalert-precompute.timer
+echo ">>> Timer neu geladen: $(systemctl show fotoalert-precompute.timer --property=OnCalendar --value)"
+
+echo ">>> App-Service neustarten..."
 sudo systemctl restart fotoalert.service
 sleep 4  # Kurz warten bis uvicorn bereit ist
 

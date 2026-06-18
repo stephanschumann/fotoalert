@@ -54,6 +54,28 @@
     }
     #header h1 { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: -.3px; }
     #header .subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    /* US-34: Refresh-Menü */
+    #refresh-menu-wrap { position: relative; }
+    #refresh-menu {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 6px 0; min-width: 240px; z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,.55);
+    }
+    #refresh-menu.open { display: block; }
+    .refresh-menu-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 16px; cursor: pointer; transition: background .15s;
+    }
+    .refresh-menu-item:hover { background: rgba(255,255,255,.06); }
+    .refresh-menu-item.running { opacity: .7; pointer-events: none; }
+    .refresh-menu-item .rmi-icon { font-size: 18px; flex-shrink: 0; }
+    .refresh-menu-item .rmi-body { flex: 1; min-width: 0; }
+    .refresh-menu-item .rmi-label { font-size: 14px; color: var(--text); }
+    .refresh-menu-item .rmi-status { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .refresh-menu-item .rmi-status.err { color: #e05; }
+    .refresh-menu-item .rmi-spin { animation: spin .7s linear infinite; font-size: 14px; }
+    .refresh-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
     #refresh-btn { background: none; border: none; color: var(--muted); cursor: pointer;
       padding: 8px; border-radius: 50%; transition: color .2s; }
     #refresh-btn:hover { color: var(--gold); }
@@ -597,12 +619,45 @@
         </button>
         <span id="filter-badge">0</span>
       </div>
-      <button id="refresh-btn" title="Aktualisieren" onclick="App.refresh()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-        <path d="M3 3v5h5"/>
-      </svg>
-      </button>
+      <div id="refresh-menu-wrap">
+        <button id="refresh-btn" title="Aktualisieren" onclick="RefreshMenu.toggle(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+        <div id="refresh-menu">
+          <div class="refresh-menu-item" id="rmi-weather" onclick="RefreshMenu.trigger('weather')">
+            <span class="rmi-icon">🌤</span>
+            <div class="rmi-body">
+              <div class="rmi-label">Wetter aktualisieren</div>
+              <div class="rmi-status" id="rms-weather">–</div>
+            </div>
+          </div>
+          <div class="refresh-menu-item" id="rmi-feed" onclick="RefreshMenu.trigger('feed')">
+            <span class="rmi-icon">📅</span>
+            <div class="rmi-body">
+              <div class="rmi-label">14-Tage-Feed berechnen</div>
+              <div class="rmi-status" id="rms-feed">–</div>
+            </div>
+          </div>
+          <div class="refresh-menu-item" id="rmi-calendar" onclick="RefreshMenu.trigger('calendar')">
+            <span class="rmi-icon">📆</span>
+            <div class="rmi-body">
+              <div class="rmi-label">Jahreskalender berechnen</div>
+              <div class="rmi-status" id="rms-calendar">–</div>
+            </div>
+          </div>
+          <div class="refresh-menu-divider"></div>
+          <div class="refresh-menu-item" style="opacity:.4;pointer-events:none">
+            <span class="rmi-icon">🔍</span>
+            <div class="rmi-body">
+              <div class="rmi-label">Locationscout-Scan</div>
+              <div class="rmi-status">Noch nicht verfügbar (US-33)</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Search bar overlay -->
     <div id="search-bar">
@@ -779,7 +834,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.25';
+const APP_VERSION = '1.4.26';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3354,25 +3409,8 @@ const App = {
     if (page === 'settings') Settings.render();
     if (page === 'locations') { if (Locations.all.length) Locations.render(Filter.applyToLocations(Locations.all)); else Locations.load(); }
   },
-  async refresh() {
-    // Header-Button: nur Wetter-Overlay neu laden (schnell, ~10s)
-    // Volle Vorberechnung (Astronomie) nur über Einstellungen
-    const btn = document.getElementById('refresh-btn');
-    btn.style.animation = 'spin .7s linear infinite';
-    try {
-      await API.post('/weather-refresh', {});
-      await new Promise(r => setTimeout(r, 12000)); // Wetter-Overlay braucht ~10s
-      await Feed.load();
-      toast('✅ Wetterdaten aktualisiert');
-    } catch(e) {
-      // Fallback: einfach neu laden ohne API-Call (falls Endpoint fehlt)
-      await Feed.load();
-      toast('✅ Feed aktualisiert');
-    }
-    btn.style.animation = '';
-  },
+  async refresh() { RefreshMenu.toggle(); },  // Rückwärtskompatibilität
   async fullRefresh() {
-    // Volle Vorberechnung (nur aus Einstellungen)
     const btn = document.querySelector('[onclick="App.fullRefresh()"]');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Läuft…'; }
     try {
@@ -3394,6 +3432,121 @@ const App = {
     setTimeout(async () => {
       await Feed.load();
     }, 12000);
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// US-34: Refresh-Menü
+// ═══════════════════════════════════════════════════════
+const RefreshMenu = {
+  _open: false,
+  _pollTimer: null,
+
+  // Endpoint und Beschriftung je Job
+  _cfg: {
+    weather:  { endpoint: '/weather-refresh', label: 'Wetter aktualisieren',        doneMsg: '✅ Wetterdaten aktualisiert', reloadFeed: true  },
+    feed:     { endpoint: '/refresh-feed',    label: '14-Tage-Feed berechnet',      doneMsg: '✅ Feed neu berechnet',       reloadFeed: true  },
+    calendar: { endpoint: '/refresh-calendar',label: 'Jahreskalender berechnet',    doneMsg: '✅ Kalender neu berechnet',   reloadFeed: false },
+  },
+
+  toggle(e) {
+    if (e) e.stopPropagation();
+    this._open ? this.close() : this.open();
+  },
+
+  open() {
+    this._open = true;
+    document.getElementById('refresh-menu').classList.add('open');
+    document.getElementById('refresh-btn').style.color = 'var(--gold)';
+    this._loadStatus();
+    // Schließen bei Klick außerhalb
+    setTimeout(() => document.addEventListener('click', this._outsideHandler = (ev) => {
+      if (!document.getElementById('refresh-menu-wrap').contains(ev.target)) this.close();
+    }), 10);
+  },
+
+  close() {
+    this._open = false;
+    document.getElementById('refresh-menu').classList.remove('open');
+    document.getElementById('refresh-btn').style.color = '';
+    document.removeEventListener('click', this._outsideHandler);
+    if (this._pollTimer) { clearInterval(this._pollTimer); this._pollTimer = null; }
+  },
+
+  async _loadStatus() {
+    try {
+      const data = await API.get('/job-status');
+      this._applyStatus(data.jobs);
+    } catch(e) { /* silent */ }
+  },
+
+  _applyStatus(jobs) {
+    for (const [key, info] of Object.entries(jobs)) {
+      const el = document.getElementById('rms-' + key);
+      const row = document.getElementById('rmi-' + key);
+      if (!el || !row) continue;
+      if (info.status === 'running') {
+        el.className = 'rmi-status';
+        el.innerHTML = '<span class="rmi-spin">⟳</span> Läuft…';
+        row.classList.add('running');
+      } else if (info.status === 'done' && info.last_run) {
+        row.classList.remove('running');
+        const ago = this._ago(info.last_run);
+        const dur = info.duration_s ? ` (${info.duration_s}s)` : '';
+        el.className = 'rmi-status';
+        el.textContent = `✓ vor ${ago}${dur}`;
+      } else if (info.status === 'error') {
+        row.classList.remove('running');
+        el.className = 'rmi-status err';
+        el.textContent = `✗ ${info.last_error || 'Fehler'}`;
+      } else {
+        el.className = 'rmi-status';
+        el.textContent = '–';
+      }
+    }
+  },
+
+  _ago(isoStr) {
+    const diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff/60)} Min.`;
+    return `${Math.floor(diff/3600)} Std.`;
+  },
+
+  async trigger(key) {
+    const cfg = this._cfg[key];
+    if (!cfg) return;
+
+    const el = document.getElementById('rms-' + key);
+    const row = document.getElementById('rmi-' + key);
+    el.className = 'rmi-status';
+    el.innerHTML = '<span class="rmi-spin">⟳</span> Gestartet…';
+    row.classList.add('running');
+
+    try {
+      await API.post(cfg.endpoint, {});
+    } catch(e) {
+      el.className = 'rmi-status err';
+      el.textContent = '✗ ' + e.message;
+      row.classList.remove('running');
+      return;
+    }
+
+    // Polling bis Job fertig
+    this._pollTimer = setInterval(async () => {
+      try {
+        const data = await API.get('/job-status');
+        this._applyStatus(data.jobs);
+        const jobInfo = data.jobs[key];
+        if (jobInfo && jobInfo.status !== 'running') {
+          clearInterval(this._pollTimer); this._pollTimer = null;
+          if (jobInfo.status === 'done') {
+            if (cfg.reloadFeed) await Feed.load();
+            toast(cfg.doneMsg);
+          }
+        }
+      } catch(e) { /* silent */ }
+    }, 3000);
   }
 };
 

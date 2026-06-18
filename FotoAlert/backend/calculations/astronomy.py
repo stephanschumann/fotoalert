@@ -166,14 +166,20 @@ def get_moon_earth_distance_km(dt: datetime) -> float:
 
     Variiert zwischen ~356.500 km (Perigäum) und ~406.700 km (Apogäum).
     Mittlerer Wert: ~384.400 km → Winkeldurchmesser ~31,1 Bogenminuten.
+
+    Verwendet Skyfield's distance.km direkt (kein AU-Umrechnungsfehler).
     """
     eph = _get_eph()
     t = _skyfield_time(dt)
     earth = eph["earth"]
     moon = eph["moon"]
     astrometric = earth.at(t).observe(moon)
-    dist_au = astrometric.distance().au
-    return dist_au * AU_TO_KM
+    dist_km = astrometric.distance().km
+    assert 350_000 < dist_km < 410_000, (
+        f"Unplausible Mond-Erde-Distanz: {dist_km:.0f} km "
+        f"(Erwartung: 350.000–410.000 km)"
+    )
+    return dist_km
 
 
 def _find_sun_altitude_crossing(

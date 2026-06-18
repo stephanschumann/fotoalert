@@ -207,6 +207,35 @@ _cache_loaded_at:   Optional[datetime] = None
 _weather_updated_at: Optional[datetime] = None
 _precompute_running: bool = False
 
+# Job-Status-Tracking (US-34)
+_job_status: dict = {
+    "weather":  {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
+    "feed":     {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
+    "calendar": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
+}
+
+def _job_start(job: str) -> float:
+    """Markiert Job als laufend, gibt Startzeit zurück."""
+    import time as _time
+    _job_status[job]["status"] = "running"
+    _job_status[job]["last_error"] = None
+    return _time.monotonic()
+
+def _job_done(job: str, t0: float) -> None:
+    """Markiert Job als fertig."""
+    import time as _time
+    _job_status[job]["status"] = "done"
+    _job_status[job]["last_run"] = datetime.now(timezone.utc).isoformat()
+    _job_status[job]["duration_s"] = round(_time.monotonic() - t0, 1)
+
+def _job_error(job: str, t0: float, msg: str) -> None:
+    """Markiert Job als fehlgeschlagen."""
+    import time as _time
+    _job_status[job]["status"] = "error"
+    _job_status[job]["last_run"] = datetime.now(timezone.utc).isoformat()
+    _job_status[job]["duration_s"] = round(_time.monotonic() - t0, 1)
+    _job_status[job]["last_error"] = msg
+
 # Push-Token Store
 _device_tokens: list[dict] = []
 
@@ -275,7 +304,9 @@ async def _weather_overlay():
     """
     global _weather_updated_at
 
+    t0 = _job_start("weather")
     if not _feed_cache:
+        _job_done("weather", t0)
         return
 
     now_utc = datetime.now(timezone.utc)
@@ -342,15 +373,17 @@ async def _weather_overlay():
 
     _weather_updated_at = now_utc
     logger.info("Wetter-Overlay: %d Events aktualisiert (%d unique Locations)", updated, len(seen))
+    _job_done("weather", t0)
 
 
 # ---------------------------------------------------------------------------
 # Vorberechnung (precompute.py als Subprocess)
 # ---------------------------------------------------------------------------
 
-async def _run_precompute():
+async def _run_precompute(mode: str = "full"):
     """
     Startet precompute.py als Subprocess (ohne Event-Loop-Blocking).
+    mode: "full" (feed+calendar) | "feed" (nur 14-Tage) | "calendar" (nur Jahreskalender)
     Nach Abschluss werden die JSON-Caches neu geladen.
     """
     global _precompute_running
@@ -358,13 +391,23 @@ async def _run_precompute():
         logger.info("Vorberechnung läuft bereits, übersprungen")
         return
 
+    # Job-Keys für Status-Tracking
+    job_keys = ["feed", "calendar"] if mode == "full" else [mode]
+    t0s = {j: _job_start(j) for j in job_keys}
+
     _precompute_running = True
     backend_dir = Path(__file__).parent
-    logger.info("Starte Vorberechnung (precompute.py)...")
+    logger.info("Starte Vorberechnung (precompute.py, mode=%s)...", mode)
+
+    args = [sys.executable, str(backend_dir / "precompute.py")]
+    if mode == "feed":
+        args.append("--feed-only")
+    elif mode == "calendar":
+        args.append("--calendar-only")
 
     try:
         proc = await asyncio.create_subprocess_exec(
-            sys.executable, str(backend_dir / "precompute.py"),
+            *args,
             cwd=str(backend_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
@@ -374,14 +417,22 @@ async def _run_precompute():
             for line in stdout.decode(errors="replace").splitlines():
                 logger.info("  [precompute] %s", line)
         if proc.returncode == 0:
-            logger.info("Vorberechnung abgeschlossen. Lade Caches neu...")
+            logger.info("Vorberechnung abgeschlossen (mode=%s). Lade Caches neu...", mode)
             _load_elevation_cache()
             _load_caches()
-            await _weather_overlay()
+            if mode in ("full", "feed"):
+                await _weather_overlay()
+            for j, t0 in t0s.items():
+                _job_done(j, t0)
         else:
-            logger.error("Vorberechnung fehlgeschlagen (exit %d)", proc.returncode)
+            msg = f"exit {proc.returncode}"
+            logger.error("Vorberechnung fehlgeschlagen (%s)", msg)
+            for j, t0 in t0s.items():
+                _job_error(j, t0, msg)
     except Exception as e:
         logger.error("Fehler beim Starten von precompute.py: %s", e)
+        for j, t0 in t0s.items():
+            _job_error(j, t0, str(e))
     finally:
         _precompute_running = False
 
@@ -772,10 +823,13 @@ async def daily_briefing(target_date: Optional[str] = None):
 async def get_calendar(
     location_id: Optional[str] = None,
     month: Optional[int] = None,
+    year: Optional[int] = None,
     min_score: float = 0.40,
 ):
     """
     Jahreskalender: astronomy-only Events für alle Locations, 365 Tage.
+    month (1–12) + year filtern serverseitig – Clients sollten immer beide
+    Parameter übergeben, um den Payload klein zu halten (~1–3 MB / Monat).
     """
     if not _calendar_cache:
         if _precompute_running:
@@ -789,6 +843,8 @@ async def get_calendar(
         events = [e for e in events if e["location_id"] == location_id]
     if month:
         events = [e for e in events if int(e["shoot_time"][5:7]) == month]
+    if year:
+        events = [e for e in events if int(e["shoot_time"][:4]) == year]
     if min_score != 0.40:
         events = [e for e in events if e["overall_score"] >= min_score]
 
@@ -812,15 +868,32 @@ async def register_device(token: str, platform: str = "ios"):
 @app.post("/refresh")
 async def trigger_refresh(background_tasks: BackgroundTasks):
     """
-    Startet eine volle Vorberechnung (precompute.py) im Hintergrund.
+    Startet eine volle Vorberechnung (precompute.py, feed+calendar) im Hintergrund.
     Dauert 2–5 Minuten. Danach werden die Caches automatisch neu geladen.
-    Für reines Wetter-Update: POST /weather-refresh (schnell, ~10s).
     """
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
-    background_tasks.add_task(_run_precompute)
+    background_tasks.add_task(_run_precompute, "full")
     return {"status": "started",
             "message": "Vorberechnung gestartet. Daten in ~2–5 Min. aktuell."}
+
+
+@app.post("/refresh-feed")
+async def trigger_feed_refresh(background_tasks: BackgroundTasks):
+    """US-34: Nur 14-Tage Feed neu berechnen (precompute --feed-only). ~30–60s."""
+    if _precompute_running:
+        return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
+    background_tasks.add_task(_run_precompute, "feed")
+    return {"status": "started", "message": "14-Tage Feed wird neu berechnet (~30–60s)."}
+
+
+@app.post("/refresh-calendar")
+async def trigger_calendar_refresh(background_tasks: BackgroundTasks):
+    """US-34: Nur Jahreskalender inkrementell neu berechnen. ~1–3 Min."""
+    if _precompute_running:
+        return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
+    background_tasks.add_task(_run_precompute, "calendar")
+    return {"status": "started", "message": "Jahreskalender wird inkrementell neu berechnet (~1–3 Min.)."}
 
 
 @app.post("/weather-refresh")
@@ -831,6 +904,15 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks):
     """
     background_tasks.add_task(_weather_overlay)
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
+
+
+@app.get("/job-status")
+async def get_job_status():
+    """US-34: Gibt den aktuellen Status aller Hintergrund-Jobs zurück."""
+    return {
+        "jobs": _job_status,
+        "precompute_running": _precompute_running,
+    }
 
 
 # ---------------------------------------------------------------------------
