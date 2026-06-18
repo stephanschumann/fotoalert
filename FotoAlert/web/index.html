@@ -507,6 +507,16 @@
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #loc-detail-sheet.open { transform: translateY(0); }
     #loc-detail-content { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+    /* TASK-11: Impressum Sheet */
+    #impressum-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      z-index: 104; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #impressum-overlay.open { opacity: 1; pointer-events: auto; }
+    #impressum-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      max-height: 92vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #impressum-sheet.open { transform: translateY(0); }
+    #impressum-content { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
     .loc-impossible-warn { margin: 0 20px 4px; background: rgba(224,80,80,.1);
       border: 1px solid rgba(224,80,80,.35); border-radius: 12px; padding: 12px 14px; }
     .loc-impossible-warn p { font-size: 13px; color: var(--red); line-height: 1.5; }
@@ -585,7 +595,7 @@
         box-shadow: 0 0 80px rgba(0,0,0,.8); }
       #header { padding-top: 20px; }
       /* BUG-07: Sheets auf App-Breite zentrieren (kein translateX – translateY-Animation bleibt intakt) */
-      #detail-sheet, #loc-detail-sheet, #filter-sheet {
+      #detail-sheet, #loc-detail-sheet, #filter-sheet, #impressum-sheet {
         left: 50%; width: 480px; right: auto; margin-left: -240px;
       }
       #add-sheet {
@@ -822,6 +832,16 @@
   </div>
 </div>
 
+<!-- Impressum Sheet (TASK-11) -->
+<div id="impressum-overlay" onclick="Impressum.close()"></div>
+<div id="impressum-sheet">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
+    <div class="sheet-handle" style="margin:0"></div>
+    <button class="close-btn" onclick="Impressum.close()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="impressum-content"></div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -834,7 +854,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.33';
+const APP_VERSION = '1.4.34';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3320,7 +3340,72 @@ const Settings = {
           <div class="settings-row"><div class="sr-label"><span>App installieren</span><small>Safari → Teilen → Zum Home-Bildschirm</small></div></div>
         </div>
       </div>
+      <div class="settings-section">
+        <h3>Rechtliches</h3>
+        <div class="settings-group">
+          <div class="settings-row" onclick="Impressum.open()" style="cursor:pointer">
+            <div class="sr-label"><span>Impressum & Datenschutz</span><small>Angaben gemäß § 5 TMG</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--muted);flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+        </div>
+      </div>
     `;
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// IMPRESSUM (TASK-11)
+// ═══════════════════════════════════════════════════════
+const Impressum = {
+  open() {
+    document.getElementById('impressum-content').innerHTML = `
+      <div style="padding:0 16px 32px">
+
+        <div style="margin:20px 0 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Angaben gemäß § 5 TMG</div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6">
+          <b>Stephan Schumann</b><br>
+          Karl-Krieger-Straße 7<br>
+          14469 Potsdam<br>
+          Deutschland<br>
+          <a href="mailto:stephanschumann.foto@icloud.com" style="color:var(--accent);text-decoration:none">stephanschumann.foto@icloud.com</a>
+        </div>
+
+        <div style="margin:20px 0 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Copyright</div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6">
+          © 2026 Stephan Schumann – Alle Rechte vorbehalten.<br>
+          App-Konzept, Design und Code: Stephan Schumann.
+        </div>
+
+        <div style="margin:20px 0 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Verwendete Dienste & Lizenzen</div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6">
+          <b>Open-Meteo</b> – Wetterdaten<br>
+          <span style="color:var(--muted);font-size:12px">open-meteo.com · CC BY 4.0</span><br><br>
+          <b>OpenTopoData</b> – Geländehöhen (EUDEM 25m)<br>
+          <span style="color:var(--muted);font-size:12px">opentopodata.org · Öffentliche Daten</span><br><br>
+          <b>Skyfield</b> – Astronomische Berechnungen<br>
+          <span style="color:var(--muted);font-size:12px">rhodesmill.org/skyfield · MIT License</span><br><br>
+          <b>JPL DE421 Ephemeris</b> – Planetenbahnen<br>
+          <span style="color:var(--muted);font-size:12px">NASA Jet Propulsion Laboratory · Public Domain</span><br><br>
+          <b>Leaflet.js</b> – Kartenkomponente<br>
+          <span style="color:var(--muted);font-size:12px">leafletjs.com · BSD 2-Clause License</span>
+        </div>
+
+        <div style="margin:20px 0 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Datenschutz</div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6">
+          Diese App verarbeitet <b>keine personenbezogenen Daten</b> auf dem Server.<br><br>
+          <b>GPS-Standort:</b> Wird nur auf explizite Anfrage verwendet (Umkreisfilter). Keine dauerhafte Speicherung, kein Tracking.<br><br>
+          <b>Lokaler Speicher:</b> Einstellungen, Filter und Verifikationen werden ausschließlich im Browser (localStorage) gespeichert und verlassen das Gerät nicht.<br><br>
+          <b>Analyse / Tracking:</b> Keine. Es werden weder Cookies für Analysezwecke gesetzt noch Nutzungsdaten an Dritte weitergegeben.
+        </div>
+
+      </div>
+    `;
+    document.getElementById('impressum-overlay').classList.add('open');
+    document.getElementById('impressum-sheet').classList.add('open');
+  },
+  close() {
+    document.getElementById('impressum-overlay').classList.remove('open');
+    document.getElementById('impressum-sheet').classList.remove('open');
   }
 };
 

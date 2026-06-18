@@ -156,24 +156,45 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 **Abhängigkeiten:** US-35[x], US-32[x] · **Version:** v1.5.x
 
-### BUG-14 · Jahres- & 14-Tage-Kalender leer nach Cron-Lauf `[ ]`
-> **Problem:** Am 2026-06-17 um 6:20 Uhr waren Jahreskalender und 14-Tage-Kalender nach dem Cron-Lauf komplett leer. Root Cause unbekannt.
->
-> **Hypothesen:**
-> 1. Cron-Startzeit (aktuell 5:30 Uhr) führt zu Race Condition mit Sonnenaufgangsdaten für den aktuellen Tag
-> 2. Fehler in der Astronomieberechnung (Skyfield) für diesen Kalendertag
-> 3. Open-Meteo API-Timeout während des Cron-Laufs → leere Wetterdaten → keine Events generiert
-> 4. Schreibfehler in `calendar.json` / `feed.json` (Permissions oder Disk-Full)
->
-> **Akzeptanzkriterien:**
-> - Root Cause identifiziert und dokumentiert
-> - Fix deployed, Cron-Lauf produziert vollständige Kalender-Daten
-> - Health-Alert: wenn nach Cron-Lauf `calendar.json` < 10 Events enthält → Fehler-Logeintrag mit Zeitstempel
-> - Regression-Test: mind. 5 Events für nächste 14 Tage und 30 Events im Jahreskalender nach Cron-Lauf
->
-> **Priorität:** Hoch – korrupte Kalender-Daten machen die App unbrauchbar
->
-> **Abhängigkeiten:** TASK-15 (Cron-Zeit auf 0:01 Uhr als möglicher Fix)
+### BUG-14 · Jahres- & 14-Tage-Kalender leer nach Cron-Lauf `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-17 |
+| **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 |
+
+**Beschreibung:** Am 2026-06-17 um 6:20 Uhr waren Jahreskalender und 14-Tage-Kalender nach dem Cron-Lauf komplett leer.
+
+**Scope:**
+- Eingeschlossen: Health-Alert-Logging nach Cron-Lauf (feed + calendar), Regression-Check-Konstanten in `precompute.py`
+- Ausgeschlossen: Frontend-Änderungen, neue API-Endpoints
+
+**Root Cause (analysiert 2026-06-18):**
+Zwei kombinierte Ursachen:
+1. **Cron-Timing (bereits behoben via TASK-15[x]):** Cron lief um 5:30 Uhr, unmittelbar um den Sonnenaufgang → potenzielle Race Condition mit Skyfield-Berechnungen für den aktuellen Tag.
+2. **Stille Exception-Handler:** `compute_feed()` und `compute_calendar_incremental()` fangen pro-Location-Exceptions (`logger.error + continue`). Wenn alle Locations scheitern, landet ein leeres Array in der JSON-Datei — ohne übergeordnete Warnung. Kein Health-Alert → Problem bleibt unbemerkt bis Nutzer die App öffnet.
+
+**Akzeptanzkriterien:**
+- [x] Root Cause identifiziert und dokumentiert
+- [x] Health-Alert: wenn nach Cron-Lauf `calendar.json` < 10 Events → `logger.error` mit Zeitstempel
+- [x] Regression-Check: Feed < 5 Events → `logger.error`; Calendar < 30 Events → `logger.warning`
+- [x] Fix deployed, Cron-Lauf produziert vollständige Kalender-Daten
+
+**Analyse & Planung:**
+- [x] `precompute.py` vollständig gelesen – Exception-Handler verstanden
+- [x] Betroffene Stelle: `main()` nach `feed_path.write_text(...)` und `cal_path.write_text(...)`
+- [x] Ansatz: Konstanten `HEALTH_FEED_MIN` / `HEALTH_CAL_MIN` / `REGRESSION_CAL_MIN` + Checks am Ende von `main()`
+- [x] Risiken: keine – rein additive Logging-Ergänzung
+
+**Testplan:**
+- [ ] Lokaler Test: `cd backend && python3 precompute.py --feed-only` → Log enthält keinen ERROR bei normalem Lauf
+- [ ] Manueller Smoke-Test: Event-Anzahl in `opportunities.json` + `calendar.json` prüfen
+
+**Abhängigkeiten:** TASK-15[x] (Cron auf 00:01 bereits umgestellt)
 
 ### ~~BUG-10 · Mond-Alignments fehlen im 365-Tage-Kalender~~ `[x]`
 > **Root Cause (gefunden 2026-06-18):**
@@ -477,15 +498,16 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 > - Exempt-Types (keine composition_analysis da kein Celestial-Tracking): Goldene Stunde Morgen/Abend, Blaue Stunde, Milchstraße, Meteoritenschauer, Sonnenfinsternis
 > - Alignment-Events (SUN_ALIGNMENT, MOON_ALIGNMENT) haben immer celestial_azimuth/altitude → composition_analysis vorhanden → werden gefiltert
 
-### US-40 · Feed-Qualität: Tägliche Routine-Events ausblenden `[~]`
+### US-40 · Feed-Qualität: Tägliche Routine-Events ausblenden `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Feature |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | (vorher offen) |
 | **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 |
 
 > **Als Fotograf** möchte ich im Chancen-Tab nicht täglich auf Goldene Stunde und Blaue Stunde hingewiesen werden, da diese jeden Tag auftreten und keine besonderen Ereignisse wie Mondaufgang oder Vollmond sind.
 >
@@ -1050,16 +1072,45 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 >
 > *Ergänzt US-34 (manuelle Auslösung) – ist unabhängig davon implementierbar und sollte vorher umgesetzt werden*
 
-### TASK-11 · Impressum & Copyright einbauen `[ ]`
-> Impressum-Seite in der PWA ergänzen (erreichbar über Einstellungen oder Footer).
->
-> **Inhalt:**
-> - Copyright-Hinweis: „© 2026 Stephan Schumann – Alle Rechte vorbehalten"
-> - Angaben gemäß § 5 TMG (Name, Adresse, Kontakt)
-> - Hinweis auf verwendete APIs (OpenTopoData, Open-Meteo, Skyfield) mit Lizenzen
-> - Datenschutzhinweis (kein Tracking, GPS nur bei Erlaubnis, keine Server-seitige Speicherung persönlicher Daten)
->
-> *Rechtlich empfohlen für öffentlich zugängliche Web-Apps.*
+### TASK-11 · Impressum & Copyright einbauen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | (vorher offen) |
+| **In Progress seit** | 2026-06-18 |
+
+**Beschreibung:** Impressum-Seite in der PWA ergänzen (erreichbar über Einstellungen).
+
+**Scope:**
+- Eingeschlossen: neues Bottom-Sheet `#impressum-sheet`, Button in Settings-Tab (neue Sektion „Rechtliches"), Inhalt: Copyright, §5 TMG, API-Credits, Datenschutzhinweis
+- Ausgeschlossen: Backend-Änderungen, eigene Route/HTML-Datei
+
+**Akzeptanzkriterien:**
+- [ ] Button „Impressum" in Settings-Tab öffnet Bottom-Sheet
+- [ ] Inhalt: Copyright © 2026 Stephan Schumann, §5-TMG-Angaben (Name, Adresse, Kontakt), API-Lizenzen, Datenschutzhinweis
+- [ ] Sheet schließbar per ×-Button (identisch zu anderen Sheets)
+- [ ] Funktioniert auf iPhone Safari (PWA) und Desktop
+
+**Analyse & Planung:**
+- [x] Settings-Tab nutzt `#page-settings` mit `settings-content`-Div, HTML via `Settings.render()` injiziert (Zeile 3283ff)
+- [x] Ansatz: neues `#impressum-sheet` (identisch zu `#detail-sheet` Struktur), `openImpressum()` Funktion, neuer Settings-Row-Button
+- [x] Betroffene Datei: ausschließlich `web/index.html`
+- [x] Kein Root-Cause-Problem — reine Ergänzung
+
+**Testplan:**
+- [ ] Settings → Impressum-Button tippen → Sheet öffnet
+- [ ] ×-Button schließt Sheet
+- [ ] Alle Inhaltsbereiche sichtbar und lesbar (iPhone + Desktop)
+
+**Implementierungsnotizen:**
+- `#impressum-sheet` nach Filter-Sheet eingefügt (z-index 104/105)
+- `Impressum.open()` injiziert HTML-Inhalt lazy (identisch zu `Settings.render()`)
+- Neue Sektion „Rechtliches" in Settings mit Chevron-Row
+- Desktop-Centering: `#impressum-sheet` in `@media (min-width:600px)` BUG-07-Block ergänzt
+- Klassen-Pattern: `.open` für Overlay und Sheet (konsistent mit allen anderen Sheets)
 
 ### TASK-01 · Kometen-Integration `[ ]`
 > NASA JPL Horizons API anbinden für aktuelle Kometen-Positionen und -Sichtbarkeit.

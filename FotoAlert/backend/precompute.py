@@ -70,6 +70,15 @@ CACHE_DIR = Path(__file__).parent / "data" / "cache"
 # ─────────────────────────────────────────────────────────────────────────────
 ALIGNMENT_TOLERANCE_DEG = 2.0  # Maximale Abweichung in Azimut und Höhe
 
+# ─────────────────────────────────────────────────────────────────────────────
+# BUG-14: Health-Alert Schwellwerte
+# Wenn nach dem Cron-Lauf weniger Events als diese Mindestwerte vorhanden sind,
+# wird ein ERROR-Log erzeugt — damit Probleme nicht still bleiben.
+# ─────────────────────────────────────────────────────────────────────────────
+HEALTH_FEED_MIN      = 5   # Feed: mindestens 5 Events für 14 Tage
+HEALTH_CAL_MIN       = 10  # Kalender: kritischer Schwellwert (ERROR)
+REGRESSION_CAL_MIN   = 30  # Kalender: Regression-Schwellwert (WARNING)
+
 # Eventtypen, die KEINEN Alignment-Filter erhalten
 # (kein Celestial-Tracking auf Motivpunkt → composition_analysis ist None)
 _ALIGNMENT_FILTER_EXEMPT = {
@@ -667,6 +676,14 @@ async def main(args: argparse.Namespace) -> None:
             encoding="utf-8",
         )
         logger.info("✅ opportunities.json: %d Events (%.1fs)", len(feed), time.time() - t1)
+        # BUG-14: Health-Alert Feed
+        if len(feed) < HEALTH_FEED_MIN:
+            logger.error(
+                "🚨 HEALTH-ALERT [%s]: opportunities.json enthält nur %d Event(s) "
+                "(Schwellwert: %d). Mögliche Ursachen: Skyfield-Fehler, API-Timeout "
+                "oder fehlerhafte Location-Daten. Bitte Logs prüfen.",
+                computed_at, len(feed), HEALTH_FEED_MIN,
+            )
 
     # ── Schicht 2b: 365-Tage Kalender (inkrementell) ─────────────────────────
     if run_calendar:
@@ -689,6 +706,20 @@ async def main(args: argparse.Namespace) -> None:
             encoding="utf-8",
         )
         logger.info("✅ calendar.json: %d Events (%.1fs)", len(calendar), time.time() - t2)
+        # BUG-14: Health-Alert Kalender
+        if len(calendar) < HEALTH_CAL_MIN:
+            logger.error(
+                "🚨 HEALTH-ALERT [%s]: calendar.json enthält nur %d Event(s) "
+                "(kritischer Schwellwert: %d). Kalender ist praktisch leer — "
+                "Jahresansicht in der App wird leer sein. Bitte Logs prüfen.",
+                computed_at, len(calendar), HEALTH_CAL_MIN,
+            )
+        elif len(calendar) < REGRESSION_CAL_MIN:
+            logger.warning(
+                "⚠️  HEALTH-WARN [%s]: calendar.json enthält nur %d Event(s) "
+                "(Regression-Schwellwert: %d). Erwartet werden ≥ %d Events.",
+                computed_at, len(calendar), REGRESSION_CAL_MIN, REGRESSION_CAL_MIN,
+            )
 
     logger.info("=== Vorberechnung abgeschlossen in %.1fs ===", time.time() - t0)
 
