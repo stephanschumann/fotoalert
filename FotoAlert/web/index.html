@@ -834,7 +834,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.31';
+const APP_VERSION = '1.4.32';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1037,7 +1037,9 @@ const Feed = {
       const msg = Search.query
         ? `Keine Chancen für „${Search.query}" gefunden.`
         : n > 0
-          ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
+          ? Filter.activeCount() > 0
+            ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
+            : `Keine besonderen Chancen in den nächsten 14 Tagen. Goldene & Blaue Stunde über den Eventtyp-Filter einblenden.`
           : `Keine Chancen gefunden. Mindest-Score: ${pct(CFG.minScore)}`;
       el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><p>${msg}</p></div>`;
       return;
@@ -1590,14 +1592,21 @@ const Filter = {
     if (btn) btn.style.color = n > 0 ? 'var(--gold)' : '';
   },
 
+  // US-40: Tägliche Routine-Events werden im Feed standardmäßig ausgeblendet.
+  // Opt-in über Eventtyp-Filter im FilterSheet.
+  _ROUTINE_TYPES: ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'],
+
   apply(data) {
     const s = this.state;
+    // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
+    const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
+    const expanded = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
     return data.filter(o => {
       if (s.eventTypes.length) {
-        // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
-        const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
-        const expanded = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
         if (!expanded.includes(o.event_type)) return false;
+      } else {
+        // Default: Routine-Events (täglich) ausblenden; opt-in via Eventtyp-Filter
+        if (this._ROUTINE_TYPES.includes(o.event_type)) return false;
       }
       if (s.tageszeit.length) {
         // Exakte Skyfield-Zeiten aus dem Backend nutzen (pro Location/Datum berechnet)

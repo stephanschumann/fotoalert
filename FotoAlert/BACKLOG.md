@@ -442,15 +442,16 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 > - Karte: Leaflet.js Satellit, Zoom-Controls
 > - Kein Backend-Call nötig (Frontend-Berechnung auf bestehenden Locationdaten)
 
-### US-57 · Alignment-Qualitätsfilter: 2°-Schärfezone `[~]`
+### US-57 · Alignment-Qualitätsfilter: 2°-Schärfezone `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Feature |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-18 |
 | **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 |
 
 > **Als Fotograf** möchte ich, dass nur Himmelsereignisse im Feed erscheinen, die sich innerhalb eines definierten Toleranzbereichs (Azimuth + Höhe) der Sichtachse zum Motiv befinden, damit ausschließlich fotografisch relevante Alignments angezeigt werden.
 >
@@ -476,18 +477,42 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 > - Exempt-Types (keine composition_analysis da kein Celestial-Tracking): Goldene Stunde Morgen/Abend, Blaue Stunde, Milchstraße, Meteoritenschauer, Sonnenfinsternis
 > - Alignment-Events (SUN_ALIGNMENT, MOON_ALIGNMENT) haben immer celestial_azimuth/altitude → composition_analysis vorhanden → werden gefiltert
 
-### US-40 · Feed-Qualität: Tägliche Routine-Events ausblenden `[ ]`
+### US-40 · Feed-Qualität: Tägliche Routine-Events ausblenden `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Feature |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | (vorher offen) |
+| **In Progress seit** | 2026-06-18 |
+
 > **Als Fotograf** möchte ich im Chancen-Tab nicht täglich auf Goldene Stunde und Blaue Stunde hingewiesen werden, da diese jeden Tag auftreten und keine besonderen Ereignisse wie Mondaufgang oder Vollmond sind.
 >
 > **Hintergrund:** US-03 hat Goldene & Blaue Stunde als technische Events eingeführt – diese Zeitfenster bleiben für den Tageszeit-Filter und die Detail-Anzeige erhalten. Im Feed-Tab sollen sie aber standardmäßig nicht als eigenständige Chancen erscheinen.
->
-> **Akzeptanzkriterien:**
-> - Goldene Stunde (Morgen/Abend) und Blaue Stunde werden im Feed-Tab standardmäßig nicht angezeigt
-> - Nutzer können sie über den Eventtyp-Filter explizit einblenden (opt-in)
-> - Tageszeit-Filter und Detail-Anzeige (Golden/Blue Hour Zeitfenster) bleiben unberührt
-> - Jahreskalender-Tab: Routine-Events dort ebenfalls ausblenden oder klar als Dauerläufer kennzeichnen
->
-> *Differenziert von US-03 ✅ (technische Berechnung bleibt) und US-36 (betrifft Alignment-Events, nicht Routine-Events)*
+
+**Scope:**
+- Eingeschlossen: `Filter.apply()` Default-Filter für Routine-Types, Feed Empty-State-Meldung
+- Ausgeschlossen: Backend-Änderungen, Tageszeit-Filter, Detail-Anzeige der Zeitfenster, Settings
+
+**Akzeptanzkriterien:**
+- [~] Goldene Stunde (Morgen/Abend) und Blaue Stunde werden im Feed-Tab standardmäßig nicht angezeigt
+- [~] Nutzer können sie über den Eventtyp-Filter explizit einblenden (opt-in)
+- [ ] Tageszeit-Filter und Detail-Anzeige (Golden/Blue Hour Zeitfenster) bleiben unberührt
+- [~] Jahreskalender-Tab: gleicher Filter (via `Filter.apply()`)
+
+**Analyse & Planung:**
+- [x] `Filter.apply()` in `web/index.html` analysiert — Filterlogik klar verstanden
+- [x] `ET_EXPAND` und `expanded` werden aus dem Callback herausgezogen (einmalige Berechnung)
+- [x] Neue Konstante `ROUTINE_TYPES = ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde']`
+- [x] Default-Filter: wenn `s.eventTypes.length === 0` → Routine-Events blocken; wenn User Goldene Stunde / Blaue Stunde im Filter wählt → einblenden
+- [x] Feed Empty-State anpassen: wenn `Filter.activeCount() === 0` aber Events vorhanden → spezifische Meldung
+
+**Implementierungsnotizen:**
+- Kein Badge-Änderung nötig — Routine-Filter ist kein "User-Filter", zählt nicht in `activeCount()`
+- `Filter.apply()` wird sowohl für Feed als auch für Jahreskalender (`CalendarView`) genutzt → ein Fix deckt beides ab
+
+*Differenziert von US-03 ✅ (technische Berechnung bleibt) und US-36 (betrifft Alignment-Events, nicht Routine-Events)*
 
 ### US-33 · Developer Tool: Locationscout Import-Management
 > **Als App-Host** möchte ich neue Locations aus Locationscout-Listen komfortabel importieren und bereits abgelehnte Spots dauerhaft ausschließen können.
