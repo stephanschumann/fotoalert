@@ -63,7 +63,10 @@ echo ">>> Dependencies prüfen..."
 # Danach daemon-reload + Timer-Neustart, damit neue OnCalendar-Zeiten wirken.
 echo ">>> systemd-Units aktualisieren..."
 sudo cp "$DEPLOY_DIR/fotoalert-precompute.timer" /etc/systemd/system/fotoalert-precompute.timer
-sudo cp "$DEPLOY_DIR/fotoalert-precompute.service" /etc/systemd/system/fotoalert-precompute.service
+# Platzhalter __APP_DIR__ und __VENV_DIR__ durch tatsächliche Pfade ersetzen
+sed "s|__APP_DIR__|$APP_DIR|g; s|__VENV_DIR__|$VENV_DIR|g" \
+    "$DEPLOY_DIR/fotoalert-precompute.service" \
+    | sudo tee /etc/systemd/system/fotoalert-precompute.service > /dev/null
 sudo systemctl daemon-reload
 sudo systemctl restart fotoalert-precompute.timer
 echo ">>> Timer neu geladen: $(systemctl show fotoalert-precompute.timer --property=OnCalendar --value)"
