@@ -23,8 +23,8 @@ Ausführung:
   python3 precompute.py --full                    # Kalender vollständig neu berechnen
   python3 precompute.py --feed-only --location-id pfingstberg  # Nur eine Location
 
-Automatisch täglich per Cron (05:30 Uhr):
-  30 5 * * * cd "/Users/stephan/Claude/Projects/Foto Location Guide/FotoAlert/backend" && python3 precompute.py >> logs/precompute.log 2>&1
+Automatisch täglich per Cron (00:01 Uhr UTC):
+  1 0 * * * cd "/Users/stephan/Claude/Projects/Foto Location Guide/FotoAlert/backend" && python3 precompute.py >> logs/precompute.log 2>&1
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ from data.locations import LOCATIONS
 # die andere Ergebnisse für bereits berechnete Tage liefern würden.
 # Format: "MAJOR.MINOR" – Minor = kleine Scoring-Anpassung, Major = Struktur.
 # ─────────────────────────────────────────────────────────────────────────────
-ALGORITHM_VERSION = "1.1"  # BUG-03: Mondgröße mit tatsächlicher Earth-Moon-Distanz
+ALGORITHM_VERSION = "1.2"  # BUG-10: _in_photo_window-Filter für Mond-Alignments erzwingen
 
 logging.basicConfig(
     level=logging.INFO,

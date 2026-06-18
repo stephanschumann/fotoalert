@@ -1,10 +1,10 @@
 [Unit]
-Description=FotoAlert – Täglich 05:30 Uhr Precompute ausführen
+Description=FotoAlert – Täglich 00:01 Uhr Precompute ausführen
 Requires=fotoalert-precompute.service
 
 [Timer]
-# Täglich um 05:30 Uhr Serverzeit (UTC) → 07:30 Uhr MEZ / 06:30 Uhr MESZ
-OnCalendar=*-*-* 05:30:00
+# Täglich um 00:01 Uhr Serverzeit (UTC) → 02:01 Uhr MEZ / 02:01 Uhr MESZ
+OnCalendar=*-*-* 00:01:00
 # Leichte Zufallsverzögerung (bis 5 Min.) verhindert Server-Lastspitzen bei mehreren Timern
 RandomizedDelaySec=300
 # Falls Server um 05:30 ausgeschaltet war, beim nächsten Start nachholen

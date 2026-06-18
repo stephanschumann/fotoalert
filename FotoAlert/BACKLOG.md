@@ -11,31 +11,216 @@
 
 ## 🐛 BugFixes
 
-### BUG-10 · Alignment-Logik: Verifikation, Fehleranalyse & Fix `[ ]`
-> **Problem:** Beim Filtern nach „Mond-Alignment" oder „Sonnen-Alignment" werden keine Ereignisse angezeigt. Nach BUG-08-Fix (Filter greift jetzt korrekt) zeigt das, dass die Events möglicherweise gar nicht im Cache existieren — nicht, dass der Filter nicht funktioniert.
+### BUG-17 · Vollbild-Nutzung: Safe Area & App-Hintergrundfarbe `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-17 16:22 |
+| **In Progress seit** | 2026-06-17 17:10 |
+| **Abgeschlossen** | 2026-06-17 17:45 |
+
+**Beschreibung:**
+Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen zu großen Abstand zwischen der Statusleiste (Uhrzeit, Kamera, Batterie/WLAN) und dem App-Header – der Hintergrund füllt diese Zone mit der falschen Farbe. Unten zeigt der Bereich hinter dem Tab-Menü Schwarz statt der App-Hintergrundfarbe, und das Menü sitzt zu nah an der Home-Indicator-Linie.
+
+**Scope:**
+- Eingeschlossen: `viewport-fit=cover` in `<meta name="viewport">`, `env(safe-area-inset-top)` auf Header, `env(safe-area-inset-bottom)` auf Tab-Bar, `background-color` auf `html`/`body`
+- Ausgeschlossen: Inhaltliche Layout-Änderungen, Sheets/Modals (sofern nicht direkt betroffen)
+
+**Akzeptanzkriterien:**
+- [x] `html` und `body` tragen die App-Dunkelfarbe – kein schwarzer Streifen oben oder unten sichtbar
+- [x] App-Content/Header reicht oben hinter die Statusleiste (`viewport-fit=cover` + `padding-top: env(safe-area-inset-top)`)
+- [x] Tab-Menü hat unten ausreichend Abstand zur Home-Indicator-Linie (`padding-bottom: env(safe-area-inset-bottom)`)
+- [x] Kein Content wird durch Statusleiste oder Home-Indicator verdeckt (Tappability vollständig erhalten)
+- [x] Auf iPhone in Safari PWA-Modus getestet und visuell bestätigt
+
+**Analyse & Planung** *(vor Implementierungsbeginn ausfüllen):*
+- [x] `<meta name="viewport">` in `web/index.html` prüfen – `viewport-fit=cover` bereits gesetzt ✅
+- [x] `html`, `body`, `#app` auf aktuelle `background-color` prüfen – `background: var(--bg)` bereits korrekt ✅
+- [x] Header-Element und dessen `padding-top` prüfen – war **hardcoded `52px`** ❌ → Fix: `calc(env(safe-area-inset-top, 0px) + 12px)`
+- [x] Tab-Bar/Bottom-Nav und deren `padding-bottom` prüfen – nutzte `var(--safe-b)` (CSS-Variable mit `env()`) → Safari-Bug-Risiko; Fix: `env()` direkt inlinen
+- [x] `#search-bar`-Overlay (Zeile 68): fehlte `padding-top` → Fix ergänzt
+
+**Testplan:**
+- [x] Manuelle Testschritte: App auf iPhone in Safari als PWA geprüft – visuell bestätigt ✅
+- [x] Unit Tests: nicht anwendbar (rein visuell/CSS)
+
+**Scope-Änderungen** *(chronologisches Log):*
+*(leer bei Erstellung)*
+
+**Implementierungsnotizen:**
+- `#header padding-top`: `52px` → `calc(env(safe-area-inset-top, 0px) + 12px)` — passt sich dynamisch an alle iPhone-Modelle an (Dynamic Island: ~59px, Standard-Notch: ~47px, Desktop-Override: 20px bleibt)
+- `#tab-bar`: `var(--safe-b)` durch direkte `env(safe-area-inset-bottom, 0px)` ersetzt — umgeht Safari-Bug mit `env()` in Custom Properties
+- `#search-bar`: `padding: 0 16px` → `padding: calc(env(safe-area-inset-top, 0px) + 4px) 16px 4px` — verhindert Überlappung mit Statusleiste wenn Suche offen
+
+---
+
+
+### BUG-18 · Mond-Erde-Distanz: Anzeige zeigt ~370 km statt ~384.400 km `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | Done |
+| **In Progress seit** | 2026-06-17 18:00 |
+| **Abgeschlossen** | 2026-06-18 |
+
+**Root Cause:** Frontend dividierte `moon_earth_distance_km` (korrekt in km im Cache, z.B. 364.312) durch 1000 → zeigte ~364 statt 364.312.  
+**Fix:** `/1000` in `web/index.html` entfernt · `astronomy.py` auf `distance.km` direkt umgestellt · Assertion `350_000 < dist_km < 410_000` ergänzt.
+
+### BUG-19 · iPhone: Close-Button in Sheets nicht erreichbar `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | Done |
+| **In Progress seit** | 2026-06-17 18:00 |
+| **Abgeschlossen** | 2026-06-18 |
+
+**Root Cause:** (a) Close-Button in scrollbaren Sheets scrollte mit Inhalt weg. (b) `#add-sheet`-Header zu nah an Dynamic Island. Safari WebKit Compositor-Bug: `position:sticky` + `z-index` in `overflow-y:auto` rendert unter Leaflet-Tiles.  
+**Fix:** Alle Sheets (`#filter-sheet`, `#detail-sheet`, `#loc-detail-sheet`) auf Flexbox umgestellt – nur Content-Div scrollt. Header/Footer mit `flex-shrink:0`. `.add-header` mit `env(safe-area-inset-top)`.
+
+### BUG-20 · PIN-Typen in FOV-Karte inkonsistent mit Legende `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | Done |
+| **In Progress seit** | 2026-06-17 18:00 |
+| **Abgeschlossen** | 2026-06-18 |
+
+**Root Cause:** FOV-Karte, Edit-Karte, AddLocation-Karte nutzten je unterschiedliche Marker-Typen ohne zentrales Objekt.  
+**Fix:** `MapMarkers`-Objekt eingeführt – Fotograf-Standort: SVG-Tropfen mit weißem Kern (goldener Drop-Pin), Motiv: SVG-Kreuzmarke mit weißem Mittelpunkt. Alle Karten, Labels und Legende zeigen identische SVG-Icons. v1.4.17.
+
+### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
+> **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
-> **Hypothesen (zu prüfen in dieser Reihenfolge):**
-> 1. **Keine Events generiert:** Mond-Alignment-Events entstehen nur wenn Mondazimut beim Auf/Untergang in `ideal_azimuth_range` der Location fällt UND Ereignis in golden/blue hour liegt (US-36-Filter). Diese Dreifach-Bedingung könnte für alle aktuellen BB-Locations im 14-Tage-Fenster nie erfüllt sein.
-> 2. **US-36-Dämmerungsfilter zu restriktiv:** Alignment-Events außerhalb ±30 Min. golden/blue hour werden bei der Generierung gefiltert.
-> 3. **Filter-UI String-Mismatch:** `_ET`-Array im FilterSheet stimmt nicht exakt mit Backend-EventType-Enum überein.
-> 4. **Azimut-Range der Locations zu eng:** Keine Location hat `ideal_azimuth_range` in der Richtung, aus der Mond für BB-Breite typischerweise auf/untergeht.
+> **Entscheidung: Option B – Tag-Chips**
+> Alle vier Lösungsoptionen dokumentiert, Option B wird implementiert:
 >
-> **Untersuchungsplan:**
-> - Schritt 1: `calendar.json` + Feed-Cache nach Alignment-Events durchsuchen (Typ, Datum, Location)
-> - Schritt 2: Einen Location × Datum-Fall manuell durch `opportunity.py` tracen
-> - Schritt 3: `azimuth_delta_deg`-Werte für Mond an bestehenden Locations prüfen — wie groß sind die typischen Abweichungen?
-> - Schritt 4: `_ET`-Array im FilterSheet gegen Backend-Enum (`opportunity.py`) abgleichen
-> - Schritt 5: Falls keine Events im 14-Tage-Fenster: 365-Kalender prüfen (existieren solche Events überhaupt in einem Jahresfenster?)
+> - **Option A – `inputmode="decimal"`:** Zeigt auf iOS den Dezimalpunkt. Einfachste Lösung, kein nativer Komma-Key auf deutschen Tastaturen.
+> - **Option B – Tag-Chips (GEWÄHLT):** Horizontaler Chip-Slider mit Standardbrennweiten. Kein Tastatur-Problem, Touch-optimiert, schnelle Auswahl.
+> - **Option C – Stepper:** +-/−-Buttons. Umständlich bei großen Werten (600mm).
+> - **Option D – Hybrid:** Chip-Schnellauswahl + „Andere…"-Eingabefeld. Maximale Flexibilität, höchster Aufwand.
+>
+> **Chip-Werte (Option B):** 10, 14, 20, 24, 28, 35, 50, 85, 100, 135, 200, 300, 400, 500, 600 mm
 >
 > **Akzeptanzkriterien:**
-> - Root Cause dokumentiert
-> - Wenn Algorithmus-Bug: Fix in `opportunity.py`/`precompute.py` + Cache-Neuberechnung
-> - Wenn US-36-Filter zu restriktiv: Schwellwert oder Ausnahmeregel anpassen + dokumentieren
-> - Wenn Filter-UI-Bug: String-Mismatch korrigiert
-> - Nachweislich ≥1 Mond-Alignment und ≥1 Sonnen-Alignment Event im 365-Kalender für ≥1 Location
-> - Falls im 14-Tage-Fenster keines vorhanden: UI-Hinweis statt leerer Liste (z.B. „Kein Mond-Alignment in den nächsten 14 Tagen")
+> - Horizontaler Chip-Slider mit allen 15 Werten (10–600 mm)
+> - Aktiver Chip visuell hervorgehoben
+> - Auswahl speichert `focal_length_mm` direkt (kein Submit nötig)
+> - Standardwert: zuletzt verwendete Brennweite oder 50 mm als Default
+> - Chips passen auf iPhone-SE-Breite; Overflow horizontal scrollbar
+> - Filter-Panel aktualisiert Ergebnisse direkt nach Chip-Tap
 >
-> *Prüft Zusammenspiel von: `opportunity.py` (Generierung), US-36-Dämmerungsfilter, FilterSheet `_ET`-Array*
+> **Abhängigkeiten:** US-32[x] (Filter-System)
+
+### BUG-22 · Änderungen in Locationdetails ohne Effekt auf Chancen `[ ]`
+> **Problem:** Nach dem Bearbeiten von Location-Feldern (außer Koordinaten) werden Chancen-Berechnungen nicht neu ausgelöst. Nutzer sehen veraltete Scores.
+>
+> **Differenzierung:**
+> - **`lat`/`lon` (Koordinaten):** Recompute via TASK-12[x] bereits implementiert → Regressionsprüfung
+> - **`focal_length_mm`:** Beeinflusst FOV → Pre-Compute nötig; prüfen ob TASK-12 das abdeckt
+> - **`observer_floor_height_m` (US-62):** Beeinflusst Elevation-Winkel → Recompute nötig
+> - **`name`/`description`:** Kein Recompute nötig – erwartetes Verhalten
+>
+> **Akzeptanzkriterien:**
+> - PATCH auf `focal_length_mm` triggert Hintergrund-Recompute (TASK-12-Mechanismus erweitern oder prüfen)
+> - PATCH auf `observer_floor_height_m` (nach US-62) triggert ebenfalls Recompute
+> - PATCH auf `name`/`description` triggert KEINEN Recompute
+> - Nach Recompute: Feed und Kalender zeigen aktualisierte Scores
+> - API-Log zeigt Recompute-Task-Start nach Focal-Length-PATCH (technischer Nachweis)
+>
+> **Abhängigkeiten:** TASK-12[x], US-62
+
+### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[ ]`
+> **Problem:** Der Eventtyp-Filter (z.B. „Mond-Alignment") im Filterpanel hat keinen Effekt auf die Kartenansicht. Alle Location-Pins erscheinen unabhängig vom Filter.
+>
+> **Lösungskonzept:** In der Kartenansicht wird der Filter semantisch neu interpretiert: nicht „zeige nur Events dieses Typs", sondern **„zeige nur Locations, für die dieser Eventtyp astronomisch möglich ist"** (standortbasierte Filterung).
+>
+> **Technische Basis:** US-35[x] berechnet `possible_bodies` pro Location. Daraus folgt, welche Event-Typen an einem Ort prinzipiell möglich sind.
+>
+> **Mapping Eventtyp → `possible_bodies`:**
+>
+> | Eventtyp-Filter | Bedingung |
+> |---|---|
+> | Mond-Alignment | `"moon" in possible_bodies` |
+> | Sonnen-Alignment | `"sun" in possible_bodies` |
+> | Mondaufgang/-untergang | `"moon" in possible_bodies` |
+> | Sonnenaufgang/-untergang | `"sun" in possible_bodies` |
+> | Goldene/Blaue Stunde | alle Locations (Sonne immer vorhanden) |
+>
+> **Wichtig:** Nur der Eventtyp-Filter ist in der Karte aktiv. Der Chancenwahrscheinlichkeits-Filter (%-Slider) wird in der Kartenansicht ausgegraut mit Hinweis „Nur in Listen-Ansicht verfügbar".
+>
+> **Akzeptanzkriterien:**
+> - Eventtyp-Filter „Mond-Alignment": Karte zeigt nur Locations mit `"moon" in possible_bodies`
+> - Chancenwahrscheinlichkeits-Filter in Kartenansicht visuell ausgegraut, Tooltip „Nur in Listen-Ansicht verfügbar"
+> - Filter-Zustand bleibt beim Wechsel Karte ↔ Feed erhalten
+> - Kein Filter aktiv: alle Location-Pins sichtbar (wie bisher)
+>
+> **Abhängigkeiten:** US-35[x], US-32[x]
+
+### BUG-14 · Jahres- & 14-Tage-Kalender leer nach Cron-Lauf `[ ]`
+> **Problem:** Am 2026-06-17 um 6:20 Uhr waren Jahreskalender und 14-Tage-Kalender nach dem Cron-Lauf komplett leer. Root Cause unbekannt.
+>
+> **Hypothesen:**
+> 1. Cron-Startzeit (aktuell 5:30 Uhr) führt zu Race Condition mit Sonnenaufgangsdaten für den aktuellen Tag
+> 2. Fehler in der Astronomieberechnung (Skyfield) für diesen Kalendertag
+> 3. Open-Meteo API-Timeout während des Cron-Laufs → leere Wetterdaten → keine Events generiert
+> 4. Schreibfehler in `calendar.json` / `feed.json` (Permissions oder Disk-Full)
+>
+> **Akzeptanzkriterien:**
+> - Root Cause identifiziert und dokumentiert
+> - Fix deployed, Cron-Lauf produziert vollständige Kalender-Daten
+> - Health-Alert: wenn nach Cron-Lauf `calendar.json` < 10 Events enthält → Fehler-Logeintrag mit Zeitstempel
+> - Regression-Test: mind. 5 Events für nächste 14 Tage und 30 Events im Jahreskalender nach Cron-Lauf
+>
+> **Priorität:** Hoch – korrupte Kalender-Daten machen die App unbrauchbar
+>
+> **Abhängigkeiten:** TASK-15 (Cron-Zeit auf 0:01 Uhr als möglicher Fix)
+
+### ~~BUG-10 · Mond-Alignments fehlen im 365-Tage-Kalender~~ `[x]`
+> **Root Cause (gefunden 2026-06-18):**
+> Zwei kombinierte Probleme:
+>
+> **1. Payload zu groß:** `calendar.json` = 149 MB, 84.045 Events. Der Browser lädt den `/calendar`-Endpoint nie vollständig — der Jahreskalender bleibt leer, weil die API-Antwort zu groß ist. Das 14-Tage-Feed (`opportunities.json`, 4,8 MB) hat keine solche Einschränkung.
+>
+> **2. Staler Cache:** `algorithm_version=None` → Cache wurde vor Einführung des `_in_photo_window`-Filters gebaut. Mond-Alignment-Events entstanden daher ganztägig (08–21h lokal) statt nur während der goldenen/blauen Stunde (20–21h). Das machte den Cache 3× größer als nötig.
+>
+> **Fix:**
+> - `precompute.py`: `ALGORITHM_VERSION` "1.1" → "1.2" → erzwingt vollständige Cache-Neuberechnung mit `_in_photo_window`-Filter
+> - `main.py`: `/calendar`-Endpoint erhält `year`-Parameter (zusätzlich zu `month`)
+> - `index.html`: `CalendarView` lädt pro Monat (`?month=X&year=Y`) statt alle 365 Tage auf einmal; Monatscache als `_monthCache: Map` im Client
+>
+> **Betroffene Dateien:** `precompute.py`, `main.py`, `web/index.html`
+>
+> **Status:** ✅ Abgeschlossen 2026-06-18 — getestet, Mond-Alignments im Jahreskalender sichtbar, month-based loading funktioniert.
+
+
+### ~~BUG-11 · App-Icon weicht vom App-Screen ab~~ `[x]`
+> **Problem:** Das KI-generierte App-Icon passte nicht zum Look des App-Screens.
+> **Fix:** Icon.png (Leica-Kamera) aus App-Screen als Basis; alle PWA-Größen (192×192, 512×512) neu generiert; Manifest-Pfade aktualisiert.
+> **Version:** v1.4.9
+
+### ~~BUG-12 · Fremddateien auf Server entfernen~~ `[x]`
+> **Problem:** `kanban.html` und `BACKLOG.md` waren öffentlich über den Webserver abrufbar.
+> **Fix:** `deploy.sh` löscht nach jedem `git pull` alle `*.md` und nicht-`index.html` HTML-Dateien aus `web/`.
+> **Version:** v1.4.9
+
+### ~~BUG-13 · Slider im Filterpanel unterschiedlich breit~~ `[x]`
+> **Problem:** Brennweite-Slider und Wahrscheinlichkeits-Slider hatten unterschiedliche Breiten.
+> **Referenz:** Breite des Wahrscheinlichkeits-Sliders ist maßgebend; Brennweite-Slider wird angepasst.
+> **Fix:** `.dual-range-wrap` erhält `padding: 0 11px` — Thumbs fluchten jetzt mit nativem Slider-Track.
+> **Version:** v1.4.9
+
+### ~~BUG-15 · Kartenansicht startet nicht in Standardansicht~~ `[x]`
+> **Problem:** Kartenansicht startete im Satellitenmodus statt OSM-Standard (Enabler: US-46).
+> **Fix:** `MapView.init()` initialisiert `layers.standard` (OpenStreetMap) als Default-Layer; Satellit/Nacht nur auf Nutzerauswahl.
+> **Version:** v1.4.9
+
+### ~~BUG-16 · Karten-Overlay „Details"-Link öffnet Gesamtübersicht~~ `[x]`
+> **Problem:** Der „Details"-Link im Pin-Popup öffnete die allgemeine Location-Übersicht statt das Location-Detail-Sheet der angeklickten Location.
+> **Fix:** `LocationDetail.open(loc.id)` direkt aus Karten-Popup aufgerufen.
+> **Version:** v1.4.9
 
 ### ~~BUG-07 · Sheets überschreiten iPhone-Breite auf Desktop~~ `[x]`
 > **Als Fotograf** möchte ich, dass Detail- und Änderungsansichten dieselbe Breite wie der iPhone-App-Container haben, damit das Layout auf Desktop-Bildschirmen konsistent aussieht.
@@ -403,6 +588,17 @@
 >
 > **Abhängigkeiten:** TASK-13 (braucht Deploy-Ziel), US-39 (Rollback-Strategie baut hierauf auf)
 
+
+### TASK-15 · Jahreskalender-Cron-Zeit auf 0:01 Uhr ändern `[~]`
+> **Als App-Host** möchte ich den Cron-Job für die Jahres- und 14-Tage-Kalenderberechnung auf 0:01 Uhr ändern, damit die Daten um Mitternacht aktualisiert werden (statt 5:30 Uhr morgens).
+>
+> **Akzeptanzkriterien:**
+> - Cron-Ausdruck: `30 5 * * *` → `1 0 * * *`
+> - Kein Konflikt mit anderen Cron-Jobs (US-34 Rolling-Forecast)
+> - Nach Änderung: Cron-Lauf um 0:01 Uhr im Log nachweisbar
+>
+> **Abhängigkeiten:** BUG-14 (möglicherweise verwandter Fehler), US-34[~]
+
 ### US-04 · Kalender-Integration für geplante Fotowalks
 > **Als Fotograf** möchte ich mit einem Tap einen Kalender-Eintrag für ein geplantes Foto-Event erstellen.
 >
@@ -440,6 +636,112 @@
 >
 > **Abhängigkeiten:** US-60 ✅, TASK-12 ✅
 
+
+### US-64 · Live Astro-Visualisierung (PhotoPills-like) `[ ]`
+> **Als Fotograf** möchte ich in Echtzeit sehen, wo sich Sonne und Mond am Himmel befinden, und diese Position relativ zu meinem Fotostandort und Motiv visualisiert bekommen.
+>
+> **Hintergrund:** FotoAlert hat Skyfield-Engine und Location-Paare. Diese Story ergänzt einen Live-Modus der die aktuelle Himmelsposition anzeigt und mit Locationdaten überlagert.
+>
+> **Akzeptanzkriterien:**
+> - Neuer API-Endpoint `GET /astro/live?location_id=X&ts=ISO8601`: liefert Azimut + Elevation für Sonne, Mond (und Milchstraßenzentrum) zum angegebenen Timestamp
+> - Frontend: Fotograf-Pin + Motiv-Pin auf Karte (aus Location-Daten); visuelle Bogenbahn Sonne/Mond überlagert
+> - Live-Modus: automatische Aktualisierung alle 60 Sekunden; Uhrzeit-Slider zum Scrubben durch den Tag
+> - Wenn Azimut des Himmelsobjekts innerhalb `ideal_azimuth_range`: grünes Highlight / Alignment-Indikator
+> - Keine AR, kein Exif – reine Karten- + Winkel-Visualisierung
+>
+> **Sequenzierung:**
+> ```
+> US-35[x] (possible_bodies) ──┐
+> US-37[x] (azimuth_delta)   ──┴─→ US-64 (Live Astro)
+> ```
+>
+> **Abhängigkeiten:** US-35[x], US-37[x]
+
+### US-65 · Automatisches Backup der App-Daten `[ ]`
+> **Als App-Host** möchte ich, dass wichtige App-Daten automatisch gesichert werden, damit bei Serverfehlern oder unbeabsichtigtem Überschreiben kein Datenverlust entsteht.
+>
+> **Scope:** Backup persistenter Nutzdaten (Code liegt in Git).
+>
+> **Akzeptanzkriterien:**
+> - **Quellen:** `custom_locations.json`, `location_overrides.json` (optional: `cache/` als Snapshot)
+> - **Trigger:** täglich via Cron (0:00 Uhr) + change-getriggert nach jedem PATCH/POST/DELETE auf Location-Endpoints
+> - **Retention:** 7 Versionen rolling; älteste Version wird automatisch gelöscht
+> - **Speicherort:** `backup/YYYY-MM-DD_HHmm/` auf Server, außerhalb Git-Repo
+> - **Restore:** `./restore.sh YYYY-MM-DD_HHmm` stellt Backup-Stand wieder her
+> - Logeintrag bei erfolgreichem Backup; Alert wenn Backup seit >25h ausgeblieben
+>
+> **Abhängigkeiten:** TASK-14, TASK-15 (Cron-Koordination)
+
+### US-66 · Host-Login für exklusive Funktionen `[ ]`
+> **Als App-Host** möchte ich mich mit einem Passwort in der App identifizieren können, damit ich Zugang zu administrativen Funktionen erhalte (Location-Bearbeitung, Debug-Info), die für normale Nutzer nicht sichtbar sind.
+>
+> **Akzeptanzkriterien:**
+> - Login-Dialog (Modal) erreichbar über verstecktes Trigger-Element (z.B. Mehrfach-Tap auf App-Header)
+> - Eingabe: Passwort-Feld (kein Username)
+> - Backend: `POST /auth/host` – Passwort-Vergleich via `bcrypt.checkpw()` gegen serverseitig gespeicherten Hash
+> - Bei Erfolg: Session-Token (JWT, 24h Laufzeit) im HTTP-only Cookie; Frontend erkennt Auth-Status
+> - **Passwort-Speicherung im Client:** nach Nutzer-Zustimmung sicherer Systemspeicher: Apple Keychain (iOS/macOS), Android Keystore, Windows Credential Manager – über Web Credential Management API (`navigator.credentials`) wo verfügbar
+> - Host-Modus: Admin-Badge im Header, Location-Bearbeitungs-Buttons sichtbar, Debug-Overlay erreichbar
+> - Logout: Button im Host-Menü; Session-Token gelöscht
+>
+> **Sequenzierung:**
+> ```
+> US-66 (Host-Login) ──→ US-68 (Host-Approval Workflow)
+> US-63[x] (Location-Edit) ←── erweitert durch US-66 (nur Host sichtbar)
+> ```
+>
+> **Abhängigkeiten:** keine (eigenständig implementierbar)
+
+### US-67 · Chancendetails: Azimut und Höhe relativ zur Motivspitze `[ ]`
+> **Als Fotograf** möchte ich bei einem Alignment-Event in verständlicher Sprache lesen, wo das Himmelsobjekt relativ zu meinem Motiv erscheint – z.B. „Mond 3° links neben dem Kirchturm, 5° darüber".
+>
+> **Hintergrund:** US-37[x] berechnet `azimuth_delta_deg` und `altitude_delta_deg`. Diese Rohwerte liegen im Cache vor, werden aber nur als Zahlen angezeigt.
+>
+> **Akzeptanzkriterien:**
+> - Im Event-Detail-Sheet: neue Sektion „Himmelsposition" mit Beschreibungstext:
+>   - `azimuth_delta < 0` → „links", `> 0` → „rechts"; `altitude_delta > 0` → „darüber", `< 0` → „darunter"
+>   - Schwellwerte: < 0.5° → „nahezu exakt auf dem Motiv"; 0.5–2° → „leicht"; > 5° → „deutlich"
+>   - Absoluter Azimut + Elevation als Sekundärinfo (für erfahrene Nutzer)
+> - Nur bei Alignment-Events (Mond-Alignment, Sonnen-Alignment); nicht bei Goldene Stunde, Mondaufgang etc.
+> - Immer relativ zum Motiv (nicht zur Kamera oder zum Norden)
+>
+> **Abhängigkeiten:** US-37[x]
+
+### US-68 · Host-Approval Workflow für Location-Änderungen `[ ]`
+> **Als normaler Nutzer** möchte ich Änderungsvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host sichtbar werden.
+>
+> **Hintergrund:** US-63[x] erlaubt vollständiges Bearbeiten. Diese Story fügt einen Review-Gate ein: Änderungen von Nicht-Host-Nutzern werden als Vorschläge gespeichert.
+>
+> **Akzeptanzkriterien:**
+> - Nicht-Host-Nutzer sehen „Änderung vorschlagen"-Button (statt direktem Edit)
+> - Vorschlag wird als `pending_override` in `location_overrides.json` gespeichert (Status: `pending`)
+> - Host-Dashboard (nach US-66-Login): Liste aller offenen Vorschläge mit Diff-Ansicht (alt ↔ neu)
+> - Host-Aktionen: „Annehmen" (Status `approved`, Wert übernommen) oder „Ablehnen" (Status `rejected`)
+> - Nach Annahme: Hintergrund-Recompute via TASK-12-Mechanismus
+> - Nicht-Host-Nutzer sehen an betroffener Location Hinweis „Vorschlag ausstehend"
+>
+> **Sequenzierung:**
+> ```
+> US-63[x] (Location-Edit-UI) ──┐
+> US-66 (Host-Login Auth)      ──┴─→ US-68 (Approval Workflow)
+> TASK-12[x] (Auto-Recompute) ──────→ US-68 (nach Approval)
+> ```
+>
+> **Abhängigkeiten:** US-63[x], US-66, TASK-12[x]
+
+### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[ ]`
+> **Als Fotograf vor Ort** möchte ich die Kartenansicht mit einem Tap auf meinen GPS-Standort zentrieren, damit ich schnell sehe, welche Fotostandorte in meiner Nähe liegen.
+>
+> **Akzeptanzkriterien:**
+> - „Mein Standort"-Button (Standort-Icon) in der Kartenansicht
+> - Tap: Karte zentriert auf aktuellen GPS-Standort (`navigator.geolocation.getCurrentPosition`), Zoom-Level 13
+> - GPS-Marker: blauer Puls-Punkt auf aktueller Position
+> - Wenn GPS-Berechtigung nicht erteilt: Anfrage; bei Ablehnung Toast „GPS-Zugriff nicht erlaubt"
+> - GPS-Koordinaten werden NICHT gespeichert (kein Tracking)
+> - GPS-Logik orientiert sich an US-32[x] (Standortnähe-Filter)
+>
+> **Abhängigkeiten:** US-32[x]
+
 ### US-17 · Lieblingslocations (Favorites)
 > **Als Fotograf** möchte ich Locations als Favoriten markieren können, **damit ich** meinen persönlichen Kern-Spotpool schnell filtern kann.
 >
@@ -469,9 +771,68 @@
 
 
 
-### US-07 · Atmosphärische Foto-Bedingungen
-> Nebel, goldene Wolken, roter Abendhimmel, sternenklare Nacht – Erweiterung des Wetter-Scorings.
-> *(Offen – Open-Meteo Wolkenschicht-Analyse ausbauen + DWD Nebel-Gitter)*
+### US-07 · Goldene Wolken & Himmelsröte Scoring `[ ]`
+> **Als Fotograf** möchte ich für Goldene-Stunde-Events eine Einschätzung der Wolkenstimmungsqualität sehen – ob Bedingungen für dramatische goldene Wolken oder leuchtende Himmelsröte vorliegen – damit ich Go/No-Go-Entscheidungen noch gezielter treffen kann.
+>
+> **Hintergrund:** US-42 [x] zeigt bereits Gesamtbewölkung als Prozentwert. Dieses Ticket erweitert das um eine qualitative Einschätzung auf Basis der Wolkenhöhenschichtung: tiefe Wolken blockieren das Licht, mittlere und hohe Wolken reflektieren und färben es golden/rot.
+>
+> **Nicht in Scope:** Nebel (DWD Nebel-Gitter, eigenständiges Folge-Ticket), sternenklare Nacht (→ TASK-09 Bortle-Karte)
+>
+> **Differenzierung zu US-42 [x]:** US-42 zeigt vorhandene Open-Meteo-Felder (Gesamtbewölkung) an. US-07 berechnet einen neuen Score aus drei Wolkenhöhenparametern (`cloudcover_low/mid/high`), die bisher nicht abgerufen werden.
+>
+> **API-Entscheidung:** Open-Meteo (bereits integriert) wird um `cloudcover_low`, `cloudcover_mid`, `cloudcover_high` erweitert. Sunsethue API als optionaler Enrichment-Layer möglich, aber nicht nötig: Eigenberechnung liefert ausreichende Qualität ohne neue externe Abhängigkeit. Quellen: [Open-Meteo](https://open-meteo.com/), [Sunsethue](https://sunsethue.com/dev-api)
+>
+> **Sequenzierung:**
+> ```
+> US-42 [x] (Basis Wetter-Anzeige + Open-Meteo Integration)
+>   └→ US-07 (Goldene Wolken & Himmelsröte Scoring)  ← kein Blocker, direkt implementierbar
+>           └→ US-55 [x] (Score-Erklärungen via ⓘ), ggf. Erweiterung um golden_cloud_score-Info
+>           └→ US-07b (Nebel & atmosphärische Sonderbedingungen, zukünftiges Ticket)
+> ```
+>
+> **Akzeptanzkriterien:**
+>
+> **Backend – Datenerhebung:**
+> - Open-Meteo hourly-Request um `cloudcover_low`, `cloudcover_mid`, `cloudcover_high` erweitert (nur Parameter ergänzen, kein separater API-Call)
+> - Neue Felder werden im bestehenden Wetter-Cache mitgespeichert und im Event-Objekt mitgegeben
+> - Betroffene Datei: `backend/weather.py` o.ä. (wo aktuell Open-Meteo aufgerufen wird)
+>
+> **Backend – Scoring-Algorithmus `_golden_cloud_score(cl, cm, ch) → float`:**
+> - Input: `cloudcover_low` (cl), `cloudcover_mid` (cm), `cloudcover_high` (ch), jeweils 0–100 %
+> - Output: Score 0.0–1.0
+> - Logik:
+>   - `cl > 80 %` → Score ≤ 0.10 (niedrige Wolken blockieren Licht vollständig)
+>   - Mittlere + hohe Bewölkung < 10 % → Score ≤ 0.20 (klarer Himmel, nichts zum Einfärben)
+>   - Mittlere + hohe Bewölkung > 90 % → Score ≤ 0.25 (gleichmäßige Decke, diffuses Licht)
+>   - Sweet Spot: mittlere + hohe Bewölkung 25–65 %, niedrige Wolken < 30 % → Score 0.70–1.0
+>   - Penalty: jeder Prozentpunkt niedrige Wolken über 30 % reduziert den Score graduell (exponentiell)
+> - Score wird **nur** für Events innerhalb Goldener/Blauer Stunde (±30 Min.) berechnet – für andere Event-Typen `null`
+> - Neue Konstante `GOLDEN_CLOUD_VERSION` in `precompute.py` → erzwingt Cache-Neuberechnung nach erstem Deployment
+>
+> **Backend – Integration in Gesamt-Score:**
+> - Für Goldene-Stunde-Events: `weather_score` bekommt Bonus wenn `golden_cloud_score ≥ 0.7` (+5–10 Prozentpunkte, gedeckelt bei 1.0)
+> - Für alle anderen Event-Typen: kein Einfluss auf bestehende Scoring-Logik
+> - `ALGORITHM_VERSION` erhöhen → erzwingt inkrementelle Cache-Neuberechnung
+>
+> **Frontend – Anzeige im Event-Detail:**
+> - Neues Label in der Wetter-Sektion: „🌅 Wolkenstimmung" mit 4 Qualitätsstufen:
+>   - Score ≥ 0.75 → `🌅 Exzellent` (goldorange)
+>   - Score ≥ 0.50 → `✨ Gut` (gelb)
+>   - Score ≥ 0.25 → `🌤 Mäßig` (grau-gelb)
+>   - Score < 0.25  → `⛅ Gering` (grau)
+> - Nur angezeigt wenn Wetter-Overlay aktiv (T-3, identisch zu US-42 [x])
+> - Nur angezeigt für Goldene-Stunde- und Blaue-Stunde-Events (bei anderen Event-Typen ausgeblendet)
+> - ⓘ-Tooltip erklärt die drei Wolkenschichten kurz (analog zu US-55 [x] Score-Erklärungen)
+>
+> **Frontend – Feed-Card:**
+> - Kein neues Badge nötig – Score fließt über weather_score-Bonus bereits in den Gesamt-Score ein
+>
+> **Tests:**
+> - Manuelle Verifikation scattered clouds: `cl=5, cm=40, ch=30` → Score ≥ 0.70
+> - Manuelle Verifikation Hochdrucklage: `cl=0, cm=0, ch=0` → Score ≤ 0.20
+> - Manuelle Verifikation bedeckter Himmel: `cl=90, cm=80, ch=70` → Score ≤ 0.10
+>
+> *Folge-Ticket: US-07b Nebel & atmosphärische Sonderbedingungen (DWD Nebel-Gitter, Sichtweite) — noch nicht erstellt*
 
 ### US-08 · GPX-Export (Apple Maps / Google Maps)
 > **Status:** Maps-Links für Fotograf-Standort und Motiv sind bereits in der Event-Detailansicht implementiert.
@@ -774,3 +1135,35 @@
 - [x] **BUG-02** Suche filtert Jahreskalender nicht – `Search._triggerRender()` mode-aware, CalendarView.render() mit Suchfilter. v1.1.8.
 - [x] **BUG-01** Brennweite-Empfehlung passt nicht zur Motiventfernung – `_focal_for_location()` aus distance_m, Min+Max-Filter, „Brennweite falsch" in Verifikation. v1.1.3.
 - [x] **BUG-03** Scheinbare Größe des Himmelsobjekts zu groß – `get_moon_earth_distance_km()` via Skyfield de421.bsp für tatsächliche Mond–Erde-Distanz zum Shoot-Zeitpunkt. Formel korrigiert: `angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km`. Distanz im Detail-Sheet als Fußnote. `ALGORITHM_VERSION = "1.1"`. v1.3.4.
+
+### BUG-24 · Kartenpanel-Filter erscheint auf Mac hinter der Leaflet-Karte `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-17 |
+| **In Progress seit** | 2026-06-17 |
+| **Abgeschlossen** | 2026-06-17 |
+
+**Beschreibung:**
+Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Leaflet-Karte und kann nicht bedient werden. Auf iPhone Safari (PWA-Standalone) funktioniert es korrekt.
+
+**Root Cause:**
+`#page-map` hatte `position: absolute; z-index: auto` und bildete **keinen eigenen Stacking-Context**. Dadurch participierten alle Leaflet-Panes direkt im Root-Stacking-Context mit ihren internen z-index-Werten (`.leaflet-tile-pane` z=200, `.leaflet-marker-pane` z=600, `#map-layer-toggle` z=1000). Das `#filter-sheet` (z=105) lag damit unter den Leaflet-Panes. Auf iPhone (PWA-Standalone) verhindert ein separater Compositing-Layer das Leaking.
+
+**Fix:**
+```css
+/* BUG-24: isolation:isolate schließt alle Leaflet-z-indices ein → #filter-sheet (z=105) erscheint darüber */
+#page-map { padding: 0 !important; isolation: isolate; }
+```
+`isolation: isolate` erzwingt einen neuen Stacking-Context für `#page-map` ohne z-index-Wert zu ändern. Alle Leaflet-z-indices sind damit eingeschlossen. `#filter-sheet` (z=105) erscheint im Parent-Context darüber.
+
+**Akzeptanzkriterien:**
+- [x] Filter-Sheet erscheint auf Mac Chrome und Safari über der Leaflet-Karte
+- [x] Filter-Sheet erscheint weiterhin korrekt auf iPhone Safari
+- [x] Karteninteraktion (Panning, Zoom, Marker-Klick) unverändert
+- [x] Layer-Toggle (Nacht/Standard/Satellit) bleibt funktionsfähig
+
+**Datei:** `web/index.html` — CSS-Regel `#page-map`
