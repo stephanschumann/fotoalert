@@ -175,7 +175,8 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Map Page ─────────────────────────────────────────────────── */
-    #page-map { padding: 0 !important; }
+    /* BUG-24 v2: isolation+z-index:0 erzwingt Stacking-Context; Filter über Leaflet-Maximum (z=1000) */
+    #page-map { padding: 0 !important; isolation: isolate; z-index: 0; }
     #map { width: 100%; height: 100%; }
     .leaflet-container { background: #0d0d1a !important; }
     .leaflet-tile { filter: brightness(.85) saturate(.7); }
@@ -282,9 +283,9 @@
       font-size: 10px; font-weight: 800; display: none; align-items: center;
       justify-content: center; pointer-events: none; }
     #filter-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
-      z-index: 104; opacity: 0; pointer-events: none; transition: opacity .25s; }
+      z-index: 1100; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #filter-overlay.open { opacity: 1; pointer-events: auto; }
-    #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
+    #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1101;
       background: var(--surface); border-radius: 22px 22px 0 0;
       max-height: 88vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
@@ -777,7 +778,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.17';
+const APP_VERSION = '1.4.19';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1036,59 +1037,73 @@ const MONTHS_DE = ['Januar','Februar','März','April','Mai','Juni',
 const DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 
 const CalendarView = {
-  events: null,   // null = not loaded, [] = loaded (possibly empty)
+  // BUG-10: Statt aller 365 Tage (149 MB!) nur den aktuellen Monat laden.
+  // Jeder Monat wird gecacht, sodass Navigation ohne erneuten API-Aufruf funktioniert.
+  _monthCache: new Map(),  // key: "YYYY-M" → events[]
   _loading: false,
   month: new Date().getMonth(),   // 0-based
   year: new Date().getFullYear(),
 
+  _cacheKey() { return `${this.year}-${this.month + 1}`; },
+
   async show() {
     const el = document.getElementById('feed-content');
-    if (!this.events) {
-      if (this._loading) return;  // Verhindert doppelten Ladevorgang bei schnellem Tab-Wechsel
+    if (!this._monthCache.has(this._cacheKey())) {
+      if (this._loading) return;
       this._loading = true;
-      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird berechnet…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
-      await this.load();
+      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird geladen…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
+      await this.loadMonth();
       this._loading = false;
     }
     if (Feed.mode === 'calendar') this.render();
   },
 
-  async load(retries = 3) {
+  async loadMonth(retries = 3) {
+    const m = this.month + 1;  // API: 1-basiert
+    const y = this.year;
     try {
-      const res = await API.get('/calendar');
+      const res = await API.get(`/calendar?month=${m}&year=${y}`);
       if (res.status === 'calculating' && retries > 0) {
-        // Noch in Berechnung – max. 3× nach 5s nochmal probieren
         await new Promise(r => setTimeout(r, 5000));
-        return this.load(retries - 1);
+        return this.loadMonth(retries - 1);
       }
-      this.events = res.events || [];
+      this._monthCache.set(this._cacheKey(), res.events || []);
     } catch(e) {
-      this.events = [];
+      this._monthCache.set(this._cacheKey(), []);
       toast('Kalender konnte nicht geladen werden');
     }
+  },
+
+  async _ensureMonth() {
+    if (!this._monthCache.has(this._cacheKey())) {
+      this._loading = true;
+      const el = document.getElementById('feed-content');
+      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Lade ${MONTHS_DE[this.month]} ${this.year}…</span></div>`;
+      await this.loadMonth();
+      this._loading = false;
+    }
+    if (Feed.mode === 'calendar') this.render();
   },
 
   prev() {
     if (this.month === 0) { this.month = 11; this.year--; }
     else this.month--;
-    this.render();
+    this._ensureMonth();
   },
 
   next() {
     if (this.month === 11) { this.month = 0; this.year++; }
     else this.month++;
-    this.render();
+    this._ensureMonth();
   },
 
   render() {
     const el = document.getElementById('feed-content');
-    if (!this.events) { return; }
+    const cached = this._monthCache.get(this._cacheKey());
+    if (!cached) { return; }
 
-    // Filter auf aktuellen Monat
-    const rawMonth = this.events.filter(e => {
-      const d = new Date(e.shoot_time);
-      return d.getFullYear() === this.year && d.getMonth() === this.month;
-    });
+    // API liefert bereits nach Monat+Jahr gefilterte Events
+    const rawMonth = cached;
 
     // Deduplizierung: pro Location + EventType + Tag nur bestes Event (höchster Score)
     const bestMap = new Map();
@@ -1114,7 +1129,7 @@ const CalendarView = {
       groups[key].push(e);
     }
 
-    const totalYear = this.events.length;
+    const totalMonth = rawMonth.length;
     const searchHint = Search.query ? ` · Suche: „${Search.query}"` : '';
     let html = `
       <div class="cal-nav">
@@ -1122,7 +1137,7 @@ const CalendarView = {
         <span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span>
         <button class="cal-nav-btn" onclick="CalendarView.next()">›</button>
       </div>
-      <div class="cal-status">${monthEvents.length} Events · ${totalYear} im Jahreskalender · nur Astronomie${searchHint}</div>`;
+      <div class="cal-status">${monthEvents.length} Events · ${totalMonth} im Monat · nur Astronomie${searchHint}</div>`;
 
     if (!monthEvents.length) {
       html += `<div class="empty" style="padding-top:40px">
