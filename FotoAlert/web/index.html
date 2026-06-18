@@ -759,6 +759,7 @@
     <h2>🎛 Filter</h2>
     <button class="close-btn" onclick="FilterSheet.close()">✕</button>
   </div>
+  <div id="filter-result-count" style="font-size:12px;padding:4px 16px 0;min-height:18px"></div>
   <div id="filter-content"></div>
   <div class="filter-actions">
     <button class="btn-secondary" style="flex:1" onclick="FilterSheet.reset()">Alle zurücksetzen</button>
@@ -778,7 +779,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.24';
+const APP_VERSION = '1.4.25';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1657,6 +1658,7 @@ const FilterSheet = {
     document.getElementById('filter-sheet').classList.add('open');
     // BUG-04: Dual-Handle Slider Events initialisieren (nach _render DOM aufgebaut)
     requestAnimationFrame(() => this.initDualSlider());
+    requestAnimationFrame(() => this._updateResultCount());
   },
 
   initDualSlider() {
@@ -1726,13 +1728,42 @@ const FilterSheet = {
     const s = Filter.state;
     if (s.maxDistKm > 0) await Filter.requestGps();
     Filter._updateBadge();
-    if (App.current === 'locations') {
+    if (App.current === 'map') {
+      MapView.applyFilter();
+    } else if (App.current === 'locations') {
       Locations.render(Filter.applyToLocations(Locations.all));
     } else if (Feed.mode === 'feed') {
       Feed.render();
     } else if (Feed.mode === 'calendar') {
       CalendarView.render();
     }
+    FilterSheet._updateResultCount();
+  },
+
+  // Zeigt live an, wie viele Ergebnisse der aktuelle Filter produziert
+  _updateResultCount() {
+    const el = document.getElementById('filter-result-count');
+    if (!el) return;
+    let count = 0, label = '';
+    if (App.current === 'map') {
+      count = MapView.markers.filter(({marker}) => MapView.map && MapView.map.hasLayer(marker)).length;
+      const total = MapView.markers.length;
+      label = count === total ? `${total} Locations` : `${count} von ${total} Locations`;
+    } else if (App.current === 'locations') {
+      count = Filter.applyToLocations(Locations.all).length;
+      label = `${count} von ${Locations.all.length} Locations`;
+    } else if (Feed.mode === 'feed' && Feed.data) {
+      count = Filter.apply(Feed.data).length;
+      label = `${count} von ${Feed.data.length} Chancen`;
+    } else if (Feed.mode === 'calendar') {
+      const cached = CalendarView._monthCache.get(CalendarView._cacheKey());
+      if (cached) {
+        count = Filter.apply(cached).length;
+        label = `${count} von ${cached.length} Events (${MONTHS_DE[CalendarView.month]})`;
+      }
+    }
+    el.textContent = label ? `↳ ${label} sichtbar` : '';
+    el.style.color = count === 0 && label ? 'var(--warn, #f0a030)' : 'var(--muted)';
   },
 
   // Debounced-Version für Slider (verhindert Flackern bei schnellem Ziehen)
@@ -1846,19 +1877,32 @@ const FilterSheet = {
     const focalMaxPct = ((mx || 600) / 600 * 100).toFixed(2) + '%';
     const focalRangePct = (((mx || 600) - mn) / 600 * 100).toFixed(2) + '%';
 
+    const isMapView = App.current === 'map';
+    const scoreSection = isMapView
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4>🎯 Mindest-Wahrscheinlichkeit</h4>
+          <div class="filter-slider-val">Nur in Listen-Ansicht verfügbar</div>
+          <div class="filter-slider-wrap">
+            <input type="range" class="filter-slider" disabled
+              min="0" max="100" step="5" value="${s.minScore}" style="--pct:${scorePct}">
+            <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+          </div>
+        </div>`
+      : `<div class="filter-section"><h4>🎯 Mindest-Wahrscheinlichkeit</h4>
+          <div class="filter-slider-val" id="filter-score-val">${scoreLabel}</div>
+          <div class="filter-slider-wrap">
+            <input type="range" class="filter-slider" id="score-slider"
+              min="0" max="100" step="5" value="${s.minScore}"
+              style="--pct:${scorePct}"
+              oninput="FilterSheet._onScoreSlider(this)">
+            <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+          </div>
+        </div>`;
+
     document.getElementById('filter-content').innerHTML =
       `<div class="filter-section"><h4>📷 Eventtyp</h4><div class="filter-chips">${etChips}</div></div>` +
       `<div class="filter-section"><h4>🕐 Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
-      `<div class="filter-section"><h4>🎯 Mindest-Wahrscheinlichkeit</h4>
-        <div class="filter-slider-val" id="filter-score-val">${scoreLabel}</div>
-        <div class="filter-slider-wrap">
-          <input type="range" class="filter-slider" id="score-slider"
-            min="0" max="100" step="5" value="${s.minScore}"
-            style="--pct:${scorePct}"
-            oninput="FilterSheet._onScoreSlider(this)">
-          <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
-        </div>
-      </div>` +
+      scoreSection +
       `<div class="filter-section"><h4>🔭 Brennweite</h4>
         <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
         <div class="dual-range-wrap">
@@ -2403,6 +2447,7 @@ const MapView = {
     const catColor = { 'Schloss & Historisch':'#a070f0', 'Wasser & Spiegelung':'#5080f0',
       'Natur & Landschaft':'#4caf70', 'Milchstraße & Astro':'#8060d0',
       'Skyline & Architektur':'#f0a030', 'Aussichtspunkt':'#f08030', 'Industrie & Urban':'#f05050' };
+    this.markers = [];
     for (const loc of locs) {
       const col = catColor[loc.category] || '#f0a030';
       const icon = L.divIcon({ className:'', html:
@@ -2416,8 +2461,59 @@ const MapView = {
         <p>${loc.category}<br><small>${loc.description.slice(0,80)}…</small></p>
         <span class="popup-btn" onclick="LocationDetail.open('${loc.id}')">Details →</span>
       </div>`);
+      this.markers.push({ marker: m, loc });
     }
-  }
+    this.applyFilter();
+  },
+
+  // BUG-23: Eventtyp-Filter auf Kartenmarker anwenden (standortbasiert via possible_bodies)
+  // Mapping: Mond-Events → "moon" in possible_bodies, Sonnen-Events → "sun" in possible_bodies
+  // Goldene/Blaue Stunde → alle Locations (Sonne immer vorhanden)
+  applyFilter() {
+    if (!this.map) return;
+    const s = Filter.state;
+    const activeTypes = s.eventTypes || [];
+
+    // BUG-23: Feed-basierter Filter – zeige nur Locations mit tatsächlichen Events
+    // im 14-Tage-Feed für den gewählten Eventtyp (sinnvoller als possible_bodies).
+    // Fallback auf possible_bodies wenn Feed noch nicht geladen.
+    const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
+    const expanded = activeTypes.flatMap(t => ET_EXPAND[t] || [t]);
+
+    // Baue Set der Location-IDs mit passenden Feed-Events (für O(1)-Lookup)
+    let locIdsWithMatch = null;
+    if (activeTypes.length > 0 && Feed.data && Feed.data.length > 0) {
+      locIdsWithMatch = new Set(
+        Feed.data
+          .filter(e => expanded.includes(e.event_type))
+          .map(e => e.location_id)
+      );
+    }
+
+    for (const { marker, loc } of this.markers) {
+      let visible = true;
+      if (activeTypes.length > 0) {
+        if (locIdsWithMatch !== null) {
+          // Feed geladen: nur Locations mit echten Events in den nächsten 14 Tagen
+          visible = locIdsWithMatch.has(loc.id);
+        } else {
+          // Fallback: possible_bodies (Feed noch nicht geladen)
+          const pb = Array.isArray(loc.possible_bodies) ? loc.possible_bodies : [];
+          const MOON_TYPES = ['Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Vollmond', 'Neumond', 'Blutmond', 'Mondfinsternis'];
+          const SUN_TYPES  = ['Sonnen-Alignment', 'Sonnenaufgang', 'Sonnenuntergang', 'Sonnenfinsternis'];
+          const needsMoon = activeTypes.some(t => MOON_TYPES.includes(t));
+          const needsSun  = activeTypes.some(t => SUN_TYPES.includes(t));
+          const hasBodylessType = activeTypes.some(t => !MOON_TYPES.includes(t) && !SUN_TYPES.includes(t));
+          visible = hasBodylessType || (needsMoon && pb.includes('moon')) || (needsSun && pb.includes('sun'));
+        }
+      }
+      if (visible) {
+        if (!this.map.hasLayer(marker)) this.map.addLayer(marker);
+      } else {
+        if (this.map.hasLayer(marker)) this.map.removeLayer(marker);
+      }
+    }
+  },
 };
 
 // ═══════════════════════════════════════════════════════
