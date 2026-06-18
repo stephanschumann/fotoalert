@@ -54,7 +54,7 @@ from data.locations import LOCATIONS
 # die andere Ergebnisse für bereits berechnete Tage liefern würden.
 # Format: "MAJOR.MINOR" – Minor = kleine Scoring-Anpassung, Major = Struktur.
 # ─────────────────────────────────────────────────────────────────────────────
-ALGORITHM_VERSION = "1.2"  # BUG-10: _in_photo_window-Filter für Mond-Alignments erzwingen
+ALGORITHM_VERSION = "1.3"  # US-57: Alignment-Qualitätsfilter (2°-Schärfezone)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,6 +63,48 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 CACHE_DIR = Path(__file__).parent / "data" / "cache"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# US-57: Alignment-Qualitätsfilter
+# Nur Events innerhalb der Schärfezone werden in Feed und Kalender aufgenommen.
+# ─────────────────────────────────────────────────────────────────────────────
+ALIGNMENT_TOLERANCE_DEG = 2.0  # Maximale Abweichung in Azimut und Höhe
+
+# Eventtypen, die KEINEN Alignment-Filter erhalten
+# (kein Celestial-Tracking auf Motivpunkt → composition_analysis ist None)
+_ALIGNMENT_FILTER_EXEMPT = {
+    "Goldene Stunde Morgen",
+    "Goldene Stunde Abend",
+    "Blaue Stunde",
+    "Milchstraße",
+    "Meteoritenschauer",
+    "Sonnenfinsternis",
+}
+
+
+def _passes_alignment_filter(event_dict: dict) -> bool:
+    """
+    US-57: Gibt True zurück, wenn das Event den Alignment-Qualitätsfilter besteht.
+
+    Logik:
+    - Exempt-Types (Goldene/Blaue Stunde, Milchstraße usw.) → immer True
+    - composition_analysis fehlt (None) → kein Deltawert verfügbar → True (Pass)
+    - Sonst: |azimuth_delta_deg| ≤ TOLERANCE AND |altitude_delta_deg| ≤ TOLERANCE
+    """
+    event_type = event_dict.get("event_type", "")
+    if event_type in _ALIGNMENT_FILTER_EXEMPT:
+        return True
+
+    ca = event_dict.get("composition_analysis")
+    if ca is None:
+        return True  # Kein Alignment-Datensatz vorhanden → kein Filter
+
+    az_delta = ca.get("azimuth_delta_deg")
+    alt_delta = ca.get("altitude_delta_deg")
+    if az_delta is None or alt_delta is None:
+        return True
+
+    return abs(az_delta) <= ALIGNMENT_TOLERANCE_DEG and abs(alt_delta) <= ALIGNMENT_TOLERANCE_DEG
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -372,7 +414,12 @@ async def compute_feed(today: date) -> list[dict]:
                 forecast=None, min_score=0.30,
                 astronomy_only=True,
             )
-            results.extend(_serialize(o) for o in opps)
+            serialized = [_serialize(o) for o in opps]
+            filtered = [e for e in serialized if _passes_alignment_filter(e)]
+            skipped = len(serialized) - len(filtered)
+            if skipped:
+                logger.info("    US-57: %d Event(s) außerhalb ±%.0f°-Schärfezone gefiltert", skipped, ALIGNMENT_TOLERANCE_DEG)
+            results.extend(filtered)
         except Exception as e:
             logger.error("    Fehler bei %s: %s", loc.name, e)
     results.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
@@ -483,7 +530,10 @@ async def compute_calendar_incremental(today: date, force_full: bool = False) ->
                 opps = await find_opportunities(
                     loc, d, forecast=None, min_score=0.40, astronomy_only=True,
                 )
-                new_events_for_loc.extend(_serialize(o) for o in opps)
+                new_events_for_loc.extend(
+                    e for e in (_serialize(o) for o in opps)
+                    if _passes_alignment_filter(e)
+                )
             except Exception as e:
                 logger.error("    Fehler %s %s: %s", loc.name, d_str, e)
 

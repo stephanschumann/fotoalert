@@ -884,7 +884,7 @@ async def trigger_feed_refresh(background_tasks: BackgroundTasks):
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
     background_tasks.add_task(_run_precompute, "feed")
-    return {"status": "started", "message": "14-Tage Feed wird neu berechnet (~30–60s)."}
+    return {"status": "started", "message": "14-Tage Feed wird neu berechnet (~2–5 Min.)."}
 
 
 @app.post("/refresh-calendar")

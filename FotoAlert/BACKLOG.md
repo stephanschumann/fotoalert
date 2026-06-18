@@ -442,18 +442,39 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 > - Karte: Leaflet.js Satellit, Zoom-Controls
 > - Kein Backend-Call nötig (Frontend-Berechnung auf bestehenden Locationdaten)
 
-### US-57 · Alignment-Qualitätsfilter: 2°-Schärfezone `[ ]`
+### US-57 · Alignment-Qualitätsfilter: 2°-Schärfezone `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Feature |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-18 |
+| **In Progress seit** | 2026-06-18 |
+
 > **Als Fotograf** möchte ich, dass nur Himmelsereignisse im Feed erscheinen, die sich innerhalb eines definierten Toleranzbereichs (Azimuth + Höhe) der Sichtachse zum Motiv befinden, damit ausschließlich fotografisch relevante Alignments angezeigt werden.
 >
 > **Hintergrund:** US-37 ✅ berechnet und zeigt `azimuth_delta_deg` und `altitude_delta_deg` bereits an. Diese Story nutzt diese Werte als Hard-Filter in der Event-Generierung.
 >
 > **Akzeptanzkriterien:**
-> - In `precompute.py` → `_composition_analysis()`: Events mit `|azimuth_delta_deg| > ALIGNMENT_TOLERANCE_DEG` ODER `|altitude_delta_deg| > ALIGNMENT_TOLERANCE_DEG` werden nicht als Feed-Event erzeugt
-> - Default-Schwellwert: `ALIGNMENT_TOLERANCE_DEG = 2.0` als Konstante in `precompute.py` (konfigurierbar)
-> - Ausnahmen (kein Azimuth-Filter): Goldene Stunde, Blaue Stunde, Milchstraße, Meteoritenschauer, Finsternisse
-> - Jahreskalender: gleiche Filterung
-> - `ALGORITHM_VERSION` erhöhen → inkrementeller Cache wird neu berechnet beim nächsten `--feed-only`
-> - Frontend: US-37-Labels bleiben unverändert; durch den Filter erscheinen ☁️-Events (> 3°) nicht mehr im Feed
+> - [~] In `precompute.py`: Events mit `|azimuth_delta_deg| > ALIGNMENT_TOLERANCE_DEG` ODER `|altitude_delta_deg| > ALIGNMENT_TOLERANCE_DEG` werden nicht als Feed-Event erzeugt
+> - [~] Default-Schwellwert: `ALIGNMENT_TOLERANCE_DEG = 2.0` als Konstante in `precompute.py` (konfigurierbar)
+> - [~] Ausnahmen (kein Filter): Goldene Stunde, Blaue Stunde, Milchstraße, Meteoritenschauer, Finsternisse
+> - [~] Jahreskalender: gleiche Filterung (via shared `_passes_alignment_filter()`)
+> - [~] `ALGORITHM_VERSION` erhöhen → Cache-Neuberechnung beim nächsten Lauf
+> - [ ] Frontend: US-37-Labels bleiben unverändert; ☁️-Events (> 3°) erscheinen nicht mehr im Feed
+>
+> **Scope:**
+> - Eingeschlossen: neue Funktion `_passes_alignment_filter()`, Anwendung in `compute_feed()` + `compute_calendar_incremental()`, ALGORITHM_VERSION bump
+> - Ausgeschlossen: Frontend-Änderungen, neue UI-Elemente
+>
+> **Betroffene Dateien:** `backend/precompute.py`
+>
+> **Analyse:**
+> - `_composition_analysis()` berechnet bereits `azimuth_delta_deg` und `altitude_delta_deg`
+> - Filter greift auf serialisiertes Dict (nach `_serialize()`) — composition_analysis kann None sein (→ pass)
+> - Exempt-Types (keine composition_analysis da kein Celestial-Tracking): Goldene Stunde Morgen/Abend, Blaue Stunde, Milchstraße, Meteoritenschauer, Sonnenfinsternis
+> - Alignment-Events (SUN_ALIGNMENT, MOON_ALIGNMENT) haben immer celestial_azimuth/altitude → composition_analysis vorhanden → werden gefiltert
 
 ### US-40 · Feed-Qualität: Tägliche Routine-Events ausblenden `[ ]`
 > **Als Fotograf** möchte ich im Chancen-Tab nicht täglich auf Goldene Stunde und Blaue Stunde hingewiesen werden, da diese jeden Tag auftreten und keine besonderen Ereignisse wie Mondaufgang oder Vollmond sind.
