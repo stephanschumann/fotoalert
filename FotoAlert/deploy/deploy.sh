@@ -59,13 +59,10 @@ echo ">>> Dependencies prüfen..."
 "$VENV_DIR/bin/pip" install --quiet -r "$BACKEND_DIR/requirements.txt"
 
 # ── 5. systemd-Units aktualisieren ──────────────────────────────────────────
-# Timer-Datei aus Repo nach /etc/systemd/system/ kopieren (falls geändert).
-# Danach daemon-reload + Timer-Neustart, damit neue OnCalendar-Zeiten wirken.
+# Service- und Timer-Dateien werden einmalig per Root-Setup installiert.
+# Deploy überschreibt sie nicht (sudo cp nicht in fotoalert-Sudoers-Whitelist).
+# Nur daemon-reload + Timer-Neustart, damit der Timer weiterläuft.
 echo ">>> systemd-Units aktualisieren..."
-# Nur Timer kopieren (kein Platzhalter, kein sudo cp nötig für Service-Datei).
-# fotoalert-precompute.service wird einmalig per Root-Setup installiert und nicht
-# bei jedem Deploy überschrieben (enthält Pfad-Platzhalter die nur Root ersetzen kann).
-sudo cp "$DEPLOY_DIR/fotoalert-precompute.timer" /etc/systemd/system/fotoalert-precompute.timer
 sudo systemctl daemon-reload
 sudo systemctl restart fotoalert-precompute.timer
 echo ">>> Timer neu geladen: $(systemctl show fotoalert-precompute.timer --property=OnCalendar --value)"
