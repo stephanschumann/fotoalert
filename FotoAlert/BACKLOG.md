@@ -1095,15 +1095,16 @@ Zwei kombinierte Ursachen:
 
 ---
 
-### US-80 · Scout-Tab: Filter-System `[~]`
+### US-80 · Scout-Tab: Filter-System `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **In Progress seit** | 2026-06-19 15:30 |
+| **Abgeschlossen** | 2026-06-19 |
 
 **Beschreibung:** Im Scout-Tab soll dasselbe Filter-System wie im Chancen-Tab verfügbar sein, damit Nutzer die Scout-Ergebnisse anhand der bestehenden Filterkriterien einschränken können. Anzeige von Gesamtanzahl und gefilterter Anzahl wie im Chancen-Tab.
 
@@ -1148,16 +1149,105 @@ Zwei kombinierte Ursachen:
 
 ---
 
-### US-81 · Scout-Tab: Weitere Event-Typen (Sonne, weitere Himmelskörper) `[ ]`
+### US-81 · Scout-Tab: Weitere Event-Typen (Sonne, weitere Himmelskörper) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-19 |
+| **In Progress seit** | 2026-06-19 |
+
+**Beschreibung:** Der Scout-Tab soll nicht auf Mond-Alignment beschränkt bleiben. Die Pipeline-Architektur wird auf mehrere Himmelskörper ausgebaut (Sonne, Milchstraße, Kometen), und die Sonne wird als erster neuer Typ vollständig implementiert. Das Datenschema wird auf `body_*`-Felder umgestellt. US-80 (event-type-agnostischer Filter) ist Voraussetzung und bereits erfüllt.
+
+**Scope:**
+- Eingeschlossen: Architektur-Refactoring (`pipeline.py` → `pipeline_base.py` + `moon_pipeline.py` + `sun_pipeline.py` + Orchestrator), Schema-Migration (`moon_*` → `body_*`), Sonne-Pipeline vollständig implementiert, Frontend-Anpassung (body-Icon + bedingter `illumination`-Chip), v2-Ticket für atmosphärisches Sun-Scoring
+- Ausgeschlossen: Milchstraße-Pipeline (→ eigenes Ticket), Kometen-Pipeline (→ eigenes Ticket), atmosphärisches Rötlichkeits-Scoring für Sonne (→ US-82)
+
+**Akzeptanzkriterien:**
+
+*Architektur:*
+- [x] `backend/discover/pipeline_base.py`: `ScoutOpportunity` Dataclass mit `body_name`, `body_azimuth_deg`, `body_altitude_deg`, `body_illumination_pct: Optional[float]`; gemeinsame Hilfsfunktionen (Wetter, Dedup, Haversine, `compute_d`, Scoring-Helfer)
+- [x] `backend/discover/moon_pipeline.py`: bestehende Moon-Logik dorthin verschoben, importiert aus `pipeline_base`
+- [x] `backend/discover/sun_pipeline.py`: neue Sonne-Pipeline, gleiche Apex-Geometrie, körper-spezifisches Scoring
+- [x] `backend/discover/pipeline.py` wird zum Orchestrator: ruft `moon_pipeline.run()` + `sun_pipeline.run()` parallel auf, merged und sortiert nach Score; Fehler in einer Pipeline bricht die andere nicht ab
+- [x] `backend/discover/geometry.py` und `subjects.py`: unverändert
+
+*Schema — `moon_*` → `body_*`:*
+- [x] `ScoutOpportunity.moon_azimuth_deg` → `body_azimuth_deg`
+- [x] `ScoutOpportunity.moon_altitude_deg` → `body_altitude_deg`
+- [x] `ScoutOpportunity.moon_illumination_pct` → `body_illumination_pct: Optional[float]` (None für Sonne)
+- [x] Neues Feld `body_name: str` = `"moon"` | `"sun"`
+- [x] `main.py`: Schema-Check beim Startup — alter Cache ohne `body_name` löst automatisch Neuberechnung aus
+
+*Sonne-Pipeline (`sun_pipeline.py`):*
+- [x] Gleiche Sessions wie Mond (golden_morning, golden_evening, blue_morning, blue_evening)
+- [x] Körper: `get_body_position(..., "sun", ...)` — bereits von `astronomy.py` unterstützt
+- [x] Alt-Gate: `sun_alt ≥ 0.5°` (Sonne sichtbar über Horizont; bei golden hour typisch 0–8°)
+- [x] Gleiche Apex-Geometrie: `d = apex_effective_m / tan(sun_alt_rad)`, Gate `D_MIN=100m` bis `D_MAX=13.000m`
+- [x] `S_alignment`: Gaußkurve um Optimum 4°, σ=8° — abweichend vom Mond (Optimum 25°)
+- [x] `S_phase = 1.0` fest (Sonne immer voll beleuchtet — v2 → US-82)
+- [x] `S_licht`, `S_komposition`, `S_wetter`: identisch zum Mond
+- [x] Gewichte: unverändert (W_ALIGNMENT=0.35, W_PHASE=0.15, W_LICHT=0.15, W_KOMPOSITION=0.20, W_WETTER=0.15)
+- [x] `body_illumination_pct = None` im Output
+- [x] Exklusionsfilter (EXCLUSION_ZONES, ≥150m von bekannten Standorten): gleich wie Mond
+
+*Frontend (`web/index.html`):*
+- [x] `Scout.render()`: Feld `o.body_name` steuert Icon (`"moon"` → 🌙, `"sun"` → ☀️); Icon auch im Karten-Titel
+- [x] Chip `body_illumination_pct`: wird nur gerendert wenn `body_illumination_pct !== null`
+- [x] Für Sonne kein Beleuchtungs-Chip (Sonne ist immer voll, kein Mehrwert)
+- [x] Scout-Karte für Sonne zeigt: ☀️ + Motivname, Datum/Uhrzeit, Höhe, Entfernung, Brennweite, Lichtphase, Wetter
+- [x] `Filter.applyToScout()`: bereits event-type-agnostisch (US-80) — kein Eingriff nötig
+
+*Neues Ticket:*
+- [x] US-82 · Scout Sun-Score v2 (Atmosphären-Rötlichkeit) im Backlog angelegt
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Rules, 4 Questions — alle beantwortet 2026-06-19)
+- [x] Architektur analysiert: `discover/pipeline.py` vollständig gelesen; `astronomy.py` `get_body_position` unterstützt bereits `"sun"`; `Filter.applyToScout()` ist body-agnostisch (US-80)
+- [x] Implementierungsansatz: Modulsplit + Schema-Migration + Sonne-Pipeline + Frontend-Icon-Logik
+- [x] Risiken: Schema-Breaking-Change — behoben via `body_name`-Check in `main.py` Startup (erzwingt automatische Neuberechnung)
+- [x] Geometrie-Validierung: Fernsehturm (368m apex) bei Sonne 3.1°: d=6.801m, f=190mm, S_alignment=0.994 ✅
+
+**Daten-Validierung:**
+- [x] Sonne bei golden hour: az=305.7°, alt=3.1° → d=6.801m für Fernsehturm (Berlin) ✅
+- [ ] Prüfen nach erstem Produktionslauf: Wie viele Sonne-Chancen im 14-Tage-Fenster? Erwartung: 5–20
+
+**Testplan:**
+- [ ] Manuell nach Release: Scout-Tab zeigt gemischte Karten mit 🌙 und ☀️ Icons
+- [ ] Manuell: Sonne-Karte zeigt keinen Beleuchtungs-Chip
+- [ ] Manuell: Filter Tageszeit „Morgen" filtert Sonne-Abend-Chancen korrekt heraus
+
+**Implementierungsreihenfolge:**
+1. [x] `pipeline_base.py` anlegen
+2. [x] `moon_pipeline.py` (refactor)
+3. [x] `sun_pipeline.py` (neue Pipeline)
+4. [x] `pipeline.py` zum Orchestrator umbauen
+5. [x] Frontend: body-Icon + bedingter illumination-Chip
+6. [x] Schema-Check in `main.py` (auto-Neuberechnung bei altem Cache)
+7. [x] US-82-Ticket in BACKLOG.md angelegt
+
+---
+
+### US-82 · Scout Sun-Score v2: Atmosphärisches Rötlichkeits-Scoring `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-19 |
 
-**Beschreibung:** Der Scout-Tab soll nicht auf Mond-Alignment beschränkt bleiben. Weitere astronomische Event-Typen (z.B. Sonne/Sonnenaufgang über Motiv, weitere Himmelskörper) sollen als eigene Scout-Pipelines implementiert werden können. Abhängigkeit: US-80 (Filter-System muss event-type-agnostisch sein).
+**Beschreibung:** Das Sun-Scoring in US-81 nutzt `S_phase = 1.0` (Sonne immer voll beleuchtet). In v2 soll `S_phase` durch einen atmosphärischen Rötlichkeits-Score ersetzt werden: je flacher die Sonne steht, desto länger ist der Lichtweg durch die Atmosphäre, desto intensiver die Rötung. Das liefert differenziertere Empfehlungen (flacher = rötlicher = besser für Silhouetten-Fotografie).
+
+**Voraussetzung:** US-81 ✅ (Sun-Pipeline muss implementiert sein)
+
+**Akzeptanzkriterien:** (werden beim Start der Story ausgearbeitet)
+- [ ] `S_atmosphaere(sun_alt_deg)` ersetzt `S_phase = 1.0` in `sun_pipeline.py`
+- [ ] Formel: basiert auf optischer Weglänge durch Atmosphäre (`airmass = 1/sin(alt)`) — niedrige Sonne = hohe Airmass = mehr Rötung
+- [ ] Optimum bei ~3–6° (maximale Rötung ohne vollständigen Horizontverlust)
+- [ ] Score 0.0 bei alt > 15° (kein Rötlichkeits-Effekt mehr bei hoher Sonne)
 
 ---
 

@@ -572,7 +572,12 @@ async def startup():
 
     # 2b. Scout-Cache laden (falls vorhanden) und ggf. neu berechnen
     _load_discover_cache()
-    if not _discover_cache:
+    # Schema-Check: US-81 migrierte moon_* → body_*. Alter Cache hat kein body_name-Feld
+    # → erzwingt Neuberechnung damit das Frontend nicht undefined° anzeigt.
+    _first_opp = (_discover_cache.get("opportunities") or [{}])[0]
+    if not _discover_cache or "body_name" not in _first_opp:
+        if _discover_cache:
+            logger.info("Scout-Cache hat altes Schema (moon_*) — starte Neuberechnung (US-81).")
         asyncio.create_task(_refresh_discover())
 
     # 3. Wenn kein Cache vorhanden: Vorberechnung starten

@@ -906,7 +906,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.8.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1251,22 +1251,25 @@ const Scout = {
       for (const o of opps) {
         const time = o.dt_utc ? new Date(o.dt_utc).toLocaleTimeString('de-DE',
           { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : '–';
-        const scorePct = Math.round(o.score * 100);
-        const moonPct  = Math.round(o.moon_illumination_pct);
+        const scorePct   = Math.round(o.score * 100);
+        const bodyIcon   = o.body_name === 'sun' ? '☀️' : '🌙';
+        const illumChip  = o.body_illumination_pct != null
+          ? `<span class="scout-chip">${bodyIcon} <strong>${Math.round(o.body_illumination_pct)}%</strong> beleuchtet</span>`
+          : '';
         const mapsUrl  = `https://maps.apple.com/?ll=${o.standpoint_lat},${o.standpoint_lon}&z=15`;
         const navUrl   = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
         html += `<div class="scout-card">
           <div class="scout-card-header">
             <div>
-              <div class="scout-subject">${o.subject_name}</div>
+              <div class="scout-subject">${bodyIcon} ${o.subject_name}</div>
               <div class="scout-kategorie">${o.kategorie || ''} · ${sessionLabel[o.session] || o.session}</div>
             </div>
             <div class="scout-score-badge">${scorePct}%</div>
           </div>
           <div class="scout-meta">
             <span class="scout-chip">🕐 <strong>${time} Uhr</strong></span>
-            <span class="scout-chip">🌕 <strong>${moonPct}%</strong> beleuchtet</span>
-            <span class="scout-chip">📐 Höhe <strong>${o.moon_altitude_deg}°</strong></span>
+            ${illumChip}
+            <span class="scout-chip">📐 Höhe <strong>${o.body_altitude_deg}°</strong></span>
             <span class="scout-chip">📏 <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
             <span class="scout-chip">📷 ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
             <span class="scout-chip">☁️ <strong>${o.weather_description}</strong></span>
@@ -1883,14 +1886,20 @@ const Filter = {
     });
   },
 
-  // Filtert Scout-Chancen (US-80) — event-type-agnostisch für zukünftige Scout-Typen (US-81)
-  // Anwendbare Dimensionen: Tageszeit (session-Mapping), Score, Brennweite, Entfernung
-  // Nicht anwendbar: eventTypes, difficulty, minRating, verification (kein Äquivalent in Scout-Daten)
+  // Filtert Scout-Chancen (US-80/US-81)
+  // Anwendbare Dimensionen: Körpertyp (body_name), Tageszeit, Score, Brennweite, Entfernung
+  // Nicht anwendbar: difficulty, minRating, verification (kein Äquivalent in Scout-Daten)
   applyToScout(data) {
     const s = this.state;
     const MORGEN = ['golden_morning', 'blue_morning'];
     const ABEND  = ['golden_evening', 'blue_evening'];
+    // eventTypes → body_name-Mapping: Mond-Alignment → moon, Sonnen-Alignment → sun
+    const BODY_FILTER = new Set();
+    if (s.eventTypes.includes('Mond-Alignment'))   BODY_FILTER.add('moon');
+    if (s.eventTypes.includes('Sonnen-Alignment')) BODY_FILTER.add('sun');
     return data.filter(o => {
+      // Körpertyp-Filter (US-81): nur ausgewählte Himmelskörper zeigen
+      if (BODY_FILTER.size > 0 && !BODY_FILTER.has(o.body_name)) return false;
       // Tageszeit: Scout-Sessions auf morgen/abend mappen
       if (s.tageszeit.length) {
         let slot = 'nacht';
