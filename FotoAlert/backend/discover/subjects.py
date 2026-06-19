@@ -1,160 +1,208 @@
 """
-Kuratierte Leitmotive für den Scout-Tab.
+Scout-Tab Motive: automatisch aus data/locations.py abgeleitet.
 
-Jedes Motiv enthält:
-  lat/lon         — GPS der Motivspitze / Hauptstruktur
-  structure_height_m — Bauwerkshöhe (Fuß bis Spitze)
-  terrain_offset_m   — Mehrere Meter wenn das Motiv auf erhöhtem Gelände steht
-                        relativ zum Berliner Mittelniveau (~35m NN)
-  apex_effective_m   — = structure_height_m + terrain_offset_m
-                        Effektive Höhe über einem Beobachter am Boden (35m NN)
+Jedes Motiv (DiscoverSubject) repräsentiert eine fotografierbare Struktur.
+Die Scout-Pipeline berechnet dazu neue Fotografen-Standpunkte aus der Mond-Position —
+abweichend von allen gespeicherten Standorten in data/locations.py.
 
-Höhenquellen: Wikipedia, Wikidata, amtliche Denkmallisten.
+Deduplication: Motive mit Subject-Koordinaten < 200m Abstand werden zusammengeführt
+(gleiche Struktur, verschiedene Fotografen-Perspektiven in locations.py).
+
+Bekannte Fotografen-Standorte: als Ausschlusszone (≥ 150 m Abstand erforderlich),
+damit Scout wirklich neue Perspektiven liefert.
 """
 from __future__ import annotations
-from dataclasses import dataclass
 
+import math
+import re
+from dataclasses import dataclass
+from typing import Optional
+
+from data.locations import LOCATIONS, LocationCategory
+
+
+# ---------------------------------------------------------------------------
+# Default-Breiten nach Kategorie (für Locations ohne subject_width_m)
+# ---------------------------------------------------------------------------
+
+_DEFAULT_WIDTH_M: dict[LocationCategory, float] = {
+    LocationCategory.SKYLINE:    80.0,
+    LocationCategory.SCHLOSS:    70.0,
+    LocationCategory.AUSSICHT:   30.0,
+    LocationCategory.INDUSTRIE:  15.0,
+    LocationCategory.WASSER:     30.0,
+    LocationCategory.NATUR:      30.0,
+    LocationCategory.MILCHSTRASSE: 30.0,
+}
+
+
+# ---------------------------------------------------------------------------
+# DiscoverSubject
+# ---------------------------------------------------------------------------
 
 @dataclass(frozen=True)
 class DiscoverSubject:
     id: str
     name: str
     kategorie: str           # Emoji + Kurzname für UI
-    lat: float
+    lat: float               # Koordinaten der Motivspitze / Hauptstruktur
     lon: float
-    structure_height_m: float   # Bauwerkshöhe vom Geländeniveau
-    terrain_offset_m: float     # Geländeoffset gegenüber ~35m NN (Berliner Mittelniveau)
-    subject_width_m: float      # Breite für Brennweiten-Berechnung
-    hoehe_confidence: str       # "hoch" | "mittel" | "niedrig"
+    structure_height_m: float
+    terrain_offset_m: float  # Höhe Gelände relativ zu Beobachter am Boden
+    subject_width_m: float
+    hoehe_confidence: str    # "hoch" | "mittel" | "niedrig"
 
     @property
     def apex_effective_m(self) -> float:
-        """Effektive Höhe über einem Beobachter auf Berliner Mittelniveau (35m NN)."""
+        """Effektive Höhe über dem Beobachter."""
         return self.structure_height_m + self.terrain_offset_m
 
 
-SUBJECTS: list[DiscoverSubject] = [
-    DiscoverSubject(
-        id="fernsehturm_berlin",
-        name="Berliner Fernsehturm",
-        kategorie="🗼 Turm",
-        lat=52.5208, lon=13.4094,
-        structure_height_m=368.0,
-        terrain_offset_m=0.0,    # Alexanderplatz ~35m NN ≈ Berliner Mittel
-        subject_width_m=18.0,    # Kugel-Durchmesser
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="siegessaeule_berlin",
-        name="Siegessäule Berlin",
-        kategorie="🏛 Denkmal",
-        lat=52.5145, lon=13.3501,
-        structure_height_m=67.0,
-        terrain_offset_m=0.0,
-        subject_width_m=8.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="berliner_dom",
-        name="Berliner Dom",
-        kategorie="⛪ Kirche",
-        lat=52.5190, lon=13.4014,
-        structure_height_m=114.0,
-        terrain_offset_m=0.0,
-        subject_width_m=70.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="schloss_sanssouci",
-        name="Schloss Sanssouci",
-        kategorie="🏰 Schloss",
-        lat=52.4039, lon=13.0386,
-        structure_height_m=14.0,
-        terrain_offset_m=10.0,   # Terrasse auf ~45m NN (+10m über Berliner Mittel)
-        subject_width_m=120.0,
-        hoehe_confidence="mittel",
-    ),
-    DiscoverSubject(
-        id="schloss_cecilienhof",
-        name="Schloss Cecilienhof",
-        kategorie="🏰 Schloss",
-        lat=52.4156, lon=13.0657,
-        structure_height_m=13.0,
-        terrain_offset_m=0.0,
-        subject_width_m=80.0,
-        hoehe_confidence="mittel",
-    ),
-    DiscoverSubject(
-        id="flatowturm_babelsberg",
-        name="Flatowturm Babelsberg",
-        kategorie="🗼 Turm",
-        lat=52.3969, lon=13.1036,
-        structure_height_m=34.0,
-        terrain_offset_m=5.0,    # Hügelkuppe Babelsberg-Park ~40m NN
-        subject_width_m=8.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="glienicker_bruecke",
-        name="Glienicker Brücke",
-        kategorie="🌉 Brücke",
-        lat=52.4156, lon=13.0883,
-        structure_height_m=9.0,
-        terrain_offset_m=0.0,    # Fotograf steht ebenfalls am Havel-Ufer (~gleiche Höhe wie Brücken-Basis)
-        subject_width_m=150.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="historische_muehle_sanssouci",
-        name="Historische Mühle Sanssouci",
-        kategorie="⚙️ Mühle",
-        lat=52.4034, lon=13.0341,
-        structure_height_m=12.0,
-        terrain_offset_m=10.0,   # Windmühlenberg ~45m NN
-        subject_width_m=10.0,
-        hoehe_confidence="mittel",
-    ),
-    DiscoverSubject(
-        id="schloss_babelsberg",
-        name="Schloss Babelsberg",
-        kategorie="🏰 Schloss",
-        lat=52.3987, lon=13.1095,
-        structure_height_m=27.0,
-        terrain_offset_m=4.0,    # Hang über Tiefer See ~39m NN
-        subject_width_m=40.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="nikolaikirche_potsdam",
-        name="Nikolaikirche Potsdam",
-        kategorie="⛪ Kirche",
-        lat=52.3997, lon=13.0596,
-        structure_height_m=94.0,
-        terrain_offset_m=0.0,    # Stadtmitte Potsdam ~35m NN
-        subject_width_m=45.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="biosphaere_potsdam",
-        name="Biosphäre Potsdam",
-        kategorie="🌿 Gebäude",
-        lat=52.3923, lon=13.0759,
-        structure_height_m=30.0,
-        terrain_offset_m=0.0,
-        subject_width_m=80.0,
-        hoehe_confidence="hoch",
-    ),
-    DiscoverSubject(
-        id="garnisonkirche_potsdam",
-        name="Garnisonkirche Potsdam",
-        kategorie="⛪ Kirche",
-        lat=52.3992, lon=13.0643,
-        structure_height_m=88.0,   # Geplante Wiederherstellung historische Höhe
-        terrain_offset_m=0.0,
-        subject_width_m=25.0,
-        hoehe_confidence="niedrig",  # Wiederaufbau noch nicht vollständig
-    ),
-]
+# ---------------------------------------------------------------------------
+# Hilfsfunktionen
+# ---------------------------------------------------------------------------
 
-# Index für schnellen Zugriff
+def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Entfernung in Metern zwischen zwei GPS-Punkten."""
+    R = 6_371_000.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (math.sin(dlat / 2) ** 2
+         + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2))
+         * math.sin(dlon / 2) ** 2)
+    return R * 2 * math.asin(math.sqrt(a))
+
+
+def _slug(name: str) -> str:
+    """Einfacher ID-Slug aus Name."""
+    s = name.lower()
+    s = re.sub(r'[äöü]', lambda m: {'ä': 'ae', 'ö': 'oe', 'ü': 'ue'}[m.group()], s)
+    s = re.sub(r'[^a-z0-9]+', '_', s)
+    return s.strip('_')[:40]
+
+
+def _kategorie_label(category: LocationCategory) -> str:
+    return {
+        LocationCategory.SKYLINE:    "🏙 Skyline",
+        LocationCategory.SCHLOSS:    "🏰 Schloss",
+        LocationCategory.AUSSICHT:   "🔭 Aussicht",
+        LocationCategory.INDUSTRIE:  "🏗 Urban",
+        LocationCategory.WASSER:     "💧 Wasser",
+        LocationCategory.NATUR:      "🌿 Natur",
+        LocationCategory.MILCHSTRASSE: "🌌 Astro",
+    }.get(category, "📍 Ort")
+
+
+def _is_placeholder(loc) -> bool:
+    """True wenn height/width offensichtlich Defaultwerte ohne echte Daten sind."""
+    return loc.subject_height_m == 20 and loc.subject_width_m is None
+
+
+# ---------------------------------------------------------------------------
+# Hauptfunktion: Subjects + Exklusionszonen aus Locations ableiten
+# ---------------------------------------------------------------------------
+
+_DEDUP_RADIUS_M = 200.0      # Motive < 200m zusammenführen
+_SCOUT_MIN_APEX_M = 5.0      # Motiv muss mindestens 5m höher als Beobachter sein
+
+
+def build_subjects(
+) -> tuple[list[DiscoverSubject], dict[str, list[tuple[float, float]]]]:
+    """
+    Leitet Scout-Subjects und Exklusionszonen aus data/locations.py ab.
+
+    Rückgabe:
+      subjects      — Liste einzigartiger DiscoverSubject-Objekte
+      exclusion_zones — {subject_id: [(observer_lat, observer_lon), ...]}
+                        Bekannte Fotografen-Standorte die im Scout ausgeschlossen werden
+    """
+    # 1. Filtere ungeeignete Locations
+    candidates = [
+        loc for loc in LOCATIONS
+        if (loc.subject_height_m is not None
+            and loc.subject_height_m > 0
+            and loc.subject_lat is not None
+            and loc.subject_lon is not None
+            and not _is_placeholder(loc))
+    ]
+
+    # 2. Dedupliziere nach Subject-Koordinaten (DEDUP_RADIUS_M)
+    #    Für jede Gruppe: erstes Vorkommen gewinnt als DiscoverSubject,
+    #    alle bekannten Fotografen-Standorte werden gesammelt.
+    groups: list[dict] = []   # [{subject, observers: [(lat,lon)]}]
+
+    for loc in candidates:
+        # Suche ob bereits eine Gruppe mit diesem Motiv existiert
+        matched_group = None
+        for g in groups:
+            dist = _haversine_m(
+                loc.subject_lat, loc.subject_lon,
+                g["subject_lat"], g["subject_lon"],
+            )
+            if dist < _DEDUP_RADIUS_M:
+                matched_group = g
+                break
+
+        if matched_group is None:
+            groups.append({
+                "id": _slug(loc.subject_name),
+                "name": loc.subject_name,
+                "category": loc.category,
+                "subject_lat": loc.subject_lat,
+                "subject_lon": loc.subject_lon,
+                "structure_height_m": loc.subject_height_m,
+                "terrain_offset_m": loc.elevation_difference_m or 0.0,
+                "subject_width_m": (
+                    loc.subject_width_m
+                    or _DEFAULT_WIDTH_M.get(loc.category, 30.0)
+                ),
+                "observers": [(loc.observer_lat, loc.observer_lon)],
+            })
+        else:
+            # Gleiche Struktur, neuer Fotografen-Standpunkt
+            matched_group["observers"].append((loc.observer_lat, loc.observer_lon))
+            # Beste Höhendaten gewinnen (höchster apex)
+            apex_existing = (matched_group["structure_height_m"]
+                             + matched_group["terrain_offset_m"])
+            apex_new = (loc.subject_height_m
+                        + (loc.elevation_difference_m or 0.0))
+            if apex_new > apex_existing:
+                matched_group["structure_height_m"] = loc.subject_height_m
+                matched_group["terrain_offset_m"] = loc.elevation_difference_m or 0.0
+            # Breite: konkrete Angabe bevorzugen
+            if loc.subject_width_m and not matched_group.get("_width_confirmed"):
+                matched_group["subject_width_m"] = loc.subject_width_m
+                matched_group["_width_confirmed"] = True
+
+    # 3. Baue DiscoverSubject-Objekte
+    subjects: list[DiscoverSubject] = []
+    exclusion_zones: dict[str, list[tuple[float, float]]] = {}
+
+    for g in groups:
+        apex = g["structure_height_m"] + g["terrain_offset_m"]
+        if apex < _SCOUT_MIN_APEX_M:
+            continue   # Motiv nicht hoch genug für Inverse-Berechnung
+
+        subj = DiscoverSubject(
+            id=g["id"],
+            name=g["name"],
+            kategorie=_kategorie_label(g["category"]),
+            lat=g["subject_lat"],
+            lon=g["subject_lon"],
+            structure_height_m=g["structure_height_m"],
+            terrain_offset_m=g["terrain_offset_m"],
+            subject_width_m=g["subject_width_m"],
+            hoehe_confidence="mittel",
+        )
+        subjects.append(subj)
+        exclusion_zones[subj.id] = g["observers"]
+
+    return subjects, exclusion_zones
+
+
+# ---------------------------------------------------------------------------
+# Gecachte Instanzen (einmal pro Prozess aufgebaut)
+# ---------------------------------------------------------------------------
+
+SUBJECTS, EXCLUSION_ZONES = build_subjects()
 SUBJECT_BY_ID: dict[str, DiscoverSubject] = {s.id: s for s in SUBJECTS}

@@ -27,7 +27,7 @@ from typing import Optional
 from calculations.astronomy import CelestialPosition, calculate_sun_info, get_body_position
 from calculations.weather import WeatherForecast, calculate_photo_weather_score, fetch_weather_forecast
 from discover.geometry import bearing_between, destination_point
-from discover.subjects import SUBJECTS, DiscoverSubject
+from discover.subjects import EXCLUSION_ZONES, SUBJECTS, DiscoverSubject
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +43,10 @@ D_MIN_M = 100.0        # Mindestdistanz Standpunkt–Motiv
 D_MAX_M = 13_000.0     # Maximaldistanz
 MOON_ALT_MIN_DEG = 5.0  # Mond muss sichtbar über Horizont sein
 SAMPLE_INTERVAL_MIN = 15  # Minuten zwischen Samplings
+
+# Scout-Exklusion: berechneter Standpunkt muss mindestens diesen Abstand
+# zu allen gespeicherten Fotografen-Standorten desselben Motivs haben.
+SCOUT_MIN_NEW_DISTANCE_M = 150.0
 
 MOON_ANGULAR_DIAM_DEG = 0.52  # Mittlerer Monddurchmesser in Bogengrad
 
@@ -86,6 +90,32 @@ class ScoutOpportunity:
 # ---------------------------------------------------------------------------
 # Hilfsfunktionen
 # ---------------------------------------------------------------------------
+
+def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Entfernung in Metern zwischen zwei GPS-Punkten."""
+    R = 6_371_000.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (math.sin(dlat / 2) ** 2
+         + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2))
+         * math.sin(dlon / 2) ** 2)
+    return R * 2 * math.asin(math.sqrt(a))
+
+
+def _is_new_perspective(
+    sp_lat: float, sp_lon: float, subject_id: str
+) -> bool:
+    """
+    True wenn der berechnete Scout-Standpunkt mindestens SCOUT_MIN_NEW_DISTANCE_M
+    von allen gespeicherten Fotografen-Standorten dieses Motivs entfernt ist.
+    Bekannte Standorte: EXCLUSION_ZONES[subject_id].
+    """
+    known = EXCLUSION_ZONES.get(subject_id, [])
+    for obs_lat, obs_lon in known:
+        if _haversine_m(sp_lat, sp_lon, obs_lat, obs_lon) < SCOUT_MIN_NEW_DISTANCE_M:
+            return False
+    return True
+
 
 def _sample_window(start: Optional[datetime], end: Optional[datetime]) -> list[datetime]:
     """Alle 15-Minuten-Zeitpunkte innerhalb eines Lichtfensters."""
@@ -302,6 +332,10 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
                     # Standpunkt: gegenüberliegende Seite des Motivs
                     standpoint_bearing = (moon.azimuth + 180.0) % 360.0
                     sp_lat, sp_lon = destination_point(subject.lat, subject.lon, standpoint_bearing, d)
+
+                    # Exklusionsfilter: nur neue Perspektiven (≥ 150m von bekannten Standorten)
+                    if not _is_new_perspective(sp_lat, sp_lon, subject.id):
+                        continue
 
                     # Mond-Beleuchtung (aus Skyfield moon.distance_au → phase aus Astronomie-Modul)
                     # Vereinfachung: Illumination über skyfield nicht direkt verfügbar via get_body_position.
