@@ -771,7 +771,7 @@
 <!-- Detail Sheet -->
 <div id="detail-overlay" onclick="Detail.close()"></div>
 <div id="detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -836,7 +836,7 @@
 <!-- Location Detail Sheet -->
 <div id="loc-detail-overlay" onclick="LocationDetail.close()"></div>
 <div id="loc-detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen">✕</button>
   </div>
@@ -861,7 +861,7 @@
 <!-- Impressum Sheet (TASK-11) -->
 <div id="impressum-overlay" onclick="Impressum.close()"></div>
 <div id="impressum-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;flex-shrink:0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
     <button class="close-btn" onclick="Impressum.close()" aria-label="Schließen">✕</button>
   </div>
@@ -880,7 +880,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.36';
+const APP_VERSION = '1.4.37';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════

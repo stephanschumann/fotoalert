@@ -91,6 +91,30 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 **Root Cause:** FOV-Karte, Edit-Karte, AddLocation-Karte nutzten je unterschiedliche Marker-Typen ohne zentrales Objekt.  
 **Fix:** `MapMarkers`-Objekt eingeführt – Fotograf-Standort: SVG-Tropfen mit weißem Kern (goldener Drop-Pin), Motiv: SVG-Kreuzmarke mit weißem Mittelpunkt. Alle Karten, Labels und Legende zeigen identische SVG-Icons. v1.4.17.
 
+### BUG-25 · Close-Button in Locationdetails auf iPhone nicht anklickbar `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-19 |
+| **In Progress seit** | 2026-06-19 |
+
+**Beschreibung:** Beim Betrachten, Bearbeiten oder Verifizieren von Locationdetails liegt das Schließen-Symbol (×) so weit oben rechts, dass es direkt unter dem Batterielade-Symbol liegt und nicht angetippt werden kann.
+
+**Root Cause:** `#detail-sheet`, `#loc-detail-sheet` und `#impressum-sheet` hatten im Header-Div `padding:10px 16px 0` ohne Safe-Area-Berücksichtigung. Bei 92vh Sheetgröße kann der Header in den Status-Bar-Bereich ragen.
+
+**Fix:** Header-Padding auf `calc(env(safe-area-inset-top, 0px) + 10px) 16px 0` geändert — identisches Muster wie `.add-header` (BUG-19-Fix). Betrifft alle drei Sheets gleichzeitig.
+
+**Akzeptanzkriterien:**
+- [~] Close-Button in `#loc-detail-sheet` auf iPhone (Dynamic Island + Notch) tappbar
+- [~] Close-Button in `#detail-sheet` (Event-Detail) ebenfalls gesichert
+- [~] Close-Button in `#impressum-sheet` ebenfalls gesichert
+- [ ] Auf iPhone in Safari PWA-Modus mit langen Inhalten getestet
+
+---
+
 ### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
 > **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
@@ -812,7 +836,7 @@ Zwei kombinierte Ursachen:
 >
 > **Abhängigkeiten:** US-63[x], US-66, TASK-12[x]
 
-### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[~]`
+### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[x]`
 > **Als Fotograf vor Ort** möchte ich die Kartenansicht mit einem Tap auf meinen GPS-Standort zentrieren, damit ich schnell sehe, welche Fotostandorte in meiner Nähe liegen.
 >
 > **Akzeptanzkriterien:**
@@ -862,6 +886,123 @@ Zwei kombinierte Ursachen:
 **Beschreibung:** Als Fotograf möchte ich im dritten Kalender-Tab „Discover" einen nach Score sortierten 14-Tage-Ausblick erhalten, welches bekannte Motiv (Schloss, Turm, Windmühle …) ich von welchem Standort aus fotografieren kann — mit freier Sichtachse, Himmelserscheinung (Mond/Sonne) im 2°-Fenster um die Motivspitze zur goldenen/blauen Stunde, und der Möglichkeit, Vorschläge als permanente Location zu speichern.
 
 **Spec:** `foto-chancen-planer-spec.md` (Cowork-Upload 2026-06-19) — 7 Capabilities (Astronomie, Motiv-Katalog, Standort-Alignment, Sichtachse/DOM, Wetter, Scoring, Ausblick), Scoring-Formel, Datenquellen (LGB bDOM, Berlin LoD2, OSM, open-meteo), 6 vertikale Slices.
+
+---
+
+### US-71 · Drei-Zustand-Filter: Include / Exclude / Off `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Jedes Filterkriterium soll drei Zustände haben: 1. Klick → aktiv/include (gelber Rand, zeigt nur Ergebnisse die das Kriterium erfüllen), 2. Klick → exclude (roter Rand, blendet Ergebnisse mit diesem Kriterium aus), 3. Klick → inaktiv (kein Rahmen, keine Filterung). Wirkt auf alle Panels wie bisher.
+
+---
+
+### US-72 · Wetterkarte `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Als Fotograf möchte ich eine Wetterkarte für Berlin/Potsdam/Umland sehen, um Wolkendecke und Niederschlag für meine geplanten Shooting-Fenster visuell einschätzen zu können.
+
+---
+
+### US-73 · Anreise zum Standort (Get to Location) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Als Fotograf möchte ich direkt aus einem Event oder einer Location heraus die Anreise zum Fotografen-Standort starten können (z. B. Link zu Maps/ÖPNV), damit ich rechtzeitig vor Ort bin.
+
+---
+
+### US-74 · Regelmäßige Open-Source-Lizenzprüfung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Das System soll regelmäßig prüfen, ob alle genutzten Open-Source-Quellen und -Daten (OSM, open-meteo, Geodaten-Portale) weiterhin für die gewerbliche Nutzung in dieser App erlaubt sind, und bei lizenzrechtlichen Änderungen einen Hinweis ausgeben.
+
+---
+
+### US-75 · User/Backend-Datensync: Qualitätssicherung & Automatisierung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Als Betreiber möchte ich sicherstellen, dass von Nutzern hinzugefügte/geänderte Locations (Motive, Standorte, Beschreibungen) regelmäßig und geprüft ins Backend übertragen werden — inkl. automatischer Generierung von Standortbeschreibungen, idealem Azimut, konsistenter Kategorisierung und automatischer Aktualisierung der Brennweitenempfehlungen.
+
+---
+
+### US-76 · Location-Kategorien als Standardliste mit Filter-Integration `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Location-Kategorien sollen standardisiert und als Auswahlliste beim Bearbeiten und Neuanlegen von Locations verfügbar sein. Der Filter soll um diese Kategorien erweitert werden, damit Nutzer nach Motivtyp filtern können.
+
+---
+
+### US-77 · Neue Locations via Backend hinzufügen + Merge mit Nutzerdaten `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Als Betreiber möchte ich neue Locations zentral über das Backend anlegen und diese automatisiert mit den Nutzerdaten (custom_locations.json) zusammenführen (Merge), ohne bestehende Nutzeränderungen zu überschreiben.
+
+---
+
+### US-78 · Duplikatserkennung bei räumlich nahen Motiven `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Beim Anlegen eines neuen Motivs soll das System warnen, wenn ein bestehendes Motiv zu nah liegt (konfigurierbare Schwelle), um Dopplungen zu vermeiden. Mehrere Fotografen-Standorte für dasselbe Motiv sind erlaubt und erwünscht, solange sie sinnvoll weit voneinander entfernt sind.
+
+---
+
+### US-79 · Mondauf- und -untergang in Event- und Locationdetails `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Ergänzend zu Sonnenaufgang und -untergang sollen auch Mondaufgang und -untergang (Uhrzeit, Azimut) in der Astronomie-Kategorie der Event- und Locationdetails angezeigt werden.
 
 ---
 
