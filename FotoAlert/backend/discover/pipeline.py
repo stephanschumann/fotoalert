@@ -3,8 +3,8 @@ Scout-Tab Pipeline: Ephemeride für Mond-Alignment-Chancen.
 
 Ablauf für jeden der nächsten 14 Tage:
   1. Lichtfenster bestimmen (goldene + blaue Stunde, morgens + abends)
-  2. Mond-Positionen im 15-min-Raster für alle Fenster berechnen
-     (einmal für Berlin-Zentrum — Parallaxenfehler < 0.002° bei 13 km Baseline)
+  2. Mond-Positionen im 15-min-Raster per Motiv berechnen
+     (topozentrisch korrekt: Subject-Koordinaten statt Berlin-Zentrum-Approximation)
   3. Standpunkt-Distanz d = apex_effective_m / tan(alt_moon) berechnen
   4. Standpunkt S via destination_point(Motiv → Mond-Gegenrichtung, d)
   5. d-Gate: 100 m ≤ d ≤ 13.000 m, moon_alt ≥ 5°
@@ -35,8 +35,9 @@ log = logging.getLogger(__name__)
 # Konfiguration
 # ---------------------------------------------------------------------------
 
-BERLIN_CENTER_LAT = 52.52
-BERLIN_CENTER_LON = 13.40
+# Berliner Zentrum: nur für Sonnen-Lichtfenster (Variation < 1 min über 50 km)
+_SUN_REF_LAT = 52.52
+_SUN_REF_LON = 13.40
 
 D_MIN_M = 100.0        # Mindestdistanz Standpunkt–Motiv
 D_MAX_M = 13_000.0     # Maximaldistanz
@@ -250,7 +251,7 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
     log.info("Berechne Lichtfenster für %d Tage...", days)
     for delta in range(days):
         d = today + timedelta(days=delta)
-        sun = calculate_sun_info(BERLIN_CENTER_LAT, BERLIN_CENTER_LON, d)
+        sun = calculate_sun_info(_SUN_REF_LAT, _SUN_REF_LON, d)
         sessions = {
             "blue_morning":   _sample_window(sun.blue_hour_morning_start,  sun.blue_hour_morning_end),
             "golden_morning": _sample_window(sun.golden_hour_morning_start, sun.golden_hour_morning_end),
@@ -259,19 +260,8 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
         }
         day_sessions[d.isoformat()] = sessions
 
-    # --- Schritt 2: Mondpositionen batch-mäßig für alle Zeitpunkte ---
-    # Einmal für Berlin-Zentrum; Parallaxe <0.002° bei 13km Baseline ist vernachlässigbar.
-    log.info("Berechne Mondpositionen (15-min-Raster)...")
-    moon_pos_cache: dict[datetime, Optional[CelestialPosition]] = {}
-
-    for day_str, sessions in day_sessions.items():
-        for session_name, timestamps in sessions.items():
-            for dt in timestamps:
-                if dt not in moon_pos_cache:
-                    pos = get_body_position(BERLIN_CENTER_LAT, BERLIN_CENTER_LON, "moon", dt)
-                    moon_pos_cache[dt] = pos
-
-    # Wetter-Forecasts für alle Subjekte vorab laden (parallel)
+    # --- Schritt 2: Wetter-Forecasts für alle Subjekte vorab laden (parallel) ---
+    # Mondpositionen werden per Subject in Schritt 3 berechnet (topozentrisch korrekt).
     log.info("Lade Wetter-Forecasts für %d Motive...", len(SUBJECTS))
     weather_tasks = {
         s.id: asyncio.create_task(_get_weather(s.lat, s.lon)) for s in SUBJECTS
@@ -284,12 +274,20 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
     for subject in SUBJECTS:
         weather_fc = await _get_weather(subject.lat, subject.lon)
 
+        # Mondpositionen für dieses Motiv an dessen tatsächlichen Koordinaten berechnen.
+        # Cache: pro Subject einmal aufgebaut, über alle Tage/Sessions wiederverwendet.
+        moon_pos_cache: dict[datetime, Optional[CelestialPosition]] = {}
+
         for day_str, sessions in day_sessions.items():
             for session_name, timestamps in sessions.items():
                 # Bestes Ergebnis für diese Kombination (Motiv/Tag/Session)
                 best: Optional[ScoutOpportunity] = None
 
                 for dt in timestamps:
+                    if dt not in moon_pos_cache:
+                        moon_pos_cache[dt] = get_body_position(
+                            subject.lat, subject.lon, "moon", dt
+                        )
                     moon = moon_pos_cache.get(dt)
                     if moon is None:
                         continue

@@ -964,7 +964,7 @@ Zwei kombinierte Ursachen:
 
 ---
 
-### US-70b · Scout-Tab Slice 2: Mondposition per Subject-Koordinaten `[ ]`
+### US-70b · Scout-Tab Slice 2: Mondposition per Subject-Koordinaten `[~]`
 
 | Feld | Wert |
 |------|------|
