@@ -69,11 +69,16 @@ echo ">>> Timer neu geladen: $(systemctl show fotoalert-precompute.timer --prope
 
 echo ">>> App-Service neustarten..."
 sudo systemctl restart fotoalert.service
-sleep 4  # Kurz warten bis uvicorn bereit ist
 
-# ── 6. Health-Check ──────────────────────────────────────────────────────────
+# ── 6. Health-Check (mit Retry-Loop) ─────────────────────────────────────────
 echo ">>> Health-Check..."
-HTTP_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+HTTP_STATUS="000"
+for i in 1 2 3 4 5; do
+    sleep 5  # 5s warten pro Versuch (max 25s gesamt)
+    HTTP_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+    if [ "$HTTP_STATUS" = "200" ]; then break; fi
+    echo "    Versuch $i: HTTP $HTTP_STATUS – warte..."
+done
 
 if [ "$HTTP_STATUS" != "200" ]; then
     echo "❌ Health-Check fehlgeschlagen (HTTP $HTTP_STATUS) – Rollback wird eingeleitet..."
