@@ -964,7 +964,9 @@ Zwei kombinierte Ursachen:
 
 ---
 
-### US-70b · Scout-Tab Slice 2: Mondposition per Subject-Koordinaten `[~]`
+### US-70b · Scout-Tab Slice 2: Mondposition per Subject-Koordinaten `[x]`
+
+### US-70c · Scout-Tab Slice 3: Subjects aus Locations + 150m-Exklusionsfilter `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -1090,6 +1092,72 @@ Zwei kombinierte Ursachen:
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Beim Anlegen eines neuen Motivs soll das System warnen, wenn ein bestehendes Motiv zu nah liegt (konfigurierbare Schwelle), um Dopplungen zu vermeiden. Mehrere Fotografen-Standorte für dasselbe Motiv sind erlaubt und erwünscht, solange sie sinnvoll weit voneinander entfernt sind.
+
+---
+
+### US-80 · Scout-Tab: Filter-System `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-19 |
+| **In Progress seit** | 2026-06-19 15:30 |
+
+**Beschreibung:** Im Scout-Tab soll dasselbe Filter-System wie im Chancen-Tab verfügbar sein, damit Nutzer die Scout-Ergebnisse anhand der bestehenden Filterkriterien einschränken können. Anzeige von Gesamtanzahl und gefilterter Anzahl wie im Chancen-Tab.
+
+**Scope:**
+- Eingeschlossen: `Filter.applyToScout()` für 4 anwendbare Dimensionen (Tageszeit, Score, Brennweite, Entfernung); Zähleranzeige in Scout-Content und Filter-Sheet; Live-Update beim Schieben von Slidern; `FilterSheet._applyLive()` und `_updateResultCount()` für Scout-Modus erweitern
+- Ausgeschlossen: Eventtyp-, Schwierigkeits-, Rating- und Verifikations-Filter (kein Äquivalent in Scout-Daten, werden ignoriert); Anpassung der Filter-Sheet-UI für Scout-Modus (alle Sektionen bleiben sichtbar, nicht-anwendbare haben schlicht keinen Effekt)
+
+**Akzeptanzkriterien:**
+- [ ] `Filter.applyToScout(data)` existiert: filtert nach Tageszeit (session-Mapping), `score` (statt `overall_score`), `focal_length_equiv_mm`, GPS-Distanz zu `standpoint_lat/lon`
+- [ ] Scout-Tab zeigt oberhalb der Karten-Liste Zähler „X von Y Scout-Chancen" wenn Filter aktiv (kein Zähler wenn kein Filter)
+- [ ] Filter-Sheet zeigt bei aktivem Scout-Modus „↳ X von Y Scout-Chancen sichtbar" in `#filter-result-count`
+- [ ] Live-Update: Scout re-rendert sofort bei Slider-Änderung im offenen Filter-Sheet
+- [ ] Tageszeit „Morgen" → nur `golden_morning` + `blue_morning` (70 von 296 aktuell)
+- [ ] Tageszeit „Abend" → nur `golden_evening` + `blue_evening` (226 von 296 aktuell)
+- [ ] Mindest-Score-Slider filtert korrekt auf `o.score` (0–1)
+- [ ] Nicht-anwendbare Filter (Eventtyp, Schwierigkeit, Rating, Verifikation) haben keinen Effekt auf Scout-Ergebnisse
+- [ ] Filter-Badge (`#filter-badge`) zeigt weiterhin Gesamtzahl aller aktiven Filter (auch wenn manche im Scout-Context ohne Wirkung)
+- [ ] Edge Case: alle Filter zusammen ergeben 0 Ergebnisse → Scout zeigt leeren Zustand mit Hinweis „Keine Scout-Chancen entsprechen den Filterkriterien"
+- [ ] Edge Case: Scout-Daten noch nicht geladen → Filter-Sheet-Zähler bleibt leer
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Rules, keine offenen Questions)
+- [x] Scout-Daten analysiert: 296 Chancen, Score 0.59–0.98, Focal 20–120mm, Distanz 0.1–3.3km, Sessions: golden_evening(112), blue_evening(114), golden_morning(37), blue_morning(33)
+- [x] Architektur analysiert: alle Änderungen in `web/index.html` — kein Backend-Eingriff nötig
+- [x] Betroffene Stellen: `Filter`-Objekt (+`applyToScout()`), `Scout.render()`, `FilterSheet._applyLive()`, `FilterSheet._updateResultCount()`
+- [ ] Implementierungsansatz: (1) `applyToScout()` in Filter-Objekt ergänzen, (2) Scout.render() auf `applyToScout()` umstellen + Zähler-Header einbauen, (3) `_applyLive()` + `_updateResultCount()` für Scout-Modus erweitern
+
+**Daten-Validierung:**
+- [x] Scout-Felder verifiziert: `score` (nicht `overall_score`!), `focal_length_equiv_mm` (direkt), `session` für Tageszeit-Mapping, `standpoint_lat/lon` für GPS-Distanz
+- [x] Tageszeit-Mapping validiert: morgen↔(golden_morning+blue_morning)=70 Einträge, abend↔(golden_evening+blue_evening)=226 Einträge — keine "tag"/"nacht"-Sessions → Auswahl dieser Slots ergibt 0 Scout-Ergebnisse (erwartetes Verhalten)
+
+**Testplan:**
+- [ ] Manuell: Filter-Button im Scout-Tab öffnen → Tageszeit „Morgen" wählen → Scout zeigt ~70 Chancen und „70 von 296 Scout-Chancen sichtbar"
+- [ ] Manuell: Tageszeit auf „Abend" umschalten → ~226 Chancen erscheinen
+- [ ] Manuell: Score-Slider auf 80 % → nur hochwertige Chancen bleiben; Zähler aktualisiert sich live
+- [ ] Manuell: Brennweite min 50mm → Chancen unter 50mm verschwinden
+- [ ] Manuell: Scout-Tab verlassen, zu Chancen-Tab wechseln → Feed-Filter funktioniert weiterhin korrekt (keine Regression)
+- [ ] Manuell: Eventtyp-Filter auf „Mondaufgang" setzen, dann Scout-Tab → alle Scout-Chancen weiterhin sichtbar (Eventtyp-Filter ohne Wirkung)
+
+**Implementierungsnotizen:**
+*(leer bei Erstellung)*
+
+---
+
+### US-81 · Scout-Tab: Weitere Event-Typen (Sonne, weitere Himmelskörper) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Der Scout-Tab soll nicht auf Mond-Alignment beschränkt bleiben. Weitere astronomische Event-Typen (z.B. Sonne/Sonnenaufgang über Motiv, weitere Himmelskörper) sollen als eigene Scout-Pipelines implementiert werden können. Abhängigkeit: US-80 (Filter-System muss event-type-agnostisch sein).
 
 ---
 

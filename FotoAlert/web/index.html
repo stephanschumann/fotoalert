@@ -906,7 +906,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1211,9 +1211,27 @@ const Scout = {
       return;
     }
 
+    // Filter anwenden (US-80)
+    const filtered = Filter.applyToScout(this.data);
+    const n = this.data.length, nf = filtered.length;
+
+    if (nf === 0) {
+      el.innerHTML = `<div class="scout-empty">
+        <div class="scout-moon-icon">🌙</div>
+        <p>Keine Scout-Chancen entsprechen den Filterkriterien.</p>
+        <p style="font-size:13px;margin-top:8px;color:var(--gold)">${n} Chancen vorhanden — Filter anpassen?</p>
+      </div>`;
+      return;
+    }
+
+    // Zähler-Header (nur bei aktivem Filter)
+    const countBar = (Filter.activeCount() > 0 && n !== nf)
+      ? `<div style="font-size:12px;color:var(--muted);padding:4px 0 10px">${nf} von ${n} Scout-Chancen</div>`
+      : '';
+
     // Gruppieren nach Tag
     const byDay = {};
-    for (const o of this.data) {
+    for (const o of filtered) {
       if (!byDay[o.day]) byDay[o.day] = [];
       byDay[o.day].push(o);
     }
@@ -1225,7 +1243,7 @@ const Scout = {
       blue_evening:   '🌆 Blaue Stunde Abend',
     };
 
-    let html = '';
+    let html = countBar;
     for (const [day, opps] of Object.entries(byDay).slice(0, 14)) {
       const d = new Date(day + 'T12:00:00Z');
       const label = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -1865,6 +1883,35 @@ const Filter = {
     });
   },
 
+  // Filtert Scout-Chancen (US-80) — event-type-agnostisch für zukünftige Scout-Typen (US-81)
+  // Anwendbare Dimensionen: Tageszeit (session-Mapping), Score, Brennweite, Entfernung
+  // Nicht anwendbar: eventTypes, difficulty, minRating, verification (kein Äquivalent in Scout-Daten)
+  applyToScout(data) {
+    const s = this.state;
+    const MORGEN = ['golden_morning', 'blue_morning'];
+    const ABEND  = ['golden_evening', 'blue_evening'];
+    return data.filter(o => {
+      // Tageszeit: Scout-Sessions auf morgen/abend mappen
+      if (s.tageszeit.length) {
+        let slot = 'nacht';
+        if (MORGEN.includes(o.session)) slot = 'morgen';
+        else if (ABEND.includes(o.session)) slot = 'abend';
+        if (!s.tageszeit.includes(slot)) return false;
+      }
+      // Score (Scout: o.score; Feed: o.overall_score — unterschiedliche Feldnamen!)
+      if (s.minScore > 0 && o.score < s.minScore / 100) return false;
+      // Brennweite (direkt auf focal_length_equiv_mm)
+      if (s.minFocal > 0 && o.focal_length_equiv_mm < s.minFocal) return false;
+      if (s.maxFocal > 0 && o.focal_length_equiv_mm > s.maxFocal) return false;
+      // Entfernung: GPS-Standort → Fotografen-Standpunkt
+      if (s.maxDistKm > 0 && this._gps) {
+        const d = haversineKm(this._gps.lat, this._gps.lon, o.standpoint_lat, o.standpoint_lon);
+        if (d > s.maxDistKm) return false;
+      }
+      return true;
+    });
+  },
+
   async requestGps() {
     if (this._gps) return true;
     return new Promise(resolve => {
@@ -1977,6 +2024,8 @@ const FilterSheet = {
       Feed.render();
     } else if (Feed.mode === 'calendar') {
       CalendarView.render();
+    } else if (Feed.mode === 'scout') {
+      Scout.render();
     }
     FilterSheet._updateResultCount();
   },
@@ -2002,6 +2051,9 @@ const FilterSheet = {
         count = Filter.apply(cached).length;
         label = `${count} von ${cached.length} Events (${MONTHS_DE[CalendarView.month]})`;
       }
+    } else if (Feed.mode === 'scout' && Scout.data) {
+      count = Filter.applyToScout(Scout.data).length;
+      label = `${count} von ${Scout.data.length} Scout-Chancen`;
     }
     el.textContent = label ? `↳ ${label} sichtbar` : '';
     el.style.color = count === 0 && label ? 'var(--warn, #f0a030)' : 'var(--muted)';
