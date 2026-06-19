@@ -867,7 +867,7 @@ Zwei kombinierte Ursachen:
 > - [ ] Ablehnen der Berechtigung → Toast erscheint, kein Absturz
 > - [ ] Zweiter Tap → kein Marker-Duplikat
 
-### US-70 · Scout-Tab: Automatisierte Foto-Ephemeride (Mond-Alignment) `[~]`
+### US-70 · Scout-Tab: Automatisierte Foto-Ephemeride (Mond-Alignment) `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -961,6 +961,31 @@ Zwei kombinierte Ursachen:
 4. Wetter-Integration in Pipeline
 5. `GET /discover` Endpoint in `main.py`
 6. Frontend: Scout-Tab in `web/index.html`
+
+---
+
+### US-70b · Scout-Tab Slice 2: Mondposition per Subject-Koordinaten `[ ]`
+
+| Feld | Wert |
+|------|------|
+| Priorität | Mittel |
+| Abhängigkeit | US-70 (Slice 1) ✅ |
+| Aufwand | S (1–2h) |
+
+**Problem:** In Slice 1 wird die Mondposition einmal am Berliner Zentrum (52.52°N, 13.40°E) berechnet und für alle 12 Subjects verwendet (Berlin-Center-Approximation). Das funktioniert für Berlin/Potsdam (~50km Radius), schlägt aber fehl sobald Subjects weiter entfernt liegen (andere Städte, deutschlandweite Erweiterung).
+
+**Lösung:** Mondposition per Subject an den tatsächlichen Subject-Koordinaten berechnen (topozentrisch korrekt). Pro Subject × Timestep → Skyfield-Call.
+
+**Betroffene Dateien:**
+- `backend/discover/pipeline.py`
+
+**Akzeptanzkriterien:**
+- `run_pipeline()` ruft `_moon_pos(ts, subject.lat, subject.lon)` statt `_moon_pos(ts, *BERLIN_CENTER)` auf
+- BERLIN_CENTER-Konstante wird entfernt oder nur noch als Fallback genutzt
+- Kein funktionaler Unterschied für bestehende Berlin/Potsdam-Subjects (Delta < 0.02°)
+- Neue Subjects außerhalb Berlin können ohne Koordinaten-Bias hinzugefügt werden
+
+**Implementierungshinweis:** Die `topos`-Methode in Skyfield erlaubt beliebige Koordinaten. Performance: 12 Subjects × ~448 Timesteps = ~5376 Calls statt 448. Ggf. Batch-Optimierung via `earth + wgs84.latlon(lat, lon)` prüfen.
 
 ---
 
