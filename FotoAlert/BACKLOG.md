@@ -114,23 +114,31 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 >
 > **Abhängigkeiten:** US-32[x] (Filter-System)
 
-### BUG-22 · Änderungen in Locationdetails ohne Effekt auf Chancen `[ ]`
-> **Problem:** Nach dem Bearbeiten von Location-Feldern (außer Koordinaten) werden Chancen-Berechnungen nicht neu ausgelöst. Nutzer sehen veraltete Scores.
->
-> **Differenzierung:**
-> - **`lat`/`lon` (Koordinaten):** Recompute via TASK-12[x] bereits implementiert → Regressionsprüfung
-> - **`focal_length_mm`:** Beeinflusst FOV → Pre-Compute nötig; prüfen ob TASK-12 das abdeckt
-> - **`observer_floor_height_m` (US-62):** Beeinflusst Elevation-Winkel → Recompute nötig
-> - **`name`/`description`:** Kein Recompute nötig – erwartetes Verhalten
->
-> **Akzeptanzkriterien:**
-> - PATCH auf `focal_length_mm` triggert Hintergrund-Recompute (TASK-12-Mechanismus erweitern oder prüfen)
-> - PATCH auf `observer_floor_height_m` (nach US-62) triggert ebenfalls Recompute
-> - PATCH auf `name`/`description` triggert KEINEN Recompute
-> - Nach Recompute: Feed und Kalender zeigen aktualisierte Scores
-> - API-Log zeigt Recompute-Task-Start nach Focal-Length-PATCH (technischer Nachweis)
->
-> **Abhängigkeiten:** TASK-12[x], US-62
+### BUG-22 · Änderungen in Locationdetails ohne Effekt auf Chancen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-18 |
+| **In Progress seit** | 2026-06-18 |
+
+**Root Cause:** PATCH `/locations/{id}` kannte nur `coord_fields | text_fields`. Weder `focal_length_suggestions` noch `observer_floor_height_m` waren in der Whitelist — PATCHes auf diese Felder wurden mit HTTP 400 abgelehnt und konnten nie Recompute auslösen.
+
+**Fix (zusammen mit US-62):**
+- `focal_length_suggestions` (list[int]) + `observer_floor_height_m` zur PATCH-Whitelist hinzugefügt
+- `recompute_fields = coord_fields | {"observer_floor_height_m", "focal_length_suggestions"}` → Recompute bei jedem dieser Felder
+- `focal_length_suggestions` wird jetzt auch in `location_overrides.json` persistiert und beim Startup geladen
+- `name`/`description` triggern weiterhin KEINEN Recompute
+
+**Akzeptanzkriterien:**
+- [~] PATCH auf `focal_length_suggestions` triggert Recompute → camera_hints aktualisiert
+- [~] PATCH auf `observer_floor_height_m` triggert Recompute → Kompositions-Analyse aktualisiert
+- [~] PATCH auf `name`/`description` triggert KEINEN Recompute
+- [~] API-Log: `recompute_triggered: true` bei Focal-Length-PATCH
+
+**Abhängigkeiten:** TASK-12[x], US-62
 
 ### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[x]`
 
@@ -682,24 +690,34 @@ Zwei kombinierte Ursachen:
 > - Löschen mit Bestätigung
 > - Export als JSON
 
-### US-62 · Höhenkorrektur Fotografenstandort (Dach, Etage) `[ ]`
-> **Als Fotograf** möchte ich angeben können, dass ich mich nicht auf Bodenniveau befinde (z. B. auf einem Dach oder in der 20. Etage eines Hochhauses), damit die Triangulation und Kompositions-Analyse korrekte Winkel für meine tatsächliche Augenhöhe berechnet.
->
-> **Hintergrund:** `observer_elevation_m` wird via OpenTopoData aus dem Geländemodell am GPS-Standort bezogen. Ein Fotograf auf dem Dach eines 60 m hohen Gebäudes hat eine effektive Augenhöhe von `terrain_elevation_m + 60 m`. Die Formel für `observer_elevation_angle_deg = arctan((subject_elevation_m + subject_height_m − observer_elevation_m) / distance_m)` wird dadurch signifikant beeinflusst — und damit alle davon abhängigen Berechnungen (FOV-Karte, Kompositions-Analyse, possible_bodies).
->
-> **Differenzierung zu US-60 ✅:** US-60 editiert Lat/Lon-Koordinaten. Diese Story ergänzt den vertikalen Offset am Beobachterstandort.
->
-> **Akzeptanzkriterien:**
-> - Neues Feld `observer_floor_height_m` (Typ: float, Default: 0.0) in Location-Datenmodell und `custom_locations.json` / `location_overrides.json`
-> - Im Location-Detail → Bearbeitungsmodus (Erweiterung des US-60-Edit-Flows): Eingabefeld „Höhe über Gelände (m)" mit Hilfetext „z. B. 60 m für Dach eines 6-Geschossers"
-> - Validierung: Wert ≥ 0, numerisch
-> - Backend: PATCH `/locations/{id}` um `observer_floor_height_m` erweitern; Nicht-Custom-Locations via `location_overrides.json`
-> - In `precompute.py`: effektive Observer-Höhe = `observer_elevation_m + (observer_floor_height_m or 0.0)` in allen Berechnungen
-> - Nach Speichern: Hintergrund-Recompute via TASK-12-Mechanismus (berührt Kompositions-Analyse, FOV-Kegel, possible_bodies)
-> - Anzeige im Location-Detail (GPS-Sektion): „Geländehöhe: 45 m + 60 m Gebäude = eff. 105 m NN"
-> - Gilt für eigene Locations UND Standard-Locations (via location_overrides.json, identisches Muster wie US-60)
->
-> **Abhängigkeiten:** US-60 ✅, TASK-12 ✅
+### US-62 · Höhenkorrektur Fotografenstandort (Dach, Etage) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Feature |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-18 |
+| **In Progress seit** | 2026-06-18 |
+
+**Beschreibung:** `observer_floor_height_m` ergänzt den vertikalen Offset wenn der Fotograf nicht auf Bodenniveau ist (Dach, Etage). Beeinflusst Kompositions-Analyse, elevation_difference_m, possible_bodies.
+
+**Scope:**
+- Eingeschlossen: `PhotoLocation`-Datenmodell, `custom_locations.json`, `location_overrides.json`, PATCH-Endpoint, `precompute.py` (`_composition_analysis`), Edit-Formular, Anzeige in Location-Detail
+- Ausgeschlossen: `possible_bodies`-Berechnung (nutzt Terrain-Elevation, nicht observer_floor), FOV-Kegel-Karte (rein visuell, kein Elevationswinkel-Effekt)
+
+**Akzeptanzkriterien:**
+- [~] Feld `observer_floor_height_m: float = 0.0` in `PhotoLocation` (data/locations.py)
+- [~] `_load_custom_locations()`: liest `observer_floor_height_m` aus JSON
+- [~] `_save_custom_location()`: schreibt `observer_floor_height_m` in JSON
+- [~] `_load_location_overrides()`: wendet `observer_floor_height_m` an
+- [~] PATCH `/locations/{id}`: `observer_floor_height_m` in Whitelist + Validierung ≥ 0
+- [~] `precompute.py _composition_analysis()`: `height_above_observer = elev_diff - observer_floor_height_m + subject_height_m`
+- [~] Edit-Formular: Eingabefeld „Höhe über Gelände (m)" nach Motivhöhe
+- [~] Location-Detail Anzeige: „+ X m Gebäude" wenn Wert > 0
+- [~] Nach Speichern: Recompute über TASK-12-Mechanismus (coords_changed-Logik erweitern)
+
+**Abhängigkeiten:** US-60 ✅, TASK-12 ✅
 
 
 ### US-64 · Live Astro-Visualisierung (PhotoPills-like) `[ ]`
@@ -1072,15 +1090,16 @@ Zwei kombinierte Ursachen:
 >
 > *Ergänzt US-34 (manuelle Auslösung) – ist unabhängig davon implementierbar und sollte vorher umgesetzt werden*
 
-### TASK-11 · Impressum & Copyright einbauen `[~]`
+### TASK-11 · Impressum & Copyright einbauen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | (vorher offen) |
 | **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 |
 
 **Beschreibung:** Impressum-Seite in der PWA ergänzen (erreichbar über Einstellungen).
 

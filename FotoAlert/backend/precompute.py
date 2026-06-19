@@ -149,8 +149,10 @@ def _composition_analysis(o) -> dict | None:
     d = loc.distance_m
 
     # Höhe der Motivspitze über dem Augen-Niveau des Beobachters
+    # US-62: observer_floor_height_m (Dach/Etage) erhöht den Beobachter → Motiv wirkt niedriger
     elev_diff = getattr(loc, "elevation_difference_m", 0.0) or 0.0
-    height_above_observer = elev_diff + loc.subject_height_m
+    observer_floor_h = getattr(loc, "observer_floor_height_m", 0.0) or 0.0
+    height_above_observer = elev_diff - observer_floor_h + loc.subject_height_m
 
     # Scheinbarer Elevationswinkel der Motivspitze (in Grad)
     subject_apparent_elev_deg = math.degrees(math.atan(height_above_observer / d))

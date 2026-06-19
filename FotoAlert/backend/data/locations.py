@@ -58,6 +58,8 @@ class PhotoLocation:
     elevation_difference_m: float = 0.0         # Niveauunterschied: Motiv-Basis minus Fotograf-Standort
                                                  # positiv = Motiv steht höher (z.B. Hügel)
                                                  # negativ = Fotograf steht höher
+    observer_floor_height_m: float = 0.0        # US-62: vertikaler Offset wenn Fotograf nicht auf Bodenniveau
+                                                 # z.B. 60.0 für Dach eines 6-Geschossers
 
     # Entfernung Fotograf → Motiv (m)
     distance_m: Optional[float] = None

@@ -126,6 +126,7 @@ def _load_custom_locations() -> None:
                 subject_width_m=e.get("subject_width_m", 0), distance_m=e.get("distance_m", 0),
                 focal_length_suggestions=e.get("focal_length_suggestions", []),
                 special_notes=e.get("special_notes", ""), difficulty=e.get("difficulty", 1),
+                observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
             )
             LOCATIONS.append(loc)
             ids_existing.add(loc.id)
@@ -151,6 +152,7 @@ def _save_custom_location(loc: PhotoLocation) -> None:
             "subject_width_m": loc.subject_width_m, "distance_m": loc.distance_m,
             "focal_length_suggestions": loc.focal_length_suggestions,
             "special_notes": loc.special_notes, "difficulty": loc.difficulty,
+            "observer_floor_height_m": loc.observer_floor_height_m,
         })
         _CUSTOM_LOC_FILE.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
         logger.info("Custom Location gespeichert: %s → %s", loc.id, _CUSTOM_LOC_FILE)
@@ -493,7 +495,7 @@ def _load_location_overrides() -> None:
             loc_id = ov.get("id")
             loc = loc_map.get(loc_id)
             if loc:
-                for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon", "name", "description"):
+                for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon", "name", "description", "observer_floor_height_m", "focal_length_suggestions"):
                     if field in ov:
                         setattr(loc, field, ov[field])
                 applied += 1
@@ -639,6 +641,7 @@ def _loc_to_out(loc) -> LocationOut:
         subject_name=loc.subject_name,
         subject_height_m=loc.subject_height_m,
         elevation_difference_m=getattr(loc, 'elevation_difference_m', 0.0),
+        observer_floor_height_m=getattr(loc, 'observer_floor_height_m', 0.0),
         distance_m=loc.distance_m,
         focal_length_suggestions=loc.focal_length_suggestions,
         special_notes=loc.special_notes,
@@ -1043,12 +1046,16 @@ async def reverse_geocode_endpoint(lat: float, lon: float):
 
 @app.patch("/locations/{loc_id}")
 async def patch_location(loc_id: str, body: dict = Body(...)):
-    """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung)."""
-    coord_fields = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
-    text_fields  = {"name", "description"}
-    allowed = {k: v for k, v in body.items() if k in (coord_fields | text_fields)}
+    """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
+    coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
+    text_fields     = {"name", "description"}
+    numeric_fields  = {"observer_floor_height_m"}       # US-62
+    list_fields     = {"focal_length_suggestions"}       # BUG-22: list[int], beeinflusst camera_hints
+    recompute_fields = coord_fields | {"observer_floor_height_m", "focal_length_suggestions"}
+    all_allowed_fields = coord_fields | text_fields | numeric_fields | list_fields
+    allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
     if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, observer_lat/lon, subject_lat/lon).")
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
 
     # Koordinaten validieren
     for f in coord_fields & allowed.keys():
@@ -1059,6 +1066,27 @@ async def patch_location(loc_id: str, body: dict = Body(...)):
             raise HTTPException(status_code=422, detail=f"{f} außerhalb ±90°.")
         if "lon" in f and not (-180 <= val <= 180):
             raise HTTPException(status_code=422, detail=f"{f} außerhalb ±180°.")
+
+    # observer_floor_height_m validieren (US-62)
+    if "observer_floor_height_m" in allowed:
+        val = allowed["observer_floor_height_m"]
+        if not isinstance(val, (int, float)):
+            raise HTTPException(status_code=422, detail="observer_floor_height_m muss eine Zahl sein.")
+        if val < 0:
+            raise HTTPException(status_code=422, detail="observer_floor_height_m muss ≥ 0 sein.")
+        allowed["observer_floor_height_m"] = float(val)
+
+    # focal_length_suggestions validieren (BUG-22)
+    if "focal_length_suggestions" in allowed:
+        val = allowed["focal_length_suggestions"]
+        if not isinstance(val, list):
+            raise HTTPException(status_code=422, detail="focal_length_suggestions muss eine Liste sein.")
+        parsed = []
+        for v in val:
+            if not isinstance(v, (int, float)) or not (8 <= v <= 1200):
+                raise HTTPException(status_code=422, detail=f"Brennweite {v} ungültig (8–1200 mm).")
+            parsed.append(int(v))
+        allowed["focal_length_suggestions"] = parsed
 
     # In-Memory-Location suchen
     target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
@@ -1077,13 +1105,13 @@ async def patch_location(loc_id: str, body: dict = Body(...)):
     for k, v in allowed.items():
         setattr(target_loc, k, v)
 
-    # TASK-12: Koordinaten geändert → Single-Location Recompute im Hintergrund
-    coords_changed = bool(coord_fields & allowed.keys())
-    if coords_changed:
-        logger.info("Koordinaten für '%s' geändert – starte Single-Location Recompute", loc_id)
+    # TASK-12: Koordinaten oder observer_floor_height_m geändert → Single-Location Recompute
+    needs_recompute = bool(recompute_fields & allowed.keys())
+    if needs_recompute:
+        logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
         asyncio.create_task(_run_precompute_single(loc_id))
 
-    return {"ok": True, "updated": allowed, "recompute_triggered": coords_changed}
+    return {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute}
 
 
 # ---------------------------------------------------------------------------

@@ -854,7 +854,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.34';
+const APP_VERSION = '1.4.35';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2741,6 +2741,12 @@ const LocationDetail = {
           placeholder="z.B. 98 für den Berliner Dom"
           value="${loc.subject_height_m != null ? loc.subject_height_m : ''}">
 
+        <label>Höhe Beobachterstandort über Gelände (m)</label>
+        <input class="input-field" id="edit-observer-floor" type="number" min="0" step="1"
+          placeholder="0 = Bodenniveau, z.B. 60 für Dach eines 6-Geschossers"
+          value="${(loc.observer_floor_height_m || 0) > 0 ? loc.observer_floor_height_m : ''}">
+        <p style="font-size:11px;color:var(--muted);margin:-8px 0 12px">Nur ausfüllen wenn du nicht auf Bodenniveau fotografierst (Dach, Hochhaus, Hügel-Aufstieg etc.)</p>
+
         <label>Brennweiten-Empfehlungen (mm, kommagetrennt)</label>
         <input class="input-field" id="edit-focal" type="text" inputmode="numeric"
           placeholder="z.B. 200, 400, 600"
@@ -2906,6 +2912,8 @@ const LocationDetail = {
     const special_notes = (document.getElementById('edit-special-notes')?.value || '').trim();
     const heightRaw = (document.getElementById('edit-subject-height')?.value || '').trim();
     const subject_height_m = heightRaw !== '' ? parseFloat(heightRaw) : null;
+    const floorRaw = (document.getElementById('edit-observer-floor')?.value || '').trim();
+    const observer_floor_height_m = floorRaw !== '' ? parseFloat(floorRaw) : null;
     const focalRaw = (document.getElementById('edit-focal')?.value || '').trim();
     const focal_length_suggestions = focalRaw
       ? focalRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
@@ -2915,6 +2923,7 @@ const LocationDetail = {
 
     const body = {name, description, subject_name, category, special_notes, difficulty, focal_length_suggestions};
     if (subject_height_m !== null && !isNaN(subject_height_m)) body.subject_height_m = subject_height_m;
+    if (observer_floor_height_m !== null && !isNaN(observer_floor_height_m) && observer_floor_height_m >= 0) body.observer_floor_height_m = observer_floor_height_m;
     if (obsCoords) { body.observer_lat = obsCoords.lat; body.observer_lon = obsCoords.lon; }
     if (subjCoords) { body.subject_lat = subjCoords.lat; body.subject_lon = subjCoords.lon; }
 
@@ -2929,6 +2938,7 @@ const LocationDetail = {
         loc.subject_name = subject_name; loc.special_notes = special_notes;
         loc.difficulty = difficulty; loc.focal_length_suggestions = focal_length_suggestions;
         if (subject_height_m !== null && !isNaN(subject_height_m)) loc.subject_height_m = subject_height_m;
+        if (observer_floor_height_m !== null && !isNaN(observer_floor_height_m)) loc.observer_floor_height_m = observer_floor_height_m;
         if (obsCoords) { loc.observer_lat = obsCoords.lat; loc.observer_lon = obsCoords.lon; }
         if (subjCoords) { loc.subject_lat = subjCoords.lat; loc.subject_lon = subjCoords.lon; }
       }
@@ -3008,7 +3018,7 @@ const LocationDetail = {
         ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
       </div>
 
-      ${mkSec('loc_obs','📍 Fotograf-Standort',`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">🗺 Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">👁 Street View</a></div>`)}
+      ${mkSec('loc_obs','📍 Fotograf-Standort',`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">🗺 Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">👁 Street View</a></div>`)}
 
       ${mkSec('loc_subj',`🎯 Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">🗺 Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 

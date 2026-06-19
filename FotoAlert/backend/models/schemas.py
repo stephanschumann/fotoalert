@@ -31,6 +31,7 @@ class LocationOut(BaseModel):
     subject_name: str
     subject_height_m: Optional[float]
     elevation_difference_m: float = 0.0
+    observer_floor_height_m: float = 0.0  # US-62: vertikaler Offset (Dach/Etage)
     distance_m: Optional[float]
     focal_length_suggestions: list[int]
     special_notes: str
