@@ -114,7 +114,7 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 >
 > **Abhängigkeiten:** US-32[x] (Filter-System)
 
-### BUG-22 · Änderungen in Locationdetails ohne Effekt auf Chancen `[~]`
+### BUG-22 · Änderungen in Locationdetails ohne Effekt auf Chancen `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -690,7 +690,7 @@ Zwei kombinierte Ursachen:
 > - Löschen mit Bestätigung
 > - Export als JSON
 
-### US-62 · Höhenkorrektur Fotografenstandort (Dach, Etage) `[~]`
+### US-62 · Höhenkorrektur Fotografenstandort (Dach, Etage) `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -812,7 +812,7 @@ Zwei kombinierte Ursachen:
 >
 > **Abhängigkeiten:** US-63[x], US-66, TASK-12[x]
 
-### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[ ]`
+### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[~]`
 > **Als Fotograf vor Ort** möchte ich die Kartenansicht mit einem Tap auf meinen GPS-Standort zentrieren, damit ich schnell sehe, welche Fotostandorte in meiner Nähe liegen.
 >
 > **Akzeptanzkriterien:**
@@ -824,6 +824,46 @@ Zwei kombinierte Ursachen:
 > - GPS-Logik orientiert sich an US-32[x] (Standortnähe-Filter)
 >
 > **Abhängigkeiten:** US-32[x]
+>
+> ---
+>
+> **Scope:**
+> Eingeschlossen: „Mein Standort"-Button in der Kartenansicht (`#page-map`), einmalige GPS-Abfrage, Zentrierung auf Zoom 13, blauer Puls-Marker. Ausgeschlossen: kontinuierliches Tracking (`watchPosition`), Speicherung/Persistenz der Position, Heading/Kompass-Richtung.
+>
+> **Akzeptanzkriterien:**
+> - [ ] Runder GPS-Button (Standort-Icon, Gold-Akzent) unten links in `#page-map`, z-index über Leaflet
+> - [ ] Tap → `navigator.geolocation.getCurrentPosition` → `MapView.map.setView([lat,lon], 13)`
+> - [ ] Blauer pulsierender Punkt (Leaflet `divIcon` mit CSS-Animation) auf aktueller Position
+> - [ ] Edge Case: erneuter Tap aktualisiert vorhandenen Marker statt Duplikat
+> - [ ] Edge Case: Ablehnung der Berechtigung → Toast „GPS-Zugriff nicht erlaubt"
+> - [ ] Edge Case: `navigator.geolocation` nicht verfügbar → Toast statt Absturz
+> - [ ] Einmalige Abfrage (kein `watchPosition`), Koordinaten werden nicht gespeichert
+>
+> **Analyse & Planung:**
+> - [x] Example Mapping durchgeführt (4 Rules, 1 Question = Button-Platzierung)
+> - [x] Architektur analysiert: `web/index.html` — `MapView` (ab Z.2502), CSS `#map-layer-toggle`/`.map-layer-btn` (Z.206), HTML `#page-map` (Z.694). GPS-Muster aus US-32 (`requestGps`, Z.1711) und `AddLocation` (Z.3118).
+> - [x] Implementierungsansatz: (1) CSS `.map-gps-btn` (FAB unten links) + `.gps-pulse` Puls-Animation. (2) HTML-Button in `#page-map`. (3) `MapView.locateMe()` — `getCurrentPosition` einmalig, `setView(...,13)`, `this._gpsMarker` als `L.marker` mit `divIcon` (anlegen/`setLatLng` bei Wiederholung), Fehler→`toast`. Aufwand: klein.
+> - [x] Risiken: rein additiv, keine bestehende Logik geändert. Puls-Marker mit `interactive:false`, damit Karten-Klicks/Filter nicht gestört werden.
+>
+> **Testplan:**
+> - [ ] Manuell unter http://localhost:8000: Karte öffnen → GPS-Button tippen → Berechtigung erlauben → Karte springt auf Standort (Zoom 13), blauer Puls sichtbar
+> - [ ] Ablehnen der Berechtigung → Toast erscheint, kein Absturz
+> - [ ] Zweiter Tap → kein Marker-Duplikat
+
+### US-70 · Discover: Automatisierte Foto-Ephemeride mit Verschattungsanalyse `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Als Fotograf möchte ich im dritten Kalender-Tab „Discover" einen nach Score sortierten 14-Tage-Ausblick erhalten, welches bekannte Motiv (Schloss, Turm, Windmühle …) ich von welchem Standort aus fotografieren kann — mit freier Sichtachse, Himmelserscheinung (Mond/Sonne) im 2°-Fenster um die Motivspitze zur goldenen/blauen Stunde, und der Möglichkeit, Vorschläge als permanente Location zu speichern.
+
+**Spec:** `foto-chancen-planer-spec.md` (Cowork-Upload 2026-06-19) — 7 Capabilities (Astronomie, Motiv-Katalog, Standort-Alignment, Sichtachse/DOM, Wetter, Scoring, Ausblick), Scoring-Formel, Datenquellen (LGB bDOM, Berlin LoD2, OSM, open-meteo), 6 vertikale Slices.
+
+---
 
 ### US-17 · Lieblingslocations (Favorites)
 > **Als Fotograf** möchte ich Locations als Favoriten markieren können, **damit ich** meinen persönlichen Kern-Spotpool schnell filtern kann.

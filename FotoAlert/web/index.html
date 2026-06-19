@@ -210,6 +210,25 @@
       font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
     .map-layer-btn.active { background: var(--gold); color: var(--bg); }
 
+    /* US-69: GPS-Standort-Button */
+    .map-gps-btn { position: absolute; bottom: 80px; left: 12px; z-index: 1000;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.5); transition: background .15s; }
+    .map-gps-btn:active { background: var(--gold-dim); }
+    /* pulsierender GPS-Marker */
+    @keyframes gps-pulse {
+      0%   { transform: scale(1);   opacity: 1; }
+      70%  { transform: scale(2.5); opacity: 0; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    .gps-dot-wrap { position: relative; width: 14px; height: 14px; }
+    .gps-dot { width: 14px; height: 14px; background: #4285f4; border-radius: 50%;
+      border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+    .gps-dot-ring { position: absolute; inset: 0; border-radius: 50%;
+      background: #4285f4; animation: gps-pulse 1.8s ease-out infinite; }
+
     /* custom popup */
     .leaflet-popup-content-wrapper { background: var(--card); color: var(--text);
       border: 1px solid var(--border); border-radius: 10px; }
@@ -698,6 +717,13 @@
         <button class="map-layer-btn active" onclick="MapView.setLayer('standard')">Standard</button>
         <button class="map-layer-btn" onclick="MapView.setLayer('satellite')">Satellit</button>
       </div>
+      <!-- US-69: Mein-Standort-Button -->
+      <button class="map-gps-btn" onclick="MapView.locateMe()" title="Mein Standort">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+          <circle cx="12" cy="12" r="8" stroke-dasharray="none"/>
+        </svg>
+      </button>
     </div>
 
     <!-- LOCATIONS -->
@@ -854,7 +880,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.35';
+const APP_VERSION = '1.4.36';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2597,6 +2623,39 @@ const MapView = {
         if (this.map.hasLayer(marker)) this.map.removeLayer(marker);
       }
     }
+  },
+
+  // US-69: Karte auf aktuellen GPS-Standort zentrieren
+  _gpsMarker: null,
+  locateMe() {
+    if (!this.map) return;
+    if (!navigator.geolocation) {
+      toast('GPS nicht verfügbar'); return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        this.map.setView([lat, lon], 13);
+        const icon = L.divIcon({
+          className: '',
+          html: '<div class="gps-dot-wrap"><div class="gps-dot-ring"></div><div class="gps-dot"></div></div>',
+          iconSize: [14, 14], iconAnchor: [7, 7],
+        });
+        if (this._gpsMarker) {
+          this._gpsMarker.setLatLng([lat, lon]);
+        } else {
+          this._gpsMarker = L.marker([lat, lon], { icon, interactive: false }).addTo(this.map);
+        }
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          toast('GPS-Zugriff nicht erlaubt');
+        } else {
+          toast('Standort konnte nicht ermittelt werden');
+        }
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
   },
 };
 
