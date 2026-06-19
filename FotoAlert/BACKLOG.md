@@ -91,27 +91,20 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 **Root Cause:** FOV-Karte, Edit-Karte, AddLocation-Karte nutzten je unterschiedliche Marker-Typen ohne zentrales Objekt.  
 **Fix:** `MapMarkers`-Objekt eingeführt – Fotograf-Standort: SVG-Tropfen mit weißem Kern (goldener Drop-Pin), Motiv: SVG-Kreuzmarke mit weißem Mittelpunkt. Alle Karten, Labels und Legende zeigen identische SVG-Icons. v1.4.17.
 
-### BUG-25 · Close-Button in Locationdetails auf iPhone nicht anklickbar `[~]`
+### ~~BUG-25 · Close-Button in Locationdetails auf iPhone nicht anklickbar~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **In Progress seit** | 2026-06-19 |
+| **Abgeschlossen** | 2026-06-19 |
 
-**Beschreibung:** Beim Betrachten, Bearbeiten oder Verifizieren von Locationdetails liegt das Schließen-Symbol (×) so weit oben rechts, dass es direkt unter dem Batterielade-Symbol liegt und nicht angetippt werden kann.
+**Root Cause:** `#detail-sheet`, `#loc-detail-sheet` und `#impressum-sheet` hatten im Header-Div `padding:10px 16px 0` ohne Safe-Area-Berücksichtigung. Bei 92vh Sheetgröße reichte der Header in den Status-Bar-Bereich (im PWA Standalone Mode = `100vh` voller Bildschirm).
 
-**Root Cause:** `#detail-sheet`, `#loc-detail-sheet` und `#impressum-sheet` hatten im Header-Div `padding:10px 16px 0` ohne Safe-Area-Berücksichtigung. Bei 92vh Sheetgröße kann der Header in den Status-Bar-Bereich ragen.
-
-**Fix:** Header-Padding auf `calc(env(safe-area-inset-top, 0px) + 10px) 16px 0` geändert — identisches Muster wie `.add-header` (BUG-19-Fix). Betrifft alle drei Sheets gleichzeitig.
-
-**Akzeptanzkriterien:**
-- [~] Close-Button in `#loc-detail-sheet` auf iPhone (Dynamic Island + Notch) tappbar
-- [~] Close-Button in `#detail-sheet` (Event-Detail) ebenfalls gesichert
-- [~] Close-Button in `#impressum-sheet` ebenfalls gesichert
-- [ ] Auf iPhone in Safari PWA-Modus mit langen Inhalten getestet
+**Fix:** Header-Padding auf `calc(env(safe-area-inset-top, 0px) + 10px) 16px 0` — identisches Muster wie `.add-header` (BUG-19). Alle drei Sheets gleichzeitig korrigiert. Auf iPhone im PWA-Modus getestet und bestätigt. ✅
 
 ---
 
@@ -874,18 +867,100 @@ Zwei kombinierte Ursachen:
 > - [ ] Ablehnen der Berechtigung → Toast erscheint, kein Absturz
 > - [ ] Zweiter Tap → kein Marker-Duplikat
 
-### US-70 · Discover: Automatisierte Foto-Ephemeride mit Verschattungsanalyse `[ ]`
+### US-70 · Scout-Tab: Automatisierte Foto-Ephemeride (Mond-Alignment) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-19 |
+| **In Progress seit** | 2026-06-19 |
 
-**Beschreibung:** Als Fotograf möchte ich im dritten Kalender-Tab „Discover" einen nach Score sortierten 14-Tage-Ausblick erhalten, welches bekannte Motiv (Schloss, Turm, Windmühle …) ich von welchem Standort aus fotografieren kann — mit freier Sichtachse, Himmelserscheinung (Mond/Sonne) im 2°-Fenster um die Motivspitze zur goldenen/blauen Stunde, und der Möglichkeit, Vorschläge als permanente Location zu speichern.
+**Beschreibung:** Als Fotograf möchte ich im neuen „🔭 Scout"-Tab einen nach Score sortierten 14-Tage-Ausblick erhalten, welches bekannte Berliner/Potsdamer Wahrzeichen (Fernsehturm, Siegessäule, Dom …) ich von welchem Standort aus fotografieren kann — mit dem Vollmond (oder Halbmond) exakt auf der Motivspitze, zur goldenen oder blauen Stunde.
 
-**Spec:** `foto-chancen-planer-spec.md` (Cowork-Upload 2026-06-19) — 7 Capabilities (Astronomie, Motiv-Katalog, Standort-Alignment, Sichtachse/DOM, Wetter, Scoring, Ausblick), Scoring-Formel, Datenquellen (LGB bDOM, Berlin LoD2, OSM, open-meteo), 6 vertikale Slices.
+**Spec-Referenz:** `foto-chancen-planer-spec.md` (v0.1) — vollständige Domänenspezifikation, Scoring-Formel, Datenquellen, 6 Slices.
+
+**v1-Entscheidungen (Example Mapping 2026-06-19):**
+- Himmelskörper: **Mond only** (v2 = Sonne, v3 = 2°-Window-Tracking)
+- Motive: **12 kuratierte Leitmotive** (v2 = OSM-Bulk)
+- Verschattung (DOM): **nicht in v1** (Slice 3)
+- Erreichbarkeit: **nicht in v1** (Slice 2)
+- Distanz: **d_min = 100 m, d_max = 13.000 m**
+- Output: **dritter Tab „Scout"** in FotoAlert (neben „14 Tage" und „365 Tage")
+
+---
+
+**Scope:**
+- Eingeschlossen: `backend/discover/` Package (Motiv-Katalog, Alignment-Pipeline, Scoring), `destination_point()`-Hilfsfunktion, `discover.json`-Cache, `GET /discover`-Endpoint, Frontend-Tab „🔭 Scout"
+- Ausgeschlossen: DOM/LOS-Verschattungsanalyse (→ Slice 3), OSM-Erreichbarkeitscheck (→ Slice 2), Sonne (→ v2), 2°-Window-Tracking (→ v3)
+
+**Akzeptanzkriterien:**
+
+*Backend — Motiv-Katalog:*
+- [ ] `backend/discover/subjects.py`: 12 kuratierte Leitmotive als Dataclass — Felder: `id`, `name`, `kategorie`, `lat`, `lon`, `terrain_height_m` (Geländehöhe), `structure_height_m` (Bauwerkshöhe), `apex_height_m` (= terrain + structure), `subject_width_m`, `hoehe_confidence`
+- [ ] Leitmotive (verifizierte Höhen): Fernsehturm Berlin (406m), Siegessäule (67m), Berliner Dom (114m), Schloss Sanssouci (Hauptgebäude ~15m auf 40m NN), Schloss Cecilienhof (~12m), Flatowturm (34m), Glienicker Brücke (Fahrbahn ~9m), Historische Mühle Sanssouci (12m), Schloss Babelsberg (27m), Nikolaikirche Potsdam (94m), Biosphäre Potsdam (30m), Garnisonkirche Potsdam (ca. 88m)
+
+*Backend — Alignment-Pipeline:*
+- [ ] `backend/discover/pipeline.py`: für jedes Motiv M × jeden Tag d (heute bis +14):
+  1. Goldene/Blaue-Stunde-Fenster berechnen (`calculate_sun_info` am Motiv-Standort)
+  2. Alle 5-Minuten-Zeitschritte in diesen Fenstern → Mond-Positionen batch-berechnen
+  3. Filter `gate_horizont`: `alt_C > 0`
+  4. d = `(apex_height_m − 1.6) / tan(alt_C)` → Filter: `d ∈ [100, 13000]`
+  5. `S = destination_point(M.lat, M.lon, (az_C + 180) % 360, d)`
+  6. Scoring → Dedup (bestes Event pro 60-Min-Fenster)
+- [ ] Neue Funktion `destination_point(lat, lon, bearing_deg, distance_m) → (lat, lon)` in `discover/geometry.py` (sphärische Formel)
+- [ ] `gate_lichtfenster`: Event nur wenn Zeitpunkt in golden_morgen / golden_abend / blau_morgen / blau_abend liegt
+- [ ] Deduplication: pro Motiv + 60-Min-Fenster nur das Event mit höchstem Score behalten
+
+*Backend — Scoring:*
+- [ ] Score-Formel: `GATE_horizont · GATE_lichtfenster · (w1·S_alignment + w2·S_phase + w3·S_licht + w4·S_komposition + w5·S_wetter)` mit `w1=0.35, w2=0.15, w3=0.15, w4=0.20, w5=0.15`
+- [ ] `S_alignment = clip(1 − |alt_offset_deg| / 2.0, 0, 1)` wobei `alt_offset = alt_C − arctan((apex_height_m−1.6) / d)`
+- [ ] `S_phase = illumination_pct / 100` (Vollmond = 1.0, Neumond = 0.0)
+- [ ] `S_licht`: golden_hour = 1.0, blue_hour = 0.7
+- [ ] `S_komposition`: basiert auf `d` — optimale Komposition bei ~3–8 km (`clip(1 − |log(d/5000)| / log(13), 0, 1)`)
+- [ ] `S_wetter = (1 − cloud_cover) · wetter_confidence` (open-meteo, bestehende `weather.py`)
+- [ ] `Confidence`: `hoch` wenn `hoehe_confidence=hoch` + Wetter <7 Tage; `mittel` sonst; `niedrig` wenn Wetter >7 Tage
+- [ ] Output-Schema pro Chance: `motiv_name`, `zeitpunkt` (ISO8601), `lichtphase`, `mond_phase`, `mond_illumination_pct`, `standort_lat`, `standort_lon`, `entfernung_m`, `peilung_deg`, `winkelabstand_deg`, `empf_brennweite_mm`, `score`, `confidence`
+- [ ] `empf_brennweite_mm` aus bestehender `calculate_focal_length_for_subject()` (sensor 36mm, fill 20%)
+
+*Backend — Cache & API:*
+- [ ] `backend/data/cache/discover.json` enthält nach Lauf die sortierten Chancen
+- [ ] `GET /discover` in `main.py` liefert cached JSON (analog zu `GET /feed`)
+- [ ] CLI-Ausführung: `cd backend && python3 -m discover.pipeline` → erzeugt `discover.json`
+
+*Frontend — Scout-Tab:*
+- [ ] Dritter Segment-Button „🔭 Scout" in der Tab-Navigation neben „14 Tage" und „365 Tage"
+- [ ] `#page-scout`: scrollbare Liste der Chancen, Score absteigend
+- [ ] Jede Karte zeigt: Motivname + Kategorie-Emoji, Datum + Uhrzeit (lokal), Entfernung + Richtung, Mondphase + Illumination, Lichtphase, Score-Badge, GPS-Button (öffnet Apple/Google Maps mit Standort-Koordinaten)
+- [ ] Empty State wenn `discover.json` leer oder fehlt: „Keine Alignment-Chancen in den nächsten 14 Tagen"
+- [ ] Score-Badge Farbkodierung: ≥0.75 gold, ≥0.50 silber, <0.50 grau
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt — 6 offene Fragen beantwortet (2026-06-19)
+- [x] Architektur analysiert: `astronomy.py` (`get_body_position`, `calculate_sun_info`, Haversine, Azimut), `weather.py`, `requirements.txt` — alle benötigten Deps vorhanden (skyfield, numpy, httpx)
+- [x] Implementierungsansatz definiert: neues `backend/discover/`-Package, kein neues Dep nötig
+- [x] Geometrische Validierung: Mondposition bei M statt S berechnen → Winkelfehler < 0.002° bei 13km Baseline + 384.000km Monddistanz → vernachlässigbar
+- [ ] Motive-Höhen verifizieren (Wikipedia / Wikidata) bevor `subjects.py` final geschrieben wird
+- [ ] Risiken: Lichtfenster-Berechnung kostet pro Motiv × Tag einen `calculate_sun_info`-Aufruf → 12 × 14 = 168 Aufrufe; akzeptabel (<30s), kann mit `functools.cache` auf 14 Aufrufe reduziert werden (alle Motive nahe beieinander, gleiche Zeitfenster)
+
+**Daten-Validierung:**
+- [ ] Stichprobe Fernsehturm Berlin (H=406m): Vollmond az≈118°, alt≈4° → d≈5.640m; S liegt in Richtung Treptow/Neukölln → plausibel für Sonnenuntergangs-Alignment von SO
+- [ ] Prüfen: Wie viele Chancen liefert v1 im typischen 14-Tage-Fenster? Erwartung: 15–40 Chancen (1–3 pro Motiv, abhängig von Mondphase)
+
+**Testplan:**
+- [ ] CLI: `python3 -m discover.pipeline` läuft durch, `discover.json` enthält ≥1 Chance
+- [ ] Validierung Fernsehturm: bei Vollmond-Nacht erscheint mindestens 1 Chance mit Score >0.6, Standort im Bereich Kreuzberg/Neukölln/Treptow (SO vom Turm)
+- [ ] `GET /discover` → HTTP 200, JSON mit `opportunities`-Array
+- [ ] Frontend: Scout-Tab öffnet, Karten erscheinen, GPS-Button öffnet Karten-App
+
+**Implementierungsreihenfolge:**
+1. `backend/discover/__init__.py` + `geometry.py` (`destination_point`)
+2. `backend/discover/subjects.py` (12 Motive mit verifizierten Höhen)
+3. `backend/discover/pipeline.py` (Kern-Algorithmus, ohne Wetter)
+4. Wetter-Integration in Pipeline
+5. `GET /discover` Endpoint in `main.py`
+6. Frontend: Scout-Tab in `web/index.html`
 
 ---
 

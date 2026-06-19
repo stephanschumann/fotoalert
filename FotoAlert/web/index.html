@@ -482,6 +482,30 @@
       cursor: pointer; transition: all .2s; }
     .fmb-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
+    /* ── Scout-Tab ───────────────────────────────────────────────── */
+    #scout-content { padding: 8px 14px 80px; }
+    .scout-card { background: var(--card); border-radius: 14px; border: 1px solid var(--border);
+      padding: 14px; margin-bottom: 10px; }
+    .scout-card-header { display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 8px; }
+    .scout-subject { font-size: 15px; font-weight: 700; color: var(--text); }
+    .scout-kategorie { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .scout-score-badge { background: var(--gold); color: #000; border-radius: 8px;
+      padding: 3px 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .scout-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .scout-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      padding: 3px 8px; font-size: 12px; color: var(--muted); }
+    .scout-chip strong { color: var(--text); }
+    .scout-actions { display: flex; gap: 8px; }
+    .scout-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s; text-align: center; }
+    .scout-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
+    .scout-day-header { font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .04em; padding: 12px 0 4px; }
+    .scout-empty { text-align: center; padding: 48px 24px; color: var(--muted); font-size: 15px; }
+    .scout-moon-icon { font-size: 28px; margin-bottom: 8px; }
+
     /* ── Kalenderansicht ─────────────────────────────────────────── */
     .cal-nav { display: flex; align-items: center; justify-content: space-between;
       padding: 8px 16px; }
@@ -705,8 +729,10 @@
       <div class="feed-mode-bar">
         <button class="fmb-btn active" id="fmb-feed" onclick="Feed.setMode('feed')">📋 14-Tage Feed</button>
         <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')">📅 Jahreskalender</button>
+        <button class="fmb-btn" id="fmb-scout" onclick="Feed.setMode('scout')">🔭 Scout</button>
       </div>
       <div id="feed-content"><div class="empty"><div class="spinner"></div></div></div>
+      <div id="scout-content" style="display:none"></div>
     </div>
 
     <!-- MAP -->
@@ -880,7 +906,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.4.37';
+const APP_VERSION = '1.5.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1044,8 +1070,14 @@ const Feed = {
     this.mode = m;
     document.getElementById('fmb-feed').classList.toggle('active', m === 'feed');
     document.getElementById('fmb-calendar').classList.toggle('active', m === 'calendar');
+    document.getElementById('fmb-scout').classList.toggle('active', m === 'scout');
+    // Scout hat eigenen Container; feed-content / cal wird ausgeblendet
+    document.getElementById('feed-content').style.display = m === 'scout' ? 'none' : '';
+    document.getElementById('scout-content').style.display = m === 'scout' ? '' : 'none';
     if (m === 'calendar') {
       CalendarView.show();
+    } else if (m === 'scout') {
+      Scout.show();
     } else {
       this.render();
     }
@@ -1131,6 +1163,105 @@ const Feed = {
     document.getElementById('header-subtitle').textContent =
       best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Berlin & Brandenburg';
   }
+};
+
+// ═══════════════════════════════════════════════════════
+// SCOUT-TAB (US-70)
+// ═══════════════════════════════════════════════════════
+const Scout = {
+  data: null,   // null = nicht geladen, [] = keine Chancen, [...] = Daten
+  _loading: false,
+
+  async show() {
+    if (this.data !== null) { this.render(); return; }
+    if (this._loading) return;
+    this._loading = true;
+    document.getElementById('scout-content').innerHTML =
+      `<div style="text-align:center;padding:40px"><div class="spinner"></div><p style="color:var(--muted);margin-top:12px">Scout-Chancen werden berechnet…</p></div>`;
+    await this.load();
+    this._loading = false;
+  },
+
+  async load(retries = 3) {
+    try {
+      const res = await API.get('/discover');
+      if (res.status === 'calculating' && retries > 0) {
+        await new Promise(r => setTimeout(r, 5000));
+        return this.load(retries - 1);
+      }
+      this.data = res.opportunities || [];
+      if (Feed.mode === 'scout') this.render();
+    } catch(e) {
+      this.data = [];
+      if (Feed.mode === 'scout') {
+        document.getElementById('scout-content').innerHTML =
+          `<div class="scout-empty"><div class="scout-moon-icon">🌙</div>Scout-Daten konnten nicht geladen werden.</div>`;
+      }
+    }
+  },
+
+  render() {
+    const el = document.getElementById('scout-content');
+    if (!this.data || this.data.length === 0) {
+      el.innerHTML = `<div class="scout-empty">
+        <div class="scout-moon-icon">🌙</div>
+        <p>Keine Scout-Chancen in den nächsten 14 Tagen gefunden.</p>
+        <p style="font-size:13px;margin-top:8px">Der Mond ist gerade nicht günstig für die ausgewählten Motive.</p>
+      </div>`;
+      return;
+    }
+
+    // Gruppieren nach Tag
+    const byDay = {};
+    for (const o of this.data) {
+      if (!byDay[o.day]) byDay[o.day] = [];
+      byDay[o.day].push(o);
+    }
+
+    const sessionLabel = {
+      blue_morning:   '🌑 Blaue Stunde Morgen',
+      golden_morning: '🌅 Goldene Stunde Morgen',
+      golden_evening: '🌇 Goldene Stunde Abend',
+      blue_evening:   '🌆 Blaue Stunde Abend',
+    };
+
+    let html = '';
+    for (const [day, opps] of Object.entries(byDay).slice(0, 14)) {
+      const d = new Date(day + 'T12:00:00Z');
+      const label = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+      html += `<div class="scout-day-header">${label}</div>`;
+      for (const o of opps) {
+        const time = o.dt_utc ? new Date(o.dt_utc).toLocaleTimeString('de-DE',
+          { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : '–';
+        const scorePct = Math.round(o.score * 100);
+        const moonPct  = Math.round(o.moon_illumination_pct);
+        const mapsUrl  = `https://maps.apple.com/?ll=${o.standpoint_lat},${o.standpoint_lon}&z=15`;
+        const navUrl   = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
+        html += `<div class="scout-card">
+          <div class="scout-card-header">
+            <div>
+              <div class="scout-subject">${o.subject_name}</div>
+              <div class="scout-kategorie">${o.kategorie || ''} · ${sessionLabel[o.session] || o.session}</div>
+            </div>
+            <div class="scout-score-badge">${scorePct}%</div>
+          </div>
+          <div class="scout-meta">
+            <span class="scout-chip">🕐 <strong>${time} Uhr</strong></span>
+            <span class="scout-chip">🌕 <strong>${moonPct}%</strong> beleuchtet</span>
+            <span class="scout-chip">📐 Höhe <strong>${o.moon_altitude_deg}°</strong></span>
+            <span class="scout-chip">📏 <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
+            <span class="scout-chip">📷 ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
+            <span class="scout-chip">☁️ <strong>${o.weather_description}</strong></span>
+          </div>
+          <div class="scout-actions">
+            <button class="scout-btn" onclick="window.open('${mapsUrl}','_blank')">📍 Standort</button>
+            <button class="scout-btn" onclick="window.open('${navUrl}','_blank')">🧭 Navigation</button>
+          </div>
+        </div>`;
+      }
+    }
+    el.innerHTML = html;
+  },
 };
 
 // ═══════════════════════════════════════════════════════

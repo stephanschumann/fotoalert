@@ -85,6 +85,7 @@ _CAL_CACHE          = _CACHE_DIR / "calendar.json"
 _ELEV_CACHE         = _CACHE_DIR / "elevations.json"
 _CUSTOM_LOC_FILE    = Path(__file__).parent / "data" / "custom_locations.json"
 _OVERRIDES_FILE     = Path(__file__).parent / "data" / "location_overrides.json"
+_DISCOVER_CACHE     = _CACHE_DIR / "discover.json"
 
 
 def _load_elevation_cache() -> None:
@@ -204,6 +205,7 @@ def _update_custom_location_file(loc_id: str, **fields) -> bool:
 # Flache Listen von dicts (aus JSON geladen, Wetter-Felder werden überschrieben)
 _feed_cache:     list[dict] = []   # 14-Tage Feed
 _calendar_cache: list[dict] = []   # 365-Tage Kalender
+_discover_cache: dict       = {}   # Scout-Tab (Mond-Alignment-Chancen)
 
 _cache_loaded_at:   Optional[datetime] = None
 _weather_updated_at: Optional[datetime] = None
@@ -292,6 +294,32 @@ def _load_caches() -> bool:
 
     _cache_loaded_at = datetime.now(timezone.utc)
     return found
+
+
+def _load_discover_cache() -> None:
+    """Lädt Scout-Cache (discover.json) von Disk falls vorhanden."""
+    global _discover_cache
+    if not _DISCOVER_CACHE.exists():
+        return
+    try:
+        _discover_cache = json.loads(_DISCOVER_CACHE.read_text(encoding="utf-8"))
+        logger.info("Scout-Cache geladen: %d Chancen (berechnet: %s)",
+                    _discover_cache.get("count", 0),
+                    str(_discover_cache.get("generated_at", "?"))[:16])
+    except Exception as e:
+        logger.error("Fehler beim Laden von discover.json: %s", e)
+
+
+async def _refresh_discover() -> None:
+    """Führt die Scout-Pipeline aus und aktualisiert _discover_cache."""
+    global _discover_cache
+    from discover.pipeline import refresh_discover_cache
+    try:
+        logger.info("Scout-Pipeline startet...")
+        await refresh_discover_cache(_DISCOVER_CACHE)
+        _load_discover_cache()
+    except Exception as e:
+        logger.error("Scout-Pipeline fehlgeschlagen: %s", e)
 
 
 # ---------------------------------------------------------------------------
@@ -542,6 +570,11 @@ async def startup():
     # 2. Wetter-Overlay für T+0..T+3 (schnell, ~5s)
     asyncio.create_task(_weather_overlay())
 
+    # 2b. Scout-Cache laden (falls vorhanden) und ggf. neu berechnen
+    _load_discover_cache()
+    if not _discover_cache:
+        asyncio.create_task(_refresh_discover())
+
     # 3. Wenn kein Cache vorhanden: Vorberechnung starten
     if not cache_ok:
         logger.warning("Kein Cache gefunden – starte Erstberechnung im Hintergrund (dauert ~2–5 Min.)")
@@ -550,9 +583,11 @@ async def startup():
     # Scheduler
     scheduler.add_job(_run_precompute,   "cron", hour=5,  minute=30)   # täglich 05:30
     scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
+    scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
     scheduler.start()
-    logger.info("Bereit. Cache: %d Feed-Events, %d Kalender-Events",
-                len(_feed_cache), len(_calendar_cache))
+    logger.info("Bereit. Cache: %d Feed-Events, %d Kalender-Events, Scout: %d Chancen",
+                len(_feed_cache), len(_calendar_cache),
+                _discover_cache.get("count", 0))
 
 
 @app.on_event("shutdown")
@@ -858,6 +893,49 @@ async def get_calendar(
         "total": len(events),
         "events": events,
     }
+
+
+@app.get("/discover")
+async def get_discover(
+    min_score: float = 0.0,
+    subject_id: Optional[str] = None,
+    days: int = 14,
+):
+    """
+    Scout-Tab: Mond-Alignment-Chancen für die nächsten 14 Tage.
+    Gibt vorberechnete Chancen aus dem Cache zurück.
+    """
+    if not _discover_cache:
+        return {
+            "status": "calculating",
+            "opportunities": [],
+            "total": 0,
+            "generated_at": None,
+            "message": "Scout-Pipeline läuft noch. Bitte in 1–2 Minuten neu laden.",
+        }
+
+    opps = list(_discover_cache.get("opportunities", []))
+    cutoff = (date.today() + timedelta(days=days)).isoformat()
+
+    if subject_id:
+        opps = [o for o in opps if o["subject_id"] == subject_id]
+    if min_score > 0:
+        opps = [o for o in opps if o["score"] >= min_score]
+    opps = [o for o in opps if o["day"] <= cutoff]
+
+    return {
+        "status": "ok",
+        "generated_at": _discover_cache.get("generated_at"),
+        "total": len(opps),
+        "opportunities": opps,
+    }
+
+
+@app.post("/refresh-discover")
+async def trigger_discover_refresh(background_tasks: BackgroundTasks):
+    """Startet die Scout-Pipeline im Hintergrund (~1–3 Min.)."""
+    background_tasks.add_task(_refresh_discover)
+    return {"status": "started", "message": "Scout-Pipeline gestartet (~1–3 Min.)."}
 
 
 @app.post("/register-device")
