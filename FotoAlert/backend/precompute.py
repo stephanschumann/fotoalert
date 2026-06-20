@@ -580,6 +580,10 @@ async def main(args: argparse.Namespace) -> None:
     logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
     logger.info("%d Locations geladen", len(LOCATIONS))
 
+    # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
+    from data import backup as _backup
+    _backup.snapshot_before_precompute()
+
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     today = date.today()
     computed_at = datetime.now(timezone.utc).isoformat()

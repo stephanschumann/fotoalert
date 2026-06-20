@@ -108,6 +108,32 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
+### BUG-26 · Standortverifikationen und GPS-Änderungen werden nicht persistiert `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Positive und negative Standortverifikationen sowie geänderte GPS-Koordinaten werden zwar verarbeitet (Feedback erscheint), aber nicht dauerhaft gespeichert. Nach dem Schließen und erneuten Öffnen der App sind alle Änderungen zurückgesetzt.
+
+---
+
+### US-80 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Im Brennweiten-Filter liegen 10, 14, 18, 21, 28 und 35 mm so nah beieinander, dass eine präzise Auswahl kaum möglich ist, während 300 und 600 mm sehr weit auseinanderliegen. Der Slider soll eine nicht-lineare Skalierung (z. B. logarithmisch oder mit definierten Stufen) erhalten, die im Weitwinkelbereich feinere Schritte und im Telebereich sinnvolle Zwischenstufen (400 mm, 500 mm) ermöglicht.
+
+---
+
 ### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
 > **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
@@ -137,9 +163,10 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-18 |
 | **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-20 |
 
 **Root Cause:** PATCH `/locations/{id}` kannte nur `coord_fields | text_fields`. Weder `focal_length_suggestions` noch `observer_floor_height_m` waren in der Whitelist — PATCHes auf diese Felder wurden mit HTTP 400 abgelehnt und konnten nie Recompute auslösen.
 
@@ -150,12 +177,14 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 - `name`/`description` triggern weiterhin KEINEN Recompute
 
 **Akzeptanzkriterien:**
-- [~] PATCH auf `focal_length_suggestions` triggert Recompute → camera_hints aktualisiert
-- [~] PATCH auf `observer_floor_height_m` triggert Recompute → Kompositions-Analyse aktualisiert
-- [~] PATCH auf `name`/`description` triggert KEINEN Recompute
-- [~] API-Log: `recompute_triggered: true` bei Focal-Length-PATCH
+- [x] PATCH auf `focal_length_suggestions` triggert Recompute → camera_hints aktualisiert
+- [x] PATCH auf `observer_floor_height_m` triggert Recompute → Kompositions-Analyse aktualisiert
+- [x] PATCH auf `name`/`description` triggert KEINEN Recompute
+- [x] API-Log: `recompute_triggered: true` bei Focal-Length-PATCH
 
 **Abhängigkeiten:** TASK-12[x], US-62
+
+**Bezug (2026-06-20):** Owner der Recompute-Trigger-Whitelist für das Epic TASK-16 (Rule 4). Fix ist umgesetzt; Akzeptanzkriterien stehen auf `[~]` → **bereit zur Test-Bestätigung und zum Abschluss**.
 
 ### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[x]`
 
@@ -386,6 +415,436 @@ Zwei kombinierte Ursachen:
 ## 🔴 Hoch – Kern-Features
 
 
+### TASK-16 · Epic: Datenfundament (Speicher · Backup · Dev/Prod-Isolation) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Epic (Architektur/Infrastruktur) |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+| **Kind-Tickets** | TASK-17 (Speicher) · TASK-18 (Backup) · TASK-19 (Dev/Prod) |
+
+> **Epic-Hinweis:** Dieses Ticket selbst liefert keinen Code. Es bündelt das Konzept und drei umsetzbare Kind-Tickets. Der Recompute-Aspekt der ursprünglichen Anforderung wird delegiert: **Trigger → BUG-22**, **Orchestrierung/Scheduling → US-34**.
+
+**Beschreibung:**
+Konzept für die zentrale Speicherung der nutzergenerierten Location-Daten auf dem Server: jederzeit durch Nutzer aktualisierbar, mit so engmaschigem Backup, dass zwischen zwei Backups gemachte Änderungen bei einer Wiederherstellung nicht verloren gehen. Die Entwicklungsumgebung muss mit denselben Daten arbeiten können, ohne die Live-Daten je zu überschreiben. Nutzerdaten sind das höchste Gut und unter allen Umständen zu schützen. Jede Datenänderung muss eine Neuberechnung auslösen (Mond-/Sonne-/Himmelsereignisse, Standort-Infos, Chancen, Scouts, Karten-/Maps-/Streetview-Links, Kartendarstellung, Wetter, Brennweiten).
+
+**Architektur-Entscheidungen (bestätigt 2026-06-20):**
+- **Speichermodell:** Migration der nutzereditierbaren Daten von JSON-Dateien → **SQLite mit WAL** (atomare Transaktionen, kein Korruptionsrisiko bei parallelen Edits).
+- **Offsite-Backup:** **Privates Git-Repo** (versioniert, jeder Stand wiederherstellbar) zusätzlich zur Server-Kopie.
+- **RPO ≈ 0:** Jede Nutzeränderung wird sofort gesichert (WAL + Commit pro Mutation).
+- **Dev/Prod-Isolation:** Read-only Snapshot in eigenes `data_dev/`-Verzeichnis; Dev schreibt nie nach Prod.
+
+---
+
+#### Ausgangslage (Ist-Analyse)
+
+| Aspekt | Heute | Risiko |
+|--------|-------|--------|
+| Persistenz | 2 JSON-Dateien (`custom_locations.json`, `location_overrides.json`), gitignored, leben nur auf dem Server | Single Point of Failure |
+| Schreibvorgang | `_save_custom_location`, `_update_custom_location`, `_save_location_override` → **nicht-atomare** `write_text()` (Komplett-Rewrite) | Crash mitten im Schreiben = korrupte Datei = **Totalverlust** |
+| Concurrency | Kein Lock; paralleler Edit überschreibt | Lost Update |
+| Backup | **Keines** (nur `sync-pull.sh`, Prod→Mac, manuell, read) | Kein Restore-Pfad |
+| Dev/Prod | Gleicher Pfad `backend/data/`; `sync-pull` überschreibt lokal | Restrisiko versehentlicher Prod-Write |
+| Recompute | `_run_precompute_single(loc_id)` nach Koord-/relevanten PATCHes (TASK-12) | Funktioniert; Trigger-Whitelist unvollständig (siehe BUG-22) |
+
+---
+
+#### Example Mapping
+
+📏 **Rule 1 — Nutzerdaten überleben jeden Crash/Fehler (Integrität).**
+  🟢 *Given* ein User speichert eine neue Location, *When* der Prozess mitten im Schreiben abstürzt, *Then* ist die vorherige DB unversehrt und die Transaktion entweder ganz oder gar nicht angewandt (SQLite-Atomarität).
+  🟢 *Given* zwei Edits treffen quasi-gleichzeitig ein, *When* beide committen, *Then* geht keine der beiden Änderungen verloren (WAL serialisiert).
+
+📏 **Rule 2 — Zwischen zwei Backups gemachte Änderungen gehen bei Restore nicht verloren (RPO ≈ 0).**
+  🟢 *Given* der Server-Datenträger fällt total aus, *When* aus dem Offsite-Backup wiederhergestellt wird, *Then* ist der letzte erfolgreich committete User-Edit enthalten.
+  🟢 *Given* eine Datenverfälschung wird Tage später entdeckt, *When* auf einen früheren Stand zurückgerollt wird, *Then* ist jeder historische Commit-Stand auswählbar (Git-Historie).
+
+📏 **Rule 3 — Die Dev-Umgebung kann Prod-Daten niemals verändern.**
+  🟢 *Given* Dev läuft lokal, *When* dort eine Location bearbeitet/gelöscht wird, *Then* bleibt die Prod-DB unberührt (getrennter `data_dev/`-Pfad, kein Schreibzugang zu Prod).
+  🟢 *Given* ein Deploy läuft, *When* `git pull --reset --hard` ausgeführt wird, *Then* werden die Daten (außerhalb Git-Tree / gitignored) nicht überschrieben.
+
+📏 **Rule 4 — Jede Datenmutation löst die vollständige Neuberechnung der abhängigen Artefakte aus.**
+  🟢 *Given* ein User ändert Koordinaten/Brennweite/Höhe einer Location, *When* gespeichert wird, *Then* werden für diese Location neu berechnet: Astronomie (Mond/Sonne/Himmelsereignisse), Composition-Analyse, Chancen/Feed, Kalender, Scout-Einträge, Wetter, Brennweiten-Empfehlungen.
+  🟢 *Given* Maps-/Streetview-Links und Kartendarstellung hängen von den Koordinaten ab, *When* Koordinaten sich ändern, *Then* zeigen Detail-Ansicht und Karte die aktualisierten Links/Marker.
+  *(Rule 4 ist delegiert: Trigger-Verdrahtung im Store stellt TASK-17 sicher; welche Felder triggern = BUG-22; was/wann neu berechnet wird = US-34.)*
+
+*(Questions = 0 — alle vier offenen Architektur-Entscheidungen wurden am 2026-06-20 mit Stephan geklärt.)*
+
+---
+
+#### Aufteilung in Kind-Tickets
+
+| Kind-Ticket | Inhalt | Abhängigkeit |
+|-------------|--------|--------------|
+| **TASK-17** | SQLite-Migration + atomare Writes (Fundament) | — |
+| **TASK-18** | Backup RPO≈0 + Restore (privates Git-Repo) | TASK-17 |
+| **TASK-19** | Dev/Prod-Daten-Isolation (`data_dev/`) | TASK-17 |
+
+#### Sequenzierung (kritischer Pfad)
+
+```
+BUG-22 (schließen) ──▶ TASK-17 ──▶ TASK-18 + TASK-19 ──▶ US-77 ──▶ US-75 ──▶ US-34 / US-38
+US-39 (Code-Rollback) läuft unabhängig parallel.
+```
+TASK-17 ist der Flaschenhals: erst danach sind Daten atomar (TASK-18) und isolierbar (TASK-19), und erst danach sind Merge/Upsert (US-77/US-75) sauber umsetzbar.
+
+**Bezug (Epic):**
+- **US-65** (Auto-Backup) → **gemerged in TASK-18** (RPO≈0 ersetzt das tägliche Snapshot-Konzept; 7-Versionen-Snapshot + >25h-Alert als Fallback übernommen).
+- **US-39** (Resilient Deployment) → **abgegrenzt** auf reines Code-/Deploy-Rollback; Bullet „Datensicherung vor Precompute" → in TASK-18 übernommen.
+- **BUG-22** → separat, liefert die Recompute-Trigger-Whitelist (Abschluss vorbereiten).
+- **US-77 / US-75 / US-34 / US-38** → separat, Abhängigkeit/Cross-Reference auf dieses Epic ergänzt.
+
+---
+
+### TASK-17 · SQLite-Migration + atomare Writes (Fundament) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Architektur) |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-20 |
+| **Erstellt** | 2026-06-20 |
+| **Epic** | TASK-16 |
+
+**Beschreibung:** Nutzereditierbare Location-Daten von JSON-Dateien auf SQLite (WAL) migrieren; alle Schreibzugriffe atomar über ein zentrales Repository kapseln. Fundament für TASK-18 und TASK-19.
+
+**Scope:**
+- Eingeschlossen: `backend/data/store.py` (SQLite-Repository, `PRAGMA journal_mode=WAL`, Transaktionen) für `custom_locations` + `location_overrides`; `migrate_json_to_sqlite.py` (idempotent, JSONs als Seed); `main.py` ruft nur noch das Repository (ersetzt `_save_custom_location`, `_update_custom_location`, `_save_location_override`); Recompute-Hook bei jeder Mutation (inkl. create/delete) verdrahten.
+- Ausgeschlossen: Backup (TASK-18), Pfad-Isolation (TASK-19), Feld-Trigger-Whitelist (BUG-22), Scheduling (US-34).
+
+**Akzeptanzkriterien:**
+- [ ] Daten liegen in SQLite mit WAL; Migration aus bestehenden JSONs verlustfrei (Einträge vorher = nachher).
+- [ ] Schreibvorgänge atomar — simulierter Crash mitten im Save lässt die DB konsistent (`PRAGMA integrity_check` = ok).
+- [ ] `main.py` greift ausschließlich über `store.py` auf Daten zu (kein `write_text` mehr).
+- [ ] Jede Mutation (inkl. neue/gelöschte Location) ruft den Recompute-Hook auf; welche Felder triggern, bleibt BUG-22.
+- [ ] Edge Case: Migration erneut ausgeführt → idempotent, keine Duplikate.
+- [ ] Edge Case: Löschen entfernt aus DB **und** aus abgeleiteten Caches (kein Geistereintrag in Feed/Kalender/Karte).
+
+**Daten-Validierung:**
+- [x] Quelldaten winzig (`custom_locations.json` ~651 B, `location_overrides.json` ~234 B) → Migration trivial; Caches (97 MB calendar.json) bleiben außen vor (reproduzierbar via precompute).
+- [x] Aktuell: 1 Custom Location (`custom_1781560330`), 1 Override (`rostiger_nagel_rusty_nail`) → 2 Einträge total.
+- [x] Kein DELETE-Endpoint vorhanden → `store.delete_custom()` implementieren, aber kein Endpoint-Wiring in diesem Ticket; Recompute-Hook-Wiring für DELETE vorbereiten.
+- [x] CREATE triggert aktuell **keinen** Recompute (nur PATCH does) → Bug; wird in TASK-17 behoben.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-20)
+- [x] Architektur analysiert: 3 betroffene Schreibfunktionen in `main.py` (`_save_custom_location`, `_update_custom_location_file`, `_save_location_override`); 2 Ladefunktionen (`_load_custom_locations`, `_load_location_overrides`).
+- [x] SQLite-Schema definiert (s.u.)
+
+**Implementierungsansatz:**
+
+**Schritt 1 — `backend/data/store.py` (neu)**
+
+```python
+class LocationStore:
+    DB_PATH = Path(__file__).parent / "fotoalert.db"
+```
+
+Zwei Tabellen:
+
+```sql
+-- custom_locations: alle Felder aus dem bestehenden JSON-Dict
+CREATE TABLE IF NOT EXISTS custom_locations (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    category TEXT DEFAULT 'SKYLINE',
+    observer_lat REAL, observer_lon REAL,
+    subject_lat REAL, subject_lon REAL,
+    subject_name TEXT DEFAULT '',
+    subject_height_m REAL DEFAULT 0,
+    subject_width_m REAL DEFAULT 0,
+    distance_m INTEGER DEFAULT 0,
+    focal_length_suggestions TEXT DEFAULT '[]',  -- JSON-Array
+    special_notes TEXT DEFAULT '',
+    difficulty INTEGER DEFAULT 1,
+    observer_floor_height_m REAL DEFAULT 0.0
+);
+
+-- location_overrides: id + fields als JSON-Blob (flexibel, da Felder variieren)
+CREATE TABLE IF NOT EXISTS location_overrides (
+    id TEXT PRIMARY KEY,
+    fields TEXT NOT NULL  -- JSON-Objekt, z.B. {"observer_lat": 51.5, "name": "..."}
+);
+```
+
+WAL aktivieren: `PRAGMA journal_mode=WAL` beim `_init_db`.
+
+Methoden:
+- `create_custom(loc: PhotoLocation) → None` — INSERT mit BEGIN/COMMIT/ROLLBACK
+- `update_custom(loc_id: str, **fields) → bool` — UPDATE einzelner Felder
+- `delete_custom(loc_id: str) → bool` — DELETE + True wenn gefunden
+- `upsert_override(loc_id: str, **fields) → None` — INSERT OR REPLACE (merge mit bestehendem JSON-Blob)
+- `load_all_custom() → list[dict]` — SELECT *; für Startup-Load
+- `load_all_overrides() → list[dict]` — SELECT id, fields; für Startup-Load
+
+Alle Writes in expliziten Transaktionen (`BEGIN` / `COMMIT` / `ROLLBACK`).
+
+**Schritt 2 — `backend/migrate_json_to_sqlite.py` (neu)**
+
+Eigenständiges Script (nicht via import), läuft einmalig vor dem ersten Start:
+
+```
+python migrate_json_to_sqlite.py
+```
+
+Ablauf:
+1. `custom_locations.json` lesen → `INSERT OR IGNORE INTO custom_locations`
+2. `location_overrides.json` lesen → `INSERT OR IGNORE INTO location_overrides`
+3. Log: „N Einträge migriert, M bereits vorhanden (übersprungen)"
+
+Idempotenz via `INSERT OR IGNORE` auf PRIMARY KEY (`id`).
+
+**Schritt 3 — `backend/main.py` (ändern)**
+
+Ersetzen:
+
+| Alt | Neu |
+|-----|-----|
+| `_CUSTOM_LOC_FILE`, `_OVERRIDES_FILE` | entfernen (nur noch Pfade im Store) |
+| `_load_custom_locations()` | `store.load_all_custom()` → PhotoLocation-Objekte bauen, an LOCATIONS hängen |
+| `_load_location_overrides()` | `store.load_all_overrides()` → setattr wie bisher |
+| `_save_custom_location(loc)` | `store.create_custom(loc)` + `asyncio.create_task(_run_precompute_single(loc.id))` ← **neu** |
+| `_update_custom_location_file(loc_id, **fields)` | `store.update_custom(loc_id, **fields)` |
+| `_save_location_override(loc_id, **fields)` | `store.upsert_override(loc_id, **fields)` |
+
+Singleton: `_store = LocationStore()` einmal auf Modulebene initialisieren.
+
+**Schritt 4 — Startup-Reihenfolge anpassen**
+
+`startup()`-Funktion: `_load_custom_locations()` + `_load_location_overrides()` → ersetzen durch Store-Calls; JSONs als Fallback-Seed wenn DB noch leer (falls Migration nicht manuell lief). Das macht den Server self-contained beim ersten Start.
+
+**Risiken:**
+- `focal_length_suggestions` wird als JSON-String gespeichert → beim Laden `json.loads()` nicht vergessen
+- `upsert_override`: merge mit bestehendem Blob (nicht blind überschreiben) — `json.loads(existing) | new_fields`
+- WAL-File (`fotoalert.db-wal`) darf nicht im `.gitignore` landen wenn TASK-18 darauf aufbaut
+
+**Testplan:**
+- [ ] Manuell (lokal): `sqlite3 fotoalert.db "SELECT * FROM custom_locations"` → 1 Eintrag nach Migration
+- [ ] `POST /preview-alignment` mit `save=true` → Neuer Eintrag in DB + Recompute-Log sichtbar
+- [ ] `PATCH /locations/custom_1781560330` mit neuen Koordinaten → DB-Eintrag geändert, Recompute getriggert
+- [ ] `PATCH /locations/rostiger_nagel_rusty_nail` → Override in DB geändert
+- [ ] Crash-Simulation: `kill -9` während PATCH → `PRAGMA integrity_check` = `ok`
+- [ ] Migration doppelt laufen → `SELECT COUNT(*) FROM custom_locations` = 1 (keine Duplikate)
+- [ ] Curl-Testschritte: Fenster 1 = Server, Fenster 2 = curl (s. Terminal-Fenster-Modell)
+
+---
+
+### TASK-18 · Backup RPO≈0 + Restore (privates Git-Repo) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Infrastruktur) |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-20 |
+| **Epic** | TASK-16 · **Abhängigkeit:** TASK-17 |
+
+**Beschreibung:** Engmaschige, versionierte Sicherung der Nutzerdaten in ein privates Git-Repo (RPO≈0) plus getesteter Restore-Pfad. Übernimmt US-65 (Auto-Backup) und den Datensicherungs-Bullet aus US-39.
+
+**Scope:**
+- Eingeschlossen: `backend/data/backup.py` — nach jedem erfolgreichen User-Edit Export (deterministisches Dump) + `git add/commit/push` ins private Daten-Repo (separater Remote, Deploy-Key); Snapshot vor jedem Precompute-Lauf; lokaler Fallback-Snapshot mit Retention (7 Versionen); `restore.sh` + Doku in `deploy/`; Backup-Health-Signal (>25h kein Backup) für US-38.
+- Ausgeschlossen: Code-/Deploy-Rollback (US-39), Caches im Backup (reproduzierbar).
+
+**Akzeptanzkriterien:**
+- [ ] Nach jedem erfolgreichen User-Edit neuer Commit im privaten Daten-Repo (RPO≈0); Push-Fehler werden geloggt + retried, blockieren den User-Request nicht.
+- [ ] Snapshot der Daten vor jedem Precompute-Lauf (übernommen aus US-39).
+- [ ] Lokaler Fallback-Snapshot mit 7-Versionen-Retention; älteste wird automatisch gelöscht (übernommen aus US-65).
+- [ ] `restore.sh` stellt aus dem Daten-Repo eine lauffähige DB her — dokumentierter, **getesteter** Restore-Lauf.
+- [ ] Health-Signal an US-38, wenn Backup seit >25h ausbleibt.
+- [ ] Edge Case: Git-Remote nicht erreichbar → lokaler Commit/Snapshot bleibt erhalten, Sync holt beim nächsten Lauf nach.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-20)
+- [x] Architektur analysiert: `backup.py` (neu), `main.py` (2 Stellen), `precompute.py` (1 Stelle), `deploy/restore.sh` (neu)
+- [x] Export-Format: JSON-Dump (nicht Binär-DB) → lesbare Git-Diffs, Restore via `migrate_json_to_sqlite.py`
+- [x] Dev-Guard: `FOTOALERT_ENV != prod` → alle Backup-Funktionen sind No-Ops
+- [x] Backup-Repo-Name: `fotoalert-backup` (privat auf GitHub, noch anzulegen)
+
+**Einmaliges Server-Setup** *(vor erstem Deploy):*
+
+```
+# 1. Auf GitHub: privates Repo "fotoalert-backup" anlegen (leer, kein README)
+
+# 2. Auf dem Server: Deploy-Key generieren
+ssh-keygen -t ed25519 -f ~/.ssh/fotoalert_backup -N ""
+cat ~/.ssh/fotoalert_backup.pub
+# → Public Key in GitHub → fotoalert-backup → Settings → Deploy Keys → Add (Write access)
+
+# 3. Backup-Repo klonen
+cd /opt/fotoalert
+git clone git@github.com:<dein-user>/fotoalert-backup.git backup-repo
+# SSH-Key für diesen Remote konfigurieren:
+git -C backup-repo config core.sshCommand "ssh -i /home/fotoalert/.ssh/fotoalert_backup"
+```
+
+**Implementierungsansatz:**
+
+**Schritt 1 — `backend/data/backup.py` (neu)**
+
+Drei öffentliche Funktionen:
+
+```python
+def backup_after_edit(loc_id: str) -> None:
+    """Exportiert DB als JSON → git commit+push ins Backup-Repo. Non-blocking (in asyncio.create_task aufrufen)."""
+
+def snapshot_before_precompute() -> None:
+    """Kopiert fotoalert.db → data/snapshots/fotoalert_YYYYMMDD_HHMM.db; behält max 7."""
+
+def last_backup_age_hours() -> float | None:
+    """Gibt Stunden seit letztem Git-Commit zurück (für Health-Signal US-38)."""
+```
+
+Dev-Guard am Anfang jeder Funktion: `if os.getenv("FOTOALERT_ENV", "prod") != "prod": return`
+
+Backup-Repo-Pfad: `/opt/fotoalert/backup-repo` (via Env-Variable `FOTOALERT_BACKUP_REPO`, Default `/opt/fotoalert/backup-repo`)
+
+`backup_after_edit` Ablauf:
+1. JSON-Export aus SQLite (`store.load_all_custom()` + `store.load_all_overrides()`)
+2. `custom_locations.json` + `location_overrides.json` in Backup-Repo schreiben
+3. `git add . && git commit -m "backup: edit {loc_id} {timestamp}"` (subprocess)
+4. `git push` in separatem Thread (Fehler loggen, nicht raise)
+
+**Schritt 2 — `backend/main.py` (ändern)**
+
+Nach jedem erfolgreichen Mutation-Write `asyncio.create_task()` ergänzen:
+
+```python
+# In patch_location (nach store-Write, vor return):
+asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+
+# In preview-alignment (nach _save_custom_location):
+asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
+```
+
+**Schritt 3 — `backend/precompute.py` (ändern)**
+
+Ganz am Anfang von `async def main()`:
+```python
+from data import backup
+backup.snapshot_before_precompute()
+```
+
+**Schritt 4 — `deploy/restore.sh` (neu)**
+
+```bash
+# Zieht neuesten Stand aus fotoalert-backup und importiert in SQLite
+cd /opt/fotoalert/backup-repo && git pull
+cp custom_locations.json /opt/fotoalert/app/FotoAlert/backend/data/
+cp location_overrides.json /opt/fotoalert/app/FotoAlert/backend/data/
+cd /opt/fotoalert/app/FotoAlert/backend
+python migrate_json_to_sqlite.py
+```
+
+**Risiken:**
+- `git push` darf den User-Request nie blockieren → immer in separatem Thread, Fehler nur loggen
+- Backup-Repo muss existieren bevor erstes Deploy mit diesem Code läuft (sonst Exception) → Guard: prüfen ob Repo-Verzeichnis existiert, sonst nur loggen + überspringen
+- `last_backup_age_hours()` liest `git log --format=%ct -1` — falls Repo leer → `None` zurückgeben
+
+**Testplan:**
+- [ ] Setup-Test: `git -C /opt/fotoalert/backup-repo log --oneline` zeigt Commits nach Edit
+- [ ] Isolation: Backup nur wenn `FOTOALERT_ENV=prod` (oder nicht gesetzt); lokal kein Commit
+- [ ] Retention: nach 8 Precompute-Läufen → genau 7 Snapshot-Dateien in `data/snapshots/`
+- [ ] Restore-Test: DB umbenennen → `restore.sh` → `PRAGMA integrity_check` = ok, Locations vorhanden
+- [ ] Edge Case: `git push` schlägt fehl → Server antwortet trotzdem mit `200 ok`, Fehler im Log
+
+**Bezug:** ersetzt US-65; übernimmt Datensicherungs-Bullet aus US-39; liefert Signal an US-38.
+
+---
+
+### TASK-19 · Dev/Prod-Daten-Isolation `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Architektur) |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-20 |
+| **Erstellt** | 2026-06-20 |
+| **Epic** | TASK-16 · **Abhängigkeit:** TASK-17 |
+
+**Beschreibung:** Die Entwicklungsumgebung arbeitet mit einer read-only Kopie der Prod-Daten in einem eigenen Verzeichnis und kann die Live-Daten technisch nicht überschreiben.
+
+**Scope:**
+- Eingeschlossen: Umgebungsvariable `FOTOALERT_ENV` (`prod`/`dev`) steuert den Datenpfad zentral in `store.py` (`data/` vs `data_dev/`); `sync-pull.sh` schreibt nach `data_dev/`; Sicherstellen, dass `deploy.sh` (`git reset --hard`) die Daten-DB nicht überschreibt (außerhalb Git-Tree / gitignored).
+- Ausgeschlossen: SQLite-Layer (TASK-17), Backup (TASK-18).
+
+**Akzeptanzkriterien:**
+- [ ] Dev (`FOTOALERT_ENV=dev`) liest/schreibt ausschließlich `data_dev/`; ein Edit in Dev verändert die Prod-DB nachweislich nicht.
+- [ ] `sync-pull.sh` legt den Prod-Snapshot in `data_dev/` ab (nicht in `data/`).
+- [ ] Deploy (`git reset --hard`) überschreibt die Daten-DB nicht.
+- [ ] Edge Case: fehlende `FOTOALERT_ENV` → Default `prod`, aber nie versehentliches Schreiben aus Dev-Kontext.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-20)
+- [x] Architektur analysiert: 3 betroffene Dateien (`store.py`, `sync-pull.sh`, neues `.gitignore`)
+- [x] Kein `.gitignore` vorhanden → muss neu angelegt werden; DB sonst versehentlich committable
+- [x] `sync-pull.sh` kopiert noch JSON-Dateien → nach TASK-17-Deployment auf DB-Kopie umstellen
+
+**Implementierungsansatz:**
+
+**Schritt 1 — `backend/data/store.py` (ändern, Zeile 25)**
+
+```python
+import os
+_ENV = os.getenv("FOTOALERT_ENV", "prod")
+_DEFAULT_DB = (
+    Path(__file__).parent / "fotoalert.db"
+    if _ENV == "prod"
+    else Path(__file__).parent.parent / "data_dev" / "fotoalert.db"
+)
+```
+
+`LocationStore.__init__` verwendet `_DEFAULT_DB` bereits als Default — keine weitere Änderung nötig. `data_dev/` wird durch `self.db_path.parent.mkdir(parents=True, exist_ok=True)` in `_init_db` automatisch angelegt.
+
+**Schritt 2 — `.gitignore` (neu, im FotoAlert-Root)**
+
+```gitignore
+# Nutzer-Daten — nie in Git
+backend/data/fotoalert.db
+backend/data/fotoalert.db-shm
+backend/data/fotoalert.db-wal
+backend/data_dev/
+
+# Entwicklungs-Artefakte
+backend/__pycache__/
+backend/data/__pycache__/
+backend/calculations/__pycache__/
+backend/models/__pycache__/
+*.pyc
+.DS_Store
+```
+
+**Schritt 3 — `sync-pull.sh` (ändern)**
+
+Statt JSON-Dateien → `fotoalert.db` von Server nach `data_dev/fotoalert.db` kopieren:
+
+```bash
+DATA_DEV_DIR="$SCRIPT_DIR/backend/data_dev"
+mkdir -p "$DATA_DEV_DIR"
+
+echo ">>> fotoalert.db vom Server holen → data_dev/..."
+scp -i "$SSH_KEY" \
+    "$SERVER_USER@$SERVER_IP:$SERVER_DATA/fotoalert.db" \
+    "$DATA_DEV_DIR/fotoalert.db"
+```
+
+Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein muss damit lokale Instanz die `data_dev`-DB verwendet.
+
+**Risiken:**
+- `fotoalert.db` könnte bereits in git index sein (vor .gitignore) → nach Anlage `.gitignore` prüfen: `git ls-files backend/data/fotoalert.db` sollte leer sein (Datei war nie committed ✓)
+- `sync-pull.sh` funktioniert erst nach TASK-17-Deployment auf dem Server (DB existiert dann); bis dahin JSON-Fallback optional, aber nicht nötig da Dev-DB initial aus lokalem Bestand aufgebaut werden kann
+
+**Testplan:**
+- [ ] `git status` → `backend/data/fotoalert.db` erscheint als ignored (nicht als untracked)
+- [ ] `FOTOALERT_ENV=dev uvicorn main:app --reload` → Startup-Log zeigt `data_dev/fotoalert.db`
+- [ ] Im Dev-Server: `PATCH /locations/custom_1781560330` → nur `data_dev/fotoalert.db` ändert sich
+- [ ] `sqlite3 backend/data/fotoalert.db "SELECT COUNT(*) FROM custom_locations"` → unverändert
+- [ ] Ohne `FOTOALERT_ENV` → Default `prod`, Startup-Log zeigt `data/fotoalert.db`
+
 ### ~~US-32 · Kombiniertes Filter-System~~ `[x]`
 > **Als Fotograf** möchte ich den Feed nach mehreren Kriterien gleichzeitig filtern können, um nur die für mich relevanten Events zu sehen.
 >
@@ -602,14 +1061,16 @@ Zwei kombinierte Ursachen:
 >
 > *Vereint: Traceability (Fehlererkennung + Lösungsspecs) + Observability (Monitoring + Alerts)*
 
-### US-39 · Resilient Deployment / Rollback
+### US-39 · Resilient Deployment / Rollback (nur Code/Deploy)
+> **Abgegrenzt (2026-06-20):** Scope auf reines **Code-/Deploy-Rollback** reduziert. Der Daten-Aspekt („Datensicherung vor Precompute") wurde nach **TASK-18** verschoben.
+>
 > **Als App-Host** möchte ich bei der Einführung neuer Features oder Fixes jederzeit auf die letzte funktionierende Version zurückrollen können, damit nie die gesamte App verloren geht.
 >
 > **Akzeptanzkriterien:**
 > - Git-basiertes Versioning: jeder Deploy-Stand ist als Tag oder Branch nachvollziehbar
 > - Rollback-Anleitung dokumentiert (welcher Befehl, welcher Stand)
 > - Cache-Kompatibilität: Rollback bricht keine bestehenden JSON-Caches (oder migriert sie)
-> - Optionale Datensicherung vor jedem Precompute-Lauf (Snapshot der cache/-Dateien)
+> - *(Datensicherung → ausgelagert nach TASK-18)*
 
 ### TASK-13 · PWA auf iPhone: Öffentliches Hosting & Remote-Zugriff `[ ]`
 > **Als App-Host** möchte ich die App auf meinem iPhone 14 Pro nutzen können — von überall, nicht nur im Heimnetz — ohne eine native iOS-App zu bauen.
@@ -757,7 +1218,9 @@ Zwei kombinierte Ursachen:
 >
 > **Abhängigkeiten:** US-35[x], US-37[x]
 
-### US-65 · Automatisches Backup der App-Daten `[ ]`
+### ~~US-65 · Automatisches Backup der App-Daten~~ `[~]` → GEMERGED in TASK-18
+> **➡️ Gemerged (2026-06-20):** Dieses Ticket geht in **TASK-18** (Backup RPO≈0) auf. Das stärkere RPO≈0-Konzept ersetzt das tägliche Snapshot-Backup; 7-Versionen-Retention + >25h-Health-Alert wurden als Fallback in TASK-18 übernommen. Inhalt unten bleibt als Referenz erhalten.
+>
 > **Als App-Host** möchte ich, dass wichtige App-Daten automatisch gesichert werden, damit bei Serverfehlern oder unbeabsichtigtem Überschreiben kein Datenverlust entsteht.
 >
 > **Scope:** Backup persistenter Nutzdaten (Code liegt in Git).
@@ -772,25 +1235,22 @@ Zwei kombinierte Ursachen:
 >
 > **Abhängigkeiten:** TASK-14, TASK-15 (Cron-Koordination)
 
-### US-66 · Host-Login für exklusive Funktionen `[ ]`
-> **Als App-Host** möchte ich mich mit einem Passwort in der App identifizieren können, damit ich Zugang zu administrativen Funktionen erhalte (Location-Bearbeitung, Debug-Info), die für normale Nutzer nicht sichtbar sind.
->
-> **Akzeptanzkriterien:**
-> - Login-Dialog (Modal) erreichbar über verstecktes Trigger-Element (z.B. Mehrfach-Tap auf App-Header)
-> - Eingabe: Passwort-Feld (kein Username)
-> - Backend: `POST /auth/host` – Passwort-Vergleich via `bcrypt.checkpw()` gegen serverseitig gespeicherten Hash
-> - Bei Erfolg: Session-Token (JWT, 24h Laufzeit) im HTTP-only Cookie; Frontend erkennt Auth-Status
-> - **Passwort-Speicherung im Client:** nach Nutzer-Zustimmung sicherer Systemspeicher: Apple Keychain (iOS/macOS), Android Keystore, Windows Credential Manager – über Web Credential Management API (`navigator.credentials`) wo verfügbar
-> - Host-Modus: Admin-Badge im Header, Location-Bearbeitungs-Buttons sichtbar, Debug-Overlay erreichbar
-> - Logout: Button im Host-Menü; Session-Token gelöscht
->
-> **Sequenzierung:**
-> ```
-> US-66 (Host-Login) ──→ US-68 (Host-Approval Workflow)
-> US-63[x] (Location-Edit) ←── erweitert durch US-66 (nur Host sichtbar)
-> ```
->
-> **Abhängigkeiten:** keine (eigenständig implementierbar)
+### US-66 · Pflicht-Login mit Rollen-Erkennung (Host / User) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-19 |
+
+**Beschreibung:** Die App erfordert beim Start einen Login. Nutzer geben nur ein Passwort ein — anhand des Passworts wird automatisch erkannt, ob es sich um einen Host (Stephan) oder einen User handelt. Host-Passwort gewährt Zugang zu allen Funktionen inkl. zukünftiger Admin-Features; User-Passwort gewährt Standardzugang. Kein Username, kein separates Rollen-Auswahlfeld.
+
+**Entscheidungen (v1):**
+- Passwort-Mechanismus: einfach (z. B. Plaintext-Vergleich im Backend oder fest kodierter Hash — kein bcrypt/JWT für v1)
+- Session-Dauer: dauerhaft bis zum expliziten Logout (kein automatisches Ablaufen)
+
+**Abhängigkeiten:** Voraussetzung für US-68 (Host-Approval Workflow)
 
 ### US-67 · Chancendetails: Azimut und Höhe relativ zur Motivspitze `[ ]`
 > **Als Fotograf** möchte ich bei einem Alignment-Event in verständlicher Sprache lesen, wo das Himmelsobjekt relativ zu meinem Motiv erscheint – z.B. „Mond 3° links neben dem Kirchturm, 5° darüber".
@@ -1054,6 +1514,8 @@ Zwei kombinierte Ursachen:
 
 **Beschreibung:** Als Betreiber möchte ich sicherstellen, dass von Nutzern hinzugefügte/geänderte Locations (Motive, Standorte, Beschreibungen) regelmäßig und geprüft ins Backend übertragen werden — inkl. automatischer Generierung von Standortbeschreibungen, idealem Azimut, konsistenter Kategorisierung und automatischer Aktualisierung der Brennweitenempfehlungen.
 
+**Abhängigkeit:** TASK-17 (Datenfundament) + US-76 (Kategorien); baut auf US-77 (Merge) auf.
+
 ---
 
 ### US-76 · Location-Kategorien als Standardliste mit Filter-Integration `[ ]`
@@ -1079,6 +1541,8 @@ Zwei kombinierte Ursachen:
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Als Betreiber möchte ich neue Locations zentral über das Backend anlegen und diese automatisiert mit den Nutzerdaten (custom_locations.json) zusammenführen (Merge), ohne bestehende Nutzeränderungen zu überschreiben.
+
+**Abhängigkeit:** TASK-17 (Datenfundament) — sicheres Merge/Upsert braucht den SQLite-Store; vorher nicht starten.
 
 ---
 

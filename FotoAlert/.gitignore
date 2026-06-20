@@ -1,0 +1,27 @@
+# =============================================================================
+# FotoAlert – .gitignore
+# =============================================================================
+
+# Nutzer-Daten — nie in Git (Source of Truth ist der Prod-Server)
+backend/data/fotoalert.db
+backend/data/fotoalert.db-shm
+backend/data/fotoalert.db-wal
+backend/data_dev/
+
+# Python-Artefakte
+__pycache__/
+*.py[cod]
+*.pyo
+
+# macOS
+.DS_Store
+
+# Virtuelle Umgebungen
+venv/
+.venv/
+env/
+
+# Editor
+.idea/
+.vscode/
+*.swp

@@ -47,6 +47,8 @@ from calculations.astronomy import (
 )
 from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
+from data.store import LocationStore
+from data import backup
 from models.schemas import (
     CameraHintOut,
     DailyBriefingOut,
@@ -83,9 +85,10 @@ _CACHE_DIR          = Path(__file__).parent / "data" / "cache"
 _OPP_CACHE          = _CACHE_DIR / "opportunities.json"
 _CAL_CACHE          = _CACHE_DIR / "calendar.json"
 _ELEV_CACHE         = _CACHE_DIR / "elevations.json"
-_CUSTOM_LOC_FILE    = Path(__file__).parent / "data" / "custom_locations.json"
-_OVERRIDES_FILE     = Path(__file__).parent / "data" / "location_overrides.json"
 _DISCOVER_CACHE     = _CACHE_DIR / "discover.json"
+
+# TASK-17: Zentraler SQLite-Store für nutzereditierbare Daten
+_store = LocationStore()
 
 
 def _load_elevation_cache() -> None:
@@ -108,11 +111,25 @@ def _load_elevation_cache() -> None:
 
 
 def _load_custom_locations() -> None:
-    """Lädt gespeicherte Custom-Locations aus JSON und hängt sie an LOCATIONS."""
-    if not _CUSTOM_LOC_FILE.exists():
-        return
+    """Lädt gespeicherte Custom-Locations aus SQLite und hängt sie an LOCATIONS.
+    TASK-17: ersetzt JSON-basiertes Laden.
+    Fallback: falls DB leer und JSON noch vorhanden, migriert automatisch.
+    """
     try:
-        entries = json.loads(_CUSTOM_LOC_FILE.read_text(encoding="utf-8"))
+        entries = _store.load_all_custom()
+
+        # Fallback: wenn DB leer ist und JSON noch vorhanden → automatisch migrieren
+        if not entries:
+            _json_file = Path(__file__).parent / "data" / "custom_locations.json"
+            if _json_file.exists():
+                import json as _json
+                raw = _json.loads(_json_file.read_text(encoding="utf-8"))
+                for e in raw:
+                    _store.create_custom_if_not_exists(e)
+                entries = _store.load_all_custom()
+                if entries:
+                    logger.info("Custom Locations auto-migriert aus JSON: %d Einträge", len(entries))
+
         ids_existing = {loc.id for loc in LOCATIONS}
         added = 0
         for e in entries:
@@ -133,32 +150,24 @@ def _load_custom_locations() -> None:
             ids_existing.add(loc.id)
             added += 1
         if added:
-            logger.info("Custom Locations geladen: %d Einträge aus %s", added, _CUSTOM_LOC_FILE)
+            logger.info("Custom Locations geladen: %d Einträge aus SQLite", added)
     except Exception as exc:
-        logger.warning("Fehler beim Laden von custom_locations.json: %s", exc)
+        logger.warning("Fehler beim Laden der Custom Locations: %s", exc)
 
 
 def _save_custom_location(loc: PhotoLocation) -> None:
-    """Persistiert eine neue Custom-Location in custom_locations.json."""
-    try:
-        existing: list[dict] = []
-        if _CUSTOM_LOC_FILE.exists():
-            existing = json.loads(_CUSTOM_LOC_FILE.read_text(encoding="utf-8"))
-        existing.append({
-            "id": loc.id, "name": loc.name, "description": loc.description,
-            "category": loc.category.name,
-            "observer_lat": loc.observer_lat, "observer_lon": loc.observer_lon,
-            "subject_lat": loc.subject_lat, "subject_lon": loc.subject_lon,
-            "subject_name": loc.subject_name, "subject_height_m": loc.subject_height_m,
-            "subject_width_m": loc.subject_width_m, "distance_m": loc.distance_m,
-            "focal_length_suggestions": loc.focal_length_suggestions,
-            "special_notes": loc.special_notes, "difficulty": loc.difficulty,
-            "observer_floor_height_m": loc.observer_floor_height_m,
-        })
-        _CUSTOM_LOC_FILE.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
-        logger.info("Custom Location gespeichert: %s → %s", loc.id, _CUSTOM_LOC_FILE)
-    except Exception as exc:
-        logger.error("Fehler beim Speichern von custom_locations.json: %s", exc)
+    """Persistiert eine neue Custom-Location in SQLite (TASK-17: ersetzt JSON-Write)."""
+    _store.create_custom({
+        "id": loc.id, "name": loc.name, "description": loc.description,
+        "category": loc.category.name,
+        "observer_lat": loc.observer_lat, "observer_lon": loc.observer_lon,
+        "subject_lat": loc.subject_lat, "subject_lon": loc.subject_lon,
+        "subject_name": loc.subject_name, "subject_height_m": loc.subject_height_m,
+        "subject_width_m": loc.subject_width_m, "distance_m": loc.distance_m,
+        "focal_length_suggestions": loc.focal_length_suggestions,
+        "special_notes": loc.special_notes, "difficulty": loc.difficulty,
+        "observer_floor_height_m": loc.observer_floor_height_m,
+    })
 
 async def _reverse_geocode(lat: float, lon: float) -> str:
     """Gibt einen kurzen Ortsnamen via Nominatim zurück (leer bei Fehler)."""
@@ -182,20 +191,8 @@ async def _reverse_geocode(lat: float, lon: float) -> str:
 
 
 def _update_custom_location_file(loc_id: str, **fields) -> bool:
-    """Aktualisiert Felder einer Custom-Location in custom_locations.json. Gibt True bei Erfolg."""
-    try:
-        if not _CUSTOM_LOC_FILE.exists():
-            return False
-        data = json.loads(_CUSTOM_LOC_FILE.read_text(encoding="utf-8"))
-        for entry in data:
-            if entry.get("id") == loc_id:
-                entry.update(fields)
-                _CUSTOM_LOC_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-                return True
-        return False
-    except Exception as exc:
-        logger.error("Fehler beim Aktualisieren von custom_locations.json: %s", exc)
-        return False
+    """Aktualisiert Felder einer Custom-Location in SQLite (TASK-17: ersetzt JSON-Write)."""
+    return _store.update_custom(loc_id, **fields)
 
 
 # ---------------------------------------------------------------------------
@@ -510,45 +507,50 @@ async def _run_precompute_single(loc_id: str) -> None:
 # Startup / Shutdown
 # ---------------------------------------------------------------------------
 
-@app.on_event("startup")
 def _load_location_overrides() -> None:
-    """Wendet location_overrides.json auf alle Locations an (Koordinaten-Overrides für Standard-Locations)."""
-    if not _OVERRIDES_FILE.exists():
-        return
+    """Wendet Location-Overrides aus SQLite auf alle Locations an.
+    TASK-17: ersetzt JSON-basiertes Laden.
+    Fallback: falls DB leer und JSON noch vorhanden, migriert automatisch.
+    """
     try:
-        overrides: list[dict] = json.loads(_OVERRIDES_FILE.read_text(encoding="utf-8"))
+        overrides = _store.load_all_overrides()
+
+        # Fallback: DB leer → aus JSON migrieren
+        if not overrides:
+            _json_file = Path(__file__).parent / "data" / "location_overrides.json"
+            if _json_file.exists():
+                import json as _json
+                raw = _json.loads(_json_file.read_text(encoding="utf-8"))
+                for ov in raw:
+                    loc_id = ov.get("id")
+                    if loc_id:
+                        fields = {k: v for k, v in ov.items() if k != "id"}
+                        _store.upsert_override_if_not_exists(loc_id, fields)
+                overrides = _store.load_all_overrides()
+                if overrides:
+                    logger.info("Location Overrides auto-migriert aus JSON: %d Einträge", len(overrides))
+
         loc_map = {loc.id: loc for loc in LOCATIONS}
         applied = 0
         for ov in overrides:
             loc_id = ov.get("id")
             loc = loc_map.get(loc_id)
             if loc:
-                for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon", "name", "description", "observer_floor_height_m", "focal_length_suggestions"):
+                for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon",
+                              "name", "description", "observer_floor_height_m",
+                              "focal_length_suggestions"):
                     if field in ov:
                         setattr(loc, field, ov[field])
                 applied += 1
         if applied:
-            logger.info("Location Overrides geladen: %d Einträge aus %s", applied, _OVERRIDES_FILE)
+            logger.info("Location Overrides geladen: %d Einträge aus SQLite", applied)
     except Exception as exc:
-        logger.warning("Fehler beim Laden von location_overrides.json: %s", exc)
+        logger.warning("Fehler beim Laden der Location Overrides: %s", exc)
 
 
 def _save_location_override(loc_id: str, **fields) -> None:
-    """Speichert/aktualisiert einen Override-Eintrag für eine beliebige Location."""
-    try:
-        existing: list[dict] = []
-        if _OVERRIDES_FILE.exists():
-            existing = json.loads(_OVERRIDES_FILE.read_text(encoding="utf-8"))
-        for entry in existing:
-            if entry.get("id") == loc_id:
-                entry.update(fields)
-                break
-        else:
-            existing.append({"id": loc_id, **fields})
-        _OVERRIDES_FILE.parent.mkdir(parents=True, exist_ok=True)
-        _OVERRIDES_FILE.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
-    except Exception as exc:
-        logger.error("Fehler beim Speichern von location_overrides.json: %s", exc)
+    """Speichert/aktualisiert einen Override-Eintrag in SQLite (TASK-17: ersetzt JSON-Write)."""
+    _store.upsert_override(loc_id, **fields)
 
 
 @app.on_event("startup")
@@ -1088,6 +1090,10 @@ async def preview_alignment(req: PreviewAlignmentRequest):
         )
         LOCATIONS.append(new_loc)
         _save_custom_location(new_loc)
+        # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
+        asyncio.create_task(_run_precompute_single(new_loc.id))
+        # TASK-18: Backup nach Create
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
         saved = True
 
     return {
@@ -1193,6 +1199,9 @@ async def patch_location(loc_id: str, body: dict = Body(...)):
     if needs_recompute:
         logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
         asyncio.create_task(_run_precompute_single(loc_id))
+
+    # TASK-18: Backup nach jedem erfolgreichen Edit
+    asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
 
     return {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute}
 
