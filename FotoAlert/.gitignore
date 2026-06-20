@@ -21,6 +21,11 @@ venv/
 .venv/
 env/
 
+# Secrets — NIE in Git (US-66: Login-Passwörter, Auth-Secret)
+.env
+*.env
+!.env.example
+
 # Editor
 .idea/
 .vscode/

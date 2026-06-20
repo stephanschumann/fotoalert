@@ -6,6 +6,38 @@
 > **Typen:** `US-XX` User Story (Feature) · `TASK-XX` Aufgabe (kein User Value) · `BUG-XX` Fehler (Problemlösung)  
 > **Status:** `[ ]` offen · `[~]` in Arbeit · `[x]` erledigt  
 > **Workflow:** Claude setzt auf `[~]` bei Implementierungsbeginn. `[x]` + Verschiebung nach ✅ Erledigt nur nach expliziter Bestätigung durch Stephan.
+>
+> **Pipeline-Lanes** *(das Pipeline-Steuerung-Board unten ist die maßgebliche Quelle):*  
+> `Inbox` → **`Ready for Analysis`** *(🚦 DEIN GATE)* → `In Analysis` → `Ready for Dev` → `In Progress` → `In Test` → `Done` → `🔁 Retro / Lernen` · `🚫 Excluded`  
+> **Gate-Regel:** Agenten (PM + Dev) nehmen **ausschließlich** Tickets auf, deren ID im Board unter **Ready for Analysis** oder einer nachgelagerten Lane steht. Tickets in `Inbox` werden nie automatisch analysiert oder implementiert — erst wenn **du** sie nach `Ready for Analysis` ziehst.  
+> **Ausschluss:** Eine ID unter `🚫 Excluded` wird nie aufgenommen, auch wenn sie sonst priorisiert wäre. Vorrang vor allen anderen Lanes.  
+> **Release bleibt manuell:** Der Übergang `In Test` → `Done` mit Deploy erfolgt nur nach deiner ausdrücklichen Freigabe.
+
+---
+
+## 🚦 Pipeline-Steuerung (Gate-Board)
+
+> **Maßgebliche Quelle für die Agenten.** Nur Ticket-IDs in **Ready for Analysis** und den
+> nachgelagerten Lanes dürfen aufgenommen werden. Du steuerst die Pipeline, indem du IDs
+> zwischen den Lanes verschiebst — vor allem von **Inbox** nach **Ready for Analysis**.
+>
+> Detail, Akzeptanzkriterien und Spec jedes Tickets stehen unverändert weiter unten in der Datei.
+
+| Lane | Bedeutung | Ticket-IDs |
+|------|-----------|-----------|
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | US-81 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-66 *(Backend grün; Frontend-Test offen)*, BUG-22 |
+| **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
+| **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-26, US-80, BUG-21, TASK-13, TASK-14, TASK-20 · **+ alle übrigen offenen Tickets unten** |
+
+**So benutzt du das Board:**
+1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
+2. **Ausschließen:** ID unter `🚫 Excluded` eintragen → bleibt unangetastet.
+3. **Release-Gate:** Steht ein Ticket in `In Test` und ist ein Deploy nötig, wartet die Pipeline auf dein „release".
 
 ---
 
@@ -415,14 +447,15 @@ Zwei kombinierte Ursachen:
 ## 🔴 Hoch – Kern-Features
 
 
-### TASK-16 · Epic: Datenfundament (Speicher · Backup · Dev/Prod-Isolation) `[ ]`
+### TASK-16 · Epic: Datenfundament (Speicher · Backup · Dev/Prod-Isolation) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Epic (Architektur/Infrastruktur) |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
+| **Abgeschlossen** | 2026-06-20 |
 | **Kind-Tickets** | TASK-17 (Speicher) · TASK-18 (Backup) · TASK-19 (Dev/Prod) |
 
 > **Epic-Hinweis:** Dieses Ticket selbst liefert keinen Code. Es bündelt das Konzept und drei umsetzbare Kind-Tickets. Der Recompute-Aspekt der ursprünglichen Anforderung wird delegiert: **Trigger → BUG-22**, **Orchestrierung/Scheduling → US-34**.
@@ -633,13 +666,14 @@ Singleton: `_store = LocationStore()` einmal auf Modulebene initialisieren.
 
 ---
 
-### TASK-18 · Backup RPO≈0 + Restore (privates Git-Repo) `[~]`
+### TASK-18 · Backup RPO≈0 + Restore (privates Git-Repo) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task (Infrastruktur) |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-20 |
 | **Erstellt** | 2026-06-20 |
 | **Epic** | TASK-16 · **Abhängigkeit:** TASK-17 |
 
@@ -844,6 +878,21 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - [ ] Im Dev-Server: `PATCH /locations/custom_1781560330` → nur `data_dev/fotoalert.db` ändert sich
 - [ ] `sqlite3 backend/data/fotoalert.db "SELECT COUNT(*) FROM custom_locations"` → unverändert
 - [ ] Ohne `FOTOALERT_ENV` → Default `prod`, Startup-Log zeigt `data/fotoalert.db`
+
+### TASK-20 · Automatisierte Frontend-Testroutine mit Bug-Reporting `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+
+**Beschreibung:** Eine automatisierte Testroutine, die das Frontend selbstständig auf korrekte Visualisierungen, angezeigte Informationen und funktionierende Links prüft. Abweichungen vom erwarteten Verhalten werden als neue Bugs mit Screenshots und allen relevanten Infos im BACKLOG.md erfasst — bestehende Tickets zum gleichen Scope werden dabei aktualisiert statt dupliziert. Die Testroutine muss außerdem in die Workflow-Automation und CI/CD-Pipeline eingebaut werden, sodass sie bei jedem Deploy automatisch ausgeführt wird und Regressions frühzeitig erkannt werden.
+
+**Bezug:** Unterstützt alle offenen BUG-Tickets (BUG-21, BUG-26 etc.); komplementär zu manuellen Testplänen in bestehenden Tickets. Abhängigkeit zu TASK-14 (Automatische Deployment Pipeline) — CI/CD-Integration setzt eine funktionierende Pipeline voraus.
+
+---
 
 ### ~~US-32 · Kombiniertes Filter-System~~ `[x]`
 > **Als Fotograf** möchte ich den Feed nach mehreren Kriterien gleichzeitig filtern können, um nur die für mich relevanten Events zu sehen.
@@ -1235,7 +1284,7 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >
 > **Abhängigkeiten:** TASK-14, TASK-15 (Cron-Koordination)
 
-### US-66 · Pflicht-Login mit Rollen-Erkennung (Host / User) `[ ]`
+### US-66 · Pflicht-Login mit Rollen-Erkennung (Host / User) `[~]`
 
 | Feld | Wert |
 |------|------|
@@ -1251,6 +1300,70 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - Session-Dauer: dauerhaft bis zum expliziten Logout (kein automatisches Ablaufen)
 
 **Abhängigkeiten:** Voraussetzung für US-68 (Host-Approval Workflow)
+
+---
+
+#### 🔬 Analyse (Pipeline-Lauf 2026-06-20 · In Analysis)
+
+**Example Mapping**
+
+📏 *Rule 1 — Ohne gültige Session kein Zugang.*
+  🟢 Given frische Installation, When App geöffnet, Then Login-Screen statt Feed.
+  🟢 Given gültige Session gespeichert, When App geöffnet, Then direkt Feed (kein erneuter Login).
+
+📏 *Rule 2 — Das Passwort bestimmt die Rolle automatisch (kein Auswahlfeld).*
+  🟢 Given Host-Passwort, When korrekt, Then Rolle=host (alle Funktionen inkl. Admin).
+  🟢 Given User-Passwort, When korrekt, Then Rolle=user (Standardzugang).
+  🟢 Given falsches Passwort, When eingegeben, Then Fehlermeldung, kein Zugang.
+
+📏 *Rule 3 — Session bleibt bis zum expliziten Logout (kein Ablauf).*
+  🟢 Given eingeloggt, When App geschlossen + neu geöffnet, Then weiterhin eingeloggt.
+  🟢 Given Logout, When bestätigt, Then zurück zum Login-Screen, Session gelöscht.
+
+❓ *Question 1:* Login nur UI gaten (Frontend) oder auch Backend-API absichern? → wird über die Optionen entschieden (s. u.).
+❓ *Question 2:* Wo liegen die zwei Passwörter? → Vorschlag: `backend/.env` (gitignored), serverseitig.
+
+**Akzeptanzkriterien** *(jedes automatisierbare AK → pytest-Fall in `backend/tests/`)*
+- [x] `POST /login` mit Host-Passwort → 200, `{"role":"host","token":…}`. *(test_us66_login)*
+- [x] `POST /login` mit User-Passwort → 200, `{"role":"user","token":…}`. *(test_us66_login)*
+- [x] `POST /login` mit falschem Passwort → 401, kein Token. *(test_us66_login)*
+- [x] Edge: leeres Passwort → 401, kein Zugang. *(test_us66_login)*
+- [x] *(Option B)* Geschützter schreibender Endpoint ohne gültiges Token → 401. *(test_us66_login)*
+- [x] *(Option B)* Host-only-Route mit User-Token → 403. *(test_us66_login)*
+- [x] Ohne Session zeigt die App den Login-Screen; kein Tab/Feed erreichbar. *(Frontend-Test bestätigt 2026-06-20)*
+- [x] Gültiges Token in der Session → App startet direkt im Feed. *(bestätigt 2026-06-20)*
+- [x] Logout (Einstellungen) löscht die Session → nächster Start zeigt Login. *(bestätigt 2026-06-20)*
+
+**Pre-Mortem** *(💀 = Versagensszenario → Gegenmaßnahme)*
+- 💀 Passwörter landen im Frontend-JS/Repo → jeder kann Host werden. → Vergleich **nur im Backend**, Passwörter in `.env` (gitignored); das Frontend kennt nur das Ergebnis-Token.
+- 💀 „Pflicht-Login" nur im Frontend → die API bleibt offen, jeder mit der URL liest/schreibt Daten (kritisch wegen Location-Edits & US-68). → Backend-Token-Check auf schreibenden Endpoints (Option B).
+- 💀 Dauerhafte Session auf geteiltem Gerät → Host bleibt eingeloggt. → akzeptiert per v1-Entscheidung; klar sichtbarer Logout als Gegenmaßnahme.
+- 💀 Bestehende Nutzer plötzlich ausgesperrt → Verwirrung beim Rollout. → kurzer Hinweis im Release; kleine Nutzerbasis.
+
+**Architektur** — betroffen: `backend/main.py` (neuer `POST /login`-Endpoint + Settings für die zwei Passwörter via pydantic-settings/`.env`), optional ein FastAPI-Dependency für geschützte Routen; `web/index.html` (Login-Screen vor `#app`, Token in localStorage analog `fa_*`, Logout in Settings). Kein bestehendes Auth-System vorhanden.
+
+**Implementierungsoptionen**
+
+*Option A — UI-Gate + Login-Endpoint, API ungeschützt.* `/login` prüft das Passwort serverseitig (`.env`) und gibt `role`+`token` zurück; das Frontend gated die UI und speichert das Token in localStorage. Die übrigen API-Endpoints bleiben offen. Aufwand: **klein**. Nachteil: schließt Pre-Mortem-Risiko 2 nicht — Daten bleiben über die API zugänglich.
+
+*Option B — wie A, plus Backend-Schutz schreibender Endpoints.* Zusätzlich ein FastAPI-Dependency, das auf mutierenden Routen (Location-Edits, Verifikationen, Push-Registrierung) einen gültigen Bearer-Token verlangt; Host-only-Routen prüfen zusätzlich die Rolle. Aufwand: **mittel**. Schützt die Daten real und ist die Basis für US-68.
+
+✅ **Empfehlung: Option B.** US-66 ist ausdrücklich Voraussetzung für US-68 (Host-Approval), und Datenmutationen ohne Backend-Schutz wären das zentrale Pre-Mortem-Risiko. Der Mehraufrund ist überschaubar (ein Dependency + Token-Ausgabe), liefert aber den eigentlichen Zweck statt eines reinen UI-Vorhangs.
+
+**Testplan**
+- [ ] Automatisiert (Harness): `POST /login` (host/user/falsch/leer), Token-Schutz schreibender Endpoints (Option B) als `test_api_regression.py`-Fälle mit `US-66` im Docstring.
+- [ ] Manuell: App ohne Session → Login-Screen; Host- und User-Passwort durchspielen; Logout → Login erscheint wieder; Neustart bleibt eingeloggt.
+
+**Implementierungsnotizen (2026-06-20):**
+- Neu `backend/auth.py`: stateless HMAC-Token (`<role>.<hmac>`), `role_for_password`, `issue_token`, `role_for_token`, Dependencies `require_auth`/`require_host`.
+- `backend/main.py`: `POST /login` (Passwort → Rolle+Token); geschützt: `patch_location`, `preview_alignment` (require_auth), `refresh*`/`refresh-discover`/`weather-refresh` (require_host). `register-device` bewusst **offen** (iOS-App noch nicht login-fähig → Folge-Ticket).
+- `web/index.html`: Login-Overlay vor `#app`, Token/Rolle in localStorage (`fa_token`/`fa_role`), `Authorization: Bearer` an allen API-Calls, 401 → Auto-Logout, Logout in Einstellungen (Sektion „Konto").
+- `backend/.env.example`: `FOTOALERT_HOST_PASSWORD` / `FOTOALERT_USER_PASSWORD` / `FOTOALERT_AUTH_SECRET` dokumentiert.
+- Tests: `tests/test_us66_login.py` (12 Fälle: Auth-Unit + Login + Schutz); BUG-22-Tests auf authentifizierte Requests umgestellt. Harness 26/26 grün.
+
+**Status:** Implementiert + getestet (Backend 26 Tests grün, Frontend manuell bestätigt 2026-06-20). Alle AKs erfüllt → **wartet nur noch auf Release** (Release-Gate).
+
+> ⚠️ **Release-Voraussetzung:** Vor/of dem Deploy `FOTOALERT_HOST_PASSWORD`, `FOTOALERT_USER_PASSWORD`, `FOTOALERT_AUTH_SECRET` auf dem Server in `.env` setzen — sonst sperrt sich die App aus (niemand kann sich einloggen).
 
 ### US-67 · Chancendetails: Azimut und Höhe relativ zur Motivspitze `[ ]`
 > **Als Fotograf** möchte ich bei einem Alignment-Event in verständlicher Sprache lesen, wo das Himmelsobjekt relativ zu meinem Motiv erscheint – z.B. „Mond 3° links neben dem Kirchturm, 5° darüber".

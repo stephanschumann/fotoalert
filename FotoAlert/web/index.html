@@ -648,6 +648,30 @@
   </style>
 </head>
 <body>
+<!-- US-66: Pflicht-Login-Overlay -->
+<style>
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--bg,#0f1117);display:none;align-items:center;justify-content:center;padding:24px;padding-top:calc(env(safe-area-inset-top,0px) + 24px)}
+#login-screen.open{display:flex}
+#login-screen .login-card{width:100%;max-width:340px;text-align:center}
+#login-screen .login-logo{font-size:48px;margin-bottom:8px}
+#login-screen h1{font-size:24px;font-weight:700;margin:0 0 4px}
+#login-screen .login-sub{color:var(--muted,#8a93a6);font-size:13px;margin:0 0 24px}
+#login-screen #login-pw{width:100%;padding:14px 16px;font-size:16px;border-radius:var(--radius,12px);border:1px solid var(--border,#2d3148);background:var(--card,#1a1d2b);color:inherit;margin-bottom:12px;outline:none}
+#login-screen #login-pw:focus{border-color:#f5a623}
+#login-screen .login-btn{width:100%;padding:14px;font-size:16px;font-weight:600;border:none;border-radius:var(--radius,12px);background:#f5a623;color:#1a1206;cursor:pointer}
+#login-screen .login-err{color:#f87171;font-size:13px;min-height:18px;margin-top:12px}
+</style>
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📷</div>
+    <h1>FotoAlert</h1>
+    <p class="login-sub">Bitte Passwort eingeben</p>
+    <input id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')LoginScreen.submit()">
+    <button class="login-btn" onclick="LoginScreen.submit()">Anmelden</button>
+    <div id="login-err" class="login-err"></div>
+  </div>
+</div>
 <div id="app">
   <!-- Header -->
   <div id="header" style="position:relative">
@@ -906,7 +930,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.8.1';
+const APP_VERSION = '1.8.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -916,32 +940,90 @@ const CFG = {
   notifyHigh: localStorage.getItem('fa_notify_high') !== 'false',
   notifyGolden: localStorage.getItem('fa_notify_golden') !== 'false',
   notifyMilky: localStorage.getItem('fa_notify_milky') === 'true',
+  token: localStorage.getItem('fa_token') || null,  // US-66: Session-Token
+  role: localStorage.getItem('fa_role') || null,    // US-66: 'host' | 'user'
 };
 
 // ═══════════════════════════════════════════════════════
 // API CLIENT
 // ═══════════════════════════════════════════════════════
 const API = {
-  async get(path) {
-    const r = await fetch(CFG.api + path);
+  // US-66: hängt das Session-Token an jede Anfrage; 401 → automatischer Logout (Re-Login).
+  _headers(extra) {
+    const h = Object.assign({}, extra || {});
+    if (CFG.token) h['Authorization'] = 'Bearer ' + CFG.token;
+    return h;
+  },
+  async _check(r) {
+    if (r.status === 401) { Auth.logout(true); throw new Error('HTTP 401'); }
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
+  },
+  async get(path) {
+    return this._check(await fetch(CFG.api + path, { headers: this._headers() }));
   },
   async post(path, body) {
-    const r = await fetch(CFG.api + path, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
+    return this._check(await fetch(CFG.api + path, {
+      method: 'POST', headers: this._headers({'Content-Type':'application/json'}),
       body: JSON.stringify(body)
-    });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    }));
   },
   async patch(path, body) {
-    const r = await fetch(CFG.api + path, {
-      method: 'PATCH', headers: {'Content-Type':'application/json'},
+    return this._check(await fetch(CFG.api + path, {
+      method: 'PATCH', headers: this._headers({'Content-Type':'application/json'}),
       body: JSON.stringify(body)
+    }));
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// AUTH (US-66 — Pflicht-Login, Rollen-Erkennung, Option B)
+// ═══════════════════════════════════════════════════════
+const Auth = {
+  isLoggedIn() { return !!CFG.token; },
+  isHost() { return CFG.role === 'host'; },
+  async login(password) {
+    // Raw fetch (nicht API.post): /login braucht kein Token und darf 401 nicht als Logout werten.
+    const r = await fetch(CFG.api + '/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password })
     });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    if (r.status === 401) return false;
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    CFG.token = d.token; CFG.role = d.role;
+    localStorage.setItem('fa_token', d.token);
+    localStorage.setItem('fa_role', d.role);
+    return true;
+  },
+  logout(silent) {
+    CFG.token = null; CFG.role = null;
+    localStorage.removeItem('fa_token'); localStorage.removeItem('fa_role');
+    LoginScreen.show();
+  }
+};
+
+// Login-Screen-Steuerung (US-66). Das Overlay liegt direkt im <body>.
+const LoginScreen = {
+  show() {
+    const el = document.getElementById('login-screen');
+    if (el) { el.classList.add('open'); const i = document.getElementById('login-pw'); if (i){ i.value=''; setTimeout(()=>i.focus(),50);} }
+  },
+  hide() { const el = document.getElementById('login-screen'); if (el) el.classList.remove('open'); },
+  async submit() {
+    const input = document.getElementById('login-pw');
+    const err = document.getElementById('login-err');
+    const pw = (input.value || '').trim();
+    if (!pw) { err.textContent = 'Bitte Passwort eingeben.'; return; }
+    err.textContent = '';
+    try {
+      const ok = await Auth.login(pw);
+      if (!ok) { err.textContent = 'Falsches Passwort.'; input.select(); return; }
+      LoginScreen.hide();
+      App.init();
+    } catch(e) {
+      err.textContent = 'Server nicht erreichbar.';
+    }
   }
 };
 
@@ -3594,6 +3676,13 @@ const Settings = {
         </div>
       </div>
       <div class="settings-section">
+        <h3>Konto</h3>
+        <div class="settings-group">
+          <div class="settings-row"><div class="sr-label"><span>Angemeldet als</span><small>${CFG.role==='host'?'Host':'User'}</small></div></div>
+          <div class="settings-row"><div class="sr-label"><span>Abmelden</span><small>Beendet die Sitzung</small></div><button class="gps-btn" onclick="Auth.logout()">Logout</button></div>
+        </div>
+      </div>
+      <div class="settings-section">
         <h3>Über FotoAlert</h3>
         <div class="settings-group">
           <div class="settings-row"><div class="sr-label"><span>Version</span></div><span class="info-badge">${APP_VERSION}</span></div>
@@ -3908,7 +3997,8 @@ const RefreshMenu = {
 // ═══════════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════════
-App.init();
+// US-66: Beim Start nur initialisieren, wenn eingeloggt — sonst Login-Screen zeigen.
+if (Auth.isLoggedIn()) { App.init(); } else { LoginScreen.show(); }
 </script>
 </body>
 </html>

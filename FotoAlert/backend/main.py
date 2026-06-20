@@ -36,10 +36,20 @@ from typing import Optional
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Body
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+# US-66: .env laden, damit Login-Passwörter & Auth-Secret aus backend/.env kommen
+# (python-dotenv ist in requirements; load_dotenv überschreibt bereits gesetzte Env-Vars nicht).
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
+import auth  # US-66: Login/Token/Rollen (Option B)
 
 from calculations.astronomy import (
     calculate_subject_angular_profile,
@@ -242,6 +252,13 @@ _device_tokens: list[dict] = []
 
 # Scheduler
 scheduler = AsyncIOScheduler(timezone="Europe/Berlin")
+
+# Test-/Sandbox-Modus (Test-Harness, PIPELINE.md Schritt 3): Wenn FOTOALERT_NO_BACKGROUND=1
+# gesetzt ist, startet der App-Startup ohne Scheduler, Precompute und Netzwerk-Tasks.
+# Damit lässt sich die App im Sandbox deterministisch und offline hochfahren (TestClient).
+# Prod-Verhalten bleibt unverändert, solange das Flag nicht gesetzt ist.
+import os as _os
+_NO_BACKGROUND = _os.getenv("FOTOALERT_NO_BACKGROUND") == "1"
 
 
 # ---------------------------------------------------------------------------
@@ -471,6 +488,9 @@ async def _run_precompute_single(loc_id: str) -> None:
     Hält den PATCH-Response nicht auf – läuft vollständig asynchron.
     """
     global _precompute_running
+    if _NO_BACKGROUND:
+        logger.info("FOTOALERT_NO_BACKGROUND=1 → Single-Location Recompute für '%s' übersprungen (Test-Modus).", loc_id)
+        return
     if _precompute_running:
         logger.info("Single-Location Recompute für '%s' übersprungen – Vorberechnung läuft bereits", loc_id)
         return
@@ -569,6 +589,13 @@ async def startup():
     # 1. JSON-Caches laden (sofort)
     cache_ok = _load_caches()
 
+    # Test-/Sandbox-Modus: hier abbrechen — keine Hintergrundjobs, kein Netzwerk, kein
+    # Scheduler. Synchron geladene Daten (Locations, Overrides, Caches) stehen den
+    # Endpoints zur Verfügung; alles Asynchrone/Periodische wird übersprungen.
+    if _NO_BACKGROUND:
+        logger.info("FOTOALERT_NO_BACKGROUND=1 → Startup ohne Scheduler/Precompute/Netzwerk (Test-Modus).")
+        return
+
     # 2. Wetter-Overlay für T+0..T+3 (schnell, ~5s)
     asyncio.create_task(_weather_overlay())
 
@@ -599,7 +626,9 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    scheduler.shutdown()
+    # Im Test-/Sandbox-Modus wurde der Scheduler nie gestartet → nicht herunterfahren.
+    if not _NO_BACKGROUND and scheduler.running:
+        scheduler.shutdown()
 
 
 # ---------------------------------------------------------------------------
@@ -938,8 +967,21 @@ async def get_discover(
     }
 
 
+@app.post("/login")
+async def login(body: dict = Body(...)):
+    """US-66: Pflicht-Login. Passwort → Rolle (host/user) + stateless Token.
+
+    Kein Username, kein Rollen-Auswahlfeld — die Rolle ergibt sich aus dem Passwort.
+    """
+    password = (body or {}).get("password", "")
+    role = auth.role_for_password(password)
+    if not role:
+        raise HTTPException(status_code=401, detail="Falsches Passwort.")
+    return {"role": role, "token": auth.issue_token(role)}
+
+
 @app.post("/refresh-discover")
-async def trigger_discover_refresh(background_tasks: BackgroundTasks):
+async def trigger_discover_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
     """Startet die Scout-Pipeline im Hintergrund (~1–3 Min.)."""
     background_tasks.add_task(_refresh_discover)
     return {"status": "started", "message": "Scout-Pipeline gestartet (~1–3 Min.)."}
@@ -947,6 +989,8 @@ async def trigger_discover_refresh(background_tasks: BackgroundTasks):
 
 @app.post("/register-device")
 async def register_device(token: str, platform: str = "ios"):
+    # US-66: bewusst NICHT geschützt — die native iOS-App ist noch nicht login-fähig.
+    # Nachziehen, sobald die iOS-App ein Token sendet (Folge-Ticket).
     if any(d["token"] == token for d in _device_tokens):
         return {"status": "already_registered"}
     _device_tokens.append({"token": token, "platform": platform})
@@ -954,7 +998,7 @@ async def register_device(token: str, platform: str = "ios"):
 
 
 @app.post("/refresh")
-async def trigger_refresh(background_tasks: BackgroundTasks):
+async def trigger_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
     """
     Startet eine volle Vorberechnung (precompute.py, feed+calendar) im Hintergrund.
     Dauert 2–5 Minuten. Danach werden die Caches automatisch neu geladen.
@@ -967,7 +1011,7 @@ async def trigger_refresh(background_tasks: BackgroundTasks):
 
 
 @app.post("/refresh-feed")
-async def trigger_feed_refresh(background_tasks: BackgroundTasks):
+async def trigger_feed_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
     """US-34: Nur 14-Tage Feed neu berechnen (precompute --feed-only). ~30–60s."""
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
@@ -976,7 +1020,7 @@ async def trigger_feed_refresh(background_tasks: BackgroundTasks):
 
 
 @app.post("/refresh-calendar")
-async def trigger_calendar_refresh(background_tasks: BackgroundTasks):
+async def trigger_calendar_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
     """US-34: Nur Jahreskalender inkrementell neu berechnen. ~1–3 Min."""
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
@@ -985,7 +1029,7 @@ async def trigger_calendar_refresh(background_tasks: BackgroundTasks):
 
 
 @app.post("/weather-refresh")
-async def trigger_weather_refresh(background_tasks: BackgroundTasks):
+async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
     """
     Aktualisiert nur das Wetter-Overlay (T+3 Tage) im Hintergrund.
     Schnell: ~10–15s. Kein precompute nötig.
@@ -1020,7 +1064,7 @@ class PreviewAlignmentRequest(BaseModel):
 
 
 @app.post("/preview-alignment")
-async def preview_alignment(req: PreviewAlignmentRequest):
+async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(auth.require_auth)):
     if not (-90 <= req.observer_lat <= 90 and -180 <= req.observer_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Fotograf-Koordinaten.")
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
@@ -1134,7 +1178,7 @@ async def reverse_geocode_endpoint(lat: float, lon: float):
 
 
 @app.patch("/locations/{loc_id}")
-async def patch_location(loc_id: str, body: dict = Body(...)):
+async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)):
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
     coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
     text_fields     = {"name", "description"}
@@ -1200,8 +1244,9 @@ async def patch_location(loc_id: str, body: dict = Body(...)):
         logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
         asyncio.create_task(_run_precompute_single(loc_id))
 
-    # TASK-18: Backup nach jedem erfolgreichen Edit
-    asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+    # TASK-18: Backup nach jedem erfolgreichen Edit (im Test-Modus aus – keine Git-Operationen)
+    if not _NO_BACKGROUND:
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
 
     return {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute}
 
