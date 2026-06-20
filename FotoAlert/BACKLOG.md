@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | US-81 |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-66 *(Backend grün; Frontend-Test offen)*, BUG-22 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-26, US-80, BUG-21, TASK-13, TASK-14, TASK-20 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-26, US-80, BUG-21, TASK-21 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -216,7 +216,7 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 **Abhängigkeiten:** TASK-12[x], US-62
 
-**Bezug (2026-06-20):** Owner der Recompute-Trigger-Whitelist für das Epic TASK-16 (Rule 4). Fix ist umgesetzt; Akzeptanzkriterien stehen auf `[~]` → **bereit zur Test-Bestätigung und zum Abschluss**.
+**Bezug (2026-06-20):** Owner der Recompute-Trigger-Whitelist für das Epic TASK-16 (Rule 4). Fix umgesetzt und **am 2026-06-20 manuell verifiziert** (4/4 AKs grün: focal_length + observer_floor_height → `recompute_triggered: true`; name/description → `false`; PATCH ohne Token → 401). Aus 🧪 In Test entfernt → Done.
 
 ### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[x]`
 
@@ -879,7 +879,7 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - [ ] `sqlite3 backend/data/fotoalert.db "SELECT COUNT(*) FROM custom_locations"` → unverändert
 - [ ] Ohne `FOTOALERT_ENV` → Default `prod`, Startup-Log zeigt `data/fotoalert.db`
 
-### TASK-20 · Automatisierte Frontend-Testroutine mit Bug-Reporting `[ ]`
+### TASK-20 · Automatisierte Frontend-Testroutine mit Bug-Reporting `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -891,6 +891,74 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 **Beschreibung:** Eine automatisierte Testroutine, die das Frontend selbstständig auf korrekte Visualisierungen, angezeigte Informationen und funktionierende Links prüft. Abweichungen vom erwarteten Verhalten werden als neue Bugs mit Screenshots und allen relevanten Infos im BACKLOG.md erfasst — bestehende Tickets zum gleichen Scope werden dabei aktualisiert statt dupliziert. Die Testroutine muss außerdem in die Workflow-Automation und CI/CD-Pipeline eingebaut werden, sodass sie bei jedem Deploy automatisch ausgeführt wird und Regressions frühzeitig erkannt werden.
 
 **Bezug:** Unterstützt alle offenen BUG-Tickets (BUG-21, BUG-26 etc.); komplementär zu manuellen Testplänen in bestehenden Tickets. Abhängigkeit zu TASK-14 (Automatische Deployment Pipeline) — CI/CD-Integration setzt eine funktionierende Pipeline voraus.
+
+---
+
+#### 🔬 Analyse (Pipeline-Lauf 2026-06-20, Analyse-Subagent · In Analysis)
+
+**Example Mapping**
+
+📏 *Rule A — Frontend-Smoke deckt alle Views & Kernelemente ab.*
+  🟢 Given App geladen + eingeloggt, When Routine navigiert Feed→Map→Locations→Settings, Then jede `.page` wird `active`, kein JS-Konsolen-Error, Schlüsselelemente (Tab-Bar, Leaflet-`#map`, Feed-Karten) sichtbar.
+  🟢 Given `#page-map` rendert ohne Leaflet-Container, Then Bug „Map-View leer".
+
+📏 *Rule B — Externe Links sind wohlgeformt (nicht abgerufen).*
+  🟢 Given Detail-Sheet offen, When Routine liest `href` der Maps-/Streetview-/Locationscout-Buttons, Then alle Pflicht-Links matchen ihr URL-Schema.
+  🟢 Edge: Location ohne `locationscout_url` → Link-Block fehlt erwartungsgemäß → **kein** Bug.
+
+📏 *Rule C — Abweichung erzeugt Bug-Ticket mit Screenshot + Dedup.*
+  🟢 Given neuer Defekt, Then genau 1 neues `### BUG-XX` in der Inbox mit Screenshot-Pfad + Fingerprint.
+  🟢 Dedup: identischer Fingerprint existiert offen → bestehendes Ticket aktualisieren, **kein** Duplikat.
+
+📏 *Rule D — Lauf in CI bei jedem Deploy, Login-Gate wird durchlaufen.*
+  🟢 Given Push auf main (TASK-14), Then Routine startet headless, loggt mit Test-PW ein, Ergebnis im CI-Log.
+
+❓ *Questions:* (1) Bug-Tickets in CI committen oder nur als Artefakt + Mac-seitiger Merge? (2) Test gegen lokale Sandbox-Instanz oder Live-URL nach Deploy? (3) Screenshots im Repo (`docs/qa-screenshots/`) vs. CI-Artefakt? (4) Welche Views „Pflicht" vs. rollenabhängig (host/user)?
+
+**Akzeptanzkriterien** *(auto = pytest/CI)*
+- [x] AK1 (auto, Browser): besucht alle 4 Haupt-Views + öffnet ≥1 Detail-Sheet; fehlendes Schlüsselelement → Fehler. *(Browserlauf grün 2026-06-20)*
+- [x] AK2 (auto, Browser): Konsolen-Errors/`pageerror` → Fehler mit Stacktrace. *(Browserlauf grün)*
+- [x] AK3 (auto, Browser): Pflicht-Links matchen Schema-Regex (Apple/Google/Street View im Location-Detail); optionale Links → kein Fehler. *(Browserlauf grün)*
+- [x] AK4 (auto, Browser): Login-Gate (US-66) via Test-PW; Fail-Fast bei falschem/leerem PW. *(Browserlauf grün)*
+- [x] AK5 (auto): bei Defekt genau **ein** Bug-Eintrag; identischer Fingerprint → Update statt Duplikat. *(test_reporter, grün)*
+- [x] AK6 (auto): jeder Bug enthält Screenshot-Pfad, View, erwartet/tatsächlich, Timestamp, Commit-SHA. *(test_reporter, grün)*
+- [x] AK7 (auto): grüner Lauf erzeugt **keinen** BACKLOG-Schreibvorgang. *(test_reporter, grün)*
+- [ ] AK8 (manuell): in CI bei Deploy ausgeführt. *(blockiert durch TASK-14 — noch kein `.github/workflows/`; Einhängepunkt vorbereitet)*
+- [x] AK9 (auto): läuft auf Python 3.9 (`from __future__ import annotations`). *(py_compile + Scan grün)*
+
+**Pre-Mortem**
+- 💀 Falsch-positive Bug-Flut → zu strenge Assertions / Render-Rennen → explizite Waits auf Render-Signale, nur kuratierte Pflicht-Elemente, AK7.
+- 💀 Dedup überschreibt/dupliziert → instabiler Fingerprint → Hash aus (View + Assertion-ID + normalisierte Message), volatile Felder raus; Idempotenz-Test.
+- 💀 Login-Gate (US-66) blockiert Routine → landet auf `#login-screen`, N Falsch-Bugs → Login als Precondition + Fail-Fast (1 Infra-Fehler statt N).
+- 💀 CI-Flakiness (Leaflet/CDN-Tiles) → Links nur per `href` prüfen (nie abrufen), Assets cachen, Retries, deterministisches `data_dev`.
+- 💀 CI pusht Bug-Commits → Deploy-Schleife → in CI **nicht** committen; Bugs als Artefakt (JSON+PNG), BACKLOG-Merge nur Mac-seitig/Intake.
+
+**Architektur**
+- Frontend unverändert (`web/index.html`): Targets `App.nav(...)`, `AddLocation.open()`, Detail-Sheets, Link-URLs, Login `LoginScreen.submit()` / `Auth.isLoggedIn()`.
+- Neu: `backend/tests/frontend/run_frontend_check.py` (Playwright, `from __future__ import annotations`), View-/Link-Spezifikation als Datentabelle, Reporter der gegen `BACKLOG.md` dedupliziert; Screenshots nach `docs/qa-screenshots/<run>/`.
+- Harness-Andockung: eigene Schicht neben `test_api_smoke.py`, Marker `frontend`/`network` (braucht Browser + Server, nicht im Offline-Standardlauf); `run_frontend.sh`. Ticket-ID im Docstring (TASK-20).
+- CI/CD (TASK-14): Actions-Step mit `playwright install chromium`, App gegen `data_dev`, Login mit Test-PW, **keine** Commits → Bug-JSON+Screenshots als Artefakt; BACKLOG-Merge Mac-seitig.
+
+**Implementierungsoptionen**
+- *Option A — Playwright + headless Chromium, getrennter `frontend`-Marker.* Echte Renderprüfung (Leaflet, Sheets, JS-Errors), native Screenshots, CI-fähig. − schwergewichtiger CI-Step, leichte Flake-Gefahr (mit Waits beherrschbar). Aufwand: **mittel**.
+- *Option B — DOM-Assertion ohne Browser (jsdom/Parsing).* + schnell, kein Browser; − erkennt **keine** Render-/Leaflet-/JS-Fehler, keine echten Screenshots → verfehlt „korrekte Visualisierungen". Aufwand: klein.
+- *Option C — Hybrid: DOM/Link-Smoke + minimaler Playwright-Screenshot-Pass.* + schnell + visuelle Belege; − zwei Codepfade, mehr Wartung. Aufwand: mittel–groß.
+
+✅ **Empfehlung: Option A** — nur ein echter Browser deckt funktionierende Visualisierungen + Links + JS-Errors + Screenshots zuverlässig ab und dockt sauber als `frontend`-Marker an das pytest-Harness und den TASK-14-CI an.
+
+**Testplan** — Auto: Login-Precondition, View-Navigation + Detail-Sheet (AK1), Konsolen-Error-Capture (AK2), Link-Schema inkl. optional (AK3), falsches/leeres PW (AK4), Dedup-Idempotenz mit synthetischem Defekt über 2 Läufe (AK5), Bug-Feld-Vollständigkeit (AK6), Grün-ohne-Schreibvorgang (AK7), 3.9-Lauf (AK9); Reporter-Selbsttests gegen eine **Test-BACKLOG-Kopie**, nie die echte Datei. Manuell: CI-Step im echten Deploy (AK8) + Sichtprüfung erster Screenshots + Artefakt→BACKLOG-Merge-Flow.
+
+> **Hinweis:** Es existiert noch **kein** `.github/workflows/` — TASK-14 muss das liefern; bis dahin läuft TASK-20 lokal (`run_frontend.sh`) und wird bei TASK-14 als CI-Step eingehängt.
+
+**Status:** ✅ **Done (2026-06-20).** Implementiert + verifiziert (Option A + Artefakt). Harness 35 grün (9 Reporter-Tests, 3.9), **Browserlauf grün 2026-06-20** („OK: keine Findings" — Login, alle Views inkl. Leaflet-Karte, Location-Detail, Links). Einzig offen: **AK8 (CI-Einhängung)** — wandert als Integrationspunkt in **TASK-14** (noch kein `.github/workflows/`).
+
+**Kalibrierungsnotizen (Browser-Verifikation):** drei Runner-Fixes nötig — (1) `window.Auth`/`window.App` → bare name (top-level `const` nicht an window gebunden); (2) Link-Prüfung im **Location**-Detail (`#loc-detail-sheet a.loc-maps-btn`) statt Event-Detail (dort nur onclick-Buttons); (3) Karten-Selektor `#map.leaflet-container` (Leaflet macht `#map` selbst zum Container, kein Kind-Element) + Warten statt Sofort-Check.
+
+**Implementierungsnotizen (2026-06-20, Impl-Subagent):**
+- Neu unter `backend/tests/frontend/`: `spec.py` (4 Views + Link-Schemata), `reporter.py` (stabiler Fingerprint, Dedup gegen BACKLOG-Kopie via `<!-- fp:… status:open -->`, `findings.json`-Artefakt, grün→kein Write), `run_frontend_check.py` (Playwright-Runner, Login-Precondition + Fail-Fast, View-Nav, Console-/Page-Error-Capture, Link-`href`-Schema, Screenshots → `docs/qa-screenshots/<run>/`), `test_reporter.py` (9 browser-freie Selbsttests auf tmp-BACKLOG-Kopie), `run_frontend.sh`.
+- Alle Dateien: `from __future__ import annotations`, `TASK-20` im Docstring. `pytest.ini`: Marker `frontend`.
+- CI committet **nie** (Artefakt-Variante) → keine Deploy-Schleife.
+- Kein Release nötig: liegt unter `backend/tests/`, wird nicht ausgeliefert und ändert die App nicht.
 
 ---
 
@@ -1121,7 +1189,9 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > - Cache-Kompatibilität: Rollback bricht keine bestehenden JSON-Caches (oder migriert sie)
 > - *(Datensicherung → ausgelagert nach TASK-18)*
 
-### TASK-13 · PWA auf iPhone: Öffentliches Hosting & Remote-Zugriff `[ ]`
+### TASK-13 · PWA auf iPhone: Öffentliches Hosting & Remote-Zugriff `[x]`
+> **✅ Done (abgeglichen 2026-06-20):** Faktisch erledigt — das Setup existiert und ist live: Hetzner CX22 + Caddy (HTTPS), Domain `https://fotoalert.stephanschumann.com`, systemd-Service + Precompute-Timer, PWA auf iPhone installierbar. Vollständige Setup-Anleitung in `deploy/DEPLOYMENT-GUIDE.md`. Ticket stand nur durch fehlenden Board-Abgleich noch in der Inbox; alle AKs sind erfüllt.
+>
 > **Als App-Host** möchte ich die App auf meinem iPhone 14 Pro nutzen können — von überall, nicht nur im Heimnetz — ohne eine native iOS-App zu bauen.
 >
 > **Ausgangslage:** App läuft aktuell auf `localhost:8000` (Mac). Für mobilen Zugriff braucht es HTTPS (Pflicht für PWA/Service Worker auf iOS) und eine öffentlich erreichbare URL.
@@ -1156,7 +1226,11 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >
 > **Abhängigkeiten:** TASK-14 hängt von diesem Task ab (CI/CD braucht Deployment-Ziel)
 
-### TASK-14 · Automatische Deployment Pipeline `[ ]`
+### TASK-14 · Automatische Deployment Pipeline `[x]`
+> **✅ Done (abgeglichen 2026-06-20):** Die Pipeline existiert und ist produktiv im Einsatz — `.github/workflows/deploy.yml` (Push auf `main` → SSH → `deploy/deploy.sh`: `git pull`, SW-Cache-Bump per Timestamp, `pip install`, systemd graceful restart, `/health`-Retry-Check, Auto-Rollback bei Fehler). Ergänzend: `release.sh` (Versions-Bump + Push), `deploy/rollback.sh` (< 2 Min), `deploy/restore.sh`, `deploy/DEPLOYMENT-GUIDE.md`. Alle AKs erfüllt **außer** der CI-Test-Gate-Integration (AK8 aus TASK-20) → herausgezogen als **TASK-21**.
+>
+> **Bezug (2026-06-20):** Trägt **AK8 von TASK-20** — die fertige Frontend-Testroutine (`backend/tests/frontend/`, Artefakt-Variante) muss hier als CI-Step bei jedem Deploy eingehängt werden: `playwright install chromium`, App gegen `data_dev`, Login mit Test-PW, `findings.json`+Screenshots als Artefakt (NICHT committen → keine Deploy-Schleife).
+>
 > **Als App-Host** möchte ich Code-Änderungen mit minimalem manuellen Aufwand veröffentlichen können — ohne fehlerträchtige manuelle Schritte wie SW-Version bumpen, Dateien kopieren oder Server neustarten.
 >
 > **Ziel:** Ein `git push` (oder ein einzelner CLI-Befehl) deployt die neue Version vollautomatisch auf den Server, bumpt die SW-Cache-Version, startet den Service neu und prüft die Verfügbarkeit.
@@ -1187,6 +1261,32 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > - Welche Dateien auf dem Server liegen (persistent vs. deploybar)
 >
 > **Abhängigkeiten:** TASK-13 (braucht Deploy-Ziel), US-39 (Rollback-Strategie baut hierauf auf)
+
+
+### TASK-21 · Frontend-Test-Gate in CI einhängen (Playwright vor Deploy) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (CI/CD) |
+| **Priorität** | Mittel |
+| **Status** | Inbox |
+| **Erstellt** | 2026-06-20 |
+| **Herkunft** | AK8 aus TASK-20 — herausgezogen beim Done-Abgleich von TASK-14 |
+
+**Beschreibung:** Die bereits implementierte Frontend-Testroutine (`backend/tests/frontend/`, TASK-20, Playwright/Option A) wird in `.github/workflows/deploy.yml` als Test-Gate **vor** dem Deploy-Step eingehängt. Aktuell deployt der Workflow direkt ohne Frontend-Regressionsprüfung.
+
+**Scope:**
+- Eingeschlossen: CI-Step `playwright install chromium`; Lauf gegen `data_dev`; Login mit Test-PW (US-66); `findings.json` + Screenshots als **CI-Artefakt** (nicht committen → keine Deploy-Schleife); roter Lauf blockiert den Deploy.
+- Ausgeschlossen: Änderungen an der Testroutine selbst (TASK-20, done); BACKLOG-Merge der Findings (bleibt Mac-seitig/Intake).
+
+**Akzeptanzkriterien:**
+- [ ] `deploy.yml`: Test-Job läuft vor dem Deploy-Job; Deploy nur bei grünem Test.
+- [ ] Playwright headless gegen `data_dev`-Instanz, Login via Test-PW-Secret.
+- [ ] Findings (`findings.json` + PNGs) als CI-Artefakt hochgeladen, **kein** Commit in der CI.
+- [ ] Roter Frontend-Lauf → Deploy wird nicht ausgeführt (Gate greift).
+- [ ] Schließt AK8 von TASK-20 ab.
+
+**Abhängigkeiten:** TASK-20 ✅ (Routine), TASK-14 ✅ (Pipeline)
 
 
 ### TASK-15 · Jahreskalender-Cron-Zeit auf 0:01 Uhr ändern `[x]`
@@ -1284,7 +1384,7 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >
 > **Abhängigkeiten:** TASK-14, TASK-15 (Cron-Koordination)
 
-### US-66 · Pflicht-Login mit Rollen-Erkennung (Host / User) `[~]`
+### US-66 · Pflicht-Login mit Rollen-Erkennung (Host / User) `[x]`
 
 | Feld | Wert |
 |------|------|
@@ -1361,7 +1461,7 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - `backend/.env.example`: `FOTOALERT_HOST_PASSWORD` / `FOTOALERT_USER_PASSWORD` / `FOTOALERT_AUTH_SECRET` dokumentiert.
 - Tests: `tests/test_us66_login.py` (12 Fälle: Auth-Unit + Login + Schutz); BUG-22-Tests auf authentifizierte Requests umgestellt. Harness 26/26 grün.
 
-**Status:** Implementiert + getestet (Backend 26 Tests grün, Frontend manuell bestätigt 2026-06-20). Alle AKs erfüllt → **wartet nur noch auf Release** (Release-Gate).
+**Status:** ✅ **Done** — released **v1.8.2** (2026-06-20), Live-Login (Host + User) auf dem Server bestätigt. Server-`.env` mit den drei Variablen gesetzt (`/opt/fotoalert/app/FotoAlert/backend/.env`, chmod 600).
 
 > ⚠️ **Release-Voraussetzung:** Vor/of dem Deploy `FOTOALERT_HOST_PASSWORD`, `FOTOALERT_USER_PASSWORD`, `FOTOALERT_AUTH_SECRET` auf dem Server in `.env` setzen — sonst sperrt sich die App aus (niemand kann sich einloggen).
 
@@ -1726,15 +1826,18 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ---
 
-### US-81 · Scout-Tab: Weitere Event-Typen (Sonne, weitere Himmelskörper) `[~]`
+### US-81 · Scout-Tab: Weitere Event-Typen (Sonne, weitere Himmelskörper) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **In Progress seit** | 2026-06-19 |
+| **Released** | v1.8.0 (Code bereits live) |
+| **Getestet & verifiziert** | 2026-06-20 (lokal + Live-Server) |
+| **Abgeschlossen** | 2026-06-20 |
 
 **Beschreibung:** Der Scout-Tab soll nicht auf Mond-Alignment beschränkt bleiben. Die Pipeline-Architektur wird auf mehrere Himmelskörper ausgebaut (Sonne, Milchstraße, Kometen), und die Sonne wird als erster neuer Typ vollständig implementiert. Das Datenschema wird auf `body_*`-Felder umgestellt. US-80 (event-type-agnostischer Filter) ist Voraussetzung und bereits erfüllt.
 
@@ -1789,12 +1892,12 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 **Daten-Validierung:**
 - [x] Sonne bei golden hour: az=305.7°, alt=3.1° → d=6.801m für Fernsehturm (Berlin) ✅
-- [ ] Prüfen nach erstem Produktionslauf: Wie viele Sonne-Chancen im 14-Tage-Fenster? Erwartung: 5–20
+- [x] Geprüft nach Scout-Lauf (2026-06-20): **588 Sonne-Chancen** im 14-Tage-Fenster (+ 288 Mond = 876). Erwartung „5–20" war deutlich zu niedrig geschätzt — real = 20 Motive × 14 Tage × 2 Golden-Sessions. Verteilung sauber: alle 14 Tage abgedeckt, nur `golden_morning`/`golden_evening` (blaue Stunde korrekt ausgegrenzt), `body_illumination_pct=null` bei allen Sonne-Einträgen, 0 echte Duplikate (28 Mehrfach-Slots = legitime verschiedene Standpunkte ≥150 m)
 
 **Testplan:**
-- [ ] Manuell nach Release: Scout-Tab zeigt gemischte Karten mit 🌙 und ☀️ Icons
-- [ ] Manuell: Sonne-Karte zeigt keinen Beleuchtungs-Chip
-- [ ] Manuell: Filter Tageszeit „Morgen" filtert Sonne-Abend-Chancen korrekt heraus
+- [x] Manuell (lokal 2026-06-20): Scout-Tab zeigt gemischte Karten mit 🌙 und ☀️ Icons
+- [x] Manuell: Sonne-Karte zeigt keinen Beleuchtungs-Chip
+- [x] Manuell: Filter Tageszeit „Morgen" filtert Sonne-Abend-Chancen korrekt heraus
 
 **Implementierungsreihenfolge:**
 1. [x] `pipeline_base.py` anlegen
