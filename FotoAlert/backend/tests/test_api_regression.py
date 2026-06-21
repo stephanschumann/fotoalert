@@ -48,3 +48,61 @@ class TestBug22RecomputeWhitelist:
         # Edge Case: Brennweite außerhalb 8–1200 mm → 422 (BUG-22-Validierung).
         r = client.patch(f"/locations/{LOC}", json={"focal_length_suggestions": [5000]}, headers=auth_headers)
         assert r.status_code == 422
+
+
+class TestBug26Verifications:
+    """BUG-26: Verifikationen server-seitig persistieren (nicht nur localStorage).
+
+    AK: POST + GET Roundtrip, DELETE letzter Eintrag, kein Auth für GET,
+        ungültiger status → 422.
+    """
+
+    LOC_V = "custom_verif_test"
+
+    def test_post_and_get_roundtrip(self, client, auth_headers):
+        """BUG-26 AK: POST speichert, GET gibt zurück (älteste zuerst)."""
+        client.delete(f"/locations/{self.LOC_V}/verifications/last", headers=auth_headers)  # cleanup
+        r = client.post(f"/locations/{self.LOC_V}/verifications", headers=auth_headers,
+                        json={"location_name": "Test", "status": "ok",
+                              "issue_type": "", "comment": "Super!", "date": "2026-06-21"})
+        assert r.status_code == 201, r.text
+        assert "id" in r.json()
+
+        r2 = client.get(f"/locations/{self.LOC_V}/verifications")
+        assert r2.status_code == 200
+        entries = r2.json()
+        assert any(e["status"] == "ok" and e["comment"] == "Super!" for e in entries)
+
+    def test_get_all_bulk_endpoint(self, client, auth_headers):
+        """BUG-26 AK: GET /verifications gibt alle zurück (Frontend-Preload)."""
+        r = client.get("/verifications")
+        assert r.status_code == 200
+        assert isinstance(r.json(), list)
+
+    def test_get_requires_no_auth(self, client):
+        """BUG-26 AK: GET /verifications ist öffentlich."""
+        r = client.get("/verifications")
+        assert r.status_code == 200
+
+    def test_delete_last(self, client, auth_headers):
+        """BUG-26 AK: DELETE /verifications/last entfernt neuesten Eintrag."""
+        client.post(f"/locations/{self.LOC_V}/verifications", headers=auth_headers,
+                    json={"location_name": "X", "status": "issue",
+                          "issue_type": "Zugang gesperrt", "comment": "", "date": "2026-06-21"})
+        before = client.get(f"/locations/{self.LOC_V}/verifications").json()
+        r = client.delete(f"/locations/{self.LOC_V}/verifications/last", headers=auth_headers)
+        assert r.status_code == 200
+        after = client.get(f"/locations/{self.LOC_V}/verifications").json()
+        assert len(after) == len(before) - 1
+
+    def test_invalid_status_rejected(self, client, auth_headers):
+        """BUG-26 Edge Case: ungültiger status → 422."""
+        r = client.post(f"/locations/{self.LOC_V}/verifications", headers=auth_headers,
+                        json={"status": "maybe", "date": "2026-06-21"})
+        assert r.status_code == 422
+
+    def test_missing_comment_accepted(self, client, auth_headers):
+        """BUG-26 Edge Case: kein Kommentar → trotzdem gespeichert."""
+        r = client.post(f"/locations/{self.LOC_V}/verifications", headers=auth_headers,
+                        json={"status": "ok", "date": "2026-06-21"})
+        assert r.status_code == 201

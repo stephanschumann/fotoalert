@@ -930,7 +930,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.8.2';
+const APP_VERSION = '1.8.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -972,6 +972,11 @@ const API = {
     return this._check(await fetch(CFG.api + path, {
       method: 'PATCH', headers: this._headers({'Content-Type':'application/json'}),
       body: JSON.stringify(body)
+    }));
+  },
+  async delete(path) {
+    return this._check(await fetch(CFG.api + path, {
+      method: 'DELETE', headers: this._headers()
     }));
   }
 };
@@ -1516,48 +1521,76 @@ const CalendarView = {
 };
 
 // ═══════════════════════════════════════════════════════
-// STANDORT-VERIFIKATION (US-23)
+// STANDORT-VERIFIKATION (US-23 / BUG-26: Backend-Persistenz)
 // ═══════════════════════════════════════════════════════
 const Verify = {
-  _KEY: 'fotoalert_verifications',
+  _KEY: 'fotoalert_verifications',  // nur noch für Migration aus localStorage
   _ISSUE_TYPES: ['Koordinaten falsch','Brennweite falsch','Zugang gesperrt','Sichtachse blockiert','Street View falsch','Motiv verändert','Sonstiges'],
+  _cache: {},  // { [locationId]: [{id, status, date, comment, issue_type, location_name}] }
 
-  // ── Datenzugriff ────────────────────────────────────────────────
-  getAll() {
-    try { return JSON.parse(localStorage.getItem(this._KEY) || '{}'); } catch { return {}; }
-  },
-  // Gibt Array aller Einträge zurück; migriert altes Einzelobjekt-Format
-  getList(locationId) {
-    const all = this.getAll();
-    const raw = all[locationId];
-    if (!raw) return [];
-    if (Array.isArray(raw)) return raw;
-    return [raw]; // Migration: altes Einzelobjekt → Array
-  },
+  // ── Datenzugriff (synchron, aus In-Memory-Cache) ──────────────────
+  getList(locationId) { return this._cache[locationId] || []; },
   getLast(locationId) {
     const list = this.getList(locationId);
     return list.length ? list[list.length - 1] : null;
   },
-  append(locationId, locationName, comment, status, issueType) {
-    const all = this.getAll();
-    const list = this.getList(locationId);
-    list.push({ location_name: locationName, date: new Date().toISOString().slice(0,10),
-                comment: comment.trim(), status, issue_type: issueType });
-    all[locationId] = list;
-    localStorage.setItem(this._KEY, JSON.stringify(all));
+
+  // ── Backend-Laden: alle Verifikationen beim App-Start ─────────────
+  async loadAll() {
+    try {
+      const all = await API.get('/verifications');
+      this._cache = {};
+      for (const v of all) {
+        if (!this._cache[v.location_id]) this._cache[v.location_id] = [];
+        this._cache[v.location_id].push(v);
+      }
+    } catch(e) {
+      // Bei Netzwerkfehler: weiter mit leerem Cache (degraded, aber stabil)
+    }
   },
-  removeLast(locationId) {
-    const all = this.getAll();
-    const list = this.getList(locationId);
-    if (!list.length) return;
-    list.pop();
-    if (list.length) all[locationId] = list; else delete all[locationId];
-    localStorage.setItem(this._KEY, JSON.stringify(all));
+
+  // ── Einmalige Migration localStorage → Backend ────────────────────
+  async migrateFromLocalStorage() {
+    const raw = localStorage.getItem(this._KEY);
+    if (!raw) return;
+    try {
+      const all = JSON.parse(raw);
+      for (const [locId, data] of Object.entries(all)) {
+        const list = Array.isArray(data) ? data : [data];
+        for (const v of list) {
+          try {
+            await API.post(`/locations/${locId}/verifications`, {
+              location_name: v.location_name || '',
+              status: v.status || 'ok',
+              issue_type: v.issue_type || '',
+              comment: v.comment || '',
+              date: v.date || new Date().toISOString().slice(0,10),
+            });
+          } catch {}
+        }
+      }
+      localStorage.removeItem(this._KEY);
+    } catch {}
   },
-  removeAll(locationId) {
-    const all = this.getAll();
-    delete all[locationId];
-    localStorage.setItem(this._KEY, JSON.stringify(all));
+
+  // ── Schreib-Operationen (async, Backend + Cache) ──────────────────
+  async append(locationId, locationName, comment, status, issueType) {
+    const date = new Date().toISOString().slice(0,10);
+    const result = await API.post(`/locations/${locationId}/verifications`, {
+      location_name: locationName,
+      status, comment: (comment || '').trim(),
+      issue_type: issueType || '', date,
+    });
+    const entry = { id: result.id, location_id: locationId, location_name: locationName,
+                    status, comment: (comment || '').trim(), issue_type: issueType || '', date };
+    if (!this._cache[locationId]) this._cache[locationId] = [];
+    this._cache[locationId].push(entry);
+  },
+
+  async removeLast(locationId) {
+    await API.delete(`/locations/${locationId}/verifications/last`);
+    const list = this._cache[locationId];
+    if (list && list.length) list.pop();
   },
 
   // ── Formatierung ────────────────────────────────────────────────
@@ -1638,9 +1671,11 @@ const Verify = {
       </div>`;
     btn.insertAdjacentElement('afterend', form);
   },
-  confirm(locationId, locationName, formId) {
+  async confirm(locationId, locationName, formId) {
     const comment = document.getElementById('verify-comment-' + formId)?.value || '';
-    this.append(locationId, locationName, comment, 'ok', null);
+    try {
+      await this.append(locationId, locationName, comment, 'ok', null);
+    } catch(e) { toast('Fehler beim Speichern: ' + e.message); return; }
     document.getElementById(formId)?.remove();
     toast('✅ Standort als geprüft markiert');
     setTimeout(() => Detail.close(), 800);
@@ -1697,24 +1732,30 @@ const Verify = {
       </div>`;
   },
 
-  saveLocOk(locationId, locationName, fid) {
+  async saveLocOk(locationId, locationName, fid) {
     const comment = document.getElementById(fid + '-txt')?.value || '';
-    this.append(locationId, locationName, comment, 'ok', null);
+    try {
+      await this.append(locationId, locationName, comment, 'ok', null);
+    } catch(e) { toast('Fehler beim Speichern: ' + e.message); return; }
     this._refreshSection(locationId, locationName);
     toast('✅ Standort als geprüft markiert');
   },
 
-  saveLocIssue(locationId, locationName, fid) {
+  async saveLocIssue(locationId, locationName, fid) {
     const selected = [...document.querySelectorAll(`#${fid} .issue-chip.selected`)].map(c => c.textContent);
     if (!selected.length) { toast('⚠ Bitte mindestens ein Problem auswählen'); return; }
     const comment = document.getElementById(fid + '-txt')?.value || '';
-    this.append(locationId, locationName, comment, 'issue', selected.join(', '));
+    try {
+      await this.append(locationId, locationName, comment, 'issue', selected.join(', '));
+    } catch(e) { toast('Fehler beim Speichern: ' + e.message); return; }
     this._refreshSection(locationId, locationName);
     toast('⚠ Problem gespeichert');
   },
 
-  resetLastFromDetail(locationId, locationName) {
-    this.removeLast(locationId);
+  async resetLastFromDetail(locationId, locationName) {
+    try {
+      await this.removeLast(locationId);
+    } catch(e) { toast('Fehler: ' + e.message); return; }
     this._refreshSection(locationId, locationName);
     toast('Letzter Eintrag gelöscht');
   },
@@ -3870,7 +3911,10 @@ const App = {
     }
     // Filter-Badge initialisieren
     Filter._updateBadge();
-    // Lade Feed
+    // BUG-26: localStorage-Verifikationen einmalig migrieren, dann alle laden
+    await Verify.migrateFromLocalStorage();
+    await Verify.loadAll();
+    // Lade Feed (Verify._cache ist jetzt befüllt → Badges korrekt)
     await Feed.load();
     // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch
     setTimeout(async () => {

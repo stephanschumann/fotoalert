@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-26, US-80, BUG-21, TASK-21 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-83, US-84, US-85, US-87, BUG-21, TASK-21 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -140,16 +140,47 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
-### BUG-26 · Standortverifikationen und GPS-Änderungen werden nicht persistiert `[ ]`
+### BUG-26 · Standortverifikationen werden nicht persistiert `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
+| **In Progress seit** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-21 |
 
-**Beschreibung:** Positive und negative Standortverifikationen sowie geänderte GPS-Koordinaten werden zwar verarbeitet (Feedback erscheint), aber nicht dauerhaft gespeichert. Nach dem Schließen und erneuten Öffnen der App sind alle Änderungen zurückgesetzt.
+**Beschreibung:** Positive und negative Standortverifikationen werden zwar verarbeitet (Toast erscheint), aber nicht dauerhaft gespeichert. Nach dem Schließen und erneuten Öffnen der App sind alle Verifikationen zurückgesetzt. GPS-Koordinatenänderungen persistieren korrekt (Backend-PATCH + SQLite).
+
+**Root Cause:** Verifikationen werden ausschließlich in `localStorage['fotoalert_verifications']` gespeichert. iOS löscht PWA-localStorage nach 7 Tagen Inaktivität (WebKit-Policy ab iOS 13.4); Kontext-Split zwischen PWA-Homescreen und Safari-Tab führt zu separaten Storage-Partitionen.
+
+**Scope:** Verifikationen server-seitig persistieren. GPS-Änderungen sind nicht betroffen.
+
+**Akzeptanzkriterien:**
+- [x] Verifikation (✓ positiv, ⚠ Problem) bleibt nach App-Schließen und Neuöffnen erhalten
+- [x] Verifikation ist auf einem zweiten Gerät nach Login sichtbar
+- [x] Bestehende localStorage-Verifikationen werden beim ersten App-Start einmalig zum Backend migriert
+- [x] `GET /locations/{id}/verifications` gibt alle Einträge zurück (kein Auth)
+- [x] `POST /locations/{id}/verifications` speichert Eintrag (Auth: user + host)
+- [x] Edge Case: Verifikation ohne Kommentar / ohne issue_type wird akzeptiert
+- [x] Edge Case: Mehrfach-Verifikationen derselben Location korrekt als Liste gespeichert
+- [x] Letzten Eintrag löschen (`DELETE /locations/{id}/verifications/last`) funktioniert
+
+**Pre-Mortem:**
+- 💀 iOS-Kontext-Split (PWA vs. Safari-Tab) → Gegenmaßnahme: Backend-Persistenz eliminiert das Problem
+- 💀 Migration verliert vorhandene localStorage-Daten → Gegenmaßnahme: Migration pusht alle Einträge ans Backend, danach löschen
+- 💀 Python-3.9-Inkompatibilität crasht Prod → Gegenmaßnahme: `from __future__ import annotations` + Optional statt `|`
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/store.py`, `backend/main.py`, `web/index.html` (Verify-Objekt)
+- [x] Implementierungsoption gewählt: Backend-Persistenz (neue SQLite-Tabelle + 2 Endpoints)
+
+**Testplan:**
+- [x] Automatisiert: `POST /locations/{id}/verifications` + `GET` Roundtrip in `backend/tests/test_api_regression.py` (6/6 Tests grün)
+- [x] Manuell: POST + GET + DELETE Roundtrip via curl verifiziert (2026-06-21)
 
 ---
 
@@ -885,8 +916,9 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
+| **Abgeschlossen** | 2026-06-20 (Harness grün; AK8 CI-Einhängung → TASK-14) |
 
 **Beschreibung:** Eine automatisierte Testroutine, die das Frontend selbstständig auf korrekte Visualisierungen, angezeigte Informationen und funktionierende Links prüft. Abweichungen vom erwarteten Verhalten werden als neue Bugs mit Screenshots und allen relevanten Infos im BACKLOG.md erfasst — bestehende Tickets zum gleichen Scope werden dabei aktualisiert statt dupliziert. Die Testroutine muss außerdem in die Workflow-Automation und CI/CD-Pipeline eingebaut werden, sodass sie bei jedem Deploy automatisch ausgeführt wird und Regressions frühzeitig erkannt werden.
 
@@ -1323,9 +1355,10 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 |------|------|
 | **Typ** | Feature |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-18 |
 | **In Progress seit** | 2026-06-18 |
+| **Abgeschlossen** | 2026-06-18 (Release v1.4.35) |
 
 **Beschreibung:** `observer_floor_height_m` ergänzt den vertikalen Offset wenn der Fotograf nicht auf Bodenniveau ist (Dach, Etage). Beeinflusst Kompositions-Analyse, elevation_difference_m, possible_bodies.
 
@@ -1390,8 +1423,9 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
+| **Abgeschlossen** | 2026-06-21 (Release v1.8.2) |
 
 **Beschreibung:** Die App erfordert beim Start einen Login. Nutzer geben nur ein Passwort ein — anhand des Passworts wird automatisch erkannt, ob es sich um einen Host (Stephan) oder einen User handelt. Host-Passwort gewährt Zugang zu allen Funktionen inkl. zukünftiger Admin-Features; User-Passwort gewährt Standardzugang. Kein Username, kein separates Rollen-Auswahlfeld.
 
@@ -1480,12 +1514,14 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >
 > **Abhängigkeiten:** US-37[x]
 
-### US-68 · Host-Approval Workflow für Location-Änderungen `[ ]`
-> **Als normaler Nutzer** möchte ich Änderungsvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host sichtbar werden.
+### US-68 · Host-Approval Workflow für Location-Änderungen und -Löschungen (inkl. Host-Aufgabenliste) `[ ]`
+> **Als normaler Nutzer** möchte ich Änderungs- und Löschvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host wirksam werden.
 >
-> **Hintergrund:** US-63[x] erlaubt vollständiges Bearbeiten. Diese Story fügt einen Review-Gate ein: Änderungen von Nicht-Host-Nutzern werden als Vorschläge gespeichert.
+> **Hintergrund:** US-63[x] erlaubt vollständiges Bearbeiten. Diese Story fügt einen Review-Gate ein: Änderungen und Löschungen von Nicht-Host-Nutzern werden als Vorschläge gespeichert und vom Host in einer Aufgabenliste freigegeben.
 >
-> **Akzeptanzkriterien:**
+> **🔀 Merge-Hinweis (2026-06-20):** US-86 (Lösch-Berechtigung Host/User + Host-Aufgabenliste + Indikator) wurde auf Stephans Freigabe in US-68 zusammengeführt — gemeinsames Host-Dashboard/Approval statt zweier paralleler Mechanismen.
+>
+> **Akzeptanzkriterien — Änderungen:**
 > - Nicht-Host-Nutzer sehen „Änderung vorschlagen"-Button (statt direktem Edit)
 > - Vorschlag wird als `pending_override` in `location_overrides.json` gespeichert (Status: `pending`)
 > - Host-Dashboard (nach US-66-Login): Liste aller offenen Vorschläge mit Diff-Ansicht (alt ↔ neu)
@@ -1493,14 +1529,25 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > - Nach Annahme: Hintergrund-Recompute via TASK-12-Mechanismus
 > - Nicht-Host-Nutzer sehen an betroffener Location Hinweis „Vorschlag ausstehend"
 >
+> **Akzeptanzkriterien — Löschungen (aus US-86):**
+> - Host darf **alle** Locations löschen (sofort, ohne Approval)
+> - Normale User dürfen nur **selbst angelegte** Locations löschen — und nur nach Zustimmung des Hosts
+> - User-Löschwunsch erzeugt eine offene Approval-Aufgabe (Status `pending`) statt sofortiger Löschung
+> - Host-Aktionen auf Löschwunsch: „Annehmen" (Location wird gelöscht + Caches/Feed/Karte bereinigt) oder „Ablehnen"
+>
+> **Akzeptanzkriterien — Host-Aufgabenliste (aus US-86):**
+> - Sektion „Aufgaben" im Bereich „Einstellungen" listet alle offenen Approval-Aufgaben (Änderungen + Löschungen)
+> - Kleiner Indikator (Badge) signalisiert dem Host, dass offene Aufgaben vorliegen (Anzahl); verschwindet, wenn keine offen sind
+>
 > **Sequenzierung:**
 > ```
 > US-63[x] (Location-Edit-UI) ──┐
-> US-66 (Host-Login Auth)      ──┴─→ US-68 (Approval Workflow)
-> TASK-12[x] (Auto-Recompute) ──────→ US-68 (nach Approval)
+> US-66 (Host-Login Auth)      ──┼─→ US-68 (Approval + Löschung + Aufgabenliste)
+> US-60   (Location löschen)   ──┤
+> TASK-12[x] (Auto-Recompute) ──┴──→ US-68 (nach Approval/Löschung)
 > ```
 >
-> **Abhängigkeiten:** US-63[x], US-66, TASK-12[x]
+> **Abhängigkeiten:** US-63[x], US-66, US-60, TASK-12[x]
 
 ### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[x]`
 > **Als Fotograf vor Ort** möchte ich die Kartenansicht mit einem Tap auf meinen GPS-Standort zentrieren, damit ich schnell sehe, welche Fotostandorte in meiner Nähe liegen.
@@ -1546,9 +1593,10 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **In Progress seit** | 2026-06-19 |
+| **Abgeschlossen** | 2026-06-20 (Releases v1.6.0–v1.7.0) |
 
 **Beschreibung:** Als Fotograf möchte ich im neuen „🔭 Scout"-Tab einen nach Score sortierten 14-Tage-Ausblick erhalten, welches bekannte Berliner/Potsdamer Wahrzeichen (Fernsehturm, Siegessäule, Dom …) ich von welchem Standort aus fotografieren kann — mit dem Vollmond (oder Halbmond) exakt auf der Motivspitze, zur goldenen oder blauen Stunde.
 
@@ -1928,6 +1976,98 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - [ ] Formel: basiert auf optischer Weglänge durch Atmosphäre (`airmass = 1/sin(alt)`) — niedrige Sonne = hohe Airmass = mehr Rötung
 - [ ] Optimum bei ~3–6° (maximale Rötung ohne vollständigen Horizontverlust)
 - [ ] Score 0.0 bei alt > 15° (kein Rötlichkeits-Effekt mehr bei hoher Sonne)
+
+---
+
+<!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
+
+### US-83 · Scout-Eintrag: Detailansicht + „Als Location speichern" `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+
+**Beschreibung:** Ein Klick auf einen Scout-Eintrag soll eine Detailansicht öffnen, die dieselben Daten zeigt wie die Locationdetails. Aus dieser Ansicht kann der Nutzer den Scout-Eintrag optional als neue Location speichern.
+
+**Bezug:** Baut auf US-70[x] (Scout-Tab) auf und wiederverwendet die Location-Detail-UI (US-60/US-63[x]) sowie die Speicher-Logik aus AddLocation (US-56). Eigenständig, grenzt an US-70 (liefert nur die Karten/Liste). Datenfundament-Epic (Location-Persistenz) ist Voraussetzung für „als Location speichern".
+
+---
+
+### US-84 · Passwort-Änderung durch den Host in der App-Oberfläche `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+
+**Beschreibung:** Der Host soll sein Passwort direkt über die App-Oberfläche ändern können (statt nur server-/dateiseitig). Voraussichtlich als Sektion in den Einstellungen.
+
+**Bezug:** Abhängig von US-66[x] (Login mit Rollen-Erkennung, Passwort-Mechanismus). Eigenständig. Tangiert den Einstellungs-Bereich, in dem auch US-86 die Host-Aufgabenliste verorten würde.
+
+---
+
+### US-85 · Karte & Blickwinkel: Sichtfeld-Trichter mit Brennweite (gestrichelte Verlängerung) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+
+**Beschreibung:** In der Ansicht „📐 Karte & Blickwinkel" soll der Blickwinkel als Trichter dargestellt werden: durchgezogen (gefüllt) vom Standort bis zum Motiv entsprechend der gewählten Brennweite, und als gestrichelte Linien über das Motiv hinaus verlängert.
+
+**Bezug:** Verfeinert die bereits in US-58[x] umgesetzte FOV-Kegel-Visualisierung; betrifft dieselbe Sektion. Grenzt an BUG-20[x] (Marker in FOV-Karte). Eigenständig, baut auf US-58.
+
+---
+
+### US-86 · 🔀 Gemerged in US-68 `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | Done (gemerged in US-68) |
+
+> **Merge (2026-06-20, von Stephan freigegeben):** Lösch-Berechtigung (Host vs. User), Lösch-Approval, Host-Aufgabenliste + Indikator wurden vollständig in **US-68** überführt (gemeinsames Host-Dashboard/Approval). Kein eigenständiges Ticket mehr — siehe US-68 für Scope, AKs und Abhängigkeiten.
+
+---
+
+### TASK-22 · Workflow: manuelle Terminal-Befehle durch Agents automatisieren `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-20 |
+| **In Progress seit** | 2026-06-21 |
+
+**Beschreibung:** Stephan muss aktuell Befehle (v. a. Git/Release) manuell im Terminal eingeben. Ziel: diese Schritte als Teil des Workflows automatisiert durch die Agents ausführen lassen, soweit möglich. Kernfrage der Analyse: Welche Schritte können sicher automatisiert werden — unter der bestehenden Randbedingung, dass Git-Operationen auf Stephans Rechner/Server laufen müssen und nicht in der Sandbox?
+
+**Bezug:** **Folgeticket von TASK-14[x]** (Automatische Deployment Pipeline — produktiv) — analog zu TASK-21, das beim Done-Abgleich aus TASK-14 herausgezogen wurde. TASK-14 liefert die Pipeline (`deploy.yml`, `release.sh`); TASK-22 adressiert den verbleibenden **manuellen Anstoß** im Terminal. Grenzt an den Release-Workflow und TASK-21 (CI-Test-Gate). Eigenständig.
+
+**Analyse-Ergebnis (2026-06-20):** Kernfrage beantwortet. Vollständige Hands-off-Automatisierung ist **nicht** möglich: Terminal.app läuft in der Computer-Steuerungs-Stufe „click" — Tippen, Cmd+V, Tastendrücke und Rechtsklick durch den Agent sind als Sicherheitsgrenze gesperrt. Der Agent kann Befehle nicht selbst eintippen/einfügen oder Enter drücken; der finale Enter (und alle Git-Befehle) bleiben bei Stephan. Die TASK-22-Randbedingung (Git auf Mac/Server, nicht in der Sandbox) bleibt damit gewahrt.
+
+**Umsetzung (zwei automatisierbare Hälften):** (1) **Eingabe-Halbautomatik** — Befehl per `mcp__computer-use__write_clipboard` in die Mac-Zwischenablage, Stephan macht nur Cmd+V + Enter; (2) **Output-Vollautomatik** — Agent liest das Ergebnis per `mcp__computer-use__screenshot` selbst aus, kein Zurückkopieren mehr. Verankert in `fotoalert-test`, `fotoalert-localdev`, `fotoalert-release` (Routine „Terminal-Automatisierung"); `fotoalert-orchestrator` erhält einen Verweis, damit Subagenten die Routine erben. Live-Health der Produktion läuft schon heute über `web_fetch`. Copy-ready Skill-Blöcke: `outputs/TASK-22_Skill-Aenderungen.md` — Einfügen über Einstellungen → Capabilities (Skill-Cache ist read-only, daher nicht aus der Session editierbar). Offen: Skill-Blöcke einsetzen + ein realer Test-/Release-Zyklus zur Verifikation. Siehe Memory `feedback_terminal_automation`.
+
+---
+
+### US-87 · Locationdetails: größere Karte / Vollbild-Overlay zum Pin-Setzen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-20 |
+
+**Beschreibung:** Die Karte in den Locationdetails ist zu klein für komfortables Navigieren und Setzen der Location-Pins. Sie soll deutlich größer werden — idealerweise in einem bildschirmfüllenden Overlay, das sich per Klick auf ein Symbol wieder schließen lässt.
+
+**Bezug:** Verbessert die Edit-Karte des Location-Details (US-60). Grenzt an US-58[x] (Blickwinkel-Karte) und US-69[x] (GPS-Zentrierung). Eigenständig.
 
 ---
 

@@ -5,10 +5,12 @@ Ersetzt die direkten JSON-Schreibzugriffe in main.py.
 Alle Writes sind atomar (BEGIN / COMMIT / ROLLBACK).
 
 Tabellen:
-  custom_locations  — vom User angelegte Foto-Standorte
-  location_overrides — Koordinaten-/Name-Korrekturen für Standard-Locations
+  custom_locations      — vom User angelegte Foto-Standorte
+  location_overrides    — Koordinaten-/Name-Korrekturen für Standard-Locations
+  location_verifications — Vor-Ort-Verifikationen und Problemmeldungen (BUG-26)
 
 TASK-17: SQLite-Migration + atomare Writes (Fundament)
+BUG-26:  location_verifications Tabelle + CRUD
 """
 
 from __future__ import annotations
@@ -56,6 +58,18 @@ CREATE TABLE IF NOT EXISTS location_overrides (
     id      TEXT PRIMARY KEY,
     fields  TEXT NOT NULL  -- JSON-Objekt mit den überschriebenen Feldern
 );
+
+CREATE TABLE IF NOT EXISTS location_verifications (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    location_id   TEXT    NOT NULL,
+    location_name TEXT    DEFAULT '',
+    status        TEXT    NOT NULL,   -- 'ok' | 'issue'
+    issue_type    TEXT    DEFAULT '',
+    comment       TEXT    DEFAULT '',
+    date          TEXT    NOT NULL    -- ISO-Datum YYYY-MM-DD
+);
+
+CREATE INDEX IF NOT EXISTS idx_verif_location ON location_verifications(location_id);
 """
 
 
@@ -287,6 +301,60 @@ class LocationStore:
         with self._connect() as conn:
             cur = conn.execute(sql, (loc_id, json.dumps(fields, ensure_ascii=False)))
             return cur.rowcount > 0
+
+    # ------------------------------------------------------------------
+    # Location Verifications (BUG-26)
+    # ------------------------------------------------------------------
+
+    def add_verification(self, location_id: str, location_name: str,
+                         status: str, issue_type: str, comment: str,
+                         date: str) -> int:
+        """Legt einen neuen Verifikationseintrag an. Gibt die neue ID zurück."""
+        sql = """INSERT INTO location_verifications
+                 (location_id, location_name, status, issue_type, comment, date)
+                 VALUES (?, ?, ?, ?, ?, ?)"""
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                cur = conn.execute(sql, (location_id, location_name, status,
+                                         issue_type or "", comment or "", date))
+                conn.execute("COMMIT")
+                new_id = cur.lastrowid
+                logger.info("Verifikation gespeichert: %s (%s) id=%s", location_id, status, new_id)
+                return new_id
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def get_verifications(self, location_id: str) -> list:
+        """Gibt alle Verifikationen für eine Location zurück (älteste zuerst)."""
+        sql = """SELECT id, location_id, location_name, status, issue_type, comment, date
+                 FROM location_verifications
+                 WHERE location_id = ?
+                 ORDER BY id ASC"""
+        with self._connect() as conn:
+            rows = conn.execute(sql, (location_id,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def delete_last_verification(self, location_id: str) -> bool:
+        """Löscht den neuesten Eintrag für eine Location. True wenn gefunden."""
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                row = conn.execute(
+                    "SELECT id FROM location_verifications WHERE location_id = ? ORDER BY id DESC LIMIT 1",
+                    (location_id,)
+                ).fetchone()
+                if not row:
+                    conn.execute("ROLLBACK")
+                    return False
+                conn.execute("DELETE FROM location_verifications WHERE id = ?", (row["id"],))
+                conn.execute("COMMIT")
+                logger.info("Letzte Verifikation gelöscht: %s (id=%s)", location_id, row["id"])
+                return True
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
 
     def integrity_check(self) -> str:
         """Führt PRAGMA integrity_check aus. Gibt 'ok' zurück bei Erfolg."""

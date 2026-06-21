@@ -1252,6 +1252,61 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
 
 
 # ---------------------------------------------------------------------------
+# Location Verifications (BUG-26)
+# ---------------------------------------------------------------------------
+
+class VerificationIn(BaseModel):
+    location_name: str = ""
+    status: str          # 'ok' | 'issue'
+    issue_type: str = ""
+    comment: str = ""
+    date: str            # YYYY-MM-DD
+
+
+@app.get("/verifications")
+async def get_all_verifications():
+    """Gibt alle Verifikationen (alle Locations) zurück — für Frontend-Cache-Preload. Kein Auth."""
+    with _store._connect() as conn:
+        rows = conn.execute(
+            "SELECT id, location_id, location_name, status, issue_type, comment, date "
+            "FROM location_verifications ORDER BY id ASC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+@app.get("/locations/{loc_id}/verifications")
+async def get_verifications(loc_id: str):
+    """Gibt alle Verifikationen für eine Location zurück (älteste zuerst). Kein Auth nötig."""
+    return _store.get_verifications(loc_id)
+
+
+@app.post("/locations/{loc_id}/verifications", status_code=201)
+async def add_verification(loc_id: str, body: VerificationIn,
+                           _role: str = Depends(auth.require_auth)):
+    """Speichert eine neue Verifikation (user + host)."""
+    if body.status not in ("ok", "issue"):
+        raise HTTPException(status_code=422, detail="status muss 'ok' oder 'issue' sein.")
+    new_id = _store.add_verification(
+        location_id=loc_id,
+        location_name=body.location_name,
+        status=body.status,
+        issue_type=body.issue_type,
+        comment=body.comment,
+        date=body.date,
+    )
+    return {"ok": True, "id": new_id}
+
+
+@app.delete("/locations/{loc_id}/verifications/last", status_code=200)
+async def delete_last_verification(loc_id: str, _role: str = Depends(auth.require_auth)):
+    """Löscht den neuesten Verifikationseintrag für eine Location."""
+    found = _store.delete_last_verification(loc_id)
+    if not found:
+        raise HTTPException(status_code=404, detail="Keine Verifikation gefunden.")
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
 # Static Files (PWA) – muss NACH allen API-Routen kommen
 # ---------------------------------------------------------------------------
 import os, pathlib
