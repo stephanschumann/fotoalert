@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | TASK-21 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-83, US-84, US-85, US-87, BUG-21, TASK-21 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-83, US-84, US-85, US-87, US-88, BUG-21, BUG-27 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -184,7 +184,7 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
-### US-80 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[ ]`
+### US-88 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[ ]`
 
 | Feld | Wert |
 |------|------|
@@ -194,6 +194,77 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Im Brennweiten-Filter liegen 10, 14, 18, 21, 28 und 35 mm so nah beieinander, dass eine präzise Auswahl kaum möglich ist, während 300 und 600 mm sehr weit auseinanderliegen. Der Slider soll eine nicht-lineare Skalierung (z. B. logarithmisch oder mit definierten Stufen) erhalten, die im Weitwinkelbereich feinere Schritte und im Telebereich sinnvolle Zwischenstufen (400 mm, 500 mm) ermöglicht.
+
+---
+
+### BUG-27 · 365-Tage-Kalender leer, lädt keine Ereignisse `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-21 |
+
+**Beschreibung:** Der 365-Tage-Kalender ist leer und zeigt keine Ereignisse an. Mögliche Ursachen: Regression von BUG-14 (Kalender leer nach Cron-Lauf), defekter Cron-Lauf, oder Frontend-Ladefehler beim monatlichen Nachladen (`?month=X&year=Y`).
+
+**Bezug:** Mögliche Regression von BUG-14 [x] (Jahres- & 14-Tage-Kalender leer nach Cron-Lauf, Fix 2026-06-18); verwandt mit BUG-10 [x] (Mond-Alignments im Kalender).
+
+---
+
+**Scope:**
+Eingeschlossen: Leere-Response-Caching im Frontend fixen; Backend-Fallback wenn `calendar.json` fehlt/leer.
+Ausgeschlossen: Cron-Scheduling-Mechanismus (US-34), Push-Notifications.
+
+**Akzeptanzkriterien:**
+- [ ] Kalender zeigt Events des aktuellen Monats, wenn `calendar.json` auf dem Server vorhanden und nicht leer ist
+- [ ] Wenn Server `no_cache` zurückgibt: Frontend **cacht kein leeres Ergebnis** (kein `_monthCache.set`) — nächster Aufruf löst erneuten Fetch aus
+- [ ] Wenn Server `no_cache` zurückgibt: Toast „Kalender wird neu berechnet – bitte in 2 Min. neu laden" statt lautloser leerer Ansicht
+- [ ] Edge Case: Race-Condition — `show()` während `_loading=true` sorgt nach Abschluss trotzdem für `render()`-Aufruf (aktuell: silentes `return`)
+- [ ] Edge Case: `calendar.json` auf Server-Disk vorhanden und nicht leer → `/calendar?month=6&year=2026` liefert `status: ok` und `total > 0`
+
+**Pre-Mortem:**
+- 💀 Szenario: Server neu gestartet, `_calendar_cache = []`, App geöffnet → `no_cache` → Frontend speichert `[]` in `_monthCache` → Kalender bleibt für die Session leer, egal wie viele Male der User navigiert.
+  Auslöser: `_monthCache.set(key, res.events || [])` speichert auch bei `status=no_cache`.
+  Gegenmaßnahme: Nur bei `status === 'ok'` und `events.length > 0` cachen (→ AK 2).
+
+- 💀 Szenario: `show()` wird zweimal aufgerufen (Tab-Wechsel während Load) → zweiter Aufruf trifft `_loading=true` → `return` → `render()` wird nie aufgerufen nach dem Load.
+  Auslöser: `if (this._loading) return;` im `show()`-Pfad.
+  Gegenmaßnahme: Nach `loadMonth()` immer `render()` erzwingen (→ AK 4).
+
+- 💀 Szenario: `calendar.json` auf Disk fehlt/korrupt nach Deployment → Server-Start lädt leeren Cache → gleiche Kette wie oben.
+  Frühwarnung: Health-Alert im Log (HEALTH_CAL_MIN=10) — aber nur beim nächsten Cron-Lauf sichtbar, nicht sofort beim Server-Start.
+  Gegenmaßnahme: AK 5 + manuell `calendar.json` auf Server prüfen vor Deploy.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CalendarView: `show()`, `loadMonth()`, `_monthCache`), `backend/main.py` (`/calendar`-Endpoint, `_calendar_cache`), `backend/precompute.py` (`compute_calendar_incremental`)
+- [ ] Implementierungsoptionen: A / B
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Frontend-Fix: Leere Responses nicht cachen + Race-Fix + Toast
+- Vorgehen:
+  1. `loadMonth()`: nur cachen wenn `res.status === 'ok'` und `res.events.length > 0`; bei `no_cache`/leer: Toast + kein `_monthCache.set`
+  2. `show()`: nach `await this.loadMonth()` immer `if (Feed.mode === 'calendar') this.render()` aufrufen (Race-Fix)
+- Betroffene Dateien: `web/index.html` (~5 Zeilen)
+- Vorteile: Minimal-invasiv, behebt beide bekannten Frontend-Ursachen; kein Backend nötig
+- Nachteile: Löst nicht das Problem wenn `calendar.json` strukturell fehlt
+- Aufwand: klein
+
+### Option B — Backend-Fix + Frontend-Fix
+- Vorgehen: Option A + beim Server-Start prüfen ob `calendar.json` vorhanden/valide → ggf. auto-trigger Neuberechnung (non-blocking background task)
+- Betroffene Dateien: `web/index.html`, `backend/main.py` (startup event)
+- Vorteile: Resilienter nach Deployments/Server-Restart
+- Nachteile: Neuberechnung dauert 2–5 Minuten → User sieht in dieser Zeit immer noch leeren Kalender; erhöhte Startup-Last
+- Aufwand: mittel
+
+**Testplan:**
+- [ ] Automatisiert: `curl https://fotoalert.stephanschumann.com/calendar?month=6&year=2026` → `status: ok`, `total > 0`
+- [ ] Manuell: App öffnen → Kalender-Tab → Events sichtbar (nicht leer)
+- [ ] Manuell: Netzwerk drosseln, Tab wechseln während Load → nach Load erscheinen Events (Race-Fix)
 
 ---
 
@@ -1295,14 +1366,15 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > **Abhängigkeiten:** TASK-13 (braucht Deploy-Ziel), US-39 (Rollback-Strategie baut hierauf auf)
 
 
-### TASK-21 · Frontend-Test-Gate in CI einhängen (Playwright vor Deploy) `[ ]`
+### TASK-21 · Frontend-Test-Gate in CI einhängen (Playwright vor Deploy) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task (CI/CD) |
 | **Priorität** | Mittel |
-| **Status** | Inbox |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-20 |
+| **In Progress seit** | 2026-06-21 |
 | **Herkunft** | AK8 aus TASK-20 — herausgezogen beim Done-Abgleich von TASK-14 |
 
 **Beschreibung:** Die bereits implementierte Frontend-Testroutine (`backend/tests/frontend/`, TASK-20, Playwright/Option A) wird in `.github/workflows/deploy.yml` als Test-Gate **vor** dem Deploy-Step eingehängt. Aktuell deployt der Workflow direkt ohne Frontend-Regressionsprüfung.
@@ -1312,11 +1384,16 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - Ausgeschlossen: Änderungen an der Testroutine selbst (TASK-20, done); BACKLOG-Merge der Findings (bleibt Mac-seitig/Intake).
 
 **Akzeptanzkriterien:**
-- [ ] `deploy.yml`: Test-Job läuft vor dem Deploy-Job; Deploy nur bei grünem Test.
+- [~] `deploy.yml`: Test-Job `test-frontend` mit `needs: [test-frontend]` auf `deploy`; implementiert in `.github/workflows/deploy.yml`.
 - [ ] Playwright headless gegen `data_dev`-Instanz, Login via Test-PW-Secret.
 - [ ] Findings (`findings.json` + PNGs) als CI-Artefakt hochgeladen, **kein** Commit in der CI.
 - [ ] Roter Frontend-Lauf → Deploy wird nicht ausgeführt (Gate greift).
 - [ ] Schließt AK8 von TASK-20 ab.
+
+**GitHub Secrets (einmalig einrichten, falls noch nicht vorhanden):**
+- `FOTOALERT_USER_PASSWORD` — Playwright-Login (User-Passwort)
+- `FOTOALERT_HOST_PASSWORD` — Dev-Server Host-Passwort
+- `FOTOALERT_AUTH_SECRET` — Dev-Server Auth-Secret
 
 **Abhängigkeiten:** TASK-20 ✅ (Routine), TASK-14 ✅ (Pipeline)
 
