@@ -29,7 +29,7 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, US-71 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21, BUG-27 · **+ alle übrigen offenen Tickets unten** |
@@ -1785,16 +1785,17 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ---
 
-### US-71 · Drei-Zustand-Filter: Include / Exclude / Off `[~]`
+### US-71 · Drei-Zustand-Filter: Include / Exclude / Off `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **In Analysis seit** | 2026-06-21 |
 | **Implementiert** | 2026-06-21 (Option A) |
+| **Released** | 2026-06-21 · v1.9.0 |
 
 **Beschreibung:** Jedes Filterkriterium soll drei Zustände haben: 1. Klick → aktiv/include (gelber Rand, zeigt nur Ergebnisse die das Kriterium erfüllen), 2. Klick → exclude (roter Rand, blendet Ergebnisse mit diesem Kriterium aus), 3. Klick → inaktiv (kein Rahmen, keine Filterung). Wirkt auf alle Panels wie bisher.
 
