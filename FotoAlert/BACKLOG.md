@@ -28,7 +28,7 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | TASK-21 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -1366,15 +1366,16 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > **Abhängigkeiten:** TASK-13 (braucht Deploy-Ziel), US-39 (Rollback-Strategie baut hierauf auf)
 
 
-### TASK-21 · Frontend-Test-Gate in CI einhängen (Playwright vor Deploy) `[~]`
+### TASK-21 · Frontend-Test-Gate in CI einhängen (Playwright vor Deploy) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task (CI/CD) |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
 | **In Progress seit** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-21 (Release v1.8.5) |
 | **Herkunft** | AK8 aus TASK-20 — herausgezogen beim Done-Abgleich von TASK-14 |
 
 **Beschreibung:** Die bereits implementierte Frontend-Testroutine (`backend/tests/frontend/`, TASK-20, Playwright/Option A) wird in `.github/workflows/deploy.yml` als Test-Gate **vor** dem Deploy-Step eingehängt. Aktuell deployt der Workflow direkt ohne Frontend-Regressionsprüfung.
@@ -1384,16 +1385,11 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 - Ausgeschlossen: Änderungen an der Testroutine selbst (TASK-20, done); BACKLOG-Merge der Findings (bleibt Mac-seitig/Intake).
 
 **Akzeptanzkriterien:**
-- [~] `deploy.yml`: Test-Job `test-frontend` mit `needs: [test-frontend]` auf `deploy`; implementiert in `.github/workflows/deploy.yml`.
-- [ ] Playwright headless gegen `data_dev`-Instanz, Login via Test-PW-Secret.
-- [ ] Findings (`findings.json` + PNGs) als CI-Artefakt hochgeladen, **kein** Commit in der CI.
-- [ ] Roter Frontend-Lauf → Deploy wird nicht ausgeführt (Gate greift).
-- [ ] Schließt AK8 von TASK-20 ab.
-
-**GitHub Secrets (einmalig einrichten, falls noch nicht vorhanden):**
-- `FOTOALERT_USER_PASSWORD` — Playwright-Login (User-Passwort)
-- `FOTOALERT_HOST_PASSWORD` — Dev-Server Host-Passwort
-- `FOTOALERT_AUTH_SECRET` — Dev-Server Auth-Secret
+- [x] `deploy.yml`: Test-Job `test-frontend` mit `needs: [test-frontend]` auf `deploy`; implementiert in `.github/workflows/deploy.yml`.
+- [x] Playwright headless gegen `data_dev`-Instanz, Login via Test-PW-Secret.
+- [x] Findings (`findings.json` + PNGs) als CI-Artefakt hochgeladen, **kein** Commit in der CI.
+- [x] Roter Frontend-Lauf → Deploy wird nicht ausgeführt (Gate greift).
+- [x] Schließt AK8 von TASK-20 ab.
 
 **Abhängigkeiten:** TASK-20 ✅ (Routine), TASK-14 ✅ (Pipeline)
 
