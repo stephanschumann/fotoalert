@@ -2,9 +2,12 @@
 # Trigger: Push auf den main-Branch
 #
 # Voraussetzung (einmalig in GitHub unter Settings → Secrets einrichten):
-#   DEPLOY_SSH_KEY  – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
-#   SERVER_IP       – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
-#   SERVER_USER     – SSH-Username auf dem Server (fotoalert)
+#   DEPLOY_SSH_KEY           – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
+#   SERVER_IP                – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
+#   SERVER_USER              – SSH-Username auf dem Server (fotoalert)
+#   FOTOALERT_USER_PASSWORD  – Test-Passwort für Playwright-Login (TASK-21)
+#   FOTOALERT_HOST_PASSWORD  – Host-Passwort für Dev-Server (TASK-21)
+#   FOTOALERT_AUTH_SECRET    – Auth-Secret für Dev-Server (TASK-21)
 
 name: Deploy to Hetzner
 
@@ -16,9 +19,84 @@ on:
   workflow_dispatch:
 
 jobs:
+  # TASK-21: Frontend-Test-Gate — läuft VOR dem Deploy.
+  # Deploy startet nur wenn dieser Job grün ist (needs: [test-frontend]).
+  test-frontend:
+    name: Frontend-Check (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      FOTOALERT_ENV: dev
+      FOTOALERT_NO_BACKGROUND: "1"
+      FOTOALERT_HOST_PASSWORD: ${{ secrets.FOTOALERT_HOST_PASSWORD }}
+      FOTOALERT_USER_PASSWORD: ${{ secrets.FOTOALERT_USER_PASSWORD }}
+      FOTOALERT_AUTH_SECRET: ${{ secrets.FOTOALERT_AUTH_SECRET }}
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4.2.2
+
+      - name: Python 3.9 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Abhängigkeiten installieren
+        working-directory: FotoAlert/backend
+        run: pip install -r requirements.txt
+
+      - name: Playwright Chromium installieren
+        run: |
+          pip install playwright
+          python -m playwright install chromium
+
+      - name: Dev-Server starten
+        working-directory: FotoAlert/backend
+        run: |
+          python -m uvicorn main:app --host 127.0.0.1 --port 8000 \
+            > /tmp/fotoalert-ci-server.log 2>&1 &
+          echo $! > /tmp/fotoalert-ci-server.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health >/dev/null 2>&1; then
+              echo "✅ Server bereit nach ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://localhost:8000/health || \
+            { echo "❌ Server nicht bereit"; cat /tmp/fotoalert-ci-server.log; exit 1; }
+
+      - name: Frontend-Check ausführen
+        working-directory: FotoAlert/backend
+        run: |
+          python3 tests/frontend/run_frontend_check.py \
+            --base-url http://localhost:8000 \
+            --password "$FOTOALERT_USER_PASSWORD" \
+            --screenshot-root /tmp/qa-screenshots \
+            --findings-json /tmp/findings.json
+
+      - name: Findings + Screenshots als CI-Artefakt hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-findings-${{ github.run_id }}
+          path: |
+            /tmp/findings.json
+            /tmp/qa-screenshots/
+          if-no-files-found: ignore
+
+      - name: Dev-Server stoppen
+        if: always()
+        run: |
+          if [ -f /tmp/fotoalert-ci-server.pid ]; then
+            kill "$(cat /tmp/fotoalert-ci-server.pid)" 2>/dev/null || true
+          fi
+
   deploy:
     name: Deploy FotoAlert
     runs-on: ubuntu-latest
+    needs: [test-frontend]
 
     steps:
       - name: Code auschecken
