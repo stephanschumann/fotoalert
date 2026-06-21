@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, US-71 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-83, US-84, US-85, US-87, US-88, BUG-21, BUG-27 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21, BUG-27 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1785,16 +1785,84 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ---
 
-### US-71 · Drei-Zustand-Filter: Include / Exclude / Off `[ ]`
+### US-71 · Drei-Zustand-Filter: Include / Exclude / Off `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-19 |
+| **In Analysis seit** | 2026-06-21 |
+| **Implementiert** | 2026-06-21 (Option A) |
 
 **Beschreibung:** Jedes Filterkriterium soll drei Zustände haben: 1. Klick → aktiv/include (gelber Rand, zeigt nur Ergebnisse die das Kriterium erfüllen), 2. Klick → exclude (roter Rand, blendet Ergebnisse mit diesem Kriterium aus), 3. Klick → inaktiv (kein Rahmen, keine Filterung). Wirkt auf alle Panels wie bisher.
+
+---
+
+#### 🔬 Analyse (2026-06-21)
+
+**Scope-Entscheidung (Stephan, 2026-06-21):** Drei-Zustand nur für die **kategorialen Mehrfachauswahl-Chips** — 📷 Eventtyp, 🕐 Tageszeit, 🎯 Schwierigkeitsgrad. Begründung: Include/Exclude/Off hat nur für kategoriale Werte saubere Semantik.
+
+- **Eingeschlossen:** Drei-Zustand-Zyklus (Off → Include → Exclude → Off) für Eventtyp, Tageszeit, Schwierigkeitsgrad in allen Ansichten, die das Kriterium heute kennen (Chancen-Feed, Kalender, Scout; Schwierigkeit zusätzlich in Locations). Rotrand-Styling für Exclude. Badge/activeCount zählt Excludes mit.
+- **Ausgeschlossen:** Slider (🔭 Brennweite, 🎯 Mindest-Wahrscheinlichkeit) und Schwellen-/Einzelauswahl (⭐ Bewertung, 📍 Entfernung, ✅ Verifikation) — bleiben unverändert. Kein Exclude für diese.
+
+**Example Mapping:**
+
+📏 *Rule 1* — Ein kategorialer Chip durchläuft im Klick-Zyklus 3 Zustände: Off → Include (Goldrand) → Exclude (Rotrand) → Off.
+- 🟢 *Given* Eventtyp-Chip „Mond-Alignment" Off. *When* 1× Klick → nur Mond-Alignment sichtbar, Chip Goldrand. *When* 2× Klick → alle **außer** Mond-Alignment, Chip Rotrand. *When* 3× Klick → keine Eventtyp-Filterung, kein Rand.
+
+📏 *Rule 2* — Innerhalb eines Kriteriums: Includes als OR (zeige wenn Wert ∈ Includes), Excludes als NOT (verstecke wenn Wert ∈ Excludes). Ein Wert kann durch den Zyklus nie gleichzeitig incl+excl sein.
+- 🟢 *Given* Tageszeit Include „Morgens" + Exclude „Nacht". *When* gefiltert → nur Morgens-Events (Tag/Abend/Nacht fallen weg, weil Include aktiv).
+- 🟢 *Given* nur Exclude „Anspruchsvoll" (kein Include). *When* gefiltert → alle Schwierigkeiten außer Anspruchsvoll.
+
+📏 *Rule 3* — Wirkt einheitlich auf alle Ansichten, die das Kriterium heute filtern. „Goldene Stunde" expandiert auch beim Exclude auf beide Backend-Werte (`Goldene Stunde Morgen/Abend`).
+
+**Akzeptanzkriterien:**
+- [ ] Klick-Zyklus: 3 Klicks auf einen Eventtyp/Tageszeit/Schwierigkeit-Chip durchlaufen Off → Include (Goldrand) → Exclude (Rotrand) → Off und zurück.
+- [ ] Include-Semantik unverändert: bei aktiven Includes werden nur passende Ergebnisse gezeigt (wie heute).
+- [ ] Exclude-Semantik: Chip im Exclude-Zustand blendet Ergebnisse mit diesem Wert aus; bei reinem Exclude (kein Include) sind alle übrigen Werte sichtbar.
+- [ ] Wirkt in Chancen-Feed, Kalender und Scout; Schwierigkeit-Exclude wirkt auch in der Locations-Liste.
+- [ ] „Goldene Stunde" exclude blendet sowohl `Goldene Stunde Morgen` als auch `Goldene Stunde Abend` aus.
+- [ ] Filter-Badge/activeCount erhöht sich auch wenn nur Excludes gesetzt sind.
+- [ ] „Alle zurücksetzen" löscht Include- und Exclude-Zustände.
+- [ ] Live-Result-Count (`↳ N von M sichtbar`) berücksichtigt Excludes.
+- [ ] Edge Case: alter gespeicherter Filter-State ohne Exclude-Felder lädt fehlerfrei (keine `undefined.includes`-Fehler).
+- [ ] Edge Case: Include + criterion-übergreifendes Exclude, das 0 Ergebnisse liefert → Result-Count zeigt „0 sichtbar"-Warnung (bestehendes Verhalten), kein Crash.
+
+**Pre-Mortem:**
+- 💀 *Exclude wirkt in einer Ansicht nicht* (z.B. Scout vergessen) → inkonsistente Ergebnisse. → Gegenmaßnahme: Exclude-Check in `apply`, `applyToLocations`, `applyToScout`; je ein AK pro Ansicht.
+- 💀 *„Goldene Stunde"-Mapping beim Exclude vergessen* → Ausschluss blendet nichts aus (Backend-Werte heißen `Goldene Stunde Morgen/Abend`). → Gegenmaßnahme: `ET_EXPAND` auch auf Exclude-Array anwenden; eigenes AK.
+- 💀 *localStorage-Migration bricht JS* → alte gespeicherte Filter ohne `*Excl`-Arrays → `undefined.includes`. → Gegenmaßnahme: `_defaults()` liefert leere Excl-Arrays, `Object.assign`-Merge; AK + manueller Test mit altem State.
+- 💀 *Badge zählt Excludes nicht* → Nutzer sieht aktiven Filter nicht. → Gegenmaßnahme: `activeCount()` um Excl-Arrays erweitern; AK.
+- 💀 *Routine-Event-Default kollidiert* (US-40: bei leerem Eventtyp-Include werden Routine-Events ausgeblendet) → unklare Wirkung wenn nur Exclude gesetzt. → Gegenmaßnahme: Default-Regel bleibt an „Include leer" gekoppelt (Exclude ändert sie nicht); im Code-Kommentar + Test festhalten.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Scope-Frage geklärt (nur kategoriale Chips)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` — `Filter` (`_defaults`/`apply`/`applyToLocations`/`applyToScout`/`activeCount`, Z. 1871–2058) + `FilterSheet` (`_render`/`_toggle`/`chip`, Z. 2060–2350) + CSS `.filter-chip` (Z. 342–345). Reines Frontend, kein Backend/keine pytest-Abdeckung.
+- [x] Implementierungsoptionen: A (Split-Arrays) / B (Object-State)
+- [ ] Empfehlung: **Option A** — wartet auf Stephans Weg-Gate
+
+**Implementierungsoptionen:**
+
+*Option A — Split-Arrays (je Kriterium ein Include- + ein Exclude-Array)* · Aufwand: klein
+- Vorgehen: Bestehende `eventTypes`/`tageszeit`/`difficulty` bleiben die Include-Arrays (rückwärtskompatibel); neu `eventTypesExcl`/`tageszeitExcl`/`difficultyExcl` in `_defaults()`. Chip-Klick wird zu `_cycle(key, val)`: off→incl→excl→off. In `apply`/`applyToLocations`/`applyToScout` je ein zusätzlicher Exclude-Check. `activeCount` + Result-Count erweitern. Neue Drei-Zustand-`chip()`-Variante + CSS `.filter-chip.exclude` (Rotrand).
+- Betroffene Dateien: nur `web/index.html`.
+- Vorteile: rückwärtskompatibel mit gespeichertem State; minimale, lokale Änderungen an bestehender Filterlogik; bestehende Include-Pfade bleiben unangetastet.
+- Nachteile/Risiken: zwei Arrays pro Kriterium (etwas mehr State-Felder).
+
+*Option B — Object-State (`{wert: 'incl'|'excl'}` statt Array)* · Aufwand: mittel
+- Vorgehen: `eventTypes` etc. werden Objekte; alle `.includes()`-Lesestellen und das Scout-`body_name`-Mapping umschreiben.
+- Vorteile: ein Feld pro Kriterium, ausdrucksstärker.
+- Nachteile/Risiken: bricht gespeicherten localStorage-State (Migration nötig); berührt jede Lesestelle → größere Regressionsfläche; mehr Pre-Mortem-Risiko 3.
+
+✅ **Empfehlung: Option A** — kleinster Eingriff, rückwärtskompatibel, hält die bewährten Include-Pfade stabil und isoliert das neue Verhalten auf additive Exclude-Checks.
+
+**Testplan:**
+- [ ] Automatisiert: keine pytest-Abdeckung (reines Frontend). Optional kleine JS-Konsolen-Asserts für `Filter.apply` mit Fixture-Daten.
+- [ ] Manuell (http://localhost:8000): je Kriterium 3-Klick-Zyklus prüfen (Gold→Rot→aus); Exclude „Goldene Stunde" → beide Routine-Varianten weg; Exclude in Scout + Kalender + Locations; Badge bei reinem Exclude; „Alle zurücksetzen"; alten Filter-State im localStorage simulieren und Sheet öffnen (kein Crash).
 
 ---
 
@@ -2053,6 +2121,21 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 ---
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
+
+### BUG-28 · Schwierigkeitsfilter im Chancen-Feed wirkungslos bis Locations-Tab besucht wurde `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-21 |
+
+**Beschreibung:** Der Schwierigkeitsfilter (Include **und** Exclude) hat im Chancen-Feed und Kalender keinen Effekt, solange `Locations.all` leer ist. Beobachtet: Include „Anspruchsvoll" zeigt im Feed weiterhin alle 111 sichtbaren Chancen, obwohl nur 5 von 56 Locations difficulty 3 haben. Erwartet: Filterung greift sofort. Ursache: `Filter.apply()` schlägt `loc.difficulty` über `Locations.all` nach, das aber erst beim Öffnen des Locations-Tabs (oder nach Location-Speichern) geladen wird — nicht beim App-Start auf dem Feed. Fix-Richtung: `Locations.all` beim Boot laden (oder lazy nachladen, wenn ein Schwierigkeitsfilter aktiv ist und die Liste leer ist).
+
+**Bezug:** Vorbestehend seit US-32 (kombiniertes Filtersystem); durch US-71 (Drei-Zustand-Filter) sichtbar geworden, aber nicht von US-71 verursacht — betrifft die Include-Logik identisch. Eigenständig, grenzt an US-71.
+
+---
 
 ### US-83 · Scout-Eintrag: Detailansicht + „Als Location speichern" `[ ]`
 

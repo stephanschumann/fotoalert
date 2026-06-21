@@ -344,6 +344,9 @@
       cursor: pointer; transition: all .15s; user-select: none; }
     .filter-chip.active { border-color: var(--gold); color: var(--gold);
       background: var(--gold-dim); }
+    /* US-71: Exclude-Zustand (Rotrand) */
+    .filter-chip.exclude { border-color: var(--red); color: var(--red);
+      background: rgba(224,80,80,.14); }
     .filter-actions { padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; flex-shrink: 0; }
     .filter-slider-wrap { padding: 4px 0 2px; }
     .filter-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
@@ -930,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.8.6';
+const APP_VERSION = '1.9.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1873,7 +1876,10 @@ const Filter = {
   _gps: null,
 
   _defaults() {
-    return { eventTypes: [], tageszeit: [], difficulty: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
+    // US-71: kategoriale Chips haben Include- (eventTypes/tageszeit/difficulty)
+    // und Exclude-Arrays (*Excl). Alte gespeicherte States ohne *Excl werden
+    // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
   },
 
   get state() {
@@ -1895,9 +1901,10 @@ const Filter = {
 
   activeCount() {
     const s = this.state;
-    return (s.eventTypes.length > 0 ? 1 : 0) +
-           (s.tageszeit.length > 0 ? 1 : 0) +
-           (s.difficulty.length > 0 ? 1 : 0) +
+    // US-71: Include- ODER Exclude-Belegung zählt als aktives Kriterium
+    return ((s.eventTypes.length || s.eventTypesExcl.length) ? 1 : 0) +
+           ((s.tageszeit.length || s.tageszeitExcl.length) ? 1 : 0) +
+           ((s.difficulty.length || s.difficultyExcl.length) ? 1 : 0) +
            (s.minRating > 0 ? 1 : 0) +
            (s.minScore > 0 ? 1 : 0) +
            (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
@@ -1921,15 +1928,19 @@ const Filter = {
     const s = this.state;
     // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
     const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
-    const expanded = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
+    const expanded     = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
+    const expandedExcl = s.eventTypesExcl.flatMap(t => ET_EXPAND[t] || [t]);  // US-71
     return data.filter(o => {
       if (s.eventTypes.length) {
         if (!expanded.includes(o.event_type)) return false;
       } else {
-        // Default: Routine-Events (täglich) ausblenden; opt-in via Eventtyp-Filter
+        // Default: Routine-Events (täglich) ausblenden; opt-in via Eventtyp-Filter.
+        // US-71: Default bleibt an "Include leer" gekoppelt; Exclude ändert ihn nicht.
         if (this._ROUTINE_TYPES.includes(o.event_type)) return false;
       }
-      if (s.tageszeit.length) {
+      // US-71: Exclude — Events mit ausgeschlossenem Typ ausblenden
+      if (expandedExcl.length && expandedExcl.includes(o.event_type)) return false;
+      if (s.tageszeit.length || s.tageszeitExcl.length) {
         // Exakte Skyfield-Zeiten aus dem Backend nutzen (pro Location/Datum berechnet)
         // Fallback auf sunrise/sunset ± Margins wenn Detailfelder noch nicht im Cache
         const tm = new Date(o.shoot_time).getTime();
@@ -1951,11 +1962,15 @@ const Filter = {
           else if (tm >= ss - 90*60000 && tm <= ss + 45*60000) slot = 'abend';
           else if (tm > sr + 90*60000 && tm < ss - 90*60000) slot = 'tag';
         }
-        if (!s.tageszeit.includes(slot)) return false;
+        if (s.tageszeit.length && !s.tageszeit.includes(slot)) return false;
+        if (s.tageszeitExcl.length && s.tageszeitExcl.includes(slot)) return false;  // US-71
       }
-      if (s.difficulty.length) {
+      if (s.difficulty.length || s.difficultyExcl.length) {
         const loc = (Locations.all || []).find(l => l.id === o.location_id);
-        if (loc && !s.difficulty.includes(loc.difficulty)) return false;
+        if (loc) {
+          if (s.difficulty.length && !s.difficulty.includes(loc.difficulty)) return false;
+          if (s.difficultyExcl.length && s.difficultyExcl.includes(loc.difficulty)) return false;  // US-71
+        }
       }
       if (s.minRating > 0 && (Rating.get(o.location_id) || 0) < s.minRating) return false;
       if (s.minScore > 0 && o.overall_score < s.minScore / 100) return false;
@@ -1993,6 +2008,7 @@ const Filter = {
     const s = this.state;
     return locs.filter(l => {
       if (s.difficulty.length && !s.difficulty.includes(l.difficulty)) return false;
+      if (s.difficultyExcl.length && s.difficultyExcl.includes(l.difficulty)) return false;  // US-71
       if (s.minRating > 0 && (Rating.get(l.id) || 0) < s.minRating) return false;
       if (s.verification !== 'all') {
         const last = Verify.getLast(l.id);
@@ -2020,15 +2036,21 @@ const Filter = {
     const BODY_FILTER = new Set();
     if (s.eventTypes.includes('Mond-Alignment'))   BODY_FILTER.add('moon');
     if (s.eventTypes.includes('Sonnen-Alignment')) BODY_FILTER.add('sun');
+    // US-71: Exclude-Mapping (Mond-/Sonnen-Alignment ausschließen)
+    const BODY_EXCL = new Set();
+    if (s.eventTypesExcl.includes('Mond-Alignment'))   BODY_EXCL.add('moon');
+    if (s.eventTypesExcl.includes('Sonnen-Alignment')) BODY_EXCL.add('sun');
     return data.filter(o => {
       // Körpertyp-Filter (US-81): nur ausgewählte Himmelskörper zeigen
       if (BODY_FILTER.size > 0 && !BODY_FILTER.has(o.body_name)) return false;
+      if (BODY_EXCL.size > 0 && BODY_EXCL.has(o.body_name)) return false;  // US-71
       // Tageszeit: Scout-Sessions auf morgen/abend mappen
-      if (s.tageszeit.length) {
+      if (s.tageszeit.length || s.tageszeitExcl.length) {
         let slot = 'nacht';
         if (MORGEN.includes(o.session)) slot = 'morgen';
         else if (ABEND.includes(o.session)) slot = 'abend';
-        if (!s.tageszeit.includes(slot)) return false;
+        if (s.tageszeit.length && !s.tageszeit.includes(slot)) return false;
+        if (s.tageszeitExcl.length && s.tageszeitExcl.includes(slot)) return false;  // US-71
       }
       // Score (Scout: o.score; Feed: o.overall_score — unterschiedliche Feldnamen!)
       if (s.minScore > 0 && o.score < s.minScore / 100) return false;
@@ -2228,6 +2250,25 @@ const FilterSheet = {
     this._applyLive();
   },
 
+  // US-71: Drei-Zustand-Zyklus für kategoriale Chips: Off → Include → Exclude → Off
+  _cycle(inclKey, exclKey, val) {
+    const s = Filter.state;
+    const incl = [...(s[inclKey] || [])];
+    const excl = [...(s[exclKey] || [])];
+    const i = incl.indexOf(val), e = excl.indexOf(val);
+    if (i >= 0) {                       // Include → Exclude
+      incl.splice(i, 1); excl.push(val);
+    } else if (e >= 0) {                // Exclude → Off
+      excl.splice(e, 1);
+    } else {                           // Off → Include
+      incl.push(val);
+    }
+    Filter.save({ [inclKey]: incl, [exclKey]: excl });
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
   _onScoreSlider(el) {
     const v = parseInt(el.value);
     el.style.setProperty('--pct', v + '%');
@@ -2271,13 +2312,20 @@ const FilterSheet = {
     const s = Filter.state;
     const chip = (label, active, onclick) =>
       `<span class="filter-chip${active ? ' active' : ''}" onclick="${onclick}">${label}</span>`;
+    // US-71: Drei-Zustand-Chip. state: 'incl' (Goldrand) | 'excl' (Rotrand) | 'off'
+    const chip3 = (label, state, onclick) => {
+      const cls = state === 'incl' ? ' active' : state === 'excl' ? ' exclude' : '';
+      return `<span class="filter-chip${cls}" onclick="${onclick}">${label}</span>`;
+    };
+    const state3 = (incl, excl, v) =>
+      incl.includes(v) ? 'incl' : excl.includes(v) ? 'excl' : 'off';
 
     const etChips = this._ET.map(([v, l]) =>
-      chip(`${ICONS[v] || '📷'} ${l}`, s.eventTypes.includes(v),
-        `FilterSheet._toggle('eventTypes','${v.replace(/'/g, "\\'")}')`)).join('');
+      chip3(`${ICONS[v] || '📷'} ${l}`, state3(s.eventTypes, s.eventTypesExcl, v),
+        `FilterSheet._cycle('eventTypes','eventTypesExcl','${v.replace(/'/g, "\\'")}')`)).join('');
 
     const diffChips = [[1,'🟢 Einfach'],[2,'🟡 Mittel'],[3,'🔴 Anspruchsvoll']]
-      .map(([v,l]) => chip(l, s.difficulty.includes(v), `FilterSheet._toggle('difficulty',${v})`)).join('');
+      .map(([v,l]) => chip3(l, state3(s.difficulty, s.difficultyExcl, v), `FilterSheet._cycle('difficulty','difficultyExcl',${v})`)).join('');
 
     const ratingChips = [[0,'Alle'],[1,'≥ ★☆☆☆☆'],[2,'≥ ★★☆☆☆'],[3,'≥ ★★★☆☆'],[4,'≥ ★★★★☆'],[5,'★★★★★']]
       .map(([v,l]) => chip(l, s.minRating===v, `FilterSheet._set('minRating',${v})`)).join('');
@@ -2292,7 +2340,7 @@ const FilterSheet = {
       ? '<p style="font-size:11px;color:var(--muted);margin-top:8px">📍 GPS wird beim Anwenden abgefragt</p>' : '';
 
     const tzChips = [['morgen','🌄 Morgens'],['tag','☀️ Tagsüber'],['abend','🌇 Abends'],['nacht','🌙 Nacht']]
-      .map(([v,l]) => chip(l, s.tageszeit.includes(v), `FilterSheet._toggle('tageszeit','${v}')`)).join('');
+      .map(([v,l]) => chip3(l, state3(s.tageszeit, s.tageszeitExcl, v), `FilterSheet._cycle('tageszeit','tageszeitExcl','${v}')`)).join('');
 
     const scoreLabel = s.minScore === 0 ? 'Alle' : `≥ ${s.minScore} %`;
     const scorePct = s.minScore + '%';
@@ -2325,7 +2373,8 @@ const FilterSheet = {
         </div>`;
 
     document.getElementById('filter-content').innerHTML =
-      `<div class="filter-section"><h4>📷 Eventtyp</h4><div class="filter-chips">${etChips}</div></div>` +
+      `<div class="filter-section"><h4>📷 Eventtyp</h4><div class="filter-chips">${etChips}</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Gilt auch für Tageszeit & Schwierigkeit.</p></div>` +
       `<div class="filter-section"><h4>🕐 Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
       scoreSection +
       `<div class="filter-section"><h4>🔭 Brennweite</h4>
