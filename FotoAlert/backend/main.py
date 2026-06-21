@@ -1307,6 +1307,62 @@ async def delete_last_verification(loc_id: str, _role: str = Depends(auth.requir
 
 
 # ---------------------------------------------------------------------------
+# Location Ratings (US-89)
+# ---------------------------------------------------------------------------
+
+class RatingIn(BaseModel):
+    value: int
+    device_id: str
+
+
+@app.get("/ratings")
+async def get_all_ratings():
+    """
+    Gibt alle Roh-Bewertungen (alle Locations, alle Geräte) zurück —
+    für den Frontend-Boot-Cache. Kein Auth. Frontend aggregiert client-seitig
+    und leitet `mine` aus dem eigenen device_id ab (analog /verifications).
+    """
+    return _store.load_all_ratings()
+
+
+@app.get("/locations/{loc_id}/ratings")
+async def get_ratings(loc_id: str, device_id: str = ""):
+    """
+    Aggregat einer Location: {count, avg, mine}. Kein Auth.
+    avg auf 1 Nachkommastelle, null bei count=0. mine = Wert des Geräts oder null.
+    """
+    return _store.get_rating_summary(loc_id, device_id or None)
+
+
+@app.post("/locations/{loc_id}/ratings", status_code=201)
+async def upsert_rating(loc_id: str, body: RatingIn,
+                        _role: str = Depends(auth.require_auth)):
+    """Speichert/aktualisiert die Bewertung eines Geräts (Upsert). value 1–5."""
+    if body.value < 1 or body.value > 5:
+        raise HTTPException(status_code=422, detail="value muss zwischen 1 und 5 liegen.")
+    if not body.device_id:
+        raise HTTPException(status_code=422, detail="device_id ist erforderlich.")
+    updated = datetime.now(timezone.utc).isoformat()
+    _store.upsert_rating(
+        location_id=loc_id,
+        device_id=body.device_id,
+        value=body.value,
+        updated=updated,
+    )
+    return {"ok": True, **_store.get_rating_summary(loc_id, body.device_id)}
+
+
+@app.delete("/locations/{loc_id}/ratings", status_code=200)
+async def delete_rating(loc_id: str, device_id: str = "",
+                        _role: str = Depends(auth.require_auth)):
+    """Löscht die Bewertung des aufrufenden Geräts. device_id als Query-Param."""
+    if not device_id:
+        raise HTTPException(status_code=422, detail="device_id ist erforderlich.")
+    _store.delete_rating(loc_id, device_id)
+    return {"ok": True, **_store.get_rating_summary(loc_id, device_id)}
+
+
+# ---------------------------------------------------------------------------
 # Static Files (PWA) – muss NACH allen API-Routen kommen
 # ---------------------------------------------------------------------------
 import os, pathlib

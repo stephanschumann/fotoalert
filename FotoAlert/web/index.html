@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '1.10.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1400,6 +1400,9 @@ const CalendarView = {
       el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird geladen…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
       await this.loadMonth();
       this._loading = false;
+      // BUG-27: Race-Fix — render immer nach load, auch wenn show() während _loading erneut aufgerufen wurde
+      if (Feed.mode === 'calendar') this.render();
+      return;
     }
     if (Feed.mode === 'calendar') this.render();
   },
@@ -1413,9 +1416,19 @@ const CalendarView = {
         await new Promise(r => setTimeout(r, 5000));
         return this.loadMonth(retries - 1);
       }
-      this._monthCache.set(this._cacheKey(), res.events || []);
+      // BUG-27: Leere Responses nicht cachen — sonst bleibt der Kalender für die Session leer
+      // auch wenn der Server später valide Daten liefert. Nur bei status=ok + Events cachen.
+      if (res.status === 'no_cache') {
+        toast('Kalender wird neu berechnet – bitte in 2 Min. neu laden');
+        return;
+      }
+      const events = res.events || [];
+      if (events.length > 0) {
+        this._monthCache.set(this._cacheKey(), events);
+      }
+      // status=ok mit 0 Events: nicht cachen (möglicherweise Server-Datenproblem);
+      // nächster Aufruf triggert erneuten Fetch.
     } catch(e) {
-      this._monthCache.set(this._cacheKey(), []);
       toast('Kalender konnte nicht geladen werden');
     }
   },
@@ -1773,26 +1786,77 @@ const Verify = {
 };
 
 // ═══════════════════════════════════════════════════════
-// STAR RATING (US-24)
+// STAR RATING (US-24 → US-89: serverseitig + geräteübergreifend aggregiert)
 // ═══════════════════════════════════════════════════════
 const Rating = {
-  _KEY: 'fotoalert_ratings',
+  _KEY: 'fotoalert_ratings',          // nur noch für Migration aus localStorage
+  _DEVICE_KEY: 'fa_device_id',
+  _cache: {},   // { [locationId]: { count, sum } }  → Aggregat für Ø + Anzahl
+  _mine: {},    // { [locationId]: value }            → eigene Bewertung (synchron)
 
-  getAll() {
-    try { return JSON.parse(localStorage.getItem(this._KEY) || '{}'); } catch { return {}; }
+  // ── Geräte-Identität (US-89): UUID lazy in localStorage ──────────
+  deviceId() {
+    let id = localStorage.getItem(this._DEVICE_KEY);
+    if (!id) {
+      id = (crypto.randomUUID && crypto.randomUUID()) ||
+           ('dev-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      localStorage.setItem(this._DEVICE_KEY, id);
+    }
+    return id;
   },
+
+  // ── Datenzugriff (synchron, aus In-Memory-Cache) ─────────────────
   get(locationId) {
-    return this.getAll()[locationId] || null;
+    // eigene Bewertung – Filter-kompatibel (synchron)
+    return this._mine[locationId] || null;
   },
-  set(locationId, value) {
-    const all = this.getAll();
-    all[locationId] = value;
-    localStorage.setItem(this._KEY, JSON.stringify(all));
+  summary(locationId) {
+    const c = this._cache[locationId];
+    if (!c || !c.count) return { count: 0, avg: null };
+    return { count: c.count, avg: Math.round((c.sum / c.count) * 10) / 10 };
   },
-  remove(locationId) {
-    const all = this.getAll();
-    delete all[locationId];
-    localStorage.setItem(this._KEY, JSON.stringify(all));
+
+  // ── Backend-Laden: alle Roh-Bewertungen beim App-Start ───────────
+  async loadAll() {
+    try {
+      const all = await API.get('/ratings');
+      this._cache = {};
+      this._mine = {};
+      const myDev = this.deviceId();
+      for (const r of all) {
+        if (!this._cache[r.location_id]) this._cache[r.location_id] = { count: 0, sum: 0 };
+        this._cache[r.location_id].count += 1;
+        this._cache[r.location_id].sum += r.value;
+        if (r.device_id === myDev) this._mine[r.location_id] = r.value;
+      }
+    } catch(e) {
+      // Netzwerkfehler → leerer Cache (degraded, aber stabil; get() liefert null)
+    }
+  },
+
+  // ── Einmalige Migration localStorage → Backend ───────────────────
+  async migrateFromLocalStorage() {
+    const raw = localStorage.getItem(this._KEY);
+    if (!raw) return;
+    try {
+      const all = JSON.parse(raw);
+      const dev = this.deviceId();
+      for (const [locId, value] of Object.entries(all)) {
+        const v = parseInt(value, 10);
+        if (!(v >= 1 && v <= 5)) continue;
+        try {
+          await API.post(`/locations/${locId}/ratings`, { value: v, device_id: dev });
+        } catch {}
+      }
+      localStorage.removeItem(this._KEY);
+    } catch { localStorage.removeItem(this._KEY); }
+  },
+
+  // ── Aggregat-Label (Ø + Anzahl) ──────────────────────────────────
+  _aggLabel(locationId) {
+    const s = this.summary(locationId);
+    if (!s.count) return '';
+    return `Ø ${s.avg.toFixed(1)} · ${s.count} Bewertung${s.count > 1 ? 'en' : ''}`;
   },
 
   // ── Interaktive Sterne-Eingabe (für Location-Detail-Sheet) ──────
@@ -1808,6 +1872,10 @@ const Rating = {
     const label = current
       ? `<span style="font-size:13px;color:var(--gold);font-weight:600">${labels[current]}</span>`
       : `<span style="font-size:12px;color:var(--muted)">Noch nicht bewertet – Stern tippen</span>`;
+    const agg = this._aggLabel(locationId);
+    const aggHtml = agg
+      ? `<div style="margin-top:4px;font-size:12px;color:var(--muted)">${agg}</div>`
+      : '';
     const clearBtn = current
       ? `<button class="btn-verify-cancel" style="font-size:11px;padding:4px 10px;margin-top:8px"
            onclick="Rating._clear('${locationId}')">Bewertung löschen</button>`
@@ -1815,36 +1883,51 @@ const Rating = {
     return `<div id="rating-section-${safe}">
       <div class="star-input">${stars}</div>
       <div style="margin-top:4px">${label}</div>
+      ${aggHtml}
       ${clearBtn}
     </div>`;
   },
 
-  // ── Kompakte Anzeige für Location-Card ──────────────────────────
+  // ── Kompakte Anzeige für Location-Card (Aggregat: Ø + Anzahl) ────
   displayHtml(locationId) {
-    const v = this.get(locationId);
-    if (!v) return '';
-    const stars = [1,2,3,4,5].map(i =>
-      `<span class="s ${i<=v?'on':'off'}">★</span>`
-    ).join('');
-    return `<span class="tag tag-gold" style="display:inline-flex;align-items:center;gap:1px;padding:2px 5px">
-      <span class="star-display">${stars}</span>
+    const s = this.summary(locationId);
+    if (!s.count) return '';
+    return `<span class="tag tag-gold" style="display:inline-flex;align-items:center;gap:3px;padding:2px 5px">
+      <span>★ ${s.avg.toFixed(1)}</span>
+      <span style="opacity:.7;font-size:10px">(${s.count})</span>
     </span>`;
   },
 
-  // ── Kompakte Anzeige für Feed-Card ──────────────────────────────
+  // ── Kompakte Anzeige für Feed-Card (Aggregat) ───────────────────
   feedTagHtml(locationId) {
-    const v = this.get(locationId);
-    if (!v) return '';
-    return `<span class="tag tag-gold">⭐ ${'★'.repeat(v)}${'☆'.repeat(5-v)}</span>`;
+    const s = this.summary(locationId);
+    if (!s.count) return '';
+    return `<span class="tag tag-gold">⭐ ${s.avg.toFixed(1)} (${s.count})</span>`;
   },
 
-  _set(locationId, value) {
-    this.set(locationId, value);
+  async _set(locationId, value) {
+    try {
+      await API.post(`/locations/${locationId}/ratings`, { value, device_id: this.deviceId() });
+    } catch(e) { toast('Fehler beim Speichern'); return; }
+    // Cache aktualisieren: bestehende eigene Bewertung berücksichtigen
+    const prev = this._mine[locationId];
+    if (!this._cache[locationId]) this._cache[locationId] = { count: 0, sum: 0 };
+    if (prev != null) { this._cache[locationId].sum += (value - prev); }
+    else { this._cache[locationId].count += 1; this._cache[locationId].sum += value; }
+    this._mine[locationId] = value;
     this._refresh(locationId);
     toast('⭐ Bewertung gespeichert');
   },
-  _clear(locationId) {
-    this.remove(locationId);
+  async _clear(locationId) {
+    try {
+      await API.delete(`/locations/${locationId}/ratings?device_id=${encodeURIComponent(this.deviceId())}`);
+    } catch(e) { toast('Fehler beim Löschen'); return; }
+    const prev = this._mine[locationId];
+    if (prev != null && this._cache[locationId]) {
+      this._cache[locationId].count -= 1;
+      this._cache[locationId].sum -= prev;
+    }
+    delete this._mine[locationId];
     this._refresh(locationId);
     toast('Bewertung gelöscht');
   },
@@ -2661,6 +2744,65 @@ const Detail = {
                </span>
              </div>` : '';
         return mkSec('ev_topo','📏 Standort &amp; Topographie',`${distRow}${elevRow}`);
+      })()}
+      ${(() => {
+        // US-67 · Himmelsposition: Klartext-Zusammenfassung relativ zur Motivspitze.
+        // Gate: nur Alignment-Events. composition_analysis allein reicht NICHT, weil das
+        // Backend es auch für Goldene/Blaue Stunde & Milchstraße setzt (Motiv-Geometrie +
+        // Sonnen-/Himmelsposition vorhanden). Daher zusätzlich die Nicht-Alignment-Typen
+        // ausschließen — Spiegel von precompute._ALIGNMENT_FILTER_EXEMPT.
+        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Milchstraße','Meteoritenschauer','Sonnenfinsternis']);
+        const ca = o.composition_analysis;
+        if (!ca || EV_SKYPOS_EXEMPT.has(o.event_type)) return '';
+        const body = ca.body_name || 'Objekt';
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        const bodyHtml = esc(body);
+        // Meter-Formatierung NUR aus gecachten Cache-Werten (keine Neuberechnung).
+        const fmtM = v => Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(2).replace('.', ',') + ' km' : Math.abs(v).toFixed(0) + ' m';
+        const azDelta = ca.azimuth_delta_deg;
+        const altDelta = ca.altitude_delta_deg;
+        const lOff = ca.lateral_offset_m;
+        const vOff = ca.vertical_offset_m;
+        // Schwellwort auf den Betrag des Deltas (getrennt pro Achse).
+        const sevWord = d => {
+          const a = Math.abs(d);
+          if (a < 0.5) return 'exact';
+          if (a < 2)   return 'leicht';
+          if (a <= 5)  return '';        // neutral
+          return 'deutlich';
+        };
+        // Bildet eine Achsen-Phrase: "<schwell> <richtung> ≈ <m> (<grad>°)"
+        const axisPhrase = (delta, offM, dirNeg, dirPos, gradFix) => {
+          const gradStr = `${delta > 0 ? '+' : ''}${delta.toFixed(gradFix)}°`;
+          const meterStr = (offM != null && isFinite(offM)) ? `≈ ${fmtM(offM)} ` : '';
+          // Achse selbst nahezu exakt (<0.5°): kein Richtungswort, deutscher Klartext.
+          if (Math.abs(delta) < 0.5) return `nahezu exakt ${meterStr}(${gradStr})`;
+          const word = sevWord(delta);
+          const dir = delta < 0 ? dirNeg : dirPos;
+          const prefix = word ? word + ' ' : '';
+          return `${prefix}${dir} ${meterStr}(${gradStr})`;
+        };
+        const bothExact = Math.abs(azDelta) < 0.5 && Math.abs(altDelta) < 0.5;
+        let sentence;
+        if (bothExact) {
+          const latPart = (lOff != null && isFinite(lOff)) ? `≈ ${fmtM(lOff)} seitlich` : '';
+          const verPart = (vOff != null && isFinite(vOff)) ? `≈ ${fmtM(vOff)} vertikal` : '';
+          const parts = [latPart, verPart].filter(Boolean).join(', ');
+          sentence = `🎯 ${bodyHtml} steht nahezu exakt auf der Motivspitze${parts ? ` (${parts})` : ''}.`;
+        } else {
+          const azPhrase = axisPhrase(azDelta, lOff, 'links', 'rechts', 1);
+          const altPhrase = axisPhrase(altDelta, vOff, 'darunter', 'darüber', 2);
+          sentence = `🧭 ${bodyHtml} ${azPhrase} neben dem Motiv, ${altPhrase}.`;
+        }
+        // Sekundärinfo für erfahrene Nutzer (gedämpft).
+        const secRows = [];
+        if (o.celestial_azimuth != null) secRows.push(`<div class="info-row"><span class="ir-label">Azimut ${bodyHtml}</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>`);
+        if (o.celestial_altitude != null) secRows.push(`<div class="info-row"><span class="ir-label">Elevation ${bodyHtml}</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>`);
+        if (ca.subject_apparent_elevation_deg != null) secRows.push(`<div class="info-row"><span class="ir-label">Motivspitze (scheinb.)</span><span class="ir-val">${ca.subject_apparent_elevation_deg.toFixed(2)}° Elevation</span></div>`);
+        const secHtml = secRows.length
+          ? `<div style="margin-top:10px">${secRows.join('')}</div>`
+          : '';
+        return mkSec('ev_skypos','🧭 Himmelsposition',`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
       })()}
       ${(() => {
         const ca = o.composition_analysis;
@@ -3963,7 +4105,10 @@ const App = {
     // BUG-26: localStorage-Verifikationen einmalig migrieren, dann alle laden
     await Verify.migrateFromLocalStorage();
     await Verify.loadAll();
-    // Lade Feed (Verify._cache ist jetzt befüllt → Badges korrekt)
+    // US-89: localStorage-Bewertungen einmalig migrieren, dann Aggregat-Cache laden
+    await Rating.migrateFromLocalStorage();
+    await Rating.loadAll();
+    // Lade Feed (Verify._cache + Rating._cache/_mine sind jetzt befüllt → Badges/Filter korrekt)
     await Feed.load();
     // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch
     setTimeout(async () => {

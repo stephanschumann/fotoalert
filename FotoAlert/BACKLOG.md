@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68, TASK-23, US-90, TASK-24 |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | US-72 |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-67, TASK-22, BUG-27 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21, BUG-27 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -197,13 +197,13 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
-### BUG-27 · 365-Tage-Kalender leer, lädt keine Ereignisse `[ ]`
+### BUG-27 · 365-Tage-Kalender leer, lädt keine Ereignisse `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-21 |
 
 **Beschreibung:** Der 365-Tage-Kalender ist leer und zeigt keine Ereignisse an. Mögliche Ursachen: Regression von BUG-14 (Kalender leer nach Cron-Lauf), defekter Cron-Lauf, oder Frontend-Ladefehler beim monatlichen Nachladen (`?month=X&year=Y`).
@@ -217,11 +217,13 @@ Eingeschlossen: Leere-Response-Caching im Frontend fixen; Backend-Fallback wenn 
 Ausgeschlossen: Cron-Scheduling-Mechanismus (US-34), Push-Notifications.
 
 **Akzeptanzkriterien:**
-- [ ] Kalender zeigt Events des aktuellen Monats, wenn `calendar.json` auf dem Server vorhanden und nicht leer ist
-- [ ] Wenn Server `no_cache` zurückgibt: Frontend **cacht kein leeres Ergebnis** (kein `_monthCache.set`) — nächster Aufruf löst erneuten Fetch aus
-- [ ] Wenn Server `no_cache` zurückgibt: Toast „Kalender wird neu berechnet – bitte in 2 Min. neu laden" statt lautloser leerer Ansicht
-- [ ] Edge Case: Race-Condition — `show()` während `_loading=true` sorgt nach Abschluss trotzdem für `render()`-Aufruf (aktuell: silentes `return`)
-- [ ] Edge Case: `calendar.json` auf Server-Disk vorhanden und nicht leer → `/calendar?month=6&year=2026` liefert `status: ok` und `total > 0`
+- [ ] Kalender zeigt Events des aktuellen Monats, wenn `calendar.json` auf dem Server vorhanden und nicht leer ist *(ausstehend: Server-Rebuild läuft overnight)*
+- [x] Wenn Server `no_cache` zurückgibt: Frontend cacht kein leeres Ergebnis — nächster Aufruf löst erneuten Fetch aus
+- [x] Wenn Server `no_cache` zurückgibt: Toast „Kalender wird neu berechnet – bitte in 2 Min. neu laden"
+- [x] Edge Case: Race-Condition `show()` während `_loading=true` — render() wird nach Load immer aufgerufen
+- [ ] Edge Case: `/calendar?month=6&year=2026` liefert `status: ok` und `total > 0` *(ausstehend: nach Rebuild prüfen)*
+
+**Fix 2026-06-21:** `web/index.html` — `loadMonth()` cacht nur bei `status=ok` + `events.length > 0`; `no_cache` → Toast; `show()` Race-Fix.
 
 **Pre-Mortem:**
 - 💀 Szenario: Server neu gestartet, `_calendar_cache = []`, App geöffnet → `no_cache` → Frontend speichert `[]` in `_monthCache` → Kalender bleibt für die Session leer, egal wie viele Male der User navigiert.
@@ -1582,10 +1584,63 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >   - `azimuth_delta < 0` → „links", `> 0` → „rechts"; `altitude_delta > 0` → „darüber", `< 0` → „darunter"
 >   - Schwellwerte: < 0.5° → „nahezu exakt auf dem Motiv"; 0.5–2° → „leicht"; > 5° → „deutlich"
 >   - Absoluter Azimut + Elevation als Sekundärinfo (für erfahrene Nutzer)
+> - **Abweichung in Grad UND Metern angeben:** Zusätzlich zur Grad-Angabe wird die Abweichung des Himmelsobjekts vom Motiv in Metern ausgewiesen (lateral und vertikal), berechnet aus Winkelabweichung × Entfernung Kamera↔Motiv — z.B. „Mond 3° links ≈ X m neben dem Kirchturm, 5° darüber ≈ Y m"
 > - Nur bei Alignment-Events (Mond-Alignment, Sonnen-Alignment); nicht bei Goldene Stunde, Mondaufgang etc.
 > - Immer relativ zum Motiv (nicht zur Kamera oder zum Norden)
 >
 > **Abhängigkeiten:** US-37[x]
+>
+> ---
+>
+> **Scope:**
+> Eingeschlossen: Eine neue, in Klartext formulierte Sektion **„🧭 Himmelsposition"** im Event-Detail-Sheet (`web/index.html`, `Detail.render`), die aus dem bereits gecachten `composition_analysis` einen verständlichen Beschreibungssatz erzeugt („Mond 3° links neben dem Motiv ≈ X m, 5° darüber ≈ Y m"), inklusive Schwellwert-Wortwahl (nahezu exakt / leicht / deutlich) und absolutem Azimut+Elevation als Sekundärinfo. Reine **Frontend-Aufgabe** — alle Rohwerte (`azimuth_delta_deg`, `altitude_delta_deg`, `lateral_offset_m`, `vertical_offset_m`, `subject_apparent_elevation_deg`, `celestial_azimuth`, `celestial_altitude`, `body_name`) liegen bereits im serialisierten Opportunity-Objekt vor (`backend/precompute.py:228–242`).
+> Ausgeschlossen: jede Neuberechnung im Backend (Deltas/Meter existieren schon), Änderung der bestehenden „🎯 Kompositions-Analyse"-Sektion (bleibt unverändert als Detailansicht; die neue Sektion ist die Klartext-Zusammenfassung darüber), Goldene/Blaue Stunde & Nicht-Alignment-Events (haben `composition_analysis = None`), iOS-App.
+>
+> **Akzeptanzkriterien:**
+> - [ ] Neue Sektion „🧭 Himmelsposition" erscheint im Event-Detail-Sheet **genau dann**, wenn `o.composition_analysis` vorhanden ist (≠ null). Bei Goldener/Blauer Stunde, Milchstraße, Mondaufgang ohne Tracking etc. (`composition_analysis === null`) wird **keine** Sektion gerendert.
+> - [ ] Beschreibungssatz nennt das Himmelsobjekt per `ca.body_name` („Mond"/„Sonne"), nie hartkodiert.
+> - [ ] Seitenrichtung: `azimuth_delta_deg < 0` → „links", `> 0` → „rechts". Höhenrichtung: `altitude_delta_deg > 0` → „darüber", `< 0` → „darunter".
+> - [ ] Schwellwort (auf den **Betrag** des jeweiligen Deltas angewandt, getrennt für Azimut und Höhe): `|Δ| < 0.5°` → „nahezu exakt auf dem Motiv" (Richtungswort entfällt); `0.5° ≤ |Δ| < 2°` → „leicht"; `2° ≤ |Δ| ≤ 5°` → (kein Zusatzwort, neutral); `|Δ| > 5°` → „deutlich".
+> - [ ] Jede Achse wird in **Grad UND Metern** angegeben. Meter = `Math.abs(ca.lateral_offset_m)` (seitlich) bzw. `Math.abs(ca.vertical_offset_m)` (vertikal) — **nicht** im Frontend neu aus Winkel×Distanz gerechnet, sondern die gecachten Backend-Werte verwendet. Format: < 1000 m → „N m" (0 Nachkommastellen), ≥ 1000 m → „N,NN km". Beispiel: „🌙 Mond leicht links neben dem Motiv ≈ 8 m (1,2°), leicht darüber ≈ 12 m (0,9°)".
+> - [ ] Sekundärinfo (kleiner, gedämpft): absoluter Azimut Himmelsobjekt `ca`-unabhängig aus `o.celestial_azimuth.toFixed(1)+"°"` und Elevation `o.celestial_altitude.toFixed(2)+"°"`; zusätzlich scheinbare Motivspitzen-Elevation `ca.subject_apparent_elevation_deg`.
+> - [ ] Edge Case: Beide Beträge < 0.5° → Satz lautet sinngemäß „🎯 Mond steht nahezu exakt auf der Motivspitze (≈ 0 m seitlich, ≈ 0 m vertikal)" ohne „links/rechts/darüber/darunter".
+> - [ ] Edge Case: exakt `azimuth_delta_deg === 0` bzw. `altitude_delta_deg === 0` → fällt in „nahezu exakt" (kein Vorzeichen-/Richtungsfehler, kein leeres Richtungswort).
+> - [ ] Edge Case: fehlt eine Einzelkomponente (z.B. `lateral_offset_m == null`), wird die Meter-Angabe für diese Achse weggelassen, der Grad-Teil aber gezeigt (kein „NaN m", kein Absturz).
+> - [ ] Regression: bestehende „🎯 Kompositions-Analyse"-Sektion, Filter (US-57) und der Feed bleiben unverändert (kein Rendering-Fehler im Detail-Sheet bei Nicht-Alignment-Events).
+>
+> **Pre-Mortem** *(💀 = Versagensszenario → Gegenmaßnahme)*
+> - 💀 Frontend rechnet Meter selbst aus `tan(Δ)×Distanz` und nutzt eine andere/fehlende Distanz (Kamera↔Motiv liegt im Detail nur als `haversine` der GPS-Punkte vor, nicht als die im Backend benutzte `loc.distance_m`) → Meter weichen von der Kompositions-Analyse ab. → **Gegenmaßnahme:** ausschließlich die gecachten `lateral_offset_m`/`vertical_offset_m` verwenden (AK), keine eigene Umrechnung.
+> - 💀 Vorzeichen-Konvention verdreht: Backend definiert `az_delta = celestial_azimuth − subject_azimuth` (−180…+180); negativ = Objekt **westlich/links** der Sichtachse. Frontend invertiert → „links/rechts" vertauscht. → **Gegenmaßnahme:** Mapping exakt wie bestehende Sektion (`web/index.html:2680`: `lOff < 0 ? '← links' : '→ rechts'`), Test mit bekanntem Vorzeichen.
+> - 💀 Sektion erscheint auch bei Events ohne Alignment, weil die Gate-Bedingung auf einem anderen Feld hängt (z.B. `celestial_azimuth` ist auch bei Mondaufgang gesetzt). → **Gegenmaßnahme:** Gate **nur** an `o.composition_analysis != null` (Backend setzt das gezielt auf `None` für Nicht-Tracking-Events, `precompute.py:145–147`).
+> - 💀 Events mit `composition_analysis`, aber einzelnen `null`-Feldern (defensiv) erzeugen „NaN m" / `toFixed of null`. → **Gegenmaßnahme:** Null-Guards pro Feld (AK Edge Case), Default-Wegfall der Meter-Angabe.
+>
+> **Analyse & Planung:**
+> - [x] Example Mapping durchgeführt (4 Rules: Gate=nur Alignment, Richtungswort aus Vorzeichen, Schwellwort aus Betrag, Grad+Meter aus Cache; Questions = 0, da Schwellwerte/Vorzeichen im Code eindeutig).
+> - [x] Pre-Mortem durchgeführt (4 Szenarien, Kern: Meter müssen aus dem Cache kommen, nicht neu gerechnet).
+> - [x] Architektur analysiert: **Backend liefert bereits alles** — `backend/precompute.py:_composition_analysis` (Z.133–242) berechnet `azimuth_delta_deg`, `altitude_delta_deg`, `lateral_offset_m` (`d·tan(az_delta)`, Z.168), `vertical_offset_m` (Z.167), `subject_apparent_elevation_deg`, `body_name`; gesetzt nur wenn `subject_height_m & distance_m & celestial_*` vorhanden (Z.145), sonst `None`. Serialisiert als `composition_analysis` (`precompute.py:328`). Frontend: Event-Detail-Sheet in `Detail` (`web/index.html`), bestehende „🎯 Kompositions-Analyse"-Section (Z.2665–2726) mit identischen Werten + Richtungs-Mapping (`lOff<0?'← links'`, Z.2680). Distanz `loc.distance_m` (Backend) ≠ Frontend-`haversineKm` (Z.2729) → Meter NUR aus Cache.
+> - [x] Implementierungsoptionen: A / B / C (siehe unten).
+> - [ ] Empfehlung: **Option A** (Weg-Gate offen).
+>
+> **Implementierungsoptionen**
+>
+> *Option A — Neue Klartext-Sektion über der bestehenden Detailansicht.* Eine zusätzliche `mkSec('ev_skypos','🧭 Himmelsposition', …)` direkt vor dem bestehenden `ev_kompo`-Block, die aus `ca` den Beschreibungssatz + Sekundärinfo baut. Reine Hinzufügung, „🎯 Kompositions-Analyse" bleibt als Detailtabelle erhalten. Betroffen: `web/index.html` (1 neuer IIFE-Block). Vorteil: erfüllt das Ticket 1:1 (eigene Sektion „Himmelsposition"), null Regressionsrisiko, klein. Nachteil: leichte Redundanz zur bestehenden Sektion. **Aufwand: klein.**
+>
+> *Option B — Bestehende „Kompositions-Analyse" umbauen/umbenennen* und den Klartextsatz oben einbetten. Vorteil: keine Redundanz. Nachteil: berührt bestehendes, getestetes UI (Regressionsrisiko, US-57-Filter zeigt dieselben Felder), und das Ticket fordert eine **eigene** Sektion. **Aufwand: mittel.**
+>
+> *Option C — Backend liefert den fertigen Satz* (`composition_analysis.sky_position_text`). Vorteil: zentral, auch für iOS nutzbar. Nachteil: erfordert Backend-Änderung + Cache-Recompute, obwohl die Formulierung rein UI-sprachlich ist; widerspricht „Frontend-only". **Aufwand: mittel–groß.**
+>
+> ✅ **Empfehlung: Option A** — die Rohwerte (inkl. Metern) liegen vollständig im Cache, das Ticket verlangt explizit eine eigene Sektion „Himmelsposition", und eine additive Frontend-Sektion hat das kleinste Regressionsrisiko gegenüber dem bestehenden, vom US-57-Filter mitgenutzten Kompositions-Block.
+>
+> **Daten-Validierung:**
+> - [ ] An einem realen Alignment-Event im Cache prüfen: `lateral_offset_m`, `vertical_offset_m`, `azimuth_delta_deg`, `altitude_delta_deg` vorhanden und konsistent (`lateral_offset_m ≈ distance_m·tan(az_delta)`); an einem Goldene-Stunde-Event prüfen: `composition_analysis === null`.
+>
+> **Testplan:**
+> - [x] Automatisiert (Harness, `backend/tests/test_us67_composition.py`, Docstring `US-67`): Verifizieren dass `_composition_analysis` für ein Alignment-Setup `lateral_offset_m`/`vertical_offset_m` mit korrektem Vorzeichen liefert (negativ az_delta → negativer lateral_offset) und für ein Setup ohne `subject_height_m`/`distance_m` `None` zurückgibt. (Frontend-Textbau ist nicht pytest-bar — Logik der Datengrundlage wird abgesichert.) → 8 Tests, grün (offline/regression).
+> - [x] Manuell unter http://localhost:8000: Alignment-Event öffnen → Sektion „🧭 Himmelsposition" zeigt Klartextsatz mit Grad **und** Metern, korrektes links/rechts + darüber/darunter, Sekundärinfo (abs. Azimut/Elevation). ✅ getestet an „Mond über Glienicker Brücke" (28.06.): „leicht links ≈ 38 m, leicht darüber ≈ 40 m".
+> - [ ] Manuell: Event mit |Δ| < 0.5° → „nahezu exakt auf der Motivspitze", keine Richtungswörter. *(kein passendes Live-Event im Cache mit beiden Δ < 0.5° — durch automatisierten/Code-Pfad abgedeckt, nicht manuell verifiziert.)*
+> - [x] Manuell: Goldene-Stunde-/Milchstraßen-Event öffnen → **keine** „Himmelsposition"-Sektion, kein Konsolenfehler. ✅ getestet an „Milchstraße über Molecule Men" — keine Sektion, „🎯 Kompositions-Analyse" bleibt vorhanden.
+>
+> **🐞 Beim Test gefunden & gefixt (2026-06-21):** Das Frontend-Gate hing nur an `if (!ca)`. `composition_analysis` wird vom Backend aber **auch** für Goldene/Blaue Stunde & Milchstraße gesetzt (Motiv-Geometrie + Himmelsposition vorhanden — `_composition_analysis` prüft nur Geometrie, nicht den Event-Typ; im Cache: 532 Goldene Stunde + 114 Milchstraße betroffen). Die Pre-Mortem-Gegenmaßnahme „Backend setzt None für Nicht-Tracking-Events" basierte auf falscher Prämisse. **Fix:** `web/index.html` ev_skypos-Gate um `EV_SKYPOS_EXEMPT` ergänzt (Spiegel von `precompute._ALIGNMENT_FILTER_EXEMPT`). Verifiziert per Node-Simulation gegen den Cache: Goldene Stunde/Milchstraße rendern jetzt 0, Mond-Alignment unverändert. ⚠️ **Noch nicht deployed** (lokaler Fix, uncommitted).
 
 ### US-68 · Host-Approval Workflow für Location-Änderungen und -Löschungen (inkl. Host-Aufgabenliste) `[ ]`
 > **Als normaler Nutzer** möchte ich Änderungs- und Löschvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host wirksam werden.
@@ -2213,6 +2268,250 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ---
 
+### TASK-23 · Audit: Welche Nutzerdaten werden nicht serverseitig persistiert (Verlustrisiko)? `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-21 |
+
+**Beschreibung:** Vollständige Bestandsaufnahme aller nutzerseitig erzeugten/änderbaren Daten daraufhin, ob sie serverseitig (SQLite) gespeichert werden oder nur lokal (`localStorage`) liegen und damit verloren gehen können (iOS löscht PWA-localStorage nach 7 Tagen Inaktivität, vgl. BUG-26). Ergebnis: eine Liste „persistiert ✅ / nur lokal ⚠️" pro Datenart mit Empfehlung, was nachgezogen werden muss — als Grundlage für Folgetickets.
+
+**Bezug:** Übergreifender Audit, der den Boden für die Persistenz-Tickets liefert. Bekannte Einzelfälle sind bereits abgedeckt: Verifikationen → BUG-26 [x] (serverseitig persistiert), Sterne-Bewertungen → US-89 (in Analyse), Location-Änderungen als Vorschläge → US-68 (Host-Approval Workflow). Dieser Task findet die *übrigen* nur-lokal gespeicherten Datenarten (z. B. Favoriten US-17, Filter-/Einstellungs-Zustände, Geräte-Token). Grenzt an US-75 (User/Backend-Datensync) — TASK-23 ist die Inventur, US-75 die laufende Sync-Sicherung.
+
+**Scope:**
+- Eingeschlossen: Web-PWA (`web/index.html` localStorage) + Backend-Persistenz (`backend/data/store.py`, `backend/main.py`). Inventar aller nutzererzeugten/-änderbaren Datenarten mit Klassifizierung ✅/⚠️/🔒 und Empfehlung. Ergebnis als Tabelle in dieses Ticket.
+- Ausgeschlossen: iOS-App (`ios/FotoAlert/`, eigene UserDefaults) — bewusst ausgeklammert (2026-06-21). Keine automatische Anlage von Folgetickets — Empfehlungen, Stephan entscheidet separat. Keine Code-Änderungen (reiner Audit).
+
+**Akzeptanzkriterien:**
+- [ ] Alle `localStorage`-Keys in `web/index.html` erfasst — Vollständigkeit per `grep -nE "localStorage\.(get|set|remove)Item" web/index.html` gegengeprüft (Soll: `fa_api`, `fa_notify_high/golden/milky`, `fa_token`, `fa_role`, `fotoalert_verifications`, `fotoalert_ratings`, `fotoalert_filters`, `fa_sec`, `cameraProfile`)
+- [ ] Jede Datenart klassifiziert: ✅ serverseitig persistiert / ⚠️ nur lokal (Verlustrisiko) / 🔒 lokal *by design* (Auth/Config)
+- [ ] Für jede ⚠️-Datenart eine Empfehlung (persistieren vs. lokal lassen) + Verweis auf bestehendes/empfohlenes Folgeticket
+- [ ] Serverseitige In-Memory-Speicher ohne Disk/DB-Persistenz erfasst (Befund: `_device_tokens` in `main.py`)
+- [ ] Bekannte Einzelfälle korrekt zugeordnet: Verifikationen→BUG-26 ✅, Ratings→US-89, Location-Edits→US-68
+- [ ] Edge Case: noch nicht gebaute Features mit geplanter Nur-Lokal-Speicherung als Designrisiko markiert (Favoriten US-17, AK sieht `localStorage` vor)
+
+**Pre-Mortem:**
+- 💀 Audit übersieht einen `localStorage`-Key → Inventar unvollständig, ein Verlust bleibt unentdeckt. Auslöser: nur statisches grep auf einen Methodennamen. Gegenmaßnahme: grep auf `get/set/removeItem` + Soll-Liste im AK fixieren.
+- 💀 Datenart als „nur lokal" eingestuft, obwohl das Backend sie längst speichert (oder umgekehrt) → falsches Folgeticket. Gegenmaßnahme: für jede ⚠️ den Backend-Pfad gegenprüfen (Ratings: kein `/rating`-Endpoint bestätigt).
+- 💀 Audit empfiehlt Persistenz für reine Geräte-Präferenzen (Filter, Sektions-State) → unnötige Komplexität. Gegenmaßnahme: Geräte-Präferenz vs. echte Nutzerdaten explizit trennen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CFG, Verify, Rating, Filter, Sections, FOV-Camera), `backend/data/store.py` (3 Tabellen), `backend/main.py` (`_device_tokens`)
+- [x] Scope bestätigt: nur Web-PWA; Deliverable: Inventar ins Ticket, keine Auto-Folgetickets (2026-06-21)
+- [x] Nur ein sinnvoller Weg (reiner Audit, kein Code) → keine Implementierungsoptionen nötig
+
+**Audit-Ergebnis (Stand 2026-06-21):**
+
+*✅ Serverseitig in SQLite persistiert:*
+| Datenart | Speicher |
+|---|---|
+| Custom Locations | `custom_locations` |
+| Location-Änderungen (Overrides) | `location_overrides` |
+| Standort-Verifikationen | `location_verifications` (BUG-26) |
+
+*⚠️ Nur lokal (`localStorage`) — Verlustrisiko (iOS löscht PWA-Storage nach 7 Tagen):*
+| Key | Datenart | Empfehlung |
+|---|---|---|
+| `fotoalert_ratings` | Sterne-Bewertungen | Persistieren → **US-89** (in Analyse) deckt ab |
+| `cameraProfile` | Kamera-Setup (Sensor, Brennweite, Ausrichtung) | Persistieren → **neues Folgeticket empfohlen** (echte Nutzerdaten, aktuell unabgedeckt) |
+| `fotoalert_filters` | Filter-Zustände | Lokal lassen (Geräte-Präferenz) — optional Sync via US-75 |
+| `fa_notify_high/golden/milky` | Benachrichtigungs-Präferenzen | Lokal lassen (geräte-/push-gebunden) |
+| `fa_sec` | Auf-/zugeklappte Detail-Sektionen | Lokal lassen (reiner UI-State) |
+
+*🔒 Lokal by design (kein Verlustrisiko):* `fa_token`, `fa_role` (Session, wird beim Login neu ausgegeben), `fa_api` (Dev-Config).
+
+*⚠️ Serverseitig, aber NICHT persistiert:* `_device_tokens` (Push-Token-Liste in `main.py`) liegt nur im RAM → bei jedem Server-Neustart weg. Push ist im Frontend noch nicht verdrahtet → latent. Empfehlung: **neues Folgeticket** (Token in SQLite), spätestens wenn Push gebaut wird.
+
+*⚠️ Noch nicht gebaut:* Favoriten (**US-17**) — AK sieht explizit `localStorage` vor → bei Bau direkt Verlustrisiko. Designhinweis in US-17 ergänzen: serverseitig persistieren.
+
+**Testplan:**
+- [ ] Automatisiert: `grep -nE "localStorage\.(get|set|remove)Item" web/index.html` → jeder gefundene Key ist im Inventar enthalten (Vollständigkeitscheck)
+- [ ] Manuell: Für jede ⚠️-Datenart den Backend-Pfad gegenprüfen (kein Persistenz-Endpoint vorhanden bestätigt)
+
+---
+
+### US-90 · Kamera-Setup serverseitig persistieren `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-21 |
+
+**Beschreibung:** Als Fotograf möchte ich, dass mein Kamera-Setup (Sensor, Brennweite, Ausrichtung) serverseitig gespeichert wird, damit es nach App-Schließen/Geräte­wechsel erhalten bleibt. Aktuell liegt es nur in `localStorage['cameraProfile']` und geht verloren (iOS löscht PWA-Storage nach 7 Tagen, vgl. BUG-26).
+
+**Bezug:** Folgeticket aus TASK-23 (Persistenz-Audit). Datenquelle eingeführt in US-58[x] (FOV-Visualisierung). Gleiches Muster wie BUG-26 (Verifikationen → SQLite). Grenzt an US-75 (User/Backend-Datensync).
+
+---
+
+#### 📋 Implementation Spec (Analyse 2026-06-21)
+
+**Scope-Check / Grundannahmen (autonom getroffen, da Stephan abwesend):**
+- `cameraProfile` ist **Geräte-Singleton**, kein Listen- und kein Location-Bezug: genau ein Objekt `{sensor, fl, ori}` pro Gerät. Damit ist nicht BUG-26 (Listen-Anhängen pro Location) die nächste Vorlage, sondern **US-89 (Ratings)** mit seinem `device_id`-Upsert-Muster — 1 Gerät = 1 Datensatz, überschreibbar.
+- **Identität = `device_id` (UUID), NICHT User/Login.** FotoAlert hat keine personenscharfen Accounts (US-66 ist rollenbasiert: `user`/`host`). Die Geräte-UUID liegt bereits unter `localStorage['fa_device_id']` (`Rating.deviceId()`, web/index.html:1785) und wird wiederverwendet. „Gerätewechsel" im Ticket-Wortlaut meint daher: Setup geht beim PWA-Storage-Wipe NICHT verloren, solange dieselbe `device_id` rekonstruierbar ist. **Annahme A1:** Echtes Cross-Device-Sync (gleiches Setup auf Handy + iPad) ist NICHT Teil dieses Tickets — das gehört zu US-75 (User/Backend-Datensync) und ist explizit ausgeschlossen. Begründung: ohne Login keine geräteübergreifende Identität.
+- **Annahme A2:** Die `fl`-Validierung folgt dem bestehenden Frontend-Limit aus US-58 (`min=8 max=1200`, Input-Clamp `8..1200` in `_readInputs`). Sensor muss ein bekannter Key sein (`fullframe|apsc_canon|apsc_sony|mft|one_inch`), `ori ∈ {landscape, portrait}`.
+
+**Scope:**
+- Eingeschlossen: `cameraProfile` (`{sensor, fl, ori}`) je `device_id` serverseitig in SQLite persistieren (Upsert). Boot-Preload des eigenen Profils. Einmalige Migration eines bestehenden `localStorage['cameraProfile']`. Validierung der drei Felder.
+- Ausgeschlossen: Geräteübergreifender Sync ohne Login (→ US-75). Mehrere benannte Profile pro Gerät („Body 1 / Body 2"). Verknüpfung mit `camera_hints` der Locations. Push-Token (→ TASK-24).
+
+**Akzeptanzkriterien:**
+- [ ] `GET /camera-profile?device_id=<uuid>` liefert `{sensor, fl, ori}` für ein bekanntes Gerät; für ein unbekanntes Gerät `{}` (HTTP 200, leeres Objekt — NICHT 404, damit das Frontend stillschweigend auf den Default fällt).
+- [ ] `POST /camera-profile` mit Body `{device_id, sensor, fl, ori}` und gültigem Bearer-Token (`require_auth`, user+host) speichert per Upsert; zweiter POST mit gleicher `device_id` überschreibt (kein zweiter Datensatz). Response `201` + `{ok: true, sensor, fl, ori}`.
+- [ ] Edge Case: `POST` ohne `device_id` → `422` „device_id ist erforderlich." (analog US-89).
+- [ ] Edge Case: `fl < 8` oder `fl > 1200` → `422`. `sensor` kein bekannter Key → `422`. `ori` nicht in `{landscape, portrait}` → `422`.
+- [ ] Edge Case: `POST` ohne Auth-Header → `401` (Schreiben verlangt Token wie bei Verify/Rating). `GET` ohne Token → `200` (lesen ist öffentlich).
+- [ ] Frontend: Beim App-Start lädt `CameraFOV._loadProfile()` das Profil des eigenen `device_id` einmalig in `_profile`; alle FOV-Panels (`panelHtml`, `_readInputs`) nutzen dieses statt direkt `localStorage`.
+- [ ] Frontend: Jede Änderung in einem FOV-Panel (`update()`) schreibt via `POST /camera-profile` ans Backend (fire-and-forget, optimistisch) und cached lokal weiter (Offline-Fallback).
+- [ ] Migration: Existiert beim ersten Start nach Deploy ein `localStorage['cameraProfile']` und das Backend hat für die `device_id` noch nichts, wird das lokale Profil einmalig hochgeladen; danach gilt der Server als Quelle. Kein Datenverlust.
+- [ ] Edge Case (Race): App-Start mit leerem/fehlerhaftem Server-Response → Frontend nutzt den localStorage-/Default-Wert, kein Crash, keine leeren Panels.
+- [ ] Regression: alle bestehenden Tests (Verify/Rating/US-66/US-67) bleiben grün; FOV-Berechnung (`_calcFOV`) unverändert.
+
+**Pre-Mortem:**
+- 💀 **Migration überschreibt frisches Server-Profil mit altem localStorage-Stand.** Auslöser: bedingungslose Migration bei jedem Start, statt nur wenn Server leer. Frühwarnung: nach Gerätewechsel/Reinstall springt das Setup auf einen alten Wert. → Gegenmaßnahme: Migration nur wenn `GET` ein leeres `{}` liefert UND lokal ein Profil existiert; danach `localStorage['cameraProfile']` als migriert markieren (oder belassen, aber nicht erneut pushen). Verankert in AK „Migration".
+- 💀 **`device_id`-Drift durch iOS-Storage-Wipe macht Persistenz wirkungslos.** Auslöser: `fa_device_id` liegt selbst in localStorage; löscht iOS nach 7 Tagen den Storage, entsteht eine NEUE UUID → das alte Server-Profil ist nicht mehr auffindbar. Das ist exakt das Problem, das BUG-26/US-89 ebenfalls haben und akzeptieren. Frühwarnung: nach >7 Tagen Inaktivität wieder Default-Setup trotz „Persistenz". → Gegenmaßnahme: bewusst als bekannte Grenze dokumentieren (gleiche Schwelle wie US-89). Echte Stabilität kommt erst mit US-75 (Login bindet Profil an Account). NICHT in diesem Ticket lösen, aber in der Retro vermerken.
+- 💀 **Python-3.10-Syntax crasht Prod (Py 3.9).** Auslöser: `str | None`-Annotation o. Ä. im neuen Store/Endpoint. Frühwarnung: grüne Sandbox (3.10), roter Prod-Start. → Gegenmaßnahme: `from __future__ import annotations` ist in store.py bereits aktiv; Endpoint-Signaturen mit `Optional[...]`/Defaults wie bei US-89; kein `|` in Annotations.
+- 💀 **Schreib-Sturm: `oninput` am Brennweiten-Feld feuert pro Tastendruck einen POST.** Auslöser: `CameraFOV.update()` hängt an `oninput`/`onchange` → bei jeder Ziffer ein Request. Frühwarnung: Netzwerk-Log voller `/camera-profile`-POSTs beim Tippen. → Gegenmaßnahme: POST per kleinem Debounce (~400 ms) oder nur auf `change` statt `input`; localStorage-Cache sofort, Server verzögert. Verankert im Frontend-AK „fire-and-forget".
+- 💀 **Stiller Datenverlust bei Offline-POST.** Auslöser: POST schlägt fehl (offline), UI zeigt aber Erfolg, lokaler Cache wird nicht geschrieben. Frühwarnung: Setup nach Reload weg, obwohl „gespeichert". → Gegenmaßnahme: localStorage IMMER zuerst/parallel schreiben (Source of Truth lokal bis Sync), Server-POST optimistisch nachziehen; Server-Wert gewinnt nur beim nächsten erfolgreichen Boot-Load.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Singleton-Daten, device_id-Identität, Migration, Offline)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, alle in AK/Plan verankert)
+- [x] Architektur analysiert:
+  - `web/index.html` — `CameraFOV` (ab Z. 2505): `_getProfile`/`_saveProfile` (Z. 2517–2521) sind die einzigen localStorage-Touchpoints; `_readInputs` (Z. 2609) liest die UI; `update()` (Z. 2631) ist der Save-Trigger. Geräte-UUID via `Rating.deviceId()` (Z. 1785, Key `fa_device_id`) wiederverwenden.
+  - `backend/data/store.py` — neue Tabelle + Methoden analog `upsert_rating`/`get_rating_summary` (Z. 375–422). `from __future__ import annotations` + `Optional` bereits vorhanden.
+  - `backend/main.py` — neue Endpoints analog Rating-Block (Z. 1313–1362): `RatingIn`-artiges Pydantic-Model, `Depends(auth.require_auth)` für POST, offenes GET.
+  - `backend/tests/test_api_regression.py` — neue Testklasse analog BUG-26-Verify-Klasse (Z. 54 ff.); `auth_headers`-Fixture aus conftest.
+- [x] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: **Option A** (siehe unten) — Weg-Gate offen für Stephan.
+
+**Implementierungsoptionen:**
+
+*Option A — Eigene Tabelle `camera_profiles` mit `device_id`-Upsert (US-89-Muster).*
+- Vorgehen: `CREATE TABLE camera_profiles (device_id TEXT PRIMARY KEY, sensor TEXT, fl INTEGER, ori TEXT, updated TEXT)`. Store: `upsert_camera_profile`, `get_camera_profile`. Endpoints: `GET /camera-profile?device_id=`, `POST /camera-profile` (`require_auth`). Frontend: `CameraFOV._loadProfile()` beim Boot, `update()` → POST + localStorage.
+- Betroffene Dateien: `backend/data/store.py`, `backend/main.py`, `web/index.html`, `backend/tests/test_api_regression.py`.
+- Vorteile: folgt 1:1 dem frisch gebauten, getesteten US-89-Pfad; `PRIMARY KEY device_id` erzwingt „1 Gerät = 1 Profil" ohne ON-CONFLICT-Verrenkung; klar erweiterbar (Spalten ergänzen).
+- Nachteile/Risiken: Geräte-Token-Identität (kein echtes Cross-Device, s. Pre-Mortem 2). Aufwand: **klein–mittel**.
+
+*Option B — Profil als JSON-Blob in bestehender Tabelle `location_overrides`-Stil (Key-Value).*
+- Vorgehen: generische Tabelle `device_kv (device_id, key, value_json)`, Profil als `key='camera_profile'`. Endpoint generisch.
+- Vorteile: wiederverwendbar für TASK-24 (Push-Token) und weitere Geräte-Settings; nur eine Tabelle für alle künftigen Device-Daten.
+- Nachteile/Risiken: höhere Abstraktion ohne aktuellen Bedarf (YAGNI); keine Spalten-Validierung auf DB-Ebene; weicht vom etablierten US-89-Muster ab → mehr Review-Last. Aufwand: **mittel**.
+
+*Option C — An US-75 koppeln, Profil an Account statt Gerät binden.*
+- Vorgehen: warten bis Login/Account-Sync (US-75) steht, Profil als User-Datensatz persistieren.
+- Vorteile: löst die `device_id`-Drift dauerhaft (echtes Cross-Device).
+- Nachteile/Risiken: blockiert US-90 auf ein größeres, nicht freigegebenes Ticket; löst das akute „7-Tage-Wipe"-Problem nicht zeitnah. Aufwand: **groß** (gekoppelt).
+
+✅ **Empfehlung: Option A** — folgt exakt dem gerade gebauten und getesteten US-89-`device_id`-Upsert-Muster, ist klein gehalten, löst das akute Persistenz-Problem sofort und hält das Cross-Device-Thema sauber für US-75 offen; die `device_id`-Drift ist eine bekannte, mit US-89 geteilte Grenze, kein neues Risiko.
+
+**Testplan:**
+- [ ] Automatisiert (Harness, `backend/tests/test_api_regression.py`, Klasse `TestCameraProfile`, Ticket-ID im Docstring):
+  - POST `{device_id:'cam-test', sensor:'fullframe', fl:85, ori:'landscape'}` → 201; GET `?device_id=cam-test` → `{sensor:'fullframe', fl:85, ori:'landscape'}`.
+  - Zweiter POST mit `fl:135` → GET zeigt `135`, kein Doppeleintrag (Upsert).
+  - GET `?device_id=unknown` → `200` + `{}`.
+  - POST ohne `device_id` → `422`; `fl:5` → `422`; `sensor:'bogus'` → `422`; `ori:'diagonal'` → `422`.
+  - POST ohne Auth-Header → `401`.
+- [ ] Manuell (http://localhost:8000): FOV-Panel öffnen, Sensor/Brennweite/Ausrichtung ändern, App schließen + neu laden → Werte erhalten. DevTools: `localStorage['cameraProfile']` löschen, neu laden → Server-Wert wird wiederhergestellt (Boot-Load). Offline (DevTools throttle) ändern → kein Crash, localStorage greift.
+
+#### 📋 Implementation Spec Ende
+
+### TASK-24 · Push-Token serverseitig persistieren `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-21 |
+
+**Beschreibung:** Die Push-Token-Liste `_device_tokens` in `backend/main.py` liegt nur im RAM und geht bei jedem Server-Neustart verloren. Token in SQLite persistieren, damit registrierte Geräte einen Neustart überdauern. Latent, da Push im Frontend noch nicht verdrahtet ist — vor dem Push-Rollout zu erledigen.
+
+**Bezug:** Folgeticket aus TASK-23 (Persistenz-Audit). Betrifft `/register-device` (siehe US-66, dort als „Folge-Ticket" vermerkt). Gleiches Persistenz-Muster wie BUG-26.
+
+---
+
+#### 📋 Implementation Spec (Analyse 2026-06-21)
+
+**Scope-Check / Grundannahmen (autonom getroffen, da Stephan abwesend):**
+- **IST-Stand verifiziert:** `_device_tokens: list[dict] = []` (`main.py:251`) wird ausschließlich im Endpoint `/register-device` (`main.py:990–997`) beschrieben/gelesen. Es gibt **keinen weiteren Konsumenten** im Code (Grep über `backend/` bestätigt: kein Scheduler-/Push-Versand greift heute auf die Liste zu). `backend/notifications/push.py` versendet an ein einzelnes `device_token` (Z. 71/107), ist aber nicht mit der Liste verdrahtet. → Push ist im Frontend UND im Backend-Versand noch nicht aktiv; das Ticket ist reine **Persistenz-Vorbereitung**, kein Push-Feature.
+- **A1 — Migration des aktuellen RAM-Stands entfällt.** `_device_tokens` ist flüchtig und beim Deploy/Neustart ohnehin leer; es existiert kein Bestand, der gerettet werden müsste. Eine Migrationsroutine wäre toter Code → **bewusst ausgeschlossen**.
+- **A2 — Identität = APNs/Push-Token selbst (TEXT), nicht `device_id`.** Anders als US-89/US-90 (Geräte-Setup je `device_id`) ist hier der Push-Token der natürliche Schlüssel: ein Gerät kann durch Token-Rotation (APNs vergibt neue Tokens) über die Zeit *mehrere* Tokens haben; APNs liefert beim Versand die Information „Token ungültig" zurück, nicht „device_id". Deshalb ist der **Token `PRIMARY KEY`**, nicht `device_id`. (Eine optionale `device_id`-Spalte wird mitgeführt, damit beim Push-Rollout pro Gerät dedupliziert werden kann — aktuell nicht erzwungen, da das Frontend noch keine `device_id` an `/register-device` sendet.)
+- **A3 — Auth-Verhalten bleibt vorerst offen (kein Bearer-Token erzwungen),** exakt wie der bestehende Kommentar in `main.py:992–993` festhält: die native iOS-App kann sich noch nicht einloggen. Die Persistenz ändert das Auth-Modell NICHT — das ist eigener Scope (s. Pre-Mortem 4). Begründung: Token-Schutz jetzt würde die einzige reale Aufruferin (iOS) aussperren.
+- **A4 — Signatur-Beibehaltung:** Der bestehende Endpoint nimmt `token: str` als **Query-Param** (kein Pydantic-Body). Da Push noch nicht verdrahtet ist, gibt es keine Aufrufer, die ein Brechen der Signatur bemerken würden — trotzdem wird die bestehende Query-Param-Signatur beibehalten (minimaler Diff, keine unnötige Vertragsänderung). Optional als Verbesserung erwähnt, aber nicht im Scope.
+
+**Scope:**
+- Eingeschlossen: Neue SQLite-Tabelle `device_tokens` in `store.py`. Store-Methoden `register_device_token` (Upsert) + `load_device_tokens` (Liste). `/register-device` schreibt persistent statt in die RAM-Liste; `_device_tokens` wird durch eine boot-seitige Hydration aus der DB ersetzt ODER vollständig durch DB-Zugriffe abgelöst (s. Optionen). Idempotenz bei doppeltem Token (kein Zweiteintrag, gleiche Response `already_registered`). Erhalt der bisherigen Response-Form (`status`, `device_count`).
+- Ausgeschlossen: Tatsächlicher Push-Versand / APNs-Verdrahtung (eigenes Push-Rollout-Ticket). Auth-Schutz von `/register-device` (eigener Scope, an iOS-Login gekoppelt). Token-Invalidierung über APNs-Feedback (s. Pre-Mortem 2, als bekannter Folgepunkt notiert). Migration eines RAM-Bestands (A1, leer). Frontend-Verdrahtung (Push im Frontend nicht gebaut).
+
+**Akzeptanzkriterien:**
+- [ ] `POST /register-device?token=abc&platform=ios` legt den Token persistent an. Response `200` + `{"status": "registered", "device_count": <n>}` (Form unverändert ggü. heute).
+- [ ] Idempotenz: zweiter `POST` mit identischem `token` legt KEINEN zweiten Datensatz an und liefert `{"status": "already_registered"}` (HTTP 200) — `device_count`-relevante Zeilenzahl bleibt gleich.
+- [ ] Persistenz über Neustart: Token registrieren → `_store` neu instanziieren (simuliert Server-Neustart, neue `LocationStore`-Instanz auf dieselbe DB) → `load_device_tokens()` enthält den Token weiterhin. (Das ist der Kern-AK des Tickets.)
+- [ ] `load_device_tokens()` liefert eine Liste von Dicts der Form `{"token": <str>, "platform": <str>}` (Form kompatibel zur bisherigen `_device_tokens`-Struktur, damit ein späterer Push-Konsument unverändert iterieren kann).
+- [ ] Edge Case: `POST /register-device` ohne `token`-Param → `422` (FastAPI-Default für fehlenden Required-Query-Param; Verhalten unverändert ggü. heute, da `token` schon required ist).
+- [ ] Edge Case: leerer Token-String (`token=`) → `422` „token ist erforderlich." (neue Guard, verhindert leere Primärschlüssel in der DB).
+- [ ] Edge Case: `platform` weggelassen → Default `"ios"` wird gespeichert (Verhalten unverändert).
+- [ ] Regression: alle bestehenden Tests (Verify/Rating/US-66/US-67/US-89) bleiben grün; keine Änderung an Auth-Verhalten anderer Endpoints.
+
+**Pre-Mortem:**
+- 💀 **Dubletten-Token sprengen die Tabelle / Doppel-Push beim Rollout.** Auslöser: `INSERT` ohne Conflict-Behandlung → zweite Registrierung desselben Tokens legt eine zweite Zeile an; späterer Push sendet doppelt. Frühwarnung: `device_count` steigt bei wiederholter Registrierung desselben Geräts. → Gegenmaßnahme: `token TEXT PRIMARY KEY` + `INSERT ... ON CONFLICT(token) DO UPDATE` (US-89-Upsert-Muster) oder vorgelagertes `SELECT`-EXISTS wie heute. Verankert in AK „Idempotenz".
+- 💀 **Token-Rotation/Invalidierung macht die Tabelle zur Müllhalde toter Tokens.** Auslöser: APNs vergibt rotierende Tokens; alte bleiben für immer in der DB, Push läuft gegen tote Tokens. Frühwarnung: beim Push-Rollout viele `410 Unregistered`-Antworten von APNs. → Gegenmaßnahme: **bewusst NICHT in diesem Ticket lösen** (Push-Versand existiert noch nicht, also gibt es kein APNs-Feedback zum Auswerten). Als bekannter Folgepunkt fürs Push-Rollout-Ticket notiert (Spalte `updated`/`last_seen` jetzt schon mitführen, damit später aufgeräumt werden kann, ohne Migration). Die optionale `device_id`-Spalte erlaubt späteres „pro Gerät nur jüngster Token".
+- 💀 **Migration des RAM-Stands erwartet, ist aber leer → verwirrende Leer-Logik.** Auslöser: jemand baut eine Migrationsroutine für `_device_tokens` → toter Code, da die Liste beim Neustart leer ist. Frühwarnung: Migrations-Code ohne erreichbaren Eingabezustand. → Gegenmaßnahme: explizit dokumentiert (A1), KEINE Migration bauen. Verankert im Scope-Ausschluss.
+- 💀 **Versehentlicher Auth-Schutz sperrt iOS aus.** Auslöser: aus Gewohnheit (US-89/US-90 schützen POST mit `require_auth`) wird `Depends(auth.require_auth)` an `/register-device` gehängt → die native App ohne Login bekommt `401`, kein Gerät registriert sich je. Frühwarnung: `register`-Aufrufe von iOS liefern `401`. → Gegenmaßnahme: Endpoint bleibt bewusst offen (A3); bestehender Kommentar `main.py:992–993` bleibt erhalten und wird ergänzt. KEIN `Depends` hinzufügen. Verankert im Scope-Ausschluss + Regression-AK.
+- 💀 **Python-3.10-Syntax crasht Prod (Py 3.9).** Auslöser: `list[dict]`/`str | None`-Annotation in neuen Store-Signaturen. Frühwarnung: grüne Sandbox (3.10), roter Prod-Start. → Gegenmaßnahme: `from __future__ import annotations` ist in `store.py` bereits aktiv; neue Methoden mit `List[dict]`/`Optional[...]` aus `typing` bzw. PEP-563-String-Annotations wie im Bestand. Kein `|` in Annotations.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Idempotenz, Persistenz-über-Neustart, Token-als-Schlüssel, offener Auth-Status)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, alle in AK/Scope verankert)
+- [x] Architektur analysiert:
+  - `backend/main.py` — `_device_tokens` (Z. 251, einziger RAM-Speicher), `/register-device` (Z. 990–997, Query-Param `token`, unauthentifiziert per US-66-Kommentar). `_store = LocationStore()` bereits global (Z. 101) → wiederverwendbar. KEIN weiterer Konsument der Liste.
+  - `backend/data/store.py` — neue Tabelle in `_INIT_SQL` (Z. 37–85) analog `location_ratings`; neue Methoden analog `upsert_rating`/`get_rating_summary` (Z. 375–422) mit `BEGIN/COMMIT/ROLLBACK`. `from __future__ import annotations` + `Optional`/`List` vorhanden.
+  - `backend/notifications/push.py` — künftiger Konsument (`send_push_notification(device_token, …)`, Z. 71); zeigt, dass die geladene Liste pro Eintrag genau einen `token` braucht → Form-AK.
+  - `backend/tests/test_api_regression.py` — neue Klasse `TestTask24DeviceTokens` analog `TestBug26Verifications` (Z. 53 ff.); kein `auth_headers` nötig (Endpoint offen). Persistenz-AK via zweiter `LocationStore`-Instanz auf dieselbe `data_dev`-DB.
+- [x] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: **Option A** (siehe unten) — Weg-Gate offen für Stephan.
+
+**Implementierungsoptionen:**
+
+*Option A — Eigene Tabelle `device_tokens`, DB ist Source of Truth, RAM-Liste entfällt.*
+- Vorgehen: `CREATE TABLE device_tokens (token TEXT PRIMARY KEY, platform TEXT DEFAULT 'ios', device_id TEXT DEFAULT '', updated TEXT)`. Store: `register_device_token(token, platform, device_id, updated)` (Upsert via `ON CONFLICT(token)`), `load_device_tokens() -> List[dict]`. `/register-device` ruft `_store.register_device_token(...)` und gibt `device_count = len(_store.load_device_tokens())` zurück. `_device_tokens`-Modulvariable wird **entfernt** (kein RAM-State mehr).
+- Betroffene Dateien: `backend/data/store.py`, `backend/main.py`, `backend/tests/test_api_regression.py`.
+- Vorteile: folgt 1:1 dem getesteten US-89-Upsert-Pfad; `PRIMARY KEY token` erzwingt Idempotenz ohne Race; keine RAM/DB-Divergenz; `updated`/`device_id`-Spalten machen das spätere Push-Rollout (Aufräumen toter Tokens, Dedup pro Gerät) ohne Migration möglich.
+- Nachteile/Risiken: jeder künftige Push-Lauf liest die Liste aus der DB (vernachlässigbar bei der Gerätezahl). Aufwand: **klein**.
+
+*Option B — DB-Persistenz + RAM-Cache (`_device_tokens` als Boot-Hydration).*
+- Vorgehen: Tabelle wie A; zusätzlich `_device_tokens` beim Startup aus `load_device_tokens()` befüllen und bei jeder Registrierung sowohl DB als auch Liste aktualisieren.
+- Vorteile: Push-Versand liest aus RAM (kein DB-Hit pro Lauf); minimaler Eingriff in spätere Push-Logik, die heute schon `_device_tokens` erwartet.
+- Nachteile/Risiken: zwei Quellen, die synchron gehalten werden müssen → Divergenz-Risiko (genau die Klasse Bug, die TASK-23 eigentlich beseitigen will); doppelte Schreibpfade. Aufwand: **klein–mittel**.
+
+*Option C — Generische `device_kv`-Tabelle (Key-Value), Token als ein Key-Typ.*
+- Vorgehen: gemeinsame Tabelle für alle Geräte-Settings (vgl. US-90 Option B), Push-Token als `key='push_token'`.
+- Vorteile: eine Tabelle für künftige Device-Daten.
+- Nachteile/Risiken: YAGNI; kein `PRIMARY KEY token` → Idempotenz nur per Anwendungslogik; weicht vom etablierten Tabellen-pro-Domäne-Muster ab → höhere Review-Last; US-90 hat dieselbe Option bereits zugunsten der dedizierten Tabelle verworfen. Aufwand: **mittel**.
+
+✅ **Empfehlung: Option A** — beseitigt den RAM-State vollständig (genau das Ziel des Persistenz-Audits TASK-23, keine zweite Wahrheit), folgt exakt dem frisch getesteten US-89-Upsert-Muster, ist der kleinste konsistente Diff und legt mit `updated`/`device_id`-Spalten das Fundament fürs spätere Push-Rollout, ohne jetzt Push-Logik vorwegzunehmen.
+
+**Testplan:**
+- [ ] Automatisiert (Harness, `backend/tests/test_api_regression.py`, Klasse `TestTask24DeviceTokens`, Ticket-ID „TASK-24" im Docstring):
+  - `POST /register-device?token=tok-test-1&platform=ios` → 200, `status == "registered"`.
+  - Zweiter `POST` mit `token=tok-test-1` → 200, `status == "already_registered"`; Zeilenzahl in `device_tokens` unverändert (kein Doppeleintrag).
+  - Persistenz: nach Registrierung neue `LocationStore`-Instanz auf dieselbe `data_dev`-DB erzeugen → `load_device_tokens()` enthält `tok-test-1` mit `{"token": "tok-test-1", "platform": "ios"}`.
+  - `POST /register-device` ohne `token` → 422; `token=` (leer) → 422.
+  - `platform` weggelassen → gespeicherter Eintrag hat `platform == "ios"`.
+  - Cleanup: Test-Token am Ende aus der DB entfernen (analog Verify-Cleanup), damit der Harness idempotent bleibt.
+- [ ] Manuell (http://localhost:8000): `curl -X POST 'http://localhost:8000/register-device?token=manual-1'` → `registered`; gleicher Call erneut → `already_registered`; Server neu starten; erneuter Call mit `manual-1` → `already_registered` (Token überlebte den Neustart). Beweist den Kern-AK.
+
+#### 📋 Implementation Spec Ende
+
+---
+
 ### US-87 · Locationdetails: größere Karte / Vollbild-Overlay zum Pin-Setzen `[ ]`
 
 | Feld | Wert |
@@ -2348,6 +2647,114 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ### US-11 · Bauarbeiten & Sperrungen
 > Manuelles Crowdsourcing + Berlin Open Data API. *(Offen)*
+
+---
+
+### US-89 · Sterne-Bewertungen serverseitig speichern & für alle aggregieren `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-21 |
+
+**Beschreibung:** Standort-Bewertungen (1–5 Sterne) liegen aktuell nur lokal im `localStorage` (pro Gerät). Für das Go-Live-Versprechen „Bewertung sichtbar für ALLE" müssen Sterne serverseitig persistiert und aggregiert (Summe + Ø) werden — analog zu BUG-26, das die SQLite-Persistenz für Verifikationen bereits gebaut hat.
+
+**Bezug:** Go-Live-Blocker aus ROADMAP.md (NOW). Baut auf der SQLite-Persistenzschicht von BUG-26 [x] auf (gemeinsame Infrastruktur). Grenzt an US-68 (Host-Approval) — eigenständig, aber gleiche Server-Daten-Domäne. Ersetzt das nie angelegte US-24 (lokale Bewertung).
+
+**Scope:**
+- Eingeschlossen: Server-Endpoint zum Speichern/Abrufen von Bewertungen pro Location; Aggregation Summe + Durchschnitt; Frontend-Anzeige geteilt statt `localStorage`; ein Nutzer = eine Bewertung pro Location (überschreibbar).
+- Ausgeschlossen: Freitext-Reviews, Spam-/Missbrauchsschutz, Nutzer-Authentifizierung über US-66 hinaus.
+
+**Akzeptanzkriterien:**
+- [x] Bewertung (1–5) wird serverseitig persistiert (gleiche SQLite-Schicht wie BUG-26) und ist geräteübergreifend sichtbar
+- [x] Pro Location werden Anzahl und Durchschnitt (Ø) berechnet und für alle Nutzer angezeigt
+- [x] Ein Nutzer kann seine eigene Bewertung abgeben und ändern (keine Mehrfachzählung)
+- [x] Bestehende lokale Bewertungen (localStorage) brechen das Frontend nicht (saubere Migration/Fallback)
+- [x] Schreib-Endpoint ist gegen US-66-Auth abgesichert, soweit nötig
+
+**Offen für Analyse:** Datenmodell (eigene Tabelle vs. Erweiterung der Verifikations-Tabelle), Identität „ein Nutzer" ohne individuelle Accounts (Geräte-Token?), Umgang mit Alt-Daten aus localStorage.
+
+## 🔬 Analyse (fotoalert-analyze, 2026-06-21)
+
+### Example Mapping
+
+**❓ Scope-Frage (vor Mapping):** „Ein Nutzer = eine Bewertung" — es gibt KEINE Nutzer-Accounts. US-66-Auth ist **rollenbasiert** (`host`/`user`), nicht personenbezogen: das Token ist `"<role>.<hmac>"` und für alle „user" identisch (`auth.py`). „Ein Nutzer" lässt sich serverseitig also nicht aus dem Auth-Token ableiten. Identität muss über einen **clientseitig generierten Geräte-Token** (UUID in localStorage) laufen. Annahme für diese Spec: 1 Gerät ≈ 1 Nutzer (akzeptierte v1-Grenze, analog zur Token-Grenze in US-66). Bei Bestätigung kein weiterer Klärungsbedarf → Mapping vollständig.
+
+📏 **Rule 1 — Persistenz & Aggregation serverseitig.** Eine Bewertung (1–5) wird im Backend gespeichert; pro Location werden Anzahl und Ø aus allen Geräten berechnet und für alle ausgeliefert.
+- 🟢 *Positiv:* Given Location L hat Bewertungen 5,4,3 von drei Geräten · When ein viertes Gerät `GET /ratings` lädt · Then es sieht `count=3, avg=4.0` (Ø auf 1 Nachkommastelle).
+- 🔴 *Negativ:* Given L hat keine Bewertung · When `GET` · Then `count=0, avg=null` (NICHT `avg=0`, sonst zeigt UI „0 Sterne" statt „noch nicht bewertet").
+- ⚠️ *Edge:* Given `value=6` oder `value=0` per POST · Then HTTP 422 (Range 1–5 erzwungen, wie `status`-Guard bei Verifikationen).
+
+📏 **Rule 2 — Ein Gerät = genau eine Bewertung, überschreibbar (Upsert).** Wiederholtes Bewerten desselben Geräts ersetzt den alten Wert, zählt nicht doppelt.
+- 🟢 *Positiv:* Given Gerät D bewertet L mit 4 · When D bewertet L erneut mit 2 · Then `count` bleibt 1, gespeicherter Wert = 2.
+- 🔴 *Negativ:* Given Gerät D und Gerät E bewerten L · Then `count=2` (verschiedene Geräte zählen getrennt — kein fälschliches Dedup über Geräte hinweg).
+- ⚠️ *Edge:* Given D löscht seine Bewertung (`DELETE`) · Then `count` sinkt um 1; war es die einzige → `count=0, avg=null`.
+
+📏 **Rule 3 — Eigene Bewertung sofort & synchron sichtbar (Filter-Kompatibilität).** Der Rating-Filter ruft `Rating.get(id)` **synchron** auf (index.html Z. 1975, 2012). Die eigene Bewertung muss daher client-seitig in einem Cache liegen (wie `Verify._cache`), nicht erst per await nachgeladen.
+- 🟢 *Positiv:* Given D hat L mit 4 bewertet, App-Neustart · When Feed lädt · Then `minRating>=3`-Filter behält L sichtbar (eigener Cache aus `GET /ratings` beim Boot befüllt).
+- 🔴 *Negativ:* Given Rating-Cache nicht geladen (Netzfehler) · Then Filter wirft nicht, behandelt fehlende Bewertung als 0 (degraded, stabil — wie Verify).
+
+📏 **Rule 4 — Migration aus localStorage, einmalig & idempotent.** Alt-Bewertungen unter `fotoalert_ratings` werden beim ersten Start ans Backend gepusht, danach lokal entfernt.
+- 🟢 *Positiv:* Given localStorage `{L1:4, L2:5}` · When `init()` · Then beide als Bewertung dieses Geräts im Backend, `fotoalert_ratings` gelöscht.
+- ⚠️ *Edge:* Given Migration läuft, Gerät hatte L1 schon serverseitig bewertet (Re-Install mit altem localStorage) · Then Upsert → kein Duplikat, keine Doppelzählung.
+
+**Questions:** 0 offen (Geräte-Token-Annahme s.o.; bei Ablehnung → Rückfrage an Stephan).
+
+### Akzeptanzkriterien (final, testbar)
+- [x] `POST /locations/{id}/ratings` mit `{value:4}` + gültigem Geräte-Token speichert/aktualisiert → `200/201`, danach `GET /locations/{id}/ratings` liefert die Bewertung dieses Geräts.
+- [x] `GET /locations/{id}/ratings` liefert `{count, avg, mine}` — `avg` auf 1 Nachkommastelle, `mine` = Wert des aufrufenden Geräts oder `null`.
+- [x] Zweite POST desselben Geräts überschreibt: `count` unverändert, neuer Wert gespeichert (Upsert über `(location_id, device_id)`).
+- [x] Zwei verschiedene Geräte → `count=2`, `avg` = Mittel beider Werte.
+- [x] `value` außerhalb 1–5 → HTTP 422.
+- [x] Edge: Location ohne Bewertungen → `count=0, avg=null` (UI zeigt „noch nicht bewertet", keine 0-Sterne).
+- [x] `DELETE /locations/{id}/ratings` (Geräte-Token) entfernt eigene Bewertung; war es die letzte → `count=0`.
+- [x] Schreib-Endpoints (POST/DELETE) verlangen `auth.require_auth` (401 ohne Bearer-Token); GET ohne Auth.
+- [x] Edge (Migration): localStorage `fotoalert_ratings` wird beim ersten Start gepusht und gelöscht; erneuter Start pusht nichts mehr (idempotent, kein Crash bei leerem/kaputtem JSON).
+- [x] Edge (Filter): `minRating`-Filter im Feed/Locations bleibt funktionsfähig (synchroner `Rating.get` aus Boot-Cache).
+
+### Pre-Mortem
+- 💀 **„Ein Nutzer" über alle Geräte gleich** — Auslöser: Identität fälschlich aus US-66-`user`-Token abgeleitet (ist für alle identisch) → ein Gerät überschreibt die Bewertung aller. Frühwarnung: zwei Geräte → `count` bleibt 1. **Gegenmaßnahme:** clientseitiger `device_id` (UUID via `crypto.randomUUID()` in localStorage `fa_device_id`), als Feld in POST mitgesendet → AK „zwei Geräte = count 2".
+- 💀 **Migration-Doppelzählung bei Re-Install** — Auslöser: alter localStorage + bereits serverseitig vorhandene Bewertung → naives INSERT erzeugt 2. Frühwarnung: `count` steigt nach Re-Install. **Gegenmaßnahme:** Upsert per `UNIQUE(location_id, device_id)` (`INSERT … ON CONFLICT … DO UPDATE`) → idempotent.
+- 💀 **Filter still tot** — Auslöser: Rating-Cache wird async geladen, aber `Rating.get` ist synchron im Filter → leerer Cache beim ersten Render filtert falsch (vgl. BUG-28). **Gegenmaßnahme:** `Rating.loadAll()` im `init()` VOR `Feed.load()` ziehen (analog `Verify.loadAll()`, Z. 4017–4019).
+- 💀 **Python-3.9-Crash in Prod** — Auslöser: `str | None`-Syntax o.Ä. Frühwarnung: grün lokal (3.10), Crash auf Prod (3.9). **Gegenmaßnahme:** `from __future__ import annotations` + `Optional[...]`, exakt wie `store.py`/`auth.py`; `INSERT … ON CONFLICT` ist in SQLite ≥3.24 (Py 3.9 ok).
+- 💀 **`avg=0` statt „unbewertet"** — Auslöser: Aggregation gibt 0 bei leerem Set → UI rendert 0 Sterne. **Gegenmaßnahme:** `avg=null` bei `count=0` (AK + Test).
+
+### Architektur-Analyse
+- **`backend/data/store.py`** — BUG-26 nutzt **eigene Tabelle** `location_verifications` (AUTOINCREMENT, Index auf `location_id`) + Methoden `add/get/delete_*`. US-89 folgt dem Muster mit **eigener Tabelle** `location_ratings` (NICHT verif-Tabelle erweitern — andere Kardinalität: hier Upsert pro `(location_id, device_id)`, dort append-Liste). Felder: `location_id TEXT`, `device_id TEXT`, `value INTEGER`, `updated TEXT`, `UNIQUE(location_id, device_id)`. Neue Methoden: `upsert_rating`, `get_rating_summary(location_id, device_id)`, `delete_rating`, ggf. `load_all_ratings` (Boot-Preload, analog `/verifications`).
+- **`backend/main.py`** — Endpoints analog Z. 1266–1306: `GET /locations/{id}/ratings` (kein Auth), `GET /ratings` (Boot-Preload, kein Auth), `POST /locations/{id}/ratings` + `DELETE …/ratings` (`Depends(auth.require_auth)`). Neues Pydantic-Modell `RatingIn{value:int, device_id:str}`, Range-Guard 1–5 (422) wie `VerificationIn`-`status`-Check.
+- **`backend/auth.py`** — unverändert; `require_auth` deckt POST/DELETE ab. Identität läuft NICHT über Auth (rollenbasiert), sondern über `device_id` im Body.
+- **`web/index.html`** — `Rating`-Objekt (Z. 1778–1860) wird umgebaut: `_cache` (Aggregat pro Location) + `_mine` (eigene Werte), `device_id` aus localStorage `fa_device_id` (lazy `crypto.randomUUID()`), `loadAll()` + `migrateFromLocalStorage()` analog `Verify`. `get()` liest aus `_mine` (synchron, Filter-kompatibel). `inputHtml/displayHtml/feedTagHtml` zusätzlich Aggregat (Ø + Anzahl) anzeigen. `_set/_clear` → async POST/DELETE statt localStorage. `App.init()` (Z. 4013–4022): `Rating.migrateFromLocalStorage()` + `Rating.loadAll()` vor `Feed.load()`.
+
+### Implementierungsoptionen
+**Option A — Eigene Tabelle `location_ratings` mit `device_id`-Upsert (empfohlen).** Neue Tabelle + 4 Store-Methoden + 4 Endpoints; Frontend mit `device_id` + Boot-Cache analog Verify. Vorteile: sauberes Aggregat per `COUNT/AVG`, echte „1 Gerät = 1 Bewertung", folgt exakt dem etablierten BUG-26-Muster. Nachteile: clientseitige Identität (Geräte-Token, nicht personenscharf). Aufwand: mittel.
+
+**Option B — Verif-Tabelle erweitern (`status='rating'`, value in Zusatzspalte).** Bewertungen als Sonder-Verifikationen ablegen. Vorteile: keine neue Tabelle. Nachteile: vermischt zwei Domänen, kein natürliches Upsert (Verif ist append-Liste → Doppelzählung), Aggregation muss filtern. Aufwand: mittel, aber fragiler.
+
+**Option C — Rollenbasierte Identität ohne Geräte-Token (`user`-Token = ein Nutzer).** Vorteile: kein Geräte-Token nötig. Nachteile: **bricht das AK** — alle „user" teilen ein Token → eine globale überschreibbare Bewertung, `count` nie > 1. Verworfen.
+
+✅ **Empfehlung: Option A** — folgt 1:1 dem bewährten BUG-26-Store-/Endpoint-Muster, erfüllt „1 Gerät = 1 Bewertung" sauber über `UNIQUE(location_id, device_id)` + Upsert und hält den synchronen Filter über einen Boot-Cache (Verify-Vorbild) am Leben; Geräte-Token ist die einzige tragfähige Identität, da US-66 rollen- statt nutzerbasiert ist.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Rules, 0 offene Questions; Geräte-Token-Annahme bestätigungsbedürftig)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AK/Plan verankert)
+- [x] Architektur analysiert: `backend/data/store.py`, `backend/main.py`, `backend/auth.py`, `web/index.html` (Rating-Objekt)
+- [x] Implementierungsoptionen: A (eigene Tabelle + device_id) / B (Verif-Tabelle) / C (rollenbasiert, verworfen)
+- [x] Empfehlung **Option A** — Weg-Gate via Board (Lane „Ready for Dev") freigegeben → implementiert
+
+**Implementierungsnotiz (2026-06-21, Pipeline-Heartbeat, Option A):**
+- `backend/data/store.py`: Tabelle `location_ratings` (`UNIQUE(location_id, device_id)`) + `upsert_rating` (INSERT … ON CONFLICT DO UPDATE), `get_rating_summary` → `{count, avg, mine}` (avg 1 NK, `None` bei count 0), `delete_rating`, `load_all_ratings` (Boot-Preload). Folgt BUG-26-Muster.
+- `backend/main.py`: `RatingIn{value, device_id}`; `GET /ratings` (Boot, kein Auth), `GET /locations/{id}/ratings?device_id=` (kein Auth), `POST` + `DELETE /locations/{id}/ratings` (`Depends(auth.require_auth)`). Range-Guard 1–5 + leeres device_id → 422. POST gibt **201**.
+- `web/index.html`: `Rating` mit `_cache`/`_mine`, `fa_device_id` (lazy `crypto.randomUUID()`), `loadAll()` + `migrateFromLocalStorage()` (idempotent, crash-sicher), synchroner `get()` aus `_mine`; `loadAll` in `App.init()` **vor** `Feed.load()`. Ø + Anzahl in input/display/feedTag.
+- Abweichungen: DELETE nutzt `device_id` als Query-Param (API.delete sendet keinen Body, konsistent mit `/verifications/last`); `GET /ratings` liefert Roh-Werte (Frontend leitet `mine` ab, analog `/verifications`).
+- Unabhängige Verifikation: **GRÜN** — alle 10 finalen AKs + 5 Pre-Mortem-Gegenmaßnahmen im Code belegt; Py-3.9-konform (keine `X | None`, `Optional[...]` + `from __future__`).
+- ⏳ **Offen (Test-Gate Stephan):** manueller Browser-/iOS-Test (zweites Gerät/`fa_device_id`, `minRating`-Filter, Migration mit Alt-Daten) + Release-Gate (Deploy am Mac-Terminal).
+
+**Testplan:**
+- [x] Automatisiert (`backend/tests/test_api_regression.py`, Docstring „US-89"): POST→GET Roundtrip (`count/avg/mine`), Upsert (zweiter POST gleiches device_id → count stabil), zwei device_ids → count=2, `value=6`→422, DELETE→count sinkt, leeres Set→`avg=null`, POST ohne Token→401. Plus Vollsystem-Regression (alle bestehenden AK-Tests).
+- [x] Manuell (http://localhost:8000): Bewertung im Detail-Sheet abgeben → in zweitem Browser-Kontext (anderes `fa_device_id`) Ø + Anzahl sichtbar; `minRating`-Filter prüft eigene Bewertung; localStorage-Migration mit Alt-Daten.
 
 ---
 
@@ -2575,8 +2982,10 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 ### US-45 · Wochenvorschau-Widget `[ ]`
 > **Als Fotograf** möchte ich die Top-3 Chancen der Woche als iOS-Homescreen-Widget sehen.
 
-### US-46 · Karten-Ansichtsmodi `[ ]`
+### US-46 · Karten-Ansichtsmodi `[x]`
 > **Als Fotograf** möchte ich zwischen Standard-, Satelliten- und Nacht-Ansicht auf der Karte wechseln können.
+>
+> **✅ Verifiziert & geschlossen (2026-06-21):** Layer-Toggle bereits implementiert in `web/index.html` — Buttons Nacht/Standard/Satellit (Z. 768–771) → `MapView.setLayer()`, Satellit via ArcGIS World_Imagery (Z. 2506). Anforderung erfüllt, kein Rest-Scope.
 
 ### TASK-06 · AR-Overlay: Sonnenbahn über Kamera-Live-Preview `[ ]`
 > Sonnenbahn als AR-Overlay über dem Kamera-Bild einblenden.

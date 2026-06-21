@@ -8,9 +8,11 @@ Tabellen:
   custom_locations      — vom User angelegte Foto-Standorte
   location_overrides    — Koordinaten-/Name-Korrekturen für Standard-Locations
   location_verifications — Vor-Ort-Verifikationen und Problemmeldungen (BUG-26)
+  location_ratings       — Sterne-Bewertungen pro Gerät (US-89)
 
 TASK-17: SQLite-Migration + atomare Writes (Fundament)
 BUG-26:  location_verifications Tabelle + CRUD
+US-89:   location_ratings Tabelle + Upsert/Aggregation
 """
 
 from __future__ import annotations
@@ -70,6 +72,16 @@ CREATE TABLE IF NOT EXISTS location_verifications (
 );
 
 CREATE INDEX IF NOT EXISTS idx_verif_location ON location_verifications(location_id);
+
+CREATE TABLE IF NOT EXISTS location_ratings (
+    location_id   TEXT    NOT NULL,
+    device_id     TEXT    NOT NULL,
+    value         INTEGER NOT NULL,   -- 1..5
+    updated       TEXT    NOT NULL,   -- ISO-Timestamp
+    UNIQUE(location_id, device_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rating_location ON location_ratings(location_id);
 """
 
 
@@ -355,6 +367,91 @@ class LocationStore:
             except Exception:
                 conn.execute("ROLLBACK")
                 raise
+
+    # ------------------------------------------------------------------
+    # Location Ratings (US-89)
+    # ------------------------------------------------------------------
+
+    def upsert_rating(self, location_id: str, device_id: str,
+                      value: int, updated: str) -> None:
+        """
+        Speichert/aktualisiert die Bewertung eines Geräts für eine Location.
+        Upsert über UNIQUE(location_id, device_id) → ein Gerät = eine Bewertung,
+        überschreibbar, keine Doppelzählung (BUG-26-Muster, aber mit ON CONFLICT).
+        """
+        sql = """INSERT INTO location_ratings (location_id, device_id, value, updated)
+                 VALUES (?, ?, ?, ?)
+                 ON CONFLICT(location_id, device_id)
+                 DO UPDATE SET value = excluded.value, updated = excluded.updated"""
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(sql, (location_id, device_id, int(value), updated))
+                conn.execute("COMMIT")
+                logger.info("Rating gespeichert: %s device=%s value=%s",
+                            location_id, device_id, value)
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def get_rating_summary(self, location_id: str,
+                           device_id: Optional[str] = None) -> dict:
+        """
+        Aggregiert Bewertungen einer Location: {count, avg, mine}.
+        avg auf 1 Nachkommastelle, None bei count=0 (NICHT 0 → UI „unbewertet").
+        mine = Wert des aufrufenden Geräts oder None.
+        """
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT COUNT(*) AS n, AVG(value) AS a FROM location_ratings "
+                "WHERE location_id = ?",
+                (location_id,)
+            ).fetchone()
+            count = row["n"] or 0
+            avg = round(row["a"], 1) if count else None
+
+            mine = None
+            if device_id:
+                mrow = conn.execute(
+                    "SELECT value FROM location_ratings "
+                    "WHERE location_id = ? AND device_id = ?",
+                    (location_id, device_id)
+                ).fetchone()
+                if mrow:
+                    mine = mrow["value"]
+        return {"count": count, "avg": avg, "mine": mine}
+
+    def delete_rating(self, location_id: str, device_id: str) -> bool:
+        """Löscht die Bewertung eines Geräts für eine Location. True wenn gefunden."""
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                cur = conn.execute(
+                    "DELETE FROM location_ratings "
+                    "WHERE location_id = ? AND device_id = ?",
+                    (location_id, device_id)
+                )
+                conn.execute("COMMIT")
+                found = cur.rowcount > 0
+                if found:
+                    logger.info("Rating gelöscht: %s device=%s", location_id, device_id)
+                return found
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def load_all_ratings(self) -> list:
+        """
+        Gibt aggregierte Bewertungen aller Locations zurück (Boot-Preload).
+        Pro Location: {location_id, count, avg}. avg auf 1 Nachkommastelle,
+        None bei count=0 (kommt durch GROUP BY hier nicht vor, aber konsistent).
+        Zusätzlich die Roh-Werte je Gerät, damit das Frontend `mine` ableiten kann.
+        """
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT location_id, device_id, value FROM location_ratings"
+            ).fetchall()
+        return [dict(r) for r in rows]
 
     def integrity_check(self) -> str:
         """Führt PRAGMA integrity_check aus. Gibt 'ok' zurück bei Erfolg."""
