@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.3';
+const APP_VERSION = '1.11.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1143,7 +1143,7 @@ function oppCard(o) {
           <span class="opp-time">${formatTime(o.shoot_time)}</span>
         </div>
         <div class="opp-title">${o.title}</div>
-        <div class="opp-location">📍 ${o.location_name}</div>
+        <div class="opp-location">📍 ${Locations.nameFor(o.location_id, o.location_name)}</div>
         <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${rated}</div>
       </div>
     </div>
@@ -1221,7 +1221,7 @@ const Feed = {
         `<div class="alert-chip" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           <div class="chip-icon">${ICONS[o.event_type]||'📷'}</div>
           <div class="chip-day">${formatDate(o.shoot_time)}</div>
-          <div class="chip-name">${o.location_name}</div>
+          <div class="chip-name">${Locations.nameFor(o.location_id, o.location_name)}</div>
         </div>`).join('');
       html += `<div id="alert-banner">
         <h3>⭐ Besondere Ereignisse (${high.length})</h3>
@@ -1524,7 +1524,7 @@ const CalendarView = {
             <div class="cal-event-icon">${icon}</div>
             <div class="cal-event-body">
               <div class="cal-event-title">${e.title}${prio}</div>
-              <div class="cal-event-sub">${e.location_name} · ${hh}:${mm} Uhr${moonTxt}</div>
+              <div class="cal-event-sub">${Locations.nameFor(e.location_id, e.location_name)} · ${hh}:${mm} Uhr${moonTxt}</div>
             </div>
             <div class="cal-event-score">${Math.round(e.overall_score * 100)}%</div>
           </div>`;
@@ -2076,7 +2076,7 @@ const Filter = {
       if (Search.query) {
         const q = Search.query;
         const hay = [
-          (o.location_name || ''),
+          (Locations.nameFor(o.location_id, o.location_name) || ''),
           (o.title || ''),
           (o.event_type || ''),
         ].join(' ').toLowerCase();
@@ -2687,7 +2687,7 @@ const Detail = {
       <div class="sheet-hero">
         <div class="sheet-hero-type">${icon} ${o.event_type}</div>
         <div class="sheet-hero-title">${o.title}</div>
-        <div class="sheet-hero-loc">📍 <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${o.location_name} →</button></div>
+        <div class="sheet-hero-loc">📍 <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>
         <div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>
       </div>
       <div class="sheet-score-bar">
@@ -2897,7 +2897,7 @@ const Detail = {
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           🔔 Erinnerung setzen (30 Min. vorher)
         </button>
-        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${o.location_name.replace(/'/g,"\\'")}' )" style="background:var(--card);color:#4caf50;border:1px solid rgba(76,175,80,.4)">
+        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\\'")}' )" style="background:var(--card);color:#4caf50;border:1px solid rgba(76,175,80,.4)">
           ${Verify.getLast(o.location_id) ? '✓ Erneut prüfen / Kommentar ändern' : '📍 Vor Ort geprüft markieren'}
         </button>
       </div>
@@ -2926,7 +2926,7 @@ const Detail = {
       'BEGIN:VEVENT',
       `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
       `SUMMARY:📸 ${o.title}`,
-      `LOCATION:${o.location_name}`,
+      `LOCATION:${Locations.nameFor(o.location_id, o.location_name)}`,
       `DESCRIPTION:${notes.replace(/\n/g,'\\n')}`,
       'END:VEVENT', 'END:VCALENDAR'
     ].join('\r\n');
@@ -2946,7 +2946,7 @@ const Detail = {
       if (ms < 0) { toast('Zeitpunkt liegt in der Vergangenheit'); return; }
       setTimeout(() => {
         new Notification(`📸 ${o.title}`, {
-          body: `Jetzt aufbrechen – optimale Aufnahmezeit in 30 Minuten bei ${o.location_name}`,
+          body: `Jetzt aufbrechen – optimale Aufnahmezeit in 30 Minuten bei ${Locations.nameFor(o.location_id, o.location_name)}`,
           icon: '/icons/icon-192.png'
         });
       }, ms);
@@ -3173,6 +3173,11 @@ const Locations = {
   async load() {
     this.all = await API.get('/locations');
     this.render(Filter.applyToLocations(this.all));
+  },
+  // BUG-30: Live-Lookup des Locations-Namens — gibt Override-Namen zurück wenn
+  // Locations.all schon befüllt ist, sonst Fallback auf den Cache-Snapshot.
+  nameFor(locationId, fallback) {
+    return this.all.find(l => l.id === locationId)?.name ?? fallback;
   },
   filter(q) {
     // Filter-Kriterien (Schwierigkeit, Rating, etc.) UND Textsuche kombinieren
@@ -3496,20 +3501,14 @@ const LocationDetail = {
     btn.textContent = 'Speichert…'; btn.disabled = true;
     try {
       await API.patch(`/locations/${locId}`, body);
-      // In-Memory lokale Liste aktualisieren
-      const loc = Locations.all.find(l => l.id === locId);
-      if (loc) {
-        loc.name = name; loc.description = description;
-        loc.subject_name = subject_name; loc.special_notes = special_notes;
-        loc.difficulty = difficulty; loc.focal_length_suggestions = focal_length_suggestions;
-        if (subject_height_m !== null && !isNaN(subject_height_m)) loc.subject_height_m = subject_height_m;
-        if (observer_floor_height_m !== null && !isNaN(observer_floor_height_m)) loc.observer_floor_height_m = observer_floor_height_m;
-        if (obsCoords) { loc.observer_lat = obsCoords.lat; loc.observer_lon = obsCoords.lon; }
-        if (subjCoords) { loc.subject_lat = subjCoords.lat; loc.subject_lon = subjCoords.lon; }
-      }
+      // BUG-30: Locations.all frisch vom Server laden damit nameFor() überall
+      // sofort den neuen Namen liefert (Feed-Karten, Opportunity-Detail-Link, Suche)
+      Locations.all = await API.get('/locations');
       toast('✓ Location aktualisiert');
       LocationDetail.open(locId);
       Locations.render(Locations.all);
+      // Feed und Kalender neu rendern damit location_name-Links sofort aktuell sind
+      if (Feed.data) Feed.render();
     } catch(e) {
       toast('Fehler: ' + e.message);
       btn.textContent = 'Speichern'; btn.disabled = false;
@@ -4108,6 +4107,9 @@ const App = {
     // US-89: localStorage-Bewertungen einmalig migrieren, dann Aggregat-Cache laden
     await Rating.migrateFromLocalStorage();
     await Rating.loadAll();
+    // BUG-30: Locations vorladen (kein Render, nur Daten) damit Locations.nameFor()
+    // im Feed/Kalender-Detail sofort den aktuellen Namen liefert — ohne Locations-Tab-Besuch.
+    Locations.all = await API.get('/locations');
     // Lade Feed (Verify._cache + Rating._cache/_mine sind jetzt befüllt → Badges/Filter korrekt)
     await Feed.load();
     // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch

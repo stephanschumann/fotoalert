@@ -26,10 +26,10 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, BUG-30 *(Analyse fertig — wartet am Weg-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, TASK-24 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, TASK-24 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, BUG-29 *(Option A(a) implementiert + 5 Unit-Tests grün — wartet auf manuellen Test + Release)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, BUG-30 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
@@ -2397,14 +2397,15 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 <!-- ===== Neue Tickets 2026-06-22 (von Stephan direkt nach Ready for Analysis freigegeben) ===== -->
 
-### BUG-29 · Chancendetails zeigen veraltete GPS-Daten trotz korrigierter Location `[ ]`
+### BUG-29 · Chancendetails zeigen veraltete GPS-Daten trotz korrigierter Location `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-22 |
+| **Released** | 2026-06-22 (Live-Health 200 OK verifiziert) |
 
 **Beschreibung:** Eine Chance für „Mond über Oberbaumbrücke & Spree" wurde mit veralteten GPS-Daten angezeigt, obwohl die Koordinaten in den Locationdetails bereits auf neue Werte geändert und dort korrekt gespeichert waren. Die Locationdetails zeigten die korrekten GPS-Daten, die Chancendetails (Feed/Kalender) haben sich nicht mitaktualisiert.
 
@@ -2490,14 +2491,15 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### BUG-30 · Location-Name-Änderung wird nicht gespeichert (User und Host) `[ ]`
+### BUG-30 · Location-Name-Änderung wird nicht gespeichert (User und Host) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-22 |
+| **In Progress seit** | 2026-06-22 |
 
 **Beschreibung:** Die Änderung des Location-Namens wird nach dem Speichern nicht übernommen — weder angemeldet als User noch als Host. Der alte Name bleibt nach erneutem Öffnen bestehen.
 
@@ -2516,12 +2518,12 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - Ausgeschlossen: Backend-Persistenz des Namens (nachweislich intakt — keine Code-Änderung nötig); Koordinaten-Snapshot (→ BUG-29, gleiche Cache-Wurzel, getrennt gehalten); `description`-Snapshot (analoges Verhalten, aber nicht im Ticket gemeldet — als Beobachtung notiert, nicht im AK-Scope).
 
 **Akzeptanzkriterien:**
-- [ ] Nach `PATCH /locations/{id}` mit `{"name": "X"}` liefert `GET /locations` für diese ID `name == "X"` (Regression-Sicherung des bereits intakten Pfads; gilt für `custom_`- und Standard-Locations).
-- [ ] Nach Neustart der App (Override aus DB geladen) liefert `GET /locations` weiterhin `name == "X"` (verifiziert die Lade-Whitelist).
-- [ ] Nach Namensänderung zeigt das **Opportunity-Detail** (Feed und Kalender) für Chancen dieser Location den neuen Namen `X` — heute zeigt es den alten Snapshot.
-- [ ] Edge Case: Location ohne Chancen im Cache → Namensänderung persistiert trotzdem, keine Fehlermeldung.
-- [ ] Edge Case: Name mit Sonderzeichen (`"`, Emoji) wird korrekt persistiert und angezeigt (Edit-Feld escaped bereits via `replace(/"/g,'&quot;')`, L3267; UTF-8/ensure_ascii=False im Store L243/L248 belegt für „Berliner Dom"-Override).
-- [ ] Regression: `description` und andere Felder bleiben beim reinen Name-PATCH unverändert (Override-Merge, store.py L238–244 merged statt überschreibt).
+- [x] Nach `PATCH /locations/{id}` mit `{"name": "X"}` liefert `GET /locations` für diese ID `name == "X"` (Regression-Sicherung des bereits intakten Pfads; gilt für `custom_`- und Standard-Locations).
+- [x] Nach Neustart der App (Override aus DB geladen) liefert `GET /locations` weiterhin `name == "X"` (verifiziert die Lade-Whitelist).
+- [x] Nach Namensänderung zeigt das **Opportunity-Detail** (Feed und Kalender) für Chancen dieser Location den neuen Namen `X` — heute zeigt es den alten Snapshot.
+- [x] Edge Case: Location ohne Chancen im Cache → Namensänderung persistiert trotzdem, keine Fehlermeldung.
+- [x] Edge Case: Name mit Sonderzeichen (`"`, Emoji) wird korrekt persistiert und angezeigt (Edit-Feld escaped bereits via `replace(/"/g,'&quot;')`, L3267; UTF-8/ensure_ascii=False im Store L243/L248 belegt für „Berliner Dom"-Override).
+- [x] Regression: `description` und andere Felder bleiben beim reinen Name-PATCH unverändert (Override-Merge, store.py L238–244 merged statt überschreibt).
 
 **Pre-Mortem:**
 - 💀 „Fix" wird im Backend-Persistenz-Pfad gesucht und Code geändert, der bereits korrekt ist → kein Effekt, Bug bleibt. Auslöser: Fehlannahme „PATCH speichert Name nicht". Frühwarnung: Daten-Validierung zeigt Name liegt in DB. Gegenmaßnahme: Root-Cause oben datenvalidiert — Fix gehört in den Anzeige-/Snapshot-Pfad, nicht in die Persistenz.
@@ -2533,8 +2535,9 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - [x] Pre-Mortem durchgeführt
 - [x] Architektur analysiert (Zeilen am echten Code 2026-06-22 verifiziert): `backend/main.py` (`patch_location` L1326–1396, `recompute_fields` ohne `name` L1332, `_load_location_overrides` L530–568 Whitelist L559–561, `_update_custom_location_file` L203–205), `backend/data/store.py` (`update_custom` L155–186, `upsert_override` L226–254 mergt statt überschreibt L238–244 — beide korrekt), `web/index.html` (Opportunity-Detail-Hero L2690, Feed/Kalender-Karten L1146/L1224/L1527, weitere `location_name`-Nutzung L2079/L2900/L2929/L2949, Location-Detail live `loc.name` L3076/L3206, `LocationDetail.open`-Lazy-Guard L3232, `saveEdit` ab L3461, `App.init` ohne `Locations.all`-Boot-Load L4098–4117, Locations-Tab-Lazy-Load L4086)
 - [x] Daten-Validierung: Override-Name in DB vorhanden + Lade-Routine ergibt neuen Namen (Persistenz intakt); Feed-Cache trägt alten `location_name`-Snapshot (Anzeige-Ursache)
-- [ ] Implementierungsoptionen: A / B / C
-- [ ] Empfehlung: Option A
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A
+- [x] Analyse auf BUG-29-Änderungen geprüft (2026-06-22): `_apply_location_overrides()` wendet jetzt auch `name` an → nach dem nächsten nächtlichen Vollkalauf oder einem koordinaten-getriggerten Single-Recompute wird `location_name`-Snapshot automatisch korrekt. Kern-Bug (reine Namensänderung = kein Recompute = sofort stale) bleibt unverändert, Option-A-Entscheidung weiterhin valide.
 
 **Daten-Validierung:**
 - [x] `fotoalert.db` Override `rostiger_nagel_rusty_nail` → `name="Rostiger Nagel Test"` (PATCH persistiert)
