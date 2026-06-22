@@ -681,14 +681,35 @@ async def find_opportunities_multi_day(
     astronomy_only=True: Wetter komplett ignorieren (für Jahreskalender).
     """
     import asyncio as _asyncio
-    all_opps: list[PhotoOpportunity] = []
-    for i in range(days):
-        d = start_date + timedelta(days=i)
-        opps = await find_opportunities(location, d, forecast, min_score, astronomy_only=astronomy_only)
-        all_opps.extend(opps)
-        # Event Loop freigeben alle 7 Tage – verhindert Blocking bei langen Scans
-        if i % 7 == 0:
-            await _asyncio.sleep(0)
+    import os as _os
+    from calculations import astronomy as _astro
+
+    # TASK-25: On-Demand Window-Engine (Feature-Flag). Wenn aktiv, werden Sonne/
+    # Mond/Milchstraße einmal für das ganze Fenster berechnet (statt pro Tag) →
+    # ein 14-Tage-Plan rechnet in Sub-Sekunden (AK1). Standard: aus (Alt-Pfad).
+    _use_window = _os.getenv("FOTOALERT_ONDEMAND", "0") == "1"
+    _window = None
+    if _use_window:
+        try:
+            from calculations.window_engine import WindowEphemeris
+            _window = WindowEphemeris(location.observer_lat, location.observer_lon,
+                                      start_date, days)
+            _astro.set_active_window(_window)
+        except Exception:
+            _window = None
+
+    try:
+        all_opps: list[PhotoOpportunity] = []
+        for i in range(days):
+            d = start_date + timedelta(days=i)
+            opps = await find_opportunities(location, d, forecast, min_score, astronomy_only=astronomy_only)
+            all_opps.extend(opps)
+            # Event Loop freigeben alle 7 Tage – verhindert Blocking bei langen Scans
+            if i % 7 == 0:
+                await _asyncio.sleep(0)
+    finally:
+        if _window is not None:
+            _astro.clear_active_window()
 
     # Sortierung: Datum aufsteigend, innerhalb eines Tages Score absteigend
     all_opps.sort(key=lambda o: (o.shoot_time.date(), -o.overall_score))

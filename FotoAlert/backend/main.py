@@ -609,13 +609,25 @@ async def startup():
             logger.info("Scout-Cache hat altes Schema (moon_*) — starte Neuberechnung (US-81).")
         asyncio.create_task(_refresh_discover())
 
+    # TASK-25 / AK5 (Option A): Im On-Demand-Modus wird der schwere 365-Tage-
+    # Kalender NICHT mehr vorberechnet (kommt live über /calendar). Es bleibt nur
+    # ein leichter 14-Tage-Feed-Refresh (für den schnellen Startbildschirm), der
+    # dank Window-Engine in Minuten statt Stunden läuft. Default (Flag aus) =
+    # bisheriges Verhalten (full).
+    _ondemand = os.getenv("FOTOALERT_ONDEMAND", "0") == "1"
+    _precompute_mode = "feed" if _ondemand else "full"
+
     # 3. Wenn kein Cache vorhanden: Vorberechnung starten
     if not cache_ok:
-        logger.warning("Kein Cache gefunden – starte Erstberechnung im Hintergrund (dauert ~2–5 Min.)")
-        asyncio.create_task(_run_precompute())
+        logger.warning("Kein Cache gefunden – starte Erstberechnung im Hintergrund "
+                       "(Modus=%s)", _precompute_mode)
+        asyncio.create_task(_run_precompute(_precompute_mode))
 
-    # Scheduler
-    scheduler.add_job(_run_precompute,   "cron", hour=5,  minute=30)   # täglich 05:30
+    # Scheduler — functools.partial bleibt eine Coroutine-Funktion (APScheduler
+    # awaitet sie korrekt; ein lambda täte das nicht).
+    import functools as _functools
+    scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
+                      "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
     scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
     scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
     scheduler.start()
@@ -835,6 +847,63 @@ async def get_today_opportunities():
     return result[:20]
 
 
+@app.get("/plan")
+async def get_plan(
+    observer_lat: float, observer_lon: float,
+    subject_lat: float, subject_lon: float,
+    subject_name: str = "Motiv",
+    subject_height_m: float = 0.0,
+    subject_width_m: float = 0.0,
+    elevation_difference_m: Optional[float] = None,
+    observer_floor_height_m: float = 0.0,
+    days: int = 14,
+    min_score: float = 0.35,
+):
+    """
+    TASK-25 / AK2: On-Demand-Plan für **beliebige** Koordinaten weltweit — ohne
+    dass die Location vorab angelegt sein muss. Nutzt die Window-Engine (eine
+    Ephemeride fürs ganze Fenster) → Sub-Sekunden pro Lokation, stateless.
+
+    Geländehöhe: wird automatisch über den Elevation-Provider aufgelöst, wenn
+    `elevation_difference_m` nicht angegeben ist. Fehlt die DEM-Abdeckung, läuft
+    die Rechnung mit 0 weiter und `elevation_incomplete=true` markiert das.
+    """
+    from datetime import date as _date
+    from data.locations import PhotoLocation, LocationCategory
+    from data.elevation import provider as _elev
+    from calculations.opportunity import find_opportunities_multi_day as _fomd
+    from calculations.window_engine import WindowEphemeris
+    from precompute import _serialize
+    import calculations.astronomy as _astro
+
+    elevation_incomplete = False
+    if elevation_difference_m is None:
+        elevation_difference_m, elevation_incomplete = await _elev.elevation_difference(
+            observer_lat, observer_lon, subject_lat, subject_lon)
+
+    loc = PhotoLocation(
+        id="adhoc", name=subject_name, description="On-demand plan",
+        category=LocationCategory.SKYLINE,
+        observer_lat=observer_lat, observer_lon=observer_lon,
+        subject_lat=subject_lat, subject_lon=subject_lon, subject_name=subject_name,
+        subject_height_m=subject_height_m or None,
+        subject_width_m=subject_width_m or None,
+        elevation_difference_m=elevation_difference_m,
+        observer_floor_height_m=observer_floor_height_m,
+    )
+    start = _date.today()
+    # Window-Engine für genau dieses Fenster erzwingen (unabhängig vom Env-Flag)
+    _astro.set_active_window(WindowEphemeris(observer_lat, observer_lon, start, days))
+    try:
+        opps = await _fomd(loc, start, days, None, min_score=min_score, astronomy_only=True)
+    finally:
+        _astro.clear_active_window()
+    return {"status": "ok", "on_demand": True, "days": days,
+            "elevation_difference_m": elevation_difference_m,
+            "elevation_incomplete": elevation_incomplete,
+            "count": len(opps), "events": [_serialize(o) for o in opps]}
+
+
 @app.get("/daily-briefing", response_model=DailyBriefingOut)
 async def daily_briefing(target_date: Optional[str] = None):
     d = date.fromisoformat(target_date) if target_date else date.today()
@@ -904,7 +973,35 @@ async def get_calendar(
     Jahreskalender: astronomy-only Events für alle Locations, 365 Tage.
     month (1–12) + year filtern serverseitig – Clients sollten immer beide
     Parameter übergeben, um den Payload klein zu halten (~1–3 MB / Monat).
+
+    TASK-25 / AK5: Bei aktivem On-Demand-Flag und gesetzter location_id wird der
+    Kalender für genau diese Location + Monat **live** berechnet (Window-Engine),
+    ohne dass ein 365×N-Batch nötig ist.
     """
+    if os.getenv("FOTOALERT_ONDEMAND", "0") == "1" and location_id and month and year:
+        import calendar as _cal
+        from datetime import date as _date
+        from data.locations import LOCATIONS as _LOCS
+        from calculations.opportunity import find_opportunities_multi_day as _fomd
+        from calculations.window_engine import WindowEphemeris
+        from precompute import _serialize, _passes_alignment_filter
+        import calculations.astronomy as _astro
+
+        loc = next((l for l in _LOCS if l.id == location_id), None)
+        if loc is None:
+            return {"status": "not_found", "events": [], "total": 0,
+                    "message": f"Location {location_id} unbekannt."}
+        ndays = _cal.monthrange(year, month)[1]
+        start = _date(year, month, 1)
+        _astro.set_active_window(WindowEphemeris(loc.observer_lat, loc.observer_lon, start, ndays))
+        try:
+            opps = await _fomd(loc, start, ndays, None, min_score=min_score, astronomy_only=True)
+        finally:
+            _astro.clear_active_window()
+        events = [e for e in (_serialize(o) for o in opps) if _passes_alignment_filter(e)]
+        return {"status": "ok", "on_demand": True, "computed_at": None,
+                "total": len(events), "events": events}
+
     if not _calendar_cache:
         if _precompute_running:
             return {"status": "calculating", "events": [], "total": 0,

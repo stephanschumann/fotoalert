@@ -38,6 +38,34 @@ def _get_eph():
 
 
 # ---------------------------------------------------------------------------
+# TASK-25: On-Demand Window-Engine (optional aktiv)
+# Wenn ein WindowEphemeris-Objekt aktiv ist und die Anfrage abdeckt, delegieren
+# die Primitive (full_report, body_position, alignment) dorthin — die Tages-
+# berechnungen kommen dann aus den vorberechneten Fenster-Arrays statt aus je
+# einem Skyfield-Call pro Tag. Kein Import von window_engine hier (duck-typed) →
+# kein Zirkelimport.
+# ---------------------------------------------------------------------------
+_active_window = None
+
+
+def set_active_window(w) -> None:
+    global _active_window
+    _active_window = w
+
+
+def clear_active_window() -> None:
+    global _active_window
+    _active_window = None
+
+
+def _win_for(lat: float, lon: float, d):
+    w = _active_window
+    if w is not None and w.covers(lat, lon, d):
+        return w
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Datenklassen
 # ---------------------------------------------------------------------------
 
@@ -325,8 +353,15 @@ def get_sun_position(lat: float, lon: float, dt: datetime) -> CelestialPosition:
     return CelestialPosition(azimuth=az.degrees, altitude=alt.degrees, distance_au=dist.au)
 
 
-def calculate_moon_info(lat: float, lon: float, target_date: date) -> MoonInfo:
-    """Berechnet Mond-Informationen: Aufgang, Phase, Beleuchtung."""
+def calculate_moon_info(
+    lat: float, lon: float, target_date: date,
+    sun_info: Optional["SunInfo"] = None,
+) -> MoonInfo:
+    """Berechnet Mond-Informationen: Aufgang, Phase, Beleuchtung.
+
+    TASK-25: ``sun_info`` kann übergeben werden, um die teure Neuberechnung von
+    ``calculate_sun_info`` zu vermeiden (identisches Ergebnis, nur schneller).
+    """
     eph = _get_eph()
     observer = wgs84.latlon(lat * N, lon * E)
     earth = eph["earth"]
@@ -364,7 +399,8 @@ def calculate_moon_info(lat: float, lon: float, target_date: date) -> MoonInfo:
     illumination = (1 - math.cos(math.radians(elongation))) / 2 * 100
 
     # Mondposition während goldener Abendstunde (ca. 1h vor Sonnenuntergang)
-    sun_info = calculate_sun_info(lat, lon, target_date)
+    if sun_info is None:
+        sun_info = calculate_sun_info(lat, lon, target_date)
     gh_time = sun_info.golden_hour_evening_start
     moon_pos_gh = get_body_position(lat, lon, "moon", gh_time)
 
@@ -384,7 +420,23 @@ def get_body_position(lat: float, lon: float, body: str, dt: datetime) -> Option
     """
     Gibt die Position (Azimut, Höhe) eines Himmelskörpers zurück.
     body: 'sun', 'moon', 'venus', 'mars', 'jupiter barycenter', 'saturn barycenter'
+
+    TASK-25: Delegiert an die aktive Window-Engine (Sonne/Mond interpoliert),
+    fällt für Planeten/ohne aktives Fenster auf die direkte Skyfield-Rechnung zurück.
     """
+    try:
+        w = _win_for(lat, lon, dt.astimezone(timezone.utc).date())
+    except Exception:
+        w = None
+    if w is not None:
+        pos = w.body_position(body, dt)
+        if pos is not None:
+            return pos
+    return _get_body_position_direct(lat, lon, body, dt)
+
+
+def _get_body_position_direct(lat: float, lon: float, body: str, dt: datetime) -> Optional[CelestialPosition]:
+    """Direkte Skyfield-Berechnung der Body-Position (ohne Window-Delegation)."""
     try:
         eph = _get_eph()
         observer = wgs84.latlon(lat * N, lon * E)
@@ -398,11 +450,18 @@ def get_body_position(lat: float, lon: float, body: str, dt: datetime) -> Option
         return None
 
 
-def calculate_milky_way_info(lat: float, lon: float, target_date: date) -> MilkyWayInfo:
+def calculate_milky_way_info(
+    lat: float, lon: float, target_date: date,
+    sun_info: Optional["SunInfo"] = None,
+    moon_info: Optional["MoonInfo"] = None,
+) -> MilkyWayInfo:
     """
     Berechnet die Sichtbarkeit des galaktischen Zentrums.
     Das galaktische Zentrum liegt bei RA 17h 45m, Dec -29°.
     Beste Sichtbarkeit: April–September, nach astronomischer Dämmerung.
+
+    TASK-25: ``sun_info``/``moon_info`` können übergeben werden, um doppelte
+    Neuberechnung zu vermeiden (identisches Ergebnis, nur schneller).
     """
     eph = _get_eph()
     observer = wgs84.latlon(lat * N, lon * E)
@@ -412,7 +471,8 @@ def calculate_milky_way_info(lat: float, lon: float, target_date: date) -> Milky
     galactic_center = Star(ra_hours=17.761, dec_degrees=-28.936)
 
     # Astronomische Dämmerung: Sonne < -18°
-    sun_info = calculate_sun_info(lat, lon, target_date)
+    if sun_info is None:
+        sun_info = calculate_sun_info(lat, lon, target_date)
 
     # Prüfe ob astronomische Dämmerung erreicht wird
     t_eve_end = sun_info.blue_hour_evening_end
@@ -437,7 +497,8 @@ def calculate_milky_way_info(lat: float, lon: float, target_date: date) -> Milky
     seasonal_factor = 1.0 if 4 <= month <= 9 else 0.3
 
     # Mondeinfluss
-    moon_info = calculate_moon_info(lat, lon, target_date)
+    if moon_info is None:
+        moon_info = calculate_moon_info(lat, lon, target_date, sun_info=sun_info)
     moon_factor = 1.0 - (moon_info.illumination_pct / 100) * 0.8
 
     darkness_score = min(1.0, seasonal_factor * moon_factor * (1.0 if visible else 0.2))
@@ -454,10 +515,20 @@ def calculate_milky_way_info(lat: float, lon: float, target_date: date) -> Milky
 
 
 def calculate_full_report(lat: float, lon: float, target_date: date) -> AstronomyReport:
-    """Erstellt einen vollständigen Astronomiebericht für Standort und Datum."""
-    sun = calculate_sun_info(lat, lon, target_date)
-    moon = calculate_moon_info(lat, lon, target_date)
-    milky_way = calculate_milky_way_info(lat, lon, target_date)
+    """Erstellt einen vollständigen Astronomiebericht für Standort und Datum.
+
+    TASK-25: Bei aktiver Window-Engine werden Sun/Moon/MilkyWay aus den
+    vorberechneten Fenster-Arrays abgeleitet (statt je 1 Skyfield-Call/Tag).
+    """
+    w = _win_for(lat, lon, target_date)
+    if w is not None:
+        sun = w.sun_info(target_date)
+        moon = w.moon_info(target_date, sun_info=sun)
+        milky_way = w.milky_way_info(target_date, sun_info=sun, moon_info=moon)
+    else:
+        sun = calculate_sun_info(lat, lon, target_date)
+        moon = calculate_moon_info(lat, lon, target_date, sun_info=sun)
+        milky_way = calculate_milky_way_info(lat, lon, target_date, sun_info=sun, moon_info=moon)
     showers = get_active_meteor_showers(target_date)
 
     # Planeten
@@ -678,6 +749,15 @@ def find_precise_alignment_times(
       → Sonne erreicht Azimut 315° im Sommer um ~20:00–20:15 Uhr
       → Bei Höhe ~1.1° = Crown-Alignment, Score ~0.9
     """
+    # TASK-25: aktive Window-Engine bevorzugen (ein Event pro Passage, AK6)
+    w = _win_for(observer_lat, observer_lon, target_date)
+    if w is not None:
+        return w.alignments(
+            subject_lat, subject_lon, subject_height_m, subject_width_m,
+            target_date, body, az_tolerance_deg=az_tolerance_deg,
+            min_quality=min_quality, elevation_difference_m=elevation_difference_m,
+        )
+
     profile = calculate_subject_angular_profile(
         observer_lat, observer_lon, subject_lat, subject_lon,
         subject_height_m, subject_width_m,
@@ -758,6 +838,11 @@ def find_sun_alignment_times(
     Nur horizontale Prüfung (kein Höhenwinkel-Check).
     Für präzises 3D-Alignment → find_precise_alignment_times() verwenden.
     """
+    w = _win_for(observer_lat, observer_lon, target_date)
+    if w is not None:
+        return w.azimuth_times("sun", target_azimuth, target_date,
+                               tolerance_deg=tolerance_deg, alt_min=0.0, hours=(4, 21))
+
     results = []
     eph = _get_eph()
     observer = wgs84.latlon(observer_lat * N, observer_lon * E)
@@ -795,6 +880,11 @@ def find_moon_alignment_times(
     Findet Zeitpunkte, an denen der Mond den Ziel-Azimut kreuzt.
     Für präzises 3D-Alignment → find_precise_alignment_times() verwenden.
     """
+    w = _win_for(observer_lat, observer_lon, target_date)
+    if w is not None:
+        return w.azimuth_times("moon", target_azimuth, target_date,
+                               tolerance_deg=tolerance_deg, alt_min=0.0, hours=(0, 24))
+
     results = []
     eph = _get_eph()
     observer = wgs84.latlon(observer_lat * N, observer_lon * E)

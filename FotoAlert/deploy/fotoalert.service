@@ -20,6 +20,8 @@ SyslogIdentifier=fotoalert
 # Umgebung
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONDONTWRITEBYTECODE=1
+# TASK-25 Option A: On-Demand-Engine aktiv (Kalender live, Feed nur leicht-refresht)
+Environment=FOTOALERT_ONDEMAND=1
 
 # Sicherheit (minimal, App braucht Dateisystem-Zugriff)
 NoNewPrivileges=true

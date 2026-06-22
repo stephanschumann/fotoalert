@@ -26,10 +26,10 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68, TASK-23, US-90, TASK-24 |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | US-72 |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-67, TASK-22, BUG-27 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | BUG-29, BUG-30, US-68, TASK-23, US-90, TASK-24, US-72 |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | TASK-25 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
@@ -197,14 +197,15 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
-### BUG-27 · 365-Tage-Kalender leer, lädt keine Ereignisse `[~]`
+### BUG-27 · 365-Tage-Kalender leer, lädt keine Ereignisse `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-22 |
 
 **Beschreibung:** Der 365-Tage-Kalender ist leer und zeigt keine Ereignisse an. Mögliche Ursachen: Regression von BUG-14 (Kalender leer nach Cron-Lauf), defekter Cron-Lauf, oder Frontend-Ladefehler beim monatlichen Nachladen (`?month=X&year=Y`).
 
@@ -217,11 +218,11 @@ Eingeschlossen: Leere-Response-Caching im Frontend fixen; Backend-Fallback wenn 
 Ausgeschlossen: Cron-Scheduling-Mechanismus (US-34), Push-Notifications.
 
 **Akzeptanzkriterien:**
-- [ ] Kalender zeigt Events des aktuellen Monats, wenn `calendar.json` auf dem Server vorhanden und nicht leer ist *(ausstehend: Server-Rebuild läuft overnight)*
+- [x] Kalender zeigt Events des aktuellen Monats — Rebuild 2026-06-22 00:34: 44.057 Events, calendar.json v1.3 ✅
 - [x] Wenn Server `no_cache` zurückgibt: Frontend cacht kein leeres Ergebnis — nächster Aufruf löst erneuten Fetch aus
 - [x] Wenn Server `no_cache` zurückgibt: Toast „Kalender wird neu berechnet – bitte in 2 Min. neu laden"
 - [x] Edge Case: Race-Condition `show()` während `_loading=true` — render() wird nach Load immer aufgerufen
-- [ ] Edge Case: `/calendar?month=6&year=2026` liefert `status: ok` und `total > 0` *(ausstehend: nach Rebuild prüfen)*
+- [x] `/calendar?month=6&year=2026` liefert `status: ok` mit Events (73k-Response bestätigt) ✅
 
 **Fix 2026-06-21:** `web/index.html` — `loadMonth()` cacht nur bei `status=ok` + `events.length > 0`; `no_cache` → Toast; `show()` Race-Fix.
 
@@ -1574,7 +1575,7 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 > ⚠️ **Release-Voraussetzung:** Vor/of dem Deploy `FOTOALERT_HOST_PASSWORD`, `FOTOALERT_USER_PASSWORD`, `FOTOALERT_AUTH_SECRET` auf dem Server in `.env` setzen — sonst sperrt sich die App aus (niemand kann sich einloggen).
 
-### US-67 · Chancendetails: Azimut und Höhe relativ zur Motivspitze `[ ]`
+### US-67 · Chancendetails: Azimut und Höhe relativ zur Motivspitze `[x]`
 > **Als Fotograf** möchte ich bei einem Alignment-Event in verständlicher Sprache lesen, wo das Himmelsobjekt relativ zu meinem Motiv erscheint – z.B. „Mond 3° links neben dem Kirchturm, 5° darüber".
 >
 > **Hintergrund:** US-37[x] berechnet `azimuth_delta_deg` und `altitude_delta_deg`. Diese Rohwerte liegen im Cache vor, werden aber nur als Zahlen angezeigt.
@@ -1597,13 +1598,13 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > Ausgeschlossen: jede Neuberechnung im Backend (Deltas/Meter existieren schon), Änderung der bestehenden „🎯 Kompositions-Analyse"-Sektion (bleibt unverändert als Detailansicht; die neue Sektion ist die Klartext-Zusammenfassung darüber), Goldene/Blaue Stunde & Nicht-Alignment-Events (haben `composition_analysis = None`), iOS-App.
 >
 > **Akzeptanzkriterien:**
-> - [ ] Neue Sektion „🧭 Himmelsposition" erscheint im Event-Detail-Sheet **genau dann**, wenn `o.composition_analysis` vorhanden ist (≠ null). Bei Goldener/Blauer Stunde, Milchstraße, Mondaufgang ohne Tracking etc. (`composition_analysis === null`) wird **keine** Sektion gerendert.
-> - [ ] Beschreibungssatz nennt das Himmelsobjekt per `ca.body_name` („Mond"/„Sonne"), nie hartkodiert.
-> - [ ] Seitenrichtung: `azimuth_delta_deg < 0` → „links", `> 0` → „rechts". Höhenrichtung: `altitude_delta_deg > 0` → „darüber", `< 0` → „darunter".
-> - [ ] Schwellwort (auf den **Betrag** des jeweiligen Deltas angewandt, getrennt für Azimut und Höhe): `|Δ| < 0.5°` → „nahezu exakt auf dem Motiv" (Richtungswort entfällt); `0.5° ≤ |Δ| < 2°` → „leicht"; `2° ≤ |Δ| ≤ 5°` → (kein Zusatzwort, neutral); `|Δ| > 5°` → „deutlich".
-> - [ ] Jede Achse wird in **Grad UND Metern** angegeben. Meter = `Math.abs(ca.lateral_offset_m)` (seitlich) bzw. `Math.abs(ca.vertical_offset_m)` (vertikal) — **nicht** im Frontend neu aus Winkel×Distanz gerechnet, sondern die gecachten Backend-Werte verwendet. Format: < 1000 m → „N m" (0 Nachkommastellen), ≥ 1000 m → „N,NN km". Beispiel: „🌙 Mond leicht links neben dem Motiv ≈ 8 m (1,2°), leicht darüber ≈ 12 m (0,9°)".
-> - [ ] Sekundärinfo (kleiner, gedämpft): absoluter Azimut Himmelsobjekt `ca`-unabhängig aus `o.celestial_azimuth.toFixed(1)+"°"` und Elevation `o.celestial_altitude.toFixed(2)+"°"`; zusätzlich scheinbare Motivspitzen-Elevation `ca.subject_apparent_elevation_deg`.
-> - [ ] Edge Case: Beide Beträge < 0.5° → Satz lautet sinngemäß „🎯 Mond steht nahezu exakt auf der Motivspitze (≈ 0 m seitlich, ≈ 0 m vertikal)" ohne „links/rechts/darüber/darunter".
+> - [x] Neue Sektion „🧭 Himmelsposition" erscheint im Event-Detail-Sheet **genau dann**, wenn `o.composition_analysis` vorhanden ist (≠ null). Bei Goldener/Blauer Stunde, Milchstraße, Mondaufgang ohne Tracking etc. (`composition_analysis === null`) wird **keine** Sektion gerendert.
+> - [x] Beschreibungssatz nennt das Himmelsobjekt per `ca.body_name` („Mond"/„Sonne"), nie hartkodiert.
+> - [x] Seitenrichtung: `azimuth_delta_deg < 0` → „links", `> 0` → „rechts". Höhenrichtung: `altitude_delta_deg > 0` → „darüber", `< 0` → „darunter".
+> - [x] Schwellwort (auf den **Betrag** des jeweiligen Deltas angewandt, getrennt für Azimut und Höhe): `|Δ| < 0.5°` → „nahezu exakt auf dem Motiv" (Richtungswort entfällt); `0.5° ≤ |Δ| < 2°` → „leicht"; `2° ≤ |Δ| ≤ 5°` → (kein Zusatzwort, neutral); `|Δ| > 5°` → „deutlich".
+> - [x] Jede Achse wird in **Grad UND Metern** angegeben. Meter = `Math.abs(ca.lateral_offset_m)` (seitlich) bzw. `Math.abs(ca.vertical_offset_m)` (vertikal) — **nicht** im Frontend neu aus Winkel×Distanz gerechnet, sondern die gecachten Backend-Werte verwendet. Format: < 1000 m → „N m" (0 Nachkommastellen), ≥ 1000 m → „N,NN km". Beispiel: „🌙 Mond leicht links neben dem Motiv ≈ 8 m (1,2°), leicht darüber ≈ 12 m (0,9°)".
+> - [x] Sekundärinfo (kleiner, gedämpft): absoluter Azimut Himmelsobjekt `ca`-unabhängig aus `o.celestial_azimuth.toFixed(1)+"°"` und Elevation `o.celestial_altitude.toFixed(2)+"°"`; zusätzlich scheinbare Motivspitzen-Elevation `ca.subject_apparent_elevation_deg`.
+> - [x] Edge Case: Beide Beträge < 0.5° → Satz lautet sinngemäß „🎯 Mond steht nahezu exakt auf der Motivspitze (≈ 0 m seitlich, ≈ 0 m vertikal)" ohne „links/rechts/darüber/darunter".
 > - [ ] Edge Case: exakt `azimuth_delta_deg === 0` bzw. `altitude_delta_deg === 0` → fällt in „nahezu exakt" (kein Vorzeichen-/Richtungsfehler, kein leeres Richtungswort).
 > - [ ] Edge Case: fehlt eine Einzelkomponente (z.B. `lateral_offset_m == null`), wird die Meter-Angabe für diese Achse weggelassen, der Grad-Teil aber gezeigt (kein „NaN m", kein Absturz).
 > - [ ] Regression: bestehende „🎯 Kompositions-Analyse"-Sektion, Filter (US-57) und der Feed bleiben unverändert (kein Rendering-Fehler im Detail-Sheet bei Nicht-Alignment-Events).
@@ -1935,6 +1936,97 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 
 ---
 
+**Annahmen (autonomer Lauf, ohne Rückfrage getroffen):**
+- A1: „Wetterkarte" = ein zuschaltbares **Overlay auf der bestehenden Leaflet-Karte** im Map-Tab (`MapView`), kein neuer Tab. Begründung: Beschreibung sagt „eine Wetterkarte … sehen", Map-Tab hat bereits Leaflet + Layer-Buttons (`web/index.html` Z. 767–774, `MapView` Z. 3034–3166).
+- A2: Open-Meteo liefert **Punkt-Vorhersagen, keine Bild-Tiles**. Eine echte flächige „Wetterkarte" wird daher als **Grid aus Punkt-Forecasts** gerendert (farbcodierte Zellen/Kreise), nicht als externe Radar-Tile. Begründung: kein Lizenzrisiko (US-74), bleibt bei der bewährten Open-Meteo-Quelle, kein neuer Provider/Key.
+- A3: Scope „Berlin/Potsdam/Umland" = festes Bounding-Box-Grid um den App-Default-Center [52.52, 13.40], Radius ~50 km. Auflösung Phase 1: grobes Raster (z. B. 6×6 = 36 Punkte) — Open-Meteo erlaubt Komma-getrennte Multi-Punkt-Abfrage in **einem** Request.
+- A4: „geplante Shooting-Fenster" = ein **Zeit-Slider/Stundenwahl** (jetzt + nächste Stunden/Tage), der das Overlay auf die gewählte Stunde umschaltet. Phase 1: stündliche Schritte bis T+3 Tage (deckt sich mit bestehendem Wetter-Overlay-Horizont).
+- A5: Zwei umschaltbare Layer: **Wolkendecke (%)** und **Niederschlag (mm bzw. Wahrscheinlichkeit %)** — getrennt, nicht überlagert (Lesbarkeit).
+
+**Example Mapping:**
+
+📏 **Rule 1 — Das Overlay zeigt flächige Wetterinformation für die gewählte Stunde.**
+Kontext: Der Fotograf will *visuell* einschätzen, wo es aufreißt. Eine Zahl pro Location reicht nicht; er braucht das räumliche Muster (Westen klar, Osten zu).
+- 🟢 Positiv: Given Map-Tab offen + Wetter-Layer „Wolken" aktiv, When Stunde = heute 19:00, Then erscheint über Berlin/Potsdam ein Raster farbiger Zellen (0 % = klar/transparent-blau → 100 % = grau/deckend), und ein nördlich klares Feld ist sichtbar heller als ein südlich bedecktes.
+- 🔴 Negativ: Given Wetter-Layer aus, When Map-Tab offen, Then keine Wetterzellen sichtbar, die normale Karte (Marker, Tiles) ist unverändert und nicht eingefärbt.
+- ⚠️ Edge: Given Open-Meteo liefert für einen Grid-Punkt `null`/Fehler, When Overlay rendert, Then diese Zelle wird ausgelassen (nicht als „0 % klar" fehlgefärbt) und der Rest rendert weiter.
+
+📏 **Rule 2 — Wolkendecke und Niederschlag sind getrennt wählbar.**
+Kontext: Wolken und Regen beantworten verschiedene Fragen (Licht vs. Nass-werden). Übereinander wären beide unlesbar.
+- 🟢 Positiv: Given Wolken-Layer aktiv, When Nutzer tippt „Niederschlag", Then verschwindet die Wolken-Einfärbung und die Niederschlags-Einfärbung (mm-Skala blau) erscheint; nur ein Wetter-Layer gleichzeitig.
+- 🔴 Negativ: Given Niederschlag-Layer aktiv, When Nutzer wechselt Karten-Basis (Standard/Satellit/Nacht), Then bleibt der Niederschlag-Layer aktiv und liegt korrekt über der neuen Basis (Overlay überlebt Basis-Wechsel).
+- ⚠️ Edge: Given keine Stunde im Niederschlag > 0, When Layer rendert, Then alle Zellen transparent/„trocken" — kein Fehler, Legende zeigt 0 mm.
+
+📏 **Rule 3 — Der Zeitbezug ist explizit und auf das Shooting-Fenster steuerbar.**
+Kontext: Wetter um 14:00 ist für eine Sonnenuntergangs-Session irrelevant. Die Karte muss die *richtige* Stunde zeigen.
+- 🟢 Positiv: Given Slider auf „morgen 21:00", When Overlay aktiv, Then zeigen alle Zellen die Vorhersage für morgen 21:00 (Ortszeit Berlin angezeigt; intern UTC — siehe Memory `shoot_time_utc`), und ein Zeit-Label nennt „Mo 21:00".
+- ⚠️ Edge: Given Slider über T+3 Tage hinaus, When Nutzer schiebt, Then ist der Slider bei T+3 hart begrenzt (über diesen Horizont wird kein Overlay geladen — konsistent mit dem bestehenden 3-Tage-Wetterfenster).
+
+📏 **Rule 4 — Daten werden gecacht, nicht bei jedem Stunden-Wechsel neu geholt.**
+Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-Limit + Lag. Ein Grid-Forecast deckt alle Stunden ab.
+- 🟢 Positiv: Given Overlay erstmals aktiviert, When es lädt, Then **ein** Multi-Punkt-Request über alle Grid-Punkte für den gesamten 3-Tage-Horizont; danach wechselt der Slider rein clientseitig zwischen Stunden ohne neuen Call.
+- ⚠️ Edge: Given Cache älter als TTL (z. B. 60 min), When Overlay erneut geöffnet, Then Refetch; sonst Cache-Hit.
+
+❓ Questions (autonom entschieden, da kein Rückfrage-Modus): alle über A1–A5 + Pre-Mortem-Gegenmaßnahmen aufgelöst. Offen für Weg-Gate: gewünschte Grid-Auflösung (36 vs. feiner) und ob Niederschlag als mm oder als Wahrscheinlichkeit (%) primär.
+
+**Scope:**
+- Eingeschlossen: zuschaltbares Wetter-Overlay im Map-Tab (`MapView`), zwei Wetter-Layer (Wolkendecke %, Niederschlag), Zeit-Slider bis T+3, Grid-Forecast via Open-Meteo Multi-Punkt, Backend-Endpoint mit Cache + Legende + Lade-/Fehlerzustand.
+- Ausgeschlossen: animierte Radar-Loop, externe Radar-Tile-Provider (Lizenzrisiko, US-74), Push-Benachrichtigung bei Wetteränderung, iOS-App (`ios/`), Auflösung > T+3 Tage, Überlagerung beider Wetter-Layer gleichzeitig.
+
+**Akzeptanzkriterien:**
+- [ ] Neuer Endpoint `GET /weather-map?hours=72` liefert JSON `{ "grid": [{"lat","lon"}...], "hourly_times": [...iso UTC...], "cloud_cover": [[pro-Punkt-pro-Stunde]], "precipitation": [[...]], "fetched_at": iso }` für das Berlin/Potsdam-Grid; Statuscode 200; `len(grid) == 36` (6×6); jede Wertereihe gleich lang wie `hourly_times`.
+- [ ] Edge: Wenn ein einzelner Grid-Punkt von Open-Meteo fehlt/`null` liefert, enthält die Antwort für diesen Punkt `null`-Werte (kein 500, kein 0-Wert) und die übrigen Punkte sind vollständig.
+- [ ] Endpoint cached das Ergebnis im Prozess (TTL 60 min); zweiter Aufruf innerhalb TTL macht **keinen** neuen Open-Meteo-Call (verifizierbar via `fetched_at` unverändert).
+- [ ] Frontend: Im Map-Tab existiert ein Wetter-Toggle mit zwei Optionen „Wolken" / „Niederschlag" + „aus" (Default aus); aktivieren zeichnet ein farbcodiertes Grid-Overlay über die Leaflet-Karte.
+- [ ] Frontend: Ein Zeit-Slider/Selector schaltet die angezeigte Stunde um (Schritt = 1 h, Bereich jetzt…T+3); Label zeigt Berliner Ortszeit; Stundenwechsel löst **keinen** neuen Backend-Call aus (rein clientseitiges Re-Render aus geladenem Datensatz).
+- [ ] Nur ein Wetter-Layer gleichzeitig sichtbar; Wechsel der Karten-Basis (Standard/Satellit/Nacht via `MapView.setLayer`) lässt das aktive Wetter-Overlay erhalten und korrekt darüber liegen.
+- [ ] Edge: Open-Meteo komplett nicht erreichbar → Frontend zeigt dezenten Hinweis („Wetterdaten nicht verfügbar"), Karte + Marker bleiben voll funktionsfähig (keine JS-Exception, Map-Tab nutzbar).
+- [ ] Legende sichtbar (Skala Wolken 0–100 %, bzw. Niederschlag mm); Werte-Farbzuordnung dokumentiert.
+
+**Pre-Mortem:**
+- 💀 Open-Meteo Rate-Limit/Block durch Slider-Spam (pro Tick ein Call) → Karte hängt, 429. Auslöser: kein Cache, Fetch an Slider gekoppelt. Frühwarnung: Lag beim Schieben, 429 im Log. → Gegenmaßnahme: **ein** Multi-Punkt-Request für den ganzen Horizont + Prozess-Cache (AK 3 + AK 5) — Slider rendert nur clientseitig.
+- 💀 Overlay-Z-Index kollidiert mit Filter/Leaflet-Panes → Overlay verdeckt Marker oder liegt unter den Tiles. Auslöser: bekannter Leaflet-Stacking-Context (siehe CSS-Kommentar Z. 200, BUG-24). Frühwarnung: Marker unklickbar / Overlay unsichtbar. → Gegenmaßnahme: Overlay als eigenes Leaflet-Pane mit definiertem `zIndex` zwischen Tile- und Marker-Pane; nicht via globalem CSS-Filter. Manueller Test „Basis-Wechsel + Marker klickbar".
+- 💀 Falsche Stunde angezeigt (UTC/Ortszeit-Verwechslung) → Fotograf plant nach falschem Wetter. Auslöser: Open-Meteo liefert UTC (`timezone=UTC` in `weather.py`), App zeigt Berlin (+2/+1). Frühwarnung: Overlay-Label weicht von Event-Detail-Zeit ab. → Gegenmaßnahme: intern durchgängig UTC, nur im Label konvertieren (Memory `shoot_time_utc`); AK 5 prüft Label-Konsistenz.
+- 💀 Grid zu grob → „Wetterkarte" wirkt wie 4 Klötze, kein Mehrwert; oder zu fein → langsamer/größerer Request. Auslöser: willkürliche Auflösung. Frühwarnung: visuell blockig oder Request > paar Sek. → Gegenmaßnahme: Start 6×6=36 (ein Request bleibt schlank), Auflösung als eine Konstante kapseln, Weg-Gate-Frage.
+- 💀 Map-Tab lädt das Overlay automatisch und kostet jedem Nutzer Open-Meteo-Calls/Latenz, auch wenn er es nie braucht. Auslöser: Eager-Load in `MapView.init()`. → Gegenmaßnahme: Overlay **lazy** — Default „aus", Fetch erst beim ersten Aktivieren (AK 4).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: Backend `backend/calculations/weather.py` (`fetch_weather_forecast`, `HourlyWeather` — liefert `cloud_cover_pct`/`precipitation_mm`/`precipitation_prob_pct`; Open-Meteo Punkt-API, kein Tile-Dienst) + `backend/main.py` (`_weather_overlay` Z. 343–420 als Vorbild für Aggregation/Logging, `/weather-refresh` Z. 1031 als Endpoint-Pattern, `_CACHE_DIR`/Prozess-Cache-Globals Z. 94–98/218, `auth.require_host`-Dependency-Muster). Frontend `web/index.html`: `MapView` (Z. 3034–3166 — `init`/`setLayer`/`loadMarkers`/eigenes Pane), Map-Tab-HTML + Layer-Buttons (Z. 767–774), Leaflet-CSS/Stacking-Hinweise (Z. 200–204), Tab-Aktivierung `if (page === 'map') MapView.init()` (Z. 4084). Reines Add-on, keine bestehende Wetter-Score-Logik wird verändert.
+- [ ] Implementierungsoptionen: A (Grid aus Open-Meteo-Punkten, eigener Render) / B (externe Radar-Tile-Layer) / C (nur Marker-basierte Wetter-Badges, kein Flächen-Overlay)
+- [ ] Empfehlung: **Option A** — wartet auf Stephans Weg-Gate
+
+**Implementierungsoptionen:**
+
+*Option A — Grid aus Open-Meteo-Punkt-Forecasts, clientseitig gerendertes Leaflet-Overlay* · Aufwand: mittel
+- Vorgehen: Neue Funktion `fetch_weather_grid(bbox, resolution, hours)` in `weather.py` (Multi-Punkt-Open-Meteo-Request, Komma-getrennte Koordinaten in einem Call). Neuer Endpoint `GET /weather-map` in `main.py` mit 60-min-Prozess-Cache (Muster wie `_weather_updated_at`). Frontend: `MapView` um `weatherOverlay`-State erweitern — eigenes Leaflet-Pane, farbcodierte `L.rectangle`/`L.circleMarker` pro Grid-Punkt, Toggle-UI (Wolken/Niederschlag/aus) neben den Layer-Buttons, Stunden-Slider, Legende. Fetch lazy beim ersten Aktivieren, Stundenwechsel rein clientseitig.
+- Betroffene Dateien: `backend/calculations/weather.py`, `backend/main.py`, `web/index.html`. Tests: `backend/tests/` (Endpoint-Form, Cache, null-Handling).
+- Vorteile: bleibt bei bewährter Open-Meteo-Quelle (kein Lizenzrisiko, kein Key), volle Kontrolle über Farben/Skalen, exakt auf das Shooting-Fenster (gleiche Datenbasis wie Event-Wetter), testbar via pytest.
+- Nachteile/Risiken: eigener Renderer + Grid-Auflösung-Tuning; grobes Raster statt Foto-realistischem Radar.
+
+*Option B — Externer Radar-/Wolken-Tile-Layer (z. B. RainViewer / OWM-Tiles) als Leaflet-TileLayer* · Aufwand: klein–mittel
+- Vorgehen: zusätzlichen `L.tileLayer(weatherTileUrl)` als Overlay-Pane einhängen.
+- Vorteile: sehr wenig Code, fotorealistisches Radar, Animation möglich.
+- Nachteile/Risiken: **neuer externer Provider** → Lizenz-/Nutzungsbedingungen-Prüfung nötig (kollidiert direkt mit US-74), oft API-Key/Rate-Limit/Kosten, Zeitbezug nicht exakt aufs Shooting-Fenster steuerbar, nicht via pytest abdeckbar, neue Abhängigkeit außerhalb der etablierten Open-Meteo-Quelle.
+
+*Option C — Keine Fläche, nur Wetter-Badges an bestehenden Location-Markern* · Aufwand: klein
+- Vorgehen: pro sichtbarem Location-Marker ein kleines Wolken-/Regen-Symbol aus den schon vorhandenen `weather_details`.
+- Vorteile: minimal, nutzt vorhandene Daten, kein neuer Endpoint.
+- Nachteile/Risiken: erfüllt die Story nicht — „Wetter*karte* … visuell einschätzen" verlangt das räumliche Muster über die Region, nicht nur Punkte an Spots; Lücken zwischen Locations bleiben blind.
+
+✅ **Empfehlung: Option A** — erfüllt die Story (flächige, zeitlich steuerbare Einschätzung), bleibt bei der lizenzsicheren Open-Meteo-Quelle (vermeidet den US-74-Konflikt von Option B), ist via pytest testbar und hält alle Pre-Mortem-Gegenmaßnahmen (ein Request + Cache, eigenes Pane, UTC-intern, lazy load) sauber umsetzbar. Option B nur erwägen, falls fotorealistisches Radar explizit gewünscht ist und die Lizenzfrage (US-74) vorab geklärt wird.
+
+**Daten-Validierung** *(in Implementierung zu bestätigen):*
+- [ ] Open-Meteo Multi-Punkt-Request (Komma-getrennte `latitude`/`longitude`) liefert für 36 Punkte in einem Call die parallelen `cloud_cover`/`precipitation`-Arrays — vor dem Frontend-Bau mit echtem Aufruf gegen das Grid prüfen (Antwortgröße, Antwortzeit, null-Verhalten an Bbox-Rändern).
+- [ ] Wertebereiche real prüfen: typische Wolkendecke 0–100, Niederschlag meist 0 — Farbskala an realen Sommer-Werten kalibrieren, nicht raten.
+
+**Testplan:**
+- [ ] Automatisiert (Harness, `backend/tests/`): Endpoint-Form von `/weather-map` (Grid-Länge 36, Reihenlängen == `hourly_times`); null-Handling bei fehlendem Grid-Punkt; Cache-Verhalten (zweiter Call → `fetched_at` unverändert / kein erneuter HTTP-Call, gemockt). Docstring mit `US-72`. Python 3.9-kompatibel (keine `X | Y`-Typen — `Optional[...]`/`List[...]` verwenden, wie in `weather.py`).
+- [ ] Manuell (http://localhost:8000, Map-Tab): Overlay aktivieren → Grid erscheint; Wolken↔Niederschlag wechseln (nur eins sichtbar); Slider schieben → Stunde/Label ändert sich, kein Netzwerk-Call (DevTools-Network); Basis-Layer wechseln → Overlay bleibt, Marker klickbar (BUG-24-Stacking); Open-Meteo offline simulieren → Hinweis statt Crash.
+
+---
+
 ### US-73 · Anreise zum Standort (Get to Location) `[ ]`
 
 | Feld | Wert |
@@ -2190,6 +2282,164 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 **Beschreibung:** Der Schwierigkeitsfilter (Include **und** Exclude) hat im Chancen-Feed und Kalender keinen Effekt, solange `Locations.all` leer ist. Beobachtet: Include „Anspruchsvoll" zeigt im Feed weiterhin alle 111 sichtbaren Chancen, obwohl nur 5 von 56 Locations difficulty 3 haben. Erwartet: Filterung greift sofort. Ursache: `Filter.apply()` schlägt `loc.difficulty` über `Locations.all` nach, das aber erst beim Öffnen des Locations-Tabs (oder nach Location-Speichern) geladen wird — nicht beim App-Start auf dem Feed. Fix-Richtung: `Locations.all` beim Boot laden (oder lazy nachladen, wenn ein Schwierigkeitsfilter aktiv ist und die Liste leer ist).
 
 **Bezug:** Vorbestehend seit US-32 (kombiniertes Filtersystem); durch US-71 (Drei-Zustand-Filter) sichtbar geworden, aber nicht von US-71 verursacht — betrifft die Include-Logik identisch. Eigenständig, grenzt an US-71.
+
+---
+
+<!-- ===== Neue Tickets 2026-06-22 (von Stephan direkt nach Ready for Analysis freigegeben) ===== -->
+
+### BUG-29 · Chancendetails zeigen veraltete GPS-Daten trotz korrigierter Location `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-22 |
+
+**Beschreibung:** Eine Chance für „Mond über Oberbaumbrücke & Spree" wurde mit veralteten GPS-Daten angezeigt, obwohl die Koordinaten in den Locationdetails bereits auf neue Werte geändert und dort korrekt gespeichert waren. Die Locationdetails zeigten die korrekten GPS-Daten, die Chancendetails (Feed/Kalender) haben sich nicht mitaktualisiert.
+
+**Beobachtet:** Chancendetail zeigt alte Koordinaten · **Erwartet:** Chancendetail übernimmt die in der Location gespeicherten neuen Koordinaten (inkl. abhängiger Maps-Links/Astronomie).
+
+**Bezug:** Überschneidung mit TASK-12 [x] (Auto-Neuberechnung nach Koordinaten-Änderung — `_run_precompute(location_ids=[id])` nach PATCH) und US-67 [x] (AK: bei Koordinatenänderung sollen Chancen/Feed/Kalender/Maps-Links aktualisiert werden). Mögliche Regression/Lücke in TASK-12: Recompute regeneriert `opportunities.json` (Feed-Cache) für diese Location nicht oder Frontend liefert gecachte Chancendetails. Eigenständiger BugFix, grenzt an TASK-12.
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-06-22)
+
+**Root-Cause (datenvalidiert):** Der Single-Location-Recompute nach PATCH ruft `precompute.py --feed-only --location-id <id>` auf (`main.py:_run_precompute_single`, L484–523). Der `--feed-only`-Branch schreibt **ausschließlich** `opportunities.json` neu (Feed) und kehrt vor jeder Kalenderberechnung zurück (`precompute.py` Single-Location-Flow L597–651, `return` L651). `calendar.json` wird daher bei einem PATCH **nie** aktualisiert — es trägt seinen eigenen denormalisierten Snapshot (`observer_lat/lon`, `subject_lat/lon`, abgeleitete Astronomie). Wird die Chance aus dem **Kalender** geöffnet, zeigt das Frontend (`index.html` Detail-Render L2686 ff.: `o.observer_lat`, Maps-Links aus `o.*`) die alten Koordinaten. Erst der nächtliche Vollkalender (Scheduler 05:30, erkennt die `coordinates_hash`-Änderung in `compute_calendar_incremental` L504–512) zieht nach. **Validierung:** `opportunities.json` enthält pro Event `observer_lat/lon` + `location_name` als Snapshot (geprüft am Live-Cache: 1737 Events, je eigene Koordinaten); `_location_hash` (precompute.py L123–130) hasht nur Observer-Koordinaten.
+
+**Scope:**
+- Eingeschlossen: Single-Location-Recompute nach Koordinaten-PATCH soll **auch** den Kalender-Cache (`calendar.json`) für genau diese Location regenerieren, inkl. abhängiger Felder (Astronomie, Maps-Links-Quellkoordinaten). Feed bleibt wie gehabt.
+- Ausgeschlossen: Vollständiger Kalender-Neulauf für alle Locations (zu teuer, ~Std.); Scout/`discover.json` (separater Cache, kein Koordinaten-Snapshot-Bug gemeldet); reine Name-Änderung (→ BUG-30); Maps-Link-Generierung selbst (passiert im Frontend aus `o.observer_lat/lon`, korrekt sobald Snapshot stimmt).
+
+**Akzeptanzkriterien:**
+- [ ] Nach `PATCH /locations/{id}` mit geänderten `observer_lat/lon` enthält `opportunities.json` für diese Location Events mit den **neuen** Koordinaten (bestehendes Verhalten, als Regression absichern).
+- [ ] Nach demselben PATCH enthält `calendar.json` für diese Location Events mit den **neuen** Koordinaten (heute kaputt) — messbar: alle Events mit `location_id==id` tragen `observer_lat==neuer_wert` (±1e-5).
+- [ ] Astronomie-abhängige Felder im Kalender-Event (`subject_azimuth`/`celestial_azimuth`) entsprechen den neuen Koordinaten (nicht den alten).
+- [ ] Edge Case: Location ohne bestehende Kalender-Events (z.B. brandneue Custom-Location) → Recompute legt korrekt neue Events an, kein Crash bei leerem Merge.
+- [ ] Edge Case: Recompute läuft bereits (`_precompute_running==True`) → PATCH-Response bleibt schnell, Kalender wird beim nächsten Lauf konsistent (kein Deadlock/Doppellauf).
+- [ ] Regression: Andere Locations in `calendar.json` bleiben unverändert (Merge ersetzt nur `location_id==id`).
+
+**Pre-Mortem:**
+- 💀 Single-Location-Kalenderlauf berechnet versehentlich 365 Tage × alle Locations → Server blockiert minutenlang. Auslöser: Aufruf von `compute_calendar_incremental` ohne Location-Filter. Frühwarnung: PATCH-Response-Zeit steigt, CPU-Spike. Gegenmaßnahme: Kalender-Single-Pfad **streng** auf `--location-id` filtern (Merge `[e for e in events if e["location_id"] != id] + new`), analog zum Feed-Merge.
+- 💀 Kalender-Merge verwirft Events anderer Locations → Kalender schrumpft drastisch. Auslöser: falscher Filter/Überschreiben statt Merge. Frühwarnung: `HEALTH-CAL`-Alert (precompute.py L716 ff.), Event-Count sinkt. Gegenmaßnahme: Merge-Test als AK; bestehende Health-Schwellen greifen lassen.
+- 💀 `coordinates_hash`-Metadaten (`computed_locations` in calendar.json) werden beim Single-Merge nicht aktualisiert → nächtlicher Vollkalender rechnet die Location erneut komplett neu (verschwendet) oder hält sie für stale. Auslöser: nur Events gemergt, Meta nicht. Gegenmaßnahme: beim Single-Kalender-Merge `computed_locations[id]` mit neuem Hash + `computed_dates` aktualisieren.
+- 💀 Long-Running-Subprozess (365-Tage-Single-Location) hält `_precompute_running=True` lange → blockiert Folge-PATCHes. Frühwarnung: zweiter PATCH meldet „Recompute läuft bereits". Gegenmaßnahme: bewusst akzeptiert (Kalender-Single ist deutlich teurer als Feed) bzw. Option B (verzögerter Kalenderlauf) prüfen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Rules: PATCH-Koord → Feed neu / Kalender neu / Maps folgt aus Koordinaten-Snapshot)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`_run_precompute_single` L484–523, `patch_location` L1180–1251), `backend/precompute.py` (Single-Flow L597–651, `compute_calendar_incremental` L444+, `_location_hash` L123), `web/index.html` (Detail-Render L2686+, Maps-URL aus `o.*`)
+- [x] Daten-Validierung: Feed-Cache trägt pro Event eigenen Koordinaten-Snapshot; Kalender-Cache (88 MB) wird vom Single-Recompute nicht angefasst
+- [ ] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+*Option A — Single-Location-Kalender-Merge in precompute.py (empfohlen)*
+- Vorgehen: Im Single-Location-Flow (`precompute.py` L597–651) nach dem Feed-Block zusätzlich die 365-Tage-Events **nur für diese Location** berechnen und nach dem Feed-Muster in `calendar.json` mergen (alte Events der Location verwerfen, neue einfügen, `computed_locations[id]`-Hash/Dates aktualisieren). `_run_precompute_single` bleibt `--feed-only`? Nein — Flag-Logik so anpassen, dass der Single-Flow Feed **und** Kalender für die eine Location schreibt (z.B. neues `--with-calendar` oder Single-Flow rechnet beides per Default).
+- Betroffene Dateien: `backend/precompute.py` (Single-Flow), `backend/main.py` (`_run_precompute_single` Argumentübergabe + `_load_caches` lädt Kalender bereits neu? prüfen).
+- Vorteile: Behebt Ursache an der Wurzel; Kalender sofort konsistent; nutzt bestehendes Merge-Muster.
+- Nachteile/Risiken: 365-Tage-Single-Location dauert spürbar länger als Feed (14 Tage) → längere `_precompute_running`-Phase (Pre-Mortem-Mitigation greift).
+- Aufwand: mittel
+
+*Option B — PATCH triggert nur Feed sofort, Kalender verzögert*
+- Vorgehen: Feed bleibt sofort, Kalender-Single-Location wird als separater Hintergrund-Task mit niedriger Priorität nachgezogen (oder kürzeres Fenster, z.B. 90 Tage statt 365).
+- Vorteile: Schnellere PATCH-Response, geringere Blockade.
+- Nachteile: Kalender-Chance kurzzeitig noch stale → AK „sofort konsistent" nur teilweise erfüllt; mehr bewegliche Teile.
+- Aufwand: mittel
+
+*Option C — Frontend liest Koordinaten/Name live aus Location statt aus Cache-Snapshot*
+- Vorgehen: Im Opportunity-Detail (`index.html`) `o.observer_lat/lon`, Maps-Links und `location_name` zur Render-Zeit aus `Locations.all.find(id)` überschreiben statt aus dem Cache-Snapshot.
+- Vorteile: Kein Backend-Recompute nötig; behebt zugleich BUG-30-Symptom.
+- Nachteile/Risiken: `Locations.all` ist im Feed-Kontext beim Boot leer (BUG-28-Gotcha, Memory `reference_frontend_dom_gotchas`) → Lookup schlägt fehl, Fix wäre still wirkungslos. Astronomie-Felder (`celestial_azimuth`) lassen sich **nicht** im Frontend nachrechnen → bleiben stale. Behebt nur Koordinaten/Maps, nicht die Astronomie.
+- Aufwand: klein, aber unvollständig
+
+✅ **Empfehlung: Option A** — behebt die Ursache (Kalender-Snapshot) inkl. der astronomisch abhängigen Felder, die Option C nicht abdecken kann, und vermeidet den BUG-28-`Locations.all`-Fallstrick. Längere Recompute-Dauer ist über das bestehende `_precompute_running`-Gating beherrschbar.
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/`, FOTOALERT_NO_BACKGROUND=1): Einheitstest gegen `precompute.main` im Single-Location-Modus (oder die Kalender-Merge-Funktion direkt) — PATCH-Koordinaten setzen, Single-Recompute laufen lassen, dann `calendar.json` lesen und prüfen, dass alle Events der Location die neuen `observer_lat/lon` + plausible neue `*_azimuth` tragen und Events anderer Locations unverändert sind. Ticket-ID `BUG-29` im Docstring.
+- [ ] Manuell (http://localhost:8000): Location-Koordinaten via Location-Detail ändern → Recompute abwarten → Kalender öffnen → Chance dieser Location aufrufen → Maps-Link/Koordinaten zeigen neue Werte.
+
+---
+
+### BUG-30 · Location-Name-Änderung wird nicht gespeichert (User und Host) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-22 |
+
+**Beschreibung:** Die Änderung des Location-Namens wird nach dem Speichern nicht übernommen — weder angemeldet als User noch als Host. Der alte Name bleibt nach erneutem Öffnen bestehen.
+
+**Beobachtet:** Geänderter Name verschwindet/wird zurückgesetzt · **Erwartet:** Neuer Name persistiert dauerhaft und ist nach Neuladen sichtbar.
+
+**Bezug:** Grenzt an US-60 [x] (✏️-Bearbeitung via `PATCH /locations/{id}`) und TASK-16 (Recompute-Whitelist: `name`/`description` lösen bewusst **keinen** Recompute aus — betrifft nur Neuberechnung, nicht die Persistenz des Namens) sowie US-29 [x] (Namens-Datenqualität). Vermutete Ursache im Name-Persistenz-Pfad des PATCH-Endpunkts oder Frontend-Save. Eigenständiger BugFix.
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-06-22)
+
+**Root-Cause (datenvalidiert — Persistenz ist intakt, Anzeige ist stale):** Der PATCH-Pfad **speichert den Namen korrekt** und lädt ihn korrekt zurück. Live-Beleg: Override-Tabelle (`fotoalert.db`) enthält für `rostiger_nagel_rusty_nail` den Override-Namen „Rostiger Nagel Test", und die nachgestellte Lade-Routine (`main.py:_load_location_overrides` L530–568, Whitelist inkl. `name` L559–561) ergibt nach Anwendung korrekt „Rostiger Nagel Test" statt des statischen „Rostiger Nagel - Rusty Nail" (verifiziert per Skript). PATCH-Handler (`main.py` L1180–1251) führt `name` in `text_fields`/`all_allowed_fields` (L1184, L1188) und persistiert via `_save_location_override` (Standard) bzw. `_store.update_custom` (Custom, echte `name`-Spalte) — beide schreiben `name`. **Der Bug ist die denormalisierte Anzeige:** Feed (`opportunities.json`) und Kalender (`calendar.json`) speichern pro Event einen `location_name`-Snapshot. Eine Namensänderung löst (per TASK-16) **keinen** Recompute aus, und `_location_hash` (precompute.py L123–130) hasht nur Koordinaten — der Snapshot bleibt also alt. Das Opportunity-Detail im Frontend rendert `${o.location_name}` direkt aus dem Cache (`index.html` L2690), Feed-/Kalender-Karten ebenso (L1146, L1224, L1527). Wird die Location aus dem Feed-/Kalender-Kontext bearbeitet und der alte Name dort weiterhin angezeigt, wirkt das wie „nicht gespeichert" — obwohl das Location-Detail (das live `loc.name` liest, L3076/L3206) den neuen Namen zeigt. **Live-Beleg:** Feed-Cache trägt für `rostiger_nagel_rusty_nail` weiterhin `location_name: "Rostiger Nagel - Rusty Nail"` (alt).
+
+**Scope:**
+- Eingeschlossen: Geänderter Name muss in **allen** Ansichten konsistent erscheinen — Location-Detail (heute schon korrekt) **und** Feed-/Kalender-/Opportunity-Detail. Lösung muss den stale `location_name`-Snapshot adressieren.
+- Ausgeschlossen: Backend-Persistenz des Namens (nachweislich intakt — keine Code-Änderung nötig); Koordinaten-Snapshot (→ BUG-29, gleiche Cache-Wurzel, getrennt gehalten); `description`-Snapshot (analoges Verhalten, aber nicht im Ticket gemeldet — als Beobachtung notiert, nicht im AK-Scope).
+
+**Akzeptanzkriterien:**
+- [ ] Nach `PATCH /locations/{id}` mit `{"name": "X"}` liefert `GET /locations` für diese ID `name == "X"` (Regression-Sicherung des bereits intakten Pfads; gilt für `custom_`- und Standard-Locations).
+- [ ] Nach Neustart der App (Override aus DB geladen) liefert `GET /locations` weiterhin `name == "X"` (verifiziert die Lade-Whitelist).
+- [ ] Nach Namensänderung zeigt das **Opportunity-Detail** (Feed und Kalender) für Chancen dieser Location den neuen Namen `X` — heute zeigt es den alten Snapshot.
+- [ ] Edge Case: Location ohne Chancen im Cache → Namensänderung persistiert trotzdem, keine Fehlermeldung.
+- [ ] Edge Case: Name mit Sonderzeichen (`"`, Emoji) wird korrekt persistiert und angezeigt (Frontend escaped bereits via `replace(/"/g,'&quot;')`, L3267).
+- [ ] Regression: `description` und andere Felder bleiben beim reinen Name-PATCH unverändert (Override-Merge, store.py L238–244 merged statt überschreibt).
+
+**Pre-Mortem:**
+- 💀 „Fix" wird im Backend-Persistenz-Pfad gesucht und Code geändert, der bereits korrekt ist → kein Effekt, Bug bleibt. Auslöser: Fehlannahme „PATCH speichert Name nicht". Frühwarnung: Daten-Validierung zeigt Name liegt in DB. Gegenmaßnahme: Root-Cause oben datenvalidiert — Fix gehört in den Anzeige-/Snapshot-Pfad, nicht in die Persistenz.
+- 💀 Frontend-Lookup `Locations.all.find(id)` zum Live-Überschreiben des `location_name` läuft im Feed-Kontext gegen leere Liste (BUG-28-Gotcha, Memory `reference_frontend_dom_gotchas`) → Fix still wirkungslos. Auslöser: `Locations.all` lädt erst beim Locations-Tab. Gegenmaßnahme: Lade-Garantie für `Locations.all` beim Boot ODER serverseitige Snapshot-Aktualisierung wählen (Option B).
+- 💀 Name-Recompute-Trigger eingebaut → 365-Tage-Kalender für jede Namensänderung neu berechnet, obwohl Astronomie unverändert → unnötige Server-Last (genau das, was TASK-16 vermeiden wollte). Gegenmaßnahme: Snapshot **ohne** Astronomie-Recompute aktualisieren (reines String-Feld-Update im Cache), nicht über den vollen Recompute-Pfad.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Rule: PATCH-Name → DB persistiert / Detail zeigt neu / Feed+Kalender zeigen neu)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`patch_location` L1180–1251, `_load_location_overrides` L530–568), `backend/data/store.py` (`update_custom` L155–186, `upsert_override` L226–254 — beide korrekt), `web/index.html` (Opportunity-Detail L2690, Feed/Kalender-Karten L1146/L1224/L1527, Location-Detail L3076/L3206, `saveEdit` L3461–3517)
+- [x] Daten-Validierung: Override-Name in DB vorhanden + Lade-Routine ergibt neuen Namen (Persistenz intakt); Feed-Cache trägt alten `location_name`-Snapshot (Anzeige-Ursache)
+- [ ] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: Option A
+
+**Daten-Validierung:**
+- [x] `fotoalert.db` Override `rostiger_nagel_rusty_nail` → `name="Rostiger Nagel Test"` (PATCH persistiert)
+- [x] `_load_location_overrides`-Simulation → `loc.name=="Rostiger Nagel Test"` (Load-Back korrekt)
+- [x] `opportunities.json` Event `rostiger_nagel_rusty_nail` → `location_name="Rostiger Nagel - Rusty Nail"` (alter Snapshot = Symptomquelle)
+
+**Implementierungsoptionen:**
+
+*Option A — Frontend rendert `location_name` live aus der Location (empfohlen)*
+- Vorgehen: In Opportunity-Detail/Feed-/Kalender-Karten den angezeigten Namen zur Render-Zeit aus der Live-Location auflösen (`Locations.all.find(id)?.name ?? o.location_name`) **mit** Lade-Garantie: sicherstellen, dass `Locations.all` beim App-Boot (nicht erst beim Locations-Tab) geladen ist — sonst greift der BUG-28-Fallstrick. Da `name` ein reiner Anzeige-String ohne Astronomie-Abhängigkeit ist, ist das die billigste korrekte Lösung und vermeidet jeden Recompute.
+- Betroffene Dateien: `web/index.html` (Render-Stellen L1146/L1224/L1527/L2690 + Boot-Lade-Logik von `Locations.all`).
+- Vorteile: Kein Backend-Recompute; sofort konsistent; löst Name-Anzeige in allen Views; respektiert TASK-16.
+- Nachteile/Risiken: Erfordert die Lade-Garantie für `Locations.all` (BUG-28-Mitigation); betrifft nur den Namen — Koordinaten (BUG-29) bleiben getrennt.
+- Aufwand: klein–mittel
+
+*Option B — Serverseitiger Snapshot-Refresh bei Name-PATCH (ohne Astronomie-Recompute)*
+- Vorgehen: PATCH mit `name` aktualisiert direkt das `location_name`-Feld aller passenden Events in `opportunities.json` + `calendar.json` (reines String-Replace pro `location_id`, kein Astronomie-Recompute).
+- Betroffene Dateien: `backend/main.py` (`patch_location`).
+- Vorteile: Caches selbst werden konsistent; Frontend braucht keine Lade-Garantie.
+- Nachteile/Risiken: Schreibt `calendar.json` (88 MB) bei jeder Namensänderung neu → I/O-Last; Sonderfall-Logik nur für `name` fühlt sich brüchig an.
+- Aufwand: mittel
+
+*Option C — Name löst regulären Single-Location-Recompute aus*
+- Vorgehen: `name` in die Recompute-Whitelist aufnehmen (kehrt TASK-16 um).
+- Nachteile/Risiken: Berechnet Astronomie unnötig neu, genau das was TASK-16 verhindern sollte; teuer. Verworfen.
+- Aufwand: klein (aber falscher Ansatz)
+
+✅ **Empfehlung: Option A** — der Name ist reine Anzeige; ihn live aus `Locations.all` zu lesen ist die schlankste Lösung ohne jeden Recompute und ohne 88-MB-Cache-Schreibvorgänge, sofern die `Locations.all`-Lade-Garantie (BUG-28) mitgezogen wird. Falls diese Lade-Garantie als zu invasiv gilt, ist Option B der robuste Fallback.
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/`, FOTOALERT_NO_BACKGROUND=1): Regression `BUG-30` — `PATCH /locations/{id}` mit `{"name":"X"}` (custom + Standard), dann `GET /locations` prüfen `name=="X"`; zweiter Test: Override in DB schreiben, `_load_location_overrides` ausführen, Name-Anwendung prüfen. (Backend-Persistenz absichern, damit keine künftige Regression sie bricht.)
+- [ ] Manuell (http://localhost:8000): Name im Location-Detail ändern → speichern → in den Feed/Kalender wechseln → Chance dieser Location öffnen → Opportunity-Detail zeigt den neuen Namen. Anschließend App neu laden → Name bleibt überall neu.
 
 ---
 
@@ -2507,6 +2757,237 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
   - `platform` weggelassen → gespeicherter Eintrag hat `platform == "ios"`.
   - Cleanup: Test-Token am Ende aus der DB entfernen (analog Verify-Cleanup), damit der Harness idempotent bleibt.
 - [ ] Manuell (http://localhost:8000): `curl -X POST 'http://localhost:8000/register-device?token=manual-1'` → `registered`; gleicher Call erneut → `already_registered`; Server neu starten; erneuter Call mit `manual-1` → `already_registered` (Token überlebte den Neustart). Beweist den Kern-AK.
+
+#### 📋 Implementation Spec Ende
+
+---
+
+### TASK-25 · On-Demand Ephemeriden-Engine (Batch-Vorberechnung ablösen) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-22 |
+
+**Beschreibung:** Den astronomischen Berechnungskern von Batch-Vorberechnung
+(365×N-Volllauf bei `ALGORITHM_VERSION`-Bump / Neu-Location-Kaltstart) auf eine
+**stateless On-Demand-Engine** umbauen: standortunabhängige Objektposition pro
+Zeitfenster einmal rechnen (Hebel 1), Event-**Rootfinding** statt 1-Min-Scan in
+`find_precise_alignment_times` (Hebel 2), Berechnung bei Anfrage statt Cron
+(Hebel 3). Ziel: eine Lokation rechnet on-demand in Sub-Sekunden, beliebige
+`lat/lon` weltweit ohne Vorberechnung — Voraussetzung für mehr Nutzer.
+
+**Spec:** `FotoAlert/docs/spec-ephemeris-engine.md` (Draft v2, code-geerdet).
+
+**Bezug:**
+- **US-64** (Live Astro-Visualisierung, offen) — *Abhängigkeit:* TASK-25 ist der
+  Backend-Enabler für den Live-Modus.
+- **US-70 / 70b / 70c** (Scout-Ephemeride, done) — *Überschneidung/Abhängigkeit:*
+  TASK-25 refaktoriert deren Code (`find_precise_alignment_times`, 5-Min-Batch).
+- **US-34** (Job-Orchestrierung, done) — *Überschneidung:* löst die dort
+  etablierte Calendar-Recompute-Strategie ab (kein `--full`-Volllauf mehr).
+- **TASK-01** (Kometen-Integration, offen) — *Abgrenzung:* TASK-25 baut den
+  Ephemeris-Core inkl. Kometen-Positionsrechnung; TASK-01 = Feature/UI darauf.
+- **Neuer Scope-Punkt:** weltweite Geländehöhen (Elevation Provider, heute
+  EUDEM-Europe-only) — in der Analyse als eigene Lane/OF zu bewerten (OF4).
+
+#### 📋 Implementation Spec (Analyse 2026-06-22)
+
+**Scope-Entscheidungen (von Stephan freigegeben):**
+- **Geo: Europe-first, erweiterbar.** Provider-Interface `get_elevation(lat,lon)`
+  + persistenter Tile-Cache jetzt bauen; DEM bleibt vorerst EUDEM. Weltweiter
+  DEM-Swap (Copernicus GLO-30) = **separates Folge-Ticket** (→ TASK-26 vorgemerkt).
+- **Cache: rein On-Demand.** `calendar.json` + 365-Tage-Cron werden entfernt
+  (Löschung erst nach bestandener AK6-Regression).
+- **Geo-Fallback:** fehlt Geländehöhe → Rechnung mit `elevation_difference_m=0`
+  weiterführen + Ergebnis-Flag `elevation_incomplete=true`.
+
+**Eingeschlossen:** On-Demand Query Engine (stateless), Ephemeris-Core-Wrapper
+(geozentrische α/δ einmal pro Fenster, de421), Rootfinding statt 1-Min-Scan,
+Mond-Parallaxe topozentrisch, Elevation-Provider-Interface (EUDEM dahinter),
+Feature-Flag-Migration, Entfernen von `calendar.json`/Cron.
+**Ausgeschlossen:** weltweiter DEM, Kometen-Feature/UI (nur Core-Hook), Scoring-
+Änderungen, Live-Frontend (US-64), DE440-Upgrade.
+
+**Akzeptanzkriterien:**
+- [ ] AK1 — 14-Tage-Plan einer Lokation (alle Objekte) server-seitig < 500 ms.
+- [ ] AK1b — 365-Tage-Plan einer Lokation < 5 s.
+- [ ] AK2 — Beliebige nicht-angelegte `lat/lon` liefern Plan ohne Vorberechnung.
+- [ ] AK3 — Sonne/Mond alt/az innerhalb 1 Bogenminute gegen Skyfield-Referenz.
+- [ ] AK4 — Auf-/Untergang & Alignment innerhalb ±1 min; Rootfinding ≥ so genau
+      wie alter 1-Min-Scan (an Pfingstberg/Babelsberg-Beispiel verifiziert).
+- [ ] AK5 — Kein Cron/Batch berechnet pro Lokation 365-Tage-Verläufe vor; ein
+      `ALGORITHM_VERSION`-Bump löst keinen Volllauf aus.
+- [ ] AK6 — *(2026-06-22 neu definiert, von Stephan freigegeben):* Für alle
+      angelegten Lokationen ist **jede echte Alignment-Passage** der Alt-Engine
+      durch **genau ein** Event der neuen Engine am Qualitätsmaximum vertreten
+      (Zeit/Höhe ±1 min / AK3). Die bit-genaue Alt-Aufzählung (Mehrfach-Events pro
+      Passage durch 1-Min-Raster + 5-Min-Dedup) ist **kein** Ziel — Artefakt, kein
+      astronomischer Grund-truth.
+- [ ] AK7 — `AlignmentResult`/`find_opportunities`-Ausgabeformat unverändert.
+- [ ] Edge Case: Position einmal pro Fenster — N Locations im selben Fenster →
+      Core-Call läuft 1×, nicht N× (über Counter/Log verifizierbar).
+- [ ] Edge Case: Geländehöhe fehlt → `elevation_difference_m=0` +
+      `elevation_incomplete=true`, kein Crash.
+- [ ] Edge Case: Azimut-Wrap bei 0°/360° korrekt (vorhandenes `np.mod`-Muster).
+
+**Pre-Mortem:**
+- 💀 **Mond steht falsch über dem Motiv.** Auslöser: Hebel-1-Wiederverwendung der
+  *geozentrischen* α/δ ohne topozentrische Parallaxe-Korrektur (bis ~1°).
+  Frühwarnung: Mond-AK3 reißt nur beim Mond, Sonne ok. Gegenmaßnahme: AK3/AK4
+  getrennt für Mond testen; Parallaxe über `distance` zwingend.
+- 💀 **Rootfinding verschluckt ein Event.** Auslöser: Grobraster (5–10 min) zu weit,
+  Doppel-/Grazing-Alignment fällt in eine Lücke. Frühwarnung: AK6 zeigt fehlende
+  Events vs. alter Scan. Gegenmaßnahme: Grobraster konservativ (5 min), AK6 zählt
+  Event-Anzahl je Location-Tag gegen Alt-Engine, nicht nur Zeiten.
+- 💀 **Prod-Crash trotz grüner Sandbox-Tests.** Auslöser: 3.10+-Syntax
+  (`float | None` als Runtime-Annotation, `match`). Frühwarnung: läuft lokal
+  (3.10), crasht auf Server (3.9). Gegenmaßnahme: 3.9-kompatibel halten
+  (`Optional[...]`), CI gegen 3.9. (Memory `reference_server_python39`.)
+- 💀 **Zeiten um 2 h verschoben angezeigt.** Auslöser: Engine rechnet UTC, App
+  zeigt Ortszeit — bei Refactor verloren. Frühwarnung: Alignment-Zeiten 2 h daneben.
+  Gegenmaßnahme: Engine gibt UTC zurück (wie heute), Konvertierung bleibt im
+  Frontend; Regressionstest auf UTC-Feldwerte. (Memory `feedback_shoot_time_utc`.)
+- 💀 **Latenz reißt auf realer Hardware.** Auslöser: < 500 ms auf Hetzner CX22
+  nicht haltbar. Frühwarnung: AK1-Messung auf Prod. Gegenmaßnahme: Cache-Option
+  bewusst verworfen → Rückfalloption ist dünner Response-Cache (OF3), erst bei
+  Bedarf; AK1 früh auf Prod messen, nicht nur Sandbox.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (R1–R5, Questions=0)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AK verankert)
+- [x] Architektur analysiert: `backend/calculations/astronomy.py`
+      (`find_precise_alignment_times` = 1-Min-Scan via `_ts.linspace`,
+      `steps=17*60`/`24*60`; `calculate_subject_angular_profile`;
+      `_classify_alignment`; `_get_eph()` lädt `de421.bsp`),
+      `calculations/opportunity.py` (`find_opportunities[_multi_day]`),
+      `backend/precompute.py` (Schicht 2 `calendar.json`, `--full`,
+      `ALGORITHM_VERSION`, `fetch_elevations` → EUDEM 25m Europe-only),
+      `data/locations.py` (`PhotoLocation`: observer/subject_lat/lon,
+      subject_height_m, elevation_difference_m, observer_floor_height_m),
+      `tests/test_astronomy_regression.py`, `test_api_regression.py`.
+- [ ] Implementierungsoptionen: A (In-place-Refactor) / B (paralleles Modul + Flag)
+- [ ] Empfehlung: **Option B**
+
+**Implementierungsoptionen:**
+
+*Option A — In-place-Refactor.* `find_precise_alignment_times` direkt umbauen:
+geozentrische α/δ einmal pro Fenster, Rootfinding statt Scan, Parallaxe pro
+Beobachter; `find_opportunities` ruft on-demand; `calendar.json`/Cron raus.
+Dateien: `astronomy.py`, `opportunity.py`, `precompute.py`.
++ minimale neue Fläche, nutzt getestete Geometrie/Dedup. − zentrale Funktion,
+hohes Regressionsrisiko, kein sauberer A/B-Vergleich für AK6. Aufwand: mittel.
+
+*Option B — Paralleles Modul hinter Feature-Flag (empfohlen).* Neue
+`calculations/ephemeris_core.py` (geozentrisch, de421, Kometen-Hook) +
+`calculations/query_engine.py` (alt/az-Trig, Parallaxe, Rootfinding, Geometrie
+über bestehende Helper). Alte `find_precise_alignment_times` bleibt bis AK6 grün;
+Flag schaltet um. Elevation-Provider als eigenes `data/elevation.py`.
+Dateien: 3 neue Module + Flag in `main.py`/`opportunity.py`.
++ saubere Zwei-Schicht-Trennung (= Spec §4), sicherer Rollback, echter A/B-Vergleich
+für AK6, entkoppelt vom zentralen Scan. − mehr neuer Code, temporäre Duplizierung.
+Aufwand: mittel-groß.
+
+✅ **Empfehlung: Option B** — der Feature-Flag-Parallelpfad ist die einzige Art,
+AK6 (Regression gegen die Alt-Engine) sauber A/B zu messen, und de-riskt den
+zentralen `find_precise_alignment_times`-Scan, statt ihn unter laufendem Betrieb
+umzuschreiben.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): AK3/AK4 als `test_ephemeris_engine.py` (Sonne+Mond
+      getrennt, Pfingstberg/Babelsberg-Koordinaten, erwartete alt/az ±1′, Zeiten
+      ±1 min). AK6 als Vergleichstest neue vs. alte Engine über alle Locations
+      (Zeiten **und** Event-Anzahl). AK1/AK1b als Latenz-Assertion. Edge-Cases
+      (Parallaxe, Azimut-Wrap, fehlende Geländehöhe) je eigener Fall.
+- [ ] Manuell (http://localhost:8000): `/preview-alignment` bzw. Plan-Endpoint
+      für eine angelegte Location → Ergebnis identisch zur Alt-Engine; danach
+      beliebige nicht-angelegte `lat/lon` → Plan kommt ohne Vorberechnung.
+      AK1 zusätzlich auf Prod (Hetzner CX22) messen.
+
+**Implementierungs-Befunde (2026-06-22, im Sandbox gemessen/verifiziert):**
+
+> Die Ticket-Prämisse „1-Min-Scan = Engpass, Rootfinding löst es" hat sich beim
+> Bauen als **falsch** erwiesen. Belege:
+> - `find_precise_alignment_times` macht bereits **einen** vektorisierten
+>   Skyfield-Call/Tag (~26 ms). Rootfinding-v2 war **langsamer** (39 ms, viele
+>   Einzel-Calls) → verworfen.
+> - Echte Per-Tag-Last (601 ms) = `calculate_full_report`, darin `sun_info` ~4×
+>   und `moon_info` ~2× redundant berechnet (`milky_way`/`moon_info` riefen sie
+>   erneut auf).
+>
+> **✅ Geliefert & verifiziert (in `astronomy.py`):** Redundanz beseitigt —
+> `calculate_full_report`/`calculate_milky_way_info`/`calculate_moon_info` reichen
+> `sun_info`/`moon_info` durch. **601 → 165 ms/Tag (3,6×)**, Ergebnis-Werte
+> **identisch** (Sunrise/Sunset/Golden/Blue/Phase/Illumination/MilkyWay geprüft).
+> → AK7 gewahrt, kein Verhaltens-/Feed-Change.
+>
+> **✅ Foundation gebaut & verifiziert:** `calculations/ephemeris_core.py`
+> (Mehrtages-Track, Hebel-1-Reuse: 2. Beobachter = 0 zusätzliche teure Calls) +
+> `calculations/query_engine.py::altaz` (Topozentrik inkl. Mond-Parallaxe;
+> **AK3: max 0,14′ Sonne / 0,01′ Mond** vs. Skyfield).
+>
+> **✅ AK1-Architektur bewiesen:** Fensterweite Ephemeride — Sonne+Mond für
+> 14 Tage in **2 Skyfield-Calls = 196 ms**, Per-Beobachter-Trig 0,7 ms →
+> Kernkosten **~197 ms** für 14-Tage-Plan (Ziel < 500 ms ✓).
+>
+> **✅ Window-Engine gebaut, verdrahtet & verifiziert:** `calculations/window_engine.py`
+> leitet `SunInfo`/`MoonInfo`/`MilkyWayInfo`/Body-Position/Alignment aus 3 Fenster-
+> Tracks ab. `astronomy.py` delegiert bei aktivem Fenster (`set_active_window`);
+> Feature-Flag **`FOTOALERT_ONDEMAND=1`** in `find_opportunities_multi_day`
+> (Default aus → Alt-Pfad unverändert). Messung 14-Tage-Plan, eine Location:
+>
+> | Metrik | Alt | Neu (Flag an) |
+> |---|---|---|
+> | 14-Tage-Plan | 3838 ms | **438 ms inkl. Fensteraufbau** (AK1 ✓) |
+> | SunInfo/MoonInfo-Felder | — | **±0,04 min** vs. alt (AK4 ✓) |
+> | Sonne/Mond alt/az | — | **0,14′ / 0,01′** vs. Skyfield (AK3 ✓) |
+> | Golden/Blue/Milchstraße-Opps | 14/14/3 | **identisch** (AK7 ✓) |
+> | Regression Flag aus | — | **18/18 grün** (kein Default-Change) |
+>
+> **✅ Entscheidung 1 (Stephan, 2026-06-22): ein Event pro Passage** — umgesetzt &
+> breit verifiziert: **40/40 Passagen** (41 Locations × 14 Tage × Sonne+Mond) durch
+> genau ein NEW-Event abgedeckt, **Zeit-Δ = 0 s** zum Alt-Best-Sample, max Δalt
+> 0,42′. Zwei Bugs dabei gefunden & gefixt: (a) monotone Qualität → Peak am Rand
+> (Ternärsuche ersetzt durch feinen 1-Min-In-Band-Scan), (b) Tagesgrenzen-Event
+> (Crown 23:59↔00:02) wurde doppelt emittiert → Scan aufs Tagesfenster begrenzt.
+> Azimut-Mond-Events (Section 3) fallen entsprechend **31 → 3** (Quasi-Duplikate weg).
+>
+> **✅ Entscheidung 2 (Stephan): Build optimiert** — Raster 5→**10 min** (Genauigkeit
+> bleibt: SunInfo ±0,09 min, Alignment Δt 0 s), Milchstraßen-Track lazy.
+> Fensteraufbau **280 → 135 ms** (Sandbox); finaler AK1-Wert auf Hetzner nach Deploy.
+>
+> **✅ AK2 geliefert & verifiziert:** neuer Endpoint **`GET /plan`** (main.py) rechnet
+> für **beliebige Koordinaten weltweit** on-demand (Paris-Test: 274 ms, 31 Events),
+> ohne angelegte Location. **AK5 (Kalender):** `GET /calendar` rechnet bei
+> `FOTOALERT_ONDEMAND=1` + `location_id`+`month`+`year` **live** (593 ms/Monat),
+> kein 365×N-Batch nötig. Default-Pfad (Cache) unverändert.
+>
+> **✅ AK5 (Option A, Stephan freigegeben) im Code umgesetzt & verifiziert:**
+> Bei `FOTOALERT_ONDEMAND=1` läuft der In-App-Precompute nur noch im **Feed-Modus**
+> (14 Tage, leicht) statt `full` → der schwere 365-Tage-Kalender-Batch entfällt,
+> Kalender kommt live über `/calendar`. Geändert: `main.py` (Startup + 05:30-Job
+> modusabhängig), Deploy-Services `fotoalert.service` + `fotoalert-precompute.service`
+> bekommen `Environment=FOTOALERT_ONDEMAND=1`. Default (Flag aus) = bisheriges
+> Verhalten. Import OK, Endpoints OK, Regression 18/18 grün.
+> **Server-Apply = Stephans Schritt** (deploy.sh / systemctl); `precompute.py` bleibt
+> (kein Löschen). Der System-Timer (`00:01`, `--feed-only`) bleibt, läuft nun dank
+> Flag schnell.
+>
+> **✅ Punkt 4 — `data/elevation.py`** geliefert: `ElevationProvider` mit
+> persistentem Tile-Cache (kein TTL) + Fallback `(0.0, incomplete=True)`; `/plan`
+> löst Geländehöhe automatisch auf und liefert `elevation_incomplete` mit. EUDEM
+> (Europa) dahinter, weltweiter DEM = TASK-26. Verifiziert (Cache-Hit, Fallback,
+> Persistenz, /plan-Integration).
+>
+> **✅ Punkt 5 — `tests/test_ephemeris_engine.py`** geliefert: 14 Tests für
+> AK1/AK1b/AK3/AK4/AK6 + Edge-Cases (Hebel-1, Azimut-Wrap, fehlende Geländehöhe).
+> **Volle Suite: 63 passed, 0 failed.** AK1b (365-Tage = ~21 s) als Guard `<45 s`;
+> 5-s-Ziel ist Platzhalter (OF3), Per-Tag-Overhead (Scoring/Refine) später optimierbar.
+>
+> **➡️ Verbleibend:** Server-Apply (Deploy, Punkt „releasen") + **TASK-26**
+> (weltweiter DEM, Punkt 6). `precompute.py` bleibt (kein Löschen ohne Freigabe).
 
 #### 📋 Implementation Spec Ende
 

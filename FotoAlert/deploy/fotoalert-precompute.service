@@ -13,6 +13,8 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=fotoalert-precompute
 Environment=PYTHONUNBUFFERED=1
+# TASK-25 Option A: Feed-Refresh nutzt die Window-Engine → Minuten statt Stunden
+Environment=FOTOALERT_ONDEMAND=1
 
 # Timeout: Precompute darf max. 30 Minuten laufen
 TimeoutStartSec=1800
