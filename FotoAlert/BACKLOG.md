@@ -28,7 +28,7 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | BUG-29, BUG-30, US-68, TASK-23, US-90, TASK-24, US-72 |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | TASK-25, TASK-26 |
+| **🔄 In Progress** | wird gerade implementiert | TASK-26 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -2762,13 +2762,13 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### TASK-25 · On-Demand Ephemeriden-Engine (Batch-Vorberechnung ablösen) `[~]`
+### TASK-25 · On-Demand Ephemeriden-Engine (Batch-Vorberechnung ablösen) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done (v1.11.0/1.11.1 deployed + aktiviert 2026-06-22; live verifiziert) |
 | **Erstellt** | 2026-06-22 |
 
 **Beschreibung:** Den astronomischen Berechnungskern von Batch-Vorberechnung
@@ -3031,6 +3031,16 @@ Kein Architektur-Umbau — nur Erweiterung von `ElevationProvider`.
 
 **Hinweis Betrieb:** OpenTopoData Public-API hat Rate-Limits (1 req/s, 1000/Tag) →
 für Skalierung später eigenes Hosting erwägen (separat).
+
+**⚠️ Live-Befund (2026-06-22, v1.11.1 deployed):** Dataset-Kette ist im Code, aber
+weltweite Auflösung **funktioniert noch nicht**: `/plan` für New York →
+`elevation_incomplete:true` (Höhe 0). Ursache: die 3 Dataset-Calls (EUDEM→SRTM→
+Mapzen) feuern schnell hintereinander → 2./3. läuft ins 1-req/s-Limit (429). Europa
+ok, weil EUDEM gleich der 1. Call ist. Fallback greift sauber (kein Crash, Plan kommt,
+nur als unvollständig markiert).
+**TODO TASK-26:** kurze Drosselung (~1,1 s Pause) **nur** vor den Folge-Datasets
+einbauen (Europa bleibt schnell, da 1. Call trifft); danach NY-Test grün erwarten.
+Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 
 ---
 

@@ -22,6 +22,7 @@ Python-3.9-kompatibel.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from pathlib import Path
@@ -34,6 +35,10 @@ logger = logging.getLogger(__name__)
 _TOPODATA_BASE = "https://api.opentopodata.org/v1"
 # Reihenfolge = Priorität: feinster/regionaler Datensatz zuerst, dann global.
 DATASET_CHAIN: List[str] = ["eudem25m", "srtm30m", "mapzen"]
+# OpenTopoData Public-API erlaubt 1 Anfrage/Sekunde. Vor jedem FOLGE-Dataset
+# kurz warten, damit die Kette nicht ins 429-Rate-Limit läuft (Europa bleibt
+# schnell, weil EUDEM = erster Call ohne Wartezeit). 0 = aus (Self-Hosting).
+RATE_LIMIT_PAUSE_S: float = 1.1
 
 _CACHE_FILE = Path(__file__).resolve().parent / "cache" / "elevation_tiles.json"
 _CACHE_PRECISION = 4  # ~11 m Raster — fein genug, klein genug für den Cache
@@ -70,7 +75,9 @@ class ElevationProvider:
         kommt (weltweit). None erst, wenn KEIN Dataset Abdeckung hat."""
         try:
             async with httpx.AsyncClient(timeout=30) as client:
-                for dataset in DATASET_CHAIN:
+                for idx, dataset in enumerate(DATASET_CHAIN):
+                    if idx > 0 and RATE_LIMIT_PAUSE_S > 0:
+                        await asyncio.sleep(RATE_LIMIT_PAUSE_S)  # 1 req/s-Limit
                     try:
                         resp = await client.get(f"{_TOPODATA_BASE}/{dataset}",
                                                 params={"locations": f"{lat},{lon}"})
