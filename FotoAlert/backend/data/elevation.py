@@ -12,9 +12,10 @@ Eigenschaften:
     zurückgegeben → die Berechnung läuft weiter, das Ergebnis ist transparent als
     „Höhendaten unvollständig" markiert (kein Crash).
 
-Datenquelle: heute OpenTopoData **EUDEM 25m (nur Europa)**. Der weltweite DEM
-(Copernicus GLO-30 / SRTM) ist als Folge-Ticket (TASK-26) geplant — er wird genau
-hier hinter `_fetch_elevation` ausgetauscht, der Rest bleibt unverändert.
+Datenquelle (TASK-26, weltweit): OpenTopoData mit **Dataset-Kette** — EUDEM 25m
+(Europa, fein) → SRTM 30m (global ~60°N–56°S) → Mapzen (global, inkl. Pole). Pro
+Punkt werden die Datasets der Reihe nach versucht, bis eine Höhe ≠ null kommt; erst
+wenn alle leer sind, greift der `incomplete=True`-Fallback.
 
 Python-3.9-kompatibel.
 """
@@ -24,14 +25,15 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import httpx
 
 logger = logging.getLogger(__name__)
 
-# EUDEM 25m (Europa). Weltweit-Wechsel → TASK-26.
-TOPODATA_URL = "https://api.opentopodata.org/v1/eudem25m"
+_TOPODATA_BASE = "https://api.opentopodata.org/v1"
+# Reihenfolge = Priorität: feinster/regionaler Datensatz zuerst, dann global.
+DATASET_CHAIN: List[str] = ["eudem25m", "srtm30m", "mapzen"]
 
 _CACHE_FILE = Path(__file__).resolve().parent / "cache" / "elevation_tiles.json"
 _CACHE_PRECISION = 4  # ~11 m Raster — fein genug, klein genug für den Cache
@@ -64,16 +66,23 @@ class ElevationProvider:
             logger.warning("Elevation-Tile-Cache nicht schreibbar: %s", e)
 
     async def _fetch_elevation(self, lat: float, lon: float) -> Optional[float]:
-        """Einzelpunkt von der DEM-Quelle holen. None bei Fehler/keine Abdeckung."""
+        """Einzelpunkt holen: Dataset-Kette der Reihe nach, bis eine Höhe ≠ null
+        kommt (weltweit). None erst, wenn KEIN Dataset Abdeckung hat."""
         try:
             async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.get(TOPODATA_URL, params={"locations": f"{lat},{lon}"})
-                resp.raise_for_status()
-                results = resp.json().get("results", [])
-                if results and results[0].get("elevation") is not None:
-                    return float(results[0]["elevation"])
+                for dataset in DATASET_CHAIN:
+                    try:
+                        resp = await client.get(f"{_TOPODATA_BASE}/{dataset}",
+                                                params={"locations": f"{lat},{lon}"})
+                        resp.raise_for_status()
+                        results = resp.json().get("results", [])
+                        if results and results[0].get("elevation") is not None:
+                            return float(results[0]["elevation"])
+                    except Exception as e:
+                        logger.info("Elevation %s (%s,%s) fehlgeschlagen: %s",
+                                    dataset, lat, lon, e)
         except Exception as e:
-            logger.info("Elevation-Abruf fehlgeschlagen (%s,%s): %s", lat, lon, e)
+            logger.info("Elevation-Abruf (%s,%s) abgebrochen: %s", lat, lon, e)
         return None
 
     async def get_elevation(self, lat: float, lon: float) -> Optional[float]:

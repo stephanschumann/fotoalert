@@ -25,10 +25,10 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | BUG-29, BUG-30, US-68, TASK-23, US-90, TASK-24, US-72 |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | BUG-29, BUG-30, US-68, TASK-23, US-90, TASK-24, US-72 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | TASK-25 |
+| **🔄 In Progress** | wird gerade implementiert | TASK-25, TASK-26 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -2986,10 +2986,51 @@ umzuschreiben.
 > **Volle Suite: 63 passed, 0 failed.** AK1b (365-Tage = ~21 s) als Guard `<45 s`;
 > 5-s-Ziel ist Platzhalter (OF3), Per-Tag-Overhead (Scoring/Refine) später optimierbar.
 >
-> **➡️ Verbleibend:** Server-Apply (Deploy, Punkt „releasen") + **TASK-26**
-> (weltweiter DEM, Punkt 6). `precompute.py` bleibt (kein Löschen ohne Freigabe).
+> **✅ Release v1.11.0 (2026-06-22) deployed & verifiziert:** Health ok; `/plan`
+> live mit Auto-Geländehöhe (Paris: elev_diff 7,8 m, `elevation_incomplete=false`).
+> **Schalter noch AUS** (Default-Verhalten unverändert) — das ist die geplante
+> dormante Stufe.
+>
+> **✅ Aktivierungs-Blocker gelöst (Kalender-Monatsübersicht):** Das Frontend lädt
+> `/calendar?month&year` **ohne** `location_id` (alle Locations). Neu: On-Demand-
+> Monats-Sammelliste mit In-Memory-Cache (`_compute_month_all_locations`) + Pre-Warm
+> des aktuellen Monats beim Start. Damit ist die Monatsansicht bei Flag-an sofort da
+> (Cache-Hit), der 365×N-Batch entfällt. Verifiziert: 4 Locs/Monat 1,2 s, Cache-Hit
+> 0 ms, per-Location-Monat 0,31 s → 64 Locs ≈ 20 s Pre-Warm (Hintergrund). Tests grün.
+> **Noch nicht released** (kommt mit dem nächsten Release vor der Aktivierung).
+>
+> **➡️ Verbleibend:**
+> - **Release** der Kalender-Aggregat-Änderung (+ TASK-26), dann **Schritt 2 —
+>   Aktivieren:** systemd-Service-Dateien nach `/etc/systemd/system` kopieren
+>   (`ssh root`), `daemon-reload`, Neustart → `FOTOALERT_ONDEMAND=1` aktiv. Reversibel.
+> - **TASK-26** (Punkt 6): weltweiter DEM (EUDEM → global).
+> - `precompute.py` bleibt (kein Löschen ohne Freigabe).
 
 #### 📋 Implementation Spec Ende
+
+---
+
+### TASK-26 · Weltweiter DEM für Geländehöhen (EUDEM → global) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-22 |
+
+**Beschreibung:** Der Elevation-Provider (`data/elevation.py`, TASK-25) nutzt bisher
+nur **EUDEM 25m = nur Europa**. Damit die On-Demand-Engine (`/plan`) weltweit
+korrekte Geländehöhen liefert, wird eine **Dataset-Kette** eingeführt: EUDEM (Europa,
+fein) → globaler DEM (z.B. SRTM 30m / Mapzen) als Fallback außerhalb Europas.
+Liefert ein Dataset `null` (keine Abdeckung), wird das nächste versucht; erst wenn
+alle leer sind, greift der `incomplete=True`-Fallback.
+
+**Bezug:** Folge-Ticket von TASK-25 (dort als OF4 / Scope-Abgrenzung vorgemerkt).
+Kein Architektur-Umbau — nur Erweiterung von `ElevationProvider`.
+
+**Hinweis Betrieb:** OpenTopoData Public-API hat Rate-Limits (1 req/s, 1000/Tag) →
+für Skalierung später eigenes Hosting erwägen (separat).
 
 ---
 

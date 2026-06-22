@@ -623,6 +623,18 @@ async def startup():
                        "(Modus=%s)", _precompute_mode)
         asyncio.create_task(_run_precompute(_precompute_mode))
 
+    # On-Demand: aktuellen Monat (alle Locations) im Hintergrund vorwärmen, damit
+    # die Kalender-Monatsübersicht beim ersten Aufruf sofort da ist (statt ~30 s).
+    if _ondemand:
+        async def _prewarm_calendar():
+            d = date.today()
+            try:
+                await _compute_month_all_locations(d.year, d.month)
+                logger.info("On-Demand-Kalender vorgewärmt: %d-%02d", d.year, d.month)
+            except Exception as e:
+                logger.error("Kalender-Pre-Warm fehlgeschlagen: %s", e)
+        asyncio.create_task(_prewarm_calendar())
+
     # Scheduler — functools.partial bleibt eine Coroutine-Funktion (APScheduler
     # awaitet sie korrekt; ein lambda täte das nicht).
     import functools as _functools
@@ -962,6 +974,52 @@ async def daily_briefing(target_date: Optional[str] = None):
     )
 
 
+# TASK-25 / AK5: In-Memory-Cache für die On-Demand-Monatsübersicht (alle Locations).
+# Ersetzt den 365×N-Batch: ein Monat wird bei Bedarf einmal gerechnet (Window-Engine)
+# und gecacht; Pre-Warm beim Start hält die gängigen Monate sofort verfügbar.
+_ondemand_month_cache: dict[str, list] = {}
+
+
+async def _compute_location_month(loc, year: int, month: int, min_score: float) -> list:
+    """Serialisierte, gefilterte Kalender-Events EINER Location für einen Monat
+    (On-Demand via Window-Engine)."""
+    import calendar as _cal
+    from datetime import date as _date
+    from calculations.opportunity import find_opportunities_multi_day as _fomd
+    from calculations.window_engine import WindowEphemeris
+    from precompute import _serialize, _passes_alignment_filter
+    import calculations.astronomy as _astro
+
+    ndays = _cal.monthrange(year, month)[1]
+    start = _date(year, month, 1)
+    _astro.set_active_window(WindowEphemeris(loc.observer_lat, loc.observer_lon, start, ndays))
+    try:
+        opps = await _fomd(loc, start, ndays, None, min_score=min_score, astronomy_only=True)
+    finally:
+        _astro.clear_active_window()
+    return [e for e in (_serialize(o) for o in opps) if _passes_alignment_filter(e)]
+
+
+async def _compute_month_all_locations(year: int, month: int, min_score: float = 0.40) -> list:
+    """Monatsübersicht über ALLE Locations (On-Demand, gecacht). Ersetzt den
+    365-Tage-Batch durch eine bedarfsgesteuerte, schnelle Monatsberechnung."""
+    import asyncio as _asyncio
+    from data.locations import LOCATIONS as _LOCS
+    key = f"{year}-{month:02d}-{min_score}"
+    if key in _ondemand_month_cache:
+        return _ondemand_month_cache[key]
+    events: list = []
+    for i, loc in enumerate(_LOCS):
+        try:
+            events.extend(await _compute_location_month(loc, year, month, min_score))
+        except Exception as e:
+            logger.error("On-Demand-Kalender %s %s-%s: %s", loc.id, year, month, e)
+        if i % 8 == 0:
+            await _asyncio.sleep(0)   # Event-Loop nicht blockieren
+    _ondemand_month_cache[key] = events
+    return events
+
+
 @app.get("/calendar")
 async def get_calendar(
     location_id: Optional[str] = None,
@@ -978,27 +1036,17 @@ async def get_calendar(
     Kalender für genau diese Location + Monat **live** berechnet (Window-Engine),
     ohne dass ein 365×N-Batch nötig ist.
     """
-    if os.getenv("FOTOALERT_ONDEMAND", "0") == "1" and location_id and month and year:
-        import calendar as _cal
-        from datetime import date as _date
+    if os.getenv("FOTOALERT_ONDEMAND", "0") == "1" and month and year:
         from data.locations import LOCATIONS as _LOCS
-        from calculations.opportunity import find_opportunities_multi_day as _fomd
-        from calculations.window_engine import WindowEphemeris
-        from precompute import _serialize, _passes_alignment_filter
-        import calculations.astronomy as _astro
-
-        loc = next((l for l in _LOCS if l.id == location_id), None)
-        if loc is None:
-            return {"status": "not_found", "events": [], "total": 0,
-                    "message": f"Location {location_id} unbekannt."}
-        ndays = _cal.monthrange(year, month)[1]
-        start = _date(year, month, 1)
-        _astro.set_active_window(WindowEphemeris(loc.observer_lat, loc.observer_lon, start, ndays))
-        try:
-            opps = await _fomd(loc, start, ndays, None, min_score=min_score, astronomy_only=True)
-        finally:
-            _astro.clear_active_window()
-        events = [e for e in (_serialize(o) for o in opps) if _passes_alignment_filter(e)]
+        if location_id:
+            loc = next((l for l in _LOCS if l.id == location_id), None)
+            if loc is None:
+                return {"status": "not_found", "events": [], "total": 0,
+                        "message": f"Location {location_id} unbekannt."}
+            events = await _compute_location_month(loc, year, month, min_score)
+        else:
+            # Alle Locations: aus dem Monats-Cache (oder bei Bedarf einmal rechnen)
+            events = await _compute_month_all_locations(year, month, min_score)
         return {"status": "ok", "on_demand": True, "computed_at": None,
                 "total": len(events), "events": events}
 
