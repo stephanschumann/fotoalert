@@ -48,6 +48,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from calculations.opportunity import find_opportunities, find_opportunities_multi_day
 from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM
 from data.locations import LOCATIONS
+from data.store import LocationStore
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Algorithmus-Version: Bump bei Änderungen an opportunity.py / astronomy.py,
@@ -128,6 +129,53 @@ def _location_hash(loc) -> str:
     """
     raw = f"{loc.observer_lat:.6f},{loc.observer_lon:.6f}"
     return hashlib.md5(raw.encode()).hexdigest()[:8]
+
+
+# Felder, die ein Location-Override überschreiben darf — identisch zur Whitelist in
+# main.py:_load_location_overrides (TASK-17), damit Server und Recompute denselben Stand sehen.
+_OVERRIDE_FIELDS = (
+    "observer_lat", "observer_lon", "subject_lat", "subject_lon",
+    "name", "description", "observer_floor_height_m", "focal_length_suggestions",
+)
+
+
+def _apply_location_overrides() -> int:
+    """
+    BUG-29: Wendet die in SQLite persistierten Location-Overrides (Koordinaten-/Name-
+    Korrekturen aus `PATCH /locations/{id}`) auf die Basis-`LOCATIONS` an.
+
+    Vorher lud `precompute.py` ausschließlich die hartcodierten Basis-Koordinaten aus
+    `data/locations.py` und ignorierte jeden Override. Folge: Nach einer Koordinaten-
+    Korrektur rechnete der Recompute (Single **und** nächtlicher Vollkalauf) weiter mit
+    den alten Koordinaten → der `coordinates_hash` blieb gleich → 0 Events neu berechnet →
+    Feed/Kalender zeigten dauerhaft veraltete GPS-Daten, obwohl die Location-Detail-Ansicht
+    (live aus dem Override) bereits korrekt war.
+
+    Spiegelt bewusst die Whitelist + setattr-Logik aus main.py:_load_location_overrides,
+    damit Server-Prozess und Recompute-Subprozess denselben Location-Stand verwenden.
+    """
+    try:
+        overrides = LocationStore().load_all_overrides()
+    except Exception as exc:
+        logger.warning("Location-Overrides nicht ladbar (%s) – rechne mit Basis-Koordinaten", exc)
+        return 0
+
+    loc_map = {loc.id: loc for loc in LOCATIONS}
+    applied = 0
+    for ov in overrides:
+        loc = loc_map.get(ov.get("id"))
+        if not loc:
+            continue
+        for field in _OVERRIDE_FIELDS:
+            if field in ov:
+                try:
+                    object.__setattr__(loc, field, ov[field])
+                except Exception:
+                    setattr(loc, field, ov[field])
+        applied += 1
+    if applied:
+        logger.info("Location-Overrides angewendet: %d (Koordinaten-/Name-Korrekturen)", applied)
+    return applied
 
 
 def _composition_analysis(o) -> dict | None:
@@ -441,7 +489,7 @@ async def compute_feed(today: date) -> list[dict]:
 # Schicht 2b: 365-Tage Kalender (INKREMENTELL)
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def compute_calendar_incremental(today: date, force_full: bool = False) -> tuple[list[dict], dict]:
+async def compute_calendar_incremental(today: date, force_full: bool = False, location_id: str | None = None) -> tuple[list[dict], dict]:
     """
     Schicht 2 – Astronomy-Cache: Inkrementeller 365-Tage Kalender.
 
@@ -476,7 +524,7 @@ async def compute_calendar_incremental(today: date, force_full: bool = False) ->
             logger.warning("  Kalender-Cache nicht lesbar: %s – Neuberechnung", e)
 
     # Version-Check
-    if force_full or cache_version != ALGORITHM_VERSION:
+    if (force_full or cache_version != ALGORITHM_VERSION) and not location_id:
         if force_full:
             logger.info("  ⚙️  --full: Vollständige Neuberechnung erzwungen")
         else:
@@ -486,6 +534,15 @@ async def compute_calendar_incremental(today: date, force_full: bool = False) ->
             )
         existing_events = []
         existing_meta = {}
+    elif location_id and not force_full and cache_version != ALGORITHM_VERSION:
+        # BUG-29: Der Single-Location-Recompute darf bei Versions-Differenz NICHT den
+        # gesamten Kalender verwerfen – das würde ihn auf eine einzige Location schrumpfen
+        # (Pre-Mortem #2). Diese eine Location wird über den coords_hash-Mismatch ohnehin
+        # neu berechnet; der nächtliche Vollkalender zieht den Rest beim Versions-Bump nach.
+        logger.warning(
+            "  Single-Recompute bei Versions-Differenz (%s → %s) – nur %s neu, übrige Locations bleiben",
+            cache_version, ALGORITHM_VERSION, location_id,
+        )
 
     # Ziel-Datumsbereich: heute bis heute+364
     target_range: set[str] = {(today + timedelta(days=i)).isoformat() for i in range(365)}
@@ -497,11 +554,32 @@ async def compute_calendar_incremental(today: date, force_full: bool = False) ->
     if pruned > 0:
         logger.info("  Veraltete Events bereinigt: %d", pruned)
 
-    new_meta: dict = {}
+    # BUG-29: Im Single-Location-Modus nur diese eine Location neu berechnen und
+    # Events + Meta aller übrigen Locations unverändert übernehmen (kein Vollkalender,
+    # kein Schrumpfen → Pre-Mortem #1/#2/#3 abgedeckt).
+    if location_id:
+        locations_to_process = [l for l in LOCATIONS if l.id == location_id]
+        if not locations_to_process:
+            logger.error("  Kalender Single-Recompute: Location '%s' nicht gefunden", location_id)
+            return valid_events, existing_meta
+        # Meta der übrigen Locations erhalten (auf target_range beschränkt, damit
+        # geprunte Vergangenheitstage nicht als „gecacht" zurückbleiben).
+        new_meta: dict = {
+            lid: {
+                "coordinates_hash": m.get("coordinates_hash"),
+                "computed_dates": sorted(set(m.get("computed_dates", [])) & target_range),
+            }
+            for lid, m in existing_meta.items()
+            if lid != location_id
+        }
+    else:
+        locations_to_process = list(LOCATIONS)
+        new_meta = {}
+
     total_skipped = 0
     total_computed = 0
 
-    for i, loc in enumerate(LOCATIONS):
+    for i, loc in enumerate(locations_to_process):
         coords_hash = _location_hash(loc)
         loc_meta = existing_meta.get(loc.id, {})
 
@@ -531,7 +609,7 @@ async def compute_calendar_incremental(today: date, force_full: bool = False) ->
 
         logger.info(
             "  Kalender [%d/%d] %s: %d neue Tage (%d gecacht)",
-            i + 1, len(LOCATIONS), loc.name, len(dates_needed), skipped,
+            i + 1, len(locations_to_process), loc.name, len(dates_needed), skipped,
         )
 
         new_events_for_loc: list[dict] = []
@@ -579,6 +657,10 @@ async def main(args: argparse.Namespace) -> None:
     t0 = time.time()
     logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
     logger.info("%d Locations geladen", len(LOCATIONS))
+    # BUG-29: Persistierte Koordinaten-/Name-Overrides anwenden, BEVOR irgendetwas
+    # berechnet oder gehasht wird — sonst rechnet der Recompute mit den alten Basis-
+    # Koordinaten und der coordinates_hash ändert sich nie.
+    _apply_location_overrides()
 
     # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
     from data import backup as _backup
@@ -647,6 +729,36 @@ async def main(args: argparse.Namespace) -> None:
                 "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
                 len(new_events), loc.name, len(merged), time.time() - t1,
             )
+
+        # BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
+        # Vorher schrieb der --feed-only-Single-Flow ausschließlich opportunities.json und
+        # returnte vor jeder Kalenderberechnung → Chancendetails aus dem Kalender zeigten
+        # alte Koordinaten/Astronomie. compute_calendar_incremental(location_id=…) merged
+        # nur die Events DIESER Location und lässt alle übrigen unverändert.
+        if run_calendar:
+            logger.info("  365-Tage Kalender für %s …", loc.name)
+            t2 = time.time()
+            calendar, computed_meta = await compute_calendar_incremental(
+                today, location_id=location_id,
+            )
+            cal_path = CACHE_DIR / "calendar.json"
+            cal_path.write_text(
+                json.dumps(
+                    {
+                        "algorithm_version": ALGORITHM_VERSION,
+                        "computed_at": computed_at,
+                        "computed_locations": computed_meta,
+                        "events": calendar,
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            logger.info(
+                "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
+                len(calendar), time.time() - t2,
+            )
+
         logger.info("=== Single-Location Recompute abgeschlossen in %.1fs ===", time.time() - t0)
         return  # Single-Location-Flow abgeschlossen
 

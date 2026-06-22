@@ -483,9 +483,14 @@ async def _run_precompute(mode: str = "full"):
 
 async def _run_precompute_single(loc_id: str) -> None:
     """
-    TASK-12: Startet precompute.py --feed-only --location-id <loc_id> im Hintergrund.
+    TASK-12 / BUG-29: Startet precompute.py --location-id <loc_id> im Hintergrund.
     Wird automatisch nach PATCH /locations/{id} mit Koordinaten-Änderung aufgerufen.
     Hält den PATCH-Response nicht auf – läuft vollständig asynchron.
+
+    BUG-29: Ohne --feed-only regeneriert der Single-Flow jetzt sowohl den Feed
+    (opportunities.json) ALS AUCH den Kalender (calendar.json) für genau diese
+    Location – vorher blieb der Kalender-Snapshot bis zum nächtlichen Vollkalender
+    veraltet, sodass Chancendetails aus dem Kalender alte Koordinaten zeigten.
     """
     global _precompute_running
     if _NO_BACKGROUND:
@@ -502,7 +507,7 @@ async def _run_precompute_single(loc_id: str) -> None:
     try:
         proc = await asyncio.create_subprocess_exec(
             sys.executable, str(backend_dir / "precompute.py"),
-            "--feed-only", "--location-id", loc_id,
+            "--location-id", loc_id,
             cwd=str(backend_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
@@ -512,7 +517,7 @@ async def _run_precompute_single(loc_id: str) -> None:
             for line in stdout.decode(errors="replace").splitlines():
                 logger.info("  [recompute-single] %s", line)
         if proc.returncode == 0:
-            logger.info("Single-Location Recompute abgeschlossen (%s). Lade Feed-Cache neu.", loc_id)
+            logger.info("Single-Location Recompute abgeschlossen (%s). Lade Feed- und Kalender-Cache neu.", loc_id)
             _load_elevation_cache()
             _load_caches()
         else:

@@ -25,11 +25,11 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | BUG-29, BUG-30, US-68, TASK-23, US-90, TASK-24, US-72 |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, BUG-30 *(Analyse fertig — wartet am Weg-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, TASK-24 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | TASK-26 |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, BUG-29 *(Option A(a) implementiert + 5 Unit-Tests grün — wartet auf manuellen Test + Release)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
@@ -1677,6 +1677,116 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > ```
 >
 > **Abhängigkeiten:** US-63[x], US-66, US-60, TASK-12[x]
+>
+> ---
+>
+> ## 📋 Implementation Spec (Analyse 2026-06-22)
+>
+> **Scope-Klärung (Identitätsmodell — KERN-Frage, vor allem anderen geklärt):**
+> US-66 vergibt **rollengebundene** Tokens (`host` / `user`), KEINE Nutzeridentität — alle „user" teilen sich ein Passwort und ein Token. Damit ist „User darf nur **selbst angelegte** Locations löschen" nicht über den Auth-Token abbildbar. Lösung: Eigentümerschaft wird über die bereits existierende `deviceId()` (localStorage-UUID, US-89, `web/index.html` Z.1798) bestimmt — dieselbe Mechanik wie bei Ratings. „Selbst angelegt" = `created_by_device == deviceId()`. Das ist eine **Komfort-/UX-Grenze, kein Sicherheits-Audit** (deviceId ist client-spoofbar) — der echte Schutz ist, dass jede Löschung ohnehin durch den Host-Approval-Gate läuft. Diese Einschränkung ist dokumentiert und akzeptiert (analog zur dokumentierten v1-Grenze in `auth.py`).
+>
+> **Scope:**
+> - **Eingeschlossen:**
+>   - Backend: neue Tabelle `location_proposals` in `data/store.py` (Änderungs- UND Lösch-Vorschläge, ein Schema mit `kind`-Diskriminator); CRUD-Methoden; neue Endpoints `POST /locations/{id}/proposals` (user reicht ein), `GET /proposals` (host, alle offenen), `POST /proposals/{pid}/approve` + `POST /proposals/{pid}/reject` (host). Rollengate in `PATCH /locations/{id}` (host → sofort, user → Vorschlag). Neuer `DELETE /locations/{id}` (host sofort; user → Lösch-Vorschlag).
+>   - `created_by_device`-Spalte auf `custom_locations` (Eigentümer-Markierung bei Create in `/preview-alignment`).
+>   - Frontend: Rollenabhängige Edit/Delete-UI im Location-Detail (host: direkt; user: „Änderung vorschlagen" / „Löschung beantragen"); „Vorschlag ausstehend"-Hinweis an betroffener Location; Host-Aufgabenliste als Sektion in `#page-settings` mit Diff-Ansicht + Annehmen/Ablehnen; Badge-Indikator mit Anzahl offener Aufgaben.
+> - **Ausgeschlossen:** Push-Benachrichtigung des Hosts bei neuem Vorschlag (Folge-Ticket); echte nutzergebundene Auth (bleibt v1-Rollenmodell); Vorschläge auf Custom-Location-Felder durch Fremd-User die nicht Eigentümer sind (User darf fremde Locations *ändern*-vorschlagen, aber nur eigene *löschen*-beantragen — siehe Rule 4); Bearbeiten eines bereits offenen Vorschlags (neuer Vorschlag überschreibt: letzter offener pro Location+Feld gewinnt, siehe Pre-Mortem #2).
+>
+> ### Example Mapping
+>
+> **📏 Rule 1 — Rolle entscheidet, ob Edit sofort oder als Vorschlag wirkt.**
+> Der Host ist Kurator: seine Änderungen sind sofort live. User-Änderungen sind nur Vorschläge, bis der Host sie freigibt — so bleibt die Datenqualität kontrolliert.
+> - 🟢 Positiv: Host (Token-Rolle `host`) ändert `subject_lat` via `PATCH /locations/X` → Wert sofort in `location_overrides`, Recompute startet, Response `{"ok":true,"applied":true}`.
+> - 🔴 Negativ: User (Rolle `user`) ändert `subject_lat` via `PATCH /locations/X` → KEINE Mutation an Location, stattdessen `location_proposals`-Eintrag (`kind='edit'`, `status='pending'`), Response `{"ok":true,"applied":false,"proposal_id":N}`.
+> - ⚠️ Edge: User schickt PATCH ohne gültiges Token → 401 (bestehender `require_auth`). Leerer/ungültiger Feld-Body → 400 (bestehende Validierung greift VOR dem Rollen-Branch).
+>
+> **📏 Rule 2 — Host genehmigt Vorschläge in einer Aufgabenliste; Annahme wendet den Wert an und löst Recompute aus.**
+> Genehmigen ist genau der Pfad, den ein Host-Direkt-Edit auch nimmt — kein zweiter Code-Pfad, sonst driften die beiden auseinander.
+> - 🟢 Positiv: Host öffnet Aufgabenliste, sieht Diff (alt `subject_lat=52.5` ↔ neu `52.6`), tippt „Annehmen" → `POST /proposals/{pid}/approve` → Wert wird wie ein Host-Edit übernommen (`upsert_override`/`update_custom`), `status='approved'`, Recompute via `_run_precompute_single`. Aufgabe verschwindet aus der Liste.
+> - 🔴 Negativ: Host tippt „Ablehnen" → `status='rejected'`, Location bleibt unverändert, kein Recompute. Aufgabe verschwindet.
+> - ⚠️ Edge: Approve eines Vorschlags, dessen Ziel-Location inzwischen gelöscht wurde → 409/404, Vorschlag wird auf `rejected` (oder `stale`) gesetzt statt Absturz.
+>
+> **📏 Rule 3 — Host darf jede Location sofort löschen; User nur eigene und nur per Approval.**
+> Der Host räumt auf; der normale User soll nicht versehentlich (oder böswillig) fremde Spots löschen — eigene Fehleinträge aber loswerden können, mit Host als Kontrolle.
+> - 🟢 Positiv (Host): `DELETE /locations/X` mit Host-Token → Location sofort weg (`delete_custom` bzw. Override-Tombstone für Standard-Location), Caches/Feed/Karte bereinigt (Recompute/Reload), Response `{"ok":true,"deleted":true}`.
+> - 🟢 Positiv (User, eigene): User mit `device_id` == `created_by_device` ruft `DELETE /locations/X` (custom) → kein Sofort-Löschen, `location_proposals`-Eintrag (`kind='delete'`, `status='pending'`), Response `{"ok":true,"deleted":false,"proposal_id":N}`.
+> - 🔴 Negativ (User, fremde): User ohne Eigentümerschaft ruft `DELETE /locations/X` → 403 „Nur der Ersteller kann die Löschung beantragen." Kein Proposal.
+> - ⚠️ Edge: User will Standard-Location (Nicht-Custom, kein `created_by_device`) löschen → 403 (Standard-Locations gehören keinem User → nie löschbar durch User).
+>
+> **📏 Rule 4 — Eigentümerschaft = `created_by_device`; gilt nur für Löschungen, nicht für Änderungs-Vorschläge.**
+> Jeder darf eine Verbesserung *vorschlagen* (kollaborativ), aber Löschen ist destruktiv → nur Eigentümer + Host-Gate.
+> - 🟢 Positiv: User A (nicht Eigentümer) schlägt Namensänderung für Location von User B vor → erlaubt (`edit`-Proposal). User B (Eigentümer) beantragt Löschung derselben → erlaubt (`delete`-Proposal).
+> - 🔴 Negativ: User A beantragt Löschung der Location von User B → 403.
+> - ⚠️ Edge: `created_by_device` ist NULL (Alt-Bestand vor diesem Ticket) → wie „kein Eigentümer" behandeln → User darf NICHT löschen (nur Host). Migration setzt Alt-Custom-Locations NICHT rückwirkend auf einen Owner.
+>
+> **📏 Rule 5 — Offene Aufgaben sind für den Host sichtbar signalisiert (Badge mit Anzahl).**
+> Der Host soll nicht aktiv nachsehen müssen — ein Badge zieht die Aufmerksamkeit, verschwindet bei 0.
+> - 🟢 Positiv: 3 offene Vorschläge → Badge „3" am Einstellungen-Tab + an der Aufgaben-Sektion. Nach Abarbeiten aller → Badge weg.
+> - 🔴 Negativ: User-Rolle sieht KEINE Aufgabenliste und KEIN Badge (Sektion nur bei `Auth.isHost()`).
+> - ⚠️ Edge: Badge-Zählung lädt beim App-Start (`GET /proposals` nur für Host) — bei Netzwerkfehler kein Absturz, Badge bleibt aus.
+>
+> **❓ Questions:** keine offen (Identitäts-/Owner-Frage oben im Scope geklärt; bei Ablehnung des deviceId-Ansatzes durch Stephan → Alternative in Option C).
+>
+> ### Akzeptanzkriterien
+> - [ ] **AK1 (Rule 1):** `PATCH /locations/{id}` mit Host-Token wendet Änderung sofort an (`applied:true`, Override/Custom gespeichert, Recompute getriggert bei Koordinaten).
+> - [ ] **AK2 (Rule 1):** `PATCH /locations/{id}` mit User-Token erzeugt `location_proposals`-Zeile (`kind='edit'`, `status='pending'`) und ändert die Location NICHT (`applied:false`, `proposal_id` gesetzt).
+> - [ ] **AK3 (Rule 2):** `POST /proposals/{pid}/approve` (Host) übernimmt den Wert exakt wie ein Host-Edit, setzt `status='approved'`, triggert Recompute bei Koordinaten; `/proposals` listet ihn danach nicht mehr.
+> - [ ] **AK4 (Rule 2):** `POST /proposals/{pid}/reject` (Host) setzt `status='rejected'`, Location bleibt unverändert.
+> - [ ] **AK5 (Rule 3):** `DELETE /locations/{id}` mit Host-Token löscht sofort (custom: aus DB; Response `deleted:true`); danach ist die Location nicht mehr in `GET /locations` und Recompute/Cache-Reload entfernt zugehörige Events.
+> - [ ] **AK6 (Rule 3+4):** `DELETE /locations/{id}` mit User-Token UND `created_by_device==deviceId` erzeugt `delete`-Proposal (`deleted:false`); mit fremdem/leerem Owner → 403, kein Proposal.
+> - [ ] **AK7 (Rule 5):** `GET /proposals` liefert nur für Host (User → 403); Response enthält pro Eintrag `id, location_id, kind, status, diff (old/new) bzw. zu löschende Location`.
+> - [ ] **AK8 (Frontend):** User sieht im Location-Detail „Änderung vorschlagen" statt direktem Speichern; nach Einreichen Hinweis „Vorschlag ausstehend" an der Location; Host sieht Aufgaben-Sektion in Einstellungen mit Diff + Annehmen/Ablehnen + Badge-Anzahl.
+> - [ ] **Edge AK9:** Approve eines Proposals auf zwischenzeitlich gelöschte Location → kein 500, Proposal wird `rejected`/`stale`, klare Meldung.
+> - [ ] **Edge AK10:** Zweiter offener Edit-Vorschlag desselben Users auf dieselbe Location/dasselbe Feld überschreibt den vorherigen offenen (kein Duplikat-Stau), siehe Pre-Mortem #2.
+>
+> ### Pre-Mortem
+> - 💀 **#1 Rollen-Gate nur im Frontend — API-Bypass.** *Auslöser:* „Änderung vorschlagen"-Button wird im JS gezeigt, aber `PATCH` mutiert serverseitig weiter für jede Rolle. *Frühwarnung:* User-Token in curl ändert eine Location direkt. *Gegenmaßnahme:* Rollen-Branch liegt **im Endpoint** (`PATCH`/`DELETE` prüfen `role`), nicht nur in der UI → AK1/AK2/AK6 als pytest mit beiden Token-Rollen.
+> - 💀 **#2 Race / Stau bei `pending`-Vorschlägen.** *Auslöser:* mehrere offene Vorschläge auf dasselbe Feld; Host approved den älteren, der neuere überschreibt ihn wieder; oder Duplikat-Flut. *Frühwarnung:* Aufgabenliste füllt sich mit Mehrfach-Einträgen. *Gegenmaßnahme:* pro (location_id, kind, [field]) nur **ein** offener Vorschlag — neuer Vorschlag setzt vorherigen offenen auf `superseded` (atomar in der `create`-Transaktion). AK10.
+> - 💀 **#3 Datenkonsistenz Standard-Location-Löschung.** *Auslöser:* Standard-Locations leben in `data/locations.py` (Code, nicht DB) — ein `delete_custom` greift dort nicht, die Location erscheint nach Neustart wieder. *Frühwarnung:* gelöschte Standard-Location ist nach Server-Restart zurück. *Gegenmaßnahme:* Standard-Location-Löschung = **Tombstone-Override** (`location_overrides` Feld `deleted=true`), `_load_location_overrides` filtert getombstonte aus `LOCATIONS`; ODER (einfacher, empfohlen) User dürfen Standard-Locations gar nicht löschen (Rule 3 Edge → 403) und Host-Löschung von Standard-Locations ebenfalls per Tombstone. AK5 prüft Persistenz über Reload.
+> - 💀 **#4 Approve nutzt zweiten Code-Pfad und driftet vom Host-Direkt-Edit ab.** *Auslöser:* `approve` reimplementiert die Persistenz statt die bestehende `_save_location_override`/`_update_custom_location_file`-Logik wiederzuverwenden. *Gegenmaßnahme:* `approve` ruft **dieselbe** interne Apply-Funktion wie der Host-PATCH-Branch (gemeinsame Helper-Funktion extrahieren). AK3.
+> - 💀 **#5 deviceId fehlt/leer → falsche 403 oder offene Löschung.** *Auslöser:* Frontend sendet keine `device_id` beim DELETE, Backend behandelt leer == match. *Gegenmaßnahme:* leere/fehlende `device_id` ⇒ niemals Eigentümer ⇒ 403; `device_id` ist Pflicht-Query/Body-Param beim User-DELETE. AK6.
+>
+> ### Analyse & Planung
+> - [x] Example Mapping durchgeführt (5 Rules, 0 offene Questions)
+> - [x] Pre-Mortem durchgeführt (5 Szenarien, alle in AKs verankert)
+> - [x] Architektur analysiert:
+>   - **Backend** `backend/main.py`: `PATCH /locations/{id}` (Z.1325, aktuell ungated für jede Rolle) → Rollen-Branch einbauen; `POST /preview-alignment` (Z.1211, Create) → `created_by_device` setzen; **kein** `DELETE /locations/{id}` vorhanden → neu. `require_auth`/`require_host` aus `auth.py` (Z.66/76). Recompute-Hook `_run_precompute_single` (Z.484, TASK-12). Override-Persistenz `_save_location_override` (Z.571) / `_update_custom_location_file` (Z.203).
+>   - **Store** `backend/data/store.py`: neue Tabelle `location_proposals` + CRUD analog `location_overrides`/`location_ratings`; `custom_locations` um Spalte `created_by_device TEXT` (additive Migration via `CREATE TABLE IF NOT EXISTS` + `ALTER TABLE … ADD COLUMN` mit try/except, da bestehende DB).
+>   - **Auth** `backend/auth.py`: rollenbasiert, keine Nutzeridentität → Owner-Modell über `deviceId` (Frontend Z.1798), nicht über Token. Python-3.9: `from __future__ import annotations` bereits aktiv, keine 3.10-Syntax.
+>   - **Frontend** `web/index.html`: Edit-Button Z.3579 (heute ungated), Save-Flow Z.3496 (`API.patch`), `Auth.isHost()` Z.992, `deviceId()` Z.1798, Settings-Render Z.3900 (Aufgaben-Sektion + Badge hier), Tab-Badge analog vorhandener Tab-Struktur.
+> - [ ] **Implementierungsoptionen:** A / B / C (siehe unten)
+> - [ ] **Empfehlung:** Option B
+>
+> ### Implementierungsoptionen
+>
+> **Option A — Separate `pending_overrides`-Datei/Tabelle nur für Edits, Löschung getrennt.**
+> Zwei Mechanismen (Edit-Vorschläge in einer Override-Pending-Spalte, Löschwünsche separat). Vorgehen: `location_overrides` um `pending`-Status erweitern, Lösch-Wünsche in eigener Mini-Tabelle. Vorteile: nah an US-68-Wortlaut („pending_override"). Nachteile: zwei Aufgaben-Quellen → Aufgabenliste/Badge muss zwei Tabellen mergen, Diff-Logik doppelt; widerspricht dem Merge-Geist (ein gemeinsames Dashboard). Aufwand: mittel-groß.
+>
+> **Option B — Eine `location_proposals`-Tabelle für Edits UND Löschungen (kind-Diskriminator), gemeinsamer Approval-Pfad.** ⭐
+> Vorgehen: eine Tabelle (`id, location_id, kind['edit'|'delete'], payload(JSON: geänderte Felder), status, created_by_device, created_at`). Rollen-Branch in `PATCH`/neuem `DELETE`. Approve ruft die **bestehende** Host-Apply-Logik. Aufgabenliste = ein `GET /proposals`. Vorteile: ein Datenmodell, eine Liste, ein Badge, ein Diff-Renderer; passt exakt zum Merge (US-86→US-68); minimaler Drift-Risiko (Pre-Mortem #4). Nachteile: „payload als JSON" etwas generischer als getypte Spalten (akzeptabel, gleiche Technik wie `location_overrides.fields`). Aufwand: mittel.
+>
+> **Option C — Kein Owner-Konzept: jede User-Löschung braucht Approval, jede User-Änderung auch; `created_by`-Frage offen lassen.**
+> Vorgehen: wie B, aber ohne `created_by_device` — jeder User darf für jede Location Lösch-Approval beantragen, der Host entscheidet. Vorteile: kein Identitätsmodell nötig, einfachste Migration. Nachteile: erfüllt AK „User dürfen nur **selbst angelegte** löschen" NICHT — verschiebt die Owner-Beschränkung auf den Host (der dann jeden fremden Löschwunsch ablehnen müsste). Weicht vom Ticket ab. Aufwand: klein.
+>
+> ✅ **Empfehlung: Option B.** Sie ist die einzige Option, die den Merge-Geist (ein gemeinsames Host-Dashboard/Approval statt zweier Mechanismen) und alle drei AK-Blöcke (Änderung, Löschung, Aufgabenliste) in einem Datenmodell erfüllt, hält Approve und Host-Direkt-Edit auf demselben Code-Pfad (Pre-Mortem #4) und nutzt die bereits vorhandene `deviceId`-Mechanik für Eigentümerschaft ohne neues Auth-System. Option C würde ein explizites AK verfehlen; Option A erzeugt doppelte Aufgaben-Quellen.
+>
+> ### Testplan
+> - [ ] **Automatisiert (`backend/tests/`, Ticket-ID im Docstring):**
+>   - `test_us68_host_patch_applies_immediately` (AK1) — Host-Token, PATCH, Override gespeichert, `applied:true`.
+>   - `test_us68_user_patch_creates_pending_proposal` (AK2) — User-Token, PATCH, Location unverändert, Proposal `pending`.
+>   - `test_us68_approve_applies_value` (AK3) + `test_us68_reject_keeps_location` (AK4).
+>   - `test_us68_host_delete_immediate` (AK5) + Reload-Persistenz (Pre-Mortem #3).
+>   - `test_us68_user_delete_own_creates_proposal` + `test_us68_user_delete_foreign_403` (AK6, Pre-Mortem #5: leere device_id → 403).
+>   - `test_us68_proposals_host_only` (AK7, User → 403).
+>   - `test_us68_supersede_open_proposal` (AK10) + `test_us68_approve_on_deleted_location` (AK9).
+>   - Token via `auth.issue_token('host')` / `issue_token('user')` (lokal, `/login` scheitert ohne `.env`).
+>   - **Vollsystem-Regression:** gesamte `backend/tests/`-Suite grün (PATCH-Verhalten für US-60/US-62/BUG-22 darf nicht brechen — Host-Pfad muss identisch zu vorher bleiben).
+> - [ ] **Manuell unter http://localhost:8000** (Owner braucht 2 Browser/Profile für verschiedene deviceIds):
+>   - Als User: Location ändern → „Vorschlag ausstehend"; eigene Custom-Location löschen → Approval-Antrag.
+>   - Als Host (Login-Wechsel): Aufgaben-Sektion + Badge prüfen, Diff ansehen, Annehmen → Wert live + Recompute; Ablehnen → unverändert.
+>   - Fremde Location als User löschen → blockiert.
+>
+> **Memory-Vormerkung (für Retro):** rollenbasierte vs. nutzerbasierte Auth-Grenze → Owner-Konzept via `deviceId` ist projektweites Muster (analog US-89-Ratings); bei künftigen „nur eigene"-Anforderungen kein neues Auth-System nötig.
 
 ### US-69 · Kartenansicht auf aktuellen GPS-Standort zentrieren `[x]`
 > **Als Fotograf vor Ort** möchte ich die Kartenansicht mit einem Tap auf meinen GPS-Standort zentrieren, damit ich schnell sehe, welche Fotostandorte in meiner Nähe liegen.
@@ -2293,7 +2403,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-22 |
 
 **Beschreibung:** Eine Chance für „Mond über Oberbaumbrücke & Spree" wurde mit veralteten GPS-Daten angezeigt, obwohl die Koordinaten in den Locationdetails bereits auf neue Werte geändert und dort korrekt gespeichert waren. Die Locationdetails zeigten die korrekten GPS-Daten, die Chancendetails (Feed/Kalender) haben sich nicht mitaktualisiert.
@@ -2329,10 +2439,17 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 **Analyse & Planung:**
 - [x] Example Mapping durchgeführt (Rules: PATCH-Koord → Feed neu / Kalender neu / Maps folgt aus Koordinaten-Snapshot)
 - [x] Pre-Mortem durchgeführt
-- [x] Architektur analysiert: `backend/main.py` (`_run_precompute_single` L484–523, `patch_location` L1180–1251), `backend/precompute.py` (Single-Flow L597–651, `compute_calendar_incremental` L444+, `_location_hash` L123), `web/index.html` (Detail-Render L2686+, Maps-URL aus `o.*`)
-- [x] Daten-Validierung: Feed-Cache trägt pro Event eigenen Koordinaten-Snapshot; Kalender-Cache (88 MB) wird vom Single-Recompute nicht angefasst
-- [ ] Implementierungsoptionen: A / B / C
-- [ ] Empfehlung: Option A
+- [x] Architektur analysiert: `backend/main.py` (`_run_precompute_single` L484–523, `patch_location` L1325–1394, `_load_caches` L279–310), `backend/precompute.py` (Single-Flow L597–651, `compute_calendar_incremental` L444–571, `_location_hash` L123–130, `_serialize` L245+), `web/index.html` (Detail-Render L2667–2909, Maps-URL aus `o.*`)
+- [x] Daten-Validierung: Feed-Cache trägt pro Event eigenen Koordinaten-Snapshot (`_serialize` L249–254: `observer_lat/lon`, `subject_lat/lon`, `location_name`); Kalender-Cache wird vom Single-Recompute nicht angefasst
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A
+
+**🔎 Code-Verifikation (Analyse-Subagent 2026-06-22 — Root-Cause am Code bestätigt, nicht nur Ticket-Vermutung):**
+- **Bestätigt:** `_run_precompute_single` (`main.py` L503–505) ruft `precompute.py --feed-only --location-id <id>` auf. Im Single-Flow setzt `run_calendar = not args.feed_only` → bei `--feed-only` ist `run_calendar=False`, aber der Single-Flow erreicht den Kalender-Block ohnehin nie: er `return`t bei `precompute.py` L651 direkt nach dem Feed-Merge (L640–645). `calendar.json` wird beim PATCH **nie** geschrieben → Root-Cause verifiziert.
+- **Bestätigt:** Frontend-Opportunity-Detail (`index.html` L2667–2909) rendert ausschließlich aus dem Cache-Snapshot `o.*` (`o.observer_lat/lon`, `o.subject_lat/lon`, `o.celestial_azimuth` L2667, `o.subject_azimuth` L2669/L2882, Maps via `Detail.openInMaps(o.observer_lat, o.observer_lon)` L2879). → Sobald der Cache-Snapshot stimmt, folgen Maps + Astronomie automatisch. Bestätigt zugleich, dass **Option C die Astronomie-Felder nicht reparieren kann** (client-seitig nicht nachrechenbar).
+- **Bestätigt (Reload-Pfad):** `_run_precompute_single` ruft nach Erfolg `_load_caches()` (`main.py` L517) auf, das **sowohl** `_OPP_CACHE` als auch `_CAL_CACHE` neu lädt (L288–307). → Sobald Option A `calendar.json` neu schreibt, übernimmt der In-Memory-Kalender automatisch; keine zusätzliche main.py-Verdrahtung für den Reload nötig.
+- **⚠️ Wichtige Präzisierung für Option A:** `compute_calendar_incremental` (`precompute.py` L444–571) hat **keinen** Single-Location-Parameter — die Schleife L504 läuft hart über `for loc in LOCATIONS` (alle). Option A erfordert daher entweder (a) einen neuen optionalen `location_id`-Filter in `compute_calendar_incremental` (Schleife auf die eine Location beschränken) **oder** (b) eine dedizierte Single-Location-Kalender-Merge-Routine im Single-Flow nach dem Feed-Muster (L633–645). Variante (a) wiederverwendet die vorhandene Hash-/Merge-/Meta-Logik (L505–559, inkl. `computed_locations`-Update) und ist robuster gegen den 3. Pre-Mortem-Punkt (Meta-Drift) → **für Implementierung empfohlene Sub-Variante: A(a)**. Aufwand bleibt mittel.
+- **Python-3.9-Check (Prod):** `precompute.py` hat `from __future__ import annotations` (L30) → alle `X | None`-Annotationen (L133/L180/L466/L593) sind Strings, **kein** 3.9-Crash. Achtung für die Impl-Phase: neuer **Laufzeit**-Code mit `int | float` in `isinstance(...)` o.ä. würde auf 3.9 trotzdem crashen — bei neuen Guards `(int, float)`-Tupel verwenden.
 
 **Implementierungsoptionen:**
 
@@ -2358,8 +2475,18 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 ✅ **Empfehlung: Option A** — behebt die Ursache (Kalender-Snapshot) inkl. der astronomisch abhängigen Felder, die Option C nicht abdecken kann, und vermeidet den BUG-28-`Locations.all`-Fallstrick. Längere Recompute-Dauer ist über das bestehende `_precompute_running`-Gating beherrschbar.
 
 **Testplan:**
-- [ ] Automatisiert (`backend/tests/`, FOTOALERT_NO_BACKGROUND=1): Einheitstest gegen `precompute.main` im Single-Location-Modus (oder die Kalender-Merge-Funktion direkt) — PATCH-Koordinaten setzen, Single-Recompute laufen lassen, dann `calendar.json` lesen und prüfen, dass alle Events der Location die neuen `observer_lat/lon` + plausible neue `*_azimuth` tragen und Events anderer Locations unverändert sind. Ticket-ID `BUG-29` im Docstring.
-- [ ] Manuell (http://localhost:8000): Location-Koordinaten via Location-Detail ändern → Recompute abwarten → Kalender öffnen → Chance dieser Location aufrufen → Maps-Link/Koordinaten zeigen neue Werte.
+- [x] Automatisiert (`backend/tests/test_bug29_calendar_single_recompute.py`, FOTOALERT_NO_BACKGROUND=1): 5 Tests gegen `compute_calendar_incremental(location_id=…)` (gestubbtes `find_opportunities` → deterministisch, kein Ephemeriden-Zugriff) — neue Koordinaten im Snapshot (AK2), Astronomie folgt (AK3), andere Locations unverändert + Meta vollständig (AK6 / Pre-Mortem #2+#3), neue Location ohne Crash (AK4), nur Ziel-Location neu berechnet (Pre-Mortem #1). Alle grün, komplette Offline-Suite grün.
+- [x] Manuell (2026-06-22, lokal verifiziert): `PATCH oberbaumbrucke_spree` → Log zeigt `Location-Overrides angewendet: 3`, Elevation-Fetch auf neue Koordinaten (52.5021), `365 neu berechnet`, `✅ Kalender: 44141 Events nach Merge`. Snapshot: `oberbaumbrucke_spree` lat=52.5021 + az 241.3→221.3; `berliner_dom_spree` unverändert (806 Events, lat/az gleich). Kalender wuchs 43997→44141 (übrige Locations erhalten).
+
+**⚠️ Korrektur der Root-Cause (beim Live-Test 2026-06-22 am Log aufgedeckt):** Die ursprüngliche Spec nahm an, der Single-Recompute rechne mit den neuen Koordinaten und es fehle „nur" der Kalender-Write. Der Live-Test zeigte die **tiefere Ursache**: `precompute.py` lädt ausschließlich die hartcodierten Basis-Koordinaten aus `data/locations.py` und wendet die in SQLite persistierten `location_overrides` (aus `PATCH /locations/{id}`) **nie** an — anders als `main.py:_load_location_overrides`, das nur die In-Memory-Liste des Servers patcht. Folge: Recompute holt Elevation/Feed/Kalender mit den **alten** Koordinaten, der `coordinates_hash` bleibt gleich → „0 neu berechnet" → Feed UND Kalender bleiben dauerhaft veraltet (auch der nächtliche Vollkalauf, entgegen der Spec-Annahme). Die Location-Detail-Ansicht war nur deshalb korrekt, weil sie live aus dem Override rendert. Log-Beleg: Elevation-Fetch für `52.5014,13.4445` (alt) statt `52.5019` (PATCH), Kalender „Zusammenfassung: 0 neu berechnet, 365 aus Cache".
+
+**🛠️ Implementiert (2026-06-22 — Override-Fix + Option A(a)):**
+- `backend/precompute.py` `_apply_location_overrides()` (neu): lädt beim Start die `location_overrides` aus dem `LocationStore` und wendet sie (gleiche Whitelist wie main.py) auf `LOCATIONS` an — VOR jeder Berechnung/Hashing. Greift im Single-Recompute **und** im nächtlichen Vollkalauf. Das ist die eigentliche Wurzel-Behebung.
+- `backend/precompute.py` `compute_calendar_incremental`: neuer optionaler `location_id`-Filter. Im Single-Modus wird nur diese Location berechnet; Events + `computed_locations`-Meta aller übrigen Locations werden unverändert übernommen (kein Vollkalender, kein Schrumpfen, keine Meta-Drift). Versions-Mismatch verwirft im Single-Modus bewusst NICHT den gesamten Kalender.
+- `backend/precompute.py` Single-Location-Flow: nach dem Feed-Block wird jetzt zusätzlich `calendar.json` für die Location regeneriert (gated über `run_calendar`).
+- `backend/main.py` `_run_precompute_single`: `--feed-only` entfernt → der Single-Recompute schreibt jetzt Feed **und** Kalender. `_load_caches()` lädt beide In-Memory-Caches ohnehin neu.
+- Python-3.9-sicher (`from __future__ import annotations` vorhanden; kein neuer Runtime-PEP604-Code).
+- **Offen / separater Scope:** `precompute.py` lädt Custom-Locations (`custom_*`) nicht (importiert nur die Basis-`LOCATIONS`) → Single-Recompute einer Custom-Location greift noch nicht. Vorbestehende Lücke, nicht Teil der gemeldeten Standard-Location. → eigenes Ticket erwägen.
 
 ---
 
@@ -2382,7 +2509,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 #### 🔬 Implementation Spec (Analyse 2026-06-22)
 
-**Root-Cause (datenvalidiert — Persistenz ist intakt, Anzeige ist stale):** Der PATCH-Pfad **speichert den Namen korrekt** und lädt ihn korrekt zurück. Live-Beleg: Override-Tabelle (`fotoalert.db`) enthält für `rostiger_nagel_rusty_nail` den Override-Namen „Rostiger Nagel Test", und die nachgestellte Lade-Routine (`main.py:_load_location_overrides` L530–568, Whitelist inkl. `name` L559–561) ergibt nach Anwendung korrekt „Rostiger Nagel Test" statt des statischen „Rostiger Nagel - Rusty Nail" (verifiziert per Skript). PATCH-Handler (`main.py` L1180–1251) führt `name` in `text_fields`/`all_allowed_fields` (L1184, L1188) und persistiert via `_save_location_override` (Standard) bzw. `_store.update_custom` (Custom, echte `name`-Spalte) — beide schreiben `name`. **Der Bug ist die denormalisierte Anzeige:** Feed (`opportunities.json`) und Kalender (`calendar.json`) speichern pro Event einen `location_name`-Snapshot. Eine Namensänderung löst (per TASK-16) **keinen** Recompute aus, und `_location_hash` (precompute.py L123–130) hasht nur Koordinaten — der Snapshot bleibt also alt. Das Opportunity-Detail im Frontend rendert `${o.location_name}` direkt aus dem Cache (`index.html` L2690), Feed-/Kalender-Karten ebenso (L1146, L1224, L1527). Wird die Location aus dem Feed-/Kalender-Kontext bearbeitet und der alte Name dort weiterhin angezeigt, wirkt das wie „nicht gespeichert" — obwohl das Location-Detail (das live `loc.name` liest, L3076/L3206) den neuen Namen zeigt. **Live-Beleg:** Feed-Cache trägt für `rostiger_nagel_rusty_nail` weiterhin `location_name: "Rostiger Nagel - Rusty Nail"` (alt).
+**Root-Cause (datenvalidiert am echten Code 2026-06-22 — Persistenz ist intakt, Anzeige ist stale):** Der PATCH-Pfad **speichert den Namen korrekt** und lädt ihn korrekt zurück. Live-Beleg (DB `backend/data/fotoalert.db`, Tabelle `location_overrides`): für `rostiger_nagel_rusty_nail` steht der Override-JSON-Blob `{"name": "Rostiger Nagel Test", ...}`, für `berliner_dom_spree` `{"name": "Berliner Dom vom Spreeufer", ...}`. Die Lade-Routine `main.py:_load_location_overrides` (L530–568) wendet die Whitelist inkl. `name` an (L559–561) → nach Boot trägt die Location den neuen Namen. PATCH-Handler `patch_location` (`main.py` L1326–1396) führt `name` in `text_fields` (L1329) und `all_allowed_fields` (L1333); `name` ist bewusst **nicht** in `recompute_fields` (L1332, TASK-16) → keine Neuberechnung. Persistenz: Standard-Location via `_save_location_override`→`_store.upsert_override` (L1380; store.py L226–254), Custom via `_update_custom_location_file`→`_store.update_custom` (L1375 → L203–205; store.py L155–186) — beide schreiben `name`. **Der Bug ist die denormalisierte Anzeige:** Feed (`opportunities.json`) und Kalender (`calendar.json`) speichern pro Event einen `location_name`-Snapshot, der bei einer reinen Namensänderung (kein Recompute) alt bleibt. Das Frontend rendert `${o.location_name}` direkt aus dem Cache: Opportunity-Detail-Hero (`index.html` L2690), Feed-Karte (L1146), Chip (L1224), Kalender-Event (L1527) — zusätzlich Suchfilter (L2079), Verify-Button/Notification (L2900/L2929/L2949). Das Location-Detail dagegen liest live `loc.name` (L3076 Render, L3206 Listen-Render) und zeigt deshalb sofort den neuen Namen. Wird die Location aus dem Feed-/Kalender-Kontext bearbeitet, bleibt der alte Snapshot dort sichtbar → wirkt wie „nicht gespeichert". **Verschärfend (BUG-28-Gotcha, datenvalidiert):** `App.init` (L4098–4117) lädt `Locations.all` beim Boot **nicht** (nur Verify/Rating/Feed); `Locations.all` füllt sich erst beim Locations-Tab (L4086) oder beim Öffnen eines Location-Details (L3232 hat eigenen Lazy-Load-Guard). Ein naiver Live-Lookup `Locations.all.find(id)?.name` im Feed-/Kalender-Detail liefe daher gegen leere Liste → Fix still wirkungslos.
 
 **Scope:**
 - Eingeschlossen: Geänderter Name muss in **allen** Ansichten konsistent erscheinen — Location-Detail (heute schon korrekt) **und** Feed-/Kalender-/Opportunity-Detail. Lösung muss den stale `location_name`-Snapshot adressieren.
@@ -2393,7 +2520,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - [ ] Nach Neustart der App (Override aus DB geladen) liefert `GET /locations` weiterhin `name == "X"` (verifiziert die Lade-Whitelist).
 - [ ] Nach Namensänderung zeigt das **Opportunity-Detail** (Feed und Kalender) für Chancen dieser Location den neuen Namen `X` — heute zeigt es den alten Snapshot.
 - [ ] Edge Case: Location ohne Chancen im Cache → Namensänderung persistiert trotzdem, keine Fehlermeldung.
-- [ ] Edge Case: Name mit Sonderzeichen (`"`, Emoji) wird korrekt persistiert und angezeigt (Frontend escaped bereits via `replace(/"/g,'&quot;')`, L3267).
+- [ ] Edge Case: Name mit Sonderzeichen (`"`, Emoji) wird korrekt persistiert und angezeigt (Edit-Feld escaped bereits via `replace(/"/g,'&quot;')`, L3267; UTF-8/ensure_ascii=False im Store L243/L248 belegt für „Berliner Dom"-Override).
 - [ ] Regression: `description` und andere Felder bleiben beim reinen Name-PATCH unverändert (Override-Merge, store.py L238–244 merged statt überschreibt).
 
 **Pre-Mortem:**
@@ -2404,7 +2531,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 **Analyse & Planung:**
 - [x] Example Mapping durchgeführt (Rule: PATCH-Name → DB persistiert / Detail zeigt neu / Feed+Kalender zeigen neu)
 - [x] Pre-Mortem durchgeführt
-- [x] Architektur analysiert: `backend/main.py` (`patch_location` L1180–1251, `_load_location_overrides` L530–568), `backend/data/store.py` (`update_custom` L155–186, `upsert_override` L226–254 — beide korrekt), `web/index.html` (Opportunity-Detail L2690, Feed/Kalender-Karten L1146/L1224/L1527, Location-Detail L3076/L3206, `saveEdit` L3461–3517)
+- [x] Architektur analysiert (Zeilen am echten Code 2026-06-22 verifiziert): `backend/main.py` (`patch_location` L1326–1396, `recompute_fields` ohne `name` L1332, `_load_location_overrides` L530–568 Whitelist L559–561, `_update_custom_location_file` L203–205), `backend/data/store.py` (`update_custom` L155–186, `upsert_override` L226–254 mergt statt überschreibt L238–244 — beide korrekt), `web/index.html` (Opportunity-Detail-Hero L2690, Feed/Kalender-Karten L1146/L1224/L1527, weitere `location_name`-Nutzung L2079/L2900/L2929/L2949, Location-Detail live `loc.name` L3076/L3206, `LocationDetail.open`-Lazy-Guard L3232, `saveEdit` ab L3461, `App.init` ohne `Locations.all`-Boot-Load L4098–4117, Locations-Tab-Lazy-Load L4086)
 - [x] Daten-Validierung: Override-Name in DB vorhanden + Lade-Routine ergibt neuen Namen (Persistenz intakt); Feed-Cache trägt alten `location_name`-Snapshot (Anzeige-Ursache)
 - [ ] Implementierungsoptionen: A / B / C
 - [ ] Empfehlung: Option A
@@ -2418,7 +2545,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 *Option A — Frontend rendert `location_name` live aus der Location (empfohlen)*
 - Vorgehen: In Opportunity-Detail/Feed-/Kalender-Karten den angezeigten Namen zur Render-Zeit aus der Live-Location auflösen (`Locations.all.find(id)?.name ?? o.location_name`) **mit** Lade-Garantie: sicherstellen, dass `Locations.all` beim App-Boot (nicht erst beim Locations-Tab) geladen ist — sonst greift der BUG-28-Fallstrick. Da `name` ein reiner Anzeige-String ohne Astronomie-Abhängigkeit ist, ist das die billigste korrekte Lösung und vermeidet jeden Recompute.
-- Betroffene Dateien: `web/index.html` (Render-Stellen L1146/L1224/L1527/L2690 + Boot-Lade-Logik von `Locations.all`).
+- Betroffene Dateien: `web/index.html` (Render-Stellen L1146/L1224/L1527/L2690, ggf. L2079/L2900/L2929/L2949 + Boot-Lade-Garantie für `Locations.all` in `App.init` L4098–4117). Konkrete Lade-Garantie: in `App.init` vor/parallel zu `Feed.load()` ein `await Locations.load()` (bzw. ein leichtes `Locations.all = await API.get('/locations')` ohne Render) ergänzen, damit der Render-Zeit-Lookup im Feed-/Kalender-Detail nie gegen leere Liste läuft.
 - Vorteile: Kein Backend-Recompute; sofort konsistent; löst Name-Anzeige in allen Views; respektiert TASK-16.
 - Nachteile/Risiken: Erfordert die Lade-Garantie für `Locations.all` (BUG-28-Mitigation); betrifft nur den Namen — Koordinaten (BUG-29) bleiben getrennt.
 - Aufwand: klein–mittel
@@ -2582,6 +2709,13 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 **Testplan:**
 - [ ] Automatisiert: `grep -nE "localStorage\.(get|set|remove)Item" web/index.html` → jeder gefundene Key ist im Inventar enthalten (Vollständigkeitscheck)
 - [ ] Manuell: Für jede ⚠️-Datenart den Backend-Pfad gegenprüfen (kein Persistenz-Endpoint vorhanden bestätigt)
+
+**Verifikation (Heartbeat 2026-06-22, separater Check):**
+- Inventar **vollständig & korrekt** — alle 10 Soll-Keys im Code bestätigt. ⚠️ Caveat: Das im AK genannte `grep`-Kommando findet nur 7 Keys, weil `fotoalert_verifications`, `fotoalert_ratings`, `fotoalert_filters`, `fa_sec` über **Konstanten** (`_KEY`/`_key`, z. B. Zeilen 1543/1792/1958/2486) statt Inline-String-Literale angesprochen werden. Der Vollständigkeitscheck sollte daher zusätzlich auf `_KEY`/`_key`-Definitionen prüfen, nicht nur auf `localStorage.…Item('…')`.
+- **Befund Veraltung:** `fotoalert_ratings` trägt jetzt im Code den Kommentar „nur noch für Migration aus localStorage" und **US-89 steht inzwischen in Done** → Sterne-Bewertungen sind serverseitig persistiert. Die Audit-Tabelle (Stand 06-21) führt sie noch als ⚠️ „US-89 (in Analyse)". → Reklassifizieren auf ✅ persistiert (US-89 erledigt). *(Inhalt bewusst nicht eigenmächtig umgeschrieben — Stephans Entscheidung.)*
+- Substanz des Audits unverändert gültig: offene Persistenz-Empfehlungen bleiben `cameraProfile` (Folgeticket) und `_device_tokens` (RAM-only, Folgeticket) + Designhinweis US-17.
+
+> ⏸️ **Weg-/Done-Gate (wartet auf Stephan):** Reiner Audit, kein Code/Release. Entscheidung offen: (a) zwei empfohlene Folgetickets anlegen (`cameraProfile`-Persistenz, `_device_tokens`-Persistenz), (b) Designhinweis in US-17 ergänzen, (c) Ratings-Zeile auf ✅ reklassifizieren — dann → Done.
 
 ---
 
@@ -3010,13 +3144,13 @@ umzuschreiben.
 
 ---
 
-### TASK-26 · Weltweiter DEM für Geländehöhen (EUDEM → global) `[~]`
+### TASK-26 · Weltweiter DEM für Geländehöhen (EUDEM → global) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done (v1.11.2 deployed 2026-06-22; live verifiziert: NY 8,0 m, incomplete=false) |
 | **Erstellt** | 2026-06-22 |
 
 **Beschreibung:** Der Elevation-Provider (`data/elevation.py`, TASK-25) nutzt bisher
