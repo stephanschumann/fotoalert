@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-33 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-33, BUG-34 · BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · TASK-30, TASK-31, TASK-32 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -3813,12 +3813,108 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Stephan hat die Location „Schloss Babelsberg von Glienicker Brücke" hinzugefügt. Laut PhotoPills steht der Mond am 26.06.2026 um 21:27 Uhr (GMT+2) 97,1 m über dem Motiv und 77 m über dem Turm — ein klares Alignment-Event. Die App zeigt für diese Location keine entsprechende Chance. Erwartet: Das Alignment taucht im Feed und/oder Jahreskalender auf.
 
 **Bezug:** Möglicherweise verwandt mit Memory-Notiz „precompute Datenquelle" — precompute.py verarbeitet keine Custom-Locations (nur Basis-LOCATIONS + Overrides, nicht neu via UI hinzugefügte). Grenzbereich: BUG-29 [x] (veraltete GPS-Daten), TASK-25 [x] (On-Demand-Ephemeriden-Engine). Ggf. ist die On-Demand-Engine der Fix-Pfad.
+
+---
+
+**Root Cause (bestätigt durch Code-Analyse):**
+`precompute.py` importiert `LOCATIONS` aus `data/locations.py` — das sind ausschließlich hartcodierte Basis-Locations. Die Funktion `_apply_location_overrides()` ergänzt nur PATCH-Overrides für Basis-Locations. Custom Locations (via UI angelegt, in SQLite `custom_locations`-Tabelle gespeichert) werden NIE geladen.
+
+Konkrete Fehler-Kette:
+1. User legt „Schloss Babelsberg" an → `LOCATIONS.append(new_loc)` + `_run_precompute_single("custom_xyz")` wird aufgerufen
+2. Subprocess: `precompute.py --location-id custom_xyz` startet — LOCATIONS = nur Basis → `locations_to_process = []` → **Log: "Location 'custom_xyz' nicht gefunden"** → 0 Events berechnet
+3. Nächtlicher Cron (`precompute.py` ohne Flag) iteriert ebenfalls nur LOCATIONS → Custom Location bleibt unsichtbar
+4. `/opportunities` liest ausschließlich aus `_feed_cache` (opportunities.json) → kein Fallback
+5. `/calendar` hat On-Demand-Pfad, aber nur wenn `FOTOALERT_ONDEMAND=1` (Default: `"0"`)
+
+---
+
+**Example Mapping:**
+
+📏 **Rule 1:** Custom Locations erscheinen nach dem Anlegen im 14-Tage-Feed (opportunities.json), wenn Alignment-Events im Zeitfenster liegen.
+🟢 **Example 1a (Happy Path):** Given: Custom Location „Babelsberg" angelegt, Mond-Alignment 26.06. 19:27 UTC in Precompute-Fenster / When: `precompute.py` läuft (Single oder nächstäglicher Cron) / Then: `/opportunities` enthält Event mit `location_id=custom_xyz`, `event_type="Mond-Alignment"`, `shoot_time` ≈ `2026-06-26T19:27`.
+🟢 **Example 1b (Edge Case — kein Alignment im Fenster):** Given: Custom Location angelegt, aber nächstes Alignment erst in 20 Tagen / When: Feed-Recompute läuft / Then: Feed leer für diese Location — kein Fehler, kein Crash.
+
+📏 **Rule 2:** Custom Locations erscheinen im Jahreskalender (`/calendar`).
+🟢 **Example 2a:** Given: Custom Location angelegt, Kalender wird abgerufen / When: `GET /calendar?location_id=custom_xyz&month=6&year=2026` / Then: Events für diese Location vorhanden.
+🟢 **Example 2b (Calendar-Recompute nach Anlage):** Given: `_run_precompute_single` abgeschlossen / When: `_load_caches()` erneut ausgeführt / Then: `_calendar_cache` enthält Einträge für `custom_xyz`.
+
+📏 **Rule 3:** Nächstäglicher Cron berücksichtigt Custom Locations dauerhaft (nicht nur beim Anlegen).
+🟢 **Example 3a:** Given: Custom Location seit 7 Tagen gespeichert / When: nächtlicher Cron läuft / Then: Neue Tage werden für Custom Location berechnet (inkrementeller Calendar-Flow).
+
+---
+
+**Akzeptanzkriterien:**
+- [ ] Nach dem Anlegen einer Custom Location (via `/preview-alignment?save=true`) erscheint binnen 5 Minuten mindestens ein Event im Feed (`GET /opportunities?location_id=<id>`), sofern ein Alignment-Event im 14-Tage-Fenster liegt.
+- [ ] `GET /calendar?location_id=<custom_id>&month=6&year=2026` liefert das Babelsberg-Mond-Alignment am 26.06.2026 (shoot_time ≈ `2026-06-26T19:27Z`, event_type enthält „Mond").
+- [ ] Nach einem Vollkalender-Recompute (`python3 precompute.py --full`) sind Custom-Location-Events in `calendar.json` enthalten (prüfbar via `grep "custom_" data/cache/calendar.json`).
+- [ ] Log beim Single-Recompute zeigt NICHT mehr „Location 'custom_xyz' nicht gefunden"; stattdessen normale Ausgabe mit berechneten Events.
+- [ ] Edge Case: Existiert keine Custom Location in SQLite, läuft precompute.py ohne Fehler durch (bestehende Basis-Locations unberührt).
+
+---
+
+**Pre-Mortem:**
+
+💀 **Szenario 1: SQLite-Zugriff in precompute.py schlägt fehl (DB gesperrt / nicht gefunden)**
+Auslöser: precompute.py läuft als Subprozess, während main.py einen WAL-Write hält
+Frühwarnung: Log „Fehler beim Laden der Custom Locations" im Recompute-Log
+Gegenmaßnahme: Fehler mit `logger.warning` abfangen + Fallback auf leere Custom-Liste (analog zu `_apply_location_overrides`), kein Abbruch → in AK als Edge Case getestet
+
+💀 **Szenario 2: Doppelte Location-IDs (Custom + Base kollidieren)**
+Auslöser: Unwahrscheinlich (Custom-IDs starten mit `custom_`), aber race condition denkbar
+Frühwarnung: doppelte `location_id` in calendar.json / opportunities.json
+Gegenmaßnahme: `ids_existing = {loc.id for loc in LOCATIONS}` Guard (wie in `_load_custom_locations` in main.py) → kein doppeltes Append
+
+💀 **Szenario 3: Babelsberg-Event liegt innerhalb der nächsten 3 Tage, Wetter-Overlay fehlt**
+Auslöser: Custom Location hat keine Wetter-Daten, weil `_weather_overlay()` auf `_feed_cache` operiert (nach Reload OK)
+Frühwarnung: Event ohne `weather_score` im Feed
+Gegenmaßnahme: `_load_caches()` nach Single-Recompute bereits triggert Wetter-Overlay → kein extra AK nötig
+
+💀 **Szenario 4: Timing-Problem — 26.06. Alignment schon vorbei, wenn Fix live geht**
+Auslöser: Fix erst nach 26.06.2026 deployed
+Frühwarnung: Datum prüfen (heute 23.06., Event 26.06.)
+Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed sein; AK mit statischem Datum testen
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `precompute.py` (L50, L142–170, L468, L561, L576, L659–663), `main.py` (`_load_custom_locations` L123–165, `_run_precompute_single` L481–519, `PATCH /locations` L1286–1289)
+- [x] Root Cause validiert: keine Vermutung — Code-Pfad vollständig nachverfolgt
+
+**Implementierungsoptionen:**
+
+### Option A — `_load_custom_locations_for_precompute()` in precompute.py (Empfohlen)
+- **Vorgehen:** In `precompute.py` eine neue Funktion `_load_custom_locations()` ergänzen (analog zu `_apply_location_overrides()`), die `LocationStore().load_all_custom()` aufruft und die Einträge als `PhotoLocation`-Objekte an `LOCATIONS` anhängt. Aufruf in `main()` direkt nach `_apply_location_overrides()`.
+- **Betroffene Dateien:** `backend/precompute.py` (ca. 25 neue Zeilen + 1 Aufruf)
+- **Vorteile:** Minimale Änderung, konsistentes Muster zu Overrides, Custom Locations in Feed + Kalender + Nacht-Cron, Single-Recompute findet Location korrekt
+- **Nachteile:** precompute.py bekommt SQLite-Abhängigkeit (aber `LocationStore` bereits importiert über data.store)
+- **Aufwand:** klein
+
+### Option B — On-Demand-Fallback für `custom_`-Locations in `/opportunities` + `/calendar`
+- **Vorgehen:** Endpoints erkennen `location_id.startswith("custom_")` → berechnen live via Window-Engine, ohne precompute.py zu ändern
+- **Betroffene Dateien:** `backend/main.py` (beide Endpoints)
+- **Vorteile:** precompute.py bleibt unverändert
+- **Nachteile:** Feed ohne `location_id` (Gesamtübersicht) zeigt keine Custom-Location-Events; inkonsistentes Verhalten; höherer Aufwand
+- **Aufwand:** mittel
+
+✅ **Empfehlung: Option A** — minimale Änderung, löst Bug vollständig für alle Pfade (Feed, Kalender, Nacht-Cron, Single-Recompute), konsistent mit bestehendem Overrides-Pattern.
+
+---
+
+**Scope:**
+- Eingeschlossen: Feed + Kalender + Single-Recompute + Nacht-Cron für Custom Locations
+- Ausgeschlossen: Scout-Tab (discover.json) — separates Ticket falls nötig; PhotoPills-Koordinaten-Validierung
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_bug33_custom_locations_precompute.py` — Unit-Test: Mock SQLite, prüfe dass LOCATIONS nach `_load_custom_locations()` eine Custom Location enthält; Integration: precompute mit bekannter Custom Location → prüfe calendar.json enthält custom_id
+- [ ] Manuell: Location ID aus `/locations` → `curl "http://localhost:8000/opportunities?location_id=<id>"` → Events vorhanden; `curl "http://localhost:8000/calendar?location_id=<id>&month=6&year=2026"` → Babelsberg-Event sichtbar
 
 ---
 
@@ -3936,3 +4032,66 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 **Testplan:**
 - [ ] Automatisiert: `pytest backend/tests/` nach Auto-Fix (Regression-Guard)
 - [ ] Manuell: `python3 tools/refactor_check.py --report` gibt JSON-Report aus; `python3 tools/refactor_check.py --fix` wendet Auto-Fixes an
+
+---
+
+### TASK-30 · Refactoring: Lange Backend-Funktionen aufteilen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** `refactor_check.py --report` meldet folgende Backend-Funktionen über dem 80-Zeilen-Threshold:
+
+- `precompute.py:229` · `_composition_analysis()` · 109 Zeilen
+- `precompute.py:341` · `_serialize()` · 84 Zeilen
+- `precompute.py:540` · `compute_calendar_incremental()` · 157 Zeilen
+- `precompute.py:704` · `main()` · 190 Zeilen
+- `main.py:1218` · `preview_alignment()` · 99 Zeilen
+- `discover/sun_pipeline.py:69` · `run()` · 92 Zeilen
+- `discover/moon_pipeline.py:94` · `run()` · 91 Zeilen
+- `discover/subjects.py:109` · `build_subjects()` · 91 Zeilen
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29), Refactor-Check 2026-06-23 (BUG-33-Release)
+
+---
+
+### TASK-31 · Typ-Annotationen in backend/main.py ergänzen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** `refactor_check.py --report` meldet: nur 24/58 Funktionen in `backend/main.py` haben Return-Annotationen. Die verbleibenden 34 Funktionen sollten Return-Typen ergänzt bekommen. Vorgabe: `from __future__ import annotations` ist bereits vorhanden (Python 3.9-Kompatibilität gesichert).
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29), Refactor-Check 2026-06-23 (BUG-33-Release)
+
+---
+
+### TASK-32 · Refactoring: Lange JS-Funktionen in index.html aufteilen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** `refactor_check.py --report` meldet folgende JS-Funktionen über dem Threshold:
+
+- `index.html:1179` · `_showError()` · ~773 Zeilen (wahrscheinlich falsch erkannt — JS-Heuristik, kein AST)
+- `index.html:1952` · `haversineKm()` · ~252 Zeilen
+- `index.html:2232` · `onUp()` · ~168 Zeilen
+- `index.html:2407` · `state3()` · ~108 Zeilen
+- `index.html:2515` · `mkSec()` · ~264 Zeilen
+- `index.html:2779` · `axisPhrase()` · ~1372 Zeilen (wahrscheinlich Sektion, kein echter Funktionskörper)
+
+Hinweis: `index.html` ist ein Monolith, JS-Längenmessung per Regex-Heuristik kann falsch-positiv sein. Vor Refactoring manuell prüfen welche Findings real sind.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29), Refactor-Check 2026-06-23 (BUG-33-Release)

@@ -47,7 +47,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from calculations.opportunity import find_opportunities, find_opportunities_multi_day
 from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM
-from data.locations import LOCATIONS
+from data.locations import LOCATIONS, PhotoLocation, LocationCategory
 from data.store import LocationStore
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -176,6 +176,54 @@ def _apply_location_overrides() -> int:
     if applied:
         logger.info("Location-Overrides angewendet: %d (Koordinaten-/Name-Korrekturen)", applied)
     return applied
+
+
+def _load_custom_locations() -> int:
+    """
+    BUG-33: Lädt Custom Locations aus SQLite und hängt sie an LOCATIONS.
+
+    main.py ruft _load_custom_locations() beim Start auf und macht Custom Locations
+    im Server-Prozess verfügbar. precompute.py läuft jedoch als eigener Subprozess
+    mit eigenem LOCATIONS-Import — Custom Locations fehlten deshalb vollständig,
+    sodass Single-Recompute und nächtlicher Cron nie Events für sie berechneten.
+
+    Spiegelt bewusst die Logik aus main.py:_load_custom_locations(), damit Server-
+    Prozess und Recompute-Subprozess denselben Location-Stand verwenden.
+    """
+    try:
+        entries = LocationStore().load_all_custom()
+    except Exception as exc:
+        logger.warning("Custom Locations nicht ladbar (%s) – übersprungen", exc)
+        return 0
+
+    ids_existing = {loc.id for loc in LOCATIONS}
+    added = 0
+    for e in entries:
+        if e.get("id") in ids_existing:
+            continue
+        try:
+            loc = PhotoLocation(
+                id=e["id"], name=e["name"], description=e.get("description", ""),
+                category=LocationCategory[e.get("category", "SKYLINE")],
+                observer_lat=e["observer_lat"], observer_lon=e["observer_lon"],
+                subject_lat=e["subject_lat"], subject_lon=e["subject_lon"],
+                subject_name=e.get("subject_name", ""),
+                subject_height_m=e.get("subject_height_m", 0),
+                subject_width_m=e.get("subject_width_m", 0),
+                distance_m=e.get("distance_m", 0),
+                focal_length_suggestions=e.get("focal_length_suggestions", []),
+                special_notes=e.get("special_notes", ""),
+                difficulty=e.get("difficulty", 1),
+                observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
+            )
+            LOCATIONS.append(loc)
+            ids_existing.add(loc.id)
+            added += 1
+        except Exception as exc:
+            logger.warning("Custom Location '%s' übersprungen (%s)", e.get("id"), exc)
+    if added:
+        logger.info("Custom Locations geladen: %d Einträge aus SQLite", added)
+    return added
 
 
 def _composition_analysis(o) -> dict | None:
@@ -661,6 +709,10 @@ async def main(args: argparse.Namespace) -> None:
     # berechnet oder gehasht wird — sonst rechnet der Recompute mit den alten Basis-
     # Koordinaten und der coordinates_hash ändert sich nie.
     _apply_location_overrides()
+    # BUG-33: Custom Locations aus SQLite laden — sie fehlen im LOCATIONS-Import aus
+    # data/locations.py komplett, da precompute.py als eigener Subprozess läuft.
+    _load_custom_locations()
+    logger.info("%d Locations nach Custom-Load + Overrides", len(LOCATIONS))
 
     # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
     from data import backup as _backup
