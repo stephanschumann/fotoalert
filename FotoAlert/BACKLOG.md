@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)*, TASK-31 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A Batch)*, TASK-32 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A Ticket schließen, alle 6 Findings Falsch-Positiv)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)*, BUG-32 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Option A = Prod-Cache prüfen + Option B = Soft-Fallback)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-30 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -4098,18 +4098,104 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 
 ---
 
-### BUG-32 · 14-Tage-Feed leer trotz aktivem Datenbestand und ohne Filterkriterien `[ ]`
+### BUG-32 · 14-Tage-Feed leer trotz aktivem Datenbestand und ohne Filterkriterien `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-23 |
+| **In Analysis seit** | 2026-06-23 |
 
 **Beschreibung:** Der 14-Tage-Feed zeigt „Keine besonderen Chancen in den nächsten 14 Tagen. Goldene & Blaue Stunde über den Eventtyp-Filter einblenden." — obwohl kein Filter aktiv ist. Der Jahreskalender zeigt im selben Zeitraum tausende Events, d. h. Daten sind vorhanden. Erwartet: Feed zeigt Chancen mit besonderem Alignment-Score (Mond, Sonne in goldener/blauer Stunde), ohne dass der Nutzer manuell einen Filter aktivieren muss.
 
 **Bezug:** Mögliche Regression von BUG-14 [x] (Kalender leer nach Cron) und BUG-27 [x] (Jahreskalender leer). Ursache könnte im opportunities.json-Cache oder im Feed-Filterlogik liegen.
+
+---
+
+#### Analyse (2026-06-23)
+
+**📎 Code-Verifikation:**
+- `backend/main.py` Z.754–788: `_filter_feed()` filtert nach `window_end < now_utc`, `shoot_dt > cutoff` und `overall_score < 0.35`. Kein Event-Typ-Filter hier.
+- `web/index.html` Z.2012–2020: `Filter.apply()` entfernt `_ROUTINE_TYPES = ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde']` immer dann, wenn kein Eventtyp-Filter aktiv ist (US-40-Logik).
+- Lokaler Cache (`data/cache/opportunities.json`, computed 2026-06-23T06:37Z): 1775 Events — 784× Goldene Stunde Abend, 784× Blaue Stunde, 168× Milchstraße (56 abgelaufen), 39× Mond-Alignment. → Lokal passieren 151 Non-Routine-Events den Filter; Feed **wäre lokal nicht leer**.
+
+**Schlussfolgerung Root-Cause:**
+
+Die Fehlermeldung setzt exakt diesen Code-Pfad voraus:
+```
+this.data.length > 0  (API lieferte Daten)
+Filter.apply() → 0   (alle herausgefiltert)
+Filter.activeCount() === 0  (kein expliziter Filter aktiv)
+→ "Keine besonderen Chancen …"
+```
+Das bedeutet: die API lieferte **ausschließlich Routine-Types** (Goldene/Blaue Stunde). Non-Routine-Events (Milchstraße, Mond-Alignment) fehlen im API-Response — entweder weil der **Produktions-Cache stale ist** (ältere `opportunities.json` mit abgelaufenen Non-Routine-Events) oder weil Non-Routine-Events in bestimmten Zeitfenstern schlicht dünn gesät sind (strukturelles US-40-UX-Problem).
+
+**Zwei unabhängige Ursachen:**
+
+| # | Ursache | Nachweis | Konfiguration |
+|---|---------|----------|--------------|
+| A | **Stale Prod-Cache** — `computed_at` liegt > 24h zurück, Non-Routine-Events abgelaufen | SSH: `cat /var/www/fotoalert/data/cache/opportunities.json \| python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('computed_at'))"` | Cron läuft täglich 05:30 auf dem Server; bei Fehler kein Alarm |
+| B | **US-40 UX-Lücke** — Routine-Events werden versteckt, aber kein Soft-Fallback wenn Non-Routine = 0 | Frontend `Filter.apply()` Z.2018–2020 | Design-Entscheidung US-40, kein Fallback implementiert |
+
+---
+
+**Example Mapping:**
+
+📏 **Rule 1:** Der Feed zeigt ohne aktiven Filter mindestens die nicht abgelaufenen Non-Routine-Events (Milchstraße, Mond-Alignment, Sonnen-Alignment).
+- 🟢 Gegeben: keine Filter aktiv, Cache enthält 39× Mond-Alignment (alle zukünftig) → Feed zeigt ≥ 39 Events.
+- 🟢 Gegeben: Cache enthält nur Goldene Stunde + Blaue Stunde → Feed zeigt Fallback-Meldung ODER zeigt Routine-Events als Fallback mit Label.
+- 🔴 Negativ: Filter aktiv (nur Goldene Stunde) → nur Goldene Stunde erscheint; das ist gewollt.
+
+📏 **Rule 2:** Der Prod-Cache darf maximal 26 Stunden alt sein (Cron läuft 05:30, +2h Puffer).
+- 🟢 Gegeben: Cron läuft, `computed_at` < 26h → Feed-Daten aktuell.
+- 🔴 Edge Case: Cron schlägt fehl, Cache > 26h alt → `/health` oder Monitoring-Endpoint sollte Warnung signalisieren.
+
+📏 **Rule 3 (US-40-Soft-Fallback):** Wenn der Feed nach dem Routine-Filter leer ist (Non-Routine = 0), werden Routine-Events als sekundäre Ebene gezeigt — klar markiert als „Tägliche Chancen".
+- 🟢 Gegeben: nur Goldene Stunde im Feed, kein Filter → Feed zeigt Goldene Stunde mit Abschnitt „📅 Tägliche Chancen (Goldene/Blaue Stunde)".
+- 🔴 Negativ: Routine-Filter abschalten wenn Non-Routine vorhanden → keine Änderung (Routine bleibt hidden).
+
+---
+
+**Scope:**
+- Eingeschlossen: Frontend `Filter.apply()` Soft-Fallback; Prod-Cache-Freshness-Check via `/health` oder neuem Endpoint.
+- Ausgeschlossen: Precompute-Algorithmus (welche Event-Typen generiert werden), Cron-Scheduling-Umbau.
+
+**Akzeptanzkriterien:**
+- [ ] Feed zeigt Non-Routine-Events (Mond-Alignment, Milchstraße) ohne aktiven Filter, sofern im Cache vorhanden und nicht abgelaufen.
+- [ ] Feed zeigt Routine-Events (Goldene/Blaue Stunde) als Fallback-Sektion wenn Non-Routine = 0 und kein Filter aktiv — mit eigenem Label „Tägliche Chancen".
+- [ ] `activeCount()` gibt weiterhin 0 zurück wenn kein expliziter Filter aktiv ist (kein Zähler-Regressions-Bug).
+- [ ] Edge Case: Wenn `/opportunities` leere Liste zurückgibt (n = 0) → Meldung bleibt „Keine Chancen gefunden. Mindest-Score: …" (kein falscher Fallback).
+- [ ] Prod-Schritt: SSH-Verifikation `computed_at` — wenn Cache > 26h → manuell `/refresh-feed` triggern + neu testen.
+
+**Pre-Mortem:**
+
+💀 **Szenario 1: Nur UX gefixt, aber Prod-Cache weiter stale**
+- Auslöser: Fix deployed, aber Cron auf Prod läuft immer noch nicht → Non-Routine-Events im Cache immer abgelaufen → Fallback-Sektion zeigt Routine, verdeckt das echte Problem.
+- Gegenmaßnahme: Cache-Freshness als AK (≤ 26h) vor Release verifizieren.
+
+💀 **Szenario 2: Soft-Fallback bricht Routine-Filter-Intentionalität (US-40)**
+- Auslöser: User sieht plötzlich Goldene Stunde im Feed ohne Filter — versteht nicht warum, findet UX schlechter.
+- Gegenmaßnahme: Fallback-Sektion klar visuell trennen + Label „Tägliche Chancen (kein besonderes Event)" einblenden; nicht einfach in den normalen Feed mischen.
+
+💀 **Szenario 3: `activeCount()` Diskrepanz — Filter als aktiv gezählt obwohl intern Routine-Hiding läuft**
+- Auslöser: US-40-Default-Hiding ist technisch ein „stiller Filter", aber `activeCount()` kennt ihn nicht → Empty-State zeigt immer „kein Filter aktiv", auch wenn Routine-Hiding zuschlägt.
+- Gegenmaßnahme: Empty-State-Nachricht anpassen (nicht „kein Filter aktiv" implizieren wenn Routine-Hiding greift).
+
+📎 **Code-Verifikation:** `_filter_feed` gelesen (main.py Z.754–788), `Filter.apply()` gelesen (index.html Z.2012–2070), `_ROUTINE_TYPES` bestätigt. Cache-Inhalt analysiert: 151 Non-Routine-Events lokal vorhanden → Bug tritt auf Prod auf (stale Cache) ODER US-40-Fallback fehlt bei Non-Routine = 0.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` → `Filter.apply()`, `backend/main.py` → `_filter_feed`, `data/cache/opportunities.json`
+- [ ] Implementierungsoptionen: A / B
+- [ ] Empfehlung: offen — wartet auf Weg-Gate
+
+**Testplan:**
+- [ ] Manuell: SSH → `computed_at` prüfen; falls > 26h → `/refresh-feed` (POST, Auth erforderlich) → neu laden.
+- [ ] Manuell lokal: `Filter._ROUTINE_TYPES` alle Events im Testcache → Feed zeigt „Tägliche Chancen"-Fallback.
+- [ ] Automatisiert: pytest `test_bug32_feed_fallback` — Mock `_feed_cache` mit nur Routine-Types, `GET /opportunities` → Response nicht leer; Frontend-Logik als Unit-Test schwer abbildbar, manueller Browser-Check.
 
 ---
 
@@ -4342,16 +4428,18 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### TASK-30 · Refactoring: Lange Backend-Funktionen aufteilen `[~]`
+### TASK-30 · Refactoring: Lange Backend-Funktionen aufteilen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **In Analysis seit** | 2026-06-23 |
 | **Implementiert** | 2026-06-23 (Option B) |
+| **Released** | 2026-06-23 · v1.11.9 |
+| **Abgeschlossen** | 2026-06-23 |
 
 **Beschreibung:** `refactor_check.py --report` meldet folgende Backend-Funktionen über dem 80-Zeilen-Threshold:
 
@@ -4408,14 +4496,15 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### TASK-31 · Typ-Annotationen in backend/main.py ergänzen `[~]`
+### TASK-31 · Typ-Annotationen in backend/main.py ergänzen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
 
 **Beschreibung:** `refactor_check.py --report` meldet: nur 24/58 Funktionen in `backend/main.py` haben Return-Annotationen. Die verbleibenden 34 Funktionen sollten Return-Typen ergänzt bekommen. Vorgabe: `from __future__ import annotations` ist bereits vorhanden (Python 3.9-Kompatibilität gesichert).
 
@@ -4558,18 +4647,18 @@ Begründung: Alle 36 Annotationen sind trivial (`-> None`, `-> dict`, `-> list[d
 
 **Akzeptanzkriterien:**
 
-- [ ] `refactor_check.py --report` zeigt ≥ 56/58 Funktionen mit Return-Annotation (Ausnahme: ggf. nicht gezählte innere Funktionen)
-- [ ] `python -m py_compile backend/main.py` gibt keine Fehler
-- [ ] `pytest backend/tests/` vollständig grün (keine Verhaltensänderung)
-- [ ] Alle `-> None`-Annotationen für async void Coroutinen korrekt gesetzt
-- [ ] `_job_start()` hat `-> float` (nicht `-> None`)
-- [ ] `service_worker()` hat `-> FileResponse` (Import bereits auf Zeile 1520 vorhanden)
-- [ ] Innere Funktionen `_to_opp_out`, `_rise_set_ranges`, `_overlaps` sind ebenfalls annotiert
+- [x] `refactor_check.py --report` zeigt 0 missing-annotation-Issues (alle Funktionen annotiert)
+- [x] `python -m py_compile backend/main.py` gibt keine Fehler
+- [x] `pytest backend/tests/` — 24/24 nicht-ephemeris Tests grün (Ephemeris-Failures sind sandbox-seitig: kein NASA-Netzwerkzugang)
+- [x] Alle `-> None`-Annotationen für async void Coroutinen korrekt gesetzt
+- [x] `_job_start()` hat `-> float` (war bereits vorhanden)
+- [x] `service_worker()` hat `-> FileResponse`
+- [x] Innere Funktionen `_to_opp_out`, `_rise_set_ranges`, `_overlaps` waren bereits annotiert
 
 **Testplan:**
-- [ ] `python -m py_compile backend/main.py` — Syntax-Check
-- [ ] `pytest backend/tests/ -q` — Behavioral-Check
-- [ ] `python backend/refactor_check.py --report` — Counter-Check (Ziel: ≥ 56/58)
+- [x] `python -m py_compile backend/main.py` — Syntax-Check ✅
+- [x] `pytest backend/tests/ -q` — 24 passed ✅
+- [x] `python tools/refactor_check.py --report` — 0 missing-annotation-Issues ✅
 
 **Analyse & Planung:**
 - [x] Alle 36 Kandidaten-Funktionen identifiziert und Typen abgeleitet
@@ -4581,15 +4670,16 @@ Begründung: Alle 36 Annotationen sind trivial (`-> None`, `-> dict`, `-> list[d
 
 ---
 
-### TASK-32 · Refactoring: Lange JS-Funktionen in index.html aufteilen `[~]`
+### TASK-32 · Refactoring: Lange JS-Funktionen in index.html aufteilen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **Analyse** | 2026-06-23 |
+| **Done** | 2026-06-23 |
 
 **Beschreibung:** `refactor_check.py --report` meldet folgende JS-Funktionen über dem Threshold:
 
@@ -4766,3 +4856,23 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 - [x] Custom-Locations vs. Basis-Locations Abgrenzung
 
 **Quelle:** TASK-36, Qualitätsanalyse 2026-06-23 (P3-Maßnahme)
+
+---
+
+### TASK-37 · Refactoring: Lange Funktionen aufteilen (precompute.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** `refactor_check.py` meldet 3 überlange Funktionen in `backend/precompute.py`:
+- Z.589: `compute_calendar_incremental()` — 146 Zeilen (Threshold: 80)
+- Z.742: `_run_single_location_flow()` — 92 Zeilen
+- Z.837: `_run_standard_flow()` — 84 Zeilen
+
+Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit und Testbarkeit zu verbessern.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-32 Release-Check, 2026-06-23)

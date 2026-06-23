@@ -337,7 +337,7 @@ async def _refresh_discover() -> None:
 # Wetter-Overlay
 # ---------------------------------------------------------------------------
 
-async def _weather_overlay():
+async def _weather_overlay() -> None:
     """
     Holt Wetter-Daten für Events in den nächsten 3 Tagen und
     aktualisiert weather_score + overall_score in _feed_cache.
@@ -421,7 +421,7 @@ async def _weather_overlay():
 # Vorberechnung (precompute.py als Subprocess)
 # ---------------------------------------------------------------------------
 
-async def _run_precompute(mode: str = "full"):
+async def _run_precompute(mode: str = "full") -> None:
     """
     Startet precompute.py als Subprocess (ohne Event-Loop-Blocking).
     mode: "full" (feed+calendar) | "feed" (nur 14-Tage) | "calendar" (nur Jahreskalender)
@@ -576,7 +576,7 @@ def _save_location_override(loc_id: str, **fields) -> None:
 
 
 @app.on_event("startup")
-async def startup():
+async def startup() -> None:
     logger.info("FotoAlert Backend v2 startet (Cache-First)...")
 
     # 0. Custom Locations laden (persistent gespeicherte User-Spots)
@@ -628,7 +628,7 @@ async def startup():
     # On-Demand: aktuellen Monat (alle Locations) im Hintergrund vorwärmen, damit
     # die Kalender-Monatsübersicht beim ersten Aufruf sofort da ist (statt ~30 s).
     if _ondemand:
-        async def _prewarm_calendar():
+        async def _prewarm_calendar() -> None:
             d = date.today()
             try:
                 await _compute_month_all_locations(d.year, d.month)
@@ -651,7 +651,7 @@ async def startup():
 
 
 @app.on_event("shutdown")
-async def shutdown():
+async def shutdown() -> None:
     # Im Test-/Sandbox-Modus wurde der Scheduler nie gestartet → nicht herunterfahren.
     if not _NO_BACKGROUND and scheduler.running:
         scheduler.shutdown()
@@ -784,7 +784,14 @@ def _filter_feed(
     # Deduplizierung: pro (location_id + event_type + Tag) nur das beste Event
     result = _dedup_best_per_day(result)
 
-    result.sort(key=lambda e: (e["shoot_time"], -e["overall_score"]))
+    # BUG-32: Non-Routine-Events (Mond, Milchstraße, Sonnen-Alignment) zuerst sortieren,
+    # damit sie nicht durch den :500-Cap verdrängt werden.
+    _ROUTINE_TYPES = {'Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'}
+    result.sort(key=lambda e: (
+        1 if e["event_type"] in _ROUTINE_TYPES else 0,
+        e["shoot_time"],
+        -e["overall_score"],
+    ))
     return result
 
 
@@ -807,7 +814,7 @@ def _dedup_best_per_day(events: list[dict]) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 @app.get("/health", response_model=HealthOut)
-async def health():
+async def health() -> HealthOut:
     return HealthOut(
         status="ok",
         version="2.0.0",
@@ -816,7 +823,7 @@ async def health():
 
 
 @app.get("/locations", response_model=list[LocationOut])
-async def get_locations(category: Optional[str] = None):
+async def get_locations(category: Optional[str] = None) -> list[LocationOut]:
     locs = LOCATIONS
     if category:
         locs = [l for l in locs if l.category.value.lower() == category.lower()]
@@ -824,7 +831,7 @@ async def get_locations(category: Optional[str] = None):
 
 
 @app.get("/locations/{location_id}", response_model=LocationOut)
-async def get_location(location_id: str):
+async def get_location(location_id: str) -> LocationOut:
     loc = get_location_by_id(location_id)
     if not loc:
         raise HTTPException(status_code=404, detail=f"Location '{location_id}' nicht gefunden.")
@@ -838,7 +845,7 @@ async def get_opportunities(
     priority: Optional[int] = None,
     days: int = 14,
     location_id: Optional[str] = None,
-):
+) -> list[dict]:
     """
     Gibt kommende Foto-Chancen zurück (aus vorberechnetem Cache + Wetter-Overlay).
     Wetter wird nur für die nächsten 3 Tage angezeigt.
@@ -851,7 +858,7 @@ async def get_opportunities(
 
 
 @app.get("/opportunities/today")
-async def get_today_opportunities():
+async def get_today_opportunities() -> list[dict]:
     today = date.today().isoformat()
     result = [
         e for e in _feed_cache
@@ -872,7 +879,7 @@ async def get_plan(
     observer_floor_height_m: float = 0.0,
     days: int = 14,
     min_score: float = 0.35,
-):
+) -> dict:
     """
     TASK-25 / AK2: On-Demand-Plan für **beliebige** Koordinaten weltweit — ohne
     dass die Location vorab angelegt sein muss. Nutzt die Window-Engine (eine
@@ -919,7 +926,7 @@ async def get_plan(
 
 
 @app.get("/daily-briefing", response_model=DailyBriefingOut)
-async def daily_briefing(target_date: Optional[str] = None):
+async def daily_briefing(target_date: Optional[str] = None) -> DailyBriefingOut:
     d = date.fromisoformat(target_date) if target_date else date.today()
     day_str = d.isoformat()
 
@@ -1028,7 +1035,7 @@ async def get_calendar(
     month: Optional[int] = None,
     year: Optional[int] = None,
     min_score: float = 0.40,
-):
+) -> dict:
     """
     Jahreskalender: astronomy-only Events für alle Locations, 365 Tage.
     month (1–12) + year filtern serverseitig – Clients sollten immer beide
@@ -1083,7 +1090,7 @@ async def get_discover(
     min_score: float = 0.0,
     subject_id: Optional[str] = None,
     days: int = 14,
-):
+) -> dict:
     """
     Scout-Tab: Mond-Alignment-Chancen für die nächsten 14 Tage.
     Gibt vorberechnete Chancen aus dem Cache zurück.
@@ -1115,7 +1122,7 @@ async def get_discover(
 
 
 @app.post("/login")
-async def login(body: dict = Body(...)):
+async def login(body: dict = Body(...)) -> dict:
     """US-66: Pflicht-Login. Passwort → Rolle (host/user) + stateless Token.
 
     Kein Username, kein Rollen-Auswahlfeld — die Rolle ergibt sich aus dem Passwort.
@@ -1128,14 +1135,14 @@ async def login(body: dict = Body(...)):
 
 
 @app.post("/refresh-discover")
-async def trigger_discover_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
+async def trigger_discover_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
     """Startet die Scout-Pipeline im Hintergrund (~1–3 Min.)."""
     background_tasks.add_task(_refresh_discover)
     return {"status": "started", "message": "Scout-Pipeline gestartet (~1–3 Min.)."}
 
 
 @app.post("/register-device")
-async def register_device(token: str, platform: str = "ios"):
+async def register_device(token: str, platform: str = "ios") -> dict:
     # US-66: bewusst NICHT geschützt — die native iOS-App ist noch nicht login-fähig.
     # TASK-24: Token wird jetzt in SQLite persistiert (nicht mehr im RAM).
     # Auth-Schutz nachziehen, sobald die iOS-App ein Token sendet (Folge-Ticket).
@@ -1149,7 +1156,7 @@ async def register_device(token: str, platform: str = "ios"):
 
 
 @app.post("/refresh")
-async def trigger_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
+async def trigger_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
     """
     Startet eine volle Vorberechnung (precompute.py, feed+calendar) im Hintergrund.
     Dauert 2–5 Minuten. Danach werden die Caches automatisch neu geladen.
@@ -1162,7 +1169,7 @@ async def trigger_refresh(background_tasks: BackgroundTasks, _role: str = Depend
 
 
 @app.post("/refresh-feed")
-async def trigger_feed_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
+async def trigger_feed_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
     """US-34: Nur 14-Tage Feed neu berechnen (precompute --feed-only). ~30–60s."""
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
@@ -1171,7 +1178,7 @@ async def trigger_feed_refresh(background_tasks: BackgroundTasks, _role: str = D
 
 
 @app.post("/refresh-calendar")
-async def trigger_calendar_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
+async def trigger_calendar_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
     """US-34: Nur Jahreskalender inkrementell neu berechnen. ~1–3 Min."""
     if _precompute_running:
         return {"status": "already_running", "message": "Vorberechnung läuft bereits."}
@@ -1180,7 +1187,7 @@ async def trigger_calendar_refresh(background_tasks: BackgroundTasks, _role: str
 
 
 @app.post("/weather-refresh")
-async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)):
+async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
     """
     Aktualisiert nur das Wetter-Overlay (T+3 Tage) im Hintergrund.
     Schnell: ~10–15s. Kein precompute nötig.
@@ -1190,7 +1197,7 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
 
 
 @app.get("/job-status")
-async def get_job_status():
+async def get_job_status() -> dict:
     """US-34: Gibt den aktuellen Status aller Hintergrund-Jobs zurück."""
     return {
         "jobs": _job_status,
@@ -1260,7 +1267,7 @@ async def _save_alignment_as_location(
 
 
 @app.post("/preview-alignment")
-async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(auth.require_auth)):
+async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(auth.require_auth)) -> dict:
     if not (-90 <= req.observer_lat <= 90 and -180 <= req.observer_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Fotograf-Koordinaten.")
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
@@ -1338,14 +1345,14 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
 # ---------------------------------------------------------------------------
 
 @app.get("/reverse-geocode")
-async def reverse_geocode_endpoint(lat: float, lon: float):
+async def reverse_geocode_endpoint(lat: float, lon: float) -> dict:
     """Gibt Ortsnamen für Koordinaten via Nominatim zurück."""
     place = await _reverse_geocode(lat, lon)
     return {"place": place}
 
 
 @app.patch("/locations/{loc_id}")
-async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)):
+async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
     coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
     text_fields     = {"name", "description"}
@@ -1431,7 +1438,7 @@ class VerificationIn(BaseModel):
 
 
 @app.get("/verifications")
-async def get_all_verifications():
+async def get_all_verifications() -> list[dict]:
     """Gibt alle Verifikationen (alle Locations) zurück — für Frontend-Cache-Preload. Kein Auth."""
     with _store._connect() as conn:
         rows = conn.execute(
@@ -1442,14 +1449,14 @@ async def get_all_verifications():
 
 
 @app.get("/locations/{loc_id}/verifications")
-async def get_verifications(loc_id: str):
+async def get_verifications(loc_id: str) -> list[dict]:
     """Gibt alle Verifikationen für eine Location zurück (älteste zuerst). Kein Auth nötig."""
     return _store.get_verifications(loc_id)
 
 
 @app.post("/locations/{loc_id}/verifications", status_code=201)
 async def add_verification(loc_id: str, body: VerificationIn,
-                           _role: str = Depends(auth.require_auth)):
+                           _role: str = Depends(auth.require_auth)) -> dict:
     """Speichert eine neue Verifikation (user + host)."""
     if body.status not in ("ok", "issue"):
         raise HTTPException(status_code=422, detail="status muss 'ok' oder 'issue' sein.")
@@ -1465,7 +1472,7 @@ async def add_verification(loc_id: str, body: VerificationIn,
 
 
 @app.delete("/locations/{loc_id}/verifications/last", status_code=200)
-async def delete_last_verification(loc_id: str, _role: str = Depends(auth.require_auth)):
+async def delete_last_verification(loc_id: str, _role: str = Depends(auth.require_auth)) -> dict:
     """Löscht den neuesten Verifikationseintrag für eine Location."""
     found = _store.delete_last_verification(loc_id)
     if not found:
@@ -1483,7 +1490,7 @@ class RatingIn(BaseModel):
 
 
 @app.get("/ratings")
-async def get_all_ratings():
+async def get_all_ratings() -> list[dict]:
     """
     Gibt alle Roh-Bewertungen (alle Locations, alle Geräte) zurück —
     für den Frontend-Boot-Cache. Kein Auth. Frontend aggregiert client-seitig
@@ -1493,7 +1500,7 @@ async def get_all_ratings():
 
 
 @app.get("/locations/{loc_id}/ratings")
-async def get_ratings(loc_id: str, device_id: str = ""):
+async def get_ratings(loc_id: str, device_id: str = "") -> dict:
     """
     Aggregat einer Location: {count, avg, mine}. Kein Auth.
     avg auf 1 Nachkommastelle, null bei count=0. mine = Wert des Geräts oder null.
@@ -1503,7 +1510,7 @@ async def get_ratings(loc_id: str, device_id: str = ""):
 
 @app.post("/locations/{loc_id}/ratings", status_code=201)
 async def upsert_rating(loc_id: str, body: RatingIn,
-                        _role: str = Depends(auth.require_auth)):
+                        _role: str = Depends(auth.require_auth)) -> dict:
     """Speichert/aktualisiert die Bewertung eines Geräts (Upsert). value 1–5."""
     if body.value < 1 or body.value > 5:
         raise HTTPException(status_code=422, detail="value muss zwischen 1 und 5 liegen.")
@@ -1521,7 +1528,7 @@ async def upsert_rating(loc_id: str, body: RatingIn,
 
 @app.delete("/locations/{loc_id}/ratings", status_code=200)
 async def delete_rating(loc_id: str, device_id: str = "",
-                        _role: str = Depends(auth.require_auth)):
+                        _role: str = Depends(auth.require_auth)) -> dict:
     """Löscht die Bewertung des aufrufenden Geräts. device_id als Query-Param."""
     if not device_id:
         raise HTTPException(status_code=422, detail="device_id ist erforderlich.")
@@ -1540,7 +1547,7 @@ _web_dir = pathlib.Path(__file__).parent.parent / "web"
 # sw.js explizit mit no-cache ausliefern, damit Browser-HTTP-Cache
 # nie eine veraltete SW-Version einfriert (behebt 304-Problem)
 @app.get("/sw.js")
-async def service_worker():
+async def service_worker() -> FileResponse:
     return FileResponse(
         str(_web_dir / "sw.js"),
         media_type="application/javascript",

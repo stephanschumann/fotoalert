@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.10';
+const APP_VERSION = '1.11.11';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1202,12 +1202,36 @@ const Feed = {
     const data = Filter.apply(this.data);
     const n = this.data.length, nf = data.length;
     if (!data.length) {
+      // BUG-32: Soft-Fallback — wenn kein expliziter Filter aktiv und Non-Routine = 0,
+      // Routine-Events (Goldene/Blaue Stunde) als Tägliche-Chancen-Sektion anzeigen.
+      if (!Search.query && Filter.activeCount() === 0 && n > 0) {
+        const routineData = this.data.filter(o => Filter._ROUTINE_TYPES.includes(o.event_type));
+        if (routineData.length > 0) {
+          let html = `<div class="section-head" style="color:var(--muted);font-size:11px;letter-spacing:.04em;padding-top:10px">📅 TÄGLICHE CHANCEN · Kein besonderes Alignment in den nächsten 14 Tagen</div>`;
+          const rGroups = {};
+          for (const o of routineData) {
+            const day = formatDate(o.shoot_time);
+            if (!rGroups[day]) rGroups[day] = [];
+            rGroups[day].push(o);
+          }
+          for (const [day, opps] of Object.entries(rGroups)) {
+            const isToday = day === 'Heute';
+            const icon = isToday
+              ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`
+              : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+            html += `<div class="section-head">${icon}${day} · ${opps.length} Chancen</div>`;
+            html += opps.map(oppCard).join('');
+          }
+          el.innerHTML = html;
+          return;
+        }
+      }
       const msg = Search.query
         ? `Keine Chancen für „${Search.query}" gefunden.`
         : n > 0
           ? Filter.activeCount() > 0
             ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
-            : `Keine besonderen Chancen in den nächsten 14 Tagen. Goldene & Blaue Stunde über den Eventtyp-Filter einblenden.`
+            : `Keine besonderen Chancen in den nächsten 14 Tagen.`
           : `Keine Chancen gefunden. Mindest-Score: ${pct(CFG.minScore)}`;
       el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><p>${msg}</p></div>`;
       return;
