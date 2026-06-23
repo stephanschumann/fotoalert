@@ -26,10 +26,10 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, TASK-24 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-22, BUG-30 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-24 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
@@ -2497,8 +2497,9 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-22 |
+| **Abgeschlossen** | 2026-06-22 |
 | **In Progress seit** | 2026-06-22 |
 
 **Beschreibung:** Die Änderung des Location-Namens wird nach dem Speichern nicht übernommen — weder angemeldet als User noch als Host. Der alte Name bleibt nach erneutem Öffnen bestehen.
@@ -2628,15 +2629,16 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### TASK-22 · Workflow: manuelle Terminal-Befehle durch Agents automatisieren `[~]`
+### TASK-22 · Workflow: manuelle Terminal-Befehle durch Agents automatisieren `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
 | **In Progress seit** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-22 |
 
 **Beschreibung:** Stephan muss aktuell Befehle (v. a. Git/Release) manuell im Terminal eingeben. Ziel: diese Schritte als Teil des Workflows automatisiert durch die Agents ausführen lassen, soweit möglich. Kernfrage der Analyse: Welche Schritte können sicher automatisiert werden — unter der bestehenden Randbedingung, dass Git-Operationen auf Stephans Rechner/Server laufen müssen und nicht in der Sandbox?
 
@@ -2809,14 +2811,15 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 #### 📋 Implementation Spec Ende
 
-### TASK-24 · Push-Token serverseitig persistieren `[ ]`
+### TASK-24 · Push-Token serverseitig persistieren `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-21 |
+| **In Progress seit** | 2026-06-22 |
 
 **Beschreibung:** Die Push-Token-Liste `_device_tokens` in `backend/main.py` liegt nur im RAM und geht bei jedem Server-Neustart verloren. Token in SQLite persistieren, damit registrierte Geräte einen Neustart überdauern. Latent, da Push im Frontend noch nicht verdrahtet ist — vor dem Push-Rollout zu erledigen.
 
@@ -2838,14 +2841,14 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - Ausgeschlossen: Tatsächlicher Push-Versand / APNs-Verdrahtung (eigenes Push-Rollout-Ticket). Auth-Schutz von `/register-device` (eigener Scope, an iOS-Login gekoppelt). Token-Invalidierung über APNs-Feedback (s. Pre-Mortem 2, als bekannter Folgepunkt notiert). Migration eines RAM-Bestands (A1, leer). Frontend-Verdrahtung (Push im Frontend nicht gebaut).
 
 **Akzeptanzkriterien:**
-- [ ] `POST /register-device?token=abc&platform=ios` legt den Token persistent an. Response `200` + `{"status": "registered", "device_count": <n>}` (Form unverändert ggü. heute).
-- [ ] Idempotenz: zweiter `POST` mit identischem `token` legt KEINEN zweiten Datensatz an und liefert `{"status": "already_registered"}` (HTTP 200) — `device_count`-relevante Zeilenzahl bleibt gleich.
-- [ ] Persistenz über Neustart: Token registrieren → `_store` neu instanziieren (simuliert Server-Neustart, neue `LocationStore`-Instanz auf dieselbe DB) → `load_device_tokens()` enthält den Token weiterhin. (Das ist der Kern-AK des Tickets.)
-- [ ] `load_device_tokens()` liefert eine Liste von Dicts der Form `{"token": <str>, "platform": <str>}` (Form kompatibel zur bisherigen `_device_tokens`-Struktur, damit ein späterer Push-Konsument unverändert iterieren kann).
-- [ ] Edge Case: `POST /register-device` ohne `token`-Param → `422` (FastAPI-Default für fehlenden Required-Query-Param; Verhalten unverändert ggü. heute, da `token` schon required ist).
-- [ ] Edge Case: leerer Token-String (`token=`) → `422` „token ist erforderlich." (neue Guard, verhindert leere Primärschlüssel in der DB).
-- [ ] Edge Case: `platform` weggelassen → Default `"ios"` wird gespeichert (Verhalten unverändert).
-- [ ] Regression: alle bestehenden Tests (Verify/Rating/US-66/US-67/US-89) bleiben grün; keine Änderung an Auth-Verhalten anderer Endpoints.
+- [x] `POST /register-device?token=abc&platform=ios` legt den Token persistent an. Response `200` + `{"status": "registered", "device_count": <n>}` (Form unverändert ggü. heute).
+- [x] Idempotenz: zweiter `POST` mit identischem `token` legt KEINEN zweiten Datensatz an und liefert `{"status": "already_registered"}` (HTTP 200) — `device_count`-relevante Zeilenzahl bleibt gleich.
+- [x] Persistenz über Neustart: Token registrieren → `_store` neu instanziieren (simuliert Server-Neustart, neue `LocationStore`-Instanz auf dieselbe DB) → `load_device_tokens()` enthält den Token weiterhin. (Das ist der Kern-AK des Tickets.)
+- [x] `load_device_tokens()` liefert eine Liste von Dicts der Form `{"token": <str>, "platform": <str>}` (Form kompatibel zur bisherigen `_device_tokens`-Struktur, damit ein späterer Push-Konsument unverändert iterieren kann).
+- [x] Edge Case: `POST /register-device` ohne `token`-Param → `422` (FastAPI-Default für fehlenden Required-Query-Param; Verhalten unverändert ggü. heute, da `token` schon required ist).
+- [x] Edge Case: leerer Token-String (`token=`) → `422` „token ist erforderlich." (neue Guard, verhindert leere Primärschlüssel in der DB).
+- [x] Edge Case: `platform` weggelassen → Default `"ios"` wird gespeichert (Verhalten unverändert).
+- [x] Regression: alle bestehenden Tests (Verify/Rating/US-66/US-67/US-89) bleiben grün; keine Änderung an Auth-Verhalten anderer Endpoints.
 
 **Pre-Mortem:**
 - 💀 **Dubletten-Token sprengen die Tabelle / Doppel-Push beim Rollout.** Auslöser: `INSERT` ohne Conflict-Behandlung → zweite Registrierung desselben Tokens legt eine zweite Zeile an; späterer Push sendet doppelt. Frühwarnung: `device_count` steigt bei wiederholter Registrierung desselben Geräts. → Gegenmaßnahme: `token TEXT PRIMARY KEY` + `INSERT ... ON CONFLICT(token) DO UPDATE` (US-89-Upsert-Muster) oder vorgelagertes `SELECT`-EXISTS wie heute. Verankert in AK „Idempotenz".
@@ -2863,7 +2866,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
   - `backend/notifications/push.py` — künftiger Konsument (`send_push_notification(device_token, …)`, Z. 71); zeigt, dass die geladene Liste pro Eintrag genau einen `token` braucht → Form-AK.
   - `backend/tests/test_api_regression.py` — neue Klasse `TestTask24DeviceTokens` analog `TestBug26Verifications` (Z. 53 ff.); kein `auth_headers` nötig (Endpoint offen). Persistenz-AK via zweiter `LocationStore`-Instanz auf dieselbe `data_dev`-DB.
 - [x] Implementierungsoptionen: A / B / C
-- [ ] Empfehlung: **Option A** (siehe unten) — Weg-Gate offen für Stephan.
+- [x] Empfehlung: **Option A** — freigegeben + implementiert (2026-06-22).
 
 **Implementierungsoptionen:**
 
@@ -2886,14 +2889,8 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 ✅ **Empfehlung: Option A** — beseitigt den RAM-State vollständig (genau das Ziel des Persistenz-Audits TASK-23, keine zweite Wahrheit), folgt exakt dem frisch getesteten US-89-Upsert-Muster, ist der kleinste konsistente Diff und legt mit `updated`/`device_id`-Spalten das Fundament fürs spätere Push-Rollout, ohne jetzt Push-Logik vorwegzunehmen.
 
 **Testplan:**
-- [ ] Automatisiert (Harness, `backend/tests/test_api_regression.py`, Klasse `TestTask24DeviceTokens`, Ticket-ID „TASK-24" im Docstring):
-  - `POST /register-device?token=tok-test-1&platform=ios` → 200, `status == "registered"`.
-  - Zweiter `POST` mit `token=tok-test-1` → 200, `status == "already_registered"`; Zeilenzahl in `device_tokens` unverändert (kein Doppeleintrag).
-  - Persistenz: nach Registrierung neue `LocationStore`-Instanz auf dieselbe `data_dev`-DB erzeugen → `load_device_tokens()` enthält `tok-test-1` mit `{"token": "tok-test-1", "platform": "ios"}`.
-  - `POST /register-device` ohne `token` → 422; `token=` (leer) → 422.
-  - `platform` weggelassen → gespeicherter Eintrag hat `platform == "ios"`.
-  - Cleanup: Test-Token am Ende aus der DB entfernen (analog Verify-Cleanup), damit der Harness idempotent bleibt.
-- [ ] Manuell (http://localhost:8000): `curl -X POST 'http://localhost:8000/register-device?token=manual-1'` → `registered`; gleicher Call erneut → `already_registered`; Server neu starten; erneuter Call mit `manual-1` → `already_registered` (Token überlebte den Neustart). Beweist den Kern-AK.
+- [x] Automatisiert (Harness, `backend/tests/test_api_regression.py`, Klasse `TestTask24DeviceTokens`): 6/6 Tests grün (2026-06-22).
+- [ ] Manuell (http://localhost:8000): `curl -X POST 'http://localhost:8000/register-device?token=manual-1'` → `registered`; gleicher Call erneut → `already_registered`; Server neu starten; erneuter Call mit `manual-1` → `already_registered` (Token überlebte den Neustart). Beweist den Kern-AK. ← **ausstehend**
 
 #### 📋 Implementation Spec Ende
 

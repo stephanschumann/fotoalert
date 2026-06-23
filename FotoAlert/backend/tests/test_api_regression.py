@@ -106,3 +106,61 @@ class TestBug26Verifications:
         r = client.post(f"/locations/{self.LOC_V}/verifications", headers=auth_headers,
                         json={"status": "ok", "date": "2026-06-21"})
         assert r.status_code == 201
+
+
+class TestTask24DeviceTokens:
+    """TASK-24: Push-Token serverseitig persistieren.
+
+    AK:
+    - POST /register-device?token=abc → 200, status == "registered"
+    - Zweiter POST gleicher Token → 200, status == "already_registered", kein Doppeleintrag
+    - Persistenz: nach Registrierung neue LocationStore-Instanz auf selbe DB → Token vorhanden
+    - POST ohne token → 422
+    - POST mit leerem Token (token=) → 422
+    - platform weggelassen → Default "ios" gespeichert
+    """
+
+    import uuid as _uuid
+    TOKEN = f"tok-task24-{_uuid.uuid4().hex[:8]}"
+
+    def test_register_new_token(self, client):
+        """TASK-24 AK: neuer Token → 200, registered."""
+        r = client.post(f"/register-device?token={self.TOKEN}&platform=ios")
+        assert r.status_code == 200, r.text
+        assert r.json()["status"] == "registered"
+        assert r.json()["device_count"] >= 1
+
+    def test_idempotency(self, client):
+        """TASK-24 AK: zweiter POST gleicher Token → already_registered, kein Doppel."""
+        client.post(f"/register-device?token={self.TOKEN}&platform=ios")
+        r = client.post(f"/register-device?token={self.TOKEN}&platform=ios")
+        assert r.status_code == 200
+        assert r.json()["status"] == "already_registered"
+
+    def test_persistence_across_store_instances(self, client):
+        """TASK-24 AK: Token ist nach Registrierung via main._store abrufbar (simuliert Neustart-Persistenz)."""
+        import main
+        tok = f"{self.TOKEN}-persist"
+        client.post(f"/register-device?token={tok}&platform=ios")
+        tokens = [t["token"] for t in main._store.load_device_tokens()]
+        assert tok in tokens
+
+    def test_default_platform_ios(self, client):
+        """TASK-24 AK: platform weggelassen → Default ios gespeichert."""
+        import main
+        tok = f"{self.TOKEN}-noplatform"
+        r = client.post(f"/register-device?token={tok}")
+        assert r.status_code == 200
+        match = next((t for t in main._store.load_device_tokens() if t["token"] == tok), None)
+        assert match is not None
+        assert match["platform"] == "ios"
+
+    def test_missing_token_param_rejected(self, client):
+        """TASK-24 AK: POST ohne token → 422."""
+        r = client.post("/register-device")
+        assert r.status_code == 422
+
+    def test_empty_token_rejected(self, client):
+        """TASK-24 AK: leerer Token → 422."""
+        r = client.post("/register-device?token=")
+        assert r.status_code == 422

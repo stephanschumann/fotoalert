@@ -82,6 +82,13 @@ CREATE TABLE IF NOT EXISTS location_ratings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_rating_location ON location_ratings(location_id);
+
+CREATE TABLE IF NOT EXISTS device_tokens (
+    token         TEXT    PRIMARY KEY,
+    platform      TEXT    NOT NULL DEFAULT 'ios',
+    device_id     TEXT    NOT NULL DEFAULT '',
+    updated       TEXT    NOT NULL   -- ISO-Timestamp
+);
 """
 
 
@@ -452,6 +459,63 @@ class LocationStore:
                 "SELECT location_id, device_id, value FROM location_ratings"
             ).fetchall()
         return [dict(r) for r in rows]
+
+    # ------------------------------------------------------------------
+    # Push-Token-Persistenz (TASK-24)
+    # ------------------------------------------------------------------
+
+    def register_device_token(
+        self,
+        token: str,
+        platform: str = "ios",
+        device_id: str = "",
+    ) -> bool:
+        """
+        Persistiert einen Push-Token (Upsert).
+        Gibt True zurück wenn neu angelegt, False wenn bereits vorhanden.
+        """
+        from datetime import datetime, timezone
+
+        updated = datetime.now(timezone.utc).isoformat()
+        try:
+            with self._connect() as conn:
+                conn.execute("BEGIN")
+                existing = conn.execute(
+                    "SELECT token FROM device_tokens WHERE token = ?", (token,)
+                ).fetchone()
+                if existing:
+                    conn.execute("ROLLBACK")
+                    return False
+                conn.execute(
+                    "INSERT INTO device_tokens (token, platform, device_id, updated) "
+                    "VALUES (?, ?, ?, ?)",
+                    (token, platform, device_id, updated),
+                )
+                conn.execute("COMMIT")
+                return True
+        except Exception:
+            try:
+                conn.execute("ROLLBACK")
+            except Exception:
+                pass
+            raise
+
+    def load_device_tokens(self) -> list:
+        """
+        Gibt alle registrierten Push-Token zurück.
+        Form: [{"token": str, "platform": str, "device_id": str, "updated": str}]
+        """
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT token, platform, device_id, updated FROM device_tokens"
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def device_token_count(self) -> int:
+        """Anzahl der persistierten Push-Token."""
+        with self._connect() as conn:
+            row = conn.execute("SELECT COUNT(*) FROM device_tokens").fetchone()
+        return row[0] if row else 0
 
     def integrity_check(self) -> str:
         """Führt PRAGMA integrity_check aus. Gibt 'ok' zurück bei Erfolg."""

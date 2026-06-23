@@ -247,9 +247,6 @@ def _job_error(job: str, t0: float, msg: str) -> None:
     _job_status[job]["duration_s"] = round(_time.monotonic() - t0, 1)
     _job_status[job]["last_error"] = msg
 
-# Push-Token Store
-_device_tokens: list[dict] = []
-
 # Scheduler
 scheduler = AsyncIOScheduler(timezone="Europe/Berlin")
 
@@ -1140,11 +1137,15 @@ async def trigger_discover_refresh(background_tasks: BackgroundTasks, _role: str
 @app.post("/register-device")
 async def register_device(token: str, platform: str = "ios"):
     # US-66: bewusst NICHT geschützt — die native iOS-App ist noch nicht login-fähig.
-    # Nachziehen, sobald die iOS-App ein Token sendet (Folge-Ticket).
-    if any(d["token"] == token for d in _device_tokens):
+    # TASK-24: Token wird jetzt in SQLite persistiert (nicht mehr im RAM).
+    # Auth-Schutz nachziehen, sobald die iOS-App ein Token sendet (Folge-Ticket).
+    if not token:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="token ist erforderlich.")
+    is_new = _store.register_device_token(token=token, platform=platform)
+    if not is_new:
         return {"status": "already_registered"}
-    _device_tokens.append({"token": token, "platform": platform})
-    return {"status": "registered", "device_count": len(_device_tokens)}
+    return {"status": "registered", "device_count": _store.device_token_count()}
 
 
 @app.post("/refresh")
