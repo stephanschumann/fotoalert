@@ -880,9 +880,14 @@
         <input class="input-field" id="subj-width"  type="number" placeholder="Breite (m)" min="0">
       </div>
     </div>
-    <button class="btn-primary" onclick="AddLocation.preview()">Alignments berechnen ✦</button>
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <button class="btn-secondary" onclick="AddLocation.reset();AddLocation.close()" style="flex-shrink:0;width:auto;padding:13px 16px">Abbrechen</button>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <button class="btn-primary" onclick="AddLocation.preview()">Alignments berechnen ✦</button>
+        <button class="btn-secondary" id="save-location-btn" style="display:none" onclick="AddLocation.save()">Location dauerhaft speichern</button>
+      </div>
+    </div>
     <div id="add-preview" style="margin-top:12px"></div>
-    <button class="btn-secondary" id="save-location-btn" style="display:none;margin-top:8px" onclick="AddLocation.save()">Location dauerhaft speichern</button>
   </div>
 </div>
 
@@ -933,7 +938,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.12';
+const APP_VERSION = '1.11.13';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════

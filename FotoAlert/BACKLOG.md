@@ -28,7 +28,7 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | BUG-37 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -4958,14 +4958,15 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### BUG-37 · „Neue Location": Formular-State wird nach Speichern nicht zurückgesetzt (Merge BUG-36+37) `[~]`
+### BUG-37 · „Neue Location": Formular-State wird nach Speichern nicht zurückgesetzt (Merge BUG-36+37) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
 
 **Beschreibung:** Nach dem Speichern einer neuen Location behält `AddLocation` seinen gesamten State. Beim nächsten Öffnen des Formulars sind alle Felder noch gefüllt (Name, Koordinaten), Marker und Verbindungslinie noch auf der Karte, der Save-Button noch sichtbar und `previewData` gesetzt — der User sieht scheinbar die zuletzt gespeicherte Location im Bearbeitenmodus. Umfasst die Symptome aus BUG-36 (Name-Feld vorausgefüllt) und BUG-37 (Edit-Modus der letzten Location).
 
@@ -4986,18 +4987,34 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### US-94 · Add-Location-Sheet: Abbrechen-Button zum bewussten Verwerfen des Formulars `[ ]`
+### US-94 · Add-Location-Sheet: Abbrechen-Button zum bewussten Verwerfen des Formulars `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Als User möchte ich im Add-Location-Sheet einen kleinen Abbrechen-Button im unteren Bereich des Formulars haben, damit ich halbfertige Eingaben bewusst verwerfen und das Formular in den Ausgangszustand zurücksetzen kann — ohne die App schließen zu müssen. Der Button soll kleiner als „Alignments berechnen" und „Location dauerhaft speichern" sein und `reset()` + `close()` auslösen.
 
 **Bezug:** BUG-37 `[~]` (hat `reset()`-Methode eingeführt — US-94 nutzt sie direkt; baut auf BUG-37 auf, erst danach implementieren).
+
+**Scope:**
+- Eingeschlossen: Abbrechen-Button links neben den Action-Buttons, ruft `reset()` + `close()` auf
+- Ausgeschlossen: Bestätigungs-Dialog vor Verwerfen
+
+**Akzeptanzkriterien:**
+- [x] Abbrechen-Button links neben „Alignments berechnen ✦" und „Location dauerhaft speichern" (Flex-Row-Layout)
+- [x] Klick ruft `AddLocation.reset()` + `AddLocation.close()` auf
+- [x] Button visuell dezenter als `.btn-primary` / `.btn-secondary` (kein Hintergrund, kleiner Font)
+- [x] Button immer sichtbar — unabhängig vom Preview-Zustand
+
+**Implementierung:** `web/index.html` Z. 883–886 — drei Buttons in Flex-Row-Wrapper; Abbrechen `flex-shrink:0` links, Action-Buttons `flex:1` vertikal gestapelt rechts.
+
+**Pre-Mortem:**
+- 💀 `close()` vor `reset()` → Marker flackern beim Schließen → Gegenmaßnahme: `reset()` zuerst (wie in `save()`). ✅ umgesetzt.
 
 ---
 
