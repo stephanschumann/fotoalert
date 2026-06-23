@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, BUG-28 *(In Progress 2026-06-23)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-33 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-33, TASK-34, TASK-35, TASK-36 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · TASK-30, TASK-31, TASK-32 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21 · TASK-30, TASK-31, TASK-32 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1284,6 +1284,246 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 >
 > *Vereint: Traceability (Fehlererkennung + Lösungsspecs) + Observability (Monitoring + Alerts)*
 
+#### 🔬 Analyse & Spec (2026-06-23)
+
+##### Ist-Stand (Code-Analyse)
+
+Der `/health`-Endpoint (`main.py:809`) gibt aktuell nur `{status, version, locations_count}` zurück — kein Cache-Alter, kein Job-Status, keine Wetter-API-Info. Das `HealthOut`-Schema (`models/schemas.py:92`) hat entsprechend nur 3 Felder.
+
+Es existiert bereits ein rudimentäres Job-Tracking-System (`main.py:222–248`): `_job_status`-Dict mit 3 Jobs (`weather`, `feed`, `calendar`), je `{status, last_run, last_error, duration_s}`. Die Helfer `_job_start()`, `_job_done()`, `_job_error()` werden in `_run_precompute()` und `_weather_overlay()` bereits aufgerufen. Die Jobs laufen via APScheduler (cron: 05:30, 05:45, alle 3h).
+
+US-34 (`backup.py`) liefert bereits `hours_since_last_backup()` als Health-Signal. Es fehlt nur die Anbindung an `/health`.
+
+**Bestehende Infrastruktur, die US-38 nutzen kann:**
+- `_job_status` (in-memory, 3 Jobs) → erweitern um `discover` + `backup`
+- APScheduler-Instanz `scheduler` → Job-History darüber abfragbar
+- Standard-Python-`logging` mit `logger = logging.getLogger(__name__)` — kein strukturiertes Format
+- `backup.hours_since_last_backup()` aus US-34
+
+---
+
+##### Example Mapping
+
+**AK 1: `/health` zeigt Status aller Subsysteme**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | App läuft normal, Cache < 24h alt, Weather-Job lief vor 2h erfolgreich | `/health` → `200 OK`, alle Subsysteme `"ok"` |
+| ❌ Negativ | Wetter-API seit 12h nicht erreichbar, weather-Job im Status `"error"` | `/health` → `200 OK` (App läuft), aber `subsystems.weather.status = "error"` mit `last_error`-Details |
+| ⚠️ Edge | Erststart ohne Cache (leer), precompute läuft gerade | `subsystems.cache.status = "building"`, `subsystems.feed.status = "running"`, Backend-Status `"degraded"` statt `"ok"` |
+
+**AK 2: Strukturiertes Logging**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | `_weather_overlay()` startet und endet erfolgreich | Log-Einträge `{"ts": "...", "job": "weather", "event": "start"}` und `{..., "event": "done", "duration_s": 4.2, "status": "ok"}` |
+| ❌ Negativ | open-meteo antwortet mit Timeout nach 30s | `{..., "event": "error", "error_class": "Timeout", "error_msg": "...", "duration_s": 30.1}` |
+| ⚠️ Edge | Logging-Format-Fehler (zirkuläre Referenz im dict) | Fallback auf plain-text-Logging, kein Crash; Fehler selbst wird geloggt |
+
+**AK 3: Automatische Fehlerklassifizierung**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | `precompute.py` beendet sich mit `exit 1` wegen korrupter JSON-Datei | Fehler-Klasse `"DataError"`, `last_error` = erste Zeile stderr |
+| ❌ Negativ | Unbekannter Exception-Typ, keiner der Classifier greift | Fehler-Klasse `"Unknown"`, rohe Exception-Message gespeichert |
+| ⚠️ Edge | subprocess.py returncode=0, aber JSON-Datei danach leer (silent failure) | Nach Cache-Reload: `len(_feed_cache) == 0` → nachgelagerte Klassifizierung als `"DataError"` |
+
+**AK 4: Automatisch generierter Lösungsvorschlag**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | Wetter-Job schlägt mit `ConnectionError` fehl | Generiert Spec: `{error_class: "APIError", files: ["backend/calculations/weather.py"], suggestion: "open-meteo nicht erreichbar — Retry-Logik oder API-Fallback prüfen"}` |
+| ❌ Negativ | Fehler-Klasse `"Unknown"` ohne Muster | Spec: `{suggestion: "Fehler nicht klassifizierbar — bitte Log manuell prüfen"}`, kein False-Positive |
+| ⚠️ Edge | Zwei Jobs gleichzeitig fehlerhaft | Je ein Spec-Objekt pro Job — kein gemeinsames, um Verwechslung zu vermeiden |
+
+**AK 5: Alert-Mechanismus**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | precompute schlägt fehl → `_job_error()` aufgerufen | `logger.error(...)` mit strukturiertem JSON-Block, Severity `CRITICAL`; optional E-Mail via SMTP |
+| ❌ Negativ | SMTP nicht konfiguriert (kein `FOTOALERT_ALERT_EMAIL` in env) | Nur Log-Eintrag, kein Absturz; E-Mail still übersprungen |
+| ⚠️ Edge | Alert-Flut: derselbe Job schlägt 5× in Folge fehl | Debounce: Alert nur beim ersten Fehler, danach frühestens nach 1h |
+
+**AK 6: Dashboard / CLI-Übersicht (7 Tage)**
+
+| Typ | Szenario | Erwartetes Ergebnis |
+|-----|----------|---------------------|
+| ✅ Positiv | `python3 tools/job_history.py` aufgerufen, 3 Fehler in 7 Tagen | Tabellarische Ausgabe: Job, Zeitstempel, Dauer, Status, Fehlerklasse |
+| ❌ Negativ | Log-Datei nicht vorhanden oder leer | Klare Fehlermeldung: `"Keine Job-History-Daten gefunden"`, exit 1 |
+| ⚠️ Edge | Log enthält >10.000 Zeilen (alte Installation) | Parst nur letzte 7 Tage effizient (kein volles Einlesen), < 1s |
+
+---
+
+##### Pre-Mortem: Was kann schiefgehen?
+
+1. **In-Memory-Verlust:** `_job_status` lebt nur im Prozess. Nach `systemctl restart fotoalert` ist die History weg — das 7-Tage-Dashboard wäre leer. → Lösung: Job-Events in SQLite oder strukturiertes Log-File persistieren.
+
+2. **_weather_overlay silent failure:** Wenn open-meteo für eine Location 404 zurückgibt, wird `logger.warning(...)` aufgerufen aber `_job_error()` nicht — der Job landet als `"done"` obwohl Wetter-Daten fehlen. → Braucht explizite Fehler-Propagierung auch bei Teil-Fehlern.
+
+3. **`discover`-Job nicht im `_job_status`-Dict:** `_refresh_discover()` ruft `_job_start()`/`_job_done()` nicht auf — der Scout-Job ist komplett unsichtbar. → Muss nachgezogen werden.
+
+4. **Backup-Signal fehlt:** `backup.hours_since_last_backup()` existiert, aber `/health` kennt es nicht. US-34-AK ist damit technisch unerfüllt.
+
+5. **Debounce-Pflicht fehlt:** Ohne Throttle bei persistentem Fehler (z.B. open-meteo down für 6h = 2 Alerts/h) entsteht eine Alert-Flut ins Log.
+
+6. **Lösungsvorschlag-Halluzination:** Automatisch generierte Specs müssen konservativ und template-basiert sein — kein LLM-Call, da offline. Gefahr: zu generische Vorschläge, die mehr verwirren als helfen.
+
+7. **Python 3.9-Kompatibilität:** `str | None` im neuen Code verboten (Server läuft 3.9). Alle Type Hints als `Optional[str]` oder `Union[str, None]` schreiben.
+
+---
+
+##### Implementierungsoptionen
+
+**Option A — Minimale Erweiterung (in-process, kein neues File)**
+- `/health` um `_job_status`, `_cache_loaded_at`, `_weather_updated_at`, `backup.hours_since_last_backup()` erweitern
+- `HealthOut`-Schema um `subsystems: dict` erweitern
+- Job-Events strukturiert per `logger.info(json.dumps({...}))` loggen
+- `discover`-Job in `_job_status` einpflegen
+- Alert: `logger.critical(...)` bei `_job_error()` + optionales SMTP (env-gesteuert)
+- CLI-Tool `tools/job_history.py`: parst Server-Log (grep + JSON-Linien), zeigt 7-Tage-Tabelle
+- Lösungsvorschläge: statische Regel-Tabelle `{error_class → files + suggestion}`
+
+**Betroffene Dateien:** `backend/main.py`, `backend/models/schemas.py`, `backend/data/backup.py` (Signal-Anbindung), neu: `backend/observability.py` (Klassifizierer + Spec-Generator), `tools/job_history.py`
+
+**Option B — SQLite-basierte Job-History + erweitertes Dashboard**
+- Alle Job-Events in eigene SQLite-Tabelle `job_runs` schreiben (Timestamp, Job, Status, Duration, ErrorClass, ErrorMsg)
+- `/health` liest aus DB statt aus in-memory Dict
+- Dashboard-Endpoint `/health/history?days=7` als REST-API (kein extra CLI-Script nötig)
+- Alert-Debounce ebenfalls in DB (letzte Alert-Zeit pro Job)
+
+**Betroffene Dateien:** zusätzlich `backend/store.py` (DB-Schema erweitern), `backend/main.py` (DB-Writes bei Job-Events)
+
+**Option C — Externe Lösung (Prometheus/Grafana oder Sentry)**
+- Job-Metriken via `prometheus_client` exportieren, Grafana-Dashboard
+- Fehler-Alerting via Sentry SDK (`.capture_exception()`)
+- Kein eigener Alert-Code
+
+**Betroffene Dateien:** `requirements.txt`, `backend/main.py`, `deploy/` (Prometheus-Scrape-Config)
+
+---
+
+##### Empfehlung: Option A + SQLite-Persistenz (Hybrid)
+
+**Option A** für den Health-Endpoint, Logging und Lösungsvorschläge (minimal-invasiv, in bestehende Patterns passend). **Plus:** Job-Events zusätzlich in die bestehende SQLite (`store.py`) schreiben — eine neue Tabelle `job_runs` mit max. 30 Tagen Retention — damit das 7-Tage-Dashboard nach Restarts nicht leer ist. Das CLI-Tool `tools/job_history.py` liest aus SQLite statt aus dem Log.
+
+Option B (reine DB) ist überengineered für einen Single-Host-Setup. Option C (externe Tools) ist komplett außerhalb des Projekt-Stacks und bringt Betriebskomplexität.
+
+---
+
+##### Implementation Spec
+
+**Schritt 1 — `_job_status` vervollständigen (`main.py`)**
+- Job `"discover"` hinzufügen
+- `_run_precompute_single()` mit `_job_start()`/`_job_done()`/`_job_error()` ausstatten (aktuell ohne Tracking)
+- In `_weather_overlay()`: Teil-Fehler (einzelne Location) zählen; wenn >50% Locations scheitern → `_job_error()` statt `_job_done()`
+
+**Schritt 2 — SQLite-Tabelle `job_runs` (`store.py`)**
+```sql
+CREATE TABLE IF NOT EXISTS job_runs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts TEXT NOT NULL,          -- ISO-8601 UTC
+  job TEXT NOT NULL,         -- "weather" | "feed" | "calendar" | "discover" | "backup"
+  status TEXT NOT NULL,      -- "done" | "error"
+  duration_s REAL,
+  error_class TEXT,          -- "Timeout" | "APIError" | "DataError" | "Unknown" | NULL
+  error_msg TEXT,
+  spec_suggestion TEXT       -- auto-generierter Lösungsvorschlag | NULL
+);
+```
+Retention: `DELETE FROM job_runs WHERE ts < datetime('now', '-30 days')` bei jedem Insert.
+
+**Schritt 3 — Fehlerklassifizierer (`backend/observability.py`, neu)**
+```python
+# Python 3.9-kompatibel
+from typing import Optional, Tuple
+
+ERROR_RULES = [
+    (("timeout", "timed out"), "Timeout",
+     ["backend/calculations/weather.py"], "Timeout bei API-Call — Retry-Logik oder Timeout-Wert erhöhen"),
+    (("connectionerror", "connection refused", "name or service not known"), "APIError",
+     ["backend/calculations/weather.py"], "API nicht erreichbar — Netzwerk oder API-Status prüfen"),
+    (("json", "decode", "corrupt", "invalid"), "DataError",
+     ["backend/precompute.py", "backend/main.py"], "Cache-Datei korrupt — Cache löschen und Neuberechnung starten"),
+    (("exit 1", "exit 2", "returncode"), "SubprocessError",
+     ["backend/precompute.py"], "precompute.py Fehler — stdout-Log prüfen"),
+]
+
+def classify_error(msg: str) -> Tuple[str, list, str]:
+    """Gibt (error_class, betroffene_files, suggestion) zurück."""
+    lower = msg.lower()
+    for keywords, cls, files, suggestion in ERROR_RULES:
+        if any(k in lower for k in keywords):
+            return cls, files, suggestion
+    return "Unknown", [], "Fehler nicht klassifizierbar — bitte Log manuell prüfen"
+```
+
+**Schritt 4 — `_job_done()` / `_job_error()` erweitern (`main.py`)**
+- Bei `_job_error()`: `classify_error(msg)` aufrufen, Ergebnis in `_job_status[job]["error_class"]` und `_job_status[job]["spec"]` speichern; DB-Write in `job_runs`; `logger.critical(json.dumps({...}))` (strukturiert)
+- Alert-Debounce: `_last_alert: dict[str, datetime]` in-memory; Alert nur wenn `now - _last_alert[job] > timedelta(hours=1)`
+- Bei `_job_done()`: DB-Write in `job_runs` (kein Alert, kein Spec)
+
+**Schritt 5 — `/health`-Endpoint erweitern (`main.py` + `models/schemas.py`)**
+
+Neues `HealthOut`-Schema (Python 3.9-kompatibel):
+```python
+from typing import Optional, Dict, Any
+class JobStatus(BaseModel):
+    status: str
+    last_run: Optional[str]
+    duration_s: Optional[float]
+    last_error: Optional[str]
+    error_class: Optional[str]
+    spec: Optional[Dict[str, Any]]
+
+class SubsystemStatus(BaseModel):
+    backend: str
+    cache: str
+    cache_age_h: Optional[float]
+    weather: str
+    weather_age_h: Optional[float]
+    backup: str
+    backup_age_h: Optional[float]
+
+class HealthOut(BaseModel):
+    status: str          # "ok" | "degraded" | "error"
+    version: str
+    locations_count: int
+    subsystems: SubsystemStatus
+    jobs: Dict[str, JobStatus]
+    precompute_running: bool
+```
+
+`/health`-Handler berechnet `status = "degraded"` wenn irgendein Job-Status `"error"` ist.
+
+**Schritt 6 — CLI-Tool `tools/job_history.py`**
+```
+python3 tools/job_history.py [--days 7] [--job weather] [--errors-only]
+```
+Liest aus SQLite `job_runs`, gibt Tabelle aus. Keine externen Dependencies (nur `sqlite3`, `datetime`, `argparse`).
+
+**Schritt 7 — Alert via E-Mail (optional, env-gesteuert)**
+```
+FOTOALERT_ALERT_EMAIL=stephanschumann@me.com
+FOTOALERT_SMTP_HOST=smtp.icloud.com
+FOTOALERT_SMTP_PORT=587
+FOTOALERT_SMTP_USER=...
+FOTOALERT_SMTP_PASS=...
+```
+Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
+
+---
+
+##### Abgrenzung zu anderen Tickets
+
+- **US-34 (Backup):** `backup.hours_since_last_backup()` wird von US-38 im `/health`-Endpoint konsumiert. US-34 implementiert es, US-38 nutzt es. Kein Merge nötig.
+- **US-37 (PWA-Refresh):** Job-Status-Anzeige im Frontend liest `_job_status` — das ist dasselbe Dict, das US-38 befüllt. Koordination: US-38 stellt sicher, dass `_job_status` vollständig und zuverlässig ist; US-37 zeigt es an.
+- **TASK-14 (Deploy):** `/health`-Retry-Check im Deploy-Script nutzt bereits den Endpoint. US-38 macht ihn aussagekräftiger — kein Breaking Change, nur Felder hinzugefügt.
+
+##### Status
+- **Analyse:** ✅ fertig 2026-06-23
+- **Empfehlung:** Option A + SQLite-Persistenz (Hybrid)
+- **Wartet am Weg-Gate:** Freigabe durch Stephan vor Implementierung
+
 ### US-39 · Resilient Deployment / Rollback (nur Code/Deploy)
 > **Abgegrenzt (2026-06-20):** Scope auf reines **Code-/Deploy-Rollback** reduziert. Der Daten-Aspekt („Datensicherung vor Precompute") wurde nach **TASK-18** verschoben.
 >
@@ -2386,12 +2626,78 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-21 |
 
 **Beschreibung:** Der Schwierigkeitsfilter (Include **und** Exclude) hat im Chancen-Feed und Kalender keinen Effekt, solange `Locations.all` leer ist. Beobachtet: Include „Anspruchsvoll" zeigt im Feed weiterhin alle 111 sichtbaren Chancen, obwohl nur 5 von 56 Locations difficulty 3 haben. Erwartet: Filterung greift sofort. Ursache: `Filter.apply()` schlägt `loc.difficulty` über `Locations.all` nach, das aber erst beim Öffnen des Locations-Tabs (oder nach Location-Speichern) geladen wird — nicht beim App-Start auf dem Feed. Fix-Richtung: `Locations.all` beim Boot laden (oder lazy nachladen, wenn ein Schwierigkeitsfilter aktiv ist und die Liste leer ist).
 
 **Bezug:** Vorbestehend seit US-32 (kombiniertes Filtersystem); durch US-71 (Drei-Zustand-Filter) sichtbar geworden, aber nicht von US-71 verursacht — betrifft die Include-Logik identisch. Eigenständig, grenzt an US-71.
+
+#### 🔬 Analyse (2026-06-23)
+
+**Root-Cause (datenvalidiert am echten Code):**
+
+`Filter.apply()` schlägt `loc.difficulty` via `(Locations.all || []).find(l => l.id === o.location_id)` nach (`index.html` Z. 2056). Wenn `loc` undefined ist (weil `Locations.all` leer), greift der `if (loc)` Guard — die Chance wird **nicht** gefiltert, sondern durchgelassen (falsch-positiv für Include, falsch-negativ für Exclude).
+
+**Entscheidend:** Der BUG-30-Fix (`App.init`, Z. 4116) lädt `Locations.all = await API.get('/locations')` bereits **vor** `await Feed.load()`. Das bedeutet: Die Lade-Garantie für `Locations.all` beim Boot ist durch BUG-30 bereits implementiert. BUG-28 ist dadurch für Feed **und** Kalender (der ohnehin erst beim Tab-Besuch lädt, zu dem Zeitpunkt ist `Locations.all` längst befüllt) de facto mitbehoben.
+
+Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein Akzeptanzkriterium wurde je getestet. Das Ticket benötigt eine Verifikation + ggf. einen Edge-Case-Fix (see AK unten).
+
+**Betroffene Dateien:**
+- `web/index.html` — `Filter.apply` Z. 2055–2059 (difficulty-Lookup), `App.init` Z. 4101–4122 (Boot-Sequenz, bereits gefixt durch BUG-30)
+
+**Scope:**
+- Eingeschlossen: Schwierigkeitsfilter (Include + Exclude) wirkt im Feed und Kalender sofort beim App-Start, ohne Locations-Tab-Besuch. Verifikation dass der BUG-30-Fix BUG-28 abdeckt.
+- Ausgeschlossen: Scout-Tab (kein `difficulty`-Cross-Collection-Lookup dort, `Filter.applyToScout` Z. 2117 kommentiert difficulty explizit als nicht anwendbar). Backend-Änderungen (rein Frontend).
+
+**Example Mapping:**
+
+📏 **Rule 1:** Wenn ein Schwierigkeitsfilter gesetzt ist, werden beim Feed-Start nur Chancen angezeigt, deren Location das passende `difficulty`-Level hat — unabhängig davon ob der Locations-Tab je besucht wurde.
+- 🟢 **Positiv:** App öffnen auf Feed-Tab, Include „Anspruchsvoll" (difficulty=3) aktiv → nur 5 Chancen sichtbar (aus den 5 Locations mit difficulty 3).
+- 🔴 **Negativ:** App öffnen auf Feed-Tab, Locations-Tab nicht besucht, Include aktiv → **nicht** alle 111 Chancen sichtbar (das war der Bug).
+- 🔲 **Edge:** Alle Locations haben difficulty=2, Filter auf difficulty=3 → 0 Chancen, leerer State korrekt.
+
+📏 **Rule 2:** Wenn `Locations.all` beim Boot geladen wurde und ein Schwierigkeitsfilter aktiv ist, wird beim Kalender-Monatswechsel korrekt gefiltert.
+- 🟢 **Positiv:** Kalender-Tab öffnen nach Boot → Monatsansicht zeigt nur Chancen passender Locations.
+
+📏 **Rule 3:** Die Boot-Sequenz garantiert `Locations.all` vor dem ersten Feed-Render.
+- 🟢 **Positiv:** `App.init` lädt `Locations.all` via `await API.get('/locations')` vor `await Feed.load()` — d.h. `Filter.apply` trifft im ersten Render auf befüllte Liste.
+
+**Akzeptanzkriterien:**
+- [ ] AK-1: App frisch öffnen (kein Locations-Tab besucht), Schwierigkeitsfilter „Anspruchsvoll" (difficulty=3) aktiv → Feed zeigt ausschließlich Chancen von Locations mit `difficulty===3` (manuell zählbar, deutlich unter 111).
+- [ ] AK-2: App frisch öffnen, Exclude „Einfach" (difficulty=1) aktiv → Feed zeigt keine Chancen von Locations mit `difficulty===1`.
+- [ ] AK-3: Kalender-Tab ohne vorherigen Locations-Tab-Besuch öffnen, Schwierigkeitsfilter aktiv → Kalender filtert korrekt (Monat mit 0 Treffern zeigt „Keine Einträge"-State).
+- [ ] AK-4 Edge: Filter auf difficulty gesetzt, eine Location hat kein `difficulty`-Feld (undefined) → Chance wird nicht gefiltert (Guard greift, kein JS-Crash).
+- [ ] AK-5 Regression: Ohne Schwierigkeitsfilter zeigt der Feed alle Chancen unverändert (kein falsches Filtern durch Boot-Load).
+
+**Pre-Mortem:**
+- 💀 **Fix ist schon da, aber unbemerkt defekt** — Auslöser: BUG-30 hat `Locations.all`-Boot-Load eingebaut, aber `/locations`-Endpoint schlägt fehl (401/500) → `Locations.all` bleibt leer, Filter still wirkungslos — und kein Error dem User. Frühwarnung: `App.init` hat kein Error-Handling für den `Locations`-Fetch. Gegenmaßnahme: AK-1 manuell testen; optional try/catch mit stiller Fehler-Toleranz ergänzen.
+- 💀 **Verifikation behauptet „gefixt", tatsächlich sind Testdaten ohne difficulty=3** — Auslöser: Wenn zufällig alle sichtbaren Chancen von Locations mit dem Include-Level stammen, filtert der Bug nicht auf. Frühwarnung: Tester prüft nicht die Anzahl gegen die Erwartung. Gegenmaßnahme: AK-1 mit expliziter Zählung (5 Locations difficulty=3 → maximal 5 Locations × n Events sichtbar).
+- 💀 **CalendarView lädt Monat bevor Boot-Load fertig** — Auslöser: Nutzer navigiert extrem schnell zum Kalender, bevor der `/locations`-Request fertig ist → `Locations.all` noch leer beim ersten `Filter.apply`. Frühwarnung: Nur auf langsamen Verbindungen reproduzierbar. Gegenmaßnahme: `App.init` ist `async`, `Feed.load()` wartet auf `Locations.all` — Kalender wird erst auf Tab-Klick geladen, der nach `init()` kommt. Risiko gering; aber AK-3 ist dennoch sinnvoll.
+
+**Implementierungsoptionen:**
+
+*Option A — Verifikation: Bug bereits durch BUG-30 behoben, Ticket schließen nach Test*
+- Vorgehen: AK-1 bis AK-5 manuell testen (lokal, `http://localhost:8000`). Bei Bestehen: Ticket auf Done setzen, kein Code-Fix nötig. Optional: Error-Handling für `/locations`-Fetch in `App.init` als Robustheit-Maßnahme ergänzen.
+- Betroffene Dateien: `web/index.html` App.init Z. 4116 (nur Error-Handling, optional)
+- Vorteile: Kein Code-Risiko; fix wurde bereits shipped; schnell abgeschlossen.
+- Nachteile: Wenn Test scheitert (z.B. Race-Condition), muss Option B greifen.
+- Aufwand: sehr klein (Test + optionales try/catch)
+
+*Option B — Defensiver Fallback: Lazy-Load in `Filter.apply` wenn `Locations.all` leer und difficulty-Filter aktiv*
+- Vorgehen: In `Filter.apply` Z. 2055, wenn `Locations.all.length === 0` und ein difficulty-Filter aktiv ist, einen synchronen Guard einbauen: Filter überspringen (alle durch) und `API.get('/locations').then(d => { Locations.all = d; Feed.render(Filter.apply(Feed.data)); })` im Hintergrund nachladen. Oder: `Filter.apply` wirft explizit wenn `Locations.all` leer und difficulty gesetzt — das macht den Bug sichtbar statt still.
+- Betroffene Dateien: `web/index.html` Filter.apply Z. 2055–2059
+- Vorteile: Robuster gegen Race-Conditions; macht den Bug sichtbar wenn er doch auftritt.
+- Nachteile: Erhöht Komplexität; async in einem sync-Filter ist architektonisch unschön; Render-Timing-Risiko.
+- Aufwand: mittel
+
+✅ **Empfehlung: Option A** — Der BUG-30-Fix löst BUG-28 bereits; eine Verifikation + optionales try/catch in `App.init` ist der sauberste Abschluss. Option B nur wenn AK-1 scheitert.
+
+**Testplan:**
+- [ ] Manuell (http://localhost:8000): App öffnen → Feed-Tab → FilterSheet → Schwierigkeit „Anspruchsvoll" aktivieren → Anzahl sichtbarer Chancen zählen → muss deutlich unter 111 liegen (nur Chancen von 5 Locations mit difficulty=3 sichtbar).
+- [ ] Manuell: Kalender-Tab direkt öffnen (ohne Locations-Tab), gleicher Filter → Kalender filtert korrekt.
+- [ ] Manuell: Kein Filter → alle Chancen sichtbar (Regression).
+- [ ] Automatisiert (optional, Backend): Kein Backend-Test nötig — rein Frontend-Bug.
 
 ---
 
@@ -3807,14 +4113,15 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 
 ---
 
-### BUG-33 · Neue Location „Schloss Babelsberg von Glienicker Brücke": Mond-Chance am 26.06 fehlt `[ ]`
+### BUG-33 · Neue Location „Schloss Babelsberg von Glienicker Brücke": Mond-Chance am 26.06 fehlt `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
 
 **Beschreibung:** Stephan hat die Location „Schloss Babelsberg von Glienicker Brücke" hinzugefügt. Laut PhotoPills steht der Mond am 26.06.2026 um 21:27 Uhr (GMT+2) 97,1 m über dem Motiv und 77 m über dem Turm — ein klares Alignment-Event. Die App zeigt für diese Location keine entsprechende Chance. Erwartet: Das Alignment taucht im Feed und/oder Jahreskalender auf.
 
@@ -3850,11 +4157,11 @@ Konkrete Fehler-Kette:
 ---
 
 **Akzeptanzkriterien:**
-- [ ] Nach dem Anlegen einer Custom Location (via `/preview-alignment?save=true`) erscheint binnen 5 Minuten mindestens ein Event im Feed (`GET /opportunities?location_id=<id>`), sofern ein Alignment-Event im 14-Tage-Fenster liegt.
-- [ ] `GET /calendar?location_id=<custom_id>&month=6&year=2026` liefert das Babelsberg-Mond-Alignment am 26.06.2026 (shoot_time ≈ `2026-06-26T19:27Z`, event_type enthält „Mond").
-- [ ] Nach einem Vollkalender-Recompute (`python3 precompute.py --full`) sind Custom-Location-Events in `calendar.json` enthalten (prüfbar via `grep "custom_" data/cache/calendar.json`).
-- [ ] Log beim Single-Recompute zeigt NICHT mehr „Location 'custom_xyz' nicht gefunden"; stattdessen normale Ausgabe mit berechneten Events.
-- [ ] Edge Case: Existiert keine Custom Location in SQLite, läuft precompute.py ohne Fehler durch (bestehende Basis-Locations unberührt).
+- [x] Nach dem Anlegen einer Custom Location (via `/preview-alignment?save=true`) erscheint binnen 5 Minuten mindestens ein Event im Feed (`GET /opportunities?location_id=<id>`), sofern ein Alignment-Event im 14-Tage-Fenster liegt.
+- [~] `GET /calendar?location_id=<custom_id>&month=6&year=2026` liefert das Babelsberg-Mond-Alignment am 26.06.2026 (shoot_time ≈ `2026-06-26T19:27Z`, event_type enthält „Mond"). *(ausstehend — nächster Prod-Cron 00:01 UTC berechnet Babelsberg erstmals)*
+- [x] Nach einem Vollkalender-Recompute (`python3 precompute.py --full`) sind Custom-Location-Events in `calendar.json` enthalten (prüfbar via `grep "custom_" data/cache/calendar.json`).
+- [x] Log beim Single-Recompute zeigt NICHT mehr „Location 'custom_xyz' nicht gefunden"; stattdessen normale Ausgabe mit berechneten Events.
+- [x] Edge Case: Existiert keine Custom Location in SQLite, läuft precompute.py ohne Fehler durch (bestehende Basis-Locations unberührt).
 
 ---
 
@@ -4095,3 +4402,96 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 Hinweis: `index.html` ist ein Monolith, JS-Längenmessung per Regex-Heuristik kann falsch-positiv sein. Vor Refactoring manuell prüfen welche Findings real sind.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29), Refactor-Check 2026-06-23 (BUG-33-Release)
+
+---
+
+### TASK-33 · Post-Deploy-Health-Assert in CI `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-23 |
+| **In Progress seit** | 2026-06-23 |
+
+**Beschreibung:** Neuer `verify-deploy`-Job in `.github/workflows/deploy.yml` nach dem Deploy-Step. Prüft Feed-Größe (≥ 5 Events), Locations-Anzahl (≥ 10) und Kalender-Monat (≥ 5 Events). Verhindert stille Regressionen wie BUG-14/BUG-27 (Kalender leer nach Cron/Deploy).
+
+**Akzeptanzkriterien:**
+- [x] `verify-deploy`-Job läuft nach `deploy` (needs: [deploy])
+- [x] Feed-Check: GET /opportunities?min_score=0.1 → ≥ 5 Events → sonst Exit 1
+- [x] Locations-Check: GET /locations → ≥ 10 → sonst Exit 1
+- [x] Kalender-Check: GET /calendar?month=X&year=Y → ≥ 5 Events → sonst Exit 1
+- [ ] Regression: ein echter Deploy läuft grün durch den neuen Job
+
+**Quelle:** TASK-33, Qualitätsanalyse 2026-06-23 (P0-Maßnahme)
+
+---
+
+### TASK-34 · Cache-Konsistenz-Tests + Sunrise-Präzisionstest `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-23 |
+| **In Progress seit** | 2026-06-23 |
+
+**Beschreibung:** Zwei neue Testdateien: (1) `test_patch_cache_consistency.py` — PATCH→GET-Roundtrip für Name (BUG-30) und Koordinaten (BUG-29); (2) Sunrise/Sunset-Referenztests + Babelsberg-Azimut-Test in `test_astronomy_regression.py`.
+
+**Akzeptanzkriterien:**
+- [x] `test_patch_cache_consistency.py` angelegt: BUG-30 Name-Persistenz (3 Tests), BUG-29 Koordinaten-Persistenz (3 Tests)
+- [x] Sunrise Berlin 2026-06-21 innerhalb ±5 min Toleranz (Referenz: 01:43 UTC)
+- [x] Sunset Berlin 2026-06-21 innerhalb ±5 min Toleranz (Referenz: 20:25 UTC)
+- [x] Babelsberg→Pfingstberg Azimut 310–340°
+- [ ] `pytest tests/test_patch_cache_consistency.py -v` lokal grün
+
+**Quelle:** TASK-34, Qualitätsanalyse 2026-06-23 (P0/P1-Maßnahme)
+
+---
+
+### TASK-35 · Mobile Viewport in Playwright-Frontend-Check `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-23 |
+| **In Progress seit** | 2026-06-23 |
+
+**Beschreibung:** `run_frontend_check.py` um `run_mobile_checks()` erweitert (iPhone 14 Viewport, 390×844, isMobile=True). Prüft: App-Container-Overflow, Close-Button im Viewport, Filter-Sheet-Breite. Wird automatisch nach dem Desktop-Pass ausgeführt. Fängt iOS-Layout-Bug-Klassen wie BUG-19, BUG-25, BUG-34 frühzeitig ab.
+
+**Akzeptanzkriterien:**
+- [x] `run_mobile_checks()` implementiert und in CLI-Main eingehängt
+- [x] iPhone 14 Viewport (390×844, deviceScaleFactor=3, isMobile=True)
+- [x] #app-Breite ≤ 390px → sonst Finding
+- [x] Close-Button im Viewport (y zwischen 0–844) → sonst Finding
+- [x] #filter-sheet-Breite ≤ 390px → sonst Finding
+- [ ] Frontend-Check lokal mit `--headed` ausgeführt und Mobile-Screenshots vorhanden
+
+**Quelle:** TASK-35, Qualitätsanalyse 2026-06-23 (P1-Maßnahme)
+
+---
+
+### TASK-36 · Data-Flow-Dokument `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-23 |
+| **In Progress seit** | 2026-06-23 |
+
+**Beschreibung:** `docs/data-flow.md` angelegt: Datenquellen-Übersicht (locations.py vs. SQLite Overrides vs. Cache-JSONs vs. Frontend Locations.all), PATCH-Invalidierungslogik, Recompute-Trigger, bekannte Synchronisationsfallen (BUG-29, BUG-30, BUG-28). Ziel: neuer Agent oder Entwickler sieht sofort, welche Komponente welche Daten liest.
+
+**Akzeptanzkriterien:**
+- [x] Tabelle: Datenquellen × Leser × Schreiber
+- [x] PATCH-Invalidierungslogik vollständig (welches Feld → recompute_triggered)
+- [x] Recompute-Ablauf als Textdiagramm
+- [x] 4 bekannte Synchronisationsfallen dokumentiert (BUG-29, BUG-30, BUG-28, coordinates_hash)
+- [x] Custom-Locations vs. Basis-Locations Abgrenzung
+
+**Quelle:** TASK-36, Qualitätsanalyse 2026-06-23 (P3-Maßnahme)

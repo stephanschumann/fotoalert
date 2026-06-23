@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.7';
+const APP_VERSION = '1.11.8';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4113,7 +4113,13 @@ const App = {
     await Rating.loadAll();
     // BUG-30: Locations vorladen (kein Render, nur Daten) damit Locations.nameFor()
     // im Feed/Kalender-Detail sofort den aktuellen Namen liefert — ohne Locations-Tab-Besuch.
-    Locations.all = await API.get('/locations');
+    // BUG-28: try/catch damit ein /locations-Fehler (401/500) den App-Start nicht blockiert;
+    // Filter greifen dann auf leeres Array zurück (alle Chancen durch) statt auf crash.
+    try {
+      Locations.all = await API.get('/locations');
+    } catch (e) {
+      console.warn('[BUG-28] /locations beim Boot nicht erreichbar — Difficulty-Filter inaktiv bis Tab-Besuch:', e);
+    }
     // Lade Feed (Verify._cache + Rating._cache/_mine sind jetzt befüllt → Badges/Filter korrekt)
     await Feed.load();
     // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch
