@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-68 *(Analyse fertig 2026-06-22 — wartet am Weg-Gate auf Stephan: Option B?)*, TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-72 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-24 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-33, BUG-34 · BUG-28, US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2811,15 +2811,17 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 #### 📋 Implementation Spec Ende
 
-### TASK-24 · Push-Token serverseitig persistieren `[~]`
+### TASK-24 · Push-Token serverseitig persistieren `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-21 |
 | **In Progress seit** | 2026-06-22 |
+| **Done** | 2026-06-22 |
+| **Release** | v1.11.5 |
 
 **Beschreibung:** Die Push-Token-Liste `_device_tokens` in `backend/main.py` liegt nur im RAM und geht bei jedem Server-Neustart verloren. Token in SQLite persistieren, damit registrierte Geräte einen Neustart überdauern. Latent, da Push im Frontend noch nicht verdrahtet ist — vor dem Push-Rollout zu erledigen.
 
@@ -3771,3 +3773,166 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 - [x] Layer-Toggle (Nacht/Standard/Satellit) bleibt funktionsfähig
 
 **Datei:** `web/index.html` — CSS-Regel `#page-map`
+
+---
+
+### BUG-31 · Jahreskalender: Kopfzeilen-Counter inkonsistent (Gesamtzahl < Monatssumme) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
+
+**Beschreibung:** Im Jahreskalender-Panel zeigt die Kopfzeile „1257 Events · 5289 im Monat · nur Astronomie" — die Gesamtzahl (1257) ist kleiner als die Monatssumme (5289). Das ist logisch inkonsistent und verwirrt den Nutzer. Erwartetes Verhalten: Gesamtzahl ≥ Monatszahl, oder die Bezeichnungen sind klar unterschiedlich (z. B. „im aktuellen Filterfenster" vs. „im Monat").
+
+**Bezug:** Kein direktes Vorgänger-Ticket. Verwandt mit BUG-27 [x] (Jahreskalender leer) — dort ging es um leere Daten, hier um fehlerhafte Aggregation/Anzeige.
+
+---
+
+### BUG-32 · 14-Tage-Feed leer trotz aktivem Datenbestand und ohne Filterkriterien `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Der 14-Tage-Feed zeigt „Keine besonderen Chancen in den nächsten 14 Tagen. Goldene & Blaue Stunde über den Eventtyp-Filter einblenden." — obwohl kein Filter aktiv ist. Der Jahreskalender zeigt im selben Zeitraum tausende Events, d. h. Daten sind vorhanden. Erwartet: Feed zeigt Chancen mit besonderem Alignment-Score (Mond, Sonne in goldener/blauer Stunde), ohne dass der Nutzer manuell einen Filter aktivieren muss.
+
+**Bezug:** Mögliche Regression von BUG-14 [x] (Kalender leer nach Cron) und BUG-27 [x] (Jahreskalender leer). Ursache könnte im opportunities.json-Cache oder im Feed-Filterlogik liegen.
+
+---
+
+### BUG-33 · Neue Location „Schloss Babelsberg von Glienicker Brücke": Mond-Chance am 26.06 fehlt `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Stephan hat die Location „Schloss Babelsberg von Glienicker Brücke" hinzugefügt. Laut PhotoPills steht der Mond am 26.06.2026 um 21:27 Uhr (GMT+2) 97,1 m über dem Motiv und 77 m über dem Turm — ein klares Alignment-Event. Die App zeigt für diese Location keine entsprechende Chance. Erwartet: Das Alignment taucht im Feed und/oder Jahreskalender auf.
+
+**Bezug:** Möglicherweise verwandt mit Memory-Notiz „precompute Datenquelle" — precompute.py verarbeitet keine Custom-Locations (nur Basis-LOCATIONS + Overrides, nicht neu via UI hinzugefügte). Grenzbereich: BUG-29 [x] (veraltete GPS-Daten), TASK-25 [x] (On-Demand-Ephemeriden-Engine). Ggf. ist die On-Demand-Engine der Fix-Pfad.
+
+---
+
+### BUG-34 · iPhone Safari: Bearbeitungs-Overlay zoomt und ragt rechts aus dem Screen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Öffnet man auf dem iPhone (Safari) das Bearbeiten-Overlay einer Location, vergrößert die Seite (Zoom) und der rechte Teil des Overlays ragt außerhalb des sichtbaren Bereichs. Erwartet: Das Overlay passt sich vollständig in den Viewport ein, kein ungewollter Zoom.
+
+**Bezug:** Verwandt mit BUG-19 [x] (Close-Button in Sheets nicht erreichbar) und BUG-07 [x] (Sheets überschreiten iPhone-Breite auf Desktop). Wahrscheinliche Ursache: iOS Safari zoomt automatisch wenn ein fokussiertes Input-Feld eine Font-Size < 16px hat; zusätzlich fehlt ggf. `max-width: 100%` / `overflow-x: hidden` am Overlay-Container.
+
+---
+
+### TASK-27 · UI-Konsistenz: „Events" durchgängig durch „Chancen" ersetzen `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | Done |
+| **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
+
+**Beschreibung:** In der App werden „Events" und „Chancen" synonym verwendet (z. B. Jahreskalender-Header „1257 Events · 5289 im Monat"). Der primäre Begriff in FotoAlert ist „Chancen". Alle sichtbaren UI-Texte, Labels und Zähler sollen einheitlich auf „Chancen" umgestellt werden.
+
+**Bezug:** Geht Hand in Hand mit BUG-31 (Kopfzeilen-Counter), könnte dort mitgemacht werden. Nicht identisch — BUG-31 ist ein Logikfehler, dieser Task ist reine Umbenennung.
+
+---
+
+### TASK-28 · Analyse-Qualität: Explizite Rückfragen statt Annahmen in der Implementierungsphase `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
+
+**Beschreibung:** Stephan hat beobachtet, dass Agenten Design- und Funktionsentscheidungen (Farben, Layout, Features) eigenständig treffen, ohne sie vorher zu spezifizieren — während gleichzeitig wichtigere Funktionen (z. B. Persistenz) unvollständig bleiben, was erst im User Testing auffällt. Gewünschtes Verhalten: Der Analyse-Agent stellt während Example Mapping gezielt Rückfragen zu offenen Punkten (nach dem Vorbild von Superhero's), hält Annahmen explizit fest und markiert sie zur Bestätigung — statt sie stillschweigend zu treffen.
+
+**Bezug:** Betrifft den `fotoalert-analyze`-Skill direkt. Umsetzung: Skill-Update (fotoalert-analyze) + ggf. Ergänzung im fotoalert-impl-Skill (Annahmen vor Implementierung kennzeichnen). Verwandt mit `feedback_example_mapping`-Memory.
+
+**Scope:**
+- Eingeschlossen: `fotoalert-analyze` (Annahmen-Protokoll in Example Mapping), `fotoalert-impl` (Annahmen-Check vor erstem Edit), Memory `feedback_assumptions_clarification.md` (projektübergreifend)
+- Ausgeschlossen: andere Skills, iOS-Code
+
+**Akzeptanzkriterien:**
+- [x] `fotoalert-analyze`: Example Mapping enthält Annahmen-Protokoll mit Priorisierung (🔴 funktional / ⚪ ästhetisch)
+- [x] `fotoalert-impl`: Annahmen-Check am Start prüft ⚠️-Marker und fragt vor erstem Edit; gilt auch mid-Implementierung
+- [x] Memory `feedback_assumptions_clarification.md` vorhanden und in MEMORY.md indexiert
+- [x] Edge Case: kein Interpretationsspielraum → kein unnötiger Rückfrage-Block
+
+**Pre-Mortem:**
+- 💀 Zu viele Rückfragen → Paralysis. Gegenmaßnahme: nur fragen wenn kein sinnvoller Default ableitbar (in Skill verankert).
+- 💀 Memory-Eintrag zu vage → nicht operationalisierbar. Gegenmaßnahme: Eintrag mit konkreten Trigger-Typen und Tabelle.
+- 💀 impl-Skill nicht updated → Lücke in Impl-Phase. Gegenmaßnahme: beide Skills im selben Ticket.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `fotoalert-analyze/SKILL.md`, `fotoalert-impl/SKILL.md`, `memory/`
+- [x] Implementierungsoption: Skills + Memory (Stephan: Option C)
+- [x] Empfehlung freigegeben
+
+**Testplan:**
+- [x] Manuell: Annahmen-Protokoll sichtbar in nächster Analyse-Session; ⚠️-Marker in Spec; Impl-Skill fragt vor Edit
+
+---
+
+### TASK-29 · Refactoring-Agent: Code-Quality-Check vor jedem Release `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | Done |
+| **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
+
+**Beschreibung:** Vor jedem Release (nach erfolgreichem Test, vor `fotoalert-release`) läuft ein Refactoring-Agent, der Backend + Frontend auf Code-Smells prüft. Sichere Fixes wendet er direkt an; zu komplexe Findings landen als Ticket in der Inbox. Der Agent ist als Cowork-Skill (`fotoalert-refactor`) + Python-Hilfsskript (`tools/refactor_check.py`) implementiert.
+
+**Scope:**
+- Eingeschlossen: Backend (`backend/*.py`, `backend/calculations/`, `backend/discover/`), Frontend (`web/index.html`)
+- Ausgeschlossen: iOS-Swift-Code, Test-Dateien, Migrations-Skripte, Drittbibliotheken
+
+**Akzeptanzkriterien:**
+- [ ] `tools/refactor_check.py` läuft in < 5 s und gibt strukturierten JSON-Report aus (auto_fixable / needs_ticket)
+- [ ] Skill `fotoalert-refactor` triggert via „refactor", „code-check", „vor dem Release" und läuft den Check
+- [ ] Auto-fixable Findings (unused imports, tote globals) werden direkt per Edit angewendet
+- [ ] Nach Auto-Fix laufen die Backend-Tests (`pytest backend/tests/`) automatisch zur Verifikation
+- [ ] Nicht-auto-fixable Findings (Funktionen > 80L, fehlende Typ-Annotationen en masse) landen als Intake-Ticket
+- [ ] Edge Case: Kein Fund → Report zeigt „✅ Keine Smells" statt leerem Output
+- [ ] Edge Case: Tests schlagen nach Auto-Fix fehl → Fix wird rückgängig gemacht (git checkout), Ticket statt direkter Änderung
+
+**Pre-Mortem:**
+- 💀 Auto-Fix bricht Funktionalität → Auslöser: Import scheinbar unused, aber per `importlib` dynamisch genutzt. Gegenmaßnahme: Tests nach jedem Auto-Fix pflicht; bei Fehler sofort revert (AK oben).
+- 💀 Frontendregeln nicht greifend → Auslöser: index.html ist Monolith ohne Modul-Grenzen; reguläre pyflakes-/AST-Ansätze greifen nicht. Gegenmaßnahme: JS-Smells via Regex-Heuristiken (duplizierte Event-Handler, console.log-Aufrufe in Prod, Inline-Style-Wiederholungen).
+- 💀 Zu viele Ticket-Erstellungen → Auslöser: 34/58 fehlende Annotations → ein Ticket pro Funktion. Gegenmaßnahme: Findings bündeln (ein Ticket pro Kategorie, nicht pro Zeile).
+- 💀 Skill triggert nicht konsistent → Auslöser: fotoalert-release läuft ohne Refactoring-Schritt wenn Stephan direkt „release" sagt. Gegenmaßnahme: Refactoring-Step in fotoalert-release-Skill-Prompt verankern (Memory-Eintrag).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `tools/refactor_check.py` (neu), `web/index.html`, `backend/main.py`, `backend/precompute.py`
+- [x] Bekannte Smells (Stand 2026-06-23): unused import `subprocess` (main.py:31), toter global `_discover_cache` (main.py:326), 9 Funktionen > 60L (längste: `precompute.main()` 186L, `compute_calendar_incremental()` 157L), 34/58 Funktionen in main.py ohne Return-Annotation
+- [ ] Implementierungsoptionen freigegeben
+- [ ] Empfehlung: Option A
+
+**Testplan:**
+- [ ] Automatisiert: `pytest backend/tests/` nach Auto-Fix (Regression-Guard)
+- [ ] Manuell: `python3 tools/refactor_check.py --report` gibt JSON-Report aus; `python3 tools/refactor_check.py --fix` wendet Auto-Fixes an

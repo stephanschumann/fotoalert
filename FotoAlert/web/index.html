@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.5';
+const APP_VERSION = '1.11.6';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1397,7 +1397,7 @@ const CalendarView = {
     if (!this._monthCache.has(this._cacheKey())) {
       if (this._loading) return;
       this._loading = true;
-      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird geladen…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
+      el.innerHTML = `<div class="cal-nav"><button class="cal-nav-btn" onclick="CalendarView.prev()">‹</button><span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span><button class="cal-nav-btn" onclick="CalendarView.next()">›</button></div><div class="cal-loading"><div class="spinner"></div><span>Jahreskalender wird geladen…<br><small>Beim ersten Start ca. 30–60 Sek.</small></span></div>`;
       await this.loadMonth();
       this._loading = false;
       // BUG-27: Race-Fix — render immer nach load, auch wenn show() während _loading erneut aufgerufen wurde
@@ -1435,9 +1435,10 @@ const CalendarView = {
 
   async _ensureMonth() {
     if (!this._monthCache.has(this._cacheKey())) {
+      if (this._loading) return;
       this._loading = true;
       const el = document.getElementById('feed-content');
-      el.innerHTML = `<div class="cal-loading"><div class="spinner"></div><span>Lade ${MONTHS_DE[this.month]} ${this.year}…</span></div>`;
+      el.innerHTML = `<div class="cal-nav"><button class="cal-nav-btn" onclick="CalendarView.prev()">‹</button><span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span><button class="cal-nav-btn" onclick="CalendarView.next()">›</button></div><div class="cal-loading"><div class="spinner"></div><span>Lade ${MONTHS_DE[this.month]} ${this.year}…</span></div>`;
       await this.loadMonth();
       this._loading = false;
     }
@@ -1459,7 +1460,10 @@ const CalendarView = {
   render() {
     const el = document.getElementById('feed-content');
     const cached = this._monthCache.get(this._cacheKey());
-    if (!cached) { return; }
+    if (!cached) {
+      el.innerHTML = `<div class="cal-nav"><button class="cal-nav-btn" onclick="CalendarView.prev()">‹</button><span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span><button class="cal-nav-btn" onclick="CalendarView.next()">›</button></div><div class="empty" style="padding-top:40px"><p>Keine Daten für ${MONTHS_DE[this.month]} ${this.year}.</p></div>`;
+      return;
+    }
 
     // API liefert bereits nach Monat+Jahr gefilterte Events
     const rawMonth = cached;
@@ -1496,7 +1500,7 @@ const CalendarView = {
         <span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span>
         <button class="cal-nav-btn" onclick="CalendarView.next()">›</button>
       </div>
-      <div class="cal-status">${monthEvents.length} Events · ${totalMonth} im Monat · nur Astronomie${searchHint}</div>`;
+      <div class="cal-status">${monthEvents.length} Chancen · nur Astronomie${searchHint}</div>`;
 
     if (!monthEvents.length) {
       html += `<div class="empty" style="padding-top:40px">
@@ -1510,7 +1514,7 @@ const CalendarView = {
       for (const [dateKey, evts] of Object.entries(groups).sort()) {
         const d = new Date(dateKey + 'T12:00:00');
         const dayLabel = `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_DE[d.getMonth()]}`;
-        html += `<div class="cal-day-head">${dayLabel} · ${evts.length} Events</div>`;
+        html += `<div class="cal-day-head">${dayLabel} · ${evts.length} Chancen</div>`;
 
         for (const e of evts) {
           const icon = ICONS[e.event_type] || '📷';
@@ -2286,7 +2290,7 @@ const FilterSheet = {
       const cached = CalendarView._monthCache.get(CalendarView._cacheKey());
       if (cached) {
         count = Filter.apply(cached).length;
-        label = `${count} von ${cached.length} Events (${MONTHS_DE[CalendarView.month]})`;
+        label = `${count} von ${cached.length} Chancen (${MONTHS_DE[CalendarView.month]})`;
       }
     } else if (Feed.mode === 'scout' && Scout.data) {
       count = Filter.applyToScout(Scout.data).length;
