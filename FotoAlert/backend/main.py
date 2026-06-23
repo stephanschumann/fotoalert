@@ -1214,6 +1214,51 @@ class PreviewAlignmentRequest(BaseModel):
     save: bool = False
 
 
+async def _save_alignment_as_location(
+    req: "PreviewAlignmentRequest",
+    profile,
+    focal_length_mm: int,
+) -> bool:
+    """
+    Speichert das Alignment-Ergebnis als neue Custom Location.
+
+    Triggert Recompute-Hook (TASK-17) und Backup-Task (TASK-18).
+    Gibt True zurück wenn gespeichert, False wenn Bedingung nicht erfüllt.
+    """
+    if not (req.save and req.subject_name and req.subject_name != "Unbenannt"):
+        return False
+
+    place = await _reverse_geocode(req.observer_lat, req.observer_lon)
+    dist_m = round(profile.ground_distance_m)
+    dist_txt = f"{dist_m // 1000},{dist_m % 1000 // 100} km" if dist_m >= 1000 else f"{dist_m} m"
+    if place:
+        desc = f"Blick vom {place} auf {req.subject_name}, {dist_txt} Entfernung."
+    else:
+        desc = f"Sichtachse auf {req.subject_name}, {dist_txt} Entfernung."
+
+    new_loc = PhotoLocation(
+        id=f"custom_{int(datetime.now().timestamp())}",
+        name=f"📍 {req.subject_name}",
+        description=desc,
+        category=LocationCategory.SKYLINE,
+        observer_lat=req.observer_lat, observer_lon=req.observer_lon,
+        subject_lat=req.subject_lat, subject_lon=req.subject_lon,
+        subject_name=req.subject_name,
+        subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
+        distance_m=dist_m,
+        focal_length_suggestions=[focal_length_mm],
+        special_notes="Automatisch erfasst via Quick Location Capture.",
+        difficulty=1,
+    )
+    LOCATIONS.append(new_loc)
+    _save_custom_location(new_loc)
+    # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
+    asyncio.create_task(_run_precompute_single(new_loc.id))
+    # TASK-18: Backup nach Create
+    asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
+    return True
+
+
 @app.post("/preview-alignment")
 async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(auth.require_auth)):
     if not (-90 <= req.observer_lat <= 90 and -180 <= req.observer_lon <= 180):
@@ -1260,36 +1305,7 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
 
     all_alignments.sort(key=lambda a: a.time)
 
-    saved = False
-    if req.save and req.subject_name and req.subject_name != "Unbenannt":
-        place = await _reverse_geocode(req.observer_lat, req.observer_lon)
-        dist_m = round(profile.ground_distance_m)
-        dist_txt = f"{dist_m // 1000},{dist_m % 1000 // 100} km" if dist_m >= 1000 else f"{dist_m} m"
-        if place:
-            desc = f"Blick vom {place} auf {req.subject_name}, {dist_txt} Entfernung."
-        else:
-            desc = f"Sichtachse auf {req.subject_name}, {dist_txt} Entfernung."
-        new_loc = PhotoLocation(
-            id=f"custom_{int(datetime.now().timestamp())}",
-            name=f"📍 {req.subject_name}",
-            description=desc,
-            category=LocationCategory.SKYLINE,
-            observer_lat=req.observer_lat, observer_lon=req.observer_lon,
-            subject_lat=req.subject_lat, subject_lon=req.subject_lon,
-            subject_name=req.subject_name,
-            subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
-            distance_m=round(profile.ground_distance_m),
-            focal_length_suggestions=[focal_length_mm],
-            special_notes="Automatisch erfasst via Quick Location Capture.",
-            difficulty=1,
-        )
-        LOCATIONS.append(new_loc)
-        _save_custom_location(new_loc)
-        # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
-        asyncio.create_task(_run_precompute_single(new_loc.id))
-        # TASK-18: Backup nach Create
-        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
-        saved = True
+    saved = await _save_alignment_as_location(req, profile, focal_length_mm)
 
     return {
         "profile": {

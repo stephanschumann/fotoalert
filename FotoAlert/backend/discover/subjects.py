@@ -106,33 +106,20 @@ _DEDUP_RADIUS_M = 200.0      # Motive < 200m zusammenführen
 _SCOUT_MIN_APEX_M = 5.0      # Motiv muss mindestens 5m höher als Beobachter sein
 
 
-def build_subjects(
-) -> tuple[list[DiscoverSubject], dict[str, list[tuple[float, float]]]]:
+def _group_location_candidates(candidates: list) -> list[dict]:
     """
-    Leitet Scout-Subjects und Exklusionszonen aus data/locations.py ab.
+    Dedupliziert Location-Kandidaten nach Subject-Koordinaten (DEDUP_RADIUS_M).
 
-    Rückgabe:
-      subjects      — Liste einzigartiger DiscoverSubject-Objekte
-      exclusion_zones — {subject_id: [(observer_lat, observer_lon), ...]}
-                        Bekannte Fotografen-Standorte die im Scout ausgeschlossen werden
+    Für jede Gruppe gewinnt das erste Vorkommen als DiscoverSubject;
+    alle bekannten Fotografen-Standorte werden gesammelt.
+
+    Rückgabe: groups — [{id, name, category, subject_lat/lon,
+                          structure_height_m, terrain_offset_m,
+                          subject_width_m, observers: [(lat,lon)]}]
     """
-    # 1. Filtere ungeeignete Locations
-    candidates = [
-        loc for loc in LOCATIONS
-        if (loc.subject_height_m is not None
-            and loc.subject_height_m > 0
-            and loc.subject_lat is not None
-            and loc.subject_lon is not None
-            and not _is_placeholder(loc))
-    ]
-
-    # 2. Dedupliziere nach Subject-Koordinaten (DEDUP_RADIUS_M)
-    #    Für jede Gruppe: erstes Vorkommen gewinnt als DiscoverSubject,
-    #    alle bekannten Fotografen-Standorte werden gesammelt.
-    groups: list[dict] = []   # [{subject, observers: [(lat,lon)]}]
+    groups: list[dict] = []
 
     for loc in candidates:
-        # Suche ob bereits eine Gruppe mit diesem Motiv existiert
         matched_group = None
         for g in groups:
             dist = _haversine_m(
@@ -173,6 +160,32 @@ def build_subjects(
             if loc.subject_width_m and not matched_group.get("_width_confirmed"):
                 matched_group["subject_width_m"] = loc.subject_width_m
                 matched_group["_width_confirmed"] = True
+
+    return groups
+
+
+def build_subjects(
+) -> tuple[list[DiscoverSubject], dict[str, list[tuple[float, float]]]]:
+    """
+    Leitet Scout-Subjects und Exklusionszonen aus data/locations.py ab.
+
+    Rückgabe:
+      subjects      — Liste einzigartiger DiscoverSubject-Objekte
+      exclusion_zones — {subject_id: [(observer_lat, observer_lon), ...]}
+                        Bekannte Fotografen-Standorte die im Scout ausgeschlossen werden
+    """
+    # 1. Filtere ungeeignete Locations
+    candidates = [
+        loc for loc in LOCATIONS
+        if (loc.subject_height_m is not None
+            and loc.subject_height_m > 0
+            and loc.subject_lat is not None
+            and loc.subject_lon is not None
+            and not _is_placeholder(loc))
+    ]
+
+    # 2. Dedupliziere nach Subject-Koordinaten (DEDUP_RADIUS_M)
+    groups = _group_location_candidates(candidates)
 
     # 3. Baue DiscoverSubject-Objekte
     subjects: list[DiscoverSubject] = []

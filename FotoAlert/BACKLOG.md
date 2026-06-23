@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, BUG-28 *(In Progress 2026-06-23)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)*, TASK-31 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A Batch)*, TASK-32 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A Ticket schließen, alle 6 Findings Falsch-Positiv)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-33, TASK-34, TASK-35, TASK-36 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-30 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21 · TASK-30, TASK-31, TASK-32 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-32, BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2620,13 +2620,13 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
 
-### BUG-28 · Schwierigkeitsfilter im Chancen-Feed wirkungslos bis Locations-Tab besucht wurde `[ ]`
+### BUG-28 · Schwierigkeitsfilter im Chancen-Feed wirkungslos bis Locations-Tab besucht wurde `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-21 |
 
 **Beschreibung:** Der Schwierigkeitsfilter (Include **und** Exclude) hat im Chancen-Feed und Kalender keinen Effekt, solange `Locations.all` leer ist. Beobachtet: Include „Anspruchsvoll" zeigt im Feed weiterhin alle 111 sichtbaren Chancen, obwohl nur 5 von 56 Locations difficulty 3 haben. Erwartet: Filterung greift sofort. Ursache: `Filter.apply()` schlägt `loc.difficulty` über `Locations.all` nach, das aber erst beim Öffnen des Locations-Tabs (oder nach Location-Speichern) geladen wird — nicht beim App-Start auf dem Feed. Fix-Richtung: `Locations.all` beim Boot laden (oder lazy nachladen, wenn ein Schwierigkeitsfilter aktiv ist und die Liste leer ist).
@@ -4342,14 +4342,16 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### TASK-30 · Refactoring: Lange Backend-Funktionen aufteilen `[ ]`
+### TASK-30 · Refactoring: Lange Backend-Funktionen aufteilen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
+| **In Analysis seit** | 2026-06-23 |
+| **Implementiert** | 2026-06-23 (Option B) |
 
 **Beschreibung:** `refactor_check.py --report` meldet folgende Backend-Funktionen über dem 80-Zeilen-Threshold:
 
@@ -4366,13 +4368,53 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### TASK-31 · Typ-Annotationen in backend/main.py ergänzen `[ ]`
+#### 🔬 Analyse (2026-06-23 · In Analysis)
+
+**Scope:**
+- Eingeschlossen: 5 sinnvolle Splits (siehe unten) + Allowlist-Einträge für 3 Ausnahmen in `refactor_check.py`
+- Ausgeschlossen: `_serialize()`, `sun_pipeline.run()`, `moon_pipeline.run()` — begründete Ausnahmen (kein Lesbarkeitsgewinn bei Split)
+
+**Akzeptanzkriterien:**
+- [ ] `pytest backend/tests/` vollständig grün nach allen Splits
+- [ ] `precompute.main()` → aufgeteilt in `_run_single_location_flow()` + `_run_standard_flow()` (je < 80 Zeilen, async)
+- [ ] `_composition_analysis()` → `_compute_body_apparent_size()` + `_build_composition_labels()` extrahiert; Ergebnis-Dict identisch zur bisherigen Ausgabe
+- [ ] `compute_calendar_incremental()` → `_load_calendar_cache()` (Phase 1, rein lesend) extrahiert; BUG-29-Logik (Single-Location-Guard, Versions-Warn) unverändert in Hauptfunktion
+- [ ] `preview_alignment()` → `_save_alignment_as_location()` extrahiert; Recompute-Hook + Backup-Task vollständig übernommen
+- [ ] `build_subjects()` → `_group_location_candidates()` extrahiert; Dedup-Logik unverändert
+- [ ] `refactor_check.py`: Allowlist-Einträge für `_serialize`, `sun_pipeline.run`, `moon_pipeline.run` mit Begründung
+- [ ] Edge Case: Kein Behavioral-Change — alle bestehenden API-Responses identisch
+
+**Pre-Mortem:**
+- 💀 BUG-29-Regression: Falscher Split von `compute_calendar_incremental()` verschiebt Single-Location-Guard → Kalender schrumpft. Gegenmaßnahme: Nur Phase 1 (Cache-Load) extrahieren; BUG-29-Kommentare mitziehen.
+- 💀 `preview_alignment`-Save-Hook geht verloren: `_save_alignment_as_location()` vergisst Recompute-Task oder Backup. Gegenmaßnahme: AK prüft explizit beide `asyncio.create_task()`-Aufrufe.
+- 💀 `_composition_analysis`-Labels-Split bricht Dict-Keys: Merge-Fehler → Key fehlt. Gegenmaßnahme: Test mit Mock-`o`-Objekt prüft alle Ausgabe-Keys.
+
+**📎 Code-Verifikation (2026-06-23):**
+- `compute_calendar_incremental()`: BUG-29-kritischer State (`valid_events`, `new_meta`) zwischen 4 Phasen geteilt — nur Phase 1 sicher extrahierbar ✅
+- `main()`: Harter `return` nach Single-Location-Flow — zwei Hilfsfunktionen teilen keinen State ✅
+- `_serialize()`: Flaches Dict-Literal ohne Branches — Split verschlechtert Lesbarkeit ✅ (Ausnahme begründet)
+- BUG-29-Schutzkommentare in `compute_calendar_incremental()`: müssen beim Extract mitgezogen werden ✅
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `precompute.py`, `main.py`, `discover/sun_pipeline.py`, `discover/moon_pipeline.py`, `discover/subjects.py`
+- [x] Implementierungsoptionen: A (alle 8 erzwungen) / B (5 sinnvolle + Allowlist)
+- [x] Empfehlung: Option B
+
+**Testplan:**
+- [ ] Automatisiert: `pytest backend/tests/` nach jedem einzelnen Split (nicht erst am Ende)
+- [ ] Manuell: `GET /opportunities` + `GET /calendar` — Antwortstruktur visuell auf Vollständigkeit prüfen
+
+---
+
+### TASK-31 · Typ-Annotationen in backend/main.py ergänzen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** `refactor_check.py --report` meldet: nur 24/58 Funktionen in `backend/main.py` haben Return-Annotationen. Die verbleibenden 34 Funktionen sollten Return-Typen ergänzt bekommen. Vorgabe: `from __future__ import annotations` ist bereits vorhanden (Python 3.9-Kompatibilität gesichert).
@@ -4381,14 +4423,173 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### TASK-32 · Refactoring: Lange JS-Funktionen in index.html aufteilen `[ ]`
+#### 🔬 Analyse (2026-06-23 · In Analysis)
+
+**Inventar — Funktionen ohne Return-Annotation (38 identifiziert, Checker zählt 34):**
+
+*Hintergrund-Hilfsfunktionen:*
+| Funktion | Signatur (Params vorhanden) | Korrekte Return-Annotation |
+|---|---|---|
+| `_job_start` | `(job: str)` | `-> float` |
+| `_job_done` | `(job: str, t0: float)` | `-> None` |
+| `_job_error` | `(job: str, t0: float, msg: str)` | `-> None` |
+| `_weather_overlay` | `()` | `-> None` |
+| `_run_precompute` | `(mode: str = "full")` | `-> None` |
+
+*Lifecycle-Events:*
+| Funktion | Korrekte Return-Annotation |
+|---|---|
+| `startup` | `-> None` |
+| `shutdown` | `-> None` |
+
+*API-Endpoints (FastAPI-Routen):*
+| Funktion | Korrekte Return-Annotation |
+|---|---|
+| `health` | `-> HealthOut` |
+| `get_locations` | `-> list[LocationOut]` |
+| `get_location` | `-> LocationOut` |
+| `get_opportunities` | `-> list[dict]` |
+| `get_today_opportunities` | `-> list[dict]` |
+| `get_plan` | `-> dict` |
+| `daily_briefing` | `-> DailyBriefingOut` |
+| `get_calendar` | `-> dict` |
+| `get_discover` | `-> dict` |
+| `login` | `-> dict` |
+| `trigger_discover_refresh` | `-> dict` |
+| `register_device` | `-> dict` |
+| `trigger_refresh` | `-> dict` |
+| `trigger_feed_refresh` | `-> dict` |
+| `trigger_calendar_refresh` | `-> dict` |
+| `trigger_weather_refresh` | `-> dict` |
+| `get_job_status` | `-> dict` |
+| `preview_alignment` | `-> dict` |
+| `reverse_geocode_endpoint` | `-> dict` |
+| `patch_location` | `-> dict` |
+| `get_all_verifications` | `-> list[dict]` |
+| `get_verifications` | `-> list[dict]` |
+| `add_verification` | `-> dict` |
+| `delete_last_verification` | `-> dict` |
+| `get_all_ratings` | `-> list[dict]` |
+| `get_ratings` | `-> dict` |
+| `upsert_rating` | `-> dict` |
+| `delete_rating` | `-> dict` |
+| `service_worker` | `-> FileResponse` |
+
+*Innere Funktion (in `daily_briefing`):*
+| Funktion | Korrekte Return-Annotation |
+|---|---|
+| `_to_opp_out` | `-> OpportunityOut` |
+
+*Innere Funktionen (in `_compute_possible_bodies`):*
+| Funktion | Korrekte Return-Annotation |
+|---|---|
+| `_rise_set_ranges` | `-> list[tuple[float, float]]` |
+| `_overlaps` | `-> bool` |
+
+*Hinweis:* `refactor_check.py` zählt innere Funktionen möglicherweise nicht mit — daher Diskrepanz (34 gemeldet vs. ~36 Kandidaten). Alle sollten annotiert werden.
+
+---
+
+**Kompatibilitätsanalyse:**
+
+`from __future__ import annotations` ist auf Zeile 25 vorhanden. Das bedeutet:
+- Alle Annotationen werden als Strings ausgewertet (PEP 563 / Lazy Evaluation)
+- `str | None`-Syntax (Python 3.10+) ist im Sourcecode erlaubt — wird nie zur Laufzeit evaluiert
+- `list[dict]`, `list[str]` ohne `List[]`-Import sind ebenfalls sicher
+- Kein zusätzlicher Import aus `typing` nötig (außer wenn `Optional` oder `Union` explizit gewünscht)
+- Bereits verwendete Typen: `Optional` (aus `typing`, importiert), `LocationOut`, `HealthOut`, `DailyBriefingOut`, `OpportunityOut`, `FileResponse` (letztere importiert auf Zeile 1520)
+
+Einzig `FileResponse` ist am Ende des Files importiert (Zeile 1520). Das ist mit `from __future__ import annotations` ebenfalls kein Problem (Forward Reference).
+
+---
+
+**Pre-Mortem:**
+
+- 💀 **Falsche Typen bei dict-Endpoints:** FastAPI-Endpoints, die `dict` zurückgeben, sind tatsächlich `dict[str, Any]` — `dict` allein ist korrekt und ausreichend für mypy (ohne strict), kein Risiko.
+- 💀 **`_weather_overlay` hat kein explizites `return`** — gibt implizit `None` zurück, Annotation `-> None` korrekt.
+- 💀 **`_run_precompute` / `_run_precompute_single` sind async void** — `-> None` ist für async-Coroutinen ohne Rückgabewert korrekt, kein Risiko.
+- 💀 **Innere Funktion `_to_opp_out` in `daily_briefing`:** mypy analysiert sie korrekt im Closure-Scope. Annotation schadet nicht, mypy kann den Typ ableiten.
+- 💀 **`startup()`-Event-Handler:** FastAPI erwartet keine Signatur-Einschränkung auf `startup`/`shutdown`. `-> None` ist problemlos.
+- 💀 **`get_plan` returns complex dict:** tatsächliche Rückgabe ist `dict[str, Any]` mit gemischten Werten. `dict` (ohne Parameter) ist für die Annotation ausreichend — kein Refactoring nötig.
+- 💀 **Mypy-Strict-Modus:** wird im Projekt nicht verwendet (kein `mypy.ini` mit `--strict`). Alle Annotationen dienen primär Lesbarkeit und dem Refactor-Checker, nicht strikter Typisierung.
+
+---
+
+**Example Mapping:**
+
+**Regel 1: Sync-Hilfsfunktionen erhalten `-> None` oder konkreten Rückgabetyp**
+
+- ✅ Positiv: `_job_start(job: str) -> float` — gibt Startzeit zurück, `float` korrekt (monotonic clock)
+- ❌ Negativ: `_job_start(job: str) -> None` — falsch, würde Caller-Aufruf `t0 = _job_start(j)` mypy-Fehler geben
+- ⚠️ Edge: `_job_done(job: str, t0: float) -> None` — gibt nichts zurück, aber verändert `_job_status` (Side Effect). `-> None` korrekt, Side Effects werden nicht annotiert.
+
+**Regel 2: FastAPI-Endpoints ohne `response_model` erhalten `-> dict` oder `-> list[dict]`**
+
+- ✅ Positiv: `get_opportunities(...) -> list[dict]` — gibt `results[:500]` zurück, korrekte Annotation
+- ❌ Negativ: `get_opportunities(...) -> list[OpportunityOut]` — falsch, Cache-Dicts sind keine Pydantic-Instanzen (FastAPI serialisiert sie implizit)
+- ⚠️ Edge: `get_calendar(...)` hat mehrere Rückgabe-Pfade (alle `dict`) — alle Pfade liefern `dict`, Annotation `-> dict` ist korrekt und konsistent
+
+**Regel 3: Async Lifecycle-Events erhalten `-> None`**
+
+- ✅ Positiv: `async def startup() -> None` — kein Rückgabewert, FastAPI ignoriert ihn
+- ❌ Negativ: `async def startup() -> bool` — FastAPI würde keinen Fehler werfen, aber der Typ wäre irreführend (Caller nutzt Rückgabe nicht)
+- ⚠️ Edge: `_prewarm_calendar()` ist eine innere async-Funktion in `startup()` — wird via `asyncio.create_task()` gestartet, Rückgabe nie genutzt. `-> None` korrekt.
+
+---
+
+**Implementierungsoptionen:**
+
+**Option A: Batch — alle ~36 Funktionen auf einmal annotieren**
+- Vorteile: Einmalige Änderung, `refactor_check.py` springt sofort auf 58/58
+- Nachteile: Großer Diff, höheres Risiko eines Tippfehlers oder falschen Typs; schwerer zu reviewen
+- Risiko: Mittel (ein falscher Typ in 36 Änderungen könnte mypy-Fehler einführen, auch wenn keine Runtime-Auswirkung)
+
+**Option B: Kritische Funktionen zuerst, Rest in Follow-up**
+- Phase 1 (kritisch): Job-Tracker + Lifecycle (7 Funktionen) + innere Funktionen (3)
+- Phase 2 (Endpoints): Alle FastAPI-Routen (~26 Funktionen)
+- Vorteile: Kleiner Diff, leichter zu reviewen, Fehler schneller isolierbar
+- Nachteile: Zwei Commits, Checker zeigt bis Phase 2 noch Warnungen
+
+**Empfehlung: Option A (Batch)**
+
+Begründung: Alle 36 Annotationen sind trivial (`-> None`, `-> dict`, `-> list[dict]` etc.) — kein einziger komplexer Union-Type oder Generic. Der Diff ist zwar breit, aber mechanisch einfach. Ein einmaliger Review-Durchlauf ist effizienter als zwei Tickets. Risiko ist minimal, da `from __future__ import annotations` verhindert, dass falsche Typen zur Laufzeit crashen.
+
+---
+
+**Akzeptanzkriterien:**
+
+- [ ] `refactor_check.py --report` zeigt ≥ 56/58 Funktionen mit Return-Annotation (Ausnahme: ggf. nicht gezählte innere Funktionen)
+- [ ] `python -m py_compile backend/main.py` gibt keine Fehler
+- [ ] `pytest backend/tests/` vollständig grün (keine Verhaltensänderung)
+- [ ] Alle `-> None`-Annotationen für async void Coroutinen korrekt gesetzt
+- [ ] `_job_start()` hat `-> float` (nicht `-> None`)
+- [ ] `service_worker()` hat `-> FileResponse` (Import bereits auf Zeile 1520 vorhanden)
+- [ ] Innere Funktionen `_to_opp_out`, `_rise_set_ranges`, `_overlaps` sind ebenfalls annotiert
+
+**Testplan:**
+- [ ] `python -m py_compile backend/main.py` — Syntax-Check
+- [ ] `pytest backend/tests/ -q` — Behavioral-Check
+- [ ] `python backend/refactor_check.py --report` — Counter-Check (Ziel: ≥ 56/58)
+
+**Analyse & Planung:**
+- [x] Alle 36 Kandidaten-Funktionen identifiziert und Typen abgeleitet
+- [x] Python 3.9-Kompatibilität bestätigt (`from __future__ import annotations` vorhanden)
+- [x] Pre-Mortem durchgeführt
+- [x] Example Mapping durchgeführt
+- [x] Implementierungsoptionen: A (Batch) / B (Phasiert)
+- [x] Empfehlung: Option A (Batch)
+
+---
+
+### TASK-32 · Refactoring: Lange JS-Funktionen in index.html aufteilen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-23 |
+| **Analyse** | 2026-06-23 |
 
 **Beschreibung:** `refactor_check.py --report` meldet folgende JS-Funktionen über dem Threshold:
 
@@ -4402,6 +4603,76 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 Hinweis: `index.html` ist ein Monolith, JS-Längenmessung per Regex-Heuristik kann falsch-positiv sein. Vor Refactoring manuell prüfen welche Findings real sind.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29), Refactor-Check 2026-06-23 (BUG-33-Release)
+
+---
+
+#### 🔬 Analyse (2026-06-23 · In Analysis)
+
+##### 1. Manuelle Verifikation der Findings
+
+| Finding | Zeile | Tatsächliche Länge | Echtes Problem? |
+|---------|-------|--------------------|-----------------|
+| `_showError()` | 1179 | **7 Zeilen** — lokale Arrow-Function innerhalb `Feed.load()` | Falsch-Positiv — Heuristik misst bis zum Ende der übergeordneten Methode |
+| `haversineKm()` | 1952 | **7 Zeilen** — reine Berechnungsfunktion (Haversine-Formel) | Falsch-Positiv — Heuristik läuft bis zum nächsten Hauptblock (~Zeile 2200) |
+| `onUp()` | 2232 | **5 Zeilen** — lokale Arrow-Function als Closure in `drag()` innerhalb `initDualSlider()` | Falsch-Positiv — Closure-Ende nicht erkannt, misst bis Methoden-Ende |
+| `state3()` | 2407 | **2 Zeilen** — lokale Arrow-Function innerhalb `FilterSheet._render()` | Falsch-Positiv — Heuristik misst bis Ende von `_render()` (~Zeile 2514) |
+| `mkSec()` | 2515 | **3 Zeilen** — kleine Top-Level Template-Helper-Funktion | Falsch-Positiv — Heuristik misst bis zur nächsten Sektion (~Zeile 2779) |
+| `axisPhrase()` | 2779 | **10 Zeilen** — lokale Arrow-Function innerhalb einem IIFE im Location-Detail | Falsch-Positiv — Heuristik läuft weit in die nächste Sektion (~Zeile 4151) |
+
+**Befund: Alle 6 Findings sind Falsch-Positive.** Die Regex-Heuristik in `refactor_check.py` erkennt nicht, wann eine verschachtelte Funktion endet. Sie misst stattdessen bis zur nächsten erkannten Top-Level-Funktion oder Sektion — was willkürlich hohe Zeilenzahlen produziert. Die tatsächlichen Längen: `_showError` = 7 Z., `haversineKm` = 7 Z., `onUp` = 5 Z., `state3` = 2 Z., `mkSec` = 3 Z., `axisPhrase` = 10 Z. Alle weit unter jedem sinnvollen Threshold.
+
+##### 2. Pre-Mortem
+
+Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
+
+- **Closure-Verlust:** `onUp`, `onMove`, `state3`, `chip3`, `axisPhrase` sind bewusst lokale Closures — sie greifen auf Eltern-Scope-Variablen zu (`rect`, `isMin`, `Filter.state`). Extraktion als eigenständige Funktionen würde diese Parameter erfordern und Signatur/Lesbarkeit verschlechtern.
+- **Kein Test-Netz:** `index.html` hat keine JS-Unit-Tests. Regressions fallen erst beim manuellen Testen auf.
+- **Monolith-Risiko:** In einem 4254-Zeilen-Monolith ohne Modul-System treffen globale Refactorings den globalen Scope — Namespace-Kollisionen und falsche Deklarationsreihenfolge sind möglich.
+- **Aufwand ohne Nutzen:** Die gemeldeten Funktionen sind in Wirklichkeit tiny. Jede Änderung macht den Code komplizierter, nicht einfacher.
+
+##### 3. Example Mapping
+
+**Regel: Ein Finding ist real, wenn die tatsächliche Funktionslänge > Threshold.**
+
+| Szenario | Ergebnis |
+|----------|---------|
+| `haversineKm()` tatsächlich 7 Zeilen | Kein Refactoring nötig |
+| Heuristik meldet 252 Zeilen (misst bis nächsten Block) | Heuristik ist kaputt — nicht der Code |
+| Closure mit Eltern-Scope-Zugriff wäre wirklich lang | Extraktion würde Correctness brechen — trotzdem kein naives Split |
+
+**Regel: Heuristik soll nur Top-Level-Funktionen messen, nicht verschachtelte.**
+
+| Szenario | Ergebnis |
+|----------|---------|
+| `function foo() {}` auf Top-Level | Länge korrekt messbar |
+| `const bar = () => {}` innerhalb Object-Literal | Heuristik läuft bis zur nächsten erkannten Funktion — falscher Wert |
+| IIFE mit inneren Closures | Alle inneren Funktionen werden als "lang" gemeldet |
+
+##### 4. Akzeptanzkriterien
+
+- [ ] **AK-1:** `refactor_check.py` meldet für alle 6 Findings keine Warnung mehr — entweder weil Heuristik korrigiert oder Findings explizit als Falsch-Positiv ausgeschlossen sind
+- [ ] **AK-2:** Ein Kommentar in `refactor_check.py` dokumentiert die bekannte Limitation (verschachtelte Closures werden nicht korrekt enden-erkannt)
+- [ ] **AK-3:** Kein produktiver JS-Code in `index.html` wurde geändert
+- [ ] **AK-4:** Nächster automatischer Refactor-Check erzeugt für diese 6 Stellen keine Warnungen mehr
+
+##### 5. Implementierungsoptionen
+
+**Option A — Empfohlen: Kein Refactoring, Limitation dokumentieren + Ticket schließen**
+- Füge einen Kommentar in `refactor_check.py` hinzu, der die bekannte Limitation für verschachtelte Funktionen beschreibt (alternativ: bekannte Falsch-Positive in eine Ignore-Liste aufnehmen)
+- Setze Ticket auf Done
+- Aufwand: ~15 Minuten
+- Nachteil: Nächster Refactor-Check wird dieselben Warnungen erzeugen, wenn keine Ignore-Liste gepflegt wird
+
+**Option B — Nicht anwendbar: Echte lange Funktionen aufteilen**
+- Keine echten langen Funktionen gefunden. Würde Closures kaputt machen.
+
+**Option C — Aufwändig: Refactor-Check-Heuristik verbessern**
+- `refactor_check.py` um Brace-Counting oder Python-AST-Analyse für JS erweitern (z.B. `esprima`-ähnlich via `node`)
+- Würde Falsch-Positive grundsätzlich verhindern
+- Aufwand: ~2–3 Stunden; Risiko: neues Tooling-Dependency
+- Empfehlung als separates zukünftiges Ticket, wenn Falsch-Positive häufig stören
+
+**Empfehlung: Option A** — alle Findings sind Falsch-Positive, der Code ist in Ordnung. Eine Ignore-Liste oder kurzer Kommentar in `refactor_check.py` genügt. Option C kann als separates Low-Prio-Ticket folgen.
 
 ---
 

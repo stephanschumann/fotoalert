@@ -226,6 +226,76 @@ def _load_custom_locations() -> int:
     return added
 
 
+def _compute_body_apparent_size(
+    event_type_val: str,
+    shoot_time,
+    distance_m: float,
+) -> tuple[float, float | None, str]:
+    """
+    Berechnet scheinbaren Körperdurchmesser (m) und Erde-Mond-Distanz.
+
+    Rückgabe: (body_apparent_diameter_m, moon_earth_distance_km, body_name)
+
+    Mond: Winkeldurchmesser aus tatsächlicher Erde-Mond-Distanz (variiert ±7,5%).
+    Sonne: Mittlerer Winkeldurchmesser 0,5333° (Variation ±1,7% vernachlässigt).
+    """
+    is_moon = "Mond" in event_type_val or "Vollmond" in event_type_val
+    moon_earth_distance_km: float | None = None
+
+    if is_moon:
+        try:
+            moon_earth_distance_km = get_moon_earth_distance_km(shoot_time)
+            angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km
+        except Exception:
+            angular_diameter_rad = math.radians(0.5181)  # Fallback: mittlerer Wert
+    else:
+        angular_diameter_rad = math.radians(0.5333)      # Sonne: mittlerer Wert
+
+    body_apparent_diameter_m = round(distance_m * angular_diameter_rad, 1)
+    body_name = "Mond" if is_moon else "Sonne"
+    return body_apparent_diameter_m, moon_earth_distance_km, body_name
+
+
+def _build_composition_labels(
+    altitude_delta: float,
+    az_delta: float,
+    size_ratio: float,
+) -> tuple[str, str, str]:
+    """
+    Erzeugt menschenlesbare Labels für Höhen-, Azimut- und Größenverhältnis.
+
+    Rückgabe: (alt_label, az_label, ratio_label)
+    """
+    if abs(altitude_delta) <= 0.5:
+        alt_label = "🎯 Exaktes Alignment – Objekt auf Höhe der Motivspitze"
+    elif 0.5 < altitude_delta <= 3.0:
+        alt_label = "✨ Knapp über dem Motiv"
+    elif altitude_delta > 3.0:
+        alt_label = "☁️ Hoch über dem Motiv"
+    else:
+        alt_label = "⬇️ Noch unterhalb der Motivspitze"
+
+    if abs(az_delta) <= 1.0:
+        az_label = "Zentral ausgerichtet"
+    elif abs(az_delta) <= 5.0:
+        direction = "links" if az_delta < 0 else "rechts"
+        az_label = f"Leicht {direction} versetzt"
+    else:
+        direction = "links" if az_delta < 0 else "rechts"
+        az_label = f"Deutlich {direction} versetzt"
+
+    if size_ratio >= 0.8:
+        ratio_label = "Himmelskörper füllt Motiv fast aus"
+    elif size_ratio >= 0.4:
+        ratio_label = "Himmelskörper halb so groß wie Motiv"
+    elif size_ratio >= 0.15:
+        ratio_label = "Himmelskörper deutlich kleiner als Motiv"
+    else:
+        ratio_label = "Himmelskörper sehr klein relativ zum Motiv"
+
+    return alt_label, az_label, ratio_label
+
+
 def _composition_analysis(o) -> dict | None:
     """
     US-37: Berechnet die Kompositions-Analyse für Events mit Himmelsobjekt-Position.
@@ -233,9 +303,6 @@ def _composition_analysis(o) -> dict | None:
     Kernidee: Der Beobachter sieht die Motivspitze unter einem bestimmten Elevationswinkel
     (arctan(Höhendifferenz / Entfernung)). Steht das Himmelsobjekt auf genau diesem Winkel,
     ist das Alignment perfekt – z.B. Mond genau auf Höhe der Fernsehturmspitze.
-
-    Zusätzlich wird der scheinbare Durchmesser des Himmelskörpers in Metern (projiziert auf
-    die Motivebene) berechnet, um das Größenverhältnis zum Motiv anzugeben.
     """
     loc = o.location
     if not (loc.subject_height_m and loc.distance_m and loc.distance_m > 0
@@ -263,63 +330,15 @@ def _composition_analysis(o) -> dict | None:
     vertical_offset_m = round(d * math.tan(math.radians(altitude_delta)), 1)
     lateral_offset_m  = round(d * math.tan(math.radians(az_delta)), 1)
 
-    # Scheinbarer Durchmesser des Himmelskörpers in Metern:
-    #   apparent_size_m = distance_to_subject_m × angular_diameter_rad
-    # Formel nach Stephan: tan(θ) ≈ θ für kleine Winkel (< 1°).
-    #
-    # Mond: Winkeldurchmesser wird aus der tatsächlichen Erde-Mond-Distanz
-    #        zur Eventzeit berechnet (variiert ±7,5%: 356.500–406.700 km).
-    # Sonne: Mittlerer Winkeldurchmesser 0,5333° (Variation ±1,7% vernachlässigt).
     event_type_val = o.event_type.value if hasattr(o.event_type, 'value') else str(o.event_type)
-    is_moon = "Mond" in event_type_val or "Vollmond" in event_type_val
-
-    moon_earth_distance_km: float | None = None
-    if is_moon:
-        try:
-            moon_earth_distance_km = get_moon_earth_distance_km(o.shoot_time)
-            # Winkeldurchmesser (rad) = physischer Durchmesser / Distanz
-            angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km
-        except Exception:
-            angular_diameter_rad = math.radians(0.5181)  # Fallback: mittlerer Wert
-    else:
-        angular_diameter_rad = math.radians(0.5333)      # Sonne: mittlerer Wert
-
-    body_apparent_diameter_m = round(d * angular_diameter_rad, 1)
+    body_apparent_diameter_m, moon_earth_distance_km, body_name = _compute_body_apparent_size(
+        event_type_val, o.shoot_time, d,
+    )
 
     # Größenverhältnis: scheinbarer Körperdurchmesser / Motivhöhe
     size_ratio = round(body_apparent_diameter_m / loc.subject_height_m, 3)
 
-    # Höhen-Label
-    if abs(altitude_delta) <= 0.5:
-        alt_label = "🎯 Exaktes Alignment – Objekt auf Höhe der Motivspitze"
-    elif 0.5 < altitude_delta <= 3.0:
-        alt_label = "✨ Knapp über dem Motiv"
-    elif altitude_delta > 3.0:
-        alt_label = "☁️ Hoch über dem Motiv"
-    else:
-        alt_label = "⬇️ Noch unterhalb der Motivspitze"
-
-    # Azimut-Label
-    if abs(az_delta) <= 1.0:
-        az_label = "Zentral ausgerichtet"
-    elif abs(az_delta) <= 5.0:
-        direction = "links" if az_delta < 0 else "rechts"
-        az_label = f"Leicht {direction} versetzt"
-    else:
-        direction = "links" if az_delta < 0 else "rechts"
-        az_label = f"Deutlich {direction} versetzt"
-
-    # Verhältnis-Label
-    if size_ratio >= 0.8:
-        ratio_label = "Himmelskörper füllt Motiv fast aus"
-    elif size_ratio >= 0.4:
-        ratio_label = "Himmelskörper halb so groß wie Motiv"
-    elif size_ratio >= 0.15:
-        ratio_label = "Himmelskörper deutlich kleiner als Motiv"
-    else:
-        ratio_label = "Himmelskörper sehr klein relativ zum Motiv"
-
-    body_name = "Mond" if is_moon else "Sonne"
+    alt_label, az_label, ratio_label = _build_composition_labels(altitude_delta, az_delta, size_ratio)
 
     return {
         "subject_apparent_elevation_deg": round(subject_apparent_elev_deg, 2),
@@ -537,6 +556,36 @@ async def compute_feed(today: date) -> list[dict]:
 # Schicht 2b: 365-Tage Kalender (INKREMENTELL)
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _load_calendar_cache(
+    cal_path,
+    force_full: bool,
+    location_id: str | None,
+) -> tuple[list[dict], dict, str | None]:
+    """
+    Lädt calendar.json und prüft den Algorithmus-Versions-Stand.
+
+    Rückgabe: (existing_events, existing_meta, cache_version)
+
+    Hinweis: BUG-29-Schutz (Single-Location-Guard, Versions-Warn) liegt bewusst in
+    compute_calendar_incremental() — nur der rein lesende Phase-1-Teil wird hier gekapselt.
+    """
+    existing_events: list[dict] = []
+    existing_meta: dict = {}
+    cache_version: str | None = None
+
+    if cal_path.exists() and not force_full:
+        try:
+            cached = json.loads(cal_path.read_text(encoding="utf-8"))
+            cache_version = cached.get("algorithm_version")
+            existing_events = cached.get("events", [])
+            existing_meta = cached.get("computed_locations", {})
+            logger.info("  Cache geladen: %d Events, Version %s", len(existing_events), cache_version)
+        except Exception as e:
+            logger.warning("  Kalender-Cache nicht lesbar: %s – Neuberechnung", e)
+
+    return existing_events, existing_meta, cache_version
+
+
 async def compute_calendar_incremental(today: date, force_full: bool = False, location_id: str | None = None) -> tuple[list[dict], dict]:
     """
     Schicht 2 – Astronomy-Cache: Inkrementeller 365-Tage Kalender.
@@ -556,20 +605,9 @@ async def compute_calendar_incremental(today: date, force_full: bool = False, lo
     """
     cal_path = CACHE_DIR / "calendar.json"
 
-    # Cache laden
-    existing_events: list[dict] = []
-    existing_meta: dict = {}
-    cache_version: str | None = None
-
-    if cal_path.exists() and not force_full:
-        try:
-            cached = json.loads(cal_path.read_text(encoding="utf-8"))
-            cache_version = cached.get("algorithm_version")
-            existing_events = cached.get("events", [])
-            existing_meta = cached.get("computed_locations", {})
-            logger.info("  Cache geladen: %d Events, Version %s", len(existing_events), cache_version)
-        except Exception as e:
-            logger.warning("  Kalender-Cache nicht lesbar: %s – Neuberechnung", e)
+    existing_events, existing_meta, cache_version = _load_calendar_cache(
+        cal_path, force_full, location_id,
+    )
 
     # Version-Check
     if (force_full or cache_version != ALGORITHM_VERSION) and not location_id:
@@ -701,120 +739,111 @@ async def compute_calendar_incremental(today: date, force_full: bool = False, lo
 # Hauptfunktion
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def main(args: argparse.Namespace) -> None:
-    t0 = time.time()
-    logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
-    logger.info("%d Locations geladen", len(LOCATIONS))
-    # BUG-29: Persistierte Koordinaten-/Name-Overrides anwenden, BEVOR irgendetwas
-    # berechnet oder gehasht wird — sonst rechnet der Recompute mit den alten Basis-
-    # Koordinaten und der coordinates_hash ändert sich nie.
-    _apply_location_overrides()
-    # BUG-33: Custom Locations aus SQLite laden — sie fehlen im LOCATIONS-Import aus
-    # data/locations.py komplett, da precompute.py als eigener Subprozess läuft.
-    _load_custom_locations()
-    logger.info("%d Locations nach Custom-Load + Overrides", len(LOCATIONS))
+async def _run_single_location_flow(
+    location_id: str,
+    today: date,
+    computed_at: str,
+    run_feed: bool,
+    run_calendar: bool,
+    feed_path,
+    elev_path,
+    t0: float,
+) -> None:
+    """Single-Location Recompute (nach Koordinaten-Änderung via PATCH)."""
+    single_loc_list = [l for l in LOCATIONS if l.id == location_id]
+    if not single_loc_list:
+        logger.error("Location '%s' nicht gefunden – Abbruch", location_id)
+        return
+    loc = single_loc_list[0]
+    logger.info("── Single-Location Recompute: %s ──", loc.name)
 
-    # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
-    from data import backup as _backup
-    _backup.snapshot_before_precompute()
+    # Elevation für diese Location neu abrufen (Koordinaten geändert)
+    logger.info("  Elevation neu abrufen …")
+    elevations = await fetch_elevations(force_refetch_ids={location_id})
+    elev_path.write_text(
+        json.dumps({"computed_at": computed_at, "elevations": elevations},
+                   ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    if location_id in elevations:
+        elev_val = elevations[location_id]["elevation_difference_m"]
+        try:
+            object.__setattr__(loc, "elevation_difference_m", elev_val)
+        except Exception:
+            setattr(loc, "elevation_difference_m", elev_val)
+        logger.info("  ✅ Elevation: Δ%+.1f m", elev_val)
 
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    today = date.today()
-    computed_at = datetime.now(timezone.utc).isoformat()
-
-    run_feed = not args.calendar_only
-    run_calendar = not args.feed_only
-    location_id: str | None = getattr(args, "location_id", None)
-    feed_path = CACHE_DIR / "opportunities.json"
-    elev_path = CACHE_DIR / "elevations.json"
-
-    # ── SINGLE-LOCATION FLOW (nach Koordinaten-Änderung via PATCH) ──────────
-    if location_id:
-        single_loc_list = [l for l in LOCATIONS if l.id == location_id]
-        if not single_loc_list:
-            logger.error("Location '%s' nicht gefunden – Abbruch", location_id)
-            return
-        loc = single_loc_list[0]
-        logger.info("── Single-Location Recompute: %s ──", loc.name)
-
-        # Elevation für diese Location neu abrufen (Koordinaten geändert)
-        logger.info("  Elevation neu abrufen …")
-        elevations = await fetch_elevations(force_refetch_ids={location_id})
-        elev_path.write_text(
-            json.dumps({"computed_at": computed_at, "elevations": elevations},
-                       ensure_ascii=False, indent=2),
+    if run_feed:
+        logger.info("  14-Tage Feed für %s …", loc.name)
+        t1 = time.time()
+        try:
+            opps = await find_opportunities_multi_day(
+                loc, today, days=14, forecast=None, min_score=0.30, astronomy_only=True,
+            )
+            new_events = [_serialize(o) for o in opps]
+        except Exception as e:
+            logger.error("  Fehler: %s", e)
+            new_events = []
+        # Merge: bestehende Events für andere Locations behalten, diese ersetzen
+        existing_events: list[dict] = []
+        if feed_path.exists():
+            try:
+                existing_events = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
+            except Exception:
+                pass
+        merged = [e for e in existing_events if e["location_id"] != location_id] + new_events
+        merged.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
+        feed_path.write_text(
+            json.dumps({"computed_at": computed_at, "opportunities": merged}, ensure_ascii=False),
             encoding="utf-8",
         )
-        if location_id in elevations:
-            elev_val = elevations[location_id]["elevation_difference_m"]
-            try:
-                object.__setattr__(loc, "elevation_difference_m", elev_val)
-            except Exception:
-                setattr(loc, "elevation_difference_m", elev_val)
-            logger.info("  ✅ Elevation: Δ%+.1f m", elev_val)
+        logger.info(
+            "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
+            len(new_events), loc.name, len(merged), time.time() - t1,
+        )
 
-        if run_feed:
-            logger.info("  14-Tage Feed für %s …", loc.name)
-            t1 = time.time()
-            try:
-                opps = await find_opportunities_multi_day(
-                    loc, today, days=14, forecast=None, min_score=0.30, astronomy_only=True,
-                )
-                new_events = [_serialize(o) for o in opps]
-            except Exception as e:
-                logger.error("  Fehler: %s", e)
-                new_events = []
-            # Merge: bestehende Events für andere Locations behalten, diese ersetzen
-            existing_events: list[dict] = []
-            if feed_path.exists():
-                try:
-                    existing_events = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
-                except Exception:
-                    pass
-            merged = [e for e in existing_events if e["location_id"] != location_id] + new_events
-            merged.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
-            feed_path.write_text(
-                json.dumps({"computed_at": computed_at, "opportunities": merged}, ensure_ascii=False),
-                encoding="utf-8",
-            )
-            logger.info(
-                "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
-                len(new_events), loc.name, len(merged), time.time() - t1,
-            )
+    # BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
+    # Vorher schrieb der --feed-only-Single-Flow ausschließlich opportunities.json und
+    # returnte vor jeder Kalenderberechnung → Chancendetails aus dem Kalender zeigten
+    # alte Koordinaten/Astronomie. compute_calendar_incremental(location_id=…) merged
+    # nur die Events DIESER Location und lässt alle übrigen unverändert.
+    if run_calendar:
+        logger.info("  365-Tage Kalender für %s …", loc.name)
+        t2 = time.time()
+        calendar, computed_meta = await compute_calendar_incremental(
+            today, location_id=location_id,
+        )
+        cal_path = CACHE_DIR / "calendar.json"
+        cal_path.write_text(
+            json.dumps(
+                {
+                    "algorithm_version": ALGORITHM_VERSION,
+                    "computed_at": computed_at,
+                    "computed_locations": computed_meta,
+                    "events": calendar,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        logger.info(
+            "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
+            len(calendar), time.time() - t2,
+        )
 
-        # BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
-        # Vorher schrieb der --feed-only-Single-Flow ausschließlich opportunities.json und
-        # returnte vor jeder Kalenderberechnung → Chancendetails aus dem Kalender zeigten
-        # alte Koordinaten/Astronomie. compute_calendar_incremental(location_id=…) merged
-        # nur die Events DIESER Location und lässt alle übrigen unverändert.
-        if run_calendar:
-            logger.info("  365-Tage Kalender für %s …", loc.name)
-            t2 = time.time()
-            calendar, computed_meta = await compute_calendar_incremental(
-                today, location_id=location_id,
-            )
-            cal_path = CACHE_DIR / "calendar.json"
-            cal_path.write_text(
-                json.dumps(
-                    {
-                        "algorithm_version": ALGORITHM_VERSION,
-                        "computed_at": computed_at,
-                        "computed_locations": computed_meta,
-                        "events": calendar,
-                    },
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
-            )
-            logger.info(
-                "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
-                len(calendar), time.time() - t2,
-            )
+    logger.info("=== Single-Location Recompute abgeschlossen in %.1fs ===", time.time() - t0)
 
-        logger.info("=== Single-Location Recompute abgeschlossen in %.1fs ===", time.time() - t0)
-        return  # Single-Location-Flow abgeschlossen
 
-    # ── STANDARD FLOW (alle Locations) ──────────────────────────────────────
+async def _run_standard_flow(
+    today: date,
+    computed_at: str,
+    run_feed: bool,
+    run_calendar: bool,
+    force_full: bool,
+    feed_path,
+    elev_path,
+) -> None:
+    """Standard-Flow: alle Locations, Elevations → Feed → Kalender."""
     # ── Schicht 1: Geo-Cache (Elevations) ────────────────────────────────────
     logger.info("── Geo-Cache: Geländehöhen (OpenTopoData EUDEM 25m) ──")
     t_elev = time.time()
@@ -860,7 +889,7 @@ async def main(args: argparse.Namespace) -> None:
         logger.info("── Astronomy-Cache: Kalender 365 Tage (inkrementell) ")
         t2 = time.time()
         calendar, computed_meta = await compute_calendar_incremental(
-            today, force_full=args.full
+            today, force_full=force_full,
         )
         cal_path = CACHE_DIR / "calendar.json"
         cal_path.write_text(
@@ -891,7 +920,56 @@ async def main(args: argparse.Namespace) -> None:
                 computed_at, len(calendar), REGRESSION_CAL_MIN, REGRESSION_CAL_MIN,
             )
 
-    logger.info("=== Vorberechnung abgeschlossen in %.1fs ===", time.time() - t0)
+
+async def main(args: argparse.Namespace) -> None:
+    t0 = time.time()
+    logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
+    logger.info("%d Locations geladen", len(LOCATIONS))
+    # BUG-29: Persistierte Koordinaten-/Name-Overrides anwenden, BEVOR irgendetwas
+    # berechnet oder gehasht wird — sonst rechnet der Recompute mit den alten Basis-
+    # Koordinaten und der coordinates_hash ändert sich nie.
+    _apply_location_overrides()
+    # BUG-33: Custom Locations aus SQLite laden — sie fehlen im LOCATIONS-Import aus
+    # data/locations.py komplett, da precompute.py als eigener Subprozess läuft.
+    _load_custom_locations()
+    logger.info("%d Locations nach Custom-Load + Overrides", len(LOCATIONS))
+
+    # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
+    from data import backup as _backup
+    _backup.snapshot_before_precompute()
+
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    today = date.today()
+    computed_at = datetime.now(timezone.utc).isoformat()
+
+    run_feed = not args.calendar_only
+    run_calendar = not args.feed_only
+    location_id: str | None = getattr(args, "location_id", None)
+    feed_path = CACHE_DIR / "opportunities.json"
+    elev_path = CACHE_DIR / "elevations.json"
+
+    if location_id:
+        await _run_single_location_flow(
+            location_id=location_id,
+            today=today,
+            computed_at=computed_at,
+            run_feed=run_feed,
+            run_calendar=run_calendar,
+            feed_path=feed_path,
+            elev_path=elev_path,
+            t0=t0,
+        )
+    else:
+        await _run_standard_flow(
+            today=today,
+            computed_at=computed_at,
+            run_feed=run_feed,
+            run_calendar=run_calendar,
+            force_full=args.full,
+            feed_path=feed_path,
+            elev_path=elev_path,
+        )
+        logger.info("=== Vorberechnung abgeschlossen in %.1fs ===", time.time() - t0)
 
 
 if __name__ == "__main__":
