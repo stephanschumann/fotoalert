@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)*, BUG-32 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Option A = Prod-Cache prüfen + Option B = Soft-Fallback)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | BUG-37 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-91, US-92, US-93, US-94 · BUG-35 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1272,6 +1272,12 @@ Hinweis in Header aktualisieren: erklärt, dass `FOTOALERT_ENV=dev` gesetzt sein
 > - Fehlgeschlagene Jobs werden geloggt und lösen Observability-Alert aus (koordiniert mit US-38)
 
 ### US-38 · Observability & Self-Healing
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Status** | In Analysis |
+
 > **Als App-Host** möchte ich die problemlose Funktionsweise der App überwachen und Fehler sofort identifizieren, damit ich die User Experience jederzeit sicherstellen kann.
 >
 > **Akzeptanzkriterien:**
@@ -2962,7 +2968,7 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-21 |
 
 **Beschreibung:** Vollständige Bestandsaufnahme aller nutzerseitig erzeugten/änderbaren Daten daraufhin, ob sie serverseitig (SQLite) gespeichert werden oder nur lokal (`localStorage`) liegen und damit verloren gehen können (iOS löscht PWA-localStorage nach 7 Tagen Inaktivität, vgl. BUG-26). Ergebnis: eine Liste „persistiert ✅ / nur lokal ⚠️" pro Datenart mit Empfehlung, was nachgezogen werden muss — als Grundlage für Folgetickets.
@@ -3036,7 +3042,7 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-21 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass mein Kamera-Setup (Sensor, Brennweite, Ausrichtung) serverseitig gespeichert wird, damit es nach App-Schließen/Geräte­wechsel erhalten bleibt. Aktuell liegt es nur in `localStorage['cameraProfile']` und geht verloren (iOS löscht PWA-Storage nach 7 Tagen, vgl. BUG-26).
@@ -4098,15 +4104,15 @@ Im Karten-Tab erscheint das Filter-Sheet auf Mac (Chrome + Safari) hinter der Le
 
 ---
 
-### BUG-32 · 14-Tage-Feed leer trotz aktivem Datenbestand und ohne Filterkriterien `[~]`
+### BUG-32 · 14-Tage-Feed leer trotz aktivem Datenbestand und ohne Filterkriterien `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
-| **In Analysis seit** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-23 |
 
 **Beschreibung:** Der 14-Tage-Feed zeigt „Keine besonderen Chancen in den nächsten 14 Tagen. Goldene & Blaue Stunde über den Eventtyp-Filter einblenden." — obwohl kein Filter aktiv ist. Der Jahreskalender zeigt im selben Zeitraum tausende Events, d. h. Daten sind vorhanden. Erwartet: Feed zeigt Chancen mit besonderem Alignment-Score (Mond, Sonne in goldener/blauer Stunde), ohne dass der Nutzer manuell einen Filter aktivieren muss.
 
@@ -4766,13 +4772,13 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 
 ---
 
-### TASK-33 · Post-Deploy-Health-Assert in CI `[~]`
+### TASK-33 · Post-Deploy-Health-Assert in CI `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **In Progress seit** | 2026-06-23 |
 
@@ -4789,13 +4795,13 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 
 ---
 
-### TASK-34 · Cache-Konsistenz-Tests + Sunrise-Präzisionstest `[~]`
+### TASK-34 · Cache-Konsistenz-Tests + Sunrise-Präzisionstest `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **In Progress seit** | 2026-06-23 |
 
@@ -4812,13 +4818,13 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 
 ---
 
-### TASK-35 · Mobile Viewport in Playwright-Frontend-Check `[~]`
+### TASK-35 · Mobile Viewport in Playwright-Frontend-Check `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **In Progress seit** | 2026-06-23 |
 
@@ -4836,13 +4842,13 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 
 ---
 
-### TASK-36 · Data-Flow-Dokument `[~]`
+### TASK-36 · Data-Flow-Dokument `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
 | **In Progress seit** | 2026-06-23 |
 
@@ -4876,3 +4882,134 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit und Testbarkeit zu verbessern.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-32 Release-Check, 2026-06-23)
+
+---
+
+### US-91 · Vollmond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Als App-User möchte ich sehen, wann Vollmond ist, damit ich diese seltenen Ereignisse gezielt für Fotowalks einplanen kann. Vollmond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium (neben Sonnenaufgang, Mondaufgang etc.) verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Vollmond für den jeweiligen Standort photographisch relevant ist (Sichtbarkeit / Alignment-Möglichkeit).
+
+**Bezug:** US-70/70b/70c (Scout-Tab Mond-Alignment — anderer Tab, ergänzender Scope) · US-79 (Mondauf/-untergang — Zeiten, nicht Mondphasen) · US-81 (weitere Scout-Event-Typen) · US-92 (Neumond), US-93 (Supermond) — parallele Mondphasen-Features, sinnvolle gemeinsame Implementierung
+
+---
+
+### US-92 · Neumond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Als App-User möchte ich sehen, wann Neumond ist, damit ich diese dunklen Nächte gezielt für Milchstraßen- und Sternfotografie einplanen kann. Neumond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Standort für Astrofotografie geeignet ist (z. B. niedriger Bortle-Wert oder freier Himmel).
+
+**Bezug:** US-91 (Vollmond — parallele Implementierung), US-93 (Supermond) · TASK-09 (Bortle-Karte — künftige Ergänzung) · TASK-10 (Astronomisches Twilight für Milchstraße — Überschneidung: beide dienen Astrofoto-Planung, Scope abgrenzen bei Implementierung)
+
+---
+
+### US-93 · Supermond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Als App-User möchte ich sehen, wann ein Supermond (Vollmond nahe Perigäum, scheinbar größer/heller) stattfindet, damit ich diese besonders eindrucksvollen Ereignisse gezielt einplanen kann. Supermond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden.
+
+**Bezug:** US-91 (Vollmond — Supermond ist Spezialfall des Vollmonds; bei Implementierung auf US-91 aufbauen, Supermond = Vollmond + Perigäum-Bedingung) · US-92 (Neumond — parallele Mondphasen-Architektur)
+
+---
+
+### BUG-35 · Neue Location: Berechnete Alignments erscheinen nicht im 14-Tage-Feed `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Beim Anlegen einer neuen Location über die Kartenansicht konnten nächste Alignments berechnet werden und wurden in der Location-Detailansicht korrekt angezeigt — erscheinen jedoch nicht im 14-Tage-Feed. Erwartet: berechnete Alignments für neue Locations sind im Feed sichtbar.
+
+**Bezug:** BUG-33 `[x]` (Mond-Chance für neue Location fehlte im Feed — als Done markiert, aber Symptom scheint weiterhin aufzutreten; mögliche Regression oder zweiter Code-Pfad). Memory: `reference_fotoalert_precompute_dataload` — precompute.py lädt keine Custom-Locations (bekannte Einschränkung, BUG-29-Fix). Bei Analyse prüfen ob der On-Demand-Berechnungspfad die Feed-Integration korrekt triggert.
+
+---
+
+### BUG-36 · „Neue Location"-Formular: Name-Feld zeigt letzten gespeicherten Location-Namen `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-23 |
+
+**→ Mit BUG-37 gemergt (gleiche Root-Cause: kein Formular-Reset nach save()). Fix in BUG-37.**
+
+---
+
+### BUG-37 · „Neue Location": Formular-State wird nach Speichern nicht zurückgesetzt (Merge BUG-36+37) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Nach dem Speichern einer neuen Location behält `AddLocation` seinen gesamten State. Beim nächsten Öffnen des Formulars sind alle Felder noch gefüllt (Name, Koordinaten), Marker und Verbindungslinie noch auf der Karte, der Save-Button noch sichtbar und `previewData` gesetzt — der User sieht scheinbar die zuletzt gespeicherte Location im Bearbeitenmodus. Umfasst die Symptome aus BUG-36 (Name-Feld vorausgefüllt) und BUG-37 (Edit-Modus der letzten Location).
+
+**Root-Cause:** `close()` entfernt nur CSS-Klassen; kein State-Reset. `open()` → `initMap()` gibt Map bei existierender Instanz sofort zurück (`if (this.map) return`).
+
+**Scope:**
+- Eingeschlossen: Reset nach `save()` (Option A)
+- Ausgeschlossen: Reset nach `close()` ohne Save (abgebrochene Eingaben bleiben erhalten)
+
+**Akzeptanzkriterien:**
+- [ ] Nach save(): Erneutes open() zeigt leeres Formular (Name, Obs-Coords, Subj-Coords leer)
+- [ ] Nach save(): Save-Button nicht sichtbar, Preview-Box leer
+- [ ] Nach save(): Keine Obs/Subj-Marker + keine Verbindungslinie auf der Karte
+- [ ] Nach save(): `AddLocation.obs`, `.subj`, `.previewData` sind null
+- [ ] Abbruch ohne Save: Eingaben beim nächsten open() noch vorhanden
+
+**Implementierung:** `reset()`-Methode in `AddLocation` (web/index.html), Aufruf am Ende von `save()` vor `close()`.
+
+---
+
+### US-94 · Add-Location-Sheet: Abbrechen-Button zum bewussten Verwerfen des Formulars `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Als User möchte ich im Add-Location-Sheet einen kleinen Abbrechen-Button im unteren Bereich des Formulars haben, damit ich halbfertige Eingaben bewusst verwerfen und das Formular in den Ausgangszustand zurücksetzen kann — ohne die App schließen zu müssen. Der Button soll kleiner als „Alignments berechnen" und „Location dauerhaft speichern" sein und `reset()` + `close()` auslösen.
+
+**Bezug:** BUG-37 `[~]` (hat `reset()`-Methode eingeführt — US-94 nutzt sie direkt; baut auf BUG-37 auf, erst danach implementieren).
+
+---
+
+### TASK-38 · Refactoring: Lange Funktionen in precompute.py aufteilen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-23 |
+
+**Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold: `compute_calendar_incremental()` (Z. 589, 146 Zeilen), `_run_single_location_flow()` (Z. 742, 92 Zeilen), `_run_standard_flow()` (Z. 837, 84 Zeilen). Aufteilen in kleinere Hilfsfunktionen.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)

@@ -933,7 +933,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.11';
+const APP_VERSION = '1.11.12';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3891,9 +3891,33 @@ const AddLocation = {
       };
       await API.post('/preview-alignment', body);
       toast('✅ Location gespeichert!');
+      this.reset();
       this.close();
       await Locations.load();
     } catch(e) { toast('Fehler beim Speichern: ' + e.message); }
+  },
+  reset() {
+    // State
+    this.obs = null; this.subj = null; this.previewData = null;
+    // Marker + Linie
+    if (this.obsMarker)  { this.obsMarker.remove();  this.obsMarker  = null; }
+    if (this.subjMarker) { this.subjMarker.remove(); this.subjMarker = null; }
+    if (this._line)      { this._line.remove();      this._line      = null; }
+    // Map zerstören → sauberer Neuaufbau beim nächsten open()
+    if (this.map) { this.map.remove(); this.map = null; }
+    // Formularfelder leeren
+    ['obs-coords','subj-coords','subj-name','subj-height','subj-width'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    ['obs-error','subj-error'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '';
+    });
+    // Preview + Save-Button zurücksetzen
+    const preview = document.getElementById('add-preview');
+    if (preview) preview.innerHTML = '';
+    const saveBtn = document.getElementById('save-location-btn');
+    if (saveBtn) saveBtn.style.display = 'none';
   }
 };
 
