@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-91, US-92, US-93 |
+| **🔄 In Progress** | wird gerade implementiert | BUG-35 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-94 · BUG-35 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -4885,14 +4885,15 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### US-91 · Vollmond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+### US-91 · Vollmond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann Vollmond ist, damit ich diese seltenen Ereignisse gezielt für Fotowalks einplanen kann. Vollmond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium (neben Sonnenaufgang, Mondaufgang etc.) verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Vollmond für den jeweiligen Standort photographisch relevant ist (Sichtbarkeit / Alignment-Möglichkeit).
 
@@ -4900,14 +4901,15 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### US-92 · Neumond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+### US-92 · Neumond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann Neumond ist, damit ich diese dunklen Nächte gezielt für Milchstraßen- und Sternfotografie einplanen kann. Neumond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Standort für Astrofotografie geeignet ist (z. B. niedriger Bortle-Wert oder freier Himmel).
 
@@ -4915,14 +4917,15 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### US-93 · Supermond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[ ]`
+### US-93 · Supermond-Events: Filter-Kriterium + Chancen-Feed + Location-Detail `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann ein Supermond (Vollmond nahe Perigäum, scheinbar größer/heller) stattfindet, damit ich diese besonders eindrucksvollen Ereignisse gezielt einplanen kann. Supermond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden.
 
@@ -5086,18 +5089,72 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### BUG-35 · Neue Location: Berechnete Alignments erscheinen nicht im 14-Tage-Feed `[ ]`
+### BUG-35 · Neue Location: Feed zeigt keine Events + kein Status-Feedback `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-23 |
+| **Analysiert** | 2026-06-24 |
+| **In Progress seit** | 2026-06-24 |
 
-**Beschreibung:** Beim Anlegen einer neuen Location über die Kartenansicht konnten nächste Alignments berechnet werden und wurden in der Location-Detailansicht korrekt angezeigt — erscheinen jedoch nicht im 14-Tage-Feed. Erwartet: berechnete Alignments für neue Locations sind im Feed sichtbar.
+**Beschreibung:** Beim Anlegen einer neuen Location über die Kartenansicht wurden berechnete Alignments in der Detailansicht korrekt angezeigt — erscheinen jedoch nicht im 14-Tage-Feed. Root-Cause (verifiziert 2026-06-24): Backend-Precompute funktioniert korrekt (alle 12 Custom Locations haben Events im Feed). Das Problem ist zweiteilig: (1) `AddLocation.save()` ruft `Feed.load()` nicht auf — der Feed wird nach dem Speichern nie aktualisiert. (2) Der Precompute dauert 30–90s asynchron — ohne Status-Feedback sieht es aus als würden Events nie erscheinen.
 
-**Bezug:** BUG-33 `[x]` (Mond-Chance für neue Location fehlte im Feed — als Done markiert, aber Symptom scheint weiterhin aufzutreten; mögliche Regression oder zweiter Code-Pfad). Memory: `reference_fotoalert_precompute_dataload` — precompute.py lädt keine Custom-Locations (bekannte Einschränkung, BUG-29-Fix). Bei Analyse prüfen ob der On-Demand-Berechnungspfad die Feed-Integration korrekt triggert.
+**Root-Cause (Zeile 3899–3903, web/index.html):**
+```js
+await API.post('/preview-alignment', body);
+toast('✅ Location gespeichert!');
+await Locations.load();
+// Feed.load() fehlt — Feed bleibt bis zum nächsten manuellen Reload stale
+```
+
+**Scope:**
+- Eingeschlossen: Feed-Reload nach Save, `/recompute-status`-Endpoint, Pending-Banner im Frontend
+- Ausgeschlossen: Retry-Queueing für geskippte Recomputes (wenn `_precompute_running=True`), Push-Notification wenn fertig
+
+**Akzeptanzkriterien:**
+- [ ] `GET /recompute-status` gibt `{"pending": ["custom_xxx"]}` zurück unmittelbar nach Location-Save
+- [ ] Nach erfolgreichem Precompute + `_load_caches()`: Location nicht mehr in pending
+- [ ] Frontend: nach Save wird `Feed.load()` aufgerufen (Feed sofort neu geladen)
+- [ ] Frontend: solange Location in pending → Banner "⏳ Chancen werden berechnet..." im Feed sichtbar
+- [ ] Frontend: wenn pending leer → Banner entfernt, `Feed.load()` erneut aufgerufen
+- [ ] Frontend: Polling stoppt nach 10 Min; Banner wechselt zu manuellem Refresh-Hinweis
+- [ ] Edge Case: `_precompute_running` beim Save → Location trotzdem in pending (kein stilles Drop)
+- [ ] Edge Case: Server-Restart → pending leer; kein falsches Banner beim nächsten App-Start
+- [ ] Edge Case: mehrere Locations gleichzeitig gespeichert → alle pending, alle verschwinden korrekt
+
+**Pre-Mortem:**
+- 💀 Precompute schlägt fehl (exit != 0) → `_load_caches()` nicht aufgerufen → Location ewig pending → Gegenmaßnahme: auch bei Fehler aus pending entfernen (finally-Block)
+- 💀 `/recompute-status` ohne Auth → nur IDs sichtbar, keine Koordinaten; da App privat: unkritisch
+- 💀 Polling-Timer bleibt nach App-Close im Speicher → Gegenmaßnahme: Frontend-Timeout 10 Min + Visibility-API-Check optional
+
+**Analyse & Planung:**
+- [x] Root-Cause verifiziert: `AddLocation.save()` ruft `Feed.load()` nicht auf (web/index.html:3899)
+- [x] Backend-Precompute korrekt: alle 12 Custom Locations haben Events im `/opportunities`-Feed (Test 2026-06-24)
+- [x] `_load_caches()` = guter Hook für pending-Cleanup (main.py:519)
+- [x] Implementierungsoptionen: A (Delay-Retry) / B (Status-Endpoint + Polling)
+- [x] Empfehlung: **Option B** — präzise, kein blindes Timing
+
+**Implementation Spec (Option B):**
+
+*Backend `main.py`:*
+1. `_recompute_pending: set[str] = set()` als module-global ergänzen
+2. In `_save_custom_location()` (nach `_store.create_custom`): `_recompute_pending.add(loc.id)`
+3. In `_load_caches()`: nach dem Laden von `_feed_cache` → `ids_in_feed = set(e["location_id"] for e in _feed_cache); _recompute_pending -= ids_in_feed`
+4. In `_run_precompute_single()` finally-Block: `_recompute_pending.discard(loc_id)` (bei Fehler)
+5. Neuer Endpoint: `GET /recompute-status` → `{"pending": list(_recompute_pending)}`
+
+*Frontend `web/index.html`:*
+6. `AddLocation.save()`: nach erfolgreichem Post → `Feed.load()` + `Feed.startPendingPoll(result.location_id)` (wenn `result.saved`)
+7. Anmerkung: `/preview-alignment`-Response enthält bereits `saved: bool` + die Location-ID ableiten aus Zeitstempel oder Response erweitern
+8. `Feed.startPendingPoll(id)`: alle 15s `API.get('/recompute-status')`, wenn id nicht mehr pending → `Feed.load()` + Banner entfernen; nach 600s stop + Fallback-Text
+9. Banner-Element im `#feed-content` Header: `<div id="recompute-banner" style="display:none">⏳ Chancen für neue Location werden berechnet…</div>`
+
+**Testplan:**
+- [ ] Automatisiert: `test_recompute_status_empty_on_start`, `test_recompute_status_after_save`, `test_pending_cleared_after_load_caches` in `backend/tests/test_bug35.py`
+- [ ] Manuell: Location speichern → sofort Feed öffnen → Banner sichtbar → nach ~60s Banner weg, Events sichtbar
 
 ---
 

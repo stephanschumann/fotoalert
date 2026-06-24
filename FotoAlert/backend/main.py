@@ -217,6 +217,7 @@ _discover_cache: dict       = {}   # Scout-Tab (Mond-Alignment-Chancen)
 _cache_loaded_at:   Optional[datetime] = None
 _weather_updated_at: Optional[datetime] = None
 _precompute_running: bool = False
+_recompute_pending:  set  = set()   # BUG-35: IDs mit laufendem/ausstehendem Recompute
 
 # Job-Status-Tracking (US-34)
 _job_status: dict = {
@@ -278,7 +279,7 @@ def _load_caches() -> bool:
     Lädt die vorberechneten JSON-Caches von Disk.
     Gibt True zurück wenn mindestens der Feed-Cache gefunden wurde.
     """
-    global _feed_cache, _calendar_cache, _cache_loaded_at
+    global _feed_cache, _calendar_cache, _cache_loaded_at, _recompute_pending
 
     found = False
 
@@ -304,6 +305,15 @@ def _load_caches() -> bool:
             logger.error("Fehler beim Laden von calendar.json: %s", e)
 
     _cache_loaded_at = datetime.now(timezone.utc)
+
+    # BUG-35: Pending-Cleanup — IDs entfernen die jetzt Events im Feed haben
+    if _recompute_pending:
+        ids_in_feed = {e["location_id"] for e in _feed_cache}
+        cleared = _recompute_pending & ids_in_feed
+        _recompute_pending -= ids_in_feed
+        if cleared:
+            logger.info("Recompute-Pending bereinigt: %s", cleared)
+
     return found
 
 
@@ -519,8 +529,10 @@ async def _run_precompute_single(loc_id: str) -> None:
             _load_caches()
         else:
             logger.error("Single-Location Recompute fehlgeschlagen (exit %d) für %s", proc.returncode, loc_id)
+            _recompute_pending.discard(loc_id)  # BUG-35: bei Fehler aus pending entfernen
     except Exception as e:
         logger.error("Fehler beim Single-Location Recompute für %s: %s", loc_id, e)
+        _recompute_pending.discard(loc_id)  # BUG-35: bei Exception aus pending entfernen
     finally:
         _precompute_running = False
 
@@ -1225,15 +1237,15 @@ async def _save_alignment_as_location(
     req: "PreviewAlignmentRequest",
     profile,
     focal_length_mm: int,
-) -> bool:
+) -> Optional[str]:
     """
     Speichert das Alignment-Ergebnis als neue Custom Location.
 
     Triggert Recompute-Hook (TASK-17) und Backup-Task (TASK-18).
-    Gibt True zurück wenn gespeichert, False wenn Bedingung nicht erfüllt.
+    BUG-35: Gibt die location_id zurück wenn gespeichert, None wenn Bedingung nicht erfüllt.
     """
     if not (req.save and req.subject_name and req.subject_name != "Unbenannt"):
-        return False
+        return None
 
     place = await _reverse_geocode(req.observer_lat, req.observer_lon)
     dist_m = round(profile.ground_distance_m)
@@ -1259,11 +1271,13 @@ async def _save_alignment_as_location(
     )
     LOCATIONS.append(new_loc)
     _save_custom_location(new_loc)
+    # BUG-35: Recompute als pending markieren bevor Task startet
+    _recompute_pending.add(new_loc.id)
     # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
     asyncio.create_task(_run_precompute_single(new_loc.id))
     # TASK-18: Backup nach Create
     asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
-    return True
+    return new_loc.id
 
 
 @app.post("/preview-alignment")
@@ -1336,8 +1350,19 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
             }
             for a in all_alignments[:30]
         ],
-        "saved": saved,
+        "saved": saved is not None,
+        "location_id": saved,  # BUG-35: ID für Frontend-Polling
     }
+
+
+# ---------------------------------------------------------------------------
+# BUG-35: Recompute-Status-Endpoint
+# ---------------------------------------------------------------------------
+
+@app.get("/recompute-status")
+async def recompute_status() -> dict:
+    """BUG-35: Gibt IDs zurück für die ein Recompute noch aussteht (in-memory, kein Auth nötig)."""
+    return {"pending": list(_recompute_pending), "running": _precompute_running}
 
 
 # ---------------------------------------------------------------------------

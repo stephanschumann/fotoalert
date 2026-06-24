@@ -758,6 +758,10 @@
         <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')">📅 Jahreskalender</button>
         <button class="fmb-btn" id="fmb-scout" onclick="Feed.setMode('scout')">🔭 Scout</button>
       </div>
+      <div id="recompute-banner" style="display:none;margin:8px 12px 0;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);align-items:center;gap:8px">
+        <div class="spinner" style="width:14px;height:14px;flex-shrink:0"></div>
+        <span id="recompute-banner-text">Chancen für neue Location werden berechnet…</span>
+      </div>
       <div id="feed-content"><div class="empty"><div class="spinner"></div></div></div>
       <div id="scout-content" style="display:none"></div>
     </div>
@@ -938,7 +942,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.12.0';
+const APP_VERSION = '1.12.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1200,6 +1204,36 @@ const Feed = {
         } catch { if (this.mode === 'feed') _showError(); }
       }, 2000);
     }
+  },
+  // BUG-35: Polling bis Recompute für neue Location fertig ist
+  startPendingPoll(locationId) {
+    const banner = document.getElementById('recompute-banner');
+    const bannerText = document.getElementById('recompute-banner-text');
+    if (banner) banner.style.display = 'flex';
+    const INTERVAL_MS = 15000;
+    const TIMEOUT_MS = 600000; // 10 Min
+    const startedAt = Date.now();
+    const timer = setInterval(async () => {
+      try {
+        const status = await API.get('/recompute-status');
+        const pending = status && status.pending ? status.pending : [];
+        if (!pending.includes(locationId)) {
+          clearInterval(timer);
+          if (banner) banner.style.display = 'none';
+          await this.load();
+          return;
+        }
+        if (Date.now() - startedAt >= TIMEOUT_MS) {
+          clearInterval(timer);
+          if (banner) {
+            const spinner = banner.querySelector('.spinner');
+            if (spinner) spinner.style.display = 'none';
+            if (bannerText) bannerText.textContent = 'Events erscheinen nach der nächsten Berechnung.';
+            setTimeout(() => { banner.style.display = 'none'; }, 8000);
+          }
+        }
+      } catch { /* netzwerkfehler — weiter polling */ }
+    }, INTERVAL_MS);
   },
   render() {
     if (this.mode !== 'feed') return;  // Kein Feed-Render im Kalender-Modus
@@ -3896,11 +3930,16 @@ const AddLocation = {
         subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
         save: true
       };
-      await API.post('/preview-alignment', body);
+      const result = await API.post('/preview-alignment', body);
       toast('✅ Location gespeichert!');
       this.reset();
       this.close();
       await Locations.load();
+      // BUG-35: Feed sofort neu laden + Polling starten wenn Recompute läuft
+      await Feed.load();
+      if (result && result.location_id) {
+        Feed.startPendingPoll(result.location_id);
+      }
     } catch(e) { toast('Fehler beim Speichern: ' + e.message); }
   },
   reset() {
