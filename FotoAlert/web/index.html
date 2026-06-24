@@ -938,7 +938,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.11.13';
+const APP_VERSION = '1.12.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2203,6 +2203,8 @@ const FilterSheet = {
     ['Mondaufgang',           'Mondaufgang'],
     ['Monduntergang',         'Monduntergang'],
     ['Vollmond',              'Vollmond'],
+    ['Neumond',               'Neumond'],
+    ['Supermond',             'Supermond'],
     ['Mond-Alignment',        'Mond-Alignment'],
     ['Sonnen-Alignment',      'Sonnen-Alignment'],
     ['Milchstraße',           'Milchstraße'],
@@ -3148,7 +3150,7 @@ const MapView = {
         } else {
           // Fallback: possible_bodies (Feed noch nicht geladen)
           const pb = Array.isArray(loc.possible_bodies) ? loc.possible_bodies : [];
-          const MOON_TYPES = ['Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Vollmond', 'Neumond', 'Blutmond', 'Mondfinsternis'];
+          const MOON_TYPES = ['Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Vollmond', 'Neumond', 'Supermond', 'Blutmond', 'Mondfinsternis'];
           const SUN_TYPES  = ['Sonnen-Alignment', 'Sonnenaufgang', 'Sonnenuntergang', 'Sonnenfinsternis'];
           const needsMoon = activeTypes.some(t => MOON_TYPES.includes(t));
           const needsSun  = activeTypes.some(t => SUN_TYPES.includes(t));

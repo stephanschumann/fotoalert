@@ -87,6 +87,7 @@ _ALIGNMENT_FILTER_EXEMPT = {
     "Goldene Stunde Abend",
     "Blaue Stunde",
     "Milchstraße",
+    "Neumond",
     "Meteoritenschauer",
     "Sonnenfinsternis",
 }

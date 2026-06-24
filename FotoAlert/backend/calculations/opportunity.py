@@ -27,6 +27,7 @@ from calculations.astronomy import (
     find_precise_alignment_times,
     find_sun_alignment_times,
     get_body_position,
+    get_moon_earth_distance_km,
 )
 from calculations.weather import WeatherForecast, calculate_photo_weather_score
 from data.locations import PhotoLocation
@@ -39,6 +40,8 @@ class EventType(str, Enum):
     MOON_RISE = "Mondaufgang"
     MOON_SET = "Monduntergang"
     FULL_MOON = "Vollmond"
+    NEW_MOON = "Neumond"
+    SUPER_MOON = "Supermond"
     SUN_ALIGNMENT = "Sonnen-Alignment"
     MOON_ALIGNMENT = "Mond-Alignment"
     MILKY_WAY = "Milchstraße"
@@ -101,6 +104,34 @@ def _score_moon_phase_for_milkyway(phase_fraction: float) -> float:
 def _score_moon_phase_for_moonshot(phase_fraction: float) -> float:
     """Vollmond = ideal für Mondfotos."""
     return 1.0 - abs(phase_fraction - 0.5) * 2
+
+
+# US-91/92/93: Schwelle für Supermond (Vollmond nahe Perigäum)
+_SUPERMOON_THRESHOLD_KM = 362_000
+
+
+def _moon_phase_special_event_type(
+    phase_fraction: float, shoot_time: datetime
+) -> Optional[EventType]:
+    """
+    Gibt SUPER_MOON, FULL_MOON oder NEW_MOON zurück wenn die Mondphase
+    einen Override des event_type rechtfertigt — sonst None.
+
+    US-91: Vollmond (phase_fraction 0.47–0.53) → FULL_MOON
+    US-93: Vollmond + Distanz < 362.000 km → SUPER_MOON (Vorrang vor FULL_MOON)
+    US-92: Neumond (phase_fraction < 0.03 oder > 0.97) → NEW_MOON
+    """
+    if 0.47 <= phase_fraction <= 0.53:
+        try:
+            dist_km = get_moon_earth_distance_km(shoot_time)
+            if dist_km < _SUPERMOON_THRESHOLD_KM:
+                return EventType.SUPER_MOON
+        except Exception:
+            pass
+        return EventType.FULL_MOON
+    if phase_fraction < 0.03 or phase_fraction > 0.97:
+        return EventType.NEW_MOON
+    return None
 
 
 _FOCAL_STEPS = [24, 35, 50, 85, 135, 200, 300, 400, 600]
@@ -402,10 +433,14 @@ async def find_opportunities(
 
             overall_m = _overall(a_s, w_s, use_weather)
             if overall_m >= min_score:
+                # US-91/92/93: Vollmond/Supermond/Neumond-Override
+                phase_special = _moon_phase_special_event_type(moon.phase_fraction, align_time)
+                moon_event_type = phase_special or EventType.MOON_ALIGNMENT
+                moon_priority = 3 if phase_special == EventType.SUPER_MOON else (2 if overall_m > 0.75 else 1)
                 opportunities.append(PhotoOpportunity(
                     id=f"{location.id}_moon_align_{align_time.strftime('%Y%m%d%H%M')}",
                     location=location,
-                    event_type=EventType.MOON_ALIGNMENT,
+                    event_type=moon_event_type,
                     title=f"Mond über {location.subject_name}",
                     description=(
                         f"Mond ({moon.phase_name}, {moon.illumination_pct:.0f}% beleuchtet) "
@@ -424,7 +459,7 @@ async def find_opportunities(
                     celestial_azimuth=round(moon_pos.azimuth, 1),
                     celestial_altitude=round(moon_pos.altitude, 1),
                     astronomy_report=astro,
-                    alert_priority=2 if overall_m > 0.75 else 1,
+                    alert_priority=moon_priority,
                 ))
 
     # -----------------------------------------------------------------------
@@ -524,10 +559,19 @@ async def find_opportunities(
                     f"{result.time.strftime('%Y%m%d%H%M')}"
                 )
 
+                # US-91/92/93: Vollmond/Supermond-Override bei Mond-Events
+                final_event_type = event_type_val
+                if not is_solar:
+                    phase_special = _moon_phase_special_event_type(moon.phase_fraction, result.time)
+                    if phase_special in (EventType.FULL_MOON, EventType.SUPER_MOON):
+                        final_event_type = phase_special
+                        if phase_special == EventType.SUPER_MOON:
+                            priority = 3
+
                 opportunities.append(PhotoOpportunity(
                     id=opp_id,
                     location=location,
-                    event_type=event_type_val,
+                    event_type=final_event_type,
                     title=f"{body_label} {align_label} – {location.subject_name}",
                     description=desc,
                     shoot_time=result.time,
@@ -595,10 +639,16 @@ async def find_opportunities(
                 target_date, datetime.min.time(), tzinfo=timezone.utc
             ) + timedelta(hours=1)
 
+            # US-92: Neumond-Override bei Milchstraße-Events
+            mw_event_type = EventType.MILKY_WAY
+            mw_special = _moon_phase_special_event_type(moon.phase_fraction, shoot_t)
+            if mw_special == EventType.NEW_MOON:
+                mw_event_type = EventType.NEW_MOON
+
             opportunities.append(PhotoOpportunity(
                 id=f"{location.id}_milkyway_{target_date.isoformat()}",
                 location=location,
-                event_type=EventType.MILKY_WAY,
+                event_type=mw_event_type,
                 title=f"Milchstraße über {location.name}",
                 description=(
                     f"Galaktisches Zentrum bei Azimut {mw.galactic_center_azimuth_at_midnight}°, "

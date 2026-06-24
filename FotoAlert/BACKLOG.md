@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-91, US-92, US-93 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-91, US-92, US-93, US-94 · BUG-35 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-94 · BUG-35 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -4891,7 +4891,7 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann Vollmond ist, damit ich diese seltenen Ereignisse gezielt für Fotowalks einplanen kann. Vollmond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium (neben Sonnenaufgang, Mondaufgang etc.) verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Vollmond für den jeweiligen Standort photographisch relevant ist (Sichtbarkeit / Alignment-Möglichkeit).
@@ -4906,7 +4906,7 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann Neumond ist, damit ich diese dunklen Nächte gezielt für Milchstraßen- und Sternfotografie einplanen kann. Neumond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden, sofern der Standort für Astrofotografie geeignet ist (z. B. niedriger Bortle-Wert oder freier Himmel).
@@ -4921,12 +4921,168 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Als App-User möchte ich sehen, wann ein Supermond (Vollmond nahe Perigäum, scheinbar größer/heller) stattfindet, damit ich diese besonders eindrucksvollen Ereignisse gezielt einplanen kann. Supermond-Events sollen im 14-Tage-Feed erscheinen, als Filter-Kriterium verfügbar sein und in der Location-Detailansicht angezeigt werden.
 
 **Bezug:** US-91 (Vollmond — Supermond ist Spezialfall des Vollmonds; bei Implementierung auf US-91 aufbauen, Supermond = Vollmond + Perigäum-Bedingung) · US-92 (Neumond — parallele Mondphasen-Architektur)
+
+---
+
+### 📋 Analyse-Spec: US-91 + US-92 + US-93 (Mondphasen-Paket) — gemeinsame Implementierung
+
+**Analysiert:** 2026-06-24 | **Scope:** US-91 (Vollmond) + US-92 (Neumond) + US-93 (Supermond)
+
+---
+
+#### Architektur-Entscheidung (aus Analyse bestätigt)
+
+**Vollmond / Supermond** sind kein neuer eigenständiger Event-Typ, sondern ein **Override des `event_type`** bei bestehenden **Mond-Alignment-Events**. Ein Mond-Alignment am Vollmond-Tag bekommt `event_type = "Vollmond"` (oder `"Supermond"`). Das ermöglicht separates Filtern — Mond-Alignment-Events auf Vollmond-Nächten verschwinden damit aus dem "Mond-Alignment"-Filter (gewollt).
+
+**Neumond** folgt demselben Muster: Override des `event_type` bei **Milchstraße-Events** auf Neumond-Nächten → `event_type = "Neumond"`. Milchstraße-Events auf Neumond-Nächten verschwinden aus "Milchstraße"-Filter (gewollt, da Neumond separat filterbar sein soll).
+
+---
+
+#### Scope
+
+**Eingeschlossen:**
+- `EventType`-Enum: `NEW_MOON = "Neumond"` und `SUPER_MOON = "Supermond"` hinzufügen
+- `find_opportunities()`: Mondphasen-Helper + Override in Sektionen 3 (einfaches Mond-Alignment), 4 (3D-Alignment, Mond-Branch), 5 (Milchstraße)
+- `_ALIGNMENT_FILTER_EXEMPT` in `precompute.py`: `"Neumond"` hinzufügen (da Milchstraße-Events exempt waren, aber nach Override nicht mehr)
+- `_filter_feed()` in `main.py`: keine Änderung nötig (string-match bereits vorhanden)
+- Frontend `index.html` `FilterSheet._ET`: `['Neumond', 'Neumond']` und `['Supermond', 'Supermond']` ergänzen; `MOON_TYPES` in Location-Detail um beide erweitern
+
+**Ausgeschlossen:**
+- Bortle-Filter für Neumond (kommt mit TASK-09)
+- Scout-Tab / Discover-Ansicht (eigener Scope US-81)
+- Standalone Mondphasen-Events ohne Alignment/Milchstraße-Basis
+
+---
+
+#### Akzeptanzkriterien
+
+- [ ] AK1: Am Vollmond-Tag (phase_fraction 0.47–0.53) hat ein bestehendes Mond-Alignment-Event `event_type = "Vollmond"` statt `"Mond-Alignment"`
+- [ ] AK2: Filter "Vollmond" zeigt diese Events; Filter "Mond-Alignment" zeigt sie **nicht** (gewolltes Verhalten)
+- [ ] AK3: An einem Tag ohne Vollmond-Bedingung bleibt `event_type = "Mond-Alignment"` unverändert
+- [ ] AK4: Supermond-Bedingung: Vollmond + `get_moon_earth_distance_km() < 362_000` km → `event_type = "Supermond"`, `alert_priority = 3`
+- [ ] AK5: An einem Vollmond-Tag ohne Perigäum-Nähe bleibt event_type = "Vollmond" (kein Supermond)
+- [ ] AK6: Am Neumond-Tag (phase_fraction < 0.03 oder > 0.97) hat ein bestehendes Milchstraße-Event `event_type = "Neumond"`
+- [ ] AK7: Filter "Neumond" zeigt Neumond-Events; Filter "Milchstraße" zeigt sie an Neumond-Nächten **nicht**
+- [ ] AK8: Frontend-Filter-Dropdown enthält "Neumond" und "Supermond" als neue Einträge
+- [ ] AK9: `_passes_alignment_filter()` filtert Neumond-Events nicht heraus (`"Neumond"` in `_ALIGNMENT_FILTER_EXEMPT`)
+- [ ] Edge Case: Location ohne Mond-Alignment-Events an Vollmond-Tag → kein Vollmond-Event im Feed (korrekt — nur bei tatsächlichem Alignment)
+- [ ] Edge Case: Kein Milchstraße-Event an Neumond-Tag (z.B. Location in der Stadt, `mw.visible = False`) → kein Neumond-Event (korrekt)
+- [ ] Edge Case: Supermond fällt mit Mond-Alignment zusammen → `event_type = "Supermond"`, NICHT `"Vollmond"` (Supermond hat Vorrang)
+
+---
+
+#### Pre-Mortem
+
+📎 **Code-Verifikation** (gelesen 2026-06-24):
+- `EventType` in `calculations/opportunity.py` Z.35: `FULL_MOON = "Vollmond"` bereits vorhanden, `NEW_MOON`/`SUPER_MOON` fehlen → hinzufügen ✓
+- `_ALIGNMENT_FILTER_EXEMPT` in `precompute.py` Z.85: enthält `"Milchstraße"` → nach Override zu `"Neumond"` ist Exempt nicht mehr aktiv → **`"Neumond"` hinzufügen Pflicht**
+- `_ROUTINE_TYPES` in `main.py` Z.789: nur `{'Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'}` → neue Typen automatisch Non-Routine → kein BUG-32-Risiko
+- `get_moon_earth_distance_km()` in `calculations/astronomy.py` Z.191: hat `assert 350_000 < dist_km < 410_000` → Exception wenn Skyfield Fehler → Try/Except-Wrapper nötig beim Aufruf
+- `_filter_feed()` in `main.py` Z.776: `e["event_type"].lower() != event_type.lower()` → case-insensitive → kein Problem
+- `_dedup_best_per_day` Z.806: key = `location_id|event_type|day` → Vollmond und Mond-Alignment werden NICHT als Duplikate erkannt → auf demselben Tag können beide existieren (wenn Location 2 Alignment-Fenster hat, eines als Vollmond, eines evtl. als reguläres Mond-Alignment sofern phase_fraction knapp außerhalb) → kein Problem, da Phase-Check deterministisch pro Tag
+
+💀 **Szenario 1: Vollmond-Filter-Blindspot bei "Mond-Alignment"**
+- Auslöser: User filtert "Mond-Alignment" auf Vollmond-Nacht → kein Ergebnis (Events sind jetzt "Vollmond")
+- Frühwarnung: AK2 im Test explizit prüfen
+- Gegenmaßnahme: Im Frontend-Tooltip / Filter-Beschreibung dokumentieren; ist korrekte Intention
+
+💀 **Szenario 2: `_passes_alignment_filter` filtert Neumond-Events**
+- Auslöser: Milchstraße-Event → event_type = "Neumond" → nicht mehr in `_ALIGNMENT_FILTER_EXEMPT` → `composition_analysis = None` → `ca is None → True` (pass). Kein echtes Risiko, da Milchstraße immer `ca = None` hat. ABER: Sicherheitshalber `"Neumond"` trotzdem in Exempt eintragen (defensive)
+- Gegenmaßnahme: Exempt-Eintrag als AK9 ✓
+
+💀 **Szenario 3: `get_moon_earth_distance_km()` Exception im Production-Pfad**
+- Auslöser: Skyfield-Fehler (ephemeris nicht geladen o.ä.) zur Laufzeit von precompute
+- Gegenmaßnahme: `try/except Exception: pass` → Fallback zu `FULL_MOON` (nicht Supermond) wenn Distanz nicht ermittelbar
+
+💀 **Szenario 4: Python 3.9 Kompatibilität**
+- Auslöser: `Optional[EventType]` Rückgabe-Typ mit `EventType | None` Syntax → Syntax-Error auf Prod
+- Gegenmaßnahme: `Optional[EventType]` (aus typing) verwenden, keine Union-Pipe-Syntax
+
+---
+
+#### Implementierungsplan
+
+**Datei 1: `backend/calculations/opportunity.py`**
+
+1. Enum ergänzen:
+   ```python
+   NEW_MOON = "Neumond"
+   SUPER_MOON = "Supermond"
+   ```
+
+2. Neuer Helper (nach `_score_moon_phase_for_moonshot`):
+   ```python
+   from typing import Optional
+   from calculations.astronomy import get_moon_earth_distance_km
+
+   SUPERMOON_THRESHOLD_KM = 362_000
+
+   def _moon_phase_special_event_type(
+       phase_fraction: float, shoot_time: datetime
+   ) -> Optional[EventType]:
+       """Vollmond/Supermond/Neumond-Override für Mond-Alignment- und Milchstraße-Events."""
+       if 0.47 <= phase_fraction <= 0.53:
+           try:
+               dist_km = get_moon_earth_distance_km(shoot_time)
+               if dist_km < SUPERMOON_THRESHOLD_KM:
+                   return EventType.SUPER_MOON
+           except Exception:
+               pass
+           return EventType.FULL_MOON
+       if phase_fraction < 0.03 or phase_fraction > 0.97:
+           return EventType.NEW_MOON
+       return None
+   ```
+   > **Import-Note:** `get_moon_earth_distance_km` ist in `opportunity.py` noch nicht importiert → zu den bestehenden `astronomy`-Imports hinzufügen.
+
+3. Sektion 3 (Mond-Alignment einfach, ab Z.384): Nach `opportunities.append(...)` → override:
+   - Vor dem `append`: `special = _moon_phase_special_event_type(moon.phase_fraction, align_time)`, dann `event_type = special or EventType.MOON_ALIGNMENT` und `alert_priority = 3 if special == EventType.SUPER_MOON else ...`
+
+4. Sektion 4 (3D-Alignment, Mond-Branch, ab Z.443): Gleicher Override-Mechanismus nach `event_type_val` Bestimmung
+
+5. Sektion 5 (Milchstraße, ab Z.588): Vor `opportunities.append()` → `special = _moon_phase_special_event_type(moon.phase_fraction, shoot_t)`, wenn `special == EventType.NEW_MOON` → `event_type = EventType.NEW_MOON`
+
+**Datei 2: `backend/precompute.py`**
+
+6. `_ALIGNMENT_FILTER_EXEMPT` (Z.85): `"Neumond"` hinzufügen
+
+**Datei 3: `web/index.html`**
+
+7. `FilterSheet._ET` (ab Z.2200): Nach `['Vollmond', 'Vollmond']` einfügen:
+   ```javascript
+   ['Neumond',   'Neumond'],
+   ['Supermond', 'Supermond'],
+   ```
+
+8. `MOON_TYPES` (Z.3151): `'Neumond'`, `'Supermond'` ergänzen
+
+---
+
+#### Testplan
+
+- [ ] **Automatisiert:** `backend/tests/test_moon_phase_events.py` neu anlegen
+  - `test_full_moon_overrides_alignment_event_type()` — phase_fraction=0.50, erwartet FULL_MOON
+  - `test_supermoon_threshold()` — phase_fraction=0.50, mock distance < 362_000 → SUPER_MOON
+  - `test_new_moon_overrides_milkyway_event_type()` — phase_fraction=0.01, erwartet NEW_MOON
+  - `test_non_phase_night_unchanged()` — phase_fraction=0.25, erwartet MOON_ALIGNMENT (kein Override)
+  - `test_alignment_filter_exempt_neumond()` — `_passes_alignment_filter({'event_type': 'Neumond', 'composition_analysis': None})` → True
+- [ ] **Manuell:** Feed laden, auf Vollmond-Datum navigieren (z.B. nächster: ca. 2026-07-21), Vollmond-Event prüfen; Filter "Vollmond" anwenden → Events sichtbar; Filter "Mond-Alignment" → Events nicht sichtbar
+
+---
+
+#### Analyse-Status
+
+- [x] Example Mapping durchgeführt
+- [x] Architektur-Entscheidung bestätigt (Stephan, 2026-06-24): Event-Type-Override, nicht eigenständige Events
+- [x] Pre-Mortem durchgeführt
+- [x] Code-Verifikation: alle 4 betroffenen Dateien gelesen
+- [x] Implementierungsoptionen bewertet → direkt umsetzbar, eine klare Option
 
 ---
 
