@@ -164,3 +164,98 @@ class TestTask24DeviceTokens:
         """TASK-24 AK: leerer Token → 422."""
         r = client.post("/register-device?token=")
         assert r.status_code == 422
+
+
+class TestCameraProfile:
+    """US-90: Kamera-Setup serverseitig persistieren.
+
+    AK:
+    - POST + GET Roundtrip (Upsert)
+    - Zweiter POST gleicher device_id überschreibt (kein Doppeleintrag)
+    - GET unbekannte device_id → 200 + {}
+    - POST ohne device_id → 422
+    - POST fl < 8 oder > 1200 → 422
+    - POST sensor unbekannt → 422
+    - POST ori unbekannt → 422
+    - POST ohne Auth → 401
+    - GET ohne Auth → 200 (öffentlich)
+    """
+
+    DEVICE = "cam-test-us90"
+
+    def test_post_and_get_roundtrip(self, client, auth_headers):
+        """US-90 AK: POST speichert, GET gibt zurück."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "fullframe",
+                              "fl": 85, "ori": "landscape"})
+        assert r.status_code == 201, r.text
+        data = r.json()
+        assert data["ok"] is True
+        assert data["sensor"] == "fullframe"
+        assert data["fl"] == 85
+
+        r2 = client.get(f"/camera-profile?device_id={self.DEVICE}")
+        assert r2.status_code == 200
+        assert r2.json()["sensor"] == "fullframe"
+        assert r2.json()["fl"] == 85
+
+    def test_upsert_overwrites(self, client, auth_headers):
+        """US-90 AK: zweiter POST gleicher device_id → überschreibt, kein Doppel."""
+        client.post("/camera-profile", headers=auth_headers,
+                    json={"device_id": self.DEVICE, "sensor": "fullframe", "fl": 85, "ori": "landscape"})
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "mft", "fl": 135, "ori": "portrait"})
+        assert r.status_code == 201
+        assert r.json()["fl"] == 135
+        assert r.json()["sensor"] == "mft"
+
+        r2 = client.get(f"/camera-profile?device_id={self.DEVICE}")
+        assert r2.json()["fl"] == 135
+        assert r2.json()["sensor"] == "mft"
+
+    def test_get_unknown_device_returns_empty(self, client):
+        """US-90 AK: unbekannte device_id → 200 + {}."""
+        r = client.get("/camera-profile?device_id=this-device-does-not-exist-us90")
+        assert r.status_code == 200
+        assert r.json() == {}
+
+    def test_post_without_device_id_rejected(self, client, auth_headers):
+        """US-90 AK: POST ohne device_id → 422."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"sensor": "fullframe", "fl": 85, "ori": "landscape", "device_id": ""})
+        assert r.status_code == 422
+
+    def test_fl_too_small_rejected(self, client, auth_headers):
+        """US-90 AK: fl < 8 → 422."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "fullframe", "fl": 5, "ori": "landscape"})
+        assert r.status_code == 422
+
+    def test_fl_too_large_rejected(self, client, auth_headers):
+        """US-90 AK: fl > 1200 → 422."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "fullframe", "fl": 1500, "ori": "landscape"})
+        assert r.status_code == 422
+
+    def test_invalid_sensor_rejected(self, client, auth_headers):
+        """US-90 AK: unbekannter sensor → 422."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "bogus", "fl": 85, "ori": "landscape"})
+        assert r.status_code == 422
+
+    def test_invalid_ori_rejected(self, client, auth_headers):
+        """US-90 AK: ori nicht landscape/portrait → 422."""
+        r = client.post("/camera-profile", headers=auth_headers,
+                        json={"device_id": self.DEVICE, "sensor": "fullframe", "fl": 85, "ori": "diagonal"})
+        assert r.status_code == 422
+
+    def test_post_requires_auth(self, client):
+        """US-90 AK: POST ohne Auth → 401."""
+        r = client.post("/camera-profile",
+                        json={"device_id": self.DEVICE, "sensor": "fullframe", "fl": 85, "ori": "landscape"})
+        assert r.status_code == 401
+
+    def test_get_requires_no_auth(self, client):
+        """US-90 AK: GET ohne Auth → 200 (öffentlich)."""
+        r = client.get(f"/camera-profile?device_id={self.DEVICE}")
+        assert r.status_code == 200

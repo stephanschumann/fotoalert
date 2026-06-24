@@ -89,6 +89,14 @@ CREATE TABLE IF NOT EXISTS device_tokens (
     device_id     TEXT    NOT NULL DEFAULT '',
     updated       TEXT    NOT NULL   -- ISO-Timestamp
 );
+
+CREATE TABLE IF NOT EXISTS camera_profiles (
+    device_id     TEXT    PRIMARY KEY,
+    sensor        TEXT    NOT NULL,
+    fl            INTEGER NOT NULL,
+    ori           TEXT    NOT NULL,
+    updated       TEXT    NOT NULL   -- ISO-Timestamp
+);
 """
 
 
@@ -516,6 +524,54 @@ class LocationStore:
         with self._connect() as conn:
             row = conn.execute("SELECT COUNT(*) FROM device_tokens").fetchone()
         return row[0] if row else 0
+
+    # ------------------------------------------------------------------
+    # Camera Profiles (US-90)
+    # ------------------------------------------------------------------
+
+    _VALID_SENSORS = {"fullframe", "apsc_canon", "apsc_sony", "mft", "one_inch"}
+    _VALID_ORI = {"landscape", "portrait"}
+
+    def upsert_camera_profile(
+        self,
+        device_id: str,
+        sensor: str,
+        fl: int,
+        ori: str,
+        updated: str,
+    ) -> None:
+        """
+        Speichert/aktualisiert das Kamera-Profil eines Geräts (Upsert).
+        PRIMARY KEY device_id → 1 Gerät = 1 Profil, überschreibbar.
+        """
+        sql = """INSERT INTO camera_profiles (device_id, sensor, fl, ori, updated)
+                 VALUES (?, ?, ?, ?, ?)
+                 ON CONFLICT(device_id)
+                 DO UPDATE SET sensor = excluded.sensor,
+                               fl = excluded.fl,
+                               ori = excluded.ori,
+                               updated = excluded.updated"""
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(sql, (device_id, sensor, int(fl), ori, updated))
+                conn.execute("COMMIT")
+                logger.info("CameraProfile gespeichert: device=%s sensor=%s fl=%s ori=%s",
+                            device_id, sensor, fl, ori)
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def get_camera_profile(self, device_id: str) -> Optional[dict]:
+        """
+        Gibt das Kamera-Profil eines Geräts zurück, oder None wenn unbekannt.
+        """
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT sensor, fl, ori FROM camera_profiles WHERE device_id = ?",
+                (device_id,)
+            ).fetchone()
+        return dict(row) if row else None
 
     def integrity_check(self) -> str:
         """Führt PRAGMA integrity_check aus. Gibt 'ok' zurück bei Erfolg."""

@@ -942,7 +942,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.12.1';
+const APP_VERSION = '1.13.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2595,12 +2595,64 @@ const CameraFOV = {
   _maps: {},    // Leaflet-Map-Instanzen  { prefix: L.Map }
   _cones: {},   // FOV-Polygon-Layer      { prefix: L.Polygon }
   _data: {},    // Geodaten               { prefix: {obsLat,obsLon,subjLat,subjLon,distM} }
+  _profile: null,   // Server-Profil-Cache (US-90); null = noch nicht geladen
+  _saveTimer: null, // Debounce-Timer für Server-POST
+
+  // US-90: Boot-Load — lädt Profil vom Server, migriert ggf. localStorage-Stand
+  async _loadProfile() {
+    const deviceId = Rating.deviceId();
+    const _default = {sensor:'fullframe', fl:85, ori:'landscape'};
+    try {
+      const resp = await API.get(`/camera-profile?device_id=${encodeURIComponent(deviceId)}`);
+      if (resp && resp.sensor) {
+        // Server hat ein Profil → als Quelle verwenden
+        this._profile = {sensor: resp.sensor, fl: resp.fl, ori: resp.ori};
+        try { localStorage.setItem('cameraProfile', JSON.stringify(this._profile)); } catch {}
+        return;
+      }
+      // Server leer → ggf. Migration aus localStorage
+      const local = (() => { try { return JSON.parse(localStorage.getItem('cameraProfile')||'{}'); } catch { return {}; } })();
+      if (local.sensor) {
+        // Migration: localStorage → Server (einmalig)
+        this._profile = Object.assign({}, _default, local);
+        try {
+          const token = localStorage.getItem('fa_token');
+          if (token) {
+            await API.post('/camera-profile', {
+              device_id: deviceId, ...this._profile
+            });
+          }
+        } catch {}
+      } else {
+        this._profile = {..._default};
+      }
+    } catch {
+      // Offline oder Server-Fehler → localStorage/Default, kein Crash
+      const local = (() => { try { return JSON.parse(localStorage.getItem('cameraProfile')||'{}'); } catch { return {}; } })();
+      this._profile = Object.assign({}, _default, local);
+    }
+  },
 
   _getProfile() {
+    if (this._profile) return {...this._profile};
+    // Fallback solange _loadProfile noch nicht gelaufen (sync, kein await)
     try { return Object.assign({sensor:'fullframe',fl:85,ori:'landscape'}, JSON.parse(localStorage.getItem('cameraProfile')||'{}')); }
     catch { return {sensor:'fullframe',fl:85,ori:'landscape'}; }
   },
-  _saveProfile(p) { try { localStorage.setItem('cameraProfile', JSON.stringify(p)); } catch {} },
+
+  _saveProfile(p) {
+    // Immer sofort lokal speichern (Offline-Fallback)
+    this._profile = {...p};
+    try { localStorage.setItem('cameraProfile', JSON.stringify(p)); } catch {}
+    // Server-POST debounced (~400 ms) — fire-and-forget
+    if (this._saveTimer) clearTimeout(this._saveTimer);
+    this._saveTimer = setTimeout(async () => {
+      try {
+        const deviceId = Rating.deviceId();
+        await API.post('/camera-profile', {device_id: deviceId, ...p});
+      } catch {}
+    }, 400);
+  },
 
   _calcFOV(sensor, fl, ori) {
     const s = this._sensors[sensor] || this._sensors.fullframe;
@@ -4205,6 +4257,8 @@ const App = {
     // US-89: localStorage-Bewertungen einmalig migrieren, dann Aggregat-Cache laden
     await Rating.migrateFromLocalStorage();
     await Rating.loadAll();
+    // US-90: Kamera-Profil vom Server laden (migration aus localStorage einmalig)
+    await CameraFOV._loadProfile();
     // BUG-30: Locations vorladen (kein Render, nur Daten) damit Locations.nameFor()
     // im Feed/Kalender-Detail sofort den aktuellen Namen liefert — ohne Locations-Tab-Besuch.
     // BUG-28: try/catch damit ein /locations-Fehler (401/500) den App-Start nicht blockiert;

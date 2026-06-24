@@ -26,9 +26,9 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | TASK-23 *(Analyse fertig — wartet am Weg-/Done-Gate auf Stephan)*, US-90 *(Analyse fertig 2026-06-21 — wartet am Weg-Gate: Empfehlung Option A)*, US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | BUG-35 |
+| **🔄 In Progress** | wird gerade implementiert | US-90 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -2962,14 +2962,15 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 
 ---
 
-### TASK-23 · Audit: Welche Nutzerdaten werden nicht serverseitig persistiert (Verlustrisiko)? `[ ]`
+### TASK-23 · Audit: Welche Nutzerdaten werden nicht serverseitig persistiert (Verlustrisiko)? `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-21 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Vollständige Bestandsaufnahme aller nutzerseitig erzeugten/änderbaren Daten daraufhin, ob sie serverseitig (SQLite) gespeichert werden oder nur lokal (`localStorage`) liegen und damit verloren gehen können (iOS löscht PWA-localStorage nach 7 Tagen Inaktivität, vgl. BUG-26). Ergebnis: eine Liste „persistiert ✅ / nur lokal ⚠️" pro Datenart mit Empfehlung, was nachgezogen werden muss — als Grundlage für Folgetickets.
 
@@ -3011,15 +3012,15 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 *⚠️ Nur lokal (`localStorage`) — Verlustrisiko (iOS löscht PWA-Storage nach 7 Tagen):*
 | Key | Datenart | Empfehlung |
 |---|---|---|
-| `fotoalert_ratings` | Sterne-Bewertungen | Persistieren → **US-89** (in Analyse) deckt ab |
-| `cameraProfile` | Kamera-Setup (Sensor, Brennweite, Ausrichtung) | Persistieren → **neues Folgeticket empfohlen** (echte Nutzerdaten, aktuell unabgedeckt) |
+| ~~`fotoalert_ratings`~~ | ~~Sterne-Bewertungen~~ | ~~Persistieren → **US-89** (in Analyse) deckt ab~~ ✅ **US-89 Done** (2026-06-21) |
+| `cameraProfile` | Kamera-Setup (Sensor, Brennweite, Ausrichtung) | Persistieren → **US-90** (In Progress) |
 | `fotoalert_filters` | Filter-Zustände | Lokal lassen (Geräte-Präferenz) — optional Sync via US-75 |
 | `fa_notify_high/golden/milky` | Benachrichtigungs-Präferenzen | Lokal lassen (geräte-/push-gebunden) |
 | `fa_sec` | Auf-/zugeklappte Detail-Sektionen | Lokal lassen (reiner UI-State) |
 
 *🔒 Lokal by design (kein Verlustrisiko):* `fa_token`, `fa_role` (Session, wird beim Login neu ausgegeben), `fa_api` (Dev-Config).
 
-*⚠️ Serverseitig, aber NICHT persistiert:* `_device_tokens` (Push-Token-Liste in `main.py`) liegt nur im RAM → bei jedem Server-Neustart weg. Push ist im Frontend noch nicht verdrahtet → latent. Empfehlung: **neues Folgeticket** (Token in SQLite), spätestens wenn Push gebaut wird.
+*✅ Serverseitig persistiert (nachträglich):* `_device_tokens` → **TASK-24 Done** (v1.11.5, 2026-06-22): Push-Token-Tabelle `device_tokens` in SQLite, kein RAM-State mehr.
 
 *⚠️ Noch nicht gebaut:* Favoriten (**US-17**) — AK sieht explizit `localStorage` vor → bei Bau direkt Verlustrisiko. Designhinweis in US-17 ergänzen: serverseitig persistieren.
 
@@ -3032,18 +3033,19 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 - **Befund Veraltung:** `fotoalert_ratings` trägt jetzt im Code den Kommentar „nur noch für Migration aus localStorage" und **US-89 steht inzwischen in Done** → Sterne-Bewertungen sind serverseitig persistiert. Die Audit-Tabelle (Stand 06-21) führt sie noch als ⚠️ „US-89 (in Analyse)". → Reklassifizieren auf ✅ persistiert (US-89 erledigt). *(Inhalt bewusst nicht eigenmächtig umgeschrieben — Stephans Entscheidung.)*
 - Substanz des Audits unverändert gültig: offene Persistenz-Empfehlungen bleiben `cameraProfile` (Folgeticket) und `_device_tokens` (RAM-only, Folgeticket) + Designhinweis US-17.
 
-> ⏸️ **Weg-/Done-Gate (wartet auf Stephan):** Reiner Audit, kein Code/Release. Entscheidung offen: (a) zwei empfohlene Folgetickets anlegen (`cameraProfile`-Persistenz, `_device_tokens`-Persistenz), (b) Designhinweis in US-17 ergänzen, (c) Ratings-Zeile auf ✅ reklassifizieren — dann → Done.
+> ✅ **Done (2026-06-24):** Audit-Ergebnis aktualisiert — Ratings auf ✅ (US-89 Done), TASK-24 auf ✅ (v1.11.5), US-90 In Progress, Designhinweis in US-17 ergänzt. Kein Code, kein Release.
 
 ---
 
-### US-90 · Kamera-Setup serverseitig persistieren `[ ]`
+### US-90 · Kamera-Setup serverseitig persistieren `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-21 |
+| **In Progress seit** | 2026-06-24 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass mein Kamera-Setup (Sensor, Brennweite, Ausrichtung) serverseitig gespeichert wird, damit es nach App-Schließen/Geräte­wechsel erhalten bleibt. Aktuell liegt es nur in `localStorage['cameraProfile']` und geht verloren (iOS löscht PWA-Storage nach 7 Tagen, vgl. BUG-26).
 
@@ -3528,6 +3530,8 @@ Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 > - Filter-Chip „Nur Favoriten" im Feed (integriert in US-32 Filter-System)
 > - Favoriten werden lokal gespeichert (localStorage / PWA)
 > - Favoriten-Tab oder Section im Locations-Menü
+>
+> ⚠️ **Persistenz-Designhinweis (TASK-23, 2026-06-24):** Das AK „localStorage/PWA" reicht nicht — iOS löscht PWA-Storage nach 7 Tagen Inaktivität (vgl. BUG-26). Bei Implementierung Favoriten direkt serverseitig persistieren (analog US-89/US-90), nicht rein lokal.
 
 ### US-26 · Sprachumschaltung DE / EN
 > **Als Fotograf** möchte ich die App zwischen Deutsch und Englisch umschalten können, **damit ich** sie auch mit internationalen Fotografie-Gästen nutzen kann.
@@ -5089,14 +5093,15 @@ Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit u
 
 ---
 
-### BUG-35 · Neue Location: Feed zeigt keine Events + kein Status-Feedback `[~]`
+### BUG-35 · Neue Location: Feed zeigt keine Events + kein Status-Feedback `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-24 |
 | **Analysiert** | 2026-06-24 |
 | **In Progress seit** | 2026-06-24 |
 

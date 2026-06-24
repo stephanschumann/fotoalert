@@ -1562,6 +1562,65 @@ async def delete_rating(loc_id: str, device_id: str = "",
 
 
 # ---------------------------------------------------------------------------
+# Camera Profiles (US-90)
+# ---------------------------------------------------------------------------
+
+_VALID_SENSORS = {"fullframe", "apsc_canon", "apsc_sony", "mft", "one_inch"}
+_VALID_ORI = {"landscape", "portrait"}
+
+
+class CameraProfileIn(BaseModel):
+    device_id: str
+    sensor: str
+    fl: int
+    ori: str
+
+
+@app.get("/camera-profile")
+async def get_camera_profile(device_id: str = "") -> dict:
+    """
+    Gibt das Kamera-Profil eines Geräts zurück.
+    Unbekanntes Gerät → {} (HTTP 200, kein 404 — Frontend fällt auf Default zurück).
+    Kein Auth erforderlich.
+    """
+    if not device_id:
+        return {}
+    profile = _store.get_camera_profile(device_id)
+    return profile if profile is not None else {}
+
+
+@app.post("/camera-profile", status_code=201)
+async def upsert_camera_profile(
+    body: CameraProfileIn,
+    _role: str = Depends(auth.require_auth),
+) -> dict:
+    """Speichert/aktualisiert das Kamera-Profil eines Geräts (Upsert). Auth erforderlich."""
+    if not body.device_id:
+        raise HTTPException(status_code=422, detail="device_id ist erforderlich.")
+    if body.sensor not in _VALID_SENSORS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"sensor muss einer von {sorted(_VALID_SENSORS)} sein."
+        )
+    if body.fl < 8 or body.fl > 1200:
+        raise HTTPException(status_code=422, detail="fl muss zwischen 8 und 1200 liegen.")
+    if body.ori not in _VALID_ORI:
+        raise HTTPException(
+            status_code=422,
+            detail=f"ori muss einer von {sorted(_VALID_ORI)} sein."
+        )
+    updated = datetime.now(timezone.utc).isoformat()
+    _store.upsert_camera_profile(
+        device_id=body.device_id,
+        sensor=body.sensor,
+        fl=body.fl,
+        ori=body.ori,
+        updated=updated,
+    )
+    return {"ok": True, "sensor": body.sensor, "fl": body.fl, "ori": body.ori}
+
+
+# ---------------------------------------------------------------------------
 # Static Files (PWA) – muss NACH allen API-Routen kommen
 # ---------------------------------------------------------------------------
 import os, pathlib
