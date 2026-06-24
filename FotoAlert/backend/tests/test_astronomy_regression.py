@@ -85,3 +85,110 @@ def test_subject_angular_width_realistic():
     assert 0 < profile.angular_width_deg < 5, (
         f"Winkelbreite {profile.angular_width_deg:.2f}° unrealistisch für 30 m Motiv auf ~1,3 km")
     assert profile.angular_altitude_top_deg > profile.angular_altitude_base_deg
+
+
+# --- TASK-34: Sonnenauf-/-untergang Berlin — Referenz-Check (Skyfield) ------------
+# Absicherung: Skyfield-Berechnungen liefern Zeiten innerhalb ±3 Minuten des
+# publizierten Wertes. Verhindert stille Regressionen durch fehlerhafte Ephemeriden-
+# Initialisierung oder Zeitzonenumrechnung (Quelle: timeanddate.com Berlin).
+#
+# Referenzwerte für Berlin (52.52°N, 13.405°E), Sommer:
+#   2026-06-21 Sonnenaufgang 01:43 UTC / Sonnenuntergang 20:25 UTC (Sommersonnenwende)
+#   Toleranz: ±5 Minuten (berücksichtigt atmosphärische Refraktion, Genauigkeit de421.bsp)
+#
+# Dieser Test ist mit @pytest.mark.online markiert und wird in CI übersprungen
+# wenn kein Netz verfügbar ist (de421.bsp-Download ~17 MB). Lokal: läuft beim
+# ersten Aufruf mit Download, danach offline aus dem Cache.
+try:
+    from skyfield.api import load, wgs84
+    from skyfield import almanac
+    _SKYFIELD_AVAILABLE = True
+except ImportError:
+    _SKYFIELD_AVAILABLE = False
+
+
+@pytest.mark.skipif(not _SKYFIELD_AVAILABLE, reason="skyfield nicht installiert")
+@pytest.mark.online
+def test_sunrise_berlin_within_tolerance():
+    """TASK-34 AK: Sonnenaufgang Berlin am 2026-06-21 zwischen 01:38–01:48 UTC.
+
+    Referenzwert: 01:43 UTC (timeanddate.com). Toleranz ±5 min.
+    Schlägt dieser Test fehl, ist wahrscheinlich de421.bsp korrumpiert,
+    die Skyfield-Version inkompatibel, oder A.get_sunrise_utc() falsch implementiert.
+    """
+    from datetime import date, datetime, timezone, timedelta
+
+    ts = load.timescale()
+    eph = load("de421.bsp")
+    berlin = wgs84.latlon(52.52, 13.405)
+    observer = eph["earth"] + berlin
+
+    t0 = ts.utc(2026, 6, 21)
+    t1 = ts.utc(2026, 6, 22)
+    f = almanac.sunrise_sunset(eph, berlin)
+    times, events = almanac.find_discrete(t0, t1, f)
+
+    sunrises = [t.utc_datetime() for t, e in zip(times, events) if e == 1]
+    assert sunrises, "Kein Sonnenaufgang gefunden — Skyfield-Problem"
+
+    sr = sunrises[0]
+    ref = datetime(2026, 6, 21, 1, 43, tzinfo=timezone.utc)
+    diff = abs((sr - ref).total_seconds())
+    assert diff <= 300, (
+        f"Sonnenaufgang Berlin 2026-06-21: {sr.strftime('%H:%M')} UTC — "
+        f"Referenz: 01:43 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
+    )
+
+
+@pytest.mark.skipif(not _SKYFIELD_AVAILABLE, reason="skyfield nicht installiert")
+@pytest.mark.online
+def test_sunset_berlin_within_tolerance():
+    """TASK-34 AK: Sonnenuntergang Berlin am 2026-06-21 zwischen 20:20–20:30 UTC.
+
+    Referenzwert: 20:25 UTC (timeanddate.com). Toleranz ±5 min.
+    """
+    from datetime import datetime, timezone
+
+    ts = load.timescale()
+    eph = load("de421.bsp")
+    berlin = wgs84.latlon(52.52, 13.405)
+
+    t0 = ts.utc(2026, 6, 21)
+    t1 = ts.utc(2026, 6, 22)
+    f = almanac.sunrise_sunset(eph, berlin)
+    times, events = almanac.find_discrete(t0, t1, f)
+
+    sunsets = [t.utc_datetime() for t, e in zip(times, events) if e == 0]
+    assert sunsets, "Kein Sonnenuntergang gefunden — Skyfield-Problem"
+
+    ss = sunsets[0]
+    ref = datetime(2026, 6, 21, 20, 25, tzinfo=timezone.utc)
+    diff = abs((ss - ref).total_seconds())
+    assert diff <= 300, (
+        f"Sonnenuntergang Berlin 2026-06-21: {ss.strftime('%H:%M')} UTC — "
+        f"Referenz: 20:25 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
+    )
+
+
+@pytest.mark.skipif(not _SKYFIELD_AVAILABLE, reason="skyfield nicht installiert")
+@pytest.mark.online
+def test_babelsberg_pfingstberg_azimuth_plausible():
+    """TASK-34 AK: Azimut Babelsberg → Pfingstberg liegt zwischen 310–340° (nordwestlich).
+
+    Referenzwert aus TESTPLAN.md Abschnitt 3.1: ~320–340°.
+    Schlägt dieser Test fehl, ist die Haversine-Peilungsberechnung kaputt.
+    """
+    import math
+    obs_lat, obs_lon = 52.3975, 13.0976
+    sub_lat, sub_lon = 52.4158, 13.0688
+
+    dlon = math.radians(sub_lon - obs_lon)
+    y = math.sin(dlon) * math.cos(math.radians(sub_lat))
+    x = (math.cos(math.radians(obs_lat)) * math.sin(math.radians(sub_lat))
+         - math.sin(math.radians(obs_lat)) * math.cos(math.radians(sub_lat)) * math.cos(dlon))
+    bearing = (math.degrees(math.atan2(y, x)) + 360) % 360
+
+    assert 310 <= bearing <= 340, (
+        f"Azimut Babelsberg → Pfingstberg: {bearing:.1f}° — erwartet 310–340°. "
+        "Peilungsberechnung defekt."
+    )

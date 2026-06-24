@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-35, BUG-36, BUG-37 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -184,22 +184,23 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 
 ---
 
-### BUG-35 · Chancendetails: Koordinaten-Sektion Layout (Overflow, Label, Ausrichtung, Kopierbarkeit) `[x]`
+### BUG-38 · Chancendetails: Koordinaten-Sektion Layout (Overflow, Label, Ausrichtung, Kopierbarkeit) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-24 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** In der Koordinaten-Sektion der Chancendetails gibt es vier zusammenhängende UI-Mängel: (1) Der „Streetview"-Button überläuft den Container rechts (nur „Stree" sichtbar). (2) Das Label „Standort Fotograf" soll zu „Standort" verkürzt werden. (3) Die Koordinatenzeilen für Standort und Motiv sind nicht gleich ausgerichtet (Motiv-Zeile fehlt Streetview-Button → asymmetrisches Layout). (4) Koordinaten sind reiner Text – nicht selektierbar/kopierbar; sie sollen als auswählbares Datenfeld (z. B. `user-select: all` oder readonly input) dargestellt werden.
 
-**Bezug:** Screenshots von 2026-06-24. Verwandt mit BUG-36 (blaugrauer Strich im selben Header-Bereich), US-87 (größere Karte).
+**Bezug:** Screenshots von 2026-06-24. Verwandt mit BUG-39 (blaugrauer Strich im selben Header-Bereich), US-87 (größere Karte).
 
 **Scope:**
 Eingeschlossen: `.coords-row` CSS + HTML-Label im Event-Detail-Sheet (`web/index.html` Z. 297–299, 2995–3012).
-Ausgeschlossen: Location-Detail-Sheet (kein `.coords-row`-Vorkommen dort); BUG-36 (blauer Strich = eigenes Ticket); US-95 (Button-Sizing).
+Ausgeschlossen: Location-Detail-Sheet (kein `.coords-row`-Vorkommen dort); BUG-39 (blauer Strich = eigenes Ticket); US-95 (Button-Sizing).
 
 **Akzeptanzkriterien:**
 - [ ] StreetView-Button „👁 Street View" vollständig sichtbar, kein Overflow
@@ -231,7 +232,7 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 ---
 
-### BUG-36 · Chancendetails: Blaugrauer Strich links im Sheet-Header `[ ]`
+### BUG-39 · Chancendetails: Blaugrauer Strich links im Sheet-Header `[ ]`
 
 | Feld | Wert |
 |------|------|
@@ -242,22 +243,53 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 **Beschreibung:** Auf Höhe des ×-Schließen-Buttons erscheint auf der linken Seite des Detail-Sheets ein blaugrauer horizontaler Strich ohne erkennbaren Zweck. Vermutlich ein verwaistes Border-, Pseudo-Element oder ein unsichtbares Icon. Kann entfernt werden.
 
-**Bezug:** Screenshot von 2026-06-24. Verwandt mit BUG-35 (selber Sheet-Bereich).
+**Bezug:** Screenshot von 2026-06-24. Verwandt mit BUG-38 (selber Sheet-Bereich).
 
 ---
 
-### BUG-37 · Chancendetails: Relative Höhe Himmelsobjekt über Motivspitze fehlt (US-67 Regression) `[ ]`
+### BUG-40 · Chancendetails: Relative Höhe Himmelsobjekt über Motivspitze fehlt (US-67 Regression) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-24 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Die in US-67 implementierte Angabe „Höhe Himmelsobjekt über Motivspitze (m)" sowie die Kompositions-Labels (🎯 Exakt / ✨ Knapp über / usw.) und der Höhenversatz-Text sind nicht mehr in der Astronomie-Sektion der Chancendetails sichtbar. Das Feld war früher vorhanden und scheint durch eine spätere Änderung entfernt oder überschrieben worden zu sein (Regression). Aktuell sichtbar: Mondphase, Azimut Himmelsobjekt, Höhe Himmelsobjekt, Azimut Sichtachse, Sonnenaufgang/-untergang – aber kein relativer Höhenversatz.
 
 **Bezug:** US-67 [x] (Originalimplementierung). Screenshot vom 2026-06-24 zeigt fehlende Zeile. Möglicherweise Konflikt mit US-70/US-81 (Scout-Tab Erweiterungen die composition_analysis-Felder umstrukturiert haben könnten).
+
+**Scope:**
+Eingeschlossen: `Sections._def` in `web/index.html` Z. 2559 — `ev_skypos` auf `true` setzen.
+Ausgeschlossen: `ev_kompo` (bleibt closed), Backend (`composition_analysis` ist korrekt), andere Sektionen.
+
+**Akzeptanzkriterien:**
+- [ ] Mond-Alignment Details: Sektion „🧭 Himmelsposition" beim Öffnen sofort sichtbar
+- [ ] Text enthält Meter-Angabe (z.B. „≈ 14 m darüber" oder „nahezu exakt")
+- [ ] Goldene Stunde / Blaue Stunde: keine Himmelsposition-Sektion (EV_SKYPOS_EXEMPT greift)
+- [ ] Event ohne composition_analysis: keine Himmelsposition-Sektion
+- [ ] `ev_kompo` (Kompositions-Analyse) bleibt geschlossen by default — keine Änderung
+- [ ] Edge Case: User hatte ev_skypos manuell geschlossen → localStorage-Wert bleibt erhalten
+
+**Pre-Mortem:**
+- 💀 Gate `!ca` → leere Sektion für Non-Alignment-Events: kein Risiko, Sektion wird nicht gerendert
+- 💀 localStorage-Migration: User ohne Eintrag bekommt neuen Default `true` korrekt; User mit `false`-Eintrag unberührt
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-24)
+- [x] Pre-Mortem durchgeführt (2026-06-24)
+- [x] Architektur analysiert: `web/index.html` Z. 2556–2584 (Sections._def), Z. 2871–2929 (ev_skypos), Z. 2930–2979 (ev_kompo)
+- [x] Implementierungsoptionen: A (1-Zeilen Default-Fix) / B (Feld in ev_astro einblenden)
+- [ ] Empfehlung: Option A — `ev_skypos: true` in `Sections._def` (Z. 2559), 1-Zeilen-Änderung
+
+**📎 Code-Verifikation (2026-06-24):**
+Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev_kompo rendern Versatz in Metern. Root-Cause: ev_skypos nicht in _def → Fallback `false` → Sektion closed.
+
+**Testplan:**
+- [ ] Automatisiert: kein Backend-Test nötig (reines CSS/Default-State)
+- [ ] Manuell: Mond-Alignment öffnen → Himmelsposition sofort sichtbar, Meter-Wert lesbar; Goldene Stunde → keine Himmelsposition-Sektion
 
 ---
 
@@ -272,7 +304,7 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 **Beschreibung:** Die Aktions-Buttons (Zum Kalender hinzufügen, Erinnerung setzen, Erneut prüfen) sind sehr groß und nehmen unverhältnismäßig viel Platz ein; gleichzeitig ist die FOV-Karte relativ klein. Durch kompaktere Buttons (geringere Höhe/Padding) und eine größere Karte wird das Manövrieren/Navigieren in der Detailansicht angenehmer. Außerdem soll ein allgemeines Design-Review auf weitere Inkonsistenzen im Sheet durchgeführt werden.
 
-**Bezug:** Verwandt mit US-87 [  ] (Vollbild-Overlay für Karte). BUG-35 und BUG-36 zuerst fixen (Koordinaten-Overflow), da sie den verfügbaren Platz ebenfalls betreffen.
+**Bezug:** Verwandt mit US-87 [  ] (Vollbild-Overlay für Karte). BUG-38 und BUG-39 zuerst fixen (Koordinaten-Overflow), da sie den verfügbaren Platz ebenfalls betreffen.
 
 ---
 
@@ -5354,5 +5386,18 @@ await Locations.load();
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold: `compute_calendar_incremental()` (Z. 589, 146 Zeilen), `_run_single_location_flow()` (Z. 742, 92 Zeilen), `_run_standard_flow()` (Z. 837, 84 Zeilen). Aufteilen in kleinere Hilfsfunktionen.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+
+### TASK-39 · Refactoring: Lange Funktion local() in index.html aufteilen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** JS-Funktion `local()` in `web/index.html` (Z. 2633, ~265 Zeilen) überschreitet den 80-Zeilen-Threshold deutlich. In kleinere Hilfsfunktionen aufteilen (z.B. Rendering, Event-Handler, Datenaufbereitung).
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)

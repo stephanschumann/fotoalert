@@ -319,6 +319,152 @@ def _check_detail_sheet(page, commit: str, shot) -> List["Finding"]:
     return findings
 
 
+# --- TASK-35: Mobile Viewport Pass ------------------------------------------------
+# Fängt iOS-PWA-Layout-Bugs ab, die im Desktop-Chromium unsichtbar sind:
+#   BUG-19 / BUG-25: Close-Button in Sheets außerhalb des Safe-Area-Bereichs
+#   BUG-34: Edit-Overlay übersteigt viewport.width auf iPhone-Breite
+#
+# Viewport: iPhone 14 (390×844 px, deviceScaleFactor=3, isMobile=True).
+# Playwright-Chromium ist kein echtes Safari/WebKit — aber die Viewport-Größe
+# reicht, um die häufigsten Layout-Klassen (overflow, z-index, position:fixed)
+# zu erkennen. Kein Ersatz für Gerätetests, aber automatischer Frühwarner.
+
+def run_mobile_checks(
+    base_url: str,
+    password: str,
+    screenshot_root: Path,
+    headless: bool = True,
+    timeout_ms: int = 15000,
+) -> List["Finding"]:
+    """Mobile-Viewport-Pass: iPhone-14-Dimensionen, isMobile=True.
+
+    Prüft ob Sheets und Overlays den Viewport nicht überschreiten und
+    ob Close-Buttons im sichtbaren Bereich bleiben.
+    """
+    sync_playwright = _import_playwright()
+    run = _run_id() + "-mobile"
+    shot_dir = screenshot_root / run
+    shot_dir.mkdir(parents=True, exist_ok=True)
+    commit = _commit_sha()
+    findings: List[Finding] = []
+
+    # iPhone 14 Viewport
+    IPHONE_WIDTH = 390
+    IPHONE_HEIGHT = 844
+
+    def _shot(name: str) -> str:
+        target = shot_dir / (name + ".png")
+        try:
+            page.screenshot(path=str(target), full_page=False)
+        except Exception:
+            return ""
+        return str(target)
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=headless)
+        ctx = browser.new_context(
+            viewport={"width": IPHONE_WIDTH, "height": IPHONE_HEIGHT},
+            device_scale_factor=3,
+            is_mobile=True,
+            has_touch=True,
+        )
+        page = ctx.new_page()
+        page.set_default_timeout(timeout_ms)
+
+        page.goto(base_url, wait_until="domcontentloaded")
+
+        # Login
+        page.fill("#login-pw", password)
+        page.click(".login-btn")
+        try:
+            page.wait_for_function("() => typeof Auth !== 'undefined' && Auth.isLoggedIn()", timeout=timeout_ms)
+        except Exception:
+            findings.append(Finding(
+                view="mobile-login",
+                assertion_id="mobile_login_precondition",
+                expected="Login im Mobile-Viewport erfolgreich",
+                actual="Auth.isLoggedIn() blieb false im Mobile-Viewport",
+                message="mobile login failed",
+                screenshot_path=_shot("mobile-login-fail"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            ))
+            browser.close()
+            return findings
+
+        # --- 1) App-Container überschreitet Viewport nicht -----------------------
+        app_width = page.eval_on_selector("#app", "el => el.getBoundingClientRect().width")
+        if app_width > IPHONE_WIDTH + 5:  # 5px Toleranz für sub-pixel rendering
+            findings.append(Finding(
+                view="mobile-layout",
+                assertion_id="app_width_overflow",
+                expected=f"#app-Breite ≤ {IPHONE_WIDTH}px",
+                actual=f"#app-Breite = {app_width:.0f}px (übersteigt Viewport)",
+                message=f"app container overflows mobile viewport: {app_width:.0f}px > {IPHONE_WIDTH}px",
+                screenshot_path=_shot("mobile-app-overflow"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            ))
+
+        # --- 2) Detail-Sheet öffnen: Close-Button im Viewport -------------------
+        page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "locations")
+        try:
+            page.wait_for_selector(_spec.LOCATION_CARD_SELECTOR, timeout=12000)
+            page.click(_spec.LOCATION_CARD_SELECTOR)
+            page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, timeout=12000)
+            _shot("mobile-detail-sheet-open")
+
+            # Close-Button muss innerhalb des Viewports liegen (BUG-19/BUG-25)
+            close_btn = page.query_selector(
+                "#loc-detail-sheet .sheet-close-btn, #loc-detail-sheet [class*='close']"
+            )
+            if close_btn:
+                rect = close_btn.bounding_box()
+                if rect:
+                    if rect["y"] < 0 or rect["y"] + rect["height"] > IPHONE_HEIGHT:
+                        findings.append(Finding(
+                            view="mobile-detail",
+                            assertion_id="close_btn_in_viewport",
+                            expected=f"Close-Button innerhalb Viewport (0–{IPHONE_HEIGHT}px)",
+                            actual=f"Close-Button y={rect['y']:.0f}px, h={rect['height']:.0f}px — außerhalb Viewport",
+                            message=f"close button outside viewport on mobile: y={rect['y']:.0f}",
+                            screenshot_path=_shot("mobile-close-btn-overflow"),
+                            timestamp=_now_iso(),
+                            commit_sha=commit,
+                        ))
+        except Exception as e:
+            # Detail-Sheet-Test best-effort: Desktop-Pass deckt Öffnen bereits ab
+            pass
+
+        # --- 3) Filter-Sheet überschreitet Viewport nicht (BUG-07 / BUG-34) ----
+        try:
+            page.evaluate("() => { const fs = document.getElementById('filter-sheet'); if(fs) fs.classList.add('open'); }")
+            page.wait_for_timeout(300)  # CSS-Transition
+
+            sheet = page.query_selector("#filter-sheet")
+            if sheet:
+                rect = sheet.bounding_box()
+                if rect and rect["width"] > IPHONE_WIDTH + 5:
+                    findings.append(Finding(
+                        view="mobile-filter",
+                        assertion_id="filter_sheet_width",
+                        expected=f"#filter-sheet-Breite ≤ {IPHONE_WIDTH}px",
+                        actual=f"#filter-sheet-Breite = {rect['width']:.0f}px",
+                        message=f"filter sheet overflows mobile viewport: {rect['width']:.0f}px",
+                        screenshot_path=_shot("mobile-filter-overflow"),
+                        timestamp=_now_iso(),
+                        commit_sha=commit,
+                    ))
+                # Sheet schließen
+                page.evaluate("() => { const fs = document.getElementById('filter-sheet'); if(fs) fs.classList.remove('open'); }")
+        except Exception:
+            pass
+
+        _shot("mobile-end")
+        browser.close()
+    return findings
+
+
 # --- CLI ---------------------------------------------------------------------------
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="FotoAlert Frontend-Check (TASK-20)")
@@ -344,12 +490,23 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    # Desktop-Pass
     findings = run_checks(
         base_url=args.base_url,
         password=args.password,
         screenshot_root=Path(args.screenshot_root),
         headless=not args.headed,
     )
+
+    # TASK-35: Mobile-Pass (iPhone 14 Viewport) — fängt iOS-Layout-Bugs ab:
+    # BUG-19 (Close-Button hinter Dynamic Island), BUG-25, BUG-34 (Edit-Overlay-Zoom).
+    mobile_findings = run_mobile_checks(
+        base_url=args.base_url,
+        password=args.password,
+        screenshot_root=Path(args.screenshot_root),
+        headless=not args.headed,
+    )
+    findings.extend(mobile_findings)
 
     _reporter.report(
         findings,

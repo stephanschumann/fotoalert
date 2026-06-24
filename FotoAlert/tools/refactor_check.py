@@ -219,6 +219,34 @@ def analyze_frontend() -> dict:
             })
 
     # 3. Sehr lange JS-Funktionen im Frontend (>100 Zeilen zwischen function/=> und })
+    #
+    # BEKANNTE LIMITATION (TASK-32, 2026-06-23):
+    # Diese Heuristik misst die Länge einer Funktion als Abstand bis zur *nächsten
+    # erkannten* Funktion — nicht bis zur tatsächlichen schließenden `}`. Das führt
+    # zu massiven Falsch-Positiven bei:
+    #   - Verschachtelten Closures (Arrow-Functions innerhalb von Methoden)
+    #   - Lokalen Arrow-Functions die auf Eltern-Scope-Variablen zugreifen
+    #   - IIFEs mit inneren Funktionen
+    # In diesen Fällen "läuft" die gemessene Länge bis in die nächste Top-Level-Funktion
+    # oder Sektion und kann Werte von 100–1400 Zeilen erzeugen, auch wenn die echte
+    # Funktion nur 2–10 Zeilen hat.
+    #
+    # Bekannte Falsch-Positive (alle manuell verifiziert, alle < 10 echte Zeilen):
+    #   _showError (Zeile ~1179), haversineKm (~1952), onUp (~2232),
+    #   state3 (~2407), mkSec (~2515), axisPhrase (~2779)
+    #
+    # Für eine zuverlässige JS-Analyse wäre ein echter AST-Parser nötig (z.B. via
+    # `node -e "require('acorn').parse(...)"`). Bis dahin: Falsch-Positive per
+    # FRONTEND_LONG_FN_IGNORELIST unterdrücken.
+    FRONTEND_LONG_FN_IGNORELIST: set[str] = {
+        "_showError",   # lokale Arrow-Function in Feed.load() — tatsächlich 7 Zeilen
+        "haversineKm",  # reine Berechnungsfunktion — tatsächlich 7 Zeilen
+        "onUp",         # Closure in initDualSlider.drag() — tatsächlich 5 Zeilen
+        "state3",       # Closure in FilterSheet._render() — tatsächlich 2 Zeilen
+        "mkSec",        # Top-Level Template-Helper — tatsächlich 3 Zeilen
+        "axisPhrase",   # Closure im Location-Detail IIFE — tatsächlich 10 Zeilen
+    }
+
     fn_pattern = re.compile(r'^\s*(async\s+)?function\s+(\w+)|(\w+)\s*[:=]\s*(async\s+)?(?:function|\([^)]*\)\s*=>)')
     fn_starts: list[tuple[int, str]] = []
     for i, line in enumerate(lines, 1):
@@ -231,6 +259,8 @@ def analyze_frontend() -> dict:
         end = fn_starts[idx + 1][0] if idx + 1 < len(fn_starts) else len(lines)
         length = end - start
         if length > 100:
+            if name in FRONTEND_LONG_FN_IGNORELIST:
+                continue  # Bekanntes Falsch-Positiv (Heuristik-Limitation) — siehe Kommentar oben
             needs_ticket.append({
                 "file": rel,
                 "line": start,
