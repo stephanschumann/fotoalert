@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, BUG-21, TASK-37, TASK-38 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-35, BUG-36, BUG-37 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -181,6 +181,98 @@ Die PWA nutzt den iPhone-Bildschirm nicht vollständig aus. Oben gibt es einen z
 **Testplan:**
 - [x] Automatisiert: `POST /locations/{id}/verifications` + `GET` Roundtrip in `backend/tests/test_api_regression.py` (6/6 Tests grün)
 - [x] Manuell: POST + GET + DELETE Roundtrip via curl verifiziert (2026-06-21)
+
+---
+
+### BUG-35 · Chancendetails: Koordinaten-Sektion Layout (Overflow, Label, Ausrichtung, Kopierbarkeit) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** In der Koordinaten-Sektion der Chancendetails gibt es vier zusammenhängende UI-Mängel: (1) Der „Streetview"-Button überläuft den Container rechts (nur „Stree" sichtbar). (2) Das Label „Standort Fotograf" soll zu „Standort" verkürzt werden. (3) Die Koordinatenzeilen für Standort und Motiv sind nicht gleich ausgerichtet (Motiv-Zeile fehlt Streetview-Button → asymmetrisches Layout). (4) Koordinaten sind reiner Text – nicht selektierbar/kopierbar; sie sollen als auswählbares Datenfeld (z. B. `user-select: all` oder readonly input) dargestellt werden.
+
+**Bezug:** Screenshots von 2026-06-24. Verwandt mit BUG-36 (blaugrauer Strich im selben Header-Bereich), US-87 (größere Karte).
+
+**Scope:**
+Eingeschlossen: `.coords-row` CSS + HTML-Label im Event-Detail-Sheet (`web/index.html` Z. 297–299, 2995–3012).
+Ausgeschlossen: Location-Detail-Sheet (kein `.coords-row`-Vorkommen dort); BUG-36 (blauer Strich = eigenes Ticket); US-95 (Button-Sizing).
+
+**Akzeptanzkriterien:**
+- [ ] StreetView-Button „👁 Street View" vollständig sichtbar, kein Overflow
+- [ ] Label lautet „📷 Standort" (nicht „Standort Fotograf")
+- [ ] Koordinaten-Werte Standort und Motiv fluchten horizontal (gleiche Spalte)
+- [ ] Tap auf Koordinatenfeld markiert den gesamten Text (user-select: all)
+- [ ] Motiv-Zeile hat nur Maps-Button, Layout trotzdem ausgerichtet
+- [ ] Edge Case: kein Azimut → nur Maps-Button, kein Overflow
+- [ ] Edge Case: subject_lat null → Zeile ausgerichtet, kein JS-Fehler
+
+**Pre-Mortem:**
+- 💀 Grid `auto`-Spalte bei langem Label-Text → Label-Spalte `max-width: 90px` als Deckel
+- 💀 `user-select: all` auf iOS Safari PWA nicht immer zuverlässig → manuell auf Device testen; Fallback `<input readonly>` vorbereiten
+- 💀 Andere Sheet-Blöcke betroffen → `.coords-row` nur einmal im Event-Detail (bestätigt durch Grep), kein zweiter Block
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-24)
+- [x] Pre-Mortem durchgeführt (2026-06-24)
+- [x] Architektur analysiert: `web/index.html` Z. 297–301 (CSS) + Z. 2995–3012 (HTML)
+- [x] Implementierungsoptionen: A (CSS Grid) / B (Sub-Zeile Buttons)
+- [x] Empfehlung: Option A — **Stephan hat Option B gewählt:** Buttons in eigene Sub-Zeile (`<div class="coords-btns">`), Zeile 1 = Label+Wert, Zeile 2 = Buttons mit indent. Skaliert besser für US-95.
+
+**📎 Code-Verifikation (2026-06-24):**
+Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` width: 130px. Buttons `flex-shrink:0`. Keine Kopierbarkeit. Overflow durch Label+Wert+2 Buttons auf ~440px.
+
+**Testplan:**
+- [ ] Automatisiert: kein Backend-Test nötig (reines CSS/HTML)
+- [ ] Manuell: Safari iPhone PWA — Koordinaten-Sektion öffnen, alle Buttons sichtbar; Tap auf Wert → Text markiert; Standort und Motiv fluchten; kein Overflow auf 320px Viewport
+
+---
+
+### BUG-36 · Chancendetails: Blaugrauer Strich links im Sheet-Header `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** Auf Höhe des ×-Schließen-Buttons erscheint auf der linken Seite des Detail-Sheets ein blaugrauer horizontaler Strich ohne erkennbaren Zweck. Vermutlich ein verwaistes Border-, Pseudo-Element oder ein unsichtbares Icon. Kann entfernt werden.
+
+**Bezug:** Screenshot von 2026-06-24. Verwandt mit BUG-35 (selber Sheet-Bereich).
+
+---
+
+### BUG-37 · Chancendetails: Relative Höhe Himmelsobjekt über Motivspitze fehlt (US-67 Regression) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** Die in US-67 implementierte Angabe „Höhe Himmelsobjekt über Motivspitze (m)" sowie die Kompositions-Labels (🎯 Exakt / ✨ Knapp über / usw.) und der Höhenversatz-Text sind nicht mehr in der Astronomie-Sektion der Chancendetails sichtbar. Das Feld war früher vorhanden und scheint durch eine spätere Änderung entfernt oder überschrieben worden zu sein (Regression). Aktuell sichtbar: Mondphase, Azimut Himmelsobjekt, Höhe Himmelsobjekt, Azimut Sichtachse, Sonnenaufgang/-untergang – aber kein relativer Höhenversatz.
+
+**Bezug:** US-67 [x] (Originalimplementierung). Screenshot vom 2026-06-24 zeigt fehlende Zeile. Möglicherweise Konflikt mit US-70/US-81 (Scout-Tab Erweiterungen die composition_analysis-Felder umstrukturiert haben könnten).
+
+---
+
+### US-95 · Chancendetails Layout-Optimierung: Buttons kleiner, Karten größer `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** Die Aktions-Buttons (Zum Kalender hinzufügen, Erinnerung setzen, Erneut prüfen) sind sehr groß und nehmen unverhältnismäßig viel Platz ein; gleichzeitig ist die FOV-Karte relativ klein. Durch kompaktere Buttons (geringere Höhe/Padding) und eine größere Karte wird das Manövrieren/Navigieren in der Detailansicht angenehmer. Außerdem soll ein allgemeines Design-Review auf weitere Inkonsistenzen im Sheet durchgeführt werden.
+
+**Bezug:** Verwandt mit US-87 [  ] (Vollbild-Overlay für Karte). BUG-35 und BUG-36 zuerst fixen (Koordinaten-Overflow), da sie den verfügbaren Platz ebenfalls betreffen.
 
 ---
 

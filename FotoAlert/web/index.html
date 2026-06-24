@@ -293,12 +293,14 @@
     .tw-time  { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
     .tw-optimal { color: var(--gold); }
     .sheet-actions { padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
-    .coords-grid { display: flex; flex-direction: column; gap: 10px; }
-    .coords-row { display: flex; align-items: center; gap: 8px; }
-    .coords-label { font-size: 12px; color: var(--muted); width: 130px; flex-shrink: 0; }
-    .coords-vals { font-size: 12px; font-family: monospace; color: var(--text); flex: 1; }
+    .coords-grid { display: flex; flex-direction: column; gap: 12px; }
+    .coords-row { display: flex; flex-direction: column; gap: 5px; }
+    .coords-top { display: flex; align-items: baseline; gap: 8px; }
+    .coords-label { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+    .coords-vals { font-size: 12px; font-family: monospace; color: var(--text); user-select: all; cursor: text; }
+    .coords-btns { display: flex; gap: 6px; }
     .coords-maps-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
-    .coords-sv-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid #3a7bd5; background: var(--card); color: #5b9cf6; cursor: pointer; }
+    .coords-sv-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
     .verified-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #4caf50; background: rgba(76,175,80,.12); border: 1px solid rgba(76,175,80,.3); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .verified-badge-issue { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--red); background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.35); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .tag-verified { background: rgba(76,175,80,.15); color: #4caf50; }
@@ -942,7 +944,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.1';
+const APP_VERSION = '1.13.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2995,19 +2997,23 @@ const Detail = {
       ${mkSec('ev_coords','📍 Koordinaten',`
         <div class="coords-grid">
           <div class="coords-row">
-            <div class="coords-label">📷 Standort Fotograf</div>
-            <div class="coords-vals">${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}</div>
-            <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">
-              🗺 Maps
-            </button>
-            ${o.subject_azimuth != null ? `<button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth})'>👁 Street View</button>` : ''}
+            <div class="coords-top">
+              <div class="coords-label">📷 Standort</div>
+              <div class="coords-vals">${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}</div>
+            </div>
+            <div class="coords-btns">
+              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">🗺 Maps</button>
+              ${o.subject_azimuth != null ? `<button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth})'>👁 Street View</button>` : ''}
+            </div>
           </div>
           <div class="coords-row">
-            <div class="coords-label">🎯 Motiv</div>
-            <div class="coords-vals">${(o.subject_lat||0).toFixed(5)}, ${(o.subject_lon||0).toFixed(5)}</div>
-            <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.subject_lat||o.observer_lat}, ${o.subject_lon||o.observer_lon}, 'Motiv')">
-              🗺 Maps
-            </button>
+            <div class="coords-top">
+              <div class="coords-label">🎯 Motiv</div>
+              <div class="coords-vals">${(o.subject_lat||0).toFixed(5)}, ${(o.subject_lon||0).toFixed(5)}</div>
+            </div>
+            <div class="coords-btns">
+              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.subject_lat||o.observer_lat}, ${o.subject_lon||o.observer_lon}, 'Motiv')">🗺 Maps</button>
+            </div>
           </div>
         </div>
       `)}
