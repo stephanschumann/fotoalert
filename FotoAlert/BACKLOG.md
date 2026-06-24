@@ -28,7 +28,7 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | US-90 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -3037,15 +3037,16 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 
 ---
 
-### US-90 · Kamera-Setup serverseitig persistieren `[~]`
+### US-90 · Kamera-Setup serverseitig persistieren `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-21 |
 | **In Progress seit** | 2026-06-24 |
+| **Abgeschlossen** | 2026-06-24 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass mein Kamera-Setup (Sensor, Brennweite, Ausrichtung) serverseitig gespeichert wird, damit es nach App-Schließen/Geräte­wechsel erhalten bleibt. Aktuell liegt es nur in `localStorage['cameraProfile']` und geht verloren (iOS löscht PWA-Storage nach 7 Tagen, vgl. BUG-26).
 
@@ -4321,18 +4322,33 @@ Gegenmaßnahme: **Hohe Priorität** — Fix muss bis spätestens 25.06. deployed
 
 ---
 
-### BUG-34 · iPhone Safari: Bearbeitungs-Overlay zoomt und ragt rechts aus dem Screen `[ ]`
+### BUG-34 · iPhone Safari: Bearbeitungs-Overlay zoomt und ragt rechts aus dem Screen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-23 |
 
 **Beschreibung:** Öffnet man auf dem iPhone (Safari) das Bearbeiten-Overlay einer Location, vergrößert die Seite (Zoom) und der rechte Teil des Overlays ragt außerhalb des sichtbaren Bereichs. Erwartet: Das Overlay passt sich vollständig in den Viewport ein, kein ungewollter Zoom.
 
 **Bezug:** Verwandt mit BUG-19 [x] (Close-Button in Sheets nicht erreichbar) und BUG-07 [x] (Sheets überschreiten iPhone-Breite auf Desktop). Wahrscheinliche Ursache: iOS Safari zoomt automatisch wenn ein fokussiertes Input-Feld eine Font-Size < 16px hat; zusätzlich fehlt ggf. `max-width: 100%` / `overflow-x: hidden` am Overlay-Container.
+
+**Scope:**
+- Eingeschlossen: alle `.input-field`-Elemente (Edit-Form, Add-Sheet, Filter), `#loc-detail-content`
+- Ausgeschlossen: iOS-App, Backend
+
+**Akzeptanzkriterien:**
+- [ ] Öffnet man auf dem iPhone Safari das Bearbeitungs-Overlay und tippt in ein Textfeld, zoomt die Seite nicht.
+- [ ] Das Overlay ragt an keiner Seite aus dem sichtbaren Bereich.
+- [ ] Auch die Koordinaten-Eingabefelder (vormals 12px) lösen keinen Zoom aus.
+- [ ] Edge Case: Auch im Add-Sheet und anderen Formularen tritt kein Zoom auf.
+
+**Implementierung:**
+- `web/index.html` Z. 438: `.input-field` `font-size: 14px` → `16px`
+- `web/index.html` Z. 457: `.coord-pair .input-field` `font-size: 12px` → `16px`
+- `web/index.html` Z. 555: `#loc-detail-content` + `overflow-x: hidden` (Defense-in-depth)
 
 ---
 
