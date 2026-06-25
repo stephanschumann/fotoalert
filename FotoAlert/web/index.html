@@ -986,7 +986,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.4';
+const APP_VERSION = '1.13.5';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3045,7 +3045,7 @@ const Detail = {
             </div>
             <div class="coords-btns">
               <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">🗺 Maps</button>
-              ${o.subject_azimuth != null ? `<button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth})'>👁 Street View</button>` : ''}
+              <button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth ?? 0})'>👁 Street View</button>
             </div>
           </div>
           <div class="coords-row">
@@ -3125,10 +3125,10 @@ const Detail = {
   openInMaps(lat, lon, label) {
     window.open(`https://maps.apple.com/?ll=${lat},${lon}&q=${label}`, '_blank');
   },
-  openStreetView(lat, lon, heading) {
+  openStreetView(lat, lon, heading = 0) {
     // Google Maps URL API: map_action=pano navigiert direkt zum nächsten Street View Panorama
-    // Kein API-Key nötig, heading = Azimut der Sichtachse
-    const h = Math.round(heading);
+    // Kein API-Key nötig, heading = Azimut der Sichtachse (0 = Nord falls kein Azimut bekannt)
+    const h = Math.round(heading || 0);
     const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}&heading=${h}&pitch=0&fov=75`;
     window.open(url, '_blank');
   }

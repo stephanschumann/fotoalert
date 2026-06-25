@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-40 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -203,13 +203,13 @@ Eingeschlossen: `.coords-row` CSS + HTML-Label im Event-Detail-Sheet (`web/index
 Ausgeschlossen: Location-Detail-Sheet (kein `.coords-row`-Vorkommen dort); BUG-39 (blauer Strich = eigenes Ticket); US-95 (Button-Sizing).
 
 **Akzeptanzkriterien:**
-- [ ] StreetView-Button „👁 Street View" vollständig sichtbar, kein Overflow
-- [ ] Label lautet „📷 Standort" (nicht „Standort Fotograf")
-- [ ] Koordinaten-Werte Standort und Motiv fluchten horizontal (gleiche Spalte)
-- [ ] Tap auf Koordinatenfeld markiert den gesamten Text (user-select: all)
-- [ ] Motiv-Zeile hat nur Maps-Button, Layout trotzdem ausgerichtet
-- [ ] Edge Case: kein Azimut → nur Maps-Button, kein Overflow
-- [ ] Edge Case: subject_lat null → Zeile ausgerichtet, kein JS-Fehler
+- [x] StreetView-Button „👁 Street View" vollständig sichtbar, kein Overflow
+- [x] Label lautet „📷 Standort" (nicht „Standort Fotograf")
+- [x] Koordinaten-Werte Standort und Motiv fluchten horizontal (gleiche Spalte)
+- [x] Tap auf Koordinatenfeld markiert den gesamten Text (user-select: all)
+- [x] Motiv-Zeile hat nur Maps-Button, Layout trotzdem ausgerichtet
+- [x] Edge Case: kein Azimut → nur Maps-Button, kein Overflow
+- [x] Edge Case: subject_lat null → Zeile ausgerichtet, kein JS-Fehler
 
 **Pre-Mortem:**
 - 💀 Grid `auto`-Spalte bei langem Label-Text → Label-Spalte `max-width: 90px` als Deckel
@@ -227,8 +227,31 @@ Ausgeschlossen: Location-Detail-Sheet (kein `.coords-row`-Vorkommen dort); BUG-3
 Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` width: 130px. Buttons `flex-shrink:0`. Keine Kopierbarkeit. Overflow durch Label+Wert+2 Buttons auf ~440px.
 
 **Testplan:**
-- [ ] Automatisiert: kein Backend-Test nötig (reines CSS/HTML)
-- [ ] Manuell: Safari iPhone PWA — Koordinaten-Sektion öffnen, alle Buttons sichtbar; Tap auf Wert → Text markiert; Standort und Motiv fluchten; kein Overflow auf 320px Viewport
+- [x] Automatisiert: kein Backend-Test nötig (reines CSS/HTML)
+- [x] Manuell: Safari Mac localhost — alle AKs bestätigt 2026-06-25
+
+---
+
+### BUG-41 · Koordinaten-Sektion: Street View Button immer sichtbar (nicht nur bei Azimut) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | Done |
+| **Erstellt** | 2026-06-25 |
+| **Abgeschlossen** | 2026-06-25 |
+
+**Beschreibung:** Der Street View Button in der Koordinaten-Sektion des Event-Detail-Sheets erschien nur wenn `subject_azimuth` gesetzt war. Für Events ohne Azimut (Goldene Stunde, Blaue Stunde) fehlte der Button, obwohl Street View auch ohne Blickrichtung nützlich ist. Ohne Azimut öffnet Street View jetzt mit `heading=0` (Norden).
+
+**Bezug:** BUG-38 [x] (Koordinaten-Sektion Layout — selber Bereich). Gefunden beim BUG-38-Testlauf 2026-06-25.
+
+**Scope:** `web/index.html` — Bedingung in `ev_coords`-Template entfernt, `openStreetView()` Default-Heading 0.
+
+**Akzeptanzkriterien:**
+- [x] Street View Button erscheint in der Koordinaten-Sektion für ALLE Event-Typen
+- [x] Mit Azimut: Street View öffnet mit korrekter Blickrichtung
+- [x] Ohne Azimut: Street View öffnet mit heading=0 (Norden), kein JS-Fehler
 
 ---
 
@@ -5474,14 +5497,15 @@ await Locations.load();
 
 ---
 
-### TASK-40 · Sections-Default-Regression-Guard: Audit + statischer Lint-Check `[~]`
+### TASK-40 · Sections-Default-Regression-Guard: Audit + statischer Lint-Check `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-24 |
+| **Abgeschlossen** | 2026-06-25 |
 
 **Beschreibung:** BUG-40 hat ein strukturelles Regressionsmuster offengelegt: eine neue Section wird per `mkSec()` ins HTML eingebaut, aber nicht in `Sections._def` eingetragen — sie bleibt dadurch immer geschlossen, ohne Fehlermeldung. Zwei Maßnahmen: (1) **Audit** der vier aktuell ungeklärten Sections (`ev_desc`, `ev_kamera`, `ev_wetter`, `ev_zeit`), die in `mkSec()` vorkommen aber nicht in `_def` stehen — je prüfen ob `false`-Default korrekt oder eine stille Regression vorliegt; (2) **Regression Guard** in `tools/refactor_check.py`: automatischer Vergleich aller `mkSec()`-IDs gegen `_def`-Keys, Abbruch mit Exit 1 bei Lücken — läuft damit vor jedem Release.
 
@@ -5499,12 +5523,12 @@ await Locations.load();
 Eingeschlossen: (a) `loc_events` auf `mkSec()` umbauen (einheitliche Bauweise); (b) Guard `tools/refactor_check.py`, Check #4 in `analyze_frontend()`. Ausgeschlossen: Backend, andere Sections (keine Regression vorhanden).
 
 **Akzeptanzkriterien (Nutzersicht — erlebbar):**
-- [ ] In der App: Alle aufklappbaren Abschnitte in Chancen- und Location-Details erscheinen im gewollten Zustand (wichtige offen, Nebeninfos eingeklappt) — unverändert zu heute.
-- [ ] Der Abschnitt „📅 Nächste Events" in den Location-Details sieht und verhält sich **identisch** zu vorher (gleiche Überschrift, gleicher Standard = offen, lädt seine Events nach).
-- [ ] Beim nächsten Release läuft der Guard automatisch mit und meldet nichts, solange alles korrekt ist.
-- [ ] Schutzfall: Würde künftig ein Abschnitt ohne hinterlegten Standardzustand eingebaut, **stoppt der Release-Check mit klarer Fehlermeldung inkl. Abschnittsname** (statt stiller, unsichtbar eingeklappter Abschnitt wie bei BUG-40).
-- [ ] Schutzfall (Option B, streng): Würde ein Abschnitt künftig hand-gerollt statt über die Standard-Bauweise gebaut, **stoppt der Release-Check** ebenfalls mit Hinweis.
-- [ ] Edge Case: Hat ein Nutzer einen Abschnitt manuell zu-/aufgeklappt, bleibt seine Wahl erhalten (localStorage unberührt).
+- [x] In der App: Alle aufklappbaren Abschnitte in Chancen- und Location-Details erscheinen im gewollten Zustand (wichtige offen, Nebeninfos eingeklappt) — unverändert zu heute.
+- [x] Der Abschnitt „📅 Nächste Events" in den Location-Details sieht und verhält sich **identisch** zu vorher (gleiche Überschrift, gleicher Standard = offen, lädt seine Events nach).
+- [x] Beim nächsten Release läuft der Guard automatisch mit und meldet nichts, solange alles korrekt ist.
+- [x] Schutzfall: Würde künftig ein Abschnitt ohne hinterlegten Standardzustand eingebaut, **stoppt der Release-Check mit klarer Fehlermeldung inkl. Abschnittsname** (statt stiller, unsichtbar eingeklappter Abschnitt wie bei BUG-40). *(Probe-verifiziert: Exit 1 + Name.)*
+- [x] Schutzfall (Option B, streng): Würde ein Abschnitt künftig hand-gerollt statt über die Standard-Bauweise gebaut, **stoppt der Release-Check** ebenfalls mit Hinweis. *(Probe-verifiziert.)*
+- [x] Edge Case: Hat ein Nutzer einen Abschnitt manuell zu-/aufgeklappt, bleibt seine Wahl erhalten (localStorage unberührt).
 
 **Pre-Mortem:**
 - 💀 Umbau von „Nächste Events" ändert ungewollt Optik/Verhalten → Gegenmaßnahme: Inline-Styles als identisch zur CSS-Klasse verifiziert (Z. 273–275); AK „identisch zu vorher" + manueller Test.
