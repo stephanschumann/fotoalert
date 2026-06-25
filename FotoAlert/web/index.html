@@ -985,7 +985,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.6';
+const APP_VERSION = '1.13.7';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3889,7 +3889,7 @@ const LocationDetail = {
       Locations.all = await API.get('/locations');
       toast('✓ Location aktualisiert');
       LocationDetail.open(locId);
-      Locations.render(Locations.all);
+      Locations.render(Filter.applyToLocations(Locations.all));
       // Feed und Kalender neu rendern damit location_name-Links sofort aktuell sind
       if (Feed.data) Feed.render();
     } catch(e) {

@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -229,6 +229,65 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 **Testplan:**
 - [x] Automatisiert: kein Backend-Test nötig (reines CSS/HTML)
 - [x] Manuell: Safari Mac localhost — alle AKs bestätigt 2026-06-25
+
+---
+
+### TASK-43 · Refactoring: Lange Funktionen aufteilen (web/index.html) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-25 |
+
+**Beschreibung:** `refactor_check.py` meldet zwei JS-Funktionen mit übermäßiger Länge: `local()` (Z. 2674, ~265 Zeilen) und `row()` (Z. 3531, ~1034 Zeilen). Beide sollten in kleinere Teilfunktionen aufgeteilt werden.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+
+---
+
+### BUG-42 · Locations-Filter: Zustand geht nach Edit verloren (alle Locations sichtbar) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-25 |
+| **Implementiert** | 2026-06-25 |
+
+**Beschreibung:** Ist in der Locations-Ansicht ein Filter aktiv (z. B. „Nur Probleme"), und der Nutzer bearbeitet danach einen Eintrag (insbesondere: löscht den letzten Verifikationseintrag), werden nach dem Schließen des Editors alle Locations angezeigt — also auch jene, die die Filterkriterien nicht erfüllen. Der Filter-Chip zeigt weiterhin „aktiv" an, das Ergebnis entspricht aber keinem gefilterten Zustand. Erst wenn der Filter manuell erneut geöffnet und bestätigt wird, greifen die Kriterien wieder korrekt. **Erwartet:** Nach Ende einer Bearbeitung bleibt der aktive Filter angewendet, ohne dass der Nutzer ihn neu aktivieren muss.
+
+**Bezug:** Verwandt mit BUG-26 (Verifikations-Persistenz). Kein Merge nötig: BUG-26 abgeschlossen, BUG-42 betrifft den Filter-Re-Apply nach Edit.
+
+**Root Cause (verifiziert):** `saveEdit` Z. 3892 ruft `Locations.render(Locations.all)` auf — ohne `Filter.applyToLocations()`. Alle anderen Render-Stellen (Z. 3558, 3567, 2371, 4495) verwenden korrekt `Filter.applyToLocations(Locations.all)`. Ein-Zeiler-Fix.
+
+**📎 Code-Verifikation:** `web/index.html` Z. 3892 gelesen 2026-06-25. `Locations.render(Locations.all)` ohne Filter-Wrap bestätigt.
+
+**Scope:**
+- Eingeschlossen: `saveEdit` Z. 3892 — `Locations.render` mit Filter-Wrap versehen.
+- Ausgeschlossen: `_refreshSection` (Verifikations-Inline-Update) — triggert keine Locations-Listen-Re-Render, kein separates Problem.
+
+**Akzeptanzkriterien:**
+- [ ] Nach „Speichern" im Edit-Modus zeigt die Locations-Liste nur Einträge, die den aktiven Filterkriterien entsprechen — nicht alle Locations.
+- [ ] Filter „Nur Probleme" aktiv + letzter Verifikationseintrag gelöscht + gespeichert → Location verschwindet aus Liste (erfüllt Kriterium nicht mehr).
+- [ ] Kein Filter aktiv → nach Speichern alle Locations sichtbar (keine Regression).
+- [ ] Edge Case: Filter aktiv, Bearbeitung ohne Verifikationsänderung → Liste bleibt korrekt gefiltert.
+
+**Pre-Mortem:**
+- 💀 Weitere `Locations.render(Locations.all)` ohne Filter-Wrap → Gegenmaßnahme: Grep vor Commit.
+- 💀 `Locations.all` leer beim Render → kein Risiko: Z. 3889 lädt frisch vom Server vor dem Render.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` Z. 3892 (`saveEdit`)
+- [x] Fix: Z. 3892 `Locations.render(Locations.all)` → `Locations.render(Filter.applyToLocations(Locations.all))`
+
+**Testplan:**
+- [ ] Automatisiert: kein Backend-Test nötig (reines Frontend)
+- [ ] Manuell: Filter „Nur Probleme" setzen → Location öffnen → letzten Verifikationseintrag löschen → Speichern → Liste darf nur Probleme zeigen
 
 ---
 
@@ -5109,14 +5168,15 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 
 ---
 
-### TASK-37 · Refactoring: Lange Funktionen aufteilen (precompute.py) `[ ]`
+### TASK-37 · Refactoring: Lange Funktionen aufteilen (precompute.py) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-25 |
 
 **Beschreibung:** `refactor_check.py` meldet 3 überlange Funktionen in `backend/precompute.py`:
 - Z.589: `compute_calendar_incremental()` — 146 Zeilen (Threshold: 80)
@@ -5126,6 +5186,51 @@ Falls trotz dieser Analyse irrtümlich Code umstrukturiert würde:
 Alle drei können in kleinere Hilfsfunktionen aufgeteilt werden, um Lesbarkeit und Testbarkeit zu verbessern.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-32 Release-Check, 2026-06-23)
+
+---
+
+#### 📋 Analyse-Spec (2026-06-25)
+
+**Scope:**
+Eingeschlossen: `backend/precompute.py` — die drei gemeldeten Funktionen werden in benannte Hilfsfunktionen aufgeteilt. Öffentliche Schnittstelle (Signaturen, Rückgabewerte) bleibt identisch.
+Ausgeschlossen: Verhaltensänderungen, Test-Harness-Umbau, andere Module.
+
+**Akzeptanzkriterien:**
+- [x] `compute_calendar_incremental()`: Location-Loop → `_compute_calendar_for_location()`; Funktion ≤ 80 Zeilen
+- [x] `_run_single_location_flow()`: Feed-Merge-Block → `_merge_and_write_feed()`; Funktion ≤ 80 Zeilen
+- [x] `_run_standard_flow()`: Feed-Write + Kalender-Write → Hilfsfunktionen; Funktion ≤ 80 Zeilen
+- [x] `refactor_check.py` meldet nach Umbau keine überlangen Funktionen mehr für diese 3
+- [x] `pytest tests/` vollständig grün (46 passed, 41 skipped — Regression ✅)
+- [x] Kein Type-Hint mit Python-3.10+-Syntax (`X | None`) in neuen Hilfsfunktionen
+
+**Pre-Mortem:**
+- 💀 BUG-29-Logik zerbrochen (valid_events-Mutation) → Gegenmaßnahme: Hilfsfunktion gibt `(new_events_for_loc, meta_entry)` zurück, Mutation bleibt in äußerer Funktion
+- 💀 Python-3.9-Inkompatibilität in neuen Funktionen → Gegenmaßnahme: kein `X | None`, `Optional[X]` aus `typing` oder keine Annotations
+- 💀 refactor_check.py meldet Hilfsfunktionen als selbst zu lang → Gegenmaßnahme: Check als letzten Schritt ausführen
+
+📎 Code-Verifikation: `precompute.py` Z.590–922 gelesen 2026-06-25.
+Bestätigt: `valid_events` wird im Location-Loop in-place via `.extend()` mutiert — Extraktion muss das berücksichtigen.
+Bestätigt: BUG-29-Kommentare durchziehen den Loop — bei Splitting erhalten.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: nur `backend/precompute.py`
+- [x] Implementierungsoptionen: A (minimale Extraktion) / B (+ Testbarkeit)
+- [x] Empfehlung: Option A
+
+**Implementierungsplan (Option A):**
+1. `compute_calendar_incremental`: Location-Loop (Z.669–727) → `_compute_calendar_for_location(loc, valid_events, target_range, existing_meta, new_meta)` — gibt `(new_events_for_loc, meta_entry)` zurück
+2. `_run_single_location_flow`: Feed-Merge (Z.788–803) → `_merge_and_write_feed(feed_path, location_id, new_events, computed_at)`; Kalender-Write (Z.817–832) → `_write_calendar_cache(cal_path, calendar, computed_meta, computed_at)`
+3. `_run_standard_flow`: Feed-Write + Health-Check (Z.872–886) → `_write_feed_cache(feed_path, feed, computed_at)`; Kalender-Write analog
+4. `refactor_check.py` ausführen → 0 Findings für die 3 Funktionen
+5. `pytest tests/` → grün
+
+**Testplan:**
+- Automatisiert (Harness): bestehende `test_patch_cache_consistency.py`-Tests sichern BUG-29-Logik ab (kein neuer Test nötig)
+- Manuell: `python tools/refactor_check.py` nach Umbau → keine überlangen Funktionen
+
+**Status:** ✅ Done — implementiert 2026-06-25, 46/46 Tests grün
 
 ---
 
@@ -5476,18 +5581,21 @@ await Locations.load();
 
 ---
 
-### TASK-38 · Refactoring: Lange Funktionen in precompute.py aufteilen `[ ]`
+### TASK-38 · Refactoring: Lange Funktionen in precompute.py aufteilen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+| **Abgeschlossen** | 2026-06-25 |
 
 **Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold: `compute_calendar_incremental()` (Z. 589, 146 Zeilen), `_run_single_location_flow()` (Z. 742, 92 Zeilen), `_run_standard_flow()` (Z. 837, 84 Zeilen). Aufteilen in kleinere Hilfsfunktionen.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+
+**Abschlussnotiz:** Bei Analyse am 2026-06-25 festgestellt, dass das Refactoring bereits in Folge-Tickets (BUG-29-Fixes) durchgeführt wurde. `compute_calendar_incremental()` wurde in `_load_calendar_cache()`, `_init_calendar_pass()` und `_compute_calendar_for_location()` aufgespalten. Alle drei Funktionen liegen unter 80 Zeilen. `refactor_check.py` meldet keine Findings für `precompute.py`.
 
 ### TASK-39 · Refactoring: Lange Funktion local() in index.html aufteilen `[ ]`
 
