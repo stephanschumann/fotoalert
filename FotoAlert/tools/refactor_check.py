@@ -270,6 +270,47 @@ def analyze_frontend() -> dict:
                 "message": f"JS-Funktion `{name}()` ist ~{length} Zeilen lang",
             })
 
+    # 4. Sections-Default-Regression-Guard (TASK-40)
+    #
+    # BUG-40-Klasse: Eine aufklappbare Section wird gerendert, aber ihr Standardzustand
+    # fehlt in Sections._def → sie bleibt stumm eingeklappt, ohne Fehler. Zusätzlich
+    # erzwingt Option B die einheitliche Bauweise: jede Section MUSS über mkSec() gebaut
+    # werden, nicht hand-gerollt via literalem Sections.toggle('id').
+    #
+    # Marker im Source:
+    #   mkSec('id', ...)        → korrekt gebaute Section
+    #   Sections.toggle('id')   → hand-gerollter Toggle-Header (Option B: verboten).
+    #       Der mkSec-INTERNE toggle nutzt '${id}' und matcht das Literal-Pattern NICHT.
+    #   Sections.isOpen('id')   → legitimer Lazy-Render-Check, KEIN Section-Marker.
+    mksec_ids = set(re.findall(r"mkSec\(\s*'([^']+)'", src))
+    handrolled_ids = set(re.findall(r"Sections\.toggle\('([a-z_]+)'\)", src))
+    rendered_ids = mksec_ids | handrolled_ids
+
+    def_keys: set[str] = set()
+    def_match = re.search(r"_def:\s*\{(.*?)\}", src, re.S)
+    if def_match:
+        def_keys = set(re.findall(r"(\w+)\s*:", def_match.group(1)))
+
+    # Rule A — gerenderte Section ohne _def-Eintrag (BUG-40-Klasse) → harter Fehler
+    for sid in sorted(rendered_ids - def_keys):
+        needs_ticket.append({
+            "file": rel,
+            "line": 0,
+            "category": "section_missing_default",
+            "message": f"Section '{sid}' wird gerendert, fehlt aber in Sections._def "
+                       f"→ bliebe stumm eingeklappt (BUG-40-Klasse). _def-Eintrag ergänzen.",
+        })
+
+    # Rule B — hand-gerollte Section statt mkSec() (Option B: einheitliche Bauweise) → harter Fehler
+    for sid in sorted(handrolled_ids):
+        needs_ticket.append({
+            "file": rel,
+            "line": 0,
+            "category": "section_handrolled",
+            "message": f"Section '{sid}' wird hand-gerollt via Sections.toggle('{sid}') statt "
+                       f"über mkSec() gebaut → auf mkSec() umstellen (TASK-40, Option B).",
+        })
+
     return {"auto_fixable": auto_fixable, "needs_ticket": needs_ticket}
 
 

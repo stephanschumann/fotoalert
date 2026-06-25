@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-40 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1831,10 +1831,13 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 >
 > **Hintergrund:** FotoAlert hat Skyfield-Engine und Location-Paare. Diese Story ergänzt einen Live-Modus der die aktuelle Himmelsposition anzeigt und mit Locationdaten überlagert.
 >
+> **Architektur (2026-06-25 geklärt):** Berechnung **clientseitig in JS**, NICHT als Backend-Endpoint. Himmelspositionen (Sonne/Mond/Milchstraßenzentrum) sind eine geschlossene Formel (Meeus), kein Solver — Az/Höhe für einen Zeitpunkt < 1 ms, eine Tagesbahn < 10 ms. Nur clientseitig fühlt sich das Pin-Ziehen/Zeit-Scrubben echtzeit an (kein Roundtrip). Bibliothek: **Astronomy Engine** (MIT, eine Datei, Sonne/Mond/Planeten + freie Sternkoordinaten für das Galaktische Zentrum). Precompute (`/astro/live`) wird damit **gestrichen** — das war der falsche Reflex aus dem Feed-Ranking-Kontext. Funktionierender Spike: `FotoAlert/prototypes/astro-live-prototype.html` (Leaflet + Astronomy Engine, Pin draggable, Zeit-Slider, Richtungslinien Sonne/Mond/MW).
+>
 > **Akzeptanzkriterien:**
-> - Neuer API-Endpoint `GET /astro/live?location_id=X&ts=ISO8601`: liefert Azimut + Elevation für Sonne, Mond (und Milchstraßenzentrum) zum angegebenen Timestamp
+> - Himmelspositionen (Azimut + Höhe Sonne, Mond, Milchstraßenzentrum) werden **clientseitig** für den gewählten Zeitpunkt berechnet — kein neuer Backend-Endpoint
 > - Frontend: Fotograf-Pin + Motiv-Pin auf Karte (aus Location-Daten); visuelle Bogenbahn Sonne/Mond überlagert
-> - Live-Modus: automatische Aktualisierung alle 60 Sekunden; Uhrzeit-Slider zum Scrubben durch den Tag
+> - **Richtungslinien auf der Karte:** vom Fotostandort ausgehende geodätische Linien entlang des Azimuts je Himmelskörper — aktuelle Richtung (dick) + Auf-/Untergangsrichtung (dünn); unter Horizont gedämpft/gestrichelt
+> - Live-Modus: automatische Aktualisierung; Uhrzeit-Slider zum Scrubben durch den Tag
 > - Wenn Azimut des Himmelsobjekts innerhalb `ideal_azimuth_range`: grünes Highlight / Alignment-Indikator
 > - Keine AR, kein Exif – reine Karten- + Winkel-Visualisierung
 >
@@ -1845,6 +1848,73 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 > ```
 >
 > **Abhängigkeiten:** US-35[x], US-37[x]
+
+---
+
+#### 📋 Analyse-Spec (2026-06-25)
+
+**Geklärte Scope-Entscheidungen (Example-Mapping-Forks):**
+- **Verortung/Pin:** Hybrid — Live-Modus öffnet aus einer gespeicherten Location (Standort+Motiv vorbefüllt), **beide Pins frei ziehbar**, Linien aktualisieren live.
+- **Bahn-Darstellung:** Richtungslinien (aktuell + Auf-/Untergang) **plus voller Tagesbogen** (Azimut-Fächer über den Tag).
+- **Körper v1:** Sonne, Mond, Milchstraßenzentrum (Planeten später).
+
+**Scope:**
+Eingeschlossen: clientseitige Live-Astro-Kartenansicht (`web/index.html`), geöffnet aus dem Location-Detail; Astronomy-Engine-JS; draggable Fotograf-/Motiv-Pins; Richtungslinien + Tagesbogen; Zeit-Slider + Live-Toggle; Readout (Az/Höhe/Mondphase); Sichtachsen-Linie + grüner Alignment-Indikator.
+Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, Planeten, Wetter-Overlay.
+
+**Akzeptanzkriterien:**
+- [ ] Astronomy Engine (`astronomy.browser.min.js`, gepinnte Version) eingebunden; globales `Astronomy` verfügbar; keine Backend-Route neu
+- [ ] Button im Location-Detail öffnet Live-Astro-Ansicht, zentriert auf `observer_lat/lon`, mit Fotograf-Tropfen (observer) + Motiv-Kreuz (subject) aus Location-Daten
+- [ ] Beide Pins draggable; Ziehen aktualisiert Linien + Readout in < 50 ms ohne Server-Call
+- [ ] Pro Körper eine dicke Richtungslinie (aktueller Azimut) ab Fotograf-Pin; transparent/gestrichelt wenn Höhe < 0°
+- [ ] Dünne Auf-/Untergangslinien für Sonne und Mond (Azimut bei Rise/Set)
+- [ ] Voller Tagesbogen: Azimut-Fächer der Sonne (Stützpunkte ~alle 10 min); nur Segmente mit Höhe ≥ 0° gezeichnet
+- [ ] Uhrzeit-Slider (0–1439 min) scrubbt durch den Tag (Berlin-Lokalzeit); Live-Toggle setzt auf jetzt + Auto-Update; Scrubben deaktiviert Live
+- [ ] Readout: Azimut + Höhe je Körper, Mondphase in %
+- [ ] Sichtachse Fotograf→Motiv als eigene Linie; **grüner** Alignment-Indikator wenn `|Az_Körper − Az_Sichtachse| ≤ 2°` (zirkuläre Differenz) UND Körper über Horizont
+- [ ] Edge Case: Sichtachse/Range mit Wrap über 0°/360° (z.B. 350°→20°) korrekt
+- [ ] Edge Case: Körper ganztägig unter Horizont (MW-Zentrum im Winter) → keine dicke Linie, Readout „nicht sichtbar"
+- [ ] Edge Case: Mond ohne Auf-/Untergang am Tag (zirkumpolar) → Rise/Set-Linie entfällt sauber
+- [ ] Live-Ansicht schließen → Timer gestoppt (kein Interval-Leak)
+
+**Pre-Mortem:**
+- 💀 Client (Astronomy Engine) ≠ Backend (Skyfield): Live-Linie und Detail-Sektion „🧭 Himmelsposition" widersprechen sich. → **Gegenmaßnahme:** Konsistenz-Test ±0.5° gegen bekannten Skyfield-Wert; denselben Wert nicht doppelt aus zwei Engines nebeneinander zeigen.
+- 💀 Azimut-Wrap: Sichtachse 355°, Sonne 5° → naive Differenz 350° → Alignment nie grün. → **Gegenmaßnahme:** zirkuläre Differenz `((a−b+540)%360)−180`; Test mit Wrap-Fall.
+- 💀 Tagesbogen zeichnet Stützpunkte unter Horizont → Linien „durch den Boden". → **Gegenmaßnahme:** nur Segmente mit Höhe ≥ 0°; Test über Segment-Anzahl.
+- 💀 Live-Timer überschreibt manuelles Scrubben. → **Gegenmaßnahme:** Scrubben schaltet Live aus; Lifecycle clearInterval beim Schließen.
+- 💀 Zweite Leaflet-Instanz rendert leer, weil Container beim Öffnen 0 px hoch ist. → **Gegenmaßnahme:** `invalidateSize()` nach Anzeige; vgl. Memory `reference_frontend_dom_gotchas`.
+
+📎 **Code-Verifikation** (gelesen 2026-06-25): Bestätigt — Leaflet 1.9.4 geladen, **keine** Astro-Lib (`web/index.html:939`); `MapView`/`#map` (Z.3161); `MapMarkers` observer/subject inkl. draggable (Z.3098–3140); `/locations` liefert `observer_lat/lon`, `subject_lat/lon`, `ideal_azimuth_range`, `possible_bodies` (`main.py:174,739–749`); Geodäsie-Vorbild `destination_point` (`moon_pipeline.py:135`). Backend = Skyfield.
+
+**Architektur:**
+- Betroffen: nur `web/index.html` — neue gekapselte Komponente `AstroLive`, Script-Tag astronomy-engine, Einstiegs-Button im `LocationDetail`. **Kein Backend.**
+- Wiederverwenden: `MapMarkers.observerDraggable/subjectDraggable`, `edit-mini-map`-Muster (eigene Leaflet-Instanz mit Lifecycle), Geodäsie-Port aus dem Prototyp `prototypes/astro-live-prototype.html`.
+- `MapView` (BUG-23-Filterlogik) bleibt unangetastet.
+
+**Implementierungsoptionen:**
+
+*Option A — In bestehenden Karten-Tab (`MapView`) integrieren.* Live-Modus blendet alle Standort-Marker aus und Pins+Linien ein.
+- Vorteil: eine Map-Instanz, Layer-Umschaltung vorhanden.
+- Nachteil: Eingriff in MapView-Filter-/Marker-Lifecycle → Regressionsrisiko (BUG-23); Modus-State. Aufwand: mittel.
+
+*Option B — Dedizierte `AstroLive`-Ansicht mit eigener Leaflet-Instanz* (Vorbild `edit-mini-map`), geöffnet aus dem Location-Detail.
+- Vorteil: saubere Kapselung, eigener Lifecycle (init/destroy, Live-Timer, Slider), kein Eingriff in MapView → kein Regressionsrisiko; gut testbar.
+- Nachteil: zweite Map-Instanz (Speicher), minimale Tile-Layer-Duplizierung. Aufwand: mittel.
+
+✅ **Empfehlung: Option B** — Kapselung gewinnt: der Live-Layer hat eigenen Timer-/Slider-Lifecycle und darf die bestehende Marker-Filterlogik nicht anfassen; `edit-mini-map` zeigt das Muster bereits.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (3 Forks geklärt)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (AstroLive, LocationDetail-Button), kein Backend
+- [x] Implementierungsoptionen: A (in MapView) / B (dedizierte Ansicht)
+- [x] Empfehlung: **Option B** — ✅ vom Stephan freigegeben (2026-06-25), Implementierung gestartet
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/`): Konsistenz-Anker Astronomy-Engine ↔ Skyfield für bekannte Location/Zeit (±0.5°); Unit für zirkuläre Azimut-Differenz.
+- [ ] Manuell (`http://localhost:8000`): Location → Live-Astro öffnen; Pins ziehen; Slider scrubben; Wrap-Location; MW-Winter-Fall (keine Linie); Ansicht schließen (Timer-Stopp).
+
+---
 
 ### ~~US-65 · Automatisches Backup der App-Daten~~ `[~]` → GEMERGED in TASK-18
 > **➡️ Gemerged (2026-06-20):** Dieses Ticket geht in **TASK-18** (Backup RPO≈0) auf. Das stärkere RPO≈0-Konzept ersetzt das tägliche Snapshot-Backup; 7-Versionen-Retention + >25h-Health-Alert wurden als Fallback in TASK-18 übernommen. Inhalt unten bleibt als Referenz erhalten.
@@ -5401,3 +5471,58 @@ await Locations.load();
 **Beschreibung:** JS-Funktion `local()` in `web/index.html` (Z. 2633, ~265 Zeilen) überschreitet den 80-Zeilen-Threshold deutlich. In kleinere Hilfsfunktionen aufteilen (z.B. Rendering, Event-Handler, Datenaufbereitung).
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+
+---
+
+### TASK-40 · Sections-Default-Regression-Guard: Audit + statischer Lint-Check `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-24 |
+
+**Beschreibung:** BUG-40 hat ein strukturelles Regressionsmuster offengelegt: eine neue Section wird per `mkSec()` ins HTML eingebaut, aber nicht in `Sections._def` eingetragen — sie bleibt dadurch immer geschlossen, ohne Fehlermeldung. Zwei Maßnahmen: (1) **Audit** der vier aktuell ungeklärten Sections (`ev_desc`, `ev_kamera`, `ev_wetter`, `ev_zeit`), die in `mkSec()` vorkommen aber nicht in `_def` stehen — je prüfen ob `false`-Default korrekt oder eine stille Regression vorliegt; (2) **Regression Guard** in `tools/refactor_check.py`: automatischer Vergleich aller `mkSec()`-IDs gegen `_def`-Keys, Abbruch mit Exit 1 bei Lücken — läuft damit vor jedem Release.
+
+**Bezug:** Ausgelöst durch BUG-40 [x]. Ergänzt TASK-20 [x] (Playwright-Runtime-Tests) und TASK-21 [x] (CI-Gate) um eine statische Lint-Schicht.
+
+---
+
+#### Analyse (2026-06-25)
+
+**📎 Code-Verifikation:**
+- *Widerlegt — Audit-Prämisse:* Die vier genannten Sections (`ev_desc`, `ev_kamera`, `ev_wetter`, `ev_zeit`) stehen **alle** in `_def`. Vollabgleich aller 17 gerenderten Section-IDs gegen `_def` → **0 Lücken**. Git: BUG-40-Commit `c8984d6` fügte nur `ev_skypos` hinzu; die vier waren schon vorher in `_def`. Die Audit-Prämisse war auch zum Erstell-Zeitpunkt falsch. → **Keine stille Regression**; `ev_desc:true`/`ev_zeit:true` (Primärinfo offen), `ev_wetter:false`/`ev_kamera:false` (Sekundärinfo eingeklappt) sind intentional korrekt.
+- *Bestätigt — Fallstrick:* `loc_events` („Nächste Events", Z. 3983–3986) baut das Toggle-Pattern **hand-gerollt** nach (eigenes `<div class="sheet-section">` + literal `Sections.toggle('loc_events')`), nicht via `mkSec()`. Die Inline-Header-Styles sind 1:1 identisch mit der CSS-Klasse `.sheet-section h4` → Umbau auf `mkSec()` ist optisch + funktional **identisch**. `#loc-events-section` wird nirgends referenziert; `sb_/sc_loc_events` erzeugt `mkSec` gleich; `#loc-events-content` + async-Loader bleiben erhalten.
+
+**Scope:**
+Eingeschlossen: (a) `loc_events` auf `mkSec()` umbauen (einheitliche Bauweise); (b) Guard `tools/refactor_check.py`, Check #4 in `analyze_frontend()`. Ausgeschlossen: Backend, andere Sections (keine Regression vorhanden).
+
+**Akzeptanzkriterien (Nutzersicht — erlebbar):**
+- [ ] In der App: Alle aufklappbaren Abschnitte in Chancen- und Location-Details erscheinen im gewollten Zustand (wichtige offen, Nebeninfos eingeklappt) — unverändert zu heute.
+- [ ] Der Abschnitt „📅 Nächste Events" in den Location-Details sieht und verhält sich **identisch** zu vorher (gleiche Überschrift, gleicher Standard = offen, lädt seine Events nach).
+- [ ] Beim nächsten Release läuft der Guard automatisch mit und meldet nichts, solange alles korrekt ist.
+- [ ] Schutzfall: Würde künftig ein Abschnitt ohne hinterlegten Standardzustand eingebaut, **stoppt der Release-Check mit klarer Fehlermeldung inkl. Abschnittsname** (statt stiller, unsichtbar eingeklappter Abschnitt wie bei BUG-40).
+- [ ] Schutzfall (Option B, streng): Würde ein Abschnitt künftig hand-gerollt statt über die Standard-Bauweise gebaut, **stoppt der Release-Check** ebenfalls mit Hinweis.
+- [ ] Edge Case: Hat ein Nutzer einen Abschnitt manuell zu-/aufgeklappt, bleibt seine Wahl erhalten (localStorage unberührt).
+
+**Pre-Mortem:**
+- 💀 Umbau von „Nächste Events" ändert ungewollt Optik/Verhalten → Gegenmaßnahme: Inline-Styles als identisch zur CSS-Klasse verifiziert (Z. 273–275); AK „identisch zu vorher" + manueller Test.
+- 💀 Guard meldet Fehlalarm auf die legitimen Lazy-Render-Checks `Sections.isOpen('ev_fov'/'loc_fov')` → Gegenmaßnahme: Guard erkennt hand-gerollte Sections **nur** an literalem `Sections.toggle('id')`, nicht an `isOpen` (verifiziert: nur `loc_events` matcht, nach Umbau 0).
+- 💀 Guard blockiert harmlos (toter `_def`-Key) → Gegenmaßnahme: Guard prüft nur fehlende Defaults + Hand-Rolling, nicht überzählige Keys.
+
+**Architektur:**
+- `web/index.html` Z. 3983–3986 (loc_events hand-gerollt), `_def` Z. 2600–2605, `mkSec()` Z. 2624.
+- `tools/refactor_check.py` `analyze_frontend()` (neuer Check #4); Exit-1 greift via bestehendem `needs_ticket`→`clean=false` (Z. 335/377), läuft über `fotoalert-refactor` vor jedem Release.
+
+**Implementierungsoptionen:**
+- A (pragmatisch): Guard akzeptiert beide Bauweisen, `loc_events` bleibt hand-gerollt.
+- B (streng/einheitlich): `loc_events` auf `mkSec()` umbauen + Guard erzwingt einheitliche Bauweise.
+- ✅ **Empfehlung & Freigabe (Stephan, 2026-06-25): Option B.**
+
+**Testplan:**
+- [ ] Automatisiert: `python3 tools/refactor_check.py --report` grün nach Umbau; Regressions-Probe (kaputte Section → Exit 1 + Name, dann entfernen).
+- [ ] Manuell: Location-Detail öffnen → „Nächste Events" offen, Events laden, Optik identisch.
+
+**Analyse & Planung:**
+- [x] Example Mapping (2026-06-25) · [x] Pre-Mortem · [x] Architektur analysiert · [x] Optionen A/B · [x] Empfehlung: B (freigegeben)

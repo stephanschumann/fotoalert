@@ -564,6 +564,36 @@
       max-height: 92vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #impressum-sheet.open { transform: translateY(0); }
+    /* US-64: Live-Astro Sheet */
+    #astro-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      z-index: 106; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #astro-overlay.open { opacity: 1; pointer-events: auto; }
+    #astro-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 107;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      max-height: 94vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #astro-sheet.open { transform: translateY(0); }
+    #astro-content { overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+    #astro-map { height: 46vh; margin: 8px 16px; border-radius: 12px; overflow: hidden;
+      background: #0d0d1a; }
+    .astro-readout { padding: 6px 0 2px; }
+    .ar-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px;
+      padding: 3px 16px; color: var(--text); }
+    .ar-row i { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+    .ar-row b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--muted); }
+    .ar-row.aligned { color: #36d07a; }
+    .ar-row.aligned b { color: #36d07a; }
+    .ar-ok { margin-left: 8px; color: #36d07a; font-weight: 700; font-size: 11px; }
+    .astro-controls { display: flex; align-items: center; gap: 10px; padding: 6px 16px 2px; }
+    #astro-time { flex: 1; accent-color: var(--gold); }
+    .astro-clock { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 700; min-width: 48px; text-align: right; }
+    .astro-live-btn { background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .astro-live-btn.on { background: var(--gold); color: #1a1300; border-color: var(--gold); }
+    .astro-legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 16px 4px; font-size: 11px; color: var(--muted); }
+    .astro-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .astro-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
     #impressum-content { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
     .loc-impossible-warn { margin: 0 20px 4px; background: rgba(224,80,80,.1);
       border: 1px solid rgba(224,80,80,.35); border-radius: 12px; padding: 12px 14px; }
@@ -907,6 +937,16 @@
   <div id="loc-detail-content"></div>
 </div>
 
+<!-- US-64: Live-Astro Sheet (PhotoPills-like) -->
+<div id="astro-overlay" onclick="AstroLive.close()"></div>
+<div id="astro-sheet">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
+    <div style="font-size:16px;font-weight:800">🌌 Live-Astro</div>
+    <button class="close-btn" onclick="AstroLive.close()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="astro-content"></div>
+</div>
+
 <!-- Filter Sheet (US-32) -->
 <div id="filter-overlay" onclick="FilterSheet.close()"></div>
 <div id="filter-sheet">
@@ -937,6 +977,8 @@
 
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- US-64: Astronomy Engine (clientseitige Himmelsmechanik, MIT) -->
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 // VERSION  (Major.Feature.Fix)
@@ -944,7 +986,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.3';
+const APP_VERSION = '1.13.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3293,6 +3335,221 @@ const MapView = {
 };
 
 // ═══════════════════════════════════════════════════════
+// US-64: LIVE-ASTRO (clientseitig via Astronomy Engine, kein Server)
+// ═══════════════════════════════════════════════════════
+const AstroLive = {
+  map: null, obs: null, subj: null, lines: [], timer: null, loc: null,
+  _live: true, _day: null, _pending: false,
+  GC: { ra: 17.7611, dec: -29.0078 },       // Milchstraßenzentrum (Sgr A*), J2000
+  COL: { sun: '#E8A020', moon: '#7fb2ff', mw: '#b06cff', axis: '#36d07a' },
+
+  open(locId) {
+    const loc = (Locations.all || []).find(l => l.id === locId) || LocationDetail._current;
+    if (!loc) return;
+    if (typeof Astronomy === 'undefined') { toast('Astronomie-Modul lädt noch – kurz erneut versuchen'); return; }
+    this.loc = loc;
+    document.getElementById('astro-content').innerHTML = this._html();
+    document.getElementById('astro-overlay').classList.add('open');
+    document.getElementById('astro-sheet').classList.add('open');
+    requestAnimationFrame(() => this._init());
+  },
+
+  close() {
+    this._stopLive();
+    if (this.map) { this.map.remove(); this.map = null; }
+    this.obs = this.subj = null; this.lines = [];
+    document.getElementById('astro-overlay').classList.remove('open');
+    document.getElementById('astro-sheet').classList.remove('open');
+    this.loc = null;
+  },
+
+  _html() {
+    return `
+      <div class="astro-readout" id="astro-readout"></div>
+      <div id="astro-map"></div>
+      <div class="astro-controls">
+        <button class="astro-live-btn on" id="astro-live" onclick="AstroLive.toggleLive()">● Live</button>
+        <input type="range" id="astro-time" min="0" max="1439" step="1" oninput="AstroLive.onScrub()">
+        <span class="astro-clock" id="astro-clock">–</span>
+      </div>
+      <div class="astro-legend">
+        <span><i style="background:${this.COL.sun}"></i>Sonne</span>
+        <span><i style="background:${this.COL.moon}"></i>Mond</span>
+        <span><i style="background:${this.COL.mw}"></i>Milchstr.-Zentrum</span>
+        <span><i style="background:${this.COL.axis}"></i>Sichtachse → Motiv</span>
+      </div>
+      <p style="font-size:11px;color:var(--muted);padding:2px 16px 8px">Pins ziehen ändert Standort/Motiv live · dünn = Auf-/Untergang · heller Fächer = Sonnenbahn über den Tag</p>`;
+  },
+
+  _init() {
+    const loc = this.loc;
+    const c = [loc.observer_lat, loc.observer_lon];
+    this.map = L.map('astro-map', { zoomControl: true, attributionControl: false }).setView(c, 15);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(this.map);
+    this.obs = MapMarkers.observerDraggable(c).addTo(this.map);
+    this.obs.on('drag', () => this._scheduleRender());
+    if (loc.subject_lat && loc.subject_lon) {
+      this.subj = MapMarkers.subjectDraggable([loc.subject_lat, loc.subject_lon]).addTo(this.map);
+      this.subj.on('drag', () => this._scheduleRender());
+    } else this.subj = null;
+    setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 60);   // Pre-Mortem: 0px-Container
+    this.setNow();
+    this.render();
+    this._startLive();
+  },
+
+  // ---- Geometrie ----
+  _dest(lat, lon, brg, d) {
+    const R = 6371000, dr = d / R, b = brg * Math.PI / 180, la1 = lat * Math.PI / 180, lo1 = lon * Math.PI / 180;
+    const la2 = Math.asin(Math.sin(la1) * Math.cos(dr) + Math.cos(la1) * Math.sin(dr) * Math.cos(b));
+    const lo2 = lo1 + Math.atan2(Math.sin(b) * Math.sin(dr) * Math.cos(la1), Math.cos(dr) - Math.sin(la1) * Math.sin(la2));
+    return [la2 * 180 / Math.PI, lo2 * 180 / Math.PI];
+  },
+  _bearing(a, b) {
+    const la1 = a[0] * Math.PI / 180, la2 = b[0] * Math.PI / 180, dl = (b[1] - a[1]) * Math.PI / 180;
+    const y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(dl);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  },
+  _distM(a, b) {
+    const R = 6371000, dLa = (b[0] - a[0]) * Math.PI / 180, dLo = (b[1] - a[1]) * Math.PI / 180,
+      la1 = a[0] * Math.PI / 180, la2 = b[0] * Math.PI / 180;
+    const h = Math.sin(dLa / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLo / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  },
+  _circDiff(a, b) { return ((a - b + 540) % 360) - 180; },   // Pre-Mortem: Azimut-Wrap
+
+  // US-64-Ergänzung: Höhe des Objekts über der Motivspitze in m (US-67-Formel, projiziert auf Motiv-Entfernung)
+  _vertOffsetM(bodyAlt) {
+    const loc = this.loc;
+    if (!this.subj || !loc.subject_height_m || bodyAlt < 0) return null;
+    const p = this.obs.getLatLng(), s = this.subj.getLatLng();
+    const d = this._distM([p.lat, p.lng], [s.lat, s.lng]);
+    if (!(d > 0)) return null;
+    const elevDiff = loc.elevation_difference_m || 0;
+    const floorH = loc.observer_floor_height_m || 0;
+    const heightAboveObs = elevDiff - floorH + loc.subject_height_m;           // Höhe Motivspitze über Augen-Niveau
+    const subjElevDeg = Math.atan(heightAboveObs / d) * 180 / Math.PI;         // scheinbarer Elevationswinkel der Spitze
+    return d * Math.tan((bodyAlt - subjElevDeg) * Math.PI / 180);              // + = über Spitze, − = darunter
+  },
+
+  // ---- Astronomie ----
+  _horizon(date, obsv, body) {
+    const eq = Astronomy.Equator(body, date, obsv, true, true);
+    const h = Astronomy.Horizon(date, obsv, eq.ra, eq.dec, 'normal');
+    return { az: h.azimuth, alt: h.altitude };
+  },
+  _horizonRaDec(date, obsv, ra, dec) {
+    const h = Astronomy.Horizon(date, obsv, ra, dec, 'normal');
+    return { az: h.azimuth, alt: h.altitude };
+  },
+  _riseSet(date, obsv, body) {
+    const d0 = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    let rise = null, set = null;
+    try { const r = Astronomy.SearchRiseSet(body, obsv, +1, d0, 1); rise = r ? this._horizon(r.date, obsv, body).az : null; } catch (e) {}
+    try { const s = Astronomy.SearchRiseSet(body, obsv, -1, d0, 1); set = s ? this._horizon(s.date, obsv, body).az : null; } catch (e) {}
+    return { rise, set };
+  },
+
+  // ---- Zeit-Steuerung ----
+  _curDate() {
+    const m = +document.getElementById('astro-time').value;
+    const d = this._day || new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), Math.floor(m / 60), m % 60);
+  },
+  setNow() {
+    const n = new Date(); this._day = n;
+    const el = document.getElementById('astro-time'); if (el) el.value = n.getHours() * 60 + n.getMinutes();
+  },
+  toggleLive() { this._live ? this._stopLive() : this._startLive(); },
+  _startLive() {
+    this._live = true;
+    const b = document.getElementById('astro-live'); if (b) b.classList.add('on');
+    this.setNow(); this.render();
+    this.timer = setInterval(() => { this.setNow(); this.render(); }, 30000);
+  },
+  _stopLive() {
+    this._live = false;
+    const b = document.getElementById('astro-live'); if (b) b.classList.remove('on');
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }   // Pre-Mortem: kein Interval-Leak
+  },
+  onScrub() { this._stopLive(); this.render(); },
+  _scheduleRender() { if (this._pending) return; this._pending = true; requestAnimationFrame(() => { this._pending = false; this.render(); }); },
+
+  // ---- Render ----
+  _clear() { this.lines.forEach(l => this.map.removeLayer(l)); this.lines = []; },
+  _ln(p, az, color, distM, weight, dashed) {
+    if (az == null || !isFinite(az)) return;
+    const e = this._dest(p.lat, p.lng, az, distM);
+    this.lines.push(L.polyline([[p.lat, p.lng], e], { color, weight, opacity: dashed ? 0.45 : 0.95, dashArray: dashed ? '4 7' : null }).addTo(this.map));
+  },
+
+  render() {
+    if (!this.map || !this.obs) return;
+    const p = this.obs.getLatLng();
+    const obsv = new Astronomy.Observer(p.lat, p.lng, 40);
+    const date = this._curDate();
+    const C = this.COL;
+    const sun = this._horizon(date, obsv, Astronomy.Body.Sun);
+    const moon = this._horizon(date, obsv, Astronomy.Body.Moon);
+    const mw = this._horizonRaDec(date, obsv, this.GC.ra, this.GC.dec);
+    const sunRS = this._riseSet(date, obsv, Astronomy.Body.Sun);
+    const moonRS = this._riseSet(date, obsv, Astronomy.Body.Moon);
+    const phase = Astronomy.Illumination(Astronomy.Body.Moon, date).phase_fraction;
+
+    this._clear();
+
+    // Sichtachse Fotograf → Motiv
+    let axisAz = null, axisDist = 2600;
+    if (this.subj) {
+      const s = this.subj.getLatLng();
+      axisAz = this._bearing([p.lat, p.lng], [s.lat, s.lng]);
+      axisDist = Math.max(1800, this._distM([p.lat, p.lng], [s.lat, s.lng]) * 1.15);
+    } else if (this.loc.ideal_azimuth_range) {
+      axisAz = (this.loc.ideal_azimuth_range[0] + this.loc.ideal_azimuth_range[1]) / 2;
+    }
+    if (axisAz != null) this._ln(p, axisAz, C.axis, axisDist, 3, false);
+
+    // Voller Tagesbogen der Sonne (Azimut-Fächer; nur Stützpunkte über Horizont)
+    for (let m = 0; m < 1440; m += 15) {
+      const t = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, m);
+      const s = this._horizon(t, obsv, Astronomy.Body.Sun);
+      if (s.alt >= 0) this._ln(p, s.az, C.sun, 1500, 1, false);
+    }
+
+    // Auf-/Untergangsrichtungen (dünn)
+    this._ln(p, sunRS.rise, C.sun, 3800, 2, true);
+    this._ln(p, sunRS.set, C.sun, 3800, 2, true);
+    this._ln(p, moonRS.rise, C.moon, 3800, 2, true);
+    this._ln(p, moonRS.set, C.moon, 3800, 2, true);
+
+    // Aktuelle Richtungen (dick; transparent wenn unter Horizont)
+    this._ln(p, sun.az, C.sun, 3000, 5, sun.alt < 0);
+    this._ln(p, moon.az, C.moon, 2800, 5, moon.alt < 0);
+    this._ln(p, mw.az, C.mw, 2600, 4, mw.alt < 0);
+
+    // Readout + Alignment-Indikator
+    const aligned = (o) => axisAz != null && o.alt >= 0 && Math.abs(this._circDiff(o.az, axisAz)) <= 2;
+    const row = (o, name, col) => {
+      const al = aligned(o);
+      let txt;
+      if (o.alt < 0) { txt = 'nicht sichtbar'; }
+      else {
+        txt = `${o.az.toFixed(0)}° · ${o.alt.toFixed(0)}° hoch`;
+        const v = this._vertOffsetM(o.alt);
+        if (v != null) txt += Math.abs(v) < 1
+          ? ' · auf Spitzenhöhe'
+          : ` · ${v >= 0 ? '+' : '−'}${Math.round(Math.abs(v))} m ${v >= 0 ? 'über' : 'unter'} Motivspitze`;
+      }
+      return `<div class="ar-row${al ? ' aligned' : ''}"><i style="background:${col}"></i>${name}<b>${txt}</b>${al ? '<span class="ar-ok">✓ Alignment</span>' : ''}</div>`;
+    };
+    document.getElementById('astro-readout').innerHTML =
+      row(sun, 'Sonne', C.sun) + row(moon, 'Mond', C.moon) + row(mw, 'Milchstr.-Zentrum', C.mw) +
+      `<div class="ar-row"><i style="background:transparent"></i>Mondphase<b>${Math.round(phase * 100)}% beleuchtet</b></div>`;
+    document.getElementById('astro-clock').textContent = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  },
+};
+
+// ═══════════════════════════════════════════════════════
 // LOCATIONS
 // ═══════════════════════════════════════════════════════
 const Locations = {
@@ -3705,6 +3962,7 @@ const LocationDetail = {
           <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">✏️</button>
         </div>
         <div class="sheet-hero-title">${loc.name}</div>
+        <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#1a1300;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">🌌 Live-Astro (Sonne · Mond · Milchstraße)</button>
         <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${loc.description}</p>
         ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
       </div>
@@ -3722,10 +3980,7 @@ const LocationDetail = {
 
       ${loc.locationscout_url ? mkSec('loc_links','🔗 Links',`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">📷 Locationscout</a>`) : ''}
 
-      <div class="sheet-section" id="loc-events-section">
-        <h4 onclick="Sections.toggle('loc_events')" style="cursor:pointer;user-select:none;justify-content:space-between;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:0"><span>📅 Nächste Events</span><span id="sc_loc_events" class="sec-chev" style="transform:rotate(${Sections.isOpen('loc_events')?'0':'-90'}deg)">▼</span></h4>
-        <div class="section-body ${Sections.isOpen('loc_events')?'open':''}" id="sb_loc_events"><div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div></div>
-      </div>
+      ${mkSec('loc_events','📅 Nächste Events',`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
 
       ${mkSec('loc_rating','⭐ Bewertung',`${Rating.inputHtml(loc.id)}`)}
 
