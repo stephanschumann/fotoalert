@@ -1191,6 +1191,108 @@ LOCATIONS: list[PhotoLocation] = [
         locationscout_url="https://www.locationscout.net/germany/30185-brandenburg-landtag/70926",
         difficulty=2,
     ),
+    # --- TASK-04: Neue Locations ---
+
+    PhotoLocation(
+        id="schloss_cecilienhof",
+        name="Schloss Cecilienhof",
+        description="Tudor-Revival-Schloss im Neuen Garten, Schauplatz der Potsdamer Konferenz 1945. "
+                    "Weitläufiges Ensemble mit 55 Kaminen und steilem Giebeldach. "
+                    "Mond- und Sonnenaufgang hinter der Ostfassade vom Parkweg aus besonders wirkungsvoll.",
+        category=LocationCategory.SCHLOSS,
+        observer_lat=52.4212, observer_lon=13.0730,
+        subject_lat=52.4227,  subject_lon=13.0706,
+        subject_name="Schloss Cecilienhof",
+        subject_height_m=14.0,
+        subject_width_m=80.0,
+        distance_m=220.0,
+        focal_length_suggestions=[85, 135, 200],
+        solar_alignment_note="Sonnenaufgang über Ostfassade im Herbst/Winter möglich.",
+        lunar_alignment_note="Vollmond-Aufgang hinter Dachfirst von Südost.",
+        access_note="Neuer Garten, Potsdam. Eintritt Park frei.",
+        difficulty=1,
+    ),
+
+    PhotoLocation(
+        id="schloss_pfaueninsel",
+        name="Schloss Pfaueninsel",
+        description="Weißes romantisches Lustschlösschen auf der Pfaueninsel in der Havel, "
+                    "zwei Rundtürme verbunden durch eine schmiedeeiserne Brücke. "
+                    "Spiegelung im Wasser und Mond-Untergang hinter den Türmen von der Fähranlegestelle.",
+        category=LocationCategory.SCHLOSS,
+        observer_lat=52.4315, observer_lon=13.1100,
+        subject_lat=52.4308,  subject_lon=13.1197,
+        subject_name="Schloss Pfaueninsel – Rundtürme",
+        subject_height_m=18.0,
+        subject_width_m=30.0,
+        distance_m=650.0,
+        focal_length_suggestions=[200, 300, 400],
+        solar_alignment_note="",
+        lunar_alignment_note="Monduntergang im Westen hinter den Türmen (Havel-Perspektive).",
+        access_note="Fähre Wannsee → Pfaueninsel (saisonal). Foto vom Festland-Ufer ohne Fährticket möglich.",
+        difficulty=1,
+    ),
+
+    PhotoLocation(
+        id="kloster_chorin",
+        name="Kloster Chorin – Westfassade",
+        description="Bedeutendste gotische Backsteinkirche Brandenburgs, ehem. Zisterzienserabtei (1258). "
+                    "Ikonische turmlose Westfassade mit gestuften Giebeln und Maßwerkfenstern. "
+                    "Ost-West-Kirchenachse: Sonnenuntergang hinter dem Westgiebel im Herbst dramatisch.",
+        category=LocationCategory.SCHLOSS,
+        observer_lat=52.8942, observer_lon=13.8720,
+        subject_lat=52.8944,  subject_lon=13.8761,
+        subject_name="Kloster Chorin – Westgiebel",
+        subject_height_m=24.0,
+        subject_width_m=35.0,
+        distance_m=280.0,
+        focal_length_suggestions=[50, 85, 135],
+        solar_alignment_note="Sonnenuntergang hinter Westgiebel (~270°) im Herbst/Winter.",
+        lunar_alignment_note="Mondaufgang hinter Ostabschluss (Chorpolygon).",
+        access_note="Chorin, Barnim. Parkplatz am Kloster. ~60 km nordöstlich Berlin.",
+        difficulty=1,
+    ),
+
+    PhotoLocation(
+        id="dorfkirche_schoenermark",
+        name="Dorfkirche Schönermark (Uckermark)",
+        description="Romanische Feldsteinkirche auf dem Dorfanger bei Angermünde, Uckermark. "
+                    "Markanter Westturm aus Feldsteinen, freistehend in idyllischer Landschaft. "
+                    "Mond- und Sonnenaufgang hinter dem Turm besonders wirkungsvoll.",
+        category=LocationCategory.SCHLOSS,
+        observer_lat=53.0155, observer_lon=14.0388,
+        subject_lat=53.0162,  subject_lon=14.0405,
+        subject_name="Dorfkirche Schönermark – Westturm",
+        subject_height_m=18.0,
+        subject_width_m=12.0,
+        distance_m=120.0,
+        focal_length_suggestions=[50, 85, 135, 200],
+        solar_alignment_note="Sonnenaufgang hinter dem Turm bei östlicher Perspektive.",
+        lunar_alignment_note="Mondaufgang hinter Westturm vom Dorfanger.",
+        access_note="Schönermark bei Angermünde, Uckermark. GPS-Koordinaten vor Ort bitte verifizieren.",
+        difficulty=2,
+    ),
+
+    PhotoLocation(
+        id="seelower_hoehen_ehrenmal",
+        name="Seelower Höhen – Sowjetisches Ehrenmal",
+        description="Sowjetisches Ehrenmal auf dem Plateau der Seelower Höhen, Gesamthöhe 9,9 m. "
+                    "Monumentale Soldatenstatue über dem Oderbruch, eingeweiht 1945. "
+                    "Sonnenaufgang über der weiten Oderbruch-Ebene hinter dem Monument: dramatisches Gegenlicht.",
+        category=LocationCategory.SCHLOSS,
+        observer_lat=52.5325, observer_lon=14.1665,
+        subject_lat=52.5340,  subject_lon=14.1680,
+        subject_name="Sowjetisches Ehrenmal Seelow",
+        subject_height_m=10.0,
+        subject_width_m=4.0,
+        distance_m=180.0,
+        focal_length_suggestions=[85, 135, 200, 300],
+        solar_alignment_note="Sonnenaufgang über Oderbruch hinter dem Monument (~90°).",
+        lunar_alignment_note="",
+        access_note="Gedenkstätte Seelower Höhen, Seelow. ~80 km östlich Berlin. GPS vor Ort verifizieren.",
+        difficulty=2,
+    ),
+
 ]  # Ende LOCATIONS
 
 

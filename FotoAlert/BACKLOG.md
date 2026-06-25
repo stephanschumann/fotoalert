@@ -27,12 +27,12 @@
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | US-88 |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -403,10 +403,48 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Ready for Dev |
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Im Brennweiten-Filter liegen 10, 14, 18, 21, 28 und 35 mm so nah beieinander, dass eine präzise Auswahl kaum möglich ist, während 300 und 600 mm sehr weit auseinanderliegen. Der Slider soll eine nicht-lineare Skalierung (z. B. logarithmisch oder mit definierten Stufen) erhalten, die im Weitwinkelbereich feinere Schritte und im Telebereich sinnvolle Zwischenstufen (400 mm, 500 mm) ermöglicht.
+
+**Scope:**
+Eingeschlossen: Dual-Range-Slider in `initDualSlider()` auf Stufen-Mapping umstellen; MAX_VAL auf 800 anheben; Migration bestehender gespeicherter Werte.
+Ausgeschlossen: Filterlogik (mm-Vergleich bleibt), Backend, Labels.
+
+**Akzeptanzkriterien:**
+- [ ] Wenn ich den linken Thumb auf ~1/4 der Slider-Breite ziehe, rastet er auf 35 mm ein (vorher wäre das ~150 mm gewesen)
+- [ ] Im Weitwinkelbereich (14–85 mm) gibt es 6 einrastbare Stufen, jede einzeln wählbar
+- [ ] Das Label zeigt immer einen Wert aus der Stufenliste, nie einen Zwischenwert
+- [ ] Stufen-Werte: 0, 14, 21, 24, 28, 35, 50, 70, 85, 105, 135, 200, 300, 400, 500, 600, 800 mm
+- [ ] Standorte mit 800 mm Brennweite sind über den Slider filterbar (Max-Thumb auf 800 mm setzbar)
+- [ ] Edge Case: Bestehende `minFocal`/`maxFocal`-Werte aus alten Einstellungen werden beim Öffnen des Sliders auf die nächste Stufe gerundet (kein Stuck-Thumb)
+- [ ] Edge Case: Min-Thumb und Max-Thumb können nicht auf dieselbe Stufe gesetzt werden
+
+**Pre-Mortem:**
+- 💀 Alter gespeicherter Wert (z.B. 75) passt zu keiner Stufe → Gegenmaßnahme: `snapToStep(v)` in `updateUI` beim Laden aufrufen
+- 💀 CSS `left`-Prozent bleibt linear gegen MAX_VAL → Gegenmaßnahme: eigene `valToPct(v)` / `pctToVal(pct)` auf Index-Basis der Stufenliste
+- 💀 MAX_VAL 600 klemmt 800-mm-Standorte aus → Gegenmaßnahme: MAX_VAL = 800, STEPS-Array endet bei 800
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-25)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` `initDualSlider()` (Z. ~2301), `_render()` (focalMinPct/MaxPct Z. ~2544), `_onFocalSlider/_onFocalMaxSlider`
+- [x] Implementierungsoption: Stufen-Array (Option A — von Stephan bestätigt)
+- [x] Stufenliste bestätigt: `[0, 14, 21, 24, 28, 35, 50, 70, 85, 105, 135, 200, 300, 400, 500, 600, 800]`
+
+**Implementierungsnotizen:**
+- `const STEPS = [0,14,21,24,28,35,50,70,85,105,135,200,300,400,500,600,800]`
+- `pctToVal(pct)`: nächste Stufe via `STEPS.reduce(...)` zum Pixel-Anteil
+- `valToPct(v)`: `STEPS.indexOf(snapToStep(v)) / (STEPS.length - 1) * 100`
+- `snapToStep(v)`: `STEPS.reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a)`
+- `MAX_VAL` in `initDualSlider` → 800; `focalMinPct/MaxPct` in `_render` ebenfalls anpassen
+- `_onFocalSlider/_onFocalMaxSlider` sind Legacy (Einzel-Slider) — prüfen ob noch aktiv, ggf. ebenfalls anpassen
+
+**Testplan:**
+- [ ] Automatisiert: kein Backend-Test nötig (rein Frontend)
+- [ ] Manuell: Filter-Sheet öffnen → Brennweiten-Slider prüfen: Thumb auf 1/4 → Label 35 mm? Thumb ganz rechts → 800 mm?
+- [ ] Manuell: localStorage mit altem Wert (z.B. `fa_filter: {"minFocal":75}`) setzen → Sheet öffnen → Thumb landet auf 70 mm?
 
 ---
 
@@ -1743,16 +1781,44 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 - **Empfehlung:** Option A + SQLite-Persistenz (Hybrid)
 - **Wartet am Weg-Gate:** Freigabe durch Stephan vor Implementierung
 
-### US-39 · Resilient Deployment / Rollback (nur Code/Deploy)
-> **Abgegrenzt (2026-06-20):** Scope auf reines **Code-/Deploy-Rollback** reduziert. Der Daten-Aspekt („Datensicherung vor Precompute") wurde nach **TASK-18** verschoben.
->
-> **Als App-Host** möchte ich bei der Einführung neuer Features oder Fixes jederzeit auf die letzte funktionierende Version zurückrollen können, damit nie die gesamte App verloren geht.
->
-> **Akzeptanzkriterien:**
-> - Git-basiertes Versioning: jeder Deploy-Stand ist als Tag oder Branch nachvollziehbar
-> - Rollback-Anleitung dokumentiert (welcher Befehl, welcher Stand)
-> - Cache-Kompatibilität: Rollback bricht keine bestehenden JSON-Caches (oder migriert sie)
-> - *(Datensicherung → ausgelagert nach TASK-18)*
+### US-39 · Resilient Deployment / Rollback (nur Code/Deploy) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | UserStory |
+| **Priorität** | Niedrig |
+| **Status** | Done |
+| **Erstellt** | 2026-06-20 |
+| **Implementiert** | 2026-06-25 |
+
+**Beschreibung:** Als App-Host möchte ich bei der Einführung neuer Features oder Fixes jederzeit auf die letzte funktionierende Version zurückrollen können.
+
+**Abgrenzung (2026-06-20):** Scope auf reines Code-/Deploy-Rollback reduziert. Datensicherung → TASK-18.
+
+**Scope:**
+- Eingeschlossen: `release.sh` (Git-Tags), `deploy/rollback.sh` (stabiler Rollback-Mechanismus), `deploy/DEPLOYMENT-GUIDE.md` (Rollback-Doku + Cache-Hinweis)
+- Ausgeschlossen: Datensicherung (TASK-18), GitHub Releases UI
+
+**Akzeptanzkriterien:**
+- [x] `release.sh` erstellt nach jedem Push einen Git-Tag (`v{VERSION}`) → `git tag` listet alle Releases
+- [x] `rollback.sh` verwendet `git reset --hard` (bewegt HEAD) → Rollback-Stand überlebt nächsten `git pull`
+- [x] DEPLOYMENT-GUIDE.md: Rollback-Sektion mit Tag-Beispiel + Cache-Kompatibilitäts-Hinweis
+- [x] Edge Case: Cache-Kompatibilität dokumentiert (Caches außerhalb Git, manueller Recompute bei alten Rollback-Zielen)
+
+**Pre-Mortem:**
+- 💀 `git checkout -- .` ohne HEAD-Bewegung → Rollback wird bei nächstem Pull überschrieben → Gegenmaßnahme: `git reset --hard` (implementiert)
+- 💀 Tags nicht auf Remote gepusht → Rollback per Tag unmöglich → Gegenmaßnahme: `git push origin "v${NEW_VERSION}"` in `release.sh` (implementiert)
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-25)
+- [x] Pre-Mortem durchgeführt (2026-06-25)
+- [x] Architektur analysiert: `release.sh`, `deploy/rollback.sh`, `deploy/DEPLOYMENT-GUIDE.md`
+- [x] Implementiert: Option A (3-Datei-Minimal-Fix)
+
+**📎 Code-Verifikation (2026-06-25):**
+- `rollback.sh` Z. 29: `git checkout "$TARGET" -- .` → `git reset --hard "$TARGET"` ✅
+- `release.sh` Z. 79ff: `git tag + git push --tags` ergänzt ✅
+- `DEPLOYMENT-GUIDE.md`: Rollback-Sektion ausgebaut ✅
 
 ### TASK-13 · PWA auf iPhone: Öffentliches Hosting & Remote-Zugriff `[x]`
 > **✅ Done (abgeglichen 2026-06-20):** Faktisch erledigt — das Setup existiert und ist live: Hetzner CX22 + Caddy (HTTPS), Domain `https://fotoalert.stephanschumann.com`, systemd-Service + Precompute-Timer, PWA auf iPhone installierbar. Vollständige Setup-Anleitung in `deploy/DEPLOYMENT-GUIDE.md`. Ticket stand nur durch fehlenden Board-Abgleich noch in der Inbox; alle AKs sind erfüllt.
@@ -4231,8 +4297,59 @@ Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 ### TASK-03 · Feuerwerk-Events `[ ]`
 > Manuelle Events für wiederkehrende Feuerwerke: Silvester, Pyronale, Havel in Flammen.
 
-### TASK-04 · Weitere Locations erfassen `[ ]`
-> Schloss Cecilienhof, Pfaueninsel, Kloster Chorin, Feldsteinkirchen Uckermark, Seelower Höhen. Locationscout-Scroll-Limit von 12 aufheben.
+### TASK-04 · Weitere Locations erfassen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | Ready for Dev |
+| **Analysiert** | 2026-06-25 |
+
+> 5 neue Locations in `backend/data/locations.py` als Base-Locations eintragen: Schloss Cecilienhof, Schloss Pfaueninsel, Kloster Chorin, Dorfkirche Schönermark (Uckermark), Seelower Höhen Ehrenmal.
+>
+> *Hinweis: „Locationscout-Scroll-Limit von 12" bezieht sich auf die externe Website locationscout.net — außerhalb unserer Kontrolle, kein Implementierungs-Scope.*
+
+**Scope:**
+- Eingeschlossen: 5 neue `PhotoLocation`-Einträge in `backend/data/locations.py`; Prod-SQLite-Check vor Deployment (ID-Kollision)
+- Ausgeschlossen: Locationscout.net-Limit (extern), Custom-Location-Bearbeitung, neue API-Endpoints
+
+**Akzeptanzkriterien:**
+- [ ] Die 5 neuen Locations erscheinen im Locations-Tab der App
+- [ ] Alle bestehenden Custom Locations (per App hinzugefügt) sind nach dem Deployment unverändert vorhanden
+- [ ] Alle bestehenden Location-Overrides (Koordinaten-Edits per App) bleiben erhalten
+- [ ] Vor Deployment: SQLite-Check auf Prod ergab keine ID-Kollision mit den neuen IDs
+- [ ] Nach Deployment: `GET /locations` liefert ≥ 60 Locations (55 bestehend + 5 neue)
+- [ ] Alle 5 neuen Locations haben `subject_height_m > 0` → Scout-Pipeline-Kandidaten
+- [ ] Nach Server-Neustart + Precompute erscheinen Events der neuen Locations im Feed
+
+**⚠️ GPS-Verifikations-Pflicht:** Koordinaten für Schönermark (🔴) und Seelower Höhen (🔴) müssen vor Ort bestätigt werden.
+
+**Pre-Mortem:**
+- 💀 ID-Kollision mit bestehender Custom Location → Custom Location wird bei Startup still ignoriert (main.py Z. 143–147) → Gegenmaßnahme: SQLite-Check ist AK
+- 💀 `subject_height_m` fehlt → Scout-Pipeline ignoriert Location ohne Fehlermeldung → Gegenmaßnahme: AK „alle 5 haben `subject_height_m > 0`"
+- 💀 Koordinaten falsch → falsche Alignment-Berechnung → Gegenmaßnahme: GPS vor Ort; FOV-Karte in App prüfen
+
+**Recherchierte Location-Daten:**
+
+| Location | Subject-Lat | Subject-Lon | Observer-Lat | Observer-Lon | Höhe | Breite | Dist |
+|----------|-------------|-------------|--------------|--------------|------|--------|------|
+| Schloss Cecilienhof | 52.4227 | 13.0706 | 52.4212 | 13.0730 | 14m | 80m | 220m |
+| Schloss Pfaueninsel | 52.4308 | 13.1197 | 52.4315 | 13.1100 | 18m | 30m | 650m |
+| Kloster Chorin | 52.8944 | 13.8761 | 52.8942 | 13.8720 | 24m | 35m | 280m |
+| Dorfkirche Schönermark 🔴 | 53.0162 | 14.0405 | 53.0155 | 14.0388 | 18m | 12m | 120m |
+| Seelower Höhen Ehrenmal 🔴 | 52.5340 | 14.1680 | 52.5325 | 14.1665 | 10m | 4m | 180m |
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/locations.py`, `main.py` `_load_custom_locations()` Z. 143–160
+- [x] GPS-Recherche für alle 5 Locations abgeschlossen
+- [ ] SQLite-Check auf Prod vor Implementierung
+
+**Testplan:**
+- [ ] Manuell: `GET /locations` → 5 neue Namen in der Liste
+- [ ] Manuell: Locations-Tab → 5 neue Cards sichtbar, FOV-Karte je Location prüfen
+- [ ] Manuell: nach Deployment → bisherige Custom Locations noch vorhanden
+- [ ] Nach Precompute: Feed zeigt Events für neue Locations
 
 ### TASK-05 · Design-Spec dokumentieren `[ ]`
 > `DESIGN.md` mit allen CSS-Tokens, Abständen, Komponenten-Regeln anlegen. *(Design ist eingefroren, Dokumentation fehlt noch)*
