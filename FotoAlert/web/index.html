@@ -985,7 +985,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.8';
+const APP_VERSION = '1.13.9';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2304,18 +2304,24 @@ const FilterSheet = {
     const thumbMin = document.getElementById('focal-thumb-min');
     const thumbMax = document.getElementById('focal-thumb-max');
     const fill     = document.getElementById('focal-fill');
-    const MAX_VAL  = 600, STEP = 25;
+    const MAX_VAL = 800;
+    const STEPS = [0,14,21,24,28,35,50,70,85,105,135,200,300,400,500,600,800];
 
-    const toVal = pct => Math.round(Math.max(0, Math.min(1, pct)) * MAX_VAL / STEP) * STEP;
-    const toPct = v   => (v / MAX_VAL * 100).toFixed(2) + '%';
+    const snapToStep = v => STEPS.reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a);
+    const valToPct   = v => STEPS.indexOf(snapToStep(v)) / (STEPS.length - 1) * 100;
+    const pctToVal   = pct => STEPS[Math.round(pct / 100 * (STEPS.length - 1))];
+
+    // Legacy-Aliasse (drag-Logik nutzt toVal/toPct intern)
+    const toVal = pct => pctToVal(Math.max(0, Math.min(1, pct)) * 100);
+    const toPct = v   => valToPct(v).toFixed(2) + '%';
 
     const updateUI = () => {
-      const mn = Filter.state.minFocal || 0;
-      const mx = Filter.state.maxFocal || MAX_VAL;
+      const mn = snapToStep(Filter.state.minFocal || 0);
+      const mx = snapToStep(Filter.state.maxFocal || MAX_VAL);
       thumbMin.style.left = toPct(mn);
       thumbMax.style.left = toPct(mx);
       fill.style.left     = toPct(mn);
-      fill.style.width    = toPct(mx - mn);
+      fill.style.width    = (valToPct(mx) - valToPct(mn)).toFixed(2) + '%';
       FilterSheet._updateFocalLabel();
       Filter._updateBadge();
     };
@@ -2328,11 +2334,15 @@ const FilterSheet = {
         const pct = (cx - rect.left) / rect.width;
         const v   = toVal(pct);
         if (isMin) {
-          const cur = Filter.state.maxFocal || MAX_VAL;
-          Filter.save({ minFocal: Math.min(v, cur - STEP) });
+          const cur = snapToStep(Filter.state.maxFocal || MAX_VAL);
+          const curIdx = STEPS.indexOf(cur);
+          const vIdx   = STEPS.indexOf(snapToStep(v));
+          Filter.save({ minFocal: STEPS[Math.min(vIdx, Math.max(0, curIdx - 1))] });
         } else {
-          const cur = Filter.state.minFocal || 0;
-          Filter.save({ maxFocal: Math.max(v, cur + STEP) });
+          const cur = snapToStep(Filter.state.minFocal || 0);
+          const curIdx = STEPS.indexOf(cur);
+          const vIdx   = STEPS.indexOf(snapToStep(v));
+          Filter.save({ maxFocal: STEPS[Math.max(vIdx, Math.min(STEPS.length - 1, curIdx + 1))] });
         }
         updateUI();
         FilterSheet._applyLiveDebounced();  // Live-Vorschau beim Brennweiten-Drag
@@ -2475,8 +2485,11 @@ const FilterSheet = {
   },
 
   _onFocalSlider(el) {
-    const v = parseInt(el.value);
-    const pct = Math.round(v / 600 * 100);
+    // Legacy: aktuell nicht im Template referenziert (Dual-Slider ersetzt input[type=range])
+    const STEPS = [0,14,21,24,28,35,50,70,85,105,135,200,300,400,500,600,800];
+    const snap = v => STEPS.reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a);
+    const v = snap(parseInt(el.value));
+    const pct = (STEPS.indexOf(v) / (STEPS.length - 1) * 100).toFixed(2);
     el.style.setProperty('--pct', pct + '%');
     Filter.save({ minFocal: v });
     FilterSheet._updateFocalLabel();
@@ -2484,8 +2497,11 @@ const FilterSheet = {
   },
 
   _onFocalMaxSlider(el) {
-    const v = parseInt(el.value);
-    const pct = Math.round(v / 600 * 100);
+    // Legacy: aktuell nicht im Template referenziert (Dual-Slider ersetzt input[type=range])
+    const STEPS = [0,14,21,24,28,35,50,70,85,105,135,200,300,400,500,600,800];
+    const snap = v => STEPS.reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a);
+    const v = snap(parseInt(el.value));
+    const pct = (STEPS.indexOf(v) / (STEPS.length - 1) * 100).toFixed(2);
     el.style.setProperty('--pct', pct + '%');
     Filter.save({ maxFocal: v });
     FilterSheet._updateFocalLabel();
@@ -2539,11 +2555,16 @@ const FilterSheet = {
 
     const scoreLabel = s.minScore === 0 ? 'Alle' : `≥ ${s.minScore} %`;
     const scorePct = s.minScore + '%';
-    const mn = s.minFocal || 0, mx = s.maxFocal || 0;
-    const focalLabel = (!mn && !mx) ? 'Alle Brennweiten' : (mn && !mx) ? `≥ ${mn} mm` : (!mn && mx) ? `≤ ${mx} mm` : `${mn}–${mx} mm`;
-    const focalMinPct = (mn / 600 * 100).toFixed(2) + '%';
-    const focalMaxPct = ((mx || 600) / 600 * 100).toFixed(2) + '%';
-    const focalRangePct = (((mx || 600) - mn) / 600 * 100).toFixed(2) + '%';
+    const FOCAL_STEPS = [0,14,21,24,28,35,50,70,85,105,135,200,300,400,500,600,800];
+    const _snapFocal = v => FOCAL_STEPS.reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a);
+    const _focalToPct = v => (FOCAL_STEPS.indexOf(_snapFocal(v)) / (FOCAL_STEPS.length - 1) * 100).toFixed(2) + '%';
+    const mn = _snapFocal(s.minFocal || 0), mx = _snapFocal(s.maxFocal || 800);
+    const focalLabel = (!s.minFocal && !s.maxFocal) ? 'Alle Brennweiten' : (s.minFocal && !s.maxFocal) ? `≥ ${mn} mm` : (!s.minFocal && s.maxFocal) ? `≤ ${mx} mm` : `${mn}–${mx} mm`;
+    const focalMinPct = _focalToPct(mn);
+    const focalMaxPct = _focalToPct(mx);
+    const _mnIdx = FOCAL_STEPS.indexOf(_snapFocal(mn));
+    const _mxIdx = FOCAL_STEPS.indexOf(_snapFocal(mx));
+    const focalRangePct = ((_mxIdx - _mnIdx) / (FOCAL_STEPS.length - 1) * 100).toFixed(2) + '%';
 
     const isMapView = App.current === 'map';
     const scoreSection = isMapView
@@ -2580,9 +2601,9 @@ const FilterSheet = {
             <div class="dual-range-thumb" id="focal-thumb-min" style="left:${focalMinPct}"></div>
             <div class="dual-range-thumb" id="focal-thumb-max" style="left:${focalMaxPct}"></div>
           </div>
-          <div class="filter-slider-labels"><span>0 mm</span><span>300 mm</span><span>600 mm</span></div>
+          <div class="filter-slider-labels"><span>0 mm</span><span>200 mm</span><span>800 mm</span></div>
         </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 600 mm = kein Limit</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
       </div>` +
       `<div class="filter-section"><h4>🎯 Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
       `<div class="filter-section"><h4>⭐ Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
@@ -3846,6 +3867,22 @@ const LocationDetail = {
     btn.textContent = '⊕'; btn.disabled = false;
   },
 
+  async deleteLocation(locId) {
+    const loc = Locations.all.find(l => l.id === locId);
+    const name = loc ? loc.name : locId;
+    if (!confirm(`„${name}" wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.`)) return;
+    try {
+      await API.delete(`/locations/${locId}`);
+      LocationDetail.close();
+      Locations.all = await API.get('/locations');
+      Locations.render(Filter.applyToLocations(Locations.all));
+      if (typeof MapView !== 'undefined') MapView.refresh();
+      toast('Location gelöscht.');
+    } catch(e) {
+      toast('Fehler beim Löschen: ' + e.message);
+    }
+  },
+
   async saveEdit(locId) {
     const name = document.getElementById('edit-name').value.trim();
     const description = document.getElementById('edit-desc').value.trim();
@@ -3959,6 +3996,7 @@ const LocationDetail = {
           ${catIcon[loc.category]||'📍'} <span>${loc.category}</span>
           <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto">${diffLabel[loc.difficulty]||'Mittel'}</span>
           <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">✏️</button>
+          ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:#ef4444;font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">🗑</button>` : ''}
         </div>
         <div class="sheet-hero-title">${loc.name}</div>
         <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#1a1300;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">🌌 Live-Astro (Sonne · Mond · Milchstraße)</button>

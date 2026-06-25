@@ -564,10 +564,18 @@ def _load_location_overrides() -> None:
                 if overrides:
                     logger.info("Location Overrides auto-migriert aus JSON: %d Einträge", len(overrides))
 
+        # US-68 Slice 1: Tombstoned Locations vor dem Mapping herausfiltern
+        tombstoned_ids = {ov["id"] for ov in overrides if ov.get("deleted")}
+        if tombstoned_ids:
+            LOCATIONS[:] = [l for l in LOCATIONS if l.id not in tombstoned_ids]
+            logger.info("Tombstoned Locations beim Start entfernt: %s", tombstoned_ids)
+
         loc_map = {loc.id: loc for loc in LOCATIONS}
         applied = 0
         for ov in overrides:
             loc_id = ov.get("id")
+            if ov.get("deleted"):
+                continue  # Tombstone – kein Feld-Apply
             loc = loc_map.get(loc_id)
             if loc:
                 for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon",
@@ -1448,6 +1456,47 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
         asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
 
     return {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute}
+
+
+# ---------------------------------------------------------------------------
+# Location Delete (US-68 Slice 1 — nur Host)
+# ---------------------------------------------------------------------------
+
+@app.delete("/locations/{loc_id}", status_code=200)
+async def delete_location(loc_id: str, _role: str = Depends(auth.require_host)) -> dict:
+    """
+    US-68 Slice 1: Löscht eine Location sofort (nur Host, kein Approval).
+    - Custom Locations: aus SQLite entfernen.
+    - Standard Locations: Tombstone-Override setzen (deleted=True); beim nächsten
+      Server-Start wird die Location in _load_location_overrides herausgefiltert.
+    In beiden Fällen: sofort aus LOCATIONS und Feed-/Kalender-Cache entfernen.
+    """
+    global _feed_cache, _calendar_cache
+
+    target = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+
+    if loc_id.startswith("custom_"):
+        ok = _store.delete_custom(loc_id)
+        if not ok:
+            raise HTTPException(status_code=404, detail="Custom Location nicht in DB gefunden.")
+    else:
+        # Standard-Location: Tombstone damit der Neustart sie herausfiltert
+        _store.upsert_override(loc_id, deleted=True)
+
+    # Aus In-Memory-Liste entfernen
+    LOCATIONS[:] = [l for l in LOCATIONS if l.id != loc_id]
+
+    # Feed- und Kalender-Cache bereinigen (Events dieser Location)
+    _feed_cache     = [e for e in _feed_cache     if e.get("location_id") != loc_id]
+    _calendar_cache = [e for e in _calendar_cache if e.get("location_id") != loc_id]
+
+    if not _NO_BACKGROUND:
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+
+    logger.info("Location gelöscht (Host): %s", loc_id)
+    return {"ok": True, "deleted": True, "id": loc_id}
 
 
 # ---------------------------------------------------------------------------

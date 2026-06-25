@@ -27,12 +27,12 @@
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | US-88 |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04, US-68 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -397,14 +397,15 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 ---
 
-### US-88 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[ ]`
+### US-88 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-19 |
+| **Implementiert** | 2026-06-25 |
 
 **Beschreibung:** Im Brennweiten-Filter liegen 10, 14, 18, 21, 28 und 35 mm so nah beieinander, dass eine präzise Auswahl kaum möglich ist, während 300 und 600 mm sehr weit auseinanderliegen. Der Slider soll eine nicht-lineare Skalierung (z. B. logarithmisch oder mit definierten Stufen) erhalten, die im Weitwinkelbereich feinere Schritte und im Telebereich sinnvolle Zwischenstufen (400 mm, 500 mm) ermöglicht.
 
@@ -2239,6 +2240,14 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 > **🐞 Beim Test gefunden & gefixt (2026-06-21):** Das Frontend-Gate hing nur an `if (!ca)`. `composition_analysis` wird vom Backend aber **auch** für Goldene/Blaue Stunde & Milchstraße gesetzt (Motiv-Geometrie + Himmelsposition vorhanden — `_composition_analysis` prüft nur Geometrie, nicht den Event-Typ; im Cache: 532 Goldene Stunde + 114 Milchstraße betroffen). Die Pre-Mortem-Gegenmaßnahme „Backend setzt None für Nicht-Tracking-Events" basierte auf falscher Prämisse. **Fix:** `web/index.html` ev_skypos-Gate um `EV_SKYPOS_EXEMPT` ergänzt (Spiegel von `precompute._ALIGNMENT_FILTER_EXEMPT`). Verifiziert per Node-Simulation gegen den Cache: Goldene Stunde/Milchstraße rendern jetzt 0, Mond-Alignment unverändert. ⚠️ **Noch nicht deployed** (lokaler Fix, uncommitted).
 
 ### US-68 · Host-Approval Workflow für Location-Änderungen und -Löschungen (inkl. Host-Aufgabenliste) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-20 |
+
 > **Als normaler Nutzer** möchte ich Änderungs- und Löschvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host wirksam werden.
 >
 > **Hintergrund:** US-63[x] erlaubt vollständiges Bearbeiten. Diese Story fügt einen Review-Gate ein: Änderungen und Löschungen von Nicht-Host-Nutzern werden als Vorschläge gespeichert und vom Host in einer Aufgabenliste freigegeben.
@@ -2349,8 +2358,8 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 >   - **Store** `backend/data/store.py`: neue Tabelle `location_proposals` + CRUD analog `location_overrides`/`location_ratings`; `custom_locations` um Spalte `created_by_device TEXT` (additive Migration via `CREATE TABLE IF NOT EXISTS` + `ALTER TABLE … ADD COLUMN` mit try/except, da bestehende DB).
 >   - **Auth** `backend/auth.py`: rollenbasiert, keine Nutzeridentität → Owner-Modell über `deviceId` (Frontend Z.1798), nicht über Token. Python-3.9: `from __future__ import annotations` bereits aktiv, keine 3.10-Syntax.
 >   - **Frontend** `web/index.html`: Edit-Button Z.3579 (heute ungated), Save-Flow Z.3496 (`API.patch`), `Auth.isHost()` Z.992, `deviceId()` Z.1798, Settings-Render Z.3900 (Aufgaben-Sektion + Badge hier), Tab-Badge analog vorhandener Tab-Struktur.
-> - [ ] **Implementierungsoptionen:** A / B / C (siehe unten)
-> - [ ] **Empfehlung:** Option B
+> - [x] **Implementierungsoptionen:** A / B / C — Slice 1 (Host-Delete) gewählt
+> - [x] **Empfehlung:** Option B → Slice 1 implementiert (2026-06-26)
 >
 > ### Implementierungsoptionen
 >
@@ -4301,8 +4310,9 @@ Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 
 | Feld | Wert |
 |------|------|
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Analysiert** | 2026-06-25 |
+| **Implementiert** | 2026-06-25 |
 
 > 5 neue Locations in `backend/data/locations.py` als Base-Locations eintragen: Schloss Cecilienhof, Schloss Pfaueninsel, Kloster Chorin, Dorfkirche Schönermark (Uckermark), Seelower Höhen Ehrenmal.
 >
