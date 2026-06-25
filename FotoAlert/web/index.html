@@ -860,8 +860,7 @@
 <!-- Detail Sheet -->
 <div id="detail-overlay" onclick="Detail.close()"></div>
 <div id="detail-sheet">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
-    <div class="sheet-handle" style="margin:0"></div>
+  <div style="display:flex;align-items:center;justify-content:flex-end;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
   </div>
   <div id="detail-content"></div>
@@ -986,7 +985,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.5';
+const APP_VERSION = '1.13.6';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════

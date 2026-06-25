@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34, BUG-39 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-68, US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-88, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -255,18 +255,25 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 ---
 
-### BUG-39 · Chancendetails: Blaugrauer Strich links im Sheet-Header `[ ]`
+### BUG-39 · Chancendetails: Blaugrauer Strich links im Sheet-Header `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-24 |
+| **Abgeschlossen** | 2026-06-25 |
 
 **Beschreibung:** Auf Höhe des ×-Schließen-Buttons erscheint auf der linken Seite des Detail-Sheets ein blaugrauer horizontaler Strich ohne erkennbaren Zweck. Vermutlich ein verwaistes Border-, Pseudo-Element oder ein unsichtbares Icon. Kann entfernt werden.
 
 **Bezug:** Screenshot von 2026-06-24. Verwandt mit BUG-38 (selber Sheet-Bereich).
+
+**Root-Cause:** `<div class="sheet-handle">` war links in einem `justify-content:space-between`-Flex-Container platziert und erzeugte so einen sichtbaren 36×4px-Strich (`.sheet-handle` = `background:var(--border)`). Behoben durch Entfernen des Handle-Divs + `justify-content:flex-end`.
+
+**Akzeptanzkriterien:**
+- [x] Kein blaugrauer Strich links im Detail-Sheet-Header
+- [x] ×-Button weiterhin rechts oben sichtbar und funktional
 
 ---
 
@@ -5550,3 +5557,38 @@ Eingeschlossen: (a) `loc_events` auf `mkSec()` umbauen (einheitliche Bauweise); 
 
 **Analyse & Planung:**
 - [x] Example Mapping (2026-06-25) · [x] Pre-Mortem · [x] Architektur analysiert · [x] Optionen A/B · [x] Empfehlung: B (freigegeben)
+
+---
+
+### TASK-41 · Refactoring: Lange Funktionen aufteilen (backend/precompute.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-25 |
+
+**Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold:
+- `compute_calendar_incremental()` Z. 590 — 146 Zeilen
+- `_run_single_location_flow()` Z. 743 — 92 Zeilen
+- `_run_standard_flow()` Z. 838 — 84 Zeilen
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-39, 2026-06-25)
+
+---
+
+### TASK-42 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-25 |
+
+**Beschreibung:** Zwei JS-Funktionen in `web/index.html` überschreiten den Threshold erheblich:
+- `local()` Z. 2674 — ~265 Zeilen
+- `row()` Z. 3531 — ~1034 Zeilen
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-39, 2026-06-25)
