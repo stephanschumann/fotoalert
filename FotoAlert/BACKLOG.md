@@ -29,7 +29,7 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04, US-68 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
@@ -2239,14 +2239,15 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 >
 > **🐞 Beim Test gefunden & gefixt (2026-06-21):** Das Frontend-Gate hing nur an `if (!ca)`. `composition_analysis` wird vom Backend aber **auch** für Goldene/Blaue Stunde & Milchstraße gesetzt (Motiv-Geometrie + Himmelsposition vorhanden — `_composition_analysis` prüft nur Geometrie, nicht den Event-Typ; im Cache: 532 Goldene Stunde + 114 Milchstraße betroffen). Die Pre-Mortem-Gegenmaßnahme „Backend setzt None für Nicht-Tracking-Events" basierte auf falscher Prämisse. **Fix:** `web/index.html` ev_skypos-Gate um `EV_SKYPOS_EXEMPT` ergänzt (Spiegel von `precompute._ALIGNMENT_FILTER_EXEMPT`). Verifiziert per Node-Simulation gegen den Cache: Goldene Stunde/Milchstraße rendern jetzt 0, Mond-Alignment unverändert. ⚠️ **Noch nicht deployed** (lokaler Fix, uncommitted).
 
-### US-68 · Host-Approval Workflow für Location-Änderungen und -Löschungen (inkl. Host-Aufgabenliste) `[ ]`
+### ~~US-68 · Host-Approval Workflow für Location-Änderungen und -Löschungen (inkl. Host-Aufgabenliste)~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
+| **Abgeschlossen** | 2026-06-26 |
 
 > **Als normaler Nutzer** möchte ich Änderungs- und Löschvorschläge für eine Location einreichen können, die erst nach Bestätigung durch den Host wirksam werden.
 >
@@ -4232,14 +4233,141 @@ Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 > *Differenziert von US-44 (manuelle Vorlaufzeit 15/30/60/120 Min.) – diese Story ist automatisch und distanzbasiert.*
 
 ### US-25 · Duplikate identifizieren (Host-Tool)
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Feature |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-26 |
+| **In Progress seit** | 2026-06-26 |
+
 > **Als Host** möchte ich Locations mit ähnlichem GPS-Standort und überlappenden Motiven finden und zur Bereinigung vorgeschlagen bekommen.
 >
-> **Akzeptanzkriterien:**
+> **Akzeptanzkriterien (original):**
 > - CLI-Tool oder Backend-Endpoint `/admin/duplicates`
 > - Findet Locations < 300m Abstand voneinander
 > - Zeigt Paarweise: Name A / Name B · Entfernung · Azimut-Differenz
 > - Empfiehlt: „Zusammenführen" (gleicher Spot, verschiedene Standpunkte) oder „Löschen" (echter Duplikat)
 > - Output als tabellarische Übersicht oder JSON
+
+---
+
+**📐 Example Mapping**
+
+📏 **Rule 1 — Nähe-Scan:** Alle Locations (Base + Custom) werden paarweise verglichen; jedes Paar mit Abstand < 300 m (observer-to-observer, Haversine) erscheint im Report.
+
+🟢 Example 1a: Berliner Dom vom Spreeufer (52.5196, 13.4008) und Dom – Lustgarten (52.5200, 13.4012) sind 108 m voneinander entfernt → erscheinen als Paar.
+🟢 Example 1b: Zwei Locations 400 m auseinander → nicht im Report.
+
+📏 **Rule 2 — Azimut-Differenz:** Pro Paar wird die mittlere `ideal_azimuth_range` verglichen; die Differenz (in Grad) erscheint im Output.
+
+🟢 Example 2a: Location A hat Range (133–173), Location B (120–160) → Mitte A=153, B=140 → Diff=13°.
+⚠️ **Annahme:** Wenn `ideal_azimuth_range` bei einer Location `None` ist, wird „–" ausgegeben (kein Crash). Bitte bestätigen.
+
+📏 **Rule 3 — Merge-/Lösch-Empfehlung:** Das Tool leitet aus Abstand + Azimut-Differenz eine Empfehlung ab.
+
+🟢 Example 3a: Abstand < 50 m **und** Azimut-Diff < 20° → „Echter Duplikat – Löschen prüfen".
+🟢 Example 3b: Abstand 50–300 m **oder** Azimut-Diff ≥ 20° → „Ähnlicher Spot – Zusammenführen prüfen".
+⚠️ **Annahme:** Schwellenwerte 50 m / 20° sind meine Defaults — bitte bestätigen oder anpassen.
+
+📏 **Rule 4 — Scope:** Das Tool umfasst Base-Locations (60 Stück) + Custom-Locations aus der SQLite-DB. Location-Overrides ändern Koordinaten → das Tool liest die durch Overrides patched Koordinaten (via `main.py`-Bootstrap-Liste, nicht direkt aus `data/locations.py`).
+
+⚠️ **Annahme:** Overrides werden beim Tool-Aufruf aus der DB eingelesen, damit der gepatchte Stand geprüft wird. Bitte bestätigen.
+
+---
+
+**✅ Akzeptanzkriterien**
+
+- [ ] Das Tool läuft als CLI-Script (`python3 tools/find_duplicates.py`) und gibt eine lesbare Tabelle im Terminal aus
+- [ ] Alle Base-Locations (60) + Custom-Locations aus der SQLite-DB werden einbezogen; Location-Overrides werden auf Base-Koordinaten angewendet
+- [ ] Jedes Paar mit observer-to-observer-Abstand < 300 m erscheint in der Ausgabe (kein Pair wird ausgelassen)
+- [ ] Pro Zeile: Name A | Name B | Abstand (m) | Azimut-Diff (°) | Empfehlung
+- [ ] Wenn `ideal_azimuth_range` fehlt (`None`), wird Azimut-Diff als „–" angezeigt (kein Crash)
+- [ ] Empfehlung „Löschen prüfen" bei Abstand < 50 m **und** Azimut-Diff < 20°; sonst „Zusammenführen prüfen"
+- [ ] Optionaler `--json`-Flag gibt JSON-Output statt Tabelle
+- [ ] Edge Case: 0 Paare gefunden → „Keine Duplikate gefunden." ausgegeben
+
+**Aktueller Live-Stand (Datenverifikation 2026-06-26):**
+- 60 Base-Locations, 1 Custom-Location
+- 3 Paare < 300 m: Dom/Spreeufer–Dom/Lustgarten (108 m), BrandTor/Tiergarten–BrandTor-Back (215 m), BrandTor/Tiergarten–Holocaust-Memorial (239 m)
+
+---
+
+**💀 Pre-Mortem**
+
+📎 **Code-Verifikation (2026-06-26):**
+- `PhotoLocation.observer_lat/lon` in `data/locations.py` bestätigt als Vergleichsfeld
+- `ideal_azimuth_range` ist `Optional[tuple[float, float]]` → kann `None` sein (Pflicht: None-Guard)
+- Keine bestehende `haversine`-Funktion im Backend — wird inline in pipelines gebaut (muss neu implementiert werden)
+- `store.py:load_all_custom()` gibt Liste von dicts, `load_all_overrides()` gibt Liste mit `id`+flachen Feldern
+- Main.py bootstrapped die Location-Liste beim Start mit Overrides — das CLI-Tool muss diese Logik replizieren
+
+💀 **Szenario 1: Overrides werden ignoriert → falsche Koordinaten verglichen**
+Auslöser: CLI-Tool importiert `LOCATIONS` direkt aus `data/locations.py` ohne Override-Anwendung
+Frühwarnung: BrandTor-Koordinaten stimmen nicht mit Admin-UI überein
+Gegenmaßnahme: Override-Ladelogik aus `main.py` in ein gemeinsames Util extrahieren oder im CLI direkt replizieren → im AK verankert
+
+💀 **Szenario 2: Custom-Locations fehlen im Report**
+Auslöser: Tool liest nur `LOCATIONS`, nicht die SQLite-DB
+Frühwarnung: Custom Locations tauchen nie als Duplikat auf
+Gegenmaßnahme: `store.load_all_custom()` explizit im CLI aufrufen → im AK verankert
+
+💀 **Szenario 3: None-Azimut führt zu Crash**
+Auslöser: `ideal_azimuth_range` ist None bei einer der Locations → Arithmetic auf None
+Frühwarnung: AttributeError im Test-Lauf mit Minimal-Location
+Gegenmaßnahme: None-Guard mit Fallback „–" → im AK verankert
+
+---
+
+**🏗 Architektur-Analyse**
+
+Betroffene Dateien:
+- `backend/data/locations.py` — Quelle der Base-Locations (`LOCATIONS`)
+- `backend/data/store.py` — `load_all_custom()`, `load_all_overrides()`
+- `backend/main.py` — Zeigt wie Overrides auf Base-Locations angewendet werden (Bootstrap-Logik)
+- **Neu:** `backend/tools/find_duplicates.py` (Option A) oder neuer Endpoint in `main.py` (Option B)
+
+Haversine-Berechnung: muss inline implementiert werden (< 10 Zeilen, kein Dependency-Bedarf).
+
+---
+
+**🔀 Implementierungsoptionen**
+
+### Option A — CLI-Script `backend/tools/find_duplicates.py`
+- **App-Wirkung:** Nur du als Host siehst das Ergebnis im Terminal; kein Effekt für App-User.
+- Vorgehen: Python-Script, liest LOCATIONS + Custom aus DB + Overrides, berechnet Haversine-Paare, gibt Tabelle/JSON aus
+- Betroffene Dateien: `backend/tools/find_duplicates.py` (neu, ~80 Zeilen)
+- Vorteile: kein Server-Neustart nötig; läuft lokal oder per SSH; kein API-Auth-Problem
+- Nachteile: muss manuell per SSH aufgerufen werden
+- Aufwand: klein
+
+### Option B — Backend-Endpoint `GET /admin/duplicates`
+- **App-Wirkung:** Endpoint via Browser/curl abrufbar; könnte künftig in Admin-UI eingebunden werden.
+- Vorgehen: neuer FastAPI-Router, gleiche Logik wie A, JSON-Response
+- Betroffene Dateien: `backend/main.py` (neuer Router, ~50 Zeilen)
+- Vorteile: ohne SSH nutzbar; erweiterbar für Admin-UI
+- Nachteile: Server-Neustart + Deploy für jede Änderung; kein Auth-Schutz im aktuellen Setup (öffentlich erreichbar)
+- Aufwand: klein–mittel
+
+✅ **Empfehlung: Option A (CLI-Script)** — Das Tool wird nur von dir als Host gebraucht, kein User-Facing-Bedarf. CLI ist sofort nutzbar (lokal + SSH), kein Deploy-Zyklus, kein Auth-Risiko. Wenn später ein Admin-Panel entsteht, kann die Logik einfach extrahiert werden.
+
+---
+
+**📋 Analyse & Planung**
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `data/locations.py`, `data/store.py`, `main.py`
+- [x] Daten-Validierung: 3 echte Paare < 300 m im Live-Stand bestätigt
+- [x] Implementierungsoption bestätigt: A (CLI-Script)
+- [x] Implementierung: `backend/tools/find_duplicates.py`
+
+**Testplan:**
+- Automatisiert: kein pytest (CLI-Only-Tool); manuell ausreichend
+- Manuell (lokal): `cd FotoAlert/backend && python3 tools/find_duplicates.py` → 3 Paare erwartet
+- Manuell (JSON): `python3 tools/find_duplicates.py --json` → valides JSON-Array
+- Manuell (Edge): Location ohne `ideal_azimuth_range` → kein Crash, „–" in Azimut-Diff-Spalte
 
 ### ~~TASK-12 · Automatische Neuberechnung nach Koordinaten-Änderung~~ `[x]`
 > **Hintergrund:** US-60 ✅ speichert geänderte Koordinaten sofort in `location_overrides.json` / `custom_locations.json`. Die davon abhängigen Berechnungen (`distance_m`, `bearing`, `azimuth_range`, `focal_length_suggestions`, `solar_alignment_note`, `lunar_alignment_note`, `elevation_difference_m`, `possible_bodies`, alle zugehörigen Events) werden jedoch NICHT sofort aktualisiert – sie sind bis zum nächsten Cron-Lauf (täglich 05:30) veraltet.
