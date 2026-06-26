@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42, TASK-43 · US-94 · **BUG-43** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -288,6 +288,59 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 **Testplan:**
 - [ ] Automatisiert: kein Backend-Test nötig (reines Frontend)
 - [ ] Manuell: Filter „Nur Probleme" setzen → Location öffnen → letzten Verifikationseintrag löschen → Speichern → Liste darf nur Probleme zeigen
+
+---
+
+### BUG-43 · Himmelsposition fehlt komplett bei Locations ohne Motivhöhe `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-26 |
+| **Implementiert** | 2026-06-26 |
+
+**Beschreibung:** Fehlt an einer Location das Feld `subject_height_m`, gibt `_composition_analysis()` sofort `None` zurück. Dadurch werden die Sektionen „🧭 Himmelsposition" und „🎯 Kompositions-Analyse" im Event-Detail gar nicht gerendert — obwohl Azimut-Alignment und die Höhe des Himmelsobjekts über dem Beobachter-Horizont weiterhin berechenbar wären. **Erwartet:** Auch ohne Motivhöhe soll zumindest die Position des Himmelsobjekts relativ zum Motivstandort (Horizonthöhe + seitlicher Versatz) angezeigt werden.
+
+**Bezug:** Kausalkette: `subject_height_m` fehlt → `_composition_analysis() = None` → `ev_skypos`-Gate (`!ca`) schlägt fehl → keine Sektion. Verwandt mit BUG-40 `[x]` (anderer Root Cause: damals fehlendes Default-Flag). US-67 `[x]` definiert `subject_height_m` als Pflichtfeld für volle Analyse — dieses Ticket erweitert den Fallback-Pfad.
+
+**Scope:**
+- Eingeschlossen: `backend/precompute.py` (`_composition_analysis` Guard + Conditional); `web/index.html` (`ev_skypos` altPhrase-Fallback + `bothExact`-Guard; `ev_kompo` Höhen-Zeilen-Guard); Server-Recompute nach Deploy
+- Ausgeschlossen: Locations mit `distance_m = 0` (bleiben ohne Analyse, kein metrischer Versatz berechenbar); iOS-App; `_passes_alignment_filter` (bereits null-sicher, Z. 115)
+
+**Akzeptanzkriterien:**
+- [ ] Mond-Alignment an Location ohne Motivhöhe: Sektion „🧭 Himmelsposition" erscheint und zeigt seitlichen Versatz (m + °) sowie absolute Horizonthöhe des Monds (°)
+- [ ] Kein „NaN m" / kein JS-Crash wenn `altitude_delta_deg` oder `vertical_offset_m` null sind
+- [ ] Locations mit Motivhöhe: Verhalten identisch zu vorher (Versatz relativ zur Motivspitze, Meter-Angabe erhalten)
+- [ ] `_passes_alignment_filter`: Events ohne Motivhöhe passieren den Filter weiterhin (alt_delta = null → True — kein Regressions-Risiko)
+- [ ] `ev_kompo` bei fehlender Motivhöhe: Höhen-abhängige Zeilen (Versatz über Motivspitze, Motivhöhe, Verhältnis) sind ausgeblendet; seitlicher Versatz + Körpergröße bleiben sichtbar
+- [ ] Edge Case: `distance_m = 0` → keine Himmelsposition-Sektion (unverändert)
+- [ ] Edge Case: `subject_height_m = 0` (explizit Null eingetragen) → behandelt wie fehlend (kein Division-by-zero)
+
+**Pre-Mortem:**
+- 💀 `bothExact`-Branch: `Math.abs(null) = 0 → 0 < 0.5 → true` → zeigt fälschlicherweise „nahezu exakt auf Motivspitze" → Gegenmaßnahme: `bothExact = altDelta != null && ...`
+- 💀 Division by zero: `size_ratio = body_apparent_diameter_m / subject_height_m` wenn `subject_height_m = 0` → Gegenmaßnahme: Guard `if loc.subject_height_m and loc.subject_height_m > 0`
+- 💀 `ev_kompo` crasht bei `ca.subject_apparent_elevation_deg.toFixed(2)` wenn null → Gegenmaßnahme: Null-Guard vor Zeilen-Rendering
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-26)
+- [x] Pre-Mortem durchgeführt (2026-06-26)
+- [x] Architektur analysiert: `precompute.py` Z. 309 (Guard), Z. 340 (size_ratio), Z. 115 (Filter null-sicher); `web/index.html` Z. 2941 (ev_skypos Gate), Z. 2970 (bothExact), Z. 2960 (axisPhrase), Z. 3017 (ev_kompo Höhen-Zeilen)
+- [x] Implementierungsoptionen: A (Backend partiell + Frontend Null-Guards) / B (Frontend-only Fallback)
+- [x] Empfehlung: Option A — Backend-seitig sauber, pytest-testbar, kein JS-Duplikat
+
+**📎 Code-Verifikation (2026-06-26):**
+- `_composition_analysis()` Guard Z. 309 bestätigt: `loc.subject_height_m and loc.distance_m` beide Pflicht
+- `_passes_alignment_filter()` Z. 115 bestätigt: `alt_delta is None → True` — bereits null-sicher
+- `bothExact` Z. 2970: `Math.abs(null) = 0` → semantisch falsch, kein Absturz, aber Guard nötig
+- `_build_composition_labels` braucht `size_ratio` — muss nur aufgerufen werden wenn vorhanden
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_bug43_partial_composition.py`, BUG-43): `_composition_analysis` mit Mock-Location ohne `subject_height_m` → `azimuth_delta_deg` vorhanden, `altitude_delta_deg = None`, kein Exception
+- [ ] Automatisiert: `_composition_analysis` mit `subject_height_m = 0` → kein ZeroDivisionError
+- [ ] Manuell: Location ohne Motivhöhe im Feed → Event-Detail → Himmelsposition sichtbar, kein NaN
+- [ ] Manuell: Location mit Motivhöhe → keine Regression (Meter-Angabe relativ zur Motivspitze erhalten)
 
 ---
 
@@ -4238,8 +4291,9 @@ Längerfristig eigenes OpenTopoData-Hosting gegen das Tageslimit.
 |------|------|
 | **Typ** | Feature |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-26 |
+| **Abgeschlossen** | 2026-06-26 |
 | **In Progress seit** | 2026-06-26 |
 
 > **Als Host** möchte ich Locations mit ähnlichem GPS-Standort und überlappenden Motiven finden und zur Bereinigung vorgeschlagen bekommen.

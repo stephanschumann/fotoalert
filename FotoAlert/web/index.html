@@ -985,7 +985,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.10';
+const APP_VERSION = '1.13.11';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2967,13 +2967,19 @@ const Detail = {
           const prefix = word ? word + ' ' : '';
           return `${prefix}${dir} ${meterStr}(${gradStr})`;
         };
-        const bothExact = Math.abs(azDelta) < 0.5 && Math.abs(altDelta) < 0.5;
+        // BUG-43: altDelta kann null sein (keine Motivhöhe) — bothExact nur wenn beide Achsen messbar
+        const bothExact = altDelta != null && Math.abs(azDelta) < 0.5 && Math.abs(altDelta) < 0.5;
         let sentence;
         if (bothExact) {
           const latPart = (lOff != null && isFinite(lOff)) ? `≈ ${fmtM(lOff)} seitlich` : '';
           const verPart = (vOff != null && isFinite(vOff)) ? `≈ ${fmtM(vOff)} vertikal` : '';
           const parts = [latPart, verPart].filter(Boolean).join(', ');
           sentence = `🎯 ${bodyHtml} steht nahezu exakt auf der Motivspitze${parts ? ` (${parts})` : ''}.`;
+        } else if (altDelta == null) {
+          // Kein subject_height_m → Fallback: Horizonthöhe statt Motivspitzen-Versatz (BUG-43)
+          const azPhrase = axisPhrase(azDelta, lOff, 'links', 'rechts', 1);
+          const horizStr = o.celestial_altitude != null ? ` · ${o.celestial_altitude.toFixed(1)}° über dem Horizont` : '';
+          sentence = `🧭 ${bodyHtml} ${azPhrase} neben dem Motiv${horizStr}.`;
         } else {
           const azPhrase = axisPhrase(azDelta, lOff, 'links', 'rechts', 1);
           const altPhrase = axisPhrase(altDelta, vOff, 'darunter', 'darüber', 2);
@@ -2992,11 +2998,13 @@ const Detail = {
       ${(() => {
         const ca = o.composition_analysis;
         if (!ca) return '';
-        const deltaSign = ca.altitude_delta_deg > 0 ? '+' : '';
+        // BUG-43: altitude_delta_deg kann null sein (keine Motivhöhe) — Guards nötig
+        const hasHeight = ca.subject_height_m != null;
+        const deltaSign = (ca.altitude_delta_deg || 0) > 0 ? '+' : '';
         const azSign = ca.azimuth_delta_deg > 0 ? '+' : '';
-        // Hintergrundfarbe des Hauptlabels je nach Qualität
-        const isExact = Math.abs(ca.altitude_delta_deg) <= 0.5;
-        const isClose = !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
+        // Hintergrundfarbe des Hauptlabels je nach Qualität (nur wenn Höhe vorhanden)
+        const isExact = hasHeight && Math.abs(ca.altitude_delta_deg) <= 0.5;
+        const isClose = hasHeight && !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
         const labelBg = isExact ? 'background:rgba(232,160,32,.15);border:1px solid var(--gold);border-radius:8px;padding:8px 12px'
                       : isClose ? 'background:rgba(100,200,100,.1);border:1px solid #4a4;border-radius:8px;padding:8px 12px'
                       : 'background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px';
@@ -3006,11 +3014,8 @@ const Detail = {
         const vSign = vOff > 0 ? '+' : '';
         const lDir  = lOff < 0 ? '← links' : lOff > 0 ? '→ rechts' : '';
         const ratioBar = Math.min(100, Math.round((ca.size_ratio || 0) * 100));
-                return mkSec('ev_kompo','🎯 Kompositions-Analyse',`<div style="${labelBg};margin-bottom:10px">
-            <div style="font-size:14px;font-weight:600">${ca.altitude_label}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
-          </div>
-
+        // Höhenabhängige Zeilen nur rendern wenn subject_height_m vorhanden (BUG-43)
+        const heightRows = hasHeight ? `
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Höhe</div>
           <div class="info-row">
             <span class="ir-label">Motivspitze (scheinb.)</span>
@@ -3021,14 +3026,8 @@ const Detail = {
             <span class="ir-val" style="${isExact ? 'color:var(--gold);font-weight:700' : ''}">
               ${vSign}${fmtM(vOff)} &nbsp;<span style="color:var(--muted);font-size:11px">(${vSign}${ca.altitude_delta_deg.toFixed(2)}°)</span>
             </span>
-          </div>
-
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Seite</div>
-          <div class="info-row">
-            <span class="ir-label">Seitlicher Versatz</span>
-            <span class="ir-val">${fmtM(Math.abs(lOff))} ${lDir} &nbsp;<span style="color:var(--muted);font-size:11px">(${azSign}${ca.azimuth_delta_deg.toFixed(1)}°)</span></span>
-          </div>
-
+          </div>` : '';
+        const ratioRows = hasHeight ? `
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Größenverhältnis</div>
           <div class="info-row">
             <span class="ir-label">${ca.body_name} (scheinb. Ø)</span>
@@ -3045,10 +3044,22 @@ const Detail = {
           <div style="height:6px;background:var(--border);border-radius:3px;margin:6px 0 4px">
             <div style="height:100%;width:${Math.min(100,ratioBar)}%;background:var(--gold);border-radius:3px"></div>
           </div>
-          <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>
-          <p style="font-size:10px;color:var(--muted);margin-top:4px">
-            Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}
-          </p>
+          <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>` : '';
+        const footNote = hasHeight
+          ? `<p style="font-size:10px;color:var(--muted);margin-top:4px">Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`
+          : `<p style="font-size:10px;color:var(--muted);margin-top:4px">Keine Motivhöhe eingetragen – Höhenversatz nicht berechenbar${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`;
+                return mkSec('ev_kompo','🎯 Kompositions-Analyse',`<div style="${labelBg};margin-bottom:10px">
+            <div style="font-size:14px;font-weight:600">${ca.altitude_label || ca.azimuth_label}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
+          </div>
+          ${heightRows}
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Seite</div>
+          <div class="info-row">
+            <span class="ir-label">Seitlicher Versatz</span>
+            <span class="ir-val">${fmtM(Math.abs(lOff))} ${lDir} &nbsp;<span style="color:var(--muted);font-size:11px">(${azSign}${ca.azimuth_delta_deg.toFixed(1)}°)</span></span>
+          </div>
+          ${ratioRows}
+          ${footNote}
         </div>`);
       })()}
       ${(() => {

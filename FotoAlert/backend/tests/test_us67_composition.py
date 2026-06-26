@@ -84,16 +84,15 @@ def test_us67_body_name_sun_for_sun_event():
     assert ca["body_name"] == "Sonne"
 
 
-# --- US-67: Gate — ohne Motivgeometrie liefert die Analyse None -------------------
-# AK: Die Frontend-Sektion erscheint genau dann, wenn composition_analysis != null.
-# Fehlt subject_height_m oder distance_m, MUSS None herauskommen (Goldene Stunde etc.).
+# --- US-67: Gate — ohne distance_m liefert die Analyse None -------------------------
+# AK: Ohne gültige distance_m ist kein metrischer Versatz berechenbar → None.
+# Hinweis: subject_height_m=None liefert seit BUG-43 eine partielle Analyse (nicht None).
 @pytest.mark.parametrize("missing", [
-    {"subject_height_m": None},
     {"distance_m": None},
     {"distance_m": 0.0},
 ])
-def test_us67_returns_none_without_subject_geometry(missing):
-    """US-67: Ohne subject_height_m bzw. gültige distance_m ⇒ composition_analysis is None."""
+def test_us67_returns_none_without_distance(missing):
+    """US-67/BUG-43: Ohne gültige distance_m ⇒ composition_analysis is None."""
     ca = P._composition_analysis(_make_event(**missing))
     assert ca is None
 

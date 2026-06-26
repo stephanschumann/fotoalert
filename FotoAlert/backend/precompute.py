@@ -304,45 +304,62 @@ def _composition_analysis(o) -> dict | None:
     Kernidee: Der Beobachter sieht die Motivspitze unter einem bestimmten Elevationswinkel
     (arctan(Höhendifferenz / Entfernung)). Steht das Himmelsobjekt auf genau diesem Winkel,
     ist das Alignment perfekt – z.B. Mond genau auf Höhe der Fernsehturmspitze.
+
+    BUG-43: subject_height_m ist kein Pflichtfeld mehr. Fehlt es, wird eine partielle
+    Analyse ohne höhenabhängige Metriken zurückgegeben (Azimut + lateraler Versatz bleiben
+    berechenbar). altitude_delta_deg, vertical_offset_m, size_ratio etc. sind dann None.
     """
     loc = o.location
-    if not (loc.subject_height_m and loc.distance_m and loc.distance_m > 0
+    if not (loc.distance_m and loc.distance_m > 0
             and o.celestial_altitude is not None and o.celestial_azimuth is not None):
         return None
 
     d = loc.distance_m
+    has_height = bool(loc.subject_height_m and loc.subject_height_m > 0)
 
-    # Höhe der Motivspitze über dem Augen-Niveau des Beobachters
-    # US-62: observer_floor_height_m (Dach/Etage) erhöht den Beobachter → Motiv wirkt niedriger
-    elev_diff = getattr(loc, "elevation_difference_m", 0.0) or 0.0
-    observer_floor_h = getattr(loc, "observer_floor_height_m", 0.0) or 0.0
-    height_above_observer = elev_diff - observer_floor_h + loc.subject_height_m
+    # Höhenabhängige Metriken nur wenn subject_height_m vorhanden (BUG-43)
+    if has_height:
+        # Höhe der Motivspitze über dem Augen-Niveau des Beobachters
+        # US-62: observer_floor_height_m (Dach/Etage) erhöht den Beobachter → Motiv wirkt niedriger
+        elev_diff = getattr(loc, "elevation_difference_m", 0.0) or 0.0
+        observer_floor_h = getattr(loc, "observer_floor_height_m", 0.0) or 0.0
+        height_above_observer = elev_diff - observer_floor_h + loc.subject_height_m
 
-    # Scheinbarer Elevationswinkel der Motivspitze (in Grad)
-    subject_apparent_elev_deg = math.degrees(math.atan(height_above_observer / d))
+        # Scheinbarer Elevationswinkel der Motivspitze (in Grad)
+        subject_apparent_elev_deg = math.degrees(math.atan(height_above_observer / d))
 
-    # Δ Höhe: positiv = Objekt steht höher als Motivspitze, 0° = exaktes Alignment
-    altitude_delta = round(o.celestial_altitude - subject_apparent_elev_deg, 2)
+        # Δ Höhe: positiv = Objekt steht höher als Motivspitze, 0° = exaktes Alignment
+        altitude_delta = round(o.celestial_altitude - subject_apparent_elev_deg, 2)
 
-    # Azimut-Differenz (vorzeichenbehaftet, −180…+180)
+        # Vertikaler Versatz (projiziert auf die Motivebene in der Entfernung d)
+        vertical_offset_m = round(d * math.tan(math.radians(altitude_delta)), 1)
+
+        # Größenverhältnis: scheinbarer Körperdurchmesser / Motivhöhe
+    else:
+        subject_apparent_elev_deg = None
+        altitude_delta = None
+        vertical_offset_m = None
+
+    # Azimut immer berechenbar (unabhängig von subject_height_m)
     az_delta = round(((o.celestial_azimuth - (o.subject_azimuth or 0)) + 180) % 360 - 180, 2)
-
-    # Metrische Versätze (projiziert auf die Motivebene in der Entfernung d)
-    vertical_offset_m = round(d * math.tan(math.radians(altitude_delta)), 1)
-    lateral_offset_m  = round(d * math.tan(math.radians(az_delta)), 1)
+    lateral_offset_m = round(d * math.tan(math.radians(az_delta)), 1)
 
     event_type_val = o.event_type.value if hasattr(o.event_type, 'value') else str(o.event_type)
     body_apparent_diameter_m, moon_earth_distance_km, body_name = _compute_body_apparent_size(
         event_type_val, o.shoot_time, d,
     )
 
-    # Größenverhältnis: scheinbarer Körperdurchmesser / Motivhöhe
-    size_ratio = round(body_apparent_diameter_m / loc.subject_height_m, 3)
-
-    alt_label, az_label, ratio_label = _build_composition_labels(altitude_delta, az_delta, size_ratio)
+    if has_height:
+        size_ratio = round(body_apparent_diameter_m / loc.subject_height_m, 3)
+        alt_label, az_label, ratio_label = _build_composition_labels(altitude_delta, az_delta, size_ratio)
+    else:
+        size_ratio = None
+        ratio_label = None
+        alt_label = None
+        _, az_label, _ = _build_composition_labels(0.0, az_delta, 1.0)
 
     return {
-        "subject_apparent_elevation_deg": round(subject_apparent_elev_deg, 2),
+        "subject_apparent_elevation_deg": round(subject_apparent_elev_deg, 2) if subject_apparent_elev_deg is not None else None,
         "altitude_delta_deg": altitude_delta,
         "azimuth_delta_deg": az_delta,
         "vertical_offset_m": vertical_offset_m,
@@ -354,7 +371,7 @@ def _composition_analysis(o) -> dict | None:
         "altitude_label": alt_label,
         "azimuth_label": az_label,
         "moon_earth_distance_km": round(moon_earth_distance_km) if moon_earth_distance_km else None,
-        "subject_height_m": loc.subject_height_m,
+        "subject_height_m": loc.subject_height_m if has_height else None,
     }
 
 
@@ -587,30 +604,20 @@ def _load_calendar_cache(
     return existing_events, existing_meta, cache_version
 
 
-async def compute_calendar_incremental(today: date, force_full: bool = False, location_id: str | None = None) -> tuple[list[dict], dict]:
+def _init_calendar_pass(
+    existing_events: list,
+    existing_meta: dict,
+    cache_version: str,
+    today: date,
+    force_full: bool,
+    location_id,
+) -> tuple:
+    """Version-Check, Cache-Reset, Event-Pruning und Location-Selektion.
+
+    Returns: (valid_events, locations_to_process, new_meta, target_range)
+             locations_to_process ist None wenn location_id nicht gefunden → Aufrufer returnt früh.
     """
-    Schicht 2 – Astronomy-Cache: Inkrementeller 365-Tage Kalender.
-
-    Logik:
-    - Lädt vorhandenen calendar.json Cache
-    - Prüft algorithm_version: Mismatch → alles verwerfen (force_full)
-    - Pro Location: prüft coordinates_hash → Koordinaten geändert → Location neu
-    - Berechnet nur fehlende Location×Datum-Kombinationen
-    - Bereinigt Events vor heute (veraltet)
-    - Gibt (events_list, computed_locations_meta) zurück
-
-    Ergebnis:
-    - Täglich: ~1 neuer Tag × N Locations (statt 365 × N)
-    - Neue Location: 365 Tage nur für diese Location
-    - ALGORITHM_VERSION-Bump: einmaliger Vollneu-Lauf
-    """
-    cal_path = CACHE_DIR / "calendar.json"
-
-    existing_events, existing_meta, cache_version = _load_calendar_cache(
-        cal_path, force_full, location_id,
-    )
-
-    # Version-Check
+    # Version-Check + ggf. Vollneu-Reset
     if (force_full or cache_version != ALGORITHM_VERSION) and not location_id:
         if force_full:
             logger.info("  ⚙️  --full: Vollständige Neuberechnung erzwungen")
@@ -622,36 +629,30 @@ async def compute_calendar_incremental(today: date, force_full: bool = False, lo
         existing_events = []
         existing_meta = {}
     elif location_id and not force_full and cache_version != ALGORITHM_VERSION:
-        # BUG-29: Der Single-Location-Recompute darf bei Versions-Differenz NICHT den
-        # gesamten Kalender verwerfen – das würde ihn auf eine einzige Location schrumpfen
-        # (Pre-Mortem #2). Diese eine Location wird über den coords_hash-Mismatch ohnehin
-        # neu berechnet; der nächtliche Vollkalender zieht den Rest beim Versions-Bump nach.
+        # BUG-29: Single-Location-Recompute darf den gesamten Kalender bei Versions-Differenz
+        # NICHT verwerfen – nur diese Location wird neu berechnet (Pre-Mortem #2).
         logger.warning(
             "  Single-Recompute bei Versions-Differenz (%s → %s) – nur %s neu, übrige Locations bleiben",
             cache_version, ALGORITHM_VERSION, location_id,
         )
 
-    # Ziel-Datumsbereich: heute bis heute+364
-    target_range: set[str] = {(today + timedelta(days=i)).isoformat() for i in range(365)}
-    today_str = today.isoformat()
-
     # Veraltete Events bereinigen (vor heute)
+    today_str = today.isoformat()
     valid_events = [e for e in existing_events if e["shoot_time"][:10] >= today_str]
     pruned = len(existing_events) - len(valid_events)
     if pruned > 0:
         logger.info("  Veraltete Events bereinigt: %d", pruned)
 
+    target_range = {(today + timedelta(days=i)).isoformat() for i in range(365)}
+
     # BUG-29: Im Single-Location-Modus nur diese eine Location neu berechnen und
-    # Events + Meta aller übrigen Locations unverändert übernehmen (kein Vollkalender,
-    # kein Schrumpfen → Pre-Mortem #1/#2/#3 abgedeckt).
+    # Events + Meta aller übrigen Locations unverändert übernehmen.
     if location_id:
         locations_to_process = [l for l in LOCATIONS if l.id == location_id]
         if not locations_to_process:
             logger.error("  Kalender Single-Recompute: Location '%s' nicht gefunden", location_id)
-            return valid_events, existing_meta
-        # Meta der übrigen Locations erhalten (auf target_range beschränkt, damit
-        # geprunte Vergangenheitstage nicht als „gecacht" zurückbleiben).
-        new_meta: dict = {
+            return valid_events, None, existing_meta, target_range
+        new_meta = {
             lid: {
                 "coordinates_hash": m.get("coordinates_hash"),
                 "computed_dates": sorted(set(m.get("computed_dates", [])) & target_range),
@@ -663,77 +664,170 @@ async def compute_calendar_incremental(today: date, force_full: bool = False, lo
         locations_to_process = list(LOCATIONS)
         new_meta = {}
 
+    return valid_events, locations_to_process, new_meta, target_range
+
+
+async def _compute_calendar_for_location(
+    loc,
+    target_range: set,
+    existing_meta: dict,
+    idx: int,
+    total: int,
+) -> tuple:
+    """Berechnet Kalender-Events für eine einzelne Location.
+
+    Returns:
+        (invalidate, dates_needed, new_events_for_loc, meta_entry)
+        - invalidate: True wenn alte Events dieser Location entfernt werden müssen
+        - dates_needed: Liste der berechneten Daten (leer = vollständig gecacht)
+        - new_events_for_loc: neu berechnete Events
+        - meta_entry: dict für new_meta[loc.id]
+    """
+    coords_hash = _location_hash(loc)
+    loc_meta = existing_meta.get(loc.id, {})
+    invalidate = False
+
+    if loc_meta.get("coordinates_hash") != coords_hash:
+        if loc_meta:
+            logger.info("  %s: Koordinaten geändert – komplette Neuberechnung", loc.name)
+        invalidate = True
+        dates_needed = sorted(target_range)
+    else:
+        # Nur fehlende Daten berechnen
+        computed_set = set(loc_meta.get("computed_dates", []))
+        dates_needed = sorted(target_range - computed_set)
+
+    old_computed = set(loc_meta.get("computed_dates", []))
+
+    if not dates_needed:
+        # Vollständig gecacht → meta übernehmen, auf target_range beschränken
+        meta_entry = {
+            "coordinates_hash": coords_hash,
+            "computed_dates": sorted(old_computed & target_range),
+        }
+        return invalidate, dates_needed, [], meta_entry
+
+    skipped = len(target_range) - len(dates_needed)
+    logger.info(
+        "  Kalender [%d/%d] %s: %d neue Tage (%d gecacht)",
+        idx + 1, total, loc.name, len(dates_needed), skipped,
+    )
+
+    new_events_for_loc = []
+    for d_str in dates_needed:
+        d = date.fromisoformat(d_str)
+        try:
+            opps = await find_opportunities(
+                loc, d, forecast=None, min_score=0.40, astronomy_only=True,
+            )
+            new_events_for_loc.extend(
+                e for e in (_serialize(o) for o in opps)
+                if _passes_alignment_filter(e)
+            )
+        except Exception as e:
+            logger.error("    Fehler %s %s: %s", loc.name, d_str, e)
+
+    # Meta für diese Location aktualisieren
+    all_computed = (old_computed | set(dates_needed)) & target_range
+    meta_entry = {
+        "coordinates_hash": coords_hash,
+        "computed_dates": sorted(all_computed),
+    }
+
+    return invalidate, dates_needed, new_events_for_loc, meta_entry
+
+
+async def compute_calendar_incremental(today: date, force_full: bool = False, location_id: str | None = None) -> tuple[list[dict], dict]:
+    """Schicht 2 – Inkrementeller 365-Tage Kalender.
+
+    Täglich: ~1 neuer Tag × N Locations. Neue Location: 365 Tage nur für diese.
+    ALGORITHM_VERSION-Bump: einmaliger Vollneu-Lauf.
+    Details: _init_calendar_pass, _compute_calendar_for_location.
+    """
+    cal_path = CACHE_DIR / "calendar.json"
+    existing_events, existing_meta, cache_version = _load_calendar_cache(cal_path, force_full, location_id)
+
+    valid_events, locations_to_process, new_meta, target_range = _init_calendar_pass(
+        existing_events, existing_meta, cache_version, today, force_full, location_id,
+    )
+    if locations_to_process is None:
+        # BUG-29: Location nicht gefunden → bestehenden Kalender unverändert zurückgeben
+        return valid_events, existing_meta
+
     total_skipped = 0
     total_computed = 0
 
     for i, loc in enumerate(locations_to_process):
-        coords_hash = _location_hash(loc)
-        loc_meta = existing_meta.get(loc.id, {})
+        invalidate, dates_needed, new_events_for_loc, meta_entry = \
+            await _compute_calendar_for_location(
+                loc, target_range, existing_meta, i, len(locations_to_process),
+            )
 
-        # Koordinaten-Änderung → alle alten Events dieser Location verwerfen
-        if loc_meta.get("coordinates_hash") != coords_hash:
-            if loc_meta:
-                logger.info("  %s: Koordinaten geändert – komplette Neuberechnung", loc.name)
-            valid_events = [e for e in valid_events if e["location_id"] != loc.id]
-            dates_needed = sorted(target_range)
-        else:
-            # Nur fehlende Daten berechnen
-            computed_set: set[str] = set(loc_meta.get("computed_dates", []))
-            dates_needed = sorted(target_range - computed_set)
-
-        skipped = len(target_range) - len(dates_needed)
-        total_skipped += skipped
+        total_skipped += len(target_range) - len(dates_needed)
         total_computed += len(dates_needed)
 
-        if not dates_needed:
-            # Vollständig gecacht → meta übernehmen, auf target_range beschränken
-            old_computed = set(loc_meta.get("computed_dates", []))
-            new_meta[loc.id] = {
-                "coordinates_hash": coords_hash,
-                "computed_dates": sorted(old_computed & target_range),
-            }
-            continue
-
-        logger.info(
-            "  Kalender [%d/%d] %s: %d neue Tage (%d gecacht)",
-            i + 1, len(locations_to_process), loc.name, len(dates_needed), skipped,
-        )
-
-        new_events_for_loc: list[dict] = []
-        for d_str in dates_needed:
-            d = date.fromisoformat(d_str)
-            try:
-                opps = await find_opportunities(
-                    loc, d, forecast=None, min_score=0.40, astronomy_only=True,
-                )
-                new_events_for_loc.extend(
-                    e for e in (_serialize(o) for o in opps)
-                    if _passes_alignment_filter(e)
-                )
-            except Exception as e:
-                logger.error("    Fehler %s %s: %s", loc.name, d_str, e)
+        if invalidate:
+            # Koordinaten-Änderung → alte Events dieser Location verwerfen
+            valid_events = [e for e in valid_events if e["location_id"] != loc.id]
 
         valid_events.extend(new_events_for_loc)
+        new_meta[loc.id] = meta_entry
+        await asyncio.sleep(0)  # Event Loop gelegentlich freigeben
 
-        # Meta für diese Location aktualisieren
-        old_computed = set(loc_meta.get("computed_dates", []))
-        all_computed = (old_computed | set(dates_needed)) & target_range
-        new_meta[loc.id] = {
-            "coordinates_hash": coords_hash,
-            "computed_dates": sorted(all_computed),
-        }
-
-        # Event Loop gelegentlich freigeben
-        await asyncio.sleep(0)
-
-    logger.info(
-        "  Zusammenfassung: %d neu berechnet, %d aus Cache",
-        total_computed, total_skipped,
-    )
-
-    # Sortierung: Zeit aufsteigend, bei Gleichstand Score absteigend
+    logger.info("  Zusammenfassung: %d neu berechnet, %d aus Cache", total_computed, total_skipped)
     valid_events.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
     return valid_events, new_meta
+
+
+def _merge_and_write_feed(feed_path, location_id: str, new_events: list, computed_at: str) -> int:
+    """Merged neue Events für location_id in bestehende opportunities.json und schreibt sie.
+
+    Returns: Gesamtzahl der gemergten Events.
+    """
+    existing_events = []
+    if feed_path.exists():
+        try:
+            existing_events = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
+        except Exception:
+            pass
+    merged = [e for e in existing_events if e["location_id"] != location_id] + new_events
+    merged.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
+    feed_path.write_text(
+        json.dumps({"computed_at": computed_at, "opportunities": merged}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return len(merged)
+
+
+def _write_calendar_cache(cal_path, calendar: list, computed_meta: dict, computed_at: str) -> None:
+    """Schreibt calendar.json mit algorithm_version, computed_at, computed_locations und events."""
+    cal_path.write_text(
+        json.dumps(
+            {
+                "algorithm_version": ALGORITHM_VERSION,
+                "computed_at": computed_at,
+                "computed_locations": computed_meta,
+                "events": calendar,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+
+def _write_feed_cache(feed_path, feed: list, computed_at: str) -> None:
+    """Schreibt opportunities.json und loggt einen Health-Alert wenn der Feed zu klein ist."""
+    feed_path.write_text(
+        json.dumps({"computed_at": computed_at, "opportunities": feed}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    if len(feed) < HEALTH_FEED_MIN:
+        logger.error(
+            "🚨 HEALTH-ALERT [%s]: opportunities.json enthält nur %d Event(s) "
+            "(Schwellwert: %d). Mögliche Ursachen: Skyfield-Fehler, API-Timeout "
+            "oder fehlerhafte Location-Daten. Bitte Logs prüfen.",
+            computed_at, len(feed), HEALTH_FEED_MIN,
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -786,21 +880,10 @@ async def _run_single_location_flow(
             logger.error("  Fehler: %s", e)
             new_events = []
         # Merge: bestehende Events für andere Locations behalten, diese ersetzen
-        existing_events: list[dict] = []
-        if feed_path.exists():
-            try:
-                existing_events = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
-            except Exception:
-                pass
-        merged = [e for e in existing_events if e["location_id"] != location_id] + new_events
-        merged.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
-        feed_path.write_text(
-            json.dumps({"computed_at": computed_at, "opportunities": merged}, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        merged_count = _merge_and_write_feed(feed_path, location_id, new_events, computed_at)
         logger.info(
             "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
-            len(new_events), loc.name, len(merged), time.time() - t1,
+            len(new_events), loc.name, merged_count, time.time() - t1,
         )
 
     # BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
@@ -815,18 +898,7 @@ async def _run_single_location_flow(
             today, location_id=location_id,
         )
         cal_path = CACHE_DIR / "calendar.json"
-        cal_path.write_text(
-            json.dumps(
-                {
-                    "algorithm_version": ALGORITHM_VERSION,
-                    "computed_at": computed_at,
-                    "computed_locations": computed_meta,
-                    "events": calendar,
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
+        _write_calendar_cache(cal_path, calendar, computed_meta, computed_at)
         logger.info(
             "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
             len(calendar), time.time() - t2,
@@ -870,20 +942,8 @@ async def _run_standard_flow(
         logger.info("── Astronomy-Feed: 14 Tage (komplett frisch) ────────")
         t1 = time.time()
         feed = await compute_feed(today)
-        feed_path.write_text(
-            json.dumps({"computed_at": computed_at, "opportunities": feed},
-                       ensure_ascii=False),
-            encoding="utf-8",
-        )
+        _write_feed_cache(feed_path, feed, computed_at)
         logger.info("✅ opportunities.json: %d Events (%.1fs)", len(feed), time.time() - t1)
-        # BUG-14: Health-Alert Feed
-        if len(feed) < HEALTH_FEED_MIN:
-            logger.error(
-                "🚨 HEALTH-ALERT [%s]: opportunities.json enthält nur %d Event(s) "
-                "(Schwellwert: %d). Mögliche Ursachen: Skyfield-Fehler, API-Timeout "
-                "oder fehlerhafte Location-Daten. Bitte Logs prüfen.",
-                computed_at, len(feed), HEALTH_FEED_MIN,
-            )
 
     # ── Schicht 2b: 365-Tage Kalender (inkrementell) ─────────────────────────
     if run_calendar:
@@ -893,18 +953,7 @@ async def _run_standard_flow(
             today, force_full=force_full,
         )
         cal_path = CACHE_DIR / "calendar.json"
-        cal_path.write_text(
-            json.dumps(
-                {
-                    "algorithm_version": ALGORITHM_VERSION,
-                    "computed_at": computed_at,
-                    "computed_locations": computed_meta,
-                    "events": calendar,
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
+        _write_calendar_cache(cal_path, calendar, computed_meta, computed_at)
         logger.info("✅ calendar.json: %d Events (%.1fs)", len(calendar), time.time() - t2)
         # BUG-14: Health-Alert Kalender
         if len(calendar) < HEALTH_CAL_MIN:
