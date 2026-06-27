@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-88, TASK-04 |
+| **🔄 In Progress** | wird gerade implementiert | US-96 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -42,6 +42,22 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-42 · Custom Locations: 📍-Emoji in Namen + Test-Duplikate bereinigen `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 |
+
+**Beschreibung:** Mehrere Custom Locations in der SQLite-DB haben das 📍-Emoji hartcodiert im Namen (z. B. „📍 Ruinenberg - Blick auf Schloss Sanssouci"). Dieses Emoji erscheint im Feed-Alert-Chip und im Detail-Sheet als sichtbares Zeichen statt als Icon, weil die App den Namen ungefiltert rendert. Zusätzlich existieren zwei Duplikat-Testentries „📍 Test Ruinenberg" (IDs custom_1782294489, custom_1782301277), die gelöscht werden können. Fix: Emoji-Präfix bei allen 4 betroffenen Einträgen entfernen, Duplikate löschen, Cache neu erzeugen.
+
+**Bezug:** Eigenständig; kosmetischer Fix im Zuge der Bauhaus-Designbereinigung (US-98).
+
+---
 
 ### BUG-17 · Vollbild-Nutzung: Safe Area & App-Hintergrundfarbe `[x]`
 
@@ -318,50 +334,6 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 ---
 
-### ~~BUG-42 · Locations-Filter: Zustand geht nach Edit verloren (alle Locations sichtbar)~~ `[x]`
-
-| Feld | Wert |
-|------|------|
-| **Typ** | BugFix |
-| **Priorität** | Mittel |
-| **Status** | Done |
-| **Erstellt** | 2026-06-25 |
-| **Abgeschlossen** | 2026-06-27 |
-
-**Beschreibung:** Ist in der Locations-Ansicht ein Filter aktiv (z. B. „Nur Probleme"), und der Nutzer bearbeitet danach einen Eintrag (insbesondere: löscht den letzten Verifikationseintrag), werden nach dem Schließen des Editors alle Locations angezeigt — also auch jene, die die Filterkriterien nicht erfüllen. Der Filter-Chip zeigt weiterhin „aktiv" an, das Ergebnis entspricht aber keinem gefilterten Zustand. Erst wenn der Filter manuell erneut geöffnet und bestätigt wird, greifen die Kriterien wieder korrekt. **Erwartet:** Nach Ende einer Bearbeitung bleibt der aktive Filter angewendet, ohne dass der Nutzer ihn neu aktivieren muss.
-
-**Bezug:** Verwandt mit BUG-26 (Verifikations-Persistenz). Kein Merge nötig: BUG-26 abgeschlossen, BUG-42 betrifft den Filter-Re-Apply nach Edit.
-
-**Root Cause (verifiziert):** `saveEdit` Z. 3892 ruft `Locations.render(Locations.all)` auf — ohne `Filter.applyToLocations()`. Alle anderen Render-Stellen (Z. 3558, 3567, 2371, 4495) verwenden korrekt `Filter.applyToLocations(Locations.all)`. Ein-Zeiler-Fix.
-
-**📎 Code-Verifikation:** `web/index.html` Z. 3892 gelesen 2026-06-25. `Locations.render(Locations.all)` ohne Filter-Wrap bestätigt.
-
-**Scope:**
-- Eingeschlossen: `saveEdit` Z. 3892 — `Locations.render` mit Filter-Wrap versehen.
-- Ausgeschlossen: `_refreshSection` (Verifikations-Inline-Update) — triggert keine Locations-Listen-Re-Render, kein separates Problem.
-
-**Akzeptanzkriterien:**
-- [ ] Nach „Speichern" im Edit-Modus zeigt die Locations-Liste nur Einträge, die den aktiven Filterkriterien entsprechen — nicht alle Locations.
-- [ ] Filter „Nur Probleme" aktiv + letzter Verifikationseintrag gelöscht + gespeichert → Location verschwindet aus Liste (erfüllt Kriterium nicht mehr).
-- [ ] Kein Filter aktiv → nach Speichern alle Locations sichtbar (keine Regression).
-- [ ] Edge Case: Filter aktiv, Bearbeitung ohne Verifikationsänderung → Liste bleibt korrekt gefiltert.
-
-**Pre-Mortem:**
-- 💀 Weitere `Locations.render(Locations.all)` ohne Filter-Wrap → Gegenmaßnahme: Grep vor Commit.
-- 💀 `Locations.all` leer beim Render → kein Risiko: Z. 3889 lädt frisch vom Server vor dem Render.
-
-**Analyse & Planung:**
-- [x] Example Mapping durchgeführt
-- [x] Pre-Mortem durchgeführt
-- [x] Architektur analysiert: `web/index.html` Z. 3892 (`saveEdit`)
-- [x] Fix: Z. 3892 `Locations.render(Locations.all)` → `Locations.render(Filter.applyToLocations(Locations.all))`
-
-**Testplan:**
-- [ ] Automatisiert: kein Backend-Test nötig (reines Frontend)
-- [ ] Manuell: Filter „Nur Probleme" setzen → Location öffnen → letzten Verifikationseintrag löschen → Speichern → Liste darf nur Probleme zeigen
-
----
-
 ### ~~BUG-43 · Himmelsposition fehlt komplett bei Locations ohne Motivhöhe~~ `[x]`
 
 | Feld | Wert |
@@ -522,13 +494,13 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 ---
 
-### US-96 · Einheitliche Chancen-Detailansicht aus allen Einstiegspunkten `[ ]`
+### [~] US-96 · Einheitliche Chancen-Detailansicht aus allen Einstiegspunkten
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Egal ob ich eine Chance im Feed (14-Tage-Ansicht), im 365-Tage-Kalender, im Scout oder in den Location Details (zukünftige Ereignisse) antippe — ich sehe immer exakt dieselbe Detailansicht mit denselben Informationen in derselben Reihenfolge. Alle Sektionen sind beim Öffnen eingeklappt. Das schafft ein konsistentes Erlebnis und macht das Navigieren zwischen den Tabs vorhersehbar.
@@ -544,6 +516,82 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 8. Aktions-Buttons
 
 **Bezug:** Hängt von US-95 ab (Layout-Optimierung der bestehenden Detailansicht, sinnvolle Basis). Blockiert US-83 (Scout-Detailansicht soll dieselbe Komponente nutzen). Tangiert US-87 (Karten-Overlay). US-95 und US-96 können als Sequenz gebündelt werden.
+
+#### 🔬 Analyse-Spec (US-96) · 2026-06-27
+
+**Bestätigte Entscheidungen:**
+- Alle bisherigen Sektionen (Beschreibung, Kamera, Astronomie, Topo, Kompo) bleiben erhalten — sie kommen nach den Himmelskörper-Bahnen, vor den Aktions-Buttons.
+- „Himmelskörper-Bahnen" = `AstroLive` (US-64). Erscheint als eingeklappte Button-Sektion IN der Detailansicht (kein eigenes Sheet-Öffnen beim Laden).
+- Beim Öffnen der Detailansicht sind alle Sektionen eingeklappt (`_def` Änderung). localStorage-Stand wird dadurch nicht verändert — nur der Startzustand beim Öffnen ändert sich.
+
+**Scope:**
+
+Eingeschlossen:
+- Neue Sektions-Reihenfolge in `Detail.open()` umsetzen
+- `Sections._def` — alle Sektionen auf `false` setzen
+- Neue Sektion `ev_astro_live` als `mkSec`-Block mit Button/Link zu AstroLive
+- `AstroLive.openForDate(locId, isoDate)` — neue Eintrittsmethode (Option B)
+- Alle 4 Einstiegspunkte (Feed, Scout, Kalender, LocationDetail) nutzen automatisch `Detail.open(o)` — kein separater Umbau nötig
+
+Ausgeschlossen:
+- AstroLive als eingebettete Karte (zwei Leaflet-Instanzen gleichzeitig — zu komplex, eigenes Ticket)
+- Vollbild-Overlay für FOV-Karte (US-87)
+- Scout-Detailansicht-Refactoring (US-83 — wartet auf US-96 als Basis)
+
+**Akzeptanzkriterien:**
+
+- [ ] AK-1: Ich tippe im Feed auf eine Chance → das Detailsheet öffnet sich. Auf einem frischen Gerät (oder ohne bisherige Interaktion) sind alle Sektionen eingeklappt.
+- [ ] AK-2: Ich tippe im Kalender auf eine Chance → exakt dasselbe Detailsheet, dieselbe Reihenfolge wie im Feed.
+- [ ] AK-3: Ich tippe im Scout auf einen Alert-Chip → exakt dasselbe Detailsheet.
+- [ ] AK-4: Ich öffne die Location Details und tippe auf ein zukünftiges Ereignis → exakt dasselbe Detailsheet.
+- [ ] AK-5: In der Detailansicht sehe ich oben: Uhrzeit → FOV-Karte → Koordinaten → Himmelsposition → Wetter → Himmelskörper-Bahnen (Button) → Beschreibung / Kamera / Astronomie / Topo / Kompo → Aktions-Buttons.
+- [ ] AK-6: Ich klappe „Himmelskörper-Bahnen" auf → es erscheint ein Button „Live-Astro (Sonne · Mond · Milchstraße)". Ich tippe darauf → das AstroLive-Sheet öffnet sich mit dem Slider voreingestellt auf Datum + Uhrzeit der Chance (nicht auf heute).
+- [ ] AK-7: Ich klappe eine Sektion auf, schließe das Sheet, öffne es erneut → die Sektion ist noch offen (meine Präferenz bleibt erhalten).
+
+**Pre-Mortem:**
+
+1. **Sektions-Reihenfolge im DOM falsch** — `Detail.open()` baut das Sheet imperativ (appendChild-Reihenfolge). Wenn bei der Umreihenfolge ein Block vergessen oder doppelt eingefügt wird, fehlt eine Sektion oder erscheint sie zweimal. → Mitigation: Nach Umbau alle 4 Einstiegspunkte einmal durchklicken und DOM-Reihenfolge gegen Spec-Liste prüfen.
+
+2. **`ev_astro_live`-Sektion kollidiert mit vorhandenem Schlüssel** — `Sections._def` und die `mkSec`-Logik kennen `ev_astro_live` noch nicht. Fehlt die Registrierung, wird die Sektion nie gerendert. → Mitigation: Schlüssel in `_def`, `registerOnOpen` (falls nötig) und im Render-Block konsistent benennen; nach Einbau per Klick verifizieren.
+
+3. **`AstroLive.openForDate` setzt Slider-Zeit falsch** — `setNow()` und `onScrub()` operieren auf `this._t` (Unix-ms). Wird das Shoot-Datum falsch als UTC/Local konvertiert (Shoot-Time ist UTC, App zeigt Berliner Ortszeit), zeigt der Slider die falsche Stunde. → Mitigation: `openForDate` muss ISO-String als UTC parsen (`new Date(isoDate)`) und direkt `this._t` setzen, ohne zusätzliche Timezone-Konvertierung.
+
+4. **`_def`-Änderung greift nur auf frischen Geräten** — bestehende Nutzer mit localStorage-Einträgen sehen weiterhin ihre bisherigen Zustände. Das ist gewollt (AK-7 bestätigt). Kein Risiko, nur Bewusstsein dass der „alle zu"-Effekt nur für neue Nutzer spürbar ist.
+
+**Analyse & Planung:**
+
+Betroffene Code-Stellen in `web/index.html`:
+- `Sections._def` (Z. ~2826): alle Werte auf `false` setzen + `ev_astro_live: false` ergänzen
+- `Detail.open()` (Z. ~3097–3311): appendChild-Reihenfolge umbauen + `ev_astro_live`-Block einfügen
+- `AstroLive` (Z. ~3590ff): neue Methode `openForDate(locId, isoDate)` ergänzen (Option B)
+- Alle 4 Einstiegspunkte: keine Änderung nötig (rufen bereits `Detail.open(o)` auf)
+
+Kein Backend-Eingriff erforderlich. Rein Frontend.
+
+**Implementierungsoptionen:**
+
+**Option A — Button-Link ohne Datum-Kontext** *(einfacher, ~20 Zeilen)*
+Eine neue `mkSec('ev_astro_live', ...)` mit einem Button, der `AstroLive.open(o.location_id)` aufruft — exakt wie der bestehende Button in LocationDetail. Der Slider im AstroLive-Sheet startet auf „jetzt" (heute). Für eine Chance in 5 Tagen zeigt der Nutzer also den falschen Tag und muss manuell scrollen.
+App-Wirkung: AstroLive öffnet sich, aber der Nutzer sieht nicht den Himmel zum Shoot-Zeitpunkt — er muss den Regler selbst verschieben.
+
+**Option B — `AstroLive.openForDate(locId, isoDate)` *(empfohlen, ~30 Zeilen)*
+Neue Methode in AstroLive: setzt `this._t` auf den Shoot-Zeitpunkt der Chance bevor das Sheet öffnet. Der Slider startet beim richtigen Tag + Uhrzeit. `Detail.open(o)` ruft `AstroLive.openForDate(o.location_id, o.shoot_time_utc)` auf.
+App-Wirkung: Nutzer öffnet AstroLive und sieht sofort Sonne/Mond-Position für den geplanten Shoot-Moment. Kein manuelles Verschieben nötig.
+
+**Empfehlung:** Option B.
+Begründung: Der Shoot-Datum-Kontext ist der Kern-Nutzwert von AstroLive in diesem Flow — ohne ihn sieht der Nutzer zufällig den heutigen Himmel, nicht den Himmel zur Chance. Der Mehraufwand (~10 Zeilen extra gegenüber A) ist vertretbar. Die neue Methode ist isoliert testbar und bricht nichts am bestehenden `AstroLive.open(locId)`-Aufruf in LocationDetail.
+
+**Testplan:**
+
+1. Feed → Chance antippen → Sheet öffnet sich, alle Sektionen eingeklappt ✓
+2. Kalender → Chance antippen → identisches Sheet ✓
+3. Scout → Alert-Chip → identisches Sheet ✓
+4. LocationDetail → zukünftiges Ereignis → identisches Sheet ✓
+5. Reihenfolge: Uhrzeit ganz oben, Aktions-Buttons ganz unten, AstroLive-Button vor den Detail-Sektionen ✓
+6. AstroLive-Button antippen → Sheet öffnet, Slider zeigt Shoot-Datum + Shoot-Uhrzeit (nicht heute) ✓
+7. Sheet schließen, erneut öffnen → alle Sektionen wieder eingeklappt ✓
+
+**Status:** Wartet am Weg-Gate (Implementierungsoption B zur Freigabe — bitte bestätigen oder Alternative wählen).
 
 ---
 
@@ -716,14 +764,15 @@ Ausgeschlossen: Map-Pin-Marker-SVGs (Z. 3297 ff., funktional/farbig — bleiben)
 
 ---
 
-### US-101 · Kompaktere Buttons und kleinere Schriftgrößen `[~]`
+### US-101 · Kompaktere Buttons und kleinere Schriftgrößen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 |
 
 **Beschreibung:** Als Nutzer empfinde ich viele Buttons und Schriften — besonders im Menü und in den Aktions-Buttons — als zu groß. Buttons (inkl. „Neu") und Schriftgrößen sollen kompakter werden, ohne Funktion oder Touch-Bedienbarkeit zu verschlechtern.
 
@@ -899,15 +948,16 @@ Ausgeschlossen: iOS App-Icon (Xcode/AppIcon.appiconset), Wortmarke als SVG-Text 
 
 ---
 
-### US-88 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[~]`
+### US-88 · Brennweiten-Filter: Nicht-linearer Slider für feinere Auflösung im Weitwinkelbereich `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **Implementiert** | 2026-06-25 |
+| **Abgeschlossen** | 2026-06-27 |
 
 **Beschreibung:** Im Brennweiten-Filter liegen 10, 14, 18, 21, 28 und 35 mm so nah beieinander, dass eine präzise Auswahl kaum möglich ist, während 300 und 600 mm sehr weit auseinanderliegen. Der Slider soll eine nicht-lineare Skalierung (z. B. logarithmisch oder mit definierten Stufen) erhalten, die im Weitwinkelbereich feinere Schritte und im Telebereich sinnvolle Zwischenstufen (400 mm, 500 mm) ermöglicht.
 
@@ -5055,13 +5105,14 @@ Haversine-Berechnung: muss inline implementiert werden (< 10 Zeilen, kein Depend
 ### TASK-03 · Feuerwerk-Events `[ ]`
 > Manuelle Events für wiederkehrende Feuerwerke: Silvester, Pyronale, Havel in Flammen.
 
-### TASK-04 · Weitere Locations erfassen `[~]`
+### TASK-04 · Weitere Locations erfassen `[x]`
 
 | Feld | Wert |
 |------|------|
-| **Status** | In Test |
+| **Status** | Done |
 | **Analysiert** | 2026-06-25 |
 | **Implementiert** | 2026-06-25 |
+| **Abgeschlossen** | 2026-06-27 |
 
 > 5 neue Locations in `backend/data/locations.py` als Base-Locations eintragen: Schloss Cecilienhof, Schloss Pfaueninsel, Kloster Chorin, Dorfkirche Schönermark (Uckermark), Seelower Höhen Ehrenmal.
 >
