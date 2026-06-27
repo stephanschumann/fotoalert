@@ -32,7 +32,7 @@
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-102** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -716,13 +716,13 @@ Ausgeschlossen: Map-Pin-Marker-SVGs (Z. 3297 ff., funktional/farbig — bleiben)
 
 ---
 
-### US-101 · Kompaktere Buttons und kleinere Schriftgrößen `[ ]`
+### US-101 · Kompaktere Buttons und kleinere Schriftgrößen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Als Nutzer empfinde ich viele Buttons und Schriften — besonders im Menü und in den Aktions-Buttons — als zu groß. Buttons (inkl. „Neu") und Schriftgrößen sollen kompakter werden, ohne Funktion oder Touch-Bedienbarkeit zu verschlechtern.
@@ -731,14 +731,120 @@ Ausgeschlossen: Map-Pin-Marker-SVGs (Z. 3297 ff., funktional/farbig — bleiben)
 
 ---
 
-### US-102 · Bauhaus-Logo und App-Icon `[~]`
+#### Analyse-Spec (2026-06-27)
+
+**Scope:**
+- Eingeschlossen: Header (App-Titel, Subtitle, Icon-Buttons), Tab-Bar (Icons + Labels + „Neu"-Button), Listen (Feed-Karten, Locations-Karten, Scout-Karten), globale Aktions-Buttons (`.btn-primary`, `.btn-secondary`, `.btn-issue`, `.btn-verify`), Refresh-Menü, Filter-Sheet-Buttons/Chips, Such-Overlay.
+- Ausgeschlossen: Chancendetail-Sheet-Buttons (gehören zu US-95), Score-Ring-Zahlen (visuell funktional), Karten-Popups (Leaflet, extern), iOS-App (SwiftUI, eigene Codebasis), Kalender-Tab-Events (gut lesbar, kein Feedback), Koordinaten-/Formular-Inputs (min. 16px iOS-Pflicht — Touch-Keyboard-Zoom-Schutz).
+
+**Example Mapping:**
+
+📏 **Rule 1:** Tab-Bar-Labels und Tab-Icons sind kompakter, ohne dass Touch-Targets leiden.
+- 🟢 Beispiel: Ich tippe auf den „Karte"-Tab am unteren Rand. Der Tab reagiert sofort — kein Danebentippen nötig, obwohl Label und Icon kleiner erscheinen.
+- 🟢 Beispiel: Ich öffne die App und sehe den Tab-Bar — die Labels sind lesbar, aber enger als heute (z.B. 9px statt 10px, Icon 20px statt 22px).
+
+📏 **Rule 2:** Aktions-Buttons (Speichern, Abbrechen, Melden) haben weniger vertikale Polsterung.
+- 🟢 Beispiel: Ich tippe im Locations-Detail auf „Speichern". Der Button ist deutlich schmaler als vorher (Padding 10px statt 14px), reagiert aber zuverlässig auf meinen Tipp.
+- 🟢 Beispiel: Edge Case: Ich tippe auf „Speichern" mit dem Daumen im unteren Bereich — der Button ist mindestens 44px hoch (Apple HIG Minimum) und reagiert.
+
+📏 **Rule 3:** App-Titel und Subtext im Header sind leicht kompakter.
+- 🟢 Beispiel: Ich sehe den Header — der App-Name ist 19–20px statt 22px, der Subtext unverändert (schon klein bei 12px).
+
+📏 **Rule 4:** Refresh-Menü-Items und Filter-Chips sind enger.
+- 🟢 Beispiel: Ich öffne das Refresh-Menü — Einträge wirken kompakter (Padding 8px statt 11px vertikal), alle Labels sind noch lesbar.
+
+⚠️ Annahme: Formular-Inputs (`.coord-pair input`, `.edit-form input`) bleiben bei 16px font-size — iOS-Pflicht gegen Auto-Zoom. Bitte bestätigen.
+⚠️ Annahme: Touch-Minimum 44×44px (Apple HIG) ist die untere Grenze für alle interaktiven Elemente. Bitte bestätigen.
+
+**Akzeptanzkriterien:**
+- [ ] Der App-Titel im Header zeigt sich 2–3px kleiner als heute (ca. 19–20px statt 22px) — erkennbar kompakter, aber noch klar lesbar.
+- [ ] Tab-Bar-Labels sind ca. 9px (statt 10px), Tab-Icons 20px (statt 22px) — die Leiste wirkt niedriger.
+- [ ] Der „Neu"-Button (goldener Kreis im Tab-Bar) ist minimal kleiner (40px statt 44px Durchmesser), bleibt aber sicher tappbar.
+- [ ] `.btn-primary`-Buttons (z.B. „Speichern") haben weniger vertikales Padding (ca. 10–11px statt 14px) — Buttons sind schmäler, aber mindestens 44px Tipp-Fläche gesamt.
+- [ ] `.btn-secondary`-Buttons (z.B. „Abbrechen") sind analog kompakter.
+- [ ] Aktions-Buttons in Report/Verify-Forms (`.btn-issue`, `.btn-verify`, `.btn-verify-cancel`) sind konsistent kompakter.
+- [ ] Refresh-Menü-Items reagieren tippbar bei reduziertem Padding (min. 44px Höhe je Item).
+- [ ] Filter-Chips (`.filter-chip`) sind leicht kompakter (padding 5px 10px statt 6px 12px).
+- [ ] Formular-Inputs bleiben unverändert bei 16px font-size (kein iOS Auto-Zoom).
+- [ ] Edge Case: Auf einem kleinen Bildschirm (iPhone SE, 375px) sind alle Buttons noch ein-fingerig benutzbar — kein ungewolltes Danebentippen beim Tipp-Test durch Stephan.
+- [ ] Die Änderungen betreffen ausschließlich `web/index.html` — keine Backend-Änderungen.
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-06-27.
+- `.btn-primary`: `padding: 14px`, `font-size: 15px` (Z. 439–440) — Kandidat für Reduktion auf 10–11px/14px.
+- `.tab`: `font-size: 10px`, SVG `22px` (Z. 170, 172) — bereits sehr klein; Tab-Bar-Höhe `--tab-h: 53px` als Token vorhanden.
+- `#tab-add` (Neu-Button): fester Kreis `width: 44px; height: 44px` (Z. 176) — aktuell genau am HIG-Limit.
+- `.refresh-menu-item`: `padding: 11px 16px` (Z. 118) — Reduktion auf ~8px möglich.
+- Formular-Inputs: `font-size: 16px` (Z. 490, 504, 509) — iOS-Pflicht, NICHT anfassen.
+
+💀 **Szenario 1: Neu-Button zu klein zum Tippen**
+- Auslöser: `width/height` des goldenen Kreises auf < 40px reduziert; tatsächliche Tipp-Fläche liegt darunter.
+- Frühwarnung: Bei manuellem Test auf echtem iPhone schwer treffbar.
+- Gegenmaßnahme: `#tab-add .tab-icon-wrap` mindestens 40×40px behalten; AK „min. 44px Tipp-Fläche" verifiziert Stephan im Tipp-Test.
+
+💀 **Szenario 2: Formular-Inputs erhalten < 16px → iOS zoomt beim Tippen**
+- Auslöser: Versehentlich Body-font-size oder Input-font-size auf 14px gesetzt.
+- Frühwarnung: Safari-Zoom beim Antippen eines Eingabefelds.
+- Gegenmaßnahme: Inputs explizit aus dem Scope ausschließen (AK verankert); bei Implementierung `font-size: 16px` an Input-Stellen nicht anfassen.
+
+💀 **Szenario 3: US-95-Konflikt — Chancendetail-Sheet-Buttons doppelt geändert**
+- Auslöser: `.btn-primary`/`.btn-secondary` sind globale Klassen — Änderung wirkt auch im Detail-Sheet (US-95-Scope).
+- Frühwarnung: Chancendetail öffnet sich mit ungewollt kleinen Buttons, obwohl US-95 noch offen ist.
+- Gegenmaßnahme: Vor Merge prüfen, ob US-95 schon In Progress ist. Falls ja: Koordination oder US-95 zuerst abschließen. Alternativ Detail-Sheet-Buttons beim Merge als gemeinsame Basis sehen (positiv: eliminiert Doppelarbeit).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CSS inline, Z. 35–650 ca.) — alle relevanten Klassen und Token identifiziert. Kein Backend betroffen.
+- [ ] Implementierungsoption gewählt (s.u.)
+
+---
+
+**Implementierungsoptionen:**
+
+### Option A — Direkte Werte-Reduktion
+Jede betroffene CSS-Klasse wird einzeln mit reduzierten `padding`/`font-size`-Werten angefasst. Keine neuen Token.
+- Vorgehen: ~15–20 gezielte Edit-Ops auf Zeilen 105, 118, 170, 172, 176, 394, 433–448 und weitere.
+- Betroffene Dateien: `web/index.html` (CSS-Block)
+- Vorteile: Einfach, transparent, minimales Risiko; leicht review-bar.
+- Nachteile: Kein gemeinsames Token mit US-95 — wenn US-95 später dieselben Buttons anfasst, entstehen Duplikate oder Widersprüche.
+- Aufwand: klein
+
+### Option B — CSS-Typo/Spacing-Token (neue Größen-Variablen)
+Neue CSS-Custom-Properties (z.B. `--btn-pad-v`, `--tab-icon-sz`, `--tab-label-sz`, `--header-title-sz`) im `:root` einführen; alle betroffenen Stellen referenzieren diese Token statt Hartwerte.
+- Vorgehen: 4–6 neue Tokens definieren, ~15 Call-Sites umstellen.
+- Betroffene Dateien: `web/index.html` (CSS `:root` + alle Call-Sites)
+- Vorteile: Saubere Token-Basis für US-95 (Ticket nennt explizit „gemeinsame Token-Basis nutzen"); spätere Größenanpassungen an einer Stelle.
+- Nachteile: Etwas mehr Aufwand; erfordert sorgfältige Benennung.
+- Aufwand: mittel
+
+✅ **Empfehlung: Option B — CSS-Typo/Spacing-Token**
+Das Ticket selbst schreibt vor, eine gemeinsame Token-Basis mit US-95 zu nutzen. Option B setzt das direkt um, vermeidet Doppelarbeit im US-95-Follow-up und macht zukünftige Größenanpassungen an einer Stelle möglich. Der Mehraufwand gegenüber Option A ist gering (~30 min).
+
+---
+
+**Testplan:**
+- [ ] Automatisiert: keine Backend-Logik betroffen — kein pytest-Fall nötig.
+- [ ] Manuell (Stephan im Browser + echtem iPhone):
+  1. App auf iPhone öffnen → Tab-Bar sichtbar kompakter, alle Tabs tippbar ohne Danebentippen.
+  2. „Neu"-Tab antippen → Formular öffnet sich korrekt.
+  3. Im Formular ein Textfeld antippen → iOS zoomt NICHT (16px check).
+  4. Einen `.btn-primary`-Button antippen → reagiert sofort, fühlt sich sicher an.
+  5. Refresh-Menü öffnen → Einträge kompakter, alle tippbar.
+  6. Filter öffnen → Chips kompakter, lesbar.
+
+---
+
+### US-102 · Bauhaus-Logo und App-Icon `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 |
 
 **Beschreibung:** Neue Bauhaus-Wortmarke (FOTO​ALERT, Blau-Akzent) plus geometrische Logo-Marke (Roundel aus Kreis/Viertel/Diamant) und passendes App-Icon in den Header und als PWA-Icon übernehmen. Umfasst auch die **PWA-Icons** (`/icons/icon-*.png`, `apple-touch-icon`, `manifest.json`, `<meta theme-color>`), damit das neue Logo beim „Zum Home-Bildschirm" / als WebApp-Symbol erscheint (heute noch altes Kamera-Icon). Quelle: FotoAlert/design/bauhaus/logo.svg.
 

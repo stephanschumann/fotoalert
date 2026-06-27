@@ -61,6 +61,12 @@
       --radius:    14px;
       --tab-h:     53px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
+      /* US-101: Typo/Spacing-Token */
+      --header-title-sz: 19px;
+      --tab-icon-sz:     20px;
+      --tab-label-sz:    9px;
+      --btn-pad-v:       10px;
+      --fab-size:        22px;
     }
     [data-theme="dark"] {
       --bg:        #15171c;
@@ -102,7 +108,7 @@
       background: linear-gradient(180deg, var(--surface) 60%, transparent);
       flex-shrink: 0; z-index: 10;
     }
-    #header h1 { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: -.3px; }
+    #header h1 { font-size: var(--header-title-sz); font-weight: 700; color: var(--gold); letter-spacing: -.3px; }
     #header .subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
     /* US-34: Refresh-Menü */
     #refresh-menu-wrap { position: relative; }
@@ -115,7 +121,7 @@
     #refresh-menu.open { display: block; }
     .refresh-menu-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 11px 16px; cursor: pointer; transition: background .15s;
+      padding: 8px 16px; cursor: pointer; transition: background .15s; min-height: 44px;
     }
     .refresh-menu-item:hover { background: var(--hover); }
     .refresh-menu-item.running { opacity: .7; pointer-events: none; }
@@ -166,15 +172,18 @@
       flex-shrink: 0; z-index: 20;
     }
     .tab { flex: 1; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 3px; background: none; border: none;
-      color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 500;
-      letter-spacing: .3px; transition: color .15s; padding: 8px 0; }
-    .tab svg { width: 22px; height: 22px; }
+      justify-content: flex-end; gap: 3px; background: none; border: none;
+      color: var(--muted); cursor: pointer; font-size: var(--tab-label-sz); font-weight: 500;
+      letter-spacing: .3px; transition: color .15s; padding: 4px 0 8px; }
+    .tab svg { width: var(--tab-icon-sz); height: var(--tab-icon-sz); }
     .tab.active, .tab:hover { color: var(--gold); }
-    .tab#tab-add { color: var(--bg); }
+    .tab#tab-add { color: var(--muted); }
     .tab#tab-add .tab-icon-wrap {
-      background: var(--gold); border-radius: 50%; width: 44px; height: 44px;
-      display: flex; align-items: center; justify-content: center; margin-bottom: -6px;
+      background: var(--gold); border-radius: 50%;
+      width: var(--fab-size); height: var(--fab-size);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--bg);
     }
 
     /* ── Cards ───────────────────────────────────────────────────── */
@@ -391,7 +400,7 @@
     .filter-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase;
       letter-spacing: .8px; color: var(--muted); margin-bottom: 10px; }
     .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .filter-chip { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+    .filter-chip { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px;
       border: 1px solid var(--border); background: var(--card); color: var(--muted);
       cursor: pointer; transition: all .15s; user-select: none; }
     .filter-chip.active { border-color: var(--gold); color: var(--gold);
@@ -430,21 +439,21 @@
     .issue-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .issue-chip { font-size: 12px; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; transition: all .15s; }
     .issue-chip.selected { border-color: var(--red); color: var(--red); background: rgba(224,80,80,.1); }
-    .btn-issue { flex: 1; background: var(--red); color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-issue { flex: 1; background: var(--red); color: #fff; border: none; border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
     .verify-form textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 10px; resize: vertical; min-height: 60px; font-family: inherit; }
     .verify-form textarea::placeholder { color: var(--muted); }
     .verify-form-actions { display: flex; gap: 8px; }
-    .btn-verify { flex: 1; background: #4caf50; color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .btn-verify-cancel { flex: 0; background: var(--card); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    .btn-verify { flex: 1; background: #4caf50; color: #fff; border: none; border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
+    .btn-verify-cancel { flex: 0; background: var(--card); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; padding: var(--btn-pad-v) 16px; font-size: 14px; cursor: pointer; min-height: 44px; }
     .btn-primary { background: var(--gold); color: var(--bg); border: none; border-radius: 12px;
-      padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
+      padding: var(--btn-pad-v) 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: opacity .15s; }
+      transition: opacity .15s; min-height: 44px; }
     .btn-primary:hover { opacity: .9; }
     .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border);
-      border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer;
+      border-radius: 12px; padding: var(--btn-pad-v) 14px; font-size: 14px; font-weight: 600; cursor: pointer;
       width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: border-color .15s; }
+      transition: border-color .15s; min-height: 44px; }
     .btn-secondary:hover { border-color: var(--gold); }
 
     /* ── Add Location Sheet ───────────────────────────────────────── */
@@ -957,7 +966,7 @@ function ic(id, size, cls){
     </button>
     <button class="tab" id="tab-add" onclick="AddLocation.open()">
       <div class="tab-icon-wrap">
-        <svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-plusbare"/></svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" style="display:block"><use href="#i-plusbare"/></svg>
       </div>
       <span style="color:var(--muted);margin-top:2px">Neu</span>
     </button>
@@ -1112,7 +1121,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.16.1';
+const APP_VERSION = '1.16.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
