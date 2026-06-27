@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04 |
+| **🔄 In Progress** | wird gerade implementiert | **US-99 + US-97** *(Option A freigegeben 2026-06-27)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-100** · **US-101** · **US-102** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -318,15 +318,15 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 ---
 
-### BUG-42 · Locations-Filter: Zustand geht nach Edit verloren (alle Locations sichtbar) `[~]`
+### ~~BUG-42 · Locations-Filter: Zustand geht nach Edit verloren (alle Locations sichtbar)~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-25 |
-| **Implementiert** | 2026-06-25 |
+| **Abgeschlossen** | 2026-06-27 |
 
 **Beschreibung:** Ist in der Locations-Ansicht ein Filter aktiv (z. B. „Nur Probleme"), und der Nutzer bearbeitet danach einen Eintrag (insbesondere: löscht den letzten Verifikationseintrag), werden nach dem Schließen des Editors alle Locations angezeigt — also auch jene, die die Filterkriterien nicht erfüllen. Der Filter-Chip zeigt weiterhin „aktiv" an, das Ergebnis entspricht aber keinem gefilterten Zustand. Erst wenn der Filter manuell erneut geöffnet und bestätigt wird, greifen die Kriterien wieder korrekt. **Erwartet:** Nach Ende einer Bearbeitung bleibt der aktive Filter angewendet, ohne dass der Nutzer ihn neu aktivieren muss.
 
@@ -533,7 +533,156 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 **Beschreibung:** Egal ob ich eine Chance im Feed (14-Tage-Ansicht), im 365-Tage-Kalender, im Scout oder in den Location Details (zukünftige Ereignisse) antippe — ich sehe immer exakt dieselbe Detailansicht mit denselben Informationen in derselben Reihenfolge. Alle Sektionen sind beim Öffnen eingeklappt. Das schafft ein konsistentes Erlebnis und macht das Navigieren zwischen den Tabs vorhersehbar.
 
+**Sektionen (Reihenfolge fest):**
+1. Titel / Score
+2. Uhrzeit
+3. FOV-Karte
+4. Koordinaten
+5. Himmelsposition
+6. Wetter
+7. Himmelskörper-Bahnen (bestehende interaktive Karte mit Zeit-Regler — Sonne/Mond-Stand relativ zum Standort; eingeklappte Sektion inline in der Detailansicht)
+8. Aktions-Buttons
+
 **Bezug:** Hängt von US-95 ab (Layout-Optimierung der bestehenden Detailansicht, sinnvolle Basis). Blockiert US-83 (Scout-Detailansicht soll dieselbe Komponente nutzen). Tangiert US-87 (Karten-Overlay). US-95 und US-96 können als Sequenz gebündelt werden.
+
+---
+
+### US-97 · Automatischer Tag/Nacht-Modus mit manuellem Umschalter `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Als Fotograf bin ich tags und nachts unterwegs und möchte, dass die App ihr Erscheinungsbild automatisch an die Umgebung anpasst — heller Modus bei Tag, dunkler Modus bei Nacht — damit der Bildschirm nachts nicht blendet und tags genug Kontrast bleibt. Die automatische Umschaltung soll standardmäßig aktiv sein (gekoppelt an die System-/Geräteeinstellung Hell/Dunkel). Zusätzlich brauche ich in den Einstellungen einen manuellen Umschalter mit drei Optionen — Auto / Hell / Dunkel —, mit dem ich die Automatik bei Bedarf übersteuern kann; meine Wahl bleibt über App-Neustarts erhalten.
+
+**Bezug:** Kind von **US-98** (Bauhaus-Redesign-Epic). Entstanden aus dem Bauhaus-Design-Prototyp (FotoAlert/design/bauhaus/prototype.html), der Auto-Umschaltung + Auto/Hell/Dunkel-Segment bereits demonstriert. **Hängt von US-99 ab** — die echte App ist derzeit reines Dunkel; das helle Theme (Theme-Tokens hell+dunkel) muss zuerst existieren, sonst gibt es bei „Tag" nichts zum Umschalten. Dieses Ticket umfasst NUR die Tag/Nacht-Mechanik (Automatik + Umschalter + Persistenz), nicht den Farb-/Icon-Umbau. Tangiert TASK-05 (Design-Spec). Kein „Nacht-Rotmodus" (separate Idee, ausgeschlossen).
+
+---
+
+### US-98 · Bauhaus-Redesign (Epic) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story (Epic) |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Dach-Ticket für die schrittweise Übernahme des freigegebenen Bauhaus-Looks in die echte App: diszipliniertes Bauhaus-Blau mit Gold als Zweitakzent, einheitliches Linien-Icon-Set statt verspielter Emojis, kompaktere Buttons + kleinere Schrift, neue Logo-/App-Icon-Marke sowie automatischer Tag/Nacht-Modus. Reine Designänderung — keine funktionalen oder Panel-Änderungen, die nicht ausdrücklich spezifiziert sind. Quelle: FotoAlert/design/bauhaus/ (prototype.html, logo.svg, icons.svg).
+
+**Kind-Tickets (empfohlene Reihenfolge):**
+1. **US-99** — Theme-Tokens (Bauhaus-Palette hell+dunkel) · Foundation, zuerst
+2. **US-97** — Automatischer Tag/Nacht-Modus + Umschalter · hängt von US-99
+3. **US-100** — Einheitliches Linien-Icon-Set ersetzt Emojis
+4. **US-101** — Kompaktere Buttons + kleinere Schrift
+5. **US-102** — Bauhaus-Logo + App-Icon
+
+**Bezug:** Tangiert TASK-05 (Design-Spec dokumentieren) — finale Tokens/Komponenten-Regeln dort festhalten. US-95/US-96 (Detailansicht-Layout) laufen parallel; Abstimmung bei gemeinsamen Komponenten.
+
+---
+
+### US-99 · Bauhaus-Theme-Tokens: Farb-/Designvariablen hell + dunkel `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Als Fundament des Redesigns sollen die Bauhaus-Farb- und Designvariablen (Hintergrund, Flächen, Text, Bauhaus-Blau, Gold, Linien, Chips, Radius) als CSS-Variablen für hellen UND dunklen Modus eingeführt werden. Die App ist heute reines Dunkel — hier entsteht das helle Theme und die saubere Variablen-Basis, auf der alle weiteren Redesign-Tickets aufbauen. Keine sichtbare Logik-Änderung, nur Farbwerte/Variablen.
+
+**Bezug:** Kind von US-98. Blockiert US-97 (Tag/Nacht braucht das Hell-Theme). Werte aus FotoAlert/design/bauhaus/prototype.html (`:root` / `[data-theme="dark"]`). Tangiert TASK-05.
+
+---
+
+#### 🔬 Analyse-Spec (US-99 + US-97 gebündelt) · 2026-06-27
+
+📎 **Code-Verifikation** (`web/index.html`, gelesen 2026-06-27): App ist reines Dunkel (`:root` Z. 22–36, kein `prefers-color-scheme`/`data-theme`/`matchMedia`). Settings rendern bei `Settings.render()` (Z. 4366) in `#settings-content`. Persistenz-Muster bereits `localStorage` (`fa_*`). `<meta name="theme-color">` statisch `#f0a030` (Z. 9). Mode-abhängige Hardcodes vorhanden: Hover-`rgba(255,255,255,…)` (~19×), `.leaflet-container {background:#0d0d1a !important}` (Z. 203), `.gps-dot #4285f4`, `.rmi-status.err #e05`.
+
+**Bestätigte Entscheidungen (Stephan, 2026-06-27):** Auto = **Systemeinstellung** (`prefers-color-scheme`, kein Tageszeit-Trigger). Farb-Umfang = **volle Bauhaus-Palette hell+dunkel** (Blau #2D4EA0 führend, Gold #E3A21A Zweitakzent), Werte aus dem Prototyp.
+
+**Scope:**
+Eingeschlossen: (1) Alle Farb-/Designwerte als CSS-Variablen-Themes — `:root` = Hell/Tag (Default Bauhaus-hell), `[data-theme="dark"]` = Bauhaus-dunkel; bestehende Hardcodes auf Tokens umstellen. (2) Bauhaus-Palette in beiden Modi. (3) Auto-Modus via `matchMedia('(prefers-color-scheme)')` inkl. Live-Wechsel bei OS-Änderung. (4) Manueller Umschalter Auto/Hell/Dunkel in neuer Settings-Sektion „Erscheinungsbild"; Wahl in `localStorage` `fa_theme` (auto|light|dark), beim Start angewandt. (5) `<meta name="theme-color">` dynamisch je Theme. (6) `.leaflet-container`-BG tokenisiert.
+Ausgeschlossen: Icon-Set (US-100), Button-/Schriftgrößen (US-101), Logo/App-Icon (US-102), Nacht-Rotmodus, Tageszeit-Automatik, Wechsel des Karten-Tile-Anbieters.
+
+**Akzeptanzkriterien (erlebbar):**
+- [ ] Erststart ohne eigene Wahl: App folgt der iOS-Einstellung — iOS hell → App hell, iOS dunkel → App dunkel.
+- [ ] Bei „Auto" und geöffneter App: Ändere ich iOS Hell↔Dunkel, wechselt die App sofort mit (ohne Neustart).
+- [ ] Einstellungen → „Erscheinungsbild" zeigt Auto/Hell/Dunkel. „Hell" hält die App hell trotz iOS-Dunkel; „Dunkel" umgekehrt.
+- [ ] Meine Wahl bleibt nach App-Neustart erhalten.
+- [ ] In beiden Modi ist jeder Text lesbar und kontrastreich — inkl. Karten-Hintergrund, Hover-Flächen, GPS-Punkt, Fehlertext (kein Weiß-auf-Weiß).
+- [ ] Look entspricht der Bauhaus-Palette (Blau führend, Gold Zweitakzent) in beiden Modi.
+- [ ] Edge: Browser ohne `prefers-color-scheme` → Start im Dunkelmodus (sicherer Default), Umschalter funktioniert weiter.
+- [ ] Edge: ungültiger gespeicherter `fa_theme`-Wert → Fallback „Auto".
+
+**Pre-Mortem:**
+- 💀 Hell-Modus stellenweise unleserlich (Hover-`rgba(255,255,255)`, dunkler Leaflet-BG bleiben) → Gegenmaßnahme: AK „lesbar in beiden Modi" + manueller Panel-Durchlauf hell+dunkel; alle mode-abhängigen Hardcodes tokenisieren.
+- 💀 Browser-Chrome-Leiste bleibt gold (statische theme-color) → Gegenmaßnahme: Meta dynamisch je Theme setzen.
+- 💀 `matchMedia`-Listener mehrfach registriert/Leak → Gegenmaßnahme: einmalige Registrierung, Test.
+- 💀 Neue „Erscheinungsbild"-Sektion bricht `Settings.render()` → Gegenmaßnahme: Vollsystem-Regression (bestehende AK-Tests) + manueller Settings-Check.
+- 💀 Karten-Tiles wirken im Hell-Modus dunkel (Tile-Anbieter unverändert) → bewusste Einschränkung dokumentiert; nur Container-BG tokenisiert, Tile-Wechsel außerhalb Scope.
+
+**Analyse & Planung:**
+- [x] Example Mapping (Auto-Trigger + Farb-Umfang als 🔴-Fragen vorab geklärt)
+- [x] Pre-Mortem inkl. Code-Verifikation
+- [x] Architektur analysiert: `web/index.html` (`:root`, `Settings.render()`, mode-abhängige Hardcodes, `<meta theme-color>`)
+- [x] Optionen: A (Tokens + `data-theme` + JS-Theme-Manager) / B (nur CSS-`@media`)
+- [x] Empfehlung: **Option A** — nur A erfüllt den manuellen Umschalter + Persistenz (B kann Auto, aber kein Hell/Dunkel-Erzwingen).
+
+**Testplan:**
+- Automatisiert (Harness): `fa_theme`-Persistenz-/Fallback-Logik (auto|light|dark|ungültig) als pytest-Fall, falls in JS-testbarer Helper ausgelagert; sonst manuell markiert.
+- Manuell (http://localhost:8000): iOS/OS Hell↔Dunkel bei „Auto" umschalten; je Umschalter-Option prüfen; Neustart-Persistenz; visueller Durchlauf aller Panels in beiden Modi.
+
+**Status:** Wartet am Weg-Gate (Option A zur Freigabe).
+
+---
+
+### US-100 · Einheitliches Bauhaus-Linien-Icon-Set ersetzt Emoji-Symbole `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Als Nutzer möchte ich überall einheitliche, klare Linien-Icons statt der gemischten/verspielten Emojis (🌅🧭🌙 …), damit die Oberfläche ruhig und konsistent wirkt. Eine einzige Icon-Familie (gleicher Strich, gleiches Raster) für Tabs, Chancen-Typen und Status. WebKit-Hinweis: Strich/Füllung als SVG-Attribute setzen, nicht per CSS-Klasse (sonst in Safari unsichtbar).
+
+**Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/icons.svg. Tangiert US-96 (Detailansicht nutzt dieselben Icons).
+
+---
+
+### US-101 · Kompaktere Buttons und kleinere Schriftgrößen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Als Nutzer empfinde ich viele Buttons und Schriften — besonders im Menü und in den Aktions-Buttons — als zu groß. Buttons (inkl. „Neu") und Schriftgrößen sollen kompakter werden, ohne Funktion oder Touch-Bedienbarkeit zu verschlechtern.
+
+**Bezug:** Kind von US-98. Überschneidet sich mit **US-95** (Detail-Buttons kleiner, Karte größer) — Abgrenzung: US-95 betrifft nur das Chancendetail-Sheet, US-101 die globalen Buttons/Typo-Skalen (Header, Tab-Bar, Listen). Bei Umsetzung gemeinsame Token-Basis nutzen.
+
+---
+
+### US-102 · Bauhaus-Logo und App-Icon `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Neue Bauhaus-Wortmarke (FOTO​ALERT, Blau-Akzent) plus geometrische Logo-Marke (Roundel aus Kreis/Viertel/Diamant) und passendes App-Icon in den Header und als PWA-Icon übernehmen.
+
+**Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/logo.svg.
 
 ---
 

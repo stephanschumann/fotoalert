@@ -6,8 +6,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FotoAlert">
-  <meta name="theme-color" content="#f0a030">
+  <meta name="theme-color" content="#15171c">
   <title>FotoAlert</title>
+  <script>
+    /* Theme früh setzen (US-99/US-97), bevor das CSS greift → kein Flash.
+       fa_theme: 'auto' (Default, folgt System) | 'light' | 'dark'. */
+    (function () {
+      try {
+        var pref = localStorage.getItem('fa_theme');
+        if (pref !== 'light' && pref !== 'dark' && pref !== 'auto') pref = 'auto';
+        var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var eff = pref === 'auto' ? (sysDark ? 'dark' : 'light') : pref;
+        document.documentElement.setAttribute('data-theme', eff);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
@@ -18,22 +33,55 @@
 
   <style>
     /* ── Design Tokens ────────────────────────────────────────────── */
+    /* Bauhaus-Theme · Hell = Default (Tag). Dunkel via [data-theme="dark"] (US-99/US-97).
+       --accent = Bauhaus-Blau (primär), --accent-2 = Gold (sekundär).
+       --gold/--blue-h sind Kompat-Aliase auf den Primär-Akzent (bestehende Call-Sites). */
     :root {
-      --bg:        #0a0a0f;
-      --surface:   #141420;
-      --card:      #1c1c2a;
-      --border:    #2a2a3a;
-      --gold:      #f0a030;
-      --gold-dim:  rgba(240,160,48,.15);
-      --blue-h:    #5080f0;
-      --text:      #e8e8f4;
-      --muted:     #7878a0;
-      --green:     #4caf70;
-      --orange:    #f08030;
-      --red:       #e05050;
+      --bg:        #eae6db;
+      --surface:   #ffffff;
+      --card:      #ffffff;
+      --border:    #e0dbcd;
+      --accent:    #2d4ea0;
+      --accent-2:  #b07a12;
+      --accent-2-dim: rgba(176,122,18,.15);
+      --accent-2-bg:  #f6efdf;
+      --accent-2-bd:  rgba(176,122,18,.35);
+      --gold:      var(--accent);
+      --gold-dim:  rgba(45,78,160,.12);
+      --blue-h:    var(--accent);
+      --text:      #1a1a1a;
+      --muted:     #6b6b62;
+      --green:     #2e7d55;
+      --orange:    #c07a16;
+      --red:       #c8472f;
+      --hover:     rgba(0,0,0,.045);
+      --hairline:  rgba(0,0,0,.08);
+      --map-bg:    #e4e1d8;
       --radius:    14px;
       --tab-h:     53px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
+    }
+    [data-theme="dark"] {
+      --bg:        #15171c;
+      --surface:   #1e2127;
+      --card:      #1e2127;
+      --border:    #2a2d34;
+      --accent:    #7c9bea;
+      --accent-2:  #e3a21a;
+      --accent-2-dim: rgba(227,162,26,.16);
+      --accent-2-bg:  #2a2415;
+      --accent-2-bd:  rgba(227,162,26,.35);
+      --gold:      var(--accent);
+      --gold-dim:  rgba(124,155,234,.16);
+      --blue-h:    var(--accent);
+      --text:      #eceae3;
+      --muted:     #8a8c95;
+      --green:     #5bb089;
+      --orange:    #e3a21a;
+      --red:       #e0664f;
+      --hover:     var(--hover);
+      --hairline:  var(--hairline);
+      --map-bg:    var(--map-bg);
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -67,7 +115,7 @@
       display: flex; align-items: center; gap: 12px;
       padding: 11px 16px; cursor: pointer; transition: background .15s;
     }
-    .refresh-menu-item:hover { background: rgba(255,255,255,.06); }
+    .refresh-menu-item:hover { background: var(--hover); }
     .refresh-menu-item.running { opacity: .7; pointer-events: none; }
     .refresh-menu-item .rmi-icon { font-size: 18px; flex-shrink: 0; }
     .refresh-menu-item .rmi-body { flex: 1; min-width: 0; }
@@ -161,7 +209,7 @@
     .opp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
     .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
     .tag-blue  { color: var(--blue-h); background: rgba(80,128,240,.15); }
-    .tag-gold  { color: var(--gold);   background: var(--gold-dim); }
+    .tag-gold  { color: var(--accent-2); background: var(--accent-2-dim); }
     .tag-warn  { color: var(--orange); background: rgba(240,128,48,.15); }
     .tag-weather-unknown { color: var(--muted); background: var(--border); }
 
@@ -172,9 +220,9 @@
     .section-head svg { width: 13px; height: 13px; }
 
     /* Alert banner */
-    #alert-banner { margin: 8px 12px; background: linear-gradient(135deg, rgba(240,160,48,.12), rgba(80,128,240,.08));
-      border: 1px solid rgba(240,160,48,.35); border-radius: var(--radius); padding: 12px 14px; }
-    #alert-banner h3 { font-size: 12px; font-weight: 700; color: var(--gold);
+    #alert-banner { margin: 8px 12px; background: var(--accent-2-bg);
+      border: 1px solid var(--accent-2-bd); border-radius: var(--radius); padding: 12px 14px; }
+    #alert-banner h3 { font-size: 12px; font-weight: 700; color: var(--accent-2);
       margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .alert-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
     .alert-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
@@ -200,7 +248,7 @@
     /* BUG-24 v2: isolation+z-index:0 erzwingt Stacking-Context; Filter über Leaflet-Maximum (z=1000) */
     #page-map { padding: 0 !important; isolation: isolate; z-index: 0; }
     #map { width: 100%; height: 100%; }
-    .leaflet-container { background: #0d0d1a !important; }
+    .leaflet-container { background: var(--map-bg) !important; }
     .leaflet-tile { filter: brightness(.85) saturate(.7); }
     /* Map layer toggle */
     #map-layer-toggle { position: absolute; top: 12px; right: 12px; z-index: 1000;
@@ -244,7 +292,7 @@
       z-index: 100; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #detail-overlay.open { opacity: 1; pointer-events: auto; }
     #detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
-      background: var(--surface); border-radius: 22px 22px 0 0;
+      background: var(--bg); border-radius: 22px 22px 0 0;
       max-height: 92vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #detail-sheet.open { transform: translateY(0); }
@@ -329,7 +377,7 @@
       z-index: 1100; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #filter-overlay.open { opacity: 1; pointer-events: auto; }
     #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1101;
-      background: var(--surface); border-radius: 22px 22px 0 0;
+      background: var(--bg); border-radius: 22px 22px 0 0;
       max-height: 88vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #filter-sheet.open { transform: translateY(0); }
@@ -399,7 +447,7 @@
 
     /* ── Add Location Sheet ───────────────────────────────────────── */
     #add-sheet { position: fixed; inset: 0; z-index: 110;
-      background: var(--surface); border-radius: 0;
+      background: var(--bg); border-radius: 0;
       display: flex; flex-direction: column; overflow: hidden;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #add-sheet.open { transform: translateY(0); }
@@ -522,7 +570,7 @@
       color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
       border-top: 1px solid var(--border); margin-top: 4px; }
     .cal-event { display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; transition: background .15s; }
+      border-bottom: 1px solid var(--hairline); cursor: pointer; transition: background .15s; }
     .cal-event:active { background: var(--card); }
     .cal-event-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
     .cal-event-body { flex: 1; min-width: 0; }
@@ -550,7 +598,7 @@
       z-index: 102; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #loc-detail-overlay.open { opacity: 1; pointer-events: auto; }
     #loc-detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 103;
-      background: var(--surface); border-radius: 22px 22px 0 0;
+      background: var(--bg); border-radius: 22px 22px 0 0;
       max-height: 92vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #loc-detail-sheet.open { transform: translateY(0); }
@@ -560,7 +608,7 @@
       z-index: 104; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #impressum-overlay.open { opacity: 1; pointer-events: auto; }
     #impressum-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
-      background: var(--surface); border-radius: 22px 22px 0 0;
+      background: var(--bg); border-radius: 22px 22px 0 0;
       max-height: 92vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #impressum-sheet.open { transform: translateY(0); }
@@ -569,14 +617,14 @@
       z-index: 106; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #astro-overlay.open { opacity: 1; pointer-events: auto; }
     #astro-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 107;
-      background: var(--surface); border-radius: 22px 22px 0 0;
+      background: var(--bg); border-radius: 22px 22px 0 0;
       max-height: 94vh; display: flex; flex-direction: column;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #astro-sheet.open { transform: translateY(0); }
     #astro-content { overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0;
       padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
     #astro-map { height: 46vh; margin: 8px 16px; border-radius: 12px; overflow: hidden;
-      background: #0d0d1a; }
+      background: var(--map-bg); }
     .astro-readout { padding: 6px 0 2px; }
     .ar-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px;
       padding: 3px 16px; color: var(--text); }
@@ -603,7 +651,7 @@
     .body-chip.possible   { background: rgba(80,200,120,.15); color: #4ec87a; border: 1px solid rgba(80,200,120,.4); }
     .body-chip.impossible { background: rgba(130,130,130,.1); color: var(--muted); border: 1px solid rgba(130,130,130,.25); text-decoration: line-through; }
     .loc-next-event-row { display: flex; align-items: center; gap: 10px;
-      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; }
+      padding: 8px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; }
     .loc-next-event-row:last-child { border-bottom: none; }
     .loc-next-event-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
     .loc-next-event-body { flex: 1; min-width: 0; }
@@ -644,6 +692,12 @@
     .toggle::after { content: ''; position: absolute; width: 20px; height: 20px;
       background: white; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; }
     .toggle:checked::after { left: 21px; }
+    /* Erscheinungsbild-Umschalter (US-97) */
+    .seg-theme { display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 3px; flex-shrink: 0; }
+    .seg-theme button { border: none; background: none; color: var(--muted); cursor: pointer;
+      font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 7px; transition: background .15s, color .15s; }
+    .seg-theme button.active { background: var(--accent); color: #fff; }
     .range-row { flex-direction: column; align-items: stretch; gap: 6px; }
     .range-row .range-label-row { display: flex; justify-content: space-between;
       font-size: 13px; }
@@ -997,7 +1051,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.14.1';
+const APP_VERSION = '1.15.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1009,6 +1063,46 @@ const CFG = {
   notifyMilky: localStorage.getItem('fa_notify_milky') === 'true',
   token: localStorage.getItem('fa_token') || null,  // US-66: Session-Token
   role: localStorage.getItem('fa_role') || null,    // US-66: 'host' | 'user'
+};
+
+// ═══════════════════════════════════════════════════════
+// THEME (US-99/US-97) — Tag/Nacht: Auto (System) + manueller Umschalter
+// ═══════════════════════════════════════════════════════
+const Theme = {
+  _mq: window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null,
+  _metaLight: '#eae6db',
+  _metaDark: '#15171c',
+
+  pref() {
+    const p = localStorage.getItem('fa_theme');
+    return (p === 'light' || p === 'dark' || p === 'auto') ? p : 'auto';
+  },
+  _effective(pref) {
+    const p = pref || this.pref();
+    if (p === 'light' || p === 'dark') return p;
+    return (this._mq && this._mq.matches) ? 'dark' : 'light';
+  },
+  apply(pref) {
+    const eff = this._effective(pref);
+    document.documentElement.setAttribute('data-theme', eff);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', eff === 'dark' ? this._metaDark : this._metaLight);
+  },
+  set(pref) {
+    const p = (pref === 'light' || pref === 'dark') ? pref : 'auto';
+    localStorage.setItem('fa_theme', p);
+    this.apply(p);
+  },
+  init() {
+    this.apply();
+    // Live-Wechsel, wenn System Hell↔Dunkel umschaltet — nur im Auto-Modus.
+    if (this._mq && !this._mq._faBound) {
+      const handler = () => { if (this.pref() === 'auto') this.apply('auto'); };
+      this._mq.addEventListener ? this._mq.addEventListener('change', handler)
+                                : this._mq.addListener(handler);
+      this._mq._faBound = true;
+    }
+  },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1781,7 +1875,7 @@ const Verify = {
       const color = isIssue ? 'var(--red)' : '#4caf50';
       const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${v.issue_type}</span>` : '';
       const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${v.comment}"</span>` : '';
-      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--hairline)">
         <span style="color:${color};font-size:14px;flex-shrink:0;width:16px">${icon}</span>
         <span style="font-size:12px;color:var(--muted);flex-shrink:0;width:72px">${this.formatDate(v.date)}</span>
         <div style="flex:1;display:flex;flex-direction:column;gap:2px">${type}${cmt}</div>
@@ -4363,7 +4457,21 @@ const AddLocation = {
 // ═══════════════════════════════════════════════════════
 const Settings = {
   render() {
+    const _th = Theme.pref();
     document.getElementById('settings-content').innerHTML = `
+      <div class="settings-section">
+        <h3>Erscheinungsbild</h3>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="sr-label"><span>Design</span><small>Auto folgt der Geräteeinstellung (Hell/Dunkel)</small></div>
+            <div class="seg-theme" id="seg-theme">
+              <button class="${_th==='auto'?'active':''}" onclick="Theme.set('auto');Settings.render()">Auto</button>
+              <button class="${_th==='light'?'active':''}" onclick="Theme.set('light');Settings.render()">Hell</button>
+              <button class="${_th==='dark'?'active':''}" onclick="Theme.set('dark');Settings.render()">Dunkel</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="settings-section">
         <h3>Benachrichtigungen</h3>
         <div class="settings-group">
@@ -4735,6 +4843,7 @@ const RefreshMenu = {
 // START
 // ═══════════════════════════════════════════════════════
 // US-66: Beim Start nur initialisieren, wenn eingeloggt — sonst Login-Screen zeigen.
+Theme.init();
 if (Auth.isLoggedIn()) { App.init(); } else { LoginScreen.show(); }
 </script>
 </body>
