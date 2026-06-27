@@ -46,6 +46,7 @@
       --accent-2-dim: rgba(176,122,18,.15);
       --accent-2-bg:  #f6efdf;
       --accent-2-bd:  rgba(176,122,18,.35);
+      --on-accent: #ffffff;
       --gold:      var(--accent);
       --gold-dim:  rgba(45,78,160,.12);
       --blue-h:    var(--accent);
@@ -71,6 +72,7 @@
       --accent-2-dim: rgba(227,162,26,.16);
       --accent-2-bg:  #2a2415;
       --accent-2-bd:  rgba(227,162,26,.35);
+      --on-accent: #15171c;
       --gold:      var(--accent);
       --gold-dim:  rgba(124,155,234,.16);
       --blue-h:    var(--accent);
@@ -79,9 +81,9 @@
       --green:     #5bb089;
       --orange:    #e3a21a;
       --red:       #e0664f;
-      --hover:     var(--hover);
-      --hairline:  var(--hairline);
-      --map-bg:    var(--map-bg);
+      --hover:     rgba(255,255,255,.06);
+      --hairline:  rgba(255,255,255,.05);
+      --map-bg:    #0d0d1a;
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -470,7 +472,7 @@
     .map-mode-bar { display: flex; gap: 6px; padding: 6px 12px; background: var(--bg); flex-shrink: 0; }
     .map-mode-btn { flex: 1; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border);
       background: var(--card); color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
-    .map-mode-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+    .map-mode-btn.active { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
     .add-form { padding: 12px 20px; overflow-y: auto; flex-shrink: 0; max-height: 42dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
     .form-section { margin-bottom: 16px; }
@@ -533,7 +535,7 @@
     .fmb-btn { flex: 1; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--border);
       background: var(--card); color: var(--muted); font-size: 13px; font-weight: 600;
       cursor: pointer; transition: all .2s; }
-    .fmb-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+    .fmb-btn.active { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
 
     /* ── Scout-Tab ───────────────────────────────────────────────── */
     #scout-content { padding: 8px 14px 80px; }
@@ -543,7 +545,7 @@
       margin-bottom: 8px; }
     .scout-subject { font-size: 15px; font-weight: 700; color: var(--text); }
     .scout-kategorie { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .scout-score-badge { background: var(--gold); color: #000; border-radius: 8px;
+    .scout-score-badge { background: var(--gold); color: var(--on-accent); border-radius: 8px;
       padding: 3px 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     .scout-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .scout-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
@@ -553,7 +555,7 @@
     .scout-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg); color: var(--text); font-size: 13px; font-weight: 600;
       cursor: pointer; transition: all .2s; text-align: center; }
-    .scout-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
+    .scout-btn:hover { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
     .scout-day-header { font-size: 13px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: .04em; padding: 12px 0 4px; }
     .scout-empty { text-align: center; padding: 48px 24px; color: var(--muted); font-size: 15px; }
@@ -638,7 +640,7 @@
     .astro-clock { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 700; min-width: 48px; text-align: right; }
     .astro-live-btn { background: var(--card); color: var(--text); border: 1px solid var(--border);
       border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .astro-live-btn.on { background: var(--gold); color: #1a1300; border-color: var(--gold); }
+    .astro-live-btn.on { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
     .astro-legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 16px 4px; font-size: 11px; color: var(--muted); }
     .astro-legend span { display: inline-flex; align-items: center; gap: 5px; }
     .astro-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
@@ -737,6 +739,72 @@
   </style>
 </head>
 <body>
+<!-- ===================== ICON SPRITE (US-100, Bauhaus-Linien-Set, WebKit-sicher: Strich/Füllung als <g>-Attribut) ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-star" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.3 9 20.7 9.2 15.5 13 17.4 19.3 12 15.5 6.6 19.3 8.5 13 3.3 9.2 9.7 9 Z"/></g></symbol>
+  <symbol id="i-starfill" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><path d="M12 3 14.3 9 20.7 9.2 15.5 13 17.4 19.3 12 15.5 6.6 19.3 8.5 13 3.3 9.2 9.7 9 Z"/></g></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 Z"/><path d="M9 3 V18 M15 6 V21"/></g></symbol>
+  <symbol id="i-plusbare" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5 V19 M5 12 H19"/></g></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 21 5 15 5 10 a7 7 0 0 1 14 0 c0 5 -7 11 -7 11 Z"/><circle cx="12" cy="10" r="2.6"/></g></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 H20 M4 12 H20 M4 16 H20"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="16" r="2"/></g></symbol>
+  <symbol id="i-sunset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 H21 M7 18 a5 5 0 0 1 10 0"/><path d="M12 4 V8 M5 8 L7.2 10 M19 8 L16.8 10"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
+  <symbol id="i-moonsmall" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18 a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.7-1.5 A3.8 3.8 0 0 1 18 18 Z"/></g></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13 11 13 11 21 19 11 13 11 Z"/></g></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9 10.5 10.5 9 15 13.5 13.5 Z"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16 L21 21"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11 a8 8 0 1 0 -2.3 6.3 M20 5 V11 H14"/></g></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 h3 l2-2 h6 l2 2 h3 v11 H4 Z"/><circle cx="12" cy="13" r="3.6"/></g></symbol>
+  <symbol id="i-tripod" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3.5" width="6" height="3.5"/><path d="M12 7 V10 M12 10 L6.5 20 M12 10 L17.5 20 M12 10 L12 20"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7 V12 L15.5 14"/></g></symbol>
+  <symbol id="i-pincheck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 21 5 15 5 10 a7 7 0 0 1 14 0 c0 5 -7 11 -7 11 Z"/><path d="M9.5 10 12 12.5 14.5 8.5"/></g></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 21 4 14 21 11 13 Z"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12 11 15 16 9"/></g></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19 3 19 Z"/><path d="M12 10 V14 M12 16.5 V16.6"/></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18 M18 6 6 18"/></g></symbol>
+  <symbol id="i-chevright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 16 12 9 19"/></g></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 V18 M6 12 H18"/></g></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12 H18"/></g></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2 V4 M12 20 V22 M2 12 H4 M20 12 H22 M5 5 6.5 6.5 M17.5 17.5 19 19 M19 5 17.5 6.5 M6.5 17.5 5 19"/></g></symbol>
+  <!-- US-100 neu gezeichnet (gleiches 24er-Raster / Strich 1.7) -->
+  <symbol id="i-sunrise" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 H21 M7 18 a5 5 0 0 1 10 0"/><path d="M12 11 V5 M9 8 L12 5 L15 8"/></g></symbol>
+  <symbol id="i-milkyway" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19 C8 14 16 10 21 5"/><path d="M5 16 6 17 M9 13 10 14 M14 9.5 15 10.5"/><path d="M16.5 5 17.4 6.7 19.1 7.6 17.4 8.5 16.5 10.2 15.6 8.5 13.9 7.6 15.6 6.7 Z"/></g></symbol>
+  <symbol id="i-meteor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4 9 15"/><path d="M14 4 9 9 M19 9 14 14 M6 18 4 20 M9 17 7.5 18.5"/><circle cx="8" cy="16" r="2.4"/></g></symbol>
+  <symbol id="i-eclipse" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M9.5 12 a4 4 0 0 0 8 0 a4 4 0 0 0 -8 0 Z"/></g></symbol>
+  <symbol id="i-castle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 V9 H6 V11 H9 V9 H11 V11 H13 V9 H15 V11 H18 V9 H20 V20 Z"/><path d="M10 20 V15 h4 V20"/></g></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 c3 -2 4 2 6 0 s4 2 6 0 4 2 6 0"/><path d="M3 14 c3 -2 4 2 6 0 s4 2 6 0 4 2 6 0"/><path d="M3 19 c3 -2 4 2 6 0 s4 2 6 0 4 2 6 0"/></g></symbol>
+  <symbol id="i-nature" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 V11"/><path d="M12 16 8 13 M12 13 16 10 M12 11 9 8"/><path d="M12 11 C9 9 9 4 12 3 c3 1 3 6 0 8 Z"/></g></symbol>
+  <symbol id="i-skyline" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 V11 h4 V21 M7 14 h4 V6 h4 V21 M15 9 h4 V21 M3 21 H21"/></g></symbol>
+  <symbol id="i-industry" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 V12 l5 3 V12 l5 3 V12 l5 3 V9 h2 V21 Z"/><path d="M5 9 V5 h2 V9"/></g></symbol>
+  <symbol id="i-viewpoint" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13 C5 8 9 5 12 5 s7 3 9 8"/><path d="M3 13 a3 2.5 0 0 0 18 0"/><circle cx="12" cy="13" r="2.4"/></g></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6 9 5 12 5 s7 1 10 7 C19 18 15 19 12 19 S5 18 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6"/></g></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 h8 l4 4 v14 H6 Z"/><path d="M14 3 v4 h4 M9 12 h6 M9 16 h6"/></g></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14 14 4 20 10 10 20 Z"/><path d="M7 11 8.5 12.5 M10 8 11.5 9.5 M13 5 14.5 6.5"/></g></symbol>
+  <symbol id="i-fov" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M12 19 5 6 M12 19 19 6"/><path d="M6.5 9 a7 7 0 0 1 11 0"/></g></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16 a6 6 0 0 1 12 0 l1 2 H5 Z"/><path d="M10 18 a2 2 0 0 0 4 0"/><path d="M12 4 V6"/></g></symbol>
+  <symbol id="i-calplus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9 H20 M8 3 V6 M16 3 V6 M12 12 V18 M9 15 H15"/></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9 H20 M8 3 V6 M16 3 V6"/></g></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 h4 L19 9 15 5 4 16 Z"/><path d="M13 7 17 11"/></g></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7 H19 M9 7 V5 h6 V7 M7 7 l1 13 h8 l1 -13"/></g></symbol>
+  <symbol id="i-walk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="M13 7 11 12 8 21 M11 12 16 14 18 20 M11 12 7 14 5 18"/></g></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9 M10 6 12 4 a3 3 0 0 1 4 4 l-2 2 M14 18 12 20 a3 3 0 0 1 -4 -4 l2 -2"/></g></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 H20 M4 16 H20"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="16" r="2"/></g></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 V4 M4 20 H20"/><path d="M8 16 V13 M12 16 V9 M16 16 V11"/></g></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 h6 l2 2 h8 v11 H4 Z"/></g></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 h3 l2-2 h6 l2 2 h3 v11 H4 Z"/><circle cx="12" cy="13" r="3.6"/></g></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5 H21 L14 13 V20 L10 18 V13 Z"/></g></symbol>
+</defs></svg>
+<script>
+// US-100: zentraler Icon-Helper. Erzeugt <use>-Referenz auf die Inline-Sprite.
+// WebKit-sicher: Strich/Füllung sind als <g>-Attribut im <symbol> gesetzt (nicht per CSS-Klasse).
+// currentColor → erbt Theme-Farbe (US-99-Tokens).
+function ic(id, size, cls){
+  const s = size || 16;
+  return `<svg class="ic ${cls||''}" style="width:${s}px;height:${s}px;vertical-align:-0.15em;flex-shrink:0" aria-hidden="true"><use href="#${id}"/></svg>`;
+}
+</script>
 <!-- US-66: Pflicht-Login-Overlay -->
 <style>
 #login-screen{position:fixed;inset:0;z-index:9999;background:var(--bg,#0f1117);display:none;align-items:center;justify-content:center;padding:24px;padding-top:calc(env(safe-area-inset-top,0px) + 24px)}
@@ -752,7 +820,7 @@
 </style>
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">📷</div>
+    <div class="login-logo"><svg style="width:42px;height:42px"><use href="#i-camera"/></svg></div>
     <h1>FotoAlert</h1>
     <p class="login-sub">Bitte Passwort eingeben</p>
     <input id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password"
@@ -765,7 +833,7 @@
   <!-- Header -->
   <div id="header" style="position:relative">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#e8a020,#c45f00);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📷</div>
+      <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#e8a020,#c45f00);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"><svg style="width:22px;height:22px;color:#fff"><use href="#i-camera"/></svg></div>
       <div>
         <h1>FotoAlert</h1>
         <div class="subtitle" id="header-subtitle">Berlin &amp; Brandenburg</div>
@@ -773,42 +841,35 @@
     </div>
     <div style="display:flex;align-items:center;gap:2px">
       <button id="search-btn" title="Suchen" onclick="Search.open()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><use href="#i-search"/></svg>
       </button>
       <div style="position:relative;display:inline-flex">
         <button id="filter-btn" title="Filter" onclick="FilterSheet.open()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><use href="#i-filter"/></svg>
         </button>
         <span id="filter-badge">0</span>
       </div>
       <div id="refresh-menu-wrap">
         <button id="refresh-btn" title="Aktualisieren" onclick="RefreshMenu.toggle(event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><use href="#i-refresh"/></svg>
         </button>
         <div id="refresh-menu">
           <div class="refresh-menu-item" id="rmi-weather" onclick="RefreshMenu.trigger('weather')">
-            <span class="rmi-icon">🌤</span>
+            <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-cloud"/></svg></span>
             <div class="rmi-body">
               <div class="rmi-label">Wetter aktualisieren</div>
               <div class="rmi-status" id="rms-weather">–</div>
             </div>
           </div>
           <div class="refresh-menu-item" id="rmi-feed" onclick="RefreshMenu.trigger('feed')">
-            <span class="rmi-icon">📅</span>
+            <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-cal"/></svg></span>
             <div class="rmi-body">
               <div class="rmi-label">14-Tage-Feed berechnen</div>
               <div class="rmi-status" id="rms-feed">–</div>
             </div>
           </div>
           <div class="refresh-menu-item" id="rmi-calendar" onclick="RefreshMenu.trigger('calendar')">
-            <span class="rmi-icon">📆</span>
+            <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-calplus"/></svg></span>
             <div class="rmi-body">
               <div class="rmi-label">Jahreskalender berechnen</div>
               <div class="rmi-status" id="rms-calendar">–</div>
@@ -816,7 +877,7 @@
           </div>
           <div class="refresh-menu-divider"></div>
           <div class="refresh-menu-item" style="opacity:.4;pointer-events:none">
-            <span class="rmi-icon">🔍</span>
+            <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-search"/></svg></span>
             <div class="rmi-body">
               <div class="rmi-label">Locationscout-Scan</div>
               <div class="rmi-status">Noch nicht verfügbar (US-33)</div>
@@ -840,9 +901,9 @@
     <!-- FEED -->
     <div id="page-feed" class="page active">
       <div class="feed-mode-bar">
-        <button class="fmb-btn active" id="fmb-feed" onclick="Feed.setMode('feed')">📋 14-Tage Feed</button>
-        <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')">📅 Jahreskalender</button>
-        <button class="fmb-btn" id="fmb-scout" onclick="Feed.setMode('scout')">🔭 Scout</button>
+        <button class="fmb-btn active" id="fmb-feed" onclick="Feed.setMode('feed')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-cal"/></svg>14-Tage Feed</button>
+        <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-calplus"/></svg>Jahreskalender</button>
+        <button class="fmb-btn" id="fmb-scout" onclick="Feed.setMode('scout')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-viewpoint"/></svg>Scout</button>
       </div>
       <div id="recompute-banner" style="display:none;margin:8px 12px 0;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);align-items:center;gap:8px">
         <div class="spinner" style="width:14px;height:14px;flex-shrink:0"></div>
@@ -887,25 +948,25 @@
   <!-- Tab Bar -->
   <div id="tab-bar">
     <button class="tab active" id="tab-feed" onclick="App.nav('feed')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
       <span>Chancen</span>
     </button>
     <button class="tab" id="tab-map" onclick="App.nav('map')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      <svg viewBox="0 0 24 24"><use href="#i-map"/></svg>
       <span>Karte</span>
     </button>
     <button class="tab" id="tab-add" onclick="AddLocation.open()">
       <div class="tab-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-plusbare"/></svg>
       </div>
       <span style="color:var(--muted);margin-top:2px">Neu</span>
     </button>
     <button class="tab" id="tab-locations" onclick="App.nav('locations')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <svg viewBox="0 0 24 24"><use href="#i-pin"/></svg>
       <span>Locations</span>
     </button>
     <button class="tab" id="tab-settings" onclick="App.nav('settings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <svg viewBox="0 0 24 24"><use href="#i-settings"/></svg>
       <span>Einstellungen</span>
     </button>
   </div>
@@ -915,7 +976,7 @@
 <div id="detail-overlay" onclick="Detail.close()"></div>
 <div id="detail-sheet">
   <div style="display:flex;align-items:center;justify-content:flex-end;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
-    <button class="close-btn" onclick="Detail.close()" aria-label="Schließen">✕</button>
+    <button class="close-btn" onclick="Detail.close()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div id="detail-content"></div>
 </div>
@@ -925,8 +986,8 @@
 <div id="add-sheet">
   <div class="add-header">
     <div class="sheet-handle" style="margin:0"></div>
-    <h2>📍 Neue Location</h2>
-    <button class="close-btn" onclick="AddLocation.close()">✕</button>
+    <h2 style="display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-pin"/></svg>Neue Location</h2>
+    <button class="close-btn" onclick="AddLocation.close()"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div class="add-map-container">
     <div id="add-map"></div>
@@ -943,8 +1004,8 @@
         placeholder="z.B. 52.40747, 13.09279 oder 52°24'26"N 13°05'33"E"
         oninput="AddLocation._onObsInput()" autocomplete="off">
       <div class="coord-actions">
-        <button class="gps-btn" onclick="AddLocation.useMyLocation()">📍 GPS</button>
-        <button class="paste-btn" onclick="AddLocation._pasteCoords('obs')">📋 Einfügen</button>
+        <button class="gps-btn" onclick="AddLocation.useMyLocation()"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"><use href="#i-pin"/></svg>GPS</button>
+        <button class="paste-btn" onclick="AddLocation._pasteCoords('obs')"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"><use href="#i-doc"/></svg>Einfügen</button>
       </div>
       <div class="coord-error" id="obs-error"></div>
     </div>
@@ -954,7 +1015,7 @@
         placeholder="z.B. 52.51234, 13.40123 oder aus Google Maps einfügen"
         oninput="AddLocation._onSubjInput()" autocomplete="off">
       <div class="coord-actions">
-        <button class="paste-btn" onclick="AddLocation._pasteCoords('subj')">📋 Einfügen</button>
+        <button class="paste-btn" onclick="AddLocation._pasteCoords('subj')"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"><use href="#i-doc"/></svg>Einfügen</button>
       </div>
       <div class="coord-error" id="subj-error"></div>
     </div>
@@ -984,7 +1045,7 @@
     <div style="display:flex;align-items:flex-start;gap:10px">
       <button class="btn-secondary" onclick="AddLocation.reset();AddLocation.close()" style="flex-shrink:0;width:auto;padding:13px 16px">Abbrechen</button>
       <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-        <button class="btn-primary" onclick="AddLocation.preview()">Alignments berechnen ✦</button>
+        <button class="btn-primary" onclick="AddLocation.preview()">Alignments berechnen <svg style="width:15px;height:15px;vertical-align:-2px;margin-left:3px"><use href="#i-star"/></svg></button>
         <button class="btn-secondary" id="save-location-btn" style="display:none" onclick="AddLocation.save()">Location dauerhaft speichern</button>
       </div>
     </div>
@@ -997,7 +1058,7 @@
 <div id="loc-detail-sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
-    <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen">✕</button>
+    <button class="close-btn" onclick="LocationDetail.close()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div id="loc-detail-content"></div>
 </div>
@@ -1006,8 +1067,8 @@
 <div id="astro-overlay" onclick="AstroLive.close()"></div>
 <div id="astro-sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
-    <div style="font-size:16px;font-weight:800">🌌 Live-Astro</div>
-    <button class="close-btn" onclick="AstroLive.close()" aria-label="Schließen">✕</button>
+    <div style="font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-milkyway"/></svg>Live-Astro</div>
+    <button class="close-btn" onclick="AstroLive.close()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div id="astro-content"></div>
 </div>
@@ -1016,8 +1077,8 @@
 <div id="filter-overlay" onclick="FilterSheet.close()"></div>
 <div id="filter-sheet">
   <div class="filter-header">
-    <h2>🎛 Filter</h2>
-    <button class="close-btn" onclick="FilterSheet.close()">✕</button>
+    <h2 style="display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-sliders"/></svg>Filter</h2>
+    <button class="close-btn" onclick="FilterSheet.close()"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div id="filter-result-count" style="font-size:12px;padding:4px 16px 0;min-height:18px"></div>
   <div id="filter-content"></div>
@@ -1032,7 +1093,7 @@
 <div id="impressum-sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;flex-shrink:0">
     <div class="sheet-handle" style="margin:0"></div>
-    <button class="close-btn" onclick="Impressum.close()" aria-label="Schließen">✕</button>
+    <button class="close-btn" onclick="Impressum.close()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
   </div>
   <div id="impressum-content"></div>
 </div>
@@ -1051,7 +1112,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.15.0';
+const APP_VERSION = '1.16.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1196,13 +1257,17 @@ const LoginScreen = {
 // ═══════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════
+// US-100: Event-Typ → Sprite-Symbol-ID (Bauhaus-Linien-Set). Unbekannter Typ → ICON_FALLBACK.
 const ICONS = {
-  'Goldene Stunde Abend':  '🌅', 'Goldene Stunde Morgen': '🌄',
-  'Blaue Stunde':          '🌙', 'Mondaufgang':           '🌕',
-  'Mond-Alignment':        '🌙', 'Sonnen-Alignment':      '☀️',
-  'Milchstraße':           '✨', 'Meteoritenschauer':     '💫',
-  'Sonnenfinsternis':      '🌑',
+  'Goldene Stunde Abend':  'i-sunset',   'Goldene Stunde Morgen': 'i-sunrise',
+  'Blaue Stunde':          'i-moon',     'Mondaufgang':           'i-moon',
+  'Mond-Alignment':        'i-moon',     'Sonnen-Alignment':      'i-sun',
+  'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
+  'Sonnenfinsternis':      'i-eclipse',
 };
+const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, kein leeres Kästchen)
+// Liefert fertiges <svg>-Icon-Markup für einen Event-Typ.
+function eventIcon(type, size, cls){ return ic(ICONS[type] || ICON_FALLBACK, size, cls); }
 
 function scoreColor(s) {
   return s >= .8 ? '#4caf70' : s >= .6 ? '#f0a030' : '#f08030';
@@ -1277,18 +1342,18 @@ function scoreRing(score, priority=0) {
 // OPPORTUNITY CARD
 // ═══════════════════════════════════════════════════════
 function oppCard(o) {
-  const icon = ICONS[o.event_type] || '📷';
+  const icon = eventIcon(o.event_type, 15, 'ct');
   const weatherTag = o.weather_score === 0
     ? `<span class="tag tag-weather-unknown">Wetter unbekannt</span>`
-    : `<span class="tag tag-blue">☁ ${pct(o.weather_score)}</span>`;
+    : `<span class="tag tag-blue">${ic('i-cloud',12)} ${pct(o.weather_score)}</span>`;
   const prio = o.alert_priority >= 2
-    ? `<span class="tag tag-gold">⭐ ${o.alert_priority >= 3 ? 'Außergewöhnlich' : 'Besonders'}</span>` : '';
+    ? `<span class="tag tag-gold">${ic('i-star',12)} ${o.alert_priority >= 3 ? 'Außergewöhnlich' : 'Besonders'}</span>` : '';
   const stativ = o.camera_hints?.[0]?.tripod_required
     ? `<span class="tag tag-warn">Stativ</span>` : '';
   const fl = o.camera_hints?.[0]?.focal_length_mm
     ? `<span class="tag tag-blue">${o.camera_hints[0].focal_length_mm}mm</span>` : '';
   const verified = Verify.getLast(o.location_id)
-    ? `<span class="tag tag-verified">✓ Geprüft</span>` : '';
+    ? `<span class="tag tag-verified">${ic('i-check',12)} Geprüft</span>` : '';
   const rated = Rating.feedTagHtml(o.location_id);
 
   return `<div class="card" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
@@ -1301,7 +1366,7 @@ function oppCard(o) {
           <span class="opp-time">${formatTime(o.shoot_time)}</span>
         </div>
         <div class="opp-title">${o.title}</div>
-        <div class="opp-location">📍 ${Locations.nameFor(o.location_id, o.location_name)}</div>
+        <div class="opp-location">${ic('i-pin',13)} ${Locations.nameFor(o.location_id, o.location_name)}</div>
         <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${rated}</div>
       </div>
     </div>
@@ -1395,7 +1460,7 @@ const Feed = {
       if (!Search.query && Filter.activeCount() === 0 && n > 0) {
         const routineData = this.data.filter(o => Filter._ROUTINE_TYPES.includes(o.event_type));
         if (routineData.length > 0) {
-          let html = `<div class="section-head" style="color:var(--muted);font-size:11px;letter-spacing:.04em;padding-top:10px">📅 TÄGLICHE CHANCEN · Kein besonderes Alignment in den nächsten 14 Tagen</div>`;
+          let html = `<div class="section-head" style="color:var(--muted);font-size:11px;letter-spacing:.04em;padding-top:10px;display:flex;align-items:center;gap:5px">${ic('i-cal',13)}TÄGLICHE CHANCEN · Kein besonderes Alignment in den nächsten 14 Tagen</div>`;
           const rGroups = {};
           for (const o of routineData) {
             const day = formatDate(o.shoot_time);
@@ -1431,12 +1496,12 @@ const Feed = {
     if (high.length) {
       const chips = high.slice(0,6).map(o =>
         `<div class="alert-chip" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
-          <div class="chip-icon">${ICONS[o.event_type]||'📷'}</div>
+          <div class="chip-icon">${eventIcon(o.event_type, 20)}</div>
           <div class="chip-day">${formatDate(o.shoot_time)}</div>
           <div class="chip-name">${Locations.nameFor(o.location_id, o.location_name)}</div>
         </div>`).join('');
       html += `<div id="alert-banner">
-        <h3>⭐ Besondere Ereignisse (${high.length})</h3>
+        <h3 style="display:flex;align-items:center;gap:6px">${ic('i-star',16)} Besondere Ereignisse (${high.length})</h3>
         <div class="alert-chips">${chips}</div>
       </div>`;
     }
@@ -1497,7 +1562,7 @@ const Scout = {
       this.data = [];
       if (Feed.mode === 'scout') {
         document.getElementById('scout-content').innerHTML =
-          `<div class="scout-empty"><div class="scout-moon-icon">🌙</div>Scout-Daten konnten nicht geladen werden.</div>`;
+          `<div class="scout-empty"><div class="scout-moon-icon">${ic('i-moon',40)}</div>Scout-Daten konnten nicht geladen werden.</div>`;
       }
     }
   },
@@ -1506,7 +1571,7 @@ const Scout = {
     const el = document.getElementById('scout-content');
     if (!this.data || this.data.length === 0) {
       el.innerHTML = `<div class="scout-empty">
-        <div class="scout-moon-icon">🌙</div>
+        <div class="scout-moon-icon">${ic('i-moon',40)}</div>
         <p>Keine Scout-Chancen in den nächsten 14 Tagen gefunden.</p>
         <p style="font-size:13px;margin-top:8px">Der Mond ist gerade nicht günstig für die ausgewählten Motive.</p>
       </div>`;
@@ -1519,7 +1584,7 @@ const Scout = {
 
     if (nf === 0) {
       el.innerHTML = `<div class="scout-empty">
-        <div class="scout-moon-icon">🌙</div>
+        <div class="scout-moon-icon">${ic('i-moon',40)}</div>
         <p>Keine Scout-Chancen entsprechen den Filterkriterien.</p>
         <p style="font-size:13px;margin-top:8px;color:var(--gold)">${n} Chancen vorhanden — Filter anpassen?</p>
       </div>`;
@@ -1539,10 +1604,10 @@ const Scout = {
     }
 
     const sessionLabel = {
-      blue_morning:   '🌑 Blaue Stunde Morgen',
-      golden_morning: '🌅 Goldene Stunde Morgen',
-      golden_evening: '🌇 Goldene Stunde Abend',
-      blue_evening:   '🌆 Blaue Stunde Abend',
+      blue_morning:   'Blaue Stunde Morgen',
+      golden_morning: 'Goldene Stunde Morgen',
+      golden_evening: 'Goldene Stunde Abend',
+      blue_evening:   'Blaue Stunde Abend',
     };
 
     let html = countBar;
@@ -1554,7 +1619,7 @@ const Scout = {
         const time = o.dt_utc ? new Date(o.dt_utc).toLocaleTimeString('de-DE',
           { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : '–';
         const scorePct   = Math.round(o.score * 100);
-        const bodyIcon   = o.body_name === 'sun' ? '☀️' : '🌙';
+        const bodyIcon   = ic(o.body_name === 'sun' ? 'i-sun' : 'i-moon', 13);
         const illumChip  = o.body_illumination_pct != null
           ? `<span class="scout-chip">${bodyIcon} <strong>${Math.round(o.body_illumination_pct)}%</strong> beleuchtet</span>`
           : '';
@@ -1563,22 +1628,22 @@ const Scout = {
         html += `<div class="scout-card">
           <div class="scout-card-header">
             <div>
-              <div class="scout-subject">${bodyIcon} ${o.subject_name}</div>
+              <div class="scout-subject" style="display:flex;align-items:center;gap:6px">${bodyIcon} ${o.subject_name}</div>
               <div class="scout-kategorie">${o.kategorie || ''} · ${sessionLabel[o.session] || o.session}</div>
             </div>
             <div class="scout-score-badge">${scorePct}%</div>
           </div>
           <div class="scout-meta">
-            <span class="scout-chip">🕐 <strong>${time} Uhr</strong></span>
+            <span class="scout-chip">${ic('i-clock',12)} <strong>${time} Uhr</strong></span>
             ${illumChip}
-            <span class="scout-chip">📐 Höhe <strong>${o.body_altitude_deg}°</strong></span>
-            <span class="scout-chip">📏 <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
-            <span class="scout-chip">📷 ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
-            <span class="scout-chip">☁️ <strong>${o.weather_description}</strong></span>
+            <span class="scout-chip">${ic('i-ruler',12)} Höhe <strong>${o.body_altitude_deg}°</strong></span>
+            <span class="scout-chip">${ic('i-nav',12)} <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
+            <span class="scout-chip">${ic('i-camera',12)} ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
+            <span class="scout-chip">${ic('i-cloud',12)} <strong>${o.weather_description}</strong></span>
           </div>
           <div class="scout-actions">
-            <button class="scout-btn" onclick="window.open('${mapsUrl}','_blank')">📍 Standort</button>
-            <button class="scout-btn" onclick="window.open('${navUrl}','_blank')">🧭 Navigation</button>
+            <button class="scout-btn" onclick="window.open('${mapsUrl}','_blank')">${ic('i-pin',14)} Standort</button>
+            <button class="scout-btn" onclick="window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
           </div>
         </div>`;
       }
@@ -1729,12 +1794,12 @@ const CalendarView = {
         html += `<div class="cal-day-head">${dayLabel} · ${evts.length} Chancen</div>`;
 
         for (const e of evts) {
-          const icon = ICONS[e.event_type] || '📷';
+          const icon = eventIcon(e.event_type, 20);
           const t = new Date(e.shoot_time);
           // +2h CEST Annäherung
           const hh = String(t.getUTCHours() + 2).padStart(2,'0');
           const mm = String(t.getUTCMinutes()).padStart(2,'0');
-          const prio = e.alert_priority >= 2 ? ' ⭐' : '';
+          const prio = e.alert_priority >= 2 ? ` ${ic('i-star',12)}` : '';
           const moonTxt = e.moon_phase ? ` · ${e.moon_phase}` : '';
           html += `<div class="cal-event" onclick="Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')})">
             <div class="cal-event-icon">${icon}</div>
@@ -1837,10 +1902,10 @@ const Verify = {
     if (v.status === 'issue') {
       const type = v.issue_type ? ` · ${v.issue_type}` : '';
       const cmt  = v.comment ? ` – „${v.comment}"` : '';
-      return `<div class='verified-badge-issue'>⚠ Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt}</div>`;
+      return `<div class='verified-badge-issue' style='display:flex;align-items:center;gap:5px'>${ic('i-warn',14)} Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt}</div>`;
     }
     const cmt = v.comment ? ` · „${v.comment}"` : '';
-    return `<div class='verified-badge'>✓ Vor Ort geprüft am ${this.formatDate(v.date)}${cmt}</div>`;
+    return `<div class='verified-badge' style='display:flex;align-items:center;gap:5px'>${ic('i-check',14)} Vor Ort geprüft am ${this.formatDate(v.date)}${cmt}</div>`;
   },
 
   // Kompakter Card-Tag: zeigt letzten Status + Gesamtzähler
@@ -1851,8 +1916,8 @@ const Verify = {
     const nIssue = list.filter(v => v.status === 'issue').length;
     const last   = list[list.length - 1];
     if (last.status === 'issue')
-      return `<span class='tag tag-issue'>⚠${nIssue > 1 ? ' ×'+nIssue : ''}${nOk ? ' · ✓×'+nOk : ''}</span>`;
-    return `<span class='tag tag-verified'>✓${nOk > 1 ? ' ×'+nOk : ''}${nIssue ? ' · ⚠×'+nIssue : ''}</span>`;
+      return `<span class='tag tag-issue'>${ic('i-warn',11)}${nIssue > 1 ? ' ×'+nIssue : ''}${nOk ? ' · '+ic('i-check',11)+'×'+nOk : ''}</span>`;
+    return `<span class='tag tag-verified'>${ic('i-check',11)}${nOk > 1 ? ' ×'+nOk : ''}${nIssue ? ' · '+ic('i-warn',11)+'×'+nIssue : ''}</span>`;
   },
 
   // Timeline-HTML für Location-Detail
@@ -1864,19 +1929,19 @@ const Verify = {
     const nIssue = list.filter(v => v.status === 'issue').length;
 
     const summary = `<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;font-weight:600">
-      ${nOk    ? `<span style="color:#4caf50">✓ ${nOk} Positiv</span>` : ''}
-      ${nIssue ? `<span style="color:var(--red)">⚠ ${nIssue} Problem${nIssue>1?'e':''}</span>` : ''}
+      ${nOk    ? `<span style="color:#4caf50;display:inline-flex;align-items:center;gap:4px">${ic('i-check',13)} ${nOk} Positiv</span>` : ''}
+      ${nIssue ? `<span style="color:var(--red);display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} ${nIssue} Problem${nIssue>1?'e':''}</span>` : ''}
     </div>`;
 
     // Neueste zuerst
     const rows = [...list].reverse().map(v => {
       const isIssue = v.status === 'issue';
-      const icon  = isIssue ? '⚠' : '✓';
+      const icon  = ic(isIssue ? 'i-warn' : 'i-check', 14);
       const color = isIssue ? 'var(--red)' : '#4caf50';
       const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${v.issue_type}</span>` : '';
       const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${v.comment}"</span>` : '';
       return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--hairline)">
-        <span style="color:${color};font-size:14px;flex-shrink:0;width:16px">${icon}</span>
+        <span style="color:${color};flex-shrink:0;width:16px">${icon}</span>
         <span style="font-size:12px;color:var(--muted);flex-shrink:0;width:72px">${this.formatDate(v.date)}</span>
         <div style="flex:1;display:flex;flex-direction:column;gap:2px">${type}${cmt}</div>
       </div>`;
@@ -1898,7 +1963,7 @@ const Verify = {
       <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis (z.B. Zugang, Besonderheiten):</div>
       <textarea id='verify-comment-${formId}' placeholder='z.B. Zugang ab Oktober gesperrt…'></textarea>
       <div class='verify-form-actions'>
-        <button class='btn-verify' onclick='Verify.confirm("${locationId}","${locationName.replace(/'/g,"\\'")}","${formId}")'>✓ Bestätigen</button>
+        <button class='btn-verify' onclick='Verify.confirm("${locationId}","${locationName.replace(/'/g,"\\'")}","${formId}")'>${ic('i-check',14)} Bestätigen</button>
         <button class='btn-verify-cancel' onclick='document.getElementById("${formId}").remove()'>Abbrechen</button>
       </div>`;
     btn.insertAdjacentElement('afterend', form);
@@ -1926,8 +1991,8 @@ const Verify = {
       <div id="${sid}">
         ${this._timelineHtml(locationId)}
         <div style='display:flex;gap:8px;margin-top:10px'>
-          <button class='btn-verify' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocOkForm("${locationId}","${safeName}")'>✓ Vor Ort geprüft</button>
-          <button class='btn-issue' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocIssueForm("${locationId}","${safeName}")'>⚠ Problem melden</button>
+          <button class='btn-verify' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocOkForm("${locationId}","${safeName}")'>${ic('i-check',14)} Vor Ort geprüft</button>
+          <button class='btn-issue' style='flex:1;font-size:13px;padding:10px' onclick='Verify.showLocIssueForm("${locationId}","${safeName}")'>${ic('i-warn',14)} Problem melden</button>
         </div>
         ${resetBtn ? `<div style='margin-top:6px'>${resetBtn}</div>` : ''}
         <div id="${fid}"></div>
@@ -1941,7 +2006,7 @@ const Verify = {
         <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis:</div>
         <textarea id='${fid}-txt' placeholder='z.B. Zugang über Nordeingang…'></textarea>
         <div class='verify-form-actions'>
-          <button class='btn-verify' onclick='Verify.saveLocOk("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>✓ Bestätigen</button>
+          <button class='btn-verify' onclick='Verify.saveLocOk("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>${ic('i-check',14)} Bestätigen</button>
           <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
         </div>
       </div>`;
@@ -1958,7 +2023,7 @@ const Verify = {
         <div class='issue-chips'>${chips}</div>
         <textarea id='${fid}-txt' placeholder='Weitere Details (optional)…' style='background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;resize:vertical;min-height:56px;font-family:inherit'></textarea>
         <div class='verify-form-actions'>
-          <button class='btn-issue' onclick='Verify.saveLocIssue("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>⚠ Problem speichern</button>
+          <button class='btn-issue' onclick='Verify.saveLocIssue("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>${ic('i-warn',14)} Problem speichern</button>
           <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
         </div>
       </div>`;
@@ -2083,7 +2148,7 @@ const Rating = {
     const stars = [1,2,3,4,5].map(i =>
       `<span class="star-btn ${i <= current ? 'filled' : ''}"
         onclick="Rating._set('${locationId}', ${i})"
-        title="${labels[i]}">★</span>`
+        title="${labels[i]}">${ic(i <= current ? 'i-starfill' : 'i-star', 26)}</span>`
     ).join('');
     const label = current
       ? `<span style="font-size:13px;color:var(--gold);font-weight:600">${labels[current]}</span>`
@@ -2109,7 +2174,7 @@ const Rating = {
     const s = this.summary(locationId);
     if (!s.count) return '';
     return `<span class="tag tag-gold" style="display:inline-flex;align-items:center;gap:3px;padding:2px 5px">
-      <span>★ ${s.avg.toFixed(1)}</span>
+      <span style="display:inline-flex;align-items:center;gap:3px">${ic('i-starfill',12)} ${s.avg.toFixed(1)}</span>
       <span style="opacity:.7;font-size:10px">(${s.count})</span>
     </span>`;
   },
@@ -2118,7 +2183,7 @@ const Rating = {
   feedTagHtml(locationId) {
     const s = this.summary(locationId);
     if (!s.count) return '';
-    return `<span class="tag tag-gold">⭐ ${s.avg.toFixed(1)} (${s.count})</span>`;
+    return `<span class="tag tag-gold">${ic('i-starfill',12)} ${s.avg.toFixed(1)} (${s.count})</span>`;
   },
 
   async _set(locationId, value) {
@@ -2642,37 +2707,42 @@ const FilterSheet = {
     const state3 = (incl, excl, v) =>
       incl.includes(v) ? 'incl' : excl.includes(v) ? 'excl' : 'off';
 
+    // US-100: kleiner farbiger Status-Punkt für Schwierigkeit (statt 🟢🟡🔴)
+    const dot = col => `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${col};vertical-align:middle;margin-right:5px"></span>`;
+    // US-100: kompakte Sterne-Reihe (gefüllt + leer) für Rating-Filter (statt ★☆-Glyphen)
+    const starRow = n => [1,2,3,4,5].map(i => ic(i<=n?'i-starfill':'i-star',12)).join('');
+
     const etChips = this._ET.map(([v, l]) =>
-      chip3(`${ICONS[v] || '📷'} ${l}`, state3(s.eventTypes, s.eventTypesExcl, v),
+      chip3(`${eventIcon(v,13)} ${l}`, state3(s.eventTypes, s.eventTypesExcl, v),
         `FilterSheet._cycle('eventTypes','eventTypesExcl','${v.replace(/'/g, "\\'")}')`)).join('');
 
-    const diffChips = [[1,'🟢 Einfach'],[2,'🟡 Mittel'],[3,'🔴 Anspruchsvoll']]
+    const diffChips = [[1,`${dot('#3fb950')}Einfach`],[2,`${dot('#d29922')}Mittel`],[3,`${dot('#f85149')}Anspruchsvoll`]]
       .map(([v,l]) => chip3(l, state3(s.difficulty, s.difficultyExcl, v), `FilterSheet._cycle('difficulty','difficultyExcl',${v})`)).join('');
 
     const catChips = [  // US-76
-      ['Schloss & Historisch','🏰 Schloss & Historisch'],
-      ['Skyline & Architektur','🏙 Skyline & Architektur'],
-      ['Natur & Landschaft','🌿 Natur & Landschaft'],
-      ['Wasser & Spiegelung','💧 Wasser & Spiegelung'],
-      ['Aussichtspunkt','🔭 Aussichtspunkt'],
-      ['Industrie & Urban','🏗 Industrie & Urban'],
-      ['Milchstraße & Astro','🌌 Milchstraße & Astro'],
+      ['Schloss & Historisch',`${ic('i-castle',13)} Schloss & Historisch`],
+      ['Skyline & Architektur',`${ic('i-skyline',13)} Skyline & Architektur`],
+      ['Natur & Landschaft',`${ic('i-nature',13)} Natur & Landschaft`],
+      ['Wasser & Spiegelung',`${ic('i-water',13)} Wasser & Spiegelung`],
+      ['Aussichtspunkt',`${ic('i-viewpoint',13)} Aussichtspunkt`],
+      ['Industrie & Urban',`${ic('i-industry',13)} Industrie & Urban`],
+      ['Milchstraße & Astro',`${ic('i-milkyway',13)} Milchstraße & Astro`],
     ].map(([v,l]) => chip3(l, state3(s.category, s.categoryExcl, v),
       `FilterSheet._cycle('category','categoryExcl','${v.replace(/'/g,"\\'")}')`)).join('');
 
-    const ratingChips = [[0,'Alle'],[1,'≥ ★☆☆☆☆'],[2,'≥ ★★☆☆☆'],[3,'≥ ★★★☆☆'],[4,'≥ ★★★★☆'],[5,'★★★★★']]
+    const ratingChips = [[0,'Alle'],[1,`≥ ${starRow(1)}`],[2,`≥ ${starRow(2)}`],[3,`≥ ${starRow(3)}`],[4,`≥ ${starRow(4)}`],[5,starRow(5)]]
       .map(([v,l]) => chip(l, s.minRating===v, `FilterSheet._set('minRating',${v})`)).join('');
 
     const distChips = [[0,'Alle'],[5,'< 5 km'],[15,'< 15 km'],[30,'< 30 km'],[50,'< 50 km']]
       .map(([v,l]) => chip(l, s.maxDistKm===v, `FilterSheet._set('maxDistKm',${v})`)).join('');
 
-    const verChips = [['all','Alle'],['verified','✓ Geprüfte'],['unverified','Nicht geprüft'],['issues','⚠ Probleme']]
+    const verChips = [['all','Alle'],['verified',`${ic('i-check',13)} Geprüfte`],['unverified','Nicht geprüft'],['issues',`${ic('i-warn',13)} Probleme`]]
       .map(([v,l]) => chip(l, s.verification===v, `FilterSheet._set('verification','${v}')`)).join('');
 
     const gpsNote = s.maxDistKm > 0
-      ? '<p style="font-size:11px;color:var(--muted);margin-top:8px">📍 GPS wird beim Anwenden abgefragt</p>' : '';
+      ? `<p style="font-size:11px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px">${ic('i-pin',13)} GPS wird beim Anwenden abgefragt</p>` : '';
 
-    const tzChips = [['morgen','🌄 Morgens'],['tag','☀️ Tagsüber'],['abend','🌇 Abends'],['nacht','🌙 Nacht']]
+    const tzChips = [['morgen',`${ic('i-sunrise',13)} Morgens`],['tag',`${ic('i-sun',13)} Tagsüber`],['abend',`${ic('i-sunset',13)} Abends`],['nacht',`${ic('i-moon',13)} Nacht`]]
       .map(([v,l]) => chip3(l, state3(s.tageszeit, s.tageszeitExcl, v), `FilterSheet._cycle('tageszeit','tageszeitExcl','${v}')`)).join('');
 
     const scoreLabel = s.minScore === 0 ? 'Alle' : `≥ ${s.minScore} %`;
@@ -2691,7 +2761,7 @@ const FilterSheet = {
     const isMapView = App.current === 'map';
     const scoreSection = isMapView
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4>🎯 Mindest-Wahrscheinlichkeit</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit</h4>
           <div class="filter-slider-val">Nur in Listen-Ansicht verfügbar</div>
           <div class="filter-slider-wrap">
             <input type="range" class="filter-slider" disabled
@@ -2699,7 +2769,7 @@ const FilterSheet = {
             <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
           </div>
         </div>`
-      : `<div class="filter-section"><h4>🎯 Mindest-Wahrscheinlichkeit</h4>
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit</h4>
           <div class="filter-slider-val" id="filter-score-val">${scoreLabel}</div>
           <div class="filter-slider-wrap">
             <input type="range" class="filter-slider" id="score-slider"
@@ -2711,11 +2781,11 @@ const FilterSheet = {
         </div>`;
 
     document.getElementById('filter-content').innerHTML =
-      `<div class="filter-section"><h4>📷 Eventtyp</h4><div class="filter-chips">${etChips}</div>
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4><div class="filter-chips">${etChips}</div>
         <p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Gilt auch für Tageszeit & Schwierigkeit.</p></div>` +
-      `<div class="filter-section"><h4>🕐 Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
       scoreSection +
-      `<div class="filter-section"><h4>🔭 Brennweite</h4>
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
         <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
         <div class="dual-range-wrap">
           <div class="dual-range-track" id="focal-track">
@@ -2727,11 +2797,11 @@ const FilterSheet = {
         </div>
         <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
       </div>` +
-      `<div class="filter-section"><h4>🎯 Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
-      `<div class="filter-section"><h4>🗂 Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
-      `<div class="filter-section"><h4>⭐ Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
-      `<div class="filter-section"><h4>📍 Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
-      `<div class="filter-section"><h4>✅ Verifikationsstatus</h4><div class="filter-chips">${verChips}</div></div>`;
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus</h4><div class="filter-chips">${verChips}</div></div>`;
   },
 };
 
@@ -2960,42 +3030,43 @@ const CameraFOV = {
 const Detail = {
   open(o) {
     if (typeof o === 'string') o = JSON.parse(o);
-    const icon = ICONS[o.event_type] || '📷';
+    const icon = eventIcon(o.event_type, 18);
     const col = scoreColor(o.overall_score);
 
     const hints = (o.camera_hints||[]).map(h => `
       <div class="camera-card">
         <div class="cam-main">${h.focal_length_mm}mm · ${h.aperture_suggestion} · ${h.shutter_suggestion} · ${h.iso_suggestion}</div>
-        ${h.tripod_required ? '<div class="cam-warning">⚠ Stativ erforderlich</div>' : ''}
+        ${h.tripod_required ? `<div class="cam-warning" style="display:flex;align-items:center;gap:5px">${ic('i-warn',13)} Stativ erforderlich</div>` : ''}
         ${h.extra_tip ? `<div class="cam-tip">${h.extra_tip}</div>` : ''}
       </div>`).join('');
 
     const astro = `
-      ${o.moon_phase ? `<div class="info-row"><span class="ir-label">Mondphase</span><span class="ir-val">🌙 ${o.moon_phase}${o.moon_illumination_pct ? ` (${Math.round(o.moon_illumination_pct)}%)` : ''}</span></div>` : ''}
+      ${o.moon_phase ? `<div class="info-row"><span class="ir-label">Mondphase</span><span class="ir-val">${ic('i-moon',13)} ${o.moon_phase}${o.moon_illumination_pct ? ` (${Math.round(o.moon_illumination_pct)}%)` : ''}</span></div>` : ''}
       ${o.celestial_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Himmelsobjekt</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>` : ''}
       ${o.celestial_altitude != null ? `<div class="info-row"><span class="ir-label">Höhe Himmelsobjekt</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>` : ''}
       ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
-      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">🌅 ${formatTime(o.sunrise_utc)}</span></div>` : ''}
-      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">🌇 ${formatTime(o.sunset_utc)}</span></div>` : ''}
-      ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">🌄 ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
-      ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">🌇 ${formatTime(o.golden_hour_evening_start)} – ${formatTime(o.blue_hour_evening_end)}</span></div>` : ''}
+      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.sunrise_utc)}</span></div>` : ''}
+      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.sunset_utc)}</span></div>` : ''}
+      ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
+      ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.golden_hour_evening_start)} – ${formatTime(o.blue_hour_evening_end)}</span></div>` : ''}
     `;
 
+    const _wdot = col => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:5px;vertical-align:middle"></span>`;
     const wLabel = o.weather_score === 0
-      ? '⏳ Wird 3 Tage vorher berechnet'
-      : o.weather_score >= 0.8 ? `✅ Ideal (${pct(o.weather_score)})`
-      : o.weather_score >= 0.6 ? `🟡 Gut (${pct(o.weather_score)})`
-      : o.weather_score >= 0.4 ? `🟠 Mäßig (${pct(o.weather_score)})`
-      : `🔴 Schwierig (${pct(o.weather_score)})`;
+      ? `${ic('i-clock',13)} Wird 3 Tage vorher berechnet`
+      : o.weather_score >= 0.8 ? `${_wdot('var(--green)')}Ideal (${pct(o.weather_score)})`
+      : o.weather_score >= 0.6 ? `${_wdot('#d29922')}Gut (${pct(o.weather_score)})`
+      : o.weather_score >= 0.4 ? `${_wdot('var(--orange)')}Mäßig (${pct(o.weather_score)})`
+      : `${_wdot('var(--red)')}Schwierig (${pct(o.weather_score)})`;
     const wColor = o.weather_score === 0 ? 'var(--muted)'
       : o.weather_score >= 0.6 ? 'var(--green)' : o.weather_score >= 0.4 ? 'var(--orange)' : 'var(--red)';
     const weatherNote = `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div>`;
 
     document.getElementById('detail-content').innerHTML = `
       <div class="sheet-hero">
-        <div class="sheet-hero-type">${icon} ${o.event_type}</div>
+        <div class="sheet-hero-type" style="display:flex;align-items:center;gap:6px">${icon} ${o.event_type}</div>
         <div class="sheet-hero-title">${o.title}</div>
-        <div class="sheet-hero-loc">📍 <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>
+        <div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>
         <div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>
       </div>
       <div class="sheet-score-bar">
@@ -3005,15 +3076,15 @@ const Detail = {
       </div>
       <div id="score-info-overlay" onclick="if(event.target===this)ScoreInfo.close()">
         <div id="score-info-box">
-          <button id="score-info-close" onclick="ScoreInfo.close()">×</button>
+          <button id="score-info-close" onclick="ScoreInfo.close()"><svg style="width:16px;height:16px"><use href="#i-x"/></svg></button>
           <div id="score-info-body"></div>
         </div>
       </div>
-      ${mkSec('ev_desc','📝 Beschreibung',`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
-      ${mkSec('ev_zeit','⏱ Zeitfenster (Ortszeit Berlin)',`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
+      ${mkSec('ev_zeit',`${ic('i-clock',15)} Zeitfenster (Ortszeit Berlin)`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
       ${(() => {
         const wd = o.weather_details;
-        if (!wd) return mkSec('ev_wetter','🌤 Wetter',`<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">⏳ Verfügbar ab T-3 Tage</span></div>`);
+        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
         const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
         const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
         const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
@@ -3023,13 +3094,13 @@ const Detail = {
           : wd.cloud_cover_pct < 80 ? 'Bewölkt' : 'Bedeckt';
         const cloudColor = wd.cloud_cover_pct < 50 ? 'var(--green)' : wd.cloud_cover_pct < 80 ? 'var(--orange)' : 'var(--red)';
         const rainColor = wd.precipitation_prob_pct < 20 ? 'var(--green)' : wd.precipitation_prob_pct < 50 ? 'var(--orange)' : 'var(--red)';
-        const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label">⚠️ Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
+        const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label" style="display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
         const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
         const wScore = wLabel;
-        return mkSec('ev_wetter','🌤 Wetter zum Shoot-Zeitpunkt',`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
+        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
       })()}
-      ${hints ? mkSec('ev_kamera','📷 Kamera-Empfehlungen',hints) : ''}
-      ${mkSec('ev_astro','🔭 Astronomie',astro)}
+      ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
+      ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}
       ${(() => {
         const hasSub = o.subject_lat && o.subject_lon;
         const distKm = hasSub ? haversineKm(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null;
@@ -3041,7 +3112,7 @@ const Detail = {
         const distRow = distKm != null
           ? `<div class="info-row">
                <span class="ir-label">Entfernung zum Motiv</span>
-               <span class="ir-val">📏 ${distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(2) + ' km'}</span>
+               <span class="ir-val">${ic('i-ruler',13)} ${distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(2) + ' km'}</span>
              </div>` : '';
         const elevRow = elev !== null && Math.abs(elev) > 2
           ? `<div class="info-row">
@@ -3051,7 +3122,7 @@ const Detail = {
                  <span style="color:var(--muted);font-size:11px">${elev > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span>
                </span>
              </div>` : '';
-        return mkSec('ev_topo','📏 Standort &amp; Topographie',`${distRow}${elevRow}`);
+        return mkSec('ev_topo',`${ic('i-ruler',15)} Standort &amp; Topographie`,`${distRow}${elevRow}`);
       })()}
       ${(() => {
         // US-67 · Himmelsposition: Klartext-Zusammenfassung relativ zur Motivspitze.
@@ -3097,16 +3168,16 @@ const Detail = {
           const latPart = (lOff != null && isFinite(lOff)) ? `≈ ${fmtM(lOff)} seitlich` : '';
           const verPart = (vOff != null && isFinite(vOff)) ? `≈ ${fmtM(vOff)} vertikal` : '';
           const parts = [latPart, verPart].filter(Boolean).join(', ');
-          sentence = `🎯 ${bodyHtml} steht nahezu exakt auf der Motivspitze${parts ? ` (${parts})` : ''}.`;
+          sentence = `${ic('i-target',15)} ${bodyHtml} steht nahezu exakt auf der Motivspitze${parts ? ` (${parts})` : ''}.`;
         } else if (altDelta == null) {
           // Kein subject_height_m → Fallback: Horizonthöhe statt Motivspitzen-Versatz (BUG-43)
           const azPhrase = axisPhrase(azDelta, lOff, 'links', 'rechts', 1);
           const horizStr = o.celestial_altitude != null ? ` · ${o.celestial_altitude.toFixed(1)}° über dem Horizont` : '';
-          sentence = `🧭 ${bodyHtml} ${azPhrase} neben dem Motiv${horizStr}.`;
+          sentence = `${ic('i-compass',15)} ${bodyHtml} ${azPhrase} neben dem Motiv${horizStr}.`;
         } else {
           const azPhrase = axisPhrase(azDelta, lOff, 'links', 'rechts', 1);
           const altPhrase = axisPhrase(altDelta, vOff, 'darunter', 'darüber', 2);
-          sentence = `🧭 ${bodyHtml} ${azPhrase} neben dem Motiv, ${altPhrase}.`;
+          sentence = `${ic('i-compass',15)} ${bodyHtml} ${azPhrase} neben dem Motiv, ${altPhrase}.`;
         }
         // Sekundärinfo für erfahrene Nutzer (gedämpft).
         const secRows = [];
@@ -3116,7 +3187,7 @@ const Detail = {
         const secHtml = secRows.length
           ? `<div style="margin-top:10px">${secRows.join('')}</div>`
           : '';
-        return mkSec('ev_skypos','🧭 Himmelsposition',`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
+        return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
       })()}
       ${(() => {
         const ca = o.composition_analysis;
@@ -3171,7 +3242,7 @@ const Detail = {
         const footNote = hasHeight
           ? `<p style="font-size:10px;color:var(--muted);margin-top:4px">Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`
           : `<p style="font-size:10px;color:var(--muted);margin-top:4px">Keine Motivhöhe eingetragen – Höhenversatz nicht berechenbar${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`;
-                return mkSec('ev_kompo','🎯 Kompositions-Analyse',`<div style="${labelBg};margin-bottom:10px">
+                return mkSec('ev_kompo',`${ic('i-target',15)} Kompositions-Analyse`,`<div style="${labelBg};margin-bottom:10px">
             <div style="font-size:14px;font-weight:600">${ca.altitude_label || ca.azimuth_label}</div>
             <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
           </div>
@@ -3188,40 +3259,40 @@ const Detail = {
       ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
           distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
-        return mkSec('ev_fov','📐 Karte & Blickwinkel', CameraFOV.panelHtml('ev'));
+        return mkSec('ev_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('ev'));
       })()}
-      ${mkSec('ev_coords','📍 Koordinaten',`
+      ${mkSec('ev_coords',`${ic('i-pin',15)} Koordinaten`,`
         <div class="coords-grid">
           <div class="coords-row">
             <div class="coords-top">
-              <div class="coords-label">📷 Standort</div>
+              <div class="coords-label" style="display:flex;align-items:center;gap:5px">${ic('i-camera',13)} Standort</div>
               <div class="coords-vals">${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}</div>
             </div>
             <div class="coords-btns">
-              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">🗺 Maps</button>
-              <button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth ?? 0})'>👁 Street View</button>
+              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.observer_lat}, ${o.observer_lon}, 'Fotograf-Standort')">${ic('i-map',13)} Maps</button>
+              <button class='coords-sv-btn' onclick='Detail.openStreetView(${o.observer_lat}, ${o.observer_lon}, ${o.subject_azimuth ?? 0})'>${ic('i-eye',13)} Street View</button>
             </div>
           </div>
           <div class="coords-row">
             <div class="coords-top">
-              <div class="coords-label">🎯 Motiv</div>
+              <div class="coords-label" style="display:flex;align-items:center;gap:5px">${ic('i-target',13)} Motiv</div>
               <div class="coords-vals">${(o.subject_lat||0).toFixed(5)}, ${(o.subject_lon||0).toFixed(5)}</div>
             </div>
             <div class="coords-btns">
-              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.subject_lat||o.observer_lat}, ${o.subject_lon||o.observer_lon}, 'Motiv')">🗺 Maps</button>
+              <button class="coords-maps-btn" onclick="Detail.openInMaps(${o.subject_lat||o.observer_lat}, ${o.subject_lon||o.observer_lon}, 'Motiv')">${ic('i-map',13)} Maps</button>
             </div>
           </div>
         </div>
       `)}
       <div class="sheet-actions">
         <button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
-          📅 Zum Kalender hinzufügen
+          ${ic('i-calplus',15)} Zum Kalender hinzufügen
         </button>
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
-          🔔 Erinnerung setzen (30 Min. vorher)
+          ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
         <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\\'")}' )" style="background:var(--card);color:#4caf50;border:1px solid rgba(76,175,80,.4)">
-          ${Verify.getLast(o.location_id) ? '✓ Erneut prüfen / Kommentar ändern' : '📍 Vor Ort geprüft markieren'}
+          ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
         </button>
       </div>
     `;
@@ -3694,7 +3765,7 @@ const AstroLive = {
           ? ' · auf Spitzenhöhe'
           : ` · ${v >= 0 ? '+' : '−'}${Math.round(Math.abs(v))} m ${v >= 0 ? 'über' : 'unter'} Motivspitze`;
       }
-      return `<div class="ar-row${al ? ' aligned' : ''}"><i style="background:${col}"></i>${name}<b>${txt}</b>${al ? '<span class="ar-ok">✓ Alignment</span>' : ''}</div>`;
+      return `<div class="ar-row${al ? ' aligned' : ''}"><i style="background:${col}"></i>${name}<b>${txt}</b>${al ? `<span class="ar-ok">${ic('i-check',12)} Alignment</span>` : ''}</div>`;
     };
     document.getElementById('astro-readout').innerHTML =
       row(sun, 'Sonne', C.sun) + row(moon, 'Mond', C.moon) + row(mw, 'Milchstr.-Zentrum', C.mw) +
@@ -3730,9 +3801,9 @@ const Locations = {
     this.render(f);
   },
   render(locs) {
-    const catIcon = { 'Schloss & Historisch':'🏰', 'Wasser & Spiegelung':'💧',
-      'Natur & Landschaft':'🌲', 'Milchstraße & Astro':'✨',
-      'Skyline & Architektur':'🏙', 'Aussichtspunkt':'🔭', 'Industrie & Urban':'🏭' };
+    const catIcon = { 'Schloss & Historisch':'i-castle', 'Wasser & Spiegelung':'i-water',
+      'Natur & Landschaft':'i-nature', 'Milchstraße & Astro':'i-milkyway',
+      'Skyline & Architektur':'i-skyline', 'Aussichtspunkt':'i-viewpoint', 'Industrie & Urban':'i-industry' };
     const catBg = { 'Schloss & Historisch':'rgba(160,112,240,.2)',
       'Wasser & Spiegelung':'rgba(80,128,240,.2)', 'Natur & Landschaft':'rgba(76,175,112,.2)',
       'Milchstraße & Astro':'rgba(128,96,208,.2)', 'Skyline & Architektur':'rgba(240,160,48,.2)',
@@ -3744,7 +3815,7 @@ const Locations = {
       const fls = l.focal_length_suggestions.slice(0,3).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
       return `<div class="card" onclick="LocationDetail.open('${l.id}')">
         <div class="loc-card">
-          <div class="loc-icon" style="background:${catBg[l.category]||'var(--border)'}">${catIcon[l.category]||'📍'}</div>
+          <div class="loc-icon" style="background:${catBg[l.category]||'var(--border)'}">${ic(catIcon[l.category]||'i-pin',22)}</div>
           <div class="loc-body">
             <h4>${l.name}</h4>
             <p>${l.category}</p>
@@ -3757,8 +3828,8 @@ const Locations = {
           <span id="loc-rating-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Rating.displayHtml(l.id)}</span>
           <span id="loc-card-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Verify.cardTagHtml(l.id)}</span>
         </div>
-        ${l.solar_alignment_note ? `<p style="font-size:11px;color:var(--gold);margin-top:6px">☀ ${l.solar_alignment_note}</p>` : ''}
-        ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px">🚶 ${l.access_note}</p>` : ''}
+        ${l.solar_alignment_note ? `<p style="font-size:11px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${l.solar_alignment_note}</p>` : ''}
+        ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${l.access_note}</p>` : ''}
       </div>`;
     }).join('');
     document.getElementById('locations-content').innerHTML = html || `<div class="empty"><p>Keine Locations gefunden.</p></div>`;
@@ -3994,9 +4065,9 @@ const LocationDetail = {
         ? `Blick vom ${place} auf ${loc.subject_name}, ${distTxt} Entfernung.`
         : `Sichtachse auf ${loc.subject_name}, ${distTxt} Entfernung.`;
       document.getElementById('edit-desc').value = desc;
-      hint.textContent = place ? `✓ Ortsname erkannt: ${place}` : '✓ Kein Ortsname gefunden – Beschreibung ohne Ortsangabe generiert.';
+      hint.textContent = place ? `Ortsname erkannt: ${place}` : 'Kein Ortsname gefunden – Beschreibung ohne Ortsangabe generiert.';
     } catch {
-      hint.textContent = '✗ Ortsname konnte nicht ermittelt werden.';
+      hint.textContent = 'Ortsname konnte nicht ermittelt werden.';
     }
     btn.textContent = '⊕'; btn.disabled = false;
   },
@@ -4077,9 +4148,9 @@ const LocationDetail = {
   },
 
   _render(loc) {
-    const catIcon = { 'Schloss & Historisch':'🏰', 'Wasser & Spiegelung':'💧',
-      'Natur & Landschaft':'🌲', 'Milchstraße & Astro':'✨',
-      'Skyline & Architektur':'🏙', 'Aussichtspunkt':'🔭', 'Industrie & Urban':'🏭' };
+    const catIcon = { 'Schloss & Historisch':'i-castle', 'Wasser & Spiegelung':'i-water',
+      'Natur & Landschaft':'i-nature', 'Milchstraße & Astro':'i-milkyway',
+      'Skyline & Architektur':'i-skyline', 'Aussichtspunkt':'i-viewpoint', 'Industrie & Urban':'i-industry' };
     const diffLabel = {1:'Einfach', 2:'Mittel', 3:'Anspruchsvoll'};
     const diffCls   = {1:'diff-1', 2:'diff-2', 3:'diff-3'};
 
@@ -4108,9 +4179,9 @@ const LocationDetail = {
     const milkywayOk = !pb || pb.includes('milkyway');
 
     const bodyChipsHtml = pb ? `<div class="body-chips">
-      ${sunOk      ? '<span class="body-chip possible">☀ Sonne</span>'       : '<span class="body-chip impossible">☀ Sonne</span>'}
-      ${moonOk     ? '<span class="body-chip possible">🌙 Mond</span>'        : '<span class="body-chip impossible">🌙 Mond</span>'}
-      ${milkywayOk ? '<span class="body-chip possible">🌌 Milchstraße</span>' : '<span class="body-chip impossible">🌌 Milchstraße</span>'}
+      <span class="body-chip ${sunOk?'possible':'impossible'}">${ic('i-sun',12)} Sonne</span>
+      <span class="body-chip ${moonOk?'possible':'impossible'}">${ic('i-moon',12)} Mond</span>
+      <span class="body-chip ${milkywayOk?'possible':'impossible'}">${ic('i-milkyway',12)} Milchstraße</span>
     </div>` : '';
 
     const impossibleNames = [
@@ -4120,42 +4191,42 @@ const LocationDetail = {
     ].filter(Boolean);
     const bodyWarn = pb && impossibleNames.length > 0 ? `
       <div class="loc-impossible-warn" style="margin-top:10px">
-        <p>⚠️ <strong>${impossibleNames.join(' & ')} ${impossibleNames.length > 1 ? 'können' : 'kann'} hier nie in der Sichtachse erscheinen</strong><br>
+        <p>${ic('i-warn',13)} <strong>${impossibleNames.join(' & ')} ${impossibleNames.length > 1 ? 'können' : 'kann'} hier nie in der Sichtachse erscheinen</strong><br>
         Der Azimutbereich (${azTxt}) liegt außerhalb des astronomisch möglichen Auf-/Untergangsbereichs für ${impossibleNames.join(' & ')} – daher gibt es dafür keine Alignment-Events.</p>
       </div>` : '';
 
     return `
       <div class="sheet-hero" style="padding-bottom:12px">
         <div class="sheet-hero-type">
-          ${catIcon[loc.category]||'📍'} <span>${loc.category}</span>
+          ${ic(catIcon[loc.category]||'i-pin',16)} <span>${loc.category}</span>
           <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto">${diffLabel[loc.difficulty]||'Mittel'}</span>
-          <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">✏️</button>
-          ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:#ef4444;font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">🗑</button>` : ''}
+          <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">${ic('i-edit',16)}</button>
+          ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:#ef4444;font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">${ic('i-trash',16)}</button>` : ''}
         </div>
         <div class="sheet-hero-title">${loc.name}</div>
-        <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#1a1300;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">🌌 Live-Astro (Sonne · Mond · Milchstraße)</button>
+        <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button>
         <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${loc.description}</p>
         ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
       </div>
 
-      ${mkSec('loc_obs','📍 Fotograf-Standort',`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">🗺 Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">👁 Street View</a></div>`)}
+      ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">${ic('i-eye',13)} Street View</a></div>`)}
 
-      ${mkSec('loc_subj',`🎯 Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">🍎 Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">🗺 Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
+      ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
-      ${mkSec('loc_azimut','🔭 Ausrichtung',`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px">☀ ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:#c0c8f8;margin-top:4px">🌙 ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px">🚶 ${loc.access_note}</p>` : ''}`)}
+      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:#c0c8f8;margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}`)}
 
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
-        return mkSec('loc_fov','📐 Karte & Blickwinkel', CameraFOV.panelHtml('loc'));
+        return mkSec('loc_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('loc'));
       })()}
 
-      ${loc.locationscout_url ? mkSec('loc_links','🔗 Links',`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">📷 Locationscout</a>`) : ''}
+      ${loc.locationscout_url ? mkSec('loc_links',`${ic('i-link',15)} Links`,`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">${ic('i-camera',13)} Locationscout</a>`) : ''}
 
-      ${mkSec('loc_events','📅 Nächste Events',`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
+      ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events`,`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
 
-      ${mkSec('loc_rating','⭐ Bewertung',`${Rating.inputHtml(loc.id)}`)}
+      ${mkSec('loc_rating',`${ic('i-starfill',15)} Bewertung`,`${Rating.inputHtml(loc.id)}`)}
 
-      ${mkSec('loc_verify','✅ Verifikation',`${Verify.verifySection(loc.id, loc.name)}`)}
+      ${mkSec('loc_verify',`${ic('i-check',15)} Verifikation`,`${Verify.verifySection(loc.id, loc.name)}`)}
     `;
   },
 
@@ -4170,12 +4241,12 @@ const LocationDetail = {
       }
       const eventIcon = e => {
         const t = (e.event_type||'').toLowerCase();
-        if (t.includes('moon')) return '🌙';
-        if (t.includes('sun')||t.includes('sonn')) return '☀️';
-        if (t.includes('milch')||t.includes('milky')) return '🌌';
-        if (t.includes('gold')) return '🌅';
-        if (t.includes('blue')||t.includes('blau')) return '🌆';
-        return '✦';
+        if (t.includes('moon')) return 'i-moon';
+        if (t.includes('sun')||t.includes('sonn')) return 'i-sun';
+        if (t.includes('milch')||t.includes('milky')) return 'i-milkyway';
+        if (t.includes('gold')) return 'i-sunrise';
+        if (t.includes('blue')||t.includes('blau')) return 'i-moon';
+        return 'i-star';
       };
       const fmt = iso => {
         const d = new Date(iso);
@@ -4184,7 +4255,7 @@ const LocationDetail = {
       };
       const rows = data.slice(0, 8).map(e => `
         <div class="loc-next-event-row" onclick="LocationDetail.close();setTimeout(()=>Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')}),300)">
-          <div class="loc-next-event-icon">${eventIcon(e)}</div>
+          <div class="loc-next-event-icon">${ic(eventIcon(e),18)}</div>
           <div class="loc-next-event-body">
             <div class="loc-next-event-title">${e.title}</div>
             <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
@@ -4221,8 +4292,8 @@ const AddLocation = {
     document.getElementById('mode-obs').classList.toggle('active', mode === 'obs');
     document.getElementById('mode-subj').classList.toggle('active', mode === 'subj');
     const hints = {
-      obs:  '📍 Auf Karte tippen → Mein Standort setzen',
-      subj: '🎯 Auf Karte tippen → Motiv setzen',
+      obs:  'Auf Karte tippen, um deinen Standort zu setzen',
+      subj: 'Auf Karte tippen, um das Motiv zu setzen',
     };
     document.getElementById('add-map-hint').textContent = hints[mode];
   },
@@ -4379,12 +4450,12 @@ const AddLocation = {
     } catch(e) {
       toast('Fehler: ' + e.message);
     }
-    btn.textContent = 'Alignments berechnen ✦'; btn.disabled = false;
+    btn.innerHTML = 'Alignments berechnen ' + ic('i-star',15,'') ; btn.disabled = false;
   },
   renderPreview(data) {
     const {profile, alignments} = data;
     const rows = alignments.slice(0,8).map(a => {
-      const icon = a.body === 'sun' ? '☀️' : '🌙';
+      const icon = ic(a.body === 'sun' ? 'i-sun' : 'i-moon', 14);
       return `<div class="align-row">
         <span class="ar-type">${icon} ${a.alignment_type}</span>
         <span class="ar-time">${formatDate(a.time)} ${formatTime(a.time)}</span>
@@ -4593,7 +4664,7 @@ const Impressum = {
 const ScoreInfo = {
   _texts: {
     gesamt: {
-      title: '📊 Gesamt-Score',
+      title: 'Gesamt-Score',
       html: `<p>Gewichteter Gesamtwert aus Astronomie und Wetter:</p>
         <ul>
           <li><b>Innerhalb 3 Tage:</b> Astronomie × 65 % + Wetter × 35 %</li>
@@ -4602,7 +4673,7 @@ const ScoreInfo = {
         <p style="margin-top:8px">Ein hoher Score bedeutet: das Himmelsereignis ist astronomisch hochwertig <em>und</em> das Wetter vielversprechend.</p>`,
     },
     astro: {
-      title: '🔭 Astronomie-Score',
+      title: 'Astronomie-Score',
       html: `<p>Bewertet die Qualität des Himmelsereignisses unabhängig vom Wetter:</p>
         <ul>
           <li><b>Goldene / Blaue Stunde:</b> Basis 0,80 · Bonus wenn Sonne im Sichtachsen-Azimut</li>
@@ -4612,7 +4683,7 @@ const ScoreInfo = {
         </ul>`,
     },
     wetter: {
-      title: '🌤 Wetter-Score',
+      title: 'Wetter-Score',
       html: `<p>Berechnet aus Open-Meteo-Stundendaten zum Shoot-Zeitpunkt:</p>
         <ul>
           <li><b>Wolken:</b> 20–50 % = ideal (1,0) · klar = 0,9 · bedeckt = 0,2</li>
@@ -4684,7 +4755,7 @@ const App = {
   async refresh() { RefreshMenu.toggle(); },  // Rückwärtskompatibilität
   async fullRefresh() {
     const btn = document.querySelector('[onclick="App.fullRefresh()"]');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Läuft…'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Läuft…'; }
     try {
       await API.post('/refresh', {});
       toast('⏳ Vorberechnung gestartet (~2–5 Min.) – danach Refresh drücken');
@@ -4783,11 +4854,11 @@ const RefreshMenu = {
         const ago = this._ago(info.last_run);
         const dur = info.duration_s ? ` (${info.duration_s}s)` : '';
         el.className = 'rmi-status';
-        el.textContent = `✓ vor ${ago}${dur}`;
+        el.textContent = `vor ${ago}${dur}`;
       } else if (info.status === 'error') {
         row.classList.remove('running');
         el.className = 'rmi-status err';
-        el.textContent = `✗ ${info.last_error || 'Fehler'}`;
+        el.textContent = `${info.last_error || 'Fehler'}`;
       } else {
         el.className = 'rmi-status';
         el.textContent = '–';
@@ -4816,7 +4887,7 @@ const RefreshMenu = {
       await API.post(cfg.endpoint, {});
     } catch(e) {
       el.className = 'rmi-status err';
-      el.textContent = '✗ ' + e.message;
+      el.textContent = e.message;
       row.classList.remove('running');
       return;
     }

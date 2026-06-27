@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-99 + US-97** *(Option A freigegeben 2026-06-27)* |
+| **🔄 In Progress** | wird gerade implementiert | **US-100** *(Option A freigegeben 2026-06-27)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-100** · **US-101** · **US-102** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-102** · **US-103** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -547,13 +547,14 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 ---
 
-### US-97 · Automatischer Tag/Nacht-Modus mit manuellem Umschalter `[ ]`
+### US-97 · Automatischer Tag/Nacht-Modus mit manuellem Umschalter `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-27 (v1.15.0) |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Als Fotograf bin ich tags und nachts unterwegs und möchte, dass die App ihr Erscheinungsbild automatisch an die Umgebung anpasst — heller Modus bei Tag, dunkler Modus bei Nacht — damit der Bildschirm nachts nicht blendet und tags genug Kontrast bleibt. Die automatische Umschaltung soll standardmäßig aktiv sein (gekoppelt an die System-/Geräteeinstellung Hell/Dunkel). Zusätzlich brauche ich in den Einstellungen einen manuellen Umschalter mit drei Optionen — Auto / Hell / Dunkel —, mit dem ich die Automatik bei Bedarf übersteuern kann; meine Wahl bleibt über App-Neustarts erhalten.
@@ -584,13 +585,14 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 ---
 
-### US-99 · Bauhaus-Theme-Tokens: Farb-/Designvariablen hell + dunkel `[ ]`
+### US-99 · Bauhaus-Theme-Tokens: Farb-/Designvariablen hell + dunkel `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-27 (v1.15.0) |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Als Fundament des Redesigns sollen die Bauhaus-Farb- und Designvariablen (Hintergrund, Flächen, Text, Bauhaus-Blau, Gold, Linien, Chips, Radius) als CSS-Variablen für hellen UND dunklen Modus eingeführt werden. Die App ist heute reines Dunkel — hier entsteht das helle Theme und die saubere Variablen-Basis, auf der alle weiteren Redesign-Tickets aufbauen. Keine sichtbare Logik-Änderung, nur Farbwerte/Variablen.
@@ -647,12 +649,69 @@ Ausgeschlossen: Icon-Set (US-100), Button-/Schriftgrößen (US-101), Logo/App-Ic
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Als Nutzer möchte ich überall einheitliche, klare Linien-Icons statt der gemischten/verspielten Emojis (🌅🧭🌙 …), damit die Oberfläche ruhig und konsistent wirkt. Eine einzige Icon-Familie (gleicher Strich, gleiches Raster) für Tabs, Chancen-Typen und Status. WebKit-Hinweis: Strich/Füllung als SVG-Attribute setzen, nicht per CSS-Klasse (sonst in Safari unsichtbar).
 
 **Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/icons.svg. Tangiert US-96 (Detailansicht nutzt dieselben Icons).
+
+---
+
+#### 🔬 Analyse-Spec (US-100) · 2026-06-27
+
+📎 **Code-Verifikation** (gelesen 2026-06-27):
+- `web/index.html`: ~187 Zeilen tragen Emojis (`grep` Unicode-Bereiche). Verteilung: `ICONS`-Map (Z. 1199–1206: 9 Event-Typen 🌅🌄🌙🌕☀️✨💫🌑), Feed-Karten (`.opp-icon` Z. 1299, Kalender-Chips Z. 1434, Sektionsköpfe „⭐ Besondere…" Z. 1439), Scout-Sheet (Z. 1500–1581: Tageszeit-Labels 🌑🌅🌇🌆, Body-Icon ☀️/🌙, Chips 🕐📐📏📷☁️, Buttons 📍 Standort / 🧭 Navigation), Chancendetail-Sheet (Z. 2963–3261: Wetter 🌤🟡🟠🔴, Mondphase 🌙, Sonne 🌅🌇🌄, Sektionsköpfe 📝📷🔭📏🧭🎯📐📍, Himmelsposition 🎯🧭, Coords-Buttons 🗺👁🍎, Aktionen 📅🔔✓), Verify-Badges (Z. 1840–1984: ✓ ⚠ ✅), Sterne-Rating (Z. 2086–2135: ★ ⭐), Filter-Sheet (Z. 2646–2734: Sektionsköpfe 🎯📷🕐🔭🗂⭐📍✅, Kategorie-Chips 🏰🏙🌿💧🔭🏗🌌, Schwierigkeit 🟢🟡🔴, Tageszeit 🌄☀️🌇🌙, Verifikation ✓⚠), Location-Liste/-Detail (Z. 3733–4149: Kategorie-Icons 🏰💧🌲✨🏙🔭🏭, Body-Chips ☀🌙🌌, Sektionsköpfe 📍🎯🔭📐, Edit/Delete ✏️🗑, Maps 🍎🗺👁🚶), Header/Login (📷), Refresh-Menü (`.rmi-icon` Z. 797–819: 🌤📅📆🔍), Mode-Buttons (📋📅🔭 Z. 843–845), Sheet-Titel (📍🌌🎛), Close-Buttons (✕).
+- **Tab-Bar ist bereits Inline-SVG** (Z. 888–908: 5 `<svg fill="none" stroke="currentColor" stroke-width="2">`-Pfade — Stern/Karte/Plus/Pin/Zahnrad). Ebenso bereits SVG: Header-Search/Refresh (Z. 776–790), Today/Calendar-Mini-Icons in Feed (Z. 1408/1454), Chevron (Z. 4526), Map-Pins (Z. 3297 ff.).
+- **Quelle**: Ticket nennt `icons.svg` — das ist aber nur ein **Showcase-Poster** (keine `<symbol>`/`id`-Defs, keine `currentColor`). Die **fertige, WebKit-sichere Sprite** liegt in `design/bauhaus/prototype.html` (Z. 312–338): `<defs>` mit `<symbol id="i-…">`, Strich/Füllung als **`<g>`-Attribute** (`stroke="currentColor" stroke-width="1.7"`), plus Helper `ic(id,size,cls)` (Z. 376). Vorhandene Symbole: `i-star`, `i-starfill`, `i-map`, `i-pin`, `i-pincheck`, `i-settings`, `i-sun`, `i-sunset`, `i-moon`/`i-moonsmall`, `i-cloud`, `i-bolt`, `i-compass`, `i-search`, `i-refresh`, `i-camera`, `i-tripod`, `i-clock`, `i-nav`, `i-check`, `i-warn`, `i-x`, `i-chevright`, `i-plus`/`i-minus`/`i-plusbare`.
+- ⚠️ **Lücke**: Für mehrere Event-Typen/Status fehlt ein Symbol — Milchstraße (✨), Meteoritenschauer (💫), Sonnenfinsternis (🌑), Mond-/Sonnen-Alignment, sowie Location-Kategorien (🏰 Schloss, 💧 Wasser, 🌲/🌿 Natur, 🏙 Skyline, 🏗/🏭 Industrie, 🔭 Aussichtspunkt) und Street-View/Maps (👁🗺🍎) und Stern-Rating-Glyphe (★). Diese müssten **neu gezeichnet** werden (gleicher Strich/Raster) oder es wird ein nächstgelegenes vorhandenes Symbol gemappt.
+
+❓ **Offene Fragen (vor Implementierung zu klären):**
+1. **Liefer-Mechanismus**: Eine Inline-SVG-Sprite (`<defs><symbol>` + `<use href="#i-…">`) wie im Prototyp, ODER einzelne Inline-SVGs pro Stelle? *Empfehlung: Sprite* — eine Definition, überall per `<use>` referenziert, WebKit-sicher (Strich als `<g>`-Attribut), trivial themebar via `currentColor`. Einzel-SVGs würden ~187 Stellen aufblähen und divergieren.
+2. **Scope der Ablösung**: (a) NUR Event-Typ-`ICONS`-Map + die 4 Kern-Buttons (📍🧭⚠⭐), oder (b) konsequent ALLE Text-Emojis (inkl. Filter-Sektionsköpfe, Location-Kategorien, Scout-Chips, Refresh-Menü, Mondphasen, Sterne-Rating)? Variante (a) lässt die App weiter gemischt wirken (Ticket-Ziel „überall einheitlich" verfehlt); (b) ist der eigentliche Ticket-Geist, aber deutlich größer und braucht ~8–10 neue Symbole.
+3. **Sterne-Rating (★)**: bleibt die Unicode-Sterne-Glyphe (rendert konsistent, kein Emoji-Look) oder auf `i-star`/`i-starfill`-SVG umstellen? (Reine ★ sind typografisch ruhig — ggf. bewusst behalten.)
+4. **Tab-Bar & bereits vorhandene SVGs**: Die heutigen Tab-/Header-SVGs (`stroke-width:2`/`2.5`) auf die Prototyp-Familie (`stroke-width:1.7`, identische Pfade) **vereinheitlichen**, oder unverändert lassen? Vereinheitlichen gibt den gewünschten „gleicher Strich"-Look, berührt aber funktionierende Stellen.
+5. **Farb-/Token-Bindung**: Tab-Icons im Prototyp sind blau (`#2D4EA0`), Status/Detail tintenfarben. Sollen die neuen Icons strikt `currentColor` erben (folgen automatisch US-99-Theme-Tokens) — bestätigen?
+
+**Scope (Vorschlag, abhängig von ❓2/❓4):**
+Eingeschlossen: (1) WebKit-sichere Inline-SVG-Sprite aus `prototype.html` in `web/index.html` einbetten (`<defs>` + Helper `ic()`). (2) Event-Typ-Icons (`ICONS`-Map) auf Sprite umstellen. (3) Kern-Buttons/Status (📍 Standort, 🧭 Navigation, ⚠ Warnung, ⭐ Top-Chance, ✓ Geprüft, ✕ Close) auf Sprite. (4) Konsequente Ablösung der übrigen Deko-/Sektions-Emojis (bei Scope-Variante b). (5) Fehlende Symbole neu zeichnen (Milchstraße, Meteor, Finsternis, Kategorien, Street-View) im selben Raster.
+Ausgeschlossen: Map-Pin-Marker-SVGs (Z. 3297 ff., funktional/farbig — bleiben), Logo/App-Icon (US-102), Button-/Schriftgrößen (US-101), Farb-Tokens (US-99 erledigt), Mondphasen-Visualisierung als Phasengrafik (nur Mond-Symbol).
+
+**Akzeptanzkriterien (erlebbar):**
+- [ ] In der Chancen-Liste zeigt jeder Eintrag statt eines bunten Emojis ein gleichmäßiges Linien-Icon (gleicher Strich wie die Tab-Leiste).
+- [ ] Im Chancendetail tragen alle Sektionsköpfe (Beschreibung, Wetter, Kamera, Astronomie, Topographie, Himmelsposition, Koordinaten) einheitliche Linien-Icons statt Emojis.
+- [ ] Die Scout-Buttons „Standort" und „Navigation" sowie der Warn-/Top-Chance-/Geprüft-Marker erscheinen als Linien-Icons.
+- [ ] In Safari (iPhone) sind alle Icons sichtbar (nicht leer/unsichtbar) und nehmen die Theme-Farbe an (hell wie dunkel, US-99).
+- [ ] Kein gemischtes Bild mehr: in den im Scope genannten Ansichten taucht kein farbiges Emoji mehr auf (Sicht-Check pro Ansicht).
+- [ ] Bei einem Event-Typ ohne eigenes Icon erscheint ein neutrales Fallback-Linien-Icon (kein 📷-Emoji, kein leeres Kästchen).
+- [ ] Edge: Icons skalieren sauber in allen Größen (13–48 px) ohne Verzerrung/Pixeligkeit.
+- [ ] Edge: Tab-Leiste und übrige Icons wirken aus einer Familie (gleiche Strichstärke) — sofern ❓4 = „vereinheitlichen".
+
+**Pre-Mortem:**
+- 💀 Icons in Safari unsichtbar, weil Strich/Füllung per CSS-Klasse statt SVG-Attribut gesetzt → Auslöser: Übernahme eines CSS-`.ic{stroke:…}`-Musters. Frühwarnung: leer im Safari-Render trotz korrektem Chrome. Gegenmaßnahme: Strich/Füllung **als `<g>`-Attribut im `<symbol>`** (Prototyp-Muster); AK „in Safari sichtbar" + manueller Safari-Check (Memory `reference_svg_use_currentcolor_webkit`).
+- 💀 Ablösung halbherzig → App wirkt weiter gemischt (Ticket-Ziel verfehlt), weil nur die `ICONS`-Map getauscht wurde → Gegenmaßnahme: ❓2 vorab klären; bei Variante (b) Sicht-Check pro Ansicht als AK.
+- 💀 Fehlendes Symbol für seltenen Event-Typ → Karte zeigt leeres Kästchen statt Icon → Gegenmaßnahme: Fallback-Symbol (`i-star`/neutral) + AK „neutrales Fallback".
+- 💀 Vereinheitlichung der bestehenden Tab-SVGs bricht Aktiv-Zustand/Größen (heutige `width/height`/`stroke-width` weichen ab) → Gegenmaßnahme: Tab-Umbau optional (❓4), Vollsystem-Regression + Sicht-Check der Tab-Leiste aktiv/inaktiv.
+- 💀 Inline-Emojis stecken auch in nicht-UI-Pfaden (Kalender-`SUMMARY:📸` Z. 3251, Notification-Titel Z. 3271, Toast-Texte) → unbeabsichtigt mitentfernt bricht Funktion → Gegenmaßnahme: diese String-Emojis bewusst aus dem Scope nehmen (kein UI-Icon), nur visuelle UI-Glyphen ersetzen.
+
+**Analyse & Planung:**
+- [x] Example Mapping (Scope-/Mechanismus-Fragen als ❓ vorab gestellt)
+- [x] Pre-Mortem inkl. Code-Verifikation (`index.html` Emoji-Inventar, `prototype.html` Sprite)
+- [x] Architektur analysiert: `web/index.html` (`ICONS`-Map, `.opp-icon`, `.scout-btn`, `mkSec`-Sektionsköpfe, Filter-/Location-/Verify-Renderer, Tab-Bar-SVGs), `design/bauhaus/prototype.html` (fertige `<symbol>`-Sprite + `ic()`-Helper)
+- [x] Optionen: A (Sprite + `<use>`, konsequente Ablösung) / B (nur `ICONS`-Map + Kern-Buttons, Einzel-SVGs)
+- [x] Empfehlung: **Option A** (Sprite, Scope b) — erfüllt „überall einheitlich", WebKit-sicher, theme-tauglich, eine zentrale Definition.
+
+**Optionen (App-Wirkung):**
+- **Option A — Sprite + vollständige Ablösung**: Eine zentrale Icon-Sammlung (aus dem Prototyp) wird einmal eingebettet; jede Stelle ruft das passende Icon ab. App wirkt durchgängig ruhig und „aus einem Guss"; Icons folgen Hell/Dunkel automatisch. Aufwand: groß (viele Stellen + ~8 neue Icons). Betroffen: `web/index.html`.
+- **Option B — nur Kern-Icons, Rest bleibt Emoji**: Nur Event-Typen + die 4 Hauptbuttons werden Linien-Icons; Filter/Kategorien/Scout-Chips bleiben Emoji. Schneller, aber App bleibt sichtbar gemischt (Ziel teilweise verfehlt). Aufwand: klein–mittel. Betroffen: `web/index.html`.
+
+✅ **Empfehlung: Option A** — nur sie löst „überall einheitlich" wirklich ein; die Sprite aus `prototype.html` ist bereits WebKit-sicher und theme-fähig, sodass das Risiko vor allem im Umfang (viele Fundstellen), nicht in der Technik liegt.
+
+**Testplan:**
+- Automatisiert (Harness): begrenzt sinnvoll (reines Frontend-Rendering). Falls eine Icon-Mapping-Tabelle (`event_type → symbol-id`) als JS-Helper ausgelagert wird: pytest/JS-Test „jeder bekannte Event-Typ liefert ein Symbol, unbekannter liefert Fallback".
+- Manuell (http://localhost:8000, **Safari Pflicht**): Feed-Liste, Kalender, Scout, Chancendetail, Filter-Sheet, Location-Liste + -Detail, Refresh-Menü je einmal öffnen → kein farbiges Emoji mehr (im Scope), alle Icons sichtbar; Hell- und Dunkelmodus durchschalten (Icons nehmen Theme-Farbe an); Tab-Leiste aktiv/inaktiv prüfen.
+
+**Weg-Gate-Entscheidung (Stephan, 2026-06-27):** ✅ **Option A** (vollständige Ablösung, Scope b). ❓1 Sprite (`<use>`). ❓2 = (b) alle UI-Emojis. ❓3 Sterne-Rating ★ → `i-star`/`i-starfill`-SVG. ❓4 bestehende Tab-/Header-SVGs **vereinheitlichen** (Strich 1.7, Prototyp-Familie). ❓5 strikt `currentColor` (folgt US-99-Tokens). String-/Notification-Emojis (Kalender-SUMMARY, Push-Titel, Toasts) bleiben bewusst außen vor.
 
 ---
 
@@ -680,9 +739,24 @@ Ausgeschlossen: Icon-Set (US-100), Button-/Schriftgrößen (US-101), Logo/App-Ic
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-27 |
 
-**Beschreibung:** Neue Bauhaus-Wortmarke (FOTO​ALERT, Blau-Akzent) plus geometrische Logo-Marke (Roundel aus Kreis/Viertel/Diamant) und passendes App-Icon in den Header und als PWA-Icon übernehmen.
+**Beschreibung:** Neue Bauhaus-Wortmarke (FOTO​ALERT, Blau-Akzent) plus geometrische Logo-Marke (Roundel aus Kreis/Viertel/Diamant) und passendes App-Icon in den Header und als PWA-Icon übernehmen. Umfasst auch die **PWA-Icons** (`/icons/icon-*.png`, `apple-touch-icon`, `manifest.json`, `<meta theme-color>`), damit das neue Logo beim „Zum Home-Bildschirm" / als WebApp-Symbol erscheint (heute noch altes Kamera-Icon). Quelle: FotoAlert/design/bauhaus/logo.svg.
 
-**Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/logo.svg.
+**Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/logo.svg. Aufkommen #4 aus dem US-100-Test (2026-06-27).
+
+---
+
+### US-103 · Karten-Marker & FOV-Legende im Bauhaus-Stil `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Die funktionalen Karten-Marker (Leaflet-Pins: Fotograf-Standort, Motiv) und die FOV-Legende („Motiv"-Fadenkreuz, „Fotograf-Standort"-Pin) sollen optisch ans Bauhaus-Design angeglichen werden (Form, Strich, Farbtöne aus US-99). In US-100 bewusst ausgeschlossen, weil farbige/funktionale Karten-Marker eigene Logik haben. Lesbarkeit auf hellen UND dunklen/satelliten Karten beachten.
+
+**Bezug:** Kind von US-98 (Bauhaus-Redesign). Aufkommen #2+#3 aus dem US-100-Test (2026-06-27). Abgrenzung zu US-100 (UI-Glyphen, erledigt) und US-102 (Logo/App-Icon).
 
 ---
 
