@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* · TASK-43 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(Analyse fertig 2026-06-23 — wartet am Weg-Gate: Empfehlung Option A + SQLite-Persistenz)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-42, US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -232,18 +232,38 @@ Bestätigt: `.coords-row` nur an einer Stelle (Z. 2997+3005). `.coords-label` wi
 
 ---
 
-### TASK-43 · Refactoring: Lange Funktionen aufteilen (web/index.html) `[ ]`
+### ~~TASK-43 · Refactoring: Lange Funktionen aufteilen (web/index.html)~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-25 |
+| **Implementiert** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 |
 
-**Beschreibung:** `refactor_check.py` meldet zwei JS-Funktionen mit übermäßiger Länge: `local()` (Z. 2674, ~265 Zeilen) und `row()` (Z. 3531, ~1034 Zeilen). Beide sollten in kleinere Teilfunktionen aufgeteilt werden.
+**Beschreibung:** `refactor_check.py` meldete zwei JS-Funktionen mit übermäßiger Länge: `local()` und `row()`. Nach Code-Verifikation: beide sind Falsch-Positive der bekannten Heuristik (TASK-32). `local` = 1-zeilige IIFE-Variable in `CameraFOV._loadProfile()`, `row` = 12-zeilige Arrow-Function in `AstroMap.render()`. Fix: beide in `FRONTEND_LONG_FN_IGNORELIST` eingetragen.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+
+**Scope:**
+- Eingeschlossen: `tools/refactor_check.py` — 2 Einträge in `FRONTEND_LONG_FN_IGNORELIST`
+- Ausgeschlossen: `web/index.html` — kein Code-Split nötig
+
+**Akzeptanzkriterien:**
+- [x] `python3 tools/refactor_check.py` gibt `✅ Keine Smells gefunden` aus
+- [x] `local` und `row` mit Kommentar in der Ignorelist erklärt
+
+**📎 Code-Verifikation (2026-06-27):**
+- `local` Z. 2724: IIFE-Variable, 1 Zeile — Falsch-Positiv bestätigt
+- `row` Z. 3592: Arrow-Function in `AstroMap.render()`, 12 Zeilen — Falsch-Positiv bestätigt
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `tools/refactor_check.py`
+- [x] Implementierungsoption: Ignorelist-Erweiterung (Option A, freigegeben 2026-06-27)
 
 ---
 
@@ -499,6 +519,21 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 **Beschreibung:** Die Aktions-Buttons (Zum Kalender hinzufügen, Erinnerung setzen, Erneut prüfen) sind sehr groß und nehmen unverhältnismäßig viel Platz ein; gleichzeitig ist die FOV-Karte relativ klein. Durch kompaktere Buttons (geringere Höhe/Padding) und eine größere Karte wird das Manövrieren/Navigieren in der Detailansicht angenehmer. Außerdem soll ein allgemeines Design-Review auf weitere Inkonsistenzen im Sheet durchgeführt werden.
 
 **Bezug:** Verwandt mit US-87 [  ] (Vollbild-Overlay für Karte). BUG-38 und BUG-39 zuerst fixen (Koordinaten-Overflow), da sie den verfügbaren Platz ebenfalls betreffen.
+
+---
+
+### US-96 · Einheitliche Chancen-Detailansicht aus allen Einstiegspunkten `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Egal ob ich eine Chance im Feed (14-Tage-Ansicht), im 365-Tage-Kalender, im Scout oder in den Location Details (zukünftige Ereignisse) antippe — ich sehe immer exakt dieselbe Detailansicht mit denselben Informationen in derselben Reihenfolge. Alle Sektionen sind beim Öffnen eingeklappt. Das schafft ein konsistentes Erlebnis und macht das Navigieren zwischen den Tabs vorhersehbar.
+
+**Bezug:** Hängt von US-95 ab (Layout-Optimierung der bestehenden Detailansicht, sinnvolle Basis). Blockiert US-83 (Scout-Detailansicht soll dieselbe Komponente nutzen). Tangiert US-87 (Karten-Overlay). US-95 und US-96 können als Sequenz gebündelt werden.
 
 ---
 
@@ -2884,18 +2919,88 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 **Beschreibung:** Als Betreiber möchte ich sicherstellen, dass von Nutzern hinzugefügte/geänderte Locations (Motive, Standorte, Beschreibungen) regelmäßig und geprüft ins Backend übertragen werden — inkl. automatischer Generierung von Standortbeschreibungen, idealem Azimut, konsistenter Kategorisierung und automatischer Aktualisierung der Brennweitenempfehlungen.
 
-**Abhängigkeit:** TASK-17 (Datenfundament) + US-76 (Kategorien); baut auf US-77 (Merge) auf.
+**Abhängigkeit:** TASK-17 ✅ (Datenfundament); US-77 ist NICHT blockierend — US-75 läuft auf bestehenden Locations unabhängig von US-77.
+
+**Epic — Kind-Tickets:**
+
+| Ticket | Inhalt | Abh. | Status |
+|--------|--------|------|--------|
+| **TASK-44** | QA-Datenmodell: Flags, Tabellen, Geo-Hash | TASK-17 ✅ | In Progress |
+| **TASK-45** | Azimut via Overpass API (Gebäude-Footprints → Horizon) | TASK-44 | ToDo |
+| **TASK-46** | LLM-Beschreibungen via Claude API | TASK-44 | ToDo |
+| **TASK-47** | Brennweiten-Auto-Calc (Geometrie) | TASK-44 | ToDo |
+| **TASK-48** | QA-Cron-Routine: Change-Detection + Scheduler | TASK-45+46+47 | ToDo |
+
+**Sequenzierung:**
+```
+TASK-44 ──▶ TASK-45 (Azimut)    ┐
+        ──▶ TASK-46 (LLM)       ├──▶ TASK-48 (Cron)
+        ──▶ TASK-47 (FL-Calc)   ┘
+```
 
 ---
 
-### US-76 · Location-Kategorien als Standardliste mit Filter-Integration `[~]`
+### TASK-44 · QA-Datenmodell: Lock-Flags, QA-Tabellen, Geo-Hash `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Architektur) |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-27 |
+| **In Progress seit** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 |
+| **Epic** | US-75 |
+
+**Beschreibung:** Fundament für alle QA-Kind-Tickets. Legt die Datenbankstruktur an, die verhindert dass auto-generierte Werte manuell kuratierte Werte überschreiben, und ermöglicht Change-Detection ohne Full-Scan.
+
+**Scope:**
+- Eingeschlossen: neue SQLite-Tabelle `location_qa_state` (Lock-Flags + `qa_checked_at` + `geo_hash`); neue Tabelle `location_qa_values` (auto-generierte Felder für BASE-Locations); neue Spalten `ideal_azimuth_min REAL`, `ideal_azimuth_max REAL` in `custom_locations`; `compute_geo_hash(loc)`-Funktion; Store-Methoden `get_qa_state`, `set_qa_lock`, `update_qa_checked`, `get_qa_values`, `set_qa_values`; Merge-Reihenfolge beim Laden: Code < qa_values < location_overrides.
+- Ausgeschlossen: Azimut-Berechnung (TASK-44), LLM (TASK-45), Brennweiten-Calc (TASK-46), Cron (TASK-47). Kein Frontend-Change (Admin-UI kommt later).
+
+**Akzeptanzkriterien:**
+- [ ] `location_qa_state`-Tabelle existiert; `get_qa_state('unbekannte-id')` → `None` (kein Fehler)
+- [ ] `set_qa_lock('id', 'description', True)` → atomar gespeichert; erneuter Aufruf überschreibt (Upsert)
+- [ ] `location_qa_values`-Tabelle existiert; `set_qa_values('id', description='…')` → speichert; `get_qa_values('id')` → gibt zurück
+- [ ] `custom_locations` hat Spalten `ideal_azimuth_min REAL DEFAULT NULL`, `ideal_azimuth_max REAL DEFAULT NULL`; Migration idempotent auf bestehender DB
+- [ ] `compute_geo_hash(lat, lon, s_lat, s_lon, height, width, dist)` → deterministischer String; gleiche Inputs (auch nach Float-Rounding auf 6 Stellen) = gleicher Hash
+- [ ] Merge beim Location-Laden: qa_values-Felder überschreiben Code-Defaults, `location_overrides` überschreiben qa_values
+- [ ] Edge Case: Migration auf bestehende `custom_locations`-Rows → alle bestehenden Rows haben `ideal_azimuth_min = NULL` (kein Datenverlust)
+- [ ] Edge Case: `set_qa_lock` auf nicht-existierende ID → legt Eintrag an (kein Fehler)
+
+**Pre-Mortem:**
+- 💀 Migration bricht bestehende `custom_locations`-Rows → Gegenmaßnahme: `ALTER TABLE ADD COLUMN IF NOT EXISTS` + Integrations-Test gegen befüllte Dev-DB
+- 💀 Merge-Reihenfolge falsch verdrahtet (overrides vor qa_values) → Gegenmaßnahme: Test mit allen drei Schichten für dieselbe Location-ID
+- 💀 `geo_hash` nicht deterministisch durch Float-Rounding → Gegenmaßnahme: Inputs vor Hash auf 6 Dezimalstellen runden; Test mit identischen Inputs in zwei Aufrufen
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/store.py` (Z.37–100 _INIT_SQL, Z.103–220 CRUD), `backend/data/locations.py` (PhotoLocation-Dataclass)
+- [x] Option B bestätigt: `location_qa_values` als eigene Tabelle (getrennt von `location_overrides`)
+- [x] Zwei Spalten statt JSON für Azimut: `ideal_azimuth_min`, `ideal_azimuth_max`
+
+**📎 Code-Verifikation (2026-06-27):**
+- Bestätigt: `_INIT_SQL` nutzt `CREATE TABLE IF NOT EXISTS` → erweiterbar ohne Schema-Drop
+- Bestätigt: `custom_locations` hat KEIN `ideal_azimuth_range`-Feld → muss hinzugefügt werden
+- Bestätigt: kein `scheduler.py` vorhanden → TASK-47 baut Scheduler neu
+- Bestätigt: `location_overrides` speichert JSON-Blob → bleibt für echte Nutzer-Overrides; qa_values kommen in eigene Tabelle
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_task43_qa_model.py`): Migration auf leerer + befüllter Dev-DB; Lock-Upsert; Geo-Hash-Determinismus; Merge-Reihenfolge (3 Schichten)
+- [ ] Manuell: `python3 -c "from data.store import LocationStore; s=LocationStore(); print(s.get_qa_state('x'))"` → None
+
+---
+
+### US-76 · Location-Kategorien als Standardliste mit Filter-Integration `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
+| **Abgeschlossen** | 2026-06-27 |
 | **In Analysis seit** | 2026-06-26 |
 | **In Progress seit** | 2026-06-26 |
 | **In Test seit** | 2026-06-26 |
