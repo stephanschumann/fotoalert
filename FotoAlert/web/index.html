@@ -179,12 +179,13 @@
     .tab.active, .tab:hover { color: var(--gold); }
     .tab#tab-add { color: var(--muted); }
     .tab#tab-add .tab-icon-wrap {
-      background: var(--gold); border-radius: 50%;
-      width: var(--fab-size); height: var(--fab-size);
+      background: var(--gold); border-radius: 10px;
+      width: 36px; height: 30px;
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       color: var(--bg);
     }
+    .tab#tab-add .tab-neu-label { display: none; }
 
     /* ── Cards ───────────────────────────────────────────────────── */
     .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border);
@@ -439,11 +440,11 @@
     .issue-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .issue-chip { font-size: 12px; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; transition: all .15s; }
     .issue-chip.selected { border-color: var(--red); color: var(--red); background: rgba(224,80,80,.1); }
-    .btn-issue { flex: 1; background: var(--red); color: #fff; border: none; border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
+    .btn-issue { flex: 1; background: transparent; color: var(--red); border: 1px solid var(--red); border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
     .verify-form textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 10px; resize: vertical; min-height: 60px; font-family: inherit; }
     .verify-form textarea::placeholder { color: var(--muted); }
     .verify-form-actions { display: flex; gap: 8px; }
-    .btn-verify { flex: 1; background: #4caf50; color: #fff; border: none; border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
+    .btn-verify { flex: 1; background: var(--gold); color: var(--on-accent); border: none; border-radius: 10px; padding: var(--btn-pad-v); font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
     .btn-verify-cancel { flex: 0; background: var(--card); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; padding: var(--btn-pad-v) 16px; font-size: 14px; cursor: pointer; min-height: 44px; }
     .btn-primary { background: var(--gold); color: var(--bg); border: none; border-radius: 12px;
       padding: var(--btn-pad-v) 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%;
@@ -968,7 +969,7 @@ function ic(id, size, cls){
       <div class="tab-icon-wrap">
         <svg viewBox="0 0 24 24" width="14" height="14" style="display:block"><use href="#i-plusbare"/></svg>
       </div>
-      <span style="color:var(--muted);margin-top:2px">Neu</span>
+      <span class="tab-neu-label" style="color:var(--muted);margin-top:2px">Neu</span>
     </button>
     <button class="tab" id="tab-locations" onclick="App.nav('locations')">
       <svg viewBox="0 0 24 24"><use href="#i-pin"/></svg>
@@ -1121,7 +1122,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.16.2';
+const APP_VERSION = '1.16.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1279,7 +1280,7 @@ const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, k
 function eventIcon(type, size, cls){ return ic(ICONS[type] || ICON_FALLBACK, size, cls); }
 
 function scoreColor(s) {
-  return s >= .8 ? '#4caf70' : s >= .6 ? '#f0a030' : '#f08030';
+  return s >= .90 ? 'var(--accent-2)' : s >= .80 ? '#4caf70' : s >= .70 ? 'var(--blue)' : 'var(--muted)';
 }
 
 function formatTime(iso, tz='Europe/Berlin') {
@@ -1338,7 +1339,7 @@ function scoreRing(score, priority=0) {
     <svg viewBox="0 0 52 52">
       <circle class="score-ring-bg" cx="26" cy="26" r="${r}"/>
       <circle class="score-ring-fg" cx="26" cy="26" r="${r}"
-        stroke="${col}" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="0"/>
+        style="stroke:${col}" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="0"/>
     </svg>
     <div class="score-label">
       <span style="color:${col}">${Math.round(score*100)}</span>
@@ -3300,7 +3301,7 @@ const Detail = {
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
-        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\\'")}' )" style="background:var(--card);color:#4caf50;border:1px solid rgba(76,175,80,.4)">
+        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\\'")}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
         </button>
       </div>
@@ -4222,7 +4223,7 @@ const LocationDetail = {
 
       ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
-      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:#c0c8f8;margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}`)}
+      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}`)}
 
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
