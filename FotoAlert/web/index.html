@@ -58,6 +58,7 @@
       --hover:     rgba(0,0,0,.045);
       --hairline:  rgba(0,0,0,.08);
       --map-bg:    #e4e1d8;
+      --overlay-bg: rgba(0,0,0,.65);
       --radius:    14px;
       --tab-h:     53px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
@@ -90,6 +91,7 @@
       --hover:     rgba(255,255,255,.06);
       --hairline:  rgba(255,255,255,.05);
       --map-bg:    #0d0d1a;
+      --overlay-bg: rgba(0,0,0,.75);
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -129,7 +131,7 @@
     .refresh-menu-item .rmi-body { flex: 1; min-width: 0; }
     .refresh-menu-item .rmi-label { font-size: 14px; color: var(--text); }
     .refresh-menu-item .rmi-status { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .refresh-menu-item .rmi-status.err { color: #e05; }
+    .refresh-menu-item .rmi-status.err { color: var(--red); }
     .refresh-menu-item .rmi-spin { animation: spin .7s linear infinite; font-size: 14px; }
     .refresh-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
     #refresh-btn { background: none; border: none; color: var(--muted); cursor: pointer;
@@ -284,10 +286,10 @@
       100% { transform: scale(2.5); opacity: 0; }
     }
     .gps-dot-wrap { position: relative; width: 14px; height: 14px; }
-    .gps-dot { width: 14px; height: 14px; background: #4285f4; border-radius: 50%;
+    .gps-dot { width: 14px; height: 14px; background: var(--accent); border-radius: 50%;
       border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
     .gps-dot-ring { position: absolute; inset: 0; border-radius: 50%;
-      background: #4285f4; animation: gps-pulse 1.8s ease-out infinite; }
+      background: var(--accent); animation: gps-pulse 1.8s ease-out infinite; }
 
     /* custom popup */
     .leaflet-popup-content-wrapper { background: var(--card); color: var(--text);
@@ -300,7 +302,7 @@
       display: inline-block; }
 
     /* ── Detail Sheet ─────────────────────────────────────────────── */
-    #detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    #detail-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
       z-index: 100; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #detail-overlay.open { opacity: 1; pointer-events: auto; }
     #detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
@@ -322,7 +324,7 @@
     .sc-info-btn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--muted); background: none; color: var(--muted); font-size: 9px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; }
     .sc-info-btn:hover { border-color: var(--gold); color: var(--gold); }
     /* Score-Info-Overlay */
-    #score-info-overlay { display: none; position: absolute; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(0,0,0,.55); padding: 20px; }
+    #score-info-overlay { display: none; position: absolute; inset: 0; z-index: 300; align-items: center; justify-content: center; background: var(--overlay-bg); padding: 20px; }
     #score-info-overlay.open { display: flex; }
     #score-info-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; max-width: 320px; width: 100%; position: relative; }
     #score-info-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
@@ -361,9 +363,9 @@
     .coords-btns { display: flex; gap: 6px; }
     .coords-maps-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
     .coords-sv-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
-    .verified-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #4caf50; background: rgba(76,175,80,.12); border: 1px solid rgba(76,175,80,.3); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
+    .verified-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--green); background: rgba(76,175,80,.12); border: 1px solid rgba(76,175,80,.3); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .verified-badge-issue { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--red); background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.35); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
-    .tag-verified { background: rgba(76,175,80,.15); color: #4caf50; }
+    .tag-verified { background: rgba(76,175,80,.15); color: var(--green); }
     .tag-issue { background: rgba(224,80,80,.15); color: var(--red); }
 
     /* ── Star Rating (US-24) ─────────────────────────────────────── */
@@ -385,7 +387,7 @@
       color: var(--bg); border-radius: 50%; width: 16px; height: 16px;
       font-size: 10px; font-weight: 800; display: none; align-items: center;
       justify-content: center; pointer-events: none; }
-    #filter-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    #filter-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
       z-index: 1100; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #filter-overlay.open { opacity: 1; pointer-events: auto; }
     #filter-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1101;
@@ -463,7 +465,7 @@
       display: flex; flex-direction: column; overflow: hidden;
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #add-sheet.open { transform: translateY(0); }
-    #add-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 109;
+    #add-overlay { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 109;
       opacity: 0; pointer-events: none; transition: opacity .25s; }
     #add-overlay.open { opacity: 1; pointer-events: auto; }
     .add-header { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
@@ -522,7 +524,7 @@
       border-radius: 10px; padding: 8px 12px; font-size: 12px; font-weight: 600;
       cursor: pointer; white-space: nowrap; transition: border-color .2s, color .2s; }
     .paste-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .coord-error { font-size: 11px; color: #ff6b6b; margin-top: 4px; min-height: 14px; }
+    .coord-error { font-size: 11px; color: var(--red); margin-top: 4px; min-height: 14px; }
     .preview-box { background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 14px; margin: 8px 0; }
     .preview-box h4 { font-size: 12px; color: var(--muted); font-weight: 700;
@@ -596,7 +598,7 @@
     /* ── Locations Page ───────────────────────────────────────────── */
     .loc-card { display: flex; gap: 12px; align-items: center; }
     .loc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex;
-      align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+      align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--accent); }
     .loc-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
     .loc-body p  { font-size: 12px; color: var(--muted); }
     .loc-diff { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
@@ -606,7 +608,7 @@
     .diff-3 { color: var(--red);    background: rgba(224,80,80,.15); }
 
     /* ── Location Detail Sheet ───────────────────────────────────── */
-    #loc-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    #loc-detail-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
       z-index: 102; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #loc-detail-overlay.open { opacity: 1; pointer-events: auto; }
     #loc-detail-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 103;
@@ -616,7 +618,7 @@
     #loc-detail-sheet.open { transform: translateY(0); }
     #loc-detail-content { overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
     /* TASK-11: Impressum Sheet */
-    #impressum-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    #impressum-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
       z-index: 104; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #impressum-overlay.open { opacity: 1; pointer-events: auto; }
     #impressum-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 105;
@@ -625,7 +627,7 @@
       transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
     #impressum-sheet.open { transform: translateY(0); }
     /* US-64: Live-Astro Sheet */
-    #astro-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    #astro-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
       z-index: 106; opacity: 0; pointer-events: none; transition: opacity .25s; }
     #astro-overlay.open { opacity: 1; pointer-events: auto; }
     #astro-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 107;
@@ -642,9 +644,9 @@
       padding: 3px 16px; color: var(--text); }
     .ar-row i { width: 11px; height: 11px; border-radius: 50%; flex: none; }
     .ar-row b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--muted); }
-    .ar-row.aligned { color: #36d07a; }
-    .ar-row.aligned b { color: #36d07a; }
-    .ar-ok { margin-left: 8px; color: #36d07a; font-weight: 700; font-size: 11px; }
+    .ar-row.aligned { color: var(--green); }
+    .ar-row.aligned b { color: var(--green); }
+    .ar-ok { margin-left: 8px; color: var(--green); font-weight: 700; font-size: 11px; }
     .astro-controls { display: flex; align-items: center; gap: 10px; padding: 6px 16px 2px; }
     #astro-time { flex: 1; accent-color: var(--gold); }
     .astro-clock { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 700; min-width: 48px; text-align: right; }
@@ -660,7 +662,7 @@
     .loc-impossible-warn p { font-size: 13px; color: var(--red); line-height: 1.5; }
     .body-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .body-chip { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-    .body-chip.possible   { background: rgba(80,200,120,.15); color: #4ec87a; border: 1px solid rgba(80,200,120,.4); }
+    .body-chip.possible   { background: rgba(80,200,120,.15); color: var(--green); border: 1px solid rgba(80,200,120,.4); }
     .body-chip.impossible { background: rgba(130,130,130,.1); color: var(--muted); border: 1px solid rgba(130,130,130,.25); text-decoration: line-through; }
     .loc-next-event-row { display: flex; align-items: center; gap: 10px;
       padding: 8px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; }
@@ -824,9 +826,9 @@ function ic(id, size, cls){
 #login-screen h1{font-size:24px;font-weight:700;margin:0 0 4px}
 #login-screen .login-sub{color:var(--muted,#8a93a6);font-size:13px;margin:0 0 24px}
 #login-screen #login-pw{width:100%;padding:14px 16px;font-size:16px;border-radius:var(--radius,12px);border:1px solid var(--border,#2d3148);background:var(--card,#1a1d2b);color:inherit;margin-bottom:12px;outline:none}
-#login-screen #login-pw:focus{border-color:#f5a623}
-#login-screen .login-btn{width:100%;padding:14px;font-size:16px;font-weight:600;border:none;border-radius:var(--radius,12px);background:#f5a623;color:#1a1206;cursor:pointer}
-#login-screen .login-err{color:#f87171;font-size:13px;min-height:18px;margin-top:12px}
+#login-screen #login-pw:focus{border-color:var(--accent-2)}
+#login-screen .login-btn{width:100%;padding:14px;font-size:16px;font-weight:600;border:none;border-radius:var(--radius,12px);background:var(--accent-2);color:var(--on-accent);cursor:pointer}
+#login-screen .login-err{color:var(--red);font-size:13px;min-height:18px;margin-top:12px}
 </style>
 <div id="login-screen">
   <div class="login-card">
@@ -1122,7 +1124,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.16.3';
+const APP_VERSION = '1.16.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1280,7 +1282,7 @@ const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, k
 function eventIcon(type, size, cls){ return ic(ICONS[type] || ICON_FALLBACK, size, cls); }
 
 function scoreColor(s) {
-  return s >= .90 ? 'var(--accent-2)' : s >= .80 ? '#4caf70' : s >= .70 ? 'var(--blue)' : 'var(--muted)';
+  return s >= .90 ? 'var(--accent-2)' : s >= .80 ? 'var(--green)' : s >= .70 ? 'var(--blue)' : 'var(--muted)';
 }
 
 function formatTime(iso, tz='Europe/Berlin') {
@@ -1939,7 +1941,7 @@ const Verify = {
     const nIssue = list.filter(v => v.status === 'issue').length;
 
     const summary = `<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;font-weight:600">
-      ${nOk    ? `<span style="color:#4caf50;display:inline-flex;align-items:center;gap:4px">${ic('i-check',13)} ${nOk} Positiv</span>` : ''}
+      ${nOk    ? `<span style="color:var(--green);display:inline-flex;align-items:center;gap:4px">${ic('i-check',13)} ${nOk} Positiv</span>` : ''}
       ${nIssue ? `<span style="color:var(--red);display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} ${nIssue} Problem${nIssue>1?'e':''}</span>` : ''}
     </div>`;
 
@@ -1947,7 +1949,7 @@ const Verify = {
     const rows = [...list].reverse().map(v => {
       const isIssue = v.status === 'issue';
       const icon  = ic(isIssue ? 'i-warn' : 'i-check', 14);
-      const color = isIssue ? 'var(--red)' : '#4caf50';
+      const color = isIssue ? 'var(--red)' : 'var(--green)';
       const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${v.issue_type}</span>` : '';
       const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${v.comment}"</span>` : '';
       return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--hairline)">
@@ -2726,7 +2728,7 @@ const FilterSheet = {
       chip3(`${eventIcon(v,13)} ${l}`, state3(s.eventTypes, s.eventTypesExcl, v),
         `FilterSheet._cycle('eventTypes','eventTypesExcl','${v.replace(/'/g, "\\'")}')`)).join('');
 
-    const diffChips = [[1,`${dot('#3fb950')}Einfach`],[2,`${dot('#d29922')}Mittel`],[3,`${dot('#f85149')}Anspruchsvoll`]]
+    const diffChips = [[1,`${dot('var(--green)')}Einfach`],[2,`${dot('var(--accent-2)')}Mittel`],[3,`${dot('var(--red)')}Anspruchsvoll`]]
       .map(([v,l]) => chip3(l, state3(s.difficulty, s.difficultyExcl, v), `FilterSheet._cycle('difficulty','difficultyExcl',${v})`)).join('');
 
     const catChips = [  // US-76
@@ -2982,7 +2984,8 @@ const CameraFOV = {
       // Motiv-Pin (MapMarkers-Standard, BUG-20)
       L.marker([subjLat, subjLon], {icon: MapMarkers.subject()}).addTo(map);
       // Sichtachse
-      L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:'#E8A020', weight:1.5, dashArray:'6,4', opacity:0.7}).addTo(map);
+      const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
+      L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:ac2, weight:1.5, dashArray:'6,4', opacity:0.7}).addTo(map);
       map.fitBounds([[obsLat,obsLon],[subjLat,subjLon]], {padding:[30,30]});
     } else {
       map.setView([obsLat, obsLon], 15);
@@ -3002,8 +3005,9 @@ const CameraFOV = {
     const half = fovDeg / 2;
     const lPt = this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM);
     const rPt = this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM);
+    const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
     this._cones[prefix] = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
-      color:'#E8A020', fillColor:'#E8A020', fillOpacity:0.13, weight:1.5
+      color:ac2, fillColor:ac2, fillOpacity:0.13, weight:1.5
     }).addTo(map);
   },
 
@@ -3065,7 +3069,7 @@ const Detail = {
     const wLabel = o.weather_score === 0
       ? `${ic('i-clock',13)} Wird 3 Tage vorher berechnet`
       : o.weather_score >= 0.8 ? `${_wdot('var(--green)')}Ideal (${pct(o.weather_score)})`
-      : o.weather_score >= 0.6 ? `${_wdot('#d29922')}Gut (${pct(o.weather_score)})`
+      : o.weather_score >= 0.6 ? `${_wdot('var(--accent-2)')}Gut (${pct(o.weather_score)})`
       : o.weather_score >= 0.4 ? `${_wdot('var(--orange)')}Mäßig (${pct(o.weather_score)})`
       : `${_wdot('var(--red)')}Schwierig (${pct(o.weather_score)})`;
     const wColor = o.weather_score === 0 ? 'var(--muted)'
@@ -3210,7 +3214,7 @@ const Detail = {
         const isExact = hasHeight && Math.abs(ca.altitude_delta_deg) <= 0.5;
         const isClose = hasHeight && !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
         const labelBg = isExact ? 'background:rgba(232,160,32,.15);border:1px solid var(--gold);border-radius:8px;padding:8px 12px'
-                      : isClose ? 'background:rgba(100,200,100,.1);border:1px solid #4a4;border-radius:8px;padding:8px 12px'
+                      : isClose ? 'background:rgba(100,200,100,.1);border:1px solid var(--green);border-radius:8px;padding:8px 12px'
                       : 'background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px';
         const fmtM = v => Math.abs(v) >= 1000 ? (v/1000).toFixed(2)+' km' : Math.abs(v).toFixed(0)+' m';
         const vOff = ca.vertical_offset_m || 0;
@@ -3464,15 +3468,12 @@ const MapView = {
   },
   async loadMarkers() {
     const locs = await API.get('/locations');
-    const catColor = { 'Schloss & Historisch':'#a070f0', 'Wasser & Spiegelung':'#5080f0',
-      'Natur & Landschaft':'#4caf70', 'Milchstraße & Astro':'#8060d0',
-      'Skyline & Architektur':'#f0a030', 'Aussichtspunkt':'#f08030', 'Industrie & Urban':'#f05050' };
     this.markers = [];
+    const col = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
     for (const loc of locs) {
-      const col = catColor[loc.category] || '#f0a030';
       const icon = L.divIcon({ className:'', html:
         `<div style="width:28px;height:28px;background:${col};border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
+          transform:rotate(-45deg);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
         iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-32]
       });
       const m = L.marker([loc.observer_lat, loc.observer_lon], {icon}).addTo(this.map);
@@ -3814,10 +3815,6 @@ const Locations = {
     const catIcon = { 'Schloss & Historisch':'i-castle', 'Wasser & Spiegelung':'i-water',
       'Natur & Landschaft':'i-nature', 'Milchstraße & Astro':'i-milkyway',
       'Skyline & Architektur':'i-skyline', 'Aussichtspunkt':'i-viewpoint', 'Industrie & Urban':'i-industry' };
-    const catBg = { 'Schloss & Historisch':'rgba(160,112,240,.2)',
-      'Wasser & Spiegelung':'rgba(80,128,240,.2)', 'Natur & Landschaft':'rgba(76,175,112,.2)',
-      'Milchstraße & Astro':'rgba(128,96,208,.2)', 'Skyline & Architektur':'rgba(240,160,48,.2)',
-      'Aussichtspunkt':'rgba(240,128,48,.2)', 'Industrie & Urban':'rgba(240,80,80,.2)' };
     const diffLabel = {1:'Einfach',2:'Mittel',3:'Anspruchsvoll'};
     const diffCls   = {1:'diff-1',2:'diff-2',3:'diff-3'};
 
@@ -3825,7 +3822,7 @@ const Locations = {
       const fls = l.focal_length_suggestions.slice(0,3).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
       return `<div class="card" onclick="LocationDetail.open('${l.id}')">
         <div class="loc-card">
-          <div class="loc-icon" style="background:${catBg[l.category]||'var(--border)'}">${ic(catIcon[l.category]||'i-pin',22)}</div>
+          <div class="loc-icon" style="background:var(--surface)">${ic(catIcon[l.category]||'i-pin',22)}</div>
           <div class="loc-body">
             <h4>${l.name}</h4>
             <p>${l.category}</p>
@@ -3916,13 +3913,13 @@ const LocationDetail = {
         <input class="input-field" id="edit-obs-coords" type="text" inputmode="text"
           placeholder="52.40747, 13.09279" value="${obsVal}"
           oninput="LocationDetail._onEditObsInput()">
-        <p id="edit-obs-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
+        <p id="edit-obs-error" style="font-size:11px;color:var(--red);margin:-8px 0 8px;min-height:14px"></p>
 
         <label><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 32 32" style="vertical-align:middle;margin-right:4px"><line x1="16" y1="2" x2="16" y2="30" stroke="#E8A020" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="16" x2="30" y2="16" stroke="#E8A020" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="16" r="5" fill="#E8A020" stroke="white" stroke-width="2.5"/></svg>Motiv (Koordinaten)</label>
         <input class="input-field" id="edit-subj-coords" type="text" inputmode="text"
           placeholder="52.51234, 13.40123" value="${subjVal}"
           oninput="LocationDetail._onEditSubjInput()">
-        <p id="edit-subj-error" style="font-size:11px;color:#e05;margin:-8px 0 8px;min-height:14px"></p>
+        <p id="edit-subj-error" style="font-size:11px;color:var(--red);margin:-8px 0 8px;min-height:14px"></p>
         <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;margin-bottom:16px;background:var(--surface)"></div>
 
         <label>Motivhöhe (m)</label>
@@ -4211,7 +4208,7 @@ const LocationDetail = {
           ${ic(catIcon[loc.category]||'i-pin',16)} <span>${loc.category}</span>
           <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto">${diffLabel[loc.difficulty]||'Mittel'}</span>
           <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">${ic('i-edit',16)}</button>
-          ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:#ef4444;font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">${ic('i-trash',16)}</button>` : ''}
+          ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:var(--red);font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">${ic('i-trash',16)}</button>` : ''}
         </div>
         <div class="sheet-hero-title">${loc.name}</div>
         <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button>
@@ -4219,7 +4216,7 @@ const LocationDetail = {
         ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
       </div>
 
-      ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:#5b9cf6;border-color:#3a7bd5">${ic('i-eye',13)} Street View</a></div>`)}
+      ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
 
       ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
