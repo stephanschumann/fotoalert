@@ -1239,6 +1239,7 @@ class PreviewAlignmentRequest(BaseModel):
     subject_width_m: float = 0.0
     days: int = 14
     save: bool = False
+    category: str = "SKYLINE"  # US-76: LocationCategory-Key, Default = SKYLINE
 
 
 async def _save_alignment_as_location(
@@ -1267,7 +1268,7 @@ async def _save_alignment_as_location(
         id=f"custom_{int(datetime.now().timestamp())}",
         name=f"📍 {req.subject_name}",
         description=desc,
-        category=LocationCategory.SKYLINE,
+        category=LocationCategory[req.category] if req.category in LocationCategory.__members__ else LocationCategory.SKYLINE,  # US-76
         observer_lat=req.observer_lat, observer_lon=req.observer_lon,
         subject_lat=req.subject_lat, subject_lon=req.subject_lon,
         subject_name=req.subject_name,

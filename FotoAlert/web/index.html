@@ -909,6 +909,18 @@
       <input class="input-field" id="subj-name" type="text" placeholder="z.B. Oberbaumbrücke Turm Nord">
     </div>
     <div class="form-section">
+      <label>Kategorie</label>
+      <select class="input-field" id="add-category" style="appearance:auto">
+        <option value="SKYLINE">Skyline &amp; Architektur</option>
+        <option value="SCHLOSS">Schloss &amp; Historisch</option>
+        <option value="NATUR">Natur &amp; Landschaft</option>
+        <option value="WASSER">Wasser &amp; Spiegelung</option>
+        <option value="AUSSICHT">Aussichtspunkt</option>
+        <option value="INDUSTRIE">Industrie &amp; Urban</option>
+        <option value="MILCHSTRASSE">Milchstraße &amp; Astro</option>
+      </select>
+    </div>
+    <div class="form-section">
       <label>Optionale Angaben</label>
       <div class="input-row">
         <input class="input-field" id="subj-height" type="number" placeholder="Höhe (m)" min="0">
@@ -985,7 +997,7 @@
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.13.11';
+const APP_VERSION = '1.14.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2072,7 +2084,7 @@ const Filter = {
     // US-71: kategoriale Chips haben Include- (eventTypes/tageszeit/difficulty)
     // und Exclude-Arrays (*Excl). Alte gespeicherte States ohne *Excl werden
     // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
   },
 
   get state() {
@@ -2098,6 +2110,7 @@ const Filter = {
     return ((s.eventTypes.length || s.eventTypesExcl.length) ? 1 : 0) +
            ((s.tageszeit.length || s.tageszeitExcl.length) ? 1 : 0) +
            ((s.difficulty.length || s.difficultyExcl.length) ? 1 : 0) +
+           ((s.category.length || s.categoryExcl.length) ? 1 : 0) +
            (s.minRating > 0 ? 1 : 0) +
            (s.minScore > 0 ? 1 : 0) +
            (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
@@ -2158,11 +2171,13 @@ const Filter = {
         if (s.tageszeit.length && !s.tageszeit.includes(slot)) return false;
         if (s.tageszeitExcl.length && s.tageszeitExcl.includes(slot)) return false;  // US-71
       }
-      if (s.difficulty.length || s.difficultyExcl.length) {
+      if (s.difficulty.length || s.difficultyExcl.length || s.category.length || s.categoryExcl.length) {
         const loc = (Locations.all || []).find(l => l.id === o.location_id);
         if (loc) {
           if (s.difficulty.length && !s.difficulty.includes(loc.difficulty)) return false;
           if (s.difficultyExcl.length && s.difficultyExcl.includes(loc.difficulty)) return false;  // US-71
+          if (s.category.length && !s.category.includes(loc.category)) return false;  // US-76
+          if (s.categoryExcl.length && s.categoryExcl.includes(loc.category)) return false;  // US-76
         }
       }
       if (s.minRating > 0 && (Rating.get(o.location_id) || 0) < s.minRating) return false;
@@ -2202,6 +2217,8 @@ const Filter = {
     return locs.filter(l => {
       if (s.difficulty.length && !s.difficulty.includes(l.difficulty)) return false;
       if (s.difficultyExcl.length && s.difficultyExcl.includes(l.difficulty)) return false;  // US-71
+      if (s.category.length && !s.category.includes(l.category)) return false;  // US-76
+      if (s.categoryExcl.length && s.categoryExcl.includes(l.category)) return false;  // US-76
       if (s.minRating > 0 && (Rating.get(l.id) || 0) < s.minRating) return false;
       if (s.verification !== 'all') {
         const last = Verify.getLast(l.id);
@@ -2538,6 +2555,17 @@ const FilterSheet = {
     const diffChips = [[1,'🟢 Einfach'],[2,'🟡 Mittel'],[3,'🔴 Anspruchsvoll']]
       .map(([v,l]) => chip3(l, state3(s.difficulty, s.difficultyExcl, v), `FilterSheet._cycle('difficulty','difficultyExcl',${v})`)).join('');
 
+    const catChips = [  // US-76
+      ['Schloss & Historisch','🏰 Schloss & Historisch'],
+      ['Skyline & Architektur','🏙 Skyline & Architektur'],
+      ['Natur & Landschaft','🌿 Natur & Landschaft'],
+      ['Wasser & Spiegelung','💧 Wasser & Spiegelung'],
+      ['Aussichtspunkt','🔭 Aussichtspunkt'],
+      ['Industrie & Urban','🏗 Industrie & Urban'],
+      ['Milchstraße & Astro','🌌 Milchstraße & Astro'],
+    ].map(([v,l]) => chip3(l, state3(s.category, s.categoryExcl, v),
+      `FilterSheet._cycle('category','categoryExcl','${v.replace(/'/g,"\\'")}')`)).join('');
+
     const ratingChips = [[0,'Alle'],[1,'≥ ★☆☆☆☆'],[2,'≥ ★★☆☆☆'],[3,'≥ ★★★☆☆'],[4,'≥ ★★★★☆'],[5,'★★★★★']]
       .map(([v,l]) => chip(l, s.minRating===v, `FilterSheet._set('minRating',${v})`)).join('');
 
@@ -2606,6 +2634,7 @@ const FilterSheet = {
         <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
       </div>` +
       `<div class="filter-section"><h4>🎯 Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
+      `<div class="filter-section"><h4>🗂 Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
       `<div class="filter-section"><h4>⭐ Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
       `<div class="filter-section"><h4>📍 Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
       `<div class="filter-section"><h4>✅ Verifikationsstatus</h4><div class="filter-chips">${verChips}</div></div>`;
@@ -4289,6 +4318,7 @@ const AddLocation = {
         subject_name: document.getElementById('subj-name').value || 'Unbenannt',
         subject_height_m: parseFloat(document.getElementById('subj-height').value) || 0,
         subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
+        category: document.getElementById('add-category').value,  // US-76
         save: true
       };
       const result = await API.post('/preview-alignment', body);
