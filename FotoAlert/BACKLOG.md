@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-100** *(Option A freigegeben 2026-06-27)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-88, TASK-04 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-102** · **US-103** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-96** · **US-98 (Epic)** · **US-101** · **US-102** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -643,14 +643,15 @@ Ausgeschlossen: Icon-Set (US-100), Button-/Schriftgrößen (US-101), Logo/App-Ic
 
 ---
 
-### US-100 · Einheitliches Bauhaus-Linien-Icon-Set ersetzt Emoji-Symbole `[ ]`
+### US-100 · Einheitliches Bauhaus-Linien-Icon-Set ersetzt Emoji-Symbole `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 (v1.16.0) |
 
 **Beschreibung:** Als Nutzer möchte ich überall einheitliche, klare Linien-Icons statt der gemischten/verspielten Emojis (🌅🧭🌙 …), damit die Oberfläche ruhig und konsistent wirkt. Eine einzige Icon-Familie (gleicher Strich, gleiches Raster) für Tabs, Chancen-Typen und Status. WebKit-Hinweis: Strich/Füllung als SVG-Attribute setzen, nicht per CSS-Klasse (sonst in Safari unsichtbar).
 
@@ -730,18 +731,50 @@ Ausgeschlossen: Map-Pin-Marker-SVGs (Z. 3297 ff., funktional/farbig — bleiben)
 
 ---
 
-### US-102 · Bauhaus-Logo und App-Icon `[ ]`
+### US-102 · Bauhaus-Logo und App-Icon `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Neue Bauhaus-Wortmarke (FOTO​ALERT, Blau-Akzent) plus geometrische Logo-Marke (Roundel aus Kreis/Viertel/Diamant) und passendes App-Icon in den Header und als PWA-Icon übernehmen. Umfasst auch die **PWA-Icons** (`/icons/icon-*.png`, `apple-touch-icon`, `manifest.json`, `<meta theme-color>`), damit das neue Logo beim „Zum Home-Bildschirm" / als WebApp-Symbol erscheint (heute noch altes Kamera-Icon). Quelle: FotoAlert/design/bauhaus/logo.svg.
 
 **Bezug:** Kind von US-98. Quelle: FotoAlert/design/bauhaus/logo.svg. Aufkommen #4 aus dem US-100-Test (2026-06-27).
+
+**Scope:**
+Eingeschlossen: Header-Roundel (inline SVG), Login-Screen-Logo, PWA-Icons alle Größen (16/32/180/192/512 px), manifest.json, `<meta theme-color>`, SW-Cache-Version bump.
+Ausgeschlossen: iOS App-Icon (Xcode/AppIcon.appiconset), Wortmarke als SVG-Text (bleibt `<h1>`-Text).
+
+**Bestätigte Entscheidungen (2026-06-27):** `theme_color` → `#2D4EA0` (Bauhaus-Blau). iOS-App-Icon nicht Teil dieses Tickets.
+
+**Akzeptanzkriterien:**
+- [ ] Im Header erscheint das Bauhaus-Roundel-SVG (Kreis/Viertel/Diamant blau-gold); oranger Kamera-Gradient-Box ist weg.
+- [ ] Login-Screen zeigt das Roundel statt des Kamera-Icons.
+- [ ] „Zum Home-Bildschirm" in Safari → App-Icon zeigt dunkles Bauhaus-Icon (kein altes Kamera-Icon).
+- [ ] `manifest.json`: `theme_color` = `#2D4EA0`, `background_color` = `#15171C`.
+- [ ] `<meta name="theme-color">` im `<head>` = `#2D4EA0`.
+- [ ] Alle Icon-Größen ersetzt: icon-16.png, icon-32.png, icon-180.png, icon-192.png, icon-512.png.
+- [ ] SW-Cache-Version ist gebumpt (neue Icons werden ausgeliefert, nicht aus altem Cache).
+- [ ] Edge Case: Icon auf weißem iOS-Homescreen gut erkennbar (dunkler Hintergrund schützt).
+
+**Pre-Mortem:**
+- 💀 cairosvg fehlt auf Server → Gegenmaßnahme: PNGs in Sandbox generieren, per Git pushen (kein Server-Dependency)
+- 💀 SVG-Farben nicht token-gebunden → Gegenmaßnahme: Roundel-Farben hardcodiert (Markenfarben — kein currentColor nötig)
+- 💀 SW cached alte Icons → Gegenmaßnahme: Cache-Version bump in sw.js
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-27)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` Z.836 (Header), Z.823 (Login), `web/manifest.json`, `web/icons/`, `web/sw.js`, `design/bauhaus/logo.svg`
+- [x] Implementierung: 2 Subagenten — Agent 1: index.html (Header + Login SVG), Agent 2: PNG-Generierung + manifest + sw.js
+
+**Testplan:**
+- [ ] Manuell: http://localhost:8000 — Header-Roundel sichtbar, Login-Roundel sichtbar
+- [ ] Manuell: Safari → Teilen → „Zum Home-Bildschirm" → Icon prüfen
+- [ ] curl: `curl -s http://localhost:8000/manifest.json | python3 -m json.tool | grep theme`
 
 ---
 
@@ -6402,6 +6435,25 @@ Eingeschlossen: (a) `loc_events` auf `mkSec()` umbauen (einheitliche Bauweise); 
 
 **Analyse & Planung:**
 - [x] Example Mapping (2026-06-25) · [x] Pre-Mortem · [x] Architektur analysiert · [x] Optionen A/B · [x] Empfehlung: B (freigegeben)
+
+---
+
+### TASK-49 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** `refactor_check.py` meldet zwei lange JS-Funktionen in `web/index.html`:
+- `ic()` Z. 803 — ~358 Zeilen (Icon-Helper, eingebracht durch US-100)
+- `handler()` Z. 1161 — ~109 Zeilen
+
+Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27)
 
 ---
 

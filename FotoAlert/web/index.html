@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FotoAlert">
-  <meta name="theme-color" content="#15171c">
+  <meta name="theme-color" content="#2D4EA0">
   <title>FotoAlert</title>
   <script>
     /* Theme früh setzen (US-99/US-97), bevor das CSS greift → kein Flash.
@@ -820,7 +820,7 @@ function ic(id, size, cls){
 </style>
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo"><svg style="width:42px;height:42px"><use href="#i-camera"/></svg></div>
+    <div class="login-logo"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="26" cy="26" r="23" stroke="#2D4EA0" stroke-width="4"/><path d="M26 3 A23 23 0 0 1 49 26 L26 26 Z" fill="#2D4EA0"/><rect x="18" y="18" width="16" height="16" transform="rotate(45 26 26)" fill="#E3A21A"/></svg></div>
     <h1>FotoAlert</h1>
     <p class="login-sub">Bitte Passwort eingeben</p>
     <input id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password"
@@ -833,7 +833,7 @@ function ic(id, size, cls){
   <!-- Header -->
   <div id="header" style="position:relative">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#e8a020,#c45f00);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"><svg style="width:22px;height:22px;color:#fff"><use href="#i-camera"/></svg></div>
+      <div style="width:36px;height:36px;flex-shrink:0"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="16" stroke="#2D4EA0" stroke-width="2.8"/><path d="M18 2 A16 16 0 0 1 34 18 L18 18 Z" fill="#2D4EA0"/><rect x="12.5" y="12.5" width="11" height="11" transform="rotate(45 18 18)" fill="#E3A21A"/></svg></div>
       <div>
         <h1>FotoAlert</h1>
         <div class="subtitle" id="header-subtitle">Berlin &amp; Brandenburg</div>
@@ -1112,7 +1112,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.16.0';
+const APP_VERSION = '1.16.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
