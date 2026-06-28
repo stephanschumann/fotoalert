@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* · **US-107** *(Spec fertig, wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-106** *(Nachbesserung „Feed+Wetter sofort, Kalender im Hintergrund" implementiert + Tests grün; lokales Test-Gate offen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-45** *(Epic Datensync: Azimut automatisch, Option C — verifiziert; fertig, wartet auf Bündel-Release)* · **TASK-47** *(Epic Datensync: Brennweite automatisch, Option A — verifiziert; fertig, wartet auf Bündel-Release)* · **TASK-48** *(Epic Datensync: Automatik-Routine, Option A — 75 Tests grün, verifiziert; fertig, wartet auf Bündel-Release)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-47** · **BUG-46** |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
@@ -45,14 +45,15 @@
 ## 🐛 BugFixes
 
 
-### US-106 · Geänderte oder neue Location sofort komplett nutzbar `[~]`
+### US-106 · Geänderte oder neue Location sofort komplett nutzbar `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Wenn ich die Position einer Location verschiebe oder eine neue Location hinzufüge, möchte ich diese Location innerhalb kurzer Zeit überall in der App vollständig und korrekt sehen — nicht erst am nächsten Morgen oder nach Stunden. Heute erscheinen die kommenden Foto-Chancen für diese Location zwar schon zügig, aber an drei Stellen hinkt die App noch hinterher: das Wetter zur Chance, die Empfehlungen im Entdecken-Bereich und Fälle, in denen gerade eine große Hintergrund-Aktualisierung läuft. Ziel: nach einer Standort-Änderung ist die Location ohne weiteres Zutun überall sofort richtig.
 
@@ -1081,10 +1082,10 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 | Ticket | Inhalt | Abh. | Status |
 |--------|--------|------|--------|
 | **TASK-44** | QA-Datenmodell: Flags, Tabellen, Geo-Hash | TASK-17 ✅ | ✅ Erledigt (archiviert) |
-| **TASK-45** | Azimut via Overpass API (Gebäude-Footprints → Horizon) | TASK-44 | ToDo |
-| **TASK-46** | LLM-Beschreibungen via Claude API | TASK-44 | ToDo |
-| **TASK-47** | Brennweiten-Auto-Calc (Geometrie) | TASK-44 | ToDo |
-| **TASK-48** | QA-Cron-Routine: Change-Detection + Scheduler | TASK-45+46+47 | ToDo |
+| **TASK-45** | Azimut via Overpass API (Gebäude-Footprints → Horizon) | TASK-44 | ✅ Done (v2.0.x, 2026-06-28) |
+| **TASK-46** | LLM-Beschreibungen via Claude API | TASK-44 | ToDo (offen) |
+| **TASK-47** | Brennweiten-Auto-Calc (Geometrie) | TASK-44 | ✅ Done (v2.0.x, 2026-06-28) |
+| **TASK-48** | QA-Cron-Routine: Change-Detection + Scheduler | TASK-45+47 | ✅ Done (v2.0.x, 2026-06-28) |
 
 **Sequenzierung:**
 ```
@@ -1095,13 +1096,13 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-45 · Idealer Azimut automatisch aus Gebäude-Footprints `[~]`
+### TASK-45 · Idealer Azimut automatisch aus Gebäude-Footprints `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
@@ -1198,13 +1199,13 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-47 · Brennweiten-Empfehlung automatisch berechnen `[~]`
+### TASK-47 · Brennweiten-Empfehlung automatisch berechnen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
@@ -1288,13 +1289,13 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 
 ---
 
-### TASK-48 · QA-Lauf automatisieren: Änderungen erkennen + planen `[~]`
+### TASK-48 · QA-Lauf automatisieren: Änderungen erkennen + planen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
@@ -1500,7 +1501,7 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 
 ---
 
-<!-- ===== INBOX: neue Tickets 2026-06-28 (warten auf Stephans Gate → Ready for Analysis) ===== -->
+<!-- ===== READY FOR ANALYSIS: freigegeben für Agenten ===== -->
 
 ### US-107 · Sonnen-Alignment-Planung: Auf-/Untergang relativ zur Location `[ ]`
 
