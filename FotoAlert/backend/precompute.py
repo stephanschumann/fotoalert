@@ -46,7 +46,7 @@ import httpx
 sys.path.insert(0, str(Path(__file__).parent))
 
 from calculations.opportunity import find_opportunities, find_opportunities_multi_day
-from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM
+from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM, get_body_position
 from data.locations import LOCATIONS, PhotoLocation, LocationCategory
 from data.store import LocationStore
 
@@ -424,6 +424,37 @@ def _serialize(o) -> dict:
         "sunset_utc": (
             o.astronomy_report.sun.sunset.isoformat()
             if o.astronomy_report and o.astronomy_report.sun.sunset else None
+        ),
+        # US-79: Mondaufgang und Monduntergang mit Azimut
+        "moonrise_utc": (
+            o.astronomy_report.moon.moonrise.isoformat()
+            if o.astronomy_report and o.astronomy_report.moon.moonrise else None
+        ),
+        "moonset_utc": (
+            o.astronomy_report.moon.moonset.isoformat()
+            if o.astronomy_report and o.astronomy_report.moon.moonset else None
+        ),
+        "moonrise_azimuth": (
+            round(
+                get_body_position(
+                    o.location.observer_lat,
+                    o.location.observer_lon,
+                    "moon",
+                    o.astronomy_report.moon.moonrise,
+                ).azimuth, 1
+            )
+            if o.astronomy_report and o.astronomy_report.moon.moonrise else None
+        ),
+        "moonset_azimuth": (
+            round(
+                get_body_position(
+                    o.location.observer_lat,
+                    o.location.observer_lon,
+                    "moon",
+                    o.astronomy_report.moon.moonset,
+                ).azimuth, 1
+            )
+            if o.astronomy_report and o.astronomy_report.moon.moonset else None
         ),
         # Golden hour & Blue hour – exakte Skyfield-Zeiten pro Location (für Filter + Detail)
         "golden_hour_morning_start": (

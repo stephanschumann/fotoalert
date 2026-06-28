@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-79** |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-103** · **BUG-46** |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-47** |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-46** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-47** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -213,14 +213,15 @@ Manuell (Safari, http://localhost:8000):
 
 ---
 
-### US-103 · Karten-Marker & FOV-Legende im Bauhaus-Stil `[ ]`
+### US-103 · Karten-Marker & FOV-Legende im Bauhaus-Stil `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Die funktionalen Karten-Marker (Leaflet-Pins: Fotograf-Standort, Motiv) und die FOV-Legende („Motiv"-Fadenkreuz, „Fotograf-Standort"-Pin) sollen optisch ans Bauhaus-Design angeglichen werden (Form, Strich, Farbtöne aus US-99). In US-100 bewusst ausgeschlossen, weil farbige/funktionale Karten-Marker eigene Logik haben. Lesbarkeit auf hellen UND dunklen/satelliten Karten beachten.
 
@@ -1066,14 +1067,15 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### US-79 · Mondauf- und -untergang in Event- und Locationdetails `[~]`
+### US-79 · Mondauf- und -untergang in Event- und Locationdetails `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Ergänzend zu Sonnenaufgang und -untergang sollen auch Mondaufgang und -untergang (Uhrzeit, Azimut) in der Astronomie-Kategorie der Event- und Locationdetails angezeigt werden.
 
@@ -1136,19 +1138,19 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 #### ✅ Akzeptanzkriterien
 
-- [ ] **AK-1:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Mondaufgang stattfindet, sieht er in der Astronomie-Sektion des Event-Details eine neue Zeile „Mondaufgang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad (z.B. „🌙 21:34 · 78°").
-- [ ] **AK-2:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Monduntergang stattfindet, sieht er in der Astronomie-Sektion eine neue Zeile „Monduntergang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad.
-- [ ] **AK-3:** Wenn an dem Tag kein Mondaufgang oder kein Monduntergang stattfindet (Felder im Event-Objekt sind `null`), fehlt die entsprechende Zeile kommentarlos — keine Anzeige von „–" oder „unbekannt".
-- [ ] **AK-4:** Die Azimut-Werte für Mondaufgang/-untergang werden auf eine Nachkommastelle gerundet angezeigt (z.B. „78.3°"), konsistent mit anderen Azimut-Angaben in der App.
-- [ ] **AK-5:** Der API-Endpoint `/opportunities` liefert vier neue Felder pro Event: `moonrise_utc` (ISO-String oder null), `moonset_utc` (ISO-String oder null), `moonrise_azimuth` (Float oder null), `moonset_azimuth` (Float oder null).
-- [ ] **AK-6:** Der Kalender-Endpoint `/calendar` liefert dieselben vier neuen Felder (da er dieselbe `_serialize()`-Funktion verwendet).
-- [ ] **AK-7 (Edge Case):** Wenn ein Event aus dem Cache kommt, der **vor** dem Recompute erstellt wurde (Felder fehlen also), zeigt das Frontend weder Fehler noch leere Zeilen an — der `null`-Check greift sauber.
-- [ ] **AK-8 (Regression):** Alle bestehenden Astronomie-Felder (Sonnenaufgang, Sonnenuntergang, Mondphase, Mondbeleuchtung, Goldene/Blaue Stunde) sind nach der Änderung noch identisch vorhanden und korrekt angezeigt.
-- [ ] **AK-NEU-A:** Mondaufgang und Monduntergang erscheinen als eigenständige Event-Karten im Feed — mit Titel, Uhrzeit und Score, direkt neben Goldene Stunde und Blaue Stunde.
-- [ ] **AK-NEU-B:** Die Filter-Chips „Mondaufgang" und „Monduntergang" im Filter-Sheet funktionieren und filtern den Feed korrekt auf diese Event-Typen.
-- [ ] **AK-NEU-C:** Im Event-Detail (Astronomie-Sektion) erscheinen Mondaufgang und Monduntergang mit Uhrzeit (Berliner Zeit) und Azimut in Grad — wenn sie an diesem Tag stattfinden.
-- [ ] **AK-NEU-D:** Wenn ein Mondaufgang- oder Monduntergang-Filter aktiv ist, werden auf der Karte nur Locations mit diesen Events angezeigt (Feed-basierter Filter greift).
-- [ ] **AK-NEU-E:** Mondaufgang- und Monduntergang-Events erscheinen im Location-Detail unter „Nächste Chancen" mit korrektem Mond-Icon (nicht i-star Fallback).
+- [x] **AK-1:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Mondaufgang stattfindet, sieht er in der Astronomie-Sektion des Event-Details eine neue Zeile „Mondaufgang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad (z.B. „🌙 21:34 · 78°").
+- [x] **AK-2:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Monduntergang stattfindet, sieht er in der Astronomie-Sektion eine neue Zeile „Monduntergang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad.
+- [x] **AK-3:** Wenn an dem Tag kein Mondaufgang oder kein Monduntergang stattfindet (Felder im Event-Objekt sind `null`), fehlt die entsprechende Zeile kommentarlos — keine Anzeige von „–" oder „unbekannt".
+- [x] **AK-4:** Die Azimut-Werte für Mondaufgang/-untergang werden auf eine Nachkommastelle gerundet angezeigt (z.B. „78.3°"), konsistent mit anderen Azimut-Angaben in der App.
+- [x] **AK-5:** Der API-Endpoint `/opportunities` liefert vier neue Felder pro Event: `moonrise_utc` (ISO-String oder null), `moonset_utc` (ISO-String oder null), `moonrise_azimuth` (Float oder null), `moonset_azimuth` (Float oder null).
+- [x] **AK-6:** Der Kalender-Endpoint `/calendar` liefert dieselben vier neuen Felder (da er dieselbe `_serialize()`-Funktion verwendet).
+- [x] **AK-7 (Edge Case):** Wenn ein Event aus dem Cache kommt, der **vor** dem Recompute erstellt wurde (Felder fehlen also), zeigt das Frontend weder Fehler noch leere Zeilen an — der `null`-Check greift sauber.
+- [x] **AK-8 (Regression):** Alle bestehenden Astronomie-Felder (Sonnenaufgang, Sonnenuntergang, Mondphase, Mondbeleuchtung, Goldene/Blaue Stunde) sind nach der Änderung noch identisch vorhanden und korrekt angezeigt.
+- [x] **AK-NEU-A:** Mondaufgang und Monduntergang erscheinen als eigenständige Event-Karten im Feed — mit Titel, Uhrzeit und Score, direkt neben Goldene Stunde und Blaue Stunde.
+- [x] **AK-NEU-B:** Die Filter-Chips „Mondaufgang" und „Monduntergang" im Filter-Sheet funktionieren und filtern den Feed korrekt auf diese Event-Typen.
+- [x] **AK-NEU-C:** Im Event-Detail (Astronomie-Sektion) erscheinen Mondaufgang und Monduntergang mit Uhrzeit (Berliner Zeit) und Azimut in Grad — wenn sie an diesem Tag stattfinden.
+- [x] **AK-NEU-D:** Wenn ein Mondaufgang- oder Monduntergang-Filter aktiv ist, werden auf der Karte nur Locations mit diesen Events angezeigt (Feed-basierter Filter greift).
+- [x] **AK-NEU-E:** Mondaufgang- und Monduntergang-Events erscheinen im Location-Detail unter „Nächste Chancen" mit korrektem Mond-Icon (nicht i-star Fallback).
 
 ---
 
@@ -1634,18 +1636,167 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 - [x] **BUG-03** Scheinbare Größe des Himmelsobjekts zu groß – `get_moon_earth_distance_km()` via Skyfield de421.bsp für tatsächliche Mond–Erde-Distanz zum Shoot-Zeitpunkt. Formel korrigiert: `angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km`. Distanz im Detail-Sheet als Fußnote. `ALGORITHM_VERSION = "1.1"`. v1.3.4.
 - [x] **US-96** Einheitliche Chancen-Detailansicht – neue Sektionsreihenfolge, alle Sektionen beim Öffnen zugeklappt, Live-Astro mit Shoot-Datum. v1.17.0.
 
-### BUG-47 · Einstellungsseite zeigt falsche Rolle nach Host-Login `[ ]`
+### BUG-47 · Einstellungsseite zeigt falsche Rolle nach Host-Login `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Nach der Anmeldung mit dem Host-Passwort zeigt die Einstellungsseite „User" statt „Host" an. Die Rolle wird also nach erfolgreichem Login falsch dargestellt — obwohl der Login selbst funktioniert und host-spezifische Rechte greife, stimmt die angezeigte Rollenbezeichnung nicht mit dem tatsächlichen Token überein.
 
 **Bezug:** Abhängig von US-66[x] (Login mit Rollen-Erkennung, Passwort-Mechanismus) — der Fehler liegt in der Darstellungsschicht nach dem Login, nicht im Auth-Mechanismus selbst. Grenzt an US-84 (Host-Passwort-Änderung in der UI), da beide die Einstellungsseite mit host-spezifischen Inhalten betreffen.
+
+---
+
+### Scope
+
+**Eingeschlossen:**
+- Korrekte Anzeige der Rolle ("Host" / "User") in der Einstellungsseite nach Login und nach Seiten-Reload
+- Robuste Rollenableitung: falls `fa_role` im localStorage fehlt, wird die Rolle aus dem gespeicherten Token abgeleitet
+
+**Ausgeschlossen:**
+- Änderungen am Backend-Login-Endpunkt oder am Auth-Mechanismus
+- Änderungen an anderen Teilen der Einstellungsseite (US-84, Passwort-Änderung)
+- iOS-App
+
+---
+
+### Analyse & Root Cause
+
+**Was passiert wo:**
+
+Das Token hat das Format `"<rolle>.<hmac>"` (z.B. `"host.abc123..."`). Der Login-Endpoint `/login` gibt `{ role: "host", token: "host.abc123..." }` zurück. Das Frontend speichert beides getrennt: Token unter `fa_token` und Rolle unter `fa_role` im localStorage. `CFG.role` wird aus `fa_role` geladen und nach Login auf `d.role` gesetzt.
+
+**Die Einstellungsseite** (`Settings.render()`, `web/index.html` Z. 4978) zeigt:
+```
+${CFG.role === 'host' ? 'Host' : 'User'}
+```
+
+**Root Cause:** Wenn `fa_role` im localStorage fehlt (aber `fa_token` vorhanden ist), initialisiert `CFG.role` sich auf `null` — obwohl das Token die korrekte Rolle enthält. Dies passiert zum Beispiel wenn:
+- Der Browser-Storage selektiv geleert wurde (z.B. durch Safari ITP / Storage-Ablauf bei langer Inaktivität), sodass `fa_token` gespeichert bleibt aber `fa_role` fehlt
+- Eine ältere App-Version nur das Token speicherte (kein `fa_role`-Key vorhanden)
+
+In diesem Zustand ist `Auth.isLoggedIn()` true (Token vorhanden), aber `CFG.role === null`, und `null === 'host'` ist false → Einstellungen zeigen "User".
+
+**Betroffene Stellen:**
+- `web/index.html` Z. 1130: CFG-Initialisierung — `role: localStorage.getItem('fa_role') || null`
+- `web/index.html` Z. 1225–1227: `Auth.login()` — setzt `CFG.role = d.role` und speichert `fa_role`
+- `web/index.html` Z. 4978: `Settings.render()` — zeigt `CFG.role === 'host' ? 'Host' : 'User'`
+
+---
+
+### Example Mapping
+
+**Regel 1: Nach dem Login zeigt die Einstellungsseite immer die tatsächlich angemeldete Rolle**
+
+- ✅ Positiv: Ich melde mich mit dem Host-Passwort an, öffne die Einstellungen → ich sehe "Host"
+- ✅ Positiv: Ich melde mich mit dem User-Passwort an, öffne die Einstellungen → ich sehe "User"
+- ❌ Negativ (Bug): Ich melde mich mit dem Host-Passwort an, öffne die Einstellungen → ich sehe "User"
+- 🔲 Edge: Ich melde mich als Host an, lade die Seite neu, öffne die Einstellungen → ich sehe "Host" (nicht "User" oder leer)
+
+**Regel 2: Die Rolle wird auch nach einem Seiten-Reload korrekt wiederhergestellt**
+
+- ✅ Positiv: Ich war als Host angemeldet, lade die Seite neu, öffne die Einstellungen → "Host"
+- 🔲 Edge: `fa_role` fehlt im localStorage, aber `fa_token` ist vorhanden → Rolle wird aus dem Token abgeleitet, Einstellungen zeigen "Host"
+- ❌ Negativ (Bug): `fa_role` fehlt, Token hat "host" kodiert → Einstellungen zeigen "User"
+
+**Regel 3: Ein Logout löscht alle Session-Daten vollständig**
+
+- ✅ Positiv: Ich klicke "Logout", lade die Seite neu → Login-Screen erscheint, keine alte Rolle bleibt
+- ❌ Negativ: Nach Logout ist immer noch eine Rolle angezeigt
+
+*Annahme (aus Code verifiziert):* Das Token-Format `"<rolle>.<hmac>"` ist stabil (auth.py Z. 50–52). Wenn sich das Token-Format ändert, muss die Rollenableitung angepasst werden.
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK1:** Wenn ich mich mit dem Host-Passwort anmelde und dann die Einstellungen öffne, steht unter „Konto" der Text „Host" — nicht „User".
+- [ ] **AK2:** Wenn ich mich mit dem User-Passwort anmelde und dann die Einstellungen öffne, steht dort „User".
+- [ ] **AK3:** Wenn ich als Host angemeldet war, die Seite neu lade und dann die Einstellungen öffne, steht immer noch „Host" — die Anmeldung überlebt den Reload mit korrekter Rollenanzeige.
+- [ ] **AK4:** Wenn `fa_role` im localStorage fehlt, aber ein gültiges Host-Token gespeichert ist, wird beim nächsten Öffnen der Einstellungen trotzdem „Host" angezeigt (Rolle aus Token abgeleitet).
+- [ ] **AK5:** Nach dem Ausloggen und erneutem Login als andere Rolle zeigt die Einstellungsseite korrekt die neue Rolle an — keine alten Werte bleiben hängen.
+
+---
+
+### Pre-Mortem
+
+**Szenario 1: Token-Format ändert sich, Rollenableitung bricht**
+- Risiko: Wenn das Token nicht mehr mit `"."` geteilt werden kann oder das erste Segment keine gültige Rolle enthält, würde `CFG.role` leer bleiben.
+- Gegenmaßnahme: Fallback auf `null` einbauen; nur `"host"` und `"user"` als gültige Werte akzeptieren. `test_bug47.py` verifiziert das Token-Format.
+
+**Szenario 2: Alter localStorage ohne `fa_role`-Key**
+- Risiko: Nutzer mit altem Token (aus einer Version vor US-66) — Token vorhanden aber kein `fa_role`-Key.
+- Gegenmaßnahme: Fix leitet Rolle immer aus Token ab → kein separater Migration-Step nötig.
+
+**Szenario 3: Safari ITP löscht selektiv Storage**
+- Risiko: Safari Intelligent Tracking Prevention kann localStorage-Keys ablaufen lassen. Wenn `fa_role` gelöscht wird aber `fa_token` noch gilt, tritt der Bug erneut auf.
+- Gegenmaßnahme: Rolle nicht aus separatem Key lesen, sondern aus Token extrahieren → `fa_role` wird nicht mehr gebraucht.
+
+**Szenario 4: CFG.role bleibt nach Logout nicht leer**
+- Risiko: Nach Logout mit falscher Rolle für nächsten Login.
+- Verifiziert: `Auth.logout()` (Z. 1231) setzt `CFG.role = null` korrekt — kein Problem hier.
+
+---
+
+### Implementierungsoptionen
+
+**Option A: Rolle aus Token ableiten (empfohlen)**
+
+*App-Wirkung:* Beim Start und nach dem Login wird die Rolle immer direkt aus dem Token gelesen — nicht aus einem separaten `fa_role`-Key. Die Einstellungsseite zeigt immer die Rolle, die im Token steht.
+
+*Technische Umsetzung:*
+- `web/index.html` Z. 1130: `CFG.role` nicht mehr aus `fa_role` lesen, sondern aus dem Token ableiten: `token ? (token.split('.')[0] === 'host' ? 'host' : token.split('.')[0] === 'user' ? 'user' : null) : null`
+- `Auth.login()` Z. 1226–1227: `localStorage.setItem('fa_role', d.role)` kann entfernt werden
+- `Auth.logout()` Z. 1232: `localStorage.removeItem('fa_role')` entfernen (optional, sauberer Cleanup)
+
+*Vorteil:* Einzige Quelle der Wahrheit ist das Token. Kein Sync-Problem, kein separater Key.
+*Nachteil:* Keiner bei diesem Anwendungsfall.
+
+**Option B: `fa_role` behalten, aber beim Startup aus Token auffüllen wenn leer**
+
+*App-Wirkung:* Falls `fa_role` fehlt aber ein Token vorhanden ist, wird `CFG.role` aus dem Token-Prefix abgeleitet. Im Normalfall bleibt alles beim Alten.
+
+*Technische Umsetzung:*
+- `web/index.html` Z. 1130: Initialisierungslogik erweitern — falls `fa_role` leer aber `fa_token` vorhanden, Rolle aus Token-Prefix lesen.
+
+*Vorteil:* Minimale Änderung.
+*Nachteil:* Zwei Quellen (Token und `fa_role`), die auseinanderlaufen können.
+
+**Empfehlung: Option A.** Weniger Zustand, keine Sync-Probleme, robuster gegen Storage-Teilbereinigung. Kleiner Change (3–4 Zeilen).
+
+---
+
+### Testplan
+
+**Backend (automatisiert, pytest):**
+- `backend/tests/test_bug47.py`: Verifiziert dass `/login` mit Host-Passwort `role: "host"` zurückgibt und das Token-Prefix mit der Rolle übereinstimmt.
+
+**Frontend (manuell, nach Implementierung):**
+
+Schritt 1 — Frischer Login als Host:
+```
+Einstellungen-Tab öffnen → unter "Konto" muss "Host" stehen
+```
+
+Schritt 2 — Reload-Persistenz:
+```
+Seite neu laden → Einstellungen öffnen → immer noch "Host"
+```
+
+Schritt 3 — Rolle aus Token bei fehlendem fa_role:
+```
+Browser-DevTools Console: localStorage.removeItem('fa_role')
+Seite neu laden → Einstellungen öffnen → "Host" (Rolle aus Token)
+```
+
+Schritt 4 — Rollenwechsel:
+```
+Logout → als User anmelden → Einstellungen → "User"
+```
 
 ---
 

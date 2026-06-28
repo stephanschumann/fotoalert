@@ -670,6 +670,53 @@ async def find_opportunities(
             ))
 
     # -----------------------------------------------------------------------
+    # 5b. MONDAUFGANG UND MONDUNTERGANG (US-79)
+    # Eigenständige Event-Typen – analog zu Goldener Stunde.
+    # Mondaufgang: moon.moonrise ist UTC-Datetime wenn vorhanden.
+    # Monduntergang: moon.moonset ist UTC-Datetime wenn vorhanden.
+    # -----------------------------------------------------------------------
+    for moon_dt, event_type_mr, event_id_suffix, label in [
+        (moon.moonrise, EventType.MOON_RISE, "moonrise", "Mondaufgang"),
+        (moon.moonset,  EventType.MOON_SET,  "moonset",  "Monduntergang"),
+    ]:
+        if moon_dt is None:
+            continue
+        # Azimut des Mondes zum Zeitpunkt des Aufgangs/Untergangs
+        moon_pos_mr = get_body_position(lat, lon, "moon", moon_dt)
+        moon_az_mr = round(moon_pos_mr.azimuth, 1) if moon_pos_mr else None
+
+        phase_score = _score_moon_phase_for_moonshot(moon.phase_fraction)
+        a_s_mr = 0.55 + phase_score * 0.3   # Basis 0.55 + Phasen-Bonus bis 0.85
+        w_s_mr = _w_score(forecast, moon_dt, use_weather)
+        overall_mr = _overall(a_s_mr, w_s_mr, use_weather)
+
+        if overall_mr >= min_score:
+            phase_note = f"Mondphase: {moon.phase_name} ({moon.illumination_pct:.0f}% beleuchtet)."
+            az_note = f" Azimut {moon_az_mr}°." if moon_az_mr is not None else ""
+            opportunities.append(PhotoOpportunity(
+                id=f"{location.id}_{event_id_suffix}_{target_date.isoformat()}",
+                location=location,
+                event_type=event_type_mr,
+                title=f"{label} – {location.name}",
+                description=(
+                    f"{label} um {_fmt_time(moon_dt)} (Ortszeit).{az_note} "
+                    f"{phase_note}"
+                ),
+                shoot_time=moon_dt,
+                shoot_window_start=moon_dt - timedelta(minutes=15),
+                shoot_window_end=moon_dt + timedelta(minutes=30),
+                overall_score=round(overall_mr, 2),
+                astronomy_score=round(a_s_mr, 2),
+                weather_score=round(w_s_mr, 2),
+                location_score=1.0,
+                camera_hints=_camera_hints_moon(200),
+                subject_azimuth=round(subject_az, 1),
+                celestial_azimuth=moon_az_mr,
+                astronomy_report=astro,
+                alert_priority=1 if overall_mr > 0.65 else 0,
+            ))
+
+    # -----------------------------------------------------------------------
     # 6. METEORITENSCHAUER
     # -----------------------------------------------------------------------
     for shower in astro.active_meteor_showers:

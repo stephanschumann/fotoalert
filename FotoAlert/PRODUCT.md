@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-28 · Basis: abgeschlossene Tickets bis US-102, US-100, US-96, BUG-42
+> Zuletzt aktualisiert: 2026-06-28 · Basis: abgeschlossene Tickets bis US-79, US-102, US-100, US-96, BUG-42
 
 ---
 
@@ -51,6 +51,8 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 | Score-Ring | Kreisring, Füllgrad = Score (0–100%), Farbe: grün ≥80%, orange 50–79%, rot <50% |
 | Wetter-Badge | Tag-Chip auf Feed-Karten nur wenn `weather_score > 0`; bei unbekanntem Wetter kein Badge (BUG-44) |
 | Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
+| Mondaufgang-Events | Eigenständige Karten im Feed mit Typ `"Mondaufgang"`, Score-Ring, Uhrzeit und Location (US-79) |
+| Monduntergang-Events | Eigenständige Karten im Feed mit Typ `"Monduntergang"`, Score-Ring, Uhrzeit und Location (US-79) |
 | Alert-Banner | Sichtbar wenn relevante Chancen heute oder morgen |
 | Tipp: Chance antippen | Öffnet Detail-Sheet (Pflicht: Detail schließt mit Overlay-Tap) |
 | Leer-State | Wenn keine Chancen passen: Hinweis-Text, kein Absturz |
@@ -64,6 +66,8 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 - [ ] Score-Ring korrekt (visuelle Überprüfung: 75% = ring 3/4 gefüllt)
 - [ ] Karten nicht doppelt vorhanden
 - [ ] Routine-Events-Filter entfernt Goldene/Blaue-Stunde-Karten
+- [ ] Filter-Chips „Mondaufgang" / „Monduntergang" filtern Feed korrekt (US-79)
+- [ ] Mondaufgang-/Monduntergang-Events erscheinen als eigenständige Karten im Feed (US-79)
 
 ---
 
@@ -160,6 +164,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | „Zum Kalender" | Lädt `.ics`-Datei herunter; Apple Kalender öffnet Event |
 | Close | Overlay antippen oder Close-Button schließt Sheet |
 | Mond-Erde-Distanz | Zeigt ~384.400 km (nicht ~370 km — BUG-18 gefixt) |
+| Mondaufgang in Astronomie-Sektion | Zeigt Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn an diesem Tag vorhanden (US-79); fehlt kommentarlos wenn null |
+| Monduntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-79); fehlt kommentarlos wenn null |
 | Koordinaten-Sektion | Kein Overflow-Problem (BUG-38 gefixt); Labels korrekt ausgerichtet |
 | Sheet-Header | Kein blaugrauer Strich links (BUG-39 gefixt) |
 
@@ -168,9 +174,11 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Alle 12 Sektionen vorhanden — **keine Sektion doppelt**
 - [ ] Beim Öffnen: alle Sektionen eingeklappt
 - [ ] Close-Button erreichbar (Safe Area, kein Overlap mit Status Bar)
-- [ ] FOV-Karte lädt (Leaflet) und zeigt Verbindungslinie
+- [ ] FOV-Karte lädt (Leaflet) und zeigt Verbindungslinie; Zielring-Marker (Ring + Ticks + Mittelpunkt, gold) sichtbar; Legende zeigt Zielring-Icon (US-103)
 - [ ] „Zum Kalender" → `.ics` Download startet
 - [ ] Street-View-Button nur sichtbar wenn Azimut verfügbar
+- [ ] Astronomie-Sektion zeigt Mondaufgang + Monduntergang mit Uhrzeit + Azimut (wenn vorhanden) (US-79)
+- [ ] Kein Fehler / keine leere Zeile wenn Mondaufgang/-untergang null (US-79)
 
 ---
 
@@ -179,7 +187,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Funktion | Verhalten |
 |----------|-----------|
 | Karte | Leaflet, dunkle Tiles (Carto Dark), Berlin zentriert |
-| Marker | ≥10 farbige Pins für gespeicherte Locations |
+| Marker | ≥10 Pins für gespeicherte Locations; SVG-Tropfen (blau, weißer Kern) im Bauhaus-Stil (US-103) |
 | Marker-Tap | Popup mit Location-Name und Kategorie |
 | Kartenfilter | Alle location-bezogenen Filterkriterien wirken auf Karten-Pins: Eventtyp (inkl. Ausschließen, BUG-23+BUG-46), Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung (GPS). Tageszeit, Brennweite und Wahrscheinlichkeit sind auf der Karte ausgegraut (BUG-46) |
 | GPS-Zentrierung | Button zentriert Karte auf aktuelle GPS-Position (US-69) |
@@ -304,8 +312,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | `/health` | GET | Status + locations_count + version |
 | `/locations` | GET | Alle Locations (Basis + Overrides + Custom) |
 | `/locations/{id}` | PATCH | Location editieren (auth: host) |
-| `/opportunities` | GET | 14-Tage-Feed; params: `min_score`, `days` |
-| `/calendar` | GET | 365-Tage-Kalender |
+| `/opportunities` | GET | 14-Tage-Feed; params: `min_score`, `days`; liefert seit US-79 vier neue Felder je Event: `moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth` (ISO-String oder null / Float oder null) |
+| `/calendar` | GET | 365-Tage-Kalender; liefert seit US-79 dieselben vier Mondfelder (nutzt dieselbe `_serialize()`-Funktion) |
 | `/discover` | GET | Scout-Ephemeride (Mond-Alignment) |
 | `/preview-alignment` | POST | Quick-Add-Vorschau (auth: host) |
 | `/refresh` | POST | Manueller Cache-Reload (auth: host) |
@@ -348,8 +356,8 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | US-83 | Scout-Detail + „Als Location speichern" (In Progress) |
 | US-95 | Chancendetails: Buttons kleiner, Karte größer |
 | US-98 | Bauhaus-Redesign Epic (übergeordnet) |
-| US-103 | Karten-Marker & FOV-Legende im Bauhaus-Stil |
 | BUG-21 | Brennweiten-Eingabe: kein Komma auf iOS |
+| US-79 offen | Location-Detail Astronomie-Block: Mondaufgang/-untergang für Heute (live berechnet) — noch nicht entschieden ob eigenes Ticket; der restliche Scope (Feed, Filter, Event-Detail) ist fertig |
 
 ---
 
@@ -365,6 +373,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | — | US-97 | Automatischer Tag/Nacht-Modus + manueller Umschalter |
 | — | US-99 | Bauhaus-Theme-Tokens (hell + dunkel) |
 | — | US-88 | Brennweiten-Filter nicht-linear |
+| 2026-06-28 | US-103 | Karten-Marker & FOV-Legende im Bauhaus-Stil (Tropfen + Zielring) |
 | 2026-06-28 | US-105 | Chancen-Detail: Sektionsreihenfolge optimiert (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) |
 | 2026-06-28 | US-104 | Scout-Karten auf Feed-Design umgestellt (ScoreRing, Himmelsrichtung, Tag-Chips) |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |
@@ -374,3 +383,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | — | BUG-38/39 | Koordinaten-Sektion: Overflow + Strich gefixt |
 | 2026-06-28 | BUG-44 | Kalender-Events im 14-Tage-Fenster zeigen vollständiges Detailsheet inkl. Wetter; „Wetter unbekannt"-Badge entfernt |
 | 2026-06-28 | BUG-46 | Filter: Drei-Zustände für Verifikation + Bewertung; Karte an alle Location-Filter angebunden; ansichtsabhängiges Ausgrauen irrelevanter Kriterien |
+| 2026-06-28 | US-79 | Mondaufgang + Monduntergang als eigenständige Event-Typen (`"Mondaufgang"`, `"Monduntergang"`) im Feed, Kalender, Filter und Location-Detail (Nächste Chancen); vier neue API-Felder in `_serialize()`: `moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`; Event-Detail Astronomie-Sektion zeigt Uhrzeit + Azimut; `/refresh-feed` nach Release ausführen |

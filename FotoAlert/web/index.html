@@ -1127,7 +1127,12 @@ const CFG = {
   notifyGolden: localStorage.getItem('fa_notify_golden') !== 'false',
   notifyMilky: localStorage.getItem('fa_notify_milky') === 'true',
   token: localStorage.getItem('fa_token') || null,  // US-66: Session-Token
-  role: localStorage.getItem('fa_role') || null,    // US-66: 'host' | 'user'
+  get role() {                                       // BUG-47: immer aus Token-Präfix lesen
+    const tok = localStorage.getItem('fa_token');
+    if (!tok) return null;
+    const prefix = tok.split('.')[0];
+    return (prefix === 'host' || prefix === 'user') ? prefix : null;
+  },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1222,13 +1227,15 @@ const Auth = {
     if (r.status === 401) return false;
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    CFG.token = d.token; CFG.role = d.role;
+    CFG.token = d.token;                           // BUG-47: role wird via getter aus Token gelesen
     localStorage.setItem('fa_token', d.token);
-    localStorage.setItem('fa_role', d.role);
+    // fa_role wird nicht mehr als maßgebliche Quelle verwendet (BUG-47),
+    // bleibt aber gesetzt für eventuelle externe Kompatibilität.
+    if (d.role) localStorage.setItem('fa_role', d.role);
     return true;
   },
   logout(silent) {
-    CFG.token = null; CFG.role = null;
+    CFG.token = null;                              // BUG-47: CFG.role ist getter, kein Setter
     localStorage.removeItem('fa_token'); localStorage.removeItem('fa_role');
     LoginScreen.show();
   }
@@ -1251,7 +1258,8 @@ const LoginScreen = {
       const ok = await Auth.login(pw);
       if (!ok) { err.textContent = 'Falsches Passwort.'; input.select(); return; }
       LoginScreen.hide();
-      App.init();
+      await App.init();
+      App.nav('feed');  // BUG-47b: nach Login immer auf Feed navigieren damit Settings.render() beim nächsten Tab-Besuch neu aufgerufen wird
     } catch(e) {
       err.textContent = 'Server nicht erreichbar.';
     }
