@@ -551,23 +551,12 @@
 
     /* ── Scout-Tab ───────────────────────────────────────────────── */
     #scout-content { padding: 8px 14px 80px; }
-    .scout-card { background: var(--card); border-radius: 14px; border: 1px solid var(--border);
-      padding: 14px; margin-bottom: 10px; cursor: pointer; }
-    .scout-card-header { display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 8px; }
-    .scout-subject { font-size: 15px; font-weight: 700; color: var(--text); }
-    .scout-kategorie { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .scout-score-badge { background: var(--gold); color: var(--on-accent); border-radius: 8px;
-      padding: 3px 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .scout-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .scout-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-      padding: 3px 8px; font-size: 12px; color: var(--muted); }
-    .scout-chip strong { color: var(--text); }
-    .scout-actions { display: flex; gap: 8px; }
+    .scout-actions { display: flex; margin-top: 8px; }
     .scout-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg); color: var(--text); font-size: 13px; font-weight: 600;
       cursor: pointer; transition: all .2s; text-align: center; }
     .scout-btn:hover { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
+    .scout-btn-nav { width: 100%; }
     .scout-day-header { font-size: 13px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: .04em; padding: 12px 0 4px; }
     .scout-empty { text-align: center; padding: 48px 24px; color: var(--muted); font-size: 15px; }
@@ -1127,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.19.0';
+const APP_VERSION = '1.19.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1279,6 +1268,7 @@ const ICONS = {
   'Mond-Alignment':        'i-moon',     'Sonnen-Alignment':      'i-sun',
   'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
   'Sonnenfinsternis':      'i-eclipse',
+  'Blaue Stunde Morgen':   'i-moon',     'Blaue Stunde Abend':    'i-moon',
 };
 const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, kein leeres Kästchen)
 // Liefert fertiges <svg>-Icon-Markup für einen Event-Typ.
@@ -1353,6 +1343,20 @@ function scoreRing(score, priority=0) {
   </div>`;
 }
 
+function bearingLabel(spLat, spLon, subLat, subLon) {
+  const dLon = (subLon - spLon) * Math.PI / 180;
+  const lat1 = spLat * Math.PI / 180;
+  const lat2 = subLat * Math.PI / 180;
+  const x = Math.sin(dLon) * Math.cos(lat2);
+  const y = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+  let bearing = Math.atan2(x, y) * 180 / Math.PI;
+  bearing = (bearing + 360) % 360;
+  // Umkehren: fromBearing = Richtung, aus der fotografiert wird (Standpunkt ist dort)
+  const fromBearing = (bearing + 180) % 360;
+  const dirs = ['Norden','Nordosten','Osten','Südosten','Süden','Südwesten','Westen','Nordwesten'];
+  return dirs[Math.round(fromBearing / 45) % 8];
+}
+
 // ═══════════════════════════════════════════════════════
 // OPPORTUNITY CARD
 // ═══════════════════════════════════════════════════════
@@ -1384,6 +1388,42 @@ function oppCard(o) {
         <div class="opp-location">${ic('i-pin',13)} ${Locations.nameFor(o.location_id, o.location_name)}</div>
         <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${rated}</div>
       </div>
+    </div>
+  </div>`;
+}
+
+function scoutCard(o) {
+  const sesLabel  = SESSION_LABELS[o.session] || o.session;
+  const icon      = eventIcon(sesLabel, 15, 'ct');
+  const time      = o.dt_utc ? formatTime(o.dt_utc) : '–';
+  const bearing   = bearingLabel(o.standpoint_lat, o.standpoint_lon, o.subject_lat, o.subject_lon);
+  const distKm    = o.distance_m != null ? (Math.round(o.distance_m / 100) / 10).toLocaleString('de-DE') : null;
+  const illumPct  = o.body_illumination_pct ?? o.moon_illumination_pct ?? null;
+
+  const weatherTag = `<span class="tag tag-blue">${ic('i-cloud',12)} ${o.weather_description}</span>`;
+  const distTag    = distKm ? `<span class="tag tag-blue">${ic('i-nav',12)} ${distKm} km</span>` : '';
+  const illumTag   = illumPct != null
+    ? `<span class="tag tag-blue">${ic('i-moon',12)} ${Math.round(illumPct)}% beleuchtet</span>`
+    : '';
+
+  const navUrl  = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
+
+  return `<div class="card" onclick="Scout.openDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+    <div class="opp-card">
+      ${scoreRing(o.score || 0)}
+      <div class="opp-body">
+        <div class="opp-meta">
+          <span class="opp-icon">${icon}</span>
+          <span class="opp-type">${sesLabel}</span>
+          <span class="opp-time">${time}</span>
+        </div>
+        <div class="opp-title">${o.subject_name || '–'}</div>
+        <div class="opp-location">${ic('i-pin',13)} Blick vom ${bearing}</div>
+        <div class="opp-tags">${weatherTag}${distTag}${illumTag}</div>
+      </div>
+    </div>
+    <div class="scout-actions">
+      <button class="scout-btn scout-btn-nav" onclick="event.stopPropagation();window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
     </div>
   </div>`;
 }
@@ -1550,6 +1590,15 @@ const Feed = {
 // ═══════════════════════════════════════════════════════
 // SCOUT-TAB (US-70)
 // ═══════════════════════════════════════════════════════
+const SESSION_LABELS = {
+  blue_morning:   'Blaue Stunde Morgen',
+  golden_morning: 'Goldene Stunde Morgen',
+  golden_evening: 'Goldene Stunde Abend',
+  blue_evening:   'Blaue Stunde Abend',
+  milky_way:      'Milchstraße',
+  moon:           'Mond-Alignment',
+};
+
 const Scout = {
   data: null,   // null = nicht geladen, [] = keine Chancen, [...] = Daten
   _loading: false,
@@ -1618,50 +1667,13 @@ const Scout = {
       byDay[o.day].push(o);
     }
 
-    const sessionLabel = {
-      blue_morning:   'Blaue Stunde Morgen',
-      golden_morning: 'Goldene Stunde Morgen',
-      golden_evening: 'Goldene Stunde Abend',
-      blue_evening:   'Blaue Stunde Abend',
-    };
-
     let html = countBar;
     for (const [day, opps] of Object.entries(byDay).slice(0, 14)) {
       const d = new Date(day + 'T12:00:00Z');
       const label = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
       html += `<div class="scout-day-header">${label}</div>`;
       for (const o of opps) {
-        const time = o.dt_utc ? new Date(o.dt_utc).toLocaleTimeString('de-DE',
-          { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : '–';
-        const scorePct   = Math.round(o.score * 100);
-        const _bodyName  = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
-        const bodyIcon   = ic(_bodyName === 'sun' ? 'i-sun' : 'i-moon', 13);
-        const illumChip  = o.moon_illumination_pct != null
-          ? `<span class="scout-chip">${bodyIcon} <strong>${Math.round(o.moon_illumination_pct)}%</strong> beleuchtet</span>`
-          : '';
-        const mapsUrl  = `https://maps.apple.com/?ll=${o.standpoint_lat},${o.standpoint_lon}&z=15`;
-        const navUrl   = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
-        html += `<div class="scout-card" onclick="Scout.openDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
-          <div class="scout-card-header">
-            <div>
-              <div class="scout-subject" style="display:flex;align-items:center;gap:6px">${bodyIcon} ${o.subject_name}</div>
-              <div class="scout-kategorie">${o.kategorie || ''} · ${sessionLabel[o.session] || o.session}</div>
-            </div>
-            <div class="scout-score-badge">${scorePct}%</div>
-          </div>
-          <div class="scout-meta">
-            <span class="scout-chip">${ic('i-clock',12)} <strong>${time} Uhr</strong></span>
-            ${illumChip}
-            <span class="scout-chip">${ic('i-ruler',12)} Höhe <strong>${(o.moon_altitude_deg ?? o.body_altitude_deg ?? '?')}°</strong></span>
-            <span class="scout-chip">${ic('i-nav',12)} <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
-            <span class="scout-chip">${ic('i-camera',12)} ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
-            <span class="scout-chip">${ic('i-cloud',12)} <strong>${o.weather_description}</strong></span>
-          </div>
-          <div class="scout-actions">
-            <button class="scout-btn" onclick="event.stopPropagation();window.open('${mapsUrl}','_blank')">${ic('i-pin',14)} Standort</button>
-            <button class="scout-btn" onclick="event.stopPropagation();window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
-          </div>
-        </div>`;
+        html += scoutCard(o);
       }
     }
     el.innerHTML = html;
@@ -1670,15 +1682,7 @@ const Scout = {
   openDetail(o) {
     // US-83: Scout → Detail Adapter (Feldnamen-Mapping aus ScoutOpportunity)
     if (typeof o === 'string') o = JSON.parse(o);
-    const _sessionLabel = {
-      blue_morning:   'Blaue Stunde Morgen',
-      golden_morning: 'Goldene Stunde Morgen',
-      golden_evening: 'Goldene Stunde Abend',
-      blue_evening:   'Blaue Stunde Abend',
-      milky_way:      'Milchstraße',
-      moon:           'Mond-Alignment',
-    };
-    const sesLabel = _sessionLabel[o.session] || o.session || '–';
+    const sesLabel = SESSION_LABELS[o.session] || o.session || '–';
     // body_name aus session ableiten — Scout-Cache hat kein body_name-Feld
     const bodyName = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
     const bodyLabel = bodyName === 'sun' ? 'Sonne' : 'Mond';
