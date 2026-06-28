@@ -26,7 +26,7 @@ if [[ "$confirm" != "j" && "$confirm" != "J" ]]; then
     exit 0
 fi
 
-git checkout "$TARGET" -- .
+git reset --hard "$TARGET"
 sudo systemctl restart fotoalert.service
 sleep 4
 

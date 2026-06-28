@@ -245,6 +245,8 @@ def analyze_frontend() -> dict:
         "state3",       # Closure in FilterSheet._render() — tatsächlich 2 Zeilen
         "mkSec",        # Top-Level Template-Helper — tatsächlich 3 Zeilen
         "axisPhrase",   # Closure im Location-Detail IIFE — tatsächlich 10 Zeilen
+        "local",        # IIFE-Variable in CameraFOV._loadProfile() — tatsächlich 1 Zeile (TASK-43)
+        "row",          # lokale Arrow-Function in AstroMap.render() — tatsächlich 12 Zeilen (TASK-43)
     }
 
     fn_pattern = re.compile(r'^\s*(async\s+)?function\s+(\w+)|(\w+)\s*[:=]\s*(async\s+)?(?:function|\([^)]*\)\s*=>)')

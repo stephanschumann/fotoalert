@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FotoAlert · Bauhaus-Prototyp</title>
+<style>
+  :root{
+    --bg:#EAE6DB; --surface:#FFFFFF; --card:#FFFFFF; --ink:#1A1A1A; --sub:#6B6B62;
+    --line:#E0DBCD; --blue:#2D4EA0; --gold:#E3A21A; --red:#C8472F; --green:#2E7D55;
+    --chipblue:#EEF1FA; --chipblueink:#2D4EA0; --chipgold:#FBF1DD; --chipgoldink:#8a5e08;
+    --chipred:#F8E7E2; --chipredink:#9c2f1c;
+    --radius:12px;
+  }
+  [data-theme="dark"]{
+    --bg:#15171C; --surface:#1E2127; --card:#1E2127; --ink:#ECEAE3; --sub:#8A8C95;
+    --line:#2A2D34; --blue:#7C9BEA; --gold:#E3A21A; --red:#E0664F; --green:#5BB089;
+    --chipblue:#202A40; --chipblueink:#9DB4F0; --chipgold:#2C2515; --chipgoldink:#E3A21A;
+    --chipred:#33201b; --chipredink:#E59079;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:'Helvetica Neue',Arial,system-ui,sans-serif;
+    background:#cfcabd;color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px 12px 48px}
+  [data-theme="dark"] body{background:#0a0b0e}
+  /* ---- control bar (outside phone) ---- */
+  .ctrl{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:none;background:none;padding:7px 16px;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;display:flex;align-items:center;gap:6px}
+  .seg button.on{background:var(--blue);color:#fff}
+  [data-theme="dark"] .seg button.on{color:#15171C}
+  .hint{font-size:12px;color:#6b6b62}
+  [data-theme="dark"] .hint{color:#8A8C95}
+  /* ---- phone ---- */
+  .phone{width:372px;max-width:96vw;height:760px;background:var(--bg);border-radius:34px;
+    border:1px solid var(--line);position:relative;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);display:flex;flex-direction:column}
+  .notch{height:30px;flex:0 0 auto}
+  /* header */
+  .hdr{display:flex;align-items:center;gap:10px;padding:6px 16px 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:0 0 auto}
+  .brand{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+  .wm{font-size:17px;font-weight:700;letter-spacing:1px}
+  .wm b{color:var(--blue);font-weight:700}
+  .pagetitle{font-size:17px;font-weight:700;letter-spacing:.3px}
+  .iconbtn{background:none;border:none;color:var(--sub);cursor:pointer;padding:4px;display:flex}
+  .iconbtn:hover{color:var(--blue)}
+  /* pages */
+  .pages{flex:1;position:relative;overflow:hidden}
+  .page{position:absolute;inset:0;overflow-y:auto;padding:12px 14px 86px;display:none}
+  .page.on{display:block}
+  .page::-webkit-scrollbar{width:0}
+  /* section label */
+  .sec{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.9px;margin:14px 4px 8px}
+  .sec:first-child{margin-top:4px}
+  /* alert banner */
+  .alert{background:var(--chipblue);border:1px solid var(--blue);border-radius:var(--radius);padding:11px 13px;display:flex;gap:11px;align-items:center;cursor:pointer}
+  .alert .ico{color:var(--gold);flex:0 0 auto}
+  .alert h3{margin:0 0 2px;font-size:12px;font-weight:700;color:var(--chipblueink);letter-spacing:.3px}
+  .alert p{margin:0;font-size:12px;color:var(--sub)}
+  /* card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:11px 12px;margin-bottom:9px;display:flex;gap:11px;align-items:center;cursor:pointer;transition:border-color .15s}
+  .card:hover{border-color:var(--blue)}
+  .ring{flex:0 0 auto}
+  .cbody{flex:1;min-width:0}
+  .cmeta{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .cmeta .ct{color:var(--blue)}
+  .ctype{font-size:10.5px;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+  .ctime{margin-left:auto;font-size:11px;font-weight:500;color:var(--ink)}
+  .ctitle{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cloc{font-size:11.5px;color:var(--sub);margin-top:1px;display:flex;align-items:center;gap:4px}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .tag{font-size:9.5px;font-weight:500;padding:2px 7px;border-radius:20px}
+  .tag.blue{background:var(--chipblue);color:var(--chipblueink)}
+  .tag.gold{background:var(--chipgold);color:var(--chipgoldink)}
+  .tag.red{background:var(--chipred);color:var(--chipredink)}
+  .tag.line{background:transparent;border:1px solid var(--line);color:var(--sub)}
+  /* tab bar */
+  .tabs{position:absolute;left:0;right:0;bottom:0;height:62px;background:var(--surface);border-top:1px solid var(--line);display:flex;align-items:center;padding:0 6px}
+  .tab{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--sub);font-size:9.5px;font-weight:500}
+  .tab.on{color:var(--blue)}
+  .tab .fab{width:34px;height:34px;border-radius:10px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff}
+  [data-theme="dark"] .tab .fab{color:#15171C}
+  /* icons */
+  .ic{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:block}
+  .ic.fill{fill:currentColor;stroke:none}
+  /* map */
+  .mapwrap{position:relative;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg);height:340px}
+  #mapcanvas{position:absolute;inset:0;transform-origin:center;transition:transform .22s ease}
+  .mtint{position:absolute;inset:0;pointer-events:none;transition:background .2s;z-index:1}
+  #mapcanvas[data-mt="satellit"] .mtint{background:#1d2433;mix-blend-mode:normal;opacity:.82}
+  #mapcanvas[data-mt="gelaende"] .mtint{background:#2e7d55;opacity:.10}
+  .maptype{width:100%}
+  .maptype button{flex:1;justify-content:center}
+  .zoomctl{position:absolute;right:10px;bottom:10px;z-index:5;display:flex;flex-direction:column;gap:6px}
+  .zoomctl button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .zoomctl button:hover{border-color:var(--blue);color:var(--blue)}
+  .mappin{position:absolute;transform:translate(-50%,-100%);color:var(--blue);cursor:pointer;z-index:2}
+  .mappin.gold{color:var(--gold)}
+  .mapnote{font-size:11px;color:var(--sub);text-align:center;margin-top:8px}
+  /* location row */
+  .lrow{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;cursor:pointer}
+  .lthumb{width:46px;height:46px;border-radius:9px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff}
+  [data-theme="dark"] .lthumb{color:#15171C}
+  .lname{font-size:14px;font-weight:500}
+  .lmeta{font-size:11.5px;color:var(--sub);margin-top:1px}
+  .ldist{margin-left:auto;font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:3px}
+  /* settings */
+  .setgrp{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+  .setrow{display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid var(--line)}
+  .setrow:last-child{border-bottom:none}
+  .setrow .si{color:var(--blue);flex:0 0 auto}
+  .setlabel{flex:1;font-size:14px}
+  .setval{font-size:13px;color:var(--sub)}
+  .sw{width:42px;height:24px;border-radius:20px;background:var(--line);position:relative;flex:0 0 auto;cursor:pointer;transition:background .2s}
+  .sw.on{background:var(--blue)}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
+  .sw.on::after{left:21px}
+  .seg3{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .seg3 button{border:none;background:none;padding:6px 12px;font-size:12px;color:var(--sub);cursor:pointer}
+  .seg3 button.on{background:var(--blue);color:#fff}
+  [data-theme="dark"] .seg3 button.on{color:#15171C}
+  input[type=range]{width:100%;accent-color:var(--blue)}
+  /* sheets */
+  .overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .overlay.on{opacity:1;pointer-events:auto}
+  .sheet{position:absolute;left:0;right:0;bottom:0;max-height:88%;background:var(--surface);border-radius:22px 22px 0 0;
+    transform:translateY(102%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:50;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .sheet.on{transform:translateY(0)}
+  .sheethead{display:flex;align-items:center;padding:14px 16px 8px;flex:0 0 auto}
+  .sheethead .close{margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;padding:4px}
+  .sheetbody{overflow-y:auto;padding:0 16px 28px}
+  /* detail */
+  .dhero{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+  .dscore{flex:0 0 auto}
+  .dtype{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+  .dtitle{font-size:20px;font-weight:700;letter-spacing:.2px;margin:1px 0}
+  .dloc{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:5px}
+  .inforow{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .inforow .il{color:var(--sub)}
+  .inforow .iv{font-weight:500;text-align:right}
+  .camcard{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-top:12px}
+  .camcard .cm{font-size:13.5px;font-weight:500}
+  .camcard .cw{font-size:12px;color:var(--red);margin-top:5px;display:flex;align-items:center;gap:5px}
+  .camcard .ctip{font-size:12px;color:var(--sub);margin-top:5px}
+  .btnrow{display:flex;gap:9px;margin-top:14px}
+  .btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+  [data-theme="dark"] .btn.primary{color:#15171C}
+  /* add form */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px;letter-spacing:.3px}
+  .field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit}
+  .field input:focus{outline:none;border-color:var(--blue)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{padding:7px 13px;border:1px solid var(--line);border-radius:20px;font-size:12.5px;color:var(--sub);cursor:pointer}
+  .chip.on{background:var(--chipblue);border-color:var(--blue);color:var(--chipblueink)}
+  h2.sheettitle{font-size:18px;font-weight:700;margin:0;letter-spacing:.3px}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="ctrl">
+  <div class="seg" id="themeseg">
+    <button data-th="light" class="on"><svg class="ic" style="width:15px;height:15px"><use href="#i-sun"/></svg>Tag</button>
+    <button data-th="dark"><svg class="ic" style="width:15px;height:15px"><use href="#i-moon"/></svg>Nacht</button>
+  </div>
+  <span class="hint">Bauhaus-Prototyp · alle Screens klickbar</span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="brand" id="brand">
+      <svg viewBox="0 0 36 36" style="width:26px;height:26px;flex:0 0 auto">
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--blue)" stroke-width="3"/>
+        <path d="M18 2.5 A15.5 15.5 0 0 1 33.5 18 L18 18 Z" fill="var(--blue)"/>
+        <rect x="12.5" y="12.5" width="11" height="11" transform="rotate(45 18 18)" fill="var(--gold)"/>
+      </svg>
+      <span class="wm">FOTO<b>ALERT</b></span>
+    </div>
+    <button class="iconbtn" id="hdr-search"><svg class="ic" style="width:21px;height:21px"><use href="#i-search"/></svg></button>
+    <button class="iconbtn" id="hdr-refresh"><svg class="ic" style="width:21px;height:21px"><use href="#i-refresh"/></svg></button>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages">
+
+    <!-- CHANCEN -->
+    <div class="page on" id="p-feed">
+      <div class="alert" data-opp="0">
+        <svg class="ic ico" style="width:26px;height:26px"><use href="#i-starfill"/></svg>
+        <div>
+          <h3>TOP-CHANCE HEUTE</h3>
+          <p id="alert-text"></p>
+        </div>
+      </div>
+      <div class="sec">Heute Abend</div>
+      <div id="feed-today"></div>
+      <div class="sec">Diese Woche</div>
+      <div id="feed-week"></div>
+    </div>
+
+    <!-- KARTE -->
+    <div class="page" id="p-map">
+      <div class="sec">Karte · Standpunkte in der Nähe</div>
+      <div class="seg3 maptype" id="maptype" style="margin:0 0 10px">
+        <button data-mt="standard" class="on">Standard</button>
+        <button data-mt="satellit">Satellit</button>
+        <button data-mt="gelaende">Gelände</button>
+      </div>
+      <div class="mapwrap" id="mapwrap">
+        <div class="zoomctl">
+          <button id="zoom-in" aria-label="Vergrößern"><svg class="ic" style="width:18px;height:18px"><use href="#i-plus"/></svg></button>
+          <button id="zoom-out" aria-label="Verkleinern"><svg class="ic" style="width:18px;height:18px"><use href="#i-minus"/></svg></button>
+        </div>
+        <div id="mapcanvas" data-mt="standard">
+          <div class="mtint"></div>
+          <svg width="100%" height="100%" viewBox="0 0 344 340" preserveAspectRatio="xMidYMid slice" style="display:block">
+            <g stroke="var(--line)" stroke-width="1" fill="none">
+              <path d="M-20 90 C80 70 120 130 200 110 S320 90 380 120"/>
+              <path d="M-20 200 C90 180 150 230 240 205 S330 190 380 215"/>
+              <path d="M70 -10 C90 90 60 160 100 260 S120 330 110 360"/>
+              <path d="M230 -10 C210 100 260 170 220 270 S210 330 230 360"/>
+            </g>
+            <path d="M120 150 C150 130 210 160 230 200 C245 235 200 250 170 240 C140 230 100 175 120 150 Z"
+                  fill="var(--chipblue)" stroke="var(--blue)" stroke-width="1.2" opacity=".7"/>
+          </svg>
+          <div class="mappin gold" style="left:46%;top:60%" data-opp="0"><svg class="ic" style="width:30px;height:30px"><use href="#i-pin"/></svg></div>
+          <div class="mappin" style="left:28%;top:38%" data-opp="1"><svg class="ic" style="width:26px;height:26px"><use href="#i-pin"/></svg></div>
+          <div class="mappin" style="left:66%;top:48%" data-opp="2"><svg class="ic" style="width:26px;height:26px"><use href="#i-pin"/></svg></div>
+          <div class="mappin" style="left:58%;top:74%" data-opp="3"><svg class="ic" style="width:26px;height:26px"><use href="#i-pin"/></svg></div>
+        </div>
+      </div>
+      <p class="mapnote">Tippe einen Standpunkt an, um Details zu sehen · Goldener Pin = Top-Chance</p>
+    </div>
+
+    <!-- LOCATIONS -->
+    <div class="page" id="p-loc">
+      <div class="sec">Meine Orte · 6 gespeichert</div>
+      <div id="loc-list"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="p-set">
+      <div class="sec">Benachrichtigungen</div>
+      <div class="setgrp">
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-starfill"/></svg><span class="setlabel">Push bei Top-Chancen</span><div class="sw on" data-toggle></div></div>
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-sunset"/></svg><span class="setlabel">Goldene Stunde</span><div class="sw on" data-toggle></div></div>
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-moonsmall"/></svg><span class="setlabel">Blaue Stunde</span><div class="sw" data-toggle></div></div>
+      </div>
+
+      <div class="sec">Filter</div>
+      <div class="setgrp">
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-pin"/></svg><span class="setlabel">Umkreis</span><span class="setval">50 km</span></div>
+        <div class="setrow" style="display:block"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span class="setlabel" style="flex:none">Mindest-Score</span><span class="setval" id="score-val">70</span></div><input type="range" min="0" max="100" value="70" id="score-range"></div>
+      </div>
+
+      <div class="sec">Erscheinungsbild</div>
+      <div class="setgrp">
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-sun"/></svg><span class="setlabel">Design</span>
+          <div class="seg3" id="appearance"><button data-app="auto" class="on">Auto</button><button data-app="light">Hell</button><button data-app="dark">Dunkel</button></div>
+        </div>
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-moonsmall"/></svg><span class="setlabel">Nacht-Rotmodus</span><div class="sw" data-toggle></div></div>
+      </div>
+
+      <div class="sec">Über</div>
+      <div class="setgrp">
+        <div class="setrow"><svg class="ic si" style="width:20px;height:20px"><use href="#i-compass"/></svg><span class="setlabel">FotoAlert</span><span class="setval">Version 1.0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-page="feed"><svg class="ic" style="width:21px;height:21px"><use href="#i-star"/></svg><span>Chancen</span></button>
+    <button class="tab" data-page="map"><svg class="ic" style="width:21px;height:21px"><use href="#i-map"/></svg><span>Karte</span></button>
+    <button class="tab" data-add><div class="fab"><svg class="ic" style="width:20px;height:20px;stroke-width:2.2"><use href="#i-plusbare"/></svg></div></button>
+    <button class="tab" data-page="loc"><svg class="ic" style="width:21px;height:21px"><use href="#i-pin"/></svg><span>Orte</span></button>
+    <button class="tab" data-page="set"><svg class="ic" style="width:21px;height:21px"><use href="#i-settings"/></svg><span>Mehr</span></button>
+  </div>
+
+  <!-- DETAIL SHEET -->
+  <div class="overlay" id="ov-detail"></div>
+  <div class="sheet" id="sheet-detail">
+    <div class="sheethead"><button class="close" id="close-detail"><svg class="ic" style="width:22px;height:22px"><use href="#i-x"/></svg></button></div>
+    <div class="sheetbody" id="detail-body"></div>
+  </div>
+
+  <!-- ADD SHEET -->
+  <div class="overlay" id="ov-add"></div>
+  <div class="sheet" id="sheet-add">
+    <div class="sheethead"><h2 class="sheettitle">Neuer Standpunkt</h2><button class="close" id="close-add"><svg class="ic" style="width:22px;height:22px"><use href="#i-x"/></svg></button></div>
+    <div class="sheetbody">
+      <div class="field"><label>Name</label><input placeholder="z. B. Oberbaumbrücke Nordufer"></div>
+      <div class="field"><label>Koordinaten</label><input placeholder="52.5016, 13.4456"></div>
+      <div class="field"><label>Motivtyp</label>
+        <div class="chips">
+          <div class="chip on">Goldene Stunde</div><div class="chip">Blaue Stunde</div><div class="chip">Milchstraße</div><div class="chip">Mondaufgang</div><div class="chip">Skyline</div>
+        </div>
+      </div>
+      <div class="field"><label>Blickrichtung (Azimut)</label><input placeholder="135°  ·  Südost"></div>
+      <button class="btn primary" id="save-add" style="width:100%;margin-top:4px"><svg class="ic" style="width:17px;height:17px"><use href="#i-check"/></svg>Speichern</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== ICON SPRITE ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-star" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.3 9 20.7 9.2 15.5 13 17.4 19.3 12 15.5 6.6 19.3 8.5 13 3.3 9.2 9.7 9 Z"/></g></symbol>
+  <symbol id="i-starfill" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><path d="M12 3 14.3 9 20.7 9.2 15.5 13 17.4 19.3 12 15.5 6.6 19.3 8.5 13 3.3 9.2 9.7 9 Z"/></g></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 Z"/><path d="M9 3 V18 M15 6 V21"/></g></symbol>
+  <symbol id="i-plusbare" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5 V19 M5 12 H19"/></g></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 21 5 15 5 10 a7 7 0 0 1 14 0 c0 5 -7 11 -7 11 Z"/><circle cx="12" cy="10" r="2.6"/></g></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 H20 M4 12 H20 M4 16 H20"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="16" r="2"/></g></symbol>
+  <symbol id="i-sunset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 H21 M7 18 a5 5 0 0 1 10 0"/><path d="M12 4 V8 M5 8 L7.2 10 M19 8 L16.8 10"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
+  <symbol id="i-moonsmall" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18 a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.7-1.5 A3.8 3.8 0 0 1 18 18 Z"/></g></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13 11 13 11 21 19 11 13 11 Z"/></g></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9 10.5 10.5 9 15 13.5 13.5 Z"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16 L21 21"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11 a8 8 0 1 0 -2.3 6.3 M20 5 V11 H14"/></g></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 h3 l2-2 h6 l2 2 h3 v11 H4 Z"/><circle cx="12" cy="13" r="3.6"/></g></symbol>
+  <symbol id="i-tripod" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3.5" width="6" height="3.5"/><path d="M12 7 V10 M12 10 L6.5 20 M12 10 L17.5 20 M12 10 L12 20"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7 V12 L15.5 14"/></g></symbol>
+  <symbol id="i-pincheck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 21 5 15 5 10 a7 7 0 0 1 14 0 c0 5 -7 11 -7 11 Z"/><path d="M9.5 10 12 12.5 14.5 8.5"/></g></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 21 4 14 21 11 13 Z"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12 11 15 16 9"/></g></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19 3 19 Z"/><path d="M12 10 V14 M12 16.5 V16.6"/></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18 M18 6 6 18"/></g></symbol>
+  <symbol id="i-chevright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 16 12 9 19"/></g></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 V18 M6 12 H18"/></g></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12 H18"/></g></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2 V4 M12 20 V22 M2 12 H4 M20 12 H22 M5 5 6.5 6.5 M17.5 17.5 19 19 M19 5 17.5 6.5 M6.5 17.5 5 19"/></g></symbol>
+</defs></svg>
+
+<script>
+// ---------- data ----------
+const OPPS = [
+  {id:0,type:"Goldene Stunde Abend",icon:"i-sunset",title:"Oberbaumbrücke",loc:"Friedrichshain",time:"21:18",score:94,prio:"Top-Chance",
+   focal:"24mm",weather:"Klarer Himmel",weatherState:"ok",tripod:true,verified:true,
+   facts:[["Shootzeit","21:18 – 21:42 Ortszeit"],["Wetter","Ideal · klarer Himmel (94 %)"],["Sonnenuntergang","21:32"],["Azimut Sichtachse","248° · Westsüdwest"],["Mondphase","Zunehmend (38 %)"]],
+   cam:{main:"24mm · f/8 · 1/60 s · ISO 100",warn:"Stativ für die blaue Stunde empfohlen",tip:"Spiegelung im Wasser bei Windstille am stärksten."}},
+  {id:1,type:"Blaue Stunde Abend",icon:"i-moonsmall",title:"Teufelsberg",loc:"Grunewald",time:"21:58",score:81,prio:null,
+   focal:"35mm",weather:"Leichte Wolken",weatherState:"mid",tripod:true,verified:false,
+   facts:[["Shootzeit","21:58 – 22:20 Ortszeit"],["Wetter","Gut · leichte Wolken (72 %)"],["Sonnenuntergang","21:32"],["Azimut Sichtachse","112° · Ostsüdost"],["Mondphase","Zunehmend (38 %)"]],
+   cam:{main:"35mm · f/4 · 2 s · ISO 400",warn:"Stativ erforderlich",tip:"Skyline-Lichter setzen ~20 Min nach Sonnenuntergang ein."}},
+  {id:2,type:"Milchstraße",icon:"i-star",title:"Sternenpark Westhavelland",loc:"Gülpe",time:"01:10",score:88,prio:"Dunkler Himmel",
+   focal:"14mm",weather:"Klar & mondlos",weatherState:"ok",tripod:true,verified:true,
+   facts:[["Shootzeit","01:10 – 02:40 Ortszeit"],["Wetter","Ideal · klar, mondlos (90 %)"],["Galakt. Zentrum","168° · Süd, 22° Höhe"],["Azimut Sichtachse","170° · Süd"],["Mondphase","Neumond (0 %)"]],
+   cam:{main:"14mm · f/2.8 · 20 s · ISO 3200",warn:"Stativ erforderlich",tip:"Bortle 4 – einer der dunkelsten Himmel der Region."}},
+  {id:3,type:"Goldene Stunde Morgen",icon:"i-sunset",title:"Schloss Sanssouci",loc:"Potsdam",time:"05:04",score:76,prio:null,
+   focal:"50mm",weather:"Dunst möglich",weatherState:"mid",tripod:false,verified:true,
+   facts:[["Shootzeit","05:04 – 05:30 Ortszeit"],["Wetter","Mäßig · Bodendunst (61 %)"],["Sonnenaufgang","04:48"],["Azimut Sichtachse","96° · Ost"],["Mondphase","Zunehmend (38 %)"]],
+   cam:{main:"50mm · f/5.6 · 1/125 s · ISO 200",warn:null,tip:"Dunst über den Terrassen kann morgens stimmungsvoll sein."}},
+  {id:4,type:"Mondaufgang",icon:"i-moonsmall",title:"Müggelturm",loc:"Köpenick",time:"22:41",score:69,prio:null,
+   focal:"200mm",weather:"Klar",weatherState:"ok",tripod:true,verified:false,
+   facts:[["Shootzeit","22:41 Ortszeit"],["Wetter","Gut · klar (78 %)"],["Mondaufgang","22:41 · 104° Ost"],["Azimut Sichtachse","104° · Ostsüdost"],["Mondphase","Zunehmend (38 %)"]],
+   cam:{main:"200mm · f/8 · 1/15 s · ISO 400",warn:"Stativ erforderlich",tip:"Mond wirkt direkt am Horizont am größten."}},
+];
+const LOCS = [
+  {name:"Oberbaumbrücke",area:"Friedrichshain · Westufer",dist:"3,1 km",icon:"i-sunset",col:"var(--gold)"},
+  {name:"Teufelsberg",area:"Grunewald · Gipfelplateau",dist:"11,4 km",icon:"i-moonsmall",col:"var(--blue)"},
+  {name:"Sternenpark Westhavelland",area:"Gülpe · Feldweg Nord",dist:"68,0 km",icon:"i-star",col:"var(--blue)"},
+  {name:"Schloss Sanssouci",area:"Potsdam · Große Fontäne",dist:"26,2 km",icon:"i-sunset",col:"var(--gold)"},
+  {name:"Müggelturm",area:"Köpenick · Aussichtsplattform",dist:"17,8 km",icon:"i-moonsmall",col:"var(--blue)"},
+  {name:"Tempelhofer Feld",area:"Tempelhof · Startbahn West",dist:"6,5 km",icon:"i-sunset",col:"var(--gold)"},
+];
+
+// ---------- helpers ----------
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function ic(id,size,cls){return `<svg class="ic ${cls||''}" style="width:${size}px;height:${size}px"><use href="#${id}"/></svg>`}
+function scoreColor(s){return s>=90?"var(--gold)":s>=75?"var(--blue)":"var(--green)"}
+function ring(s,size){
+  const r=size/2-3, c=2*Math.PI*r, off=c*(1-s/100), col=scoreColor(s);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="ring">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--line)" stroke-width="3.5"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 ${size/2} ${size/2})"/>
+    <text x="${size/2}" y="${size/2+4}" text-anchor="middle" font-size="${size*0.3}" font-weight="700" fill="var(--ink)" font-family="Helvetica Neue,Arial,sans-serif">${s}</text>
+  </svg>`;
+}
+function tagsHtml(o){
+  let h="";
+  if(o.prio) h+=`<span class="tag gold">${o.prio}</span>`;
+  h+=`<span class="tag blue">${o.focal}</span>`;
+  const wc=o.weatherState==="ok"?"line":o.weatherState==="mid"?"line":"red";
+  h+=`<span class="tag ${o.weatherState==='ok'?'line':'red'}">${o.weather}</span>`;
+  if(o.tripod) h+=`<span class="tag line">Stativ</span>`;
+  if(o.verified) h+=`<span class="tag blue">✓ Geprüft</span>`;
+  return h;
+}
+function cardHtml(o){
+  return `<div class="card" data-opp="${o.id}">
+    ${ring(o.score,46)}
+    <div class="cbody">
+      <div class="cmeta">${ic(o.icon,15,'ct')}<span class="ctype">${o.type}</span><span class="ctime">${o.time}</span></div>
+      <div class="ctitle">${o.title}</div>
+      <div class="cloc">${ic('i-pin',13)} ${o.loc}</div>
+      <div class="tags">${tagsHtml(o)}</div>
+    </div></div>`;
+}
+
+// ---------- render ----------
+$("#alert-text").textContent = `${OPPS[0].title} · ${OPPS[0].type} · ${OPPS[0].time} · Score ${OPPS[0].score}`;
+$("#feed-today").innerHTML = [0,1,4].map(i=>cardHtml(OPPS[i])).join("");
+$("#feed-week").innerHTML = [2,3].map(i=>cardHtml(OPPS[i])).join("");
+$("#loc-list").innerHTML = LOCS.map((l,i)=>`<div class="lrow" data-opp="${i<5?i:0}">
+  <div class="lthumb" style="background:${l.col}">${ic(l.icon,22)}</div>
+  <div><div class="lname">${l.name}</div><div class="lmeta">${l.area}</div></div>
+  <div class="ldist">${ic('i-pin',13)} ${l.dist}</div>
+</div>`).join("");
+
+function detailHtml(o){
+  return `<div class="dhero">
+    <div class="dscore">${ring(o.score,64)}</div>
+    <div><div class="dtype">${ic(o.icon,13)} ${o.type}</div>
+      <div class="dtitle">${o.title}</div>
+      <div class="dloc">${ic('i-pin',14)} ${o.loc}</div></div>
+  </div>
+  ${o.prio?`<span class="tag gold" style="display:inline-block;margin:6px 0 2px">${o.prio}</span>`:""}
+  <div style="margin-top:8px">${o.facts.map(f=>`<div class="inforow"><span class="il">${f[0]}</span><span class="iv">${f[1]}</span></div>`).join("")}</div>
+  <div class="camcard">
+    <div class="cm">${ic('i-camera',15)} ${o.cam.main}</div>
+    ${o.cam.warn?`<div class="cw">${ic('i-tripod',14)} ${o.cam.warn}</div>`:""}
+    ${o.cam.tip?`<div class="ctip">${o.cam.tip}</div>`:""}
+  </div>
+  <div class="btnrow">
+    <button class="btn">${ic('i-pincheck',16)} Standort</button>
+    <button class="btn primary">${ic('i-nav',16)} Navigation</button>
+  </div>`;
+}
+
+// ---------- interactions ----------
+function openDetail(id){ $("#detail-body").innerHTML=detailHtml(OPPS[id]); $("#detail-body").scrollTop=0; $("#ov-detail").classList.add("on"); $("#sheet-detail").classList.add("on"); }
+function closeDetail(){ $("#ov-detail").classList.remove("on"); $("#sheet-detail").classList.remove("on"); }
+function openAdd(){ $("#ov-add").classList.add("on"); $("#sheet-add").classList.add("on"); }
+function closeAdd(){ $("#ov-add").classList.remove("on"); $("#sheet-add").classList.remove("on"); }
+
+document.body.addEventListener("click",e=>{
+  const opp=e.target.closest("[data-opp]"); if(opp){ openDetail(+opp.dataset.opp); return; }
+  const tog=e.target.closest("[data-toggle]"); if(tog){ tog.classList.toggle("on"); return; }
+});
+$("#close-detail").onclick=closeDetail; $("#ov-detail").onclick=closeDetail;
+$("#close-add").onclick=closeAdd; $("#ov-add").onclick=closeAdd; $("#save-add").onclick=closeAdd;
+
+// tabs
+$$("#tabs .tab").forEach(t=>t.onclick=()=>{
+  if(t.hasAttribute("data-add")){ openAdd(); return; }
+  $$("#tabs .tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+  $$(".page").forEach(p=>p.classList.remove("on"));
+  $("#p-"+t.dataset.page).classList.add("on");
+  $(".pages").scrollTop=0;
+});
+
+// add-sheet chips
+$$("#sheet-add .chip").forEach(c=>c.onclick=()=>{ $$("#sheet-add .chip").forEach(x=>x.classList.remove("on")); c.classList.add("on"); });
+
+// theme
+function setTheme(t){ document.body.dataset.theme=t; $$("#themeseg button").forEach(b=>b.classList.toggle("on",b.dataset.th===t)); }
+$$("#themeseg button").forEach(b=>b.onclick=()=>setTheme(b.dataset.th));
+$$("#appearance button").forEach(b=>b.onclick=()=>{
+  $$("#appearance button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  if(b.dataset.app!=="auto") setTheme(b.dataset.app);
+});
+$("#score-range").oninput=e=>$("#score-val").textContent=e.target.value;
+$("#hdr-search").onclick=()=>{}; $("#hdr-refresh").onclick=function(){this.style.transform="rotate(360deg)";this.style.transition="transform .6s";setTimeout(()=>{this.style.transform="";this.style.transition=""},650)};
+
+// map: type + zoom
+$$("#maptype button").forEach(b=>b.onclick=()=>{ $$("#maptype button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); $("#mapcanvas").dataset.mt=b.dataset.mt; });
+let mapZoom=1;
+function applyZoom(){ $("#mapcanvas").style.transform="scale("+mapZoom+")"; }
+$("#zoom-in").onclick=()=>{ mapZoom=Math.min(2.6,Math.round((mapZoom+0.3)*10)/10); applyZoom(); };
+$("#zoom-out").onclick=()=>{ mapZoom=Math.max(1,Math.round((mapZoom-0.3)*10)/10); applyZoom(); };
+</script>
+</body>
+</html>

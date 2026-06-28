@@ -49,10 +49,12 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 |----------|-----------|
 | Chance-Karten | Jede Karte zeigt: Titel, Datum/Uhrzeit, Location-Name, Score-Ring (farbcodiert), Event-Typ |
 | Score-Ring | Kreisring, Füllgrad = Score (0–100%), Farbe: grün ≥80%, orange 50–79%, rot <50% |
-| Feed-Filter | Filter-Panel (Sheet) mit: Mindest-Score Slider, Event-Typ Checkboxen, Brennweiten-Range-Slider (nicht-linear, US-88), Routinen-Events ausblenden (US-40) |
+| Wetter-Badge | Tag-Chip auf Feed-Karten nur wenn `weather_score > 0`; bei unbekanntem Wetter kein Badge (BUG-44) |
+| Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
 | Alert-Banner | Sichtbar wenn relevante Chancen heute oder morgen |
 | Tipp: Chance antippen | Öffnet Detail-Sheet (Pflicht: Detail schließt mit Overlay-Tap) |
 | Leer-State | Wenn keine Chancen passen: Hinweis-Text, kein Absturz |
+| Kalender-Modus | Button „Jahreskalender" im Feed schaltet auf Monatskalender-Ansicht um; Tap auf Kalender-Event sucht passenden Feed-Eintrag (location_id + ±1h) und übergibt vollständiges Objekt (inkl. weather_details) an Detail-Sheet (BUG-44) |
 
 **Pflicht-Regression Feed:**
 - [ ] Mindestens 1 Karte sichtbar (bei min_score 0.2)
@@ -62,6 +64,75 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 - [ ] Score-Ring korrekt (visuelle Überprüfung: 75% = ring 3/4 gefüllt)
 - [ ] Karten nicht doppelt vorhanden
 - [ ] Routine-Events-Filter entfernt Goldene/Blaue-Stunde-Karten
+
+---
+
+## 3a. Filter (BUG-46 — vollständige Spezifikation)
+
+Der Filter hat 9 Kriterien. Vier davon haben **Drei-Zustände** (Off → Einschließen → Ausschließen → Off):
+Eventtyp, Tageszeit, Schwierigkeit, Kategorie.
+Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
+
+### Kriterien und ihre Zustände
+
+| Kriterium | Drei-Zustände | Anmerkung |
+|---|---|---|
+| **Eventtyp** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für Chancen-Feed, Kalender, Scout, Karte |
+| **Tageszeit** | Ja (Off → nur zeigen → ausblenden → Off) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
+| **Mindest-Wahrscheinlichkeit** | Nein (Slider 0–100%) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
+| **Brennweite** | Nein (Dual-Handle-Slider) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
+| **Schwierigkeit** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
+| **Kategorie** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
+| **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
+| **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte |
+| **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
+
+### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
+
+**Mindest-Bewertung:**
+- Goldrand (Einschließen): zeigt nur Locations/Chancen mit eigener Bewertung ≥ N Sterne
+- Rotrand (Ausschließen): zeigt nur Locations/Chancen mit eigener Bewertung < N Sterne (gezielt niedrig Bewertete ansehen)
+- Off: keine Filterung
+
+**Verifikationsstatus:**
+- Chip „Geprüfte" — Goldrand (Einschließen): zeigt nur verifiziert-ok
+- Chip „Geprüfte" — Rotrand (Ausschließen, `excl_verified`): zeigt alle außer verifiziert-ok (= ungeprüft + Probleme)
+- Off: keine Filterung
+- Chips „Nicht geprüft" und „Probleme" bleiben einfache Selekt-Chips
+
+### Ausgrauen-Verhalten (BUG-46)
+
+Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 0.45, pointer-events none) — sie bleiben sichtbar, sind aber nicht bedienbar:
+
+| Ansicht | Ausgegraut |
+|---|---|
+| **Karte** | Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
+| **Locations-Tab** | Eventtyp, Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
+| **Chancen-Feed / Kalender / Scout** | Nichts ausgegraut |
+
+### Wirkungs-Übersicht nach Ansicht
+
+| Kriterium | Chancen-Feed | Kalender | Scout | Locations-Tab | Karte |
+|---|---|---|---|---|---|
+| Eventtyp | ✓ | ✓ | ✓ (body_name) | — (ausgegraut) | ✓ (via Feed-Daten) |
+| Tageszeit | ✓ | ✓ | ✓ (session) | — (ausgegraut) | — (ausgegraut) |
+| Wahrscheinlichkeit | ✓ | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
+| Brennweite | ✓ | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
+| Schwierigkeit | ✓ | ✓ | — | ✓ | ✓ |
+| Kategorie | ✓ | ✓ | — | ✓ | ✓ |
+| Mindest-Bewertung | ✓ | ✓ | — | ✓ | ✓ |
+| Entfernung (GPS) | ✓ | — | ✓ | — | ✓ |
+| Verifikation | ✓ | ✓ | — | ✓ | ✓ |
+
+**Pflicht-Regression Filter (BUG-46):**
+- [ ] Filter-Badge zeigt korrekte Anzahl aktiver Kriterien
+- [ ] Bewertungs-Chip: Off → gold „≥ N" → rot „< N" → Off (drei Tipp-Schritte)
+- [ ] Verifikation „Geprüfte": Off → gold → rot → Off (drei Tipp-Schritte)
+- [ ] Tageszeit, Brennweite, Wahrscheinlichkeit auf Karte ausgegraut
+- [ ] Eventtyp, Tageszeit, Brennweite, Wahrscheinlichkeit auf Locations-Tab ausgegraut
+- [ ] Karte zeigt nach Schwierigkeits-Filter nur passende Pins
+- [ ] Karte zeigt nach Kategorie-Filter nur passende Pins
+- [ ] Karte zeigt nach Verifikations-Filter nur passende Pins
 
 ---
 
@@ -110,7 +181,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Karte | Leaflet, dunkle Tiles (Carto Dark), Berlin zentriert |
 | Marker | ≥10 farbige Pins für gespeicherte Locations |
 | Marker-Tap | Popup mit Location-Name und Kategorie |
-| Kartenfilter | Event-Typ-Filter synchronisiert mit Feed-Filter (BUG-23 gefixt) |
+| Kartenfilter | Alle location-bezogenen Filterkriterien wirken auf Karten-Pins: Eventtyp (inkl. Ausschließen, BUG-23+BUG-46), Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung (GPS). Tageszeit, Brennweite und Wahrscheinlichkeit sind auf der Karte ausgegraut (BUG-46) |
 | GPS-Zentrierung | Button zentriert Karte auf aktuelle GPS-Position (US-69) |
 
 **Pflicht-Regression Karte:**
@@ -178,7 +249,12 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 
 **Pflicht-Regression Scout:**
 - [ ] Scout-Tab lädt ohne Fehler
-- [ ] ≥1 Scout-Karte sichtbar
+- [ ] ≥1 Scout-Karte sichtbar mit ScoreRing (links), Session-Icon + Label + Uhrzeit, Motivname, Location-Zeile „Blick vom [Richtung]", Tag-Chips
+- [ ] Location-Zeile zeigt NUR die Himmelsrichtung (kein Motivname-Duplikat): „Blick vom Nordosten"
+- [ ] Tag-Chips: Wetter-Text + Entfernung (km) + Mondbeleuchtung (nur bei Mond-Chancen)
+- [ ] Kein Standort-Button auf der Karte (nur Navigation-Button, vollbreit)
+- [ ] Navigation-Button öffnet Apple Maps-Routenführung zum Standpunkt; öffnet NICHT die Detailansicht
+- [ ] Karte antippen (außerhalb Button) → Detailansicht öffnet sich
 - [ ] Karte nicht doppelt (keine Render-Dopplung)
 - [ ] Klick auf Scout-Karte öffnet Detail-Sheet mit allen Sektionen (eingeklappt)
 - [ ] „Als Location speichern"-Button sichtbar (SVG-Icon, kein Emoji)
@@ -296,3 +372,5 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | — | BUG-42 | Custom Locations: kein 📍-Emoji in Namen |
 | — | BUG-41 | Street-View-Button nur bei Azimut sichtbar |
 | — | BUG-38/39 | Koordinaten-Sektion: Overflow + Strich gefixt |
+| 2026-06-28 | BUG-44 | Kalender-Events im 14-Tage-Fenster zeigen vollständiges Detailsheet inkl. Wetter; „Wetter unbekannt"-Badge entfernt |
+| 2026-06-28 | BUG-46 | Filter: Drei-Zustände für Verifikation + Bewertung; Karte an alle Location-Filter angebunden; ansichtsabhängiges Ausgrauen irrelevanter Kriterien |

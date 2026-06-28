@@ -57,7 +57,7 @@ from calculations.astronomy import (
 )
 from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
-from data.store import LocationStore
+from data.store import LocationStore, compute_geo_hash
 from data import backup
 from models.schemas import (
     CameraHintOut,
@@ -595,6 +595,39 @@ def _save_location_override(loc_id: str, **fields) -> None:
     _store.upsert_override(loc_id, **fields)
 
 
+def _load_qa_values() -> None:
+    """TASK-43: Wendet auto-generierte QA-Felder auf alle Locations an.
+
+    Merge-Reihenfolge: Code-Defaults < qa_values < location_overrides.
+    qa_values überschreiben also Standardwerte aus locations.py, werden aber
+    selbst durch manuell gesetzte location_overrides überschrieben.
+
+    Unterstützte Felder: description, ideal_azimuth_min/max, focal_length_suggestions.
+    """
+    try:
+        qa_values = _store.load_all_qa_values()
+        if not qa_values:
+            return
+        loc_map = {loc.id: loc for loc in LOCATIONS}
+        applied = 0
+        for qv in qa_values:
+            loc_id = qv.get("location_id")
+            loc = loc_map.get(loc_id)
+            if not loc:
+                continue
+            if qv.get("description") is not None:
+                loc.description = qv["description"]
+            if qv.get("ideal_azimuth_min") is not None and qv.get("ideal_azimuth_max") is not None:
+                loc.ideal_azimuth_range = (qv["ideal_azimuth_min"], qv["ideal_azimuth_max"])
+            if qv.get("focal_length_suggestions") is not None:
+                loc.focal_length_suggestions = qv["focal_length_suggestions"]
+            applied += 1
+        if applied:
+            logger.info("QA-Values geladen: %d Locations gepatcht", applied)
+    except Exception as exc:
+        logger.warning("Fehler beim Laden der QA-Values: %s", exc)
+
+
 @app.on_event("startup")
 async def startup() -> None:
     logger.info("FotoAlert Backend v2 startet (Cache-First)...")
@@ -602,7 +635,11 @@ async def startup() -> None:
     # 0. Custom Locations laden (persistent gespeicherte User-Spots)
     _load_custom_locations()
 
-    # 0a. Location Overrides laden (Koordinaten-Korrekturen für alle Location-Typen)
+    # 0a. QA-Values laden (auto-generierte Felder, TASK-43)
+    # Reihenfolge: Code-Defaults < qa_values < location_overrides
+    _load_qa_values()
+
+    # 0b. Location Overrides laden (Koordinaten-Korrekturen für alle Location-Typen)
     _load_location_overrides()
 
     # 0b. Geländehöhen-Cache laden und Locations patchen

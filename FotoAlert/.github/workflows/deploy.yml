@@ -1,0 +1,179 @@
+# FotoAlert – Automatisches Deployment via GitHub Actions
+# Trigger: Push auf den main-Branch
+#
+# Voraussetzung (einmalig in GitHub unter Settings → Secrets einrichten):
+#   DEPLOY_SSH_KEY           – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
+#   SERVER_IP                – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
+#   SERVER_USER              – SSH-Username auf dem Server (fotoalert)
+#   FOTOALERT_USER_PASSWORD  – Test-Passwort für Playwright-Login (TASK-21)
+#   FOTOALERT_HOST_PASSWORD  – Host-Passwort für Dev-Server (TASK-21)
+#   FOTOALERT_AUTH_SECRET    – Auth-Secret für Dev-Server (TASK-21)
+
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+  # Manueller Trigger: in GitHub unter Actions → Run workflow
+  workflow_dispatch:
+
+jobs:
+  # TASK-21: Frontend-Test-Gate — läuft VOR dem Deploy.
+  # Deploy startet nur wenn dieser Job grün ist (needs: [test-frontend]).
+  test-frontend:
+    name: Frontend-Check (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      FOTOALERT_ENV: dev
+      FOTOALERT_NO_BACKGROUND: "1"
+      FOTOALERT_HOST_PASSWORD: ${{ secrets.FOTOALERT_HOST_PASSWORD }}
+      FOTOALERT_USER_PASSWORD: ${{ secrets.FOTOALERT_USER_PASSWORD }}
+      FOTOALERT_AUTH_SECRET: ${{ secrets.FOTOALERT_AUTH_SECRET }}
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4.2.2
+
+      - name: Python 3.9 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Abhängigkeiten installieren
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Playwright Chromium installieren
+        run: |
+          pip install playwright
+          python -m playwright install chromium
+
+      - name: Dev-Server starten
+        working-directory: backend
+        run: |
+          python -m uvicorn main:app --host 127.0.0.1 --port 8000 \
+            > /tmp/fotoalert-ci-server.log 2>&1 &
+          echo $! > /tmp/fotoalert-ci-server.pid
+          # Warten bis Server bereit (max. 30 s)
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health >/dev/null 2>&1; then
+              echo "✅ Server bereit nach ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://localhost:8000/health || \
+            { echo "❌ Server nicht bereit"; cat /tmp/fotoalert-ci-server.log; exit 1; }
+
+      - name: Frontend-Check ausführen
+        working-directory: backend
+        run: |
+          python3 tests/frontend/run_frontend_check.py \
+            --base-url http://localhost:8000 \
+            --password "$FOTOALERT_USER_PASSWORD" \
+            --screenshot-root /tmp/qa-screenshots \
+            --findings-json /tmp/findings.json
+
+      - name: Findings + Screenshots als CI-Artefakt hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-findings-${{ github.run_id }}
+          path: |
+            /tmp/findings.json
+            /tmp/qa-screenshots/
+          if-no-files-found: ignore
+
+      - name: Dev-Server stoppen
+        if: always()
+        run: |
+          if [ -f /tmp/fotoalert-ci-server.pid ]; then
+            kill "$(cat /tmp/fotoalert-ci-server.pid)" 2>/dev/null || true
+          fi
+
+  deploy:
+    name: Deploy FotoAlert
+    runs-on: ubuntu-latest
+    needs: [test-frontend]
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4.2.2
+
+      - name: SSH-Key einrichten
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy auf Server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=30 \
+              "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}" \
+              "bash /opt/fotoalert/app/FotoAlert/deploy/deploy.sh"
+
+      - name: SSH-Key aufräumen
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
+
+  # TASK-33: Post-Deploy-Health-Assert — läuft NACH dem Deploy.
+  # Prüft ob Feed und Kalender nach dem Deployment befüllt sind.
+  # Verhindert stille Regressionen wie BUG-14 / BUG-27 (Kalender leer nach Cron/Deploy).
+  verify-deploy:
+    name: Post-Deploy-Verifikation
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    timeout-minutes: 5
+
+    steps:
+      - name: Warte kurz auf Server-Neustart
+        run: sleep 20
+
+      - name: Health-Check
+        run: |
+          HEALTH=$(curl -fsS "https://fotoalert.stephanschumann.com/health" 2>&1) || {
+            echo "❌ Health-Endpoint nicht erreichbar: $HEALTH"
+            exit 1
+          }
+          echo "✅ Health: $HEALTH"
+
+      - name: Feed-Größe prüfen (≥ 5 Events erwartet)
+        run: |
+          COUNT=$(curl -fsS "https://fotoalert.stephanschumann.com/opportunities?min_score=0.1" \
+            | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+          echo "Feed-Events: $COUNT"
+          [ "$COUNT" -ge 5 ] || {
+            echo "❌ Feed leer nach Deploy ($COUNT Events — erwartet ≥ 5)"
+            exit 1
+          }
+          echo "✅ Feed OK ($COUNT Events)"
+
+      - name: Locations-Anzahl prüfen (≥ 10 erwartet)
+        run: |
+          COUNT=$(curl -fsS "https://fotoalert.stephanschumann.com/locations" \
+            | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+          echo "Locations: $COUNT"
+          [ "$COUNT" -ge 10 ] || {
+            echo "❌ Locations leer nach Deploy ($COUNT — erwartet ≥ 10)"
+            exit 1
+          }
+          echo "✅ Locations OK ($COUNT)"
+
+      - name: Kalender-Monat prüfen (≥ 5 Events erwartet)
+        run: |
+          YEAR=$(date -u +%Y)
+          MONTH=$(date -u +%-m)
+          COUNT=$(curl -fsS "https://fotoalert.stephanschumann.com/calendar?month=${MONTH}&year=${YEAR}" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('events',d) if isinstance(d,dict) else d))")
+          echo "Kalender-Events diesen Monat: $COUNT"
+          [ "$COUNT" -ge 5 ] || {
+            echo "⚠️ Kalender-Events niedrig ($COUNT — erwartet ≥ 5). Mögliche Regression von BUG-14/BUG-27."
+            exit 1
+          }
+          echo "✅ Kalender OK ($COUNT Events)"

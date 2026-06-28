@@ -9,18 +9,23 @@ Tabellen:
   location_overrides    — Koordinaten-/Name-Korrekturen für Standard-Locations
   location_verifications — Vor-Ort-Verifikationen und Problemmeldungen (BUG-26)
   location_ratings       — Sterne-Bewertungen pro Gerät (US-89)
+  location_qa_state     — Lock-Flags + Change-Detection-Hash pro Location (TASK-43)
+  location_qa_values    — Auto-generierte Felder für BASE-Locations (TASK-43)
 
 TASK-17: SQLite-Migration + atomare Writes (Fundament)
 BUG-26:  location_verifications Tabelle + CRUD
 US-89:   location_ratings Tabelle + Upsert/Aggregation
+TASK-43: QA-Datenmodell (Lock-Flags, qa_values, geo_hash)
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -97,6 +102,24 @@ CREATE TABLE IF NOT EXISTS camera_profiles (
     ori           TEXT    NOT NULL,
     updated       TEXT    NOT NULL   -- ISO-Timestamp
 );
+
+-- TASK-43: QA-Datenmodell
+CREATE TABLE IF NOT EXISTS location_qa_state (
+    location_id       TEXT    PRIMARY KEY,
+    description_lock  INTEGER DEFAULT 0,   -- 1 = manuell gesperrt, kein Auto-Update
+    azimuth_lock      INTEGER DEFAULT 0,
+    focal_length_lock INTEGER DEFAULT 0,
+    qa_checked_at     TEXT,                -- ISO-Timestamp des letzten QA-Laufs
+    geo_hash          TEXT                 -- Hash der Geo-Kernfelder für Change-Detection
+);
+
+CREATE TABLE IF NOT EXISTS location_qa_values (
+    location_id              TEXT    PRIMARY KEY,
+    description              TEXT,
+    ideal_azimuth_min        REAL,
+    ideal_azimuth_max        REAL,
+    focal_length_suggestions TEXT            -- JSON-Array
+);
 """
 
 
@@ -118,10 +141,28 @@ class LocationStore:
         return conn
 
     def _init_db(self) -> None:
-        """Erstellt Tabellen falls noch nicht vorhanden."""
+        """Erstellt Tabellen falls noch nicht vorhanden.
+
+        TASK-43: Führt idempotente Spaltenmigration für custom_locations durch
+        (ideal_azimuth_min / ideal_azimuth_max). SQLite unterstützt kein
+        ALTER TABLE ADD COLUMN IF NOT EXISTS, daher try/except.
+        """
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             conn.executescript(_INIT_SQL)
+            # TASK-43: Azimut-Spalten in custom_locations ergänzen (idempotent)
+            for col, typedef in [
+                ("ideal_azimuth_min", "REAL DEFAULT NULL"),
+                ("ideal_azimuth_max", "REAL DEFAULT NULL"),
+            ]:
+                try:
+                    conn.execute(
+                        f"ALTER TABLE custom_locations ADD COLUMN {col} {typedef}"
+                    )
+                    conn.commit()
+                    logger.info("Migration TASK-43: custom_locations.%s ergänzt", col)
+                except sqlite3.OperationalError:
+                    pass  # Spalte existiert bereits
         logger.info("LocationStore initialisiert: %s", self.db_path)
 
     # ------------------------------------------------------------------
@@ -578,3 +619,147 @@ class LocationStore:
         with self._connect() as conn:
             row = conn.execute("PRAGMA integrity_check").fetchone()
             return row[0] if row else "unknown"
+
+    # ------------------------------------------------------------------
+    # TASK-43: QA-Datenmodell — Lock-Flags, QA-Values, Geo-Hash
+    # ------------------------------------------------------------------
+
+    def get_qa_state(self, location_id: str) -> Optional[dict]:
+        """Gibt den QA-Zustand einer Location zurück, oder None wenn noch nie geprüft."""
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM location_qa_state WHERE location_id = ?",
+                (location_id,),
+            ).fetchone()
+        return dict(row) if row else None
+
+    def set_qa_lock(self, location_id: str, field: str, locked: bool) -> None:
+        """Setzt Lock-Flag für ein auto-generierbares Feld (Upsert).
+
+        field: 'description' | 'azimuth' | 'focal_length'
+        locked: True = manuell gesperrt, kein Auto-Update; False = freigegeben
+        """
+        col = f"{field}_lock"
+        value = 1 if locked else 0
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(
+                    f"""INSERT INTO location_qa_state (location_id, {col})
+                        VALUES (?, ?)
+                        ON CONFLICT(location_id) DO UPDATE SET {col} = excluded.{col}""",
+                    (location_id, value),
+                )
+                conn.execute("COMMIT")
+                logger.info(
+                    "QA-Lock %s=%s für %s gesetzt", col, value, location_id
+                )
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def update_qa_checked(self, location_id: str, geo_hash: str) -> None:
+        """Aktualisiert qa_checked_at und geo_hash nach einem QA-Lauf (Upsert)."""
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(
+                    """INSERT INTO location_qa_state
+                           (location_id, qa_checked_at, geo_hash)
+                       VALUES (?, ?, ?)
+                       ON CONFLICT(location_id) DO UPDATE SET
+                           qa_checked_at = excluded.qa_checked_at,
+                           geo_hash      = excluded.geo_hash""",
+                    (location_id, now, geo_hash),
+                )
+                conn.execute("COMMIT")
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def get_qa_values(self, location_id: str) -> Optional[dict]:
+        """Gibt auto-generierte Felder für eine Location zurück, oder None."""
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM location_qa_values WHERE location_id = ?",
+                (location_id,),
+            ).fetchone()
+        if not row:
+            return None
+        d = dict(row)
+        if d.get("focal_length_suggestions"):
+            d["focal_length_suggestions"] = json.loads(d["focal_length_suggestions"])
+        return d
+
+    def set_qa_values(self, location_id: str, **fields) -> None:
+        """Speichert auto-generierte Felder für eine Location (Upsert).
+
+        Unterstützte Felder: description, ideal_azimuth_min, ideal_azimuth_max,
+        focal_length_suggestions (list → JSON).
+        """
+        if not fields:
+            return
+        if "focal_length_suggestions" in fields:
+            fields = dict(fields)
+            fields["focal_length_suggestions"] = json.dumps(
+                fields["focal_length_suggestions"]
+            )
+        cols = ", ".join(["location_id"] + list(fields.keys()))
+        placeholders = ", ".join(["?"] * (1 + len(fields)))
+        updates = ", ".join(f"{k} = excluded.{k}" for k in fields)
+        sql = (
+            f"INSERT INTO location_qa_values ({cols}) VALUES ({placeholders}) "
+            f"ON CONFLICT(location_id) DO UPDATE SET {updates}"
+        )
+        params = [location_id] + list(fields.values())
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(sql, params)
+                conn.execute("COMMIT")
+                logger.info("QA-Values gesetzt für %s: %s", location_id, list(fields.keys()))
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
+    def load_all_qa_values(self) -> list:
+        """Lädt alle QA-Values für den Merge beim Server-Start."""
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM location_qa_values").fetchall()
+        result = []
+        for row in rows:
+            d = dict(row)
+            if d.get("focal_length_suggestions"):
+                d["focal_length_suggestions"] = json.loads(d["focal_length_suggestions"])
+            result.append(d)
+        return result
+
+
+# ---------------------------------------------------------------------------
+# TASK-43: Geo-Hash-Berechnung (Modul-Ebene, auch ohne Store-Instanz nutzbar)
+# ---------------------------------------------------------------------------
+
+def compute_geo_hash(
+    observer_lat: Optional[float],
+    observer_lon: Optional[float],
+    subject_lat: Optional[float],
+    subject_lon: Optional[float],
+    subject_height_m: Optional[float],
+    subject_width_m: Optional[float],
+    distance_m: Optional[float],
+) -> str:
+    """Deterministischer MD5-Hash der Geo-Kernfelder für Change-Detection.
+
+    Inputs werden auf 6 Dezimalstellen gerundet um Float-Rounding-Artefakte
+    zu vermeiden (52.5200001 == 52.52 nach Rounding).
+    """
+    def _fmt(v: Optional[float]) -> str:
+        return f"{round(v, 6):.6f}" if v is not None else "None"
+
+    raw = "|".join([
+        _fmt(observer_lat), _fmt(observer_lon),
+        _fmt(subject_lat), _fmt(subject_lon),
+        _fmt(subject_height_m), _fmt(subject_width_m), _fmt(distance_m),
+    ])
+    return hashlib.md5(raw.encode()).hexdigest()

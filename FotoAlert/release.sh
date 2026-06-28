@@ -77,6 +77,8 @@ git add \
 
 git commit -m "release: v${NEW_VERSION} – ${COMMIT_MSG}"
 git push origin main
+git tag "v${NEW_VERSION}"
+git push origin "v${NEW_VERSION}"
 
 echo ""
 echo "✅ v${NEW_VERSION} gepusht. GitHub Actions deployt jetzt automatisch."

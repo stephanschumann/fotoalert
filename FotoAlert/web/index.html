@@ -406,7 +406,7 @@
     .filter-chip { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px;
       border: 1px solid var(--border); background: var(--card); color: var(--muted);
       cursor: pointer; transition: all .15s; user-select: none; }
-    .filter-chip.active { border-color: var(--gold); color: var(--gold);
+    .filter-chip.active { border-color: var(--accent); color: var(--accent);
       background: var(--gold-dim); }
     /* US-71: Exclude-Zustand (Rotrand) */
     .filter-chip.exclude { border-color: var(--red); color: var(--red);
@@ -2380,7 +2380,9 @@ const Filter = {
     // US-71: kategoriale Chips haben Include- (eventTypes/tageszeit/difficulty)
     // und Exclude-Arrays (*Excl). Alte gespeicherte States ohne *Excl werden
     // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verification: 'all' };
+    // BUG-46: minRatingExcl (bool) = Drei-Zustand für Bewertung (false=≥N, true=<N).
+    // verificationIncl/verificationExcl: Arrays mit 'verified'|'unverified'|'issues' (unabhängige Drei-Zustände).
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [] };
   },
 
   get state() {
@@ -2411,7 +2413,7 @@ const Filter = {
            (s.minScore > 0 ? 1 : 0) +
            (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
            (s.maxDistKm > 0 ? 1 : 0) +
-           (s.verification !== 'all' ? 1 : 0);
+           ((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0);
   },
 
   _updateBadge() {
@@ -2476,7 +2478,12 @@ const Filter = {
           if (s.categoryExcl.length && s.categoryExcl.includes(loc.category)) return false;  // US-76
         }
       }
-      if (s.minRating > 0 && (Rating.get(o.location_id) || 0) < s.minRating) return false;
+      // BUG-46: Drei-Zustand Bewertung: incl = ≥N, excl = <N
+      if (s.minRating > 0) {
+        const r = Rating.get(o.location_id) || 0;
+        if (!s.minRatingExcl && r < s.minRating) return false;
+        if (s.minRatingExcl && r >= s.minRating) return false;
+      }
       if (s.minScore > 0 && o.overall_score < s.minScore / 100) return false;
       if (s.minFocal > 0 || s.maxFocal > 0) {
         const hints = o.camera_hints || [];
@@ -2487,11 +2494,13 @@ const Filter = {
         const d = haversineKm(this._gps.lat, this._gps.lon, o.observer_lat, o.observer_lon);
         if (d > s.maxDistKm) return false;
       }
-      if (s.verification !== 'all') {
+      if (s.verificationIncl.length || s.verificationExcl.length) {
         const last = Verify.getLast(o.location_id);
-        if (s.verification === 'verified'   && (!last || last.status !== 'ok'))    return false;
-        if (s.verification === 'unverified' && last)                                return false;
-        if (s.verification === 'issues'     && (!last || last.status !== 'issue')) return false;
+        const cat = !last ? 'unverified' : last.status === 'ok' ? 'verified' : 'issues';
+        // Incl: mindestens ein Chip aktiv → nur passende zeigen (ODER-Logik)
+        if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) return false;
+        // Excl: diese Kategorie explizit ausschließen
+        if (s.verificationExcl.includes(cat)) return false;
       }
       // Textsuche (US-53) – AND mit allen anderen Filtern; sucht in Name, Titel und Event-Typ
       if (Search.query) {
@@ -2515,12 +2524,17 @@ const Filter = {
       if (s.difficultyExcl.length && s.difficultyExcl.includes(l.difficulty)) return false;  // US-71
       if (s.category.length && !s.category.includes(l.category)) return false;  // US-76
       if (s.categoryExcl.length && s.categoryExcl.includes(l.category)) return false;  // US-76
-      if (s.minRating > 0 && (Rating.get(l.id) || 0) < s.minRating) return false;
-      if (s.verification !== 'all') {
+      // BUG-46: Drei-Zustand Bewertung
+      if (s.minRating > 0) {
+        const r = Rating.get(l.id) || 0;
+        if (!s.minRatingExcl && r < s.minRating) return false;
+        if (s.minRatingExcl && r >= s.minRating) return false;
+      }
+      if (s.verificationIncl.length || s.verificationExcl.length) {
         const last = Verify.getLast(l.id);
-        if (s.verification === 'verified'   && (!last || last.status !== 'ok'))    return false;
-        if (s.verification === 'unverified' && last)                                return false;
-        if (s.verification === 'issues'     && (!last || last.status !== 'issue')) return false;
+        const cat = !last ? 'unverified' : last.status === 'ok' ? 'verified' : 'issues';
+        if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) return false;
+        if (s.verificationExcl.includes(cat)) return false;
       }
       if (s.minScore > 0 && Feed.data && Feed.data.length) {
         // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
@@ -2839,7 +2853,7 @@ const FilterSheet = {
     const s = Filter.state;
     const chip = (label, active, onclick) =>
       `<span class="filter-chip${active ? ' active' : ''}" onclick="${onclick}">${label}</span>`;
-    // US-71: Drei-Zustand-Chip. state: 'incl' (Goldrand) | 'excl' (Rotrand) | 'off'
+    // US-71: Drei-Zustand-Chip. state: 'incl' (Blaurand via --accent) | 'excl' (Rotrand) | 'off'
     const chip3 = (label, state, onclick) => {
       const cls = state === 'incl' ? ' active' : state === 'excl' ? ' exclude' : '';
       return `<span class="filter-chip${cls}" onclick="${onclick}">${label}</span>`;
@@ -2870,14 +2884,36 @@ const FilterSheet = {
     ].map(([v,l]) => chip3(l, state3(s.category, s.categoryExcl, v),
       `FilterSheet._cycle('category','categoryExcl','${v.replace(/'/g,"\\'")}')`)).join('');
 
+    // BUG-46: Drei-Zustand für Bewertung — "Alle" → "≥ N" (gold) → "< N" (rot) → "Alle"
+    // _cycleRating(v): wenn v=0 → Alle (reset); wenn aktiv+incl → excl; wenn aktiv+excl → reset; wenn inaktiv → incl
+    const ratingState = (v) => {
+      if (v === 0) return s.minRating === 0 ? 'incl' : 'off';  // "Alle"-Chip: active wenn minRating=0
+      if (s.minRating !== v) return 'off';
+      return s.minRatingExcl ? 'excl' : 'incl';
+    };
+    const ratingChipLabel = (v, base) => {
+      if (v === 0) return base;
+      // Im Exclude-Zustand Prefix "< " statt "≥ "
+      if (s.minRating === v && s.minRatingExcl) return `< ${starRow(v)}`;
+      return base;
+    };
     const ratingChips = [[0,'Alle'],[1,`≥ ${starRow(1)}`],[2,`≥ ${starRow(2)}`],[3,`≥ ${starRow(3)}`],[4,`≥ ${starRow(4)}`],[5,starRow(5)]]
-      .map(([v,l]) => chip(l, s.minRating===v, `FilterSheet._set('minRating',${v})`)).join('');
+      .map(([v,base]) => chip3(ratingChipLabel(v, base), ratingState(v), `FilterSheet._cycleRating(${v})`)).join('');
 
     const distChips = [[0,'Alle'],[5,'< 5 km'],[15,'< 15 km'],[30,'< 30 km'],[50,'< 50 km']]
       .map(([v,l]) => chip(l, s.maxDistKm===v, `FilterSheet._set('maxDistKm',${v})`)).join('');
 
-    const verChips = [['all','Alle'],['verified',`${ic('i-check',13)} Geprüfte`],['unverified','Nicht geprüft'],['issues',`${ic('i-warn',13)} Probleme`]]
-      .map(([v,l]) => chip(l, s.verification===v, `FilterSheet._set('verification','${v}')`)).join('');
+    // Verifikationsstatus: drei unabhängige Chips mit je drei Zuständen (off → incl → excl → off)
+    const verState = (v) => {
+      if (s.verificationIncl.includes(v)) return 'incl';
+      if (s.verificationExcl.includes(v)) return 'excl';
+      return 'off';
+    };
+    const verChips = [
+      ['verified',     `${ic('i-check',13)} Geprüft`],
+      ['unverified',   'Nicht geprüft'],
+      ['issues',       `${ic('i-warn',13)} Probleme`],
+    ].map(([v,l]) => chip3(l, verState(v), `FilterSheet._cycleVerification('${v}')`)).join('');
 
     const gpsNote = s.maxDistKm > 0
       ? `<p style="font-size:11px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px">${ic('i-pin',13)} GPS wird beim Anwenden abgefragt</p>` : '';
@@ -2898,11 +2934,21 @@ const FilterSheet = {
     const _mxIdx = FOCAL_STEPS.indexOf(_snapFocal(mx));
     const focalRangePct = ((_mxIdx - _mnIdx) / (FOCAL_STEPS.length - 1) * 100).toFixed(2) + '%';
 
-    const isMapView = App.current === 'map';
-    const scoreSection = isMapView
+    // BUG-46: Ansichts-abhängiges Ausgrauen
+    const isMapView      = App.current === 'map';
+    const isLocationView = App.current === 'locations';
+    const isChancenOnly  = !isMapView && !isLocationView;  // Feed/Kalender/Scout
+
+    // Chancen-spezifische Kriterien: Tageszeit, Mindest-Wahrscheinlichkeit
+    // → ausgegraut auf Locations-Tab und Karte
+    const dimOnLocAndMap = isMapView || isLocationView;
+    // Brennweite: Locations-Eigenschaft → weder auf der Karte noch im Locations-Tab ausgrauen
+    const dimFocalOnMap = false;
+
+    const scoreSection = (isMapView || isLocationView)
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
           <h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit</h4>
-          <div class="filter-slider-val">Nur in Listen-Ansicht verfügbar</div>
+          <div class="filter-slider-val">Nur im Chancen-Feed verfügbar</div>
           <div class="filter-slider-wrap">
             <input type="range" class="filter-slider" disabled
               min="0" max="100" step="5" value="${s.minScore}" style="--pct:${scorePct}">
@@ -2920,28 +2966,107 @@ const FilterSheet = {
           </div>
         </div>`;
 
-    document.getElementById('filter-content').innerHTML =
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4><div class="filter-chips">${etChips}</div>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Gilt auch für Tageszeit & Schwierigkeit.</p></div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>` +
-      scoreSection +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
-        <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
-        <div class="dual-range-wrap">
-          <div class="dual-range-track" id="focal-track">
-            <div class="dual-range-fill" id="focal-fill" style="left:${focalMinPct};width:${focalRangePct}"></div>
-            <div class="dual-range-thumb" id="focal-thumb-min" style="left:${focalMinPct}"></div>
-            <div class="dual-range-thumb" id="focal-thumb-max" style="left:${focalMaxPct}"></div>
+    const tzSection = dimOnLocAndMap
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4>
+          <div class="filter-chips">${tzChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed verfügbar (an Shoot-Zeitpunkt gebunden)</p>
+        </div>`
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>`;
+
+    const focalSection = dimFocalOnMap
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
+          <div class="filter-slider-val">Nur im Chancen-Feed und Locations-Tab verfügbar</div>
+          <div class="dual-range-wrap">
+            <div class="dual-range-track" id="focal-track">
+              <div class="dual-range-fill" id="focal-fill" style="left:${focalMinPct};width:${focalRangePct}"></div>
+              <div class="dual-range-thumb" id="focal-thumb-min" style="left:${focalMinPct}"></div>
+              <div class="dual-range-thumb" id="focal-thumb-max" style="left:${focalMaxPct}"></div>
+            </div>
+            <div class="filter-slider-labels"><span>0 mm</span><span>200 mm</span><span>800 mm</span></div>
           </div>
-          <div class="filter-slider-labels"><span>0 mm</span><span>200 mm</span><span>800 mm</span></div>
-        </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
-      </div>` +
+        </div>`
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
+          <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
+          <div class="dual-range-wrap">
+            <div class="dual-range-track" id="focal-track">
+              <div class="dual-range-fill" id="focal-fill" style="left:${focalMinPct};width:${focalRangePct}"></div>
+              <div class="dual-range-thumb" id="focal-thumb-min" style="left:${focalMinPct}"></div>
+              <div class="dual-range-thumb" id="focal-thumb-max" style="left:${focalMaxPct}"></div>
+            </div>
+            <div class="filter-slider-labels"><span>0 mm</span><span>200 mm</span><span>800 mm</span></div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
+        </div>`;
+
+    // Eventtyp: wirkt auf Map (via Feed-Daten BUG-23) und auf Chancen-Feed/Kalender/Scout.
+    // Auf Locations-Tab: kein direkter Effekt → ausgrauen.
+    const etSection = isLocationView
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4>
+          <div class="filter-chips">${etChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed und auf der Karte verfügbar</p>
+        </div>`
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4><div class="filter-chips">${etChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Gilt auch für Tageszeit & Schwierigkeit.</p></div>`;
+
+    const verNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`;
+    const ratingNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">≥ N Sterne</span> → <span style="color:var(--red)">weniger als N Sterne</span> → aus</p>`;
+
+    document.getElementById('filter-content').innerHTML =
+      etSection +
+      tzSection +
+      scoreSection +
+      focalSection +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div>${ratingNote}</div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus</h4><div class="filter-chips">${verChips}</div></div>`;
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus</h4><div class="filter-chips">${verChips}</div>${verNote}</div>`;
+  },
+
+  // BUG-46: Drei-Zustand-Zyklus für Bewertung: Off(Alle) → Include(≥N) → Exclude(<N) → Off(Alle)
+  _cycleRating(v) {
+    const s = Filter.state;
+    if (v === 0) {
+      // "Alle" tippen → reset
+      Filter.save({ minRating: 0, minRatingExcl: false });
+    } else if (s.minRating !== v) {
+      // Off → Include
+      Filter.save({ minRating: v, minRatingExcl: false });
+    } else if (!s.minRatingExcl) {
+      // Include → Exclude
+      Filter.save({ minRating: v, minRatingExcl: true });
+    } else {
+      // Exclude → Off
+      Filter.save({ minRating: 0, minRatingExcl: false });
+    }
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
+  // Verifikationsstatus: jeder Chip unabhängig, off → incl → excl → off
+  _cycleVerification(v) {
+    const s = Filter.state;
+    const incl = [...(s.verificationIncl || [])];
+    const excl = [...(s.verificationExcl || [])];
+    if (incl.includes(v)) {
+      // incl → excl
+      incl.splice(incl.indexOf(v), 1);
+      excl.push(v);
+    } else if (excl.includes(v)) {
+      // excl → off
+      excl.splice(excl.indexOf(v), 1);
+    } else {
+      // off → incl
+      incl.push(v);
+    }
+    Filter.save({ verificationIncl: incl, verificationExcl: excl });
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
   },
 };
 
@@ -3623,18 +3748,20 @@ const MapView = {
   },
 
   // BUG-23: Eventtyp-Filter auf Kartenmarker anwenden (standortbasiert via possible_bodies)
-  // Mapping: Mond-Events → "moon" in possible_bodies, Sonnen-Events → "sun" in possible_bodies
-  // Goldene/Blaue Stunde → alle Locations (Sonne immer vorhanden)
+  // BUG-46: Zusätzlich Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung anwenden.
+  // Tageszeit bleibt auf der Karte ohne Wirkung (an shoot_time gebunden, nicht an Locations).
   applyFilter() {
     if (!this.map) return;
     const s = Filter.state;
     const activeTypes = s.eventTypes || [];
+    const exclTypes   = s.eventTypesExcl || [];
 
     // BUG-23: Feed-basierter Filter – zeige nur Locations mit tatsächlichen Events
     // im 14-Tage-Feed für den gewählten Eventtyp (sinnvoller als possible_bodies).
     // Fallback auf possible_bodies wenn Feed noch nicht geladen.
     const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
-    const expanded = activeTypes.flatMap(t => ET_EXPAND[t] || [t]);
+    const expanded     = activeTypes.flatMap(t => ET_EXPAND[t] || [t]);
+    const expandedExcl = exclTypes.flatMap(t => ET_EXPAND[t] || [t]);
 
     // Baue Set der Location-IDs mit passenden Feed-Events (für O(1)-Lookup)
     let locIdsWithMatch = null;
@@ -3645,12 +3772,27 @@ const MapView = {
           .map(e => e.location_id)
       );
     }
+    // Baue Set der Location-IDs für Excl-Eventtypen (Locations ohne jegliches Matching-Event)
+    let locIdsExcluded = null;
+    if (expandedExcl.length > 0 && Feed.data && Feed.data.length > 0) {
+      // Eine Location wird ausgeschlossen wenn ALLE ihre Feed-Events zu einem ausgeschlossenen Typ gehören
+      // Genauer: Location sichtbar wenn sie mindestens ein Event hat das nicht ausgeschlossen ist
+      const allLocIds = new Set(this.markers.map(({loc}) => loc.id));
+      locIdsExcluded = new Set();
+      for (const locId of allLocIds) {
+        const locEvents = Feed.data.filter(e => e.location_id === locId);
+        if (locEvents.length > 0 && locEvents.every(e => expandedExcl.includes(e.event_type))) {
+          locIdsExcluded.add(locId);
+        }
+      }
+    }
 
     for (const { marker, loc } of this.markers) {
       let visible = true;
+
+      // Eventtyp Include-Filter (BUG-23)
       if (activeTypes.length > 0) {
         if (locIdsWithMatch !== null) {
-          // Feed geladen: nur Locations mit echten Events in den nächsten 14 Tagen
           visible = locIdsWithMatch.has(loc.id);
         } else {
           // Fallback: possible_bodies (Feed noch nicht geladen)
@@ -3663,6 +3805,46 @@ const MapView = {
           visible = hasBodylessType || (needsMoon && pb.includes('moon')) || (needsSun && pb.includes('sun'));
         }
       }
+
+      // Eventtyp Exclude-Filter (BUG-46)
+      if (visible && locIdsExcluded !== null && locIdsExcluded.has(loc.id)) visible = false;
+
+      // BUG-46: Schwierigkeit
+      if (visible && s.difficulty.length && !s.difficulty.includes(loc.difficulty)) visible = false;
+      if (visible && s.difficultyExcl.length && s.difficultyExcl.includes(loc.difficulty)) visible = false;
+
+      // BUG-46: Kategorie
+      if (visible && s.category.length && !s.category.includes(loc.category)) visible = false;
+      if (visible && s.categoryExcl.length && s.categoryExcl.includes(loc.category)) visible = false;
+
+      // BUG-46: Bewertung (Drei-Zustand)
+      if (visible && s.minRating > 0) {
+        const r = Rating.get(loc.id) || 0;
+        if (!s.minRatingExcl && r < s.minRating) visible = false;
+        if (s.minRatingExcl && r >= s.minRating) visible = false;
+      }
+
+      // Verifikationsstatus
+      if (visible && (s.verificationIncl.length || s.verificationExcl.length)) {
+        const last = Verify.getLast(loc.id);
+        const cat = !last ? 'unverified' : last.status === 'ok' ? 'verified' : 'issues';
+        if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) visible = false;
+        if (s.verificationExcl.includes(cat)) visible = false;
+      }
+
+      // Brennweite (Locations-Eigenschaft, gilt auch auf der Karte)
+      if (visible && (s.minFocal > 0 || s.maxFocal > 0)) {
+        const hints = loc.camera_hints || [];
+        if (s.minFocal > 0 && !hints.some(h => h.focal_length_mm >= s.minFocal)) visible = false;
+        if (s.maxFocal > 0 && !hints.some(h => h.focal_length_mm <= s.maxFocal)) visible = false;
+      }
+
+      // BUG-46: Entfernung (GPS)
+      if (visible && s.maxDistKm > 0 && Filter._gps) {
+        const d = haversineKm(Filter._gps.lat, Filter._gps.lon, loc.observer_lat, loc.observer_lon);
+        if (d > s.maxDistKm) visible = false;
+      }
+
       if (visible) {
         if (!this.map.hasLayer(marker)) this.map.addLayer(marker);
       } else {

@@ -25,14 +25,14 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* · **BUG-46** |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-103** |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-44** |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-46** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -43,20 +43,6 @@
 
 ## 🐛 BugFixes
 
-### US-95 · Chancendetails Layout-Optimierung: Buttons kleiner, Karten größer `[ ]`
-
-| Feld | Wert |
-|------|------|
-| **Typ** | User Story |
-| **Priorität** | Niedrig |
-| **Status** | ToDo |
-| **Erstellt** | 2026-06-24 |
-
-**Beschreibung:** Die Aktions-Buttons (Zum Kalender hinzufügen, Erinnerung setzen, Erneut prüfen) sind sehr groß und nehmen unverhältnismäßig viel Platz ein; gleichzeitig ist die FOV-Karte relativ klein. Durch kompaktere Buttons (geringere Höhe/Padding) und eine größere Karte wird das Manövrieren/Navigieren in der Detailansicht angenehmer. Außerdem soll ein allgemeines Design-Review auf weitere Inkonsistenzen im Sheet durchgeführt werden.
-
-**Bezug:** Verwandt mit US-87 [  ] (Vollbild-Overlay für Karte). BUG-38 und BUG-39 zuerst fixen (Koordinaten-Overflow), da sie den verfügbaren Platz ebenfalls betreffen.
-
----
 
 ### US-98 · Bauhaus-Redesign (Epic) `[ ]`
 
@@ -232,7 +218,7 @@ Manuell (Safari, http://localhost:8000):
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Die funktionalen Karten-Marker (Leaflet-Pins: Fotograf-Standort, Motiv) und die FOV-Legende („Motiv"-Fadenkreuz, „Fotograf-Standort"-Pin) sollen optisch ans Bauhaus-Design angeglichen werden (Form, Strich, Farbtöne aus US-99). In US-100 bewusst ausgeschlossen, weil farbige/funktionale Karten-Marker eigene Logik haben. Lesbarkeit auf hellen UND dunklen/satelliten Karten beachten.
@@ -1264,6 +1250,7 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 - [x] **BUG-02** Suche filtert Jahreskalender nicht – `Search._triggerRender()` mode-aware, CalendarView.render() mit Suchfilter. v1.1.8.
 - [x] **BUG-01** Brennweite-Empfehlung passt nicht zur Motiventfernung – `_focal_for_location()` aus distance_m, Min+Max-Filter, „Brennweite falsch" in Verifikation. v1.1.3.
 - [x] **BUG-03** Scheinbare Größe des Himmelsobjekts zu groß – `get_moon_earth_distance_km()` via Skyfield de421.bsp für tatsächliche Mond–Erde-Distanz zum Shoot-Zeitpunkt. Formel korrigiert: `angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km`. Distanz im Detail-Sheet als Fußnote. `ALGORITHM_VERSION = "1.1"`. v1.3.4.
+- [x] **US-96** Einheitliche Chancen-Detailansicht – neue Sektionsreihenfolge, alle Sektionen beim Öffnen zugeklappt, Live-Astro mit Shoot-Datum. v1.17.0.
 
 ### BUG-34 · iPhone Safari: Bearbeitungs-Overlay zoomt und ragt rechts aus dem Screen `[~]`
 
@@ -1319,13 +1306,14 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-27 |
 
-**Beschreibung:** `refactor_check.py` meldet zwei lange JS-Funktionen in `web/index.html`:
-- `ic()` Z. 803 — ~358 Zeilen (Icon-Helper, eingebracht durch US-100)
-- `handler()` Z. 1161 — ~109 Zeilen
+**Beschreibung:** `refactor_check.py` meldet drei lange JS-Funktionen in `web/index.html`:
+- `ic()` Z. 805 — ~360 Zeilen (Icon-Helper, eingebracht durch US-100)
+- `handler()` Z. 1165 — ~110 Zeilen
+- `verState()` Z. 2907 — ~196 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28)
 
 ---
 
@@ -1370,7 +1358,7 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Analysis |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Der Filter verhält sich in zwei Punkten inkonsistent:
@@ -1536,21 +1524,21 @@ Aufwand: mittel-groß
 ### Offene Fragen / Assumptions
 
 **F1 — Verifikations-Exclude: Welche Semantik soll „Geprüfte ausblenden" haben?**
-Annahme: Exclude von „Geprüfte" = zeige nur nicht-geprüfte UND problematische Locations (alle außer `status === 'ok'`). Alternative: zeige nur nicht-geprüfte (ohne Probleme). → Bitte Stephan entscheiden vor Impl.
+✅ **Entschieden 2026-06-28:** Exclude = zeige nicht-geprüfte UND problematisch markierte Locations (alle außer verifiziert-ok).
 
 **F2 — Karten-Filter für Tageszeit: sinnvoll oder ausgegraut?**
-Annahme: Tageszeit ist ein Chancen-Kriterium (an shoot_time geknüpft), nicht direkt an Locations. Die Karte zeigt Locations, keine Chancen → Tageszeit auf Karte ausgr. (wie Score). Alternativ: Karte filtert Locations, die im Feed Chancen der gewählten Tageszeit haben. Das wäre möglich, erhöht aber Komplexität. → Empfehlung: ausgegraut lassen.
+✅ **Entschieden 2026-06-28:** Tageszeit auf der Karte ausgegraut (keine Filterung).
 
 **F3 — Mindest-Bewertung: Soll die Karte nach Bewertung filtern?**
-Annahme: Ja — Bewertungen sind an Locations geknüpft (`Rating.get(loc.id)`), nicht an Chancen. Der Code dafür existiert in `applyToLocations()`. Die Karte kann ihn direkt nutzen. → Im Soll als ✅ markiert.
+Annahme: Ja — Bewertungen sind an Locations geknüpft, nicht an Chancen. Der Code dafür existiert bereits. Die Karte kann ihn direkt nutzen. → Im Soll als ✅ markiert.
 
-**F4 — Drei-Zustände für „Mindest-Bewertung" und „Entfernung": nötig?**
-Annahme: Nein. „Mindest-Bewertung" ist per Definition ein Min-Wert (kein sinnvoller Ausschluss-Zyklus — „zeige nur Locations mit weniger als 3 Sternen" ist ein Randf­all). „Entfernung" ist eine Obergrenze, kein Ausschluss. → Beide bleiben einfache Auswahl-Filter ohne Drei-Zustände.
+**F4 — Drei-Zustände für „Mindest-Bewertung"?**
+✅ **Entschieden 2026-06-28:** Ja, Mindest-Bewertung bekommt Drei-Zustände. „Ausschließen"-Modus kehrt die Logik um: statt „zeige nur ≥ N Sterne" zeigt er „zeige nur < N Sterne". Anwendungsfall: gezielt niedrig bewertete Locations ansehen. „Entfernung" bleibt einfacher Filter ohne Drei-Zustände (Obergrenze, kein sinnvoller Ausschluss).
 
 ---
 
 **Analyse:** ✅ fertig 2026-06-28
-**Wartet auf:** Freigabe der offenen Fragen F1 + F2 durch Stephan vor Implementierungsstart
+**Alle offenen Fragen:** ✅ geklärt 2026-06-28 — bereit für Weg-Gate
 
 ---
 
@@ -1764,14 +1752,15 @@ Die Sektions-Blöcke werden in ein Array von `{id, html}`-Objekten umgebaut und 
 
 ---
 
-### BUG-44 · Kalender-Event-Detail: Wetter, Kamera-Empfehlung und Kompositions-Analyse fehlen `[~]`
+### BUG-44 · Kalender-Event-Detail: Wetter, Kamera-Empfehlung und Kompositions-Analyse fehlen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Wenn man im 365-Tage-Kalender auf ein Event tippt, öffnet sich das Detailsheet — aber die Sektionen Wetter, Kamera-Empfehlungen und Kompositions-Analyse fehlen. Im 14-Tage-Feed sind dieselben Sektionen für dasselbe Event vollständig vorhanden.
 
@@ -1836,14 +1825,14 @@ Der Lookup verwendet `location_id` und `shoot_time` als kombinierten Schlüssel.
 
 ##### Akzeptanzkriterien
 
-- [ ] **AK-1 (Wetter sichtbar):** Wenn ich im Kalender auf ein Event tippe, das heute oder in den nächsten 13 Tagen liegt, zeigt das Detailsheet die vollständige Wettersektion: Temperatur, Wolkendecke, Regenwahrscheinlichkeit, Windstärke und Sichtweite — genau wie im Feed-Tab für dasselbe Event.
-- [ ] **AK-2 (Wetter-Score sichtbar):** Der Wetter-Score im Dreierblock (Gesamt / Astronomie / Wetter) oben im Sheet ist nicht "–", sondern zeigt einen konkreten Prozentwert — identisch mit dem Feed-Detailsheet.
-- [ ] **AK-3 (Kein Unterschied zum Feed):** Wenn ich dasselbe Event im Feed und im Kalender antippe (beide innerhalb 14 Tage), sind Inhalt, Reihenfolge und Optik der Sektionen identisch.
-- [ ] **AK-4 (Außerhalb 14 Tage bleibt unverändert):** Ein Event, das in 15 Tagen oder später liegt, zeigt im Kalender-Detail "Wird 3 Tage vorher berechnet" in der Wettersektion. Keine Verschlechterung des heutigen Verhaltens.
-- [ ] **AK-5 (Kein Match = Fallback):** Wenn ein Event zwar innerhalb 14 Tage liegt, aber kein passender Feed-Eintrag existiert, öffnet das Sheet trotzdem mit den Kalender-Daten. Kein leerer Sheet, kein JavaScript-Fehler.
-- [ ] **AK-6 (Feed leer = Fallback):** Wenn `Feed.data` beim Antippen noch nicht geladen ist (z.B. wegen Netzwerkproblem), öffnet das Sheet trotzdem mit dem Kalender-Event. Kein Absturz.
-- [ ] **AK-7 (Kamera-Empfehlungen sichtbar):** Tippt man ein Mond-Alignment oder Golden-Hour-Event im Kalender an (innerhalb 14 Tage), ist die Kamera-Empfehlungs-Sektion im Sheet vorhanden — identisch mit dem Feed.
-- [ ] **Edge Case AK-8 (Tagesgrenze):** Ein Event exakt heute (shoot_time = jetzt oder in den nächsten Stunden) findet einen Feed-Match und zeigt vollständige Wetterdaten.
+- [x] **AK-1 (Wetter sichtbar):** Wenn ich im Kalender auf ein Event tippe, das heute oder in den nächsten 13 Tagen liegt, zeigt das Detailsheet die vollständige Wettersektion: Temperatur, Wolkendecke, Regenwahrscheinlichkeit, Windstärke und Sichtweite — genau wie im Feed-Tab für dasselbe Event.
+- [x] **AK-2 (Wetter-Score sichtbar):** Der Wetter-Score im Dreierblock (Gesamt / Astronomie / Wetter) oben im Sheet ist nicht "–", sondern zeigt einen konkreten Prozentwert — identisch mit dem Feed-Detailsheet.
+- [x] **AK-3 (Kein Unterschied zum Feed):** Wenn ich dasselbe Event im Feed und im Kalender antippe (beide innerhalb 14 Tage), sind Inhalt, Reihenfolge und Optik der Sektionen identisch.
+- [x] **AK-4 (Außerhalb 14 Tage bleibt unverändert):** Ein Event, das in 15 Tagen oder später liegt, zeigt im Kalender-Detail "Wird 3 Tage vorher berechnet" in der Wettersektion. Keine Verschlechterung des heutigen Verhaltens.
+- [x] **AK-5 (Kein Match = Fallback):** Wenn ein Event zwar innerhalb 14 Tage liegt, aber kein passender Feed-Eintrag existiert, öffnet das Sheet trotzdem mit den Kalender-Daten. Kein leerer Sheet, kein JavaScript-Fehler.
+- [x] **AK-6 (Feed leer = Fallback):** Wenn `Feed.data` beim Antippen noch nicht geladen ist (z.B. wegen Netzwerkproblem), öffnet das Sheet trotzdem mit dem Kalender-Event. Kein Absturz.
+- [x] **AK-7 (Kamera-Empfehlungen sichtbar):** Tippt man ein Mond-Alignment oder Golden-Hour-Event im Kalender an (innerhalb 14 Tage), ist die Kamera-Empfehlungs-Sektion im Sheet vorhanden — identisch mit dem Feed.
+- [x] **Edge Case AK-8 (Tagesgrenze):** Ein Event exakt heute (shoot_time = jetzt oder in den nächsten Stunden) findet einen Feed-Match und zeigt vollständige Wetterdaten.
 
 ---
 

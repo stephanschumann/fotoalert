@@ -360,10 +360,32 @@ git push
 # → In ~60 Sekunden ist die neue Version auf deinem iPhone
 ```
 
-### Wenn etwas nicht funktioniert (Rollback auf vorherige Version)
+### Rollback auf vorherige Version
+
+Jeder Release wird als Git-Tag gespeichert (`v1.2.3`). Du hast zwei Wege:
+
+**Option A — ein Commit zurück (Standardfall):**
 ```bash
 ssh fotoalert@157.90.123.45
 bash /opt/fotoalert/app/FotoAlert/deploy/rollback.sh
+```
+Das Skript fragt nach Bestätigung und zeigt aktuellen + Ziel-Commit vor dem Rollback.
+
+**Option B — auf einen bestimmten Release-Tag zurück:**
+```bash
+ssh fotoalert@157.90.123.45
+bash /opt/fotoalert/app/FotoAlert/deploy/rollback.sh v1.4.2
+```
+
+**Alle Releases anzeigen (lokal):**
+```bash
+git tag --sort=-version:refname | head -10
+```
+
+**Hinweis Cache-Kompatibilität:** JSON-Caches (`/opt/fotoalert/cache/`) liegen außerhalb von Git und werden durch einen Rollback nicht verändert. Bei sehr alten Rollback-Zielen (neue Cache-Felder fehlen) nach dem Rollback manuellen Recompute starten:
+```bash
+ssh fotoalert@157.90.123.45
+sudo systemctl start fotoalert-precompute.service
 ```
 
 ### Logs anschauen

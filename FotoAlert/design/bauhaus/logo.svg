@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="560" viewBox="0 0 760 560">
+  <!-- FotoAlert · Bauhaus logo system -->
+  <defs>
+    <style>
+      .ink{fill:#1A1A1A}.inkd{fill:#ECEAE3}
+      .blue{fill:#2D4EA0}.blued{fill:#7C9BEA}
+      .gold{fill:#E3A21A}
+      .wm{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;letter-spacing:1.5px}
+      .wmd{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:300;letter-spacing:0.5px}
+      .cap{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:400;font-size:13px;letter-spacing:.5px}
+    </style>
+  </defs>
+
+  <!-- ===== light panel ===== -->
+  <rect x="0" y="0" width="760" height="280" fill="#EAE6DB"/>
+  <text x="40" y="34" class="cap" fill="#6B6B62">Hell · primär</text>
+
+  <!-- mark: roundel = circle (lens) + quarter blade (light) + diamond (focus) -->
+  <g transform="translate(70,70)">
+    <circle cx="70" cy="70" r="62" fill="none" stroke="#2D4EA0" stroke-width="11"/>
+    <path d="M70 8 A62 62 0 0 1 132 70 L70 70 Z" class="blue"/>
+    <rect x="49" y="49" width="42" height="42" transform="rotate(45 70 70)" class="gold"/>
+  </g>
+
+  <!-- horizontal lockup -->
+  <text x="230" y="150" class="wm ink" font-size="48">FOTO<tspan class="blue">ALERT</tspan></text>
+  <text x="232" y="178" class="cap" fill="#6B6B62">Foto-Chancen für Berlin &amp; Brandenburg</text>
+
+  <!-- app tile (on light panel, clean right side) -->
+  <g transform="translate(575,55)">
+    <rect x="0" y="0" width="150" height="150" rx="34" fill="#15171C"/>
+    <circle cx="75" cy="75" r="46" fill="none" stroke="#7C9BEA" stroke-width="8.5"/>
+    <path d="M75 29 A46 46 0 0 1 121 75 L75 75 Z" class="blued"/>
+    <rect x="59" y="59" width="32" height="32" transform="rotate(45 75 75)" class="gold"/>
+  </g>
+  <text x="650" y="225" class="cap" fill="#6B6B62" text-anchor="middle">App-Icon</text>
+
+  <!-- ===== dark panel ===== -->
+  <rect x="0" y="280" width="760" height="280" fill="#15171C"/>
+  <text x="40" y="314" class="cap" fill="#8A8C95">Dunkel · nacht</text>
+
+  <g transform="translate(70,350)">
+    <circle cx="70" cy="70" r="62" fill="none" stroke="#7C9BEA" stroke-width="11"/>
+    <path d="M70 8 A62 62 0 0 1 132 70 L70 70 Z" class="blued"/>
+    <rect x="49" y="49" width="42" height="42" transform="rotate(45 70 70)" class="gold"/>
+  </g>
+  <text x="230" y="430" class="wm inkd" font-size="48">FOTO<tspan class="blued">ALERT</tspan></text>
+  <text x="232" y="458" class="cap" fill="#8A8C95">Foto-Chancen für Berlin &amp; Brandenburg</text>
+
+  <!-- monogram tile on dark -->
+  <g transform="translate(575,335)">
+    <rect x="0" y="0" width="150" height="150" rx="34" fill="#EAE6DB"/>
+    <circle cx="75" cy="75" r="46" fill="none" stroke="#2D4EA0" stroke-width="8.5"/>
+    <path d="M75 29 A46 46 0 0 1 121 75 L75 75 Z" class="blue"/>
+    <rect x="59" y="59" width="32" height="32" transform="rotate(45 75 75)" class="gold"/>
+  </g>
+  <text x="650" y="505" class="cap" fill="#8A8C95" text-anchor="middle">App-Icon · hell</text>
+</svg>
