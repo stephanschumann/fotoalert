@@ -25,14 +25,14 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-103** |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-46** |
+| **🔄 In Progress** | wird gerade implementiert | **US-79** |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-103** · **BUG-46** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-47** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -44,14 +44,15 @@
 ## 🐛 BugFixes
 
 
-### US-98 · Bauhaus-Redesign (Epic) `[ ]`
+### US-98 · Bauhaus-Redesign (Epic) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story (Epic) |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Dach-Ticket für die schrittweise Übernahme des freigegebenen Bauhaus-Looks in die echte App: diszipliniertes Bauhaus-Blau mit Gold als Zweitakzent, einheitliches Linien-Icon-Set statt verspielter Emojis, kompaktere Buttons + kleinere Schrift, neue Logo-/App-Icon-Marke sowie automatischer Tag/Nacht-Modus. Reine Designänderung — keine funktionalen oder Panel-Änderungen, die nicht ausdrücklich spezifiziert sind. Quelle: FotoAlert/design/bauhaus/ (prototype.html, logo.svg, icons.svg).
 
@@ -218,12 +219,187 @@ Manuell (Safari, http://localhost:8000):
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | Ready for Analysis |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Die funktionalen Karten-Marker (Leaflet-Pins: Fotograf-Standort, Motiv) und die FOV-Legende („Motiv"-Fadenkreuz, „Fotograf-Standort"-Pin) sollen optisch ans Bauhaus-Design angeglichen werden (Form, Strich, Farbtöne aus US-99). In US-100 bewusst ausgeschlossen, weil farbige/funktionale Karten-Marker eigene Logik haben. Lesbarkeit auf hellen UND dunklen/satelliten Karten beachten.
 
 **Bezug:** Kind von US-98 (Bauhaus-Redesign). Aufkommen #2+#3 aus dem US-100-Test (2026-06-27). Abgrenzung zu US-100 (UI-Glyphen, erledigt) und US-102 (Logo/App-Icon).
+
+---
+
+#### 🔬 Analyse-Spec (2026-06-28)
+
+---
+
+##### Annahmen-Protokoll
+
+- ⚠️ Die bestehenden Marker (`MapMarkers._obsIcon()`, `MapMarkers._subjIcon()`) verwenden bereits `--accent-2` (Gold) als Füllfarbe und `--surface` als Konturfarbe. Das ist eine gute Ausgangsbasis, aber noch kein explizites Bauhaus-Design (kein weißer Kontur-Rand der auf Satellit gut lesbar ist, kein klarer Bauhaus-Formenkanon wie Kreis/Quadrat/Dreieck).
+- ⚠️ Der MapView-Übersichts-Marker (`MapView.loadMarkers()`, Zeile ~3734) benutzt `--accent` (Bauhaus-Blau) statt `--accent-2` (Gold) — das ist **inkonsistent** zu den Detail-Markern in `MapMarkers`. Muss angeglichen werden.
+- ⚠️ Der FOV-Kegel in `CameraFOV._redrawCone()` liest die Farbe per `getComputedStyle` als konkreten Hex-Wert — das funktioniert, ist aber ein Workaround weil Leaflet-Polygone keine CSS-Variablen unterstützen.
+- ⚠️ Die FOV-Karte in `CameraFOV.initMap()` verwendet fix einen Satelliten-Layer (`arcgisonline`). Marker müssen dort immer lesbar sein.
+- ⚠️ SVG-Inline-Styles nutzen `style="fill:var(--accent-2)"` — in Safari/WebKit funktionieren CSS-Variablen in inline-SVG-`style`-Attributen grundsätzlich, ABER nur wenn das SVG im DOM eingebettet ist (nicht als `src`-Attribut geladen). Da diese SVGs als `html`-String in `L.divIcon` eingesetzt werden, landen sie im DOM — CSS-Variablen sollten funktionieren. Trotzdem sorgfältig testen.
+
+---
+
+##### Example Mapping
+
+**Regel 1: Fotograf-Marker ist klar als Standort erkennbar**
+
+- ✅ Positiv: Ich öffne eine Location-Detail-Ansicht, scrolle zur „Karte & Blickwinkel"-Sektion — der Fotograf-Standort ist als goldener Pin mit weißem Kern sofort als Standort-Marker erkennbar, auch auf der Satelliten-Karte.
+- ❌ Negativ: Öffne ich dieselbe Sektion auf einem Gerät im Dark-Mode, soll der Pin genauso gut lesbar sein — er darf nicht im dunklen Satelliten-Hintergrund verschwinden.
+- ⚠️ Edge: Wenn Dark- und Light-Mode dasselbe `--surface`-Token für den weißen Kern verwenden, ändert sich die Kern-Farbe mit dem Theme — das ist gewollt (Kern = immer Hintergrundfarbe des Panels).
+
+**Regel 2: Motiv-Marker unterscheidet sich klar vom Fotograf-Marker**
+
+- ✅ Positiv: Auf der FOV-Karte sehe ich zwei unterschiedliche Symbole: Tropfen-Pin (Fotograf) und Fadenkreuz-Kreis (Motiv). Ich kann auf einen Blick erkennen, wo ich stehe und worauf ich fotografiere.
+- ❌ Negativ: Beide Marker haben nie dieselbe Form — auch wenn beide `--accent-2` nutzen.
+
+**Regel 3: Übersichts-Karte zeigt konsistente Farben**
+
+- ✅ Positiv: Im Locations-Tab zeigt die Karte alle Standort-Marker in derselben Farbe wie die Detail-Marker — Bauhaus-Gold (`--accent-2`), nicht Bauhaus-Blau.
+- ❌ Negativ: Aktuell zeigt die Übersichts-Karte Bauhaus-Blau (`--accent`) — das ist inkonsistent. Nach der Implementierung soll es Gold sein.
+
+**Regel 4: FOV-Legende ist lesbar und passt zum Bauhaus-Design**
+
+- ✅ Positiv: Unter jeder FOV-Karte sehe ich eine kompakte Legende mit zwei Mini-Icons (Tropfen für Fotograf, Fadenkreuz für Motiv) und den deutschen Labels. Die Icons stimmen visuell exakt mit den Karten-Markern überein.
+- ❌ Negativ: Legende zeigt nie generische Punkt/Kreuz-Icons, die nicht zu den tatsächlichen Markern passen.
+
+---
+
+##### Offene Fragen
+
+- Soll der MapView-Übersichts-Marker (bisher runder Diamant-Pin in Bauhaus-Blau) auf einen Tropfen-Pin in Gold (`--accent-2`) angeglichen werden, oder soll er bewusst anders aussehen (z. B. kleiner Punkt in `--accent`)? → Empfehlung: Gold-Tropfen wie Detail-Marker, aber kleinere Größe für die Übersicht.
+
+---
+
+##### Akzeptanzkriterien
+
+**AK-1 (FOV-Karte, Fotograf-Marker):**
+Wenn ich in der Event- oder Location-Detail-Ansicht die „Karte & Blickwinkel"-Sektion öffne, sehe ich den Fotograf-Standort als **tropfenförmigen Pin in Bauhaus-Gold (`--accent-2`) mit weißem Kern (`--surface`)**. Der Pin hat einen dunklen Drop-Shadow, damit er auf der Satelliten-Karte nicht im Hintergrund versinkt. Der weiße Kern signalisiert „leer" im Bauhaus-Sinn — Ort ohne Objekt.
+
+**AK-2 (FOV-Karte, Motiv-Marker):**
+Das Motiv ist als **Fadenkreuz-Kreis in Bauhaus-Gold mit weißer Innen-Kontur** dargestellt. Die zwei Achslinien + gefüllter Kreis sind klar erkennbar, sowohl auf heller als auch auf dunkler/Satelliten-Karte. Drop-Shadow vorhanden.
+
+**AK-3 (Übersichts-Karte Locations-Tab):**
+Alle Standort-Marker auf der Locations-Übersichtskarte erscheinen in **Bauhaus-Gold (`--accent-2`)**, nicht in Bauhaus-Blau. Die Form bleibt der rotierende Tropfen (bereits vorhanden, aber andere Farbe).
+
+**AK-4 (Konsistenz):**
+Die Mini-Icons in der FOV-Legende unter der Karte stimmen **exakt** mit den tatsächlichen Karten-Markern überein — selbe Form, selbe Farbtöne.
+
+**AK-5 (Dark-Mode):**
+Im Dark-Mode (System-Präferenz) bleiben alle Marker lesbar. Der weiße Kern (`--surface` = `#1e2127` im Dark-Mode) hebt sich durch den Drop-Shadow vom Satelliten-Hintergrund ab.
+
+**AK-6 (Safari/WebKit):**
+Alle SVG-Striche und -Füllungen werden korrekt gerendert — in Safari auf iPhone und Mac. Inline-SVG-`style`-Attribute mit CSS-Variablen sind erlaubt (DOM-eingebettet), aber `stroke`/`fill`-Attribute direkt auf `<g>`-Tags sind sicherer (kein WebKit-Bug).
+
+---
+
+##### Pre-Mortem
+
+**Versagen 1: CSS-Variablen in SVG-Strings werden in Safari nicht aufgelöst.**
+- Frühwarnung: Icon erscheint schwarz (Browser-Fallback) statt gold.
+- Gegenmaßnahme: Attribute direkt auf SVG-Elemente setzen (`stroke="currentColor"` + `color: var(--accent-2)` auf dem Container-Div) ODER `getComputedStyle` wie bei `_redrawCone()` verwenden. Testen auf echtem iPhone vor Release.
+
+**Versagen 2: Marker auf Satelliten-Karte nicht lesbar.**
+- Frühwarnung: Beim manuellen Test auf dem Satelliten-Layer verschwinden die Marker.
+- Gegenmaßnahme: Drop-Shadow mit `feDropShadow flood-opacity=0.7` für starken Kontrast. Weißer Kern bleibt immer als Orientierungspunkt.
+
+**Versagen 3: Dark-Mode-Kern wird unsichtbar.**
+- Frühwarnung: Im Dark-Mode ist der weiße Kern (= `--surface` = `#1e2127`) unsichtbar auf dunklem Satelliten-Hintergrund.
+- Gegenmaßnahme: Kern-Farbe fix weiß (`#ffffff`) statt `var(--surface)`, da Satelliten-Karte immer dunkel ist. Oder: Kern-Kontur in `--accent-2` mit weißem Innenfüller.
+
+**Versagen 4: Übersichts-Marker verliert Farbe beim Theme-Wechsel.**
+- Frühwarnung: Nach Theme-Wechsel bleiben alte Marker auf der Karte in der vorherigen Farbe.
+- Gegenmaßnahme: `MapView.loadMarkers()` nach Theme-Wechsel neu aufrufen ODER Farbe aus CSS-Variable lesen (bereits mit `getComputedStyle` gelöst — aber nur beim initialen Laden). Theme-Wechsel-Event prüfen.
+
+**Versagen 5: Inkonsistenz bei Scope-Creep.**
+- Frühwarnung: Es verleitet, auch den GPS-Dot-Marker, den FOV-Kegel-Stil oder die Sichtachse anzupassen.
+- Gegenmaßnahme: Scope bleibt bei den 3 explizit genannten Elementen: (a) FOV-Marker (Fotograf + Motiv), (b) Übersichts-Marker, (c) Legende. Alles andere → separates Ticket.
+
+---
+
+##### Architektur-Analyse
+
+**Betroffene Code-Stellen in `web/index.html`:**
+
+1. **`MapMarkers._obsIcon()`** (Zeile ~3641) — Fotograf-Tropfen-Pin für FOV-Karte und Location-Detail. Nutzt `L.divIcon` mit inline-SVG. Farben: `--accent-2` (Gold), `--surface` (Kern). Bereits gut; Form-Feinschliff möglich.
+
+2. **`MapMarkers._subjIcon()`** (Zeile ~3657) — Motiv-Fadenkreuz für FOV-Karte. Nutzt `L.divIcon` mit inline-SVG. Farben: `--accent-2`. Bereits vorhanden; Drop-Shadow prüfen.
+
+3. **`MapMarkers.legendHtml()`** (Zeile ~3682) — HTML-Legende mit Mini-SVGs. Spiegelt die Marker, aber ohne Drop-Shadow (korrekt für Legende). Kann 1:1 als Vorlage dienen.
+
+4. **`MapView.loadMarkers()`** (Zeile ~3734) — Übersichts-Marker mit `L.divIcon`. **Problem:** Nutzt `--accent` (Blau) statt `--accent-2` (Gold). Muss korrigiert werden.
+
+5. **`CameraFOV.initMap()`** (Zeile ~3228) — FOV-Karten-Init; nutzt `MapMarkers.observer()` und `MapMarkers.subject()` — erbt automatisch Fixes aus Punkt 1+2.
+
+**Leaflet-API:**
+- `L.divIcon({ className:'', html: svgString, iconSize, iconAnchor })` — der Weg für custom Marker
+- `L.marker(latlng, { icon })` — standard
+- Kein Canvas, kein SVG-Overlay — alles DOM-basiert
+
+**CSS-Token-Quelle (US-99, Zeile 37–92):**
+- `:root` → `--accent: #2d4ea0`, `--accent-2: #b07a12`, `--surface: #ffffff`, `--on-accent: #ffffff`
+- `@media (prefers-color-scheme: dark)` → `--accent: #7c9bea`, `--accent-2: #e3a21a`, `--surface: #1e2127`
+
+---
+
+##### Implementierungsoptionen
+
+**Option A — Inline-SVG-Attribute statt `style`-String (empfohlen)**
+
+Änderung: In `_obsIcon()` und `_subjIcon()` die Farb-Angaben von `style="fill:var(--accent-2)"` auf direkte SVG-Attribute umstellen: `fill` und `stroke` als Attribute am `<path>`/`<line>`/`<circle>`-Element, Farbe als CSS-Variable über ein Wrapper-Div mit `color: var(--accent-2)` und `currentColor`.
+
+Vorgehen:
+1. `MapMarkers._obsIcon()` — SVG-Elemente: `fill="currentColor"` für den Tropfen-Körper, `stroke="white"` für den Außenrand, `fill="white"` für den Kern. Wrapper-Div: `style="color:var(--accent-2)"`.
+2. `MapMarkers._subjIcon()` — analog für Fadenkreuz-Linien und Kreis.
+3. `MapMarkers.legendHtml()` — Mini-SVGs analog anpassen.
+4. `MapView.loadMarkers()` — `--accent` → `--accent-2` für Übersichts-Marker.
+
+Betroffene Dateien: nur `web/index.html`
+
+Vorteile:
+- WebKit-sicher: `currentColor` als SVG-Attribut (nicht CSS-Klasse) ist das Memory-konforme Muster
+- Nur eine Datei, 4 Änderungspunkte
+- Keine neue Logik, keine neuen Abhängigkeiten
+- Dark-Mode funktioniert automatisch via CSS-Variable am Container
+
+Nachteile:
+- Kern-Farbe (weißer Punkt) muss fix `white` sein statt `var(--surface)`, damit Satelliten-Lesbarkeit erhalten bleibt
+
+Aufwand: ~2 Stunden
+
+---
+
+**Option B — Theme-wechsel-robuste Farb-Aktualisierung via JS**
+
+Änderung: Marker-SVGs bleiben als `style`-Strings, aber beim Theme-Wechsel werden alle Marker neu erstellt (analog zu `_redrawCone()` mit `getComputedStyle`).
+
+Vorgehen:
+1. Theme-Change-Listener auf `prefers-color-scheme` oder auf den manuellen Umschalter.
+2. Bei Theme-Wechsel: `MapView.loadMarkers()` neu aufrufen, alle FOV-Karten-Marker neu setzen.
+3. `MapView.loadMarkers()` Farbe von `--accent` auf `--accent-2` korrigieren.
+
+Betroffene Dateien: `web/index.html`
+
+Vorteile:
+- Erzwingt Konsistenz bei Theme-Wechsel auch bei alten Markers
+- Klar trennbar pro Komponente
+
+Nachteile:
+- Höherer Aufwand, neue Listener-Logik
+- Potenzielle Bugs bei gleichzeitig offenen Karten + Theme-Wechsel
+- Overkill: CSS-Variablen in inline-SVG lösen Theme-Wechsel bereits automatisch
+
+Aufwand: ~4 Stunden
+
+---
+
+##### Empfehlung
+
+**Option A** — Inline-SVG-Attribute mit `currentColor` + Wrapper-`color:`-CSS-Variable.
+
+Begründung: Minimal-invasiv (nur `web/index.html`, 4 Stellen), WebKit-sicher nach Memory-Muster, Dark-Mode automatisch, kein neuer JS-Code. Der einzige Trade-off (Kern fix weiß statt `var(--surface)`) ist sinnvoll: Satelliten-Karten sind immer dunkel, weißer Kern immer lesbar. Zusätzlich Korrektur der Übersichts-Marker von `--accent` auf `--accent-2` für Farbkonsistenz.
 
 ---
 
@@ -890,16 +1066,222 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### US-79 · Mondauf- und -untergang in Event- und Locationdetails `[ ]`
+### US-79 · Mondauf- und -untergang in Event- und Locationdetails `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Ergänzend zu Sonnenaufgang und -untergang sollen auch Mondaufgang und -untergang (Uhrzeit, Azimut) in der Astronomie-Kategorie der Event- und Locationdetails angezeigt werden.
+
+---
+
+#### 📐 Example Mapping
+
+**Annahmen-Protokoll:**
+
+| Typ | Punkt |
+|-----|-------|
+| ✅ klar | `moonrise` und `moonset` werden bereits von `calculate_moon_info()` in `astronomy.py` berechnet (Z. 378–385), sind aber **nicht** in `_serialize()` im `precompute.py`-Output enthalten |
+| ✅ klar | Azimut zum Zeitpunkt des Mondaufgangs/-untergangs lässt sich mit der bereits vorhandenen `get_body_position(lat, lon, "moon", moonrise_time)` berechnen |
+| ⚠️ Annahme | Mondauf-/-untergang werden **nur im Event-Detail und Location-Detail** angezeigt, nicht als eigener Filter-Chip — bitte bestätigen |
+| ⚠️ Annahme | Wenn kein Mondaufgang/-untergang an diesem Tag stattfindet (Polarnacht-Szenario für Mond: tritt bei FotoAlert-Breitengraden selten auf, aber möglich), wird die Zeile einfach ausgeblendet — bitte bestätigen |
+| ✅ klar | Es gibt kein eigenes Mondaufgang-/Monduntergangs-Icon — `i-moon` wird wiederverwendet (wie bei Mondphase) |
+
+**📏 Regeln:**
+
+📏 **Rule 1 — Mondaufgang mit Uhrzeit und Azimut im Event-Detail**
+Wenn ein Event geöffnet wird, zeigt die Astronomie-Sektion — sofern an diesem Tag ein Mondaufgang stattfindet — die Uhrzeit (Berliner Zeit) und den Aufgangsazimut in Grad an.
+
+🟢 Example 1a (Mondaufgang vorhanden):
+- **Given** der Nutzer öffnet ein Goldene-Stunde-Event am 15. Juli 2026
+- **When** die Astronomie-Sektion erscheint
+- **Then** sieht er z.B. „Mondaufgang · 21:34 · 78°" als neue Zeile, direkt unter Sonnenuntergang
+
+🟢 Example 1b (kein Mondaufgang an diesem Tag):
+- **Given** an dem Tag gibt es keinen Mondaufgang (selten, aber möglich)
+- **When** die Astronomie-Sektion erscheint
+- **Then** fehlt die Mondaufgang-Zeile kommentarlos (kein „–" oder „unbekannt")
+
+📏 **Rule 2 — Monduntergang mit Uhrzeit und Azimut im Event-Detail**
+Analog zu Mondaufgang: Monduntergangszeit und -azimut werden in derselben Sektion angezeigt, falls vorhanden.
+
+🟢 Example 2a (Monduntergang vorhanden):
+- **Given** das Event-Detail ist offen
+- **When** Monduntergang ist für diesen Tag berechenbar
+- **Then** erscheint „Monduntergang · 04:12 · 282°" als eigene Zeile
+
+📏 **Rule 3 — Dieselben Daten im Location-Detail**
+Location-Details zeigen Mondauf-/-untergang für den aktuellen Tag (Heute) in der Astronomie-Sektion an.
+
+🟢 Example 3a:
+- **Given** der Nutzer öffnet das Location-Detail
+- **When** er die Astronomie-Infos sieht (aktuell nur Mondphase sichtbar, da Location-Details keine event-spezifischen Felder haben)
+- **Then** — **Achtung:** Location-Details haben keinen Event-Kontext und damit keine `sunrise_utc`/`sunset_utc`-Felder. Location-Details zeigen derzeit keine Astronomie-Zeitangaben an. → Dies muss als Scope-Entscheidung geklärt werden (❓ Question 1).
+
+❓ **Question 1 — Location-Detail: heute oder event-spezifisch?**
+Das Location-Detail zeigt keinen Event-Kontext. Soll für das Location-Detail:
+- (a) der **heutige Tag** als Referenz genommen werden (live berechnet via API-Call oder JS-Bibliothek)?
+- (b) nur im **Event-Detail** (das einen konkreten Datum-Kontext hat) angezeigt werden?
+
+⚠️ Annahme für die Spec: Scope = **primär Event-Detail**; Location-Detail als nachgelagerter Scope wenn (a) bestätigt.
+
+📏 **Rule 4 — Recompute erforderlich**
+Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`) werden im Backend berechnet und im Cache gespeichert. Nach der Implementierung ist ein vollständiger Recompute nötig, damit alle gecachten Events die neuen Felder haben.
+
+---
+
+#### ✅ Akzeptanzkriterien
+
+- [ ] **AK-1:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Mondaufgang stattfindet, sieht er in der Astronomie-Sektion des Event-Details eine neue Zeile „Mondaufgang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad (z.B. „🌙 21:34 · 78°").
+- [ ] **AK-2:** Wenn der Nutzer ein beliebiges Event öffnet und an diesem Tag ein Monduntergang stattfindet, sieht er in der Astronomie-Sektion eine neue Zeile „Monduntergang" mit Uhrzeit (Berliner Zeit) und Azimut in Grad.
+- [ ] **AK-3:** Wenn an dem Tag kein Mondaufgang oder kein Monduntergang stattfindet (Felder im Event-Objekt sind `null`), fehlt die entsprechende Zeile kommentarlos — keine Anzeige von „–" oder „unbekannt".
+- [ ] **AK-4:** Die Azimut-Werte für Mondaufgang/-untergang werden auf eine Nachkommastelle gerundet angezeigt (z.B. „78.3°"), konsistent mit anderen Azimut-Angaben in der App.
+- [ ] **AK-5:** Der API-Endpoint `/opportunities` liefert vier neue Felder pro Event: `moonrise_utc` (ISO-String oder null), `moonset_utc` (ISO-String oder null), `moonrise_azimuth` (Float oder null), `moonset_azimuth` (Float oder null).
+- [ ] **AK-6:** Der Kalender-Endpoint `/calendar` liefert dieselben vier neuen Felder (da er dieselbe `_serialize()`-Funktion verwendet).
+- [ ] **AK-7 (Edge Case):** Wenn ein Event aus dem Cache kommt, der **vor** dem Recompute erstellt wurde (Felder fehlen also), zeigt das Frontend weder Fehler noch leere Zeilen an — der `null`-Check greift sauber.
+- [ ] **AK-8 (Regression):** Alle bestehenden Astronomie-Felder (Sonnenaufgang, Sonnenuntergang, Mondphase, Mondbeleuchtung, Goldene/Blaue Stunde) sind nach der Änderung noch identisch vorhanden und korrekt angezeigt.
+- [ ] **AK-NEU-A:** Mondaufgang und Monduntergang erscheinen als eigenständige Event-Karten im Feed — mit Titel, Uhrzeit und Score, direkt neben Goldene Stunde und Blaue Stunde.
+- [ ] **AK-NEU-B:** Die Filter-Chips „Mondaufgang" und „Monduntergang" im Filter-Sheet funktionieren und filtern den Feed korrekt auf diese Event-Typen.
+- [ ] **AK-NEU-C:** Im Event-Detail (Astronomie-Sektion) erscheinen Mondaufgang und Monduntergang mit Uhrzeit (Berliner Zeit) und Azimut in Grad — wenn sie an diesem Tag stattfinden.
+- [ ] **AK-NEU-D:** Wenn ein Mondaufgang- oder Monduntergang-Filter aktiv ist, werden auf der Karte nur Locations mit diesen Events angezeigt (Feed-basierter Filter greift).
+- [ ] **AK-NEU-E:** Mondaufgang- und Monduntergang-Events erscheinen im Location-Detail unter „Nächste Chancen" mit korrektem Mond-Icon (nicht i-star Fallback).
+
+---
+
+#### 💀 Pre-Mortem
+
+📎 **Code-Verifikation** (durchgeführt 2026-06-28):
+- `calculate_moon_info()` in `backend/calculations/astronomy.py` Z. 358–415: berechnet bereits `moonrise` und `moonset` als `Optional[datetime]`. Azimut zum Aufgangszeitpunkt muss **neu** via `get_body_position(lat, lon, "moon", moonrise)` abgerufen werden — das ist eine vorhandene Funktion.
+- `_serialize()` in `backend/precompute.py` Z. 378–469: enthält `moonrise`/`moonset` **nicht**. Die neuen Felder müssen dort ergänzt werden.
+- `MoonInfo`-Dataclass hat `azimuth_at_golden_hour` aber **keinen** `moonrise_azimuth`/`moonset_azimuth` — diese müssen entweder in die Dataclass oder direkt in `_serialize()` berechnet werden.
+- Frontend (Z. 3313–3320): die `astro`-Variable im Event-Detail nutzt `o.moonrise_utc` noch nicht — genau dort werden die neuen Zeilen eingefügt.
+- Bestätigt: `i-moon` Icon vorhanden (Z. 753); `formatTime()` akzeptiert ISO-Strings und gibt Berliner Zeit zurück (Z. 1281).
+
+💀 **Szenario 1: Alter Cache — neue Felder fehlen → JS-Fehler**
+- Auslöser: Frontend erwartet `o.moonrise_utc`, aber bestehende Cache-Events haben das Feld noch nicht
+- Frühwarnung: Fehler-Konsole im Browser zeigt `undefined` bei Feldauswertung
+- Gegenmaßnahme: Im Frontend **immer** mit `o.moonrise_utc ?` konditionalen Guard arbeiten (wie bei sunrise_utc bereits Standard) → AK-7
+
+💀 **Szenario 2: Azimut-Berechnung zum Zeitpunkt moonrise schlägt fehl**
+- Auslöser: `moonrise` ist None (kein Mondaufgang an diesem Tag) → `get_body_position()` wird mit None aufgerufen
+- Frühwarnung: Backend-Exception in Precompute-Log
+- Gegenmaßnahme: In `_serialize()` explizit `if o.astronomy_report.moon.moonrise` prüfen, bevor Azimut berechnet wird → in Testfall abdecken
+
+💀 **Szenario 3: Recompute nicht durchgeführt → Felder im Cache fehlen dauerhaft**
+- Auslöser: Nach Release wird kein `POST /refresh-feed` ausgeführt
+- Frühwarnung: `/opportunities`-Response hat `moonrise_utc: null` für alle Events
+- Gegenmaßnahme: Recompute als expliziter Release-Schritt im Release-Gate vermerken (Bestandteil des Testplans)
+
+💀 **Szenario 4: Python 3.9 Kompatibilität verletzt**
+- Auslöser: In `_serialize()` oder `MoonInfo` wird `str | None`-Syntax (Python 3.10+) verwendet
+- Frühwarnung: Prod-Server-Crash beim Start
+- Gegenmaßnahme: Alle neuen Typen als `Optional[str]` / `Optional[float]` aus `typing` schreiben
+
+💀 **Szenario 5: Azimut-Berechnung nutzt Window-Engine-Cache für falschen Zeitpunkt**
+- Auslöser: `get_body_position()` wird mit dem `moonrise`-Zeitpunkt aufgerufen. Die Window-Engine interpoliert nur innerhalb ihres vorberechneten Tages-Fensters. `moonrise` liegt am Beginn des Tages oder am Ende — Edge-Case beim Rand des Fensters.
+- Frühwarnung: Azimut-Wert erscheint als `null`, obwohl Mondaufgang vorhanden
+- Gegenmaßnahme: Fallback auf direkten Skyfield-Call wenn `get_body_position()` None zurückgibt → testen mit Randzeiten
+
+---
+
+#### 🏗 Architektur-Analyse
+
+**Betroffene Dateien:**
+
+| Datei | Änderung |
+|-------|----------|
+| `backend/calculations/opportunity.py` | Block 5b neu: Mondaufgang/-untergang als eigenständige PhotoOpportunity-Events (EventType.MOON_RISE / MOON_SET), analog zu Goldener Stunde |
+| `backend/precompute.py` | `_serialize()`: 4 neue Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`), Azimut via `get_body_position()` zur Mondaufgangszeit; Import von `get_body_position` ergänzt |
+| `web/index.html` | `ICONS`-Map: `Monduntergang` → `i-moon` ergänzt; `Detail.open()` astro-Block: 2 neue info-rows für Mondaufgang/-untergang mit Uhrzeit + Azimut |
+| `backend/tests/test_us79_moon_rise_set.py` | 9 pytest-Tests: Quellcode-Verifikation für Felder, Event-Erzeugung, Guard und Regression |
+
+**Entry-Point-Datenquellencheck:**
+
+| Entry-Point | Endpoint | Datenquelle | moonrise_utc vorhanden? |
+|-------------|----------|-------------|------------------------|
+| Feed (Event-Detail) | `/opportunities` | `_serialize()` aus precompute-Cache | ❌ noch nicht |
+| Kalender (Event-Detail) | `/calendar` | `_serialize()` (identisch) | ❌ noch nicht |
+| Location-Detail | — | kein eigener Astronomy-Endpoint | — (Scope-Frage) |
+
+**Wichtig:** Kalender und Feed nutzen **dieselbe** `_serialize()`-Funktion → eine Änderung deckt beide ab. Kein divergierendes Daten-Problem.
+
+---
+
+#### 🛠 Implementierungsoptionen
+
+**Was der Nutzer erlebt:**
+
+**Option A** — Der Nutzer sieht beim Öffnen eines Events die Mondaufgang- und Monduntergangszeit direkt in der Astronomie-Sektion, mit Uhrzeit und Richtungsgrad. Der Azimut wird beim täglichen Recompute-Lauf einmalig berechnet und gecacht — keine Laufzeit-Berechnung.
+
+**Option B** — Identisches Erscheinungsbild für den Nutzer, aber der Azimut zum Mondaufgangszeitpunkt wird als separate `get_body_position()`-Erweiterung in der `MoonInfo`-Dataclass verankert, statt direkt in `_serialize()`. Sauberer für künftige Erweiterungen (z.B. wenn MoonInfo anderswo gebraucht wird).
+
+---
+
+### Option A — Direkt in `_serialize()` (minimal invasiv)
+
+- **Vorgehen:** In `_serialize()` werden `moonrise_utc` und `moonset_utc` direkt aus `o.astronomy_report.moon.moonrise/.moonset` serialisiert; `moonrise_azimuth`/`moonset_azimuth` werden ad-hoc via `get_body_position()` berechnet (nur wenn Zeitpunkt nicht None ist). Keine Änderung an `MoonInfo`.
+- **Betroffene Dateien:** `backend/precompute.py` (4 neue Felder), `web/index.html` (2 neue Zeilen)
+- **Vorteile:** Minimale Änderungsfläche, kein Refactoring von Datenklassen, schnell
+- **Nachteile:** Azimut-Logik verteilt sich zwischen `astronomy.py` (Berechnung) und `precompute.py` (Ad-hoc-Nutzung); weniger kohärent
+- **Aufwand:** klein
+
+### Option B — MoonInfo-Dataclass erweitern (strukturell sauber)
+
+- **Vorgehen:** `MoonInfo` bekommt zwei neue Felder (`moonrise_azimuth: Optional[float]`, `moonset_azimuth: Optional[float]`). `calculate_moon_info()` berechnet sie beim Aufruf automatisch mit. `_serialize()` liest sie dann nur noch aus.
+- **Betroffene Dateien:** `backend/calculations/astronomy.py` (Dataclass + Berechnung), `backend/precompute.py` (nur Auslesen), `web/index.html` (2 neue Zeilen)
+- **Vorteile:** Azimut-Berechnung ist kohärent in `calculate_moon_info()` gebündelt; bei künftigen Nutzern von `MoonInfo` (z.B. neuer Endpoint) automatisch mitgeliefert
+- **Nachteile:** Etwas mehr Änderungsfläche in `astronomy.py`; marginaler Mehraufwand
+- **Aufwand:** klein–mittel
+
+✅ **Empfehlung: Option B** — Die `MoonInfo`-Dataclass ist der semantisch richtige Ort für Mondauf-/-untergangs-Azimute. Alle `MoonInfo`-Aufrufer profitieren automatisch. Mehraufwand ist minimal (2–3 Zeilen in `astronomy.py`). Option A wäre technische Schuld: der Azimut gehört zur Mondberechnung, nicht zur Serialisierung.
+
+---
+
+#### 🧪 Testplan
+
+**Automatisiert (pytest) — `backend/tests/test_us79_moon_rise_set.py`:**
+- [ ] `test_moonrise_fields_in_serialize()` — `_serialize()` eines Mock-PhotoOpportunity mit `astronomy_report.moon.moonrise = datetime(...)` liefert `moonrise_utc` als ISO-String und `moonrise_azimuth` als float ≠ None
+- [ ] `test_moonset_fields_in_serialize()` — analog für Monduntergang
+- [ ] `test_no_moonrise_returns_null()` — `astronomy_report.moon.moonrise = None` → `moonrise_utc: null`, `moonrise_azimuth: null`
+- [ ] `test_moonrise_azimuth_range()` — `moonrise_azimuth` liegt zwischen 0° und 360°
+- [ ] `test_mooninfo_dataclass_has_azimuth_fields()` (bei Option B) — `MoonInfo`-Instanz hat Felder `moonrise_azimuth` und `moonset_azimuth`
+
+**Manuell (Browser unter `http://localhost:8000`):**
+1. App öffnen → Feed-Tab → beliebiges Event tippen → Astronomie-Sektion öffnen
+   → **Erwartetes Ergebnis:** neue Zeile „Mondaufgang" mit Uhrzeit + Azimut sichtbar (oder fehlt wenn kein Mondaufgang heute)
+2. Kalender-Tab → Monat wählen → Event tippen → Astronomie-Sektion
+   → **Erwartetes Ergebnis:** identische Mondfelder wie im Feed-Event-Detail
+3. Event mit bekanntem Datum suchen wo kein Mondaufgang stattfindet
+   → **Erwartetes Ergebnis:** keine leere Zeile, keine Fehleranzeige
+4. **Regression:** Sonnenaufgang, Mondphase, Goldene Stunde — alle noch vorhanden und korrekt
+
+**Regressions-Matrix (aus PRODUCT.md):**
+- Backend-Änderung in `precompute.py` → Feed, Kalender, Discover auf korrekte Serialisierung prüfen
+- `astronomy.py`-Änderung → alle astronomy-basierten Event-Typen (Mond-Alignment, Goldene Stunde, Milchstraße) in Feed auf korrekte Scores prüfen
+
+---
+
+#### 📋 Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/precompute.py`, `backend/calculations/astronomy.py`, `web/index.html`
+- [x] Implementierungsoptionen: A (direkt in _serialize) / B (MoonInfo erweitern)
+- [x] Empfehlung: **Option B** — MoonInfo-Dataclass um `moonrise_azimuth`/`moonset_azimuth` erweitern
+
+**Scope (erweitert auf vollwertige Event-Typen laut US-79-Freigabe):**
+- ✅ Eingeschlossen: Mondaufgang/-untergang als eigenständige Events in `opportunity.py` (EventType.MOON_RISE, EventType.MOON_SET)
+- ✅ Eingeschlossen: `_serialize()` in `precompute.py` liefert `moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`
+- ✅ Eingeschlossen: Event-Detail zeigt Mondaufgang/-untergang in der Astronomie-Sektion
+- ✅ Eingeschlossen: Filter-Chips „Mondaufgang" / „Monduntergang" vorhanden (waren bereits im _ET-Array)
+- ✅ Eingeschlossen: Map-Filter für Mondaufgang/-untergang greift via Feed-basierten Typ-Match
+- ✅ Eingeschlossen: Location-Detail „Nächste Chancen" zeigt Mondaufgang/-untergang (via /opportunities mit location_id)
+- ✅ Eingeschlossen: ICONS-Map hat `Monduntergang` → `i-moon` ergänzt (fehlte bisher)
+- ❌ Ausgeschlossen: Location-Detail Astronomie-Block mit live-berechnetem Mondaufgang für Heute (kein Event-Kontext; separater Scope wenn gewünscht)
 
 ---
 
@@ -1251,6 +1633,21 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 - [x] **BUG-01** Brennweite-Empfehlung passt nicht zur Motiventfernung – `_focal_for_location()` aus distance_m, Min+Max-Filter, „Brennweite falsch" in Verifikation. v1.1.3.
 - [x] **BUG-03** Scheinbare Größe des Himmelsobjekts zu groß – `get_moon_earth_distance_km()` via Skyfield de421.bsp für tatsächliche Mond–Erde-Distanz zum Shoot-Zeitpunkt. Formel korrigiert: `angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km`. Distanz im Detail-Sheet als Fußnote. `ALGORITHM_VERSION = "1.1"`. v1.3.4.
 - [x] **US-96** Einheitliche Chancen-Detailansicht – neue Sektionsreihenfolge, alle Sektionen beim Öffnen zugeklappt, Live-Astro mit Shoot-Datum. v1.17.0.
+
+### BUG-47 · Einstellungsseite zeigt falsche Rolle nach Host-Login `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Nach der Anmeldung mit dem Host-Passwort zeigt die Einstellungsseite „User" statt „Host" an. Die Rolle wird also nach erfolgreichem Login falsch dargestellt — obwohl der Login selbst funktioniert und host-spezifische Rechte greife, stimmt die angezeigte Rollenbezeichnung nicht mit dem tatsächlichen Token überein.
+
+**Bezug:** Abhängig von US-66[x] (Login mit Rollen-Erkennung, Passwort-Mechanismus) — der Fehler liegt in der Darstellungsschicht nach dem Login, nicht im Auth-Mechanismus selbst. Grenzt an US-84 (Host-Passwort-Änderung in der UI), da beide die Einstellungsseite mit host-spezifischen Inhalten betreffen.
+
+---
 
 ### BUG-34 · iPhone Safari: Bearbeitungs-Overlay zoomt und ragt rechts aus dem Screen `[~]`
 

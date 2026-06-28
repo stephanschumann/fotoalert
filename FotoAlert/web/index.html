@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.19.3';
+const APP_VERSION = '1.19.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1265,7 +1265,8 @@ const LoginScreen = {
 const ICONS = {
   'Goldene Stunde Abend':  'i-sunset',   'Goldene Stunde Morgen': 'i-sunrise',
   'Blaue Stunde':          'i-moon',     'Mondaufgang':           'i-moon',
-  'Mond-Alignment':        'i-moon',     'Sonnen-Alignment':      'i-sun',
+  'Monduntergang':         'i-moon',     'Mond-Alignment':        'i-moon',
+  'Sonnen-Alignment':      'i-sun',
   'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
   'Sonnenfinsternis':      'i-eclipse',
   'Blaue Stunde Morgen':   'i-moon',     'Blaue Stunde Abend':    'i-moon',
@@ -3316,6 +3317,8 @@ const Detail = {
       ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
       ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.sunrise_utc)}</span></div>` : ''}
       ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.sunset_utc)}</span></div>` : ''}
+      ${o.moonrise_utc ? `<div class="info-row"><span class="ir-label">Mondaufgang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonrise_utc)}${o.moonrise_azimuth != null ? ` · ${o.moonrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${o.moonset_utc ? `<div class="info-row"><span class="ir-label">Monduntergang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonset_utc)}${o.moonset_azimuth != null ? ` · ${o.moonset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
       ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
       ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.golden_hour_evening_start)} – ${formatTime(o.blue_hour_evening_end)}</span></div>` : ''}
     `;
@@ -3651,15 +3654,20 @@ const MapMarkers = {
       iconSize: [28, 38], iconAnchor: [14, 36], popupAnchor: [0, -38]
     });
   },
-  // Motiv: Kreuzmarke mit Punkt (Vorschlag D)
+  // Motiv: Zielring mit 4 Ticks + Mittelpunkt (Bauhaus)
   _subjIcon() {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-      <filter id="ds2"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.55"/></filter>
-      <g filter="url(#ds2)">
-        <line x1="16" y1="2" x2="16" y2="30" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="2" y1="16" x2="30" y2="16" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="16" cy="16" r="5" style="fill:var(--accent-2);stroke:var(--surface)" stroke-width="2.5"/>
-      </g>
+      <circle cx="16" cy="16" r="11" fill="none" stroke="var(--surface)" stroke-width="4.5"/>
+      <circle cx="16" cy="16" r="11" fill="none" style="stroke:var(--accent-2)" stroke-width="2"/>
+      <line x1="16" y1="3" x2="16" y2="7" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="16" y1="3" x2="16" y2="7" style="stroke:var(--accent-2)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="16" y1="25" x2="16" y2="29" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="16" y1="25" x2="16" y2="29" style="stroke:var(--accent-2)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="3" y1="16" x2="7" y2="16" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="3" y1="16" x2="7" y2="16" style="stroke:var(--accent-2)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="25" y1="16" x2="29" y2="16" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="25" y1="16" x2="29" y2="16" style="stroke:var(--accent-2)" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="3.5" style="fill:var(--accent-2)" stroke="var(--surface)" stroke-width="2"/>
     </svg>`;
     return L.divIcon({
       className: '',
@@ -3686,9 +3694,17 @@ const MapMarkers = {
       <circle cx="14" cy="14" r="5" style="fill:var(--surface)"/>
     </svg>`;
     const subjSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 32 32" style="vertical-align:middle">
-      <line x1="16" y1="2" x2="16" y2="30" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="2" y1="16" x2="30" y2="16" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="5" style="fill:var(--accent-2);stroke:var(--surface)" stroke-width="2.5"/>
+      <circle cx="16" cy="16" r="11" fill="none" stroke="var(--surface)" stroke-width="5"/>
+      <circle cx="16" cy="16" r="11" fill="none" style="stroke:var(--accent-2)" stroke-width="2.5"/>
+      <line x1="16" y1="3" x2="16" y2="8" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="16" y1="3" x2="16" y2="8" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="16" y1="24" x2="16" y2="29" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="16" y1="24" x2="16" y2="29" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="3" y1="16" x2="8" y2="16" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="3" y1="16" x2="8" y2="16" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="24" y1="16" x2="29" y2="16" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="24" y1="16" x2="29" y2="16" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="3.5" style="fill:var(--accent-2)" stroke="var(--surface)" stroke-width="2"/>
     </svg>`;
     return `<div style="display:flex;gap:12px;align-items:center;font-size:11px;color:var(--muted)">
       <span>${obsSvg} Fotograf-Standort</span>
@@ -3732,9 +3748,12 @@ const MapView = {
     const col = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
     for (const loc of locs) {
       const icon = L.divIcon({ className:'', html:
-        `<div style="width:28px;height:28px;background:${col};border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);border:2px solid var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
-        iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-32]
+        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
+          <path d="M14 2C7 2 2 8 2 15c0 9 12 21 12 21s12-12 12-21C26 8 21 2 14 2z"
+                fill="${col}" stroke="var(--surface)" stroke-width="2.5"/>
+          <circle cx="14" cy="14" r="5" fill="var(--surface)"/>
+        </svg>`,
+        iconSize:[28,38], iconAnchor:[14,36], popupAnchor:[0,-38]
       });
       const m = L.marker([loc.observer_lat, loc.observer_lon], {icon}).addTo(this.map);
       m.bindPopup(`<div class="map-popup">
