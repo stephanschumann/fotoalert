@@ -59,6 +59,7 @@ from calculations.weather import fetch_weather_forecast, calculate_photo_weather
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
+from data import qa_azimuth, qa_focal  # TASK-48: fertige Auto-Verbesserungen anstoßen
 from models.schemas import (
     CameraHintOut,
     DailyBriefingOut,
@@ -218,6 +219,13 @@ _cache_loaded_at:   Optional[datetime] = None
 _weather_updated_at: Optional[datetime] = None
 _precompute_running: bool = False
 _recompute_pending:  set  = set()   # BUG-35: IDs mit laufendem/ausstehendem Recompute
+
+# TASK-48: Single-Flight-Guard für den nächtlichen QA-Lauf (Azimut/Brennweite
+# auto-verbessern). Analog zu _precompute_running; verhindert Doppelläufe und
+# Überlappung mit dem großen Recompute.
+_qa_pass_running: bool = False
+# TASK-48: Drosselungs-Parameter (Pause zwischen Spots, Schutz externer Dienste).
+_QA_PASS_THROTTLE_S: float = 1.0
 
 # US-106 Teil 2: Scout-Volllauf nach Location-Änderung entprellt anstoßen.
 _scout_running: bool = False              # Single-Flight-Guard (kein Doppellauf)
@@ -664,6 +672,166 @@ async def _drain_recompute_pending() -> None:
         await _run_precompute_single(loc_id, _allow_drain=False)
 
 
+# ---------------------------------------------------------------------------
+# TASK-48 — Nächtlicher QA-Lauf: Änderungen erkennen + Auto-Verbesserungen anstoßen
+# ---------------------------------------------------------------------------
+
+def _qa_geo_hash_for(loc) -> str:
+    """Aktueller Geo-Fingerabdruck einer Location aus ihren 7 Geo-Kernfeldern.
+
+    Identische Feldauswahl wie compute_geo_hash (store.py). getattr mit Default
+    None, damit fehlende Felder (z.B. ältere Custom-Locations) nicht crashen.
+    """
+    return compute_geo_hash(
+        getattr(loc, "observer_lat", None),
+        getattr(loc, "observer_lon", None),
+        getattr(loc, "subject_lat", None),
+        getattr(loc, "subject_lon", None),
+        getattr(loc, "subject_height_m", None),
+        getattr(loc, "subject_width_m", None),
+        getattr(loc, "distance_m", None),
+    )
+
+
+def _qa_select_due(locations, store) -> list:
+    """Wählt die Spots aus, die einen QA-Lauf brauchen (Change-Detection).
+
+    Ein Spot fällt an, wenn er noch nie geprüft wurde (kein QA-State bzw. kein
+    gespeicherter geo_hash) ODER wenn sein aktueller Geo-Hash vom gespeicherten
+    abweicht. Unveränderte, bereits geprüfte Spots werden übersprungen.
+
+    Rückgabe: Liste von (loc, current_hash)-Tupeln.
+    """
+    due = []
+    for loc in locations:
+        current = _qa_geo_hash_for(loc)
+        try:
+            state = store.get_qa_state(loc.id)
+        except Exception as exc:
+            logger.warning("QA-State für %s nicht lesbar (%s) – Spot fällt an", loc.id, exc)
+            state = None
+        stored = state.get("geo_hash") if state else None
+        if stored is None or stored != current:
+            due.append((loc, current))
+    return due
+
+
+def _qa_improve_one(loc, store) -> bool:
+    """Stößt die fertigen Auto-Verbesserungen für GENAU EINEN Spot an (synchron).
+
+    Wird über asyncio.to_thread aus dem Job aufgerufen, damit die (potenziell
+    blockierende) Rechen-/Netzarbeit nicht im Event-Loop läuft.
+
+    Stößt Azimut (TASK-45) + Brennweite (TASK-47) an. Beide respektieren ihre
+    eigenen Locks und werfen nie; ein gesetztes Lock = kein Schreiben, gilt aber
+    trotzdem als geprüft. Fehler eines einzelnen Dienstes werden hier isoliert,
+    sodass der Spot insgesamt als erfolgreich verarbeitet gilt (er wird nicht
+    künstlich erneut anfällig nur weil ein Dienst hakte).
+
+    # TASK-46 Erweiterungspunkt: hier update_location_description(store, loc.id, ...)
+    # anstoßen, sobald die LLM-Beschreibung gebaut ist — mit identischer
+    # Fehler-Isolierung/Drosselung wie Azimut/Brennweite. HEUTE bewusst KEIN
+    # Aufruf (Funktion existiert noch nicht). Die Beschreibung fließt über den
+    # precompute-Merge (_apply_qa_values) automatisch in Feed/Kalender.
+
+    Rückgabe: True bei erfolgreicher Verarbeitung (Hash/Zeitstempel fortschreiben),
+    False bei einem harten Fehler (Spot bleibt ungeprüft, fällt erneut an).
+    """
+    ok = True
+    try:
+        qa_azimuth.update_location_azimuth(
+            store, loc.id,
+            getattr(loc, "observer_lat", None),
+            getattr(loc, "observer_lon", None),
+            getattr(loc, "subject_lat", None),
+            getattr(loc, "subject_lon", None),
+        )
+    except Exception as exc:
+        logger.warning("QA-Azimut für %s fehlgeschlagen: %s", loc.id, exc)
+        ok = False
+    try:
+        qa_focal.update_location_focal(
+            store, loc.id,
+            getattr(loc, "subject_height_m", None),
+            getattr(loc, "distance_m", None),
+        )
+    except Exception as exc:
+        logger.warning("QA-Brennweite für %s fehlgeschlagen: %s", loc.id, exc)
+        ok = False
+    return ok
+
+
+async def _run_qa_pass() -> Optional[dict]:
+    """TASK-48: Nächtlicher QA-Lauf.
+
+    Verbessert nur die Spots, deren Geo-Fingerabdruck sich geändert hat oder die
+    noch nie geprüft wurden (Change-Detection über persistierten Geo-Hash).
+    Schwere Arbeit pro Spot wird via asyncio.to_thread aus dem Event-Loop
+    ausgelagert; zwischen den Spots eine kurze Pause (Drosselung externer
+    Dienste). Single-Flight + Respekt vor laufendem Recompute.
+
+    Nach erfolgreichem Spot: qa_checked_at + geo_hash fortschreiben. Ein
+    Fehlversuch schreibt NICHT fort → der Spot fällt beim nächsten Lauf erneut an.
+    Ein Ausfall bei einem Spot bricht den Lauf nicht ab (try/except pro Spot).
+
+    Rückgabe (TASK-48 On-Demand): eine kompakte Zusammenfassung als dict
+    {"status", "checked", "improved", "failed"}. Der Scheduler ruft die Funktion
+    weiterhin ohne Argumente auf und ignoriert den Rückgabewert — das bestehende
+    Verhalten (Logs/Flags) bleibt unverändert; die Rückgabe ist rein additiv.
+    """
+    global _qa_pass_running
+
+    # AK-6: nicht überlappen — weder mit einem zweiten QA-Lauf noch mit dem Recompute.
+    if _qa_pass_running:
+        logger.info("QA-Lauf läuft bereits, übersprungen")
+        return {"status": "skipped", "reason": "qa_pass_running",
+                "checked": 0, "improved": 0, "failed": 0}
+    if _precompute_running:
+        logger.info("QA-Lauf übersprungen — Neuberechnung läuft (wird nächste Nacht nachgeholt)")
+        return {"status": "skipped", "reason": "precompute_running",
+                "checked": 0, "improved": 0, "failed": 0}
+
+    _qa_pass_running = True
+    logger.info("Starte QA-Lauf (TASK-48)...")
+    checked = 0
+    improved = 0
+    failed = 0
+    try:
+        due = _qa_select_due(LOCATIONS, _store)
+        logger.info("QA-Lauf: %d von %d Spots fällig (geändert/neu)", len(due), len(LOCATIONS))
+        for loc, current_hash in due:
+            # AK-6: Falls inzwischen ein großer Recompute angelaufen ist, sauber
+            # abbrechen — die offenen Spots fallen beim nächsten QA-Lauf erneut an
+            # (kein verlorener Stand, da Hash nur bei Erfolg fortgeschrieben wird).
+            if _precompute_running:
+                logger.info("QA-Lauf pausiert — Neuberechnung gestartet; Rest fällt nächste Nacht an")
+                break
+            try:
+                ok = await asyncio.to_thread(_qa_improve_one, loc, _store)
+                if ok:
+                    # AK-1/AK-3/AK-8: Erfolg → Hash + Zeitstempel fortschreiben,
+                    # auch wenn nur ein Lock-Spot „nichts geschrieben" hat.
+                    _store.update_qa_checked(loc.id, current_hash)
+                    checked += 1
+                    improved += 1
+                else:
+                    # AK-5: harter Fehler → NICHT fortschreiben, erneut versuchen.
+                    failed += 1
+            except Exception as exc:
+                # Fehlerisolierung pro Spot (Lauf bricht nie ganz ab).
+                logger.warning("QA-Lauf: Spot %s übersprungen (%s)", loc.id, exc)
+                failed += 1
+            # AK-7: Drosselung — kurze Pause zwischen Spots.
+            if _QA_PASS_THROTTLE_S > 0:
+                await asyncio.sleep(_QA_PASS_THROTTLE_S)
+        logger.info("QA-Lauf fertig: %d geprüft, %d verbessert, %d fehlgeschlagen", checked, improved, failed)
+    except Exception as exc:
+        logger.error("QA-Lauf abgebrochen (unerwartet): %s", exc)
+    finally:
+        _qa_pass_running = False
+    return {"status": "completed", "checked": checked, "improved": improved, "failed": failed}
+
+
 async def _run_precompute_single_subproc(loc_id: str, flag: str, tag: str) -> int:
     """
     US-106 (Nachbesserung): Startet precompute.py --location-id <loc_id> mit genau
@@ -945,6 +1113,10 @@ async def startup() -> None:
     # Scheduler — functools.partial bleibt eine Coroutine-Funktion (APScheduler
     # awaitet sie korrekt; ein lambda täte das nicht).
     import functools as _functools
+    # TASK-48: Nächtlicher QA-Lauf um 05:15 — bewusst 15 Min VOR dem Recompute
+    # (05:30), damit frisch verbesserte Auto-Werte beim Recompute schon vorliegen
+    # und über _apply_qa_values() in Feed/Kalender einfließen.
+    scheduler.add_job(_run_qa_pass, "cron", hour=1, minute=0)   # täglich 01:00 (großer Puffer vor Recompute 05:30)
     scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
                       "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
     scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
@@ -1499,6 +1671,24 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
     """
     background_tasks.add_task(_weather_overlay)
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
+
+
+@app.post("/run-qa-pass")
+async def trigger_qa_pass(_role: str = Depends(auth.require_host)) -> dict:
+    """TASK-48 (On-Demand): Stößt den nächtlichen QA-Lauf einmalig sofort an.
+
+    Damit lässt sich der QA-Lauf lokal/operativ testen, ohne bis 01:00 zu warten.
+    Geschützt wie alle Host-/Admin-Aktionen (Depends(auth.require_host) → Host-Token,
+    sonst 401/403). Läuft synchron und gibt eine kompakte Zusammenfassung zurück.
+
+    Single-Flight bleibt: läuft bereits ein QA-Lauf oder ein Recompute, antwortet
+    _run_qa_pass() mit status="skipped" (kein paralleler Start).
+    """
+    summary = await _run_qa_pass()
+    if summary is None:
+        # Defensiv — _run_qa_pass liefert seit TASK-48 immer ein dict.
+        summary = {"status": "completed", "checked": 0, "improved": 0, "failed": 0}
+    return summary
 
 
 @app.get("/job-status")

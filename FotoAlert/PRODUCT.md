@@ -328,6 +328,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | `/refresh` | POST | Manueller Cache-Reload (auth: host) |
 | `/daily-briefing` | GET | Tages-Zusammenfassung |
 | `/login` | POST | JWT-Token (Prod only; lokal: `auth.issue_token()`) |
+| `/run-qa-pass` | POST | Stößt den Standort-Qualitätslauf sofort an, statt auf die Nacht zu warten (auth: host) |
 
 **Pflicht-Regression Backend:**
 ```bash
@@ -338,6 +339,29 @@ curl -s "http://localhost:8000/opportunities?min_score=0.1&days=14" | python3 -c
 curl -s http://localhost:8000/discover | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✅ Scout OK ({len(d)} Events)')"
 curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✅ Kalender OK ({len(d)} Events)')"
 ```
+
+---
+
+## 11a. Automatische Standort-Verbesserung (Datensync, Epic US-75)
+
+**Was der Nutzer davon hat:** Neue oder geänderte Standorte werden automatisch sinnvoll ausgefüllt, ohne dass jemand Werte von Hand eintragen muss.
+
+| Funktion | Verhalten |
+|----------|-----------|
+| Ideale Blickrichtung automatisch | Für einen Standort wird die ideale Blickrichtung (Azimut) selbsttätig bestimmt und eingetragen. |
+| Brennweiten-Empfehlung automatisch | Passend zum Motiv und zur Entfernung wird eine empfohlene Brennweite berechnet und hinterlegt. |
+| Nächtlicher Lauf (01:00 Uhr) | Einmal pro Nacht prüft die App alle Standorte und erkennt am „Fingerabdruck" eines Standorts, ob sich etwas geändert hat oder er neu ist. Nur diese werden neu durchgerechnet — der Rest bleibt unangetastet, damit der Lauf schnell bleibt. |
+| Werte erscheinen in Feed & Kalender | Die automatisch ermittelten Werte fließen in die nächste Neuberechnung ein, sodass sie danach auch in den Foto-Chancen (Feed) und im Kalender sichtbar sind. |
+| Manuelle Werte bleiben geschützt | Hat jemand eine Blickrichtung oder Brennweite selbst gesetzt oder gesperrt, rührt die Automatik diese Werte nicht an. |
+| Sofort-Auslöser | Ein geschützter Auslöser (nur für den Host) startet diesen Qualitätslauf bei Bedarf sofort, ohne auf die Nacht zu warten. |
+
+**Pflicht-Regression Standort-Automatik:**
+- [ ] Neuer Standort ohne Blickrichtung erhält nach dem Lauf eine automatische Blickrichtung
+- [ ] Standort ohne Brennweiten-Empfehlung erhält nach dem Lauf eine Empfehlung
+- [ ] Manuell gesetzte/gesperrte Werte bleiben nach dem Lauf unverändert
+- [ ] Unveränderte Standorte werden nicht erneut durchgerechnet (nur geänderte/neue)
+- [ ] Automatische Werte erscheinen nach der Neuberechnung in Feed + Kalender
+- [ ] Sofort-Auslöser ohne Host-Token → HTTP 401
 
 ---
 
@@ -388,6 +412,9 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | US-106 (Nachbesserung) | Reihenfolge umgestellt: erst Feed+Wetter (Banner weg in Sekunden), Jahres-Kalender dieser Location zieht danach im Hintergrund nach (vorher hing das Banner ~10 Min am 365-Tage-Kalender). Kalender-Fehler nehmen die Freigabe nicht zurück; weiterhin nur eine schwere Berechnung gleichzeitig, zweite Änderung wird nachgeholt. Status Implemented — Test/Refactor/Release ausstehend. |
 | 2026-06-28 | US-105 | Chancen-Detail: Sektionsreihenfolge optimiert (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) |
 | 2026-06-28 | US-104 | Scout-Karten auf Feed-Design umgestellt (ScoreRing, Himmelsrichtung, Tag-Chips) |
+| 2026-06-28 | TASK-45 | Ideale Blickrichtung (Azimut) wird für Standorte automatisch bestimmt; manuelle/gesperrte Werte bleiben unangetastet |
+| 2026-06-28 | TASK-47 | Brennweiten-Empfehlung wird automatisch aus Motiv + Entfernung berechnet; respektiert gesetzte/gesperrte Werte |
+| 2026-06-28 | TASK-48 | Nächtlicher Standort-Qualitätslauf (01:00) erkennt geänderte/neue Standorte per Fingerabdruck und rechnet nur diese neu; Auto-Werte fließen in Feed + Kalender; geschützter Sofort-Auslöser `/run-qa-pass` (host) |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |
 | — | US-66 | Login + Auth (Host/User) |
 | — | BUG-42 | Custom Locations: kein 📍-Emoji in Namen |

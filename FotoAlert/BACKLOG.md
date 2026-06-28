@@ -26,10 +26,10 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* · **US-107** *(Spec fertig, wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | **US-106** *(Nachbesserung „Feed+Wetter sofort, Kalender im Hintergrund" implementiert + Tests grün; lokales Test-Gate offen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-45** *(Epic Datensync: Azimut automatisch, Option C — verifiziert; fertig, wartet auf Bündel-Release)* · **TASK-47** *(Epic Datensync: Brennweite automatisch, Option A — verifiziert; fertig, wartet auf Bündel-Release)* · **TASK-48** *(Epic Datensync: Automatik-Routine, Option A — 75 Tests grün, verifiziert; fertig, wartet auf Bündel-Release)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-47** · **BUG-46** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -1069,7 +1069,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Als Betreiber möchte ich sicherstellen, dass von Nutzern hinzugefügte/geänderte Locations (Motive, Standorte, Beschreibungen) regelmäßig und geprüft ins Backend übertragen werden — inkl. automatischer Generierung von Standortbeschreibungen, idealem Azimut, konsistenter Kategorisierung und automatischer Aktualisierung der Brennweitenempfehlungen.
@@ -1080,7 +1080,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 | Ticket | Inhalt | Abh. | Status |
 |--------|--------|------|--------|
-| **TASK-44** | QA-Datenmodell: Flags, Tabellen, Geo-Hash | TASK-17 ✅ | In Progress |
+| **TASK-44** | QA-Datenmodell: Flags, Tabellen, Geo-Hash | TASK-17 ✅ | ✅ Erledigt (archiviert) |
 | **TASK-45** | Azimut via Overpass API (Gebäude-Footprints → Horizon) | TASK-44 | ToDo |
 | **TASK-46** | LLM-Beschreibungen via Claude API | TASK-44 | ToDo |
 | **TASK-47** | Brennweiten-Auto-Calc (Geometrie) | TASK-44 | ToDo |
@@ -1092,6 +1092,362 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
         ──▶ TASK-46 (LLM)       ├──▶ TASK-48 (Cron)
         ──▶ TASK-47 (FL-Calc)   ┘
 ```
+
+---
+
+### TASK-45 · Idealer Azimut automatisch aus Gebäude-Footprints `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-28 |
+| **Epic** | US-75 |
+
+**Beschreibung:** Für Locations ohne kuratierten Idealbereich soll das System aus frei verfügbaren Kartendaten ableiten, aus welcher Himmelsrichtung Sonne oder Mond hinter dem Motiv stehen müssten, damit die App auch bei neuen oder per Backend angelegten Spots automatisch einen sinnvollen „idealer Azimut"-Bereich anzeigt — ohne dass jemand ihn von Hand eintragen muss.
+
+**(Dies ist das vertieft analysierte erste Kind — volle Spec.)**
+
+**Example Mapping:**
+- 📏 Rule: Wenn ein Spot Fotografen-Standort und Motiv-Koordinate hat, leitet das System die Blickrichtung zum Motiv ab und macht daraus einen Azimut-Bereich (Blickrichtung ± Toleranz).
+  - 🟢 Beispiel: Ein neuer Spot zeigt von Nordwesten auf eine Kirche im Südosten. Das System schlägt automatisch einen Idealbereich um „Südost" vor; in der App erscheint dieser Bereich, ohne dass jemand ihn eingetragen hat.
+- 📏 Rule: Wenn ein Mensch den Idealbereich bereits gepflegt (gesperrt) hat, fasst das System ihn nicht an.
+  - 🟢 Beispiel: Ein redaktionell gepflegter Spot behält seinen Bereich, auch wenn der Auto-Lauf etwas anderes berechnen würde.
+- 📏 Rule: Wenn die nötigen Geo-Daten fehlen oder die externe Karte nicht antwortet, ändert das System nichts und lässt den bestehenden Zustand stehen.
+  - 🟢 Beispiel: Bei einem Spot ohne Motiv-Koordinate bleibt der Azimut leer statt mit einem Zufallswert gefüllt zu werden.
+- ⚠️ Annahme: Toleranzbreite des Bereichs (z.B. ±15°) ist konventionell — Default vorgeschlagen, bitte bestätigen.
+- ⚠️ Annahme: Reine Sichtlinie Standort→Motiv (Bearing) als Basis; eine echte Horizont-/Footprint-Analyse via Overpass ist die Ausbaustufe (siehe Optionen).
+
+**Scope:**
+- Eingeschlossen: Auto-Ableitung eines Azimut-Bereichs (min/max) je Location aus vorhandenen Geo-Feldern bzw. OSM-Footprint; Schreiben nur in die QA-Werte-Tabelle (`location_qa_values.ideal_azimuth_min/max`), Respektieren des `azimuth_lock`; Schreiben nur, wenn noch kein gesperrter/kuratierter Wert existiert.
+- Ausgeschlossen: Cron-Orchestrierung (TASK-48), Frontend-/Admin-UI, Beschreibungstexte (TASK-46), Brennweiten (TASK-47), das Sichtbarmachen im täglichen Recompute (siehe Pre-Mortem-Risiko — wird in TASK-48 adressiert oder hier als Folge-AK markiert).
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] Bei einem neu angelegten Spot mit Fotografen- und Motiv-Standort zeigt die App nach dem QA-Lauf automatisch einen plausiblen Idealbereich (grob die Richtung vom Standort zum Motiv), den vorher niemand eingetragen hatte.
+- [ ] Ein Spot, dessen Idealbereich ein Mensch bewusst gesperrt hat, behält seinen Wert auch nach dem Auto-Lauf unverändert.
+- [ ] Fehlt einem Spot die Motiv-Koordinate oder ist die externe Karte nicht erreichbar, bleibt der Idealbereich unverändert (kein falscher Wert, kein Absturz).
+- [ ] Edge Case: Steht das Motiv exakt im Norden (Übergang 360°/0°), zeigt die App einen sinnvollen Bereich über die Nordgrenze hinweg statt eines widersprüchlichen „von 350 bis 10".
+- [ ] Edge Case: Läuft die Auto-Ableitung zweimal hintereinander auf denselben unveränderten Spot, kommt beide Male derselbe Bereich heraus (keine zufälligen Sprünge).
+
+**Pre-Mortem:**
+- 💀 Szenario: Der berechnete Idealbereich erscheint in der App, aber Feed/Kalender zeigen weiter alte Chancen. Auslöser: Die tägliche Vorberechnung läuft als eigener Prozess und liest die QA-Werte nicht ein. Frühwarnung: Nach einem QA-Lauf ändert sich die App-Detailansicht, aber die Chancenliste nicht. Gegenmaßnahme: Sichtbarkeit im Recompute ist bekanntes Risiko (BUG-29-Muster) → in TASK-48 muss der Recompute die QA-Werte mitladen; hier als Folge-Risiko dokumentiert, nicht still angenommen.
+- 💀 Szenario: Auto-Wert überschreibt einen guten redaktionellen Bereich. Auslöser: Lock wird nicht geprüft. Gegenmaßnahme: Schreiben nur wenn kein Lock und (Option) kein bestehender kuratierter Wert.
+- 💀 Szenario: Externe Karte (Overpass) ist langsam/down und der ganze Lauf hängt. Gegenmaßnahme: kurzes Timeout, pro Spot abfangen, Fehler überspringen statt abzubrechen; reiner Bearing-Fallback ohne Netz.
+- 💀 Szenario: Nord-Wraparound erzeugt unsinnigen Bereich (min > max). Gegenmaßnahme: Bereichsbildung explizit modulo 360 testen.
+- 📎 Code-Verifikation (2026-06-28): `data/locations.py` PhotoLocation hat `observer_lat/lon`, `subject_lat/lon`, `ideal_azimuth_range` (Z.41–70). `data/store.py` `set_qa_values`/`get_qa_state`/`set_qa_lock` + Spalten `ideal_azimuth_min/max` vorhanden (TASK-44). Merge im Server via `main.py:_load_qa_values()` (Z.846). **Widerlegt die TASK-44-Notiz teilweise:** `precompute.py:main()` (Z.1005–1016) ruft `_apply_location_overrides()` + `_load_custom_locations()`, aber **kein** `load_all_qa_values()` → QA-Werte erreichen den täglichen Recompute heute nicht. `httpx` ist in `requirements.txt` vorhanden (Overpass-Calls möglich).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `data/locations.py` (PhotoLocation-Geo-Felder), `data/store.py` (`set_qa_values`, Locks, Geo-Hash), `main.py:_load_qa_values()` (Merge), `precompute.py:main()` (Datenquelle des Recompute), `calculations/` (Azimut-Konsum in `_compute_possible_bodies`)
+- [ ] Implementierungsoptionen: A (Bearing-only) / B (Overpass-Footprint) / C (Bearing-Basis + Overpass-Verfeinerung)
+- [ ] Empfehlung: Option C
+
+**Implementierungsoptionen:**
+- **Option A — Sichtlinie (Bearing-only):** Idealbereich = berechnete Richtung Standort→Motiv ± feste Toleranz. Kein Netz, deterministisch, sofort. Schwäche: ignoriert Gebäudebreite/Ausdehnung — bei breiten Motiven zu eng. Aufwand: klein.
+- **Option B — Overpass-Footprint:** OSM-Gebäudeumriss des Motivs holen, aus der Geometrie den horizontalen Winkelbereich (von links- bis rechtsaußen) ableiten. Genauer für ausgedehnte Bauwerke. Schwäche: Netzabhängig, Rate-Limits, nicht jedes Motiv hat einen Footprint, langsamer. Aufwand: mittel–groß.
+- **Option C — Bearing-Basis + Overpass-Verfeinerung:** Immer Bearing als robuster Default; wo ein Footprint sauber ladbar ist, den Bereich darauf verbreitern. Netzfehler degradieren still auf Bearing. Aufwand: mittel.
+- ✅ **Empfehlung: Option C** — liefert sofort für jeden Spot einen sinnvollen Wert (Qualität + Robustheit), nutzt Overpass nur als optionale Verbesserung, und der Netz-Fallback erfüllt das „bei API-Fehler nichts kaputt"-Kriterium aus dem Pre-Mortem.
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_task45_azimuth.py`): Bearing-Berechnung gegen bekannte Koordinatenpaare; Nord-Wraparound (min>max → korrekt umgebrochen); Determinismus (zwei Läufe gleiches Ergebnis); Lock wird respektiert (gesperrter Wert bleibt); fehlende Motiv-Koordinate → kein Schreiben; Overpass-Fehler gemockt → Bearing-Fallback greift.
+- [ ] Manuell: Neuen Test-Spot mit klarer Blickrichtung anlegen, QA-Lauf für diese ID auslösen, im Location-Detail prüfen dass der Idealbereich grob der Sichtlinie entspricht.
+
+---
+
+### TASK-46 · Standortbeschreibungen automatisch erzeugen (LLM) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-28 |
+| **Epic** | US-75 |
+
+**Beschreibung:** Für Spots ohne (oder mit dürftiger) Beschreibung soll das System per Sprach-KI eine kurze, brauchbare Standortbeschreibung erzeugen, damit auch neu angelegte oder per Backend importierte Locations in der App nicht leer wirken.
+
+**Scope:**
+- Eingeschlossen: Generierung einer kurzen Beschreibung aus vorhandenen Fakten (Name, Motiv, Kategorie, Koordinaten); Schreiben nach `location_qa_values.description` unter Beachtung des `description_lock`; nur generieren wenn keine kuratierte/gesperrte Beschreibung existiert; Anthropic-API per HTTP (kein SDK — `httpx` vorhanden), API-Key aus Umgebungsvariable.
+- Ausgeschlossen: Cron/Trigger (TASK-48), Admin-UI, mehrsprachige Texte, Bildanalyse.
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] Ein neuer Spot ohne Text bekommt nach dem QA-Lauf eine kurze, zum Motiv passende deutsche Beschreibung, die in der App im Detail sichtbar ist.
+- [ ] Ein Spot mit einer von Hand gepflegten (gesperrten) Beschreibung behält diese unverändert.
+- [ ] Ist der KI-Dienst nicht erreichbar oder kein Schlüssel hinterlegt, bleibt der Spot ohne Auto-Text (keine halben/kaputten Texte, kein Absturz) und der Betreiber sieht im Log warum.
+- [ ] Edge Case: Liefert die KI einen unbrauchbaren/leeren Text, wird nichts geschrieben statt Müll zu speichern.
+
+**Pre-Mortem:**
+- 💀 Szenario: Auto-Text überschreibt eine gute redaktionelle Beschreibung. Gegenmaßnahme: Lock + „nur wenn leer"-Regel, mit Test.
+- 💀 Szenario: API-Key landet im Log oder Cache. Gegenmaßnahme: Key nur aus Env lesen, nie loggen, nie persistieren.
+- 💀 Szenario: KI erfindet falsche Fakten (z.B. nicht existierende Bauwerke). Gegenmaßnahme: Prompt strikt auf gegebene Fakten beschränken, Länge begrenzen; im Scope als „kann fachlich danebenliegen" benennen, optional menschliche Freigabe.
+- 💀 Szenario: Recompute zeigt neue Texte nicht (gleiches QA-Werte-Lade-Problem wie TASK-45). Gegenmaßnahme: in TASK-48 mitziehen.
+- 📎 Code-Verifikation (2026-06-28): `set_qa_values(description=…)` + `description_lock` vorhanden (`data/store.py`, TASK-44); Merge via `main.py:_load_qa_values()` (Z.846 setzt `loc.description`). Kein `anthropic`-Paket in `requirements.txt` → Aufruf via `httpx` gegen die Messages-API. Kein API-Key-Handling im Code bisher (`grep` ANTHROPIC/API_KEY: nur FOTOALERT_*-Flags).
+
+**Analyse & Planung:**
+- [x] Example Mapping (kompakt)
+- [x] Pre-Mortem (kompakt)
+- [x] Architektur analysiert: `data/store.py` (qa_values/description_lock), `main.py:_load_qa_values()`, neue API-Client-Funktion (HTTP)
+- [ ] Optionen: A (Anthropic HTTP direkt) / B (Pipeline mit Caching + Freigabe-Flag) — Detailwahl in eigener Analyse-Phase
+- [ ] Empfehlung: offen (A als schlanker Start wahrscheinlich)
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_task46_descriptions.py`): API gemockt → Text landet in qa_values; Lock respektiert; leere/fehlerhafte API-Antwort → kein Schreiben; fehlender Key → sauberes Überspringen.
+- [ ] Manuell: Test-Spot ohne Text anlegen, QA-Lauf, im Detail prüfen dass eine sinnvolle Beschreibung erscheint.
+
+---
+
+### TASK-47 · Brennweiten-Empfehlung automatisch berechnen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-28 |
+| **Epic** | US-75 |
+
+**Beschreibung:** Für Spots ohne kuratierte Brennweiten-Empfehlung soll das System aus Motivgröße und Entfernung automatisch eine passende Brennweite vorschlagen, damit die App auch bei neuen Spots eine brauchbare Objektiv-Empfehlung zeigt.
+
+---
+
+**Was Stephan in der App erleben soll (Kurzfassung):**
+Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröße und Entfernung bekannt sind, errechnet das System nach dem Qualitäts-Lauf von allein eine passende Brennweite und zeigt sie im Spot-Detail an. Ein weiter entferntes Motiv bekommt eine längere Brennweite. Bei gleicher Bildfüllung braucht ein größeres (höheres) Motiv eine kürzere und ein kleineres eine längere Brennweite — so füllt das Motiv das Bild jeweils gleich stark. Hat jemand schon eine eigene Empfehlung gepflegt (und gesperrt), bleibt diese unangetastet. Fehlt eine der nötigen Angaben, wird lieber nichts angezeigt als eine erfundene Zahl.
+
+---
+
+**Scope:**
+- **Eingeschlossen:** Ein neues, eigenständiges Modul, das für eine einzelne Location aus Motivhöhe und Entfernung eine Brennweiten-Empfehlung ableitet, das Sperr-Flag prüft und das Ergebnis als auto-generierten Wert in der QA-Werte-Ablage speichert — exakt nach dem Muster, das die Schwester-Aufgabe (Azimut) bereits etabliert hat. Geschrieben wird nur, wenn keine kuratierte Liste existiert und die Empfehlung nicht gesperrt ist.
+- **Bewusst ausgeschlossen:** Der automatische, regelmäßige Qualitäts-Lauf, der dieses Modul reihum über alle Spots aufruft (das ist die nächste Aufgabe). Keine UI-Änderung (die Anzeige der Brennweite existiert bereits). Keine Änderung an der bestehenden Live-Geometrie im Chancen-Code (die bleibt als Laufzeit-Fallback erhalten). Keine Verwendung von Motiv-*breite* in diesem ersten Schritt (siehe Annahme A1).
+
+**⚠️ Annahmen (bitte beim Weg-Gate bestätigen):**
+- **A1 — Welche Maßzahl?** Die bestehende Live-Geometrie nutzt die Motiv*höhe* als maßgebliche Größe. Annahme: das neue Modul übernimmt das (Höhe, nicht Breite), damit Auto-Wert und Live-Fallback dieselbe Logik teilen. Motivbreite bleibt vorerst ungenutzt. *Begründung: Konsistenz mit dem schon ausgelieferten Verhalten; sonst entstünde ein zweiter, abweichender Rechenweg.*
+- **A2 — Eine Zahl oder eine Staffel?** Die kuratierten Listen enthalten meist 3–4 gestaffelte Brennweiten (z.B. 50/85/135). Annahme: der Auto-Wert liefert **eine** gerasterte Empfehlung als einelementige Liste (z.B. `[135]`). *Begründung: die Geometrie liefert genau einen physikalisch sinnvollen Wert; eine künstliche Staffel wäre geraten, nicht berechnet.* Falls eine Staffel gewünscht ist, bitte als 🔴-Entscheidung melden.
+- **A3 — Bildfüllung.** Annahme: dieselbe Bildfüllung (25 %) wie der bestehende Location-Fallback, damit Auto-Wert und Laufzeit-Fallback identische Zahlen ergeben.
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] Ein neuer Spot mit Angaben zu Motivhöhe und Entfernung zeigt nach dem Qualitäts-Lauf eine plausible Brennweiten-Empfehlung im Spot-Detail. Konkret nachprüfbar: ein weiter entferntes Motiv erhält eine längere Brennweite als ein nahes; und bei gleicher Bildfüllung erhält ein größeres (höheres) Motiv eine kürzere Brennweite als ein kleineres (damit beide das Bild gleich stark füllen). Die Empfehlung folgt dieser Geometrie, nicht dem Zufall.
+- [ ] Ein Spot, dessen Brennweiten-Empfehlung von Hand gepflegt und gesperrt ist, behält exakt diese Werte — der Auto-Lauf ändert nichts daran.
+- [ ] Ein Spot, der bereits eine kuratierte Empfehlungs-Liste hat, behält sie; der Auto-Wert drängt sich nicht dazwischen.
+- [ ] Fehlt die Motivhöhe **oder** die Entfernung (oder ist die Entfernung 0), bleibt die Empfehlung leer — es erscheint keine erfundene Zahl, und es gibt keinen Absturz.
+- [ ] Edge Case: Zwei Läufe hintereinander auf denselben, unveränderten Spot ergeben exakt dieselbe Empfehlung (kein Zufall, keine Schwankung).
+- [ ] Edge Case: Eine extrem kleine Entfernung oder ein extrem großes Motiv führt nicht zu einer absurd langen Brennweite jenseits des sinnvollen Rasters — der Wert wird auf die bekannte Brennweiten-Staffel gerundet.
+
+**Pre-Mortem:**
+- 💀 Szenario: Der Auto-Wert überschreibt eine von Hand gepflegte oder gesperrte Empfehlung. → **Auslöser:** Sperr-Prüfung oder „nur wenn leer"-Regel fehlt. **Gegenmaßnahme:** vor dem Schreiben Sperr-Flag prüfen (wie beim Azimut-Modul) **und** nur schreiben, wenn keine kuratierte Liste vorliegt; durch AK 2+3 abgesichert.
+- 💀 Szenario: Division durch null / unsinnige Brennweite bei fehlender oder 0-Entfernung. → **Auslöser:** die reine Geometrie-Formel teilt durch die Entfernung und durch die Bildfüllung; die Standalone-Funktion `calculate_focal_length_for_subject` hat **keinen** eigenen 0-Schutz (verifiziert, s.u.). **Gegenmaßnahme:** das neue Modul prüft Höhe>0 und Entfernung>0 **bevor** es rechnet (genau wie der bestehende Location-Fallback), sonst kein Schreiben; AK 4.
+- 💀 Szenario: Absurd lange Brennweite bei Mini-Entfernung/Riesen-Motiv wird unverändert gespeichert. → **Gegenmaßnahme:** Ergebnis auf die bestehende Brennweiten-Staffel rastern (wie der Live-Fallback); AK 6.
+- 💀 Szenario: Neue Werte erscheinen nicht in der App, weil sie beim Server-Start in der falschen Reihenfolge gemerged werden. → **Gegenmaßnahme:** verifiziert, dass die QA-Werte beim Start *vor* den manuellen Overrides gemerged werden (Code < QA-Werte < Overrides), Brennweite ist im Merge bereits berücksichtigt; der *regelmäßige* Auto-Aufruf ist die nächste Aufgabe.
+- 💀 Szenario: Sensorformat-/Einheiten-Annahme falsch (Crop-Sensor, cm statt m). → **Gegenmaßnahme:** Vollformat (36 mm Sensorbreite) und Meter sind die durchgängige Konvention im Bestand; das neue Modul übernimmt sie unverändert, keine eigene Annahme.
+
+**📎 Code-Verifikation (2026-06-28, echter Code gelesen):**
+- **Geometrie vorhanden:** `calculations/astronomy.py:calculate_focal_length_for_subject(subject_size_m, distance_m, sensor_width_mm=36.0, desired_frame_fill_pct=0.3)` (Z.915–930) — rechnet `atan(size/distance)`, teilt durch `desired_frame_fill_pct`, dann `tan`-Umkehr. **Bestätigt: kein 0-Schutz** für `distance_m` oder `desired_frame_fill_pct` in dieser Funktion → 0-Guard muss im neuen Modul liegen.
+- **Location-Wrapper:** `calculations/opportunity.py:_focal_for_location` (Z.140–158) priorisiert kuratierte Liste → sonst `calculate_focal_length_for_subject(subject_height_m, distance_m, desired_frame_fill_pct=0.25)` (Höhe, 25 %) → rastert auf `_FOCAL_STEPS = [24,35,50,85,135,200,300,400,600]` (Z.137). **Diese Logik wird wiederverwendet, nicht verändert** (bleibt Laufzeit-Fallback).
+- **Ablage vorhanden:** Spalte `location_qa_values.focal_length_suggestions TEXT` (`data/store.py` Z.121) + Sperr-Flag `location_qa_state.focal_length_lock` (Z.111). `set_qa_values(focal_length_suggestions=[…])` serialisiert als JSON (Z.703–707), `get_qa_values` parst zurück (Z.691–692). `get_qa_state` liefert das Sperr-Flag (Z.627–634). **Kein Schema-Umbau nötig.**
+- **Merge bestätigt:** `main.py:_load_qa_values()` (Z.846–876) übernimmt `focal_length_suggestions` aus den QA-Werten in die Location (Z.870–871); Start-Reihenfolge `_load_qa_values()` (Z.888) **vor** `_load_location_overrides()` (Z.891) → Override gewinnt über Auto-Wert (Code < QA < Override).
+- **Lücke (das ist die Aufgabe):** Es gibt **kein** Schwester-Modul zu `data/qa_azimuth.py` für Brennweite. `data/qa_azimuth.py` (TASK-45) liefert die Vorlage: deterministisch, `update_location_azimuth(store, location_id, …)` prüft `get_qa_state(...).get("azimuth_lock")` und schreibt via `set_qa_values`, gibt bei Lock/fehlenden Daten `None` zurück, wirft nie eine Exception. **Dieses Muster wird 1:1 für Brennweite übernommen.**
+- **Python 3.9:** Vorlage nutzt `from __future__ import annotations` + `typing.Optional/List/Tuple`, kein `str|None`, kein `match` — wird übernommen.
+
+**Architektur-Analyse — betroffene Dateien:**
+- **Neu:** `backend/data/qa_focal.py` — Schwester zu `qa_azimuth.py`. Reine Berechnung + Schreib-Funktion mit Sperr-Prüfung. Wiederverwendung der bestehenden Geometrie aus `calculations/astronomy.py` + `_FOCAL_STEPS`-Rasterung.
+- **Neu:** `backend/tests/test_task47_focal.py` — analog zu `test_task45_azimuth.py`.
+- **Unverändert (nur referenziert):** `calculations/astronomy.py`, `calculations/opportunity.py` (Live-Fallback bleibt), `data/store.py` (Methoden + Schema reichen), `main.py` (Merge reicht).
+
+**Implementierungsoptionen:**
+
+*Option A — Bestehende Geometrie wiederverwenden, eigenes QA-Modul (analog Azimut)*
+- App-Wirkung: Auto-Brennweite ist exakt dieselbe Zahl, die die App schon heute als Laufzeit-Fallback berechnet — nur jetzt sichtbar gespeichert. Ein Rechenweg, ein Verhalten, kein Auseinanderdriften.
+- Vorgehen: neues Modul `qa_focal.py` mit `compute_focal_suggestion(...)` (Guard >0, ruft `calculate_focal_length_for_subject` mit 25 %, rastert auf `_FOCAL_STEPS`) und `update_location_focal(store, location_id, …)` (Sperr-Prüfung → Schreiben via `set_qa_values`). Konsistent mit `qa_azimuth.py`.
+- Risiken: gering — nutzt verifizierte, bereits ausgelieferte Geometrie.
+- Aufwand: klein.
+
+*Option B — Eigene, neue Brennweiten-Berechnung im QA-Modul*
+- App-Wirkung: Risiko, dass der gespeicherte Auto-Wert von der Live-Anzeige des Chancen-Codes abweicht → derselbe Spot zeigt je nach Pfad verschiedene Empfehlungen. Verwirrend, schwer zu testen.
+- Vorgehen: Geometrie im QA-Modul neu schreiben.
+- Risiken: Doppel-Logik, Drift, mehr Testfläche, kein Mehrwert.
+- Aufwand: mittel.
+
+✅ **Empfehlung: Option A** — wiederverwendet die bereits verifizierte, ausgelieferte Geometrie, folgt 1:1 dem etablierten Azimut-Muster (Konsistenz, ein Rechenweg) und hält das Risiko klein. Option B brächte nur Doppel-Logik und Abweichungsrisiko.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (mit Annahmen-Protokoll A1–A3)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AKs verankert)
+- [x] Architektur analysiert: neues `data/qa_focal.py`, Wiederverwendung Geometrie aus `calculations/astronomy.py`/`opportunity.py`, Ablage/Merge unverändert
+- [x] Optionen: A (bestehende Geometrie wiederverwenden, eigenes QA-Modul) / B (eigene Berechnung) — **Empfehlung A**
+- [ ] Weg-Gate: Stephan bestätigt Option A + Annahmen A1–A3
+
+**Testplan:**
+- [ ] **Automatisiert** (`backend/tests/test_task47_focal.py`, analog `test_task45_azimuth.py`):
+  - bekannte Höhe + Entfernung → erwartete gerasterte Brennweite aus `_FOCAL_STEPS`; größere Entfernung → längere Brennweite, größere Motivhöhe → kürzere Brennweite (gleiche Bildfüllung). *(AK 1, 6)*
+  - gesetztes Sperr-Flag → `update_location_focal` schreibt nichts, gibt `None`. *(AK 2)*
+  - vorhandene kuratierte Liste → kein Auto-Schreiben. *(AK 3)*
+  - fehlende Höhe / fehlende Entfernung / Entfernung 0 → `None`, kein Schreiben, kein Crash. *(AK 4)*
+  - zwei identische Läufe → identisches Ergebnis (Determinismus). *(AK 5)*
+- [ ] **Manuell** (unter http://localhost:8000): Test-Spot mit Motivhöhe + Entfernung ohne kuratierte Liste anlegen, Auto-Funktion einmal aufrufen, Spot-Detail öffnen → Brennweiten-Empfehlung sichtbar und plausibel; danach denselben Spot sperren, erneut aufrufen → Empfehlung unverändert.
+
+---
+
+### TASK-48 · QA-Lauf automatisieren: Änderungen erkennen + planen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-28 |
+| **Epic** | US-75 |
+
+**Beschreibung:** Das System soll regelmäßig und automatisch prüfen, welche Spots sich geändert haben oder noch nie geprüft wurden, und für genau diese die Auto-Verbesserungen anstoßen — ohne unveränderte Spots unnötig neu zu berechnen und ohne externe Dienste zu überlasten. Dies ist der Schlussstein von Epic US-75: er verbindet die fertigen Bausteine (Azimut TASK-45, Brennweite TASK-47) mit einem geplanten Lauf und stellt zugleich sicher, dass die ermittelten Werte auch in den täglich vorberechneten Chancen (Feed/Kalender) ankommen — nicht nur in der Live-Detailansicht.
+
+**Scope:**
+- **Eingeschlossen:**
+  - Ein geplanter QA-Lauf, angehängt an den bereits vorhandenen Zeitplan im Backend (`main.py`-Scheduler) — **kein** separater Dienst, **kein** neues Modul.
+  - Erkennen, welche Spots überhaupt einen neuen Lauf brauchen: ein Spot kommt auf die Liste, wenn sich seine Geo-Kernfelder geändert haben (Vergleich des aktuellen Geo-Fingerabdrucks mit dem gespeicherten) **oder** wenn er noch nie geprüft wurde. Unveränderte, schon geprüfte Spots werden übersprungen.
+  - Anstoßen der **fertigen** Auto-Verbesserungen für genau diese Spots: Azimut (TASK-45) und Brennweite (TASK-47). Beide respektieren ihre Sperren und werfen nie.
+  - Nach erfolgreichem Verbessern eines Spots: seinen Prüf-Zeitstempel und seinen Geo-Fingerabdruck fortschreiben, damit er beim nächsten Lauf nicht erneut anfällt (außer er ändert sich wieder).
+  - **Sichtbarmachen der Auto-Werte im täglichen Recompute:** Der nächtliche Vorberechnungs-Prozess muss dieselben Auto-Werte einlesen wie der Live-Server, sonst zeigen Feed/Kalender weiter alte Werte (BUG-29-Muster — siehe Code-Verifikation).
+  - Drosselung gegenüber externen Diensten und Fehlerisolierung pro Spot.
+  - Ein **klar markierter Erweiterungspunkt** für die spätere LLM-Beschreibung (TASK-46), der heute nichts aufruft.
+- **Ausgeschlossen:** Admin-UI; manueller Trigger-Endpoint (optional als Folge-Ticket); Lizenz-Checks (US-79); die LLM-Beschreibung selbst (TASK-46, noch nicht gebaut — TASK-48 ruft sie **nicht** auf).
+
+**✅ Laufzeit (von Stephan bestätigt 2026-06-28):** QA-Job **täglich 01:00** (Ortszeit Berlin), großer Puffer vor dem nächtlichen Recompute (05:30). So sind frische Auto-Werte sicher vorhanden, bevor der Recompute sie einliest.
+
+**🔘 Geschützter Sofort-Auslöser (Erweiterung 2026-06-28, von Stephan freigegeben):** Damit man den QA-Lauf lokal und operativ testen kann, ohne bis 01:00 zu warten, gibt es einen geschützten Auslöser, der den Lauf einmalig sofort anstößt und kurz zurückmeldet, wie viele Spots geprüft/verbessert wurden bzw. ob gerade schon ein Lauf läuft (dann wird er sauber übersprungen, nichts startet parallel). Der Auslöser ist nur für den Host und nutzt denselben Schutz wie die übrigen Admin-Aktionen (Host-Login/Token). Test-Pfad: `POST /run-qa-pass` mit Host-Token.
+
+---
+
+**Example Mapping:**
+
+📏 **Regel 1 — Nur betroffene Spots werden verbessert.** Geprüft wird, ob sich der Geo-Fingerabdruck eines Spots seit der letzten Prüfung geändert hat oder ob er noch nie geprüft wurde.
+- 🟢 Ein Spot wurde umgesetzt (neue Koordinaten) → beim nächsten Lauf wird genau dieser neu verbessert.
+- 🟢 Ein Spot ist unverändert und wurde gestern geprüft → er wird übersprungen, keine externe Anfrage.
+- 🟢 Ein brandneuer Spot ohne Prüf-Historie → wird beim nächsten Lauf erstmals verbessert.
+
+📏 **Regel 2 — Sperren bleiben heilig.** Hat jemand einen Wert (Azimut oder Brennweite) eines Spots manuell gesperrt, rührt der Lauf diesen Wert nicht an, der Rest des Spots wird trotzdem aktualisiert.
+- 🟢 Azimut gesperrt, Brennweite frei → nur die Brennweite wird neu gesetzt.
+- 🟢 Beide gesperrt → es wird nichts geschrieben, der Spot gilt als geprüft.
+
+📏 **Regel 3 — Ein Lauf gleichzeitig.** Es läuft nie ein QA-Lauf, während schon einer (oder ein großer Recompute) läuft, und umgekehrt blockieren sie sich nicht gegenseitig dauerhaft.
+- 🟢 Der geplante Recompute läuft noch, der QA-Lauf wird fällig → der QA-Lauf wartet bzw. wird übersprungen und beim nächsten Mal nachgeholt, statt sich zu überlagern.
+
+📏 **Regel 4 — Auto-Werte erreichen Feed/Kalender.** Was der QA-Lauf an einem Spot verbessert, ist nach dem nächsten Recompute auch in den vorberechneten Chancen sichtbar, nicht nur im Detail.
+- 🟢 Beschreibung eines Spots wird (künftig) automatisch erzeugt → sie taucht im Feed-Eintrag auf, nicht nur im Detail-Overlay.
+
+❓ **Questions:** keine offen (Laufzeit als ⚠️-Annahme markiert, blockiert nicht).
+
+---
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] **AK-1 (geänderter Spot):** Wird an einem Spot ein geo-relevantes Feld geändert (Standort, Motiv, Entfernung), wird beim nächsten geplanten Lauf genau dieser Spot neu verbessert; bereits geprüfte, unveränderte Spots werden dabei übersprungen.
+- [ ] **AK-2 (neuer Spot):** Ein noch nie geprüfter Spot wird beim nächsten Lauf erstmals automatisch verbessert.
+- [ ] **AK-3 (kein erneutes Anfallen):** Ein gerade verbesserter, danach unveränderter Spot fällt beim übernächsten Lauf nicht erneut an — bis sich wieder etwas an ihm ändert.
+- [ ] **AK-4 (Sichtbarkeit in Feed/Kalender):** Nach einem QA-Lauf und dem darauffolgenden täglichen Recompute wirken sich die neuen Auto-Werte auch auf die vorberechneten Chancen (Feed/Kalender) aus — nicht nur in der Live-Detailansicht. Live-Server und nächtlicher Recompute zeigen denselben Wertstand für einen Spot.
+- [ ] **AK-5 (Robustheit bei Ausfall):** Fällt ein externer Dienst aus oder schlägt ein einzelner Spot fehl, läuft der Rest des Laufs normal weiter, und der betroffene Spot wird beim nächsten Lauf erneut versucht — er bleibt nicht dauerhaft hängen.
+- [ ] **AK-6 (kein Überlappen):** Ein QA-Lauf startet nicht, während bereits ein QA-Lauf oder ein großer Recompute läuft; nichts blockiert dauerhaft.
+- [ ] **AK-7 (Drosselung) — Edge Case:** Der Lauf belastet externe Dienste gedrosselt (begrenzte gleichzeitige Anfragen / kurze Pausen), sodass keine Sperren durch zu viele Anfragen entstehen.
+- [ ] **AK-8 (Sperren) — Edge Case:** Manuell gesperrte Werte eines Spots bleiben unverändert; der Spot gilt nach dem Lauf trotzdem als geprüft.
+
+---
+
+**Pre-Mortem:**
+
+📎 **Code-Verifikation (2026-06-28, gelesen, nicht erinnert):**
+- **Scheduler:** `backend/main.py` nutzt bereits `AsyncIOScheduler` (Import Z.38, Instanz `scheduler = AsyncIOScheduler(timezone="Europe/Berlin")` Z.258). In `startup()` werden drei Cron-Jobs registriert (Z.948–951: precompute täglich 05:30 via `functools.partial(_run_precompute, _precompute_mode)`, weather alle 3h, discover 05:45), dann `scheduler.start()`. → TASK-48 hängt **einen** weiteren Cron-Job an, baut keinen neuen Dienst. **Bestätigt.**
+- **Single-Flight:** Globales Flag `_precompute_running` (Z.219) schützt `_run_precompute` (Z.589: „läuft bereits, übersprungen") und `_run_precompute_single` (Z.768ff). Bei Überlappung wird eine Einzel-ID in `_recompute_pending` (Z.220) geparkt und am Lauf-Ende über `_drain_recompute_pending()` (Z.643) nachgeholt (US-106). → Muster für den QA-Lauf direkt nutzbar. **Bestätigt.**
+- **Geo-Hash / QA-State:** `compute_geo_hash(observer_lat, observer_lon, subject_lat, subject_lon, subject_height_m, subject_width_m, distance_m)` (data/store.py Z.743, Modul-Ebene, MD5, auf 6 Stellen gerundet). `get_qa_state(location_id)` (Z.627, liefert dict mit `geo_hash`, `qa_checked_at`, Lock-Flags oder None), `update_qa_checked(location_id, geo_hash)` (Z.661, Upsert). **Bestätigt — Change-Detection-Basis vollständig vorhanden.**
+- **Bausteine:** `data/qa_azimuth.py:update_location_azimuth(store, location_id, observer_lat, observer_lon, subject_lat, subject_lon, tolerance_deg=…, use_overpass=False)` (Z.237) und `data/qa_focal.py:update_location_focal(store, location_id, subject_height_m, distance_m, frame_fill_pct=…)` (Z.84). Beide lesen `get_qa_state`, respektieren das jeweilige Lock (und Brennweite zusätzlich eine bereits kuratierte Liste), schreiben via `set_qa_values`, geben den geschriebenen Wert oder `None` zurück und **werfen nie**. **Signaturen bestätigt.**
+- **LLM-Beschreibung (TASK-46):** **Existiert nicht.** Kein `update_location_description` o.ä. im Code. → TASK-48 stößt nur Azimut + Brennweite real an; für die Beschreibung nur ein markierter Platzhalter (kein Aufruf einer nicht-existenten Funktion). **Bestätigt.**
+- **Sichtbarkeits-Lücke (Kern):** `main.py:_load_qa_values()` (Z.846–878) liest beim Server-Start `_store.load_all_qa_values()` und patcht damit die Live-Location-Objekte: `loc.description`, `loc.ideal_azimuth_range` (aus `ideal_azimuth_min/max`), `loc.focal_length_suggestions` — Merge-Reihenfolge Code-Defaults < qa_values < Overrides (Aufruf in `startup()` Z.888). **`precompute.py:main()` (Z.1005–1016) ruft nur `_apply_location_overrides()` (Z.1012) und `_load_custom_locations()` (Z.1015) auf — KEIN Äquivalent zu `_load_qa_values()`.** → Der Recompute-Subprozess sieht die Auto-Werte nicht. **Bestätigt — exakt das BUG-29-Muster.**
+- **Datenfluss-Präzisierung (wichtig für den Scope):** Im Feed-/Kalender-Payload (precompute.py Z.380ff) ist `"description": o.description` pro Event eingebettet → die (künftige) Auto-Beschreibung **fließt direkt in die vorberechneten Chancen** und braucht den Recompute-Merge zwingend. Dagegen wird `subject_azimuth` aus der Geometrie berechnet (calculations/opportunity.py), **nicht** aus `ideal_azimuth_range`; `ideal_azimuth_range` speist `_compute_possible_bodies` (main.py Z.969) + Detailanzeige. `focal_length_suggestions` ist ein Location-Feld (Detail/Kamera-Hinweis). → Der Recompute-Merge ist für **Beschreibung** funktional unverzichtbar und für **Azimut/Brennweite** notwendig für Stand-Gleichheit Server↔Recompute (sonst divergieren beide). **Belegt.**
+
+💀 **Szenario 1 — Auto-Werte erscheinen im Detail, aber Feed/Kalender bleiben alt** (BUG-29-Muster).
+   Auslöser: `precompute.py` lädt die Auto-Werte nicht (verifiziert: kein `_load_qa_values()`-Äquivalent).
+   Frühwarnung: Nach einem QA-Lauf zeigt das Detail neue Werte, aber ein Feed-Eintrag (besonders die Beschreibung) bleibt alt.
+   Gegenmaßnahme (**Kern dieses Tickets**): In `precompute.py:main()` ein `_apply_qa_values()` einführen — gespiegelt von `main.py:_load_qa_values()`, mit **identischer Merge-Reihenfolge** Code-Defaults < qa_values < Overrides, ausgeführt **nach** `_apply_location_overrides()`/`_load_custom_locations()`. Real gegen einen Single-Recompute tracen (Schritt 4d). → AK-4.
+
+💀 **Szenario 2 — Jeder Lauf rechnet/ruft alles neu** → unnötige Last/Kosten an externen Diensten.
+   Auslöser: Change-Detection greift nicht (z.B. Hash-Felder unvollständig, oder `qa_checked_at`/`geo_hash` werden nicht fortgeschrieben).
+   Frühwarnung: Lauf-Dauer und externe Anfragen wachsen mit jedem Lauf statt zu sinken.
+   Gegenmaßnahme: strikter Geo-Hash-Diff (gleiche 7 Felder wie `compute_geo_hash`), nach jedem verbesserten Spot `update_qa_checked` schreiben; Test prüft „gleicher Hash → übersprungen". → AK-1/AK-3.
+
+💀 **Szenario 3 — Doppelläufe überlappen** (QA-Lauf + nächtlicher Recompute / zweiter QA-Lauf).
+   Auslöser: Zwei schwere Läufe greifen gleichzeitig auf dieselben Daten zu.
+   Frühwarnung: Log zeigt zwei laufende Berechnungen; Werte „flackern".
+   Gegenmaßnahme: Eigenes Single-Flight-Flag für den QA-Lauf (analog `_precompute_running`); zusätzlich beim Start prüfen, ob `_precompute_running` aktiv ist → dann verschieben. Job zeitlich vor den Recompute legen (01:00 vor 05:30). → AK-6.
+
+💀 **Szenario 4 — QA-Lauf blockiert den Event-Loop** (synchrone externe Aufrufe in der Async-App).
+   Auslöser: `update_location_*` macht ggf. blockierende Netz-/Rechenarbeit, direkt im Scheduler-Coroutine-Kontext ausgeführt → Server reagiert minutenlang nicht.
+   Frühwarnung: API-Antwortzeiten steigen während des Laufs stark; Health-Check träge.
+   Gegenmaßnahme: QA-Verarbeitung pro Spot in einen Thread auslagern (`asyncio.to_thread`, Py3.9+) bzw. mit `await asyncio.sleep(0)`/begrenzter Parallelität takten; nie eine lange synchrone Schleife direkt im Loop. → AK-7.
+
+💀 **Szenario 5 — Geänderter Spot wird übersprungen und bleibt hängen** (US-106-Muster: ID bleibt in `_recompute_pending`).
+   Auslöser: Eine Standort-Änderung trifft ein, während ein großer Lauf läuft; die ID wird geparkt, der QA-Lauf läuft danach aber an ihr vorbei.
+   Frühwarnung: Ein nachweislich geänderter Spot trägt nach mehreren Läufen noch den alten Geo-Hash.
+   Gegenmaßnahme: Change-Detection allein über den persistierten Geo-Hash (nicht über flüchtiges `_recompute_pending`) — ein geänderter Spot fällt so lange an, bis sein gespeicherter Hash dem aktuellen entspricht. Fehlversuche schreiben `qa_checked_at`/`geo_hash` **nicht** fort → automatischer Re-Try. → AK-1/AK-5.
+
+💀 **Szenario 6 — Externe Rate-Limits / Dienst-Ausfall.**
+   Auslöser: zu viele/zu schnelle Anfragen an Karte oder KI.
+   Gegenmaßnahme: begrenzte gleichzeitige Anfragen + kurze Pausen; Fehler pro Spot abfangen und isolieren (Lauf bricht nie ganz ab); fehlgeschlagener Spot bleibt „ungeprüft" und wird erneut versucht. → AK-5/AK-7.
+
+---
+
+**Architektur-Analyse:**
+- **Betroffene Dateien:**
+  - `backend/main.py` — neuer Cron-Job + Job-Funktion (z.B. `_run_qa_pass`) mit eigenem Single-Flight-Flag; nutzt vorhandenes Scheduler-Setup (Z.948ff) und `_precompute_running`-Check.
+  - `backend/precompute.py` — neues `_apply_qa_values()` (Spiegel von `main.py:_load_qa_values`), aufgerufen in `main()` nach Overrides/Custom-Load (≈ nach Z.1015). **Der eigentliche Sichtbarkeits-Fix.**
+  - `backend/data/store.py` — bereits vollständig (Hash/State/checked/load_all_qa_values), **keine Änderung nötig**; ggf. ein Helper für „liste alle bekannten Location-IDs + ihren Geo-Hash" falls die Spot-Liste zentralisiert werden soll (prüfen, nicht zwingend).
+  - `backend/data/qa_azimuth.py`, `backend/data/qa_focal.py` — werden nur **aufgerufen**, nicht geändert.
+  - `backend/tests/test_task48_qa_cron.py` — neu.
+- **Change-Detection-Logik:** Für jeden bekannten Spot den aktuellen Geo-Hash aus seinen 7 Geo-Feldern berechnen (`compute_geo_hash`), gegen `get_qa_state(id)["geo_hash"]` vergleichen. Anfällig, wenn unterschiedlich **oder** `get_qa_state` liefert None (nie geprüft). Nach erfolgreichem Verbessern `update_qa_checked(id, neuer_hash)`.
+- **Lade-Reihenfolge (Pflicht-Check, Schritt 4d):** Der QA-Lauf läuft im Server-Prozess → er sieht Live-Locations inkl. Overrides/Custom. Der **Recompute-Subprozess** ist getrennt und muss die Auto-Werte selbst nachladen (`_apply_qa_values()`), sonst stale. Beim Bau einmal real tracen: Geo-Feld eines Test-Spots ändern → QA-Lauf → Single-Recompute → prüfen, dass der neue Wert (insb. Beschreibung) im `opportunities.json` ankommt.
+- **Python 3.9-Konformität:** Keine `X | Y`-Annotationen in neuem Code (`Optional[...]`, `List[...]` aus `typing`); `asyncio.to_thread` ist in 3.9 verfügbar.
+
+---
+
+**Implementierungsoptionen:**
+
+### Option A — QA-Job im bestehenden Scheduler + Werte-Merge im Recompute (Empfehlung)
+- Vorgehen: Einen weiteren Cron-Job an den vorhandenen Backend-Scheduler hängen (täglich 01:00, vor dem Recompute). Der Job ermittelt die betroffenen Spots über den Geo-Fingerabdruck, stößt für sie Azimut + Brennweite an (gedrosselt, Fehler pro Spot isoliert), schreibt danach Prüf-Zeitstempel + Hash fort. Zusätzlich liest der nächtliche Recompute dieselben Auto-Werte ein wie der Live-Server, damit Feed/Kalender sie zeigen.
+- App-Wirkung für Stephan: Standortänderungen „pflanzen sich" automatisch fort — der geänderte Spot wird über Nacht verbessert und die neuen Werte sind am Morgen sowohl im Detail als auch im Feed/Kalender sichtbar, ohne manuelles Zutun.
+- Betroffene Dateien: `main.py` (Job + Flag), `precompute.py` (Werte-Merge), neuer Test.
+- Vorteile: konsistent mit der bestehenden Architektur (ein Scheduler, ein Single-Flight-Muster), kein neuer Dienst zu betreiben, geringe Angriffsfläche, deckt den Sichtbarkeits-Fix mit ab.
+- Nachteile/Risiken: Schwere Arbeit im Server-Prozess → muss sauber aus dem Event-Loop ausgelagert werden (Szenario 4).
+- Aufwand: mittel.
+
+### Option B — Separater QA-Dienst/Prozess
+- Vorgehen: Ein eigenständiger Hintergrundprozess (eigener systemd-Service/Cron) führt den QA-Lauf außerhalb des Servers aus.
+- App-Wirkung: für Stephan identisch sichtbar; der Unterschied ist rein betrieblich.
+- Vorteile: schwere Arbeit belastet den Server-Prozess nicht.
+- Nachteile/Risiken: zweiter Prozess mit eigener Datenquelle/Deployment → genau die Trennung, die schon BUG-29/BUG-33 verursacht hat (eigener Stand, vergessenes Nachladen); mehr Betriebsaufwand; widerspricht dem im Ticket vorgegebenen Scope („kein separater Service").
+- Aufwand: groß.
+
+✅ **Empfehlung: Option A** — sie folgt der vorhandenen Scheduler-/Single-Flight-Architektur, vermeidet einen zweiten Prozess mit eigener Datenquelle (Hauptrisiko des Epics) und löst den Sichtbarkeits-Fix gleich mit. Die einzige echte Sorge (Event-Loop-Blockade) ist mit `asyncio.to_thread` + Drosselung beherrschbar.
+
+**LLM-Erweiterungspunkt (TASK-46):** In der Job-Funktion eine klar kommentierte Stelle pro Spot, an der die Beschreibungs-Erzeugung später eingehängt wird — heute **ohne Aufruf** (kein Ruf einer nicht-existenten Funktion). Form: ein Kommentar-Block `# TASK-46 Erweiterungspunkt: hier update_location_description(...) anstoßen, sobald gebaut` an derselben Schleifenstelle, an der Azimut/Brennweite angestoßen werden, mit identischer Fehler-Isolierung/Drosselung. Da die Beschreibung über den Recompute-Merge bereits in Feed/Kalender fließt (Datenfluss-Präzisierung oben), ist nach Einbau von TASK-46 keine weitere Verdrahtung in TASK-48 nötig.
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Regeln, Examples belegt, keine offenen Questions)
+- [x] Pre-Mortem durchgeführt (6 Szenarien, je Gegenmaßnahme in AK/Plan verankert)
+- [x] Architektur analysiert: `main.py` (Scheduler Z.948 + Single-Flight Z.219), `precompute.py` (Datenquelle Z.1005–1016, fehlender qa_values-Merge), `data/store.py` (Hash/State/checked vollständig), `qa_azimuth.py`/`qa_focal.py` als aufgerufene Bausteine
+- [x] Datenfluss verifiziert (Beschreibung fließt per-Event in Feed; Azimut/Brennweite Detail-/Stand-Gleichheit)
+- [x] Implementierungsoptionen: A (Job im bestehenden Scheduler + Werte-Merge im Recompute) / B (separater Dienst)
+- [x] Empfehlung: Option A
+
+**Daten-Validierung (beim Bau, Schritt 4d — Pflicht):**
+- [ ] Einmal real tracen: Geo-Feld eines Test-Spots ändern → QA-Lauf → Single-Recompute → bestätigen, dass der neue Auto-Wert (insb. Beschreibung) im `opportunities.json` landet (nicht nur im Live-Detail).
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_task48_qa_cron.py`, Ticket-ID im Docstring):
+  - geänderter Geo-Hash → Spot wird ausgewählt; gleicher Hash → übersprungen; nie geprüft (State None) → ausgewählt (AK-1/2/3).
+  - nach erfolgreichem Lauf sind `qa_checked_at` + `geo_hash` für den Spot fortgeschrieben; nach Fehlversuch **nicht** (AK-5).
+  - Single-Flight: läuft bereits ein Lauf, startet kein zweiter (AK-6).
+  - gesperrter Wert bleibt unverändert, Spot gilt trotzdem als geprüft (AK-8).
+  - `precompute._apply_qa_values()`: nach Setzen eines qa_value erscheint dieser im neu berechneten Event (AK-4) — Merge-Reihenfolge Code-Defaults < qa_values < Overrides eingehalten.
+- [ ] Manuell (unter http://localhost:8000): Geo-Feld eines Test-Spots ändern, QA-Lauf auslösen, im Log beobachten, dass **nur dieser** Spot anfällt, danach Single-Recompute beobachten und prüfen, dass die neuen Werte in Feed/Kalender (`opportunities.json`) ankommen.
+- [ ] Regression: bestehende Cron-Jobs (precompute 05:30, weather, discover) laufen unverändert; Server reagiert während des QA-Laufs (Health-Check bleibt flott — Szenario 4).
 
 ---
 
@@ -1143,6 +1499,202 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 - [ ] Score 0.0 bei alt > 15° (kein Rötlichkeits-Effekt mehr bei hoher Sonne)
 
 ---
+
+<!-- ===== INBOX: neue Tickets 2026-06-28 (warten auf Stephans Gate → Ready for Analysis) ===== -->
+
+### US-107 · Sonnen-Alignment-Planung: Auf-/Untergang relativ zur Location `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Als Fotograf möchte ich für eine Location sehen, wann und in welcher Richtung die Sonne auf- oder untergeht — ob sie dabei nah, hinter oder über dem Motiv steht, oder ob ein Untergang gegenüber der Location für Gegenlicht-Motive interessant ist — damit ich Shootings präzise planen kann.
+
+**Bezug:** US-64 (Live Astro-Visualisierung, zeigt Sonnenbahn live auf der Karte — US-107 ergänzt das um Planungs-/Zeitperspektive und Richtungsklassifizierung relativ zum Motiv), US-82 (Sun-Score v2 — berechnet Rötlichkeits-Score, kein Planungs-UI), TASK-45 (Azimut-Ableitung aus Geo-Daten — Infrastruktur, die US-107 nutzen kann), US-79 (Mondaufgang/-untergang im Detail — analoges Konzept für Mond, US-107 ist das Pendant für Sonne mit Planungsaspekt). Abgrenzung: US-64 zeigt Echtzeit-Position; US-107 zeigt geplante Auf-/Untergangszeiten + Richtungsklassifizierung (nah/hinter/über/gegenüber Motiv) für konkrete Tage.
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-06-28)
+
+##### 📐 Example Mapping
+
+**Annahmen-Protokoll:**
+
+| Typ | Punkt |
+|-----|-------|
+| ✅ Klar | Sonnenaufgang und -untergang-Zeiten sind bereits im precompute-Cache (`sunrise_utc`, `sunset_utc`). Azimut zur Auf-/Untergangszeit muss noch ergänzt werden (analog `moonrise_azimuth` / `moonset_azimuth` in US-79). |
+| ✅ Klar | Die Motiv-Sichtachse (Azimut vom Fotograf-Standort zum Motiv) ist via `calculate_azimuth_alignment()` berechenbar sobald `observer_lat/lon` + `subject_lat/lon` vorhanden sind. Dieses Feld (`subject_azimuth`) existiert bereits im Opportunity-Objekt. |
+| ⚠️ Annahme: Wo wird das angezeigt? Im **Event-Detail** (jede Opportunity hat `sunrise_utc`/`sunset_utc` schon) UND im **Location-Detail** (Abschnitt „Ausrichtung"). Das ist der natürliche Ort: Motiv-Azimut + Sonnenauf-/untergangs-Azimut pro Tag → Differenz → Klassifizierung. Bitte bestätigen. |
+| ⚠️ Annahme: Richtungsklassifizierung wird als lesbarer Text angezeigt (z.B. „Sonne geht fast genau hinter dem Motiv auf") statt nur als Gradzahl. Toleranz für „nah am Motiv": ±15°. Bitte bestätigen oder anpassen. |
+| ⚠️ Annahme: Das Feature zeigt primär den **heutigen Tag** im Location-Detail (kein Datums-Picker in US-107). Für andere Tage kann Stephan via „Live-Astro"-Button navigieren. Bitte bestätigen. |
+
+📏 **Regel 1 — Sonnenaufgang/-untergang mit Azimut im Event-Detail.**
+Im Event-Detail (Feed, Kalender) stehen neben Uhrzeit jetzt auch der Azimut der Sonne beim Aufgang bzw. Untergang — wie beim Mondaufgang in US-79.
+
+- 🟢 *Positiv:* Ich öffne eine „Goldene Stunde Abend"-Chance → im Astronomie-Bereich sehe ich „Sonnenuntergang 21:05 · 289°". Ich weiß sofort, die Sonne geht fast im Westen unter.
+- 🔴 *Negativ:* Events ohne `sunrise_utc`/`sunset_utc` (älterer Cache-Stand) zeigen keinen Azimut-Wert — kein Placeholder „0°", sondern einfach weggelassen.
+- ⚙️ *Edge:* Im Polarsommer gibt es keinen echten Sonnenuntergang → `sunset_utc` ist null → kein Azimut-Feld sichtbar (kein Fehler).
+
+📏 **Regel 2 — Richtungsklassifizierung relativ zum Motiv im Location-Detail.**
+Im Abschnitt „Ausrichtung" des Location-Details erscheint für den heutigen Tag eine lesbare Einschätzung: Geht die Sonne nah am Motiv auf/unter, dahinter, darüber, oder gegenüber (Gegenlicht)?
+
+- 🟢 *Positiv:* Berliner Dom, Motiv-Azimut ~153°. Ich öffne das Location-Detail → ich lese „Heute: Sonnenaufgang 52° (101° vom Motiv entfernt) · Sonnenuntergang 308° (155° — Gegenlicht)". Sofort nutzbare Planungsinfo.
+- 🟢 *Positiv (Hochwerttag):* Motiv-Azimut 153°, Sonnenaufgang heute 151° → ich lese „Heute: Sonnenaufgang 151° — Sonne geht fast genau hinter dem Motiv auf (nur 2° Abweichung)!". Klar als Highlight erkennbar.
+- 🔴 *Negativ:* Location ohne Motiv-Koordinaten (kein `subject_lat`/`subject_lon`) → keine Richtungsklassifizierung möglich. Stattdessen: nur „Sonnenaufgang HH:MM · XXX°" ohne Motivbezug.
+- ⚙️ *Edge:* Location mit Motiv-Koordinaten, aber ohne idealen Azimut-Bereich → Berechnung läuft trotzdem (Azimut aus Koordinaten berechnet); `ideal_azimuth_range` ist optional.
+
+📏 **Regel 3 — Konsistenz: Daten kommen aus demselben Cache wie das Event-Detail.**
+Im Location-Detail wird für die Sonnen-Infos ein echtes Opportunities-Datum abgerufen (heutiges Datum), nicht auf Basis von rohen Skyfield-Live-Calls für jeden Seitenaufruf. Kalte Berechnungen per API für die Location-Detailansicht sind akzeptabel wenn gecacht.
+
+- 🟢 *Positiv:* Ich öffne das Location-Detail → die Sonneninfos sind konsistent mit dem, was ich im Feed-Event für heute sehe.
+- 🔴 *Negativ:* Sonnenauf-/untergangszeit im Location-Detail weicht von der im Feed-Event ab (weil andere Berechnungsquelle) → Verwirrung.
+
+---
+
+**📎 Code-Verifikation** (gelesen am 2026-06-28):
+
+- `backend/calculations/astronomy.py` `SunInfo`-Dataclass (Z.73–86): hat `sunrise` und `sunset` als `datetime`, aber **keinen Azimut-Wert**. Azimut muss via `get_sun_position(lat, lon, sunrise)` nachberechnet werden — exakt wie bei `moonrise_azimuth` in US-79 (precompute.py Z.437–458).
+- `backend/precompute.py` `_serialize()` (Z.420–428): serialisiert `sunrise_utc` und `sunset_utc` bereits; **kein `sunrise_azimuth` / `sunset_azimuth`**. Lücke bestätigt.
+- `get_body_position(lat, lon, "sun", sunrise_dt)` → `CelestialPosition.azimuth` — diese Funktion existiert und ist getestet; dasselbe Muster wie moonrise_azimuth.
+- `web/index.html` Z.3343–3344: Sonnenauf-/untergang im Event-Detail zeigt nur Uhrzeit, kein Azimut. Mondaufgang Z.3345 zeigt Azimut mit `· ${azimuth.toFixed(1)}°`. Anpassungsmuster ist direkt übertragbar.
+- `LocationDetail._render()` Z.4650: Abschnitt `loc_azimut` zeigt bereits `idealer Azimut` und `Alignments` + `solar_alignment_note`. Erweiterung um heutige Auf-/Untergangsazimute + Richtungsklassifizierung ist hier der richtige Ort.
+- `calculate_azimuth_alignment(obs_lat, obs_lon, subj_lat, subj_lon)` in astronomy.py Z.556–568: berechnet Azimut Fotograf→Motiv. Rückgabe ist ein `float`. Bereits in `opportunity.py` als `subject_azimuth` verwendet.
+- Klassifizierungslogik (`classify_alignment()` o.ä.) existiert für Crown-Alignment (Z.681ff), aber **nicht** für die einfachere Richtungsklassifizierung „nah/gegenüber". Muss neu gebaut werden (wenige Zeilen, reine Differenz-Berechnung).
+- `_loadEvents()` in LocationDetail (Z.4667): ruft bereits `/opportunities?location_id=...&days=30` ab. Die Sonneninformationen für **heute** könnten aus dem ersten heutigen Event dieser Liste entnommen werden — oder als separater `/sun-info?location_id=...&date=today`-Call.
+
+---
+
+##### ⚠️ Pre-Mortem
+
+💀 **Szenario 1: Sunrise-Azimut-Call blockiert LocationDetail-Öffnung**
+- Auslöser: Wenn `get_body_position` synchron per API-Aufruf für jeden Location-Open-Vorgang gerufen wird (kein Cache), dauert es ~100–500 ms → Location-Detail lädt spürbar langsam.
+- Frühwarnung: Local-Test zeigt spürbares Hängen beim Öffnen des Sheets.
+- Gegenmaßnahme: Azimut-Werte **im precompute-Cache speichern** (wie moonrise_azimuth), nicht live berechnen. Alternativ: asynchron nachladen (erst Sheet öffnen, dann Azimut einfügen).
+
+💀 **Szenario 2: Richtungsklassifizierung funktioniert nur für Locations mit Motiv-Koordinaten**
+- Auslöser: Viele Locations haben keinen `subject_lat`/`subject_lon` → kein `subject_azimuth` → keine Klassifizierung → leerer Bereich im Location-Detail, der verwirrend wirkt.
+- Frühwarnung: Im Local-Test: Location ohne Motiv öffnen → Feld fehlt.
+- Gegenmaßnahme: Klares Fallback: Wenn kein Motiv → nur „Sonnenaufgang HH:MM · XXX°" zeigen (ohne Motivvergleich). Kein Placeholder-Text wie „–" ohne Erklärung.
+
+💀 **Szenario 3: Datenquelle Location-Detail vs. Event-Detail inkonsistent (US-96-Muster)**
+- Auslöser: Location-Detail könnte Sonnen-Azimut aus einem anderen Pfad (Live-Skyfield) berechnen, während Event-Detail aus precompute-Cache liest → kleine Zeitabweichungen.
+- Frühwarnung: Manuelle Probe: Event-Detail Sonnenuntergang und Location-Detail-Azimut vergleichen → Wert unterschiedlich?
+- Gegenmaßnahme: Beide aus demselben Cache (precompute `opportunities.json`). Location-Detail verwendet das erste heutige Event der Location für die Sonnen-Zeitangaben.
+
+💀 **Szenario 4: `get_body_position("sun", sunrise_dt)` schlägt fehl wenn sunrise_dt=None (Polarsommer/Edge)**
+- Auslöser: `sunrise_dt` ist None (kein Aufgang im 24h-Fenster) → `get_body_position` crasht auf None.
+- Frühwarnung: pytest mit sunrise=None → TypeError oder AttributeError.
+- Gegenmaßnahme: Guard `if ... and o.astronomy_report.sun.sunrise else None` (analog zu moonrise_azimuth in precompute.py Z.446).
+
+💀 **Szenario 5: Azimut-Wert 0.0° erscheint als „fehlt" (Norden)**
+- Auslöser: Azimut 0° (Sonne geht exakt im Norden auf — Polarsommer) wird als null-ish behandelt und versteckt.
+- Frühwarnung: `if o.sunrise_azimuth` in JS-Code → 0.0 ist falsy in JS → wird ausgeblendet.
+- Gegenmaßnahme: Im Frontend `!= null` statt Truthy-Check (wie bei `moonrise_azimuth != null`).
+
+---
+
+##### 🏗️ Architektur-Analyse
+
+**Betroffene Dateien:**
+- `backend/precompute.py` — `_serialize()`: `sunrise_azimuth` und `sunset_azimuth` ergänzen (analog moonrise/moonset, Z.437–458)
+- `backend/models/schemas.py` — OpportunityOut-Schema prüfen, ob neue Felder ergänzt werden müssen
+- `backend/main.py` — OpportunityOut-Serialisierung prüfen (Z.1265)
+- `web/index.html` — Event-Detail (Z.3343–3344): Azimut neben Uhrzeit ergänzen; LocationDetail._render() (Z.4650): Richtungsklassifizierung im `loc_azimut`-Abschnitt; neue Hilfsfunktion `sunAlignmentLabel(sunAz, motifAz)` für Richtungsklassifizierung
+
+**Neue Funktion (pure JS, kein Backend-Aufruf):**
+```
+sunAlignmentLabel(sunAz, motifAz):
+  diff = ((sunAz - motifAz + 180) % 360) - 180  // Winkeldifferenz -180..+180
+  if |diff| <= 15  → "fast genau hinter dem Motiv" (🔥 Highlight)
+  if |diff| <= 45  → "nah am Motiv (${diff.toFixed(0)}°)"
+  if |diff| >= 150 → "gegenüber dem Motiv — Gegenlicht-Motive möglich"
+  else             → "${diff.toFixed(0)}° vom Motiv entfernt"
+```
+
+**Daten-Einstiegspunkte-Check:**
+- Event-Detail (Feed/Kalender): erhält das serialisierte Opportunity-Objekt direkt → `sunrise_azimuth`/`sunset_azimuth` müssen in precompute + Schema
+- Location-Detail: lädt `/opportunities?location_id=...&days=30` asynchron → `_loadEvents()` Ergebnis auswerten für heute; alternativ: separate `/sun-info`-API. Einfachster Weg: aus bereits geladenem `_loadEvents`-Ergebnis das heutige Event extrahieren.
+
+---
+
+##### 🔀 Implementierungsoptionen
+
+**Option A — Azimut im precompute-Cache, Klassifizierung im Frontend (empfohlen)**
+
+Was du in der App erlebst: Beim Öffnen jedes Event-Details siehst du sofort neben „Sonnenaufgang" und „Sonnenuntergang" auch den Azimut in Grad — ohne Wartezeit. Im Location-Detail erscheint im Ausrichtungs-Abschnitt eine klare Einschätzung für heute: „Sonnenaufgang 151° — fast genau hinter dem Motiv 🔥". Die Daten kommen aus dem normalen täglichen Precompute — kein Extra-API-Call.
+
+- Vorgehen: `sunrise_azimuth`/`sunset_azimuth` in `precompute.py::_serialize()` ergänzen (4 Zeilen, exakt wie moonrise_azimuth). Schema + main.py ergänzen. Im Frontend Event-Detail-Template Azimut anzeigen. In LocationDetail._render() aus dem bereits geladenen `_loadEvents`-Ergebnis das heutige Ereignis auslesen und Klassifizierungstext berechnen.
+- Betroffene Dateien: `backend/precompute.py`, `backend/models/schemas.py`, `backend/main.py`, `web/index.html`
+- Vorteile: Kein Extra-API-Call; konsistent mit moonrise_azimuth-Pattern; schnell im UI; einfach zu testen
+- Nachteile: Azimut-Wert erst nach nächstem Precompute im Cache (ältere Events zeigen keinen Azimut bis Recompute)
+- Aufwand: klein
+
+**Option B — Separater `/sun-info`-API-Endpoint für das Location-Detail**
+
+Was du in der App erlebst: Das Location-Detail macht beim Öffnen einen eigenen API-Call für die Sonnen-Infos des heutigen Tages — ohne Wartezeit (async, Sheet öffnet sofort). Azimut und Klassifizierung erscheinen kurz nach dem Sheet-Open (wie Wetter-Overlay).
+
+- Vorgehen: Neuer Endpoint `/sun-info?location_id=&date=` in main.py, berechnet via Skyfield live. LocationDetail ruft diesen Endpoint async auf.
+- Betroffene Dateien: `backend/main.py` (neuer Endpoint), `web/index.html`
+- Vorteile: Immer aktuell (auch für Locations ohne recent precompute); kein Cache-Umbau
+- Nachteile: Live-Skyfield-Call pro Location-Open (50–200ms); Event-Detail bekommt keinen Azimut (zwei getrennte Implementierungen); höherer Aufwand
+- Aufwand: mittel
+
+**Option C — Nur Event-Detail, kein Location-Detail**
+
+Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut. Im Location-Detail bleibt der Ausrichtungs-Abschnitt wie bisher (ohne heutige Auf-/Untergangs-Klassifizierung).
+
+- Vorgehen: Nur precompute + Schema + Event-Detail-Template
+- Vorteile: Minimaler Aufwand
+- Nachteile: Kern-Use-Case (Planungsansicht für eine Location) nicht abgedeckt; Ticket-Beschreibung zielt klar auf Location-Planungssicht
+- Aufwand: sehr klein
+
+✅ **Empfehlung: Option A** — minimaler Aufwand, maximaler Wert, konsistent mit dem moonrise_azimuth-Pattern aus US-79, kein Extra-API-Call nötig. Die leichte Einschränkung (Azimut nur nach Precompute) ist akzeptabel, da der Precompute täglich läuft und bei Location-Änderungen getriggert wird.
+
+---
+
+**Scope:**
+- Eingeschlossen: (1) `sunrise_azimuth` + `sunset_azimuth` im Opportunity-Cache + Schema; (2) Azimut neben Sonnenaufgang/-untergang im Event-Detail; (3) Richtungsklassifizierung relativ zum Motiv im Location-Detail-Ausrichtungs-Abschnitt (heute)
+- Ausgeschlossen: Datums-Picker für die Richtungsklassifizierung (→ Live-Astro); iOS-App; Push-Benachrichtigungen für „heute perfektes Alignment"; Änderungen am Precompute-Trigger-Mechanismus
+
+**Akzeptanzkriterien:**
+- [ ] AK-1: Wenn ich eine Foto-Chance (z.B. „Goldene Stunde Abend") im Feed öffne, sehe ich neben „Sonnenaufgang" und „Sonnenuntergang" jeweils auch den Azimut in Grad — z.B. „Sonnenuntergang 21:05 · 289°".
+- [ ] AK-2: Sonnenaufgang und -untergang werden im Event-Detail nur mit Azimut angezeigt, wenn der Wert im Cache vorhanden ist. Wenn er fehlt (alter Cache-Stand), erscheint nur die Uhrzeit — kein „0°" oder Fehler.
+- [ ] AK-3: Im Location-Detail (Abschnitt „Ausrichtung") sehe ich für den heutigen Tag Sonnenauf- und -untergang mit Azimut.
+- [ ] AK-4: Wenn die Location Motiv-Koordinaten hat, erscheint zusätzlich eine lesbare Einschätzung — z.B. „fast genau hinter dem Motiv (2°)" oder „Gegenlicht-Motive möglich (158°)". Locations ohne Motiv zeigen nur Azimut ohne Bewertung.
+- [ ] AK-5: Wenn die Richtungsabweichung ≤ 15° beträgt (Sonne fast genau am Motiv), wird das optisch hervorgehoben (z.B. mit Flammen-Emoji oder Farbe) — als klares Planungs-Signal.
+- [ ] AK-6: Ein Azimut von 0° wird korrekt angezeigt (nicht versteckt), weil die Sonne theoretisch genau im Norden aufgehen könnte.
+- [ ] AK-7: Wenn heute kein Sonnenaufgang oder -untergang stattfindet (Polarsommer/Edge), erscheint kein leerer oder kaputt wirkender Bereich — das Feld wird einfach weggelassen.
+- [ ] AK-8: Die Azimut-Werte im Event-Detail stimmen mit dem überein, was die Live-Astro-Ansicht für denselben Tag anzeigt (Konsistenz-Check, manuelle Probe).
+- [ ] Edge Case: Locations ohne Motiv-Koordinaten → im Location-Detail erscheint im Ausrichtungs-Abschnitt trotzdem Sonnenauf-/-untergangs-Azimut (nur ohne Motivvergleich).
+
+**Pre-Mortem (Zusammenfassung):**
+- 💀 Sunrise-Azimut-Call blockiert Sheet → Gegenmaßnahme: nur aus precompute-Cache, nicht live (Option A)
+- 💀 Klassifizierung nur für Locations mit Motiv → Gegenmaßnahme: sauberes Fallback (nur Azimut ohne Motivbezug)
+- 💀 Datenquelle-Inkonsistenz Location- vs. Event-Detail → Gegenmaßnahme: beide aus precompute-Cache
+- 💀 sunrise=None → TypeError → Gegenmaßnahme: Guard wie in moonrise_azimuth-Pattern
+- 💀 Azimut 0° als falsy in JS → Gegenmaßnahme: `!= null` statt Truthy-Check
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/precompute.py`, `backend/models/schemas.py`, `backend/main.py`, `web/index.html` (Z.3343–3344, Z.4584–4665)
+- [ ] Implementierungsoption freigegeben: Option A (Azimut im Cache + Klassifizierung im Frontend)
+- [ ] Empfehlung: Option A
+
+**Testplan:**
+- [ ] Automatisiert (pytest): `backend/tests/test_us107_sunrise_azimuth.py`
+  - AK-1/AK-2: `_serialize()` gibt `sunrise_azimuth` / `sunset_azimuth` als float oder None zurück — keine 0.0 wenn sunrise=None
+  - AK-6: sunrise_azimuth=0.0 (Norden) bleibt 0.0, nicht None
+  - AK-7: sunrise=None → sunrise_azimuth=None (kein Crash)
+- [ ] Manuell:
+  1. Server lokal starten, Feed öffnen, Chance öffnen → Event-Detail prüfen: Sonnenaufgang mit Azimut?
+  2. Location-Detail öffnen (Location mit Motiv-Koordinaten) → Ausrichtungs-Abschnitt: Klassifizierung sichtbar?
+  3. Location ohne Motiv-Koordinaten → Ausrichtungs-Abschnitt: nur Azimut, keine Klassifizierung, kein Fehler?
+  4. Wert mit Live-Astro-Ansicht für denselben Tag vergleichen (AK-8)
+  5. Regression: Mondaufgang/-untergang noch sichtbar? Feed-Filter noch funktionsfähig?
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
 

@@ -227,6 +227,62 @@ def _load_custom_locations() -> int:
     return added
 
 
+def _set_loc_attr(loc, field, value):
+    """setattr-Helfer, der auch bei frozen/slots-Dataclasses funktioniert
+    (gleiches Muster wie _apply_location_overrides)."""
+    try:
+        object.__setattr__(loc, field, value)
+    except Exception:
+        setattr(loc, field, value)
+
+
+def _apply_qa_values() -> int:
+    """
+    TASK-48 (Sichtbarkeits-Fix, BUG-29-Muster): Wendet die auto-generierten
+    QA-Felder (Azimut/Brennweite/Beschreibung) auf die Basis-`LOCATIONS` an —
+    spiegelt bewusst main.py:_load_qa_values(), damit der Recompute-Subprozess
+    denselben Wertstand wie der Live-Server berechnet.
+
+    Ohne diesen Merge sieht der nächtliche Recompute die QA-Werte nicht → Feed/
+    Kalender zeigen weiter alte Werte (insb. die künftige Auto-Beschreibung, die
+    pro Event in den Feed-Payload eingebettet wird), obwohl die Live-Detail-
+    Ansicht bereits korrekt ist.
+
+    Merge-Reihenfolge: Code-Defaults < qa_values < location_overrides — daher
+    MUSS dieser Aufruf in main() VOR _apply_location_overrides() stehen, damit ein
+    manuell gesetzter Override einen Auto-Wert weiterhin überschreibt (identisch
+    zur Startup-Reihenfolge in main.py).
+
+    Unterstützte Felder: description, ideal_azimuth_min/max (→ ideal_azimuth_range),
+    focal_length_suggestions.
+    """
+    try:
+        qa_values = LocationStore().load_all_qa_values()
+    except Exception as exc:
+        logger.warning("QA-Values nicht ladbar (%s) – rechne ohne Auto-Werte", exc)
+        return 0
+    if not qa_values:
+        return 0
+
+    loc_map = {loc.id: loc for loc in LOCATIONS}
+    applied = 0
+    for qv in qa_values:
+        loc = loc_map.get(qv.get("location_id"))
+        if not loc:
+            continue
+        if qv.get("description") is not None:
+            _set_loc_attr(loc, "description", qv["description"])
+        if qv.get("ideal_azimuth_min") is not None and qv.get("ideal_azimuth_max") is not None:
+            _set_loc_attr(loc, "ideal_azimuth_range",
+                          (qv["ideal_azimuth_min"], qv["ideal_azimuth_max"]))
+        if qv.get("focal_length_suggestions") is not None:
+            _set_loc_attr(loc, "focal_length_suggestions", qv["focal_length_suggestions"])
+        applied += 1
+    if applied:
+        logger.info("QA-Values angewendet: %d Locations gepatcht (Auto-Azimut/Brennweite/Beschreibung)", applied)
+    return applied
+
+
 def _compute_body_apparent_size(
     event_type_val: str,
     shoot_time,
@@ -1006,14 +1062,21 @@ async def main(args: argparse.Namespace) -> None:
     t0 = time.time()
     logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
     logger.info("%d Locations geladen", len(LOCATIONS))
+    # Lade-Reihenfolge gespiegelt von main.py:startup() — Code-Defaults < Custom
+    # < qa_values < location_overrides — damit Recompute-Subprozess und Live-Server
+    # exakt denselben Location-Stand verwenden.
+    # BUG-33: Custom Locations aus SQLite laden — sie fehlen im LOCATIONS-Import aus
+    # data/locations.py komplett, da precompute.py als eigener Subprozess läuft.
+    _load_custom_locations()
+    # TASK-48: Auto-QA-Werte (Azimut/Brennweite/Beschreibung) anwenden, BEVOR die
+    # Overrides drüberlaufen — damit ein manueller Override einen Auto-Wert
+    # weiterhin überschreibt (identische Merge-Reihenfolge wie im Server-Start).
+    _apply_qa_values()
     # BUG-29: Persistierte Koordinaten-/Name-Overrides anwenden, BEVOR irgendetwas
     # berechnet oder gehasht wird — sonst rechnet der Recompute mit den alten Basis-
     # Koordinaten und der coordinates_hash ändert sich nie.
     _apply_location_overrides()
-    # BUG-33: Custom Locations aus SQLite laden — sie fehlen im LOCATIONS-Import aus
-    # data/locations.py komplett, da precompute.py als eigener Subprozess läuft.
-    _load_custom_locations()
-    logger.info("%d Locations nach Custom-Load + Overrides", len(LOCATIONS))
+    logger.info("%d Locations nach Custom-Load + QA-Values + Overrides", len(LOCATIONS))
 
     # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
     from data import backup as _backup
