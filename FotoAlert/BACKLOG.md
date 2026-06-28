@@ -28,11 +28,11 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | US-96 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-83, US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **BUG-44** · **BUG-45** · **US-104** · **US-105** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -494,14 +494,15 @@ Bestätigt: composition_analysis korrekt berechnet + gespeichert. ev_skypos + ev
 
 ---
 
-### [~] US-96 · Einheitliche Chancen-Detailansicht aus allen Einstiegspunkten
+### US-96 · Einheitliche Chancen-Detailansicht aus allen Einstiegspunkten `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-06-27 (v1.17.0) |
 
 **Beschreibung:** Egal ob ich eine Chance im Feed (14-Tage-Ansicht), im 365-Tage-Kalender, im Scout oder in den Location Details (zukünftige Ereignisse) antippe — ich sehe immer exakt dieselbe Detailansicht mit denselben Informationen in derselben Reihenfolge. Alle Sektionen sind beim Öffnen eingeklappt. Das schafft ein konsistentes Erlebnis und macht das Navigieren zwischen den Tabs vorhersehbar.
 
@@ -930,6 +931,21 @@ Ausgeschlossen: iOS App-Icon (Xcode/AppIcon.appiconset), Wortmarke als SVG-Text 
 - [ ] Manuell: http://localhost:8000 — Header-Roundel sichtbar, Login-Roundel sichtbar
 - [ ] Manuell: Safari → Teilen → „Zum Home-Bildschirm" → Icon prüfen
 - [ ] curl: `curl -s http://localhost:8000/manifest.json | python3 -m json.tool | grep theme`
+
+---
+
+### US-104 · Scout-Karten: einheitliches Design wie 14-Tage-Feed-Karten `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Die Scout-Karten sollen visuell identisch mit den Feed-Karten (14-Tage-Ansicht) aussehen — gleicher Aufbau mit Score-Ring, Event-Typ-Icon, Uhrzeit, Titel, Location-Zeile und Tag-Chips. Aktuell haben Scout-Karten ein abweichendes Layout (flache Info-Chips, blauer Score-Badge, zwei große Buttons). Das schafft Inkonsistenz innerhalb der App. Die „Standort"- und „Navigation"-Buttons bleiben erhalten, werden aber stilistisch angeglichen.
+
+**Bezug:** Hängt von US-83 [In Progress] ab (Scout-Karten sind jetzt klickbar — Detailansicht). Abgrenzung: US-83 = Detailansicht beim Klick; US-104 = visuelles Design der Karte selbst. Grenzt an US-98/US-103 (Bauhaus-Redesign), aber US-104 ist unabhängig davon umsetzbar.
 
 ---
 
@@ -3921,12 +3937,192 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-20 |
 
 **Beschreibung:** Ein Klick auf einen Scout-Eintrag soll eine Detailansicht öffnen, die dieselben Daten zeigt wie die Locationdetails. Aus dieser Ansicht kann der Nutzer den Scout-Eintrag optional als neue Location speichern.
 
-**Bezug:** Baut auf US-70[x] (Scout-Tab) auf und wiederverwendet die Location-Detail-UI (US-60/US-63[x]) sowie die Speicher-Logik aus AddLocation (US-56). Eigenständig, grenzt an US-70 (liefert nur die Karten/Liste). Datenfundament-Epic (Location-Persistenz) ist Voraussetzung für „als Location speichern".
+**Bezug:** Baut auf US-70[x] (Scout-Tab) auf und wiederverwendet die Location-Detail-UI (US-60/US-63[x]) sowie die Speicher-Logik aus AddLocation (US-56). Eigenständig, grenzt an US-70 (liefert nur die Karten/Liste). Datenfundament-Epic (Location-Persistenz) ist Voraussetzung für „als Location speichern". **Vorbedingung US-96[x] ist erfüllt** — `Detail.open(o)` existiert bereits.
+
+---
+
+#### 🔬 Analyse-Spec (US-83) · 2026-06-28
+
+---
+
+##### 🗺 Scope-Klärung: Was ist eine Scout-Detailansicht?
+
+Scout-Einträge sind **berechnete Standpunkt-Chancen**, keine gespeicherten Locations. Das `ScoutOpportunity`-Objekt (Backend: `pipeline_base.py`) liefert:
+
+| Feld | Beispiel | Bedeutung |
+|------|---------|-----------|
+| `subject_name` | „Fernsehturm" | Name des Motivs |
+| `subject_lat/lon` | 52.5208, 13.4094 | Koordinaten des Motivs |
+| `standpoint_lat/lon` | 52.519, 13.411 | Berechneter Fotograf-Standpunkt |
+| `day` | „2026-07-05" | Datum der Chance |
+| `dt_utc` | „2026-07-05T19:23:00Z" | Optimaler Zeitpunkt |
+| `session` | „golden_evening" | Lichtqualität |
+| `body_name` | „sun" / „moon" | Himmelskörper |
+| `body_altitude_deg` | 12.3 | Höhe Himmelskörper |
+| `body_azimuth_deg` | 280.1 | Azimut Himmelskörper vom Motiv aus |
+| `body_illumination_pct` | 67.0 | Mondbeleuchtung (null für Sonne) |
+| `distance_m` | 320 | Standpunkt→Motiv-Distanz |
+| `focal_length_equiv_mm` | 85 | Empfohlene Brennweite |
+| `score` | 0.87 | Gesamt-Score (0–1) |
+| `score_alignment`, `score_phase`, `score_licht`, `score_komposition`, `score_wetter` | — | Teilscores |
+| `weather_description` | „Leicht bewölkt" | Wetter-Text |
+| `kategorie` | „🏙 Skyline" | Kategorie-Label |
+
+**Was fehlt im Scout-Objekt (vs. Feed-Opportunity):**
+- `event_type`, `title` → kein strukturiertes Event
+- `overall_score`, `astronomy_score`, `weather_score` → andere Feldnamen (`score`, Teilscores)
+- `observer_lat/lon` → heißt hier `standpoint_lat/lon`
+- `location_id`, `location_name` → keine gespeicherte Location
+- `camera_hints`, `moon_phase`, `celestial_azimuth`, `shoot_time`, `shoot_window_start/end` → nicht vorhanden
+- `sunrise_utc`, `sunset_utc`, usw. → nicht vorhanden
+
+**Schlussfolgerung:** Scout-Einträge können **nicht direkt** in `Detail.open(o)` übergeben werden — die Felder sind zu verschieden. Entweder (A) werden sie vorher in ein kompatibles Objekt gemappt, oder (B) es entsteht ein leichtgewichtiges eigenes Sheet.
+
+**Die Scout-Detailansicht ist eine Chancen-Detailansicht, keine Location-Detailansicht.** Ein Scout-Eintrag hat keinen Namen, keine Beschreibung, keine gespeicherten Alignments — er hat einen Standpunkt, ein Motiv und eine berechnete Gelegenheit. Die passende Anzeige zeigt: Motiv, Standpunkt-Koordinaten, Datum/Uhrzeit, Brennweite, Score, Wetter — plus den „Als Location speichern"-Button.
+
+---
+
+##### 🔭 Architektur-Analyse
+
+**Aktueller Zustand (Scout-Tab, `Scout.render()`):**
+- Scout-Karten zeigen: Motiv-Name, Kategorie, Session, Score-Badge, Uhrzeit, Illumination, Höhe, Entfernung, Brennweite, Wetter.
+- Buttons: „Standort" (Apple Maps) und „Navigation" (Apple Maps). **Kein Klick → Detailansicht.**
+- Kein `onclick` auf der `.scout-card` selbst oder dem Motiv-Titel.
+
+**`Detail.open(o)` (US-96, fertig):**
+- Erwartet: `o.event_type`, `o.overall_score`, `o.astronomy_score`, `o.weather_score`, `o.title`, `o.location_id`, `o.observer_lat/lon`, `o.subject_lat/lon`, `o.shoot_time`, usw.
+- Zeigt: Score-Bar (Gesamt/Astronomie/Wetter), Zeitfenster, FOV-Karte, Koordinaten, Astronomie-Infos.
+- **Nicht direkt für Scout nutzbar** — zu viele Pflichtfelder fehlen.
+
+**`AddLocation.save()` (US-56, fertig):**
+- Ruft `API.post('/preview-alignment', {..., save: true})` auf.
+- Braucht: `observer_lat/lon`, `subject_lat/lon`, `subject_name`, `subject_height_m`, `subject_width_m`, `category`.
+- Davon hat Scout: `standpoint_lat/lon` (= observer), `subject_lat/lon`, `subject_name`, `kategorie`.
+- Fehlend: `subject_height_m`, `subject_width_m` — Standardwerte möglich (aus `DiscoverSubject`-Defaults).
+- **Saving ist grundsätzlich machbar** über denselben API-Endpoint.
+
+---
+
+##### 📐 Example Mapping
+
+**Rule 1: Klick auf Scout-Karte öffnet Detailansicht**
+- ✅ Positiv: Nutzer tippt auf eine Scout-Karte → ein Sheet öffnet sich mit Motiv-Name, Standpunkt-Koordinaten, Datum, Uhrzeit (Berlin), Session-Label, Score, Wetter, Brennweite, Body-Infos.
+- ❌ Negativ: Klick auf „Standort"- oder „Navigation"-Button → öffnet Maps, kein Detail-Sheet.
+- 🔲 Edge: Scout-Karte ohne `weather_description` (leerer String) → Wetter-Zeile zeigt „–" oder entfällt.
+
+**Rule 2: Sichtbare Daten im Detail**
+- ✅ Positiv: Motiv-Name „Fernsehturm", Kategorie „🏙 Skyline", Datum „Sa, 5. Juli", Uhrzeit „21:23 Uhr", Session „Goldene Stunde Abend", Score 87%, Wetter „Leicht bewölkt", Brennweite ~85mm, Mondbeleuchtung 67%, Körperhöhe 12.3°.
+- ✅ Positiv (Sonne): Illumination-Chip entfällt (Sonne ist immer voll beleuchtet — so auch im Feed).
+- 🔲 Edge: `subject_lat/lon` vorhanden → Motiv-Koordinaten-Zeile zeigen + Maps-Link. Scout liefert immer `subject_lat/lon`.
+- 🔲 Edge: Standpunkt-Koordinaten immer vorhanden (`standpoint_lat/lon`).
+
+**Rule 3: „Als Location speichern"**
+- ✅ Positiv: Nutzer tippt „Als Location speichern" → kurze Bestätigung (Toast), Location erscheint im Locations-Tab.
+- ✅ Positiv: Nach Speichern wird `Locations.load()` und `Feed.load()` aufgerufen (wie AddLocation.save()).
+- ❌ Negativ: API-Fehler → Toast mit Fehlermeldung, kein Sheet-Schließen.
+- 🔲 Edge: Scout-Eintrag repräsentiert ein Motiv mit bekannten Koordinaten aus LOCATIONS — gespeicherte Location ist trotzdem sinnvoll (neuer Standpunkt, andere Perspektive). Kein Duplikat-Schutz nötig (Standpunkte sind verschieden).
+- 🔲 Edge: Nutzer speichert denselben Scout-Eintrag zweimal → zweite Location mit identischen Koordinaten wird angelegt. Akzeptierbar für v1 (Duplikat-Prüfung = separates Ticket).
+
+**Rule 4: Navigation / Schließen**
+- ✅ Positiv: Sheet schließt sich per „Schließen"-Button oder Overlay-Tap (wie Feed-Detail).
+- ✅ Positiv: Nach Schließen ist Scout-Tab wieder sichtbar (kein Tab-Wechsel).
+
+---
+
+##### 💀 Pre-Mortem
+
+**Szenario 1: `Detail.open(o)` produziert leere/defekte Anzeige für Scout-Objekte**
+- Auslöser: `o.overall_score` ist `undefined` → Score-Bar zeigt `NaN%`; `o.location_id` fehlt → Location-Link crasht (`Locations.nameFor(undefined, undefined)` gibt evtl. leeren String).
+- Verifiziert im Code: Zeile 3084 — `Locations.nameFor(o.location_id, o.location_name)` — ohne location_id immer leer. Zeile 3091 — `o.overall_score*100` → NaN. Zeile 3100 — `CameraFOV._data['ev'] = { obsLat:o.observer_lat ... }` → Scout hat `standpoint_lat`, nicht `observer_lat` → FOV-Karte zeigt falschen Punkt.
+- Gegenmaßnahme (Option A): Scout-Objekt vor `Detail.open()` in ein kompatibles Format mappen. (Option B): Eigenes Scout-Detail-Sheet ohne diese Felder.
+
+**Szenario 2: `AddLocation.save()` schlägt fehl wegen fehlender Höhen-Daten**
+- Auslöser: `subject_height_m` und `subject_width_m` fehlen im Scout-Objekt (Backend speichert sie nicht im API-Response).
+- Verifiziert: `ScoutOpportunity` (pipeline_base.py) hat diese Felder nicht. `AddLocation.save()` übergibt `parseFloat(document.getElementById('subj-height').value) || 0` — Default 0 funktioniert. `/preview-alignment` akzeptiert height_m=0 (wie im Frontend-Default). Kein Crash, aber Brennweiten-Schätzung im Alignment basiert auf height=0 → leicht ungenau, aber akzeptierbar.
+- Gegenmaßnahme: `subject_height_m: 0` und `subject_width_m: 0` als Defaults beim Speichern — OK für v1.
+
+**Szenario 3: Kategorie-Mapping Scout→Location funktioniert nicht**
+- Auslöser: Scout liefert `kategorie` als Emoji+Text-String (z.B. „🏙 Skyline"). `AddLocation.save()` übergibt `category` als Enum-Wert (z.B. „skyline"). Das sind verschiedene Formate.
+- Verifiziert: `AddLocation.save()` liest `document.getElementById('add-category').value` — einen `<select>`-Wert. Beim programmatischen Speichern aus dem Scout-Detail muss `kategorie` zu einem gültigen Category-Enum-Wert gemappt werden.
+- Gegenmaßnahme: Mapping-Tabelle im Scout-Detail-Sheet: `„🏙 Skyline" → „skyline"` usw. (alle Kategorien aus `LocationCategory` bekannt).
+
+---
+
+##### 🔀 Implementierungsoptionen
+
+**Option A — Scout-Objekt in Detail.open()-Format mappen (Adapter)**
+
+Was Stephan erlebt: Er tippt auf eine Scout-Karte und sieht exakt dasselbe Detail-Sheet wie bei einer Feed-Chance. Standpunkt-Koordinaten, Brennweite, Score sind sichtbar. Felder die Scout nicht hat (Zeitfenster Start/Ende, Moonphase im Detail-Format, Location-Link) werden weggelassen oder durch Fallbacks ersetzt. Ein „Als Location speichern"-Button erscheint am unteren Rand.
+
+Technisch: Eine `ScoutDetail.open(o)`-Funktion baut ein Pseudo-Opportunity-Objekt:
+```js
+{
+  overall_score: o.score,
+  astronomy_score: o.score_alignment,  // Näherung
+  weather_score: o.score_wetter,
+  title: o.subject_name,
+  event_type: sessionLabel[o.session],
+  location_id: null,  // kein Location-Link
+  observer_lat: o.standpoint_lat, observer_lon: o.standpoint_lon,
+  subject_lat: o.subject_lat, subject_lon: o.subject_lon,
+  shoot_time: o.dt_utc,
+  // …restliche Felder aus Scout-Objekt
+}
+```
+Dann `Detail.open(adaptedObj)` aufrufen — aber: `Detail.open` rendert einen Location-Link (`Locations.nameFor(...)`) und greift auf `o.location_id` zu. Location-Link muss supprimiert werden, was eine Änderung in `Detail.open()` erfordert (oder ein Guard `if (o.location_id)`).
+
+Vorteile: Eine Detailansicht für alle Chancen, konsistentes UX.  
+Nachteile: Adapter ist fragil (Felder müssen exakt stimmen), `Detail.open()` braucht Guards für optionale Felder. Mittlerer Aufwand.
+
+---
+
+**Option B — Eigenes Scout-Detail-Sheet (leichtgewichtig)**
+
+Was Stephan erlebt: Tippen auf eine Scout-Karte öffnet ein schmales Bottom-Sheet (ähnlich wie das Filter-Sheet) das genau die Scout-Daten zeigt: Motiv-Name, Standpunkt-Koordinaten mit Maps-Link, Datum, Uhrzeit, Brennweite, Score (als einzelner Balken), Mondbeleuchtung, Wetter. Unten: „Als Location speichern"-Button und „Schließen". Das Sheet ist bewusst reduziert — kein Score-Dreiteiler, kein FOV-Widget, keine Astronomie-Tabelle.
+
+Technisch: Neues `<div id="scout-detail-sheet">` mit eigenem HTML-Template in `Scout.openDetail(o)`. Kein Eingriff in `Detail.open()`. Speichern: direkter Aufruf von `API.post('/preview-alignment', {..., save: true})` mit Scout-Feldern.
+
+Vorteile: Keine Seiteneffekte auf `Detail.open()`, Scout-spezifische Felder direkt anzeigbar, geringer Aufwand (~2h).  
+Nachteile: Zweite Sheet-Komponente, nicht vollständig konsistent mit Feed-Chancen-Detail.
+
+---
+
+##### ✅ Empfehlung (revidiert 2026-06-28)
+
+**Option A** — Scout-Objekt via Adapter in `Detail.open()` übergeben. Scout-Einträge sind vollwertige Chancen mit Standort, Motiv, Zeitpunkt, Himmelsposition, Wetter und Brennweite — sie verdienen dieselbe vollständige Detailansicht wie Feed-Chancen. Reduzierte Sicht wäre ein schlechteres UX.
+
+**Entscheidungen (2026-06-28):**
+- Shoot-Zeitfenster: nur `dt_utc` als einzelne Uhrzeit (kein Start/Ende)
+- Location-Beschreibung: auto-generierter Text aus Scout-Feldern (Motiv, Kategorie, Session, Körper, Distanz)
+- `location_id`: null → Location-Link-Sektion entfällt (Guard in `Detail.open()`)
+
+---
+
+##### 📋 Akzeptanzkriterien (revidiert 2026-06-28)
+
+- [x] **AK-1:** Tippen auf Scout-Karte → `Detail.open()` öffnet sich mit vollem Inhalt. Maps-Buttons öffnen Maps (kein Detail).
+- [x] **AK-2:** Detail zeigt: Titel (Motiv-Name), Score (Gesamt/Astronomie/Wetter), Uhrzeit Berlin, FOV-Karte mit Standpunkt+Motiv, Koordinaten beider Punkte mit Street-View-Link, Himmelsposition (Azimut/Höhe/Illumination), Wetter, Kameraempfehlung (Brennweite + Stativ-Hinweis), Himmelskörper-Bahn (interaktive Karte), auto-generierte Beschreibung.
+- [x] **AK-3:** Sektionen die nicht befüllbar sind (z.B. gespeicherte Location-Infos) werden ausgeblendet, nicht leer angezeigt.
+- [x] **AK-4:** „Als Location speichern"-Button im Detail → `/preview-alignment` mit `save: true`. Erfolg: Toast, Sheet schließt, Locations + Feed reload.
+- [x] **AK-5:** API-Fehler → Toast, Sheet bleibt offen.
+- [x] **AK-6:** Sheet schließt per Button oder Overlay-Tap. Scout-Tab bleibt aktiv.
+- [x] **AK-7 (nicht sichtbar):** Kategorie als Enum-Wert an API (z.B. „skyline").
+
+---
+
+##### 🧪 Testplan
+
+1. Scout-Tab → Karte antippen → volles Detail-Sheet öffnet sich (alle Sektionen aus AK-2 prüfen).
+2. Sektionen einzeln aufklappen: FOV-Karte, Koordinaten, Himmelsposition, Wetter, Kameraempfehlung, Himmelskörper-Bahn, Beschreibung.
+3. Street-View-Link antippen → öffnet sich korrekt.
+4. „Als Location speichern" → Toast + Location im Locations-Tab.
+5. Maps-Buttons auf Scout-Karte → Maps öffnet sich, kein Detail.
+6. Mond vs. Sonne: Illuminations-Chip nur bei Mond sichtbar.
 
 ---
 
@@ -6646,3 +6842,106 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 - `row()` Z. 3531 — ~1034 Zeilen
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-39, 2026-06-25)
+
+---
+
+### US-105 · Chancen-Detail: Sektionsreihenfolge optimieren (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Die Sektionsreihenfolge im Chancen-Detail-Sheet soll thematisch optimiert werden: BESCHREIBUNG kommt als erstes (Kontext zuerst), WETTER direkt nach IDEALES ZEITFENSTER (zeitlich zusammengehörig), KOMPOSITIONS-ANALYSE direkt nach KARTE & BLICKWINKEL (räumlich/visuell zusammengehörig).
+
+**Neue Reihenfolge:**
+1. BESCHREIBUNG
+2. IDEALES ZEITFENSTER
+3. WETTER ZUM SHOOT-ZEITPUNKT
+4. KARTE & BLICKWINKEL
+5. KOMPOSITIONS-ANALYSE
+6. KOORDINATEN
+7. HIMMELSPOSITION
+8. KAMERA-EMPFEHLUNGEN
+9. ASTRONOMIE
+10. STANDORT & TOPOGRAPHIE
+11. HIMMELSKÖRPER-BAHNEN
+
+**Bezug:** Folgt auf US-96 (hat die aktuelle Reihenfolge eingeführt). Berührt dieselbe Datei (`web/index.html`, `Detail.open()`). BUG-45 muss vor diesem Ticket released sein (gleiche Datei im Working Tree).
+
+---
+
+### BUG-45 · Event-Detail: Mehrere Sektionen erscheinen doppelt `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Im Detail-Sheet eines Events erscheinen mindestens drei Sektionen doppelt: „KAMERA-EMPFEHLUNGEN", „ASTRONOMIE" und „STANDORT & TOPOGRAPHIE". Aus einem Screenshot vom 28.06.2026 geht hervor, dass die Reihenfolge einer vollständigen ersten Hälfte (bis STANDORT & TOPOGRAPHIE) gefolgt von einer zweiten Block-Hälfte (HIMMELSKÖRPER-BAHNEN, BESCHREIBUNG, KAMERA-EMPFEHLUNGEN, ASTRONOMIE, STANDORT & TOPOGRAPHIE, KOMPOSITIONS-ANALYSE) entspricht — als ob zwei Render-Blöcke hintereinander ausgegeben werden. Erwartet: Jede Sektion genau einmal, in der durch US-96 definierten Reihenfolge.
+
+**Bezug:** Verwandt mit US-96 (einheitliche Detailansicht, Sektionsreihenfolge) und BUG-44 (Kalender-Event-Detail vollständige Sektionen). Möglicherweise durch US-96-Implementierung eingeführt (zwei separate Render-Pfade).
+
+---
+
+**Scope:** Entfernung der drei duplizierten Render-Aufrufe (`ev_kamera`, `ev_astro`, `ev_topo`) im `innerHTML`-Template von `Detail.open()` in `web/index.html`. Ausgeschlossen: Reihenfolge-Änderungen (durch US-96 garantiert), Backend-Änderungen.
+
+**Akzeptanzkriterien:**
+- [ ] Im Detail-Sheet jeder Feed-Chance erscheinen KAMERA-EMPFEHLUNGEN, ASTRONOMIE und STANDORT & TOPOGRAPHIE jeweils genau einmal
+- [ ] Die Sektions-Reihenfolge entspricht weiterhin US-96: ZEITFENSTER → KARTE → KOORDINATEN → HIMMELSPOSITION → WETTER → KAMERA-EMPFEHLUNGEN → ASTRONOMIE → STANDORT & TOPOGRAPHIE → HIMMELSKÖRPER-BAHNEN → BESCHREIBUNG → KOMPOSITIONS-ANALYSE
+- [ ] Alle Sektionen sind auf- und zuklappbar (Toggle funktioniert für jede Instanz)
+- [ ] Edge Case: Eine Chance ohne Kamera-Hints zeigt KAMERA-EMPFEHLUNGEN keinmal (war bedingt, bleibt bedingt)
+
+**Pre-Mortem:**
+- 💀 Fix entfernt falsche Zeile (erste statt zweite Instanz) → Sektion fehlt komplett statt doppelt → Gegenmaßnahme: AK-Test prüft Reihenfolge explizit
+- 💀 ev_astro_live-Fallback (openForLatLon für Scout-Events) gehört nicht zu BUG-45, kommt aber im selben Working-Tree-Diff mit → wenn isoliert deployt werden soll, aufpassen dass dieser Fix nicht verloren geht
+
+**📎 Code-Verifikation (2026-06-28):**
+- `web/index.html` gelesen: `ev_kamera`, `ev_astro`, `ev_topo` erscheinen im Working Tree je **einmal** (Zeilen 3321–3344)
+- Im HEAD-Commit `5a384f9` (v1.17.0) standen diese drei Sektionen nach `ev_desc` **ein zweites Mal** → bestätigt durch `git diff HEAD`
+- Fix bereits im Working Tree vorhanden: Die drei duplizierten Zeilen sind entfernt
+- Weitere Working-Tree-Änderungen: `backend/main.py` + `backend/data/store.py` (TASK-43 QA-Modell), `ev_astro_live` Scout-Fallback — **unabhängig von BUG-45**
+
+**Implementierungsoptionen:**
+Nur eine sinnvolle Option: Die drei duplizierten `mkSec()`-Aufrufe nach `ev_desc` aus `web/index.html` entfernen.
+✅ **Fix ist bereits im Working Tree implementiert.** Kein weiterer Code-Aufwand.
+
+**Testplan:**
+- [ ] Manuell: Feed öffnen → beliebige Chance antippen → Detail-Sheet scrollen → jede der drei Sektionen exakt einmal sichtbar
+- [ ] Toggle testen: Jede Sektion auf- und zuklappbar
+- [ ] Chance ohne Kamera-Hints: KAMERA-EMPFEHLUNGEN taucht nicht auf (0×)
+
+**Analyse & Planung:**
+- [x] Root Cause verifiziert: US-96 (`5a384f9`) hat `ev_kamera/astro/topo` an neue Position verschoben, in alter Position (nach `ev_desc`) aber nicht entfernt
+- [x] Fix im Working Tree bestätigt (git diff HEAD)
+- [x] Keine Backend-Änderungen nötig
+- [ ] Test bestanden
+- [ ] Refactor-Check
+- [ ] Release
+
+---
+
+### BUG-44 · Kalender-Event-Detail: Wetter, Kamera-Empfehlung und Kompositions-Analyse fehlen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-27 |
+
+**Beschreibung:** Wenn man im 365-Tage-Kalender auf ein Event tippt, öffnet sich das Detailsheet — aber die Sektionen Wetter, Kamera-Empfehlungen und Kompositions-Analyse fehlen. Im 14-Tage-Feed sind dieselben Sektionen für dasselbe Event vollständig vorhanden.
+
+**Ursache:** `Detail.open()` ist für beide Einstiegspunkte identisch, aber die Event-Objekte unterscheiden sich. Kalender-Events stammen aus `calendar.json` (astronomy-only, ohne Wetter- und Kompositionsfelder). Feed-Events stammen aus `opportunities.json` (vollständige Daten mit allen enriched Feldern). Das Detail-Sheet rendert nur, was im übergebenen Objekt vorhanden ist.
+
+**Lösungsidee:** Liegt ein Kalender-Event innerhalb des 14-Tage-Fensters, beim Antippen den enriched Event aus dem Feed-Cache (`opportunities.json`) anhand einer passenden Kennung (Location-ID + Event-Zeitstempel) suchen und dieses vollständige Objekt stattdessen an `Detail.open()` übergeben. Liegt das Event außerhalb des 14-Tage-Fensters, bleibt das Verhalten unverändert (kein Wetter verfügbar — korrekt so).
+
+**Ziel:** Wenn ein Event im 14-Tage-Fenster liegt, ist das Detailsheet aus dem Kalender inhaltlich und in der Reihenfolge identisch mit dem aus dem Feed — gleiche Sektionen, gleiche Reihenfolge, gleiches Design.
+
+**Bezug:** Folgeticket von US-96 (einheitliche Detailansicht). Die Reihenfolge der Sektionen ist durch US-96 garantiert; dieses Ticket stellt sicher, dass auch die Inhalte vollständig sind.
+
+**Abgrenzung:** Kein Umbau von `Detail.open()` selbst; reine Lookup-Logik im Kalender-Tab-Handler. Events außerhalb des Feed-Zeitfensters sind bewusst ausgenommen.

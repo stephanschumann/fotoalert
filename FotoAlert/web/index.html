@@ -552,7 +552,7 @@
     /* ── Scout-Tab ───────────────────────────────────────────────── */
     #scout-content { padding: 8px 14px 80px; }
     .scout-card { background: var(--card); border-radius: 14px; border: 1px solid var(--border);
-      padding: 14px; margin-bottom: 10px; }
+      padding: 14px; margin-bottom: 10px; cursor: pointer; }
     .scout-card-header { display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 8px; }
     .scout-subject { font-size: 15px; font-weight: 700; color: var(--text); }
@@ -637,6 +637,7 @@
     #astro-sheet.open { transform: translateY(0); }
     #astro-content { overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0;
       padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+
     #astro-map { height: 46vh; margin: 8px 16px; border-radius: 12px; overflow: hidden;
       background: var(--map-bg); }
     .astro-readout { padding: 6px 0 2px; }
@@ -1075,6 +1076,8 @@ function ic(id, size, cls){
   <div id="loc-detail-content"></div>
 </div>
 
+
+
 <!-- US-64: Live-Astro Sheet (PhotoPills-like) -->
 <div id="astro-overlay" onclick="AstroLive.close()"></div>
 <div id="astro-sheet">
@@ -1124,7 +1127,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.17.0';
+const APP_VERSION = '1.19.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1631,13 +1634,14 @@ const Scout = {
         const time = o.dt_utc ? new Date(o.dt_utc).toLocaleTimeString('de-DE',
           { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) : '–';
         const scorePct   = Math.round(o.score * 100);
-        const bodyIcon   = ic(o.body_name === 'sun' ? 'i-sun' : 'i-moon', 13);
-        const illumChip  = o.body_illumination_pct != null
-          ? `<span class="scout-chip">${bodyIcon} <strong>${Math.round(o.body_illumination_pct)}%</strong> beleuchtet</span>`
+        const _bodyName  = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
+        const bodyIcon   = ic(_bodyName === 'sun' ? 'i-sun' : 'i-moon', 13);
+        const illumChip  = o.moon_illumination_pct != null
+          ? `<span class="scout-chip">${bodyIcon} <strong>${Math.round(o.moon_illumination_pct)}%</strong> beleuchtet</span>`
           : '';
         const mapsUrl  = `https://maps.apple.com/?ll=${o.standpoint_lat},${o.standpoint_lon}&z=15`;
         const navUrl   = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
-        html += `<div class="scout-card">
+        html += `<div class="scout-card" onclick="Scout.openDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           <div class="scout-card-header">
             <div>
               <div class="scout-subject" style="display:flex;align-items:center;gap:6px">${bodyIcon} ${o.subject_name}</div>
@@ -1648,19 +1652,123 @@ const Scout = {
           <div class="scout-meta">
             <span class="scout-chip">${ic('i-clock',12)} <strong>${time} Uhr</strong></span>
             ${illumChip}
-            <span class="scout-chip">${ic('i-ruler',12)} Höhe <strong>${o.body_altitude_deg}°</strong></span>
+            <span class="scout-chip">${ic('i-ruler',12)} Höhe <strong>${(o.moon_altitude_deg ?? o.body_altitude_deg ?? '?')}°</strong></span>
             <span class="scout-chip">${ic('i-nav',12)} <strong>${Math.round(o.distance_m / 100) / 10} km</strong> Entfernung</span>
             <span class="scout-chip">${ic('i-camera',12)} ~<strong>${o.focal_length_equiv_mm} mm</strong></span>
             <span class="scout-chip">${ic('i-cloud',12)} <strong>${o.weather_description}</strong></span>
           </div>
           <div class="scout-actions">
-            <button class="scout-btn" onclick="window.open('${mapsUrl}','_blank')">${ic('i-pin',14)} Standort</button>
-            <button class="scout-btn" onclick="window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
+            <button class="scout-btn" onclick="event.stopPropagation();window.open('${mapsUrl}','_blank')">${ic('i-pin',14)} Standort</button>
+            <button class="scout-btn" onclick="event.stopPropagation();window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
           </div>
         </div>`;
       }
     }
     el.innerHTML = html;
+  },
+
+  openDetail(o) {
+    // US-83: Scout → Detail Adapter (Feldnamen-Mapping aus ScoutOpportunity)
+    if (typeof o === 'string') o = JSON.parse(o);
+    const _sessionLabel = {
+      blue_morning:   'Blaue Stunde Morgen',
+      golden_morning: 'Goldene Stunde Morgen',
+      golden_evening: 'Goldene Stunde Abend',
+      blue_evening:   'Blaue Stunde Abend',
+      milky_way:      'Milchstraße',
+      moon:           'Mond-Alignment',
+    };
+    const sesLabel = _sessionLabel[o.session] || o.session || '–';
+    // body_name aus session ableiten — Scout-Cache hat kein body_name-Feld
+    const bodyName = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
+    const bodyLabel = bodyName === 'sun' ? 'Sonne' : 'Mond';
+    // Scout-Cache nutzt moon_azimuth_deg / moon_altitude_deg statt body_azimuth_deg
+    const bodyAz  = o.moon_azimuth_deg  ?? o.body_azimuth_deg  ?? null;
+    const bodyAlt = o.moon_altitude_deg ?? o.body_altitude_deg ?? null;
+    const illumPct = o.moon_illumination_pct ?? o.body_illumination_pct ?? null;
+    const distKm = o.distance_m != null ? (Math.round(o.distance_m / 100) / 10) : null;
+    // Zeitfenster: ±15 Min um Optimal-Zeitpunkt
+    const shootMs = o.dt_utc ? new Date(o.dt_utc).getTime() : null;
+    const windowStart = shootMs ? new Date(shootMs - 15 * 60 * 1000).toISOString() : o.dt_utc;
+    const windowEnd   = shootMs ? new Date(shootMs + 15 * 60 * 1000).toISOString() : o.dt_utc;
+    const desc = `Scout-Standpunkt für ${o.subject_name || '–'} zur ${sesLabel}` +
+      (bodyAlt != null ? ` — ${bodyLabel} steht bei ${bodyAlt.toFixed(1)}° Höhe` : '') +
+      (bodyAz  != null ? `, Azimut ${bodyAz.toFixed(1)}°` : '') +
+      (distKm  != null ? `, Entfernung zum Motiv: ${distKm} km.` : '.');
+    // Kamera-Hints: nur wenn Brennweite vorhanden, mit sinnvollen Platzhaltern
+    const cameraHints = o.focal_length_equiv_mm != null
+      ? [{ focal_length_mm: o.focal_length_equiv_mm,
+           aperture_suggestion: bodyName === 'moon' ? 'f/5.6–f/8' : 'f/4–f/8',
+           shutter_suggestion:  bodyName === 'moon' ? '1/125s–1/500s' : '1/30s–1s',
+           iso_suggestion:      bodyName === 'moon' ? 'ISO 100–400' : 'ISO 400–1600',
+           tripod_required:     bodyName !== 'moon',
+           extra_tip:           bodyName === 'moon'
+             ? `${bodyLabel} bei ${illumPct != null ? Math.round(illumPct)+'% Beleuchtung' : 'aktueller Phase'}.`
+             : `${sesLabel} — Stativ empfohlen für lange Belichtungszeiten.` }]
+      : [];
+    const adapted = {
+      _isScout:           true,
+      _scoutRaw:          o,
+      title:              o.subject_name || '–',
+      overall_score:      o.score || 0,
+      astronomy_score:    o.score_alignment || o.score || 0,
+      weather_score:      o.score_wetter || 0,
+      event_type:         sesLabel,
+      shoot_time:         o.dt_utc,
+      shoot_window_start: windowStart,
+      shoot_window_end:   windowEnd,
+      observer_lat:       o.standpoint_lat,
+      observer_lon:       o.standpoint_lon,
+      subject_lat:        o.subject_lat,
+      subject_lon:        o.subject_lon,
+      subject_azimuth:    bodyAz,   // Azimut des Himmelskörpers = Blickachse vom Standpunkt
+      celestial_azimuth:  bodyAz,
+      celestial_altitude: bodyAlt,
+      moon_illumination_pct: bodyName === 'moon' ? illumPct : null,
+      weather_description: o.weather_description,
+      camera_hints:       cameraHints,
+      description:        desc,
+      location_id:        null,
+      location_name:      null,
+    };
+    Detail.open(adapted);
+  },
+
+  async _saveFromDetail() {
+    const o = Detail._currentScout;
+    if (!o) return;
+    const _katMap = {
+      '🏙 Skyline':      'SKYLINE',
+      '🌿 Natur':        'NATUR',
+      '🏛 Architektur':  'SKYLINE',
+      '🌉 Brücke':       'SKYLINE',
+      '🌊 Wasser':       'WASSER',
+      '🎡 Freizeitpark': 'SKYLINE',
+      '🏭 Industrie':    'INDUSTRIE',
+      '⛪ Kirche':       'SKYLINE',
+      '🗼 Turm':         'SKYLINE',
+      '🌳 Park':         'NATUR',
+    };
+    const category = _katMap[o.kategorie] || 'SKYLINE';
+    try {
+      await API.post('/preview-alignment', {
+        observer_lat:     o.standpoint_lat,
+        observer_lon:     o.standpoint_lon,
+        subject_lat:      o.subject_lat,
+        subject_lon:      o.subject_lon,
+        subject_name:     o.subject_name,
+        subject_height_m: 0,
+        subject_width_m:  0,
+        category:         category,
+        save:             true,
+      });
+      toast('✅ Location gespeichert!');
+      Detail.close();
+      await Locations.load();
+      await Feed.load();
+    } catch (err) {
+      toast('❌ ' + (err.message || 'Fehler beim Speichern'));
+    }
   },
 };
 
@@ -2423,8 +2531,11 @@ const Filter = {
     if (s.eventTypesExcl.includes('Sonnen-Alignment')) BODY_EXCL.add('sun');
     return data.filter(o => {
       // Körpertyp-Filter (US-81): nur ausgewählte Himmelskörper zeigen
-      if (BODY_FILTER.size > 0 && !BODY_FILTER.has(o.body_name)) return false;
-      if (BODY_EXCL.size > 0 && BODY_EXCL.has(o.body_name)) return false;  // US-71
+      // body_name aus session ableiten (Scout-Cache hat kein body_name-Feld)
+      const _scoutBody = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
+      const _bodyName = o.body_name ?? _scoutBody;
+      if (BODY_FILTER.size > 0 && !BODY_FILTER.has(_bodyName)) return false;
+      if (BODY_EXCL.size > 0 && BODY_EXCL.has(_bodyName)) return false;  // US-71
       // Tageszeit: Scout-Sessions auf morgen/abend mappen
       if (s.tageszeit.length || s.tageszeitExcl.length) {
         let slot = 'nacht';
@@ -3043,6 +3154,7 @@ const CameraFOV = {
 };
 
 const Detail = {
+  _currentScout: null,
   open(o) {
     if (typeof o === 'string') o = JSON.parse(o);
     const icon = eventIcon(o.event_type, 18);
@@ -3056,7 +3168,7 @@ const Detail = {
       </div>`).join('');
 
     const astro = `
-      ${o.moon_phase ? `<div class="info-row"><span class="ir-label">Mondphase</span><span class="ir-val">${ic('i-moon',13)} ${o.moon_phase}${o.moon_illumination_pct ? ` (${Math.round(o.moon_illumination_pct)}%)` : ''}</span></div>` : ''}
+      ${o.moon_phase ? `<div class="info-row"><span class="ir-label">Mondphase</span><span class="ir-val">${ic('i-moon',13)} ${o.moon_phase}${o.moon_illumination_pct ? ` (${Math.round(o.moon_illumination_pct)}%)` : ''}</span></div>` : (o.moon_illumination_pct != null ? `<div class="info-row"><span class="ir-label">Mondbeleuchtung</span><span class="ir-val">${ic('i-moon',13)} ${Math.round(o.moon_illumination_pct)}%</span></div>` : '')}
       ${o.celestial_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Himmelsobjekt</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>` : ''}
       ${o.celestial_altitude != null ? `<div class="info-row"><span class="ir-label">Höhe Himmelsobjekt</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>` : ''}
       ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
@@ -3081,8 +3193,8 @@ const Detail = {
       <div class="sheet-hero">
         <div class="sheet-hero-type" style="display:flex;align-items:center;gap:6px">${icon} ${o.event_type}</div>
         <div class="sheet-hero-title">${o.title}</div>
-        <div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>
-        <div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>
+        ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>` : ''}
+        ${o.location_id ? `<div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>` : ''}
       </div>
       <div class="sheet-score-bar">
         <div class="score-col"><div class="sc-val" style="color:${col}">${Math.round(o.overall_score*100)}%</div><div class="sc-lbl">Gesamt <button class="sc-info-btn" onclick="ScoreInfo.show('gesamt')">i</button></div></div>
@@ -3095,7 +3207,7 @@ const Detail = {
           <div id="score-info-body"></div>
         </div>
       </div>
-      ${mkSec('ev_zeit',`${ic('i-clock',15)} Zeitfenster (Ortszeit Berlin)`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
       ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
           distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
@@ -3191,7 +3303,7 @@ const Detail = {
       })()}
       ${(() => {
         const wd = o.weather_details;
-        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
+        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
         const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
         const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
         const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
@@ -3231,33 +3343,8 @@ const Detail = {
              </div>` : '';
         return mkSec('ev_topo',`${ic('i-ruler',15)} Standort &amp; Topographie`,`${distRow}${elevRow}`);
       })()}
-      ${mkSec('ev_astro_live',`${ic('i-milkyway',15)} Himmelskörper-Bahnen`,`<button onclick="AstroLive.openForDate('${o.location_id}','${o.shoot_time}')" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button><p style="font-size:11px;color:var(--muted);margin:6px 0 0">Zeigt Sonne, Mond und Milchstraße für den Shoot-Zeitpunkt dieser Chance.</p>`)}
+      ${mkSec('ev_astro_live',`${ic('i-milkyway',15)} Himmelskörper-Bahnen`,`<button onclick="${o.location_id ? `AstroLive.openForDate('${o.location_id}','${o.shoot_time}')` : `AstroLive.openForLatLon(${o.observer_lat},${o.observer_lon},'${o.shoot_time}')`}" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button><p style="font-size:11px;color:var(--muted);margin:6px 0 0">Zeigt Sonne, Mond und Milchstraße für den Shoot-Zeitpunkt dieser Chance.</p>`)}
       ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
-      ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
-      ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}
-      ${(() => {
-        const hasSub = o.subject_lat && o.subject_lon;
-        const distKm = hasSub ? haversineKm(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null;
-        // elevation_difference_m direkt aus dem Event (seit v1.1.1), Fallback: Locations-Lookup
-        const elev = o.elevation_difference_m != null
-          ? o.elevation_difference_m
-          : ((Locations.all||[]).find(l => l.id === o.location_id)?.elevation_difference_m ?? null);
-        if (!distKm && (elev === null || Math.abs(elev) <= 2)) return '';
-        const distRow = distKm != null
-          ? `<div class="info-row">
-               <span class="ir-label">Entfernung zum Motiv</span>
-               <span class="ir-val">${ic('i-ruler',13)} ${distKm < 1 ? Math.round(distKm * 1000) + ' m' : distKm.toFixed(2) + ' km'}</span>
-             </div>` : '';
-        const elevRow = elev !== null && Math.abs(elev) > 2
-          ? `<div class="info-row">
-               <span class="ir-label">Niveaudifferenz</span>
-               <span class="ir-val" title="Topographiedaten EUDEM 25m">
-                 ${elev > 0 ? '+' : ''}${Math.round(elev)} m
-                 <span style="color:var(--muted);font-size:11px">${elev > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span>
-               </span>
-             </div>` : '';
-        return mkSec('ev_topo',`${ic('i-ruler',15)} Standort &amp; Topographie`,`${distRow}${elevRow}`);
-      })()}
       ${(() => {
         const ca = o.composition_analysis;
         if (!ca) return '';
@@ -3326,17 +3413,21 @@ const Detail = {
         </div>`);
       })()}
       <div class="sheet-actions">
-        <button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+        ${o._isScout
+          ? `<button class="btn-primary" onclick="Scout._saveFromDetail()" style="background:var(--accent);color:var(--on-accent,#000);border:none">${ic('i-pin',15)} Als Location speichern</button>`
+          : `<button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           ${ic('i-calplus',15)} Zum Kalender hinzufügen
         </button>
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
-        <button id="verify-btn-${o.location_id.replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\\'")}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
+        <button id="verify-btn-${(o.location_id||'x').replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\'")}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
-        </button>
+        </button>`
+        }
       </div>
     `;
+    Detail._currentScout = o._isScout ? o._scoutRaw : null;
     document.getElementById('detail-overlay').classList.add('open');
     document.getElementById('detail-sheet').classList.add('open');
     // US-58: FOV-Karte wenn Sektion bereits offen (localStorage)
@@ -3623,6 +3714,28 @@ const AstroLive = {
     document.getElementById('astro-overlay').classList.add('open');
     document.getElementById('astro-sheet').classList.add('open');
     requestAnimationFrame(() => this._init());
+  },
+
+  openForLatLon(lat, lon, isoDate) {
+    if (typeof Astronomy === 'undefined') { toast('Astronomie-Modul lädt noch – kurz erneut versuchen'); return; }
+    this.loc = { observer_lat: lat, observer_lon: lon, name: 'Scout-Standpunkt' };
+    document.getElementById('astro-content').innerHTML = this._html();
+    document.getElementById('astro-overlay').classList.add('open');
+    document.getElementById('astro-sheet').classList.add('open');
+    requestAnimationFrame(() => {
+      this._init();
+      const d = new Date(isoDate);
+      const minutes = d.getUTCHours() * 60 + d.getUTCMinutes();
+      this._stopLive();
+      this._t = d.getTime();
+      const slider = document.getElementById('astro-time');
+      if (slider) slider.value = minutes;
+      this.render();
+      const clock = document.getElementById('astro-clock');
+      if (clock) clock.textContent = formatTime(isoDate);
+      const liveBtn = document.getElementById('astro-live');
+      if (liveBtn) { liveBtn.classList.remove('on'); liveBtn.textContent = '● Live'; }
+    });
   },
 
   openForDate(locId, isoDate) {
