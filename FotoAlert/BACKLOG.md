@@ -26,13 +26,13 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* · **BUG-46** |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-105 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-44** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **BUG-44** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1364,13 +1364,203 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 
 ---
 
-### US-105 · Chancen-Detail: Sektionsreihenfolge optimieren (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) `[~]`
+### BUG-46 · Filter-Inkonsistenz: Nicht alle Kriterien bieten aktiv/ausgeschlossen/deaktiviert an; kein Effekt auf Karte `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Der Filter verhält sich in zwei Punkten inkonsistent:
+
+1. **Fehlende Ausschluss-Option:** Nicht alle Filterkriterien bieten die drei Zustände „aktiv", „ausgeschlossen" und „deaktiviert" an. Beispiel: „Geprüfte/verifizierte Standorte" lässt sich nicht exkludieren — es gibt nur aktiv/inaktiv, aber kein „nur nicht-verifizierte zeigen".
+
+2. **Kein Filter-Effekt auf Karte:** Die Kartenansicht ignoriert die gesetzten Filterkriterien vollständig. Die Filterung soll auf alle Ansichten wirken: Chance (14-Tage, Kalender, Scout), Locations-Liste **und** Karte.
+
+**Zusatz:** Wenn ein Filterkriterium für eine Ansicht nicht relevant ist (z. B. ein Chancen-spezifisches Kriterium auf dem Locations-Tab), soll es ausgegraut oder ausgeblendet werden — statt inaktiv aber sichtbar zu bleiben und Verwirrung zu stiften.
+
+---
+
+#### 🔬 Analyse-Spec (BUG-46) · 2026-06-28
+
+### Aktueller Produktstand
+
+Der Filter hat aktuell **neun Kriterien**, von denen nur vier (Eventtyp, Tageszeit, Schwierigkeit, Kategorie) den Drei-Zustands-Mechanismus kennen — also: aktiv (Goldrand), ausgeschlossen (Rotrand), deaktiviert. Die anderen fünf Kriterien — Verifikationsstatus, Mindest-Bewertung (Sterne), Entfernung/GPS, Mindest-Wahrscheinlichkeit und Brennweite — sind einfache Auswahl-Chips oder Slider ohne Ausschluss-Option.
+
+Der Verifikationsstatus bietet heute vier Optionen: „Alle", „Geprüfte", „Nicht geprüft", „Probleme". Man kann also „Nur geprüfte anzeigen" — aber nicht „Geprüfte ausblenden" als Ausschluss-Zustand. Analoges gilt für Bewertung und Entfernung: es gibt keinen „Exclude"-Pfad.
+
+Die **Karte** (Map-Tab) reagiert heute nur auf einen einzigen Filter: den Eventtyp-Include-Filter. Alle anderen Kriterien — Tageszeit, Schwierigkeit, Kategorie, Verifikation, Bewertung, Score, Entfernung — werden auf der Karte vollständig ignoriert. Auch der Eventtyp-Exclude-Filter (Ausschluss) wird auf der Karte nicht berücksichtigt: wer z.B. „Mondaufgang" auf Ausgeschlossen setzt, sieht auf der Karte weiterhin alle Mondaufgang-Locations.
+
+Der **Locations-Tab** filtert nach Schwierigkeit, Kategorie, Bewertung, Verifikation und Score — aber nicht nach Eventtyp oder Tageszeit (weil der Locations-Tab keine Chancen, sondern Standorte zeigt: das ist korrekt). Der **Kalender** und der **Scout** wenden die zutreffenden Filter korrekt an.
+
+**Kurz:** Der Karten-Filter ist rudimentär (nur Eventtyp-Include, kein Exclude, keine anderen Kriterien). Der Verifikationsstatus-Filter kennt keinen echten Ausschluss-Zyklus.
+
+---
+
+### Example Mapping
+
+**Regel 1: Jedes Filterkriterium bietet den Drei-Zustands-Zyklus, wo er semantisch sinnvoll ist**
+
+Kontext: Stephan will gezielt „nur nicht-verifizierte Standorte" sehen, um zu entscheiden, welche er als nächstes prüfen soll — derzeit unmöglich ohne Kriterium „Verifikation = Nicht geprüft".
+
+- ✅ Positiv: Stephan tippt auf „Geprüfte" im Verifikations-Abschnitt — beim zweiten Tap wechselt der Chip auf Rot (Ausschluss), die Liste zeigt nur nicht-verifizierte und problematische Standorte.
+- ❌ Negativ: Stephan tippt zweimal auf „Geprüfte", aber nichts passiert beim zweiten Tap — nur ein/aus — Bug bleibt.
+- ⚠️ Edge: Stephan hat sowohl „Geprüfte" auf Ausschluss als auch „Nicht geprüft" auf Ausschluss gesetzt → alle Verifikationszustände ausgeblendet → leere Liste mit Hinweis „0 Locations entsprechen den Kriterien", kein Crash.
+
+**Regel 2: Die Karte zeigt nur Locations, die allen aktiven Filterkriterien entsprechen**
+
+Kontext: Stephan setzt Schwierigkeit auf „Einfach" und schaut auf die Karte — er erwartet, nur einfache Standorte als Marker zu sehen.
+
+- ✅ Positiv: Filter Schwierigkeit = Einfach aktiv → Karte zeigt nur Marker für einfache Locations. Anspruchsvolle Locations verschwinden.
+- ❌ Negativ: Schwierigkeit = Einfach aktiv, Karte zeigt weiterhin alle Marker unverändert → Bug (Ist-Zustand).
+- ⚠️ Edge: Filter Eventtyp = „Mondaufgang" auf Ausschluss + Karte offen → Locations, die im 14-Tage-Feed ausschließlich Mondaufgänge haben, verschwinden von der Karte.
+
+**Regel 3: Die Karte berücksichtigt Eventtyp-Exclude korrekt**
+
+Kontext: Im Feed hat Stephan „Goldene Stunde" auf Ausschluss gesetzt, schaut dann auf die Karte — er erwartet, dass Goldene-Stunde-Locations nicht hervorgehoben/sichtbar sind.
+
+- ✅ Positiv: Eventtyp „Mondaufgang" auf Ausschluss → Karte blendet Locations aus, die im Feed ausschließlich Mondaufgänge haben. Locations mit mehreren Eventtypen bleiben sichtbar (da nur der ausgeschlossene Typ fehlt, aber andere vorhanden sind).
+- ❌ Negativ: Eventtyp auf Ausschluss, Karte ändert sich nicht → Bug (Ist-Zustand).
+- ⚠️ Edge: Eventtyp „Mond-Alignment" auf Ausschluss + Feed noch nicht geladen → Fallback auf `possible_bodies`: Locations ohne `moon` in `possible_bodies` bleiben sichtbar, Mond-Locations werden ausgeblendet.
+
+**Regel 4: Nicht relevante Kriterien auf der Karte werden ausgegraut — nicht entfernt**
+
+Kontext: Stephan öffnet den Filter im Map-Tab. „Mindest-Wahrscheinlichkeit" ist ein Chancen-Kriterium, nicht direkt auf Locations anwendbar — es soll erkennbar sein, dass dieser Slider hier nichts bewirkt.
+
+- ✅ Positiv: Im Map-Tab ist „Mindest-Wahrscheinlichkeit" ausgegraut und deaktiviert (wie heute schon), mit Hinweis „Nur in Listen-Ansicht verfügbar". Alle anderen Kriterien sind aktiv.
+- ⚠️ Edge: Stephan setzt auf dem Feed-Tab einen Score-Filter, wechselt zur Karte → Karte zeigt zwar keine Score-Filterung (Score ist Chancen-spezifisch), der gespeicherte Score-Wert bleibt aber erhalten und wirkt, wenn Stephan zurück zum Feed wechselt.
+
+**Regel 5: Brennweiten-Filter wird auf Karte ausgegraut (da Chancen-spezifisch)**
+
+Kontext: Brennweite ist an Chancen-Daten (camera_hints) geknüpft, nicht direkt an Locations. Eine Karten-Filterung nach Brennweite ist ohne Chancen-Kontext nicht sinnvoll.
+
+- ✅ Positiv: Brennweiten-Slider im Map-Tab ausgegraut + Hinweistext, wie der Score-Slider heute.
+- ⚠️ Edge: Brennweite im Locations-Tab: Location-Daten enthalten kein `camera_hints`-Feld direkt → ausgegraut (wie Karte). Brennweiten-Filter wirkt nur auf Chancen-Ansichten (Feed/Kalender/Scout).
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] AK-1: Im Filter-Sheet kann ich den Verifikationsstatus durch Antippen durchschalten: erster Tap = nur diese anzeigen (Goldrand), zweiter Tap = diese ausblenden (Rotrand), dritter Tap = zurück zu „Alle". Das gilt für alle vier Optionen (Geprüfte, Nicht geprüft, Probleme — „Alle" bleibt Ein-Zustand-Reset).
+- [ ] AK-2: Im Filter-Sheet kann ich die Mindest-Bewertung nicht ausschließen (Sterne sind eine Mindest-Schwelle, kein Ausschluss) — der Bewertungs-Slider bleibt ein reiner Min-Wert-Filter. Dieser Abschnitt bleibt unverändert.
+- [ ] AK-3: Die Karte zeigt nach dem Anwenden eines Schwierigkeits-Filters nur noch Marker für Locations mit der gewählten Schwierigkeit. Marker für andere Schwierigkeiten werden entfernt.
+- [ ] AK-4: Die Karte berücksichtigt Kategorie-Filter: setze ich „Natur & Landschaft" auf aktiv, sind nur Natur-Locations als Marker sichtbar.
+- [ ] AK-5: Die Karte berücksichtigt Verifikations-Filter: setze ich Verifikation auf „Geprüfte", sind nur verifizierte Locations auf der Karte sichtbar.
+- [ ] AK-6: Die Karte berücksichtigt Eventtyp-Exclude: setze ich „Mondaufgang" auf Ausschluss, verschwinden Locations, die im Feed ausschließlich Mondaufgänge haben.
+- [ ] AK-7: Die Karte berücksichtigt Entfernung/GPS: setze ich „< 5 km", sind nur Locations innerhalb von 5 km sichtbar (wenn GPS verfügbar). Kein GPS → Toast, kein Crash.
+- [ ] AK-8: Mindest-Wahrscheinlichkeit und Brennweite bleiben auf der Karte ausgegraut (wie heute schon für Score — analog für Brennweite neu einführen). Ein erklärender Hinweis ist sichtbar.
+- [ ] AK-9: Im Locations-Tab bleiben Eventtyp und Tageszeit ausgegraut (Chancen-spezifisch, keine direkte Location-Entsprechung). Ein Hinweis erklärt, warum.
+- [ ] AK-10: Regression — Feed, Kalender und Scout reagieren weiterhin korrekt auf alle Filter. Kein Verlust bestehender Filterlogik.
+- [ ] AK-11: Der Filter-Badge (Zahl oben rechts am Filter-Button) zählt den Verifikations-Ausschluss als aktives Kriterium (wie alle anderen Exclude-Zustände heute schon).
+
+---
+
+### Pre-Mortem
+
+**Risiko 1 — Karten-Filter zu aggressiv: leere Karte bei kombinierten Kriterien**
+Auslöser: Schwierigkeit + Kategorie + Verifikation kombiniert — viele Kriterien → nur 1–2 Locations übrig → Karte wirkt leer.
+Gegenmaßnahme: Der Live-Zähler im Filter-Sheet zeigt schon beim Einstellen „X von Y Locations sichtbar". Kein eigener Schutz nötig, aber klar kommunizieren (AK-8: Score/Brennweite ausgegraut → erklärt, was warum nicht greift).
+
+**Risiko 2 — Verifikations-Exclude-Logik korrekt umkehren**
+Auslöser: Exclude bei `verified` soll Locations OHNE `ok`-Verifikation zeigen — falsch implementiert könnte es umgekehrt filtern.
+Gegenmaßnahme: Bestehende `applyToLocations`-Logik für Verifikation als Referenz nehmen; Exclude = Negation der Include-Bedingung; Test mit bekannter verifizierten und nicht-verifizierten Location.
+
+**Risiko 3 — MapView.applyFilter() läuft bevor Feed.data geladen**
+Auslöser: Beim ersten App-Start ist `Feed.data` noch leer, der Karten-Filter für Schwierigkeit/Kategorie/Verifikation würde auf `Locations.all` zugreifen — das ist beim Tab-Wechsel ggf. noch nicht geladen.
+Gegenmaßnahme: `Locations.all` wird beim Boot vorab geladen (bereits implementiert in `_boot()`). Defensive Guards behalten: `if (!Locations.all.length) return true`.
+
+**Risiko 4 — Entfernung auf Karte: GPS-Abfrage-Timing**
+Auslöser: GPS-Abfrage ist async, `MapView.applyFilter()` ist sync — wenn GPS noch nicht abgefragt, ist `Filter._gps` null.
+Gegenmaßnahme: Verhalten wie heute im Feed: wenn `_gps === null` → Entfernung-Filter überspringen (alle anzeigen). Beim Anwenden wird GPS im `FilterSheet.apply()` vorab abgefragt — dasselbe Muster für die Karte anwenden.
+
+**Risiko 5 — Graue Abschnitte im Filter-Sheet pro Ansicht unterschiedlich**
+Auslöser: Die Grau-Logik muss bei jedem `_render()`-Aufruf den aktuellen Tab (`App.current` und `Feed.mode`) kennen — bisher nur für Score und Map-Tab implementiert. Falsches Grauen kann verwirrend sein.
+Gegenmaßnahme: Eine zentrale Hilfsfunktion `_isDisabled(criterium)` die auf `App.current` und `Feed.mode` prüft; klar definieren welche Kriterien wo sinnlos sind (Tabelle unten in Implementierungsoptionen). Manuell alle vier Haupt-Tabs nach Grau-Logik testen.
+
+---
+
+### Implementierungsoptionen
+
+#### Option A — Schrittweise Erweiterung: erst Verifikations-Exclude, dann Karten-Filter
+
+**Phase 1 — Verifikationsstatus erhält Drei-Zustands-Zyklus**
+Vorgehen: `verChips` in `FilterSheet._render()` von `chip()`-Generierung auf `chip3()` umstellen. Neue State-Variable `verificationExcl` in `Filter._defaults()` einführen. `_cycle`-Mechanismus für Verifikation anpassen (Besonderheit: Verifikation ist ein Enum, kein Array — hier `verification` als Include-Wert und `verificationExcl` als Exclude-Wert). `Filter.apply()`, `Filter.applyToLocations()` und `MapView.applyFilter()` um Exclude-Pfad für Verifikation erweitern.
+
+**Phase 2 — Karten-Filter vollständig**
+Vorgehen: `MapView.applyFilter()` um alle Location-relevanten Kriterien erweitern: Schwierigkeit (incl + excl), Kategorie (incl + excl), Verifikation (incl + excl), Entfernung/GPS (async, vorab abgefragt), Mindest-Bewertung. Code aus `Filter.applyToLocations()` wiederverwenden — der Code ist bereits vorhanden, muss nur in `applyFilter()` aufgerufen werden.
+
+**Phase 3 — Ausgrau-Logik pro Tab vollständig**
+Vorgehen: Zentrale `_isDisabled(criterium)` Funktion. Brennweite auf Karte + Locations ausgegraut. Eventtyp + Tageszeit auf Locations ausgegraut. Score + Brennweite auf Karte — wie bisher für Score, neu für Brennweite.
+
+Betroffene Dateien: `web/index.html` (Filter, FilterSheet, MapView.applyFilter)
+Vorteile: inkrementell, jede Phase einzeln testbar, geringes Regressions-Risiko
+Aufwand: mittel (Phase 1: klein, Phase 2: mittel, Phase 3: klein)
+
+#### Option B — Alles in einem Zug: einheitliche Architektur
+
+Vorgehen: `applyToLocations()` wird zur einzigen Filterquelle für alle Location-Ansichten (Locations-Tab UND Karte). `MapView.applyFilter()` ruft `Filter.applyToLocations()` auf statt eigene Logik zu duplizieren. Verifikation und Eventtyp werden gleichzeitig auf Drei-Zustände umgebaut. Ausgrau-Logik als Teil desselben Commits.
+
+Betroffene Dateien: `web/index.html`
+Vorteile: eine Quelle der Wahrheit, kein Code-Duplikat zwischen `applyToLocations` und `applyFilter`
+Nachteile: größerer Diff, schwieriger zu testen/zu bisecten wenn ein Fehler auftritt; `MapView.applyFilter()` hat Feed-basierte Logik (Eventtyp via Feed.data), die nicht in `applyToLocations()` steckt → muss zusammengeführt werden (aufwendiger)
+Aufwand: mittel-groß
+
+---
+
+### Empfehlung
+
+**Option A (Phase 1 → 2 → 3)** ist die klare Empfehlung. Die bestehende `Filter.applyToLocations()`-Logik ist vollständig und korrekt — `MapView.applyFilter()` muss sie nur noch anwenden. Phase 2 kann dafür auf denselben Code zugreifen, ohne ihn zu duplizieren: `MapView.applyFilter()` kann die Location-Attribute direkt prüfen (Referenz auf `Filter.applyToLocations()` als Template). Das minimiert das Regressions-Risiko und macht jeden Schritt einzeln testbar. Option B verlockt zu vorzeitiger Abstraktion an einer Stelle, die stabilen Code hat.
+
+---
+
+### Kriterien-Übersicht: Was wirkt wo?
+
+| Kriterium | Drei-Zustände heute? | Feed/Kalender | Scout | Locations-Tab | Karte (Ist) | Karte (Soll) |
+|-----------|---------------------|---------------|-------|---------------|-------------|--------------|
+| Eventtyp | ✅ ja | ✅ | ✅ (Mapping) | ⬜ ausgr. | ✅ (nur Incl.) | ✅ Incl. + Excl. |
+| Tageszeit | ✅ ja | ✅ | ✅ | ⬜ ausgr. | ❌ nein | ⬜ ausgr. |
+| Schwierigkeit | ✅ ja | ✅ | ❌ ausgr. | ✅ | ❌ nein | ✅ Incl. + Excl. |
+| Kategorie | ✅ ja | ✅ | ❌ ausgr. | ✅ | ❌ nein | ✅ Incl. + Excl. |
+| Verifikation | ❌ nur Auswahl | ✅ | ❌ ausgr. | ✅ | ❌ nein | ✅ + Excl. neu |
+| Mindest-Bewertung | ❌ Slider | ✅ | ❌ ausgr. | ✅ | ❌ nein | ✅ |
+| Mindest-Score | ❌ Slider | ✅ | ✅ | ✅ (via Feed) | ⬜ ausgr. | ⬜ bleibt ausgr. |
+| Brennweite | ❌ Dual-Slider | ✅ | ✅ | ❌ ausgr. | ❌ ausgr.* | ⬜ ausgr. + Hinweis |
+| Entfernung/GPS | ❌ Auswahl | ✅ | ✅ | ❌ (kein GPS-Check) | ❌ nein | ✅ |
+
+*Brennweite auf Karte: aktuell nicht explizit ausgegraut, aber faktisch ohne Effekt.
+
+---
+
+### Offene Fragen / Assumptions
+
+**F1 — Verifikations-Exclude: Welche Semantik soll „Geprüfte ausblenden" haben?**
+Annahme: Exclude von „Geprüfte" = zeige nur nicht-geprüfte UND problematische Locations (alle außer `status === 'ok'`). Alternative: zeige nur nicht-geprüfte (ohne Probleme). → Bitte Stephan entscheiden vor Impl.
+
+**F2 — Karten-Filter für Tageszeit: sinnvoll oder ausgegraut?**
+Annahme: Tageszeit ist ein Chancen-Kriterium (an shoot_time geknüpft), nicht direkt an Locations. Die Karte zeigt Locations, keine Chancen → Tageszeit auf Karte ausgr. (wie Score). Alternativ: Karte filtert Locations, die im Feed Chancen der gewählten Tageszeit haben. Das wäre möglich, erhöht aber Komplexität. → Empfehlung: ausgegraut lassen.
+
+**F3 — Mindest-Bewertung: Soll die Karte nach Bewertung filtern?**
+Annahme: Ja — Bewertungen sind an Locations geknüpft (`Rating.get(loc.id)`), nicht an Chancen. Der Code dafür existiert in `applyToLocations()`. Die Karte kann ihn direkt nutzen. → Im Soll als ✅ markiert.
+
+**F4 — Drei-Zustände für „Mindest-Bewertung" und „Entfernung": nötig?**
+Annahme: Nein. „Mindest-Bewertung" ist per Definition ein Min-Wert (kein sinnvoller Ausschluss-Zyklus — „zeige nur Locations mit weniger als 3 Sternen" ist ein Randf­all). „Entfernung" ist eine Obergrenze, kein Ausschluss. → Beide bleiben einfache Auswahl-Filter ohne Drei-Zustände.
+
+---
+
+**Analyse:** ✅ fertig 2026-06-28
+**Wartet auf:** Freigabe der offenen Fragen F1 + F2 durch Stephan vor Implementierungsstart
+
+---
+
+### US-105 · Chancen-Detail: Sektionsreihenfolge optimieren (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Die Sektionsreihenfolge im Chancen-Detail-Sheet soll thematisch optimiert werden: BESCHREIBUNG kommt als erstes (Kontext zuerst), WETTER direkt nach IDEALES ZEITFENSTER (zeitlich zusammengehörig), KOMPOSITIONS-ANALYSE direkt nach KARTE & BLICKWINKEL (räumlich/visuell zusammengehörig).
@@ -1388,7 +1578,7 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 10. STANDORT & TOPOGRAPHIE
 11. HIMMELSKÖRPER-BAHNEN
 
-**Bezug:** Folgt auf US-96 (hat die aktuelle Reihenfolge eingeführt). Berührt dieselbe Datei (`web/index.html`, `Detail.open()`). BUG-45 muss vor diesem Ticket released sein — BUG-45 existiert jedoch noch nicht im Backlog (höchste BUG-Nr. ist BUG-44); Dependency ist daher aktuell gegenstandslos. Kein Working-Tree-Konflikt vorhanden (letzter Commit auf web/index.html: v1.19.1 US-104).
+**Bezug:** Folgt auf US-96 (hat die aktuelle Reihenfolge eingeführt). Berührt dieselbe Datei (`web/index.html`, `Detail.open()`). Keine Blocking-Dependency mehr (BUG-45 gelöscht). Kein Working-Tree-Konflikt vorhanden (letzter Commit auf web/index.html: v1.19.1 US-104).
 
 **Akzeptanzkriterien:**
 - [ ] Öffne im Browser ein beliebiges Feed-Chance-Detail → die erste sichtbare Sektion ist „BESCHREIBUNG" (der erklärende Text zur Fotoopportunity)
@@ -1569,18 +1759,18 @@ Die Sektions-Blöcke werden in ein Array von `{id, html}`-Objekten umgebaut und 
 
 ##### Offene Fragen / Assumptions-Protokoll
 
-- **BUG-45:** Im Ticket als Blocking-Dependency genannt, existiert aber nicht im Backlog (höchste BUG-Nr. = BUG-44). Kein Working-Tree-Konflikt vorhanden. → Assumption: Dependency ist gegenstandslos; US-105 kann direkt implementiert werden sobald Ready for Dev.
+- **BUG-45 (gelöscht):** War als Blocking-Dependency genannt; wurde durch BUG-46 (Filter-Inkonsistenz) ersetzt. US-105 hat keine Blocking-Dependency mehr.
 - **BUG-44** (Kalender-Event-Detail fehlende Sektionen): Separat getracktes Ticket. US-105 ändert die Reihenfolge, BUG-44 wird die fehlenden Daten nachliefern. Beide Tickets sind unabhängig umsetzbar — US-105 verschlechtert BUG-44 nicht, verbessert ihn aber auch nicht.
 
 ---
 
-### BUG-44 · Kalender-Event-Detail: Wetter, Kamera-Empfehlung und Kompositions-Analyse fehlen `[ ]`
+### BUG-44 · Kalender-Event-Detail: Wetter, Kamera-Empfehlung und Kompositions-Analyse fehlen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** Wenn man im 365-Tage-Kalender auf ein Event tippt, öffnet sich das Detailsheet — aber die Sektionen Wetter, Kamera-Empfehlungen und Kompositions-Analyse fehlen. Im 14-Tage-Feed sind dieselben Sektionen für dasselbe Event vollständig vorhanden.
@@ -1594,3 +1784,178 @@ Die Sektions-Blöcke werden in ein Array von `{id, html}`-Objekten umgebaut und 
 **Bezug:** Folgeticket von US-96 (einheitliche Detailansicht). Die Reihenfolge der Sektionen ist durch US-96 garantiert; dieses Ticket stellt sicher, dass auch die Inhalte vollständig sind.
 
 **Abgrenzung:** Kein Umbau von `Detail.open()` selbst; reine Lookup-Logik im Kalender-Tab-Handler. Events außerhalb des Feed-Zeitfensters sind bewusst ausgenommen.
+
+---
+
+#### Analyse (BUG-44) — 2026-06-28
+
+##### 📎 Code-Verifikation
+
+Gelesen: `backend/precompute.py` (Z. 378–462), `backend/main.py` (Z. 347–427), `web/index.html` (Z. 3160–3393)
+
+**Bestätigt:**
+- Kalender-Events und Feed-Events durchlaufen identisch `_serialize()` → beide haben `camera_hints` und `composition_analysis`.
+- `astronomy_only=True` betrifft nur den Wetter-Score-Berechnungsweg — kein Einfluss auf `camera_hints` oder `composition_analysis`.
+- Das Wetter-Overlay (`_weather_overlay()` in `main.py`) befüllt **ausschließlich** `_feed_cache`, nie `_calendar_cache`. Kalender-Events erhalten daher: `weather_score: 0.0`, `weather_description: ""`, und **kein `weather_details`-Objekt** (das Dict existiert im Kalender-Event schlicht nicht).
+- Im Detail-Sheet rendert die Wetter-Sektion bei `!o.weather_details` → Platzhalter "Verfügbar ab T-3 Tage" — auch wenn das Event morgen stattfindet und echte Wetterdaten vorliegen.
+- `camera_hints` Guard: `${hints ? mkSec(...) : ''}` — rendert wenn `camera_hints` befüllt. `composition_analysis` Guard: `if (!ca) return ''` — rendert wenn vorhanden. Beide Felder sind in Kalender-Events vorhanden.
+
+**Widerlegt:**
+- Ticket-Beschreibung: "ohne Wetter- und Kompositionsfelder" ist zu weit gefasst. Tatsächlich fehlt **nur `weather_details`** (das Wetter-Detailobjekt). Kamera-Empfehlungen und Kompositions-Analyse sind in `calendar.json` vorhanden — aber ggf. durch den Dedup-Mechanismus im Feed-Cache angereichert oder durch unterschiedliche Min-Score-Schwellen (Feed: 0.30–0.35, Kalender: 0.40) leicht unterschiedlich befüllt.
+
+**Ursache-Präzisierung:** Das Problem ist ausschließlich das fehlende `weather_details`-Objekt. Kamera und Komposition sind da, aber der Nutzer sieht ggf. leere Kamera-Sektion wenn für einen bestimmten Event-Typ keine `camera_hints` berechnet werden — das wäre ein separates Problem.
+
+---
+
+##### Example Mapping
+
+**📏 Rule 1 — Feed-Lookup bei Kalender-Events im 14-Tage-Fenster:**
+Tippt der Nutzer im Kalender auf ein Event, das innerhalb der nächsten 14 Tage liegt, wird zunächst im Feed-Cache nachgeschlagen (Schlüssel: `location_id` + `shoot_time`). Wird ein Treffer gefunden, öffnet das Detailsheet mit dem enriched Feed-Event — inklusive Wetter.
+
+🟢 Beispiel: Heute ist 28. Juni. Kalender zeigt ein Goldene-Stunde-Event am 30. Juni um 20:45 an Standort X. Im Feed existiert dasselbe Event. → Detailsheet zeigt Temperatur, Wolkendecke, Regenwahrscheinlichkeit.
+
+🔴 Gegenbeispiel: Kalender zeigt Event am 15. August — liegt außerhalb T+14. → Detailsheet öffnet mit Kalender-Event, Wetter-Sektion zeigt "Verfügbar ab T-3 Tage" (korrekt).
+
+**📏 Rule 2 — Kein Match im Feed = Kalender-Event als Fallback:**
+Liegt das Event im 14-Tage-Fenster, aber kein passender Feed-Eintrag existiert (z.B. Score < Feed-Min-Score, Event durch Dedup entfernt), öffnet das Detailsheet trotzdem — mit dem Kalender-Event-Objekt. Kein Fehler, kein leerer Sheet.
+
+🟢 Beispiel: Kalender-Event Score 0.41 (über Kalender-Schwelle 0.40), aber Feed-Schwelle 0.35 hat dieses Event durch Dedup wegoptimiert. → Detailsheet öffnet mit Kalender-Daten, Wetter-Sektion zeigt Platzhalter.
+
+**📏 Rule 3 — Match-Schlüssel: location_id + shoot_time (exakt):**
+Der Lookup verwendet `location_id` und `shoot_time` als kombinierten Schlüssel. Der Zeitstempel muss exakt übereinstimmen (beide aus `_serialize()` → ISO-Format).
+
+🟢 Beispiel: Kalender-Event `{location_id: "alexanderplatz", shoot_time: "2026-06-30T18:45:00+00:00"}` findet Feed-Event mit identischen Feldern. → Match.
+
+🔴 Edge Case: Minimal-Zeitabweichung durch Dedup (gleicher Tag, ähnliche Zeit, anderer Sekundenbruchteil) → kein Match. Kalender-Fallback greift.
+
+**⚠️ Annahme: shoot_time-Format ist in beiden Quellen identisch** (beide via `_serialize()` → `.isoformat()`). Bestätigt durch Code-Verifikation.
+
+**⚠️ Annahme: Feed.data ist beim Öffnen eines Kalender-Events garantiert geladen.** Der Feed lädt beim App-Start. Wenn Nutzer direkt zum Kalender-Tab navigiert (ohne je den Feed-Tab zu besuchen), könnte `Feed.data` leer sein. → Als Pre-Mortem-Szenario aufgenommen, Guard nötig.
+
+---
+
+##### Akzeptanzkriterien
+
+- [ ] **AK-1 (Wetter sichtbar):** Wenn ich im Kalender auf ein Event tippe, das heute oder in den nächsten 13 Tagen liegt, zeigt das Detailsheet die vollständige Wettersektion: Temperatur, Wolkendecke, Regenwahrscheinlichkeit, Windstärke und Sichtweite — genau wie im Feed-Tab für dasselbe Event.
+- [ ] **AK-2 (Wetter-Score sichtbar):** Der Wetter-Score im Dreierblock (Gesamt / Astronomie / Wetter) oben im Sheet ist nicht "–", sondern zeigt einen konkreten Prozentwert — identisch mit dem Feed-Detailsheet.
+- [ ] **AK-3 (Kein Unterschied zum Feed):** Wenn ich dasselbe Event im Feed und im Kalender antippe (beide innerhalb 14 Tage), sind Inhalt, Reihenfolge und Optik der Sektionen identisch.
+- [ ] **AK-4 (Außerhalb 14 Tage bleibt unverändert):** Ein Event, das in 15 Tagen oder später liegt, zeigt im Kalender-Detail "Wird 3 Tage vorher berechnet" in der Wettersektion. Keine Verschlechterung des heutigen Verhaltens.
+- [ ] **AK-5 (Kein Match = Fallback):** Wenn ein Event zwar innerhalb 14 Tage liegt, aber kein passender Feed-Eintrag existiert, öffnet das Sheet trotzdem mit den Kalender-Daten. Kein leerer Sheet, kein JavaScript-Fehler.
+- [ ] **AK-6 (Feed leer = Fallback):** Wenn `Feed.data` beim Antippen noch nicht geladen ist (z.B. wegen Netzwerkproblem), öffnet das Sheet trotzdem mit dem Kalender-Event. Kein Absturz.
+- [ ] **AK-7 (Kamera-Empfehlungen sichtbar):** Tippt man ein Mond-Alignment oder Golden-Hour-Event im Kalender an (innerhalb 14 Tage), ist die Kamera-Empfehlungs-Sektion im Sheet vorhanden — identisch mit dem Feed.
+- [ ] **Edge Case AK-8 (Tagesgrenze):** Ein Event exakt heute (shoot_time = jetzt oder in den nächsten Stunden) findet einen Feed-Match und zeigt vollständige Wetterdaten.
+
+---
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Feed.data ist beim Öffnen eines Kalender-Events noch nicht geladen**
+- Auslöser: Nutzer öffnet App und navigiert sofort zum Kalender-Tab, bevor der Feed geladen ist (`Feed.data` ist `null` oder leeres Array).
+- Frühwarnung: `Feed.data?.find(...)` würde `undefined` zurückgeben, nicht null — kein expliziter Fehler, aber immer Kalender-Fallback.
+- Gegenmaßnahme: Guard `if (!Feed.data || !Feed.data.length)` vor dem Lookup → direkt Kalender-Event übergeben. In AK-6 verankert.
+
+💀 **Szenario 2: shoot_time-Schlüssel stimmt nicht exakt überein**
+- Auslöser: Kalender und Feed berechnen shoot_time leicht unterschiedlich (z.B. Sekunden-Rundung, Timezone-Suffix unterschiedlich `+00:00` vs `Z`).
+- Frühwarnung: Kein Match obwohl Event sichtbar im Feed.
+- Gegenmaßnahme: shoot_time-Vergleich auf Minuten-Niveau begrenzen (ersten 16 Zeichen: `"2026-06-30T18:45"`). Code-Verifikation zeigt: beide `_serialize()` via `.isoformat()` → identisches Format. Risiko niedrig, aber minutengenaue Vergleich macht Lookup robuster.
+
+💀 **Szenario 3: Dedup oder Score-Schwelle entfernt Event aus Feed**
+- Auslöser: Kalender-Event (min_score 0.40) hat kein Pendant im Feed, weil der Dedup-Mechanismus den Eintrag wegoptimiert hat oder der Score knapp unter Feed-Min-Score (0.35) liegt.
+- Frühwarnung: In AK-5 bereits als gültiger Fallback beschrieben.
+- Gegenmaßnahme: Fallback auf Kalender-Event, kein Fehler. Guard implementiert.
+
+💀 **Szenario 4: Scope Creep — Kamera/Komposition werden "gefixt" obwohl nicht kaputt**
+- Auslöser: Implementierung versucht auch camera_hints / composition_analysis zu "reparieren", obwohl sie im Kalender-Event bereits vorhanden sind.
+- Frühwarnung: Unnötige Komplexität, potentielle Regression.
+- Gegenmaßnahme: Klar im Scope halten — Impl. nur den Feed-Lookup für `weather_details`. Code-Verifikation bestätigt: camera_hints und composition_analysis brauchen keinen Fix.
+
+💀 **Szenario 5: Regression im Feed-Tab oder Scout-Tab**
+- Auslöser: Änderung am CalendarView-onclick-Handler beeinflusst versehentlich andere `Detail.open()`-Aufrufe.
+- Frühwarnung: Nach Impl. Feed-Tab und Scout-Tab testen.
+- Gegenmaßnahme: Änderung ist lokal im `onclick`-Template in `CalendarView.render()` (Z. 1928). Kein Einfluss auf andere Entry-Points. Regression-Check im Testplan.
+
+---
+
+##### Implementierungsoptionen
+
+**Was bedeutet das für das App-Erlebnis:**
+
+**Option A — Feed-Lookup im onclick-Aufruf (im CalendarView-Render):**
+Beim Tippen auf ein Kalender-Event wird kurz im geladenen Feed nachgeschaut, ob es einen Eintrag mit gleicher Location und Uhrzeit gibt. Wenn ja, öffnet das Sheet mit den vollständigen Feed-Daten (inkl. Wetter). Wenn nein, öffnet es mit dem Kalender-Event wie bisher. Der Nutzer merkt nichts vom Lookup — das Sheet öffnet sich genau gleich schnell, aber mit Wetter-Infos.
+
+**Option B — Eigener API-Aufruf beim Öffnen:**
+Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportunities?location_id=...` gesendet, um den enriched Event live abzuholen. Das Sheet öffnet sich kurz leer/mit Ladeindikator, dann erscheinen die Daten. Das ist für den Nutzer spürbar langsamer und erfordert eine Netzwerkverbindung beim Tippen.
+
+---
+
+### Option A — Feed-Lookup im Frontend (empfohlen)
+
+- **Vorgehen:** Im `onclick`-Template in `CalendarView.render()` (Z. 1928): vor `Detail.open(e)` aus `Feed.data` einen Match suchen (Schlüssel: `location_id` + erster 16-Zeichen-Block von `shoot_time`). Wenn Match → `Detail.open(match)`, sonst `Detail.open(e)`.
+- **Betroffene Dateien:** `web/index.html` (eine Stelle: Z. ~1928, CalendarView-Render)
+- **Vorteile:** Zero-Latenz (Feed ist bereits im Memory), keine neue Abhängigkeit, kein API-Call, kein Loading-State. Fallback ist eingebaut. Minimal invasiv.
+- **Nachteile:** `Feed.data` muss geladen sein — Guard nötig (bereits in AK-6).
+- **Aufwand:** Klein (~5 Zeilen JS)
+
+### Option B — API-Lookup beim Öffnen
+
+- **Vorgehen:** `Detail.open()` erweitern: bei Kalender-Events (erkennbar an fehlendem `weather_details`) live-Request an `/opportunities?location_id=X&event_type=Y` — dann den passenden Event finden.
+- **Betroffene Dateien:** `web/index.html` (Detail-Objekt, Detail.open())
+- **Vorteile:** Immer aktuellste Wetterdaten.
+- **Nachteile:** Umbau von `Detail.open()` (explizit im Ticket ausgeschlossen), Netzwerkabhängigkeit, Loading-State, höhere Komplexität.
+- **Aufwand:** Groß
+
+✅ **Empfehlung: Option A** — Feed-Lookup im CalendarView-onclick. Minimal invasiv, zero Latenz, Fallback eingebaut, und entspricht genau der Lösungsidee im Ticket. Option B scheidet aus weil sie `Detail.open()` umbaut (explizit ausgeschlossen) und Netzwerk-Abhängigkeit beim Tippen einführt.
+
+---
+
+##### Scope
+
+**Eingeschlossen:**
+- Kalender-Events, die innerhalb T+0 bis T+13 (14-Tage-Fenster) liegen: Feed-Lookup + Detailsheet mit Wetter
+- Fallback auf Kalender-Event wenn kein Match im Feed
+
+**Ausgeschlossen:**
+- Events außerhalb T+14 (kein Wetter verfügbar — intentional)
+- Umbau von `Detail.open()` selbst
+- Reparatur von camera_hints / composition_analysis (nicht kaputt)
+- Neue API-Endpoints
+
+---
+
+##### Testplan
+
+**Automatisiert (pytest):** Kein Backend-Change → kein pytest nötig. Der Fix ist rein Frontend-JS.
+
+**Manuell:** Lokal testen unter http://localhost:8000
+
+1. **Kalender-Event im 14-Tage-Fenster:**
+   - Kalender-Tab öffnen → heutigen Monat anzeigen → Event für die nächsten 14 Tage antippen
+   - Erwartet: Detailsheet zeigt Wetter-Sektion mit konkreten Werten (Temperatur, Wolken, Regen)
+   - Verifikation AK-1 + AK-2
+
+2. **Kalender-Event außerhalb 14 Tage:**
+   - Kalender-Tab → zum übernächsten Monat navigieren → Event antippen
+   - Erwartet: Wetter-Sektion zeigt "Wird 3 Tage vorher berechnet"
+   - Verifikation AK-4
+
+3. **Vergleich Feed vs. Kalender (dasselbe Event):**
+   - Feed-Tab → Event innerhalb 14 Tage öffnen → Screenshot/Notiz aller Sektionen
+   - Kalender-Tab → dasselbe Event antippen → Vergleich
+   - Erwartet: identische Sektionen, identische Werte
+   - Verifikation AK-3
+
+4. **Regression Feed-Tab:** Feed-Event antippen → Detailsheet vollständig wie bisher.
+5. **Regression Scout-Tab:** Scout-Event antippen → Detailsheet vollständig wie bisher.
+
+---
+
+##### Analyse & Planung
+
+- [x] Code-Verifikation: `precompute.py` (Z. 378–462), `main.py` (Z. 347–427), `web/index.html` (Z. 1928, 3160–3393)
+- [x] Datenstruktur-Diff: Kalender-Events fehlt `weather_details` (Objekt), Feed-Events haben es
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: nur `web/index.html` Z. ~1928 betroffen
+- [ ] Implementierungsoptionen: A (empfohlen) / B
+- [ ] Weg-Gate: Warten auf Stephans Freigabe
+

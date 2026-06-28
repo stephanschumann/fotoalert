@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.19.2';
+const APP_VERSION = '1.19.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1362,9 +1362,9 @@ function bearingLabel(spLat, spLon, subLat, subLon) {
 // ═══════════════════════════════════════════════════════
 function oppCard(o) {
   const icon = eventIcon(o.event_type, 15, 'ct');
-  const weatherTag = o.weather_score === 0
-    ? `<span class="tag tag-weather-unknown">Wetter unbekannt</span>`
-    : `<span class="tag tag-blue">${ic('i-cloud',12)} ${pct(o.weather_score)}</span>`;
+  const weatherTag = o.weather_score > 0
+    ? `<span class="tag tag-blue">${ic('i-cloud',12)} ${pct(o.weather_score)}</span>`
+    : '';
   const prio = o.alert_priority >= 2
     ? `<span class="tag tag-gold">${ic('i-star',12)} ${o.alert_priority >= 3 ? 'Außergewöhnlich' : 'Besonders'}</span>` : '';
   const stativ = o.camera_hints?.[0]?.tripod_required
@@ -1925,7 +1925,7 @@ const CalendarView = {
           const mm = String(t.getUTCMinutes()).padStart(2,'0');
           const prio = e.alert_priority >= 2 ? ` ${ic('i-star',12)}` : '';
           const moonTxt = e.moon_phase ? ` · ${e.moon_phase}` : '';
-          html += `<div class="cal-event" onclick="Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')})">
+          html += `<div class="cal-event" onclick="CalendarView.openDetail(${JSON.stringify(e).replace(/"/g,'&quot;')})">
             <div class="cal-event-icon">${icon}</div>
             <div class="cal-event-body">
               <div class="cal-event-title">${e.title}${prio}</div>
@@ -1938,6 +1938,19 @@ const CalendarView = {
     }
 
     el.innerHTML = html;
+  },
+
+  // BUG-44: Kalender-Tap → Feed-Lookup für weather_details
+  // Wenn das angeklickte Event im Feed-Datensatz (±1h, gleiche location_id) liegt,
+  // das vollständige Feed-Objekt (mit weather_details) übergeben.
+  openDetail(calEvent) {
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+    const calTime = new Date(calEvent.shoot_time).getTime();
+    const feedMatch = (Feed.data || []).find(function(f) {
+      return f.location_id === calEvent.location_id &&
+        Math.abs(new Date(f.shoot_time).getTime() - calTime) <= ONE_HOUR_MS;
+    });
+    Detail.open(feedMatch || calEvent);
   },
 };
 
