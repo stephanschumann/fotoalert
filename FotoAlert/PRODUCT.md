@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-28 · Basis: abgeschlossene Tickets bis US-79, US-102, US-100, US-96, BUG-42
+> Zuletzt aktualisiert: 2026-06-28 · Basis: abgeschlossene Tickets bis US-79, US-102, US-100, US-96, BUG-42, BUG-47
 
 ---
 
@@ -280,11 +280,14 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Backend-URL | Änderbar; wird in localStorage gespeichert |
 | „Jetzt aktualisieren" | POST `/refresh`; Toast „✅ Daten aktualisiert" nach ~3s |
 | Impressum | Öffnet Impressum-Sheet |
+| Rollen-Anzeige | Zeigt „Host" oder „User" — Rolle wird aus dem Token-Präfix abgeleitet (`CFG.role` als Getter aus `fa_token`), nicht aus `fa_role` in localStorage; robust gegen Safari ITP / Storage-Bereinigung (BUG-47) |
 
 **Pflicht-Regression Einstellungen:**
 - [ ] Slider auf 80% → Feed-Reload → weniger Karten
 - [ ] Theme-Umschalter ändert sofort das Erscheinungsbild
 - [ ] Theme-Auswahl überlebt App-Reload
+- [ ] Nach Host-Login sofort „Host" sichtbar (kein Browser-Refresh nötig) (BUG-47)
+- [ ] Nach Logout und erneutem Login als User → „User" sichtbar
 
 ---
 
@@ -297,10 +300,13 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | User-Login | Lesen + eigene Custom-Locations |
 | Session | JWT-Token; überlebt App-Reload |
 | Logout | Manuell in Einstellungen |
+| Rollen-Ableitung | `CFG.role` wird als Getter aus dem Token-Präfix (`fa_token`) gelesen — kein Fallback auf `fa_role` localStorage-Key; nach Login `App.init()` + `App.nav('feed')` sorgen für korrektes Re-Render des Settings-Tabs (BUG-47) |
 
 **Pflicht-Regression Auth:**
 - [ ] Nicht-eingeloggter Zugriff → Login-Screen erscheint
-- [ ] Login als Host → alle Tabs erreichbar
+- [ ] Login als Host → alle Tabs erreichbar, Einstellungen zeigen sofort „Host"
+- [ ] Login als User → Einstellungen zeigen „User"
+- [ ] App-Reload nach Host-Login → Einstellungen zeigen weiterhin „Host" (Token-Präfix-Auswertung)
 - [ ] Geschützte Endpoints ohne Token → HTTP 401
 
 ---
@@ -384,3 +390,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | BUG-44 | Kalender-Events im 14-Tage-Fenster zeigen vollständiges Detailsheet inkl. Wetter; „Wetter unbekannt"-Badge entfernt |
 | 2026-06-28 | BUG-46 | Filter: Drei-Zustände für Verifikation + Bewertung; Karte an alle Location-Filter angebunden; ansichtsabhängiges Ausgrauen irrelevanter Kriterien |
 | 2026-06-28 | US-79 | Mondaufgang + Monduntergang als eigenständige Event-Typen (`"Mondaufgang"`, `"Monduntergang"`) im Feed, Kalender, Filter und Location-Detail (Nächste Chancen); vier neue API-Felder in `_serialize()`: `moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`; Event-Detail Astronomie-Sektion zeigt Uhrzeit + Azimut; `/refresh-feed` nach Release ausführen |
+| 2026-06-28 | BUG-47 | Einstellungsseite zeigt korrekte Rolle nach Host-Login: `CFG.role` als Getter aus Token-Präfix (robust gegen Safari ITP); nach Login `App.init()` + `App.nav('feed')` für sofortiges UI-Update ohne Browser-Refresh |

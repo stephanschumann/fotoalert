@@ -28,8 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **BUG-47** |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-46** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-47** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
@@ -1636,14 +1637,15 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 - [x] **BUG-03** Scheinbare Größe des Himmelsobjekts zu groß – `get_moon_earth_distance_km()` via Skyfield de421.bsp für tatsächliche Mond–Erde-Distanz zum Shoot-Zeitpunkt. Formel korrigiert: `angular_diameter_rad = MOON_DIAMETER_KM / moon_earth_distance_km`. Distanz im Detail-Sheet als Fußnote. `ALGORITHM_VERSION = "1.1"`. v1.3.4.
 - [x] **US-96** Einheitliche Chancen-Detailansicht – neue Sektionsreihenfolge, alle Sektionen beim Öffnen zugeklappt, Live-Astro mit Shoot-Datum. v1.17.0.
 
-### BUG-47 · Einstellungsseite zeigt falsche Rolle nach Host-Login `[~]`
+### BUG-47 · Einstellungsseite zeigt falsche Rolle nach Host-Login `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Nach der Anmeldung mit dem Host-Passwort zeigt die Einstellungsseite „User" statt „Host" an. Die Rolle wird also nach erfolgreichem Login falsch dargestellt — obwohl der Login selbst funktioniert und host-spezifische Rechte greife, stimmt die angezeigte Rollenbezeichnung nicht mit dem tatsächlichen Token überein.
 
