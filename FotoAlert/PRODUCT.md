@@ -69,18 +69,18 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 
 Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Events (US-96).
 
-**Sektions-Reihenfolge (fest, alle beim Öffnen eingeklappt):**
-1. Titel / Score
-2. Uhrzeit (3 Spalten: Start / Optimal / Ende)
-3. FOV-Karte (Leaflet, zeigt Fotograf + Motiv + Richtungsstrahl)
-4. Koordinaten (mit Street-View-Button nur wenn Azimut vorhanden — BUG-41)
-5. Himmelsposition (Azimut + Höhe relativ zur Motivspitze — US-67)
-6. Wetter
-7. Himmelskörper-Bahnen (AstroLive, US-64 — eingeklappte inline-Sektion)
-8. Kamera-Tipps (Brennweite, Blende, Belichtungszeit)
+**Sektions-Reihenfolge (fest, alle beim Öffnen eingeklappt — US-105):**
+1. Beschreibung (Kontext zuerst)
+2. Ideales Zeitfenster
+3. Wetter zum Shoot-Zeitpunkt (zeitlich zusammengehörig mit Zeitfenster)
+4. Karte & Blickwinkel (FOV-Karte, Leaflet)
+5. Kompositions-Analyse (räumlich zusammengehörig mit Karte; entfällt bei Scout/Kalender)
+6. Koordinaten (mit Street-View-Button nur wenn Azimut vorhanden — BUG-41)
+7. Himmelsposition (Azimut + Höhe relativ zur Motivspitze — US-67)
+8. Kamera-Empfehlungen (Brennweite, Blende, Belichtungszeit)
 9. Astronomie (Erweitert)
-10. Topographie
-11. Komposition
+10. Standort & Topographie
+11. Himmelskörper-Bahnen (AstroLive, US-64 — eingeklappte inline-Sektion)
 12. Aktions-Buttons: „Zum Kalender", „Erinnerung setzen", „Erneut prüfen"
 
 | Funktion | Verhalten |
@@ -289,6 +289,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | — | US-97 | Automatischer Tag/Nacht-Modus + manueller Umschalter |
 | — | US-99 | Bauhaus-Theme-Tokens (hell + dunkel) |
 | — | US-88 | Brennweiten-Filter nicht-linear |
+| 2026-06-28 | US-105 | Chancen-Detail: Sektionsreihenfolge optimiert (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) |
 | 2026-06-28 | US-104 | Scout-Karten auf Feed-Design umgestellt (ScoreRing, Himmelsrichtung, Tag-Chips) |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |
 | — | US-66 | Login + Auth (Host/User) |

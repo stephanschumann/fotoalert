@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.19.1';
+const APP_VERSION = '1.19.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3211,11 +3211,96 @@ const Detail = {
           <div id="score-info-body"></div>
         </div>
       </div>
+      ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
       ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${(() => {
+        const wd = o.weather_details;
+        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
+        const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
+        const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
+        const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
+          : wd.wind_speed_kmh < 20 ? 3 : wd.wind_speed_kmh < 29 ? 4 : wd.wind_speed_kmh < 39 ? 5
+          : wd.wind_speed_kmh < 50 ? 6 : wd.wind_speed_kmh < 62 ? 7 : 8;
+        const cloudLabel = wd.cloud_cover_pct < 20 ? 'Klar' : wd.cloud_cover_pct < 50 ? 'Leicht bewölkt'
+          : wd.cloud_cover_pct < 80 ? 'Bewölkt' : 'Bedeckt';
+        const cloudColor = wd.cloud_cover_pct < 50 ? 'var(--green)' : wd.cloud_cover_pct < 80 ? 'var(--orange)' : 'var(--red)';
+        const rainColor = wd.precipitation_prob_pct < 20 ? 'var(--green)' : wd.precipitation_prob_pct < 50 ? 'var(--orange)' : 'var(--red)';
+        const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label" style="display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
+        const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
+        const wScore = wLabel;
+        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
+      })()}
       ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
           distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
         return mkSec('ev_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('ev'));
+      })()}
+      ${(() => {
+        const ca = o.composition_analysis;
+        if (!ca) return '';
+        // BUG-43: altitude_delta_deg kann null sein (keine Motivhöhe) — Guards nötig
+        const hasHeight = ca.subject_height_m != null;
+        const deltaSign = (ca.altitude_delta_deg || 0) > 0 ? '+' : '';
+        const azSign = ca.azimuth_delta_deg > 0 ? '+' : '';
+        // Hintergrundfarbe des Hauptlabels je nach Qualität (nur wenn Höhe vorhanden)
+        const isExact = hasHeight && Math.abs(ca.altitude_delta_deg) <= 0.5;
+        const isClose = hasHeight && !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
+        const labelBg = isExact ? 'background:rgba(232,160,32,.15);border:1px solid var(--gold);border-radius:8px;padding:8px 12px'
+                      : isClose ? 'background:rgba(100,200,100,.1);border:1px solid var(--green);border-radius:8px;padding:8px 12px'
+                      : 'background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px';
+        const fmtM = v => Math.abs(v) >= 1000 ? (v/1000).toFixed(2)+' km' : Math.abs(v).toFixed(0)+' m';
+        const vOff = ca.vertical_offset_m || 0;
+        const lOff = ca.lateral_offset_m || 0;
+        const vSign = vOff > 0 ? '+' : '';
+        const lDir  = lOff < 0 ? '← links' : lOff > 0 ? '→ rechts' : '';
+        const ratioBar = Math.min(100, Math.round((ca.size_ratio || 0) * 100));
+        // Höhenabhängige Zeilen nur rendern wenn subject_height_m vorhanden (BUG-43)
+        const heightRows = hasHeight ? `
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Höhe</div>
+          <div class="info-row">
+            <span class="ir-label">Motivspitze (scheinb.)</span>
+            <span class="ir-val">${ca.subject_apparent_elevation_deg.toFixed(2)}° Elevation</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Versatz über Motivspitze</span>
+            <span class="ir-val" style="${isExact ? 'color:var(--gold);font-weight:700' : ''}">
+              ${vSign}${fmtM(vOff)} &nbsp;<span style="color:var(--muted);font-size:11px">(${vSign}${ca.altitude_delta_deg.toFixed(2)}°)</span>
+            </span>
+          </div>` : '';
+        const ratioRows = hasHeight ? `
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Größenverhältnis</div>
+          <div class="info-row">
+            <span class="ir-label">${ca.body_name} (scheinb. Ø)</span>
+            <span class="ir-val">${fmtM(ca.body_apparent_diameter_m)}</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Motiv</span>
+            <span class="ir-val">${ca.subject_height_m} m</span>
+          </div>
+          <div class="info-row">
+            <span class="ir-label">Verhältnis</span>
+            <span class="ir-val">${(ca.size_ratio * 100).toFixed(1)} %</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:3px;margin:6px 0 4px">
+            <div style="height:100%;width:${Math.min(100,ratioBar)}%;background:var(--gold);border-radius:3px"></div>
+          </div>
+          <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>` : '';
+        const footNote = hasHeight
+          ? `<p style="font-size:10px;color:var(--muted);margin-top:4px">Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`
+          : `<p style="font-size:10px;color:var(--muted);margin-top:4px">Keine Motivhöhe eingetragen – Höhenversatz nicht berechenbar${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`;
+                return mkSec('ev_kompo',`${ic('i-target',15)} Kompositions-Analyse`,`<div style="${labelBg};margin-bottom:10px">
+            <div style="font-size:14px;font-weight:600">${ca.altitude_label || ca.azimuth_label}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
+          </div>
+          ${heightRows}
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Seite</div>
+          <div class="info-row">
+            <span class="ir-label">Seitlicher Versatz</span>
+            <span class="ir-val">${fmtM(Math.abs(lOff))} ${lDir} &nbsp;<span style="color:var(--muted);font-size:11px">(${azSign}${ca.azimuth_delta_deg.toFixed(1)}°)</span></span>
+          </div>
+          ${ratioRows}
+          ${footNote}
+        </div>`);
       })()}
       ${mkSec('ev_coords',`${ic('i-pin',15)} Koordinaten`,`
         <div class="coords-grid">
@@ -3305,23 +3390,6 @@ const Detail = {
           : '';
         return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
       })()}
-      ${(() => {
-        const wd = o.weather_details;
-        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
-        const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
-        const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
-        const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
-          : wd.wind_speed_kmh < 20 ? 3 : wd.wind_speed_kmh < 29 ? 4 : wd.wind_speed_kmh < 39 ? 5
-          : wd.wind_speed_kmh < 50 ? 6 : wd.wind_speed_kmh < 62 ? 7 : 8;
-        const cloudLabel = wd.cloud_cover_pct < 20 ? 'Klar' : wd.cloud_cover_pct < 50 ? 'Leicht bewölkt'
-          : wd.cloud_cover_pct < 80 ? 'Bewölkt' : 'Bedeckt';
-        const cloudColor = wd.cloud_cover_pct < 50 ? 'var(--green)' : wd.cloud_cover_pct < 80 ? 'var(--orange)' : 'var(--red)';
-        const rainColor = wd.precipitation_prob_pct < 20 ? 'var(--green)' : wd.precipitation_prob_pct < 50 ? 'var(--orange)' : 'var(--red)';
-        const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label" style="display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
-        const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
-        const wScore = wLabel;
-        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
-      })()}
       ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
       ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}
       ${(() => {
@@ -3348,74 +3416,6 @@ const Detail = {
         return mkSec('ev_topo',`${ic('i-ruler',15)} Standort &amp; Topographie`,`${distRow}${elevRow}`);
       })()}
       ${mkSec('ev_astro_live',`${ic('i-milkyway',15)} Himmelskörper-Bahnen`,`<button onclick="${o.location_id ? `AstroLive.openForDate('${o.location_id}','${o.shoot_time}')` : `AstroLive.openForLatLon(${o.observer_lat},${o.observer_lon},'${o.shoot_time}')`}" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button><p style="font-size:11px;color:var(--muted);margin:6px 0 0">Zeigt Sonne, Mond und Milchstraße für den Shoot-Zeitpunkt dieser Chance.</p>`)}
-      ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
-      ${(() => {
-        const ca = o.composition_analysis;
-        if (!ca) return '';
-        // BUG-43: altitude_delta_deg kann null sein (keine Motivhöhe) — Guards nötig
-        const hasHeight = ca.subject_height_m != null;
-        const deltaSign = (ca.altitude_delta_deg || 0) > 0 ? '+' : '';
-        const azSign = ca.azimuth_delta_deg > 0 ? '+' : '';
-        // Hintergrundfarbe des Hauptlabels je nach Qualität (nur wenn Höhe vorhanden)
-        const isExact = hasHeight && Math.abs(ca.altitude_delta_deg) <= 0.5;
-        const isClose = hasHeight && !isExact && ca.altitude_delta_deg > 0 && ca.altitude_delta_deg <= 3;
-        const labelBg = isExact ? 'background:rgba(232,160,32,.15);border:1px solid var(--gold);border-radius:8px;padding:8px 12px'
-                      : isClose ? 'background:rgba(100,200,100,.1);border:1px solid var(--green);border-radius:8px;padding:8px 12px'
-                      : 'background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px';
-        const fmtM = v => Math.abs(v) >= 1000 ? (v/1000).toFixed(2)+' km' : Math.abs(v).toFixed(0)+' m';
-        const vOff = ca.vertical_offset_m || 0;
-        const lOff = ca.lateral_offset_m || 0;
-        const vSign = vOff > 0 ? '+' : '';
-        const lDir  = lOff < 0 ? '← links' : lOff > 0 ? '→ rechts' : '';
-        const ratioBar = Math.min(100, Math.round((ca.size_ratio || 0) * 100));
-        // Höhenabhängige Zeilen nur rendern wenn subject_height_m vorhanden (BUG-43)
-        const heightRows = hasHeight ? `
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Höhe</div>
-          <div class="info-row">
-            <span class="ir-label">Motivspitze (scheinb.)</span>
-            <span class="ir-val">${ca.subject_apparent_elevation_deg.toFixed(2)}° Elevation</span>
-          </div>
-          <div class="info-row">
-            <span class="ir-label">Versatz über Motivspitze</span>
-            <span class="ir-val" style="${isExact ? 'color:var(--gold);font-weight:700' : ''}">
-              ${vSign}${fmtM(vOff)} &nbsp;<span style="color:var(--muted);font-size:11px">(${vSign}${ca.altitude_delta_deg.toFixed(2)}°)</span>
-            </span>
-          </div>` : '';
-        const ratioRows = hasHeight ? `
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Größenverhältnis</div>
-          <div class="info-row">
-            <span class="ir-label">${ca.body_name} (scheinb. Ø)</span>
-            <span class="ir-val">${fmtM(ca.body_apparent_diameter_m)}</span>
-          </div>
-          <div class="info-row">
-            <span class="ir-label">Motiv</span>
-            <span class="ir-val">${ca.subject_height_m} m</span>
-          </div>
-          <div class="info-row">
-            <span class="ir-label">Verhältnis</span>
-            <span class="ir-val">${(ca.size_ratio * 100).toFixed(1)} %</span>
-          </div>
-          <div style="height:6px;background:var(--border);border-radius:3px;margin:6px 0 4px">
-            <div style="height:100%;width:${Math.min(100,ratioBar)}%;background:var(--gold);border-radius:3px"></div>
-          </div>
-          <p style="font-size:11px;color:var(--muted)">${ca.ratio_label}</p>` : '';
-        const footNote = hasHeight
-          ? `<p style="font-size:10px;color:var(--muted);margin-top:4px">Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`
-          : `<p style="font-size:10px;color:var(--muted);margin-top:4px">Keine Motivhöhe eingetragen – Höhenversatz nicht berechenbar${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`;
-                return mkSec('ev_kompo',`${ic('i-target',15)} Kompositions-Analyse`,`<div style="${labelBg};margin-bottom:10px">
-            <div style="font-size:14px;font-weight:600">${ca.altitude_label || ca.azimuth_label}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
-          </div>
-          ${heightRows}
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px">Seite</div>
-          <div class="info-row">
-            <span class="ir-label">Seitlicher Versatz</span>
-            <span class="ir-val">${fmtM(Math.abs(lOff))} ${lDir} &nbsp;<span style="color:var(--muted);font-size:11px">(${azSign}${ca.azimuth_delta_deg.toFixed(1)}°)</span></span>
-          </div>
-          ${ratioRows}
-          ${footNote}
-        </div>`);
-      })()}
       <div class="sheet-actions">
         ${o._isScout
           ? `<button class="btn-primary" onclick="Scout._saveFromDetail()" style="background:var(--accent);color:var(--on-accent,#000);border:none">${ic('i-pin',15)} Als Location speichern</button>`

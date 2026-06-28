@@ -29,10 +29,10 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-105 |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **BUG-44** · **US-104** · **US-105** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, US-95, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **US-98 (Epic)** · **US-103** · **TASK-49** · **BUG-44** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -80,14 +80,15 @@
 
 ---
 
-### US-104 · Scout-Karten: einheitliches Design wie 14-Tage-Feed-Karten `[ ]`
+### US-104 · Scout-Karten: einheitliches Design wie 14-Tage-Feed-Karten `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
+| **Abgeschlossen** | 2026-06-28 |
 
 **Beschreibung:** Die Scout-Karten sollen visuell identisch mit den Feed-Karten (14-Tage-Ansicht) aussehen — gleicher Aufbau mit Score-Ring, Event-Typ-Icon, Uhrzeit, Titel, Location-Zeile und Tag-Chips. Aktuell haben Scout-Karten ein abweichendes Layout (flache Info-Chips, blauer Score-Badge, zwei große Buttons). Das schafft Inkonsistenz innerhalb der App. Die „Standort"- und „Navigation"-Buttons bleiben erhalten, werden aber stilistisch angeglichen.
 
@@ -1363,13 +1364,13 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 
 ---
 
-### US-105 · Chancen-Detail: Sektionsreihenfolge optimieren (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) `[ ]`
+### US-105 · Chancen-Detail: Sektionsreihenfolge optimieren (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Die Sektionsreihenfolge im Chancen-Detail-Sheet soll thematisch optimiert werden: BESCHREIBUNG kommt als erstes (Kontext zuerst), WETTER direkt nach IDEALES ZEITFENSTER (zeitlich zusammengehörig), KOMPOSITIONS-ANALYSE direkt nach KARTE & BLICKWINKEL (räumlich/visuell zusammengehörig).
@@ -1387,7 +1388,189 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 10. STANDORT & TOPOGRAPHIE
 11. HIMMELSKÖRPER-BAHNEN
 
-**Bezug:** Folgt auf US-96 (hat die aktuelle Reihenfolge eingeführt). Berührt dieselbe Datei (`web/index.html`, `Detail.open()`). BUG-45 muss vor diesem Ticket released sein (gleiche Datei im Working Tree).
+**Bezug:** Folgt auf US-96 (hat die aktuelle Reihenfolge eingeführt). Berührt dieselbe Datei (`web/index.html`, `Detail.open()`). BUG-45 muss vor diesem Ticket released sein — BUG-45 existiert jedoch noch nicht im Backlog (höchste BUG-Nr. ist BUG-44); Dependency ist daher aktuell gegenstandslos. Kein Working-Tree-Konflikt vorhanden (letzter Commit auf web/index.html: v1.19.1 US-104).
+
+**Akzeptanzkriterien:**
+- [ ] Öffne im Browser ein beliebiges Feed-Chance-Detail → die erste sichtbare Sektion ist „BESCHREIBUNG" (der erklärende Text zur Fotoopportunity)
+- [ ] Direkt unter dem Zeitfenster erscheinen sofort die Wetterdaten — nicht erst nach Himmelsposition oder anderen Sektionen
+- [ ] Direkt unter der Karte & Blickwinkel-Sektion erscheint die Kompositions-Analyse (wenn vorhanden) — nicht ganz unten
+- [ ] Öffne ein Scout-Detailsheet → kein JavaScript-Fehler in der Console, Kompositions-Analyse erscheint nicht (Scout hat keine), Layout intakt
+- [ ] Öffne ein Kalender-Event-Detail → kein Fehler, alle verfügbaren Sektionen zeigen korrekt an
+- [ ] Die relative Reihenfolge von KOORDINATEN → HIMMELSPOSITION → KAMERA-EMPFEHLUNGEN → ASTRONOMIE → STANDORT & TOPOGRAPHIE → HIMMELSKÖRPER-BAHNEN ist unverändert gegenüber heute
+
+---
+
+#### Implementation Spec
+
+**Analysiert:** 2026-06-28
+
+---
+
+##### Scope-Klärung
+
+- Betrifft **alle Event-Typen** (Goldene Stunde, Mondaufgang, Milchstraße, Sonnenuntergang etc.) — `Detail.open()` ist eine einzige Renderfunktion für alle Typen.
+- Betrifft **alle Entry-Points** (Feed, Kalender, Scout), da alle `Detail.open(obj)` aufrufen. Die Reihenfolge der Sektions-Blöcke im Template ist Entry-Point-unabhängig.
+- **Scout-Objekte** haben kein `composition_analysis`-Feld → `ev_kompo` wird nicht gerendert (Guard `if (!ca) return ''` greift). Reihenfolge trotzdem korrekt, da der leere String kein Layout bricht.
+- **Kalender-Events** ohne enriched Daten: Wetter, Kompositions-Analyse und Kamera-Empfehlungen fehlen im Objekt → die entsprechenden Sektionen rendern leer oder fallen weg. Kein Problem durch die Umstrukturierung — die Guards in den IIFE-Blöcken bleiben unverändert.
+- **Himmelsposition (ev_skypos)** hat einen eigenen Guard (`EV_SKYPOS_EXEMPT`-Set + `if (!ca)`). Bleibt unverändert an seiner neuen Position (nach KOORDINATEN).
+
+---
+
+##### Aktuelle Sektionsreihenfolge im Code (web/index.html, ~Zeile 3214–3418)
+
+| # | ID | Titel | Zeile |
+|---|-----|-------|-------|
+| 1 | ev_zeit | Ideales Zeitfenster | ~3214 |
+| 2 | ev_fov | Karte & Blickwinkel | ~3218 |
+| 3 | ev_coords | Koordinaten | ~3220 |
+| 4 | ev_skypos | Himmelsposition | ~3306 |
+| 5 | ev_wetter | Wetter zum Shoot-Zeitpunkt | ~3323 |
+| 6 | ev_kamera | Kamera-Empfehlungen | ~3325 |
+| 7 | ev_astro | Astronomie | ~3326 |
+| 8 | ev_topo | Standort & Topographie | ~3348 |
+| 9 | ev_astro_live | Himmelskörper-Bahnen | ~3350 |
+| 10 | ev_desc | Beschreibung | ~3351 |
+| 11 | ev_kompo | Kompositions-Analyse | ~3405 |
+
+---
+
+##### Ziel-Sektionsreihenfolge
+
+| # | ID | Titel |
+|---|-----|-------|
+| 1 | ev_desc | Beschreibung |
+| 2 | ev_zeit | Ideales Zeitfenster |
+| 3 | ev_wetter | Wetter zum Shoot-Zeitpunkt |
+| 4 | ev_fov | Karte & Blickwinkel |
+| 5 | ev_kompo | Kompositions-Analyse |
+| 6 | ev_coords | Koordinaten |
+| 7 | ev_skypos | Himmelsposition |
+| 8 | ev_kamera | Kamera-Empfehlungen |
+| 9 | ev_astro | Astronomie |
+| 10 | ev_topo | Standort & Topographie |
+| 11 | ev_astro_live | Himmelskörper-Bahnen |
+
+**Änderungen gegenüber IST:**
+- `ev_desc` (Beschreibung) von Position 10 → **Position 1** (ganz nach oben)
+- `ev_wetter` (Wetter) von Position 5 → **Position 3** (direkt nach Zeitfenster)
+- `ev_kompo` (Kompositions-Analyse) von Position 11 → **Position 5** (direkt nach Karte)
+- `ev_coords`, `ev_skypos`, `ev_kamera`, `ev_astro`, `ev_topo`, `ev_astro_live` rutschen jeweils 1–2 Positionen nach hinten
+
+---
+
+##### Example Mapping
+
+**Regel 1: Beschreibung steht als erste Sektion**
+- ✅ Positiv: Nutzer öffnet Detailsheet einer Goldene-Stunde-Chance → erste Sektion ist BESCHREIBUNG mit dem Kontext-Text
+- ✅ Positiv: Nutzer öffnet Detailsheet eines Mondaufgangs → erste Sektion ist BESCHREIBUNG
+- ❌ Negativ (alt): Erste Sektion war IDEALES ZEITFENSTER — kein Kontext, Nutzer weiß nicht warum diese Chance interessant ist
+- ⚠️ Edge: Scout-Objekt hat `description` als `desc`-String (adaptiert) → `ev_desc` rendert korrekt
+
+**Regel 2: Wetter steht direkt nach Ideales Zeitfenster**
+- ✅ Positiv: Nutzer sieht Zeitfenster 18:45–19:15, darunter sofort Wetterdaten (Bewölkung, Regen, Wind) — zeitlich zusammengehörige Info auf einen Blick
+- ❌ Negativ (alt): Wetter stand nach Himmelsposition — thematisch getrennt von Zeitfenster
+- ⚠️ Edge: Wetter nicht verfügbar (Event > 3 Tage) → Sektion zeigt Platzhalter-Hinweis „Verfügbar ab T-3 Tage" — bleibt korrekt
+
+**Regel 3: Kompositions-Analyse steht direkt nach Karte & Blickwinkel**
+- ✅ Positiv: Nutzer sieht Karte mit Standort + FOV-Overlay, darunter sofort die Kompositions-Analyse (Azimut-Versatz, Größenverhältnis) — räumlich zusammengehörig
+- ❌ Negativ (alt): Kompositions-Analyse war letzte Sektion — räumlich von der Karte getrennt
+- ⚠️ Edge: Kein `composition_analysis`-Feld im Objekt (Scout, Goldene Stunde etc.) → `ev_kompo` rendert '' → kein Layout-Problem; `ev_coords` folgt direkt auf `ev_fov`
+
+**Regel 4: Alle anderen Sektionen bleiben in unveränderter relativer Reihenfolge**
+- ✅ Positiv: KOORDINATEN, HIMMELSPOSITION, KAMERA, ASTRONOMIE, TOPOGRAPHIE, BAHNEN — relative Reihenfolge untereinander identisch zu IST
+
+---
+
+##### Pre-Mortem (Was könnte schiefgehen?)
+
+1. **Falsche Zeilen-Referenz beim Edit:** Die Sektionen sind kein Array, sondern sequenzielle Template-Literal-Blöcke in einem großen Template-String. Ein Edit, der zu wenig Kontext mitgibt, kann an die falsche Stelle treffen (Edit-Tool-Zielpassage-Problem). → Gegenmaßnahme: Jede Sektion hat eindeutige IDs (`ev_desc`, `ev_kompo` etc.) als Anker; gezielt per Read+Grep vor dem Edit die genaue Zielstelle lesen.
+
+2. **IIFE-Blöcke (`${ (() => { ... })() }`) beim Umordnen vergessen zusammenzuhalten:** `ev_skypos`, `ev_wetter`, `ev_topo`, `ev_kompo`, `ev_fov` sind in IIFE-Blöcke eingebettet. Beim Ausschneiden und Einfügen muss der gesamte `${(() => { ... })()}` Block inklusive öffnender und schließender Klammern vollständig verschoben werden, sonst entsteht ein JS-Syntaxfehler. → Gegenmaßnahme: Read des gesamten Abschnitts von ~3214 bis ~3419 vor dem Edit; jeden IIFE-Block vollständig identifizieren.
+
+3. **ev_kompo ist tief verschachtelt (ab ~Zeile 3352–3418):** Der Kompositions-Analyse-Block ist mit ~65 Zeilen der längste einzelne Sektions-Block. Beim Verschieben auf Position 5 muss er vollständig an die richtige Stelle — zwischen `ev_fov` und `ev_coords`. → Gegenmaßnahme: Block vollständig auslesen, dann als ganzes Stück an neuer Position einfügen.
+
+4. **Scout-adapted-Objekt hat kein `composition_analysis`:** Guard `if (!ca) return ''` in `ev_kompo` und `ev_skypos` muss nach dem Umordnen noch korrekt greifen. Da der Guard im IIFE-Block selbst sitzt (nicht im umgebenden Template), ist er durch das Umordnen nicht gefährdet. → Gegenmaßnahme: Nach Impl. manuell Scout-Detailsheet öffnen und prüfen, dass keine JS-Fehler erscheinen.
+
+5. **Regression auf Kalender-Entry-Point:** BUG-44 zeigt, dass Kalender-Events weniger Felder haben. Die neue Reihenfolge ändert die Guards nicht — `ev_desc` rendert immer (wenn `o.description` vorhanden), `ev_wetter` rendert Platzhalter wenn `!wd`. Keine Regression erwartet, aber: nach Impl. Kalender-Detailsheet öffnen und prüfen.
+
+---
+
+##### Architektur-Analyse
+
+**Wo ist die Reihenfolge definiert?**
+Alle `mkSec()`-Aufrufe und IIFE-Blöcke befinden sich sequenziell im Template-String innerhalb von `Detail.open()` in `web/index.html` (ab ~Zeile 3190). Die Reihenfolge ergibt sich aus der physischen Reihenfolge der Ausdrücke im Template-Literal — es gibt kein Array, kein Switch, keine Konfiguration. Umordnen = Blöcke im Template physisch umhängen.
+
+**Entry-Points:**
+- **Feed** (Zeile 1378): `onclick="Detail.open(${JSON.stringify(o)...})"` — vollständiges opportunities.json-Objekt
+- **Kalender** (Zeile 1928): `onclick="Detail.open(${JSON.stringify(e)...})"` — calendar.json-Event (astronomy-only)
+- **Scout** (Zeile 1738): `Detail.open(adapted)` — Scout-adaptiertes Objekt ohne `composition_analysis`, `weather_details`, `elevation_difference_m`
+
+Die `Detail.open()`-Funktion ist für alle Entry-Points identisch. Guards in jedem Sektions-Block (`if (!ca)`, `if (!wd)`, `if (!distKm && ...)`) stellen sicher, dass fehlende Felder keine Fehler produzieren.
+
+---
+
+##### Implementierungsoptionen
+
+**Option A — Direkte Blockverschiebung im Template (empfohlen)**
+Die Sektions-Blöcke werden in der Datei `web/index.html` durch gezielte Edit-Operationen in die neue Reihenfolge gebracht. Jeder Block wird mit seiner vollständigen `${...}`-Syntax ausgeschnitten und an der Zielposition eingefügt. Vier separate Edit-Operationen (ev_desc nach oben, ev_wetter nach oben, ev_kompo an Position 5, Rest rutscht nach).
+
+- ✅ Minimal invasiv: nur Reihenfolge, kein Logik-Change
+- ✅ Alle Guards und IDs bleiben unverändert
+- ✅ Testbar sofort nach Speichern im lokalen Dev-Server
+- ⚠️ Edit-Tool muss genug Kontext haben — vorher gezielt lesen
+
+**Option B — Sektionen in ein Array auslagern und dann sortieren**
+Die Sektions-Blöcke werden in ein Array von `{id, html}`-Objekten umgebaut und dann per Array-Literal in gewünschter Reihenfolge zusammengeführt.
+
+- ❌ Erheblicher Umbau für minimalen Gewinn (reine Reihenfolge-Änderung)
+- ❌ Erzeugt unnötige Komplexität im Code (Qualität vor Geschwindigkeit: sauberer ist kleiner)
+- Nicht empfohlen
+
+**Empfehlung: Option A** — minimaler, chirurgischer Eingriff. Vier Edit-Operationen, kein Logik-Change, vollständig reversibel.
+
+---
+
+##### Tests
+
+**Vorbedingung:** Lokaler Dev-Server läuft und antwortet auf Health-Check.
+
+**T1 — Feed, Event mit vollständigen Daten (Goldene Stunde o.ä.)**
+- Öffne Feed → tippe auf eine Chance → Detailsheet öffnet sich
+- Erwartete Reihenfolge der sichtbaren Sektionen (von oben nach unten): BESCHREIBUNG · IDEALES ZEITFENSTER · WETTER · KARTE & BLICKWINKEL · [KOMPOSITIONS-ANALYSE falls Alignment-Event] · KOORDINATEN · [HIMMELSPOSITION falls Alignment] · KAMERA-EMPFEHLUNGEN · ASTRONOMIE · [TOPOGRAPHIE falls vorhanden] · HIMMELSKÖRPER-BAHNEN
+
+**T2 — Feed, Event ohne composition_analysis (Goldene Stunde)**
+- KOMPOSITIONS-ANALYSE und HIMMELSPOSITION sollen nicht erscheinen
+- Keine JS-Fehler in der Konsole
+
+**T3 — Feed, Event ohne Wetterdaten (> 3 Tage)**
+- WETTER zeigt Platzhalter „Verfügbar ab T-3 Tage" — erscheint trotzdem an Position 3 (direkt nach Zeitfenster)
+
+**T4 — Scout-Detailsheet**
+- Scout öffnen → Standort antippen → Detail öffnet sich
+- BESCHREIBUNG als erste Sektion, WETTER an Position 3
+- Keine KOMPOSITIONS-ANALYSE (kein `composition_analysis` im Scout-Objekt) — kein Fehler
+
+**T5 — Kalender-Detailsheet**
+- Kalender → Event antippen → Detail öffnet sich
+- BESCHREIBUNG als erste Sektion
+- Wetter zeigt Platzhalter (Kalender-Events haben kein `weather_details`)
+- Keine JS-Fehler
+
+**T6 — Regression: alle bestehenden Sektionen noch vorhanden**
+- Für einen Feed-Alignment-Event (z.B. Mondaufgang hinter Turm) alle 11 Sektionen der Zielreihenfolge bestätigen
+
+---
+
+##### Dateien
+
+- `web/index.html` — einzige zu ändernde Datei; Detail-Sheet-Template ab ~Zeile 3190
+
+---
+
+##### Offene Fragen / Assumptions-Protokoll
+
+- **BUG-45:** Im Ticket als Blocking-Dependency genannt, existiert aber nicht im Backlog (höchste BUG-Nr. = BUG-44). Kein Working-Tree-Konflikt vorhanden. → Assumption: Dependency ist gegenstandslos; US-105 kann direkt implementiert werden sobald Ready for Dev.
+- **BUG-44** (Kalender-Event-Detail fehlende Sektionen): Separat getracktes Ticket. US-105 ändert die Reihenfolge, BUG-44 wird die fehlenden Daten nachliefern. Beide Tickets sind unabhängig umsetzbar — US-105 verschlechtert BUG-44 nicht, verbessert ihn aber auch nicht.
 
 ---
 
