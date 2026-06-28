@@ -219,6 +219,12 @@ _weather_updated_at: Optional[datetime] = None
 _precompute_running: bool = False
 _recompute_pending:  set  = set()   # BUG-35: IDs mit laufendem/ausstehendem Recompute
 
+# US-106 Teil 2: Scout-Volllauf nach Location-Änderung entprellt anstoßen.
+_scout_running: bool = False              # Single-Flight-Guard (kein Doppellauf)
+_scout_dirty:   bool = False             # Nachlauf-Flag (während Lauf erneut geändert)
+_scout_debounce_task: Optional["asyncio.Task"] = None
+_SCOUT_DEBOUNCE_S: float = 90.0          # Fenster für mehrere schnelle Edits (Zielzeit < 2–3 Min)
+
 # Job-Status-Tracking (US-34)
 _job_status: dict = {
     "weather":  {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
@@ -306,13 +312,12 @@ def _load_caches() -> bool:
 
     _cache_loaded_at = datetime.now(timezone.utc)
 
-    # BUG-35: Pending-Cleanup — IDs entfernen die jetzt Events im Feed haben
-    if _recompute_pending:
-        ids_in_feed = {e["location_id"] for e in _feed_cache}
-        cleared = _recompute_pending & ids_in_feed
-        _recompute_pending -= ids_in_feed
-        if cleared:
-            logger.info("Recompute-Pending bereinigt: %s", cleared)
+    # US-106: Pending NICHT mehr hier freigeben.
+    # Früher (BUG-35) wurde eine ID aus _recompute_pending entfernt, sobald sie
+    # nach dem Feed-Write im Feed-Cache auftauchte — also BEVOR das Wetter für
+    # die Location nachgeladen war. Dadurch verschwand das "wird aktualisiert"-
+    # Banner zu früh (lügendes Banner). Die Freigabe passiert jetzt erst in
+    # _finalize_pending(), wenn Feed UND Wetter für die Location stehen.
 
     return found
 
@@ -332,20 +337,124 @@ def _load_discover_cache() -> None:
 
 
 async def _refresh_discover() -> None:
-    """Führt die Scout-Pipeline aus und aktualisiert _discover_cache."""
-    global _discover_cache
+    """
+    Führt die Scout-Pipeline (Volllauf) aus und aktualisiert _discover_cache.
+
+    US-106 Teil 2: Single-Flight + Dirty-Nachlauf. Der Scout existiert NUR als
+    Volllauf (keine location_id-Unterstützung). Damit eine Location-Änderung den
+    Scout zeitnah aktualisiert, ohne bei mehreren schnellen Edits mehrere teure
+    parallele Läufe zu starten:
+      - läuft bereits ein Scout-Lauf → nur das Dirty-Flag setzen (Nachlauf),
+        statt einen zweiten Lauf parallel zu starten;
+      - nach jedem Lauf wird geprüft, ob währenddessen etwas dirty wurde, und
+        genau EIN Nachlauf gemacht.
+    """
+    global _discover_cache, _scout_running, _scout_dirty
     from discover.pipeline import refresh_discover_cache
+
+    if _scout_running:
+        # Single-Flight: kein zweiter paralleler Volllauf. Nachlauf vormerken.
+        _scout_dirty = True
+        logger.info("Scout-Pipeline läuft bereits – Nachlauf vorgemerkt (dirty).")
+        return
+
+    _scout_running = True
     try:
-        logger.info("Scout-Pipeline startet...")
-        await refresh_discover_cache(_DISCOVER_CACHE)
-        _load_discover_cache()
-    except Exception as e:
-        logger.error("Scout-Pipeline fehlgeschlagen: %s", e)
+        while True:
+            _scout_dirty = False
+            try:
+                logger.info("Scout-Pipeline startet (Volllauf)...")
+                await refresh_discover_cache(_DISCOVER_CACHE)
+                _load_discover_cache()
+            except Exception as e:
+                logger.error("Scout-Pipeline fehlgeschlagen: %s", e)
+            # US-106: Wurde während des Laufs erneut eine Änderung gemeldet → genau
+            # ein Nachlauf, dann fertig.
+            if not _scout_dirty:
+                break
+            logger.info("Scout-Pipeline: Dirty-Flag gesetzt → genau ein Nachlauf.")
+    finally:
+        _scout_running = False
+
+
+def _trigger_discover_debounced() -> None:
+    """
+    US-106 Teil 2: Entprellter Trigger für den Scout-Volllauf nach einer
+    Location-Änderung. Mehrere schnelle Edits werden zu EINEM Lauf zusammengefasst
+    (Debounce-Fenster _SCOUT_DEBOUNCE_S). Der eigentliche Lauf ist durch
+    _refresh_discover Single-Flight-geschützt.
+    """
+    global _scout_debounce_task, _scout_dirty
+    if _NO_BACKGROUND:
+        return
+
+    # Läuft gerade ein Scout-Lauf, reicht das Dirty-Flag (Nachlauf nach Lauf-Ende).
+    if _scout_running:
+        _scout_dirty = True
+        logger.info("Scout-Trigger während laufendem Lauf → dirty (Nachlauf).")
+        return
+
+    # Bestehenden Debounce-Timer zurücksetzen (Edits zusammenfassen).
+    if _scout_debounce_task and not _scout_debounce_task.done():
+        _scout_debounce_task.cancel()
+
+    async def _delayed() -> None:
+        try:
+            await asyncio.sleep(_SCOUT_DEBOUNCE_S)
+        except asyncio.CancelledError:
+            return
+        await _refresh_discover()
+
+    _scout_debounce_task = asyncio.create_task(_delayed())
+    logger.info("Scout-Refresh in %.0fs angestoßen (debounced).", _SCOUT_DEBOUNCE_S)
 
 
 # ---------------------------------------------------------------------------
 # Wetter-Overlay
 # ---------------------------------------------------------------------------
+
+def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff: datetime) -> bool:
+    """
+    US-106: Wetter-Anwendung für GENAU EIN Feed-Event (DRY-Helfer für Voll- und
+    Single-Overlay). Setzt zusätzlich e["weather_status"]:
+      - "none": Event außerhalb T+3 → planmäßig kein Wetter (nicht "lädt ewig").
+      - "ok":   echtes Wetter aufgespielt.
+    Bei "none" und fehlendem Forecast bleibt weather_status unverändert "lädt"
+    (kein Status → Frontend zeigt "wird nachgeladen", solange Location pending ist).
+    Gibt True zurück, wenn echtes Wetter ("ok") gesetzt wurde.
+    """
+    shoot_dt = datetime.fromisoformat(e["shoot_time"])
+    if shoot_dt > cutoff or shoot_dt < now_utc - timedelta(hours=1):
+        # Außerhalb T+3: planmäßig kein Wetter (Forecast reicht nur ~7 Tage).
+        e["weather_score"]  = 0.0
+        e["overall_score"]  = e["astronomy_score"]
+        e["weather_status"] = "none"
+        return False
+
+    if not forecast:
+        return False
+
+    w_at = forecast.get_at(shoot_dt)
+    if not w_at:
+        return False
+
+    w_score = calculate_photo_weather_score(w_at)
+    e["weather_score"]  = round(w_score, 3)
+    e["overall_score"]  = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
+    e["weather_description"] = wmo_code_to_description(w_at.weather_code) if hasattr(w_at, "weather_code") else ""
+    e["weather_details"] = {
+        "temperature_c":        round(w_at.temperature_c, 1),
+        "precipitation_prob_pct": round(w_at.precipitation_prob_pct),
+        "precipitation_mm":     round(w_at.precipitation_mm, 1),
+        "cloud_cover_pct":      round(w_at.cloud_cover_pct),
+        "cloud_cover_high_pct": round(w_at.cloud_cover_high_pct),
+        "wind_speed_kmh":       round(w_at.wind_speed_kmh),
+        "wind_direction_deg":   round(w_at.wind_direction_deg),
+        "visibility_m":         round(w_at.visibility_m),
+    }
+    e["weather_status"] = "ok"
+    return True
+
 
 async def _weather_overlay() -> None:
     """
@@ -373,11 +482,12 @@ async def _weather_overlay() -> None:
     if not near_events:
         logger.info("Wetter-Overlay: keine Events in T+3, übersprungen")
         _weather_updated_at = now_utc
+        _job_done("weather", t0)
         return
 
     # Unique Locations aus den nahen Events
-    seen: set[str] = set()
-    loc_forecasts: dict[str, object] = {}
+    seen: set = set()
+    loc_forecasts: dict = {}
     for e in near_events:
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
         if key not in seen:
@@ -392,39 +502,77 @@ async def _weather_overlay() -> None:
     # Scores in _feed_cache aktualisieren
     updated = 0
     for e in _feed_cache:
-        shoot_dt = datetime.fromisoformat(e["shoot_time"])
-        if shoot_dt > cutoff or shoot_dt < now_utc - timedelta(hours=1):
-            # Außerhalb T+3: Wetter unbekannt zurücksetzen
-            e["weather_score"] = 0.0
-            e["overall_score"] = e["astronomy_score"]
-            continue
-
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
-        fc  = loc_forecasts.get(key)
-        if not fc:
-            continue
-
-        w_at = fc.get_at(shoot_dt)
-        if w_at:
-            w_score = calculate_photo_weather_score(w_at)
-            e["weather_score"]  = round(w_score, 3)
-            e["overall_score"]  = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
-            e["weather_description"] = wmo_code_to_description(w_at.weather_code) if hasattr(w_at, "weather_code") else ""
-            e["weather_details"] = {
-                "temperature_c":        round(w_at.temperature_c, 1),
-                "precipitation_prob_pct": round(w_at.precipitation_prob_pct),
-                "precipitation_mm":     round(w_at.precipitation_mm, 1),
-                "cloud_cover_pct":      round(w_at.cloud_cover_pct),
-                "cloud_cover_high_pct": round(w_at.cloud_cover_high_pct),
-                "wind_speed_kmh":       round(w_at.wind_speed_kmh),
-                "wind_direction_deg":   round(w_at.wind_direction_deg),
-                "visibility_m":         round(w_at.visibility_m),
-            }
+        if _apply_weather_to_event(e, loc_forecasts.get(key), now_utc, cutoff):
             updated += 1
 
     _weather_updated_at = now_utc
     logger.info("Wetter-Overlay: %d Events aktualisiert (%d unique Locations)", updated, len(seen))
     _job_done("weather", t0)
+
+
+async def _weather_overlay_single(loc_id: str) -> bool:
+    """
+    US-106 Teil 1: Gezieltes Wetter-Nachladen für GENAU EINE Location.
+    Holt den 7-Tage-Forecast für die Koordinaten dieser Location und spielt das
+    Wetter nur auf deren Feed-Events auf (alle anderen Locations unberührt).
+    So steht das Wetter Sekunden nach einer Standort-Änderung, ohne einen teuren
+    Voll-Overlay über alle Locations und ohne doppelte Fremd-Fetches.
+
+    Gibt True zurück, wenn für die Location nichts mehr offen ist (alle ihre
+    Events in T+3 haben echtes Wetter ODER es gibt keine Events in T+3).
+    """
+    own_events = [e for e in _feed_cache if e.get("location_id") == loc_id]
+    if not own_events:
+        # Keine Events → es gibt nichts nachzuladen; Location gilt als fertig.
+        return True
+
+    now_utc = datetime.now(timezone.utc)
+    cutoff  = now_utc + timedelta(days=3)
+
+    near_events = [
+        e for e in own_events
+        if now_utc - timedelta(hours=1) <= datetime.fromisoformat(e["shoot_time"]) <= cutoff
+    ]
+
+    # Events außerhalb T+3 sauber als "noch kein Wetter" markieren. Wir nutzen den
+    # DRY-Helfer (forecast=None): für Out-of-Window-Events setzt er exakt
+    # weather_score=0 / overall_score=astronomy_score / weather_status="none" und
+    # kehrt sofort zurück, ohne das (hier noch nicht geladene) Wetter zu brauchen.
+    for e in own_events:
+        shoot_dt = datetime.fromisoformat(e["shoot_time"])
+        if shoot_dt > cutoff or shoot_dt < now_utc - timedelta(hours=1):
+            _apply_weather_to_event(e, None, now_utc, cutoff)
+
+    if not near_events:
+        # Alle Events liegen außerhalb des Forecast-Fensters → fertig, kein Fetch.
+        return True
+
+    ref = near_events[0]
+    try:
+        fc = await fetch_weather_forecast(ref["observer_lat"], ref["observer_lon"], days=7)
+    except Exception as err:
+        logger.warning("US-106 Single-Wetter für %s fehlgeschlagen: %s", loc_id, err)
+        return False
+
+    all_ok = True
+    for e in near_events:
+        if not _apply_weather_to_event(e, fc, now_utc, cutoff):
+            all_ok = False
+    logger.info("US-106 Single-Wetter für %s: %d/%d Events in T+3 aktualisiert",
+                loc_id, sum(1 for e in near_events if e.get("weather_status") == "ok"), len(near_events))
+    return all_ok
+
+
+def _finalize_pending(loc_id: str) -> None:
+    """
+    US-106 Teil 3: Eine Location erst dann aus _recompute_pending freigeben, wenn
+    Feed UND Wetter für sie stehen. Wird nach dem gezielten Wetter-Nachladen
+    aufgerufen. Damit verschwindet das "wird aktualisiert"-Banner im Frontend
+    erst, wenn die Location wirklich vollständig fertig ist.
+    """
+    _recompute_pending.discard(loc_id)
+    logger.info("US-106 Pending freigegeben (Feed+Wetter fertig): %s", loc_id)
 
 
 # ---------------------------------------------------------------------------
@@ -486,35 +634,48 @@ async def _run_precompute(mode: str = "full") -> None:
             _job_error(j, t0, str(e))
     finally:
         _precompute_running = False
+        # US-106 Teil 3: Offene Einzel-Neuberechnungen, die während dieses
+        # Großlaufs per Single-Flight-Guard übersprungen wurden, jetzt am
+        # Lauf-Ende nachholen — keine still verlorene Änderung.
+        await _drain_recompute_pending()
 
 
-async def _run_precompute_single(loc_id: str) -> None:
+async def _drain_recompute_pending() -> None:
     """
-    TASK-12 / BUG-29: Startet precompute.py --location-id <loc_id> im Hintergrund.
-    Wird automatisch nach PATCH /locations/{id} mit Koordinaten-Änderung aufgerufen.
-    Hält den PATCH-Response nicht auf – läuft vollständig asynchron.
-
-    BUG-29: Ohne --feed-only regeneriert der Single-Flow jetzt sowohl den Feed
-    (opportunities.json) ALS AUCH den Kalender (calendar.json) für genau diese
-    Location – vorher blieb der Kalender-Snapshot bis zum nächtlichen Vollkalender
-    veraltet, sodass Chancendetails aus dem Kalender alte Koordinaten zeigten.
+    US-106 Teil 3: Arbeitet offene _recompute_pending-IDs sequenziell ab.
+    Wird am Ende jedes großen Laufs UND am Ende eines Einzel-Laufs aufgerufen.
+    Single-Flight: läuft gerade schon eine Berechnung (z.B. ein neuer Großlauf
+    startete), brechen wir ab — der jeweils laufende Prozess holt die offenen
+    IDs an seinem eigenen Lauf-Ende nach. Schutz gegen Endlos-Rekursion durch
+    das _precompute_running-Gate in _run_precompute_single (übersprungene IDs
+    bleiben pending und werden beim nächsten Drain erneut versucht).
     """
-    global _precompute_running
     if _NO_BACKGROUND:
-        logger.info("FOTOALERT_NO_BACKGROUND=1 → Single-Location Recompute für '%s' übersprungen (Test-Modus).", loc_id)
         return
-    if _precompute_running:
-        logger.info("Single-Location Recompute für '%s' übersprungen – Vorberechnung läuft bereits", loc_id)
-        return
+    # Snapshot, damit parallele Änderungen die Iteration nicht stören.
+    for loc_id in list(_recompute_pending):
+        if _precompute_running:
+            logger.info("US-106 Drain pausiert – Berechnung läuft bereits; offene IDs: %s",
+                        list(_recompute_pending))
+            return
+        if loc_id not in _recompute_pending:
+            continue  # zwischenzeitlich fertig geworden
+        logger.info("US-106 Nachhol-Lauf für ausstehende Location: %s", loc_id)
+        await _run_precompute_single(loc_id, _allow_drain=False)
 
-    _precompute_running = True
+
+async def _run_precompute_single_subproc(loc_id: str, flag: str, tag: str) -> int:
+    """
+    US-106 (Nachbesserung): Startet precompute.py --location-id <loc_id> mit genau
+    EINEM Teil-Flag (--feed-only oder --calendar-only) als Subprozess.
+    Gibt den Exit-Code zurück (oder -1 bei Start-Fehler). Loggt die Subprozess-
+    Ausgabe mit dem Tag, damit Feed- und Kalender-Schritt im Log unterscheidbar sind.
+    """
     backend_dir = Path(__file__).parent
-    logger.info("Starte Single-Location Recompute: %s", loc_id)
-
     try:
         proc = await asyncio.create_subprocess_exec(
             sys.executable, str(backend_dir / "precompute.py"),
-            "--location-id", loc_id,
+            "--location-id", loc_id, flag,
             cwd=str(backend_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
@@ -522,19 +683,106 @@ async def _run_precompute_single(loc_id: str) -> None:
         stdout, _ = await proc.communicate()
         if stdout:
             for line in stdout.decode(errors="replace").splitlines():
-                logger.info("  [recompute-single] %s", line)
-        if proc.returncode == 0:
-            logger.info("Single-Location Recompute abgeschlossen (%s). Lade Feed- und Kalender-Cache neu.", loc_id)
-            _load_elevation_cache()
-            _load_caches()
-        else:
-            logger.error("Single-Location Recompute fehlgeschlagen (exit %d) für %s", proc.returncode, loc_id)
-            _recompute_pending.discard(loc_id)  # BUG-35: bei Fehler aus pending entfernen
+                logger.info("  [%s] %s", tag, line)
+        return proc.returncode if proc.returncode is not None else -1
     except Exception as e:
-        logger.error("Fehler beim Single-Location Recompute für %s: %s", loc_id, e)
-        _recompute_pending.discard(loc_id)  # BUG-35: bei Exception aus pending entfernen
+        logger.error("Fehler beim Start von precompute.py (%s) für %s: %s", tag, loc_id, e)
+        return -1
+
+
+async def _recompute_one(loc_id: str) -> None:
+    """
+    US-106 (Nachbesserung): Kern der Einzel-Neuberechnung OHNE Single-Flight-Guard/Drain.
+
+    Reihenfolge nach Stephans Entscheidung „Feed + Wetter sofort, Kalender im
+    Hintergrund":
+      1. Einzel-FEED schnell rechnen (precompute.py --location-id --feed-only),
+         Caches laden, gezieltes Wetter für genau diese Location aufspielen.
+         Sobald Feed UND Wetter stehen → _finalize_pending → Banner verschwindet
+         in Sekunden (vorher hing es ~10 Min am 365-Tage-Kalender).
+      2. DANACH den 365-Tage-KALENDER für genau diese Location nachziehen
+         (precompute.py --location-id --calendar-only). Dieser Schritt läuft noch
+         innerhalb desselben _precompute_running-Gates (kein zweiter schwerer
+         Kalenderlauf parallel), hält aber die bereits erfolgte Freigabe/das
+         Banner NICHT mehr auf. Kalender-Fehler nehmen die Feed/Wetter-Freigabe
+         NICHT zurück.
+
+    Schlägt das gezielte Wetter fehl → Location bleibt pending (Banner bleibt
+    ehrlich), nächster Drain/Cron versucht es erneut. Der Kalender wird trotzdem
+    nachgezogen (er hängt nicht am Wetter), die FREIGABE erfolgt aber erst, wenn
+    das Wetter steht.
+    """
+    logger.info("Starte Single-Location Recompute: %s", loc_id)
+
+    # --- Schritt 1: Feed schnell + gezieltes Wetter + Freigabe -----------------
+    rc_feed = await _run_precompute_single_subproc(loc_id, "--feed-only", "recompute-feed")
+    if rc_feed != 0:
+        logger.error("Single-Location FEED fehlgeschlagen (exit %d) für %s", rc_feed, loc_id)
+        _recompute_pending.discard(loc_id)
+        return
+
+    logger.info("Single-Location FEED abgeschlossen (%s). Lade Feed-Cache neu.", loc_id)
+    _load_elevation_cache()
+    _load_caches()
+
+    # US-106 Teil 1: gezielt Wetter für genau diese Location nachladen.
+    weather_ready = await _weather_overlay_single(loc_id)
+    if weather_ready:
+        # US-106 Teil 3: jetzt freigeben (Feed UND Wetter stehen) – Banner weg in Sekunden.
+        _finalize_pending(loc_id)
+    else:
+        # Wetter (noch) nicht aufspielbar → Location bleibt pending; ehrliches
+        # Banner bleibt sichtbar, nächster Drain/Cron versucht es erneut.
+        logger.info("US-106 %s bleibt pending – Wetter noch nicht vollständig.", loc_id)
+
+    # --- Schritt 2: 365-Tage-Kalender im Hintergrund nachziehen ----------------
+    # Hält die Freigabe oben NICHT auf. Ein Fehler hier nimmt die bereits
+    # erfolgte Feed/Wetter-Freigabe NICHT zurück (kein _recompute_pending-Eingriff).
+    logger.info("US-106 Ziehe 365-Tage-Kalender für %s im Hintergrund nach …", loc_id)
+    rc_cal = await _run_precompute_single_subproc(loc_id, "--calendar-only", "recompute-calendar")
+    if rc_cal != 0:
+        logger.error("Single-Location KALENDER fehlgeschlagen (exit %d) für %s – "
+                     "Feed/Wetter bleiben freigegeben, Kalender zeigt vorerst den alten Stand.",
+                     rc_cal, loc_id)
+        return
+    logger.info("Single-Location KALENDER abgeschlossen (%s). Lade Kalender-Cache neu.", loc_id)
+    _load_caches()
+
+
+async def _run_precompute_single(loc_id: str, _allow_drain: bool = True) -> None:
+    """
+    TASK-12 / BUG-29: Startet precompute.py --location-id <loc_id> im Hintergrund.
+    Wird automatisch nach PATCH /locations/{id} mit Koordinaten-Änderung aufgerufen.
+    Hält den PATCH-Response nicht auf – läuft vollständig asynchron.
+
+    BUG-29: Ohne --feed-only regeneriert der Single-Flow jetzt sowohl den Feed
+    (opportunities.json) ALS AUCH den Kalender (calendar.json) für genau diese
+    Location.
+
+    US-106 Teil 3: Wird die Berechnung wegen eines laufenden Großlaufs
+    übersprungen, geht die Änderung NICHT verloren — die ID bleibt in
+    _recompute_pending und wird am Ende des laufenden Laufs nachgeholt
+    (siehe _drain_recompute_pending). Nach erfolgreicher Einzel-Berechnung
+    arbeitet dieser Lauf selbst noch offene Pending-IDs ab (_allow_drain).
+    """
+    global _precompute_running
+    if _NO_BACKGROUND:
+        logger.info("FOTOALERT_NO_BACKGROUND=1 → Single-Location Recompute für '%s' übersprungen (Test-Modus).", loc_id)
+        return
+    if _precompute_running:
+        # US-106: NICHT mehr stillschweigend verwerfen. ID bleibt pending und
+        # wird am Lauf-Ende des aktuell laufenden Prozesses nachgeholt.
+        _recompute_pending.add(loc_id)
+        logger.info("Single-Location Recompute für '%s' verschoben – Berechnung läuft bereits (bleibt pending)", loc_id)
+        return
+
+    _precompute_running = True
+    try:
+        await _recompute_one(loc_id)
     finally:
         _precompute_running = False
+        if _allow_drain:
+            await _drain_recompute_pending()
 
 
 # ---------------------------------------------------------------------------
@@ -1321,6 +1569,8 @@ async def _save_alignment_as_location(
     _recompute_pending.add(new_loc.id)
     # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
     asyncio.create_task(_run_precompute_single(new_loc.id))
+    # US-106 Teil 2: neue Location zeitnah auch im Entdecken-Bereich
+    _trigger_discover_debounced()
     # TASK-18: Backup nach Create
     asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, new_loc.id))
     return new_loc.id
@@ -1407,7 +1657,13 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
 
 @app.get("/recompute-status")
 async def recompute_status() -> dict:
-    """BUG-35: Gibt IDs zurück für die ein Recompute noch aussteht (in-memory, kein Auth nötig)."""
+    """BUG-35 / US-106: Gibt IDs zurück für die ein Recompute noch aussteht.
+
+    US-106: Eine ID bleibt jetzt so lange in 'pending', bis für die Location
+    Feed UND Wetter stehen (nicht mehr schon nach dem Feed-Write). Das Frontend-
+    Banner ('wird aktualisiert') folgt dieser Liste und verschwindet daher erst,
+    wenn die Location wirklich vollständig fertig ist. In-memory, kein Auth nötig.
+    """
     return {"pending": list(_recompute_pending), "running": _precompute_running}
 
 
@@ -1487,7 +1743,9 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     needs_recompute = bool(recompute_fields & allowed.keys())
     if needs_recompute:
         logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
+        _recompute_pending.add(loc_id)  # US-106: sofort pending, damit Banner ehrlich bleibt
         asyncio.create_task(_run_precompute_single(loc_id))
+        _trigger_discover_debounced()  # US-106 Teil 2: Entdecken zieht zeitnah nach
 
     # TASK-18: Backup nach jedem erfolgreichen Edit (im Test-Modus aus – keine Git-Operationen)
     if not _NO_BACKGROUND:

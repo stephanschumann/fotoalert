@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.19.4';
+const APP_VERSION = '1.19.5';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1371,9 +1371,16 @@ function bearingLabel(spLat, spLon, subLat, subLon) {
 // ═══════════════════════════════════════════════════════
 function oppCard(o) {
   const icon = eventIcon(o.event_type, 15, 'ct');
-  const weatherTag = o.weather_score > 0
-    ? `<span class="tag tag-blue">${ic('i-cloud',12)} ${pct(o.weather_score)}</span>`
-    : '';
+  // US-106: Wetter-Tag mit drei ehrlichen Zuständen:
+  //  - echtes Wetter (status ok / score>0): Prozent-Tag wie bisher
+  //  - Location wird gerade nachberechnet & Wetter noch nicht da: "wird nachgeladen"
+  //  - status "none" (Chance > ~3 Tage entfernt): kein Tag (kein "lädt ewig")
+  let weatherTag = '';
+  if (o.weather_status === 'ok' || (o.weather_score > 0)) {
+    weatherTag = `<span class="tag tag-blue">${ic('i-cloud',12)} ${pct(o.weather_score)}</span>`;
+  } else if (o.weather_status !== 'none' && Feed.pendingLocations.has(o.location_id)) {
+    weatherTag = `<span class="tag tag-weather-unknown">${ic('i-clock',12)} Wetter wird nachgeladen</span>`;
+  }
   const prio = o.alert_priority >= 2
     ? `<span class="tag tag-gold">${ic('i-star',12)} ${o.alert_priority >= 3 ? 'Außergewöhnlich' : 'Besonders'}</span>` : '';
   const stativ = o.camera_hints?.[0]?.tripod_required
@@ -1443,6 +1450,7 @@ function scoutCard(o) {
 const Feed = {
   data: [],
   mode: 'feed',  // 'feed' | 'calendar'
+  pendingLocations: new Set(),  // US-106: Locations, deren Wetter gerade nachgeladen wird
   setMode(m) {
     this.mode = m;
     document.getElementById('fmb-feed').classList.toggle('active', m === 'feed');
@@ -1483,26 +1491,35 @@ const Feed = {
       }, 2000);
     }
   },
-  // BUG-35: Polling bis Recompute für neue Location fertig ist
+  // BUG-35 / US-106: Polling bis Recompute UND Wetter für neue/geänderte Location fertig sind.
+  // Der Hinweis bleibt ehrlich sichtbar, solange die Location pending ist (Backend gibt
+  // sie erst frei, wenn Feed UND Wetter stehen). Karten zeigen währenddessen
+  // "Wetter wird nachgeladen" über Feed.pendingLocations.
   startPendingPoll(locationId) {
     const banner = document.getElementById('recompute-banner');
     const bannerText = document.getElementById('recompute-banner-text');
     if (banner) banner.style.display = 'flex';
-    const INTERVAL_MS = 15000;
-    const TIMEOUT_MS = 600000; // 10 Min
+    this.pendingLocations.add(locationId);
+    const INTERVAL_MS = 6000;     // US-106: enger als bisher (15s) für strenge Zielzeit
+    const TIMEOUT_MS = 600000;    // 10 Min
     const startedAt = Date.now();
     const timer = setInterval(async () => {
       try {
         const status = await API.get('/recompute-status');
         const pending = status && status.pending ? status.pending : [];
+        // Pending-Set synchron halten, damit Karten den Lade-Zustand korrekt zeigen.
+        this.pendingLocations = new Set(pending);
         if (!pending.includes(locationId)) {
           clearInterval(timer);
           if (banner) banner.style.display = 'none';
-          await this.load();
+          await this.load();   // jetzt mit echtem Wetter
           return;
         }
+        // Während pending: Feed neu rendern, damit "wird nachgeladen" aktuell bleibt.
+        await this.load();
         if (Date.now() - startedAt >= TIMEOUT_MS) {
           clearInterval(timer);
+          this.pendingLocations.delete(locationId);
           if (banner) {
             const spinner = banner.querySelector('.spinner');
             if (spinner) spinner.style.display = 'none';
@@ -3332,7 +3349,13 @@ const Detail = {
     `;
 
     const _wdot = col => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:5px;vertical-align:middle"></span>`;
-    const wLabel = o.weather_score === 0
+    // US-106: ehrlicher Lade-Zustand statt Platzhalter, solange Wetter dieser
+    // Location gerade nachgeladen wird.
+    const _wLoading = o.weather_status !== 'ok' && o.weather_score === 0
+      && o.weather_status !== 'none' && Feed.pendingLocations.has(o.location_id);
+    const wLabel = _wLoading
+      ? `${ic('i-clock',13)} Wetter wird nachgeladen …`
+      : o.weather_score === 0
       ? `${ic('i-clock',13)} Wird 3 Tage vorher berechnet`
       : o.weather_score >= 0.8 ? `${_wdot('var(--green)')}Ideal (${pct(o.weather_score)})`
       : o.weather_score >= 0.6 ? `${_wdot('var(--accent-2)')}Gut (${pct(o.weather_score)})`
@@ -4531,7 +4554,7 @@ const LocationDetail = {
     const btn = document.querySelector('.edit-actions .btn-primary');
     btn.textContent = 'Speichert…'; btn.disabled = true;
     try {
-      await API.patch(`/locations/${locId}`, body);
+      const res = await API.patch(`/locations/${locId}`, body);
       // BUG-30: Locations.all frisch vom Server laden damit nameFor() überall
       // sofort den neuen Namen liefert (Feed-Karten, Opportunity-Detail-Link, Suche)
       Locations.all = await API.get('/locations');
@@ -4540,6 +4563,11 @@ const LocationDetail = {
       Locations.render(Filter.applyToLocations(Locations.all));
       // Feed und Kalender neu rendern damit location_name-Links sofort aktuell sind
       if (Feed.data) Feed.render();
+      // US-106: Wurde eine Neuberechnung ausgelöst (Koordinaten o.ä. geändert),
+      // Banner + Wetter-Nachlade-Hinweis zeigen, bis Feed UND Wetter stehen.
+      if (res && res.recompute_triggered) {
+        Feed.startPendingPoll(locId);
+      }
     } catch(e) {
       toast('Fehler: ' + e.message);
       btn.textContent = 'Speichern'; btn.disabled = false;

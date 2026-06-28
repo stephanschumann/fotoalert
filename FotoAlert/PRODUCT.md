@@ -49,7 +49,9 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 |----------|-----------|
 | Chance-Karten | Jede Karte zeigt: Titel, Datum/Uhrzeit, Location-Name, Score-Ring (farbcodiert), Event-Typ |
 | Score-Ring | Kreisring, Füllgrad = Score (0–100%), Farbe: grün ≥80%, orange 50–79%, rot <50% |
-| Wetter-Badge | Tag-Chip auf Feed-Karten nur wenn `weather_score > 0`; bei unbekanntem Wetter kein Badge (BUG-44) |
+| Wetter-Badge | Tag-Chip auf Feed-Karten wenn Wetter bekannt (`weather_status: "ok"` bzw. `weather_score > 0`). Wird das Wetter einer gerade geänderten/neuen Location gerade nachgeladen, zeigt die Karte stattdessen ehrlich „Wetter wird nachgeladen" (Uhr-Icon). Chancen weiter als ~3 Tage in der Zukunft (`weather_status: "none"`) zeigen kein Wetter-Badge (kein „lädt ewig"). (BUG-44, US-106) |
+| Wetter sofort nach Standort-Änderung (US-106) | Nach dem Verschieben/Anlegen einer Location wird das Wetter gezielt nur für diese Location nachgeladen (Sekunden, nicht bis zu 3 h). Das „wird aktualisiert"-Banner verschwindet erst, wenn Foto-Chancen UND echtes Wetter stehen — nicht schon beim Platzhalter. Schlägt das Wetter-Nachladen fehl, bleibt die Location als „wird aktualisiert" markiert und wird beim nächsten Lauf erneut versucht. |
+| Reihenfolge bei Standort-Änderung: Feed+Wetter sofort, Kalender im Hintergrund (US-106 Nachbesserung) | Nach dem Verschieben einer Location werden zuerst die sichtbaren Foto-Chancen + ihr Wetter berechnet; sobald beides steht, verschwindet das „wird aktualisiert"-Banner in Sekunden. Der vollständige Jahres-Kalender dieser Location wird **danach im Hintergrund** nachgerechnet, ohne das Banner aufzuhalten — der Kalender-Tab dieser Location kann dabei ein paar Minuten noch den alten Stand zeigen (bewusst akzeptiert). Ein Fehler beim Hintergrund-Kalender nimmt die bereits erfolgte Freigabe nicht zurück. Es läuft nie mehr als eine schwere Berechnung gleichzeitig; eine zweite Änderung während der laufenden Kalender-Rechnung wird gemerkt und danach automatisch nachgeholt. |
 | Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
 | Mondaufgang-Events | Eigenständige Karten im Feed mit Typ `"Mondaufgang"`, Score-Ring, Uhrzeit und Location (US-79) |
 | Monduntergang-Events | Eigenständige Karten im Feed mit Typ `"Monduntergang"`, Score-Ring, Uhrzeit und Location (US-79) |
@@ -249,6 +251,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Funktion | Verhalten |
 |----------|-----------|
 | Scout-Feed | Automatisiert berechnete Foto-Ephemeride (Mond-Alignments, US-70) |
+| Scout zieht nach Standort-Änderung nach (US-106) | Nach dem Verschieben/Anlegen einer Location wird der Scout-Volllauf zeitnah (wenige Minuten) angestoßen, sodass die Location im Entdecken-Bereich erscheint — nicht erst am nächsten Morgen. Mehrere schnelle Änderungen werden zu einem Lauf zusammengefasst (entprellt) und nie parallel ausgeführt (Single-Flight); ändert sich während eines Laufs erneut etwas, folgt genau ein Nachlauf. |
 | Scout-Karten | Identisches Design wie Feed-Karten: ScoreRing (farbcodiert), Session-Icon + Session-Label + Uhrzeit, Motivname, Location-Zeile „Blick vom [Himmelsrichtung]", Tag-Chips (Wetter, Entfernung, Mondbeleuchtung bei Mond-Chancen); Navigation-Button vollbreit am Kartenende (US-104) |
 | Scout-Detail | Klick auf Scout-Karte öffnet vollständige Detail-Ansicht (identisch mit Feed-Chancen): FOV-Karte, Koordinaten, Himmelsposition, Wetter, Kameraempfehlung, AstroLive-Bahn, Beschreibung (US-83, v1.18.0) |
 | Scout-Detail: Als Location speichern | Button „Als Location speichern" (SVG-Pin-Icon) in der Detailansicht; speichert den Scout-Standpunkt via POST `/preview-alignment` (save:true) als neue Location (US-83) |
@@ -359,6 +362,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 
 | Ticket | Beschreibung |
 |--------|-------------|
+| US-106 | Geänderte/neue Location sofort komplett nutzbar — Wetter + Entdecken + Nachholen (Implemented, lokales Test-Gate + Refactor + Release ausstehend) |
 | US-83 | Scout-Detail + „Als Location speichern" (In Progress) |
 | US-95 | Chancendetails: Buttons kleiner, Karte größer |
 | US-98 | Bauhaus-Redesign Epic (übergeordnet) |
@@ -380,6 +384,8 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | — | US-99 | Bauhaus-Theme-Tokens (hell + dunkel) |
 | — | US-88 | Brennweiten-Filter nicht-linear |
 | 2026-06-28 | US-103 | Karten-Marker & FOV-Legende im Bauhaus-Stil (Tropfen + Zielring) |
+| 2026-06-28 | US-106 | Geänderte/neue Location sofort komplett nutzbar: gezieltes Wetter-Nachladen (Teil 1), debounced Scout-Volllauf mit Single-Flight + Dirty-Nachlauf (Teil 2), Pending-Queue mit Nachlauf am Lauf-Ende + Banner bleibt bis Feed UND Wetter stehen (Teil 3). Status Implemented — Test/Refactor/Release ausstehend. |
+| 2026-06-28 | US-106 (Nachbesserung) | Reihenfolge umgestellt: erst Feed+Wetter (Banner weg in Sekunden), Jahres-Kalender dieser Location zieht danach im Hintergrund nach (vorher hing das Banner ~10 Min am 365-Tage-Kalender). Kalender-Fehler nehmen die Freigabe nicht zurück; weiterhin nur eine schwere Berechnung gleichzeitig, zweite Änderung wird nachgeholt. Status Implemented — Test/Refactor/Release ausstehend. |
 | 2026-06-28 | US-105 | Chancen-Detail: Sektionsreihenfolge optimiert (Beschreibung zuerst, Wetter nach Zeitfenster, Kompositions-Analyse nach Karte) |
 | 2026-06-28 | US-104 | Scout-Karten auf Feed-Design umgestellt (ScoreRing, Himmelsrichtung, Tag-Chips) |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |

@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-46** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-47** |
+| **🔄 In Progress** | wird gerade implementiert | **US-106** *(Nachbesserung „Feed+Wetter sofort, Kalender im Hintergrund" implementiert + Tests grün; lokales Test-Gate offen)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-47** · **BUG-46** |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · BUG-34 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
@@ -44,6 +44,129 @@
 
 ## 🐛 BugFixes
 
+
+### US-106 · Geänderte oder neue Location sofort komplett nutzbar `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-28 |
+
+**Beschreibung:** Wenn ich die Position einer Location verschiebe oder eine neue Location hinzufüge, möchte ich diese Location innerhalb kurzer Zeit überall in der App vollständig und korrekt sehen — nicht erst am nächsten Morgen oder nach Stunden. Heute erscheinen die kommenden Foto-Chancen für diese Location zwar schon zügig, aber an drei Stellen hinkt die App noch hinterher: das Wetter zur Chance, die Empfehlungen im Entdecken-Bereich und Fälle, in denen gerade eine große Hintergrund-Aktualisierung läuft. Ziel: nach einer Standort-Änderung ist die Location ohne weiteres Zutun überall sofort richtig.
+
+**Teilpunkte (drei erlebbare Lücken, die geschlossen werden sollen):**
+1. **Wetter sofort statt mit Verzögerung:** Direkt nach der Standort-Änderung zeigen die neuen Foto-Chancen dieser Location auch das passende Wetter an — nicht erst nach bis zu drei Stunden. Bis das echte Wetter geladen ist, ist erkennbar, dass es gerade nachgeladen wird, statt eine falsche oder leere Wetterangabe zu zeigen.
+2. **Im Entdecken-Bereich sofort dabei:** Die geänderte oder neu angelegte Location taucht zeitnah auch im Entdecken-/Vorschlags-Bereich auf — nicht erst am nächsten Morgen.
+3. **Keine still verlorenen Änderungen bei laufender großer Berechnung:** Verschiebe oder ergänze ich eine Location, während im Hintergrund gerade eine große Aktualisierung läuft, geht meine Änderung nicht verloren. Sie wird automatisch nachgeholt, sobald die große Berechnung fertig ist, und der Hinweis in der App bleibt so lange ehrlich („wird noch aktualisiert"), bis die Location wirklich fertig durchgerechnet ist.
+
+**Bezug:**
+- **TASK-12** (erledigt, v1.4.2) — hat die sofortige Neuberechnung der Foto-Chancen (14-Tage-Feed + Jahreskalender) für die geänderte Location eingeführt. US-106 baut direkt darauf auf und schließt die drei verbliebenen Lücken (Wetter, Entdecken, laufende Großberechnung). Direkte Abhängigkeit/Erweiterung.
+- **US-77** (offen) — neue Locations zentral im Backend anlegen + Merge. Grenzt an, betrifft aber das *Anlegen/Zusammenführen* von Locations, nicht die *Aktualität der abgeleiteten Daten*. Getrennt halten.
+- Merge/Split-Empfehlung: **Ein US mit drei klar benannten Teilpunkten** (so angelegt). Split in drei Tickets ist möglich, falls die Teile getrennt freigegeben/getestet werden sollen — empfohlen nur, wenn der Entdecken-Teil (2) deutlich später kommen soll als Wetter (1) und der Nachhol-Mechanismus (3).
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-06-28)
+
+**📎 Code-Verifikation** (gelesen am 2026-06-28):
+- `backend/main.py` — `_run_precompute_single` (~Z.491): bei `if _precompute_running` (~Z.506) **Skip ohne Retry**; ID bleibt in `_recompute_pending`, wird aber nur durch `_load_caches` (~Z.310) gelöscht, *wenn die Location im Feed-Cache auftaucht* — ohne Recompute taucht sie dort aber nicht neu auf → Banner hängt bis Timeout. **Bestätigt.**
+- `_weather_overlay` (~Z.350): **voller** Overlay über *alle* Unique-Locations in T+3, Cron alle 3h, Forecast `days=7`, Key = gerundetes `lat,lon` (3 Nachkommastellen). Single-Recompute schreibt nur Platzhalter `weather_score=0.0` (`backend/precompute.py` Z.396, Kommentar „wird zur Laufzeit durch Wetter-Overlay ersetzt"). **Bestätigt.**
+- **Pending-Cleanup-Lücke bestätigt:** `_load_caches` entfernt die ID aus `_recompute_pending`, sobald sie im Feed-Cache ist — das passiert nach dem Feed/Kalender-Write, aber **bevor** das Wetter aufgespielt ist. Banner verschwindet also, während die Wetterangabe noch `0` (Platzhalter) ist.
+- `backend/discover/pipeline.py` — `run_pipeline(days)` / `refresh_discover_cache(cache_path)` nehmen **keinen** `location_id`. Scout existiert **nur als Volllauf** (Mond- + Sonnen-Pipeline parallel über alle Locations). **Kein inkrementeller Einzel-Pfad vorhanden — bestätigt.** Cron 05:45 + Startup + POST `/refresh-discover`. Wird bei Location-Änderung **nicht** getriggert.
+- `precompute.py` läuft als **eigener Subprozess** und lädt LOCATIONS + Overrides + (BUG-29/33) selbst; der Scout läuft dagegen **im Server-Prozess** → sieht live LOCATIONS inkl. Custom. **Bestätigt.**
+- Hinweis: `precompute.py` nutzt bereits `str | None` (Z.611) — Prod-Python 3.9 verträgt das in einem separat gestarteten Subprozess offenbar (bestehender Code); neuer Code in `main.py`/`pipeline.py` bleibt vorsichtshalber 3.9-konform.
+
+**Scope:**
+- Eingeschlossen: (1) Wetter sofort für die geänderte/neue Location inkl. ehrlichem „wird nachgeladen"-Zustand; (2) geänderte/neue Location zeitnah im Entdecken-Bereich; (3) keine still verworfene Einzel-Neuberechnung bei laufendem Großlauf — automatisches Nachholen + ehrliches Banner bis *wirklich* fertig (Feed+Kalender+Wetter).
+- Ausgeschlossen: Anlegen/Merge von Locations selbst (US-77); generelle Wetter-Genauigkeit/Provider-Wechsel; Push-Benachrichtigungen zu neuen Chancen; iOS-App (nur Web).
+
+**Example Mapping:**
+
+📏 **Regel 1 — Wetter folgt der Location sofort.** Nach einer Standort-Änderung wird das Wetter für genau diese Location zeitnah nachgeladen; bis dahin zeigt die App ehrlich „wird nachgeladen" statt einer falschen oder leeren Wetterangabe.
+- 🟢 *Positiv:* Stephan verschiebt eine Location → kurz darauf zeigen ihre kommenden Chancen echte Wetterwerte (Temperatur, Bewölkung), ohne dass er etwas tut oder bis zu 3 h wartet.
+- 🔴 *Negativ:* Während das Wetter noch lädt, darf **keine** Chance dieser Location einen ausgedachten oder leeren Wert (z. B. „0 %"/„–" als wäre es echtes Ergebnis) als fertiges Wetter darstellen — stattdessen klar als „lädt" erkennbar.
+- ⚙️ *Edge:* Chance liegt weiter als 3 Tage in der Zukunft → dort gibt es planmäßig noch kein Wetter (Forecast reicht nur ~7 Tage); das ist kein Fehler und muss als „noch kein Wetter" (nicht als „lädt ewig") erkennbar bleiben.
+
+📏 **Regel 2 — Entdecken zieht zeitnah nach.** Eine geänderte oder neu angelegte Location erscheint im Entdecken-/Vorschlags-Bereich zeitnah nach der Änderung, nicht erst am nächsten Morgen.
+- 🟢 *Positiv:* Stephan legt eine neue Location an → wenig später taucht sie (sofern sie eine relevante Chance hat) im Entdecken-Bereich auf.
+- 🔴 *Negativ:* Stephan macht 5 Änderungen kurz hintereinander → es wird **nicht** 5× ein teurer Volllauf gestartet (kein Doppel-/Mehrfach-Lauf, der den Server blockiert).
+- ⚙️ *Edge:* Die geänderte Location hat im betrachteten Zeitraum keine entdeckenswerte Chance → sie taucht korrekterweise *nicht* auf (kein leerer Platzhalter-Eintrag).
+
+📏 **Regel 3 — Keine still verlorene Änderung.** Läuft beim Ändern gerade eine große Hintergrund-Berechnung, wird die Einzel-Neuberechnung automatisch nachgeholt; der Hinweis bleibt ehrlich, bis die Location wirklich vollständig (Chancen + Kalender + Wetter) fertig ist.
+- 🟢 *Positiv:* Stephan ändert eine Location, während nachts/morgens gerade der Großlauf läuft → der Hinweis „wird noch aktualisiert" bleibt sichtbar, und sobald der Großlauf fertig ist, wird seine Location automatisch nachberechnet; danach verschwindet der Hinweis und alles stimmt.
+- 🔴 *Negativ:* Der Hinweis verschwindet **nicht**, solange noch der Platzhalter-Wetterwert (statt echtem Wetter) angezeigt würde.
+- ⚙️ *Edge:* Der Großlauf bricht mit Fehler ab → die nachzuholende Änderung wird trotzdem angestoßen (oder der Hinweis wird ehrlich auf „wird mit der nächsten Berechnung aktualisiert" gesetzt) — sie verschwindet nicht stillschweigend ohne Ergebnis.
+
+❓ **Offene Entscheidungen (vor Umsetzung):**
+1. **Scout-Trigger-Strategie (Teil 2):** Volllauf nach jeder Änderung mit Entprellung (z. B. 60–120 s zusammenfassen) — vs. den Scout erst beim nächsten Cron/Startup. Empfehlung unten ist „debounced Volllauf". Bestätigen?
+2. **„Zeitnah" konkret (Teil 1 & 2):** Reicht „innerhalb weniger Minuten" als gefühlte Sofortigkeit, oder soll Wetter spürbar < 1 min und Entdecken < 2–3 min sein? (beeinflusst Debounce-Fenster)
+3. **Banner-Wahrheit bei Wetter:** Soll der Hinweis erst verschwinden, wenn auch das Wetter steht (empfohlen) — das macht das Banner für ~Sekunden länger sichtbar. OK?
+
+**Akzeptanzkriterien (erlebbares App-Verhalten):**
+- [ ] Nach dem Verschieben einer Location zeigen ihre kommenden Foto-Chancen (innerhalb der nächsten 3 Tage) ohne weiteres Zutun echte Wetterangaben — ohne dass Stephan bis zu 3 Stunden warten oder manuell „Wetter aktualisieren" drücken muss.
+- [ ] Solange das echte Wetter noch geladen wird, ist das an der Chance klar als „wird nachgeladen" erkennbar — es erscheint kein ausgedachter oder leerer Wert, der wie ein fertiges Ergebnis aussieht.
+- [ ] Eine Chance, die weiter als ~3 Tage in der Zukunft liegt, zeigt verständlich „noch kein Wetter" und nicht endlos „wird geladen".
+- [ ] Eine neu angelegte oder verschobene Location taucht zeitnah (wenige Minuten) im Entdecken-Bereich auf, sofern sie dort eine relevante Chance hat — nicht erst am nächsten Morgen.
+- [ ] Mehrere Änderungen kurz hintereinander führen nicht dazu, dass die App spürbar langsamer/blockiert wird (keine mehrfachen parallelen Großberechnungen).
+- [ ] Ändere ich eine Location, während gerade eine große Hintergrund-Aktualisierung läuft, bleibt der Hinweis „wird noch aktualisiert" sichtbar und meine Änderung wird automatisch nachgeholt; danach stimmen Chancen, Kalender und Wetter für diese Location.
+- [ ] Der Hinweis „wird noch aktualisiert" verschwindet erst, wenn die Location wirklich vollständig fertig ist — inklusive echtem Wetter, nicht schon beim Platzhalter.
+- [ ] Edge: Schlägt die große Berechnung fehl, verschwindet meine Änderung nicht spurlos — sie wird angestoßen oder der Hinweis sagt ehrlich, dass sie mit der nächsten Berechnung kommt.
+
+**Pre-Mortem:**
+- 💀 *Race zwischen Einzel- und Großlauf — Änderung verpufft.* Auslöser: `_precompute_running`-Skip ohne Retry; ID bleibt pending, wird aber nie aufgelöst. Frühwarnung: Banner hängt bis 10-min-Timeout, Feed bleibt stale. → Gegenmaßnahme: am Ende jedes Laufs (`_run_precompute` **und** `_run_precompute_single`) `_recompute_pending` abarbeiten (Nachhol-Schleife), sequenziell, mit Schutz gegen Endlos-Rekursion. (AK „automatisch nachgeholt").
+- 💀 *Banner lügt — verschwindet vor dem Wetter.* Auslöser: `_load_caches` löscht Pending-ID, sobald Location im Feed ist (vor Wetter-Overlay). Frühwarnung: Wetter zeigt 0/„–" obwohl Banner weg. → Gegenmaßnahme: Pending-ID erst freigeben, wenn auch das Wetter für die Location aufgespielt ist (separater „weather_pending"-Zustand oder Reihenfolge: erst Wetter-für-Location, dann Pending clear). (AK „Hinweis erst weg wenn wirklich fertig").
+- 💀 *Scout-Volllauf bei jeder Änderung — Server überlastet / doppelte Läufe.* Auslöser: naiver Trigger pro PATCH; Volllauf ist teuer (zwei Pipelines über alle Locations). Frühwarnung: mehrere parallele Scout-Läufe, hohe CPU, langsame Antworten. → Gegenmaßnahme: Entprellung (Debounce-Fenster) + Single-Flight-Guard (kein zweiter Lauf, solange einer läuft; stattdessen „dirty"-Flag, das einen Nachlauf auslöst). (AK „keine mehrfachen parallelen Berechnungen").
+- 💀 *Doppelte Wetter-Fetches / Rate-Limit beim Provider.* Auslöser: gezielter Single-Overlay + paralleler 3h-Cron-Overlay holen dieselben Koordinaten doppelt. Frühwarnung: Wetter-API-Fehler/Drosselung im Log. → Gegenmaßnahme: Single-Overlay nur für die *eine* Location (deren Key), Wetter-Cache wiederverwenden; kein Voll-Overlay anstoßen.
+- 💀 *UTC/Ortszeit-Verwechslung beim „T+3"-Fenster.* Auslöser: Cache-Zeiten sind UTC, „nächste 3 Tage" muss in UTC gerechnet werden (wie bestehender Code). Frühwarnung: Wetter fehlt für Chancen am Tagesrand. → Gegenmaßnahme: bestehende UTC-Logik aus `_weather_overlay` wiederverwenden, nicht neu in Ortszeit rechnen.
+
+**Architektur (betroffen):**
+- `backend/main.py`: `_run_precompute_single` (Skip→Nachhol-Logik), `_load_caches` (Pending-Clear-Zeitpunkt), `_weather_overlay` (gezielte Single-Location-Variante), `_refresh_discover` (Debounce-Trigger), `/recompute-status` (Wetter-Readiness mit aufnehmen), Trigger-Stellen PATCH `/locations/{id}` (~Z.1490) + `_save_alignment_as_location` (~Z.1321).
+- `backend/discover/pipeline.py`: ggf. `run_pipeline`/`refresh_discover_cache` um optionalen Single-Flight/Trigger; **kein** echter Inkrement-Pfad vorhanden (Volllauf bleibt).
+- `web/index.html`: `startPendingPoll` (~Z.1487, Banner-Lebensdauer an Wetter-Readiness koppeln), Wetter-Anzeige (Z.1374/3335/3355 — „lädt"-Zustand statt 0).
+
+**Implementierungsoptionen + Empfehlung**
+
+*Teil 1 — Wetter sofort:*
+- **Option A (empfohlen): Gezielter Single-Location-Wetter-Overlay.** Nach erfolgreichem Single-Recompute nur das Wetter für genau diese eine Location nachladen (deren `lat,lon`-Key), Pending erst danach freigeben. App-Wirkung: Wetter steht in Sekunden für die geänderte Location, ohne alle anderen anzufassen. Aufwand: mittel.
+- Option B: vollen `_weather_overlay()` anstoßen. Einfacher (Funktion existiert), aber teuer (alle Locations) und riskiert doppelte Fetches/Rate-Limit. Aufwand: klein, aber schlechter skalierend.
+- ✅ **Empfehlung A** — präzise, günstig, keine Fremd-Locations belastet; passt zum „nur diese Location wird neu"-Modell.
+
+*Teil 2 — Entdecken sofort:*
+- **Option A (empfohlen): Debounced Volllauf nach Änderung mit Single-Flight.** Da der Scout **nur** als Volllauf existiert, nach einer Änderung einen Scout-Refresh anstoßen, aber Änderungen über ein kurzes Zeitfenster zusammenfassen und nie parallel laufen lassen (läuft schon einer → „dirty" merken, danach genau ein Nachlauf). App-Wirkung: neue/geänderte Location erscheint in wenigen Minuten im Entdecken, auch bei mehreren schnellen Edits ohne Server-Überlast. Aufwand: mittel.
+- Option B: echten inkrementellen Single-Location-Scout bauen (nur diese Location durch Mond-/Sonnen-Pipeline + Merge in discover.json). App-Wirkung identisch, günstiger pro Lauf — aber deutlich mehr Code (Merge-Logik, Pipeline-Refactor) und neue Fehlerquellen. Aufwand: groß.
+- ✅ **Empfehlung A** — der Volllauf existiert und ist robust; Debounce+Single-Flight löst das Kostenproblem mit wenig Risiko. B nur, falls der Volllauf sich messbar als zu teuer erweist (dann eigenes Ticket).
+
+*Teil 3 — Nachholen + ehrliches Banner:*
+- **Option A (empfohlen): Pending-Queue mit Nachlauf am Lauf-Ende + Wetter-gekoppeltes Banner.** Jeder Recompute (Einzel/Groß) arbeitet am Ende offene `_recompute_pending`-IDs sequenziell ab; eine ID gilt erst als erledigt, wenn Feed **und** Wetter für sie stehen. `/recompute-status` meldet erst dann „fertig". App-Wirkung: keine verlorene Änderung, Banner bleibt ehrlich bis wirklich alles steht. Aufwand: mittel.
+- Option B: nur einfacher Retry beim Skip (Single-Recompute später erneut versuchen, ohne Wetter-Kopplung). Weniger Code, aber Banner kann weiterhin vor dem Wetter verschwinden → verletzt AK. Aufwand: klein.
+- ✅ **Empfehlung A** — schließt beide Lücken (verlorene Änderung **und** lügendes Banner) sauber; B löst nur die halbe Anforderung.
+
+**Testplan:**
+- Automatisiert (`backend/tests/test_us106.py`, Ticket-ID im Docstring), mit `FOTOALERT_NO_BACKGROUND` gesteuert:
+  - Single-Recompute während simuliertem laufendem Großlauf (`_precompute_running=True`) → ID bleibt pending; nach „Lauf-Ende" wird sie abgearbeitet (Nachhol-Logik greift).
+  - `/recompute-status` meldet die ID erst dann nicht mehr als pending, wenn Feed **und** Wetter für sie gesetzt sind (Wetter-Readiness im Status).
+  - Single-Wetter-Overlay setzt `weather_score`/`weather_description` nur für die Ziel-Location, lässt andere unberührt; Chancen außerhalb T+3 bleiben „kein Wetter" (nicht „lädt").
+  - Scout-Trigger: mehrere schnelle Änderungen → höchstens ein paralleler Lauf (Single-Flight), genau ein Nachlauf bei „dirty".
+- Manuell (unter http://localhost:8000): (a) Location verschieben → binnen Sekunden echtes Wetter an den Chancen, Banner bleibt bis Wetter da ist; (b) neue Location anlegen → wenige Minuten später im Entdecken-Bereich; (c) Änderung während laufender Berechnung → Banner bleibt, danach automatisch korrekt. **Regressions-Matrix (PRODUCT.md §12, Backend/Cache-Typ):** Feed, Kalender, Entdecken, LocationDetail-Wetter, 3h-Wetter-Cron, nächtlicher Großlauf auf Seiteneffekte prüfen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert (main.py / discover/pipeline.py / web/index.html)
+- [x] Implementierungsoptionen je Teilpunkt: A / B
+- [x] Empfehlung freigeben (Weg-Gate Stephan): Teil1=A, Teil2=A, Teil3=A
+- [x] Offene Entscheidungen 1–3 klären
+
+**✅ Stephan-Freigabe 2026-06-28:** Teil1=A (gezielter Single-Location-Wetter-Overlay), Teil2=A (debounced Scout-Volllauf + Single-Flight + dirty-Nachlauf), Teil3=A (Pending-Queue mit Nachlauf, Banner bleibt bis Wetter steht). Zielzeiten streng: Wetter < 1 Min, Entdecken < 2–3 Min. Banner verschwindet erst, wenn Feed UND Wetter für die Location stehen. Edge: schlägt der Großlauf fehl, geht die Änderung nicht spurlos verloren (Anstoß oder ehrliches „kommt mit der nächsten Berechnung").
+
+**🔧 Nachbesserung 2026-06-28 (nach Lokaltest):** Im ersten Lokaltest dauerte das Nutzbar-Werden einer verschobenen Location fast 10 Minuten — nahezu komplett der 365-Tage-Kalender. Die sichtbaren Foto-Chancen standen schon nach ~4 Sekunden, der Jahres-Kalender brauchte aber ~10 Minuten und das „wird aktualisiert"-Banner hing so lange. Stephans Entscheidung: **„Feed + Wetter sofort, Kalender im Hintergrund."** Umgesetzt: Nach einer Standort-Änderung werden zuerst die sichtbaren Foto-Chancen und ihr Wetter berechnet — sobald beides steht, verschwindet das Banner (in Sekunden). Der vollständige Jahres-Kalender für diese Location wird danach im Hintergrund nachgerechnet, ohne das Banner aufzuhalten. Dass der Kalender-Tab dieser Location ein paar Minuten noch den alten Stand zeigt, ist bewusst akzeptiert. Schlägt die Wetter-Abfrage fehl, bleibt das Banner ehrlich stehen (Location bleibt offen für den nächsten Versuch); ein Fehler beim Hintergrund-Kalender nimmt die bereits erfolgte Freigabe nicht zurück.
+
+> Zusatz-AK (Nachbesserung): Nach dem Verschieben einer Location verschwindet das „wird aktualisiert"-Banner in **Sekunden**, sobald die sichtbaren Foto-Chancen + ihr Wetter stehen — es wartet **nicht** mehr auf den vollständigen Jahres-Kalender. Der Jahres-Kalender dieser Location zieht im Hintergrund nach und darf dabei ein paar Minuten den alten Stand zeigen.
+
+
+---
 
 ### US-98 · Bauhaus-Redesign (Epic) `[x]`
 
@@ -1902,13 +2025,13 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 
 ---
 
-### BUG-46 · Filter-Inkonsistenz: Nicht alle Kriterien bieten aktiv/ausgeschlossen/deaktiviert an; kein Effekt auf Karte `[ ]`
+### BUG-46 · Filter-Inkonsistenz: Nicht alle Kriterien bieten aktiv/ausgeschlossen/deaktiviert an; kein Effekt auf Karte `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Der Filter verhält sich in zwei Punkten inkonsistent:
