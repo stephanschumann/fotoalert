@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.0';
+const APP_VERSION = '1.20.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3232,12 +3232,12 @@ const CameraFOV = {
     const d = this._data[prefix];
     const hasSub = d && d.subjLat;
     return `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-        <select id="fov_sensor_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;flex:1;min-width:140px">${opts}</select>
+        <select id="fov_sensor_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:16px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;flex:1;min-width:140px">${opts}</select>
         <div style="display:flex;align-items:center;gap:4px">
-          <input type="number" id="fov_fl_${prefix}" min="8" max="1200" value="${p.fl}" oninput="CameraFOV.update('${prefix}')" style="width:58px;font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 6px;text-align:right">
+          <input type="number" id="fov_fl_${prefix}" min="8" max="1200" value="${p.fl}" oninput="CameraFOV.update('${prefix}')" style="width:64px;font-size:16px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 6px;text-align:right">
           <span style="font-size:12px;color:var(--muted)">mm</span>
         </div>
-        <select id="fov_ori_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px">
+        <select id="fov_ori_${prefix}" onchange="CameraFOV.update('${prefix}')" style="font-size:16px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px">
           <option value="landscape"${p.ori==='landscape'?' selected':''}>Querformat</option>
           <option value="portrait"${p.ori==='portrait'?' selected':''}>Hochformat</option>
         </select>
