@@ -90,7 +90,7 @@ Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
 | **Schwierigkeit** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Kategorie** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
-| **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte |
+| **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51) |
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
 
 ### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
@@ -361,13 +361,15 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 | Brennweiten-Empfehlung automatisch | Passend zum Motiv und zur Entfernung wird eine empfohlene Brennweite berechnet und hinterlegt. |
 | Nächtlicher Lauf (01:00 Uhr) | Einmal pro Nacht prüft die App alle Standorte und erkennt am „Fingerabdruck" eines Standorts, ob sich etwas geändert hat oder er neu ist. Nur diese werden neu durchgerechnet — der Rest bleibt unangetastet, damit der Lauf schnell bleibt. |
 | Werte erscheinen in Feed & Kalender | Die automatisch ermittelten Werte fließen in die nächste Neuberechnung ein, sodass sie danach auch in den Foto-Chancen (Feed) und im Kalender sichtbar sind. |
-| Manuelle Werte bleiben geschützt | Hat jemand eine Blickrichtung oder Brennweite selbst gesetzt oder gesperrt, rührt die Automatik diese Werte nicht an. |
+| Standortbeschreibung automatisch | Für Standorte ohne (oder mit leerer) Beschreibung wird automatisch ein kurzer deutscher Text aus den vorhandenen Fakten (Name, Motiv, Kategorie, Koordinaten) erzeugt und hinterlegt. |
+| Manuelle Werte bleiben geschützt | Hat jemand eine Blickrichtung, Brennweite oder Beschreibung selbst gesetzt oder gesperrt, rührt die Automatik diese Werte nicht an. |
 | Sofort-Auslöser | Ein geschützter Auslöser (nur für den Host) startet diesen Qualitätslauf bei Bedarf sofort, ohne auf die Nacht zu warten. |
 
 **Pflicht-Regression Standort-Automatik:**
 - [ ] Neuer Standort ohne Blickrichtung erhält nach dem Lauf eine automatische Blickrichtung
 - [ ] Standort ohne Brennweiten-Empfehlung erhält nach dem Lauf eine Empfehlung
-- [ ] Manuell gesetzte/gesperrte Werte bleiben nach dem Lauf unverändert
+- [ ] Standort ohne Beschreibung erhält nach dem Lauf einen automatisch erzeugten deutschen Text
+- [ ] Manuell gesetzte/gesperrte Werte (inkl. Beschreibung) bleiben nach dem Lauf unverändert
 - [ ] Unveränderte Standorte werden nicht erneut durchgerechnet (nur geänderte/neue)
 - [ ] Automatische Werte erscheinen nach der Neuberechnung in Feed + Kalender
 - [ ] Sofort-Auslöser ohne Host-Token → HTTP 401
@@ -424,6 +426,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | TASK-45 | Ideale Blickrichtung (Azimut) wird für Standorte automatisch bestimmt; manuelle/gesperrte Werte bleiben unangetastet |
 | 2026-06-28 | TASK-47 | Brennweiten-Empfehlung wird automatisch aus Motiv + Entfernung berechnet; respektiert gesetzte/gesperrte Werte |
 | 2026-06-28 | TASK-48 | Nächtlicher Standort-Qualitätslauf (01:00) erkennt geänderte/neue Standorte per Fingerabdruck und rechnet nur diese neu; Auto-Werte fließen in Feed + Kalender; geschützter Sofort-Auslöser `/run-qa-pass` (host) |
+| 2026-06-29 | TASK-46 | Standortbeschreibungen werden automatisch per Mistral AI erzeugt (Deutsch, faktenbasiert); respektiert `description_lock`; überspringt bei fehlendem Key/API-Fehler sauber |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |
 | — | US-66 | Login + Auth (Host/User) |
 | — | BUG-42 | Custom Locations: kein 📍-Emoji in Namen |
@@ -435,3 +438,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | BUG-47 | Einstellungsseite zeigt korrekte Rolle nach Host-Login: `CFG.role` als Getter aus Token-Präfix (robust gegen Safari ITP); nach Login `App.init()` + `App.nav('feed')` für sofortiges UI-Update ohne Browser-Refresh |
 | 2026-06-28 | BUG-34 | iOS-Zoom in "Karte & Blickwinkel" behoben (font-size 16px) |
 | 2026-06-29 | US-107 | Sonnen-Alignment-Planung: Sonnenaufgang/-untergang mit Azimut im Event-Detail (Astronomie-Sektion, analog Mondaufgang US-79); Richtungsklassifizierung relativ zum Motiv im Location-Detail (Abschnitt Ausrichtung, ±15°-Toleranz); neue API-Felder `sunrise_azimuth`/`sunset_azimuth` in `_serialize()`; Klassifizierungslogik `classify_sun_alignment()` neu; `/refresh-feed` nach Release ausführen |
+| 2026-06-29 | BUG-51 | Entfernungsfilter wirkt jetzt im Locations-Tab (applyToLocations + GPS-Lifecycle) |

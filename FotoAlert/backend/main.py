@@ -59,7 +59,7 @@ from calculations.weather import fetch_weather_forecast, calculate_photo_weather
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
-from data import qa_azimuth, qa_focal  # TASK-48: fertige Auto-Verbesserungen anstoßen
+from data import qa_azimuth, qa_focal, qa_description  # TASK-45/46/47: Auto-QA (Azimut, Beschreibung, Brennweite)
 from models.schemas import (
     CameraHintOut,
     DailyBriefingOut,
@@ -722,17 +722,11 @@ def _qa_improve_one(loc, store) -> bool:
     Wird über asyncio.to_thread aus dem Job aufgerufen, damit die (potenziell
     blockierende) Rechen-/Netzarbeit nicht im Event-Loop läuft.
 
-    Stößt Azimut (TASK-45) + Brennweite (TASK-47) an. Beide respektieren ihre
+    Stößt Azimut (TASK-45) + Brennweite (TASK-47) + Beschreibung (TASK-46) an. Alle respektieren ihre
     eigenen Locks und werfen nie; ein gesetztes Lock = kein Schreiben, gilt aber
     trotzdem als geprüft. Fehler eines einzelnen Dienstes werden hier isoliert,
     sodass der Spot insgesamt als erfolgreich verarbeitet gilt (er wird nicht
     künstlich erneut anfällig nur weil ein Dienst hakte).
-
-    # TASK-46 Erweiterungspunkt: hier update_location_description(store, loc.id, ...)
-    # anstoßen, sobald die LLM-Beschreibung gebaut ist — mit identischer
-    # Fehler-Isolierung/Drosselung wie Azimut/Brennweite. HEUTE bewusst KEIN
-    # Aufruf (Funktion existiert noch nicht). Die Beschreibung fließt über den
-    # precompute-Merge (_apply_qa_values) automatisch in Feed/Kalender.
 
     Rückgabe: True bei erfolgreicher Verarbeitung (Hash/Zeitstempel fortschreiben),
     False bei einem harten Fehler (Spot bleibt ungeprüft, fällt erneut an).
@@ -757,6 +751,20 @@ def _qa_improve_one(loc, store) -> bool:
         )
     except Exception as exc:
         logger.warning("QA-Brennweite für %s fehlgeschlagen: %s", loc.id, exc)
+        ok = False
+    try:
+        result = qa_description.update_location_description(
+            store, loc.id,
+            getattr(loc, "name", "") or "",
+            getattr(loc, "subject_name", "") or "",
+            getattr(loc, "category", "") or "",
+            getattr(loc, "observer_lat", None),
+            getattr(loc, "observer_lon", None),
+        )
+        if result is not None:
+            logger.info("QA-Beschreibung für %s erzeugt", loc.id)
+    except Exception as exc:
+        logger.warning("QA-Beschreibung für %s fehlgeschlagen: %s", loc.id, exc)
         ok = False
     return ok
 

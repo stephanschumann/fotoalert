@@ -29,8 +29,8 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-51** |
-| **🏁 Done** | abgeschlossen + deployed | **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-46** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **+ alle übrigen offenen Tickets unten** |
@@ -1157,13 +1157,13 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-46 · Standortbeschreibungen automatisch erzeugen (LLM) `[ ]`
+### TASK-46 · Standortbeschreibungen automatisch erzeugen (LLM) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
@@ -1186,16 +1186,101 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 - 💀 Szenario: Recompute zeigt neue Texte nicht (gleiches QA-Werte-Lade-Problem wie TASK-45). Gegenmaßnahme: in TASK-48 mitziehen.
 - 📎 Code-Verifikation (2026-06-28): `set_qa_values(description=…)` + `description_lock` vorhanden (`data/store.py`, TASK-44); Merge via `main.py:_load_qa_values()` (Z.846 setzt `loc.description`). Kein `anthropic`-Paket in `requirements.txt` → Aufruf via `httpx` gegen die Messages-API. Kein API-Key-Handling im Code bisher (`grep` ANTHROPIC/API_KEY: nur FOTOALERT_*-Flags).
 
+**📎 Code-Verifikation (2026-06-29, echter Code gelesen):**
+- **Ablage vorhanden:** `location_qa_values.description TEXT` (`data/store.py` Z.118) + Sperr-Flag `location_qa_state.description_lock INTEGER` (Z.109). `set_qa_values(description=…)` ist bereits unterstützt (Z.698). `get_qa_state` liefert das Sperr-Flag. **Kein Schema-Umbau nötig.**
+- **Merge bestätigt:** `main.py:_load_qa_values()` (Z.1014–1035) setzt `loc.description = qv["description"]` wenn der QA-Wert nicht None ist (Z.1034–1035). Start-Reihenfolge: `_load_qa_values()` vor `_load_location_overrides()` (Z.1056 ff.) → Override gewinnt über Auto-Wert.
+- **Erweiterungspunkt:** `main.py` Z.731 — Kommentar „TASK-46 Erweiterungspunkt: hier `update_location_description(store, loc.id, …)`" — dort den Aufruf einhängen.
+- **httpx vorhanden:** `qa_azimuth.py` nutzt `import httpx` lokal (Z.150) für den Overpass-Call. Dasselbe Muster für den Anthropic-HTTP-Call.
+- **Kein anthropic-Paket:** `requirements.txt` enthält kein `anthropic`-Paket → direkter HTTP-Call gegen `https://api.anthropic.com/v1/messages` per `httpx`.
+- **Lücke (das ist die Aufgabe):** Es gibt kein Schwester-Modul `data/qa_description.py`. `qa_azimuth.py` liefert die Vorlage: Sperr-Prüfung, Schreiben via `set_qa_values`, None bei Lock/fehlendem Ergebnis, keine Exception nach außen.
+
+**Architektur-Analyse — betroffene Dateien:**
+- **Neu:** `backend/data/qa_description.py` — Schwester zu `qa_azimuth.py`. Enthält:
+  - `_build_prompt(loc_name, subject_name, category, observer_lat, observer_lon) → str` — Fakten-basierter Prompt auf Deutsch, max. 3 Sätze, strikt keine Erfindungen.
+  - `_call_anthropic_api(prompt, api_key, timeout_s) → Optional[str]` — httpx-POST gegen `https://api.anthropic.com/v1/messages`, Header `x-api-key`, `anthropic-version: 2023-06-01`, model `claude-haiku-3-5` (klein, schnell, günstig). Key nie loggen. Bei jedem Fehler/Timeout → None.
+  - `generate_description(loc_name, subject_name, category, observer_lat, observer_lon, api_key, timeout_s) → Optional[str]` — ruft die beiden oberen auf; gibt None zurück wenn Antwort leer/nur Whitespace.
+  - `update_location_description(store, location_id, loc_name, subject_name, category, observer_lat, observer_lon, timeout_s) → Optional[str]` — prüft `description_lock`; schreibt via `set_qa_values(description=…)`; gibt None bei Lock/fehlendem Ergebnis; wirft nie.
+- **Neu:** `backend/tests/test_task46_descriptions.py` — pytest-Tests (s.u. Testplan).
+- **Geändert:** `backend/main.py` Z.731 — Aufruf von `update_location_description` mit Fehler-Isolierung analog zu Azimut/Brennweite einhängen (import hinzufügen).
+- **Unverändert (nur referenziert):** `data/store.py` (Methoden + Schema reichen), `data/qa_azimuth.py` (Vorlage, kein Code-Umbau).
+
+**Implementierungsoptionen:**
+
+*Option A — Anthropic HTTP direkt, synchroner httpx-Call im QA-Modul (analog Azimut)*
+- App-Wirkung: Nach dem QA-Lauf hat ein leerer Spot eine kurze deutsche Beschreibung, die sofort im Detail sichtbar ist. Kein zusätzlicher Schritt, kein manuelles Gate.
+- Vorgehen: `qa_description.py` wie oben beschrieben; `_call_anthropic_api` blockiert kurz (1–5 s typisch) — wird wie Azimut via `asyncio.to_thread` im QA-Lauf aufgerufen, blockiert also nicht den Event-Loop.
+- Risiken: (1) Kosten pro API-Call (Haiku ist günstig, ~$0.001/Spot); (2) KI kann faktisch danebenliegen (Gegenmaßnahme: Prompt auf übergebene Fakten beschränken); (3) Netz-Abhängigkeit (Gegenmaßnahme: Timeout + stilles None wie Overpass in Azimut).
+- Aufwand: klein (1 Modul, ~120 Zeilen, Tests, 1 Zeile main.py).
+
+*Option B — Pipeline mit Caching + Freigabe-Flag (zweistufig)*
+- App-Wirkung: Beschreibung erscheint erst nach manueller Freigabe durch den Betreiber. Höhere Qualitätskontrolle, aber Latenz und Betreiber-Aufwand.
+- Vorgehen: Generierter Text landet zunächst in einem „pending"-Status; ein Admin-Schritt setzt ein Freigabe-Flag; erst dann wird die Beschreibung sichtbar.
+- Risiken: Erheblich mehr Infrastruktur (neue DB-Spalten, Admin-Endpunkt, UI) — weit außerhalb des Scopes. Fakten-Halluzinationen werden manuell gefangen, aber der Overhead ist hoch.
+- Aufwand: groß; braucht Admin-UI (ausgeschlossen laut Scope).
+
+✅ **Empfehlung: Option A** — schlanker Start, folgt exakt dem Azimut-Muster (Konsistenz), kein Infrastruktur-Overhead. Das Fakten-Halluzinations-Risiko wird durch einen strikten Prompt (nur übergebene Fakten verwenden, keine Erfindungen, maximal 3 Sätze) auf das Minimum begrenzt. Ein zukünftiges Freigabe-Gate kann jederzeit als Add-on gebaut werden (Lock-Flag existiert bereits). Option B ist nur sinnvoll wenn manuelle Kontrolle über jeden Text Pflicht wird — das ist heute kein Requirement.
+
 **Analyse & Planung:**
 - [x] Example Mapping (kompakt)
 - [x] Pre-Mortem (kompakt)
-- [x] Architektur analysiert: `data/store.py` (qa_values/description_lock), `main.py:_load_qa_values()`, neue API-Client-Funktion (HTTP)
-- [ ] Optionen: A (Anthropic HTTP direkt) / B (Pipeline mit Caching + Freigabe-Flag) — Detailwahl in eigener Analyse-Phase
-- [ ] Empfehlung: offen (A als schlanker Start wahrscheinlich)
+- [x] Architektur analysiert: `data/store.py` (qa_values/description_lock), `main.py:_load_qa_values()` + Erweiterungspunkt Z.731, neues Modul `data/qa_description.py` nach Azimut-Muster
+- [x] Optionen: A (Anthropic HTTP direkt, synchron via httpx) / B (Pipeline + Freigabe-Flag) — **Empfehlung A**
+- [x] Empfehlung: Option A — schlanker Start, Azimut-Muster, kein Infrastruktur-Overhead
 
 **Testplan:**
-- [ ] Automatisiert (`backend/tests/test_task46_descriptions.py`): API gemockt → Text landet in qa_values; Lock respektiert; leere/fehlerhafte API-Antwort → kein Schreiben; fehlender Key → sauberes Überspringen.
-- [ ] Manuell: Test-Spot ohne Text anlegen, QA-Lauf, im Detail prüfen dass eine sinnvolle Beschreibung erscheint.
+
+*Automatisiert (`backend/tests/test_task46_descriptions.py`):*
+
+```
+test_description_written_when_empty
+  Gegeben: Store mit Location ohne description + kein Lock
+  Und: Anthropic-API gemockt → gibt "Ein toller Spot." zurück
+  Wenn: update_location_description(store, loc_id, …) aufgerufen
+  Dann: store.get_qa_values(loc_id)["description"] == "Ein toller Spot."
+
+test_description_lock_respected
+  Gegeben: description_lock = 1 gesetzt
+  Und: Anthropic-API gemockt (würde Text liefern)
+  Wenn: update_location_description aufgerufen
+  Dann: Rückgabewert None; set_qa_values NICHT aufgerufen (API-Mock NICHT aufgerufen)
+
+test_empty_api_response_not_written
+  Gegeben: kein Lock; API-Mock gibt leeren String "" zurück
+  Wenn: update_location_description aufgerufen
+  Dann: Rückgabewert None; description in qa_values nicht gesetzt (bleibt None)
+
+test_whitespace_only_response_not_written
+  Gegeben: kein Lock; API-Mock gibt "   \n  " zurück
+  Dann: wie test_empty_api_response_not_written
+
+test_api_error_silent
+  Gegeben: kein Lock; API-Mock wirft httpx.ConnectError
+  Dann: Rückgabewert None; keine Exception nach außen; Log-Ausgabe vorhanden
+
+test_missing_api_key_skips_silently
+  Gegeben: ANTHROPIC_API_KEY nicht gesetzt (None)
+  Dann: Rückgabewert None; keine Exception; kein HTTP-Call
+
+test_existing_description_not_overwritten
+  Gegeben: kein Lock; aber location hat bereits eine description "Beste Aussicht"
+           in qa_values (oder manuell — durch description_lock simuliert)
+  Dann: Wert bleibt "Beste Aussicht" — update_location_description schreibt nicht
+
+test_build_prompt_contains_facts
+  Gegeben: loc_name="Teufelsberg", subject_name="Berliner Dom", category="SKYLINE"
+  Dann: _build_prompt(...) enthält "Teufelsberg", "Berliner Dom", "SKYLINE";
+        enthält keine Erfindungen (kein Platzhalter-Text außerhalb der Fakten)
+```
+
+*Manuell (nach lokalem Serverstart):*
+1. Server starten (Fenster 1): `cd .../FotoAlert/backend && python main.py`
+2. ANTHROPIC_API_KEY in Umgebung setzen.
+3. Via Chrome-Console oder curl einen Test-Spot ohne description anlegen:
+   `API.post('/preview-alignment', {save:true})` oder `curl -X PATCH /locations/{id}` mit leerer description.
+4. QA-Lauf triggern (TASK-48-Endpunkt oder direkter Python-Aufruf im Fenster 2).
+5. `curl http://localhost:8000/locations/{id}` — Feld `description` muss jetzt einen kurzen deutschen Text enthalten.
+6. `description_lock` auf 1 setzen, QA-Lauf wiederholen → Beschreibung bleibt unverändert.
+7. ANTHROPIC_API_KEY löschen (`unset`), QA-Lauf → kein Absturz, Beschreibung bleibt wie sie war, Log zeigt Überspringen.
 
 ---
 
@@ -3230,14 +3315,15 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ---
 
-### BUG-51 · Filter nach Entfernung funktioniert nicht `[ ]`
+### BUG-51 · Filter nach Entfernung funktioniert nicht `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Der Entfernungsfilter (Radius-Slider oder Entfernungs-Chips) hat keine sichtbare Wirkung auf die angezeigte Locations- oder Feed-Liste — Locations außerhalb des gewählten Radius werden trotzdem angezeigt. Erwartetes Verhalten: nur Locations innerhalb des gesetzten Radius sind sichtbar.
 
