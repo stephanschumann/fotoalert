@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47
+> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -90,7 +90,7 @@ Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
 | **Schwierigkeit** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Kategorie** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
-| **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51) |
+| **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51). GPS-Dialog erscheint pro Session maximal einmal — laufende Anfragen werden dedupliziert via `Filter._gpsPromise`-Caching (BUG-52) |
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
 
 ### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
@@ -440,3 +440,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | BUG-34 | iOS-Zoom in "Karte & Blickwinkel" behoben (font-size 16px) |
 | 2026-06-29 | US-107 | Sonnen-Alignment-Planung: Sonnenaufgang/-untergang mit Azimut im Event-Detail (Astronomie-Sektion, analog Mondaufgang US-79); Richtungsklassifizierung relativ zum Motiv im Location-Detail (Abschnitt Ausrichtung, ±15°-Toleranz); neue API-Felder `sunrise_azimuth`/`sunset_azimuth` in `_serialize()`; Klassifizierungslogik `classify_sun_alignment()` neu; `/refresh-feed` nach Release ausführen |
 | 2026-06-29 | BUG-51 | Entfernungsfilter wirkt jetzt im Locations-Tab (applyToLocations + GPS-Lifecycle) |
+| 2026-06-29 | BUG-52 | GPS-Dialog erscheint pro Session nur einmal (Promise-Caching via `Filter._gpsPromise`) |

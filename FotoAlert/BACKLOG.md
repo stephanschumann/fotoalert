@@ -28,12 +28,12 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | — |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-52** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-50** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -3374,12 +3374,131 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-29 |
 
 **Beschreibung:** Bei Locations, die per Quick Location Capture angelegt wurden, speichert die App den Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Löscht der Nutzer diesen Text, schreibt sich der Wert beim nächsten Speichern/Öffnen erneut hinein — der Hinweis lässt sich nicht dauerhaft entfernen (reproduzierbar z. B. bei Ehrenhof-Kollonaden am Schloss Sanssouci).
 
 **Bezug:** Keine Dubletten gefunden.
+
+---
+
+#### Analyse (BUG-50)
+
+##### 📎 Code-Verifikation (durchgeführt 2026-06-29)
+
+- `PATCH /locations/{loc_id}` in `backend/main.py` Zeile 1879–1952 gelesen.
+- `all_allowed_fields` (Zeile 1887): `{observer_lat, observer_lon, subject_lat, subject_lon, name, description, observer_floor_height_m, focal_length_suggestions}` — **`special_notes` fehlt vollständig**.
+- Frontend `saveEdit()` in `web/index.html` Zeile 4581: sendet `special_notes` im Body — aber der Endpoint filtert es mit `allowed = {k: v for k, v in body.items() if k in all_allowed_fields}` (Zeile 1888) still heraus.
+- `_update_custom_location_file()` → `_store.update_custom()` in `store.py` Zeile 211–242: unterstützt `special_notes` vollständig (Spalte existiert in DB, dynamisches SQL).
+- **Root-Cause:** `special_notes` ist nicht in der Whitelist des PATCH-Endpoints. Das Frontend sendet den Wert korrekt; der Server ignoriert ihn. Die DB behält den ursprünglichen Wert „Automatisch erfasst via Quick Location Capture." — beim Öffnen des Edit-Formulars erscheint er wieder.
+- Bestätigt: **kein zweites Schreibloch** — die DB-Spalte existiert, `update_custom()` verarbeitet sie korrekt, nur die Whitelist fehlt.
+
+##### Example Mapping
+
+**📏 Rule 1:** Löscht der Nutzer den Text im HINWEISE-Feld und speichert, ist der ursprüngliche Text dauerhaft weg.
+
+🟢 Beispiel: Location „Ehrenhof-Kollonaden" wurde per Quick Capture angelegt. Stephan öffnet Bearbeiten, löscht „Automatisch erfasst via Quick Location Capture.", tippt stattdessen „Beste Lichtzeit: 18–20 Uhr" und speichert. Beim erneuten Öffnen steht „Beste Lichtzeit: 18–20 Uhr" im Feld — der ursprüngliche Text ist weg.
+
+🟢 Beispiel (Leerlassen): Stephan löscht den Text und lässt das Feld leer. Nach Speichern ist das Feld dauerhaft leer.
+
+**📏 Rule 2:** Der `PATCH`-Endpoint akzeptiert und persistiert `special_notes` für Custom-Locations.
+
+🟢 Beispiel: `PATCH /locations/custom_xyz {"special_notes": "Neue Info"}` → Antwort `{"ok": true, "updated": {"special_notes": "Neue Info"}}`. Beim GET der Location steht der neue Text.
+
+**📏 Rule 3:** Für Standard-Locations (keine `custom_`-Prefix) wird `special_notes` ebenfalls via Override persistiert.
+
+🟢 Beispiel: `PATCH /locations/loc_123 {"special_notes": "Hinweis"}` → `_save_location_override` wird aufgerufen; beim nächsten Server-Start bleibt der Wert.
+
+##### Akzeptanzkriterien
+
+- [ ] AK-1: Stephan öffnet die Bearbeiten-Ansicht einer per Quick Capture angelegten Location, löscht den vorausgefüllten Hinweis-Text und speichert. Beim erneuten Öffnen der Location ist das Hinweisfeld leer — der ursprüngliche Text erscheint nicht erneut.
+- [ ] AK-2: Stephan ersetzt den Hinweis-Text durch eigenen Text und speichert. Der eigene Text bleibt nach Server-Neustart dauerhaft erhalten.
+- [ ] AK-3: `PATCH /locations/{custom_id} {"special_notes": "X"}` gibt `{"ok": true, "updated": {"special_notes": "X"}, ...}` zurück (HTTP 200) — `special_notes` erscheint in `updated`.
+- [ ] AK-4: `PATCH /locations/{standard_id} {"special_notes": "X"}` gibt HTTP 200 zurück und persistiert den Wert via Override.
+- [ ] AK-5 (Edge Case): Leerer String `""` als `special_notes` wird akzeptiert und korrekt persistiert (nicht abgelehnt oder durch Default ersetzt).
+- [ ] AK-6 (Regression): Alle bisher erlaubten Felder (name, description, Koordinaten, focal_length_suggestions, observer_floor_height_m) funktionieren nach der Änderung unverändert.
+
+##### Pre-Mortem
+
+💀 **Szenario 1: `special_notes` landet in `recompute_fields` — unerwünschter Recompute**
+Auslöser: Jemand fügt `special_notes` versehentlich zu `recompute_fields` hinzu.
+Frühwarnung: Jedes Hinweis-Edit löst einen teuren Single-Location Recompute aus.
+Gegenmaßnahme: `special_notes` explizit nur zu `text_fields` + `all_allowed_fields` hinzufügen — `recompute_fields` unverändert lassen. Im AK-Test: kein Recompute-Flag in der Response bei reinem `special_notes`-PATCH.
+
+💀 **Szenario 2: Standard-Location Overrides fehlen `special_notes`-Unterstützung**
+Auslöser: `_save_location_override()` persistiert `special_notes` nicht.
+Frühwarnung: Bei Standard-Locations bleibt der Wert im In-Memory (verschwindet nach Restart).
+Gegenmaßnahme: `_save_location_override` prüfen ob `special_notes` in den Override-Write einbezogen wird. (Prüfpunkt in Impl.)
+
+💀 **Szenario 3: `allowed`-Filter bricht die Fehlerbehandlung für leere Updates**
+Auslöser: Body enthält nur `special_notes` → `allowed` ist danach nicht-leer → kein 400-Fehler. Korrekt.
+Frühwarnung: Kein Risiko — das ist gewünschtes Verhalten. Kein Pre-Mortem-Fall.
+
+💀 **Szenario 4: Validierung für `special_notes` fehlt — XSS oder überlange Strings**
+Auslöser: Nutzer sendet sehr langen oder HTML-haltigen String ins Hinweisfeld.
+Frühwarnung: Kein Längen-Check in anderen Textfeldern vorhanden — konsistent nicht validiert.
+Gegenmaßnahme: Keine zusätzliche Validierung nötig (konsistent mit `name`, `description`). Scope bewusst ausgeschlossen.
+
+##### Architektur-Analyse
+
+**Betroffene Stellen:**
+
+1. `backend/main.py` Zeile 1884 — `text_fields` (enthält `name`, `description`)
+2. `backend/main.py` Zeile 1887 — `all_allowed_fields` (Union aller erlaubten Felder)
+3. `_save_location_override()` — zu prüfen ob `special_notes` in Overrides unterstützt wird
+
+**Nicht betroffen:**
+- `store.py` `update_custom()` — unterstützt `special_notes` bereits korrekt
+- Frontend `saveEdit()` — sendet `special_notes` bereits korrekt
+- Recompute-Pfad — darf nicht berührt werden
+
+##### Implementierungsoptionen
+
+**Was bedeutet das für die App:**
+
+Option A: Das Hinweisfeld verhält sich wie Name und Beschreibung — editierbar, dauerhaft gespeichert, kein Nebeneffekt.
+
+Option B: Gleiches Ergebnis, aber über einen separaten Endpoint. In der App identisches Erlebnis, mehr technischer Aufwand.
+
+---
+
+### Option A — `special_notes` in `text_fields` aufnehmen (1-Zeilen-Fix)
+
+- **Vorgehen:** `special_notes` in `text_fields` (Zeile 1884) eintragen → automatisch Teil von `all_allowed_fields`. Kein weiterer Code nötig. Zusätzlich prüfen ob `_save_location_override` den Wert für Standard-Locations persistiert.
+- **Betroffene Dateien:** `backend/main.py` (1 Zeile); ggf. minimal `_save_location_override` (falls dort Whitelist)
+- **Vorteile:** Minimalinvasiv, keine neuen Code-Pfade, konsistent mit bestehender Architektur
+- **Nachteile / Risiken:** Keine — `update_custom` und DB unterstützen das Feld bereits
+- **Aufwand:** klein
+
+### Option B — Separater `PATCH /locations/{id}/notes` Endpoint
+
+- **Vorgehen:** Neuer dedizierter Endpoint nur für `special_notes`
+- **Betroffene Dateien:** `backend/main.py` (neuer Endpoint + Frontend-Anpassung)
+- **Vorteile:** Expliziter API-Vertrag
+- **Nachteile / Risiken:** Unnötiger Aufwand — kein struktureller Unterschied zu Option A aus App-Sicht
+- **Aufwand:** mittel
+
+✅ **Empfehlung: Option A** — 1-Zeilen-Fix in `text_fields`. Unterstützung in DB und `update_custom()` bereits vorhanden. Konsistent mit `name`/`description`.
+
+##### Scope
+
+**Eingeschlossen:** `special_notes` via PATCH editierbar + dauerhaft persistiert (Custom + Standard Locations).
+
+**Ausgeschlossen:** Längen-/HTML-Validierung (nicht vorhanden für andere Textfelder — Konsistenz).
+
+##### Testplan
+
+- [ ] **Automatisiert (pytest):** `backend/tests/test_bug50.py` — PATCH custom location mit `special_notes`; PATCH mit `""` (Leeren); Verify: `special_notes` in `updated`; kein `recompute_triggered`.
+- [ ] **Manuell:** Quick-Capture-Location in Edit öffnen → Hinweistext löschen → Speichern → Location erneut öffnen → Feld muss leer sein.
+- [ ] **Regression:** PATCH name, description, Koordinaten weiterhin funktionstüchtig.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (PATCH-Endpoint, `all_allowed_fields`), `backend/data/store.py` (`update_custom`)
+- [x] Implementierungsoptionen: A (1-Zeilen-Fix) / B (separater Endpoint)
+- [x] Empfehlung: Option A
 
 ---
 
@@ -3523,14 +3642,15 @@ Gegenmaßnahme: Fix isoliert in `applyToLocations` — berührt Map-Code (Zeile 
 
 ---
 
-### BUG-52 · Standort-Freigabe (Geolocation) wird nicht für die Session gespeichert `[ ]`
+### BUG-52 · Standort-Freigabe (Geolocation) wird nicht für die Session gespeichert `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Die App fordert die Geolocation-Berechtigung wiederholt innerhalb einer Session an — auch wenn der Nutzer sie bereits erteilt hat. Erwartetes Verhalten: Nach einmaliger Zustimmung bleibt die Freigabe für die laufende Session aktiv und wird nicht erneut abgefragt.
 
@@ -3576,11 +3696,11 @@ Ein Neuladen der Seite (Browser-Refresh) ist ein Session-Neustart; die erneute A
 
 #### Akzeptanzkriterien
 
-- [ ] AK-1: Stephan setzt den Entfernungsfilter auf einen Wert > 0 km. Der GPS-Dialog erscheint genau einmal. Beim Wechsel zwischen Feed, Karte und Standorte-Tab erscheint kein zweiter Dialog.
-- [ ] AK-2: Stephan wechselt mit aktivem Entfernungsfilter schnell zwischen mehreren Tabs (z.B. Locations → Feed → Scout). Dabei erscheint der GPS-Dialog insgesamt nur einmal — nicht mehrfach in schneller Folge.
-- [ ] AK-3: Stephan lehnt den GPS-Dialog ab. Die App zeigt kein zweites Mal einen Dialog — der Entfernungsfilter ist stumm deaktiviert. (Toast „GPS nicht verfügbar" erscheint einmal.)
-- [ ] AK-4: Alle anderen Filter (Eventtyp, Schwierigkeit, Bewertung etc.) funktionieren nach der Änderung genauso wie vorher.
-- [ ] Edge Case AK-5: Stephan lädt die Seite neu (Browser-Refresh). Die App darf nach dem Reload wieder GPS anfragen — das ist kein Bug.
+- [x] AK-1: Stephan setzt den Entfernungsfilter auf einen Wert > 0 km. Der GPS-Dialog erscheint genau einmal. Beim Wechsel zwischen Feed, Karte und Standorte-Tab erscheint kein zweiter Dialog.
+- [x] AK-2: Stephan wechselt mit aktivem Entfernungsfilter schnell zwischen mehreren Tabs (z.B. Locations → Feed → Scout). Dabei erscheint der GPS-Dialog insgesamt nur einmal — nicht mehrfach in schneller Folge.
+- [x] AK-3: Stephan lehnt den GPS-Dialog ab. Die App zeigt kein zweites Mal einen Dialog — der Entfernungsfilter ist stumm deaktiviert. (Toast „GPS nicht verfügbar" erscheint einmal.)
+- [x] AK-4: Alle anderen Filter (Eventtyp, Schwierigkeit, Bewertung etc.) funktionieren nach der Änderung genauso wie vorher.
+- [x] Edge Case AK-5: Stephan lädt die Seite neu (Browser-Refresh). Die App darf nach dem Reload wieder GPS anfragen — das ist kein Bug.
 
 ---
 

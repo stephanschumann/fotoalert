@@ -1880,14 +1880,14 @@ async def reverse_geocode_endpoint(lat: float, lon: float) -> dict:
 async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
     coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
-    text_fields     = {"name", "description"}
+    text_fields     = {"name", "description", "special_notes"}
     numeric_fields  = {"observer_floor_height_m"}       # US-62
     list_fields     = {"focal_length_suggestions"}       # BUG-22: list[int], beeinflusst camera_hints
     recompute_fields = coord_fields | {"observer_floor_height_m", "focal_length_suggestions"}
     all_allowed_fields = coord_fields | text_fields | numeric_fields | list_fields
     allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
     if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
 
     # Koordinaten validieren
     for f in coord_fields & allowed.keys():
