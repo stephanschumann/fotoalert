@@ -427,6 +427,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | TASK-47 | Brennweiten-Empfehlung wird automatisch aus Motiv + Entfernung berechnet; respektiert gesetzte/gesperrte Werte |
 | 2026-06-28 | TASK-48 | Nächtlicher Standort-Qualitätslauf (01:00) erkennt geänderte/neue Standorte per Fingerabdruck und rechnet nur diese neu; Auto-Werte fließen in Feed + Kalender; geschützter Sofort-Auslöser `/run-qa-pass` (host) |
 | 2026-06-29 | TASK-46 | Standortbeschreibungen werden automatisch per Mistral AI erzeugt (Deutsch, faktenbasiert); respektiert `description_lock`; überspringt bei fehlendem Key/API-Fehler sauber |
+| 2026-06-29 | BUG-53 | 📍-Emoji wird nicht mehr in Location-Namen gespeichert; bestehende Locations bereinigt |
 | — | US-70 | Scout-Tab: Mond-Alignment-Ephemeride |
 | — | US-66 | Login + Auth (Host/User) |
 | — | BUG-42 | Custom Locations: kein 📍-Emoji in Namen |

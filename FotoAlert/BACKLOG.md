@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-46** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | — |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **+ alle übrigen offenen Tickets unten** |
@@ -44,6 +44,73 @@
 
 ## 🐛 BugFixes
 
+### BUG-53 · Feed zeigt Location-Namen mit vorangestelltem 📍-Emoji `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
+
+**Beschreibung:** Nachdem neue Locations angelegt wurden, erscheinen die Location-Namen im 14-Tage-Feed mit einem vorangestellten 📍-Emoji direkt im Namen (z. B. „Mondaufgang – 📍 Alter Hafen Potsdam"). Das Emoji soll nicht Teil des gespeicherten Location-Namens sein — es wird im UI separat ergänzt. Vermutlich wird beim Speichern neuer Locations das 📍 fälschlicherweise in den `name`-Wert geschrieben und persistiert. Erwartetes Verhalten: Der Location-Name enthält kein Emoji; das UI rendert ggf. ein Emoji dekorativ, aber nicht dauerhaft gespeichert im Namen.
+
+**Bezug:** Kein direktes Vorgänger-Ticket. Möglicherweise Zusammenhang mit US-106 (neue Locations anlegen), falls das Add-Formular oder der Preview-Alignment-Endpoint das Emoji in den Namen übernimmt.
+
+---
+
+**Implementation Spec**
+
+**Root Cause (verifiziert):**
+In `backend/main.py`, Zeile 1752, wird beim Speichern einer neuen Location via `/preview-alignment`-Endpoint der Name so gesetzt:
+
+```python
+name=f"📍 {req.subject_name}",
+```
+
+Das 📍-Emoji ist fest in den gespeicherten `name`-Wert eingebaut. Da dieser Name in der Datenbank persistiert wird und als `location_name` in Feed-Einträge fließt, erscheint das Emoji dauerhaft im Feed-Titel (z. B. „Mondaufgang – 📍 Alter Hafen Potsdam").
+
+**Example Mapping**
+
+*Regel:* Der in der Datenbank gespeicherte Location-Name enthält kein Emoji. Dekorative Icons werden ausschließlich im UI ergänzt, nicht im Datensatz.
+
+*Positiv-Beispiel:* Eine Basis-Location wie „Berliner Dom vom Spreeufer" erscheint im Feed als „Mondaufgang – Berliner Dom vom Spreeufer" — kein Emoji im Titel.
+
+*Negativ-Beispiel (Bug):* Eine via Quick Location Capture angelegte Location mit `subject_name = "Alter Hafen Potsdam"` wird als `name = "📍 Alter Hafen Potsdam"` gespeichert. Im Feed erscheint: „Mondaufgang – 📍 Alter Hafen Potsdam".
+
+*Edge-Case:* Bereits in der DB gespeicherte Custom Locations tragen das Emoji bereits im Namen. Diese müssen nachträglich bereinigt werden (einmalige Migration beim Start oder per Patch-Endpoint).
+
+**Pre-Mortem**
+
+- Bereits in SQLite gespeicherte Custom Locations haben das Emoji im Namen — ein reiner Backend-Fix bereinigt sie nicht automatisch.
+- Beim Lesen aus SQLite werden die Namen unverändert zurückgegeben — eine reine Frontend-Bereinigung wäre Workaround, nicht Ursachen-Fix.
+- Falls anderswo im Code das 📍 als Präfix für Custom Locations erwartet wird (z. B. zur Unterscheidung), bricht die Änderung diese Logik.
+- Alte Feed-Caches (opportunities.json) können das Emoji noch enthalten — nach Fix neu precomputen oder Cache invalidieren.
+
+**Akzeptanzkriterien**
+
+1. Wenn ich über Quick Location Capture eine neue Location anlege und den Namen „Alter Hafen Potsdam" eingebe, erscheint diese Location im 14-Tage-Feed als „Mondaufgang – Alter Hafen Potsdam" — ohne 📍 im Titel.
+2. Wenn ich im Locations-Tab die neu angelegte Location öffne, steht im Detail-Header ebenfalls kein 📍 vor dem Namen.
+3. Wenn ich die Location-Liste per `/locations`-API abrufe, enthält das `name`-Feld kein vorangestelltes 📍-Emoji.
+4. Bereits bestehende Custom Locations mit 📍 im Namen werden beim Server-Start (oder per Migration) automatisch bereinigt, sodass auch diese im Feed ohne Emoji erscheinen.
+5. Bestehende Basis-Locations (ohne Custom-Prefix) sind nach dem Fix unverändert.
+
+**Implementierungsoptionen**
+
+*Option A — Fix im Backend (Empfehlung): Emoji beim Speichern entfernen*
+In `backend/main.py`, Zeile 1752: `name=f"📍 {req.subject_name}",` → `name=req.subject_name,`.
+Zusätzlich: Einmalige DB-Migration, die bestehende Custom Location-Namen von führendem „📍 " bereinigt (z. B. `UPDATE locations SET name = REPLACE(name, '📍 ', '') WHERE id LIKE 'custom_%'`).
+Vorteil: Ursache beseitigt, saubere Datenbasis, kein Workaround.
+
+*Option B — Fix im Frontend: Emoji beim Anzeigen herausfiltern*
+Im Feed-Renderer und im Detail-Header per JS `name.replace(/^📍\s*/, '')` entfernen.
+Nachteil: Workaround, Daten bleiben verschmutzt, jede neue Anzeige-Stelle muss ebenfalls gefiltert werden. Nicht empfohlen.
+
+*Option C — Fix im Formular-Input: Emoji gar nicht erst eintragen*
+Das Formular (falls vorhanden) oder der API-Caller sendet kein Emoji. Greift aber nicht für die serverseitige Konstruktion in `main.py` und ist daher unvollständig.
+
+**Empfehlung: Option A** — direkte Ursachenbeseitigung im Backend. Einzeiliger Fix + einmalige DB-Migration. Kein Workaround, keine Folgeprobleme bei neuen UI-Stellen.
 
 ### US-106 · Geänderte oder neue Location sofort komplett nutzbar `[x]`
 
@@ -1064,13 +1131,13 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### US-75 · User/Backend-Datensync: Qualitätssicherung & Automatisierung `[ ]`
+### US-75 · User/Backend-Datensync: Qualitätssicherung & Automatisierung `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Als Betreiber möchte ich sicherstellen, dass von Nutzern hinzugefügte/geänderte Locations (Motive, Standorte, Beschreibungen) regelmäßig und geprüft ins Backend übertragen werden — inkl. automatischer Generierung von Standortbeschreibungen, idealem Azimut, konsistenter Kategorisierung und automatischer Aktualisierung der Brennweitenempfehlungen.
@@ -1083,7 +1150,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |--------|--------|------|--------|
 | **TASK-44** | QA-Datenmodell: Flags, Tabellen, Geo-Hash | TASK-17 ✅ | ✅ Erledigt (archiviert) |
 | **TASK-45** | Azimut via Overpass API (Gebäude-Footprints → Horizon) | TASK-44 | ✅ Done (v2.0.x, 2026-06-28) |
-| **TASK-46** | LLM-Beschreibungen via Claude API | TASK-44 | ToDo (offen) |
+| **TASK-46** | LLM-Beschreibungen (via Mistral AI) | TASK-44 | ✅ Done (v1.20.4, 2026-06-28) |
 | **TASK-47** | Brennweiten-Auto-Calc (Geometrie) | TASK-44 | ✅ Done (v2.0.x, 2026-06-28) |
 | **TASK-48** | QA-Cron-Routine: Change-Detection + Scheduler | TASK-45+47 | ✅ Done (v2.0.x, 2026-06-28) |
 
@@ -1157,13 +1224,13 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-46 · Standortbeschreibungen automatisch erzeugen (LLM) `[~]`
+### TASK-46 · Standortbeschreibungen automatisch erzeugen (LLM) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
@@ -2622,10 +2689,11 @@ Logout → als User anmelden → Einstellungen → "User"
 - `ic()` Z. 805 — ~360 Zeilen (Icon-Helper, eingebracht durch US-100)
 - `handler()` Z. 1165 — ~110 Zeilen
 - `verState()` Z. 2907 — ~196 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
+- `sunAlignmentLabel()` Z. 4280 — ~1034 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29)
 
 ---
 

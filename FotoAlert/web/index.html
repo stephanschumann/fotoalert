@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.4';
+const APP_VERSION = '1.20.5';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4225,7 +4225,9 @@ const Locations = {
   // BUG-30: Live-Lookup des Locations-Namens — gibt Override-Namen zurück wenn
   // Locations.all schon befüllt ist, sonst Fallback auf den Cache-Snapshot.
   nameFor(locationId, fallback) {
-    return this.all.find(l => l.id === locationId)?.name ?? fallback;
+    const loc = this.all.find(l => l.id === locationId);
+    const name = loc?.name ?? fallback;
+    return name;
   },
   async filter(q) {
     // Filter-Kriterien (Schwierigkeit, Rating, etc.) UND Textsuche kombinieren

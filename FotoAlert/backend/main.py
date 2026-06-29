@@ -1749,7 +1749,7 @@ async def _save_alignment_as_location(
 
     new_loc = PhotoLocation(
         id=f"custom_{int(datetime.now().timestamp())}",
-        name=f"📍 {req.subject_name}",
+        name=req.subject_name,
         description=desc,
         category=LocationCategory[req.category] if req.category in LocationCategory.__members__ else LocationCategory.SKYLINE,  # US-76
         observer_lat=req.observer_lat, observer_lon=req.observer_lon,
