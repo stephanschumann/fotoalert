@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-28 · Basis: abgeschlossene Tickets bis US-79, US-102, US-100, US-96, BUG-42, BUG-47
+> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47
 
 ---
 
@@ -168,6 +168,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Mond-Erde-Distanz | Zeigt ~384.400 km (nicht ~370 km — BUG-18 gefixt) |
 | Mondaufgang in Astronomie-Sektion | Zeigt Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn an diesem Tag vorhanden (US-79); fehlt kommentarlos wenn null |
 | Monduntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-79); fehlt kommentarlos wenn null |
+| Sonnenaufgang in Astronomie-Sektion | Zeigt Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-107); fehlt kommentarlos wenn null (z.B. Polarsommer) |
+| Sonnenuntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-107); fehlt kommentarlos wenn null |
 | Koordinaten-Sektion | Kein Overflow-Problem (BUG-38 gefixt); Labels korrekt ausgerichtet |
 | Sheet-Header | Kein blaugrauer Strich links (BUG-39 gefixt) |
 
@@ -181,6 +183,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Street-View-Button nur sichtbar wenn Azimut verfügbar
 - [ ] Astronomie-Sektion zeigt Mondaufgang + Monduntergang mit Uhrzeit + Azimut (wenn vorhanden) (US-79)
 - [ ] Kein Fehler / keine leere Zeile wenn Mondaufgang/-untergang null (US-79)
+- [ ] Astronomie-Sektion zeigt Sonnenaufgang + Sonnenuntergang mit Uhrzeit + Azimut in Grad (US-107)
+- [ ] Kein Azimut-Wert wenn `sunrise_utc`/`sunset_utc` null (kein Placeholder „0°") (US-107)
 
 ---
 
@@ -232,7 +236,9 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Locations-Liste | ≥15 Location-Karten; scrollbar |
 | Suche | Live-Textsuche filtert nach Standortname (US-53) |
 | Location antippen | Öffnet Location-Detail-Sheet |
-| Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, zukünftige Events |
+| Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, Sonnen-Ausrichtung heute, zukünftige Events |
+| Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
+| Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch |
 | Custom Locations | Vom Nutzer gespeicherte Locations erscheinen hier; Namen ohne 📍-Emoji (BUG-42) |
 | Standortverifikation | Verifikationen werden persistiert (BUG-26) |
@@ -241,6 +247,9 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] ≥15 Karten sichtbar
 - [ ] Suche „Babelsberg" filtert korrekt
 - [ ] Location-Detail-Sheet öffnet und schließt
+- [ ] Abschnitt „Ausrichtung" zeigt Sonnenaufgang/-untergang mit Azimut für heute (US-107)
+- [ ] Locations mit Motiv-Koordinaten zeigen Richtungsklassifizierung relativ zum Motiv (US-107)
+- [ ] Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, kein leerer Abschnitt (US-107)
 - [ ] Edit → Speichern → Änderung sofort in Sheet + Liste sichtbar (kein Reload nötig)
 - [ ] Close-Button erreichbar (Safe Area — BUG-25 gefixt)
 
@@ -425,3 +434,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-28 | US-79 | Mondaufgang + Monduntergang als eigenständige Event-Typen (`"Mondaufgang"`, `"Monduntergang"`) im Feed, Kalender, Filter und Location-Detail (Nächste Chancen); vier neue API-Felder in `_serialize()`: `moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_azimuth`; Event-Detail Astronomie-Sektion zeigt Uhrzeit + Azimut; `/refresh-feed` nach Release ausführen |
 | 2026-06-28 | BUG-47 | Einstellungsseite zeigt korrekte Rolle nach Host-Login: `CFG.role` als Getter aus Token-Präfix (robust gegen Safari ITP); nach Login `App.init()` + `App.nav('feed')` für sofortiges UI-Update ohne Browser-Refresh |
 | 2026-06-28 | BUG-34 | iOS-Zoom in "Karte & Blickwinkel" behoben (font-size 16px) |
+| 2026-06-29 | US-107 | Sonnen-Alignment-Planung: Sonnenaufgang/-untergang mit Azimut im Event-Detail (Astronomie-Sektion, analog Mondaufgang US-79); Richtungsklassifizierung relativ zum Motiv im Location-Detail (Abschnitt Ausrichtung, ±15°-Toleranz); neue API-Felder `sunrise_azimuth`/`sunset_azimuth` in `_serialize()`; Klassifizierungslogik `classify_sun_alignment()` neu; `/refresh-feed` nach Release ausführen |

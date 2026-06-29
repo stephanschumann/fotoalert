@@ -512,6 +512,29 @@ def _serialize(o) -> dict:
             )
             if o.astronomy_report and o.astronomy_report.moon.moonset else None
         ),
+        # US-107: Sonnenaufgang/-untergang-Azimut (analog moonrise/moonset_azimuth)
+        "sunrise_azimuth": (
+            round(
+                get_body_position(
+                    o.location.observer_lat,
+                    o.location.observer_lon,
+                    "sun",
+                    o.astronomy_report.sun.sunrise,
+                ).azimuth, 1
+            )
+            if o.astronomy_report and o.astronomy_report.sun.sunrise else None
+        ),
+        "sunset_azimuth": (
+            round(
+                get_body_position(
+                    o.location.observer_lat,
+                    o.location.observer_lon,
+                    "sun",
+                    o.astronomy_report.sun.sunset,
+                ).azimuth, 1
+            )
+            if o.astronomy_report and o.astronomy_report.sun.sunset else None
+        ),
         # Golden hour & Blue hour – exakte Skyfield-Zeiten pro Location (für Filter + Detail)
         "golden_hour_morning_start": (
             o.astronomy_report.sun.golden_hour_morning_start.isoformat()

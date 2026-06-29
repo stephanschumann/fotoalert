@@ -69,6 +69,9 @@ class OpportunityOut(BaseModel):
     elevation_difference_m: Optional[float] = None
     sunrise_utc: Optional[datetime] = None
     sunset_utc: Optional[datetime] = None
+    # US-107: Sonnenaufgang/-untergang-Azimut
+    sunrise_azimuth: Optional[float] = None
+    sunset_azimuth: Optional[float] = None
     # Golden & Blue Hour – exakte Skyfield-Zeiten pro Location
     golden_hour_morning_start: Optional[datetime] = None
     golden_hour_morning_end: Optional[datetime] = None

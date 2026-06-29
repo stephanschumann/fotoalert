@@ -26,14 +26,14 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* · **US-107** *(Spec fertig, wartet am Weg-Gate)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **US-107** |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1509,7 +1509,7 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Analysis |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-28 |
 
 **Beschreibung:** Als Fotograf möchte ich für eine Location sehen, wann und in welcher Richtung die Sonne auf- oder untergeht — ob sie dabei nah, hinter oder über dem Motiv steht, oder ob ein Untergang gegenüber der Location für Gegenlicht-Motive interessant ist — damit ich Shootings präzise planen kann.
@@ -3174,3 +3174,25 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 - [ ] Implementierungsoptionen: A (empfohlen) / B
 - [ ] Weg-Gate: Warten auf Stephans Freigabe
 
+
+---
+
+### BUG-48 · /opportunities-API liefert nur Mond-Events — Goldene/Blaue Stunde fehlen komplett `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-29 |
+
+**Beschreibung:** Die `/opportunities`-API gibt 500 Events zurück, aber ausschließlich Mond-Events (Mondaufgang, Monduntergang, Milchstraße, Mond-Alignment). Goldene Stunde und Blaue Stunde erscheinen mit 0 Treffern — obwohl `opportunities.json` im Cache 910× Goldene Stunde Abend und 910× Blaue Stunde enthält.
+
+**Root-Cause-Hypothese:** Die BUG-32-Sortierung priorisiert Nicht-Routine-Events (Mond, Milchstraße) vor Goldene/Blaue Stunde. Mit ~2298 Nicht-Routine-Events im 14-Tage-Cache füllen diese den `:500`-Cap vollständig — Routine-Events fallen heraus.
+
+**Offene Prüffrage:** Gibt es überhaupt valide Goldene-Stunde- und Blaue-Stunde-Events im Cache mit `score ≥ 0.35`? Falls nicht, wäre das ein separates Datenproblem im Precompute (eigenes Ticket).
+
+**Bezug:**
+- Abhängig von / direkt verursacht durch die Sortierlogik aus BUG-32 (Sort-Key-Fix: Nicht-Routine-Events werden vorgezogen — verdrängt bei hohem Volumen Routine-Events)
+- Grenzt an BUG-28 (Cap+Sort-Diagnose, `:500`-Cap-Verdrängung von seltenen Event-Typen) — gleiches strukturelle Problem, andere Manifestation
+- Unabhängig von US-107 (Sonnen-Alignment-Planung, andere Feature-Dimension)

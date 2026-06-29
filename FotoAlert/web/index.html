@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.1';
+const APP_VERSION = '1.20.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3340,8 +3340,8 @@ const Detail = {
       ${o.celestial_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Himmelsobjekt</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>` : ''}
       ${o.celestial_altitude != null ? `<div class="info-row"><span class="ir-label">Höhe Himmelsobjekt</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>` : ''}
       ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
-      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.sunrise_utc)}</span></div>` : ''}
-      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.sunset_utc)}</span></div>` : ''}
+      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.sunrise_utc)}${o.sunrise_azimuth != null ? ` · ${o.sunrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.sunset_utc)}${o.sunset_azimuth != null ? ` · ${o.sunset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
       ${o.moonrise_utc ? `<div class="info-row"><span class="ir-label">Mondaufgang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonrise_utc)}${o.moonrise_azimuth != null ? ` · ${o.moonrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
       ${o.moonset_utc ? `<div class="info-row"><span class="ir-label">Monduntergang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonset_utc)}${o.moonset_azimuth != null ? ` · ${o.moonset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
       ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
@@ -4266,6 +4266,19 @@ const Locations = {
 };
 
 // ═══════════════════════════════════════════════════════
+// US-107: Sonnen-Alignment-Hilfsfunktion
+// ═══════════════════════════════════════════════════════
+function sunAlignmentLabel(sunAz, motifAz) {
+  // Winkeldifferenz im Bereich -180..+180
+  const diff = ((sunAz - motifAz + 180) % 360) - 180;
+  const absDiff = Math.abs(diff);
+  if (absDiff <= 15) return { text: `fast genau hinter dem Motiv (${diff.toFixed(0)}° Abweichung)`, highlight: true };
+  if (absDiff <= 45) return { text: `nah am Motiv (${diff.toFixed(0)}° Abweichung)`, highlight: false };
+  if (absDiff >= 150) return { text: `gegenüber dem Motiv — Gegenlicht möglich`, highlight: false };
+  return { text: `${diff.toFixed(0)}° vom Motiv entfernt`, highlight: false };
+}
+
+// ═══════════════════════════════════════════════════════
 // LOCATION DETAIL
 // ═══════════════════════════════════════════════════════
 const LocationDetail = {
@@ -4647,7 +4660,7 @@ const LocationDetail = {
 
       ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
-      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}`)}
+      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}<div id="loc-sun-today"></div>`)}
 
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
@@ -4669,6 +4682,41 @@ const LocationDetail = {
       const data = await API.get(`/opportunities?location_id=${locId}&days=30&min_score=0.3`);
       const el = document.getElementById('loc-events-content');
       if (!el) return;
+      // US-107: Heutiges Event für Sonnen-Azimut im Ausrichtungs-Abschnitt
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayEvt = (data && data.length) ? data.find(e => e.sunrise_utc && e.sunrise_utc.slice(0, 10) === todayStr) : null;
+      const sunEl = document.getElementById('loc-sun-today');
+      if (sunEl && todayEvt) {
+        const loc = this._current;
+        const srAz = todayEvt.sunrise_azimuth;
+        const ssAz = todayEvt.sunset_azimuth;
+        const fmt2 = iso => new Date(iso).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+        const motifAz = (loc && loc.subject_lat && loc.subject_lon) ? todayEvt.subject_azimuth : null;
+        const srLabel = srAz != null ? ` · ${srAz.toFixed(1)}°` : '';
+        const ssLabel = ssAz != null ? ` · ${ssAz.toFixed(1)}°` : '';
+        let srNote = '', ssNote = '';
+        if (motifAz != null) {
+          if (srAz != null) {
+            const r = sunAlignmentLabel(srAz, motifAz);
+            srNote = r.highlight
+              ? `<span style="color:var(--gold);font-weight:600"> — Sonne geht ${r.text} auf 🔥</span>`
+              : `<span style="color:var(--muted)"> — Sonne geht ${r.text} auf</span>`;
+          }
+          if (ssAz != null) {
+            const r = sunAlignmentLabel(ssAz, motifAz);
+            ssNote = r.highlight
+              ? `<span style="color:var(--gold);font-weight:600"> — Sonne geht ${r.text} unter 🔥</span>`
+              : `<span style="color:var(--muted)"> — Sonne geht ${r.text} unter</span>`;
+          }
+        }
+        sunEl.innerHTML = `
+          <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Heute</div>
+            ${todayEvt.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${fmt2(todayEvt.sunrise_utc)}${srLabel}${srNote}</span></div>` : ''}
+            ${todayEvt.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${fmt2(todayEvt.sunset_utc)}${ssLabel}${ssNote}</span></div>` : ''}
+          </div>`;
+      }
+
       if (!data || data.length === 0) {
         el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Keine Events in den nächsten 30 Tagen.</p>';
         return;
