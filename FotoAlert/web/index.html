@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.5';
+const APP_VERSION = '1.20.6';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2401,6 +2401,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 const Filter = {
   _KEY: 'fotoalert_filters',
   _gps: null,
+  _gpsPromise: null,
 
   _defaults() {
     // US-71: kategoriale Chips haben Include- (eventTypes/tageszeit/difficulty)
@@ -2622,14 +2623,24 @@ const Filter = {
 
   async requestGps() {
     if (this._gps) return true;
-    return new Promise(resolve => {
-      if (!navigator.geolocation) { resolve(false); return; }
+    if (this._gpsPromise) return this._gpsPromise;
+    this._gpsPromise = new Promise(resolve => {
+      if (!navigator.geolocation) { this._gpsPromise = null; resolve(false); return; }
       navigator.geolocation.getCurrentPosition(
-        p => { this._gps = {lat: p.coords.latitude, lon: p.coords.longitude}; resolve(true); },
-        () => { toast('📍 GPS nicht verfügbar'); resolve(false); },
+        p => {
+          this._gps = {lat: p.coords.latitude, lon: p.coords.longitude};
+          this._gpsPromise = null;
+          resolve(true);
+        },
+        () => {
+          this._gpsPromise = null;
+          toast('📍 GPS nicht verfügbar');
+          resolve(false);
+        },
         {timeout: 8000}
       );
     });
+    return this._gpsPromise;
   },
 };
 

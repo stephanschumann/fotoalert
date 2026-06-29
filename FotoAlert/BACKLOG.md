@@ -29,11 +29,11 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | — |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-52** |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2685,15 +2685,15 @@ Logout → als User anmelden → Einstellungen → "User"
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-27 |
 
-**Beschreibung:** `refactor_check.py` meldet drei lange JS-Funktionen in `web/index.html`:
-- `ic()` Z. 805 — ~360 Zeilen (Icon-Helper, eingebracht durch US-100)
-- `handler()` Z. 1165 — ~110 Zeilen
-- `verState()` Z. 2907 — ~196 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
-- `sunAlignmentLabel()` Z. 4280 — ~1034 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
+**Beschreibung:** `refactor_check.py` meldet vier lange JS-Funktionen in `web/index.html`:
+- `ic()` Z. 805 — ~365 Zeilen (Icon-Helper, eingebracht durch US-100)
+- `handler()` Z. 1170 — ~114 Zeilen
+- `verState()` Z. 2949 — ~196 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
+- `sunAlignmentLabel()` Z. 4291 — ~1034 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29)
 
 ---
 
@@ -3529,9 +3529,152 @@ Gegenmaßnahme: Fix isoliert in `applyToLocations` — berührt Map-Code (Zeile 
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-29 |
 
 **Beschreibung:** Die App fordert die Geolocation-Berechtigung wiederholt innerhalb einer Session an — auch wenn der Nutzer sie bereits erteilt hat. Erwartetes Verhalten: Nach einmaliger Zustimmung bleibt die Freigabe für die laufende Session aktiv und wird nicht erneut abgefragt.
 
 **Bezug:** Keine Dubletten gefunden.
+
+---
+
+### Analyse-Spec (BUG-52)
+
+**Datum:** 2026-06-29
+
+---
+
+#### Example Mapping
+
+📏 **Rule 1 — Einmalige GPS-Abfrage pro Session**
+Die App darf den Browser-GPS-Dialog innerhalb einer Sitzung (Seite geöffnet, nicht neu geladen) höchstens einmal auslösen — egal wie oft der Entfernungsfilter angewendet oder der Tab gewechselt wird.
+
+🟢 Example:
+- Gegeben: Stephan öffnet die App und setzt den Entfernungsfilter auf 10 km
+- Wenn: Der Browser-Dialog erscheint und Stephan klickt „Erlauben"
+- Dann: Bei jedem weiteren Tab-Wechsel (Feed, Karte, Standorte), Filteränderung oder Reload der aktuellen Ansicht erscheint kein zweiter GPS-Dialog
+
+🟢 Edge Case — gleichzeitige Aufrufe:
+- Gegeben: Stephan öffnet den Locations-Tab mit aktivem Entfernungsfilter, während gleichzeitig auch Feed.render() einen GPS-Check auslöst
+- Wenn: Beide Code-Pfade gleichzeitig `requestGps()` aufrufen, bevor die erste Antwort zurückkommt
+- Dann: Es gibt trotzdem nur einen Browser-Dialog; beide Aufrufe warten auf dasselbe Ergebnis
+
+📏 **Rule 2 — Fehler-Zustand wird nicht wiederholt abgefragt**
+Wenn Stephan die GPS-Berechtigung verweigert, erscheint kein weiterer Dialog in dieser Session. Der Entfernungsfilter bleibt inaktiv, die App läuft normal weiter.
+
+🟢 Example:
+- Gegeben: GPS-Dialog erscheint, Stephan klickt „Ablehnen"
+- Wenn: Stephan zum Feed wechselt und wieder zurück
+- Dann: Kein erneuter Dialog — der Entfernungsfilter ist schlicht wirkungslos
+
+📏 **Rule 3 — Page-Reload darf neu fragen**
+Ein Neuladen der Seite (Browser-Refresh) ist ein Session-Neustart; die erneute Abfrage ist korrekt (der Browser merkt sich die Berechtigung und fragt ggf. nicht nochmal — das ist Browser-Sache, nicht App-Sache).
+
+⚠️ **Annahme:** Der Bug tritt auf wenn mehrere Code-Stellen gleichzeitig `requestGps()` aufrufen (kein Promise-Deduplication). Bestätigt durch Code-Verifikation (siehe unten).
+
+---
+
+#### Akzeptanzkriterien
+
+- [ ] AK-1: Stephan setzt den Entfernungsfilter auf einen Wert > 0 km. Der GPS-Dialog erscheint genau einmal. Beim Wechsel zwischen Feed, Karte und Standorte-Tab erscheint kein zweiter Dialog.
+- [ ] AK-2: Stephan wechselt mit aktivem Entfernungsfilter schnell zwischen mehreren Tabs (z.B. Locations → Feed → Scout). Dabei erscheint der GPS-Dialog insgesamt nur einmal — nicht mehrfach in schneller Folge.
+- [ ] AK-3: Stephan lehnt den GPS-Dialog ab. Die App zeigt kein zweites Mal einen Dialog — der Entfernungsfilter ist stumm deaktiviert. (Toast „GPS nicht verfügbar" erscheint einmal.)
+- [ ] AK-4: Alle anderen Filter (Eventtyp, Schwierigkeit, Bewertung etc.) funktionieren nach der Änderung genauso wie vorher.
+- [ ] Edge Case AK-5: Stephan lädt die Seite neu (Browser-Refresh). Die App darf nach dem Reload wieder GPS anfragen — das ist kein Bug.
+
+---
+
+#### Pre-Mortem
+
+📎 **Code-Verifikation:** `web/index.html`, Zeilen 2623–2633 gelesen am 2026-06-29.
+- Bestätigt: `requestGps()` hat einen Guard `if (this._gps) return true` — funktioniert, sobald `_gps` gesetzt ist.
+- Bestätigt: **Kein** `_gpsPromise`-Feld vorhanden — laufende Anfragen werden nicht dedupliziert.
+- Bestätigt: `requestGps()` wird an mindestens 3 Stellen aufgerufen: `_applyLive()` (Z. 2737), `Locations.load()` (Z. 4222), `Locations.filter()` (Z. 4234) — alle ohne Koordination untereinander.
+- Festgestellt: Wenn zwei dieser Aufrufe gleichzeitig starten (beide sehen `_gps === null`), erzeugen beide ein neues `Promise` und beide rufen `navigator.geolocation.getCurrentPosition()` auf → zwei Browser-Dialoge.
+
+💀 **Szenario 1 — Doppelter Dialog beim Locations-Tab-Wechsel**
+Auslöser: `Locations.load()` + gleichzeitiger `_applyLive()`-Trigger rufen beide `requestGps()` auf, bevor die erste Antwort da ist.
+Frühwarnung: GPS-Dialog erscheint zweimal kurz hintereinander.
+Gegenmaßnahme: Promise-Deduplication in `requestGps()` → in AK-2 abgedeckt.
+
+💀 **Szenario 2 — Fix bricht Fehlerbehandlung**
+Auslöser: Der `_gpsPromise`-Cache wird nach Fehler nicht zurückgesetzt — bei Permission-Denial bleibt `_gpsPromise` gecacht und alle späteren `requestGps()`-Aufrufe erhalten `false`.
+Frühwarnung: Entfernungsfilter bleibt dauerhaft wirkungslos auch nach Deny.
+Gegenmaßnahme: Nach Fehler `_gpsPromise` auf `null` zurücksetzen — nächster Aufruf kann neu fragen. AK-3 prüft dieses Verhalten.
+
+💀 **Szenario 3 — Regression: Andere Filter funktionieren nicht mehr**
+Auslöser: Umbau von `requestGps()` bricht das `async/await`-Verhalten in `_applyLive()`.
+Frühwarnung: Entfernungsfilter hat keinen Effekt mehr, oder App friert kurz ein.
+Gegenmaßnahme: AK-4 prüft andere Filter explizit nach der Änderung.
+
+---
+
+#### Architektur-Analyse
+
+**Betroffene Datei:** `web/index.html` — nur `Filter.requestGps()` (~10 Zeilen) + Feld-Deklaration
+
+**Root Cause:** `requestGps()` (Z. 2623–2633) speichert das laufende Promise nicht zwischen. Werden zwei gleichzeitige Aufrufe ausgelöst — was passiert wenn `Locations.load()` + `_applyLive()` quasi gleichzeitig feuern — erzeugen beide ein eigenes `getCurrentPosition`-Promise, und der Browser zeigt zwei Dialoge.
+
+**Guard existiert bereits, aber greift zu spät:** `if (this._gps) return true` wirkt korrekt, aber nur nachdem die erste Anfrage abgeschlossen ist und `_gps` gesetzt hat. Während die erste Anfrage läuft (bis zu 8 Sekunden Timeout), ist `_gps` noch null — jeder weitere Aufruf startet einen eigenen Dialog.
+
+**Aufruforte (alle in `web/index.html`):**
+- Z. 2737: `Filter._applyLive()` — bei jeder Filteränderung
+- Z. 4222: `Locations.load()` — beim Öffnen des Locations-Tabs
+- Z. 4234: `Locations.filter()` — bei Textsuche im Locations-Tab
+
+**Kein Backend-Eingriff nötig.** Rein frontend-seitiger Fix in ~8 Zeilen.
+
+---
+
+#### Implementierungsoptionen
+
+**In App-Sprache:** Es geht darum, dass die App beim ersten GPS-Dialog wartet bis der Nutzer geantwortet hat — und alle anderen Teile der App, die gleichzeitig auch GPS brauchen, einfach mitlaufen lassen, statt eine zweite Frage zu stellen.
+
+##### Option A — Promise-Caching (empfohlen)
+
+Beim ersten `requestGps()`-Aufruf das laufende Promise in `Filter._gpsPromise` speichern. Alle weiteren Aufrufe während die Anfrage läuft erhalten dasselbe Promise zurück — kein zweiter Browser-Dialog. Nach Abschluss wird `_gpsPromise` geleert.
+
+- Betroffene Datei: `web/index.html` — nur `requestGps()` + Feld-Deklaration `_gps: null`
+- Vorteile: Minimaler Eingriff (~8 Zeilen), kein Verhaltens-Change außer dem Fix, keine Regression möglich
+- Nachteile: Keine
+- Aufwand: **klein**
+
+##### Option B — Einmaliger watchPosition-Aufruf beim App-Start
+
+`navigator.geolocation.watchPosition()` beim Boot aufrufen und Position kontinuierlich tracken. `requestGps()` gibt einfach den letzten bekannten Wert zurück.
+
+- Betroffene Datei: `web/index.html` — App-Boot-Sequenz + `requestGps()`
+- Vorteile: Position immer aktuell; elegantere Langfrist-Lösung
+- Nachteile: GPS-Dialog erscheint beim App-Start — auch wenn der Nutzer nie den Entfernungsfilter nutzt. Scope-Creep, verändert UX grundsätzlich.
+- Aufwand: **mittel**, mehr Änderungen, Risiko für Regression
+
+✅ **Empfehlung: Option A** — Minimaler Eingriff, löst genau das Problem ohne Seiteneffekte. Option B würde den GPS-Dialog für alle Nutzer vorziehen, auch wenn sie den Entfernungsfilter nie nutzen — das geht über den Ticket-Scope hinaus.
+
+---
+
+#### Scope
+
+**Eingeschlossen:** Deduplizierung gleichzeitiger `requestGps()`-Aufrufe innerhalb einer Session.
+
+**Ausgeschlossen:** Persistenz über Page-Reloads hinweg (wäre sessionStorage — nicht angefragt). Kontinuierliches Position-Tracking (Option B). Änderungen an MapView-Geolocation-Aufrufen (`locateMe`, `useMyLocation`, Karten-Init) — diese sind unabhängig und betreffen keine Permission-Dialoge.
+
+---
+
+#### Testplan
+
+- [ ] **Automatisiert:** Kein sinnvoller pytest-Fall (rein frontend, Browser-API). Manueller Test ist der Hauptweg.
+- [ ] **Manuell AK-1+2:** Lokalen Server starten (`http://localhost:8000`). Entfernungsfilter auf 5 km setzen. GPS erlauben. Zwischen Feed, Karte und Standorte wechseln — beobachten: erscheint der Dialog erneut? Erwartet: genau 1x gesamt.
+- [ ] **Manuell AK-3:** Seite neu laden. Entfernungsfilter setzen. GPS ablehnen. Tab wechseln. Erwartet: kein zweiter Dialog, Toast einmalig, Entfernungsfilter wirkungslos (alle Standorte sichtbar).
+- [ ] **Regression AK-4:** Eventtyp-Filter, Bewertungsfilter, Schwierigkeitsfilter testen — sollen weiterhin korrekt filtern.
+
+---
+
+#### Analyse-Status
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Code-Verifikation: `web/index.html` Z. 2623–2633 gelesen; Root Cause bestätigt
+- [x] Architektur analysiert: nur `Filter.requestGps()` + Feld-Deklaration betroffen
+- [x] Implementierungsoptionen: A (Promise-Caching) / B (watchPosition)
+- [x] Empfehlung: Option A
+
