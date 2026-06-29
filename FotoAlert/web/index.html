@@ -1116,7 +1116,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.2';
+const APP_VERSION = '1.20.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2566,6 +2566,11 @@ const Filter = {
         // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
         const hasEvent = Feed.data.some(e => e.location_id === l.id && e.overall_score >= s.minScore / 100);
         if (!hasEvent) return false;
+      }
+      // BUG-51: Entfernungsfilter (analog Map-Filterung, Zeile 3892–3896)
+      if (s.maxDistKm > 0 && Filter._gps) {
+        const d = haversineKm(Filter._gps.lat, Filter._gps.lon, l.observer_lat, l.observer_lon);
+        if (d > s.maxDistKm) return false;
       }
       return true;
     });
@@ -4214,6 +4219,7 @@ const Locations = {
   all: [],
   async load() {
     this.all = await API.get('/locations');
+    if (Filter.state.maxDistKm > 0) await Filter.requestGps();  // BUG-51
     this.render(Filter.applyToLocations(this.all));
   },
   // BUG-30: Live-Lookup des Locations-Namens — gibt Override-Namen zurück wenn
@@ -4221,8 +4227,9 @@ const Locations = {
   nameFor(locationId, fallback) {
     return this.all.find(l => l.id === locationId)?.name ?? fallback;
   },
-  filter(q) {
+  async filter(q) {
     // Filter-Kriterien (Schwierigkeit, Rating, etc.) UND Textsuche kombinieren
+    if (Filter.state.maxDistKm > 0) await Filter.requestGps();  // BUG-51
     let f = Filter.applyToLocations(this.all);
     if (q) {
       f = f.filter(l =>

@@ -28,12 +28,12 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-107** |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-51** |
+| **🏁 Done** | abgeschlossen + deployed | **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1503,14 +1503,15 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 
 <!-- ===== READY FOR ANALYSIS: freigegeben für Agenten ===== -->
 
-### US-107 · Sonnen-Alignment-Planung: Auf-/Untergang relativ zur Location `[ ]`
+### US-107 · Sonnen-Alignment-Planung: Auf-/Untergang relativ zur Location `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-28 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Als Fotograf möchte ich für eine Location sehen, wann und in welcher Richtung die Sonne auf- oder untergeht — ob sie dabei nah, hinter oder über dem Motiv steht, oder ob ein Untergang gegenüber der Location für Gegenlicht-Motive interessant ist — damit ich Shootings präzise planen kann.
 
@@ -3196,3 +3197,187 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 - Abhängig von / direkt verursacht durch die Sortierlogik aus BUG-32 (Sort-Key-Fix: Nicht-Routine-Events werden vorgezogen — verdrängt bei hohem Volumen Routine-Events)
 - Grenzt an BUG-28 (Cap+Sort-Diagnose, `:500`-Cap-Verdrängung von seltenen Event-Typen) — gleiches strukturelle Problem, andere Manifestation
 - Unabhängig von US-107 (Sonnen-Alignment-Planung, andere Feature-Dimension)
+
+---
+
+### BUG-49 · Doppeltes Suchfeld im Locations-Panel `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-29 |
+
+**Beschreibung:** Im Locations-Panel existieren zwei Sucheingaben gleichzeitig: ein statisch sichtbares „Suchen"-Feld und ein weiteres, das sich über das Suchlogo im Menü öffnet. Das ist redundant und verwirrend — es sollte nur einen einzigen konsistenten Sucheinstieg geben.
+
+**Bezug:** Keine Dubletten gefunden.
+
+---
+
+### BUG-50 · HINWEISE-Feld überschreibt sich nach Quick Location Capture `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-29 |
+
+**Beschreibung:** Bei Locations, die per Quick Location Capture angelegt wurden, speichert die App den Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Löscht der Nutzer diesen Text, schreibt sich der Wert beim nächsten Speichern/Öffnen erneut hinein — der Hinweis lässt sich nicht dauerhaft entfernen (reproduzierbar z. B. bei Ehrenhof-Kollonaden am Schloss Sanssouci).
+
+**Bezug:** Keine Dubletten gefunden.
+
+---
+
+### BUG-51 · Filter nach Entfernung funktioniert nicht `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-06-29 |
+
+**Beschreibung:** Der Entfernungsfilter (Radius-Slider oder Entfernungs-Chips) hat keine sichtbare Wirkung auf die angezeigte Locations- oder Feed-Liste — Locations außerhalb des gewählten Radius werden trotzdem angezeigt. Erwartetes Verhalten: nur Locations innerhalb des gesetzten Radius sind sichtbar.
+
+**Bezug:** Keine Dubletten gefunden; vgl. allgemeines Filter-Thema BUG-46 (Verifikationsfilter), aber anderes Kriterium.
+
+---
+
+#### Analyse (BUG-51)
+
+##### Example Mapping
+
+📎 **Code-Verifikation (durchgeführt 2026-06-29):**
+- `applyToLocations()` (web/index.html, Zeile 2546–2572) gelesen: **enthält keinen `maxDistKm`-Check** — das ist die Root-Cause für Locations-Tab und Textsuche.
+- `MapView.applyFilter()` (Zeile 3892–3896): enthält Entfernungscheck via `haversineKm` + `Filter._gps` — Karte funktioniert bereits korrekt.
+- `Filter.apply()` für Feed (Zeile 2519–2522): enthält Entfernungscheck — Feed funktioniert bereits korrekt.
+- `Filter.applyToScout()` (Zeile 2610–2612): enthält Entfernungscheck — Scout funktioniert bereits korrekt.
+- `Filter._applyLive()` (Zeile 2732): ruft `requestGps()` auf, dann je nach `App.current` unterschiedliche Render-Wege. Für `'locations'` → `Locations.render(Filter.applyToLocations(...))` — GPS wird also schon angefragt, aber `applyToLocations` ignoriert es danach.
+- `haversineKm()` (Zeile 2392–2399): korrekte Haversine-Implementierung, wiederverwendbar.
+- Location-Objekte haben `observer_lat`/`observer_lon` Felder (identisch zu den Feldern in der Map-Filterung).
+
+**Befund:** Der Bug existiert ausschließlich in `applyToLocations()`. Die Funktion prüft Schwierigkeit, Kategorie, Bewertung, Verifikation und Score — aber nicht Entfernung. Der GPS-Request wird zwar in `_applyLive()` ausgelöst, aber das Ergebnis (`Filter._gps`) wird in `applyToLocations` nie ausgelesen. Alle anderen Filter-Pfade (Map, Feed, Scout) haben den Entfernungscheck korrekt implementiert.
+
+---
+
+**📏 Rule 1:** Wenn im Locations-Tab ein Entfernungsradius gesetzt ist und GPS-Standort bekannt ist, werden nur Locations angezeigt, deren Fotografen-Standpunkt (observer) innerhalb des Radius liegt.
+
+🟢 Beispiel: Stephan wählt „< 15 km" als Entfernungsfilter. GPS zeigt Berlin-Mitte. Im Locations-Tab erscheinen nur Standorte innerhalb von 15 km — ein Spot in Potsdam (25 km entfernt) verschwindet aus der Liste.
+
+🟢 Beispiel: Stephan tippt gleichzeitig „Schloss" in die Suche. Nur Schloss-Locations innerhalb 15 km sind sichtbar (Entfernungs- und Textfilter kombiniert).
+
+**📏 Rule 2:** Wenn GPS nicht verfügbar oder nicht erteilt ist, wird der Entfernungsfilter übersprungen und alle Locations bleiben sichtbar.
+
+🟢 Beispiel: GPS-Berechtigung verweigert, Entfernungsfilter auf „< 5 km" gesetzt → alle Locations sichtbar, Toast „GPS nicht verfügbar" erscheint.
+
+**📏 Rule 3:** Die Entfernungsmessung erfolgt vom GPS-Standort des Nutzers zum `observer_lat`/`observer_lon` der Location (Fotografen-Standpunkt) — identisch zur Map-Filterung.
+
+🟢 Beispiel: Identischer Spot wird in Map und Locations-Tab mit gleichem Entfernungsfilter übereinstimmend ein-/ausgeblendet.
+
+❓ **Keine offenen Fragen** — die Root-Cause ist eindeutig, das Fix-Pattern ist aus der Map-Filterung direkt ableitbar.
+
+---
+
+##### Akzeptanzkriterien
+
+- [ ] Wenn Stephan im Filtermenü „< 15 km" wählt und GPS-Standort vorhanden ist: Im Locations-Tab sind danach nur Locations sichtbar, deren Fotografen-Standpunkt innerhalb von 15 km liegt.
+- [ ] Wenn Stephan „< 5 km" wählt: Locations weiter entfernt verschwinden sofort aus der Liste, sobald er „Anwenden" tippt.
+- [ ] Entfernungsfilter und Textsuche (Suchfeld im Locations-Tab) wirken kombiniert: nur Locations die BEIDE Bedingungen erfüllen, werden angezeigt.
+- [ ] Map und Locations-Tab zeigen bei gleichem Entfernungsfilter identische Locations an (kein Unterschied mehr zwischen den Ansichten).
+- [ ] Edge Case: GPS nicht verfügbar (Berechtigung verweigert) → Locations-Tab zeigt alle Locations, Toast „GPS nicht verfügbar" erscheint, kein leeres Ergebnis.
+- [ ] Edge Case: Entfernungsfilter auf „Alle" (= 0) gesetzt → alle Locations sichtbar, kein GPS-Request.
+- [ ] Scout-Tab und Feed sind vom Fix nicht betroffen (Regression: weiterhin korrekte Entfernungsfilterung).
+
+---
+
+##### Pre-Mortem
+
+💀 **Szenario 1: GPS-Request fehlt im Locations-Render-Pfad**
+Auslöser: `applyToLocations` prüft `Filter._gps`, aber bei direktem Tab-Wechsel (ohne `_applyLive`) wurde noch kein GPS-Request gestellt → `Filter._gps === null` → Filter wirkt nicht.
+Frühwarnung: Nur nach frischem App-Start wirkt der Filter nicht; nach einem vorherigen Map-Besuch (wo GPS angefragt wurde) funktioniert er.
+Gegenmaßnahme: In `Locations.load()` und `Locations.filter()` einen `await Filter.requestGps()` voranstellen wenn `s.maxDistKm > 0` — analog zu `_applyLive`.
+
+💀 **Szenario 2: Locations-Tab-Render nach Tab-Wechsel ignoriert GPS-State**
+Auslöser: Stephan setzt Filter, wechselt Tab, wechselt zum Locations-Tab → `App.current` triggert `Locations.load()` ohne GPS-Abfrage.
+Frühwarnung: Filter-Badge zeigt Entfernungsfilter aktiv, aber Liste bleibt ungefiltert.
+Gegenmaßnahme: GPS-Check auch in `Locations.load()` integrieren.
+
+💀 **Szenario 3: Regression auf Map oder Feed**
+Auslöser: Falsche Stelle in der gemeinsamen Filter-Logik geändert, was bestehende Map- oder Feed-Filterung kaputt macht.
+Frühwarnung: Map zeigt nach Fix andere Locations als vorher.
+Gegenmaßnahme: Fix isoliert in `applyToLocations` — berührt Map-Code (Zeile 3892) und Feed-Code (Zeile 2519) nicht.
+
+---
+
+##### Implementierungsoptionen
+
+**Option A — Entfernungscheck in `applyToLocations` ergänzen (minimaler Eingriff)**
+- Was bedeutet das für Stephan: Die Liste im Locations-Tab verhält sich ab sofort genauso wie die Karte — gleicher Filter, gleiches Ergebnis. Einzige Änderung: 3 Zeilen Code im Locations-Filterblock.
+- Betroffene Dateien: `web/index.html` — nur `applyToLocations()` (ca. Zeile 2570, vor `return true`)
+- Zusätzlich: In `Locations.load()` und `Locations.filter()` GPS-Request voranstellen wenn `maxDistKm > 0`
+- Vorteile: Kleinstmöglicher Fix; identische Logik wie Map (bewährt); kein Risiko für andere Filterfelder
+- Nachteile: Kein async in `applyToLocations` möglich → GPS-Request muss VOR dem Filteraufruf erfolgen
+- Aufwand: klein (~5 Zeilen Änderung + 2 await-Stellen)
+
+**Option B — GPS-State gemeinsam vor jedem Locations-Render sicherstellen**
+- Was bedeutet das für Stephan: Gleiche App-Wirkung wie Option A, aber robusterer GPS-Lifecycle (GPS wird garantiert immer vor dem Locations-Render geprüft, unabhängig vom Einstiegspfad).
+- Betroffene Dateien: `web/index.html` — `Locations.load()`, `Locations.filter()`, `applyToLocations()`
+- Vorteile: Sauberer GPS-Lifecycle; deckt alle Einstiegspfade ab (Tab-Wechsel, Textsuche, App-Start)
+- Nachteile: Etwas mehr Refactoring; minimal mehr Komplexität im Locations-Modul
+- Aufwand: klein-mittel (~8–10 Zeilen)
+
+✅ **Empfehlung: Option B** — weil Option A das GPS-Problem nur in `_applyLive` löst, nicht bei direktem Tab-Wechsel oder Textsuche nach Filter-Setzen. Option B schließt alle Einstiegspfade mit überschaubarem Mehraufwand. Konkreter Plan:
+1. `applyToLocations()`: Entfernungscheck nach Verifikations-Block ergänzen (3 Zeilen, analog Map-Code Zeile 3893-3895, mit `Filter._gps`)
+2. `Locations.load()`: `if (Filter.state.maxDistKm > 0) await Filter.requestGps();` vor dem Render
+3. `Locations.filter(q)`: dieselbe GPS-Abfrage vor dem `Filter.applyToLocations(this.all)`-Aufruf
+
+---
+
+##### Scope
+
+**Eingeschlossen:**
+- Entfernungsfilter im Locations-Tab (Liste + Textsuche)
+- GPS-Request-Sicherung für alle Locations-Render-Pfade
+
+**Ausgeschlossen (bereits korrekt):**
+- Map-Filterung (Zeile 3892–3896): funktioniert
+- Feed-Filterung (Zeile 2519–2522): funktioniert
+- Scout-Filterung (Zeile 2610–2612): funktioniert
+
+---
+
+##### Testplan
+
+**Automatisiert (pytest):** Kein Backend-Test nötig — reine Frontend-Logik. Die Filterlogik ist nicht in Python abgebildet.
+
+**Manuell (Browser unter http://localhost:8000):**
+1. App öffnen → Filter-Sheet → „< 5 km" wählen → Anwenden → Locations-Tab öffnen: Nur Locations innerhalb 5 km sichtbar (GPS-Abfrage erscheint falls nicht erteilt)
+2. Im Locations-Tab Suchfeld „Schloss" eingeben: Kombinationsfilter — nur Schloss-Locations innerhalb 5 km
+3. Auf Karte wechseln: Karte zeigt dieselben Locations wie Liste
+4. GPS verweigern: Toast erscheint, alle Locations sichtbar
+5. Filter zurücksetzen: Alle Locations wieder sichtbar, kein GPS-Request
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Code-Verifikation: `applyToLocations()` gelesen (Zeile 2546–2572) — `maxDistKm`-Check fehlt bestätigt
+- [x] Architektur analysiert: nur `web/index.html` betroffen, `applyToLocations()` + GPS-Request in `Locations.load/filter`
+- [x] Implementierungsoptionen: A (minimaler Fix) / B (robuster GPS-Lifecycle)
+- [x] Empfehlung: Option B
+
+---
+
+### BUG-52 · Standort-Freigabe (Geolocation) wird nicht für die Session gespeichert `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-29 |
+
+**Beschreibung:** Die App fordert die Geolocation-Berechtigung wiederholt innerhalb einer Session an — auch wenn der Nutzer sie bereits erteilt hat. Erwartetes Verhalten: Nach einmaliger Zustimmung bleibt die Freigabe für die laufende Session aktiv und wird nicht erneut abgefragt.
+
+**Bezug:** Keine Dubletten gefunden.
