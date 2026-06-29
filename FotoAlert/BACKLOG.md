@@ -25,15 +25,15 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-07** |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-49** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-48** |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2148,7 +2148,8 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 
 
-### US-07 · Goldene Wolken & Himmelsröte Scoring `[ ]`
+### US-07 · Goldene Wolken & Himmelsröte Scoring `[~]`
+> **Status:** In Analysis
 > **Als Fotograf** möchte ich für Goldene-Stunde-Events eine Einschätzung der Wolkenstimmungsqualität sehen – ob Bedingungen für dramatische goldene Wolken oder leuchtende Himmelsröte vorliegen – damit ich Go/No-Go-Entscheidungen noch gezielter treffen kann.
 >
 > **Hintergrund:** US-42 [x] zeigt bereits Gesamtbewölkung als Prozentwert. Dieses Ticket erweitert das um eine qualitative Einschätzung auf Basis der Wolkenhöhenschichtung: tiefe Wolken blockieren das Licht, mittlere und hohe Wolken reflektieren und färben es golden/rot.
@@ -2210,6 +2211,145 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 > - Manuelle Verifikation bedeckter Himmel: `cl=90, cm=80, ch=70` → Score ≤ 0.10
 >
 > *Folge-Ticket: US-07b Nebel & atmosphärische Sonderbedingungen (DWD Nebel-Gitter, Sichtweite) — noch nicht erstellt*
+
+---
+
+**📋 IMPLEMENTATION SPEC — US-07 · Goldene Wolken & Himmelsröte Scoring**
+
+**Scope:**
+- Eingeschlossen: `_golden_cloud_score()`-Funktion in `calculations/weather.py`; `golden_cloud_score`-Feld in Wetter-Overlay (`main.py`); Frontend-Anzeige im Wetter-Detail-Sheet; `ALGORITHM_VERSION`-Bump auf "1.4".
+- Ausgeschlossen: Blaue-Stunde-Events (Ticket sagt „nur Goldene Stunde" trotz Frontend-Formulierung — siehe ⚠️ Annahme unten); Nebel/DWD (→ US-07b); Sunsethue-API; Kalender- und Scout-Ansicht (kein eigenes Detail-Sheet mit Wetter-Sektion).
+
+> ⚠️ **Annahme A:** Das Ticket sagt in der Backend-Spec „nur für Events innerhalb Goldener/Blauer Stunde" und im Frontend-AK „Nur angezeigt für Goldene-Stunde- und Blaue-Stunde-Events". Code-seitig liegt `BLUE_HOUR_EVENING` nah genug, dass der Score dort sinnvoll wäre (tiefe/mittlere/hohe Wolken spielen auch bei blauem Licht eine Rolle). **Annahme: Score wird für `GOLDEN_HOUR_MORNING`, `GOLDEN_HOUR_EVENING` und `BLUE_HOUR_EVENING` berechnet, nicht für Alignment/Mond/Milchstraße.** Bitte bestätigen oder korrigieren.
+>
+> ⚠️ **Annahme B:** Der `weather_score`-Bonus bei `golden_cloud_score ≥ 0.7` wirkt nur im Live-Wetter-Overlay (`_apply_weather_to_event` in `main.py`), nicht in `precompute.py` (der Precompute kennt kein Wetter). `GOLDEN_CLOUD_VERSION` in `precompute.py` erzwingt keinen nützlichen Cache-Invalidierungseffekt für diesen Score — weil der Score ausschließlich zur Laufzeit via Wetter-Overlay berechnet wird. **Annahme: Kein `GOLDEN_CLOUD_VERSION` in precompute.py nötig; stattdessen nur `ALGORITHM_VERSION`-Bump.** Bestätigung erbeten.
+
+**📎 Code-Verifikation (2026-06-29):**
+- `backend/calculations/weather.py` gelesen: `cloud_cover_low_pct`, `cloud_cover_mid_pct`, `cloud_cover_high_pct` sind **bereits in `HourlyWeather` vorhanden** und werden via Open-Meteo bereits abgerufen (Zeilen 29–31 + 163–176). Ticker-Annahme „Felder bisher nicht abgerufen" ist **widerlegt** — die Felder kommen bereits an.
+- `backend/main.py`, Funktion `_apply_weather_to_event()` (Zeile 453–463): `weather_details`-Dict enthält `cloud_cover_pct` und `cloud_cover_high_pct`, aber **nicht** `cloud_cover_low_pct` und `cloud_cover_mid_pct`. Diese müssen ergänzt werden, damit das Frontend `golden_cloud_score` berechnen oder anzeigen kann (alternativ: Score direkt im Backend berechnen und als fertige Zahl mitliefern — empfohlen).
+- `calculate_photo_weather_score()` enthält bereits Cirrus-Bonus (Zeile 108–109): `cloud_cover_high_pct > 20 and cloud_cover_low_pct < 30 → *1.15`. Das ist ein einfacher Vorläufer; US-07 baut darauf auf, aber ersetzt ihn nicht (kein Scope Creep).
+- `ALGORITHM_VERSION = "1.3"` (precompute.py Zeile 58) — muss auf `"1.4"` gehoben werden.
+- `OpportunityOut` (schemas.py Zeile 46–83): kein `golden_cloud_score`-Feld — muss als `Optional[float]` ergänzt werden.
+- Frontend Wetter-Sektion (index.html Zeile 3401–3415): `o.weather_details` als Dict, daraus `wd.cloud_cover_high_pct` bereits genutzt (Cirrus-Hinweis). Das neue Feld `golden_cloud_score` sollte direkt als Top-Level-Feld des Events kommen (nicht im `weather_details`-Dict), analog zu `weather_score`.
+
+**Example Mapping:**
+
+📏 **Rule 1:** Für Goldene-Stunde- und Blaue-Stunde-Events berechnet das Backend beim Wetter-Overlay einen `golden_cloud_score` (0.0–1.0) aus den drei Wolkenhöhen.
+- 🟢 *Scattered clouds (Sweet Spot):* `cl=5, cm=40, ch=30` → Score ≥ 0.70. In der App: Wetter-Sektion zeigt „✨ Gut" oder „🌅 Exzellent".
+- 🟢 *Klarer Himmel:* `cl=0, cm=0, ch=0` → Score ≤ 0.20. In der App: „⛅ Gering".
+- 🟢 *Tiefe Wolken dominieren:* `cl=90, cm=20, ch=10` → Score ≤ 0.10. In der App: „⛅ Gering".
+
+📏 **Rule 2:** Bei `golden_cloud_score ≥ 0.7` erhält der `weather_score` des Events einen Bonus von 5–10 Prozentpunkten (max. 1.0).
+- 🟢 *Bonus greift:* Event hat `weather_score=0.75`, `golden_cloud_score=0.82` → `weather_score` wird auf max. 0.85 angehoben.
+- 🟢 *Kein Bonus:* Event hat `golden_cloud_score=0.55` → `weather_score` bleibt unverändert.
+
+📏 **Rule 3:** Für alle anderen Event-Typen (Mond, Milchstraße, Alignment etc.) ist `golden_cloud_score = null` und die Anzeige bleibt ausgeblendet.
+- 🟢 *Mond-Alignment:* Event-Typ „Mond-Alignment" → `golden_cloud_score` ist `null` → keine „Wolkenstimmung"-Zeile im Detail-Sheet.
+
+📏 **Rule 4:** Die „Wolkenstimmung"-Zeile erscheint nur wenn das Wetter-Overlay aktiv ist (d.h. `weather_details` vorhanden, Event innerhalb T-3 Tage).
+- 🟢 *T+5 Tage:* kein `weather_details` → keine Wolkenstimmungs-Zeile sichtbar, auch wenn Event-Typ passt.
+
+**Akzeptanzkriterien:**
+
+- [ ] AK-1: Beim Öffnen des Detail-Sheets einer Goldene-Stunde-Chance in den nächsten 3 Tagen erscheint in der Wetter-Sektion eine neue Zeile „Wolkenstimmung" mit einem der vier Labels (🌅 Exzellent / ✨ Gut / 🌤 Mäßig / ⛅ Gering).
+- [ ] AK-2: Beim Öffnen des Detail-Sheets einer Mond-Alignment- oder Milchstraßen-Chance ist die Zeile „Wolkenstimmung" nicht sichtbar (weder Label noch Platzhalter).
+- [ ] AK-3: Beim Öffnen des Detail-Sheets einer Goldene-Stunde-Chance mit `cl=5, cm=40, ch=30` zeigt die App „✨ Gut" oder „🌅 Exzellent" (Score ≥ 0.70).
+- [ ] AK-4: Beim Öffnen des Detail-Sheets einer Goldene-Stunde-Chance mit `cl=90, cm=20, ch=10` zeigt die App „⛅ Gering" (Score ≤ 0.10).
+- [ ] AK-5: Beim Öffnen des Detail-Sheets einer Goldene-Stunde-Chance bei klarem Himmel (`cl=0, cm=0, ch=0`) zeigt die App „⛅ Gering" (Score ≤ 0.20).
+- [ ] AK-6: Eine Goldene-Stunde-Chance mit `golden_cloud_score ≥ 0.7` hat einen `weather_score` der um 5–10 Prozentpunkte höher liegt als ohne den Bonus, maximal 1.0.
+- [ ] AK-7: Events weiter als 3 Tage entfernt zeigen keine Wolkenstimmungs-Zeile (da kein Wetter-Overlay aktiv).
+- [ ] AK-8 (Regression): Bestehende Wetter-Anzeige (Bewertung, Temperatur, Wolken %, Regen, Wind, Sicht) für alle Event-Typen bleibt unverändert funktionsfähig.
+- [ ] AK-9 (Regression): `overall_score`-Berechnung für Nicht-Goldene-Stunde-Events (Mond, Milchstraße, Alignment) bleibt unverändert.
+- [ ] Edge Case AK-10: Wenn `cloud_cover_low_pct`, `cloud_cover_mid_pct` oder `cloud_cover_high_pct` im API-Response `null` sind, wird der `golden_cloud_score` auf `null` gesetzt (kein Crash, kein Fallback-Wert).
+
+**Pre-Mortem:**
+
+💀 **Szenario 1: `cloud_cover_low/mid_pct` fehlten bisher in `weather_details`**
+- Auslöser: Ticket-Beschreibung suggerierte, die Felder würden noch nicht abgerufen. Tatsächlich werden sie abgerufen (HourlyWeather), aber nicht in das `weather_details`-Dict übernommen.
+- Frühwarnung: Test `curl /opportunities` und `weather_details` inspizieren zeigt das sofort.
+- Gegenmaßnahme: `_apply_weather_to_event()` erweitern um `cloud_cover_low_pct` und `cloud_cover_mid_pct` (oder golden_cloud_score direkt berechnen und als Feld anhängen — bevorzugt).
+
+💀 **Szenario 2: Cirrus-Bonus in `calculate_photo_weather_score()` wird doppelt bewertet**
+- Auslöser: `calculate_photo_weather_score()` enthält bereits einen Cirrus-Bonus (`*1.15`). Wenn US-07 zusätzlich einen `weather_score`-Bonus bei `golden_cloud_score ≥ 0.7` addiert, werden gute Cirrus-Bedingungen zweifach belohnt.
+- Frühwarnung: Unit-Test mit `cl=5, cm=0, ch=40` → `weather_score` deutlich > 1.0 vor Kappung.
+- Gegenmaßnahme: Den bestehenden Cirrus-Bonus in `calculate_photo_weather_score()` durch den neuen `golden_cloud_score`-Bonus ersetzen — oder den Bonus nur einmal anwenden. Scope-Entscheidung: **Vorschlag ist, den Cirrus-Bonus in `calculate_photo_weather_score()` zu belassen (Nicht-Goldene-Stunde-Events profitieren davon weiter) und den `golden_cloud_score`-Bonus additiv zu deckeneln.** Wegen möglicher Doppelbewertung Bonus max. +5 Pp. (nicht +10).
+
+💀 **Szenario 3: `golden_cloud_score` erscheint fälschlicherweise im Kalender-Detail**
+- Auslöser: Kalender-Events kommen von `/calendar`-Endpoint; wenn `OpportunityOut`-Schema erweitert wird, landet das Feld dort ebenfalls.
+- Frühwarnung: US-96 Retro zeigte: `/calendar` liefert astronomy-only-Events ohne Wetter-Details → `weather_details = null` → Frontend zeigt sowieso nichts. Sicher, solange Frontend `golden_cloud_score` nur rendert wenn `weather_details` vorhanden.
+- Gegenmaßnahme: Frontend-Bedingung immer `if (wd && o.golden_cloud_score !== null && o.golden_cloud_score !== undefined)`.
+
+💀 **Szenario 4: `ALGORITHM_VERSION`-Bump erzwingt vollständigen Precompute-Lauf (~8h)**
+- Auslöser: `ALGORITHM_VERSION` von "1.3" auf "1.4" → Cache wird als veraltet markiert → vollständige Neuberechnung beim nächsten Start (ca. 8h Laufzeit).
+- Frühwarnung: Bekannt aus Memory `reference_fotoalert_server_paths`.
+- Gegenmaßnahme: In Release-Notes dokumentieren; Release außerhalb Stoßzeiten; Wetter-Overlay übernimmt `golden_cloud_score` live, sodass der Score auch vor Ende des Precompute sofort sichtbar ist (für T-3-Events).
+
+💀 **Szenario 5: Blaue-Stunde-Events zeigen „Wolkenstimmung" obwohl Score wenig Aussagekraft hat**
+- Auslöser: Blaue Stunde findet nach Sonnenuntergang statt — Wolkenfärbung viel geringer. Ein „Exzellent"-Score könnte Erwartungen wecken, die nicht erfüllt werden.
+- Frühwarnung: User-Feedback „warum zeigt mir die App exzellente Wolkenstimmung für die Blaue Stunde, wenn der Himmel nur tiefblau ist?"
+- Gegenmaßnahme: Anzeige auf `GOLDEN_HOUR_MORNING` und `GOLDEN_HOUR_EVENING` beschränken (nicht `BLUE_HOUR_EVENING`). → ⚠️ Annahme A oben – bitte Stephan bestätigen.
+
+**Architektur-Analyse:**
+
+Betroffene Dateien:
+1. `backend/calculations/weather.py` — neue Funktion `_golden_cloud_score(cl, cm, ch)` hinzufügen
+2. `backend/main.py` — `_apply_weather_to_event()`: `golden_cloud_score` berechnen und als Top-Level-Feld ans Event anhängen; `weather_details`-Dict um `cloud_cover_low_pct`, `cloud_cover_mid_pct` ergänzen
+3. `backend/models/schemas.py` — `OpportunityOut`: `golden_cloud_score: Optional[float] = None`
+4. `backend/precompute.py` — `ALGORITHM_VERSION` "1.3" → "1.4"
+5. `web/index.html` — Wetter-Sektion: neue „Wolkenstimmung"-Zeile + ⓘ-Tooltip
+
+Nicht betroffen: `precompute.py` Scoring-Logik (Wetter-Score wird nicht in Precompute berechnet, nur im Live-Overlay), `discover/`-Pipeline, iOS-App.
+
+**Implementierungsoptionen:**
+
+### Option A — Score vollständig im Backend berechnen (empfohlen)
+
+Was du in der App erlebst: Die App liefert dir direkt eine fertige Einschätzung — „Exzellent", „Gut", „Mäßig", „Gering" — ohne dass dein Browser noch etwas berechnen muss. Das Feld `golden_cloud_score` (Zahl 0–1) kommt fertig vom Server und das Frontend zeigt nur das Label dazu.
+
+- Vorgehen: `_golden_cloud_score()` in `calculations/weather.py`; Aufruf in `_apply_weather_to_event()` in `main.py`; Score als `e["golden_cloud_score"]` speichern; `OpportunityOut` um `Optional[float]` ergänzen; Frontend liest `o.golden_cloud_score`.
+- Betroffene Dateien: `weather.py`, `main.py`, `schemas.py`, `precompute.py`, `index.html`
+- Vorteile: Testbar per pytest; Konsistenz mit allen bestehenden Score-Feldern; keine Logik im Frontend.
+- Nachteile: `ALGORITHM_VERSION`-Bump → 8h-Precompute; minimale Schema-Erweiterung.
+- Aufwand: mittel
+
+### Option B — Score im Frontend aus den Wolken-Feldern berechnen
+
+Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik sitzt im Browser. Die Drei-Schichten-Werte (`cloud_cover_low/mid/high_pct`) müssen alle in `weather_details` stecken und das Frontend rechnet den Score.
+
+- Vorgehen: `weather_details` um `cloud_cover_low_pct` + `cloud_cover_mid_pct` ergänzen; Scoring-Logik als JS-Funktion in `index.html`; kein neues Backend-Feld.
+- Betroffene Dateien: `main.py` (weather_details), `index.html`
+- Vorteile: Kein `ALGORITHM_VERSION`-Bump nötig; kein Schema-Change.
+- Nachteile: Scoring-Logik nicht testbar per pytest; Duplikation (Logik existiert bereits im Backend-Kontext); `weather_score`-Bonus (AK-6) kann nicht im Frontend berechnet werden → AK-6 würde entfallen oder müsste im Backend bleiben → Hybrid-Ansatz nötig.
+- Aufwand: mittel (aber schlechtere Qualität wegen fehlender Testbarkeit)
+
+✅ **Empfehlung: Option A** — Score im Backend berechnen. Nur so ist AK-6 (weather_score-Bonus) testbar und konsistent. Der `ALGORITHM_VERSION`-Bump ist bekannter Standardprozess. Option B erzeugt einen Hybrid (Score im Frontend, Bonus im Backend) der schwer zu maintainen ist.
+
+**Testplan:**
+
+- [ ] Automatisiert (pytest in `backend/tests/test_us07.py`):
+  - AK-3: `_golden_cloud_score(cl=5, cm=40, ch=30)` → ≥ 0.70
+  - AK-4: `_golden_cloud_score(cl=90, cm=20, ch=10)` → ≤ 0.10
+  - AK-5: `_golden_cloud_score(cl=0, cm=0, ch=0)` → ≤ 0.20
+  - AK-6: Mock-Event mit `golden_cloud_score=0.82`, `weather_score=0.75` → `weather_score` nach Bonus ≤ 1.0 und > 0.75
+  - AK-10: `_golden_cloud_score()` mit `None`-Inputs → gibt `None` zurück (kein Crash)
+  - Regression Pre-Mortem S2: `cl=5, cm=0, ch=40` → `weather_score` nach Bonus ≤ 1.0
+
+- [ ] Manuell (Browser + curl, nach Serverstart unter http://localhost:8000):
+  1. `curl "http://localhost:8000/opportunities?days=3"` → in der Response eines Goldene-Stunde-Events prüfen: Feld `golden_cloud_score` vorhanden (Zahl 0–1 oder null).
+  2. App öffnen → Feed → Goldene-Stunde-Event der nächsten 3 Tage antippen → Wetter-Sektion aufklappen → Zeile „Wolkenstimmung" mit Label sichtbar.
+  3. Dasselbe für ein Mond-Alignment-Event → Zeile „Wolkenstimmung" darf nicht erscheinen.
+  4. Regressions-Check: Bestehende Wetter-Sektion (Bewertung, Temperatur, Wolken, Regen, Wind, Sicht) für alle Event-Typen unverändert vorhanden.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2026-06-29)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, alle mit Gegenmaßnahmen)
+- [x] Code-Verifikation: `weather.py`, `main.py`, `schemas.py`, `precompute.py`, `index.html` gelesen
+- [x] Architektur analysiert: 5 betroffene Dateien identifiziert
+- [ ] Weg-Gate: Option A / B → Empfehlung Option A — Freigabe durch Stephan ausstehend
+- [ ] ⚠️ Klärung Annahme A: Score nur Goldene Stunde oder auch Blaue Stunde?
+- [ ] ⚠️ Klärung Annahme B: `GOLDEN_CLOUD_VERSION` in precompute.py nötig oder nicht?
+
+---
 
 ### US-08 · GPX-Export (Apple Maps / Google Maps)
 > **Status:** Maps-Links für Fotograf-Standort und Motiv sind bereits in der Event-Detailansicht implementiert.
@@ -3337,7 +3477,7 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-06-29 |
 
 **Beschreibung:** Die `/opportunities`-API gibt 500 Events zurück, aber ausschließlich Mond-Events (Mondaufgang, Monduntergang, Milchstraße, Mond-Alignment). Goldene Stunde und Blaue Stunde erscheinen mit 0 Treffern — obwohl `opportunities.json` im Cache 910× Goldene Stunde Abend und 910× Blaue Stunde enthält.
@@ -3353,14 +3493,115 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ---
 
-### BUG-49 · Doppeltes Suchfeld im Locations-Panel `[~]`
+#### Analyse (BUG-48)
+
+**Verifizierte Fakten (aus Code + Daten):**
+
+- Cache `opportunities.json` enthält insgesamt **4.178 Events** (Schlüssel `opportunities`)
+- Davon Routine-Events: **1.848** (Goldene Stunde Abend: 924, Blaue Stunde: 924)
+- Davon Nicht-Routine: **2.330** (Monduntergang: 924, Mondaufgang: 858, Milchstraße: 528, Alignment: 18, Vollmond: 2)
+- Nach Score-Filter (≥ 0.35) + Zeitfenster (14 Tage future): **3.912 Events** bleiben → alle Routine-Events sind valide (Score-Range 0.75–1.0)
+- Nach Dedup: **3.899 Events** — immer noch weit über dem :500-Cap
+- Sort-Key in `_filter_feed` (main.py, Zeile 1275): `(1 if routine else 0, shoot_time, -score)` → Non-Routine-Events (Wert 0) kommen ZUERST
+- **Die ersten 500 Einträge nach Sort**: 264× Monduntergang + 235× Mondaufgang + 1× Alignment = **500 Nicht-Routine-Events, 0 Routine-Events**
+- ✅ Prüffrage beantwortet: Routine-Events haben Scores 0.75–1.0, alle ≥ 0.35 → kein separates Datenproblem
+
+**Scope:**
+
+Der Sort-Key in `_filter_feed` (main.py, ca. Zeile 1272–1279) muss so angepasst werden, dass alle Event-Typen proportional im :500-Fenster vertreten sind. Der BUG-32-Fix (Non-Routine zuerst) war gedacht um seltene Events nicht zu verdrängen — hat aber das exakte Gegenteil bewirkt: häufige Mond-Events (1.650+ Einträge) verdrängen nun komplett die Routine-Events.
+
+**Akzeptanzkriterien:**
+
+- [ ] Wenn Stephan in der App den Feed öffnet, sieht er Goldene Stunde und Blaue Stunde im Feed — nicht ausschließlich Mond-Events
+- [ ] Die API `/opportunities` (ohne Filter) gibt mindestens 100 Goldene-Stunde- und 100 Blaue-Stunde-Events zurück (bei 858 im validen Cache-Window)
+- [ ] Mondaufgang und Monduntergang sind weiterhin im Feed sichtbar (werden nicht komplett verdrängt)
+- [ ] Milchstraße und Mond-Alignment bleiben auffindbar (werden nicht durch Routine-Events verdrängt)
+- [ ] Mit `?event_type=Goldene+Stunde+Abend` gibt die API korrekt nur Goldene-Stunde-Events zurück (bestehende Filter-Funktion unverändert)
+
+**Example Mapping:**
+
+Rule 1: Alle Event-Typen müssen im Feed erscheinen können
+- ✅ Positiv: Feed mit Standardparametern enthält Goldene Stunde, Blaue Stunde, Mondaufgang, Monduntergang und Milchstraße gleichzeitig
+- ❌ Negativ (aktueller Bug): Feed enthält 0× Goldene Stunde + 0× Blaue Stunde, obwohl 858 davon im Cache vorhanden sind
+- 🔶 Edge: Wenn Cache ausschließlich Routine-Events enthält → Feed muss diese zeigen, nicht leer sein
+
+Rule 2: Der :500-Cap darf keine Event-Typen systematisch ausschließen
+- ✅ Positiv: Bei 3.899 validen Events nach Dedup ergibt ein fairer Schnitt proportionale Anteile (~130 pro Typ)
+- ❌ Negativ: Sort-Key 0/1 für Non-Routine/Routine füllt die ersten 500 komplett mit Non-Routine-Events
+- 🔶 Edge: Wenn ein Typ 450+ Events hat und ein anderer nur 5 → der seltene Typ soll trotzdem erscheinen
+
+Rule 3: Score-Filter greift beim Laden, Cap greift beim Ausgeben
+- ✅ Positiv: `min_score=0.35` filtert Events heraus bevor der Cap greift
+- ❌ Negativ: Wenn Cap vor Score-Filter läge, würden hochwertige Events nach dem Cap wegfallen
+- 🔶 Edge: `min_score=0.99` → nur Top-Events → Cap wahrscheinlich nicht binding
+
+**Pre-Mortem:**
+
+- 💀 Szenario 1 — Neuer BUG-32-Effekt in umgekehrter Richtung: Option A (Routine zuerst) verdrängt jetzt Mond/Milchstraße — Stephan beschwert sich, dass Mondaufgänge fehlen. **Frühwarnung:** Test nach Fix zeigt 0 Mondaufgänge im Feed. **Gegenmaßnahme:** Round-Robin oder proportionale Auswahl statt reiner Prioritätssortierung.
+
+- 💀 Szenario 2 — Cache-Inhalt ändert sich saisonal: Im Winter gibt es kaum Milchstraße (528 → 0) → Sort-Key ist irrelevant, aber Cap bleibt Bottleneck bei anderen Typen. **Frühwarnung:** Regression-Test schlägt im Dezember fehl. **Gegenmaßnahme:** AK als dauerhafter API-Test in CI (curl + count per Typ).
+
+- 💀 Szenario 3 — precompute erzeugt zukünftig noch mehr Events: Bei 5.000+ Events pro 14 Tage bleibt das Problem strukturell unlösbar mit reiner Sortierung. **Frühwarnung:** Cap wird regelmäßig erschöpft. **Gegenmaßnahme:** Cap pro Typ statt global (Option C ist robuster langfristig).
+
+**Implementierungsoptionen:**
+
+**Option A – Sort-Key umdrehen (Routine zuerst):**
+- Sort-Key: `(0 if routine else 1, shoot_time, -score)` — Routine-Events kommen zuerst
+- Vorteil: minimale Änderung, 1 Zeile
+- Nachteil: dreht BUG-32 vollständig um — Mond/Milchstraße fallen nun heraus. Löst das Grundproblem nicht, verlagert es nur
+
+**Option B – Zeitbasierte Sortierung (kein Typ-Bias):**
+- Sort-Key: `(shoot_time, -score)` — nur nach Zeit sortieren, kein Typ-Gewicht
+- Vorteil: fair, einfach, deterministisch
+- Nachteil: Bei vielen zukünftigen Nicht-Routine-Events füllen diese wieder den Cap wenn Mond täglich auftritt — kurzfristig besser, strukturell nicht gelöst
+- Simuliertes Ergebnis mit aktuellem Cache: ~130 pro Typ im :500-Fenster ✅
+
+**Option C – Typ-proportionale Auswahl (Round-Robin per Typ):**
+- Nach Filter + Dedup: Events nach Typ gruppieren, dann reihum je 1 Event pro Typ auswählen bis Cap erreicht
+- Vorteil: garantiert Repräsentation aller Typen unabhängig von Volumen; robust bei saisonal variierenden Counts
+- Nachteil: komplexer (~20 Zeilen statt 1), Reihenfolge im Feed ist nicht mehr rein zeitlich
+- Events sind immer noch nach Score innerhalb jedes Typs priorisiert
+
+**Empfehlung: Option C (Round-Robin)**
+
+Begründung: Option B löst das Problem für den aktuellen Cache, bricht aber bei 500+ Non-Routine-Events pro Typ erneut zusammen. Option C ist die einzige Lösung, die strukturell hält. Die Komplexität ist überschaubar (~20 Zeilen). Der BUG-32-Kommentar im Code belegt, dass dieses Problem schon einmal auftrat — Option B würde es erneut entstehen lassen.
+
+**Architektur:**
+- Einzige Änderung: `_filter_feed` in `backend/main.py` (Zeile 1269–1280)
+- Der `:500`-Cap in `get_opportunities` (Zeile 1342) bleibt unverändert
+- Keine Änderungen an Frontend, Cache, Precompute
+
+**Daten-Validierung:**
+- [x] Cache-Probe durchgeführt: 4.178 Events total, davon 1.848 Routine (Score 0.75–1.0, alle ≥ 0.35), 2.330 Non-Routine
+- [x] Simulation bestätigt: aktueller Sort-Key liefert 500/500 Nicht-Routine-Events, 0/500 Routine-Events
+- [x] Simulation Option B: zeitbasierter Sort → ~130 Goldene Stunde + ~130 Blaue Stunde im :500-Fenster ✅
+- [x] Prüffrage beantwortet: Routine-Events haben valide Scores — kein separates Datenproblem
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: nur `_filter_feed` in `backend/main.py` (Zeilen 1272–1279) betroffen
+- [x] Implementierungsoptionen: A (Sort umdrehen) / B (zeitbasiert) / C (Round-Robin)
+- [ ] Empfehlung: Option C (Round-Robin per Typ) — robust gegen saisonale Volumen-Schwankungen
+
+**Testplan:**
+- [ ] Automatisiert: `curl "/opportunities"` → response enthält mindestens 100 Goldene-Stunde-Events und 100 Blaue-Stunde-Events
+- [ ] Automatisiert: `curl "/opportunities"` → response enthält mindestens 50 Mondaufgang-Events (Non-Routine nicht verdrängt)
+- [ ] Manuell: Feed-Tab in der App öffnen → Goldene Stunde und Blaue Stunde sind sichtbar
+- [ ] Manuell: Feed nach Typ „Goldene Stunde Abend" filtern → Events erscheinen korrekt
+- [ ] Regression: `/opportunities/today` und `/opportunities?event_type=Mondaufgang` weiterhin korrekt
+
+---
+
+### BUG-49 · Doppeltes Suchfeld im Locations-Panel `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Im Locations-Panel existieren zwei Sucheingaben gleichzeitig: ein statisch sichtbares „Suchen"-Feld und ein weiteres, das sich über das Suchlogo im Menü öffnet. Das ist redundant und verwirrend — es sollte nur einen einzigen konsistenten Sucheinstieg geben.
 

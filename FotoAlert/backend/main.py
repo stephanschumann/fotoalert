@@ -1269,15 +1269,40 @@ def _filter_feed(
     # Deduplizierung: pro (location_id + event_type + Tag) nur das beste Event
     result = _dedup_best_per_day(result)
 
-    # BUG-32: Non-Routine-Events (Mond, Milchstraße, Sonnen-Alignment) zuerst sortieren,
-    # damit sie nicht durch den :500-Cap verdrängt werden.
-    _ROUTINE_TYPES = {'Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'}
-    result.sort(key=lambda e: (
-        1 if e["event_type"] in _ROUTINE_TYPES else 0,
-        e["shoot_time"],
-        -e["overall_score"],
-    ))
-    return result
+    # BUG-48: Round-Robin pro Event-Typ damit kein Typ den :500-Cap dominiert.
+    # 1. Alle Events nach Score absteigend sortieren (Round-Robin nimmt immer den besten noch verfügbaren)
+    result.sort(key=lambda e: -e["overall_score"])
+
+    # 2. Nach event_type gruppieren (Reihenfolge der Typen = erster Auftritt im Score-Sort)
+    # dict ist seit Python 3.7 insertion-ordered — OrderedDict nicht nötig
+    _CAP = 500
+    groups: dict = {}
+    for e in result:
+        t = e["event_type"]
+        if t not in groups:
+            groups[t] = []
+        groups[t].append(e)
+
+    # 3. Reihum je 1 Event pro Typ nehmen bis Cap erreicht
+    type_keys = list(groups.keys())
+    indices = {t: 0 for t in type_keys}
+    selected = []
+    while len(selected) < _CAP:
+        added_any = False
+        for t in type_keys:
+            if len(selected) >= _CAP:
+                break
+            idx = indices[t]
+            if idx < len(groups[t]):
+                selected.append(groups[t][idx])
+                indices[t] = idx + 1
+                added_any = True
+        if not added_any:
+            break
+
+    # 4. Ergebnis zeitlich sortieren für die Ausgabe
+    selected.sort(key=lambda e: e["shoot_time"])
+    return selected
 
 
 def _dedup_best_per_day(events: list[dict]) -> list[dict]:
