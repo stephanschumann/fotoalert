@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -234,12 +234,12 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Funktion | Verhalten |
 |----------|-----------|
 | Locations-Liste | ≥15 Location-Karten; scrollbar |
-| Suche | Live-Textsuche filtert nach Standortname (US-53) |
+| Suche | Live-Textsuche filtert nach Standortname — Sucheinstieg über das Lupensymbol im Header (BUG-49; lokales Suchfeld im Panel entfernt) |
 | Location antippen | Öffnet Location-Detail-Sheet |
 | Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, Sonnen-Ausrichtung heute, zukünftige Events |
 | Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
-| Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch |
+| Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. |
 | Custom Locations | Vom Nutzer gespeicherte Locations erscheinen hier; Namen ohne 📍-Emoji (BUG-42) |
 | Standortverifikation | Verifikationen werden persistiert (BUG-26) |
 
@@ -441,3 +441,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-29 | US-107 | Sonnen-Alignment-Planung: Sonnenaufgang/-untergang mit Azimut im Event-Detail (Astronomie-Sektion, analog Mondaufgang US-79); Richtungsklassifizierung relativ zum Motiv im Location-Detail (Abschnitt Ausrichtung, ±15°-Toleranz); neue API-Felder `sunrise_azimuth`/`sunset_azimuth` in `_serialize()`; Klassifizierungslogik `classify_sun_alignment()` neu; `/refresh-feed` nach Release ausführen |
 | 2026-06-29 | BUG-51 | Entfernungsfilter wirkt jetzt im Locations-Tab (applyToLocations + GPS-Lifecycle) |
 | 2026-06-29 | BUG-52 | GPS-Dialog erscheint pro Session nur einmal (Promise-Caching via `Filter._gpsPromise`) |
+| 2026-06-29 | BUG-49 | Lokales Suchfeld aus Locations-Panel entfernt; Suche läuft jetzt ausschließlich über Lupensymbol im Header (Option B) |

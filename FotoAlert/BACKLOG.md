@@ -29,11 +29,11 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-50** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-49** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **BUG-49** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **BUG-48** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -3353,13 +3353,13 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ---
 
-### BUG-49 · Doppeltes Suchfeld im Locations-Panel `[ ]`
+### BUG-49 · Doppeltes Suchfeld im Locations-Panel `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-29 |
 
 **Beschreibung:** Im Locations-Panel existieren zwei Sucheingaben gleichzeitig: ein statisch sichtbares „Suchen"-Feld und ein weiteres, das sich über das Suchlogo im Menü öffnet. Das ist redundant und verwirrend — es sollte nur einen einzigen konsistenten Sucheinstieg geben.
@@ -3368,14 +3368,114 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ---
 
-### BUG-50 · HINWEISE-Feld überschreibt sich nach Quick Location Capture `[ ]`
+#### Analyse (BUG-49)
+
+##### 📎 Code-Verifikation (durchgeführt 2026-06-29)
+
+- `web/index.html` Z. 935–942 gelesen: Im `#page-locations`-Block existiert ein eigenständiges `<div class="search-wrap">` mit `<input class="search-input" oninput="Locations.filter(this.value)">` — das statisch sichtbare Suchfeld.
+- `web/index.html` Z. 891–898 gelesen: Im globalen Header existiert `<div id="search-bar">` mit `<input id="search-input" oninput="Search.onInput(this.value)">` — das per Lupensymbol (Z. 845) geöffnete Overlay-Suchfeld.
+- `Search._triggerRender()` (Z. 5235–5238): Wenn `App.current === 'locations'`, ruft das Header-Overlay ebenfalls `Locations.filter(this._query)` auf — beide Felder landen also in derselben Filterfunktion.
+- Das lokale `.search-input` übergibt `this.value` direkt (kein Eintrag in `Search._query`), das Header-Overlay schreibt in `Search._query` und triggert darüber. Die zwei Felder sind **nicht synchronisiert** — beide können gleichzeitig Werte haben, die sich nicht kennen.
+- Bestätigt: **kein Backend-Bezug** — rein Frontend, nur `web/index.html`.
+
+##### Example Mapping
+
+**📏 Rule 1:** Im Locations-Tab gibt es genau einen sichtbaren Sucheinstieg.
+
+🟢 Beispiel (Positiv): Stephan wechselt zum Locations-Tab. Oben im Panel sieht er ein Suchfeld — das ist die einzige Möglichkeit, nach Locations zu filtern. Er tippt „Teufel" und die Liste filtert sofort.
+
+🔴 Beispiel (Negativ — aktueller Bug): Stephan wechselt zum Locations-Tab. Oben sieht er ein Suchfeld im Panel. Zusätzlich kann er das Lupensymbol im Header antippen und bekommt ein zweites Overlay-Suchfeld. Beide filtern die Locations-Liste — aber unabhängig voneinander.
+
+**📏 Rule 2:** Das Header-Lupensymbol ist nur auf Feed, Kalender und Scout sinnvoll — nicht auf dem Locations-Tab.
+
+🟢 Beispiel: Stephan ist im Feed. Er tippt auf die Lupe im Header, ein Overlay öffnet sich. Er sucht nach „Biesdorf" — der Feed filtert.
+
+⚠️ Edge Case: Stephan hat im lokalen Locations-Suchfeld „Teufel" eingetippt und wechselt dann zum Feed. Die Header-Suche zeigt keinen Wert (Search._query war leer). Erwartung: Feed wird ohne Suchfilter gezeigt — der Locations-Filter ist losgelöst.
+
+**❓ Frage:** Soll beim Wechsel vom Locations-Tab zum Feed der lokale Locations-Filter geleert werden — oder darf er beim Zurückwechseln noch aktiv sein?
+
+⚠️ Annahme: Das lokale Locations-Suchfeld bleibt beim Verlassen des Tabs aktiv (kein Auto-Reset) — bitte bestätigen.
+
+##### Akzeptanzkriterien
+
+- [ ] AK-1: Im Locations-Tab ist das Suchfeld am oberen Rand des Panels dauerhaft sichtbar und sofort benutzbar — kein Antippen einer Schaltfläche nötig.
+- [ ] AK-2: Das Lupensymbol im Header öffnet auf dem Locations-Tab **kein** Overlay mehr — der Tap auf die Lupe wird ignoriert oder das Symbol wird auf diesem Tab ausgeblendet.
+- [ ] AK-3: Auf Feed, Kalender und Scout funktioniert das Header-Lupe-Overlay wie bisher — kein Rückschritt.
+- [ ] AK-4: Stephan tippt im Locations-Suchfeld „Teufel" — die Liste filtert sofort auf passende Locations. Löscht er den Text, erscheint die volle Liste wieder.
+- [ ] Edge Case AK-5: Stephan wechselt vom Locations-Tab (mit aktivem Filter) zum Feed und zurück — der Locations-Filter zeigt noch denselben Wert wie vorher (kein ungewolltes Reset).
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Header-Suche funktioniert auf dem Locations-Tab nach Fix nicht mehr**
+- Auslöser: `Search.open()` wird für den Locations-Tab deaktiviert, aber `Search._query` wird nicht geleert — Feed/Kalender/Scout übernehmen noch einen alten Query-Wert.
+- Frühwarnung: Nach Deaktivierung auf Locations-Tab im Feed suchen → Overlay-Query noch gefüllt.
+- Gegenmaßnahme: `Search.close()` beim Tab-Wechsel aufrufen (oder `_query` zurücksetzen) → AK-3 testen.
+
+💀 **Szenario 2: Lokales Suchfeld und Header-Overlay konkurrieren gleichzeitig**
+- Auslöser: Beide Felder bleiben aktiv. Stephan tippt lokal „Dom", dann öffnet er das Overlay mit „Teufel" → unklar welcher Filter gilt.
+- Frühwarnung: Beide Inputs gleichzeitig ausfüllen, Ergebnis prüfen.
+- Gegenmaßnahme: Header-Lupe auf Locations-Tab vollständig deaktivieren (Option A).
+
+💀 **Szenario 3: Locations-Filter-State geht verloren beim Tab-Wechsel (Option B)**
+- Auslöser: Option B entfernt das lokale Feld und leitet Locations-Tab auf Header-Overlay um; beim Tab-Wechsel wird `Search.close()` aufgerufen → Filter weg.
+- Frühwarnung: Filter eingeben → Tab wechseln → zurück → Feld leer, Liste ungefiltert.
+- Gegenmaßnahme: `Search.close()` nur aufrufen wenn Ziel-Tab kein Locations-Tab ist, oder lokalen Filter-State separat halten.
+
+##### Implementierungsoptionen
+
+**Option A — Lokales Suchfeld behalten, Lupe auf Locations-Tab deaktivieren** *(empfohlen)*
+
+- **App-Erlebnis:** Im Locations-Tab bleibt das Suchfeld am oberen Rand des Panels, genau wie heute. Das Lupensymbol im Header tut auf dem Locations-Tab nichts (oder wird ausgeblendet) — kein Overlay erscheint mehr. Der Nutzer hat einen klaren, immer sichtbaren Sucheinstieg.
+- Betroffene Dateien: `web/index.html` — `Search.open()` erhält eine Guard-Bedingung: `if (App.current === 'locations') return;`
+- Vorteile: Minimale Änderung, kein Risiko für Feed/Kalender/Scout, lokaler Filter-State bleibt erhalten.
+- Nachteile: Das Lupensymbol reagiert auf dem Locations-Tab nicht — könnte verwirrend wirken (Schaltfläche ohne Funktion).
+- Aufwand: **klein** (1 Zeile JS-Guard, optional: Symbol auf Locations-Tab ausblenden via CSS)
+
+**Option B — Lokales Suchfeld entfernen, Header-Overlay auch für Locations nutzen**
+
+- **App-Erlebnis:** Im Locations-Tab verschwindet das permanente Suchfeld oben. Suchen geht nur noch über das Lupensymbol im Header — genau wie im Feed. Das Feld ist nur aktiv wenn die Lupe angetippt wird; danach schließt es sich wieder.
+- Betroffene Dateien: `web/index.html` — `.search-wrap`-Block aus `#page-locations` entfernen, `Search._triggerRender()` bereits korrekt verdrahtet.
+- Vorteile: Einheitlicheres Interaktionsmuster über alle Tabs.
+- Nachteile: Suchfeld ist nicht dauerhaft sichtbar — mehr Taps nötig; Filter-State geht beim Tab-Wechsel verloren (da `Search.close()` implizit aufgerufen wird); höheres Risiko für Regressions-Seiteneffekte.
+- Aufwand: **mittel** (HTML-Entfernung + State-Management prüfen)
+
+✅ **Empfehlung: Option A** — eine Guard-Zeile löst den Bug mit minimalem Risiko; das lokale Suchfeld ist UX-sinnvoll (dauerhaft sichtbar, kein Extra-Tap nötig) und der Locations-Tab hat damit einen klar definierten, stabilen Sucheinstieg.
+
+##### Scope
+
+**Eingeschlossen:** Deaktivierung der Header-Lupe auf dem Locations-Tab (JS-Guard). Optional: visuelles Ausblenden des Lupensymbols auf diesem Tab.
+
+**Ausgeschlossen:** Änderungen an der Suchlogik (`Locations.filter()`), am Filter-Panel, an anderen Tabs.
+
+##### Testplan
+
+- [ ] **Manuell AK-1:** Locations-Tab öffnen → Suchfeld ist sofort sichtbar, kein Antippen nötig.
+- [ ] **Manuell AK-2:** Locations-Tab → Lupensymbol antippen → kein Overlay erscheint.
+- [ ] **Manuell AK-3 Regression:** Feed-Tab → Lupensymbol antippen → Overlay erscheint und filtert den Feed.
+- [ ] **Manuell AK-4:** Locations-Tab → „Teufel" eintippen → Liste filtert → löschen → volle Liste.
+- [ ] **Manuell AK-5:** Locations-Tab → „Dom" eintippen → Feed-Tab → zurück zu Locations → Feld noch aktiv.
+- [ ] **Automatisiert:** kein pytest-Fall (rein Frontend-JS, kein Backend-Bezug).
+
+##### Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Code-Verifikation: `web/index.html` Z. 845, 891–898, 935–942, 5211–5240 gelesen
+- [x] Architektur analysiert: nur `web/index.html` betroffen
+- [x] Implementierungsoptionen: A (empfohlen) / B
+- [ ] Weg-Gate: Warten auf Stephans Freigabe
+
+---
+
+### BUG-50 · HINWEISE-Feld überschreibt sich nach Quick Location Capture `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Bei Locations, die per Quick Location Capture angelegt wurden, speichert die App den Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Löscht der Nutzer diesen Text, schreibt sich der Wert beim nächsten Speichern/Öffnen erneut hinein — der Hinweis lässt sich nicht dauerhaft entfernen (reproduzierbar z. B. bei Ehrenhof-Kollonaden am Schloss Sanssouci).
 
@@ -3412,12 +3512,12 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ##### Akzeptanzkriterien
 
-- [ ] AK-1: Stephan öffnet die Bearbeiten-Ansicht einer per Quick Capture angelegten Location, löscht den vorausgefüllten Hinweis-Text und speichert. Beim erneuten Öffnen der Location ist das Hinweisfeld leer — der ursprüngliche Text erscheint nicht erneut.
-- [ ] AK-2: Stephan ersetzt den Hinweis-Text durch eigenen Text und speichert. Der eigene Text bleibt nach Server-Neustart dauerhaft erhalten.
-- [ ] AK-3: `PATCH /locations/{custom_id} {"special_notes": "X"}` gibt `{"ok": true, "updated": {"special_notes": "X"}, ...}` zurück (HTTP 200) — `special_notes` erscheint in `updated`.
-- [ ] AK-4: `PATCH /locations/{standard_id} {"special_notes": "X"}` gibt HTTP 200 zurück und persistiert den Wert via Override.
-- [ ] AK-5 (Edge Case): Leerer String `""` als `special_notes` wird akzeptiert und korrekt persistiert (nicht abgelehnt oder durch Default ersetzt).
-- [ ] AK-6 (Regression): Alle bisher erlaubten Felder (name, description, Koordinaten, focal_length_suggestions, observer_floor_height_m) funktionieren nach der Änderung unverändert.
+- [x] AK-1: Stephan öffnet die Bearbeiten-Ansicht einer per Quick Capture angelegten Location, löscht den vorausgefüllten Hinweis-Text und speichert. Beim erneuten Öffnen der Location ist das Hinweisfeld leer — der ursprüngliche Text erscheint nicht erneut.
+- [x] AK-2: Stephan ersetzt den Hinweis-Text durch eigenen Text und speichert. Der eigene Text bleibt nach Server-Neustart dauerhaft erhalten.
+- [x] AK-3: `PATCH /locations/{custom_id} {"special_notes": "X"}` gibt `{"ok": true, "updated": {"special_notes": "X"}, ...}` zurück (HTTP 200) — `special_notes` erscheint in `updated`.
+- [x] AK-4: `PATCH /locations/{standard_id} {"special_notes": "X"}` gibt HTTP 200 zurück und persistiert den Wert via Override.
+- [x] AK-5 (Edge Case): Leerer String `""` als `special_notes` wird akzeptiert und korrekt persistiert (nicht abgelehnt oder durch Default ersetzt).
+- [x] AK-6 (Regression): Alle bisher erlaubten Felder (name, description, Koordinaten, focal_length_suggestions, observer_floor_height_m) funktionieren nach der Änderung unverändert.
 
 ##### Pre-Mortem
 
