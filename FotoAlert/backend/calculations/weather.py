@@ -179,6 +179,63 @@ def calculate_golden_cloud_score(cl: float, cm: float, ch: float) -> float:
     return round(max(0.0, min(1.0, base_score)), 3)
 
 
+def should_generate_golden_clouds_event(
+    gcs: float,
+    sun_azimuth: float,
+    subject_azimuth: float,
+) -> bool:
+    """
+    US-109: Prüft ob ein GOLDEN_CLOUDS-Event erzeugt werden soll.
+
+    Bedingungen:
+    - golden_cloud_score >= 0.70
+    - Azimut-Differenz zwischen Sonnenposition und Motivrichtung <= 30°
+      (Sonne scheint aus Motivrichtung → Wolken werden von vorne beleuchtet)
+
+    Args:
+        gcs:              Golden Cloud Score (0.0–1.0)
+        sun_azimuth:      Sonnen-Azimut in Grad (0–360, 0=Nord im Uhrzeigersinn)
+        subject_azimuth:  Motiv-Azimut vom Standpunkt aus (0–360)
+
+    Returns:
+        True wenn GOLDEN_CLOUDS-Event erzeugt werden soll
+    """
+    if gcs < 0.70:
+        return False
+    diff = abs(sun_azimuth - subject_azimuth) % 360
+    if diff > 180:
+        diff = 360 - diff
+    return diff <= 30
+
+
+def should_generate_red_sky_event(
+    gcs: float,
+    cl: float,
+    cm: float,
+) -> bool:
+    """
+    US-109: Prüft ob ein RED_SKY-Event erzeugt werden soll.
+
+    Bedingungen:
+    - golden_cloud_score >= 0.80
+    - cloud_cover_low + cloud_cover_mid >= 60 % (dominante tiefe/mittlere Bewölkung)
+      → der Gesamthimmel rötet sich, nicht nur Cirrus-Schleier
+
+    Kein Richtungsfilter: Himmelsröte ist omnidirektional sichtbar.
+
+    Args:
+        gcs: Golden Cloud Score (0.0–1.0)
+        cl:  cloud_cover_low in Prozent (0–100)
+        cm:  cloud_cover_mid in Prozent (0–100)
+
+    Returns:
+        True wenn RED_SKY-Event erzeugt werden soll
+    """
+    if gcs < 0.80:
+        return False
+    return (cl + cm) >= 60
+
+
 def wmo_code_to_description(code: int) -> str:
     """WMO Wettercodes zu Beschreibung."""
     codes = {

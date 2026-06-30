@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-06-30 · Basis: abgeschlossene Tickets bis US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -50,6 +50,7 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 | Chance-Karten | Jede Karte zeigt: Titel, Datum/Uhrzeit, Location-Name, Score-Ring (farbcodiert), Event-Typ |
 | Score-Ring | Kreisring, Füllgrad = Score (0–100%), Farbe: grün ≥80%, orange 50–79%, rot <50% |
 | Wetter-Badge | Tag-Chip auf Feed-Karten wenn Wetter bekannt (`weather_status: "ok"` bzw. `weather_score > 0`). Wird das Wetter einer gerade geänderten/neuen Location gerade nachgeladen, zeigt die Karte stattdessen ehrlich „Wetter wird nachgeladen" (Uhr-Icon). Chancen weiter als ~3 Tage in der Zukunft (`weather_status: "none"`) zeigen kein Wetter-Badge (kein „lädt ewig"). (BUG-44, US-106) |
+| Golden Cloud Score (US-07) | Jede Foto-Chance hat ein Feld `golden_cloud_score` (0.0–1.0): bewertet wie gut Wolken das Licht bei Goldener/Blauer Stunde verstärken könnten — hoher Score = dramatische Struktur zu erwarten. Berechnung in `backend/weather.py` (`calculate_golden_cloud_score`), Feld in `schemas.py` definiert. Im Frontend Filter-Slider „Bewölkungs-Qualität" (0–100%) — nur Chancen ab diesem Schwellwert werden gezeigt. (US-07) |
 | Wetter sofort nach Standort-Änderung (US-106) | Nach dem Verschieben/Anlegen einer Location wird das Wetter gezielt nur für diese Location nachgeladen (Sekunden, nicht bis zu 3 h). Das „wird aktualisiert"-Banner verschwindet erst, wenn Foto-Chancen UND echtes Wetter stehen — nicht schon beim Platzhalter. Schlägt das Wetter-Nachladen fehl, bleibt die Location als „wird aktualisiert" markiert und wird beim nächsten Lauf erneut versucht. |
 | Reihenfolge bei Standort-Änderung: Feed+Wetter sofort, Kalender im Hintergrund (US-106 Nachbesserung) | Nach dem Verschieben einer Location werden zuerst die sichtbaren Foto-Chancen + ihr Wetter berechnet; sobald beides steht, verschwindet das „wird aktualisiert"-Banner in Sekunden. Der vollständige Jahres-Kalender dieser Location wird **danach im Hintergrund** nachgerechnet, ohne das Banner aufzuhalten — der Kalender-Tab dieser Location kann dabei ein paar Minuten noch den alten Stand zeigen (bewusst akzeptiert). Ein Fehler beim Hintergrund-Kalender nimmt die bereits erfolgte Freigabe nicht zurück. Es läuft nie mehr als eine schwere Berechnung gleichzeitig; eine zweite Änderung während der laufenden Kalender-Rechnung wird gemerkt und danach automatisch nachgeholt. |
 | Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
@@ -446,3 +447,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-29 | BUG-48 | Round-Robin-Cap im /opportunities-Feed: alle Event-Typen proportional vertreten |
 | 2026-06-29 | BUG-49 | Lokales Suchfeld aus Locations-Panel entfernt; Suche läuft jetzt ausschließlich über Lupensymbol im Header (Option B) |
 | 2026-06-30 | US-108 | Mondaufgang/-untergang: Events werden nur erzeugt wenn Mond ≤ 35° zur Sichtachse (vordere Azimut-Zone); seitlich + hinter dem Fotografen werden unterdrückt; `/refresh-feed` nach Release ausführen |
+| 2026-06-30 | US-07 | Golden Cloud Score: neues Feld `golden_cloud_score` (0.0–1.0) je Foto-Chance; bewertet Wolkenstruktur-Qualität für Goldene/Blaue Stunde; `calculate_golden_cloud_score()` in `backend/weather.py`, Schema in `schemas.py`; Frontend-Slider „Bewölkungs-Qualität" in Filter-Sheet (index.html) |

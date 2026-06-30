@@ -27,9 +27,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import copy as _copy
 import math
 import subprocess
 import sys
+import uuid as _uuid
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
@@ -55,7 +57,7 @@ from calculations.astronomy import (
     calculate_subject_angular_profile,
     find_precise_alignment_times,
 )
-from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score
+from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
@@ -484,6 +486,104 @@ def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff
     return True
 
 
+_GOLDEN_HOUR_TYPES = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
+
+
+def _generate_cloud_mood_events(feed_cache):
+    """
+    US-109: Erzeugt GOLDEN_CLOUDS- und RED_SKY-Events aus Goldene-Stunde-Events
+    mit echtem Wetter-Overlay (weather_status == "ok").
+
+    Gibt ein Tupel zurück:
+      - neue_events: Liste neuer Event-Dicts (GOLDEN_CLOUDS / Himmelsröte)
+      - zu_entfernende_ids: Set von Event-IDs der unterdrückten Goldene-Stunde-Events
+        (AK-10: wenn GOLDEN_CLOUDS erzeugt wird, fliegt das Original raus)
+    """
+    neue_events = []
+    zu_entfernende_ids = set()
+
+    for e in feed_cache:
+        if e.get("event_type") not in _GOLDEN_HOUR_TYPES:
+            continue
+        if e.get("weather_status") != "ok":
+            continue
+
+        gcs = e.get("golden_cloud_score")
+        if gcs is None:
+            continue
+
+        wd = e.get("weather_details")
+        if not wd:
+            continue
+
+        cl = wd.get("cloud_cover_low_pct", 0)
+        cm = wd.get("cloud_cover_mid_pct", 0)
+
+        # Sonnen-Azimut: Morgen → sunrise_azimuth, Abend → sunset_azimuth
+        if e.get("event_type") == "Goldene Stunde Morgen":
+            sun_az = e.get("sunrise_azimuth")
+        else:
+            sun_az = e.get("sunset_azimuth")
+
+        subject_az = e.get("subject_azimuth")
+
+        # GOLDEN_CLOUDS prüfen (AK-1, AK-12)
+        if sun_az is not None and subject_az is not None and should_generate_golden_clouds_event(gcs, sun_az, subject_az):
+            new_event = _copy.deepcopy(e)
+            new_event["id"] = "gc_" + _uuid.uuid4().hex[:12]
+            new_event["event_type"] = "Goldene Wolken"
+            new_event["title"] = "Goldene Wolken"
+            new_event["description"] = (
+                "Die Sonne geht in Motivrichtung auf oder unter und trifft auf "
+                "Wolkenschichten, die das Licht warm-golden einfärben. "
+                "Ideal für dramatische Himmelsstimmungen direkt über dem Motiv."
+            )
+            new_event["alert_priority"] = 2
+            neue_events.append(new_event)
+            # AK-10: Original-Goldene-Stunde-Karte unterdrücken
+            zu_entfernende_ids.add(e["id"])
+
+        # RED_SKY prüfen (AK-4) — unabhängig von GOLDEN_CLOUDS
+        if should_generate_red_sky_event(gcs, cl, cm):
+            new_event = _copy.deepcopy(e)
+            new_event["id"] = "rs_" + _uuid.uuid4().hex[:12]
+            new_event["event_type"] = "Himmelsröte"
+            new_event["title"] = "Himmelsröte"
+            new_event["description"] = (
+                "Tiefe und mittlere Wolkenschichten dominieren den Himmel und werden "
+                "vom streifenden Sonnenlicht intensiv rot-orange eingefärbt. "
+                "Diese Röte ist rundum sichtbar – kein bestimmter Blickwinkel nötig."
+            )
+            new_event["alert_priority"] = 2
+            neue_events.append(new_event)
+
+    return neue_events, zu_entfernende_ids
+
+
+def _inject_cloud_mood_events() -> None:
+    """
+    US-109: Liest _feed_cache, generiert GOLDEN_CLOUDS/Himmelsröte-Events
+    und schreibt das Ergebnis zurück in _feed_cache (in-place).
+    Entfernt zuvor alle bereits injizierten Cloud-Mood-Events (id-Präfix gc_/rs_),
+    damit wiederholte Wetter-Overlay-Läufe keine Duplikate erzeugen.
+    """
+    global _feed_cache
+    # Alte Cloud-Mood-Events aus vorherigen Wetter-Overlay-Läufen entfernen
+    _feed_cache = [
+        e for e in _feed_cache
+        if not (e.get("id", "").startswith("gc_") or e.get("id", "").startswith("rs_"))
+    ]
+    neue_events, zu_entfernende_ids = _generate_cloud_mood_events(_feed_cache)
+    if zu_entfernende_ids:
+        _feed_cache = [e for e in _feed_cache if e["id"] not in zu_entfernende_ids]
+    _feed_cache.extend(neue_events)
+    if neue_events:
+        logger.info(
+            "US-109 Cloud-Mood: %d neue Events erzeugt, %d Goldene-Stunde-Events unterdrückt",
+            len(neue_events), len(zu_entfernende_ids),
+        )
+
+
 async def _weather_overlay() -> None:
     """
     Holt Wetter-Daten für Events in den nächsten 3 Tagen und
@@ -533,6 +633,9 @@ async def _weather_overlay() -> None:
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
         if _apply_weather_to_event(e, loc_forecasts.get(key), now_utc, cutoff):
             updated += 1
+
+    # US-109: GOLDEN_CLOUDS- und Himmelsröte-Events erzeugen
+    _inject_cloud_mood_events()
 
     _weather_updated_at = now_utc
     logger.info("Wetter-Overlay: %d Events aktualisiert (%d unique Locations)", updated, len(seen))
@@ -589,6 +692,8 @@ async def _weather_overlay_single(loc_id: str) -> bool:
             all_ok = False
     logger.info("US-106 Single-Wetter für %s: %d/%d Events in T+3 aktualisiert",
                 loc_id, sum(1 for e in near_events if e.get("weather_status") == "ok"), len(near_events))
+    # US-109: Cloud-Mood-Events nach Einzel-Wetter ebenfalls aktualisieren
+    _inject_cloud_mood_events()
     return all_ok
 
 

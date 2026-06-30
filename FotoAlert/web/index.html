@@ -1274,6 +1274,7 @@ const ICONS = {
   'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
   'Sonnenfinsternis':      'i-eclipse',
   'Blaue Stunde Morgen':   'i-moon',     'Blaue Stunde Abend':    'i-moon',
+  'Goldene Wolken':        'i-cloud',    'Himmelsröte':           'i-cloud',
 };
 const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, kein leeres Kästchen)
 // Liefert fertiges <svg>-Icon-Markup für einen Event-Typ.
@@ -2665,6 +2666,8 @@ const FilterSheet = {
     ['Milchstraße',           'Milchstraße'],
     ['Meteoritenschauer',     'Meteoritenschauer'],
     ['Sonnenfinsternis',      'Sonnenfinsternis'],
+    ['Goldene Wolken',        'Goldene Wolken'],
+    ['Himmelsröte',           'Himmelsröte'],
   ],
 
   open() {
@@ -3458,8 +3461,9 @@ const Detail = {
         const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label" style="display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
         const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
         const wScore = wLabel;
-        // US-07: Goldene Wolken & Himmelsröte Scoring — nur für Goldene Stunde
-        const isGoldenHour = o.event_type === 'Goldene Stunde Morgen' || o.event_type === 'Goldene Stunde Abend';
+        // US-07: Goldene Wolken & Himmelsröte Scoring — für Goldene Stunde und US-109-Events
+        const isGoldenHour = o.event_type === 'Goldene Stunde Morgen' || o.event_type === 'Goldene Stunde Abend'
+                          || o.event_type === 'Goldene Wolken' || o.event_type === 'Himmelsröte';
         const gcs = o.golden_cloud_score;
         let goldenCloudRow = '';
         if (isGoldenHour && gcs != null) {
@@ -3574,7 +3578,7 @@ const Detail = {
         // Backend es auch für Goldene/Blaue Stunde & Milchstraße setzt (Motiv-Geometrie +
         // Sonnen-/Himmelsposition vorhanden). Daher zusätzlich die Nicht-Alignment-Typen
         // ausschließen — Spiegel von precompute._ALIGNMENT_FILTER_EXEMPT.
-        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Milchstraße','Meteoritenschauer','Sonnenfinsternis']);
+        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Milchstraße','Meteoritenschauer','Sonnenfinsternis','Goldene Wolken','Himmelsröte']);
         const ca = o.composition_analysis;
         if (!ca || EV_SKYPOS_EXEMPT.has(o.event_type)) return '';
         const body = ca.body_name || 'Objekt';
@@ -3632,6 +3636,58 @@ const Detail = {
           ? `<div style="margin-top:10px">${secRows.join('')}</div>`
           : '';
         return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
+      })()}
+      ${(() => {
+        // US-109: Erklärungssektion für Goldene Wolken und Himmelsröte (AK-3)
+        const isGoldenClouds = o.event_type === 'Goldene Wolken';
+        const isRedSky       = o.event_type === 'Himmelsröte';
+        if (!isGoldenClouds && !isRedSky) return '';
+        if (isGoldenClouds) {
+          // Ermittle welcher Sonnenazimut das Event ausgelöst hat:
+          // Backend prüft sunrise_azimuth für Morgen-Events und sunset_azimuth für Abend-Events.
+          // Da event_type jetzt "Goldene Wolken" (nicht Morgen/Abend), nehmen wir den Azimut
+          // der die kleinere Differenz zum Motiv-Azimut hat (≤30° — sonst wäre kein Event entstanden).
+          const subAz = o.subject_azimuth;
+          const azDiffFn = (a, b) => { if (a == null || b == null) return 999; let d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+          const diffRise = azDiffFn(o.sunrise_azimuth, subAz);
+          const diffSet  = azDiffFn(o.sunset_azimuth,  subAz);
+          const sunAz = (diffRise <= 30 && diffRise < diffSet) ? o.sunrise_azimuth
+                      : (diffSet  <= 30) ? o.sunset_azimuth
+                      : (o.sunset_azimuth != null ? o.sunset_azimuth : o.sunrise_azimuth);
+          // (Fallback: nimm was vorhanden, auch wenn >30°, für Anzeigezwecke)
+          const azDiff = (sunAz != null && subAz != null)
+            ? (() => { let d = Math.abs(sunAz - subAz) % 360; return d > 180 ? 360 - d : d; })()
+            : null;
+          const dirRow = (sunAz != null)
+            ? `<div class="info-row"><span class="ir-label">Sonnenazimut</span><span class="ir-val">${sunAz.toFixed(1)}°</span></div>`
+            : '';
+          const motifRow = (subAz != null)
+            ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${subAz.toFixed(1)}°</span></div>`
+            : '';
+          const diffRow = (azDiff != null)
+            ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${azDiff.toFixed(1)}° ≤ 30° ✓</span></div>`
+            : '';
+          return mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
+            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
+            dirRow + motifRow + diffRow
+          );
+        }
+        if (isRedSky) {
+          const wd = o.weather_details;
+          const cl = wd ? wd.cloud_cover_low_pct : null;
+          const cm = wd ? wd.cloud_cover_mid_pct : null;
+          const total = (cl != null && cm != null) ? cl + cm : null;
+          const clRow = (cl != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${cl} %</span></div>` : '';
+          const cmRow = (cm != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${cm} %</span></div>` : '';
+          const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
+          return mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Tiefe und mittlere Wolken dominieren den Himmel und werden vom flachen Sonnenlicht intensiv rot-orange eingefärbt. Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung.</p>` +
+            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
+            clRow + cmRow + totRow
+          );
+        }
+        return '';
       })()}
       ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
       ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}

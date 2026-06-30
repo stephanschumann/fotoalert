@@ -27,13 +27,14 @@
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
+| **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-108** · **US-07** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-109** *(Goldene Wolken & Himmelsröte)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-109** · **US-110** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2148,8 +2149,9 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 
 
-### US-07 · Goldene Wolken & Himmelsröte Scoring `[~]`
-> **Status:** In Test
+### US-07 · Goldene Wolken & Himmelsröte Scoring `[x]`
+> **Status:** Done
+> **Abgeschlossen:** 2026-06-30
 > **Als Fotograf** möchte ich für Goldene-Stunde-Events eine Einschätzung der Wolkenstimmungsqualität sehen – ob Bedingungen für dramatische goldene Wolken oder leuchtende Himmelsröte vorliegen – damit ich Go/No-Go-Entscheidungen noch gezielter treffen kann.
 >
 > **Hintergrund:** US-42 [x] zeigt bereits Gesamtbewölkung als Prozentwert. Dieses Ticket erweitert das um eine qualitative Einschätzung auf Basis der Wolkenhöhenschichtung: tiefe Wolken blockieren das Licht, mittlere und hohe Wolken reflektieren und färben es golden/rot.
@@ -2214,38 +2216,237 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 ---
 
-### US-109 · Richtungsbasiertes Wolken-Scoring: Wo erscheinen goldene Wolken relativ zum Motiv? `[ ]`
+### US-109 · Goldene Wolken & Himmelsröte als eigene Chancen: Richtungsbewusstes Scoring und Feed-Events `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-30 |
 
-**Beschreibung:** Der aktuelle `golden_cloud_score` (US-07) berechnet nur die Gesamtmenge der Wolken pro Höhenstufe — er weiß nicht, in welcher Himmelsrichtung die Wolken stehen. Für goldene Wolken und Himmelsröte ist entscheidend, dass die Wolken **hinter dem Motiv in Sonnenrichtung** stehen (beim Abendrot im Westen, beim Morgenrot im Osten). Dieses Ticket soll eine richtungsbewusste Erweiterung bringen: eine schematische Darstellung im Detail-Sheet, die zeigt wo goldene Wolken wahrscheinlich am Himmel erscheinen — relativ zur Sichtachse Fotograf→Motiv und zur Sonnenrichtung. Kernanforderung: Klärung welche Datenquelle räumliche Wolkenverteilung liefern kann (Open-Meteo liefert nur Gesamtprozente, keine Richtung; Alternativen: Satellitenbild-APIs, Radar-Tiles mit Lizenzprüfung).
+**Beschreibung:** Der aktuelle `golden_cloud_score` (US-07) berechnet nur die Gesamtmenge der Wolken pro Höhenstufe — er weiß nicht, in welcher Himmelsrichtung die Wolken stehen. Für goldene Wolken und Himmelsröte ist entscheidend, dass die Wolken **hinter dem Motiv in Sonnenrichtung** stehen (beim Abendrot im Westen, beim Morgenrot im Osten).
+
+**Kern-Ziel dieses Tickets:** Wenn die Bedingungen für goldene Wolken oder Himmelsröte gut genug sind, soll für jede Location mit definiertem Standort und Motiv eine **eigenständige Chance im Feed erscheinen** — analog zu Mond-Alignment oder Sonnenfinsternis: als eigene Karte, mit eigenem Icon und eigenem Detail-Sheet. Die Chance bewertet, ob die Wolken photographisch nützlich stehen (Richtung Sonne, hinter dem Motiv), nicht nur ob Wolken vorhanden sind.
+
+**Umfang:**
+1. **Datenquellen-Klärung (Analyse-Phase):** Welche API kann räumliche Wolkenverteilung liefern? Open-Meteo liefert nur Gesamtprozente, keine Richtung. Alternativen: Satellitenbild-APIs, Radar-Tiles, Wolken-Cover-Gridforecast. Klärung inkl. Lizenz, Kosten, Verfügbarkeit in der Analyse.
+2. **Richtungsbewusstes Scoring:** Berechnung ob Wolken in der Himmelsrichtung stehen, in die die Sichtachse Fotograf→Motiv zeigt — und ob die Sonne aus dieser Richtung leuchtet (Sonnenazimut aus US-107 bereits verfügbar).
+3. **Chancen-Erzeugung:** Neue Event-Typen `GOLDEN_CLOUDS` und `RED_SKY` im Feed, die ausgelöst werden wenn Score ≥ Schwellwert. Eigene Karte, Icon, Detail-Sheet (ähnlich `MOON_ALIGNMENT`).
+4. **Schematische Darstellung im Detail-Sheet:** Zeigt wo goldene Wolken relativ zur Sichtachse und Sonnenrichtung am Himmel erscheinen.
 
 **Bezug:**
-- **US-07 [~]** — Abhängigkeit: baut auf `golden_cloud_score` + Wolkenhöhen-Daten auf; ergänzt den Score um Richtungsinformation
+- **US-07 [x]** — Abhängigkeit: baut auf `golden_cloud_score` + Wolkenhöhen-Daten auf; ergänzt den Score um Richtungsinformation
 - **US-107 [x]** — Überschneidung: Sonnen-Alignment-Planung liefert Sonnenazimut bereits; dieser kann als Basis für die Richtungsdarstellung genutzt werden
+- **US-110 [ ]** — Ursprünglich separates Ticket für neue Event-Typen; Scope jetzt in US-109 integriert — US-110 kann nach Analyse ggf. geschlossen oder auf Restscope reduziert werden
 - **US-72 [ ]** — Verwandt: Wetterkarte mit Grid-Forecast; könnte Datenquelle teilen
 
 ---
 
-### US-110 · Neue Event-Typen „Goldene Wolken" und „Himmelsröte" im Feed `[ ]`
+**📋 IMPLEMENTATION SPEC — US-109 · Goldene Wolken & Himmelsröte als eigene Feed-Events**
+
+**Datenquellen-Klärung (Pflicht-Schritt laut Ticket — Ergebnis: 2026-06-30)**
+
+Open-Meteo liefert `cloud_cover_low/mid/high_pct` als **Gesamtprozent über dem Standort** — keine räumliche Richtungsverteilung. Eine eigene Richtungsinformation für Wolken (Himmelssektor N/O/S/W) gibt es über Open-Meteo nicht und ist über keine frei zugängliche Standard-Forecast-API verfügbar:
+
+- **Open-Meteo:** Gridded-Point-Forecast, columnar (kein Sektor). Kein Direktional-Parameter dokumentiert. Auch DWD MTG Satelliten-Integration (Feb 2026, 2.5–5 km) liefert nur Cloud-Cover-Gesamtwerte, keine Azimut-Verteilung.
+- **Satellitenbild-APIs (NASA GIBS, EOS, Meteomatics):** Liefern Rasterbilder (GeoTIFF/PNG), keine strukturierte Azimut-Verteilung. Bildanalyse wäre möglich, aber komplex, teuer und lizenzrechtlich aufwändig — kein realisierbarer Weg für dieses Ticket.
+- **Radar-Tiles / Wetterkarten:** Visualisierung, keine Machine-readable Direction-Daten pro Standort und Azimut.
+
+**Fazit:** Eine echte gerichtete Wolkenverteilung ist mit verfügbaren APIs in diesem Rahmen **nicht realisierbar**. Das Ticket muss auf einen alternativen Ansatz umschwenken (→ Implementierungsoptionen).
+
+---
+
+**Annahmen-Protokoll (vor Example Mapping)**
+
+| Punkt | Typ | Entscheidung |
+|-------|-----|--------------|
+| Eigene Event-Typen `GOLDEN_CLOUDS` / `RED_SKY` im Precompute oder nur im Wetter-Overlay? | 🔴 Kritisch | ✅ **Wetter-Overlay zur Laufzeit** (wie `golden_cloud_score`) — kein Precompute (Q1, 2026-06-30) |
+| Soll US-110 nach dieser Analyse geschlossen werden? | 🔴 Kritisch | ✅ **US-110 geschlossen (Cancelled)** — Scope vollständig in US-109 integriert (Q2, 2026-06-30) |
+| Richtungsbewusstsein: Proxy via `sunrise/sunset_azimuth` und `subject_azimuth` statt echter Wolken-Richtung? | ⚪ Annahme | ✅ **Harter Schwellwert ≤ 30° Azimut-Differenz** — kein gewichteter Score (Q3, 2026-06-30) |
+| Score-Schwellwert für Event-Auslösung | ⚪ Annahme | → `golden_cloud_score ≥ 0.70` (konsistent mit US-07 Bonus-Grenze) |
+| Separate Events vs. Anreicherung bestehender Goldene-Stunde-Events | 🔴 Kritisch | ✅ **`GOLDEN_CLOUDS` verdrängt normale Goldene-Stunde-Karte** — nur eine Karte pro Location+Zeit erscheint (Q4, 2026-06-30) |
+
+---
+
+**📎 Code-Verifikation (2026-06-30)**
+
+- `backend/calculations/weather.py` gelesen: `calculate_golden_cloud_score()` existiert (US-07, deployed). `ALGORITHM_VERSION = "1.4"` in `precompute.py` (Zeile 58) — bereits gebumped für US-07.
+- `backend/precompute.py` gelesen: `sunrise_azimuth` und `sunset_azimuth` werden pro Location berechnet (Zeilen 516–537) und sind im serialisierten Event verfügbar. `subject_azimuth` ist ebenfalls vorhanden (Zeile 465). Damit sind alle Azimut-Werte für einen Richtungs-Proxy bereits im Event-Objekt.
+- `_ALIGNMENT_FILTER_EXEMPT` enthält `"Goldene Stunde Morgen"` und `"Goldene Stunde Abend"` — neue Event-Typen müssten dort ebenfalls eingetragen werden.
+- Frontend `index.html`: `_ROUTINE_TYPES` enthält Goldene Stunde + Blaue Stunde (Zeile 2454). Neue Event-Typen müssen explizit kategorisiert werden (routine oder nicht) — beeinflusst Cap+Sort-Verdrängung (BUG-32-Mechanismus).
+- `golden_hour_types` in `main.py` ist ein String-Set, kein Enum. Neue Typen können einfach ergänzt werden.
+
+---
+
+**Example Mapping**
+
+📏 **Rule 1:** Wenn `golden_cloud_score ≥ 0.70` bei einer Goldene-Stunde-Chance und die Sonne aus Richtung des Motivs (≤ 30° Azimut-Differenz zwischen `sunset/sunrise_azimuth` und `subject_azimuth`) scheint, erscheint eine eigenständige „Goldene Wolken"-Karte im Feed.
+- 🟢 *Abend, Motiv im Westen, Sonnenuntergang 278°, Motiv-Azimut 265°, gcs=0.82:* → Differenz 13° → Chance erscheint als eigene Karte „Goldene Wolken".
+- 🔴 *Abend, Motiv im Osten (Azimut 90°), Sonnenuntergang 278°, gcs=0.82:* → Differenz 188° → Sonne leuchtet nicht ins Motiv → keine eigene Karte (nur normaler Goldene-Stunde-Event).
+- ❓ Wenn Differenz im mittleren Bereich (30°–60°): noch „gut genug"? → Schwellwert klären.
+
+📏 **Rule 2:** „Himmelsröte" (RED_SKY) tritt auf wenn `golden_cloud_score ≥ 0.80` und Wolkenschicht niedrig-mittel dominiert (`cloud_cover_low + cloud_cover_mid ≥ 60 %`) — dann färbt sich der Gesamthimmel tiefrot, nicht nur Cirrus. Kein Richtungsfilter nötig (Röte ist omnidirektional).
+- 🟢 *`gcs=0.85`, `cl=40, cm=35, ch=10`:* → Himmelsröte-Event erscheint.
+- 🔴 *`gcs=0.80`, `cl=5, cm=10, ch=60`:* → hohe Cirrus-Wolken, kein RED_SKY (nur GOLDEN_CLOUDS).
+
+📏 **Rule 3:** Wenn `GOLDEN_CLOUDS`-Bedingungen erfüllt sind, **verdrängt** der neue Event die normale Goldene-Stunde-Karte — es erscheint nur eine Karte pro Location und Goldene-Stunde-Slot. Das verhindert Doppelkarten und Verwirrung.
+- 🟢 *Feed zeigt: nur „Goldene Wolken" (neu) — keine separate „Goldene Stunde Abend"-Karte für dieselbe Location + Zeit.*
+- 🔴 *Feed zeigt: „Goldene Stunde Abend" (normal) + „Goldene Wolken" (neu) gleichzeitig für dieselbe Location.* ← **nicht erwünscht (Q4-Entscheid).**
+
+✅ **Q1 (entschieden 2026-06-30):** Neue Events werden **im Wetter-Overlay zur Laufzeit** erzeugt — wie `golden_cloud_score` selbst. Kein Precompute-Lauf nötig; kein ALGORITHM_VERSION-Bump erforderlich (außer wenn weitere Precompute-Änderungen nötig werden).
+
+✅ **Q2 (entschieden 2026-06-30):** US-110 wird **geschlossen (Cancelled)** — Scope vollständig in US-109 integriert.
+
+✅ **Q3 (entschieden 2026-06-30):** Azimut-Differenz als **harter Schwellwert ≤ 30°** — kein gewichteter Score. `|sunset_azimuth − subject_azimuth| mod 360 ≤ 30°` → GOLDEN_CLOUDS-Event wird erzeugt.
+
+⚠️ **Annahme A:** Score-Schwellwert für Event-Auslösung: `golden_cloud_score ≥ 0.70` für GOLDEN_CLOUDS, `≥ 0.80` für RED_SKY — bitte bestätigen.
+⚠️ **Annahme B:** Neue Event-Typen sind **nicht-routinemäßig** (wie Mond-Alignment) → werden in `_ROUTINE_TYPES` nicht eingetragen → profitieren vom BUG-32-Fix (priorisiert vor Goldener Stunde im Cap+Sort).
+⚠️ **Annahme C:** Neue Events erhalten im Filter-Sheet je einen eigenen Chip unter „Event-Typen" (analog zu „Mond-Alignment"). Kein separater „Stimmungsfilter"-Block erforderlich — Annahme D (separater Chip-Block) alternativ möglich.
+⚠️ **Annahme D:** Das Detail-Sheet zeigt eine schematische Himmels-Kompass-Grafik: Sonnenrichtung, Motiv-Richtung, und Wolkenposition relativ dazu — als SVG-Skizze analog zu CameraFOV. Aufwand: mittel. Falls Stephan das weglassen möchte → nur Text-Zeilen (Aufwand: klein).
+
+---
+
+**Akzeptanzkriterien**
+
+- [ ] AK-1: Im Feed erscheint für eine Location, bei der `golden_cloud_score ≥ 0.70` und die Sonne aus Motivrichtung (Azimut-Differenz ≤ 30°) scheint, eine eigene Karte „Goldene Wolken" — zusätzlich zum normalen Goldene-Stunde-Event.
+- [ ] AK-2: Die „Goldene Wolken"-Karte hat ein eigenes Icon und einen eigenen Kartentitel (nicht „Goldene Stunde Abend").
+- [ ] AK-3: Beim Öffnen des Detail-Sheets einer „Goldene Wolken"-Chance ist eine Erklärung sichtbar, welche Wolkenkonstellation für die Bewertung relevant ist.
+- [ ] AK-4: Im Feed erscheint für eine Location, bei der `golden_cloud_score ≥ 0.80` und `cloud_cover_low + mid ≥ 60 %`, eine eigene Karte „Himmelsröte" — unabhängig von der Motiv-Richtung.
+- [ ] AK-5: „Himmelsröte"-Karte hat eigenes Icon + Titel.
+- [ ] AK-6: Wenn `golden_cloud_score < 0.70` (oder kein Wetter-Overlay vorhanden), erscheint weder „Goldene Wolken"- noch „Himmelsröte"-Event.
+- [ ] AK-7 (Richtungsfilter): Liegt die Sonne beim Abend-Event im Osten (Motiv im Westen, Differenz > 90°), erscheint **kein** „Goldene Wolken"-Event.
+- [ ] AK-8 (Filter-Chip): Im Filter-Sheet unter „Event-Typen" sind „Goldene Wolken" und „Himmelsröte" als eigene Chips bedienbar.
+- [ ] AK-9 (Cap+Sort): „Goldene Wolken"- und „Himmelsröte"-Events sind im Feed sichtbar, wenn gleichzeitig viele Goldene-Stunde-Events das Cap füllen (keine Verdrängung durch BUG-32-Mechanismus).
+- [ ] AK-10 (Verdrängung, Q4): Wenn `GOLDEN_CLOUDS`-Bedingungen für eine Location erfüllt sind, erscheint **nur die Goldene-Wolken-Karte** — die normale Goldene-Stunde-Karte für dieselbe Location + Zeit wird unterdrückt. Für Locations ohne GOLDEN_CLOUDS-Bedingung erscheinen Goldene-Stunde-Events weiterhin normal.
+- [ ] AK-11 (Regression): `golden_cloud_score`-Anzeige in der Wetter-Sektion (US-07) bleibt unverändert.
+- [ ] Edge Case AK-12: Wenn `subject_azimuth` für eine Location fehlt (kein Motiv definiert), wird kein GOLDEN_CLOUDS-Event erzeugt (kein Richtungsvergleich möglich).
+- [ ] Edge Case AK-13: Wenn kein Wetter-Overlay verfügbar (Event > 3 Tage), erscheinen keine GOLDEN_CLOUDS- oder RED_SKY-Events.
+
+---
+
+**Pre-Mortem**
+
+💀 **Szenario 1: Cap+Sort-Verdrängung der neuen Event-Typen**
+- Auslöser: Neue Typen landen im gleichen `[:500]`-Cap wie Goldene Stunde. Wenn sie als non-routine nicht korrekt priorisiert werden, erscheinen sie trotzdem nur selten.
+- Frühwarnung: `Counter(e["event_type"] for e in result[:500])` zeigt GOLDEN_CLOUDS mit 0 oder 1 Einträgen.
+- Gegenmaßnahme: Neue Typen explizit aus `_ROUTINE_TYPES` heraushalten; BUG-32-Fix in `_filter_feed()` greift dann automatisch.
+
+💀 **Szenario 2: Doppelter Event für dieselbe Location und Zeit**
+- Auslöser: Feed zeigt 3 Karten für dieselbe Location zur selben Zeit: Goldene Stunde Abend + Goldene Wolken + Himmelsröte. Das kann verwirrend sein und Deduplizierung brechen.
+- Frühwarnung: Deduplizierungslogik in `_filter_feed()` (Zeile 1289–1296 main.py) verwendet `(location_id + event_type + Tag)` als Key — neue Typen werden korrekt separat gehalten, aber gleichzeitige Häufung ist möglich.
+- Gegenmaßnahme: Entweder Prioritätsregel (GOLDEN_CLOUDS verdrängt normalen GOLDEN_HOUR wenn Bedingungen erfüllt) oder Hinweis im Detail-Sheet auf den zusammenhang. In Analyse-Phase als ❓ Q4 klären.
+
+💀 **Szenario 3: `subject_azimuth` fehlt bei vielen Locations**
+- Auslöser: Nur Locations mit definiertem Motiv haben `subject_azimuth`. Bei Locations ohne Motiv (nur Observer-Punkt) kann kein Richtungsvergleich stattfinden → GOLDEN_CLOUDS-Events würden für diese Locations nie erscheinen.
+- Frühwarnung: Prüfen wie viele aktive Locations `subject_azimuth IS NULL` haben.
+- Gegenmaßnahme: Fallback → wenn `subject_azimuth` fehlt: RED_SKY trotzdem erzeugen (omnidirektional), GOLDEN_CLOUDS nicht (richtungsabhängig).
+
+💀 **Szenario 4: Wetter-Overlay-Events im Precompute vs. Laufzeit**
+- Auslöser: Wenn neue Events im Precompute erzeugt werden müssen (wie Mond-Alignment) aber Wolkendaten erst T-3 verfügbar sind → Events werden nie erzeugt.
+- Frühwarnung: Wetter-Overlay-Architektur in main.py lesen vor Impl.
+- Gegenmaßnahme: Events ausschließlich im Wetter-Overlay zur Laufzeit erzeugen — Precompute hat keine Wetterdaten.
+
+💀 **Szenario 5: ALGORITHM_VERSION bereits auf 1.4 (US-07)**
+- Auslöser: Version 1.4 ist bereits deployed. Ein weiterer Bump auf 1.5 löst erneut ~8h Precompute-Vollauf aus — direkt nach US-07-Release.
+- Frühwarnung: `precompute.py` Zeile 58 zeigt `ALGORITHM_VERSION = "1.4"`.
+- Gegenmaßnahme: Bump auf 1.5 in Release-Notes dokumentieren; Release koordinieren. Alternativ: wenn neue Events nur im Wetter-Overlay erzeugt werden (Laufzeit), ist kein Version-Bump nötig.
+
+---
+
+**Architektur-Analyse**
+
+Betroffene Dateien:
+
+1. `backend/calculations/weather.py` — neue Funktion `should_generate_golden_cloud_event(gcs, sun_azimuth, subject_azimuth)` → prüft Bedingungen; `should_generate_red_sky_event(gcs, cl, cm)` → Himmelsröte-Schwellwert
+2. `backend/main.py` — `_apply_weather_to_event()`: Logik für neue Event-Erzeugung im Wetter-Overlay; neue Events als separate Dicts in `_feed_cache` einfügen (analog zu bestehenden Events, aber `event_type = "Goldene Wolken"` / `"Himmelsröte"`)
+3. `backend/precompute.py` — `_ALIGNMENT_FILTER_EXEMPT`: neue Typen ergänzen; ggf. `ALGORITHM_VERSION` Bump auf 1.5 (nur wenn Precompute-relevante Änderungen nötig)
+4. `web/index.html` — `ICONS`: neue Icons für `"Goldene Wolken"` und `"Himmelsröte"`; `_ROUTINE_TYPES`: neue Typen explizit NICHT aufnehmen; Filter-Chips unter Event-Typen ergänzen; Detail-Sheet: ggf. Himmels-Kompass-SVG
+5. `backend/tests/test_us109.py` — neue pytest-Fälle
+
+**Einstiegspunkt-Check:**
+- `/opportunities` → `_feed_cache` → Wetter-Overlay fügt neue Events ein → ✅ neue Events erscheinen im Feed
+- `/calendar` → eigener Pfad, kein Wetter-Overlay → neue Events erscheinen **nicht** im Kalender (akzeptabel — Wolken-Events sind wetterabhängig)
+- `/discover` (Scout) → eigener Pfad, kein Wetter-Overlay → neue Events erscheinen **nicht** im Scout (akzeptabel)
+
+---
+
+**Implementierungsoptionen**
+
+### Option A — Proxy-Richtung: Azimut-Differenz Sonne ↔ Motiv (empfohlen)
+
+Was du in der App erlebst: Die App berechnet, ob die Sonne beim Shooting aus der Richtung leuchtet, in die du schaust — also ob Sonnenuntergang/-aufgang und dein Motiv auf derselben Himmelsseite liegen. Wenn ja UND Wolkenstimmung gut genug: eigene Event-Karte. Das ist eine fundierte Näherung, die mit vorhandenen Daten (sunrise/sunset_azimuth + subject_azimuth) auskommt — ohne externe API.
+
+- Vorgehen: Neue Events im Wetter-Overlay (`_apply_weather_to_event()`) generieren, wenn Schwellwerte erfüllt. Azimut-Differenz `|sunset_azimuth − subject_azimuth| mod 360 ≤ 30°` als Richtungs-Gate für GOLDEN_CLOUDS. RED_SKY ohne Richtungs-Gate.
+- Betroffene Dateien: `weather.py`, `main.py`, `precompute.py` (Exempt-Liste), `index.html`, `tests/`
+- Vorteile: Kein externer API-Key, keine Kosten, sofort umsetzbar; Azimut-Daten bereits vorhanden; testbar per pytest.
+- Nachteile: Proxy ist eine Näherung — die Sonne kann aus der richtigen Richtung scheinen, aber Wolken sind trotzdem woanders. Das ist eine bekannte Einschränkung, die im Detail-Sheet transparent kommuniziert werden sollte.
+- Aufwand: mittel
+
+### Option B — Echte Wolken-Richtung via Satellitenbild-Analyse
+
+Was du in der App erlebst: Die App würde Satelliten-Kacheln analysieren und auswerten, wo Wolken im Umkreis deines Standorts stehen — theoretisch präziser. In der Praxis: nicht realisierbar, da keine API räumliche Wolkenverteilung als strukturierte Daten liefert; Bildanalyse wäre ein eigenständiges ML-Projekt.
+
+- Vorgehen: Satellitenbild herunterladen → Wolkenanteil im Azimut-Sektor (z.B. ±45° um Motiv-Azimut) extrahieren → Score.
+- Betroffene Dateien: viele, inkl. neuem Bildverarbeitungs-Modul.
+- Vorteile: Theoretisch präziser.
+- Nachteile: Kein geeigneter API-Anbieter gefunden; Bildanalyse außerhalb des Projekt-Rahmens; Laufzeit und Kosten unbekannt.
+- Aufwand: groß — nicht empfohlen.
+
+### Option C — Scope-Reduktion: Keine eigenen Events, statt dessen stärkere Hervorhebung im bestehenden Goldene-Stunde-Event
+
+Was du in der App erlebst: Keine neue Karte. Stattdessen: Wenn `golden_cloud_score` hoch und Richtung stimmt, bekommt die bestehende Goldene-Stunde-Karte ein zusätzliches Badge oder ein Highlight-Icon. Weniger Aufwand, kein neuer Event-Typ.
+
+- Vorteile: Minimaler Scope, kein neues Event-Erzeugungs-Muster.
+- Nachteile: Widerspricht dem Kern-Ziel des Tickets (eigenständige Karte wie Mond-Alignment). Nur als Fallback wenn Stephan Option A nicht freigeben möchte.
+- Aufwand: klein
+
+✅ **Empfehlung: Option A** — Proxy via Azimut-Differenz. Sauber, testbar, nutzt vorhandene Daten. Die Einschränkung (kein echter Wolken-Richtungssensor) wird im Detail-Sheet transparent kommuniziert. Option B ist nicht realisierbar; Option C widerspricht dem Ticket-Ziel.
+
+---
+
+**Testplan**
+
+- [ ] Automatisiert (`backend/tests/test_us109.py`):
+  - AK-1/6: Mockdaten: `gcs=0.82`, `sunset_azimuth=278`, `subject_azimuth=265` → Event-Typ `"Goldene Wolken"` in Output
+  - AK-7: `gcs=0.82`, `sunset_azimuth=278`, `subject_azimuth=90` → kein GOLDEN_CLOUDS-Event
+  - AK-4: `gcs=0.83`, `cl=40, cm=35` → Event-Typ `"Himmelsröte"` in Output
+  - AK-12: `subject_azimuth=None` → kein GOLDEN_CLOUDS, ggf. RED_SKY
+  - AK-9 (Cap+Sort): Counter prüfen nach BUG-32-Muster
+
+- [ ] Manuell (Browser + curl nach Serverstart):
+  1. `curl "http://localhost:8000/opportunities?days=3"` → Response auf Events mit `event_type = "Goldene Wolken"` oder `"Himmelsröte"` prüfen.
+  2. App öffnen → Feed → ggf. Datum mit passenden Wetterbedingungen suchen → Goldene Wolken-Karte antippen → Detail-Sheet öffnet mit korrektem Icon + Inhalt.
+  3. Filter-Sheet öffnen → „Goldene Wolken" und „Himmelsröte" als Chips sichtbar.
+  4. Regression: Bestehende Goldene-Stunde-Events weiterhin im Feed sichtbar.
+  5. Regression: Wetter-Sektion im Detail-Sheet (US-07 Wolkenstimmung) unverändert.
+
+**Analyse & Planung:**
+- [x] Datenquellen-Klärung: Open-Meteo liefert keine Richtungsverteilung; Satellitenbild-Analyse nicht realisierbar (2026-06-30)
+- [x] Example Mapping durchgeführt (2026-06-30)
+- [x] Pre-Mortem durchgeführt (2026-06-30)
+- [x] Architektur analysiert: `main.py`, `weather.py`, `precompute.py`, `index.html`
+- [x] Weg-Gate: Option A freigegeben, Q1–Q4 entschieden (2026-06-30) — Spec komplett, Ready for Dev
+
+---
+
+### ~~US-110 · Neue Event-Typen „Goldene Wolken" und „Himmelsröte" im Feed~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done (Cancelled) |
 | **Erstellt** | 2026-06-30 |
+| **Geschlossen** | 2026-06-30 |
+
+> ⛔ **Cancelled:** Scope in US-109 integriert. US-109 deckt sowohl das richtungsbasierte Scoring als auch die neuen Event-Typen `GOLDEN_CLOUDS` und `RED_SKY` vollständig ab. Separate Umsetzung nicht mehr erforderlich.
 
 **Beschreibung:** Wenn die Wolkenbedingungen besonders gut für goldene Wolken oder Himmelsröte sind, soll ein eigenständiges Event im Feed erscheinen — als eigene Karte (analog zu Mondaufgang, Milchstraße), nicht nur als Score-Zusatz auf einer bestehenden Goldene-Stunde-Karte. „Goldene Wolken" und „Himmelsröte" werden zu eigenen Event-Typen mit eigenen Icons, eigener Karte und eigenem Detail-Sheet. Baut auf dem `golden_cloud_score` aus US-07 auf; der Score-Schwellwert für die Event-Auslösung ist Teil der Analyse.
 
 **Bezug:**
-- **US-07 [~]** — Abhängigkeit: `golden_cloud_score`-Berechnung muss fertig und deployed sein
-- **US-109 [ ]** — Sinnvolle Sequenzierung: Richtungsdaten aus US-109 könnten in das Detail-Sheet dieser Events einfließen; kann aber unabhängig implementiert werden
+- **US-07 [x]** — Abhängigkeit: `golden_cloud_score`-Berechnung muss fertig und deployed sein
+- **US-109 [~]** — Scope vollständig integriert — US-110 daher Cancelled
 - **US-82 [ ]** — Überschneidung: Scout Sun-Score v2 (Atmosphärisches Rötlichkeits-Scoring) hat ähnliche Zielsetzung; Abgrenzung in Analyse prüfen
 
 ---
@@ -2918,15 +3119,35 @@ Logout → als User anmelden → Einstellungen → "User"
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-27 |
 
-**Beschreibung:** `refactor_check.py` meldet vier lange JS-Funktionen in `web/index.html`:
+**Beschreibung:** `refactor_check.py` meldet fünf lange JS-Funktionen in `web/index.html`:
 - `ic()` Z. 805 — ~361 Zeilen (Icon-Helper, eingebracht durch US-100)
-- `handler()` Z. 1166 — ~114 Zeilen
-- `verState()` Z. 2955 — ~232 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
-- `sunAlignmentLabel()` Z. 4346 — ~1044 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
+- `handler()` Z. 1166 — ~115 Zeilen
+- `verState()` Z. 2958 — ~232 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
+- `azDiffFn()` Z. 3651 — ~665 Zeilen (neu gemeldet durch US-109-Refactor, 2026-06-30)
+- `sunAlignmentLabel()` Z. 4402 — ~1044 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30); azDiffFn ergänzt + Zeilennummern aktualisiert durch US-109-Refactor (2026-06-30)
+
+---
+
+### BUG-54 · Sections._def: ev_golden_clouds und ev_red_sky fehlen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Bug |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-30 |
+
+**Beschreibung:** `refactor_check.py` (category: `section_missing_default`) meldet, dass zwei Event-Sections gerendert werden, aber keinen Eintrag in `Sections._def` haben:
+- `ev_golden_clouds`
+- `ev_red_sky`
+
+Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklappt (BUG-40-Klasse). Beide Sections wurden durch US-109 eingebracht. Fix: `_def`-Eintrag für beide ergänzen (analog zu anderen Event-Sections).
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-109-Refactor, 2026-06-30)
 
 ---
 
@@ -4235,11 +4456,12 @@ Beim ersten `requestGps()`-Aufruf das laufende Promise in `Filter._gpsPromise` s
 
 ---
 
-### US-108 · Azimut-Zonen für Sonnen- und Mondauf-/-untergang
+### US-108 · Azimut-Zonen für Sonnen- und Mondauf-/-untergang `[x]`
 
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | 🧪 In Test |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-30 |
 
 **Beschreibung:**
 Sonnenauf-/-untergang und Mondauf-/-untergang werden aktuell für jede Location angezeigt, unabhängig davon, ob der Auf-/Untergang zur Sichtachse auf das Motiv passt. Das führt zu irrelevanten Chancen-Einträgen (z. B. Sonnenuntergang seitlich, obwohl er weder im Bild liegt noch das Motiv beleuchtet).

@@ -90,6 +90,9 @@ _ALIGNMENT_FILTER_EXEMPT = {
     "Neumond",
     "Meteoritenschauer",
     "Sonnenfinsternis",
+    # US-109: Wetter-Overlay-Events (Laufzeit, kein eigener subject_azimuth nötig)
+    "Goldene Wolken",
+    "Himmelsröte",
 }
 
 
