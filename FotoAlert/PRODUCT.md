@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-06-29 · Basis: abgeschlossene Tickets bis US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -53,10 +53,11 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 | Wetter sofort nach Standort-Änderung (US-106) | Nach dem Verschieben/Anlegen einer Location wird das Wetter gezielt nur für diese Location nachgeladen (Sekunden, nicht bis zu 3 h). Das „wird aktualisiert"-Banner verschwindet erst, wenn Foto-Chancen UND echtes Wetter stehen — nicht schon beim Platzhalter. Schlägt das Wetter-Nachladen fehl, bleibt die Location als „wird aktualisiert" markiert und wird beim nächsten Lauf erneut versucht. |
 | Reihenfolge bei Standort-Änderung: Feed+Wetter sofort, Kalender im Hintergrund (US-106 Nachbesserung) | Nach dem Verschieben einer Location werden zuerst die sichtbaren Foto-Chancen + ihr Wetter berechnet; sobald beides steht, verschwindet das „wird aktualisiert"-Banner in Sekunden. Der vollständige Jahres-Kalender dieser Location wird **danach im Hintergrund** nachgerechnet, ohne das Banner aufzuhalten — der Kalender-Tab dieser Location kann dabei ein paar Minuten noch den alten Stand zeigen (bewusst akzeptiert). Ein Fehler beim Hintergrund-Kalender nimmt die bereits erfolgte Freigabe nicht zurück. Es läuft nie mehr als eine schwere Berechnung gleichzeitig; eine zweite Änderung während der laufenden Kalender-Rechnung wird gemerkt und danach automatisch nachgeholt. |
 | Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
-| Mondaufgang-Events | Eigenständige Karten im Feed mit Typ `"Mondaufgang"`, Score-Ring, Uhrzeit und Location (US-79) |
-| Monduntergang-Events | Eigenständige Karten im Feed mit Typ `"Monduntergang"`, Score-Ring, Uhrzeit und Location (US-79) |
+| Mondaufgang-Events | Eigenständige Karten im Feed mit Typ `"Mondaufgang"`, Score-Ring, Uhrzeit und Location (US-79); werden nur angezeigt wenn Mond ≤ 35° zur Sichtachse liegt (vordere Zone) — seitlich oder hinter dem Fotografen werden unterdrückt (US-108) |
+| Monduntergang-Events | Eigenständige Karten im Feed mit Typ `"Monduntergang"`, Score-Ring, Uhrzeit und Location (US-79); werden nur angezeigt wenn Mond ≤ 35° zur Sichtachse liegt (vordere Zone) — seitlich oder hinter dem Fotografen werden unterdrückt (US-108) |
 | Alert-Banner | Sichtbar wenn relevante Chancen heute oder morgen |
 | Tipp: Chance antippen | Öffnet Detail-Sheet (Pflicht: Detail schließt mit Overlay-Tap) |
+| Event-Typ-Verteilung | Round-Robin-Cap im `/opportunities`-Endpoint: alle Event-Typen (Goldene Stunde, Blaue Stunde, Mondaufgang, Monduntergang, Milchstraße) sind proportional im Feed vertreten — kein Typ verdrängt einen anderen vollständig (BUG-48) |
 | Leer-State | Wenn keine Chancen passen: Hinweis-Text, kein Absturz |
 | Kalender-Modus | Button „Jahreskalender" im Feed schaltet auf Monatskalender-Ansicht um; Tap auf Kalender-Event sucht passenden Feed-Eintrag (location_id + ±1h) und übergibt vollständiges Objekt (inkl. weather_details) an Detail-Sheet (BUG-44) |
 
@@ -70,6 +71,7 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen in Berlin/Potsdam/Umland automa
 - [ ] Routine-Events-Filter entfernt Goldene/Blaue-Stunde-Karten
 - [ ] Filter-Chips „Mondaufgang" / „Monduntergang" filtern Feed korrekt (US-79)
 - [ ] Mondaufgang-/Monduntergang-Events erscheinen als eigenständige Karten im Feed (US-79)
+- [ ] Feed enthält sowohl Goldene Stunde als auch Blaue Stunde (nicht nur Mond-Events) — Round-Robin-Cap (BUG-48)
 
 ---
 
@@ -441,4 +443,6 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-29 | US-107 | Sonnen-Alignment-Planung: Sonnenaufgang/-untergang mit Azimut im Event-Detail (Astronomie-Sektion, analog Mondaufgang US-79); Richtungsklassifizierung relativ zum Motiv im Location-Detail (Abschnitt Ausrichtung, ±15°-Toleranz); neue API-Felder `sunrise_azimuth`/`sunset_azimuth` in `_serialize()`; Klassifizierungslogik `classify_sun_alignment()` neu; `/refresh-feed` nach Release ausführen |
 | 2026-06-29 | BUG-51 | Entfernungsfilter wirkt jetzt im Locations-Tab (applyToLocations + GPS-Lifecycle) |
 | 2026-06-29 | BUG-52 | GPS-Dialog erscheint pro Session nur einmal (Promise-Caching via `Filter._gpsPromise`) |
+| 2026-06-29 | BUG-48 | Round-Robin-Cap im /opportunities-Feed: alle Event-Typen proportional vertreten |
 | 2026-06-29 | BUG-49 | Lokales Suchfeld aus Locations-Panel entfernt; Suche läuft jetzt ausschließlich über Lupensymbol im Header (Option B) |
+| 2026-06-30 | US-108 | Mondaufgang/-untergang: Events werden nur erzeugt wenn Mond ≤ 35° zur Sichtachse (vordere Azimut-Zone); seitlich + hinter dem Fotografen werden unterdrückt; `/refresh-feed` nach Release ausführen |

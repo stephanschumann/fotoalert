@@ -55,7 +55,7 @@ from calculations.astronomy import (
     calculate_subject_angular_profile,
     find_precise_alignment_times,
 )
-from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description
+from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
@@ -447,14 +447,34 @@ def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff
         return False
 
     w_score = calculate_photo_weather_score(w_at)
-    e["weather_score"]  = round(w_score, 3)
-    e["overall_score"]  = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
+
+    # US-07: Golden Cloud Score nur für Goldene Stunde berechnen
+    event_type = e.get("event_type", "")
+    golden_hour_types = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
+    if event_type in golden_hour_types:
+        gcs = calculate_golden_cloud_score(
+            w_at.cloud_cover_low_pct,
+            w_at.cloud_cover_mid_pct,
+            w_at.cloud_cover_high_pct,
+        )
+        # Bonus auf weather_score wenn gcs >= 0.7 (+5 Pp, gedeckelt bei 1.0)
+        # Nur +5 (nicht +10) wegen Cirrus-Doppelbewertung mit calculate_photo_weather_score
+        if gcs >= 0.7:
+            w_score = min(1.0, w_score + 0.05)
+    else:
+        gcs = None
+
+    e["weather_score"]     = round(w_score, 3)
+    e["overall_score"]     = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
+    e["golden_cloud_score"] = round(gcs, 3) if gcs is not None else None
     e["weather_description"] = wmo_code_to_description(w_at.weather_code) if hasattr(w_at, "weather_code") else ""
     e["weather_details"] = {
         "temperature_c":        round(w_at.temperature_c, 1),
         "precipitation_prob_pct": round(w_at.precipitation_prob_pct),
         "precipitation_mm":     round(w_at.precipitation_mm, 1),
         "cloud_cover_pct":      round(w_at.cloud_cover_pct),
+        "cloud_cover_low_pct":  round(w_at.cloud_cover_low_pct),
+        "cloud_cover_mid_pct":  round(w_at.cloud_cover_mid_pct),
         "cloud_cover_high_pct": round(w_at.cloud_cover_high_pct),
         "wind_speed_kmh":       round(w_at.wind_speed_kmh),
         "wind_direction_deg":   round(w_at.wind_direction_deg),

@@ -89,6 +89,31 @@ class PhotoOpportunity:
     alert_priority: int = 0  # 0=niedrig, 1=mittel, 2=hoch, 3=außergewöhnlich
 
 
+# ---------------------------------------------------------------------------
+# US-108: Azimut-Zonen-Klassifizierung
+# ---------------------------------------------------------------------------
+
+class AzimuthZone(str, Enum):
+    FRONT = "front"
+    BACK  = "back"
+    SIDE  = "side"
+
+
+def _azimuth_zone(celestial_az: float, sightline_az: Optional[float]) -> AzimuthZone:
+    """Klassifiziert den Azimut-Versatz zwischen Himmelskörper und Sichtachse.
+
+    Gibt SIDE zurück wenn sightline_az None ist (= Chance unterdrücken).
+    """
+    if sightline_az is None:
+        return AzimuthZone.SIDE
+    delta = abs((celestial_az - sightline_az + 180) % 360 - 180)
+    if delta <= 35:
+        return AzimuthZone.FRONT
+    if delta >= 145:
+        return AzimuthZone.BACK
+    return AzimuthZone.SIDE
+
+
 def _score_moon_phase_for_milkyway(phase_fraction: float) -> float:
     """Neumond = ideal für Milchstraße. Vollmond = schlecht."""
     if phase_fraction < 0.1 or phase_fraction > 0.9:
@@ -286,6 +311,7 @@ def _weather_label(weather: float, use_weather: bool) -> str:
     if weather >= 0.4:
         return f"Wetter mäßig ({weather:.0%})"
     return f"Wetter schwierig ({weather:.0%})"
+
 
 
 # ---------------------------------------------------------------------------
@@ -684,6 +710,10 @@ async def find_opportunities(
         # Azimut des Mondes zum Zeitpunkt des Aufgangs/Untergangs
         moon_pos_mr = get_body_position(lat, lon, "moon", moon_dt)
         moon_az_mr = round(moon_pos_mr.azimuth, 1) if moon_pos_mr else None
+
+        # US-108: Azimut-basierte Filterung – nur FRONT-Zone zeigen
+        if moon_az_mr is None or _azimuth_zone(moon_az_mr, subject_az) != AzimuthZone.FRONT:
+            continue
 
         phase_score = _score_moon_phase_for_moonshot(moon.phase_fraction)
         a_s_mr = 0.55 + phase_score * 0.3   # Basis 0.55 + Phasen-Bonus bis 0.85

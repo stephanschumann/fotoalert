@@ -55,7 +55,7 @@ from data.store import LocationStore
 # die andere Ergebnisse für bereits berechnete Tage liefern würden.
 # Format: "MAJOR.MINOR" – Minor = kleine Scoring-Anpassung, Major = Struktur.
 # ─────────────────────────────────────────────────────────────────────────────
-ALGORITHM_VERSION = "1.3"  # US-57: Alignment-Qualitätsfilter (2°-Schärfezone)
+ALGORITHM_VERSION = "1.4"  # US-07: Goldene Wolken & Himmelsröte Scoring
 
 logging.basicConfig(
     level=logging.INFO,

@@ -25,15 +25,15 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-07** |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **BUG-48** |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-108** · **US-07** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-109** · **US-110** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2149,7 +2149,7 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 
 ### US-07 · Goldene Wolken & Himmelsröte Scoring `[~]`
-> **Status:** In Analysis
+> **Status:** In Test
 > **Als Fotograf** möchte ich für Goldene-Stunde-Events eine Einschätzung der Wolkenstimmungsqualität sehen – ob Bedingungen für dramatische goldene Wolken oder leuchtende Himmelsröte vorliegen – damit ich Go/No-Go-Entscheidungen noch gezielter treffen kann.
 >
 > **Hintergrund:** US-42 [x] zeigt bereits Gesamtbewölkung als Prozentwert. Dieses Ticket erweitert das um eine qualitative Einschätzung auf Basis der Wolkenhöhenschichtung: tiefe Wolken blockieren das Licht, mittlere und hohe Wolken reflektieren und färben es golden/rot.
@@ -2184,8 +2184,8 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 >   - Mittlere + hohe Bewölkung > 90 % → Score ≤ 0.25 (gleichmäßige Decke, diffuses Licht)
 >   - Sweet Spot: mittlere + hohe Bewölkung 25–65 %, niedrige Wolken < 30 % → Score 0.70–1.0
 >   - Penalty: jeder Prozentpunkt niedrige Wolken über 30 % reduziert den Score graduell (exponentiell)
-> - Score wird **nur** für Events innerhalb Goldener/Blauer Stunde (±30 Min.) berechnet – für andere Event-Typen `null`
-> - Neue Konstante `GOLDEN_CLOUD_VERSION` in `precompute.py` → erzwingt Cache-Neuberechnung nach erstem Deployment
+> - Score wird **nur** für Events vom Typ `GOLDEN_HOUR_MORNING` oder `GOLDEN_HOUR_EVENING` berechnet – für alle anderen Event-Typen (inkl. Blaue Stunde) `null`
+> - Kein separates `GOLDEN_CLOUD_VERSION` — stattdessen `ALGORITHM_VERSION`-Bump auf "1.4" (genügt, da Score live im Wetter-Overlay berechnet wird, nicht in precompute)
 >
 > **Backend – Integration in Gesamt-Score:**
 > - Für Goldene-Stunde-Events: `weather_score` bekommt Bonus wenn `golden_cloud_score ≥ 0.7` (+5–10 Prozentpunkte, gedeckelt bei 1.0)
@@ -2199,7 +2199,7 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 >   - Score ≥ 0.25 → `🌤 Mäßig` (grau-gelb)
 >   - Score < 0.25  → `⛅ Gering` (grau)
 > - Nur angezeigt wenn Wetter-Overlay aktiv (T-3, identisch zu US-42 [x])
-> - Nur angezeigt für Goldene-Stunde- und Blaue-Stunde-Events (bei anderen Event-Typen ausgeblendet)
+> - Nur angezeigt für Goldene-Stunde-Events (`GOLDEN_HOUR_MORNING`, `GOLDEN_HOUR_EVENING`) — Blaue Stunde und alle anderen Event-Typen: ausgeblendet
 > - ⓘ-Tooltip erklärt die drei Wolkenschichten kurz (analog zu US-55 [x] Score-Erklärungen)
 >
 > **Frontend – Feed-Card:**
@@ -2210,19 +2210,59 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 > - Manuelle Verifikation Hochdrucklage: `cl=0, cm=0, ch=0` → Score ≤ 0.20
 > - Manuelle Verifikation bedeckter Himmel: `cl=90, cm=80, ch=70` → Score ≤ 0.10
 >
-> *Folge-Ticket: US-07b Nebel & atmosphärische Sonderbedingungen (DWD Nebel-Gitter, Sichtweite) — noch nicht erstellt*
+> *Folge-Tickets: US-109 (Richtungsbasiertes Wolken-Scoring), US-110 (Neue Event-Typen Goldene Wolken & Himmelsröte)*
+
+---
+
+### US-109 · Richtungsbasiertes Wolken-Scoring: Wo erscheinen goldene Wolken relativ zum Motiv? `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-30 |
+
+**Beschreibung:** Der aktuelle `golden_cloud_score` (US-07) berechnet nur die Gesamtmenge der Wolken pro Höhenstufe — er weiß nicht, in welcher Himmelsrichtung die Wolken stehen. Für goldene Wolken und Himmelsröte ist entscheidend, dass die Wolken **hinter dem Motiv in Sonnenrichtung** stehen (beim Abendrot im Westen, beim Morgenrot im Osten). Dieses Ticket soll eine richtungsbewusste Erweiterung bringen: eine schematische Darstellung im Detail-Sheet, die zeigt wo goldene Wolken wahrscheinlich am Himmel erscheinen — relativ zur Sichtachse Fotograf→Motiv und zur Sonnenrichtung. Kernanforderung: Klärung welche Datenquelle räumliche Wolkenverteilung liefern kann (Open-Meteo liefert nur Gesamtprozente, keine Richtung; Alternativen: Satellitenbild-APIs, Radar-Tiles mit Lizenzprüfung).
+
+**Bezug:**
+- **US-07 [~]** — Abhängigkeit: baut auf `golden_cloud_score` + Wolkenhöhen-Daten auf; ergänzt den Score um Richtungsinformation
+- **US-107 [x]** — Überschneidung: Sonnen-Alignment-Planung liefert Sonnenazimut bereits; dieser kann als Basis für die Richtungsdarstellung genutzt werden
+- **US-72 [ ]** — Verwandt: Wetterkarte mit Grid-Forecast; könnte Datenquelle teilen
+
+---
+
+### US-110 · Neue Event-Typen „Goldene Wolken" und „Himmelsröte" im Feed `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-30 |
+
+**Beschreibung:** Wenn die Wolkenbedingungen besonders gut für goldene Wolken oder Himmelsröte sind, soll ein eigenständiges Event im Feed erscheinen — als eigene Karte (analog zu Mondaufgang, Milchstraße), nicht nur als Score-Zusatz auf einer bestehenden Goldene-Stunde-Karte. „Goldene Wolken" und „Himmelsröte" werden zu eigenen Event-Typen mit eigenen Icons, eigener Karte und eigenem Detail-Sheet. Baut auf dem `golden_cloud_score` aus US-07 auf; der Score-Schwellwert für die Event-Auslösung ist Teil der Analyse.
+
+**Bezug:**
+- **US-07 [~]** — Abhängigkeit: `golden_cloud_score`-Berechnung muss fertig und deployed sein
+- **US-109 [ ]** — Sinnvolle Sequenzierung: Richtungsdaten aus US-109 könnten in das Detail-Sheet dieser Events einfließen; kann aber unabhängig implementiert werden
+- **US-82 [ ]** — Überschneidung: Scout Sun-Score v2 (Atmosphärisches Rötlichkeits-Scoring) hat ähnliche Zielsetzung; Abgrenzung in Analyse prüfen
 
 ---
 
 **📋 IMPLEMENTATION SPEC — US-07 · Goldene Wolken & Himmelsröte Scoring**
 
 **Scope:**
-- Eingeschlossen: `_golden_cloud_score()`-Funktion in `calculations/weather.py`; `golden_cloud_score`-Feld in Wetter-Overlay (`main.py`); Frontend-Anzeige im Wetter-Detail-Sheet; `ALGORITHM_VERSION`-Bump auf "1.4".
-- Ausgeschlossen: Blaue-Stunde-Events (Ticket sagt „nur Goldene Stunde" trotz Frontend-Formulierung — siehe ⚠️ Annahme unten); Nebel/DWD (→ US-07b); Sunsethue-API; Kalender- und Scout-Ansicht (kein eigenes Detail-Sheet mit Wetter-Sektion).
+- Eingeschlossen: `_golden_cloud_score()`-Funktion in `calculations/weather.py`; `golden_cloud_score`-Feld in Wetter-Overlay (`main.py`); Frontend-Anzeige im Wetter-Detail-Sheet; `ALGORITHM_VERSION`-Bump auf "1.4"; **Filterkriterium „Wolkenstimmung" im Feed-Filter-Sheet** (neu 2026-06-29).
+- Ausgeschlossen: Blaue-Stunde-Events (Score und Anzeige NUR Goldene Stunde — bestätigt Stephan 2026-06-29); Nebel/DWD (→ US-07b); Sunsethue-API; Kalender- und Scout-Ansicht (kein eigenes Detail-Sheet mit Wetter-Sektion).
 
-> ⚠️ **Annahme A:** Das Ticket sagt in der Backend-Spec „nur für Events innerhalb Goldener/Blauer Stunde" und im Frontend-AK „Nur angezeigt für Goldene-Stunde- und Blaue-Stunde-Events". Code-seitig liegt `BLUE_HOUR_EVENING` nah genug, dass der Score dort sinnvoll wäre (tiefe/mittlere/hohe Wolken spielen auch bei blauem Licht eine Rolle). **Annahme: Score wird für `GOLDEN_HOUR_MORNING`, `GOLDEN_HOUR_EVENING` und `BLUE_HOUR_EVENING` berechnet, nicht für Alignment/Mond/Milchstraße.** Bitte bestätigen oder korrigieren.
+> ✅ **Annahme A (bestätigt 2026-06-29):** Score gilt **ausschließlich für Goldene Stunde** (`GOLDEN_HOUR_MORNING`, `GOLDEN_HOUR_EVENING`) — **nicht für Blaue Stunde** (`BLUE_HOUR_EVENING`). Für alle anderen Event-Typen (Mond, Milchstraße, Alignment, Blaue Stunde) ist `golden_cloud_score = null` und die Anzeige bleibt ausgeblendet.
 >
-> ⚠️ **Annahme B:** Der `weather_score`-Bonus bei `golden_cloud_score ≥ 0.7` wirkt nur im Live-Wetter-Overlay (`_apply_weather_to_event` in `main.py`), nicht in `precompute.py` (der Precompute kennt kein Wetter). `GOLDEN_CLOUD_VERSION` in `precompute.py` erzwingt keinen nützlichen Cache-Invalidierungseffekt für diesen Score — weil der Score ausschließlich zur Laufzeit via Wetter-Overlay berechnet wird. **Annahme: Kein `GOLDEN_CLOUD_VERSION` in precompute.py nötig; stattdessen nur `ALGORITHM_VERSION`-Bump.** Bestätigung erbeten.
+> ✅ **Annahme B (bestätigt 2026-06-29):** Kein separates `GOLDEN_CLOUD_VERSION` in `precompute.py`. Stattdessen einfacher **`ALGORITHM_VERSION`-Bump** von "1.3" → "1.4". Der Score wird ausschließlich zur Laufzeit im Wetter-Overlay berechnet, kein Precompute-Cache-Invalidierungseffekt nötig.
+>
+> ✅ **Annahme C (bestätigt 2026-06-29):** Der Wolkenstimmungs-Filter-Chip erscheint im Scout-Tab **ausgegraut** (nicht bedienbar) mit dem Hinweis-Text **„Nur im Feed verfügbar"** — sichtbar z.B. als statischer Text direkt unter den ausgegrautem Chips. Scout ignoriert `minCloudMood` vollständig.
+>
+> ✅ **Annahme D (bestätigt 2026-06-29):** Der Kalender **ignoriert den Wolkenstimmungs-Filter vollständig** — er zeigt unabhängig vom `minCloudMood`-Wert immer alle Kalender-Events an. Kein Ausgrauen, kein Hinweis nötig (Kalender-Events haben grundsätzlich kein Wetter-Overlay).
 
 **📎 Code-Verifikation (2026-06-29):**
 - `backend/calculations/weather.py` gelesen: `cloud_cover_low_pct`, `cloud_cover_mid_pct`, `cloud_cover_high_pct` sind **bereits in `HourlyWeather` vorhanden** und werden via Open-Meteo bereits abgerufen (Zeilen 29–31 + 163–176). Ticker-Annahme „Felder bisher nicht abgerufen" ist **widerlegt** — die Felder kommen bereits an.
@@ -2233,6 +2273,42 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 - Frontend Wetter-Sektion (index.html Zeile 3401–3415): `o.weather_details` als Dict, daraus `wd.cloud_cover_high_pct` bereits genutzt (Cirrus-Hinweis). Das neue Feld `golden_cloud_score` sollte direkt als Top-Level-Feld des Events kommen (nicht im `weather_details`-Dict), analog zu `weather_score`.
 
 **Example Mapping:**
+
+**Frontend – Filter (Wolkenstimmung):**
+
+**State-Modell:** Neues Feld `minCloudMood` (Integer 0–4) im Filter-State, analog zu `minScore` (ebenfalls ein Stufen-Wert, kein Include/Exclude-Array). Wert bedeutet: 0 = Alle, 2 = Mäßig+, 3 = Gut+, 4 = Exzellent. Standard: 0 (kein Filter aktiv). Erweiterung von `_defaults()` und `activeCount()` (+ 1 wenn `minCloudMood > 0`).
+
+**UI:** Neue `filter-section` im Feed-Filter-Sheet, direkt unterhalb von „Mindest-Wahrscheinlichkeit" (beide sind Chancen-Kriterien, werden auf Karte/Locations ausgegraut). Abschnitt-Titel: „☁️ Wolkenstimmung". Vier Chips (einfacher Toggle, kein Drei-Zustand — das Kriterium ist ein Minimum, kein In-/Ausschluss):
+
+| Chip-Label | minCloudMood | Score-Schwelle |
+|---|---|---|
+| Alle | 0 | Filter inaktiv |
+| Mäßig+ | 2 | `golden_cloud_score ≥ 0.40` |
+| Gut+ | 3 | `golden_cloud_score ≥ 0.65` |
+| Exzellent | 4 | `golden_cloud_score ≥ 0.85` |
+
+Antippen eines Chips setzt `minCloudMood` auf den Wert (erneutes Antippen des aktiven Chips setzt zurück auf 0). Nur ein Chip gleichzeitig aktiv (kein Multi-Select). Mapping Score → Stufe konsistent mit Anzeige-Labels im Detail-Sheet (AK-1, AK-3, AK-4, AK-5).
+
+**Score-Schwellenwerte (Konsistenz Detail-Sheet ↔ Filter):**
+
+| Stufe | Anzeige-Label | Score-Bereich | Filter-Chip |
+|---|---|---|---|
+| Exzellent | 🌅 Exzellent | ≥ 0.85 | Exzellent |
+| Gut | ✨ Gut | 0.65 – 0.84 | Gut+ |
+| Mäßig | 🌤 Mäßig | 0.40 – 0.64 | Mäßig+ |
+| Gering | ⛅ Gering | < 0.40 | (nicht filterbar — würde „alles ohne Exzellent" bedeuten) |
+
+**Filterlogik in `Filter.apply()`:**
+- `minCloudMood > 0` aktiv: Events, bei denen `o.golden_cloud_score` **null oder undefined** ist (z.B. Mond, Milchstraße, Blaue Stunde, Events ohne Wetter-Overlay), werden **ausgeblendet**. Begründung: Der Filter bedeutet aktiv „zeig mir nur Goldene-Stunde-Events mit guter Wolkenstimmung" — Events ohne Score können diese Bedingung nicht erfüllen.
+- Filterlogik: Schwellenwert je Stufe: Exzellent (4) → `o.golden_cloud_score >= 0.85`; Gut (3) → `>= 0.65`; Mäßig (2) → `>= 0.40`.
+- Scout-Ansicht (`applyToScout`): Scout-Events kommen von `/discover`, kein `golden_cloud_score`-Feld. Wenn Filter aktiv, würden alle Scout-Events ausgeblendet. Daher: `applyToScout()` ignoriert `minCloudMood` (keine Filterung). Filter-Sektion erscheint auf Scout-Tab **ausgegraut** wie Tageszeit/Score, zusätzlich mit Hinweis-Text „Nur im Feed verfügbar" (z.B. als Tooltip oder statischer Text unter den ausgegrautem Chips). ✅ **Bestätigt Stephan 2026-06-29** (Annahme C).
+- Kalender-Ansicht: `Filter.apply()` wird auf Kalender-Events angewendet (Zeile 1907 in index.html). Kalender-Events haben kein Wetter-Overlay → `golden_cloud_score = null` → bei aktivem Filter ignoriert der Kalender `minCloudMood` vollständig: Kalender zeigt **immer alle Events**, unabhängig vom Wolkenstimmungs-Filter-Wert. ✅ **Bestätigt Stephan 2026-06-29** (Annahme D).
+- Ausgrauen im Filter-Sheet: Analog zu Tageszeit und Mindest-Wahrscheinlichkeit wird die Wolkenstimmungs-Sektion auf Karte und Locations-Tab **ausgegraut** (`opacity:.45;pointer-events:none`) — das Kriterium ist Chancen-spezifisch.
+- Architekturpunkt: `minCloudMood` in `_defaults()` ergänzen (damit alter gespeicherter localStorage-State ohne das Feld per `Object.assign` korrekt aufgefüllt wird — bestehender Mechanismus, kein neuer Code nötig).
+
+**Hinweis-Text unter den Chips:** „Nur für Goldene-Stunde-Chancen mit Wetter-Overlay (nächste 3 Tage). Chancen ohne Wolkendaten werden ausgeblendet."
+
+---
 
 📏 **Rule 1:** Für Goldene-Stunde- und Blaue-Stunde-Events berechnet das Backend beim Wetter-Overlay einen `golden_cloud_score` (0.0–1.0) aus den drei Wolkenhöhen.
 - 🟢 *Scattered clouds (Sweet Spot):* `cl=5, cm=40, ch=30` → Score ≥ 0.70. In der App: Wetter-Sektion zeigt „✨ Gut" oder „🌅 Exzellent".
@@ -2261,6 +2337,15 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 - [ ] AK-8 (Regression): Bestehende Wetter-Anzeige (Bewertung, Temperatur, Wolken %, Regen, Wind, Sicht) für alle Event-Typen bleibt unverändert funktionsfähig.
 - [ ] AK-9 (Regression): `overall_score`-Berechnung für Nicht-Goldene-Stunde-Events (Mond, Milchstraße, Alignment) bleibt unverändert.
 - [ ] Edge Case AK-10: Wenn `cloud_cover_low_pct`, `cloud_cover_mid_pct` oder `cloud_cover_high_pct` im API-Response `null` sind, wird der `golden_cloud_score` auf `null` gesetzt (kein Crash, kein Fallback-Wert).
+- [ ] AK-11 (Filter – UI): Im Feed-Filter-Sheet erscheint unterhalb von „Mindest-Wahrscheinlichkeit" ein neuer Abschnitt „☁️ Wolkenstimmung" mit den Chips „Alle", „Mäßig+", „Gut+" und „Exzellent".
+- [ ] AK-12 (Filter – Grundfunktion): Ist der Chip „Gut+" aktiv, zeigt der Feed nur noch Goldene-Stunde-Chancen der nächsten 3 Tage mit `golden_cloud_score ≥ 0.65`. Mond-Events, Milchstraßen-Events und Events ohne Wetter-Overlay sind nicht mehr sichtbar.
+- [ ] AK-13 (Filter – Chip-Toggle): Antippen des bereits aktiven Chips setzt den Filter zurück auf „Alle" (Filter-Badge zählt –1).
+- [ ] AK-14 (Filter – Ausgrauen Karte/Locations): Auf der Karte und im Locations-Tab ist der Wolkenstimmungs-Abschnitt ausgegraut und nicht bedienbar, analog zu Tageszeit und Mindest-Wahrscheinlichkeit.
+- [ ] AK-14b (Filter – Scout ausgegraut + Hinweis): Im Scout-Tab ist der Wolkenstimmungs-Abschnitt ausgegraut und nicht bedienbar. Unterhalb der ausgegrautem Chips erscheint der Hinweis-Text „Nur im Feed verfügbar".
+- [ ] AK-14c (Filter – Kalender ignoriert Filter): Im Kalender-Tab werden unabhängig vom gewählten Wolkenstimmungs-Chip immer alle Events angezeigt. Der Kalender hat keinen eigenen Ausgrau-Hinweis (Verhalten entspricht dem bei Tageszeit/Wahrscheinlichkeit).
+- [ ] AK-15 (Filter – Persistenz): Der gewählte Wolkenstimmungs-Filter bleibt nach App-Neustart erhalten (localStorage). Beim ersten Start nach dem Update ist der Filter auf „Alle" gesetzt (kein alter State ohne `minCloudMood` verursacht Fehler).
+- [ ] AK-16 (Filter – Badge): Der Filter-Badge-Zähler am Filter-Icon erhöht sich um 1 wenn ein Wolkenstimmungs-Chip aktiv ist, und sinkt um 1 wenn er zurückgesetzt wird.
+- [ ] Edge Case AK-17 (Filter – null-Score): Bei aktivem Wolkenstimmungs-Filter ist eine Goldene-Stunde-Chance, die mehr als 3 Tage entfernt liegt (kein Wetter-Overlay, `golden_cloud_score = null`), im Feed nicht sichtbar.
 
 **Pre-Mortem:**
 
@@ -2287,7 +2372,7 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 💀 **Szenario 5: Blaue-Stunde-Events zeigen „Wolkenstimmung" obwohl Score wenig Aussagekraft hat**
 - Auslöser: Blaue Stunde findet nach Sonnenuntergang statt — Wolkenfärbung viel geringer. Ein „Exzellent"-Score könnte Erwartungen wecken, die nicht erfüllt werden.
 - Frühwarnung: User-Feedback „warum zeigt mir die App exzellente Wolkenstimmung für die Blaue Stunde, wenn der Himmel nur tiefblau ist?"
-- Gegenmaßnahme: Anzeige auf `GOLDEN_HOUR_MORNING` und `GOLDEN_HOUR_EVENING` beschränken (nicht `BLUE_HOUR_EVENING`). → ⚠️ Annahme A oben – bitte Stephan bestätigen.
+- Gegenmaßnahme: ✅ Umgesetzt — Anzeige auf `GOLDEN_HOUR_MORNING` und `GOLDEN_HOUR_EVENING` beschränkt; `BLUE_HOUR_EVENING` explizit ausgeschlossen (bestätigt Stephan 2026-06-29).
 
 **Architektur-Analyse:**
 
@@ -2299,6 +2384,9 @@ Betroffene Dateien:
 5. `web/index.html` — Wetter-Sektion: neue „Wolkenstimmung"-Zeile + ⓘ-Tooltip
 
 Nicht betroffen: `precompute.py` Scoring-Logik (Wetter-Score wird nicht in Precompute berechnet, nur im Live-Overlay), `discover/`-Pipeline, iOS-App.
+
+**Betroffene Dateien (zusätzlich durch Filter-Erweiterung):**
+6. `web/index.html` — `Filter._defaults()`: `minCloudMood: 0` ergänzen; `Filter.activeCount()`: `(s.minCloudMood > 0 ? 1 : 0)` ergänzen; `Filter.apply()`: Filterlogik nach dem `minScore`-Check einfügen; `FilterSheet._render()`: neue `cloudSection` (analog `scoreSection`) mit Ausgrauen auf Karte/Locations, Chips + Hinweis-Text; `FilterSheet.render()`: `cloudSection` in `filter-content`-HTML einbinden.
 
 **Implementierungsoptionen:**
 
@@ -2339,6 +2427,11 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
   2. App öffnen → Feed → Goldene-Stunde-Event der nächsten 3 Tage antippen → Wetter-Sektion aufklappen → Zeile „Wolkenstimmung" mit Label sichtbar.
   3. Dasselbe für ein Mond-Alignment-Event → Zeile „Wolkenstimmung" darf nicht erscheinen.
   4. Regressions-Check: Bestehende Wetter-Sektion (Bewertung, Temperatur, Wolken, Regen, Wind, Sicht) für alle Event-Typen unverändert vorhanden.
+  5. (AK-11) Filter öffnen → Abschnitt „☁️ Wolkenstimmung" mit Chips „Alle / Mäßig+ / Gut+ / Exzellent" sichtbar. Auf Karte: Abschnitt ausgegraut.
+  6. (AK-12) Chip „Gut+" antippen → Anwenden → Feed zeigt nur noch Goldene-Stunde-Events der nächsten 3 Tage; Mond-Events verschwunden.
+  7. (AK-13) Filter erneut öffnen → aktiven Chip nochmal antippen → Anwenden → Mond-Events wieder sichtbar, Badge–1.
+  8. (AK-15) Page reload → Filter „Gut+" bleibt aktiv (aus localStorage).
+  9. (AK-17) Feed-Event weiter als 3 Tage in die Zukunft → bei aktivem Filter nicht im Feed.
 
 **Analyse & Planung:**
 - [x] Example Mapping durchgeführt (2026-06-29)
@@ -2346,8 +2439,8 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 - [x] Code-Verifikation: `weather.py`, `main.py`, `schemas.py`, `precompute.py`, `index.html` gelesen
 - [x] Architektur analysiert: 5 betroffene Dateien identifiziert
 - [ ] Weg-Gate: Option A / B → Empfehlung Option A — Freigabe durch Stephan ausstehend
-- [ ] ⚠️ Klärung Annahme A: Score nur Goldene Stunde oder auch Blaue Stunde?
-- [ ] ⚠️ Klärung Annahme B: `GOLDEN_CLOUD_VERSION` in precompute.py nötig oder nicht?
+- [x] ✅ Klärung Annahme A: Score **nur** Goldene Stunde (GOLDEN_HOUR_MORNING + GOLDEN_HOUR_EVENING) — Blaue Stunde ausgeschlossen (bestätigt 2026-06-29)
+- [x] ✅ Klärung Annahme B: Kein `GOLDEN_CLOUD_VERSION` — nur `ALGORITHM_VERSION`-Bump auf "1.4" (bestätigt 2026-06-29)
 
 ---
 
@@ -2826,14 +2919,14 @@ Logout → als User anmelden → Einstellungen → "User"
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** `refactor_check.py` meldet vier lange JS-Funktionen in `web/index.html`:
-- `ic()` Z. 805 — ~365 Zeilen (Icon-Helper, eingebracht durch US-100)
-- `handler()` Z. 1170 — ~114 Zeilen
-- `verState()` Z. 2949 — ~196 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
-- `sunAlignmentLabel()` Z. 4291 — ~1034 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
+- `ic()` Z. 805 — ~361 Zeilen (Icon-Helper, eingebracht durch US-100)
+- `handler()` Z. 1166 — ~114 Zeilen
+- `verState()` Z. 2955 — ~232 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
+- `sunAlignmentLabel()` Z. 4346 — ~1044 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30)
 
 ---
 
@@ -3471,14 +3564,15 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 
 ---
 
-### BUG-48 · /opportunities-API liefert nur Mond-Events — Goldene/Blaue Stunde fehlen komplett `[ ]`
+### BUG-48 · /opportunities-API liefert nur Mond-Events — Goldene/Blaue Stunde fehlen komplett `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-29 |
+| **Abgeschlossen** | 2026-06-29 |
 
 **Beschreibung:** Die `/opportunities`-API gibt 500 Events zurück, aber ausschließlich Mond-Events (Mondaufgang, Monduntergang, Milchstraße, Mond-Alignment). Goldene Stunde und Blaue Stunde erscheinen mit 0 Treffern — obwohl `opportunities.json` im Cache 910× Goldene Stunde Abend und 910× Blaue Stunde enthält.
 
@@ -4138,4 +4232,182 @@ Beim ersten `requestGps()`-Aufruf das laufende Promise in `Filter._gpsPromise` s
 - [x] Architektur analysiert: nur `Filter.requestGps()` + Feld-Deklaration betroffen
 - [x] Implementierungsoptionen: A (Promise-Caching) / B (watchPosition)
 - [x] Empfehlung: Option A
+
+---
+
+### US-108 · Azimut-Zonen für Sonnen- und Mondauf-/-untergang
+
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | 🧪 In Test |
+
+**Beschreibung:**
+Sonnenauf-/-untergang und Mondauf-/-untergang werden aktuell für jede Location angezeigt, unabhängig davon, ob der Auf-/Untergang zur Sichtachse auf das Motiv passt. Das führt zu irrelevanten Chancen-Einträgen (z. B. Sonnenuntergang seitlich, obwohl er weder im Bild liegt noch das Motiv beleuchtet).
+
+**Gewünschtes Verhalten:**
+Die Darstellung soll auf Azimut-Zonen umgestellt werden:
+
+- **Vorne** (zirkuläre Differenz Auf-/Untergang-Azimut zur Sichtachse ≤ 35°): Sonne/Mond im oder nahe am Bild → Frontlicht, Sunstar-Potential → Chance anzeigen
+- **Hinten** (zirkuläre Differenz ≥ 145°, also grob 180° gegenüber der Sichtachse): Auf-/Untergang hinter dem Fotografen → beleuchtet das Motiv (Alpenglühen, pastell Wolken) → Chance anzeigen — **nur für Sonne**, nicht für Mond
+- **Seitlich** (35°–145°): kein besonderer Bildwert → Chance unterdrücken
+
+**Locations ohne Sichtachsen-Azimut** (kein `observer_lat/lon` + `subject_lat/lon` eingetragen): Der Auf-/Untergang wird nicht angezeigt. Kein Fallback auf das alte Verhalten.
+
+**Labels** bleiben unverändert: Mondaufgang, Monduntergang, Sonnenaufgang, Sonnenuntergang.
+
+**Betroffene Datei:** `FotoAlert/backend/calculations/opportunity.py`
+
+**Bezug / Abgrenzung:**
+- **US-107** *(Done, 2026-06-29)*: Hat Richtungsklassifizierung für das Location-Detail-UI eingeführt. US-108 nutzt dasselbe Konzept, aber im Backend zur Filterentscheidung für den Chancen-Feed.
+- **TASK-45** *(Done)*: Azimut-Ableitung aus Gebäude-Footprints — liefert `ideal_azimuth_range` / `subject_azimuth` als Basis.
+- **US-35** *(Done)*: `possible_bodies`-Berechnung — orthogonal (astronomisch unmöglich ≠ falsche Richtungszone).
+- **US-79** *(offen)*: Mondaufgang/-untergang im Detail — US-108 ist dessen Voraussetzung für korrekte Mond-Filterung; US-108 sollte zuerst.
+- **US-64** *(offen)*: Live Astro-Visualisierung — unabhängig (Live-UI ≠ Backend-Filterlogik).
+
+**Sequenzierung:** Vor US-79 implementieren.
+
+---
+
+## Implementation Spec (US-108)
+
+### Code-Analyse: Ist-Zustand
+
+**Sichtachsen-Azimut** wird in `find_opportunities()` (opportunity.py, Z. 323–326) aus `observer_lat/lon` + `subject_lat/lon` berechnet:
+```python
+subject_az = calculate_azimuth_alignment(
+    location.observer_lat, location.observer_lon,
+    location.subject_lat, location.subject_lon,
+)
+```
+Alle Locations haben `observer_lat/lon` + `subject_lat/lon` — kein separates Sichtachsen-Feld existiert. `subject_az` ist also der Sichtachsen-Azimut (Richtung vom Standpunkt zum Motiv).
+
+**Betroffener Code-Block:** Abschnitt 5b (Z. 672–717): `MOON_RISE` / `MOON_SET`. Dort wird `moon_az_mr` (Mondazimut beim Auf-/Untergang) berechnet, aber kein Vergleich mit `subject_az` gemacht — jeder Mondauf-/-untergang wird (wenn Score ≥ min_score) als Chance ausgegeben.
+
+Analoges Verhalten fehlt für Sonnenauf-/-untergang — dieser Event-Typ wird aktuell gar nicht als eigenständiges Event erzeugt (nur über Goldene Stunde und SUN_ALIGNMENT abgedeckt). US-108 führt also **keinen neuen Sunrise/Sunset-Event-Typ ein** — die Filterung betrifft nur `MOON_RISE` und `MOON_SET`.
+
+### Example Mapping
+
+**Regel 1 — Vorne: Mond im Bild**
+- Positiv: Location Brandenburger Tor, Sichtachse Ost (90°). Mondaufgang um 5:32 Uhr, Mondazimut 85°. Delta = 5° → Zone Vorne → Chance erscheint im Feed.
+- Negativ: Mondazimut 140°, Delta = 50° → Zone Seitlich → Chance wird unterdrückt.
+- Edge: Mondazimut 55°, Delta = 35° → Grenzwert → Vorne (≤ 35° ist inklusiv).
+
+**Regel 2 — Hinten: Monduntergang beleuchtet das Motiv NICHT (nur Sonne darf)**
+- Positiv (Sonne, künftig): Sonnenuntergang hinter dem Fotografen (Delta 170°) → beleuchtet Motiv mit Abendlicht → Chance zeigen.
+- Negativ (Mond): Monduntergang hinter dem Fotografen (Delta 170°) → kein Alpenglühen-Effekt beim Mond → Chance wird unterdrückt.
+- Edge: Delta genau 145° → Grenzwert Hinten (≥ 145° ist inklusiv).
+
+**Regel 3 — Location ohne Koordinaten → kein Fallback**
+- Negativ: Location hat `observer_lat = subject_lat` (Punkt-Location ohne echte Sichtachse) → `subject_az` ist rechnerisch instabil (Distanz = 0) → **Chance unterdrücken**.
+- Hinweis: Alle aktuellen Locations haben getrennte observer/subject-Koordinaten. Sicherheitscheck: `observer_lat == subject_lat and observer_lon == subject_lon` → überspringen.
+
+**Regel 4 — Seitlich: keine Chance**
+- Erlebbar: Mond geht im Süden auf (180°), Sichtachse zeigt Ost (90°). Delta = 90° → Zone Seitlich → kein Eintrag im Feed. Der Mond ist weder im Bild noch beleuchtet er das Motiv sinnvoll.
+
+### Pre-Mortem (Grenzfälle + Risiken)
+
+1. **0°/360°-Wrap**: Delta-Berechnung muss zirkulär sein. `abs(az1 - az2)` reicht nicht — `(az1 - az2 + 180) % 360 - 180` liefert den kürzesten Winkelabstand (bereits im Code für andere Events so verwendet, Z. 336).
+2. **Punkt-Location (observer = subject)**: `calculate_azimuth_alignment` mit identischen Koordinaten → undefined/0 → muss vor der Zonen-Prüfung abgefangen werden.
+3. **moon_az_mr = None**: `get_body_position()` kann None zurückgeben (Z. 686). Wenn kein Mondazimut bekannt → Chance unterdrücken.
+4. **Sunrises/Sunsets fehlen als Event-Typ**: Das Ticket beschreibt Filterung von Auf-/Untergängen — `SUNRISE` und `SUNSET` als eigene EventTypes existieren nicht. Scope: nur `MOON_RISE`/`MOON_SET` filtern.
+5. **Performance**: Filterung ist O(1) pro Event — kein Performance-Risiko.
+6. **Score-Schwelle**: Die Azimut-Filterung greift **vor** dem Score-Check (Early Return), damit keine unnötigen Score-Berechnungen stattfinden.
+
+### Implementierungsoptionen
+
+**Option A — Inline-Filter je Event (direkt im 5b-Block)**
+
+```python
+# Zirkulärer Winkelabstand zwischen Mondazimut und Sichtachse
+if moon_az_mr is None:
+    continue  # kein Azimut bekannt → überspringen
+delta = abs((moon_az_mr - subject_az + 180) % 360 - 180)
+# Vorne (≤ 35°): erlaubt für Mond + Sonne
+# Hinten (≥ 145°): nur für Sonne (MOON_RISE/MOON_SET → skip)
+# Seitlich (35–145°): immer überspringen
+if delta > 35:
+    continue  # Mond: weder Hinten noch Vorne → skip
+```
+
+Einfach, lokal, keine neue Funktion. Schwächer bei Wiederverwendung wenn Sunrise/Sunset als Event-Typ dazukommt.
+
+**Option B — Zentrale Hilfsfunktion `_azimuth_zone()`**
+
+```python
+from enum import Enum
+
+class AzimuthZone(str, Enum):
+    FRONT = "front"
+    BACK  = "back"
+    SIDE  = "side"
+
+def _azimuth_zone(celestial_az: float, sightline_az: float) -> AzimuthZone:
+    delta = abs((celestial_az - sightline_az + 180) % 360 - 180)
+    if delta <= 35:
+        return AzimuthZone.FRONT
+    if delta >= 145:
+        return AzimuthZone.BACK
+    return AzimuthZone.SIDE
+```
+
+Im 5b-Block dann:
+```python
+if moon_az_mr is None:
+    continue
+zone = _azimuth_zone(moon_az_mr, subject_az)
+if zone == AzimuthZone.SIDE:
+    continue
+if zone == AzimuthZone.BACK:
+    continue  # Mond: Hinten kein Mehrwert
+# zone == FRONT → weiter
+```
+
+Sauber, testbar, erweiterbar für künftige Sunrise/Sunset-Events.
+
+**Empfehlung: Option B**
+Die Zonenfunktion ist in 10 Zeilen geschrieben, hat keinen Overhead, ist mit pytest isoliert testbar und macht die Logik explizit lesbar. Wenn Sonnenauf-/-untergang als eigener Event-Typ nachkommt (US-79 oder Folgeticket), ist die Erweiterung trivial — Sonne darf in BACK, Mond nicht.
+
+### Akzeptanzkriterien
+
+**AK 1 — Mondaufgang vorne erscheint**
+Wenn der Mondaufgang-Azimut ≤ 35° von der Sichtachse abweicht, erscheint im Feed ein „Mondaufgang"-Eintrag für diese Location.
+
+**AK 2 — Mondaufgang seitlich wird unterdrückt**
+Wenn der Mondaufgang-Azimut 35°–145° von der Sichtachse abweicht, erscheint kein „Mondaufgang"-Eintrag im Feed.
+
+**AK 3 — Monduntergang hinten wird unterdrückt**
+Wenn der Monduntergang-Azimut ≥ 145° von der Sichtachse abweicht (hinter dem Fotografen), erscheint kein „Monduntergang"-Eintrag im Feed — auch nicht als Alpenglühen-Logik (das gilt nur für Sonne).
+
+**AK 4 — Mondaufgang ohne bekannten Azimut wird unterdrückt**
+Wenn `get_body_position()` None zurückgibt (Azimut unbekannt), erscheint kein Eintrag im Feed.
+
+**AK 5 — Grenzwerte korrekt**
+Delta = 35° → Zone Vorne → Eintrag erscheint. Delta = 145° → Zone Hinten → bei Mond: kein Eintrag.
+
+**AK 6 — Keine Regression bei anderen Event-Typen**
+Golden Hour, Blue Hour, SUN_ALIGNMENT, MOON_ALIGNMENT, Milchstraße, Meteoritenschauer werden durch US-108 nicht verändert.
+
+### Betroffene Dateien
+
+- `FotoAlert/backend/calculations/opportunity.py` — `_azimuth_zone()` hinzufügen, Abschnitt 5b anpassen
+
+### Pytest-Testfälle (vor Implementierung schreiben)
+
+```python
+def test_azimuth_zone_front():
+    assert _azimuth_zone(90, 85) == AzimuthZone.FRONT   # delta=5
+    assert _azimuth_zone(90, 55) == AzimuthZone.FRONT   # delta=35 (Grenze)
+
+def test_azimuth_zone_side():
+    assert _azimuth_zone(90, 140) == AzimuthZone.SIDE   # delta=50
+    assert _azimuth_zone(90, 0) == AzimuthZone.SIDE     # delta=90
+
+def test_azimuth_zone_back():
+    assert _azimuth_zone(270, 90) == AzimuthZone.BACK   # delta=180
+    assert _azimuth_zone(235, 90) == AzimuthZone.BACK   # delta=145 (Grenze)
+
+def test_wrap_around_360():
+    assert _azimuth_zone(355, 5) == AzimuthZone.FRONT   # delta=10, 0/360-Wrap
+    assert _azimuth_zone(5, 355) == AzimuthZone.FRONT
+```
 

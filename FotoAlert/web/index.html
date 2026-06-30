@@ -1112,7 +1112,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.8';
+const APP_VERSION = '1.20.9';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1904,7 +1904,8 @@ const CalendarView = {
     let monthEvents = Array.from(bestMap.values());
 
     // Alle aktiven Filter anwenden (Score, EventType, Tageszeit, Suche, …)
-    monthEvents = Filter.apply(monthEvents);
+    // US-07 AK-14c: Kalender ignoriert Wolkenstimmungs-Filter (skipCloudMood=true)
+    monthEvents = Filter.apply(monthEvents, { skipCloudMood: true });
 
     // Gruppieren nach Tag
     const groups = {};
@@ -2405,7 +2406,7 @@ const Filter = {
     // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
     // BUG-46: minRatingExcl (bool) = Drei-Zustand für Bewertung (false=≥N, true=<N).
     // verificationIncl/verificationExcl: Arrays mit 'verified'|'unverified'|'issues' (unabhängige Drei-Zustände).
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [] };
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0 };
   },
 
   get state() {
@@ -2436,7 +2437,8 @@ const Filter = {
            (s.minScore > 0 ? 1 : 0) +
            (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
            (s.maxDistKm > 0 ? 1 : 0) +
-           ((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0);
+           ((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0) +
+           (s.minCloudMood > 0 ? 1 : 0);
   },
 
   _updateBadge() {
@@ -2451,7 +2453,7 @@ const Filter = {
   // Opt-in über Eventtyp-Filter im FilterSheet.
   _ROUTINE_TYPES: ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'],
 
-  apply(data) {
+  apply(data, { skipCloudMood = false } = {}) {
     const s = this.state;
     // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
     const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
@@ -2524,6 +2526,14 @@ const Filter = {
         if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) return false;
         // Excl: diese Kategorie explizit ausschließen
         if (s.verificationExcl.includes(cat)) return false;
+      }
+      // US-07: Wolkenstimmungs-Filter — nur im Feed (Kalender und skipCloudMood=true ignorieren)
+      if (s.minCloudMood > 0 && !skipCloudMood) {
+        const gcs = o.golden_cloud_score;
+        // Events ohne Score (null/undefined) = nicht goldene Stunde oder kein Wetter-Overlay → ausblenden
+        if (gcs == null) return false;
+        const threshold = s.minCloudMood === 4 ? 0.85 : s.minCloudMood === 3 ? 0.65 : 0.40;
+        if (gcs < threshold) return false;
       }
       // Textsuche (US-53) – AND mit allen anderen Filtern; sucht in Name, Titel und Event-Typ
       if (Search.query) {
@@ -3052,10 +3062,37 @@ const FilterSheet = {
     const verNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`;
     const ratingNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">≥ N Sterne</span> → <span style="color:var(--red)">weniger als N Sterne</span> → aus</p>`;
 
+    // US-07: Wolkenstimmungs-Filter
+    const isScoutView = App.current === 'scout';
+    const cloudMoodLabels = [['Alle', 0], ['Mäßig+', 2], ['Gut+', 3], ['Exzellent', 4]];
+    const cloudMoodChips = cloudMoodLabels.map(([l, v]) => {
+      const active = s.minCloudMood === v;
+      return `<span class="filter-chip${active ? ' active' : ''}" onclick="FilterSheet._setCloudMood(${v})">${l}</span>`;
+    }).join('');
+    const cloudNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Nur für Goldene-Stunde-Chancen mit Wetter-Overlay (nächste 3 Tage). Chancen ohne Wolkendaten werden ausgeblendet.</p>`;
+    const cloudSection = (isMapView || isLocationView)
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <div class="filter-chips">${cloudMoodChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed verfügbar</p>
+        </div>`
+      : isScoutView
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <div class="filter-chips">${cloudMoodChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Feed verfügbar</p>
+        </div>`
+      : `<div class="filter-section">
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <div class="filter-chips">${cloudMoodChips}</div>
+          ${cloudNote}
+        </div>`;
+
     document.getElementById('filter-content').innerHTML =
       etSection +
       tzSection +
       scoreSection +
+      cloudSection +
       focalSection +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
@@ -3102,6 +3139,15 @@ const FilterSheet = {
       incl.push(v);
     }
     Filter.save({ verificationIncl: incl, verificationExcl: excl });
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
+  // US-07: Wolkenstimmungs-Chip — einfacher Toggle, erneutes Tippen setzt zurück auf 0
+  _setCloudMood(v) {
+    const current = Filter.state.minCloudMood;
+    Filter.save({ minCloudMood: current === v ? 0 : v });
     this._render();
     requestAnimationFrame(() => this.initDualSlider());
     this._applyLive();
@@ -3412,7 +3458,20 @@ const Detail = {
         const fogWarn = wd.visibility_m < 1000 ? `<div class="info-row"><span class="ir-label" style="display:inline-flex;align-items:center;gap:4px">${ic('i-warn',13)} Nebel</span><span class="ir-val" style="color:var(--red)">Sicht nur ${wd.visibility_m < 100 ? '<100' : Math.round(wd.visibility_m/100)*100} m</span></div>` : '';
         const cirrusNote = wd.cloud_cover_high_pct > 20 ? ` · ${wd.cloud_cover_high_pct}% Cirrus (fotogen!)` : '';
         const wScore = wLabel;
-        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div><div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div><div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
+        // US-07: Goldene Wolken & Himmelsröte Scoring — nur für Goldene Stunde
+        const isGoldenHour = o.event_type === 'Goldene Stunde Morgen' || o.event_type === 'Goldene Stunde Abend';
+        const gcs = o.golden_cloud_score;
+        let goldenCloudRow = '';
+        if (isGoldenHour && gcs != null) {
+          const gcPct = Math.round(gcs * 100);
+          const gcShort = gcs >= 0.85 ? 'Exzellent' : gcs >= 0.65 ? 'Gut' : gcs >= 0.40 ? 'Mäßig' : 'Gering';
+          const gcColor = gcs >= 0.85 ? 'var(--gold)' : gcs >= 0.65 ? 'var(--yellow,#e8b820)' : 'var(--muted)';
+          goldenCloudRow = `<div class="info-row"><span class="ir-label">Wolkenstimmung <button class="sc-info-btn" onclick="ScoreInfo.show('wolkenstimmung')">i</button></span><span class="ir-val" style="color:${gcColor}">${gcPct} % · ${gcShort}</span></div>`;
+        }
+        const cloudLowRow = (wd.cloud_cover_low_pct != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${wd.cloud_cover_low_pct} %</span></div>` : '';
+        const cloudMidRow = (wd.cloud_cover_mid_pct != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${wd.cloud_cover_mid_pct} %</span></div>` : '';
+        const cloudHighRow = (wd.cloud_cover_high_pct != null) ? `<div class="info-row"><span class="ir-label">Hohe Wolken</span><span class="ir-val">${wd.cloud_cover_high_pct} %</span></div>` : '';
+        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div>${goldenCloudRow}<div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div>${cloudLowRow}${cloudMidRow}${cloudHighRow}<div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
       })()}
       ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
@@ -5190,6 +5249,16 @@ const ScoreInfo = {
           <li><b>Nebel:</b> Sichtweite &lt; 1 km → starker Abzug</li>
         </ul>
         <p style="margin-top:8px">Nur verfügbar für Ereignisse innerhalb der nächsten 3 Tage.</p>`,
+    },
+    wolkenstimmung: {
+      title: 'Wolkenstimmung',
+      html: `<p>Schätzt das Potenzial für goldene Wolken und Himmelsröte — basierend auf der Wolkenverteilung nach Höhenschicht:</p>
+        <ul>
+          <li><b>Tiefe Wolken (0–2 km):</b> blockieren das Licht → hohe Werte sind schlecht</li>
+          <li><b>Mittlere Wolken (2–6 km):</b> Altocumulus reflektiert das Licht golden → Sweet Spot 25–65 %</li>
+          <li><b>Hohe Wolken (6+ km):</b> Cirrus streut das Licht warm → Chance auf Himmelsröte</li>
+        </ul>
+        <p style="margin-top:8px"><b>Wichtig:</b> Der Score zeigt wie gut die Wolkenmenge insgesamt ist — nicht in welcher Richtung die Wolken stehen. Ob sie tatsächlich hinter dem Motiv in Sonnenrichtung erscheinen, ist hier nicht einberechnet.</p>`,
     },
   },
   show(key) {

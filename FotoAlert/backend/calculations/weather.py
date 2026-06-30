@@ -124,6 +124,61 @@ def calculate_photo_weather_score(hw: HourlyWeather) -> float:
     return round(min(1.0, score), 2)
 
 
+def _golden_cloud_score(cl: Optional[float], cm: Optional[float], ch: Optional[float]) -> Optional[float]:
+    """
+    US-07: Private Wrapper mit None-Handling.
+    Gibt None zurück wenn ein Input None ist.
+    """
+    if cl is None or cm is None or ch is None:
+        return None
+    return calculate_golden_cloud_score(cl, cm, ch)
+
+
+def calculate_golden_cloud_score(cl: float, cm: float, ch: float) -> float:
+    """
+    US-07: Berechnet Goldene-Wolken-Score für Goldene Stunde (0.0–1.0).
+
+    Tiefe Wolken blockieren das Licht komplett → starker Malus.
+    Mittlere und hohe Wolken reflektieren und färben das Licht golden → Sweet Spot.
+
+    Args:
+        cl: cloudcover_low 0–100 % (tiefe Wolken)
+        cm: cloudcover_mid 0–100 % (mittlere Wolken)
+        ch: cloudcover_high 0–100 % (Cirrus)
+
+    Returns:
+        Score 0.0–1.0
+    """
+    # Tiefe Wolken blockieren das Licht vollständig
+    if cl > 80:
+        return 0.10
+
+    # Mittlere + hohe Bewölkung zusammen
+    mid_high = (cm + ch) / 2.0
+
+    # Klarer Himmel: kaum etwas zum Einfärben
+    if mid_high < 10:
+        return 0.20
+
+    # Gleichmäßige Decke: diffuses Licht ohne Dramatik
+    if mid_high > 90:
+        return 0.25
+
+    # Sweet Spot: 25–65 % mittlere+hohe Wolken, tiefe Wolken < 30 %
+    if 25 <= mid_high <= 65 and cl < 30:
+        base_score = 0.70 + (mid_high - 25) / (65 - 25) * 0.30
+    else:
+        # Außerhalb Sweet Spot: linearer Score aus mid_high
+        base_score = 0.30 + mid_high / 100.0 * 0.40
+
+    # Penalty: exponentiell für tiefe Wolken über 30 %
+    if cl > 30:
+        penalty = ((cl - 30) / 70.0) ** 2
+        base_score *= (1.0 - penalty)
+
+    return round(max(0.0, min(1.0, base_score)), 3)
+
+
 def wmo_code_to_description(code: int) -> str:
     """WMO Wettercodes zu Beschreibung."""
     codes = {

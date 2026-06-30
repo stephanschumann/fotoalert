@@ -81,6 +81,8 @@ class OpportunityOut(BaseModel):
     blue_hour_morning_end: Optional[datetime] = None
     blue_hour_evening_start: Optional[datetime] = None
     blue_hour_evening_end: Optional[datetime] = None
+    # US-07: Goldene Wolken & Himmelsröte Scoring (nur für GOLDEN_HOUR_MORNING/EVENING)
+    golden_cloud_score: Optional[float] = None
 
 
 class DailyBriefingOut(BaseModel):
