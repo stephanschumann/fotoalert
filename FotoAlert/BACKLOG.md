@@ -30,8 +30,8 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-109** *(Goldene Wolken & Himmelsröte)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
@@ -2216,14 +2216,15 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 
 ---
 
-### US-109 · Goldene Wolken & Himmelsröte als eigene Chancen: Richtungsbewusstes Scoring und Feed-Events `[~]`
+### US-109 · Goldene Wolken & Himmelsröte als eigene Chancen: Richtungsbewusstes Scoring und Feed-Events `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-30 |
+| **Abgeschlossen** | 2026-06-30 |
 
 **Beschreibung:** Der aktuelle `golden_cloud_score` (US-07) berechnet nur die Gesamtmenge der Wolken pro Höhenstufe — er weiß nicht, in welcher Himmelsrichtung die Wolken stehen. Für goldene Wolken und Himmelsröte ist entscheidend, dass die Wolken **hinter dem Motiv in Sonnenrichtung** stehen (beim Abendrot im Westen, beim Morgenrot im Osten).
 
@@ -3138,7 +3139,7 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 |------|------|
 | **Typ** | Bug |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-30 |
 
 **Beschreibung:** `refactor_check.py` (category: `section_missing_default`) meldet, dass zwei Event-Sections gerendert werden, aber keinen Eintrag in `Sections._def` haben:

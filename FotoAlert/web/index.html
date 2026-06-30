@@ -3165,7 +3165,7 @@ const Sections = {
   _def: {
     ev_desc:false, ev_zeit:false, ev_wetter:false, ev_kamera:false,
     ev_astro:false, ev_topo:false, ev_skypos:false, ev_kompo:false, ev_fov:false, ev_coords:false,
-    ev_astro_live:false,
+    ev_astro_live:false, ev_golden_clouds:false, ev_red_sky:false,
     loc_obs:true, loc_subj:true, loc_azimut:true, loc_links:false,
     loc_fov:false, loc_events:true, loc_rating:false, loc_verify:false
   },
@@ -3478,6 +3478,58 @@ const Detail = {
         return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div>${goldenCloudRow}<div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div>${cloudLowRow}${cloudMidRow}${cloudHighRow}<div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
       })()}
       ${(() => {
+        // US-109: Erklärungssektion für Goldene Wolken und Himmelsröte (AK-3)
+        const isGoldenClouds = o.event_type === 'Goldene Wolken';
+        const isRedSky       = o.event_type === 'Himmelsröte';
+        if (!isGoldenClouds && !isRedSky) return '';
+        if (isGoldenClouds) {
+          // Ermittle welcher Sonnenazimut das Event ausgelöst hat:
+          // Backend prüft sunrise_azimuth für Morgen-Events und sunset_azimuth für Abend-Events.
+          // Da event_type jetzt "Goldene Wolken" (nicht Morgen/Abend), nehmen wir den Azimut
+          // der die kleinere Differenz zum Motiv-Azimut hat (≤30° — sonst wäre kein Event entstanden).
+          const subAz = o.subject_azimuth;
+          const azDiffFn = (a, b) => { if (a == null || b == null) return 999; let d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+          const diffRise = azDiffFn(o.sunrise_azimuth, subAz);
+          const diffSet  = azDiffFn(o.sunset_azimuth,  subAz);
+          const sunAz = (diffRise <= 30 && diffRise < diffSet) ? o.sunrise_azimuth
+                      : (diffSet  <= 30) ? o.sunset_azimuth
+                      : (o.sunset_azimuth != null ? o.sunset_azimuth : o.sunrise_azimuth);
+          // (Fallback: nimm was vorhanden, auch wenn >30°, für Anzeigezwecke)
+          const azDiff = (sunAz != null && subAz != null)
+            ? (() => { let d = Math.abs(sunAz - subAz) % 360; return d > 180 ? 360 - d : d; })()
+            : null;
+          const dirRow = (sunAz != null)
+            ? `<div class="info-row"><span class="ir-label">Sonnenazimut</span><span class="ir-val">${sunAz.toFixed(1)}°</span></div>`
+            : '';
+          const motifRow = (subAz != null)
+            ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${subAz.toFixed(1)}°</span></div>`
+            : '';
+          const diffRow = (azDiff != null)
+            ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${azDiff.toFixed(1)}° ≤ 30° ✓</span></div>`
+            : '';
+          return mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
+            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
+            dirRow + motifRow + diffRow
+          );
+        }
+        if (isRedSky) {
+          const wd = o.weather_details;
+          const cl = wd ? wd.cloud_cover_low_pct : null;
+          const cm = wd ? wd.cloud_cover_mid_pct : null;
+          const total = (cl != null && cm != null) ? cl + cm : null;
+          const clRow = (cl != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${cl} %</span></div>` : '';
+          const cmRow = (cm != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${cm} %</span></div>` : '';
+          const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
+          return mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Tiefe und mittlere Wolken dominieren den Himmel und werden vom flachen Sonnenlicht intensiv rot-orange eingefärbt. Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung.</p>` +
+            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
+            clRow + cmRow + totRow
+          );
+        }
+        return '';
+      })()}
+      ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
           distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
         return mkSec('ev_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('ev'));
@@ -3636,58 +3688,6 @@ const Detail = {
           ? `<div style="margin-top:10px">${secRows.join('')}</div>`
           : '';
         return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
-      })()}
-      ${(() => {
-        // US-109: Erklärungssektion für Goldene Wolken und Himmelsröte (AK-3)
-        const isGoldenClouds = o.event_type === 'Goldene Wolken';
-        const isRedSky       = o.event_type === 'Himmelsröte';
-        if (!isGoldenClouds && !isRedSky) return '';
-        if (isGoldenClouds) {
-          // Ermittle welcher Sonnenazimut das Event ausgelöst hat:
-          // Backend prüft sunrise_azimuth für Morgen-Events und sunset_azimuth für Abend-Events.
-          // Da event_type jetzt "Goldene Wolken" (nicht Morgen/Abend), nehmen wir den Azimut
-          // der die kleinere Differenz zum Motiv-Azimut hat (≤30° — sonst wäre kein Event entstanden).
-          const subAz = o.subject_azimuth;
-          const azDiffFn = (a, b) => { if (a == null || b == null) return 999; let d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
-          const diffRise = azDiffFn(o.sunrise_azimuth, subAz);
-          const diffSet  = azDiffFn(o.sunset_azimuth,  subAz);
-          const sunAz = (diffRise <= 30 && diffRise < diffSet) ? o.sunrise_azimuth
-                      : (diffSet  <= 30) ? o.sunset_azimuth
-                      : (o.sunset_azimuth != null ? o.sunset_azimuth : o.sunrise_azimuth);
-          // (Fallback: nimm was vorhanden, auch wenn >30°, für Anzeigezwecke)
-          const azDiff = (sunAz != null && subAz != null)
-            ? (() => { let d = Math.abs(sunAz - subAz) % 360; return d > 180 ? 360 - d : d; })()
-            : null;
-          const dirRow = (sunAz != null)
-            ? `<div class="info-row"><span class="ir-label">Sonnenazimut</span><span class="ir-val">${sunAz.toFixed(1)}°</span></div>`
-            : '';
-          const motifRow = (subAz != null)
-            ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${subAz.toFixed(1)}°</span></div>`
-            : '';
-          const diffRow = (azDiff != null)
-            ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${azDiff.toFixed(1)}° ≤ 30° ✓</span></div>`
-            : '';
-          return mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
-            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
-            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
-            dirRow + motifRow + diffRow
-          );
-        }
-        if (isRedSky) {
-          const wd = o.weather_details;
-          const cl = wd ? wd.cloud_cover_low_pct : null;
-          const cm = wd ? wd.cloud_cover_mid_pct : null;
-          const total = (cl != null && cm != null) ? cl + cm : null;
-          const clRow = (cl != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${cl} %</span></div>` : '';
-          const cmRow = (cm != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${cm} %</span></div>` : '';
-          const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
-          return mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
-            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Tiefe und mittlere Wolken dominieren den Himmel und werden vom flachen Sonnenlicht intensiv rot-orange eingefärbt. Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung.</p>` +
-            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
-            clRow + cmRow + totRow
-          );
-        }
-        return '';
       })()}
       ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
       ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}
