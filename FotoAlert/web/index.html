@@ -272,6 +272,39 @@
       font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
     .map-layer-btn.active { background: var(--gold); color: var(--bg); }
 
+    /* US-72: Wetter-Toggle */
+    #map-weather-toggle { position: absolute; top: 52px; right: 12px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    #map-weather-toggle .wtoggle-row { display: flex; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .map-weather-btn { background: none; border: none; color: var(--muted); font-size: 12px;
+      font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
+    .map-weather-btn.active { background: var(--gold); color: var(--bg); }
+    /* US-72: Zeit-Slider */
+    #map-weather-slider-wrap { position: absolute; bottom: 130px; left: 0; right: 0;
+      z-index: 1000; padding: 8px 16px; background: var(--surface);
+      border-top: 1px solid var(--border); display: none; }
+    #map-weather-slider-wrap.open { display: block; }
+    #map-weather-slider { width: 100%; accent-color: var(--gold); }
+    #map-weather-slider-label { text-align: center; font-size: 12px; color: var(--text);
+      margin-top: 4px; }
+    /* US-72: Legende */
+    #map-weather-legend { position: absolute; bottom: 200px; left: 12px; z-index: 1000;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 8px 12px; font-size: 11px; color: var(--text); display: none; min-width: 130px; }
+    #map-weather-legend.open { display: block; }
+    #map-weather-legend .legend-title { font-weight: 700; margin-bottom: 6px; }
+    .legend-bar { display: flex; gap: 0; height: 12px; border-radius: 4px; overflow: hidden;
+      margin-bottom: 4px; }
+    .legend-labels { display: flex; justify-content: space-between; font-size: 10px;
+      color: var(--muted); }
+    /* US-72: Fehler-Banner */
+    #map-weather-error { position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+      z-index: 1100; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--muted);
+      display: none; white-space: nowrap; }
+    #map-weather-error.open { display: block; }
+
     /* US-69: GPS-Standort-Button */
     .map-gps-btn { position: absolute; bottom: 80px; left: 12px; z-index: 1000;
       width: 44px; height: 44px; border-radius: 50%;
@@ -923,6 +956,32 @@ function ic(id, size, cls){
         <button class="map-layer-btn active" onclick="MapView.setLayer('standard')">Standard</button>
         <button class="map-layer-btn" onclick="MapView.setLayer('satellite')">Satellit</button>
       </div>
+      <!-- US-72: Wetter-Toggle -->
+      <div id="map-weather-toggle">
+        <div class="wtoggle-row">
+          <button class="map-weather-btn active" onclick="WeatherMap.setMode('off')">aus</button>
+          <button class="map-weather-btn" onclick="WeatherMap.setMode('clouds')">Wolken</button>
+          <button class="map-weather-btn" onclick="WeatherMap.setMode('precip')">Niederschlag</button>
+        </div>
+        <div class="wtoggle-row" id="map-weather-sub" style="display:none">
+          <button class="map-weather-btn active" onclick="WeatherMap.setSub('mm')">mm</button>
+          <button class="map-weather-btn" onclick="WeatherMap.setSub('pct')">%</button>
+        </div>
+      </div>
+      <!-- US-72: Zeit-Slider -->
+      <div id="map-weather-slider-wrap">
+        <input type="range" id="map-weather-slider" min="0" step="1" value="0"
+               oninput="WeatherMap.onSlider(this.value)">
+        <div id="map-weather-slider-label">–</div>
+      </div>
+      <!-- US-72: Legende -->
+      <div id="map-weather-legend">
+        <div class="legend-title" id="weather-legend-title">Wolken %</div>
+        <div class="legend-bar" id="weather-legend-bar"></div>
+        <div class="legend-labels" id="weather-legend-labels"></div>
+      </div>
+      <!-- US-72: Fehler-Hinweis -->
+      <div id="map-weather-error">Wetterdaten nicht verfügbar</div>
       <!-- US-69: Mein-Standort-Button -->
       <button class="map-gps-btn" onclick="MapView.locateMe()" title="Mein Standort">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1112,7 +1171,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.9';
+const APP_VERSION = '1.20.10';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3165,7 +3224,7 @@ const Sections = {
   _def: {
     ev_desc:false, ev_zeit:false, ev_wetter:false, ev_kamera:false,
     ev_astro:false, ev_topo:false, ev_skypos:false, ev_kompo:false, ev_fov:false, ev_coords:false,
-    ev_astro_live:false, ev_golden_clouds:false, ev_red_sky:false,
+    ev_astro_live:false, ev_golden_clouds:false, ev_red_sky:false, ev_compass_gc:true, ev_compass_rs:true,
     loc_obs:true, loc_subj:true, loc_azimut:true, loc_links:false,
     loc_fov:false, loc_events:true, loc_rating:false, loc_verify:false
   },
@@ -3190,6 +3249,150 @@ const Sections = {
 function mkSec(id, title, content) {
   const open = Sections.isOpen(id);
   return `<div class="sheet-section"><h4 onclick="Sections.toggle('${id}')"><span>${title}</span><span id="sc_${id}" class="sec-chev" style="transform:rotate(${open?'0':'-90'}deg)">▼</span></h4><div class="section-body ${open?'open':''}" id="sb_${id}">${content}</div></div>`;
+}
+
+
+// ═══════════════════════════════════════════════════════
+// US-111 · Wolken-Kompass-Diagramm für GOLDEN_CLOUDS + RED_SKY
+function _haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r) * Math.cos(lat2*r) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
+  const W = 240, H = 240, cx = 120, cy = 120, R = 108;
+  // Convert azimuth (0=N, clockwise) to SVG angle (0=up, clockwise)
+  const azToRad = az => (az - 90) * Math.PI / 180;
+  const pt = (az, r) => {
+    const a = azToRad(az);
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+
+  // Sector path: arc from startAz to endAz, outer radius rO, inner rI
+  function sectorPath(startAz, endAz, rO, rI) {
+    // Normalize span
+    let span = ((endAz - startAz) + 360) % 360;
+    if (span === 0) span = 360;
+    const large = span > 180 ? 1 : 0;
+    const [x1o, y1o] = pt(startAz, rO);
+    const [x2o, y2o] = pt(endAz,   rO);
+    const [x1i, y1i] = pt(startAz, rI);
+    const [x2i, y2i] = pt(endAz,   rI);
+    return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rO} ${rO} 0 ${large} 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rI} ${rI} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
+  }
+
+  // Zone: GOLDEN_CLOUDS = ±30° around sunAz, RED_SKY = ±90° (half-ring opposite of sun)
+  let zonePath = '';
+  if (isRedSky) {
+    // Opposite half: sunAz+90 to sunAz+270 (the side away from sun for scattered light)
+    zonePath = `<path d="${sectorPath(sunAz + 90, sunAz + 270, 104, 22)}" fill="#ef4444" fill-opacity="0.18" stroke="#ef4444" stroke-opacity="0.5" stroke-width="1.2"/>`;
+  } else {
+    zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="#d4860a" fill-opacity="0.22" stroke="#d4860a" stroke-opacity="0.6" stroke-width="1.2"/>`;
+  }
+
+  // Sun arrow (from center to r=95, arrowhead, sun circle)
+  const [sax, say] = pt(sunAz, 95);
+  const [sax2, say2] = pt(sunAz, 107);
+  const sunColor = '#d4860a';
+  // Arrowhead points
+  const arrowAngle = azToRad(sunAz);
+  const perpA = arrowAngle + Math.PI / 2;
+  const tipX = sax.toFixed(2), tipY = say.toFixed(2);
+  const ah1x = (sax - 10 * Math.cos(arrowAngle) + 5 * Math.cos(perpA)).toFixed(2);
+  const ah1y = (say - 10 * Math.sin(arrowAngle) + 5 * Math.sin(perpA)).toFixed(2);
+  const ah2x = (sax - 10 * Math.cos(arrowAngle) - 5 * Math.cos(perpA)).toFixed(2);
+  const ah2y = (say - 10 * Math.sin(arrowAngle) - 5 * Math.sin(perpA)).toFixed(2);
+
+  const sunArrow = `
+    <line x1="${cx}" y1="${cy}" x2="${(sax - 8 * Math.cos(arrowAngle)).toFixed(2)}" y2="${(say - 8 * Math.sin(arrowAngle)).toFixed(2)}"
+      stroke="${sunColor}" stroke-width="2.2" stroke-linecap="round"/>
+    <polygon points="${tipX},${tipY} ${ah1x},${ah1y} ${ah2x},${ah2y}" fill="${sunColor}"/>
+    <circle cx="${sax2.toFixed(2)}" cy="${say2.toFixed(2)}" r="5" fill="${sunColor}" fill-opacity="0.9"/>`;
+
+  // Subject azimuth dashed line with arrowhead toward subject
+  let subjLine = '';
+  if (subjectAz != null) {
+    const [s1x, s1y] = pt(subjectAz, 95);       // Motiv-Seite (Pfeilspitze)
+    const [s2x, s2y] = pt(subjectAz + 180, 95); // Rückseite (Standort-Seite)
+    const sAng = azToRad(subjectAz);
+    const sPerpA = sAng + Math.PI / 2;
+    // Pfeilspitze an Motiv-Seite
+    const sAh1x = (s1x - 9 * Math.cos(sAng) + 4.5 * Math.cos(sPerpA)).toFixed(2);
+    const sAh1y = (s1y - 9 * Math.sin(sAng) + 4.5 * Math.sin(sPerpA)).toFixed(2);
+    const sAh2x = (s1x - 9 * Math.cos(sAng) - 4.5 * Math.cos(sPerpA)).toFixed(2);
+    const sAh2y = (s1y - 9 * Math.sin(sAng) - 4.5 * Math.sin(sPerpA)).toFixed(2);
+    subjLine = `
+      <line x1="${s2x.toFixed(2)}" y1="${s2y.toFixed(2)}" x2="${(s1x - 7 * Math.cos(sAng)).toFixed(2)}" y2="${(s1y - 7 * Math.sin(sAng)).toFixed(2)}"
+        stroke="#5272c0" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.85"/>
+      <polygon points="${s1x.toFixed(2)},${s1y.toFixed(2)} ${sAh1x},${sAh1y} ${sAh2x},${sAh2y}" fill="#5272c0" opacity="0.85"/>`;
+    // (Entfernung wird als HTML unterhalb des SVG angezeigt, nicht im SVG)
+  }
+
+  // Compass rings
+  const rings = `
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#888" stroke-opacity="0.35" stroke-width="1.2"/>
+    <circle cx="${cx}" cy="${cy}" r="80" fill="none" stroke="#888" stroke-opacity="0.15" stroke-width="0.8"/>
+    <circle cx="${cx}" cy="${cy}" r="40" fill="none" stroke="#888" stroke-opacity="0.12" stroke-width="0.8"/>`;
+
+  // Cardinal ticks & labels
+  const cardinals = [
+    { az: 0,   lbl: 'N', color: '#d4860a', bold: true },
+    { az: 90,  lbl: 'O', color: '#999',    bold: false },
+    { az: 180, lbl: 'S', color: '#999',    bold: false },
+    { az: 270, lbl: 'W', color: '#999',    bold: false },
+  ];
+  let ticks = '', labels = '';
+  for (const c of cardinals) {
+    const [tx1, ty1] = pt(c.az, R - 4);
+    const [tx2, ty2] = pt(c.az, R + 6);
+    ticks += `<line x1="${tx1.toFixed(2)}" y1="${ty1.toFixed(2)}" x2="${tx2.toFixed(2)}" y2="${ty2.toFixed(2)}" stroke="${c.color}" stroke-width="${c.bold ? 2 : 1.2}"/>`;
+    const [lx, ly] = pt(c.az, R + 18);
+    labels += `<text x="${lx.toFixed(2)}" y="${(ly + 4.5).toFixed(2)}" text-anchor="middle" font-size="11" font-weight="${c.bold ? '700' : '400'}" fill="${c.color}">${c.lbl}</text>`;
+  }
+  // Intercardinal ticks (NE, SE, SW, NW)
+  for (const az of [45, 135, 225, 315]) {
+    const [tx1, ty1] = pt(az, R - 3);
+    const [tx2, ty2] = pt(az, R + 4);
+    ticks += `<line x1="${tx1.toFixed(2)}" y1="${ty1.toFixed(2)}" x2="${tx2.toFixed(2)}" y2="${ty2.toFixed(2)}" stroke="#888" stroke-opacity="0.4" stroke-width="0.9"/>`;
+  }
+
+  // Center dot
+  const centerDot = `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#555"/>`;
+
+  // Legend
+  const legendItems = isRedSky
+    ? `<text x="8" y="228" font-size="10" fill="#ef4444">● Günstige Zone (Röte)</text><text x="8" y="240" font-size="10" fill="#d4860a">→ Sonne</text>`
+    : `<text x="8" y="228" font-size="10" fill="#d4860a">● Goldene Zone (±30°)</text><text x="8" y="240" font-size="10" fill="#d4860a">→ Sonne</text>`;
+  const subjLegend = subjectAz != null
+    ? `<text x="120" y="228" font-size="10" fill="#5272c0">- - Sichtachse</text>` : '';
+
+  // Entfernungszeile + ggf. Hinweis bei sehr kurzem Motiv-Abstand
+  let distHtml = '';
+  if (subjectAz != null) {
+    const distTxt = (distanceM != null && distanceM > 0)
+      ? (distanceM >= 1000
+          ? `${(distanceM / 1000).toFixed(1).replace('.', ',')} km`
+          : `${Math.round(distanceM)} m`)
+      : '–';
+    distHtml = `<p style="font-size:12px;color:#5272c0;text-align:center;margin:8px 0 0;font-weight:600">📷 Motiv: ${distTxt}</p>`;
+    if (distanceM != null && distanceM < 500 && distanceM > 0) {
+      distHtml += `<p style="font-size:11px;color:#b07a12;margin:6px 0 0;padding:6px 10px;background:rgba(176,122,18,.1);border-radius:6px;border:1px solid rgba(176,122,18,.25);line-height:1.5">⚠ Motiv sehr nah — Wolken wirken als eigenständiges Motiv, nicht als direkter Hintergrund.</p>`;
+    }
+  }
+
+  return `<div><svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;max-width:260px;height:260px;margin:0 auto">
+    ${rings}
+    ${zonePath}
+    ${ticks}
+    ${labels}
+    ${subjLine}
+    ${sunArrow}
+    ${centerDot}
+    ${legendItems}
+    ${subjLegend}
+  </svg>${distHtml}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3507,7 +3710,12 @@ const Detail = {
           const diffRow = (azDiff != null)
             ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${azDiff.toFixed(1)}° ≤ 30° ✓</span></div>`
             : '';
-          return mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
+          const compassHtmlGC = (sunAz != null)
+            ? mkSec('ev_compass_gc',`${ic('i-compass',15)} Wolken & Himmelsrichtung`,
+                mkCloudCompassSvg(sunAz, subAz, false,
+                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
+            : '';
+          return compassHtmlGC + mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
             `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
             dirRow + motifRow + diffRow
@@ -3521,7 +3729,13 @@ const Detail = {
           const clRow = (cl != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${cl} %</span></div>` : '';
           const cmRow = (cm != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${cm} %</span></div>` : '';
           const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
-          return mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
+          const rsSunAz = o.sunset_azimuth ?? o.sunrise_azimuth ?? null;
+          const compassHtmlRS = (rsSunAz != null)
+            ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung`,
+                mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, true,
+                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
+            : '';
+          return compassHtmlRS + mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
             `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Tiefe und mittlere Wolken dominieren den Himmel und werden vom flachen Sonnenlicht intensiv rot-orange eingefärbt. Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung.</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
             clRow + cmRow + totRow
@@ -4061,6 +4275,288 @@ const MapView = {
       },
       { timeout: 10000, maximumAge: 60000 }
     );
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// US-72: WETTERKARTE
+// ═══════════════════════════════════════════════════════
+const WeatherMap = {
+  // Zustand
+  mode: 'off',          // 'off' | 'clouds' | 'precip'
+  sub: 'mm',            // 'mm' | 'pct'  (nur für precip)
+  sliderIdx: 0,
+  data: null,           // API-Response-Objekt
+  fetchedAt: null,      // Date-Objekt (Client-Cache)
+  rectangles: [],       // Leaflet L.rectangle-Instanzen
+  pane: null,           // Leaflet-Pane
+  _savedView: null,     // {center, zoom} vor dem Einschalten (BUG-55)
+  _CACHE_TTL_MS: 3600000, // 60 Minuten
+
+  // BUG-55: Feste Deutschland-Hülle als Fallback, falls beim Einschalten
+  // keine Gitterdaten geladen sind. Robuste Quelle ist this.data.grid
+  // (Min/Max ± halbe Zellbreite) — siehe _gridBounds(); diese Konstante
+  // ist nur das Sicherheitsnetz. BBox 47.3/55.0/6.0/15.0 ± halbe Schrittweite.
+  _FALLBACK_BOUNDS: [[46.87, 5.5], [55.43, 15.5]],
+
+  // Farbpaletten
+  _CLOUD_COLORS: [
+    [0,   '#c8e8ff'], [25, '#b0c8d8'], [50, '#8ca8b8'],
+    [75,  '#607888'], [100,'#384858'],
+  ],
+  _PRECIP_MM_COLORS: [
+    [0,   '#eaf4ff'], [0.5,'#7dc4f0'], [2,  '#3498db'],
+    [5,   '#1e5fa8'], [10, '#0a2d6b'],
+  ],
+  _PRECIP_PCT_COLORS: [
+    [0,  '#eaf4ff'], [20, '#a8d8f0'], [40, '#5baee3'],
+    [60, '#2575c4'], [80, '#0a3d91'], [100,'#030f3c'],
+  ],
+
+  _colorInterp(value, stops) {
+    // Lineare Interpolation zwischen Farb-Stopps
+    if (value === null || value === undefined) return 'rgba(128,128,128,0.15)';
+    const last = stops[stops.length - 1];
+    if (value >= last[0]) return last[1];
+    for (let i = 0; i < stops.length - 1; i++) {
+      const [v0, c0] = stops[i];
+      const [v1, c1] = stops[i + 1];
+      if (value <= v1) {
+        const t = (value - v0) / (v1 - v0);
+        return this._lerpHex(c0, c1, t);
+      }
+    }
+    return stops[0][1];
+  },
+
+  _lerpHex(h0, h1, t) {
+    const p = s => parseInt(s, 16);
+    const r0 = p(h0.slice(1,3)), g0 = p(h0.slice(3,5)), b0 = p(h0.slice(5,7));
+    const r1 = p(h1.slice(1,3)), g1 = p(h1.slice(3,5)), b1 = p(h1.slice(5,7));
+    const r = Math.round(r0 + (r1 - r0) * t);
+    const g = Math.round(g0 + (g1 - g0) * t);
+    const b = Math.round(b0 + (b1 - b0) * t);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  },
+
+  _palette() {
+    if (this.mode === 'clouds') return this._CLOUD_COLORS;
+    return this.sub === 'mm' ? this._PRECIP_MM_COLORS : this._PRECIP_PCT_COLORS;
+  },
+
+  _dataKey() {
+    if (this.mode === 'clouds') return 'cloud_cover';
+    return this.sub === 'mm' ? 'precipitation_mm' : 'precipitation_prob';
+  },
+
+  _ensurePane() {
+    const map = MapView.map;
+    if (!map) return;
+    if (!this.pane) {
+      this.pane = map.createPane('weatherPane');
+      this.pane.style.zIndex = 250; // zwischen Tile (200) und Marker (400)
+      this.pane.style.pointerEvents = 'none';
+    }
+  },
+
+  _clearRects() {
+    this.rectangles.forEach(r => { try { r.remove(); } catch(e) {} });
+    this.rectangles = [];
+  },
+
+  _render() {
+    this._clearRects();
+    const map = MapView.map;
+    if (!map || !this.data || this.mode === 'off') return;
+    const grid = this.data.grid;
+    if (!grid || !grid.length) return;
+
+    const idx = this.sliderIdx;
+    const palette = this._palette();
+    const key = this._dataKey();
+
+    // Grid 10×10 row-major: lat wächst mit row, lon mit col.
+    const COLS = 10;
+    const dLat = (grid[COLS].lat - grid[0].lat);   // lat-Schritt zwischen Rows
+    const dLon = (grid[1].lon - grid[0].lon);       // lon-Schritt zwischen Cols
+
+    for (let i = 0; i < grid.length; i++) {
+      const pt = grid[i];
+      const series = pt[key];
+      const value = (series && idx < series.length) ? series[idx] : null;
+      const color = this._colorInterp(value, palette);
+
+      const lat0 = pt.lat - dLat / 2;
+      const lat1 = pt.lat + dLat / 2;
+      const lon0 = pt.lon - dLon / 2;
+      const lon1 = pt.lon + dLon / 2;
+
+      const rect = L.rectangle([[lat0, lon0], [lat1, lon1]], {
+        color: 'transparent',
+        fillColor: color,
+        fillOpacity: 0.6,
+        weight: 0,
+        pane: 'weatherPane',
+        interactive: false,
+      });
+      rect.addTo(map);
+      this.rectangles.push(rect);
+    }
+  },
+
+  _updateSlider() {
+    const wrap = document.getElementById('map-weather-slider-wrap');
+    const slider = document.getElementById('map-weather-slider');
+    const label = document.getElementById('map-weather-slider-label');
+    if (this.mode === 'off' || !this.data) {
+      wrap.classList.remove('open');
+      return;
+    }
+    const times = this.data.hourly_times || [];
+    const max = Math.max(0, times.length - 1);
+    slider.max = max;
+    slider.value = Math.min(this.sliderIdx, max);
+    wrap.classList.add('open');
+    this._updateSliderLabel();
+  },
+
+  _updateSliderLabel() {
+    const label = document.getElementById('map-weather-slider-label');
+    const times = (this.data && this.data.hourly_times) || [];
+    if (!times.length) { label.textContent = '–'; return; }
+    const idx = Math.min(this.sliderIdx, times.length - 1);
+    const iso = times[idx];
+    // UTC → Berliner Zeit (CEST = UTC+2 im Sommer, CET = UTC+1 im Winter)
+    try {
+      const dt = new Date(iso.endsWith('Z') ? iso : iso + 'Z');
+      const opts = { timeZone: 'Europe/Berlin', weekday: 'short',
+                     day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+      label.textContent = dt.toLocaleString('de-DE', opts);
+    } catch(e) {
+      label.textContent = iso;
+    }
+  },
+
+  _updateLegend() {
+    const legend = document.getElementById('map-weather-legend');
+    const title = document.getElementById('weather-legend-title');
+    const bar = document.getElementById('weather-legend-bar');
+    const lbls = document.getElementById('weather-legend-labels');
+    if (this.mode === 'off') { legend.classList.remove('open'); return; }
+    legend.classList.add('open');
+    const palette = this._palette();
+    if (this.mode === 'clouds') title.textContent = 'Wolken %';
+    else if (this.sub === 'mm') title.textContent = 'Niederschlag mm';
+    else title.textContent = 'Niederschlag %';
+
+    // Farb-Verlaufs-Balken
+    bar.innerHTML = '';
+    for (let i = 0; i < palette.length - 1; i++) {
+      const [v0, c0] = palette[i];
+      const [v1, c1] = palette[i + 1];
+      const seg = document.createElement('div');
+      seg.style.flex = String(v1 - v0);
+      seg.style.background = `linear-gradient(to right, ${c0}, ${c1})`;
+      bar.appendChild(seg);
+    }
+
+    // Labels: erster + letzter Stopp
+    lbls.innerHTML = '';
+    palette.forEach(([v], i) => {
+      if (i === 0 || i === palette.length - 1) {
+        const s = document.createElement('span');
+        s.textContent = v;
+        lbls.appendChild(s);
+      } else {
+        const s = document.createElement('span');
+        s.textContent = '';
+        lbls.appendChild(s);
+      }
+    });
+  },
+
+  _updateSubRow() {
+    const sub = document.getElementById('map-weather-sub');
+    sub.style.display = this.mode === 'precip' ? '' : 'none';
+  },
+
+  async _fetch() {
+    const now = Date.now();
+    if (this.data && this.fetchedAt && (now - this.fetchedAt) < this._CACHE_TTL_MS) return;
+    const errEl = document.getElementById('map-weather-error');
+    try {
+      const res = await API.get('/weather-map?hours=72');
+      this.data = res;
+      this.fetchedAt = now;
+      errEl.classList.remove('open');
+    } catch(e) {
+      errEl.classList.add('open');
+      this.data = null;
+    }
+  },
+
+  // BUG-55: Bounds des aktuell geladenen Wetter-Gitters (Min/Max lat/lon,
+  // erweitert um halbe Zellbreite). Passt sich automatisch an das geladene
+  // Gebiet an. Fallback auf feste Deutschland-Hülle, falls keine Daten da sind.
+  _gridBounds() {
+    const grid = this.data && this.data.grid;
+    if (!grid || !grid.length) return this._FALLBACK_BOUNDS;
+    const COLS = 10;
+    const dLat = (grid.length > COLS) ? (grid[COLS].lat - grid[0].lat) : 0.856;
+    const dLon = (grid.length > 1)    ? (grid[1].lon - grid[0].lon)    : 1.0;
+    let latMin = Infinity, latMax = -Infinity, lonMin = Infinity, lonMax = -Infinity;
+    for (const pt of grid) {
+      if (pt.lat < latMin) latMin = pt.lat;
+      if (pt.lat > latMax) latMax = pt.lat;
+      if (pt.lon < lonMin) lonMin = pt.lon;
+      if (pt.lon > lonMax) lonMax = pt.lon;
+    }
+    return [[latMin - dLat / 2, lonMin - dLon / 2],
+            [latMax + dLat / 2, lonMax + dLon / 2]];
+  },
+
+  async setMode(mode) {
+    const wasOff = this.mode === 'off';
+    this.mode = mode;
+    // Toggle-Buttons aktualisieren
+    document.querySelectorAll('.map-weather-btn').forEach(b => {
+      // Nur die Buttons in der ersten Reihe
+      if (b.closest('#map-weather-sub')) return;
+      b.classList.toggle('active', b.getAttribute('onclick') === `WeatherMap.setMode('${mode}')`);
+    });
+    this._updateSubRow();
+    if (mode !== 'off') {
+      await this._fetch();
+      this._ensurePane();
+      // BUG-55: NUR beim Übergang aus→an Ansicht merken + auf das Gitter zoomen.
+      // Bei an→an (clouds↔precip) nicht erneut zoomen / _savedView nicht überschreiben.
+      if (wasOff && MapView.map) {
+        this._savedView = { center: MapView.map.getCenter(), zoom: MapView.map.getZoom() };
+        MapView.map.fitBounds(this._gridBounds(), { padding: [20, 20] });
+      }
+    } else if (this._savedView && MapView.map) {
+      // BUG-55: Übergang an→aus — vorherige Ansicht wiederherstellen.
+      MapView.map.setView(this._savedView.center, this._savedView.zoom);
+      this._savedView = null;
+    }
+    this._render();
+    this._updateSlider();
+    this._updateLegend();
+  },
+
+  setSub(sub) {
+    this.sub = sub;
+    document.querySelectorAll('#map-weather-sub .map-weather-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('onclick') === `WeatherMap.setSub('${sub}')`);
+    });
+    this._render();
+    this._updateLegend();
+  },
+
+  onSlider(val) {
+    this.sliderIdx = parseInt(val, 10);
+    this._render();
+    this._updateSliderLabel();
   },
 };
 
