@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 *(…wartet am Weg-Gate)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-72 · US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-111** · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -44,6 +44,123 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-55 · Wetterkarte: Overlay erscheint als senkrechte Linie statt 10×10-Gitter (Zoom zu nah) `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Done |
+| **Erstellt** | 2026-06-30 |
+| **Abgeschlossen** | 2026-06-30 |
+
+**Beschreibung:** Beim Einschalten des Wetter-Overlays (US-72) zeigt die Karte statt des erwarteten 10×10-Mosaiks nur eine schmale senkrechte Linie. Beobachtet: Alle 100 Grid-Rechtecke sind im DOM, aber nur 2 davon haben sichtbare Größe. Ursache (bereits verifiziert, kein Render-/Daten-/Safari-Fehler): Das Wetter-Gitter spannt ganz Deutschland auf — eine Zelle ist 1,0° breit und damit bei der Start-Zoomstufe (Karte startet auf Berlin, Zoom 10) breiter als das gesamte Kartenfenster; 98 von 100 Zellen liegen außerhalb des Sichtbereichs und werden von Leaflet weggeschnitten. Es ist ein Maßstabs-Problem, kein Bug an den Daten. Erwartet: Beim Aktivieren des Overlays wird das vollständige Deutschland-Gitter als zusammenhängendes Mosaik sichtbar.
+
+**Lösungsansatz (nur Vorschlag, nicht Teil dieses Intake):** Beim Einschalten des Wetter-Overlays die Karte automatisch so weit herauszoomen (z. B. via `fitBounds` auf die Gitter-/Deutschland-Bounding-Box 47.3°N–55.0°N, 6.0°E–15.0°E), dass das gesamte Gitter sichtbar ist; beim Ausschalten zur vorherigen Ansicht (Center + Zoom) zurückkehren.
+
+**Bezug:** Direkte Abhängigkeit von **US-72** (Wetterkarte, aktuell „In Test") — BUG-55 ist ein Folgefehler aus deren Implementierung; betrifft AK „aktivieren zeichnet ein farbcodiertes Grid-Overlay" sowie das Pre-Mortem-Risiko „Grid zu grob / unsichtbar". Empfehlung: eigenständig führen, aber an US-72 koppeln (siehe Beziehungsanalyse). Keine Dublette zu BUG-34 (iOS-Overlay-Zoom, anderer Mechanismus).
+
+---
+
+**Implementation Spec**
+
+**Root Cause (verifiziert am Code):**
+📎 Code-Verifikation: `web/index.html` (`MapView.init`, `WeatherMap.setMode`/`_render`) + `backend/calculations/weather.py` (`fetch_weather_grid`) gelesen am 2026-06-30.
+- Bestätigt: Die Karte startet fix auf Berlin, Zoom 10 — `MapView.init` ruft `L.map('map', …).setView([52.52, 13.40], 10)` (web/index.html). Bei Zoom 10 ist eine Gitterzelle (1,0° breit) breiter als das Kartenfenster.
+- Bestätigt: Das Gitter spannt ganz Deutschland — `fetch_weather_grid` erzeugt ein 10×10-Raster über `lat_min=47.3, lat_max=55.0, lon_min=6.0, lon_max=15.0` (weather.py). Die Gitterpunkte liegen Kante-an-Kante (`r/(rows-1)`), Schrittweite lat ≈ 0,856°, lon = 1,0°.
+- Bestätigt: `WeatherMap._render` zeichnet pro Punkt ein `L.rectangle` von `pt ± dLat/2` bzw. `pt ± dLon/2`. Dadurch reichen die äußersten Rechtecke je eine halbe Zelle über die nominale BBox hinaus — die **tatsächliche Mosaik-Hülle** ist ca. 46,87°N–55,43°N, 5,5°E–15,5°E. Diese erweiterte Hülle muss `fitBounds` umfassen, sonst werden Randzellen wieder beschnitten.
+- Bestätigt: `WeatherMap.setMode` ändert die Kartenansicht **nicht** — es fetcht, rendert, aktualisiert Slider/Legende, aber kein `setView`/`fitBounds`. Genau hier fehlt der Zoom-Out.
+- Widerlegt: kein Render-/Daten-/Safari-Fehler. Alle 100 Rechtecke liegen korrekt im DOM (vom Intake bereits belegt), nur außerhalb des Sichtfensters.
+
+**Scope:**
+- Eingeschlossen: Beim Wechsel auf einen Wetter-Modus (Wolken/Niederschlag) zoomt die Karte automatisch so weit heraus, dass das gesamte Deutschland-Mosaik sichtbar ist. Beim Zurückschalten auf „aus" kehrt die Karte zur Ansicht zurück, die vor dem ersten Einschalten aktiv war (Mittelpunkt + Zoomstufe).
+- Eingeschlossen: Nur die Web-App (`web/index.html`). Reines Frontend-Verhalten, keine Backend-/API-Änderung.
+- Ausgeschlossen: iOS-Overlay (BUG-34, anderer Mechanismus). Keine Änderung an Gittergröße, Auflösung, Farben oder am `/weather-map`-Endpoint. Kein automatisches Mitschwenken bei Moduswechsel Wolken↔Niederschlag (Ansicht bleibt dort einfach stehen).
+
+**Akzeptanzkriterien:**
+- [x] Wenn ich auf der Karte (Start: Berlin, nah herangezoomt) „Wolken" oder „Niederschlag" einschalte, ist sofort das vollständige farbcodierte Deutschland-Mosaik als zusammenhängende Fläche sichtbar — keine senkrechte Linie, kein abgeschnittener Rand.
+- [x] Auch die Zellen an den Rändern (Nord/Süd/Ost/West-Kante Deutschlands) sind vollständig sichtbar, nicht halb vom Kartenfenster abgeschnitten.
+- [x] Wenn ich danach wieder auf „aus" schalte, ist die Karte exakt da, wo sie vor dem Einschalten war (gleicher Ausschnitt von Berlin, gleiche Zoomstufe).
+- [x] Edge Case: Schalte ich direkt von „Wolken" auf „Niederschlag" (ohne zwischendurch „aus"), bleibt das Gesamtdeutschland-Mosaik sichtbar; beim späteren „aus" lande ich trotzdem bei der ursprünglichen Berlin-Ansicht (die gemerkte Ansicht wird beim zweiten Einschalten nicht überschrieben).
+- [x] Edge Case: Habe ich während aktivem Overlay manuell in eine Region gezoomt und schalte dann „aus", kehrt die Karte zur ursprünglichen Berlin-Ansicht zurück (nicht zu meinem manuellen Zwischen-Zoom) — die gemerkte Ansicht ist die VOR dem Einschalten.
+
+**Pre-Mortem:**
+- 💀 Szenario: Beim Ausschalten springt die Karte an einen falschen Ort / unerwarteten Zoom. → Auslöser: Vorherige Ansicht wird beim *zweiten* Einschalten überschrieben oder gar nicht erst gemerkt. → Gegenmaßnahme: Ansicht nur merken, wenn vorher `mode === 'off'` war (also genau beim Übergang aus → an); im Zustand `_savedView` halten und beim Übergang an → aus wiederherstellen + zurücksetzen. In AK 3+4 verankert.
+- 💀 Szenario: Beim Moduswechsel Wolken→Niederschlag zoomt die Karte erneut auf Gesamtdeutschland und reißt den Nutzer aus seinem aktuellen Ausschnitt. → Auslöser: `fitBounds` läuft bei jedem `setMode(!= off)`. → Gegenmaßnahme: `fitBounds` nur beim Übergang aus → an ausführen, nicht bei an → an. In AK 4 verankert.
+- 💀 Szenario: `fitBounds` auf die nominale BBox schneidet die Randzellen ab, weil die Rechtecke eine halbe Zelle über die BBox hinausragen. → Auslöser: Falsche Bounds (nominal 47.3/55.0/6.0/15.0 statt erweiterter Hülle). → Gegenmaßnahme: `fitBounds` auf die erweiterte Hülle (BBox ± halbe Zellbreite) oder mit ausreichendem `padding`. In AK 2 verankert (Test-Probe: äußerste Zellen vollständig sichtbar).
+- 💀 Szenario: Auf mobilem Safari mit Animation wirkt der Sprung ruckelig oder `fitBounds` feuert vor Tile-Layout. → Auslöser: Animations-Timing / Karte noch nicht „settled". → Gegenmaßnahme: `fitBounds` mit definiertem Verhalten (z.B. `animate:false` oder kurze Animation) nach `_ensurePane()`/vor `_render()`; Memory `reference_frontend_dom_gotchas` (auf `leaflet-container` warten) beachten. Manueller Test auf Safari mobil.
+- 💀 Szenario: Overlay ist beim Tab-Wechsel schon an, Nutzer verlässt Karte und kommt zurück — gemerkte Ansicht ist verloren oder doppelt gespeichert. → Auslöser: Zustand `_savedView` lebt nur im WeatherMap-Objekt, kein reaktives Binding. → Gegenmaßnahme: Zustand robust im WeatherMap-Objekt halten; Verhalten ist „best effort" für diese Sitzung, kein Persistieren über Reload nötig (Scope). Im Test einmal Tab wechseln + zurück prüfen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Rules: Einschalten → fitBounds auf erweiterte Deutschland-Hülle; Ausschalten → vorherige Ansicht; Merken nur beim Übergang aus→an).
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AKs verankert).
+- [x] Architektur analysiert: `web/index.html` — `WeatherMap.setMode` (Zoom-Logik fehlt hier), `WeatherMap` Zustand (neues Feld `_savedView`), `MapView.map`/`MapView.init` (Start Berlin Zoom 10). Backend `weather.py:fetch_weather_grid` nur als Bounds-Quelle gelesen (keine Änderung).
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Zoom-Logik in `WeatherMap.setMode` (Ansicht merken/wiederherstellen)
+- App-Wirkung: Beim ersten Einschalten merkt sich die App die aktuelle Berlin-Ansicht und zoomt sanft auf ganz Deutschland; beim Ausschalten kehrt sie genau dorthin zurück. Genau das im Lösungsansatz beschriebene Verhalten.
+- Vorgehen: In `WeatherMap` ein Feld `_savedView` ergänzen. In `setMode(mode)`: beim Übergang `off → (clouds|precip)` `this._savedView = {center: MapView.map.getCenter(), zoom: MapView.map.getZoom()}` setzen und `MapView.map.fitBounds([[46.87, 5.5],[55.43, 15.5]], {padding:[20,20]})` (erweiterte Hülle = BBox ± halbe Zellbreite) ausführen. Beim Übergang `(clouds|precip) → off` `fitBounds`/`setView` auf `_savedView` zurück und `_savedView = null`. Bounds als benannte Konstante (`_GRID_VIEW_BOUNDS`) ableitbar aus BBox 47.3/55.0/6.0/15.0 ± halbe Schrittweite (≈ ±0,428° lat, ±0,5° lon).
+- Betroffene Dateien: `web/index.html` (nur `WeatherMap`-Block, ~15 Zeilen).
+- Vorteile: Lokal in der zuständigen Komponente; nutzt vorhandenes `MapView.map`; minimaler Eingriff; gut testbar; respektiert „kein reaktives Binding" (expliziter Zustand).
+- Nachteile / Risiken: Übergangslogik (aus→an vs. an→an) muss korrekt sein, sonst Pre-Mortem-Szenario 1/2. Bounds müssen die erweiterte Hülle treffen.
+- Aufwand: klein.
+
+### Option B — Gitter-Bounds dynamisch aus den geladenen Daten berechnen
+- App-Wirkung: Identisch für den Nutzer, aber die Zoom-Fläche wird aus den tatsächlich vom Server gelieferten Gitterpunkten berechnet statt aus festen Werten.
+- Vorgehen: Wie A, aber statt fester Bounds aus `this.data.grid` das Min/Max von lat/lon ableiten und um `dLat/2`/`dLon/2` erweitern (dieselben Werte, die `_render` schon berechnet). `fitBounds` auf diese berechneten Bounds.
+- Betroffene Dateien: `web/index.html` (`WeatherMap`-Block).
+- Vorteile: Bounds bleiben automatisch korrekt, falls die Gittergröße/Auflösung im Backend je geändert wird — keine doppelte Wahrheit zwischen Backend-BBox und Frontend-Konstante.
+- Nachteile / Risiken: Hängt davon ab, dass `this.data` beim ersten `setMode` schon geladen ist (ist es — `_fetch()` läuft davor in `setMode`); etwas mehr Logik; bei `data === null` (Fetch-Fehler) braucht es einen Fallback auf feste Bounds.
+- Aufwand: klein–mittel.
+
+✅ Empfehlung: **Option A** — kleinster, klarster Eingriff, der genau den im Ticket beschriebenen Lösungsansatz umsetzt; die Backend-BBox ist seit US-72 stabil und unwahrscheinlich variabel, daher überwiegt Einfachheit. Die robuste Idee aus B (Bounds aus Daten) kann als interner Kommentar vermerkt werden, falls die Auflösung später konfigurierbar wird. Empfehlung mit Fallback-Hinweis: Bounds als benannte Konstante ablegen, damit eine spätere Synchronisierung mit dem Backend trivial bleibt.
+
+**Entscheidung (Weg-Gate, 2026-06-30): Option B gewählt** — abweichend von der Analyse-Empfehlung (A). Grund: Stephan plant, die App demnächst auch in Norwegen, Dänemark und Italien zu nutzen. Der Zoom soll sich automatisch an das jeweils geladene Wetter-Gebiet anpassen, statt feste Deutschland-Eckwerte zu verwenden. Umsetzung daher: Zoom-Fläche aus `this.data.grid` ableiten (Min/Max von lat/lon, erweitert um `dLat/2`/`dLon/2` — dieselben Werte wie in `_render`), mit Fallback auf feste Deutschland-Hülle, falls `this.data` beim Einschalten nicht geladen ist. **Hinweis:** Damit überhaupt Wetter für andere Länder erscheint, muss separat die Backend-Grid-BBox erweitert werden (eigenes Ticket) — nicht Teil von BUG-55.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Reines Leaflet-/DOM-Zoomverhalten ist clientseitig und nicht über `pytest`/`backend/tests/` abdeckbar. Bestehende `test_us72_weather_map.py` (Backend-Grid + BBox 47.3/55.0/6.0/15.0) muss weiterhin grün bleiben (Regression: BBox-Konstanten unverändert). Kein neuer Backend-Test nötig, da keine Backend-Änderung.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Karten-Tab öffnen (startet auf Berlin, nah). „Wolken" tippen → Erwartung: ganz Deutschland als zusammenhängendes Farb-Mosaik sichtbar, inkl. Rändern (AK 1+2).
+  2. „aus" tippen → Erwartung: zurück auf den ursprünglichen Berlin-Ausschnitt + Zoom (AK 3).
+  3. „Wolken" → ohne „aus" direkt „Niederschlag" → Erwartung: Mosaik bleibt auf Gesamtdeutschland; danach „aus" → zurück auf Berlin (AK 4).
+  4. „Wolken" einschalten, manuell in eine Region zoomen, dann „aus" → Erwartung: zurück auf ursprüngliche Berlin-Ansicht, nicht auf den Zwischen-Zoom (AK 5).
+  5. Auf Safari mobil wiederholen (Animation/Timing prüfen).
+  6. Regression (PRODUCT.md §12, Karten-/CSS-Bereich): Marker, Layer-Umschaltung (Nacht/Standard/Satellit), GPS-Button, Slider + Legende des Overlays weiterhin funktionsfähig.
+
+---
+
+**❌ ZURÜCKGEZOGEN (2026-06-30): Diese Open-Meteo-Mehrländer-Erweiterung wird NICHT released.** Stephan hat entschieden, stattdessen auf echte Modelldaten (DWD ICON-D2 + MET Norway) mit weichem Verlauf umzustellen — siehe **US-112**. BUG-55 liefert nur den getesteten Zoom-Fix; die folgende Erweiterungs-Beschreibung bleibt als Historie stehen, ist aber nicht Teil des Release.
+
+**🔧 Scope-Erweiterung (verworfen — siehe oben, ersetzt durch US-112):**
+
+Der Zoom-Fix (Option B) ist bereits getestet ✅. Zusätzlich gewünscht: feineres Wetter-Gitter + mehrere Länder. **Weg 2** gewählt: pro Land ein eigenes feines Raster (~50 km Kantenlänge statt heute ~85 km), zu einem Overlay zusammengesetzt; über offenem Meer bleibt die Karte leer.
+
+**Gebiete (Stephan bestätigt):**
+| Land | BBox (lat_min–lat_max, lon_min–lon_max) | ca. Raster |
+|------|------------------------------------------|-----------|
+| Deutschland | 47.3–55.0 °N, 6.0–15.0 °E | 17×13 |
+| Österreich | 46.3–49.1 °N, 9.5–17.2 °E | 7×12 |
+| Italien (Norden: Alpen/Dolomiten/Toskana) | 42.7–47.1 °N, 6.6–13.8 °E | 10×12 |
+| Norwegen (Süd bis Lofoten/Nord) | 58.0–69.5 °N, 4.5–16.0 °E | 26×12 |
+
+(Rastergrößen Richtwert für ~50 km; Implementierer darf leicht anpassen. Summe ~740 Punkte — innerhalb des Open-Meteo-Limits ~1000, aber pro Land separater Request empfohlen wegen URL-Länge/Robustheit.)
+
+**Datenvertrag (Backend → Frontend):** Jeder Gitterpunkt erhält zusätzlich seine eigene Zellgröße `dlat`/`dlon` (da die Länder unterschiedliche Rasterweiten haben). Das Frontend zeichnet jede Kachel mit der punkteigenen Größe statt einer global aus `grid[1]`/`grid[10]` berechneten — Fallback auf die alte globale Berechnung, falls `dlat`/`dlon` fehlen. `hourly_times` über alle Länder identisch (gleiche `forecast_days`, UTC) — erstes Land als Zeitachse. Fehlgeschlagenes Land → null-Werte nur für dessen Punkte, andere bleiben.
+
+**Akzeptanzkriterien (Erweiterung):**
+- [ ] Schalte ich „Wolken"/„Niederschlag" ein, sehe ich farbige Kacheln über Deutschland, Österreich, Norditalien und Norwegen (bis hoch zu den Lofoten) — und die Karte zoomt automatisch so weit raus, dass alle vier Gebiete zusammen ins Bild passen.
+- [ ] Die Kacheln sind sichtbar kleiner/feiner als vorher (mehr, kleinere Felder je Land).
+- [ ] Über offenem Meer zwischen den Ländern bleibt die Karte frei (keine Farbflächen wo keine Daten sind).
+- [ ] Der Stunden-Schieber verändert weiterhin alle Gebiete gleichzeitig; die Zeitanzeige stimmt.
+- [ ] Fällt der Wetterabruf für ein Land aus, bleiben die anderen Länder trotzdem eingefärbt.
+
+**Betroffen:** `backend/calculations/weather.py` (Mehr-Gebiete-Gitter + `dlat`/`dlon` je Punkt), `backend/main.py` (`/weather-map` ruft das Mehr-Gebiete-Gitter), `web/index.html` (`WeatherMap._render` nutzt punkteigene Zellgröße). Keine Farb-/Slider-/Legenden-Logik ändern.
+
+---
 
 ### BUG-53 · Feed zeigt Location-Namen mit vorangestelltem 📍-Emoji `[x]`
 
@@ -1002,13 +1119,13 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 
 ---
 
-### US-72 · Wetterkarte `[ ]`
+### US-72 · Wetterkarte `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-19 |
 
 **Beschreibung:** Als Fotograf möchte ich eine Wetterkarte für Berlin/Potsdam/Umland sehen, um Wolkendecke und Niederschlag für meine geplanten Shooting-Fenster visuell einschätzen zu können.
@@ -1018,9 +1135,9 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 **Annahmen (autonomer Lauf, ohne Rückfrage getroffen):**
 - A1: „Wetterkarte" = ein zuschaltbares **Overlay auf der bestehenden Leaflet-Karte** im Map-Tab (`MapView`), kein neuer Tab. Begründung: Beschreibung sagt „eine Wetterkarte … sehen", Map-Tab hat bereits Leaflet + Layer-Buttons (`web/index.html` Z. 767–774, `MapView` Z. 3034–3166).
 - A2: Open-Meteo liefert **Punkt-Vorhersagen, keine Bild-Tiles**. Eine echte flächige „Wetterkarte" wird daher als **Grid aus Punkt-Forecasts** gerendert (farbcodierte Zellen/Kreise), nicht als externe Radar-Tile. Begründung: kein Lizenzrisiko (US-74), bleibt bei der bewährten Open-Meteo-Quelle, kein neuer Provider/Key.
-- A3: Scope „Berlin/Potsdam/Umland" = festes Bounding-Box-Grid um den App-Default-Center [52.52, 13.40], Radius ~50 km. Auflösung Phase 1: grobes Raster (z. B. 6×6 = 36 Punkte) — Open-Meteo erlaubt Komma-getrennte Multi-Punkt-Abfrage in **einem** Request.
+- A3: Scope = ganz Deutschland. Feste Bounding Box: 47.3°N–55.0°N, 6.0°E–15.0°E. Auflösung: **10×10 = 100 Punkte**, Punktabstand ~90 km — Open-Meteo erlaubt Komma-getrennte Multi-Punkt-Abfrage in **einem** Request.
 - A4: „geplante Shooting-Fenster" = ein **Zeit-Slider/Stundenwahl** (jetzt + nächste Stunden/Tage), der das Overlay auf die gewählte Stunde umschaltet. Phase 1: stündliche Schritte bis T+3 Tage (deckt sich mit bestehendem Wetter-Overlay-Horizont).
-- A5: Zwei umschaltbare Layer: **Wolkendecke (%)** und **Niederschlag (mm bzw. Wahrscheinlichkeit %)** — getrennt, nicht überlagert (Lesbarkeit).
+- A5: Zwei umschaltbare Layer: **Wolkendecke (%)** und **Niederschlag** — getrennt, nicht überlagert (Lesbarkeit). Der Niederschlag-Layer hat zwei wechselbare Sub-Optionen: **mm (Menge)** und **% (Wahrscheinlichkeit)**; beide Einheiten sind separat wählbar.
 
 **Example Mapping:**
 
@@ -1032,7 +1149,7 @@ Kontext: Der Fotograf will *visuell* einschätzen, wo es aufreißt. Eine Zahl pr
 
 📏 **Rule 2 — Wolkendecke und Niederschlag sind getrennt wählbar.**
 Kontext: Wolken und Regen beantworten verschiedene Fragen (Licht vs. Nass-werden). Übereinander wären beide unlesbar.
-- 🟢 Positiv: Given Wolken-Layer aktiv, When Nutzer tippt „Niederschlag", Then verschwindet die Wolken-Einfärbung und die Niederschlags-Einfärbung (mm-Skala blau) erscheint; nur ein Wetter-Layer gleichzeitig.
+- 🟢 Positiv: Given Wolken-Layer aktiv, When Nutzer tippt „Niederschlag", Then verschwindet die Wolken-Einfärbung und der Niederschlag-Layer erscheint (Standard-Sub-Option: mm, blau); nur ein Wetter-Layer gleichzeitig. When Nutzer wechselt Sub-Option auf „%", Then zeigt die Karte die Wahrscheinlichkeitsskala statt der Menge — ohne neuen Backend-Call.
 - 🔴 Negativ: Given Niederschlag-Layer aktiv, When Nutzer wechselt Karten-Basis (Standard/Satellit/Nacht), Then bleibt der Niederschlag-Layer aktiv und liegt korrekt über der neuen Basis (Overlay überlebt Basis-Wechsel).
 - ⚠️ Edge: Given keine Stunde im Niederschlag > 0, When Layer rendert, Then alle Zellen transparent/„trocken" — kein Fehler, Legende zeigt 0 mm.
 
@@ -1046,35 +1163,35 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - 🟢 Positiv: Given Overlay erstmals aktiviert, When es lädt, Then **ein** Multi-Punkt-Request über alle Grid-Punkte für den gesamten 3-Tage-Horizont; danach wechselt der Slider rein clientseitig zwischen Stunden ohne neuen Call.
 - ⚠️ Edge: Given Cache älter als TTL (z. B. 60 min), When Overlay erneut geöffnet, Then Refetch; sonst Cache-Hit.
 
-❓ Questions (autonom entschieden, da kein Rückfrage-Modus): alle über A1–A5 + Pre-Mortem-Gegenmaßnahmen aufgelöst. Offen für Weg-Gate: gewünschte Grid-Auflösung (36 vs. feiner) und ob Niederschlag als mm oder als Wahrscheinlichkeit (%) primär.
+✅ Questions (alle durch Stephan entschieden): Grid 10×10 = 100 Punkte (~90 km Abstand), Abdeckung ganz Deutschland (47.3°N–55.0°N, 6.0°E–15.0°E), Niederschlag als mm UND % (wechselbare Sub-Optionen), Option A (Open-Meteo Multi-Punkt). Keine offenen Fragen mehr.
 
 **Scope:**
-- Eingeschlossen: zuschaltbares Wetter-Overlay im Map-Tab (`MapView`), zwei Wetter-Layer (Wolkendecke %, Niederschlag), Zeit-Slider bis T+3, Grid-Forecast via Open-Meteo Multi-Punkt, Backend-Endpoint mit Cache + Legende + Lade-/Fehlerzustand.
+- Eingeschlossen: zuschaltbares Wetter-Overlay im Map-Tab (`MapView`), zwei Wetter-Layer (Wolkendecke %, Niederschlag mit Sub-Optionen mm/%), Zeit-Slider bis T+3, Grid-Forecast 10×10=100 Punkte (Deutschland-BBox 47.3°N–55.0°N, 6.0°E–15.0°E) via Open-Meteo Multi-Punkt in einem Request, Backend-Endpoint mit Cache + Legende + Lade-/Fehlerzustand.
 - Ausgeschlossen: animierte Radar-Loop, externe Radar-Tile-Provider (Lizenzrisiko, US-74), Push-Benachrichtigung bei Wetteränderung, iOS-App (`ios/`), Auflösung > T+3 Tage, Überlagerung beider Wetter-Layer gleichzeitig.
 
 **Akzeptanzkriterien:**
-- [ ] Neuer Endpoint `GET /weather-map?hours=72` liefert JSON `{ "grid": [{"lat","lon"}...], "hourly_times": [...iso UTC...], "cloud_cover": [[pro-Punkt-pro-Stunde]], "precipitation": [[...]], "fetched_at": iso }` für das Berlin/Potsdam-Grid; Statuscode 200; `len(grid) == 36` (6×6); jede Wertereihe gleich lang wie `hourly_times`.
+- [ ] Neuer Endpoint `GET /weather-map?hours=72` liefert JSON `{ "grid": [{"lat","lon"}...], "hourly_times": [...iso UTC...], "cloud_cover": [[pro-Punkt-pro-Stunde]], "precipitation_mm": [[...]], "precipitation_prob": [[...]], "fetched_at": iso }` für das Deutschland-Grid (BBox 47.3°N–55.0°N, 6.0°E–15.0°E); Statuscode 200; `len(grid) == 100` (10×10); jede Wertereihe gleich lang wie `hourly_times`.
 - [ ] Edge: Wenn ein einzelner Grid-Punkt von Open-Meteo fehlt/`null` liefert, enthält die Antwort für diesen Punkt `null`-Werte (kein 500, kein 0-Wert) und die übrigen Punkte sind vollständig.
 - [ ] Endpoint cached das Ergebnis im Prozess (TTL 60 min); zweiter Aufruf innerhalb TTL macht **keinen** neuen Open-Meteo-Call (verifizierbar via `fetched_at` unverändert).
-- [ ] Frontend: Im Map-Tab existiert ein Wetter-Toggle mit zwei Optionen „Wolken" / „Niederschlag" + „aus" (Default aus); aktivieren zeichnet ein farbcodiertes Grid-Overlay über die Leaflet-Karte.
+- [ ] Frontend: Im Map-Tab existiert ein Wetter-Toggle mit zwei Optionen „Wolken" / „Niederschlag" + „aus" (Default aus); aktivieren zeichnet ein farbcodiertes Grid-Overlay über die Leaflet-Karte. Bei aktivem Niederschlag-Layer ist eine Sub-Option „mm" / „%" wählbar; Wechsel zwischen beiden erfolgt rein clientseitig ohne neuen Backend-Call.
 - [ ] Frontend: Ein Zeit-Slider/Selector schaltet die angezeigte Stunde um (Schritt = 1 h, Bereich jetzt…T+3); Label zeigt Berliner Ortszeit; Stundenwechsel löst **keinen** neuen Backend-Call aus (rein clientseitiges Re-Render aus geladenem Datensatz).
 - [ ] Nur ein Wetter-Layer gleichzeitig sichtbar; Wechsel der Karten-Basis (Standard/Satellit/Nacht via `MapView.setLayer`) lässt das aktive Wetter-Overlay erhalten und korrekt darüber liegen.
 - [ ] Edge: Open-Meteo komplett nicht erreichbar → Frontend zeigt dezenten Hinweis („Wetterdaten nicht verfügbar"), Karte + Marker bleiben voll funktionsfähig (keine JS-Exception, Map-Tab nutzbar).
-- [ ] Legende sichtbar (Skala Wolken 0–100 %, bzw. Niederschlag mm); Werte-Farbzuordnung dokumentiert.
+- [ ] Legende sichtbar (Skala Wolken 0–100 %; Niederschlag mm-Menge; Niederschlag %-Wahrscheinlichkeit); Legende wechselt mit Sub-Option; Werte-Farbzuordnung dokumentiert.
 
 **Pre-Mortem:**
 - 💀 Open-Meteo Rate-Limit/Block durch Slider-Spam (pro Tick ein Call) → Karte hängt, 429. Auslöser: kein Cache, Fetch an Slider gekoppelt. Frühwarnung: Lag beim Schieben, 429 im Log. → Gegenmaßnahme: **ein** Multi-Punkt-Request für den ganzen Horizont + Prozess-Cache (AK 3 + AK 5) — Slider rendert nur clientseitig.
 - 💀 Overlay-Z-Index kollidiert mit Filter/Leaflet-Panes → Overlay verdeckt Marker oder liegt unter den Tiles. Auslöser: bekannter Leaflet-Stacking-Context (siehe CSS-Kommentar Z. 200, BUG-24). Frühwarnung: Marker unklickbar / Overlay unsichtbar. → Gegenmaßnahme: Overlay als eigenes Leaflet-Pane mit definiertem `zIndex` zwischen Tile- und Marker-Pane; nicht via globalem CSS-Filter. Manueller Test „Basis-Wechsel + Marker klickbar".
 - 💀 Falsche Stunde angezeigt (UTC/Ortszeit-Verwechslung) → Fotograf plant nach falschem Wetter. Auslöser: Open-Meteo liefert UTC (`timezone=UTC` in `weather.py`), App zeigt Berlin (+2/+1). Frühwarnung: Overlay-Label weicht von Event-Detail-Zeit ab. → Gegenmaßnahme: intern durchgängig UTC, nur im Label konvertieren (Memory `shoot_time_utc`); AK 5 prüft Label-Konsistenz.
-- 💀 Grid zu grob → „Wetterkarte" wirkt wie 4 Klötze, kein Mehrwert; oder zu fein → langsamer/größerer Request. Auslöser: willkürliche Auflösung. Frühwarnung: visuell blockig oder Request > paar Sek. → Gegenmaßnahme: Start 6×6=36 (ein Request bleibt schlank), Auflösung als eine Konstante kapseln, Weg-Gate-Frage.
+- 💀 Grid zu grob → „Wetterkarte" wirkt wie 4 Klötze, kein Mehrwert; oder zu fein → langsamer/größerer Request. Auslöser: willkürliche Auflösung. Frühwarnung: visuell blockig oder Request > paar Sek. → Gegenmaßnahme: 10×10=100 Punkte (~90 km Abstand, ganz Deutschland) — durch Stephan entschieden; Auflösung als eine Konstante kapseln. Daten-Validierung: ersten echten Call gegen 100-Punkt-Grid messen (Antwortgröße, -zeit) vor Frontend-Bau.
 - 💀 Map-Tab lädt das Overlay automatisch und kostet jedem Nutzer Open-Meteo-Calls/Latenz, auch wenn er es nie braucht. Auslöser: Eager-Load in `MapView.init()`. → Gegenmaßnahme: Overlay **lazy** — Default „aus", Fetch erst beim ersten Aktivieren (AK 4).
 
 **Analyse & Planung:**
 - [x] Example Mapping durchgeführt
 - [x] Pre-Mortem durchgeführt
 - [x] Architektur analysiert: Backend `backend/calculations/weather.py` (`fetch_weather_forecast`, `HourlyWeather` — liefert `cloud_cover_pct`/`precipitation_mm`/`precipitation_prob_pct`; Open-Meteo Punkt-API, kein Tile-Dienst) + `backend/main.py` (`_weather_overlay` Z. 343–420 als Vorbild für Aggregation/Logging, `/weather-refresh` Z. 1031 als Endpoint-Pattern, `_CACHE_DIR`/Prozess-Cache-Globals Z. 94–98/218, `auth.require_host`-Dependency-Muster). Frontend `web/index.html`: `MapView` (Z. 3034–3166 — `init`/`setLayer`/`loadMarkers`/eigenes Pane), Map-Tab-HTML + Layer-Buttons (Z. 767–774), Leaflet-CSS/Stacking-Hinweise (Z. 200–204), Tab-Aktivierung `if (page === 'map') MapView.init()` (Z. 4084). Reines Add-on, keine bestehende Wetter-Score-Logik wird verändert.
-- [ ] Implementierungsoptionen: A (Grid aus Open-Meteo-Punkten, eigener Render) / B (externe Radar-Tile-Layer) / C (nur Marker-basierte Wetter-Badges, kein Flächen-Overlay)
-- [ ] Empfehlung: **Option A** — wartet auf Stephans Weg-Gate
+- [x] Implementierungsoptionen: A (Grid aus Open-Meteo-Punkten, eigener Render) / B (externe Radar-Tile-Layer) / C (nur Marker-basierte Wetter-Badges, kein Flächen-Overlay)
+- [x] Empfehlung: **Option A** — durch Stephan bestätigt
 
 **Implementierungsoptionen:**
 
@@ -1097,12 +1214,38 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 ✅ **Empfehlung: Option A** — erfüllt die Story (flächige, zeitlich steuerbare Einschätzung), bleibt bei der lizenzsicheren Open-Meteo-Quelle (vermeidet den US-74-Konflikt von Option B), ist via pytest testbar und hält alle Pre-Mortem-Gegenmaßnahmen (ein Request + Cache, eigenes Pane, UTC-intern, lazy load) sauber umsetzbar. Option B nur erwägen, falls fotorealistisches Radar explizit gewünscht ist und die Lizenzfrage (US-74) vorab geklärt wird.
 
 **Daten-Validierung** *(in Implementierung zu bestätigen):*
-- [ ] Open-Meteo Multi-Punkt-Request (Komma-getrennte `latitude`/`longitude`) liefert für 36 Punkte in einem Call die parallelen `cloud_cover`/`precipitation`-Arrays — vor dem Frontend-Bau mit echtem Aufruf gegen das Grid prüfen (Antwortgröße, Antwortzeit, null-Verhalten an Bbox-Rändern).
+- [ ] Open-Meteo Multi-Punkt-Request (Komma-getrennte `latitude`/`longitude`) liefert für **100 Punkte** in einem Call die parallelen `cloud_cover`/`precipitation_mm`/`precipitation_prob`-Arrays — vor dem Frontend-Bau mit echtem Aufruf gegen das Deutschland-Grid prüfen (Antwortgröße, Antwortzeit, null-Verhalten an Bbox-Rändern).
 - [ ] Wertebereiche real prüfen: typische Wolkendecke 0–100, Niederschlag meist 0 — Farbskala an realen Sommer-Werten kalibrieren, nicht raten.
 
 **Testplan:**
-- [ ] Automatisiert (Harness, `backend/tests/`): Endpoint-Form von `/weather-map` (Grid-Länge 36, Reihenlängen == `hourly_times`); null-Handling bei fehlendem Grid-Punkt; Cache-Verhalten (zweiter Call → `fetched_at` unverändert / kein erneuter HTTP-Call, gemockt). Docstring mit `US-72`. Python 3.9-kompatibel (keine `X | Y`-Typen — `Optional[...]`/`List[...]` verwenden, wie in `weather.py`).
+- [ ] Automatisiert (Harness, `backend/tests/`): Endpoint-Form von `/weather-map` (Grid-Länge 100, Reihenlängen == `hourly_times`; `precipitation_mm` + `precipitation_prob` beide vorhanden); null-Handling bei fehlendem Grid-Punkt; Cache-Verhalten (zweiter Call → `fetched_at` unverändert / kein erneuter HTTP-Call, gemockt). Docstring mit `US-72`. Python 3.9-kompatibel (keine `X | Y`-Typen — `Optional[...]`/`List[...]` verwenden, wie in `weather.py`).
 - [ ] Manuell (http://localhost:8000, Map-Tab): Overlay aktivieren → Grid erscheint; Wolken↔Niederschlag wechseln (nur eins sichtbar); Slider schieben → Stunde/Label ändert sich, kein Netzwerk-Call (DevTools-Network); Basis-Layer wechseln → Overlay bleibt, Marker klickbar (BUG-24-Stacking); Open-Meteo offline simulieren → Hinweis statt Crash.
+
+---
+
+### US-112 · Wetter-Overlay: echte Modelldaten (DWD ICON-D2 + MET Norway) als weicher Verlauf `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-06-30 |
+
+**Beschreibung:** Als Fotograf möchte ich das Wetter-Overlay der Karte auf einer echten, hochaufgelösten Modell-Datenbasis und als weichen, fließenden Verlauf sehen (statt grober Kacheln), damit ich Wolkendecke und Niederschlag räumlich präziser einschätzen kann — und damit die App zukunftssicher auf einer gratis **und** kommerziell nutzbaren Quelle steht (Open-Meteos Gratis-Stufe ist nicht-kommerziell, die App könnte perspektivisch kommerziell werden). Umgestellt wird auf **DWD Open Data ICON-D2** (echtes Modellgitter ~2 km, deckt Deutschland/Österreich/Norditalien ab) plus **MET Norway** (gratis, kommerziell nutzbar, CC BY) für Norwegen, da ICON-D2 Norwegen nicht abdeckt. Die Darstellung wird ein reiner weicher Verlauf (Interpolation/Heatmap), kein hartes Kachelraster. Der bestehende 72-Stunden-Vorhersage-Schieber bleibt Pflicht.
+
+**Bezug:**
+- Baut auf **US-72** (Wetterkarte, aktuell „In Test") auf und **ersetzt deren Datenbasis** (Open-Meteo Punkt-Grid → echte Modelldaten) sowie die grobe Kachel-Darstellung durch einen weichen Verlauf. US-72 liefert Endpoint-Struktur, Toggle-UI, Cache-Muster und 72h-Slider als Fundament.
+- Löst die in **BUG-55** zurückgehaltene Open-Meteo-Mehrländer-Variante ab: Der Zoom-/`fitBounds`-Fix aus BUG-55 wird **separat released**; die dort enthaltene **Open-Meteo-Mehrländer-Erweiterung wird NICHT released**, sondern durch dieses Ticket (US-112) auf die neue DWD-/MET-Datenbasis abgelöst.
+- Berührt **US-74** (Open-Source-Lizenzprüfung): neue Quellen DWD + MET Norway sind beide gratis + kommerziell nutzbar; Attribution (DWD + MET) ist Pflicht.
+
+**Offene Punkte für die Analyse-Phase** *(nur Hinweis, hier NICHT lösen):*
+- Server-seitige GRIB-Verarbeitung der ICON-D2-Daten (Systembibliothek, Hintergrund-Job, Speicher-/Laufzeitbedarf).
+- Verifizieren, ob ICON-D2 **Österreich + Norditalien** tatsächlich abdeckt.
+- MET-Norway-Spielregeln: Pflicht-Kennung/User-Agent, Caching, Tempolimit/Rate-Limit.
+- Zusammenführen beider Quellen (ICON-D2 + MET) auf eine gemeinsame 72h-Zeitachse.
+- Attribution beider Quellen (DWD + MET) im Frontend.
+- Weicher Render-Ansatz im Frontend (Interpolation/Heatmap statt `L.rectangle`-Kacheln).
 
 ---
 
@@ -2819,9 +2962,6 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 ### TASK-07 · Export als PhotoPills-Bookmark `[ ]`
 > Location-Daten im PhotoPills-kompatiblen Format exportieren.
 
-### TASK-08 · Wetter-Radar-Overlay `[ ]`
-> DWD-Radar als Overlay auf der Karte einblenden.
-
 ### TASK-09 · Bortle-Karte `[ ]`
 > Lichtverschmutzungs-Overlay für Milchstraßen-Locations (Bortle-Skala).
 
@@ -3133,13 +3273,13 @@ Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher U
 
 ---
 
-### BUG-54 · Sections._def: ev_golden_clouds und ev_red_sky fehlen `[ ]`
+### BUG-54 · Sections._def: ev_golden_clouds und ev_red_sky fehlen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Bug |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-30 |
 
 **Beschreibung:** `refactor_check.py` (category: `section_missing_default`) meldet, dass zwei Event-Sections gerendert werden, aber keinen Eintrag in `Sections._def` haben:
@@ -4634,3 +4774,153 @@ def test_wrap_around_360():
     assert _azimuth_zone(5, 355) == AzimuthZone.FRONT
 ```
 
+
+---
+
+### US-111 · Detail-Sheet: Schematisches Himmels-Kompass-Diagramm für Goldene-Wolken/Himmelsröte-Events `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-06-30 |
+
+**Beschreibung:**
+Im Detail-Sheet eines „Goldene Wolken"- oder „Himmelsröte"-Events soll eine schematische visuelle Darstellung (SVG-Skizze) zeigen, wo die Sonne steht, wo die Sichtachse Fotograf → Motiv zeigt, und ob die Wolken sich in der richtigen Richtung für das jeweilige Event befinden. Die Darstellung ist locationspezifisch (basiert auf dem Azimut der Location) und sitzt lokal im Detail-Sheet — keine Karten-Heatmap.
+
+Inspiration: Viewfindr zeigt auf ihrer Himmelsröte-Seite eine Karte mit konzentrischen Bögen (Ideal/High/Medium/Low probability) und einer Heatmap. FotoAlert übernimmt das Prinzip als kompaktes Kompass-Diagramm im Detail-Sheet: Nord oben, Sonnenposition als Pfeil/Symbol, Sichtachse als Linie, Wolken-Erwartungsbereich als farbige Zone.
+
+**Warum:**
+Ohne visuellen Hinweis muss der Fotograf selbst aus Azimutwinkeln ableiten, ob die Wolken „vor" oder „hinter" ihm stehen. Das Diagramm macht diese räumliche Beziehung sofort erfassbar und erhöht die Planungsqualität für go/no-go-Entscheidungen.
+
+**Bezug:** Nachfolger von **US-109** (Goldene Wolken & Himmelsröte, released 2026-06-30) — in der US-109-Analyse war diese Darstellung als ⚠️ **Annahme D** markiert und explizit als offene Frage geführt. Sie hat es nicht in die AKs geschafft und wird jetzt als eigenständiges Ticket nachgeholt.
+
+---
+
+## Analyse (US-111) · 2026-06-30
+
+### Example Mapping
+
+**Scope-Check:** Das Ticket ist bewusst auf Goldene Wolken + Himmelsröte beschränkt. Andere Event-Typen (Goldene Stunde, Blaue Stunde) könnten theoretisch auch ein Kompass-Diagramm nutzen — aber ihr räumlicher Kontext ist bereits über die bestehende „Himmelsposition"-Sektion (ev_skypos, US-67) abgedeckt. Goldene Wolken/Himmelsröte sind explizit aus ev_skypos ausgenommen (EV_SKYPOS_EXEMPT), weil sie andere Logik brauchen. US-111 schließt diese Lücke gezielt.
+
+**Annahmen-Protokoll:**
+
+| Punkt | Typ | Entscheidung |
+|-------|-----|--------------|
+| Diagramm-Größe: kompakt (ca. 200px) oder groß (Kartengröße 220px wie FOV-Map)? | ⚪ ästhetisch | Annahme: ~200×200px, wie ein kompaktes Icon-Diagramm — Begründung: kein interaktives Element, kein Leaflet nötig |
+| Wolken-Zone für Himmelsröte: Halbkreis oder Vollkreis? | ✅ aus Ticket ableitbar | Himmelsröte ist rundum-sichtbar → kein Richtungsfilter → Zone entfällt oder zeigt Vollkreis |
+| Goldene Wolken: Wolken-Zone ±30°, ±45°, oder ±60° um die Sichtachse? | ⚪ ästhetisch | Annahme: ±30° (exakte Winkelgrenze aus US-109-Backend-Logik) |
+| Diagramm als inline-SVG im HTML-String oder als Canvas? | ✅ klar | SVG (wie alle anderen UI-Elemente) |
+| Soll das Diagramm in einer neuen Section sitzen oder in die bestehende ev_golden_clouds / ev_red_sky-Section eingebettet werden? | ⚪ ästhetisch | Annahme: eingebettet in bestehende Section, kein neues mkSec nötig |
+| Fallback wenn subject_azimuth fehlt (Location ohne Motivkoordinaten): Diagramm verstecken oder nur Sonnenposition zeigen? | ✅ aus Ticket-Constraints | Diagramm zeigt nur Sonne + Nord-Markierung; Sichtachse wird weggelassen (graceful) |
+
+**Rules + Examples:**
+
+📏 **Rule 1: Diagramm erscheint im Detail-Sheet eines Goldene-Wolken-Events**
+🟢 *Given* ein Goldene-Wolken-Event mit sunset_azimuth=250° und subject_azimuth=255°, *When* ich das Detail-Sheet öffne, *Then* sehe ich in der „Warum Goldene Wolken?"-Sektion ein Kompass-Diagramm mit: Nord oben, einer Linie bei ~250° (Sonne), einer Linie bei ~255° (Sichtachse), und einer goldenen Zone ±30° um 255°.
+
+📏 **Rule 2: Diagramm erscheint im Detail-Sheet eines Himmelsröte-Events**
+🟢 *Given* ein Himmelsröte-Event, *When* ich die „Warum Himmelsröte?"-Sektion öffne, *Then* sehe ich ein Kompass-Diagramm mit Nord oben, Sonnenposition als Pfeil, und einem roten Farbring ringsum (rundum-sichtbar — keine Richtungsbevorzugung).
+
+📏 **Rule 3: Graceful Fallback wenn subject_azimuth fehlt**
+🟢 *Given* ein Goldene-Wolken-Event für eine Location ohne Motivkoordinaten (subject_azimuth = null), *When* ich das Detail-Sheet öffne, *Then* zeigt das Diagramm nur den Sonnen-Pfeil und die Nord-Markierung — kein Fehler, kein leeres Element.
+
+📏 **Rule 4: Diagramm orientiert sich am echten Azimut (locationspezifisch)**
+🟢 *Given* Location A mit subject_azimuth=60° (Ost) und Location B mit subject_azimuth=240° (Südwest), *When* ich beide Detail-Sheets öffne, *Then* zeigen beide Diagramme unterschiedliche Sichtachsen-Winkel (Linie zeigt nach Ost vs. Südwest).
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK-1:** Im Detail-Sheet eines Goldene-Wolken-Events sehe ich unterhalb des bestehenden Textes in der „Warum Goldene Wolken?"-Sektion ein Kompass-Diagramm — Nord zeigt nach oben, die Sonne ist als Pfeil/Symbol am richtigen Himmelsrand eingezeichnet, die Sichtachse (Fotograf → Motiv) als Linie, und eine goldene Zone markiert den ±30°-Bereich um die Sichtachse.
+- [ ] **AK-2:** Im Detail-Sheet eines Himmelsröte-Events sehe ich in der „Warum Himmelsröte?"-Sektion ein Kompass-Diagramm mit Sonnenposition und einem roten Farbring ringsum (kein Richtungssektor), der die rundum-Wirkung der Röte visualisiert.
+- [ ] **AK-3:** Das Diagramm dreht sich korrekt mit dem Azimut der Location — bei zwei verschiedenen Locations mit unterschiedlichen Sichtachsen zeigen die Sichtachsen-Linien in unterschiedliche Himmelsrichtungen.
+- [ ] **AK-4 (Fallback):** Bei einem Goldene-Wolken-Event, dessen Location keine Motivkoordinaten hat (subject_azimuth = null), zeigt das Diagramm nur Sonnenposition und Nord — kein Fehler, keine leere Fläche, kein defektes SVG.
+- [ ] **AK-5 (Safari-Kompatibilität):** Das Diagramm ist in Safari sichtbar und korrekt eingefärbt — kein unsichtbarer Strich, kein fehlendes Element (kein SVG `use`+`currentColor` ohne direkte Attribute).
+- [ ] **AK-6 (Keine Regression):** Alle anderen Event-Typen (Goldene Stunde, Blaue Stunde, Milchstraße, Mond-Alignment etc.) zeigen kein zusätzliches Kompass-Diagramm — die neue Section erscheint nur bei Goldene Wolken und Himmelsröte.
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation:** `web/index.html` Zeilen 3540–3600 gelesen am 2026-06-30.
+- Bestätigt: `sunAz` wird bereits in ev_golden_clouds berechnet (sunrise/sunset azimuth Vergleich, Fallback auf vorhandenen Wert). Diese Logik ist wiederverwendbar für das Diagramm.
+- Bestätigt: `EV_SKYPOS_EXEMPT` enthält explizit 'Goldene Wolken' und 'Himmelsröte' → ev_skypos wird nicht ausgelöst → keine Dopplung.
+- Bestätigt: SVG-Symbole liegen in `<symbol>`-Tags mit `g`-Attributen (kein `use`+`currentColor` nötig, da Diagramm inline als Template-Literal gebaut wird).
+- Bestätigt: `subject_azimuth` ist am Event-Objekt `o` verfügbar (Zeile 3549), `sunrise_azimuth` + `sunset_azimuth` ebenfalls (Z. 3551–3555).
+
+💀 **Szenario 1: Inline-SVG mit `currentColor` in Safari unsichtbar**
+Auslöser: SVG-Elemente erhalten Farbe via CSS-Klasse statt direktem Attribut.
+Frühwarnung: In Safari erscheint das Diagramm leer oder nur als Kreislinie.
+Gegenmaßnahme: Alle Farben direkt als `stroke="..."` / `fill="..."` Attribute auf den SVG-Elementen setzen (Memory: `reference_svg_use_currentcolor_webkit`). → In AK-5 verankert.
+
+💀 **Szenario 2: sunAz-Berechnung liefert falschen Wert (Fallback-Fallback)**
+Auslöser: Weder sunrise_azimuth noch sunset_azimuth vorhanden (unwahrscheinlich aber möglich bei sehr alten Cache-Einträgen).
+Frühwarnung: Sonnen-Pfeil zeigt auf 0° (Nord) statt korrekte Richtung.
+Gegenmaßnahme: `sunAz != null`-Guard im Diagramm-Renderer — wenn null: nur Kompassring + Sichtachse, kein Sonnen-Pfeil.
+
+💀 **Szenario 3: Diagramm erscheint auch bei anderen Event-Typen (Scope-Leak)**
+Auslöser: Bedingung nicht eng genug gefasst (`isGoldenClouds || isRedSky` Guard fehlt oder falsch).
+Frühwarnung: Goldene-Stunde-Events zeigen plötzlich ein zweites Diagramm.
+Gegenmaßnahme: Diagramm-Code nur innerhalb des bestehenden `if (isGoldenClouds)` / `if (isRedSky)` Blocks. → In AK-6 verankert.
+
+💀 **Szenario 4: SVG-Breite bricht Layout auf schmalen Screens**
+Auslöser: `viewBox` zu groß, kein `width:100%` gesetzt.
+Frühwarnung: Diagramm überlappt mit Sheet-Rand auf Mobilgerät.
+Gegenmaßnahme: `width="100%" height="200"` + `viewBox="0 0 200 200"` → responsive ohne Overflow.
+
+---
+
+### Implementierungsoptionen
+
+**Option A — Diagramm inline in die bestehenden ev_golden_clouds / ev_red_sky Sections einbetten**
+
+*Was du in der App erlebst:* Direkt im aufgeklappten „Warum Goldene Wolken?"-Block erscheint unter dem Text + den Winkelzeilen ein kompaktes Kompass-Diagramm. Keine neue Sektion, kein weiteres Aufklappen nötig.
+
+- Vorgehen: In den bestehenden `if (isGoldenClouds)` und `if (isRedSky)` Blöcken (Z. 3541ff.) nach dem Text-HTML einen SVG-String anhängen. Eine Hilfsfunktion `mkCloudCompassSvg(sunAz, subjectAz, isRedSky)` erzeugt den inline-SVG.
+- Betroffene Dateien: `web/index.html` (nur dieser Block, ~30 Zeilen neu)
+- Vorteile: Kein neues mkSec nötig, kein neuer Section-State, kein neuer Sections.registerOnOpen. Diagramm ist immer sichtbar wenn die Section offen ist.
+- Nachteile: Diagramm kann nicht separat auf-/zugeklappt werden.
+- Aufwand: klein
+
+**Option B — Neue eigene Section `ev_compass` direkt nach ev_golden_clouds / ev_red_sky**
+
+*Was du in der App erlebst:* Nach der „Warum Goldene Wolken?"-Sektion gibt es eine weitere aufklappbare Sektion „Kompass-Diagramm", die das SVG enthält.
+
+- Vorgehen: `mkSec('ev_compass', '🧭 Kompass', svgHtml)` nach den bestehenden Sections; neuen Key in `_def` hinzufügen.
+- Betroffene Dateien: `web/index.html` (Section-Registrierung, _def-Eintrag, neuer mkSec-Block)
+- Vorteile: Kann separat zugeklappt werden.
+- Nachteile: Mehr Code-Aufwand, ein weiteres Aufklappen für Nutzer, Section erscheint auch bei anderen Event-Typen wenn Guard nicht exakt; _def braucht neuen Eintrag.
+- Aufwand: mittel
+
+✅ **Empfehlung: Option A** — Das Diagramm ist eine visuelle Ergänzung zur Erklärung, keine eigenständige Funktion. Es gehört direkt in die Erklärungssektion, ohne extra Klick. Geringster Code-Overhead, kein neuer Section-State.
+
+---
+
+### Testplan
+
+**Automatisiert (pytest):** Kein Backend betroffen → kein pytest-Fall nötig.
+
+**Manuell (Browser unter http://localhost:8000):**
+
+1. Feed öffnen → Goldene-Wolken-Event antippen → Detail-Sheet öffnet sich → Sektion „Warum Goldene Wolken?" aufklappen → **erwartet: Kompass-Diagramm erscheint** mit Sonnen-Pfeil, Sichtachse, goldene Zone (AK-1).
+2. Himmelsröte-Event tippen → Detail-Sheet → „Warum Himmelsröte?" → **erwartet: rotes Rund-Diagramm** ohne Richtungssektor, Sonnen-Pfeil korrekt positioniert (AK-2).
+3. Zwei Goldene-Wolken-Events aus verschiedenen Locations vergleichen → **erwartet: Sichtachsen-Linien zeigen in unterschiedliche Richtungen** (AK-3).
+4. Location ohne Motivkoordinaten suchen → Goldene-Wolken-Event → Diagramm → **erwartet: Sonnen-Pfeil + Nord sichtbar, keine Sichtachse, kein Fehler** (AK-4).
+5. Safari öffnen → gleiche Schritte → **erwartet: Diagramm vollständig sichtbar** (AK-5).
+6. Goldene-Stunde-Event öffnen → **erwartet: kein Kompass-Diagramm** (AK-6 Regression).
+
+---
+
+### Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` Z. 3540–3600 (ev_golden_clouds / ev_red_sky), Z. 779–809 (SVG-Symbole), Z. 3692 (EV_SKYPOS_EXEMPT)
+- [x] Implementierungsoptionen: A (inline) / B (neue Section)
+- [x] Empfehlung: Option A
+
+**Scope:**
+- Eingeschlossen: Inline-SVG-Kompass-Diagramm in ev_golden_clouds und ev_red_sky Sections. Nur `web/index.html`.
+- Ausgeschlossen: Kein Backend-Change, keine neue Section, kein Filter-Chip, kein Kalender/Scout-Entry, keine andere Event-Typen.
