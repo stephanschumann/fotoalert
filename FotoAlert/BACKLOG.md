@@ -26,7 +26,7 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
@@ -34,7 +34,7 @@
 | **🏁 Done** | abgeschlossen + deployed | **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-111** · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-111** · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1229,7 +1229,7 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-06-30 |
 
 **Beschreibung:** Als Fotograf möchte ich das Wetter-Overlay der Karte auf einer echten, hochaufgelösten Modell-Datenbasis und als weichen, fließenden Verlauf sehen (statt grober Kacheln), damit ich Wolkendecke und Niederschlag räumlich präziser einschätzen kann — und damit die App zukunftssicher auf einer gratis **und** kommerziell nutzbaren Quelle steht (Open-Meteos Gratis-Stufe ist nicht-kommerziell, die App könnte perspektivisch kommerziell werden). Umgestellt wird auf **DWD Open Data ICON-D2** (echtes Modellgitter ~2 km, deckt Deutschland/Österreich/Norditalien ab) plus **MET Norway** (gratis, kommerziell nutzbar, CC BY) für Norwegen, da ICON-D2 Norwegen nicht abdeckt. Die Darstellung wird ein reiner weicher Verlauf (Interpolation/Heatmap), kein hartes Kachelraster. Der bestehende 72-Stunden-Vorhersage-Schieber bleibt Pflicht.
