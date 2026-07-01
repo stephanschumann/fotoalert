@@ -1234,6 +1234,8 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 **🎨 Designer-Check (2026-06-30, bestanden):** Farbskalen (Wolken 0–100 %, Niederschlag mm/h) monoton in Helligkeit → farbenblind-sicher und Bauhaus-konform; Overlay-Deckkraft ~59 % lässt Karte+Marker durch; Attribution leicht verstärkt (CSS direkt angepasst). **Offen, erst am echten gerenderten Bild nach Deploy:** (1) weiche Naht DWD↔MET bei ~58°N, (2) Deckkraft über Satelliten-Layer, (3) Modus-Wechsel Wolken↔Regen, (4) Gold-Kontrast aktiver Toggle im Hellmodus. Keine Blocker.
 
+**🔧 Nachtrag Live-Test (2026-07-01):** Erster Deploy war strukturell ok (Endpoint, Attribution, 72h-Achse, MET/Norwegen), aber die DWD-Daten kamen nicht an (`sources: icon_d2:0, icon_eu:0, met:16`) — über Deutschland/Österreich/Italien leer. Ursache: falsches DWD-Dateinamen-Schema in `_dwd_url` (fehlendes `_2d_`, falsche Gitter-/Groß-Klein-Bausteine). Am Live-Verzeichnis verifizierte echte Namen: ICON-D2 `..._<fc>_2d_clct` / `..._2d_tot_prec` (klein), ICON-EU `..._<fc>_CLCT` / `..._TOT_PREC` (groß, ohne `_2d_`). `_dwd_url` entsprechend korrigiert; Sandbox-Check erzeugt exakt die vier echten Namen. Wartet auf Re-Deploy + Prüfung, dass `icon_d2`/`icon_eu` > 0.
+
 **🚦 Weg-Gate-Entscheidung (2026-06-30, Stephan):**
 - **Weg: Option A** — echte DWD-Modelldaten (ICON-D2 ~2 km für 0–48 h + ICON-EU ~7 km für 48–72 h) **plus** MET Norway (Norwegen), serverseitig zu einem weichen Bild (PNG je Stunde, `L.imageOverlay`) verrechnet. Volle 72-h-Pflicht bleibt, 2-km-Schärfe wird erreicht.
 - **US-72-Backend:** existiert nicht (nur Frontend gegen 404) → der Wetter-Endpoint wird **direkt in US-112 neu gebaut**; US-72 geht darin auf.

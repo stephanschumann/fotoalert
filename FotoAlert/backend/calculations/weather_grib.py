@@ -252,11 +252,18 @@ def _dwd_url(model: str, run: datetime, param: str, fchour: int) -> str:
     """
     rr = "%02d" % run.hour
     ymdh = run.strftime("%Y%m%d%H")
-    grid = "icon-d2_germany" if model == "icon-d2" else "icon-eu_europe"
-    suffix = "2d" if param in ("clct",) else "single-level"
-    fname = "%s_regular-lat-lon_single-level_%s_%03d_%s.grib2.bz2" % (
-        grid, ymdh, fchour, param,
-    )
+    # Reale DWD-Open-Data-Namensschemata (am Live-Verzeichnis verifiziert 2026-07-01):
+    #   ICON-D2:  icon-d2_germany_regular-lat-lon_single-level_<run>_<fc>_2d_<param_klein>.grib2.bz2
+    #   ICON-EU:  icon-eu_europe_regular-lat-lon_single-level_<run>_<fc>_<PARAM_GROSS>.grib2.bz2
+    # Verzeichnis-Unterordner ist bei beiden Modellen kleingeschrieben (param).
+    if model == "icon-d2":
+        fname = "icon-d2_germany_regular-lat-lon_single-level_%s_%03d_2d_%s.grib2.bz2" % (
+            ymdh, fchour, param,
+        )
+    else:  # icon-eu
+        fname = "icon-eu_europe_regular-lat-lon_single-level_%s_%03d_%s.grib2.bz2" % (
+            ymdh, fchour, param.upper(),
+        )
     return "%s/%s/grib/%s/%s/%s" % (DWD_OPENDATA, model, rr, param, fname)
 
 
