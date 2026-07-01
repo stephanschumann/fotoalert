@@ -273,17 +273,17 @@
     .map-layer-btn.active { background: var(--gold); color: var(--bg); }
 
     /* US-72: Wetter-Toggle */
-    #map-weather-toggle { position: absolute; top: 52px; right: 12px; z-index: 1000;
-      display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    #map-weather-toggle { position: absolute; top: 12px; left: 12px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
     #map-weather-toggle .wtoggle-row { display: flex; background: var(--surface);
       border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
     .map-weather-btn { background: none; border: none; color: var(--muted); font-size: 12px;
       font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
     .map-weather-btn.active { background: var(--gold); color: var(--bg); }
     /* US-72: Zeit-Slider */
-    #map-weather-slider-wrap { position: absolute; bottom: 130px; left: 0; right: 0;
+    #map-weather-slider-wrap { position: absolute; bottom: 30px; left: 64px; right: 60px;
       z-index: 1000; padding: 8px 16px; background: var(--surface);
-      border-top: 1px solid var(--border); display: none; }
+      border: 1px solid var(--border); border-radius: 12px; display: none; }
     #map-weather-slider-wrap.open { display: block; }
     #map-weather-slider { width: 100%; accent-color: var(--gold); }
     #map-weather-slider-label { text-align: center; font-size: 12px; color: var(--text);
@@ -315,7 +315,7 @@
     #map-weather-attribution a { color: #fff; text-decoration: underline; }
 
     /* US-69: GPS-Standort-Button */
-    .map-gps-btn { position: absolute; bottom: 80px; left: 12px; z-index: 1000;
+    .map-gps-btn { position: absolute; bottom: 30px; left: 12px; z-index: 1000;
       width: 44px; height: 44px; border-radius: 50%;
       background: var(--surface); border: 1px solid var(--border);
       color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center;
