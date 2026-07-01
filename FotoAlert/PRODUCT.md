@@ -200,12 +200,15 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Marker-Tap | Popup mit Location-Name und Kategorie |
 | Kartenfilter | Alle location-bezogenen Filterkriterien wirken auf Karten-Pins: Eventtyp (inkl. Ausschließen, BUG-23+BUG-46), Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung (GPS). Tageszeit, Brennweite und Wahrscheinlichkeit sind auf der Karte ausgegraut (BUG-46) |
 | GPS-Zentrierung | Button zentriert Karte auf aktuelle GPS-Position (US-69) |
+| Wetter-Overlay (US-112) | Umschalter „aus / Wolken / Niederschlag". Zeigt einen **weichen, fließenden Verlauf** (kein Kachelraster) aus **echten Wettermodell-Daten**: DWD ICON-D2 (~2 km, Stunde 0–48) + DWD ICON-EU (Stunde 48–72) über Deutschland/Österreich/Norditalien, plus MET Norway über Norwegen. Ein **72-Stunden-Schieber** wählt die Vorhersagestunde (Label in Berliner Zeit). Serverseitig wird je Stunde ein PNG gerendert (`backend/calculations/weather_grib.py`, Endpoints `/weather-map` + `/weather-map/png/{field}/{idx}`), im Frontend als `L.imageOverlay` gelegt (`WeatherMap`, zwischen Tiles und Markern). Pflicht-Quellenangabe „Daten: DWD · MET Norway (CC BY 4.0)" unten links. Gratis + kommerziell nutzbar; ersetzt die frühere Open-Meteo-Kacheldarstellung (US-72/BUG-55). Ist die Karte gerade im Neubau, zeigt der Endpoint ehrlich `ready:false` und die App „Wetterdaten werden geladen …" statt zu blockieren. |
+| Karten-Bedienleiste (US-112) | Basiskarten-Menü (Nacht/Standard/Satellit) und Wetter-Menü stehen **nebeneinander** in einer Reihe oben; Zeitachse, GPS-Taste und Zoom-Buttons sitzen am **unteren** Kartenrand → maximale Kartenfläche |
 
 **Pflicht-Regression Karte:**
 - [ ] Leaflet-Karte lädt (kein weißer/leerer Block)
 - [ ] ≥10 Pins sichtbar
 - [ ] Pin antippen → Popup erscheint
 - [ ] Karte nicht leer nach Theme-Wechsel
+- [ ] Wetter-Overlay „Wolken"/„Niederschlag": weicher Verlauf über DE + Norwegen sichtbar (nicht leer), 72-h-Schieber zeigt Berliner Zeit und ändert die Fläche, Quellenangabe sichtbar (US-112)
 
 ---
 

@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 |
+| **🏁 Done** | abgeschlossen + deployed | **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-111** · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-113** *(Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung)* · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1223,14 +1223,17 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### US-112 · Wetter-Overlay: echte Modelldaten (DWD ICON-D2 + MET Norway) als weicher Verlauf `[~]`
+### US-112 · Wetter-Overlay: echte Modelldaten (DWD ICON-D2 + MET Norway) als weicher Verlauf `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-30 |
+| **Abgeschlossen** | 2026-07-01 (released, live verifiziert) |
+
+**✅ Abschluss (2026-07-01):** Live auf der Produktion verifiziert — weicher Wolken-/Niederschlags-Verlauf über DE/AT/Norditalien (DWD ICON-D2 0–48 h + ICON-EU 48–72 h) plus Norwegen (MET), 72-h-Schieber mit Berliner Zeit, Attribution, kein Speicher-Abbruch. Vier Live-Fehler behoben (DWD-Dateinamen, Speicherüberlauf → Blockgröße, zu langsames Rendern → Stützpunkt-Ausdünnung, ICON-EU 6-h-Hauptläufe) + Zeit-Label-Fix (`+00:00`→Invalid Date) + Layout-Feinschliff (Menüs nebeneinander, Zeitachse/GPS unten, Quellenangabe links). **Nicht-Bug gelernt:** Overlay „fehlte" nur, weil der Browser gegen den lokalen Server (`fa_api`/localhost) ohne DWD-Daten lief bzw. ein alter Service Worker die Seite cachte — Produktion war korrekt.
 
 **🎨 Designer-Check (2026-06-30, bestanden):** Farbskalen (Wolken 0–100 %, Niederschlag mm/h) monoton in Helligkeit → farbenblind-sicher und Bauhaus-konform; Overlay-Deckkraft ~59 % lässt Karte+Marker durch; Attribution leicht verstärkt (CSS direkt angepasst). **Offen, erst am echten gerenderten Bild nach Deploy:** (1) weiche Naht DWD↔MET bei ~58°N, (2) Deckkraft über Satelliten-Layer, (3) Modus-Wechsel Wolken↔Regen, (4) Gold-Kontrast aktiver Toggle im Hellmodus. Keine Blocker.
 
@@ -1368,6 +1371,25 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 **Testplan:**
 - [ ] Automatisiert (`backend/tests/`, Docstring `US-112`, Python 3.9 / `Optional[...]`): `/weather-map`-Schema (gemeinsame `hourly_times` Länge ~72, Wolken+Niederschlag vorhanden, Bild/Gitter je Stunde); Quellen-Merge (DWD-Gebiet + Norwegen-Punkte auf einer Achse); null-Handling bei Quellen-Ausfall (eine Quelle weg → andere bleibt gültig, kein 500); Cache (zweiter Call ohne neuen Fetch). GRIB-Parsing gegen ein kleines Fixture, nicht gegen Live-DWD.
 - [ ] Manuell (http://localhost:8000, Map-Tab): Overlay an → weicher Verlauf ohne Kacheln; Slider bis +72 h → DE/AT/Norditalien/Norwegen durchgehend gefüllt, Label Berliner Zeit, kein Netzwerk-Call beim Schieben (DevTools); Quellenangabe sichtbar + Link; eine Quelle offline simulieren → Hinweis statt Crash; Basis-Wechsel → Overlay bleibt, Marker klickbar.
+
+---
+
+### TASK-50 · Service-Worker: neue Version nach Release automatisch übernehmen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-01 |
+
+**Beschreibung:** Nach einem Release zeigt die App im Browser oft noch die **alte** Version (altes Layout/Verhalten), obwohl der neue Stand längst deployed ist — weil der alte Service Worker die gecachte Seite weiter ausliefert. „Cache leeren" reicht nicht; aktuell muss man die Website-Daten manuell entfernen bzw. den Service Worker von Hand abmelden. Gewünscht: Nach einem Release übernimmt die neue Version **automatisch** beim nächsten Öffnen/Neuladen, ohne manuelles Eingreifen.
+
+**Kontext (aus US-112 gelernt):** Der Service Worker (`web/sw.js`) benennt beim Deploy zwar den Cache-Namen um und löscht beim Aktivieren alte Caches (`clients.claim()`), aber die neue Version wird nicht sofort aktiv (kein `skipWaiting()`), solange noch ein Tab mit dem alten Worker offen ist. Bei US-112 kostete das mehrfach Verwirrung: Layout- und Overlay-Änderungen erschienen erst nach manuellem Abmelden des alten Workers.
+
+**Offene Punkte für die Analyse-Phase** *(nur Hinweis, hier NICHT lösen):*
+- Sofort-Übernahme (`skipWaiting()` + Steuerung übernehmen) gegen die Gefahr abwägen, dass eine laufende Sitzung mitten im Betrieb die Assets wechselt (ggf. dezenter „Neue Version verfügbar – neu laden"-Hinweis statt hartem Reload).
+- Verhalten für die zum Home-Bildschirm hinzugefügte PWA prüfen.
 
 ---
 
@@ -4899,14 +4921,15 @@ def test_wrap_around_360():
 
 ---
 
-### US-111 · Detail-Sheet: Schematisches Himmels-Kompass-Diagramm für Goldene-Wolken/Himmelsröte-Events `[~]`
+### US-111 · Detail-Sheet: Schematisches Himmels-Kompass-Diagramm für Goldene-Wolken/Himmelsröte-Events `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-06-30 |
+| **Abgeschlossen** | 2026-07-01 |
 
 **Beschreibung:**
 Im Detail-Sheet eines „Goldene Wolken"- oder „Himmelsröte"-Events soll eine schematische visuelle Darstellung (SVG-Skizze) zeigen, wo die Sonne steht, wo die Sichtachse Fotograf → Motiv zeigt, und ob die Wolken sich in der richtigen Richtung für das jeweilige Event befinden. Die Darstellung ist locationspezifisch (basiert auf dem Azimut der Location) und sitzt lokal im Detail-Sheet — keine Karten-Heatmap.
@@ -5046,3 +5069,18 @@ Gegenmaßnahme: `width="100%" height="200"` + `viewBox="0 0 200 200"` → respon
 **Scope:**
 - Eingeschlossen: Inline-SVG-Kompass-Diagramm in ev_golden_clouds und ev_red_sky Sections. Nur `web/index.html`.
 - Ausgeschlossen: Kein Backend-Change, keine neue Section, kein Filter-Chip, kein Kalender/Scout-Entry, keine andere Event-Typen.
+
+---
+
+### US-113 · Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-01 |
+
+**Beschreibung:** Die „Himmelsröte"-Chance (RED_SKY, Sonnenauf-/-untergang-Himmelsfarbe/„goldene Stunde") soll nur ausgelöst werden, wenn sich die Wolkenzone mit der Sichtachse vom Standort zum Motiv überschneidet. Liegen die Wolken zwar vor, aber außerhalb der Blickrichtung, soll keine Chance generiert werden — aktuell wird Himmelsröte bewusst omnidirektional (ohne Richtungsfilter) ausgelöst.
+
+**Bezug:** US-109 [x] hat RED_SKY bewusst **ohne** Richtungsfilter spezifiziert (Rule 2 + Q3-Entscheid: „Röte ist omnidirektional", da keine echte gerichtete Wolkendatenquelle verfügbar war — nur `golden_cloud_score` + `cloud_cover_low/mid ≥ 60 %`). GOLDEN_CLOUDS hat dagegen bereits einen Richtungsfilter (±30° Azimut-Differenz Sonnenazimut↔Sichtachse) erhalten. Dieses Ticket überschreibt/verschärft die US-109-Entscheidung für RED_SKY gezielt — nutzt vermutlich denselben Azimut-Differenz-Mechanismus wie GOLDEN_CLOUDS (`backend/calculations/weather.py`, `subject_azimuth`, `sunrise/sunset_azimuth`), muss aber in der Analyse klären ob ein eigener Schwellwert sinnvoll ist. Überschneidung/Abhängigkeit auch zu US-111 [~] (In Progress): Das dortige Kompass-Diagramm zeigt für Himmelsröte laut Rule 2 explizit einen „roten Farbring ringsum (kein Richtungssektor)" — falls US-113 den Richtungsfilter einführt, muss diese Diagramm-Logik in US-111 ggf. mit angepasst werden (Reihenfolge/Abstimmung mit Stephan klären, da US-111 noch offen ist).
