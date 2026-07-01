@@ -189,7 +189,7 @@ def grib_to_samples(
     field: str,
     samples: List[SamplePoint],
     point_index: Dict[Tuple[float, float], int],
-    stride: int = 6,
+    stride: int = 15,
 ) -> None:
     """Trägt die Werte EINER GRIB-Nachricht als Stützpunkte für `hour_index` ein.
 
@@ -445,11 +445,12 @@ def interpolate_idw(
     max_dist2 = (1.5) ** 2  # in Grad² (~1.5° ≈ 150 km lat)
 
     # Blockweise, um Speicher zu schonen (Distanzmatrix = BLOCK × Stützpunkte).
-    # Beim echten 2-km-Gitter entstehen ~35k Stützpunkte; BLOCK=4096 ergab eine
-    # Matrix von mehreren GB → OOM auf dem Server (US-112, 2026-07-01). Kleinerer
-    # BLOCK begrenzt den Spitzenspeicher hart, ohne das Ergebnis zu verändern.
+    # Historie US-112 (2026-07-01): BLOCK=4096 × ~35k Punkte → mehrere GB → OOM.
+    # Seit die Stützpunkte per stride=15 auf ~4–6k ausgedünnt sind, ist die Matrix
+    # klein; BLOCK=1024 hält den Speicher niedrig UND das Rendern zügig (vorher zu
+    # langsam: volles 2-km-Gitter auf 144 Bilder war massiv überabgetastet).
     n_pix = flat_lat.shape[0]
-    BLOCK = 256
+    BLOCK = 1024
     k = min(_IDW_NEIGHBORS, plat.shape[0])
     for start in range(0, n_pix, BLOCK):
         end = min(start + BLOCK, n_pix)
