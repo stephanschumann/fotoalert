@@ -26,11 +26,11 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 · **US-112** *(Wetter-Overlay DWD/MET weicher Verlauf)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -1223,14 +1223,22 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 
 ---
 
-### US-112 · Wetter-Overlay: echte Modelldaten (DWD ICON-D2 + MET Norway) als weicher Verlauf `[ ]`
+### US-112 · Wetter-Overlay: echte Modelldaten (DWD ICON-D2 + MET Norway) als weicher Verlauf `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-30 |
+
+**🎨 Designer-Check (2026-06-30, bestanden):** Farbskalen (Wolken 0–100 %, Niederschlag mm/h) monoton in Helligkeit → farbenblind-sicher und Bauhaus-konform; Overlay-Deckkraft ~59 % lässt Karte+Marker durch; Attribution leicht verstärkt (CSS direkt angepasst). **Offen, erst am echten gerenderten Bild nach Deploy:** (1) weiche Naht DWD↔MET bei ~58°N, (2) Deckkraft über Satelliten-Layer, (3) Modus-Wechsel Wolken↔Regen, (4) Gold-Kontrast aktiver Toggle im Hellmodus. Keine Blocker.
+
+**🚦 Weg-Gate-Entscheidung (2026-06-30, Stephan):**
+- **Weg: Option A** — echte DWD-Modelldaten (ICON-D2 ~2 km für 0–48 h + ICON-EU ~7 km für 48–72 h) **plus** MET Norway (Norwegen), serverseitig zu einem weichen Bild (PNG je Stunde, `L.imageOverlay`) verrechnet. Volle 72-h-Pflicht bleibt, 2-km-Schärfe wird erreicht.
+- **US-72-Backend:** existiert nicht (nur Frontend gegen 404) → der Wetter-Endpoint wird **direkt in US-112 neu gebaut**; US-72 geht darin auf.
+- **Geltungsbereich:** Deutschland + Österreich + Norditalien (DWD) + Norwegen (MET). Dänemark/restliches Skandinavien bewusst **draußen**.
+- **Kosten/Key:** keine Kosten, kein Account/Key. Pflichten: GRIB-Verarbeitung serverseitig (Systembibliothek eccodes/cfgrib — neu auf dem Server zu installieren), MET-Pflicht-`User-Agent` mit App+Kontakt, Caching-Pflicht, Attribution „Daten: DWD · MET Norway (CC BY 4.0)" im Frontend.
 
 **Beschreibung:** Als Fotograf möchte ich das Wetter-Overlay der Karte auf einer echten, hochaufgelösten Modell-Datenbasis und als weichen, fließenden Verlauf sehen (statt grober Kacheln), damit ich Wolkendecke und Niederschlag räumlich präziser einschätzen kann — und damit die App zukunftssicher auf einer gratis **und** kommerziell nutzbaren Quelle steht (Open-Meteos Gratis-Stufe ist nicht-kommerziell, die App könnte perspektivisch kommerziell werden). Umgestellt wird auf **DWD Open Data ICON-D2** (echtes Modellgitter ~2 km, deckt Deutschland/Österreich/Norditalien ab) plus **MET Norway** (gratis, kommerziell nutzbar, CC BY) für Norwegen, da ICON-D2 Norwegen nicht abdeckt. Die Darstellung wird ein reiner weicher Verlauf (Interpolation/Heatmap), kein hartes Kachelraster. Der bestehende 72-Stunden-Vorhersage-Schieber bleibt Pflicht.
 
@@ -1246,6 +1254,118 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 - Zusammenführen beider Quellen (ICON-D2 + MET) auf eine gemeinsame 72h-Zeitachse.
 - Attribution beider Quellen (DWD + MET) im Frontend.
 - Weicher Render-Ansatz im Frontend (Interpolation/Heatmap statt `L.rectangle`-Kacheln).
+
+---
+
+**Implementation Spec** *(Analyse 2026-06-30)*
+
+**⚠️ Befund vorab — die Datenbasis von US-72 existiert im Backend gar nicht.**
+📎 Code-Verifikation am 2026-06-30 (HEAD + Working Tree, `git grep`): Es gibt **keinen** `/weather-map`-Endpoint und **keine** Gitter-Funktion im Backend — weder in `backend/main.py` noch in `backend/calculations/weather.py`. `fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS` und `_weather_map_cache` kommen ausschließlich in der **untracked** Testdatei `backend/tests/test_us72_weather_map.py` vor (test-first geschrieben, nie implementiert). Das Frontend `WeatherMap` (web/index.html ab Z. 4284) ist committed und ruft `/weather-map?hours=72` auf — gegen einen Endpoint, der auf dem Server **404** liefert. Das erklärt, warum US-72 dauerhaft „In Test" hängt: Die Backend-Hälfte wurde nie gebaut; nur die BUG-55-Zoom-Korrektur (reines Frontend) ging als v1.20.10 live. **Konsequenz:** US-112 ist kein reiner Datenquellen-Austausch, sondern muss den `/weather-map`-Endpoint **erstmals** bauen. Das vergrößert den Aufwand erheblich und ist eine Entscheidung für Stephan (siehe Offene Entscheidungen E0).
+
+**Recherche-Befunde (verifiziert):**
+- ✅ **ICON-D2-Abdeckung:** Modellgebiet **43,2°N 3,9°W → 58,1°N 20,3°E** (regular grid). Damit **Österreich vollständig** und **Norditalien/Po-Ebene** (~44–46°N) abgedeckt — beide *verifiziert*. Quelle: weatherfiles.com (DWD-Slicing-Dienst), DWD NWP-Seite.
+- ⛔ **ICON-D2 reicht nur bis +48 h** (Läufe alle 3 h, 00/03/06/09/12/15/18/21 UTC; 2,2 km). Der geforderte **72-h-Slider lässt sich mit ICON-D2 allein nicht füllen** — *verifiziert*. **ICON-EU** (ebenfalls DWD Open Data, gratis, GRIB2, ~7 km) reicht bis **+120 h** (stündlich bis +78 h) und deckt ganz Europa inkl. Skandinavien ab. Quelle: DWD NWP forecast data.
+- ✅ **DWD-Zugriff:** `opendata.dwd.de/weather/nwp/icon-d2/grib/<run>/<param>/…`, **GRIB2**, kein Key/Account, kostenlos. Felder: **CLCT** (total cloud cover %), **TOT_PREC** (akkumulierter Niederschlag mm — pro Stunde = Differenz aufeinanderfolgender Schritte). Dateien werden nach ~24 h gelöscht. Verarbeitung serverseitig braucht eine GRIB-Bibliothek (**eccodes** als Systemlib + `cfgrib`/`xarray` oder `pygrib`) — *aktuell NICHT in `requirements.txt`* (nur numpy/pandas vorhanden). Quelle: DWD Open Data, DWD-Doku.
+- ✅ **MET Norway Locationforecast 2.0:** **Punkt-API** (eine Koordinate je Request, kein Gitter), JSON. Stündlich 0–60 h, danach 6-stündlich bis ~10 Tage → für 72 h sind die letzten 12 h nur 6-stündlich. **Pflicht-`User-Agent`** mit App-/Domainname + Kontakt (generischer UA → Block, kein Throttle). **Caching-Pflicht** via `Expires`/`If-Modified-Since`, nicht öfter abfragen als `Expires`. **Lizenz CC BY 4.0** → Namensnennung + Link Pflicht. Gratis, kommerziell nutzbar. Quelle: api.met.no ToS/FAQ.
+- ✅ **Weicher Render-Ansatz (Leaflet):** Statt `L.rectangle` pro Punkt → serverseitig ein **interpoliertes PNG** (IDW/bilinear über das Gitter) pro Stunde rendern und als **`L.imageOverlay`** mit Verlauf einblenden, ODER clientseitig **Canvas-Heatmap** (z. B. bilineare Interpolation in ein `<canvas>` über die Gitter-Bounds, als imageOverlay). Beides Leaflet-kompatibel, ohne fremden Tile-Provider (kein US-74-Konflikt). Quelle: Leaflet-Plugins/Heatmap-Praxis. *Render-Detail offen → Designer-Check Pflicht.*
+
+**Annahmen (markiert):**
+- ⚠️ Annahme A1: Für die **72-h-Pflicht** wird in DE/AT/Norditalien **ICON-D2 (0–48 h)** mit **ICON-EU (48–72 h)** kombiniert (beide DWD, gratis), statt den Slider auf 48 h zu kürzen. Bitte bestätigen (sonst E1).
+- ⚠️ Annahme A2: Render erfolgt **serverseitig als interpoliertes PNG je Stunde** (imageOverlay), weil das den weichsten Verlauf liefert und die GRIB-Schwerlast ohnehin im Backend liegt. Bitte bestätigen (sonst E2).
+- ⚠️ Annahme A3: Abdeckung bleibt **DE + AT + Norditalien + Norwegen** (wie Ticket). Dänemark/restliches Skandinavien NICHT in diesem Ticket (würde MET- oder ICON-EU-Ausweitung brauchen).
+
+**Example Mapping:**
+
+📏 **Rule 1 — Das Overlay zeigt einen weichen, fließenden Verlauf statt sichtbarer Kacheln.**
+- 🟢 Positiv: Given Karte über Deutschland, Wetter „Wolken" an, Stunde = heute 20:00, Then sehe ich einen sanften Farbverlauf (hell = klar → dunkel = bedeckt) ohne erkennbare Rechteck-Kanten; Übergänge zwischen klar und bedeckt sind weich.
+- 🔴 Negativ: Given Wetter aus, Then keine Wetterfläche; normale Karte unverändert.
+- ⚠️ Edge: Given einzelne Modellzelle ohne Wert, Then wird dort interpoliert/ausgelassen, kein harter Block, kein Loch mit Fehlfarbe.
+
+📏 **Rule 2 — Die Fläche basiert auf echten Modelldaten, nicht auf wenigen Stützpunkten.**
+- 🟢 Positiv: Given ich vergleiche zwei nah beieinander liegende Orte (z. B. Berlin-Mitte vs. Potsdam), Then unterscheidet sich der Verlauf fein (Auflösung ~2 km in DE/AT/Norditalien), nicht in ~90-km-Blöcken wie vorher.
+- ⚠️ Edge: Given Norwegen (außerhalb ICON-D2), Then erscheint dort trotzdem Wetter (aus MET Norway), und der Übergang zwischen DWD- und MET-Gebiet hat keinen harten Bruch/keine Doppelfläche.
+
+📏 **Rule 3 — Der 72-h-Schieber bleibt voll funktionsfähig.**
+- 🟢 Positiv: Given Overlay an, When ich den Schieber von „jetzt" bis „+72 h" ziehe, Then ändert sich die Fläche pro Stunde, das Zeit-Label zeigt Berliner Ortszeit, und kein Stundenwechsel löst einen neuen Server-Call aus (alles vorab geladen).
+- ⚠️ Edge: Given Stunde 48–72 (jenseits ICON-D2), Then zeigt die Karte weiterhin Fläche (aus ICON-EU bzw. MET), ohne dass DE/AT plötzlich leer wird.
+
+📏 **Rule 4 — Die Quellen werden korrekt genannt (Lizenzpflicht).**
+- 🟢 Positiv: Given Overlay an, Then ist eine dezente Quellenangabe sichtbar: „Daten: DWD (ICON-D2/EU) · MET Norway (CC BY 4.0)" mit Link.
+- 🔴 Negativ: Given Overlay an ohne Attribution, Then verstößt die App gegen CC BY → nicht zulässig.
+
+✅ Questions offen → siehe „Offene Entscheidungen für Stephan" (E0–E4). Keine 🔴-kritische Question wird hier still entschieden.
+
+**Scope:**
+- Eingeschlossen: Neuer/echter `/weather-map`-Backend-Endpoint, der ICON-D2 (DE/AT/Norditalien, 0–48 h) + ICON-EU (48–72 h) + MET Norway (Norwegen) verarbeitet und auf eine **gemeinsame 72-h-Stundenachse** zusammenführt; serverseitige GRIB-Verarbeitung als Hintergrund-Job mit Cache; weiches Verlaufs-Overlay im Frontend (imageOverlay/Canvas statt `L.rectangle`); 72-h-Slider (bestehend) weiternutzen; Quellen-Attribution im Map-Tab; Toggle Wolken/Niederschlag (bestehend).
+- Ausgeschlossen: iOS (`ios/`), animierte Radar-Loop, Push bei Wetterwechsel, Länder außerhalb DE/AT/Norditalien/Norwegen, Auflösung > 72 h, gleichzeitige Überlagerung beider Wetter-Layer.
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] Schalte ich auf der Karte „Wolken" oder „Niederschlag" ein, erscheint über Deutschland/Österreich/Norditalien eine **weiche, fließende Wetterfläche** ohne sichtbare Rechteck-Kacheln; benachbarte Orte unterscheiden sich fein (nicht in groben Blöcken).
+- [ ] Über **Norwegen** erscheint ebenfalls Wetter; am Übergang zwischen dem deutschen und dem norwegischen Datengebiet gibt es keinen harten Sprung und keine doppelte Fläche.
+- [ ] Der **72-Stunden-Schieber** funktioniert über den ganzen Bereich: von „jetzt" bis „+72 h" ändert sich die Fläche pro Stunde; auch jenseits von +48 h (wo das hochauflösende Modell endet) bleibt überall Wetter sichtbar, Deutschland wird nicht plötzlich leer.
+- [ ] Das Zeit-Label zeigt **Berliner Ortszeit**; das Verschieben des Schiebers lädt **keine** neuen Daten nach (nur die erste Aktivierung lädt).
+- [ ] Eine dezente **Quellenangabe** ist sichtbar, solange das Overlay an ist: „Daten: DWD · MET Norway (CC BY 4.0)" mit anklickbarem Lizenz-/Quellen-Link.
+- [ ] Edge: Ist eine der Wetterquellen gerade nicht erreichbar, zeigt die App einen dezenten Hinweis und die Karte (Marker, Basis) bleibt voll bedienbar — kein Hängen, kein Absturz.
+- [ ] Edge: An einzelnen Stellen ohne Modellwert entsteht kein farbiges Loch und kein harter Block; die Fläche bleibt durchgehend weich.
+- [ ] Schalte ich das Overlay aus und auf eine andere Karten-Basis (Standard/Satellit/Nacht), bleibt die Karte korrekt; beim erneuten Einschalten liegt das Overlay wieder sauber über der Basis und unter den Markern (Marker klickbar).
+
+**Pre-Mortem (Code-verifiziert):**
+- 📎 Verifiziert: `backend/calculations/weather.py` nutzt Open-Meteo-Punkt-API, `from __future__ import annotations` (also `list[...]` auf 3.9 ok); `backend/main.py` hat Prozess-Cache-Muster (`_weather_updated_at`, `_weather_overlay` als 3-h-Cron Z. 1255) und Background-Task-Muster — als Vorbild für GRIB-Job + Cache nutzbar. Frontend `WeatherMap` (web/index.html Z. 4284–4561) rendert heute `L.rectangle` pro Punkt, eigenes `weatherPane` (zIndex 250), liest `data.grid[].{cloud_cover,precipitation_mm,precipitation_prob}` + `data.hourly_times` + 72-h-Slider — der weiche Render ersetzt nur `_render()`, Slider/Cache/Pane bleiben.
+- 💀 `/weather-map` existiert serverseitig nicht → US-112 wird als „Quellenwechsel" geplant, ist aber „Endpoint-Neubau". Auslöser: US-72-Backend nie committed. Frühwarnung: `git grep weather-map backend/*.py` leer (bereits eingetreten). → Gegenmaßnahme: E0 vor Implementierung klären; Aufwand als „groß" einstufen.
+- 💀 72-h-Slider bleibt jenseits +48 h in DE/AT leer, weil ICON-D2 nur 48 h liefert. Auslöser: Annahme „ein Modell deckt 72 h". → Gegenmaßnahme: ICON-EU für 48–72 h dazunehmen (A1/E1); AK „Deutschland wird nicht leer" prüft genau das.
+- 💀 GRIB-Verarbeitung sprengt Speicher/Laufzeit auf dem kleinen Hetzner-Server (eccodes + ganzes ICON-D2-Gebiet × 72 h × 2 Felder). Auslöser: ungeschnittene GRIB-Last. → Gegenmaßnahme: serverseitig auf die App-Bounding-Box + nur CLCT/TOT_PREC slicen, als Hintergrund-Job mit Cache (analog 3-h-Wetter-Cron), Laufzeit/Größe beim ersten echten Lauf messen (Daten-Validierung), Python 3.9-kompatibel halten.
+- 💀 MET Norway sperrt die App (generischer User-Agent / zu häufige Abfragen). Auslöser: fehlende Kennung/Cache. → Gegenmaßnahme: fester `User-Agent` „FotoAlert/<ver> (kontakt)", `Expires`/`If-Modified-Since` respektieren, Ergebnis cachen; nur Norwegen-Gitterpunkte abfragen, nicht pro Stunde neu.
+- 💀 Naht zwischen DWD- und MET-Gebiet zeigt harten Bruch/Doppelfläche. Auslöser: zwei Quellen auf einer Achse ohne Blending. → Gegenmaßnahme: gemeinsame Stundenachse + räumliches Blending an der Gebietsgrenze; AK „kein harter Sprung" prüft das.
+- 💀 Niederschlag falsch, weil ICON liefert **akkumuliert** (TOT_PREC), MET teils Intervall/anders. Auslöser: Einheiten-Mismatch. → Gegenmaßnahme: TOT_PREC pro Stunde als Differenz aufeinanderfolgender Schritte; MET-Felder auf dieselbe Einheit (mm/h) normalisieren; an realen Werten kalibrieren.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (Code-verifiziert: Endpoint fehlt im Backend)
+- [x] Architektur analysiert: Backend `backend/main.py` (Cache-/Cron-/Background-Muster), `backend/calculations/weather.py` (Open-Meteo-Vorbild, 3.9-kompatibel), **neuer GRIB-Pfad nötig** (eccodes/cfgrib oder pygrib → `requirements.txt`); Frontend `web/index.html` `WeatherMap` (nur `_render()` auf weichen Verlauf umstellen, Slider/Cache/Pane bleiben) + Attribution im Map-Tab.
+- [x] Designer-Check: visuell **ja** → vor Implementierung `fotoalert-designer` für den weichen Verlauf (Farbskala, Opazität, Naht-Blending, Attribution-Platzierung) einholen.
+- [x] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: Option A (Weg-Gate offen)
+
+**Implementierungsoptionen:**
+
+### Option A — DWD GRIB (ICON-D2 + ICON-EU) + MET Norway, serverseitig verarbeitet, weiches imageOverlay
+- App-Wirkung: Genau die Ticket-Vision — hochaufgelöster, weicher Verlauf aus echten Modelldaten in DE/AT/Norditalien, Norwegen aus MET, durchgehender 72-h-Slider, gratis + kommerziell nutzbar.
+- Vorgehen: Backend lädt + slict GRIB2 (CLCT/TOT_PREC) auf App-BBox, fügt ICON-EU für 48–72 h und MET-Norway-Punkte für Norwegen hinzu, interpoliert je Stunde zu einem PNG; neuer `/weather-map`-Endpoint + Hintergrund-Job + Cache. Frontend: `_render()` auf `L.imageOverlay` umstellen, Attribution einblenden.
+- Betroffene Dateien: `backend/main.py`, `backend/calculations/weather.py` (+ ggf. neues `weather_grib.py`), `backend/requirements.txt` (eccodes/cfgrib o. pygrib), `web/index.html`.
+- Vorteile: erfüllt die Story voll; lizenzsicher (DWD + MET CC BY); zukunftssicher kommerziell.
+- Nachteile/Risiken: **größter Aufwand**; neue Systembibliothek (eccodes) auf dem Server; GRIB-Last messen; Naht-Blending. Aufwand: **groß**.
+
+### Option B — Nur MET Norway als Multi-Punkt-Gitter für ALLE Gebiete (kein GRIB)
+- App-Wirkung: Weicher Verlauf aus echten Daten, aber gröber als 2 km; Norwegen + Mitteleuropa aus einer Quelle.
+- Vorgehen: ein Gitter eigener Punkte über alle Gebiete, je Punkt MET-Locationforecast; clientseitige Canvas-Interpolation. Kein GRIB, keine Systemlib.
+- Vorteile: deutlich einfacher (kein eccodes), eine Quelle, 72 h aus MET; gratis + CC BY.
+- Nachteile/Risiken: viele Einzel-Requests (Rate-/Caching-Disziplin!), gröbere Auflösung (kein 2-km-Vorteil), MET ab 60 h nur 6-stündlich. Aufwand: **mittel**. Verfehlt das Ticket-Versprechen „2-km-Modellgitter" teilweise.
+- ⚠️ Hinweis: MET-Daten stammen u. a. selbst aus ICON-Modellen, aber als Punkt-API ohne native Gitterauflösung.
+
+### Option C — Slider auf 48 h kürzen, nur ICON-D2 + MET
+- App-Wirkung: Höchste Auflösung in DE/AT/Norditalien, aber nur 48-h-Vorschau statt 72 h.
+- Vorgehen: wie A, aber ohne ICON-EU; Slider-Max auf 48 h.
+- Vorteile: weniger Quellen zusammenzuführen.
+- Nachteile/Risiken: **verletzt die 72-h-Pflicht** aus dem Ticket → nur zulässig, wenn Stephan die Kürzung ausdrücklich freigibt. Aufwand: groß (GRIB bleibt).
+
+✅ **Empfehlung: Option A** — als einzige Variante, die alle Ticket-Vorgaben erfüllt (echtes ~2-km-Modellgitter, weicher Verlauf, 72 h, gratis + kommerziell, Norwegen abgedeckt). Voraussetzung sind die Entscheidungen E0–E2. Option B ist der pragmatische Rückfallweg, falls eccodes auf dem Server zu schwer ist; Option C nur bei bewusster 72→48-h-Kürzung.
+
+**Offene Entscheidungen für Stephan (vor Implementierung):**
+- **E0 (kritisch):** US-72-Backend (`/weather-map`) wurde nie gebaut. US-112 muss den Endpoint **erstmals** implementieren (großer Aufwand). Geht US-112 trotzdem direkt los, oder zuerst ein schlankes US-72-Backend nachziehen?
+- **E1 (kritisch):** 72-h-Pflicht: ICON-D2 reicht nur 48 h. **ICON-EU für 48–72 h dazunehmen** (empfohlen, A1) ODER Slider auf 48 h kürzen (Option C)?
+- **E2:** Render serverseitig als interpoliertes PNG (A2, weichste Optik) ODER clientseitige Canvas-Heatmap (leichter fürs Backend)?
+- **E3:** Server-Belastung: eccodes/GRIB auf dem Hetzner-Server akzeptabel (Speicher/Laufzeit messen) ODER lieber GRIB-frei via MET-Multi-Punkt (Option B)?
+- **E4:** Bestätigung Abdeckungs-Scope: DE + AT + Norditalien + Norwegen — Dänemark/Skandinavien bewusst NICHT in diesem Ticket?
+
+**Daten-Validierung** *(in Implementierung zu bestätigen):*
+- [ ] Realen ICON-D2-GRIB-Lauf gegen App-BBox slicen → Speicher/Laufzeit/Größe messen (eccodes), bevor Frontend gebaut wird.
+- [ ] ICON-D2-Abdeckung Norditalien am echten Gitter prüfen (Süd-Rand 43,2°N deckt Po-Ebene — am Datensatz gegenchecken, nicht nur Doku).
+- [ ] MET-Norway-Antwort an einem Norwegen-Punkt: Felder, Einheiten, `Expires`-Header, Stundenraster 0–60 h prüfen.
+- [ ] TOT_PREC (akkumuliert) korrekt auf mm/h differenzieren; mit MET-Niederschlag auf gleiche Einheit kalibrieren.
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/`, Docstring `US-112`, Python 3.9 / `Optional[...]`): `/weather-map`-Schema (gemeinsame `hourly_times` Länge ~72, Wolken+Niederschlag vorhanden, Bild/Gitter je Stunde); Quellen-Merge (DWD-Gebiet + Norwegen-Punkte auf einer Achse); null-Handling bei Quellen-Ausfall (eine Quelle weg → andere bleibt gültig, kein 500); Cache (zweiter Call ohne neuen Fetch). GRIB-Parsing gegen ein kleines Fixture, nicht gegen Live-DWD.
+- [ ] Manuell (http://localhost:8000, Map-Tab): Overlay an → weicher Verlauf ohne Kacheln; Slider bis +72 h → DE/AT/Norditalien/Norwegen durchgehend gefüllt, Label Berliner Zeit, kein Netzwerk-Call beim Schieben (DevTools); Quellenangabe sichtbar + Link; eine Quelle offline simulieren → Hinweis statt Crash; Basis-Wechsel → Overlay bleibt, Marker klickbar.
 
 ---
 

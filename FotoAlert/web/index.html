@@ -305,6 +305,15 @@
       display: none; white-space: nowrap; }
     #map-weather-error.open { display: block; }
 
+    /* US-112: Quellen-Attribution (Pflicht solange Overlay an) */
+    #map-weather-attribution { position: absolute; bottom: 6px; right: 8px; z-index: 1000;
+      background: rgba(0,0,0,0.58); color: #fff; border-radius: 6px;
+      padding: 4px 9px; font-size: 10px; line-height: 1.3; display: none;
+      max-width: 70%; text-align: right; pointer-events: auto;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.5); }
+    #map-weather-attribution.open { display: block; }
+    #map-weather-attribution a { color: #fff; text-decoration: underline; }
+
     /* US-69: GPS-Standort-Button */
     .map-gps-btn { position: absolute; bottom: 80px; left: 12px; z-index: 1000;
       width: 44px; height: 44px; border-radius: 50%;
@@ -982,6 +991,8 @@ function ic(id, size, cls){
       </div>
       <!-- US-72: Fehler-Hinweis -->
       <div id="map-weather-error">Wetterdaten nicht verfügbar</div>
+      <!-- US-112: Quellen-Attribution (CC BY 4.0 Pflicht) -->
+      <div id="map-weather-attribution"></div>
       <!-- US-69: Mein-Standort-Button -->
       <button class="map-gps-btn" onclick="MapView.locateMe()" title="Mein Standort">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1171,7 +1182,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.11';
+const APP_VERSION = '1.20.12';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4286,18 +4297,18 @@ const WeatherMap = {
   mode: 'off',          // 'off' | 'clouds' | 'precip'
   sub: 'mm',            // 'mm' | 'pct'  (nur für precip)
   sliderIdx: 0,
-  data: null,           // API-Response-Objekt
+  data: null,           // API-Response-Objekt (US-112: {bounds, hourly_times, frames, attribution})
   fetchedAt: null,      // Date-Objekt (Client-Cache)
-  rectangles: [],       // Leaflet L.rectangle-Instanzen
+  overlay: null,        // US-112: aktuelle L.imageOverlay-Instanz (weicher Verlauf)
+  _imgCache: {},        // US-112: vorab geladene Image-Objekte (url → HTMLImageElement)
   pane: null,           // Leaflet-Pane
   _savedView: null,     // {center, zoom} vor dem Einschalten (BUG-55)
   _CACHE_TTL_MS: 3600000, // 60 Minuten
 
-  // BUG-55: Feste Deutschland-Hülle als Fallback, falls beim Einschalten
-  // keine Gitterdaten geladen sind. Robuste Quelle ist this.data.grid
-  // (Min/Max ± halbe Zellbreite) — siehe _gridBounds(); diese Konstante
-  // ist nur das Sicherheitsnetz. BBox 47.3/55.0/6.0/15.0 ± halbe Schrittweite.
-  _FALLBACK_BOUNDS: [[46.87, 5.5], [55.43, 15.5]],
+  // US-112: Fallback-Hülle (DE/AT/Norditalien/Norwegen-BBox), falls beim
+  // Einschalten noch keine Bounds vom Server da sind. Robuste Quelle ist
+  // this.data.bounds [[S,W],[N,E]] — siehe _gridBounds().
+  _FALLBACK_BOUNDS: [[43.0, 3.0], [71.5, 21.0]],
 
   // Farbpaletten
   _CLOUD_COLORS: [
@@ -4344,9 +4355,9 @@ const WeatherMap = {
     return this.sub === 'mm' ? this._PRECIP_MM_COLORS : this._PRECIP_PCT_COLORS;
   },
 
-  _dataKey() {
-    if (this.mode === 'clouds') return 'cloud_cover';
-    return this.sub === 'mm' ? 'precipitation_mm' : 'precipitation_prob';
+  // US-112: Welche Bild-Serie (frames) gehört zum aktuellen Modus?
+  _frameKey() {
+    return this.mode === 'clouds' ? 'clouds' : 'precip';
   },
 
   _ensurePane() {
@@ -4359,48 +4370,58 @@ const WeatherMap = {
     }
   },
 
-  _clearRects() {
-    this.rectangles.forEach(r => { try { r.remove(); } catch(e) {} });
-    this.rectangles = [];
+  // US-112: aktuelles imageOverlay entfernen.
+  _clearOverlay() {
+    if (this.overlay) {
+      try { this.overlay.remove(); } catch(e) {}
+      this.overlay = null;
+    }
   },
 
+  // US-112: URL des PNG-Frames für eine Stunde (oder null, wenn keins existiert).
+  _frameUrl(idx) {
+    if (!this.data || !this.data.frames) return null;
+    const arr = this.data.frames[this._frameKey()];
+    if (!arr || idx >= arr.length) return null;
+    return arr[idx];
+  },
+
+  // US-112: alle Frames im Hintergrund vorladen → flüssiges Slider-Wischen
+  // ohne Netzwerk-Call beim Stundenwechsel (nur ein Cache-Hit).
+  _preload() {
+    if (!this.data || !this.data.frames) return;
+    ['clouds', 'precip'].forEach(k => {
+      (this.data.frames[k] || []).forEach(url => {
+        if (url && !this._imgCache[url]) {
+          const im = new Image();
+          im.src = CFG.api + url;
+          this._imgCache[url] = im;
+        }
+      });
+    });
+  },
+
+  // US-112: weicher Verlauf via L.imageOverlay (kein L.rectangle-Raster mehr).
   _render() {
-    this._clearRects();
     const map = MapView.map;
-    if (!map || !this.data || this.mode === 'off') return;
-    const grid = this.data.grid;
-    if (!grid || !grid.length) return;
+    if (!map || !this.data || this.mode === 'off') { this._clearOverlay(); return; }
+    const bounds = (this.data.bounds && this.data.bounds.length === 2)
+      ? this.data.bounds : this._FALLBACK_BOUNDS;
+    const url = this._frameUrl(this.sliderIdx);
+    if (!url) { this._clearOverlay(); return; }
+    const full = CFG.api + url;
 
-    const idx = this.sliderIdx;
-    const palette = this._palette();
-    const key = this._dataKey();
-
-    // Grid 10×10 row-major: lat wächst mit row, lon mit col.
-    const COLS = 10;
-    const dLat = (grid[COLS].lat - grid[0].lat);   // lat-Schritt zwischen Rows
-    const dLon = (grid[1].lon - grid[0].lon);       // lon-Schritt zwischen Cols
-
-    for (let i = 0; i < grid.length; i++) {
-      const pt = grid[i];
-      const series = pt[key];
-      const value = (series && idx < series.length) ? series[idx] : null;
-      const color = this._colorInterp(value, palette);
-
-      const lat0 = pt.lat - dLat / 2;
-      const lat1 = pt.lat + dLat / 2;
-      const lon0 = pt.lon - dLon / 2;
-      const lon1 = pt.lon + dLon / 2;
-
-      const rect = L.rectangle([[lat0, lon0], [lat1, lon1]], {
-        color: 'transparent',
-        fillColor: color,
-        fillOpacity: 0.6,
-        weight: 0,
+    if (this.overlay) {
+      // Vorhandenes Overlay nur neu bespielen (kein Flackern beim Schieben).
+      this.overlay.setBounds(bounds);
+      this.overlay.setUrl(full);
+    } else {
+      this.overlay = L.imageOverlay(full, bounds, {
+        opacity: 1,            // Transparenz steckt schon im PNG-Alpha
         pane: 'weatherPane',
         interactive: false,
       });
-      rect.addTo(map);
-      this.rectangles.push(rect);
+      this.overlay.addTo(map);
     }
   },
 
@@ -4445,9 +4466,10 @@ const WeatherMap = {
     if (this.mode === 'off') { legend.classList.remove('open'); return; }
     legend.classList.add('open');
     const palette = this._palette();
+    // US-112: Der Server rendert Niederschlag als mm/h (DWD TOT_PREC differenziert
+    // + MET mm/h). Es gibt nur diese eine Niederschlags-Darstellung.
     if (this.mode === 'clouds') title.textContent = 'Wolken %';
-    else if (this.sub === 'mm') title.textContent = 'Niederschlag mm';
-    else title.textContent = 'Niederschlag %';
+    else title.textContent = 'Niederschlag mm/h';
 
     // Farb-Verlaufs-Balken
     bar.innerHTML = '';
@@ -4476,43 +4498,56 @@ const WeatherMap = {
   },
 
   _updateSubRow() {
+    // US-112: Niederschlag hat serverseitig nur eine Darstellung (mm/h) — die
+    // mm/%-Umschaltung (Open-Meteo-Relikt) entfällt, Sub-Reihe bleibt verborgen.
     const sub = document.getElementById('map-weather-sub');
-    sub.style.display = this.mode === 'precip' ? '' : 'none';
+    sub.style.display = 'none';
   },
 
   async _fetch() {
     const now = Date.now();
-    if (this.data && this.fetchedAt && (now - this.fetchedAt) < this._CACHE_TTL_MS) return;
+    // US-112: Cache nur halten, wenn die Daten bereits fertig (ready) sind —
+    // sonst beim Server-Bau erneut nachfragen.
+    if (this.data && this.data.ready && this.fetchedAt && (now - this.fetchedAt) < this._CACHE_TTL_MS) return;
     const errEl = document.getElementById('map-weather-error');
     try {
       const res = await API.get('/weather-map?hours=72');
       this.data = res;
       this.fetchedAt = now;
-      errEl.classList.remove('open');
+      this._preload();   // US-112: alle PNG-Frames vorab in den Browser-Cache
+      // ready=false → Overlay wird gerade serverseitig gebaut: Hinweis zeigen,
+      // aber Karte voll bedienbar lassen (kein Hängen).
+      if (res && res.ready === false) {
+        errEl.textContent = 'Wetterdaten werden geladen …';
+        errEl.classList.add('open');
+      } else {
+        errEl.classList.remove('open');
+      }
     } catch(e) {
+      errEl.textContent = 'Wetterdaten nicht verfügbar';
       errEl.classList.add('open');
       this.data = null;
     }
   },
 
-  // BUG-55: Bounds des aktuell geladenen Wetter-Gitters (Min/Max lat/lon,
-  // erweitert um halbe Zellbreite). Passt sich automatisch an das geladene
-  // Gebiet an. Fallback auf feste Deutschland-Hülle, falls keine Daten da sind.
+  // US-112: Bounds des Overlays kommen direkt vom Server ([[S,W],[N,E]]).
+  // Fallback auf die feste Geltungsbereich-Hülle, falls noch keine Daten da sind.
   _gridBounds() {
-    const grid = this.data && this.data.grid;
-    if (!grid || !grid.length) return this._FALLBACK_BOUNDS;
-    const COLS = 10;
-    const dLat = (grid.length > COLS) ? (grid[COLS].lat - grid[0].lat) : 0.856;
-    const dLon = (grid.length > 1)    ? (grid[1].lon - grid[0].lon)    : 1.0;
-    let latMin = Infinity, latMax = -Infinity, lonMin = Infinity, lonMax = -Infinity;
-    for (const pt of grid) {
-      if (pt.lat < latMin) latMin = pt.lat;
-      if (pt.lat > latMax) latMax = pt.lat;
-      if (pt.lon < lonMin) lonMin = pt.lon;
-      if (pt.lon > lonMax) lonMax = pt.lon;
+    if (this.data && this.data.bounds && this.data.bounds.length === 2) {
+      return this.data.bounds;
     }
-    return [[latMin - dLat / 2, lonMin - dLon / 2],
-            [latMax + dLat / 2, lonMax + dLon / 2]];
+    return this._FALLBACK_BOUNDS;
+  },
+
+  // US-112: Quellen-Attribution (CC BY 4.0 Pflicht) ein-/ausblenden.
+  _updateAttribution() {
+    const el = document.getElementById('map-weather-attribution');
+    if (!el) return;
+    if (this.mode === 'off') { el.classList.remove('open'); return; }
+    const txt = (this.data && this.data.attribution) || 'Daten: DWD · MET Norway (CC BY 4.0)';
+    const url = (this.data && this.data.attribution_url) || 'https://www.met.no/en/free-meteorological-data';
+    el.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener">' + txt + '</a>';
+    el.classList.add('open');
   },
 
   async setMode(mode) {
@@ -4542,6 +4577,7 @@ const WeatherMap = {
     this._render();
     this._updateSlider();
     this._updateLegend();
+    this._updateAttribution();
   },
 
   setSub(sub) {
@@ -4551,6 +4587,7 @@ const WeatherMap = {
     });
     this._render();
     this._updateLegend();
+    this._updateAttribution();
   },
 
   onSlider(val) {

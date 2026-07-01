@@ -15,3 +15,8 @@ pytz==2024.1
 # Push Notifications
 PyJWT==2.8.0
 cryptography==42.0.8
+# US-112: Wetter-Karten-Overlay (DWD ICON-D2/-EU GRIB2 + MET Norway → PNG je Stunde)
+# eccodes (Python-Wheel bündelt die eccodes-Bibliothek; auf Hetzner ggf. zusätzlich
+# das System-Paket "libeccodes0"/"libeccodes-tools" via apt installieren, siehe US-112).
+eccodes==2.47.0
+Pillow==10.3.0

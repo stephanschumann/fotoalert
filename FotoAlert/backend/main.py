@@ -58,6 +58,7 @@ from calculations.astronomy import (
     find_precise_alignment_times,
 )
 from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
+from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
@@ -219,6 +220,16 @@ _discover_cache: dict       = {}   # Scout-Tab (Mond-Alignment-Chancen)
 
 _cache_loaded_at:   Optional[datetime] = None
 _weather_updated_at: Optional[datetime] = None
+
+# US-112: Wetter-Karten-Overlay (DWD ICON-D2/-EU + MET Norway → PNG je Stunde).
+# Prozess-Cache: Metadaten (bounds, hourly_times, Quellen) + PNG-Bytes je Stunde
+# pro Feld. Wird vom Hintergrund-Job gefüllt; /weather-map liefert Metadaten,
+# /weather-map/png/{field}/{idx} die einzelnen Bilder. TTL via _weather_map_updated_at.
+_weather_map_cache: Optional[dict] = None           # {bounds, hourly_times, sources, attribution, n_points}
+_weather_map_png:   dict = {"cloud": [], "precip": []}  # Listen Optional[bytes] je Stunde
+_weather_map_updated_at: Optional[datetime] = None
+_weather_map_building: bool = False
+_WEATHER_MAP_TTL = timedelta(hours=1)               # Modell-Overlay 1 h gültig
 _precompute_running: bool = False
 _recompute_pending:  set  = set()   # BUG-35: IDs mit laufendem/ausstehendem Recompute
 
@@ -240,6 +251,7 @@ _job_status: dict = {
     "weather":  {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
     "feed":     {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
     "calendar": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
+    "weather-map": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},  # US-112
 }
 
 def _job_start(job: str) -> float:
@@ -695,6 +707,49 @@ async def _weather_overlay_single(loc_id: str) -> bool:
     # US-109: Cloud-Mood-Events nach Einzel-Wetter ebenfalls aktualisieren
     _inject_cloud_mood_events()
     return all_ok
+
+
+async def _build_weather_map() -> None:
+    """US-112: Baut das Wetter-Karten-Overlay (weicher Verlauf) im Hintergrund.
+
+    Lädt DWD ICON-D2 (0–48 h) + ICON-EU (48–72 h) + MET Norway (Norwegen),
+    interpoliert je Stunde zu einem PNG (Wolken + Niederschlag) und legt alles im
+    Prozess-Cache ab. Robust: fällt eine Quelle aus, bleiben die anderen gültig.
+    Wird nie aus dem Request-Pfad direkt awaited (kann ~Sekunden bis Minuten dauern).
+    """
+    global _weather_map_cache, _weather_map_png, _weather_map_updated_at, _weather_map_building
+
+    if _weather_map_building:
+        return
+    _weather_map_building = True
+    t0 = _job_start("weather-map")
+    try:
+        ua = "FotoAlert/%s (https://github.com/  kontakt: stephanschumann@me.com)" % app.version
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            overlay = await weather_grib.build_weather_overlay(client, n_hours=72, user_agent=ua)
+
+        # PNGs je Feld/Stunde rendern (CPU-lastig → in Thread auslagern)
+        cloud_pngs = await asyncio.to_thread(weather_grib.render_all_pngs, overlay, "cloud")
+        precip_pngs = await asyncio.to_thread(weather_grib.render_all_pngs, overlay, "precip")
+
+        _weather_map_png = {"cloud": cloud_pngs, "precip": precip_pngs}
+        _weather_map_cache = {
+            "bounds": weather_grib.overlay_bounds(),
+            "hourly_times": overlay["hourly_times"],
+            "sources": overlay["sources"],
+            "n_points": overlay["n_points"],
+            "attribution": "Daten: DWD · MET Norway (CC BY 4.0)",
+            "attribution_url": "https://www.met.no/en/free-meteorological-data",
+        }
+        _weather_map_updated_at = datetime.now(timezone.utc)
+        logger.info("US-112 Wetter-Karte gebaut: %d Stützpunkte, Quellen=%s",
+                    overlay["n_points"], overlay["sources"])
+        _job_done("weather-map", t0)
+    except Exception as exc:
+        logger.warning("US-112 Wetter-Karten-Bau fehlgeschlagen: %s", exc)
+        _job_done("weather-map", t0)
+    finally:
+        _weather_map_building = False
 
 
 def _finalize_pending(loc_id: str) -> None:
@@ -1207,6 +1262,10 @@ async def startup() -> None:
     # 2. Wetter-Overlay für T+0..T+3 (schnell, ~5s)
     asyncio.create_task(_weather_overlay())
 
+    # US-112: Wetter-Karten-Overlay (DWD ICON + MET Norway → PNG je Stunde) im
+    # Hintergrund vorbauen, damit der Map-Tab beim ersten Einschalten schon Daten hat.
+    asyncio.create_task(_build_weather_map())
+
     # 2b. Scout-Cache laden (falls vorhanden) und ggf. neu berechnen
     _load_discover_cache()
     # Schema-Check: US-81 migrierte moon_* → body_*. Alter Cache hat kein body_name-Feld
@@ -1253,6 +1312,7 @@ async def startup() -> None:
     scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
                       "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
     scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
+    scheduler.add_job(_build_weather_map, "cron", minute=20, hour="*/3") # US-112: Karten-Overlay alle 3h
     scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
     scheduler.start()
     logger.info("Bereit. Cache: %d Feed-Events, %d Kalender-Events, Scout: %d Chancen",
@@ -1829,6 +1889,85 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
     """
     background_tasks.add_task(_weather_overlay)
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
+
+
+@app.get("/weather-map")
+async def weather_map(hours: int = 72) -> dict:
+    """US-112: Metadaten des Wetter-Karten-Overlays (weicher Verlauf, PNG je Stunde).
+
+    Liefert Bounds (für L.imageOverlay), die gemeinsame 72-h-Stundenachse (UTC),
+    Quellen-Status, Attribution und — pro Feld — die PNG-URLs je Stunde. Die
+    Bilder selbst kommen über /weather-map/png/{field}/{idx}.
+
+    Cache-Verhalten: Ist der Prozess-Cache frisch (< TTL), wird er direkt
+    zurückgegeben (kein neuer Fetch). Sonst wird der Bau im Hintergrund
+    angestoßen; bis er fertig ist liefert der Endpoint den (ggf. leeren) Stand
+    mit `ready=false`, statt den Request zu blockieren.
+    """
+    global _weather_map_updated_at
+
+    now = datetime.now(timezone.utc)
+    fresh = (
+        _weather_map_cache is not None
+        and _weather_map_updated_at is not None
+        and (now - _weather_map_updated_at) < _WEATHER_MAP_TTL
+    )
+
+    if not fresh and not _weather_map_building and not _NO_BACKGROUND:
+        # Hintergrund-Bau anstoßen (blockiert den Request nicht)
+        asyncio.create_task(_build_weather_map())
+
+    if _weather_map_cache is None:
+        # Noch nichts gebaut → leere, aber gültige Antwort (Frontend zeigt Hinweis)
+        return {
+            "ready": False,
+            "bounds": weather_grib.overlay_bounds(),
+            "hourly_times": [],
+            "frames": {"clouds": [], "precip": []},
+            "attribution": "Daten: DWD · MET Norway (CC BY 4.0)",
+            "attribution_url": "https://www.met.no/en/free-meteorological-data",
+            "sources": {"icon_d2": 0, "icon_eu": 0, "met": 0},
+        }
+
+    n = len(_weather_map_cache["hourly_times"])
+    cloud = _weather_map_png.get("cloud", [])
+    precip = _weather_map_png.get("precip", [])
+    frames = {
+        "clouds": [
+            ("/weather-map/png/cloud/%d" % i) if (i < len(cloud) and cloud[i]) else None
+            for i in range(n)
+        ],
+        "precip": [
+            ("/weather-map/png/precip/%d" % i) if (i < len(precip) and precip[i]) else None
+            for i in range(n)
+        ],
+    }
+    return {
+        "ready": True,
+        "bounds": _weather_map_cache["bounds"],
+        "hourly_times": _weather_map_cache["hourly_times"],
+        "frames": frames,
+        "attribution": _weather_map_cache["attribution"],
+        "attribution_url": _weather_map_cache["attribution_url"],
+        "sources": _weather_map_cache["sources"],
+        "fetched_at": _weather_map_updated_at.isoformat() if _weather_map_updated_at else None,
+    }
+
+
+@app.get("/weather-map/png/{field}/{idx}")
+async def weather_map_png(field: str, idx: int):
+    """US-112: Liefert das interpolierte PNG einer Stunde (RGBA, weicher Verlauf)."""
+    from fastapi import Response
+    if field not in ("cloud", "precip"):
+        raise HTTPException(status_code=404, detail="Unbekanntes Feld")
+    frames = _weather_map_png.get(field, [])
+    if idx < 0 or idx >= len(frames) or not frames[idx]:
+        raise HTTPException(status_code=404, detail="Kein Bild für diese Stunde")
+    return Response(
+        content=frames[idx],
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=1800"},
+    )
 
 
 @app.post("/run-qa-pass")
