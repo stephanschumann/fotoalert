@@ -588,9 +588,12 @@ async def build_weather_overlay(
         except Exception as exc:
             logger.warning("ICON-D2-Abruf fehlgeschlagen: %s", exc)
 
-        # ICON-EU: 3-stündliche Läufe, für 48–72 h.
+        # ICON-EU für 48–72 h: NUR die 6-stündlichen Hauptläufe (00/06/12/18)
+        # verwenden — die reichen bis +120 h. Die 3-stündlichen Zwischenläufe
+        # (03/09/15/21) enden bei +48 h, ihre 48–72-h-Dateien fehlen → 404
+        # (am Live-Verzeichnis verifiziert 2026-07-01, US-112).
         if n_hours > 48:
-            run_eu = _latest_run(now, step_hours=3, delay_hours=4)
+            run_eu = _latest_run(now, step_hours=6, delay_hours=5)
             off_eu = int(round((now - run_eu).total_seconds() / 3600.0))
             fc_eu = list(range(off_eu + 48, off_eu + n_hours))
             try:
