@@ -444,9 +444,12 @@ def interpolate_idw(
     # (kein Wert "erfunden", keine Fehlfarben-Löcher, kein harter Block).
     max_dist2 = (1.5) ** 2  # in Grad² (~1.5° ≈ 150 km lat)
 
-    # Blockweise, um Speicher zu schonen (Punkte × Pixel kann groß werden).
+    # Blockweise, um Speicher zu schonen (Distanzmatrix = BLOCK × Stützpunkte).
+    # Beim echten 2-km-Gitter entstehen ~35k Stützpunkte; BLOCK=4096 ergab eine
+    # Matrix von mehreren GB → OOM auf dem Server (US-112, 2026-07-01). Kleinerer
+    # BLOCK begrenzt den Spitzenspeicher hart, ohne das Ergebnis zu verändern.
     n_pix = flat_lat.shape[0]
-    BLOCK = 4096
+    BLOCK = 256
     k = min(_IDW_NEIGHBORS, plat.shape[0])
     for start in range(0, n_pix, BLOCK):
         end = min(start + BLOCK, n_pix)
