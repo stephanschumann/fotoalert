@@ -4449,7 +4449,11 @@ const WeatherMap = {
     const iso = times[idx];
     // UTC → Berliner Zeit (CEST = UTC+2 im Sommer, CET = UTC+1 im Winter)
     try {
-      const dt = new Date(iso.endsWith('Z') ? iso : iso + 'Z');
+      // Server liefert ISO mit Zeitzone ("+00:00") ODER "Z" ODER bar (ohne).
+      // Nur bei fehlender Zeitzone "Z" ergänzen — sonst entsteht "…+00:00Z"
+      // (ungültig → "Invalid Date"). (US-112, 2026-07-01)
+      const hasTz = /(?:Z|[+-]\d{2}:?\d{2})$/.test(iso);
+      const dt = new Date(hasTz ? iso : iso + 'Z');
       const opts = { timeZone: 'Europe/Berlin', weekday: 'short',
                      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
       label.textContent = dt.toLocaleString('de-DE', opts);
