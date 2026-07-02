@@ -1,6 +1,13 @@
 # Retro-Gate-Zuverlässigkeit — Design
 
-> **Status:** Entwurf zur Freigabe · **Erstellt:** 2026-07-02 · **Owner:** Stephan
+> **Status:** ⚠️ ÜBERHOLT — ersetzt durch
+> [`2026-07-02-pipeline-gate-reliability-design.md`](2026-07-02-pipeline-gate-reliability-design.md).
+> Nachdem dieses Dokument geschrieben war, ergab eine Recherche vor der Plan-Erstellung, dass die
+> Retro-Lücke nur eine von drei strukturell identischen Lücken ist (Refactor-Check,
+> Verifikations-Subagent). Das Nachfolge-Dokument behandelt alle drei mit demselben Mechanismus.
+> Dieses Dokument bleibt als Historie stehen, ist aber nicht mehr die aktuelle Spec.
+>
+> **Ursprünglicher Status:** Entwurf zur Freigabe · **Erstellt:** 2026-07-02 · **Owner:** Stephan
 > **Verwandt:** `PIPELINE.md` §3.4/§3.5 (Lern-Loop, offen), `docs/gate-status-konvention.md`,
 > `tools/gate_check.py`, Scheduled Task `fotoalert-pipeline-heartbeat`
 
