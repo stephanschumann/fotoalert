@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-06-30 · Basis: abgeschlossene Tickets bis US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-07-03 · Basis: abgeschlossene Tickets bis BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -452,5 +452,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-30 | US-108 | Mondaufgang/-untergang: Events werden nur erzeugt wenn Mond ≤ 35° zur Sichtachse (vordere Azimut-Zone); seitlich + hinter dem Fotografen werden unterdrückt; `/refresh-feed` nach Release ausführen |
 | 2026-06-30 | US-07 | Golden Cloud Score: neues Feld `golden_cloud_score` (0.0–1.0) je Foto-Chance; bewertet Wolkenstruktur-Qualität für Goldene/Blaue Stunde; `calculate_golden_cloud_score()` in `backend/weather.py`, Schema in `schemas.py`; Frontend-Slider „Bewölkungs-Qualität" in Filter-Sheet (index.html) |
 | 2026-06-30 | US-109 | Goldene Wolken & Himmelsröte als eigene Event-Typen im Feed; richtungsbewusstes Scoring (Azimut-Differenz Sonne ↔ Motiv ≤ 30°); eigene Detail-Sheets mit Erklärtext + Wetterdaten; Filter-Chips; Cap+Sort-Schutz gegen Verdrängung |
-| 2026-06-30 | US-111 | Kompass-Diagramm im Detail-Sheet für Goldene Wolken + Himmelsröte: zeigt Sonnenposition (gold), Sichtachse Fotograf→Motiv (blau gestrichelt, mit Pfeil), Wolken-Erwartungsbereich als farbige Zone (±30° golden / ±90° rot); Entfernungsanzeige unter dem Diagramm (Haversine aus Koordinaten); Hinweis bei Motiv < 500 m |
+| 2026-06-30 | US-111 | Kompass-Diagramm im Detail-Sheet für Goldene Wolken + Himmelsröte: zeigt Sonnenposition (gold), Sichtachse Fotograf→Motiv (blau gestrichelt, mit Pfeil), Wolken-Erwartungsbereich als farbige Zone (±30° golden / ±90° rot — **von US-113 am 2026-07-02 auf ±30°-Sektor am Gegenpunkt der Sonne korrigiert, siehe dort**); Entfernungsanzeige unter dem Diagramm (Haversine aus Koordinaten); Hinweis bei Motiv < 500 m |
 | 2026-06-30 | BUG-55 | Wetterkarte: Beim Einschalten von „Wolken"/„Niederschlag" zoomt die Karte automatisch auf das Wetter-Gitter heraus (vorher nur eine senkrechte Linie, weil bei Stadt-Zoom nur 1–2 von 100 Kacheln im Bild lagen); beim Ausschalten zurück zur vorherigen Ansicht (`WeatherMap._savedView`/`_gridBounds`/`fitBounds`, nur Frontend) |
+| 2026-07-02 | US-113 | Himmelsröte-Chance nur noch bei Sichtachse im Gegenpunkt-Sektor der Sonne (±30°), Kompass-Diagramm + Legende entsprechend angepasst |
+| 2026-07-03 | BUG-56 | Astronomie-Regressionstest korrigiert: falscher Vergleichswert für Sonnenauf-/-untergang Berlin (21.06.2026) im Test berichtigt (01:43→02:43 UTC, 20:25→19:33 UTC); Berechnung selbst war korrekt, nur der Testreferenzwert war falsch; Toleranz unverändert |

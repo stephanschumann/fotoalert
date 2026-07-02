@@ -29,9 +29,9 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-113** *(Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-56** *(Astronomie-Regression — 13/13 Tests grün, unabhängig verifiziert)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **BUG-57** *(Weather-Map-Testdatei fetch_weather_multigrid fehlt)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
@@ -720,12 +720,97 @@ Begründung: Minimal-invasiv (nur `web/index.html`, 4 Stellen), WebKit-sicher na
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-02 |
 
 **Beschreibung:** `tests/test_astronomy_regression.py::test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance` schlagen fehl — die berechnete Sonnenauf-/-untergangszeit für Berlin liegt außerhalb der im Test erwarteten Toleranz. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113 (Himmelsröte-Chance). Root Cause noch nicht analysiert — offen ob Ephemeriden-Bibliothek, Zeitzonen-Handling oder Toleranzwert des Tests veraltet ist.
 
-**Bezug:** Unabhängig von BUG-57 (Weather-Map-Tests) — andere Root Cause (Astronomie-Berechnung vs. veraltete US-72-Testdatei), daher als eigenes Ticket geführt statt zusammengelegt.
+**Bezug:** Unabhängig von BUG-57 (Weather-Map-Tests) — andere Root Cause (Astronomie-Berechnung vs. veraltete US-72-Testdatei), daher als eigenes Ticket geführt statt zusammengelegt. Berührt inhaltlich US-107 (Sonnen-Alignment-Planung, done 2026-06-29): Beide nutzen dieselbe Sonnenauf-/-untergangs-Berechnung im Backend. Da diese Berechnung sich als korrekt erwiesen hat (siehe Root Cause unten), besteht **kein** Korrekturbedarf an US-107 — die dort ausgelieferten Zeiten sind nicht betroffen.
+
+**Root Cause (verifiziert):**
+
+Testlauf (`pytest backend/tests/test_astronomy_regression.py -v`) zeigt für den 21.06.2026 (Berlin, 52,52°N/13,405°O):
+
+| Ereignis | Berechnet | Test-Referenzwert | Abweichung |
+|----------|-----------|--------------------|------------|
+| Sonnenaufgang | 02:43 UTC | 01:43 UTC | 60,1 Min. |
+| Sonnenuntergang | 19:33 UTC | 20:25 UTC | 51,7 Min. |
+
+Auffällig: Beide Abweichungen liegen nahe bei genau einer Stunde — das typische Muster eines Zeitzonen-/Sommerzeit-Versatzes (MESZ = UTC+2, nicht UTC+1), nicht das Muster eines Rechenfehlers (der würde eher gleichmäßig in dieselbe Richtung oder mit wachsendem Fehler über den Tag streuen).
+
+Zur Gegenprobe wurde die berechnete Zeit mit einer zweiten, unabhängigen Bibliothek (`astral`, andere Berechnungsmethode als die im Test verwendete Skyfield/de421.bsp-Ephemeride) für exakt denselben Ort und dasselbe Datum geprüft:
+
+| Ereignis | Skyfield (im Test genutzt) | astral (unabhängige Gegenprobe) | Differenz |
+|----------|------------------------------|----------------------------------|-----------|
+| Sonnenaufgang | 02:43:06 UTC | 02:43:28 UTC | 22 Sek. |
+| Sonnenuntergang | 19:33:16 UTC | 19:32:55 UTC | 21 Sek. |
+
+Zwei unabhängige Berechnungsmethoden stimmen bis auf ~20 Sekunden überein (methodenbedingte Restdifferenz, weit innerhalb jeder sinnvollen Toleranz). Das belegt: **Die Berechnung im Produktivcode ist astronomisch korrekt.** Zusätzlich beweist die Skyfield-Version im Regressionstest (1.54, aktuell) und die verwendete de421.bsp-Ephemeride (Standardwerk, gültig 1899–2053) selbst, dass hier keine veraltete oder defekte Bibliothek im Spiel ist.
+
+Wichtiger Architektur-Fund: Der Regressionstest berechnet die Sonnenzeiten **komplett unabhängig** noch einmal direkt mit Skyfield — er ruft nicht die Produktionsfunktion (`calculations/astronomy.py::calculate_sun_info`) auf. Die Produktionsfunktion selbst verwendet exakt dieselbe Skyfield-Methode (`almanac.sunrise_sunset`) wie der Test. Ein Fehler im Test-Referenzwert sagt also **nichts** über einen Fehler im ausgelieferten App-Verhalten aus — betroffen ist ausschließlich der Vergleichswert, der im Test hinterlegt ist, nicht die App-Berechnung selbst.
+
+**Fazit Root Cause:** Der im Test hinterlegte Referenzwert (01:43 UTC / 20:25 UTC, laut Kommentar von timeanddate.com übernommen) ist um rund eine Stunde falsch — vermutlich wurde beim Übertragen der Berliner Ortszeit (MESZ, UTC+2) versehentlich nur ein Stunden-Offset von einer Stunde statt zwei abgezogen, oder der Wert wurde für Winterzeit statt Sommerzeit notiert. Die tatsächliche, astronomisch korrekte Zeit für Berlin am 21.06.2026 liegt bei ca. 02:43 UTC (Aufgang) / 19:33 UTC (Untergang) — nicht bei den im Test hinterlegten Werten. **Nicht verifizierbar war** der direkte Abgleich mit der timeanddate.com-Webseite selbst, da in dieser Umgebung kein Internetzugriff auf externe Webseiten möglich war (weder `curl` noch `web_fetch` lieferten Daten). Die Gegenprobe erfolgte stattdessen über eine zweite, offline verfügbare Ephemeriden-Bibliothek (`astral`), was methodisch gleichwertig ist, da zwei unabhängige Berechnungsverfahren übereinstimmen.
+
+**Pre-Mortem:**
+- 💀 Szenario: Die Toleranz wird einfach von ±5 auf ±65 Minuten aufgeweitet, um den Test grün zu bekommen. → Gegenmaßnahme: Nicht die Toleranz verändern, sondern den falschen Referenzwert korrigieren (01:43→02:43 UTC, 20:25→19:33 UTC). Die enge Toleranz von ±5 Minuten ist sinnvoll und schützt genau vor echten künftigen Regressionen (kaputte Ephemeride, fehlerhafte Zeitzonenumrechnung) — sie darf nicht geopfert werden, nur weil der aktuelle Vergleichswert falsch ist.
+- 💀 Szenario: Der Fix wird an der Produktionsberechnung (`calculate_sun_info`) vorgenommen, obwohl diese nachweislich korrekt rechnet — dadurch werden reale App-Funktionen (Goldene Stunde, Blaue Stunde, US-107 Sonnen-Alignment, Sonnenuntergangs-Chancen im Feed) verfälscht. → Gegenmaßnahme: Root Cause ist klar auf den Testwert eingegrenzt (siehe oben, per Gegenprobe belegt) — die Spec schließt Änderungen an `astronomy.py` explizit aus.
+- 💀 Szenario: Beim Korrigieren des Referenzwerts wird versehentlich nur einer der beiden Werte (Aufgang oder Untergang) angepasst, der andere bleibt falsch stehen und der Test bleibt halb rot. → Gegenmaßnahme: Beide Werte in derselben Änderung korrigieren, Testlauf danach zeigt beide Tests grün.
+- 💀 Szenario: Der korrigierte Referenzwert wird erneut ohne Gegenprobe „aus dem Gedächtnis" oder plausibel geschätzt eingetragen und ist wieder leicht daneben. → Gegenmaßnahme: Der in dieser Analyse per Skyfield **und** astral doppelt verifizierte Wert (02:43 UTC / 19:33 UTC, siehe Tabelle oben) wird 1:1 übernommen, nicht neu geschätzt.
+- 💀 Szenario: Der Test wird künftig bei jedem Lauf minimal rot, weil die Toleranz zu eng an der methodenbedingten Restdifferenz (~20–30 Sek.) verschiedener Skyfield-/de421.bsp-Versionen liegt. → Gegenmaßnahme: Die bestehende Toleranz von ±5 Minuten bleibt unverändert, da sie mit >10-facher Sicherheitsmarge über der beobachteten Methodendifferenz liegt (20–30 Sek. vs. 300 Sek. Toleranz) — kein Anpassungsbedarf.
+
+**Akzeptanzkriterien:**
+- [ ] Der automatisierte Regressionstest für den Berliner Sonnenaufgang am 21.06.2026 zeigt nach dem Fix ein bestandenes Ergebnis, ohne dass die erlaubte Abweichung (Toleranzfenster) verändert wurde.
+- [ ] Der automatisierte Regressionstest für den Berliner Sonnenuntergang am 21.06.2026 zeigt nach dem Fix ein bestandenes Ergebnis, ohne dass die erlaubte Abweichung (Toleranzfenster) verändert wurde.
+- [ ] Die in der App angezeigten Zeiten für Sonnenaufgang, Sonnenuntergang, Goldene Stunde und Blaue Stunde bleiben nach dem Fix unverändert (keine Seiteneffekte, da die Produktionsberechnung nicht angefasst wird).
+- [ ] Edge Case: Ein künftiger echter Fehler in der Zeitberechnung (z. B. durch eine fehlerhafte Bibliotheks-Aktualisierung) lässt den Test weiterhin zuverlässig fehlschlagen — die Korrektur darf die Empfindlichkeit des Tests nicht verwässern.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Root-Cause-Klärung ersetzt hier das übliche Feature-Mapping, da es sich um einen reinen Test-Datenfehler handelt — keine Verhaltensregeln zu klären)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: betroffene Datei ist ausschließlich `backend/tests/test_astronomy_regression.py` (Referenzwerte in `test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance`); `backend/calculations/astronomy.py` wurde gelesen und als nicht fehlerhaft bestätigt, bleibt unangetastet
+- [x] Designer-Check: nicht visuell (reiner Backend-Test), übersprungen
+- [ ] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Testreferenzwert korrigieren
+- Vorgehen: Die beiden im Test hinterlegten Vergleichswerte werden auf die verifizierten, astronomisch korrekten Zeiten (02:43 UTC Sonnenaufgang, 19:33 UTC Sonnenuntergang) korrigiert. Toleranz (±5 Minuten) bleibt unverändert. Begleitkommentar im Test wird angepasst, damit künftig klar ist, dass der Wert doppelt (Skyfield + astral) verifiziert wurde.
+- Betroffene Dateien: `backend/tests/test_astronomy_regression.py`
+- Vorteile: Behebt exakt die nachgewiesene Ursache (falscher Testwert), keine Berührung von Produktionscode, kein Risiko für Golden-Hour/Blue-Hour/US-107-Funktionen, sehr kleiner Änderungsumfang.
+- Nachteile / Risiken: Keine wesentlichen — einziges Risiko (versehentlich nur einen der beiden Werte korrigieren) ist im Pre-Mortem abgedeckt und durch die AKs abgesichert.
+- Aufwand: klein
+
+### Option B — Toleranz aufweiten
+- Vorgehen: Die Toleranz im Test würde von ±5 auf z. B. ±65 Minuten erhöht, damit der aktuelle (falsche) Referenzwert wieder „passt".
+- Betroffene Dateien: `backend/tests/test_astronomy_regression.py`
+- Vorteile: Keine.
+- Nachteile / Risiken: Verdeckt den eigentlichen Fehler dauerhaft, entwertet den Regressionstest als Schutz gegen echte künftige Zeitberechnungsfehler (genau das Szenario, das im Pre-Mortem als Hauptrisiko benannt ist). Nicht empfohlen.
+- Aufwand: klein (aber der falsche Weg)
+
+### Option C — Produktionsberechnung anpassen
+- Vorgehen: Die Sonnenauf-/-untergangsberechnung in `calculations/astronomy.py` würde geändert, in der Annahme, sie rechne falsch.
+- Betroffene Dateien: `backend/calculations/astronomy.py` (und alle Features, die darauf aufbauen: Golden Hour, Blue Hour, US-107 Sonnen-Alignment, Feed-Chancen).
+- Vorteile: Keine — die Berechnung ist nachweislich korrekt (Gegenprobe mit `astral`, Abweichung < 30 Sek.).
+- Nachteile / Risiken: Würde eine funktionierende Berechnung verfälschen und mehrere ausgelieferte Features (US-107, Golden/Blue Hour, Feed-Zeiten) beschädigen. Nicht empfohlen.
+- Aufwand: mittel (aber unnötig und schädlich)
+
+✅ **Empfehlung: Option A** — Die Root-Cause-Analyse hat eindeutig belegt (zwei unabhängige Berechnungsmethoden stimmen auf ~20 Sekunden überein), dass ausschließlich der im Test hinterlegte Vergleichswert falsch ist, nicht die Berechnung selbst. Option A behebt exakt diese Ursache mit minimalem, risikofreiem Eingriff. Option B würde den Test dauerhaft entschärfen und wurde im Pre-Mortem als Hauptgefahr identifiziert. Option C würde funktionierenden Code ohne Grund anfassen und reale Features gefährden.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance` in `backend/tests/test_astronomy_regression.py` laufen nach der Korrektur grün; restliche 11 Tests in derselben Datei bleiben unverändert grün (Regression innerhalb der Testdatei).
+- [ ] Manuell: Nach dem Fix `pytest backend/tests/test_astronomy_regression.py -v` lokal ausführen — erwartet: 13/13 Tests bestanden, keine Fehlermeldung mehr zu Sonnenaufgang/-untergang Berlin.
+
+**Umsetzung (2026-07-02):**
+Vor der Korrektur per Live-Testlauf (`pytest backend/tests/test_astronomy_regression.py -v`) gegenverifiziert: berechneter Sonnenaufgang 02:43:05.875239 UTC, Sonnenuntergang 19:33:16.495871 UTC — deckt sich mit den in der Analyse ermittelten Werten. Geänderte Datei: `backend/tests/test_astronomy_regression.py`.
+- `test_sunrise_berlin_within_tolerance`: Referenzwert `ref = datetime(2026, 6, 21, 1, 43, ...)` → `datetime(2026, 6, 21, 2, 43, ...)` (01:43 UTC → 02:43 UTC), inkl. Docstring/Fehlermeldungstext angepasst.
+- `test_sunset_berlin_within_tolerance`: Referenzwert `ref = datetime(2026, 6, 21, 20, 25, ...)` → `datetime(2026, 6, 21, 19, 33, ...)` (20:25 UTC → 19:33 UTC), inkl. Docstring/Fehlermeldungstext angepasst.
+- Kommentarblock oberhalb beider Tests (Zeile ~95) auf die neuen Referenzwerte aktualisiert + Hinweis auf BUG-56 als Quelle der Korrektur ergänzt.
+- Toleranz (±5 Min.) unverändert. Produktionscode (`calculations/astronomy.py`) nicht angefasst.
+- Testergebnis: `pytest backend/tests/test_astronomy_regression.py -v` → 13/13 grün.
+- Regressions-Check Nachbartests: `test_ephemeris_engine.py`, `test_moon_phase_events.py`, `test_us79_moon_rise_set.py` → 25/28 grün, 3 Fehlschläge durch vorbestehenden `ModuleNotFoundError: No module named 'httpx'` in `calculations/weather.py` (Sandbox-Umgebungslücke, unabhängig von dieser Änderung). `test_us07.py`, `test_us07_golden_cloud_score.py`, `test_us113.py` konnten aus demselben Grund (fehlendes `httpx`-Modul) nicht kollisionsfrei geladen werden — ebenfalls keine Verbindung zur Testwert-Korrektur.
+
+**Unabhängige Verifikation (2026-07-02):** Separater Subagent hat den Fix gegengeprüft (nicht der Implementierer): 13/13 Tests frisch selbst ausgeführt und grün, Toleranz (±5 Min.) nachweislich unverändert, Produktionscode (`calculations/astronomy.py`) unangetastet, kein neuer Fehlerfall im selben Testfile. Urteil: **bestanden**, keine Restrisiken.
 
 ---
 
@@ -5122,14 +5207,15 @@ Gegenmaßnahme: `width="100%" height="200"` + `viewBox="0 0 200 200"` → respon
 
 ---
 
-### US-113 · Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung `[~]`
+### US-113 · Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-01 |
+| **Abgeschlossen** | 2026-07-02 |
 
 **Beschreibung:** Die „Himmelsröte"-Chance (RED_SKY, Sonnenauf-/-untergang-Himmelsfarbe/„goldene Stunde") soll nur ausgelöst werden, wenn sich die Wolkenzone mit der Sichtachse vom Standort zum Motiv überschneidet. Liegen die Wolken zwar vor, aber außerhalb der Blickrichtung, soll keine Chance generiert werden — aktuell wird Himmelsröte bewusst omnidirektional (ohne Richtungsfilter) ausgelöst.
 

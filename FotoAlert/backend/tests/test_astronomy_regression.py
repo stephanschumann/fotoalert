@@ -93,8 +93,10 @@ def test_subject_angular_width_realistic():
 # Initialisierung oder Zeitzonenumrechnung (Quelle: timeanddate.com Berlin).
 #
 # Referenzwerte für Berlin (52.52°N, 13.405°E), Sommer:
-#   2026-06-21 Sonnenaufgang 01:43 UTC / Sonnenuntergang 20:25 UTC (Sommersonnenwende)
+#   2026-06-21 Sonnenaufgang 02:43 UTC / Sonnenuntergang 19:33 UTC (Sommersonnenwende)
 #   Toleranz: ±5 Minuten (berücksichtigt atmosphärische Refraktion, Genauigkeit de421.bsp)
+#   (BUG-56: vormals 01:43/20:25 UTC — Zeitzonen-Offset-Fehler im Testwert, per
+#   Skyfield + astral doppelt gegenverifiziert, siehe BACKLOG.md BUG-56)
 #
 # Dieser Test ist mit @pytest.mark.online markiert und wird in CI übersprungen
 # wenn kein Netz verfügbar ist (de421.bsp-Download ~17 MB). Lokal: läuft beim
@@ -110,9 +112,10 @@ except ImportError:
 @pytest.mark.skipif(not _SKYFIELD_AVAILABLE, reason="skyfield nicht installiert")
 @pytest.mark.online
 def test_sunrise_berlin_within_tolerance():
-    """TASK-34 AK: Sonnenaufgang Berlin am 2026-06-21 zwischen 01:38–01:48 UTC.
+    """TASK-34 AK: Sonnenaufgang Berlin am 2026-06-21 zwischen 02:38–02:48 UTC.
 
-    Referenzwert: 01:43 UTC (timeanddate.com). Toleranz ±5 min.
+    Referenzwert: 02:43 UTC (BUG-56: korrigiert, per Skyfield + astral verifiziert).
+    Toleranz ±5 min.
     Schlägt dieser Test fehl, ist wahrscheinlich de421.bsp korrumpiert,
     die Skyfield-Version inkompatibel, oder A.get_sunrise_utc() falsch implementiert.
     """
@@ -132,20 +135,21 @@ def test_sunrise_berlin_within_tolerance():
     assert sunrises, "Kein Sonnenaufgang gefunden — Skyfield-Problem"
 
     sr = sunrises[0]
-    ref = datetime(2026, 6, 21, 1, 43, tzinfo=timezone.utc)
+    ref = datetime(2026, 6, 21, 2, 43, tzinfo=timezone.utc)
     diff = abs((sr - ref).total_seconds())
     assert diff <= 300, (
         f"Sonnenaufgang Berlin 2026-06-21: {sr.strftime('%H:%M')} UTC — "
-        f"Referenz: 01:43 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
+        f"Referenz: 02:43 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
     )
 
 
 @pytest.mark.skipif(not _SKYFIELD_AVAILABLE, reason="skyfield nicht installiert")
 @pytest.mark.online
 def test_sunset_berlin_within_tolerance():
-    """TASK-34 AK: Sonnenuntergang Berlin am 2026-06-21 zwischen 20:20–20:30 UTC.
+    """TASK-34 AK: Sonnenuntergang Berlin am 2026-06-21 zwischen 19:28–19:38 UTC.
 
-    Referenzwert: 20:25 UTC (timeanddate.com). Toleranz ±5 min.
+    Referenzwert: 19:33 UTC (BUG-56: korrigiert, per Skyfield + astral verifiziert).
+    Toleranz ±5 min.
     """
     from datetime import datetime, timezone
 
@@ -162,11 +166,11 @@ def test_sunset_berlin_within_tolerance():
     assert sunsets, "Kein Sonnenuntergang gefunden — Skyfield-Problem"
 
     ss = sunsets[0]
-    ref = datetime(2026, 6, 21, 20, 25, tzinfo=timezone.utc)
+    ref = datetime(2026, 6, 21, 19, 33, tzinfo=timezone.utc)
     diff = abs((ss - ref).total_seconds())
     assert diff <= 300, (
         f"Sonnenuntergang Berlin 2026-06-21: {ss.strftime('%H:%M')} UTC — "
-        f"Referenz: 20:25 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
+        f"Referenz: 19:33 UTC — Abweichung: {diff/60:.1f} min (Toleranz: 5 min)"
     )
 
 
