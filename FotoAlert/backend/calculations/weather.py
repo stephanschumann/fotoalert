@@ -208,32 +208,64 @@ def should_generate_golden_clouds_event(
     return diff <= 30
 
 
+RED_SKY_AZIMUTH_TOLERANCE_DEG = 30
+"""
+US-113: Toleranzwinkel für den Sonnenazimut-Sichtachsen-Filter bei RED_SKY.
+Eigene, unabhängig änderbare Konstante (nicht an GOLDEN_CLOUDS' 30°-Wert gekoppelt,
+auch wenn sie initial denselben Wert hat) — siehe Implementierungsoption A, US-113.
+"""
+
+
 def should_generate_red_sky_event(
     gcs: float,
     cl: float,
     cm: float,
+    sun_azimuth: Optional[float] = None,
+    subject_azimuth: Optional[float] = None,
 ) -> bool:
     """
-    US-109: Prüft ob ein RED_SKY-Event erzeugt werden soll.
+    US-109 / US-113: Prüft ob ein RED_SKY-Event erzeugt werden soll.
 
     Bedingungen:
     - golden_cloud_score >= 0.80
     - cloud_cover_low + cloud_cover_mid >= 60 % (dominante tiefe/mittlere Bewölkung)
       → der Gesamthimmel rötet sich, nicht nur Cirrus-Schleier
+    - US-113: Azimut-Differenz zwischen Motivrichtung und dem GEGENPUNKT der Sonne
+      <= RED_SKY_AZIMUTH_TOLERANCE_DEG (siehe Korrektur unten)
 
-    Kein Richtungsfilter: Himmelsröte ist omnidirektional sichtbar.
+    US-113-Korrektur (2026-07-02, fachlicher Analysefehler behoben):
+    Himmelsröte (Gegendämmerung, "Belt of Venus") entsteht am GEGENPUNKT der Sonne
+    (Antisolarpunkt = sun_azimuth + 180°), NICHT am Sonnenazimut selbst wie bei
+    GOLDEN_CLOUDS (Alpenglühen, direktes Streulicht rund um die Sonne). Die ursprüngliche
+    Implementierung verglich subject_azimuth fälschlich direkt gegen sun_azimuth (1:1
+    von GOLDEN_CLOUDS übernommen) — das ist geometrisch falsch für RED_SKY. Quellen:
+    https://de.wikipedia.org/wiki/Gegend%C3%A4mmerung, https://en.wikipedia.org/wiki/Belt_of_Venus
+
+    Ohne sun_azimuth oder subject_azimuth (z. B. Location ohne definiertes Motiv) ist kein
+    Richtungsvergleich möglich → kein RED_SKY-Event (analog zum GOLDEN_CLOUDS-Verhalten).
 
     Args:
-        gcs: Golden Cloud Score (0.0–1.0)
-        cl:  cloud_cover_low in Prozent (0–100)
-        cm:  cloud_cover_mid in Prozent (0–100)
+        gcs:             Golden Cloud Score (0.0–1.0)
+        cl:              cloud_cover_low in Prozent (0–100)
+        cm:              cloud_cover_mid in Prozent (0–100)
+        sun_azimuth:      Sonnen-Azimut in Grad (0–360, 0=Nord im Uhrzeigersinn), optional
+        subject_azimuth:  Motiv-Azimut vom Standpunkt aus (0–360), optional
 
     Returns:
         True wenn RED_SKY-Event erzeugt werden soll
     """
     if gcs < 0.80:
         return False
-    return (cl + cm) >= 60
+    if (cl + cm) < 60:
+        return False
+    if sun_azimuth is None or subject_azimuth is None:
+        return False
+    # Gegendämmerung/Belt of Venus: die Himmelsröte liegt gegenüber der Sonne, nicht bei ihr.
+    antisolar_azimuth = (sun_azimuth + 180) % 360
+    diff = abs(antisolar_azimuth - subject_azimuth) % 360
+    if diff > 180:
+        diff = 360 - diff
+    return diff <= RED_SKY_AZIMUTH_TOLERANCE_DEG
 
 
 def wmo_code_to_description(code: int) -> str:

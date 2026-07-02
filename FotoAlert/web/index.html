@@ -1182,7 +1182,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.12';
+const APP_VERSION = '1.20.13';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3273,7 +3273,11 @@ function _haversineM(lat1, lon1, lat2, lon2) {
 }
 
 function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
-  const W = 240, H = 240, cx = 120, cy = 120, R = 108;
+  // H erweitert (US-113-Folgefix): Sicherheitsabstand zw. Kreisrand (inkl. Cardinal-Labels bei S,
+  // äußerster Punkt = cy+R+18+4.5 = 250.5) und Legende, damit Pfeilspitzen (max. r=107) die Legende
+  // bei keinem Winkel erreichen. Puffer 12px = etabliertes Bauhaus-Spacing-Muster im File
+  // (vgl. margin-top:12px an anderen UI-Blöcken). Kreis (R) und cx unveraendert.
+  const W = 240, H = 284, cx = 120, cy = 120, R = 108;
   // Convert azimuth (0=N, clockwise) to SVG angle (0=up, clockwise)
   const azToRad = az => (az - 90) * Math.PI / 180;
   const pt = (az, r) => {
@@ -3294,11 +3298,14 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
     return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rO} ${rO} 0 ${large} 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rI} ${rI} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
   }
 
-  // Zone: GOLDEN_CLOUDS = ±30° around sunAz, RED_SKY = ±90° (half-ring opposite of sun)
+  // Zone: GOLDEN_CLOUDS = ±30° around sunAz (Alpenglühen, Streulicht um die Sonne).
+  // RED_SKY (US-113, korrigiert 2026-07-02) = ±RED_SKY_AZ_TOLERANCE um den GEGENPUNKT der Sonne
+  // (Gegendämmerung/Belt of Venus entsteht gegenüber der Sonne, nicht bei ihr — siehe BACKLOG.md US-113).
+  const RED_SKY_AZ_TOLERANCE = 30; // muss mit backend/calculations/weather.py RED_SKY_AZIMUTH_TOLERANCE_DEG uebereinstimmen
   let zonePath = '';
   if (isRedSky) {
-    // Opposite half: sunAz+90 to sunAz+270 (the side away from sun for scattered light)
-    zonePath = `<path d="${sectorPath(sunAz + 90, sunAz + 270, 104, 22)}" fill="#ef4444" fill-opacity="0.18" stroke="#ef4444" stroke-opacity="0.5" stroke-width="1.2"/>`;
+    const antisolarAz = (sunAz + 180) % 360;
+    zonePath = `<path d="${sectorPath(antisolarAz - RED_SKY_AZ_TOLERANCE, antisolarAz + RED_SKY_AZ_TOLERANCE, 104, 22)}" fill="#ef4444" fill-opacity="0.18" stroke="#ef4444" stroke-opacity="0.5" stroke-width="1.2"/>`;
   } else {
     zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="#d4860a" fill-opacity="0.22" stroke="#d4860a" stroke-opacity="0.6" stroke-width="1.2"/>`;
   }
@@ -3372,12 +3379,14 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
   // Center dot
   const centerDot = `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#555"/>`;
 
-  // Legend
+  // Legend (US-113-Folgefix: Y-Positionen um 12px-Sicherheitspuffer nach unten verschoben,
+  // damit Pfeilspitzen der Sichtachse/Sonne bei keinem Winkel mit der Legende kollidieren.
+  // Inhalt/Farben/Zeilenabstand unveraendert.)
   const legendItems = isRedSky
-    ? `<text x="8" y="228" font-size="10" fill="#ef4444">● Günstige Zone (Röte)</text><text x="8" y="240" font-size="10" fill="#d4860a">→ Sonne</text>`
-    : `<text x="8" y="228" font-size="10" fill="#d4860a">● Goldene Zone (±30°)</text><text x="8" y="240" font-size="10" fill="#d4860a">→ Sonne</text>`;
+    ? `<text x="8" y="263" font-size="10" fill="#ef4444">● Günstige Zone (±30° zum Gegenpunkt)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`
+    : `<text x="8" y="263" font-size="10" fill="#d4860a">● Goldene Zone (±30°)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`;
   const subjLegend = subjectAz != null
-    ? `<text x="120" y="228" font-size="10" fill="#5272c0">- - Sichtachse</text>` : '';
+    ? `<text x="120" y="263" font-size="10" fill="#5272c0">- - Sichtachse</text>` : '';
 
   // Entfernungszeile + ggf. Hinweis bei sehr kurzem Motiv-Abstand
   let distHtml = '';
@@ -3393,7 +3402,9 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
     }
   }
 
-  return `<div><svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;max-width:260px;height:260px;margin:0 auto">
+  // Anzeigehöhe an neues viewBox-Seitenverhältnis (240:284) angepasst, sonst Stauchung/Verzerrung
+  // des Kreises trotz unveränderter viewBox-Breite (US-113-Folgefix).
+  return `<div><svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;max-width:260px;height:307px;margin:0 auto">
     ${rings}
     ${zonePath}
     ${ticks}
@@ -3746,10 +3757,26 @@ const Detail = {
                 mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, true,
                   o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
             : '';
+          const rsSubAz = o.subject_azimuth ?? null;
+          // US-113-Korrektur (2026-07-02): Himmelsröte liegt am Gegenpunkt der Sonne
+          // (Gegendämmerung/Belt of Venus), nicht bei der Sonne selbst — daher Vergleich
+          // gegen den Antisolarpunkt (rsSunAz + 180°), analog zum Backend-Fix.
+          const rsAntisolarAz = (rsSunAz != null) ? (rsSunAz + 180) % 360 : null;
+          const rsAzDiff = (rsAntisolarAz != null && rsSubAz != null)
+            ? (() => { let d = Math.abs(rsAntisolarAz - rsSubAz) % 360; return d > 180 ? 360 - d : d; })()
+            : null;
+          const rsDirRow = (rsSunAz != null)
+            ? `<div class="info-row"><span class="ir-label">Sonnenazimut</span><span class="ir-val">${rsSunAz.toFixed(1)}°</span></div>` : '';
+          const rsMotifRow = (rsSubAz != null)
+            ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${rsSubAz.toFixed(1)}°</span></div>` : '';
+          const rsDiffRow = (rsAzDiff != null)
+            ? `<div class="info-row"><span class="ir-label">Winkelversatz zum Gegenpunkt</span><span class="ir-val" style="color:var(--red)">${rsAzDiff.toFixed(1)}° ≤ 30° ✓</span></div>` : '';
           return compassHtmlRS + mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
-            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Tiefe und mittlere Wolken dominieren den Himmel und werden vom flachen Sonnenlicht intensiv rot-orange eingefärbt. Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung.</p>` +
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
-            clRow + cmRow + totRow
+            clRow + cmRow + totRow +
+            `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Richtungs-Prüfung (Gegenpunkt der Sonne ↔ Motiv ≤ 30°):</p>` +
+            rsDirRow + rsMotifRow + rsDiffRow
           );
         }
         return '';

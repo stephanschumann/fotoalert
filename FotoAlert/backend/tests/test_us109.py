@@ -71,23 +71,60 @@ def test_golden_clouds_azimut_wrap_um_180():
 # ---------------------------------------------------------------------------
 
 def test_red_sky_ausgeloest():
-    """AK-4: gcs=0.85, cl=40, cm=35 (Summe 75 >= 60) → True."""
-    assert should_generate_red_sky_event(0.85, cl=40, cm=35) is True
+    """AK-4: gcs=0.85, cl=40, cm=35 (Summe 75 >= 60) → True.
+
+    US-113: RED_SKY ist seit US-113 nicht mehr omnidirektional (das war die
+    ursprüngliche US-109-Entscheidung), sondern verlangt zusätzlich eine
+    gültige Sichtachse zum GEGENPUNKT der Sonne (Gegendämmerung/Belt of Venus,
+    Korrektur 2026-07-02 — siehe BACKLOG.md US-113). sun_azimuth=278 →
+    Gegenpunkt = (278+180)%360 = 98. subject_azimuth=85 → Differenz zum
+    Gegenpunkt = 13° <= 30°, damit dieser Test weiterhin die Wolkenbedingung
+    prüft, ohne an der Azimut-Bedingung zu scheitern.
+    """
+    assert should_generate_red_sky_event(0.85, cl=40, cm=35, sun_azimuth=278, subject_azimuth=85) is True
 
 
 def test_red_sky_zu_niedriger_score():
-    """AK-6: gcs=0.75 < 0.80 → kein RED_SKY."""
-    assert should_generate_red_sky_event(0.75, cl=40, cm=35) is False
+    """AK-6: gcs=0.75 < 0.80 → kein RED_SKY.
+
+    US-113 (Korrektur 2026-07-02): Azimut-Werte gegen den Gegenpunkt der Sonne
+    ergänzt (gültige Sichtachse: sun_azimuth=278 → Gegenpunkt=98, subject_azimuth=85
+    → Differenz 13°), damit ausschließlich der Score-Schwellwert getestet wird und
+    nicht die Azimut-Bedingung das Ergebnis beeinflusst.
+    """
+    assert should_generate_red_sky_event(0.75, cl=40, cm=35, sun_azimuth=278, subject_azimuth=85) is False
 
 
 def test_red_sky_zu_wenig_tiefe_wolken():
-    """AK-4: gcs=0.85, aber cl+cm=15 < 60 → False (nur Cirrus)."""
-    assert should_generate_red_sky_event(0.85, cl=5, cm=10) is False
+    """AK-4: gcs=0.85, aber cl+cm=15 < 60 → False (nur Cirrus).
+
+    US-113 (Korrektur 2026-07-02): Azimut-Werte gegen den Gegenpunkt der Sonne
+    ergänzt (sun_azimuth=278 → Gegenpunkt=98, subject_azimuth=85 → Differenz 13°),
+    damit ausschließlich die Wolkenbedingung getestet wird und nicht die
+    Azimut-Bedingung das Ergebnis beeinflusst.
+    """
+    assert should_generate_red_sky_event(0.85, cl=5, cm=10, sun_azimuth=278, subject_azimuth=85) is False
 
 
 def test_red_sky_genau_schwellwert_beides():
-    """AK-4: gcs=0.80 genau, cl+cm=60 genau → True."""
-    assert should_generate_red_sky_event(0.80, cl=30, cm=30) is True
+    """AK-4: gcs=0.80 genau, cl+cm=60 genau → True.
+
+    US-113 (Korrektur 2026-07-02): RED_SKY verlangt eine gültige Sichtachse zum
+    GEGENPUNKT der Sonne, nicht zur Sonne selbst. sun_azimuth=100 → Gegenpunkt =
+    (100+180)%360 = 280. subject_azimuth=280 → Differenz 0°, damit dieser Test
+    weiterhin die Score-/Wolken-Schwellwerte an der Grenze prüft.
+    """
+    assert should_generate_red_sky_event(0.80, cl=30, cm=30, sun_azimuth=100, subject_azimuth=280) is True
+
+
+def test_red_sky_verwechslungsfall_motiv_bei_sonne_statt_gegenpunkt():
+    """US-113-Korrektur (2026-07-02): Deckt den ursprünglichen fachlichen Fehler ab —
+    subject_azimuth nahe dem SONNENAZIMUT selbst (wie bei GOLDEN_CLOUDS), nicht nahe
+    dessen Gegenpunkt. sun_azimuth=278, subject_azimuth=265 (Differenz zur Sonne nur
+    13°, das wäre bei der alten fehlerhaften Logik fälschlich True gewesen) → aber
+    Gegenpunkt von 278° ist 98°, Differenz zum Gegenpunkt = 167° > 30° → muss False sein.
+    """
+    assert should_generate_red_sky_event(0.85, cl=40, cm=35, sun_azimuth=278, subject_azimuth=265) is False
 
 
 # ---------------------------------------------------------------------------
@@ -163,11 +200,17 @@ def test_integration_golden_clouds_verdraengt_original(monkeypatch):
 
 
 def test_integration_red_sky_erzeugt():
-    """AK-4: gcs=0.85, cl=40, cm=35 → Himmelsröte-Event wird erzeugt."""
+    """AK-4: gcs=0.85, cl=40, cm=35 → Himmelsröte-Event wird erzeugt.
+
+    US-113 (Korrektur 2026-07-02): subject_azimuth=85 explizit gesetzt statt
+    Default (265) zu übernehmen — sun_azimuth=278 → Gegenpunkt=98, Differenz
+    zum Gegenpunkt = 13° <= 30° (der Default 265 läge am Sonnenazimut selbst,
+    nicht am Gegenpunkt, und würde seit der Korrektur kein Event mehr erzeugen).
+    """
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from main import _generate_cloud_mood_events
 
-    feed = [_make_golden_event(gcs=0.85, cl=40, cm=35)]
+    feed = [_make_golden_event(gcs=0.85, cl=40, cm=35, subject_azimuth=85)]
     neue, _ = _generate_cloud_mood_events(feed)
     typen = [e["event_type"] for e in neue]
     assert "Himmelsröte" in typen, f"Himmelsröte fehlt. Erzeugte Typen: {typen}"

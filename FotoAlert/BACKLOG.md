@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-72 |
-| **🏁 Done** | abgeschlossen + deployed | **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🔄 In Progress** | wird gerade implementiert | **US-113** *(Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **US-113** *(Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung)* · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **BUG-57** *(Weather-Map-Testdatei fetch_weather_multigrid fehlt)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -714,6 +714,36 @@ Begründung: Minimal-invasiv (nur `web/index.html`, 4 Stellen), WebKit-sicher na
 
 ---
 
+### BUG-56 · Astronomie-Regressionstest: Sonnenauf-/-untergang Berlin außerhalb Toleranz `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-02 |
+
+**Beschreibung:** `tests/test_astronomy_regression.py::test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance` schlagen fehl — die berechnete Sonnenauf-/-untergangszeit für Berlin liegt außerhalb der im Test erwarteten Toleranz. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113 (Himmelsröte-Chance). Root Cause noch nicht analysiert — offen ob Ephemeriden-Bibliothek, Zeitzonen-Handling oder Toleranzwert des Tests veraltet ist.
+
+**Bezug:** Unabhängig von BUG-57 (Weather-Map-Tests) — andere Root Cause (Astronomie-Berechnung vs. veraltete US-72-Testdatei), daher als eigenes Ticket geführt statt zusammengelegt.
+
+---
+
+### BUG-57 · Weather-Map-Testdatei referenziert nicht existierende Funktion `fetch_weather_multigrid` `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-02 |
+
+**Beschreibung:** `tests/test_us72_weather_map.py` schlägt mit `ImportError`/`AttributeError` fehl, da `backend/main.py` keine Funktion `fetch_weather_multigrid` (mehr) besitzt. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113. Vermutliche Ursache laut US-112-Analyse-Spec (Zeile 1268 f.): Die Testdatei wurde test-first für das nie gebaute US-72-Backend geschrieben (`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_weather_map_cache` kamen laut damaligem Befund ausschließlich in dieser untracked Testdatei vor, nie im Backend implementiert). US-112 hat den `/weather-map`-Endpoint dann tatsächlich gebaut, aber mit anderer Architektur (DWD ICON-D2 + MET Norway statt Open-Meteo-Multigrid) — die alte Testdatei wurde dabei nicht auf die neue Implementierung migriert oder entfernt. Zu klären: Testdatei an die tatsächliche US-112-Implementierung anpassen, oder als obsolet entfernen (US-72 „geht in US-112 auf", siehe US-112-Bezug).
+
+**Bezug:** Direkte Verbindung zu **US-72** (Wetterkarte, Board-Status „Done", aber Backend laut US-112-Analyse nie eigenständig existent) und **US-112** (Wetter-Overlay DWD/MET, Board-Status „Done", released 2026-07-01, hat US-72 laut eigenem Bezugstext „aufgehen lassen"). Kein neuer Bug in der Wetter-Funktionalität selbst — US-112 wurde live verifiziert und funktioniert; betrifft ausschließlich eine veraltete/verwaiste Testdatei aus der US-72-Phase. Unabhängig von BUG-56 (Astronomie) — andere Root Cause, daher getrennt geführt.
+
+---
+
 ### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
 > **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
@@ -1119,14 +1149,15 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 
 ---
 
-### US-72 · Wetterkarte `[~]`
+### US-72 · Wetterkarte `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-19 |
+| **Abgeschlossen** | 2026-07-01 |
 
 **Beschreibung:** Als Fotograf möchte ich eine Wetterkarte für Berlin/Potsdam/Umland sehen, um Wolkendecke und Niederschlag für meine geplanten Shooting-Fenster visuell einschätzen zu können.
 
@@ -3404,16 +3435,35 @@ Logout → als User anmelden → Einstellungen → "User"
 | **Status** | ToDo |
 | **Erstellt** | 2026-06-27 |
 
-**Beschreibung:** `refactor_check.py` meldet fünf lange JS-Funktionen in `web/index.html`:
-- `ic()` Z. 805 — ~361 Zeilen (Icon-Helper, eingebracht durch US-100)
-- `handler()` Z. 1166 — ~115 Zeilen
-- `verState()` Z. 2958 — ~232 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
-- `azDiffFn()` Z. 3651 — ~665 Zeilen (neu gemeldet durch US-109-Refactor, 2026-06-30)
-- `sunAlignmentLabel()` Z. 4402 — ~1044 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
+**Beschreibung:** `refactor_check.py` meldet sechs lange JS-Funktionen in `web/index.html`:
+- `ic()` Z. 847 — ~389 Zeilen (Icon-Helper, eingebracht durch US-100)
+- `handler()` Z. 1236 — ~115 Zeilen
+- `verState()` Z. 3028 — ~232 Zeilen (neu gemeldet durch BUG-46, 2026-06-28)
+- `sectorPath()` Z. 3289 — ~160 Zeilen (neu gemeldet durch US-113-Refactor, 2026-07-02)
+- `azDiffFn()` Z. 3716 — ~190 Zeilen (neu gemeldet durch US-109-Refactor, 2026-06-30)
+- `sunAlignmentLabel()` Z. 4966 — ~1044 Zeilen (neu gemeldet durch BUG-53, 2026-06-29)
 
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30); azDiffFn ergänzt + Zeilennummern aktualisiert durch US-109-Refactor (2026-06-30)
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30); azDiffFn ergänzt + Zeilennummern aktualisiert durch US-109-Refactor (2026-06-30); sectorPath ergänzt + Zeilennummern aktualisiert durch US-113-Refactor (2026-07-02)
+
+---
+
+### TASK-51 · Refactoring: Lange Funktion `startup()` aufteilen (backend/main.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-02 |
+
+**Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `backend/main.py`:
+- `startup()` Z. 1237 — 84 Zeilen (Threshold: 80)
+
+Aufteilen in kleinere Hilfsfunktionen (z.B. Scheduler-Setup, QA-Values-Laden, Location-Overrides separieren). Kein inhaltlicher Umbau.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-113, 2026-07-02)
 
 ---
 
@@ -5072,15 +5122,212 @@ Gegenmaßnahme: `width="100%" height="200"` + `viewBox="0 0 200 200"` → respon
 
 ---
 
-### US-113 · Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung `[ ]`
+### US-113 · Himmelsröte-Chance nur bei Wolken in Sichtachsen-Richtung `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-01 |
 
 **Beschreibung:** Die „Himmelsröte"-Chance (RED_SKY, Sonnenauf-/-untergang-Himmelsfarbe/„goldene Stunde") soll nur ausgelöst werden, wenn sich die Wolkenzone mit der Sichtachse vom Standort zum Motiv überschneidet. Liegen die Wolken zwar vor, aber außerhalb der Blickrichtung, soll keine Chance generiert werden — aktuell wird Himmelsröte bewusst omnidirektional (ohne Richtungsfilter) ausgelöst.
 
-**Bezug:** US-109 [x] hat RED_SKY bewusst **ohne** Richtungsfilter spezifiziert (Rule 2 + Q3-Entscheid: „Röte ist omnidirektional", da keine echte gerichtete Wolkendatenquelle verfügbar war — nur `golden_cloud_score` + `cloud_cover_low/mid ≥ 60 %`). GOLDEN_CLOUDS hat dagegen bereits einen Richtungsfilter (±30° Azimut-Differenz Sonnenazimut↔Sichtachse) erhalten. Dieses Ticket überschreibt/verschärft die US-109-Entscheidung für RED_SKY gezielt — nutzt vermutlich denselben Azimut-Differenz-Mechanismus wie GOLDEN_CLOUDS (`backend/calculations/weather.py`, `subject_azimuth`, `sunrise/sunset_azimuth`), muss aber in der Analyse klären ob ein eigener Schwellwert sinnvoll ist. Überschneidung/Abhängigkeit auch zu US-111 [~] (In Progress): Das dortige Kompass-Diagramm zeigt für Himmelsröte laut Rule 2 explizit einen „roten Farbring ringsum (kein Richtungssektor)" — falls US-113 den Richtungsfilter einführt, muss diese Diagramm-Logik in US-111 ggf. mit angepasst werden (Reihenfolge/Abstimmung mit Stephan klären, da US-111 noch offen ist).
+**Bezug:** US-109 [x] hat RED_SKY bewusst **ohne** Richtungsfilter spezifiziert (Rule 2 + Q3-Entscheid: „Röte ist omnidirektional", da keine echte gerichtete Wolkendatenquelle verfügbar war — nur `golden_cloud_score` + `cloud_cover_low/mid ≥ 60 %`). GOLDEN_CLOUDS hat dagegen bereits einen Richtungsfilter (±30° Azimut-Differenz Sonnenazimut↔Sichtachse) erhalten. Dieses Ticket überschreibt/verschärft die US-109-Entscheidung für RED_SKY gezielt — nutzt denselben Azimut-Differenz-Mechanismus wie GOLDEN_CLOUDS (`backend/calculations/weather.py`, `subject_azimuth`, `sunrise/sunset_azimuth`). **Korrektur zum Intake-Kontext:** US-111 ist bereits **`[x]` Done** (abgeschlossen 2026-07-01), nicht mehr „In Progress" — das Kompass-Diagramm für Himmelsröte ist bereits live im Detail-Sheet. Es zeigt (Code-Verifikation, siehe unten) **keinen reinen Vollkreis**, sondern bereits eine Halbring-Zone (±90° gegenüber der Sonnenrichtung, `sunAz+90` bis `sunAz+270`). Falls US-113 einen engeren Richtungsfilter einführt, muss diese Zone in `web/index.html` (`mkCloudCompassSvg()`) mit angepasst werden — das ist Teil des Scopes dieser Analyse, siehe Architektur-Analyse unten.
+
+---
+
+## Analyse (US-113) · 2026-07-01
+
+> ⚠️ **Korrektur nach Live-Test, 2026-07-02:** Die ursprüngliche Analyse (sofort unten) enthielt einen fachlichen Geometrie-Fehler bei der **Referenzrichtung** für RED_SKY. Angenommen wurde: "RED_SKY funktioniert nach demselben Mechanismus wie GOLDEN_CLOUDS" — das stimmt für den generellen **Ansatz** (Azimut-Differenz mit Toleranzwinkel, Sonnenazimut als einzig verfügbarer gerichteter Proxy), aber **nicht** für die Referenzrichtung selbst.
+>
+> **Fachlicher Fehler:** Die Spec/Implementierung verglich `subject_azimuth` direkt gegen `sun_azimuth` (wie bei GOLDEN_CLOUDS). Das ist für GOLDEN_CLOUDS (Alpenglühen-artiges direktes Streulicht um die Sonne) richtig, aber für RED_SKY/Himmelsröte fachlich falsch.
+>
+> **Neue Regel:** Himmelsröte (Gegendämmerung, "Belt of Venus") entsteht am **Gegenpunkt der Sonne** (Antisolarpunkt = `(sun_azimuth + 180) % 360`), nicht am Sonnenazimut selbst. Die günstige Zone für RED_SKY muss also um den Gegenpunkt liegen, nicht um die Sonne.
+>
+> Quellen: [Gegendämmerung (Wikipedia DE)](https://de.wikipedia.org/wiki/Gegend%C3%A4mmerung), [Belt of Venus (Wikipedia EN)](https://en.wikipedia.org/wiki/Belt_of_Venus)
+>
+> Entdeckt von Stephan per Screenshot: Kompass-Diagramm zeigte die Sonne oben links, die rote "günstige Zone" lag aber fälschlich ebenfalls um die Sonne herum statt gegenüber.
+>
+> Der generelle Azimut-Toleranz-Ansatz (Wraparound-Vergleich, ±30° Toleranz, Fallback ohne `subject_azimuth`) bleibt unverändert richtig — korrigiert wird ausschließlich der Referenzwert, gegen den `subject_azimuth` verglichen wird (Details in Implementierung, Testplan-Nachtrag und Code, siehe unten sowie `backend/calculations/weather.py`, `web/index.html`, `backend/tests/test_us113.py`).
+
+### Example Mapping
+
+**Scope-Check:** Das Ticket nimmt eine bewusste Design-Entscheidung aus US-109 (Q3: „Röte ist omnidirektional") zurück. Das ist keine Erweiterung eines ersten Slices, sondern eine gezielte Verschärfung einer bereits getroffenen und live ausgerollten Entscheidung. Das wird als 🔴-Frage behandelt (Q1 unten), da es unmittelbar App-Verhalten betrifft, das Nutzer heute schon sehen.
+
+**Annahmen-Protokoll:**
+
+| Punkt | Typ | Entscheidung / Default |
+|-------|-----|------------------------|
+| Rücknahme der Q3-Entscheidung aus US-109 (RED_SKY omnidirektional → jetzt richtungsgebunden) — ist das wirklich gewollt, oder nur eine Verschärfung für bestimmte Fälle? | 🔴 Kritisch | ❓ Q1 — siehe unten |
+| Toleranzwinkel für die Sichtachsen-Bindung bei RED_SKY: identisch zu GOLDEN_CLOUDS (±30°) oder eigener, ggf. größerer Wert? | 🔴 Kritisch | ❓ Q2 — siehe unten |
+| Geometrische Prüfung „Wolken überschneiden Sichtachse": echte Wolkenrichtung oder derselbe Azimut-Differenz-Proxy wie GOLDEN_CLOUDS (Sonnenazimut ↔ Motivazimut)? | 🔴 Kritisch (Datenlage) | ❓ Q3 — siehe unten (Datenlage siehe Pre-Mortem) |
+| Soll US-111s Kompass-Diagramm (Halbring ±90° für Himmelsröte) in diesem Ticket mit angepasst werden, oder ausdrücklich als Folgeticket abgegrenzt? | 🔴 Kritisch (Scope) | ❓ Q4 — siehe unten |
+| Edge Case: Wolken/Sichtachse exakt am Toleranzrand (z. B. Differenz = 30,0°) | ⚪ Konventionell | Default: `≤` (inklusiv), analog zur bestehenden GOLDEN_CLOUDS-Implementierung (`diff <= 30`, siehe Code-Verifikation) |
+| Bestehende „Himmelsröte ist rundum sichtbar"-Texte im Detail-Sheet (`web/index.html` Z. 3750) | ⚪ Konventionell | Default: Text muss mit angepasst werden, wenn Q1 mit „ja, Filter einführen" beantwortet wird — sonst widerspricht die App-Erklärung dem neuen Verhalten |
+
+**🔴 Offene Fragen (bitte vor Freigabe beantworten — Best-Effort-Spec unten trotzdem vollständig, mit Annahmen markiert):**
+
+1. **Q1 — Rücknahme bestätigen:** Soll die Q3-Entscheidung aus US-109 („Röte ist omnidirektional") vollständig zurückgenommen werden, sodass RED_SKY ab sofort einen Richtungsfilter wie GOLDEN_CLOUDS bekommt? Oder ist eine mildere Variante gemeint (z. B. größerer Toleranzwinkel als GOLDEN_CLOUDS, weil Himmelsröte physikalisch tatsächlich einen größeren Sichtbarkeitsbereich hat als eng gebündelte goldene Wolken)?
+   *Best-Effort-Annahme für diese Spec:* Ja, vollständige Rücknahme — RED_SKY bekommt denselben Mechanismus wie GOLDEN_CLOUDS (harter Azimut-Schwellwert), da das Ticket „soll nur ausgelöst werden, wenn..." eindeutig eine Bedingung statt eine Gewichtung fordert.
+
+2. **Q2 — Toleranzwinkel:** Gleicher Wert wie GOLDEN_CLOUDS (±30°) oder ein eigener, größerer Wert (z. B. ±60°) mit der Begründung, dass Himmelsröte ein flächigeres, weniger scharf gebündeltes Phänomen ist als goldene Wolken direkt hinterm Motiv?
+   *Best-Effort-Annahme für diese Spec:* ±30°, identisch zu GOLDEN_CLOUDS — konsistent, einfach zu erklären, keine Sonderregel nötig. Falls Stephan einen größeren Winkel für physikalisch treffender hält, ist das ein Ein-Zeilen-Parameter-Wechsel (`RED_SKY_AZ_TOLERANCE = 30` als eigene Konstante, siehe Implementierungsoptionen).
+
+3. **Q3 — Datenlage (siehe auch Pre-Mortem):** Bestätigt durch Code-Verifikation unten: Es gibt **keine** echte Wolkenrichtungsdaten in den Wetterdaten (Open-Meteo liefert nur `cloud_cover_low/mid/high_pct` als Gesamtprozent über dem Standort — bereits in US-109 abschließend geklärt, siehe dortige Datenquellen-Klärung). Die einzige verfügbare Richtungsinformation ist der Sonnenazimut (`sunrise_azimuth`/`sunset_azimuth`) als Proxy. Frage an Stephan: Ist dieser Proxy (identisch zu GOLDEN_CLOUDS) für Stephan akzeptabel, oder sollte RED_SKY aus fachlicher Sicht anders behandelt werden, weil „Röte am Himmel" nicht zwingend an der Sonnenposition hängt (auch entgegengesetzter Himmel kann rot leuchten – Alpenglühen-Effekt)?
+   *Best-Effort-Annahme für diese Spec:* Denselben Proxy-Mechanismus wie GOLDEN_CLOUDS verwenden (keine Alternative verfügbar) — mit dem Hinweis, dass das eine Näherung bleibt und im Detail-Sheet transparent kommuniziert wird (wie bereits bei GOLDEN_CLOUDS in US-109 gehandhabt).
+
+4. **Q4 — Scope zu US-111:** Soll die Anpassung des Kompass-Diagramms (Halbring → Sektor, analog zur GOLDEN_CLOUDS-Zone) **innerhalb** von US-113 miterledigt werden, oder als eigenes Folgeticket abgegrenzt?
+   *Best-Effort-Annahme für diese Spec:* Innerhalb von US-113 miterledigen — sonst zeigt das Detail-Sheet nach Release einen Diagramm-Halbring, der dem neuen (engeren) Filterverhalten widerspricht: ein Nutzer sähe im Diagramm eine ±90°-Zone, obwohl die Chance real nur bei ±30° ausgelöst wird. Das wäre eine sofort sichtbare Inkonsistenz. Wird unten als expliziter Teil-Scope geführt (Architektur-Analyse + Implementierungsoptionen).
+
+**Rules + Examples:**
+
+📏 **Rule 1: RED_SKY wird nur noch erzeugt, wenn zusätzlich zur bestehenden Wolkenbedingung auch die Richtungsbedingung erfüllt ist**
+- 🟢 *Given* `gcs=0.85`, `cl=40, cm=35` (Wolkenbedingung erfüllt wie bisher), `sunset_azimuth=278°`, `subject_azimuth=265°` (Differenz 13° ≤ 30°), *When* das Wetter-Overlay läuft, *Then* erscheint die „Himmelsröte"-Karte im Feed — wie bisher.
+- 🔴 *Given* `gcs=0.85`, `cl=40, cm=35` (Wolkenbedingung erfüllt), `sunset_azimuth=278°`, `subject_azimuth=90°` (Differenz 172°), *When* das Wetter-Overlay läuft, *Then* erscheint **keine** „Himmelsröte"-Karte — obwohl die Wolkenbedingung erfüllt wäre (neues Verhalten ggü. US-109).
+
+📏 **Rule 2: Fehlt die Motivrichtung (kein `subject_azimuth`), kann kein Richtungsvergleich stattfinden**
+- 🟢 *Given* eine Location ohne definiertes Motiv (`subject_azimuth = null`), Wolkenbedingung erfüllt, *When* das Wetter-Overlay läuft, *Then* [siehe ❓ hierzu: Fallback-Verhalten muss geklärt werden — zwei plausible Varianten unten].
+- ❓ Zwei sinnvolle Verhaltensweisen sind denkbar: (a) ohne Motiv keine Sichtachse definierbar → RED_SKY entfällt komplett (konsistent mit GOLDEN_CLOUDS-Verhalten, AK-12 aus US-109), oder (b) ohne Motiv fällt der Filter automatisch weg → RED_SKY bleibt omnidirektional (Rückfall auf US-109-Verhalten als Fallback). *Best-Effort-Annahme:* Variante (a) — konsistent mit GOLDEN_CLOUDS, einfacher zu erklären („keine Motivrichtung = keine Sichtachsen-Chance"). Als Frage an Stephan im Weg-Gate erneut aufgreifen, falls (b) bevorzugt wird.
+
+📏 **Rule 3: Das Kompass-Diagramm im Detail-Sheet zeigt für Himmelsröte künftig eine Richtungszone statt eines Halbrings**
+- 🟢 *Given* ein Himmelsröte-Event mit `sunset_azimuth=278°`, `subject_azimuth=265°`, *When* ich das Detail-Sheet öffne, *Then* zeigt das Kompass-Diagramm eine rote Zone von ±30° um die Sichtachse (analog zur goldenen Zone bei GOLDEN_CLOUDS) statt des bisherigen ±90°-Halbrings.
+
+📏 **Rule 4: Bestehende Erklärungstexte im Detail-Sheet werden an das neue Verhalten angepasst**
+- 🟢 *Given* ein Himmelsröte-Event, *When* ich die „Warum Himmelsröte?"-Sektion öffne, *Then* lese ich nicht mehr „Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung", sondern einen Text der die Richtungsbedingung erklärt (analog zum GOLDEN_CLOUDS-Text).
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK-1:** Zeigt eine Location bereits heute die Bedingungen für eine „Himmelsröte"-Karte (Wolken tief+mittel ≥ 60 %, Score ≥ 0,80) UND die Sonne geht in Motivrichtung auf/unter (Winkel-Differenz ≤ 30°), erscheint die Karte weiterhin wie bisher.
+- [ ] **AK-2:** Zeigt eine Location die gleichen Wolkenbedingungen, aber die Sonne geht **nicht** in Motivrichtung auf/unter (Winkel-Differenz > 30°), erscheint **keine** „Himmelsröte"-Karte mehr im Feed — auch wenn die Wolken vorhanden sind.
+- [ ] **AK-3:** Bei einer Location **ohne** definiertes Motiv (keine Motivkoordinaten) erscheint keine „Himmelsröte"-Karte, selbst wenn die Wolkenbedingung erfüllt ist (kein Richtungsvergleich möglich — analog zu Goldene Wolken).
+- [ ] **AK-4:** Im Detail-Sheet einer „Himmelsröte"-Karte zeigt das Kompass-Diagramm eine rote Richtungszone (±30° um die Sichtachse) statt des bisherigen Halbrings ringsum.
+- [ ] **AK-5:** Der Erklärungstext in der „Warum Himmelsröte?"-Sektion beschreibt die neue Richtungsbedingung (Sonne ↔ Motiv ≤ 30°) statt der bisherigen Aussage „rundum sichtbar, keine bestimmte Blickrichtung nötig".
+- [ ] **AK-6 (Regression):** „Goldene Wolken"-Karten und ihr Verhalten bleiben unverändert (kein Nebeneffekt auf GOLDEN_CLOUDS-Logik).
+- [ ] **AK-7 (Regression):** Die normale Wetter-Sektion (Wolken, Temperatur etc.) im Detail-Sheet bleibt unverändert.
+- [ ] Edge Case AK-8: Bei einer Winkel-Differenz von genau 30,0° erscheint die Karte weiterhin (inklusive Grenzwert, `≤`).
+- [ ] Edge Case AK-9: Fehlt das Wetter-Overlay (Event > 3 Tage in der Zukunft), erscheint wie bisher keine „Himmelsröte"-Karte (unverändert zu US-109).
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation (2026-07-01):**
+- `backend/calculations/weather.py` Z. 211–236 gelesen: `should_generate_red_sky_event(gcs, cl, cm)` prüft aktuell **nur** `gcs >= 0.80` und `(cl + cm) >= 60` — **kein** Azimut-Parameter vorhanden. Docstring bestätigt explizit: „Kein Richtungsfilter: Himmelsröte ist omnidirektional sichtbar." Das ist die Stelle, die geändert werden muss.
+- `backend/calculations/weather.py` Z. 182–208 gelesen: `should_generate_golden_clouds_event(gcs, sun_azimuth, subject_azimuth)` ist die exakte Vorlage — bereits als reine, gut testbare Funktion mit Azimut-Differenz-Berechnung (`diff = abs(sun_azimuth - subject_azimuth) % 360`, dann `diff > 180 → 360 - diff`, dann `diff <= 30`). Wiederverwendbares Muster, 1:1 übertragbar.
+- `backend/main.py` Z. 504–572 (`_generate_cloud_mood_events`) gelesen: Ruft `should_generate_red_sky_event(gcs, cl, cm)` in Z. 559 auf — **ohne** `sun_az`/`subject_az`, obwohl beide Werte in derselben Funktion für GOLDEN_CLOUDS bereits berechnet sind (Z. 534–540: `sun_az` und `subject_az` stehen zum Zeitpunkt des RED_SKY-Checks längst zur Verfügung). Erweiterung ist ein kleiner, lokaler Eingriff — keine neue Datenbeschaffung nötig.
+- **Datenlage bestätigt (zentrale technische Frage):** Open-Meteo liefert laut US-109-Datenquellen-Klärung (BACKLOG.md Z. 2539–2545) **nur Gesamtprozent-Bedeckung pro Höhenschicht** (`cloud_cover_low/mid/high_pct`), keine räumliche/richtungsbezogene Verteilung. Es gibt **keine** Wolkenposition am Himmel in den Wetterdaten — nur die Sonnenazimut-Werte (`sunrise_azimuth`/`sunset_azimuth`) sind gerichtete Daten, die bereits im Event-Objekt verfügbar sind (`backend/precompute.py` Z. 516–537, bestätigt in US-109-Code-Verifikation). Der einzig verfügbare Mechanismus ist somit derselbe Sonnenazimut-Proxy wie bei GOLDEN_CLOUDS — **nicht** eine echte Wolkenrichtungsprüfung.
+- `web/index.html` Z. 3275–3394 (`mkCloudCompassSvg`) gelesen: Für RED_SKY wird aktuell eine Zone von `sunAz+90` bis `sunAz+270` gezeichnet (Kommentar Z. 3297: „RED_SKY = ±90° (half-ring opposite of sun)") — das ist bereits **kein** echter Vollkreis, wie der Ticket-Text „Farbring ringsum" nahelegt, sondern ein Halbring gegenüber der Sonne. Diese Zone muss auf einen ±30°-Sektor um die Sichtachse verengt werden, wenn Q1/Q2 wie angenommen entschieden werden — analog zum bestehenden GOLDEN_CLOUDS-Zonencode (Z. 3302–3304).
+- `web/index.html` Z. 3735–3753 (RED_SKY-Erklärungssektion) gelesen: Enthält Legende + Erklärtext mit „Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung" (Z. 3750) und Legenden-Text „Günstige Zone (Röte)" (Z. 3377) — beide müssen bei Filtereinführung textlich angepasst werden, sonst widerspricht die App-Erklärung dem neuen Verhalten.
+
+💀 **Szenario 1: Datenlage nur Gesamt-Bedeckungsgrad, keine echte Wolkenrichtung — Ticket-Formulierung „Wolken überschneiden sich mit der Sichtachse" ist geometrisch nicht wörtlich umsetzbar**
+- Auslöser: Der Ticket-Text suggeriert eine echte räumliche Wolkenprüfung. Die verfügbare Datenlage (siehe Code-Verifikation) erlaubt das nicht — es gibt nur einen Sonnenazimut-Proxy, keine Wolkenposition.
+- Frühwarnung: Wurde bereits in US-109 exakt so durchdekliniert und dokumentiert (Datenquellen-Klärung, Fazit: „nicht realisierbar").
+- Gegenmaßnahme: Spec verwendet explizit den Sonnenazimut-Proxy (wie GOLDEN_CLOUDS) statt einer wörtlichen Wolken-Geometrie-Prüfung — im Detail-Sheet und in der Spec transparent als Näherung kommuniziert (siehe AK-5, Implementierungsoptionen).
+
+💀 **Szenario 2: US-111-Diagramm wird vergessen — Diagramm zeigt weiterhin ±90°-Halbring, Filter greift aber bei ±30°**
+- Auslöser: US-113 wird als reine Backend-Änderung missverstanden; das Frontend-Diagramm (US-111, bereits live) wird nicht mit angepasst.
+- Frühwarnung: Ein Nutzer öffnet eine der wenigen (jetzt selteneren) Himmelsröte-Karten und sieht ein Diagramm, das eine viel größere „günstige Zone" zeigt, als tatsächlich zur Auslösung geführt hat — Diagramm und Realität widersprechen sich sichtbar.
+- Gegenmaßnahme: Q4 explizit gestellt; Best-Effort-Annahme nimmt die Diagramm-Anpassung in den Scope von US-113 auf (siehe AK-4, Architektur-Analyse, Implementierungsoptionen).
+
+💀 **Szenario 3: Deutlich weniger Himmelsröte-Events als vorher — Nutzer empfindet Feature als "kaputt"**
+- Auslöser: RED_SKY war bisher omnidirektional und damit für jede Location mit passenden Wolken auslösbar. Mit Richtungsfilter fällt ein großer Teil der Locations (die nicht zufällig in Sonnenrichtung liegen) komplett raus — potenziell ein harter Rückgang der Event-Häufigkeit.
+- Frühwarnung: Keine quantitative Prüfung möglich ohne Live-Daten (kein Zugriff auf aktuelle Cache-Statistiken in der Analyse-Phase) — sollte vor Release stichprobenartig gegen den Live-Cache geprüft werden (`/opportunities` Counter für `event_type == "Himmelsröte"` vor/nach Deploy vergleichen).
+- Gegenmaßnahme: Als Testschritt im Testplan verankert (manueller Vorher/Nachher-Vergleich). Falls der Rückgang zu stark ausfällt, ist Q2 (größerer Toleranzwinkel) die vorgesehene Stellschraube.
+
+💀 **Szenario 4: `subject_azimuth`-Fallback-Verhalten uneindeutig — RED_SKY verschwindet für alle Locations ohne Motiv komplett**
+- Auslöser: Viele Locations haben laut US-109-Pre-Mortem-Szenario 3 kein definiertes Motiv (`subject_azimuth IS NULL`). Bisher liefen diese Locations für RED_SKY trotzdem durch (omnidirektional). Mit Filter würden sie komplett wegfallen — eine potenziell große, stille Verhaltensänderung.
+- Frühwarnung: Keine Live-Zählung der Locations ohne Motiv in dieser Analyse durchgeführt (siehe ❓ Q2 in Rule 2) — sollte vor Freigabe geprüft werden.
+- Gegenmaßnahme: Als offene Rule-2-Frage markiert; Best-Effort-Annahme (a) gewählt, aber Stephan sollte die Zahl der betroffenen Locations vor Freigabe sehen (Empfehlung: kurzer DB-Check `SELECT COUNT(*) FROM locations WHERE subject_lat IS NULL` vor Implementierungsstart).
+
+💀 **Szenario 5: `ev_compass_rs`-Section-Guard und Legendentexte laufen bei der Umstellung auf Sektor-Zone auseinander**
+- Auslöser: `mkCloudCompassSvg()` wird für GOLDEN_CLOUDS und RED_SKY gemeinsam genutzt (`isRedSky`-Flag steuert nur Farbe + Zonen-Winkel). Wird die Zonen-Berechnung für RED_SKY versehentlich identisch zur GOLDEN_CLOUDS-Farbe (statt rot) umgestellt, oder der Legendentext nicht mitgezogen, entsteht eine visuell inkonsistente Karte (rote Farbe, aber falscher Zonenwinkel oder falscher Text).
+- Frühwarnung: Bei manuellem Test das Diagramm visuell mit einer aktuellen GOLDEN_CLOUDS-Karte vergleichen — Farbe muss rot bleiben, nur der Winkel (90°→30°) ändert sich.
+- Gegenmaßnahme: In AK-4 verankert; Implementierung ändert ausschließlich die Zonen-Winkelberechnung in Z. 3299–3304, nicht die Farblogik.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien (alle gelesen, nicht nur überflogen):**
+
+1. `backend/calculations/weather.py` (Z. 211–236) — `should_generate_red_sky_event()` erhält zwei neue Parameter (`sun_azimuth`, `subject_azimuth`) und die Azimut-Differenz-Prüfung analog zu `should_generate_golden_clouds_event()` (Z. 182–208, direkte Vorlage).
+2. `backend/main.py` (Z. 504–572, `_generate_cloud_mood_events`) — Aufruf in Z. 559 wird um `sun_az`, `subject_az` erweitert (beide Werte liegen zum Zeitpunkt des Aufrufs bereits vor, Z. 534–540). Guard für `subject_az is not None` ergänzen (analog zu GOLDEN_CLOUDS-Guard in Z. 543).
+3. `web/index.html` (Z. 3275–3394, `mkCloudCompassSvg`) — Zonen-Berechnung für `isRedSky` (Z. 3299–3304) von `sunAz+90…sunAz+270` (Halbring) auf `sunAz-30…sunAz+30` (Sektor, wie GOLDEN_CLOUDS) umstellen. Reine Zahlenänderung, keine neue Funktion nötig — ggf. eigene Konstante statt hartcodiertem `30`, um Q2-Antwort (Toleranzwinkel) leicht änderbar zu halten.
+4. `web/index.html` (Z. 3735–3753, RED_SKY-Erklärungssektion) — Text „Diese Röte ist rundum sichtbar — du brauchst keine bestimmte Blickrichtung" durch einen Text ersetzen, der die Richtungsbedingung erklärt (analog zum GOLDEN_CLOUDS-Text Z. 3730). Legendentext Z. 3377 „Günstige Zone (Röte)" bleibt sachlich korrekt, kann bestehen bleiben.
+5. `web/index.html` (Z. 3743–3746) — `rsSunAz` und `o.subject_azimuth` werden bereits ans Diagramm übergeben; keine neue Datenübergabe nötig, nur die Zonen-Logik in `mkCloudCompassSvg` ändert sich.
+6. `backend/tests/test_us113.py` (neu, siehe Testplan) — Kein `backend/tests/`-Verzeichnis im Repo vorhanden (per Glob geprüft) — muss ggf. neu angelegt werden, analog zur in US-109 referenzierten (aber ebenfalls nicht vorgefundenen) `test_us109.py`. Wird in Implementierungsphase geklärt/angelegt.
+
+**Einstiegspunkt-Check:**
+- `/opportunities` → `_feed_cache` → `_generate_cloud_mood_events()` → ✅ betroffen, hier greift der neue Filter.
+- `/calendar`, `/discover` (Scout) → kein Wetter-Overlay, RED_SKY erscheint dort laut US-109 ohnehin nicht → nicht betroffen.
+
+**Kein neues Score-Feld, kein neuer Event-Typ (Schritt 4f entfällt):** RED_SKY existiert bereits als Event-Typ mit Filter-Chip (US-109 AK-8) — dieses Ticket ändert nur die Auslöse-Bedingung, keine neue UI-Filterkategorie nötig.
+
+---
+
+### Designer-Check (Schritt 4b)
+
+Diese Änderung hat **sichtbare** Auswirkungen (Kompass-Diagramm-Zone ändert sich von Halbring zu Sektor, Erklärungstext ändert sich) — aber es handelt sich um eine reine **Parameteränderung an einer bereits bestehenden, gestalteten Komponente** (`mkCloudCompassSvg`, durch `fotoalert-designer` im Rahmen von US-111 bereits abgenommen: Farben, Radien, SVG-Aufbau). Es entsteht **kein neues visuelles Element**, keine neue Farbe, kein neues Icon — nur der Winkelbereich einer bestehenden Zone wird verengt (90°→30°) und ein Text angepasst.
+
+**Kein zusätzlicher Designer-Call für dieses Ticket nötig.** Festgehalten als Abhängigkeit: Die Diagramm-Anpassung ist **kein eigenständiger Scope von US-113**, sondern eine notwendige Folgeanpassung an US-111, die hier aus Konsistenzgründen mit erledigt wird (siehe Q4). Sollte Stephan die Diagramm-Anpassung lieber als eigenes Ticket auslagern wollen, ist das im Weg-Gate zu entscheiden.
+
+---
+
+### Implementierungsoptionen
+
+**Option A — Sonnenazimut-Proxy, identischer Mechanismus wie GOLDEN_CLOUDS (empfohlen)**
+
+*Was du in der App erlebst:* Himmelsröte-Karten erscheinen ab sofort nur noch, wenn die Sonne beim Auf-/Untergang aus der Richtung leuchtet, in die du dein Motiv fotografierst — genau wie bei „Goldene Wolken" heute schon. Liegt die Sonne beim Sonnenuntergang im Westen, dein Motiv aber im Osten, bekommst du keine Himmelsröte-Karte mehr für diese Location, selbst wenn genug Wolken da sind. Das Kompass-Diagramm im Detail-Sheet zeigt die günstige Zone dann als engeren Sektor statt als große Halbkreis-Fläche.
+
+- Vorgehen: `should_generate_red_sky_event()` um `sun_azimuth`/`subject_azimuth`-Parameter + Azimut-Differenz-Prüfung (`≤ 30°`, wie GOLDEN_CLOUDS) erweitern. Aufrufstelle in `main.py` entsprechend füttern. Diagramm-Zone in `index.html` von Halbring auf Sektor umstellen. Erklärungstext anpassen.
+- Betroffene Dateien: `weather.py`, `main.py`, `index.html` (Diagramm + Text), `tests/test_us113.py` (neu).
+- Vorteile: Keine neue Datenquelle nötig, exakt dieselbe Datenlage/Architektur wie bei GOLDEN_CLOUDS bereits produktiv und getestet; kleiner, gut abgrenzbarer Eingriff; konsistente Nutzererfahrung (beide Wolken-Chancen funktionieren nach demselben Prinzip).
+- Nachteile / Risiken: Bleibt eine Näherung (Sonnenazimut ≠ echte Wolkenposition) — physikalisch kann Himmelsröte auch entgegengesetzt der Sonne sichtbar sein (Alpenglühen-Effekt), das wird mit diesem Ansatz nicht erfasst. Die Zahl der ausgelösten Himmelsröte-Events sinkt spürbar (siehe Pre-Mortem Szenario 3) — sollte vor Release stichprobenartig geprüft werden.
+- Aufwand: klein bis mittel (Backend: klein, Frontend-Diagramm+Text: klein, Tests: klein).
+
+**Option B — Eigener, großzügigerer Toleranzwinkel für RED_SKY (z. B. ±60° statt ±30°)**
+
+*Was du in der App erlebst:* Wie Option A, aber der Sichtachsen-Filter ist bei Himmelsröte großzügiger als bei Goldenen Wolken — Himmelsröte-Karten erscheinen noch, wenn die Motivrichtung bis zu 60° von der Sonnenrichtung abweicht (statt 30°). Grund: Himmelsröte ist ein physikalisch großflächigeres Phänomen als eng gebündelte goldene Wolken direkt hinterm Motiv.
+
+- Vorgehen: Identisch zu Option A, aber mit eigener Konstante `RED_SKY_AZ_TOLERANCE = 60` statt Wiederverwendung des GOLDEN_CLOUDS-Werts.
+- Betroffene Dateien: Gleich wie Option A.
+- Vorteile: Fängt den Effekt ab, dass Himmelsröte tatsächlich physikalisch weiter sichtbar sein kann als goldene Wolken direkt am Motiv; mildert den befürchteten Event-Rückgang aus Pre-Mortem-Szenario 3.
+- Nachteile / Risiken: Der konkrete Winkel (60°? 45°? 90°?) ist reine Schätzung ohne empirische Grundlage — genauso wenig belegt wie 30°. Erfordert eine explizite Entscheidung von Stephan (Q2), die aktuell nicht vorliegt.
+- Aufwand: identisch zu Option A (nur ein Konstantenwert unterschiedlich).
+
+✅ **Empfehlung: Option A** — mit `RED_SKY_AZ_TOLERANCE` als **eigene, benannte Konstante** (nicht hart auf denselben Wert wie GOLDEN_CLOUDS verdrahtet), initial auf 30° gesetzt. Das macht Q2 im Nachhinein zu einer Ein-Zeilen-Änderung, falls Stephan nach dem Live-Test einen größeren Winkel bevorzugt — ohne Code-Struktur-Änderung. Reine Datenlage lässt keine bessere Option zu (Option „echte Wolkenrichtung" wurde in US-109 bereits als nicht realisierbar verworfen, siehe Code-Verifikation).
+
+---
+
+### Testplan
+
+- [ ] **Automatisiert** (`backend/tests/test_us113.py`, neu anzulegen — kein bestehendes `backend/tests/`-Verzeichnis gefunden):
+  - AK-1: `gcs=0.85, cl=40, cm=35, sunset_azimuth=278, subject_azimuth=265` → `should_generate_red_sky_event(...)` liefert `True`.
+  - AK-2: `gcs=0.85, cl=40, cm=35, sunset_azimuth=278, subject_azimuth=90` → liefert `False` (Differenz 172° > 30°).
+  - AK-3: `subject_azimuth=None` → liefert `False` (kein Richtungsvergleich möglich).
+  - AK-8 (Edge Case): Differenz exakt `30.0°` → liefert `True` (inklusiver Grenzwert).
+  - AK-6 (Regression): GOLDEN_CLOUDS-Testfälle aus US-109 laufen unverändert grün.
+
+- [ ] **Manuell** (Browser + curl nach Serverstart unter `http://localhost:8000`):
+  1. `curl "http://localhost:8000/opportunities?days=3"` → Anzahl `event_type == "Himmelsröte"` **vor** und **nach** der Änderung zählen (Vergleichswert für Pre-Mortem-Szenario 3 — spürbarer Rückgang erwartet, aber nicht Totalausfall).
+  2. App öffnen → Feed → eine verbleibende Himmelsröte-Karte antippen → Detail-Sheet → „Warum Himmelsröte?"-Sektion öffnen → **erwartet:** Kompass-Diagramm zeigt engen roten Sektor (nicht mehr Halbring), Text erklärt die Richtungsbedingung (AK-4, AK-5).
+  3. Falls auffindbar: eine Location mit Wolkenbedingung erfüllt, aber Motiv entgegen der Sonnenrichtung → **erwartet:** keine Himmelsröte-Karte mehr (AK-2).
+  4. Regression: „Goldene Wolken"-Karten weiterhin normal sichtbar und unverändert (AK-6).
+  5. Regression: normale Wetter-Sektion (Temperatur, Wolken %, Regen) im Detail-Sheet unverändert (AK-7).
+
+---
+
+### Analyse & Planung
+
+- [x] Example Mapping durchgeführt (2026-07-01)
+- [x] Akzeptanzkriterien abgeleitet (2026-07-01)
+- [x] Pre-Mortem durchgeführt inkl. Code-Verifikation (2026-07-01)
+- [x] Architektur analysiert: `backend/calculations/weather.py`, `backend/main.py`, `web/index.html` (Kompass-Diagramm + Erklärungstext)
+- [x] Designer-Check: visuell sichtbar, aber reine Parameteränderung an bestehender, bereits abgenommener Komponente → kein zusätzlicher Designer-Call nötig
+- [x] Implementierungsoptionen: A (Proxy, gleicher Winkel wie GOLDEN_CLOUDS) / B (Proxy, eigener größerer Winkel)
+- [x] Empfehlung: Option A mit eigener, leicht änderbarer Toleranzwinkel-Konstante
+- [x] 🔴 Offene Fragen Q1–Q4 von Stephan im Weg-Gate pauschal mit "ja" zur empfohlenen Option A bestätigt (2026-07-02) — alle Best-Effort-Annahmen (Q1 volle Rücknahme, Q2 30°, Q3 Sonnenazimut-Proxy, Q4 Diagramm im Scope) gelten damit als freigegeben
+- [x] Weg-Gate: Option A gewählt (2026-07-02) — Implementierung gestartet

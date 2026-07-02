@@ -555,16 +555,17 @@ def _generate_cloud_mood_events(feed_cache):
             # AK-10: Original-Goldene-Stunde-Karte unterdrücken
             zu_entfernende_ids.add(e["id"])
 
-        # RED_SKY prüfen (AK-4) — unabhängig von GOLDEN_CLOUDS
-        if should_generate_red_sky_event(gcs, cl, cm):
+        # RED_SKY prüfen (AK-4, US-113: jetzt mit Sichtachsen-Filter) — unabhängig von GOLDEN_CLOUDS
+        if should_generate_red_sky_event(gcs, cl, cm, sun_az, subject_az):
             new_event = _copy.deepcopy(e)
             new_event["id"] = "rs_" + _uuid.uuid4().hex[:12]
             new_event["event_type"] = "Himmelsröte"
             new_event["title"] = "Himmelsröte"
             new_event["description"] = (
-                "Tiefe und mittlere Wolkenschichten dominieren den Himmel und werden "
-                "vom streifenden Sonnenlicht intensiv rot-orange eingefärbt. "
-                "Diese Röte ist rundum sichtbar – kein bestimmter Blickwinkel nötig."
+                "Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in "
+                "Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und "
+                "mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal "
+                "für dramatische Himmelsstimmungen direkt über dem Motiv."
             )
             new_event["alert_priority"] = 2
             neue_events.append(new_event)
