@@ -529,6 +529,26 @@
     .map-mode-btn.active { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
     .add-form { padding: 12px 20px; overflow-y: auto; flex-shrink: 0; max-height: 42dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+
+    /* ── US-87: Vollbild-Overlay für die Bearbeiten-Karte (Edit-Mini-Map) ────── */
+    #edit-map-expand-btn { position: absolute; top: 8px; right: 8px; z-index: 1000;
+      width: 36px; height: 36px; min-width: 44px; min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); cursor: pointer; transform: translate(4px, -4px); }
+    #edit-map-fs-sheet { position: fixed; inset: 0; z-index: 130;
+      background: var(--bg); border-radius: 0; overflow-x: hidden;
+      display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #edit-map-fs-sheet.open { transform: translateY(0); }
+    #edit-map-fs-overlay { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 129;
+      opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #edit-map-fs-overlay.open { opacity: 1; pointer-events: auto; }
+    .edit-map-fs-header { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .edit-map-fs-header h2 { font-size: 18px; font-weight: 800; }
+    .edit-map-fs-container { flex: 1; min-height: 0; position: relative; }
+    #edit-map-fs { width: 100%; height: 100%; }
     .form-section { margin-bottom: 16px; }
     .form-section label { display: block; font-size: 11px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
@@ -776,7 +796,7 @@
       #detail-sheet, #loc-detail-sheet, #filter-sheet, #impressum-sheet {
         left: 50%; width: 480px; right: auto; margin-left: -240px;
       }
-      #add-sheet {
+      #add-sheet, #edit-map-fs-sheet {
         left: 50%; width: 480px; right: auto; top: 0; bottom: 0; margin-left: -240px;
       }
     }
@@ -807,6 +827,7 @@
   <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12 11 15 16 9"/></g></symbol>
   <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19 3 19 Z"/><path d="M12 10 V14 M12 16.5 V16.6"/></g></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18 M18 6 6 18"/></g></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 H4 V9 M15 4 H20 V9 M4 15 V20 H9 M20 15 V20 H15"/></g></symbol>
   <symbol id="i-chevright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 16 12 9 19"/></g></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 V18 M6 12 H18"/></g></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12 H18"/></g></symbol>
@@ -1121,6 +1142,19 @@ function ic(id, size, cls){
   </div>
 </div>
 
+<!-- US-87: Vollbild-Overlay für die Bearbeiten-Karte (Location-Detail Edit) -->
+<div id="edit-map-fs-overlay" onclick="LocationDetail.closeMapFullscreen()"></div>
+<div id="edit-map-fs-sheet">
+  <div class="edit-map-fs-header">
+    <div class="sheet-handle" style="margin:0"></div>
+    <h2 style="display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-expand"/></svg>Pins setzen</h2>
+    <button class="close-btn" onclick="LocationDetail.closeMapFullscreen()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="edit-map-fs-container">
+    <div id="edit-map-fs"></div>
+  </div>
+</div>
+
 <!-- Location Detail Sheet -->
 <div id="loc-detail-overlay" onclick="LocationDetail.close()"></div>
 <div id="loc-detail-sheet">
@@ -1182,7 +1216,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.15';
+const APP_VERSION = '1.20.16';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4997,6 +5031,9 @@ const LocationDetail = {
   close() {
     document.getElementById('loc-detail-overlay').classList.remove('open');
     document.getElementById('loc-detail-sheet').classList.remove('open');
+    // US-87: falls das Vollbild-Kartenoverlay noch offen war, mitschließen
+    document.getElementById('edit-map-fs-overlay').classList.remove('open');
+    document.getElementById('edit-map-fs-sheet').classList.remove('open');
     this._current = null;
   },
 
@@ -5050,7 +5087,12 @@ const LocationDetail = {
           placeholder="52.51234, 13.40123" value="${subjVal}"
           oninput="LocationDetail._onEditSubjInput()">
         <p id="edit-subj-error" style="font-size:11px;color:var(--red);margin:-8px 0 8px;min-height:14px"></p>
-        <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;margin-bottom:16px;background:var(--surface)"></div>
+        <div style="position:relative;margin-bottom:16px">
+          <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;background:var(--surface)"></div>
+          <button id="edit-map-expand-btn" onclick="LocationDetail.openMapFullscreen()" aria-label="Karte im Vollbild öffnen" title="Karte im Vollbild öffnen">
+            <svg style="width:18px;height:18px"><use href="#i-expand"/></svg>
+          </button>
+        </div>
 
         <label>Motivhöhe (m)</label>
         <input class="input-field" id="edit-subject-height" type="number" min="0" step="0.5"
@@ -5094,6 +5136,12 @@ const LocationDetail = {
           <button class="btn-primary" style="flex:2" onclick="LocationDetail.saveEdit('${loc.id}')">Speichern</button>
         </div>
       </div>`;
+    // US-87: Vollbild-Kartenoverlay gehört zu einem statischen DOM-Container (#edit-map-fs),
+    // der nicht bei jedem openEdit() neu gerendert wird – alte Instanz einer evtl. zuvor
+    // bearbeiteten Location daher explizit verwerfen, sonst zeigt das Vollbild beim nächsten
+    // Öffnen den falschen Stand.
+    if (this._editMapFs) { this._editMapFs.remove(); this._editMapFs = null; }
+    this._editObsMFs = null; this._editSubjMFs = null; this._editLineFs = null;
     // Init mini-map after DOM ready
     requestAnimationFrame(() => LocationDetail._initEditMap());
   },
@@ -5138,6 +5186,98 @@ const LocationDetail = {
       const subj = this._editSubjM.getLatLng();
       this._editLine = L.polyline([[obs.lat,obs.lng],[subj.lat,subj.lng]],
         {color:'#f0a030',weight:2,dashArray:'6 4',opacity:.7}).addTo(this._editMap);
+    }
+  },
+
+  // ── US-87: Vollbild-Overlay für die Bearbeiten-Karte ──────────────────
+  // Die Koordinatenfelder (edit-obs-coords/edit-subj-coords) bleiben die
+  // alleinige Quelle der Wahrheit. Jede Pin-Bewegung (klein ODER groß)
+  // schreibt sofort dorthin zurück; die jeweils andere Karte übernimmt den
+  // Stand beim nächsten Öffnen/Re-Sync aus denselben Feldern.
+  _editMapFs: null, _editObsMFs: null, _editSubjMFs: null, _editLineFs: null,
+
+  openMapFullscreen() {
+    document.getElementById('edit-map-fs-overlay').classList.add('open');
+    document.getElementById('edit-map-fs-sheet').classList.add('open');
+    // Pre-Mortem Szenario 1 (0px-Container): Karteninitialisierung erst nach
+    // Öffnen-Animation, danach invalidateSize() – analog AddLocation.open()/initMap().
+    setTimeout(() => this._initEditMapFs(), 300);
+  },
+
+  closeMapFullscreen() {
+    document.getElementById('edit-map-fs-overlay').classList.remove('open');
+    document.getElementById('edit-map-fs-sheet').classList.remove('open');
+    // Kleine Karte übernimmt beim Schließen denselben Stand aus den Koordinatenfeldern.
+    this._onEditObsInput();
+    this._onEditSubjInput();
+  },
+
+  _initEditMapFs() {
+    const loc = this._current;
+    if (!loc) return;
+    if (this._editMapFs) {
+      // Bereits initialisiert (mehrfaches Öffnen/Schließen) – nur Größe korrigieren
+      // und Marker aus den Koordinatenfeldern neu einlesen (Quelle der Wahrheit).
+      this._editMapFs.invalidateSize();
+      this._reloadEditMapFsFromFields();
+      return;
+    }
+    const obsCoords = this._parseEditCoords(document.getElementById('edit-obs-coords').value) ||
+      {lat: loc.observer_lat, lon: loc.observer_lon};
+    this._editMapFs = L.map('edit-map-fs', {zoomControl:true, attributionControl:false})
+      .setView([obsCoords.lat, obsCoords.lon], 15);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {maxZoom:19}).addTo(this._editMapFs);
+    this._editMapFs.invalidateSize();
+    this._reloadEditMapFsFromFields();
+  },
+
+  // Liest beide Marker aus den Koordinatenfeldern neu ein (Quelle der Wahrheit)
+  // und baut sie auf der Vollbild-Karte auf.
+  _reloadEditMapFsFromFields() {
+    if (!this._editMapFs) return;
+    const obsCoords = this._parseEditCoords(document.getElementById('edit-obs-coords').value);
+    if (this._editObsMFs) { this._editObsMFs.remove(); this._editObsMFs = null; }
+    if (obsCoords) {
+      this._editObsMFs = MapMarkers.observerDraggable([obsCoords.lat, obsCoords.lon]).addTo(this._editMapFs);
+      this._editObsMFs.on('drag', () => this._drawEditLineFs());
+      this._editObsMFs.on('dragend', e => {
+        const {lat, lng} = e.target.getLatLng();
+        document.getElementById('edit-obs-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('edit-obs-error').textContent = '';
+        if (this._editObsM) { this._editObsM.setLatLng([lat, lng]); this._drawEditLine(); }
+        this._drawEditLineFs();
+      });
+    }
+    const subjCoords = this._parseEditCoords(document.getElementById('edit-subj-coords').value);
+    if (this._editSubjMFs) { this._editSubjMFs.remove(); this._editSubjMFs = null; }
+    if (subjCoords) {
+      this._editSubjMFs = MapMarkers.subjectDraggable([subjCoords.lat, subjCoords.lon]).addTo(this._editMapFs);
+      this._editSubjMFs.on('drag', () => this._drawEditLineFs());
+      this._editSubjMFs.on('dragend', e => {
+        const {lat, lng} = e.target.getLatLng();
+        document.getElementById('edit-subj-coords').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('edit-subj-error').textContent = '';
+        if (this._editSubjM) { this._editSubjM.setLatLng([lat, lng]); this._drawEditLine(); }
+        else if (this._editMap) {
+          this._editSubjM = MapMarkers.subjectDraggable([lat, lng]).addTo(this._editMap);
+          this._drawEditLine();
+        }
+        this._drawEditLineFs();
+      });
+    }
+    // Edge Case: kein Motiv-Pin gesetzt → nur der Fotograf-Standort-Pin ist sichtbar, kein Platzhalter.
+    this._drawEditLineFs();
+  },
+
+  _drawEditLineFs() {
+    if (this._editLineFs) this._editLineFs.remove();
+    if (!this._editMapFs || !this._editObsMFs) return;
+    const obs = this._editObsMFs.getLatLng();
+    if (this._editSubjMFs) {
+      const subj = this._editSubjMFs.getLatLng();
+      this._editLineFs = L.polyline([[obs.lat,obs.lng],[subj.lat,subj.lng]],
+        {color:'#f0a030',weight:2,dashArray:'6 4',opacity:.7}).addTo(this._editMapFs);
     }
   },
 
