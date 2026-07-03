@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-56** *(Astronomie-Regression — 13/13 Tests grün, unabhängig verifiziert)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-37, TASK-38, TASK-39, TASK-41, TASK-42 · US-94 · **BUG-43** · **TASK-49** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **BUG-57** *(Weather-Map-Testdatei fetch_weather_multigrid fehlt)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -714,14 +714,15 @@ Begründung: Minimal-invasiv (nur `web/index.html`, 4 Stellen), WebKit-sicher na
 
 ---
 
-### BUG-56 · Astronomie-Regressionstest: Sonnenauf-/-untergang Berlin außerhalb Toleranz `[ ]`
+### BUG-56 · Astronomie-Regressionstest: Sonnenauf-/-untergang Berlin außerhalb Toleranz `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-02 |
+| **Abgeschlossen** | 2026-07-03 |
 
 **Beschreibung:** `tests/test_astronomy_regression.py::test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance` schlagen fehl — die berechnete Sonnenauf-/-untergangszeit für Berlin liegt außerhalb der im Test erwarteten Toleranz. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113 (Himmelsröte-Chance). Root Cause noch nicht analysiert — offen ob Ephemeriden-Bibliothek, Zeitzonen-Handling oder Toleranzwert des Tests veraltet ist.
 
@@ -814,18 +815,95 @@ Vor der Korrektur per Live-Testlauf (`pytest backend/tests/test_astronomy_regres
 
 ---
 
-### BUG-57 · Weather-Map-Testdatei referenziert nicht existierende Funktion `fetch_weather_multigrid` `[ ]`
+### BUG-57 · Weather-Map-Testdatei referenziert nicht existierende Funktion `fetch_weather_multigrid` `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-02 |
 
 **Beschreibung:** `tests/test_us72_weather_map.py` schlägt mit `ImportError`/`AttributeError` fehl, da `backend/main.py` keine Funktion `fetch_weather_multigrid` (mehr) besitzt. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113. Vermutliche Ursache laut US-112-Analyse-Spec (Zeile 1268 f.): Die Testdatei wurde test-first für das nie gebaute US-72-Backend geschrieben (`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_weather_map_cache` kamen laut damaligem Befund ausschließlich in dieser untracked Testdatei vor, nie im Backend implementiert). US-112 hat den `/weather-map`-Endpoint dann tatsächlich gebaut, aber mit anderer Architektur (DWD ICON-D2 + MET Norway statt Open-Meteo-Multigrid) — die alte Testdatei wurde dabei nicht auf die neue Implementierung migriert oder entfernt. Zu klären: Testdatei an die tatsächliche US-112-Implementierung anpassen, oder als obsolet entfernen (US-72 „geht in US-112 auf", siehe US-112-Bezug).
 
 **Bezug:** Direkte Verbindung zu **US-72** (Wetterkarte, Board-Status „Done", aber Backend laut US-112-Analyse nie eigenständig existent) und **US-112** (Wetter-Overlay DWD/MET, Board-Status „Done", released 2026-07-01, hat US-72 laut eigenem Bezugstext „aufgehen lassen"). Kein neuer Bug in der Wetter-Funktionalität selbst — US-112 wurde live verifiziert und funktioniert; betrifft ausschließlich eine veraltete/verwaiste Testdatei aus der US-72-Phase. Unabhängig von BUG-56 (Astronomie) — andere Root Cause, daher getrennt geführt.
+
+---
+
+**Implementation Spec** *(Analyse 2026-07-03)*
+
+**📎 Code-Verifikation (tatsächlich gelesen, nicht vermutet):**
+- `backend/tests/test_us72_weather_map.py` (262 Zeilen) vollständig gelesen. Importiert/nutzt: `from calculations.weather import WEATHER_REGIONS` (Z. 39), `from calculations.weather import _build_germany_grid` (Z. 77), `from calculations.weather import fetch_weather_multigrid` (Z. 105, 145, 171), sowie `patch("main.fetch_weather_multigrid", ...)` (Z. 212, 254) und `main._weather_map_cache` / `main._weather_map_updated_at` als einfache Attribut-Zuweisung (Z. 189 f., 245 f.) — passend zum alten Multigrid-Schema (`grid`/`hourly_times`/`fetched_at`), nicht zum heutigen Schema.
+- `backend/calculations/weather.py` per Grep auf `^def `/`^async def ` durchsucht: enthält `calculate_photo_weather_score`, `_golden_cloud_score`, `calculate_golden_cloud_score`, `should_generate_golden_clouds_event`, `should_generate_red_sky_event`, `wmo_code_to_description`, `fetch_weather_forecast`, `is_golden_hour_weather_good`. **Keine** der vier von der Testdatei referenzierten Namen (`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_build_germany_grid`) existiert dort — auch `fetch_weather_grid` (die von der Testdatei als „Regression" erwartete Single-Grid-Funktion aus der ursprünglichen US-72-Analyse) ist inzwischen nicht mehr vorhanden.
+- `backend/main.py` per Grep durchsucht: `/weather-map` (Z. 1895) und `/weather-map/png/{field}/{idx}` (Z. 1958) sind real implementiert, nutzen aber `_build_weather_map()` (Z. 713, importiert aus `calculations/weather_grib.py`) — GRIB/PNG-Architektur (DWD ICON-D2 + MET Norway, `_weather_map_png`, `bounds`/`sources`/`frames`/`attribution`), nicht das Open-Meteo-Multigrid-Schema der alten Testdatei. `fetch_weather_multigrid` kommt in `main.py` nirgends vor (0 Treffer außer in der alten Testdatei selbst).
+- `backend/tests/test_us112_weather_map.py` (280 Zeilen) vollständig gelesen: bereits vorhandene, vollständige Testsuite für die reale US-112-Implementierung — testet `calculations/weather_grib.py` (GRIB-Dekodierung, Deakkumulation, IDW-Interpolation, PNG-Encoding, Quellen-Merge DWD+MET, Null-Handling) sowie die Endpoints `/weather-map` (Schema `bounds`/`hourly_times`/`frames`/`attribution`/`sources`), `/weather-map/png/{field}/{idx}` und Cache-Verhalten. Deckt exakt das ab, was die alte Testdatei für die (nie gebaute) Multigrid-Architektur abdecken sollte — nur eben gegen die tatsächlich existierende Architektur.
+- Git-Status geprüft (`git status --porcelain` + `git ls-files`): `backend/tests/test_us72_weather_map.py` ist **untracked** (`??`), nie eingecheckt. `test_us112_weather_map.py` ist getrackt (im Repo committed, liegt als kompilierte `.pyc` im `__pycache__` vor, also bereits gelaufen).
+- BACKLOG.md US-112-Spec (Zeile 1385, bereits am 2026-06-30 dokumentiert) bestätigt unabhängig denselben Befund: „`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS` und `_weather_map_cache` kommen ausschließlich in der untracked Testdatei … vor (test-first geschrieben, nie implementiert)".
+
+**Example Mapping:**
+
+📏 **Rule 1 — Die Test-Suite darf keine Tests enthalten, die gegen nie existierenden bzw. inzwischen entfernten Code laufen.**
+Kontext: `pytest` soll ein verlässliches Signal für „ist die Wetter-Funktionalität intakt" sein. Ein Test, der strukturell nicht bestehen kann (ImportError vor jeder Assertion), ist Rauschen, kein Schutz.
+- 🟢 Positiv: Given `pytest backend/tests/` läuft, When die Wetter-Tests ausgeführt werden, Then referenziert keine Testdatei mehr `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_build_germany_grid` oder das alte `fetch_weather_grid` — alle Imports zeigen auf real existierenden Code.
+- 🔴 Negativ: Given die alte Testdatei bliebe unverändert, When CI/lokaler Testlauf läuft, Then schlagen 6 Tests mit `ImportError`/`AttributeError` fehl, bevor überhaupt eine Assertion geprüft wird (aktueller IST-Zustand, unerwünscht).
+- ⚠️ Edge: Given `test_us112_weather_map.py` deckt Endpoint-Schema, GRIB-Verarbeitung, Cache und Null-Handling bereits vollständig ab, When man prüft ob eine „angepasste" alte Datei zusätzlichen Wert brächte, Then wäre das reine Duplikation derselben Szenarien unter anderem Dateinamen — kein Mehrwert, nur Wartungslast.
+
+📏 **Rule 2 — Die Bereinigung darf die reale Wetter-Funktionalität nicht anfassen.**
+Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifiziert (2026-07-01). Scope ist ausschließlich Test-Suite-Hygiene.
+- 🟢 Positiv: Given die Bereinigung ist durchgeführt, When man `backend/calculations/weather.py`, `backend/calculations/weather_grib.py` und `backend/main.py` (Wetter-Endpunkte) per Diff prüft, Then sind dort **keine** Änderungen vorhanden.
+- 🔴 Negativ: Given jemand würde versuchen, `fetch_weather_multigrid` oder `WEATHER_REGIONS` nachträglich in `weather.py` zu ergänzen, „damit der Test passt", Then wäre das Scope Creep — es gibt keine Anforderung für eine Open-Meteo-Multigrid-Variante neben der bestehenden DWD/MET-Architektur.
+- ⚠️ Edge: Given BUG-56 (Astronomie-Regression) hat kürzlich ebenfalls Tests korrigiert, When man BUG-57 umsetzt, Then bleibt das getrennt — keine Berührung von `test_astronomy_regression.py` oder verwandten Dateien.
+
+✅ Questions (durch Code-Fakten bereits beantwortet, keine Rückfrage an Stephan nötig): Ist die alte Testdatei getrackt? Nein (untracked). Gibt es bereits eine Testdatei für die reale Architektur? Ja, vollständig (`test_us112_weather_map.py`). Existiert noch irgendein Rest der Multigrid-Funktionen im Backend? Nein (0 Treffer außerhalb der alten Testdatei).
+
+**Scope:**
+- Eingeschlossen: Entfernen der obsoleten Datei `backend/tests/test_us72_weather_map.py`. Kurzer Abgleich, dass `test_us112_weather_map.py` die relevanten Szenarien (Endpoint-Schema, Cache, Null-Handling bei Quellenausfall) bereits abdeckt (bereits in dieser Analyse erledigt, siehe Code-Verifikation oben).
+- Ausgeschlossen: Jede Änderung an `calculations/weather.py`, `calculations/weather_grib.py`, `main.py` (Wetter-Endpunkte), `test_us112_weather_map.py`; keine neuen Wetter-Features; kein Anfassen von BUG-56 oder `test_astronomy_regression.py`; keine Änderung an CI-/Test-Runner-Konfiguration (nicht nötig — es gibt keine explizite Testdatei-Allowlist, `pytest` sammelt Dateien nach Namenskonvention `test_*.py` automatisch).
+
+**Akzeptanzkriterien (Dev-Tooling — kein sichtbares App-Verhalten; der Effekt zeigt sich darin, dass die Test-Suite wieder vollständig grün läuft, nicht in der App selbst):**
+- [ ] `backend/tests/test_us72_weather_map.py` existiert nach der Umsetzung nicht mehr im Repo.
+- [ ] `pytest backend/tests/` läuft ohne `ImportError`/`AttributeError` bezogen auf `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_build_germany_grid` oder `fetch_weather_grid` — diese Fehlerklasse ist vollständig verschwunden.
+- [ ] `pytest backend/tests/test_us112_weather_map.py -v` läuft weiterhin unverändert grün (Regression: die reale Wetter-Testsuite ist von der Bereinigung unberührt).
+- [ ] Voller Testlauf `pytest backend/tests/ -v` zeigt keine neuen Fehlschläge gegenüber dem Stand vor der Bereinigung (abgesehen vom Wegfall der 6 vorher fehlschlagenden Tests aus der entfernten Datei) — insbesondere bleiben die von BUG-56 bereits behobenen Astronomie-Tests unberührt grün.
+- [ ] `git diff`/`git status` zeigt ausschließlich die Entfernung der einen Datei, keine Änderung an `calculations/weather.py`, `calculations/weather_grib.py` oder `main.py`.
+
+**Pre-Mortem (Code-verifiziert):**
+- 💀 Jemand „repariert" die alte Testdatei, indem `fetch_weather_multigrid`/`WEATHER_REGIONS` nachträglich in `weather.py` ergänzt werden, um Import-Fehler zu beheben. Auslöser: Testdatei sieht aus wie eine legitime Spec, Autofix-Reflex „Test grün machen" statt Root Cause zu hinterfragen. Frühwarnung: Diff zeigt neue Funktionen in `weather.py`, die von keinem Endpoint aufgerufen werden (toter Code). → Gegenmaßnahme: Diese Spec hält explizit fest, dass die Multigrid-Architektur nie gebaut wurde und durch US-112 (DWD/MET) ersetzt ist — Option B (Entfernen) ist die einzige empfohlene Richtung.
+- 💀 Löschen ohne Genehmigung — Memory-Regel „Keine Löschung ohne Genehmigung" verlangt explizites Ja von Stephan vor dem Entfernen einer Datei. Auslöser: Analyse-Phase empfiehlt Entfernung, aber Freigabe ist Sache des Hauptthreads/Stephans, nicht dieser Analyse. → Gegenmaßnahme: Diese Spec spricht nur eine **Empfehlung** aus; das eigentliche Löschen erfolgt erst in der Implementierungsphase nach Stephans Freigabe des Tickets (Status bleibt hier bewusst „Ready for Analysis").
+- 💀 Man verwechselt „Testdatei entfernen" mit „Testabdeckung sinkt". Auslöser: oberflächlich betrachtet werden 6 Tests weniger ausgeführt. Frühwarnung: Kein Frühwarnsignal nötig, da bereits code-verifiziert. → Gegenmaßnahme: Code-Vergleich zeigt, dass `test_us112_weather_map.py` dieselben Szenarien (Endpoint-Schema, Cache-Verhalten, Quellenausfall-Null-Handling, sogar granularer bis auf GRIB-Ebene) bereits gegen die reale Architektur abdeckt — kein Abdeckungsverlust, nur Wegfall von Duplikat-Rauschen gegen nie existierenden Code.
+- 💀 Eine übersehene Abhängigkeit (z. B. ein Test-Runner-Config-Eintrag, eine `conftest.py`-Fixture, die nur von dieser Datei gebraucht wird) bricht beim Entfernen. Auslöser: nicht geprüft, ob `conftest.py` oder `pytest.ini`/`pyproject.toml` die Datei namentlich referenzieren. Frühwarnung: `pytest`-Sammlung wirft nach Entfernen einen unerwarteten Fehler, der nicht mit der entfernten Datei zusammenhängt. → Gegenmaßnahme: In der Implementierungsphase vor dem Löschen kurz `grep -r "test_us72_weather_map" backend/` (auch in Config-Dateien) prüfen — laut bisheriger Analyse gibt es keine Referenzen außerhalb der Datei selbst, aber das ist ein Zwei-Sekunden-Check wert.
+- 💀 Verwechslung mit BUG-56: Jemand überträgt das dortige Muster („Testwert korrigieren, Produktionscode unangetastet") 1:1 auf BUG-57, obwohl hier kein Referenzwert falsch ist, sondern die referenzierte Funktion nie existierte — eine Korrektur (Option A: Testdatei anpassen) wäre in Wahrheit ein Neuschreiben der kompletten Datei gegen eine völlig andere Architektur, keine Wertkorrektur. → Gegenmaßnahme: Diese Spec benennt den Unterschied explizit (siehe Implementierungsoptionen unten); Empfehlung ist Entfernen, nicht Anpassen.
+
+**Implementierungsoptionen:**
+
+*Option A — Testdatei an die tatsächliche US-112-Architektur anpassen (neu schreiben)* · Aufwand: mittel–groß
+- Vorgehen: `test_us72_weather_map.py` komplett umschreiben, um `calculations/weather_grib.py` (GRIB-Dekodierung, IDW-Interpolation, PNG-Encoding, DWD+MET-Merge) sowie das reale `/weather-map`-Endpoint-Schema zu testen.
+- Vorteile: keine.
+- Nachteile/Risiken: `test_us112_weather_map.py` deckt exakt diese Szenarien bereits vollständig ab (code-verifiziert, siehe oben) — Ergebnis wäre eine zweite, redundante Testdatei mit anderem Namen für dieselbe Architektur. Doppelte Wartungslast (zwei Dateien bei jeder künftigen Wetter-Änderung pflegen), ohne zusätzlichen Testwert. Klarer Fall von unnötigem Aufwand.
+- Aufwand: mittel–groß (vollständiges Neuschreiben von ca. 260 Zeilen Testcode)
+
+*Option B — Testdatei vollständig entfernen* · Aufwand: minimal
+- Vorgehen: `backend/tests/test_us72_weather_map.py` löschen (Datei ist untracked, kein Git-History-Verlust, da nie committed). Kurzer Bestätigungs-Check, dass `test_us112_weather_map.py` weiterhin grün läuft.
+- Betroffene Dateien: nur `backend/tests/test_us72_weather_map.py` (Löschung).
+- Vorteile: Beseitigt exakt das gemeldete Problem (ImportError/AttributeError bei Testläufen), keine Redundanz, kein Risiko für die reale Wetter-Funktionalität (die unangetastet bleibt), minimaler Aufwand, sauberste Lösung angesichts vollständiger Abdeckung durch `test_us112_weather_map.py`.
+- Nachteile/Risiken: Löschung erfordert laut Memory-Regel explizite Genehmigung von Stephan vor Ausführung (siehe Pre-Mortem) — kein technisches Risiko, aber ein Prozess-Gate.
+- Aufwand: minimal (eine Dateilöschung + Regressionslauf)
+
+*Option C — Hybrid* · nicht sinnvoll
+- Geprüft, aber verworfen: Es gibt keine Teilmenge von `test_us72_weather_map.py`, die einen Testwert hätte, den `test_us112_weather_map.py` nicht bereits abdeckt — ein Hybrid (z. B. „nur die Cache-Tests migrieren") würde denselben Code ein drittes Mal testen. Kein Hybrid-Vorteil identifizierbar.
+
+✅ **Empfehlung: Option B** — Die Testdatei testet eine Architektur (Open-Meteo-Multigrid mit `fetch_weather_multigrid`/`WEATHER_REGIONS`), die nachweislich nie gebaut wurde und durch US-112 (DWD ICON-D2 + MET Norway) vollständig ersetzt wurde, bevor sie je existierte. `test_us112_weather_map.py` deckt die reale Architektur bereits vollständig und mit größerer Tiefe ab (bis auf GRIB-Byte-Ebene). Option A würde nur Redundanz erzeugen; Option C bietet keinen Vorteil. Einzige Voraussetzung vor Ausführung: Stephans explizite Löschfreigabe (Memory-Regel), da die Datei sichtbaren Testcode enthält, auch wenn sie nie Teil des Git-Repos war.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/tests/test_us72_weather_map.py` (zu entfernende Datei, untracked), `backend/tests/test_us112_weather_map.py` (bereits vorhandene, vollständige Ersatz-Abdeckung, unverändert zu lassen), `backend/calculations/weather.py` + `backend/calculations/weather_grib.py` + `backend/main.py` (reale Wetter-Architektur, nicht anzufassen). Keine CI-/Test-Runner-Konfigurationsdatei referenziert die alte Testdatei namentlich (Namenskonvention `test_*.py` reicht für automatisches Einsammeln durch `pytest`).
+- [x] Implementierungsoptionen: A (Testdatei anpassen) / B (Testdatei entfernen) / C (Hybrid, verworfen)
+- [x] Empfehlung: **Option B** — Entfernen, vorbehaltlich Stephans expliziter Löschfreigabe
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Nach Entfernen der Datei `pytest backend/tests/ -v` vollständig laufen lassen — erwartet: keine `ImportError`/`AttributeError` mehr zu `fetch_weather_multigrid`/`WEATHER_REGIONS`/`_build_germany_grid`/`fetch_weather_grid`; `test_us112_weather_map.py` weiterhin vollständig grün (Regressionscheck der realen Wetter-Tests); `test_astronomy_regression.py` (BUG-56) weiterhin unberührt grün.
+- [ ] Manuell: `git status` nach der Änderung zeigt ausschließlich die Entfernung der einen Datei, keine Modifikation an `weather.py`/`weather_grib.py`/`main.py`. Kurzer `grep -r "test_us72_weather_map" backend/` vor dem Löschen, um versteckte Referenzen (Config/`conftest.py`) auszuschließen.
 
 ---
 
@@ -3496,28 +3574,31 @@ Logout → als User anmelden → Einstellungen → "User"
 
 ---
 
-### TASK-39 · Refactoring: Lange Funktion local() in index.html aufteilen `[ ]`
+### ~~TASK-39 · Refactoring: Lange Funktion local() in index.html aufteilen~~ `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done (Duplicate) |
 | **Erstellt** | 2026-06-24 |
+| **Geschlossen** | 2026-07-03 |
 
 **Beschreibung:** JS-Funktion `local()` in `web/index.html` (Z. 2633, ~265 Zeilen) überschreitet den 80-Zeilen-Threshold deutlich. In kleinere Hilfsfunktionen aufteilen (z.B. Rendering, Event-Handler, Datenaufbereitung).
 
-**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29)
+**Duplikat von TASK-42:** TASK-42 deckt exakt dieselbe Funktion (`local()`, gleiche Datei, gleiche Zeilengröße) zusätzlich zu `row()` bereits ab. Als Duplikat geschlossen, keine separate Umsetzung — Weiterverfolgung unter TASK-42.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (TASK-29); als Duplikat von TASK-42 geschlossen nach Overlap-Check am 2026-07-03
 
 ---
 
-### TASK-49 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[ ]`
+### TASK-49 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-27 |
 
 **Beschreibung:** `refactor_check.py` meldet sechs lange JS-Funktionen in `web/index.html`:
@@ -3531,6 +3612,67 @@ Logout → als User anmelden → Einstellungen → "User"
 Aufteilen in kleinere Hilfsfunktionen oder Modul-Abschnitte. Kein inhaltlicher Umbau.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (US-102, 2026-06-27); ergänzt durch BUG-46-Refactor (2026-06-28); ergänzt durch BUG-53-Refactor (2026-06-29); Zeilennummern aktualisiert durch BUG-52-Refactor (2026-06-29); Zeilennummern aktualisiert durch US-07-Refactor (2026-06-30); azDiffFn ergänzt + Zeilennummern aktualisiert durch US-109-Refactor (2026-06-30); sectorPath ergänzt + Zeilennummern aktualisiert durch US-113-Refactor (2026-07-02)
+
+**Scope:**
+Alle sechs von `refactor_check.py` gemeldeten Funktionen wurden im echten Code (`web/index.html`) verifiziert — mit demselben Ergebnis wie bei TASK-42: **alle sechs sind False Positives** der Regex-Heuristik, keine einzige ist tatsächlich eine lange Funktion. Es gibt daher **nichts aufzuteilen** — der Scope dieses Tickets reduziert sich auf eine Korrektur des Analyse-Werkzeugs (Ignorelist-Ergänzung), analog zu TASK-42.
+
+Verifikationsdetails je Funktion (echte Start-/Endzeile per Read bestimmt, echte Zeilenzahl gezählt):
+
+| Funktion | Ticket-Wert | Echte Zeilen | Tatsächliches Ende | Befund |
+|---|---|---|---|---|
+| `ic()` Z. 847 | ~389 Zeilen | **4 Zeilen** (847–850) | `}` in Z. 850 | False Positive |
+| `handler` Z. 1236 | ~115 Zeilen | **1 Zeile** (komplett einzeilig: `const handler = () => { ... };`) | Semikolon in Z. 1236 | False Positive |
+| `verState()` Z. 3028 | ~232 Zeilen | **5 Zeilen** (3028–3032) | `};` in Z. 3032 | False Positive |
+| `sectorPath()` Z. 3289 | ~160 Zeilen | **11 Zeilen** (3289–3299) | `}` in Z. 3299 | False Positive |
+| `azDiffFn` Z. 3716 | ~190 Zeilen | **1 Zeile** (komplett einzeilig) | Semikolon in Z. 3716 | False Positive |
+| `sunAlignmentLabel()` Z. 4966 | ~1044 Zeilen | **9 Zeilen** (4966–4974) | `}` in Z. 4974 | False Positive |
+
+**Ursache identisch zu TASK-42/TASK-32:** Die Regex-Heuristik in `refactor_check.py` (Abschnitt „Sehr lange JS-Funktionen im Frontend", Zeilen 221–273) misst die Funktionslänge als Abstand bis zur *nächsten von der Regex erkannten* Funktion, nicht bis zur echten schließenden `}`. Das wurde durch Nachrechnen exakt bestätigt: die vollständige Liste der Regex-Treffer zeigt, dass z.B. nach `ic()` (Z. 847) der nächste Treffer `handler` in Z. 1236 ist → `1236 − 847 = 389`, exakt der gemeldete Wert. Dasselbe Muster gilt für alle fünf weiteren Funktionen (nächster Regex-Treffer minus Start-Zeile ergibt exakt den gemeldeten Wert in jedem einzelnen Fall). Besonders auffällig: `handler` und `azDiffFn` sind sogar vollständig **einzeilige** Arrow-Functions — die Heuristik kann so etwas grundsätzlich nicht als „kurz" erkennen, weil sie nie die eigentliche schließende Klammer sucht.
+
+Kein inhaltlicher Umbau nötig, weil keine der sechs Funktionen tatsächlich lang oder unübersichtlich ist. Statt eines Code-Refactorings wird `FRONTEND_LONG_FN_IGNORELIST` in `tools/refactor_check.py` um die sechs Namen (`ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel`) ergänzt, mit Kommentar zur echten Zeilenzahl — analog zu den bereits dort gelisteten Einträgen aus TASK-32/TASK-43.
+
+⚠️ Annahme: Die Namen `handler` und `azDiffFn` sind nicht komplett eindeutig (es könnte an anderer Stelle im Code eine andere lokale Variable/Funktion gleichen Namens geben, die künftig fälschlich mitunterdrückt würde). Das Risiko wird als gering eingeschätzt, weil die Ignorelist bereits heute nach demselben Muster funktioniert (z.B. `state3`, `local`, `row` sind ebenfalls generische Namen) und die Konsequenz im schlimmsten Fall nur ein unterdrücktes Ticket-Finding ist, kein Funktionsfehler.
+
+**Example Mapping — Regel: „Verhalten bleibt nach der Korrektur identisch"**
+
+Regel 1 — Die App verhält sich für Stephan unverändert, weil kein Anwendungscode angefasst wird.
+- Beispiel (Given/When/Then): Given die App lief vor diesem Ticket fehlerfrei, When `tools/refactor_check.py` um die Ignorelist-Einträge ergänzt wird (kein Edit an `web/index.html`), Then verhält sich die App (Icons, Filter-Sheet, Kompass-Grafik, Sonnen-Ausrichtungstext) exakt wie vorher, weil keine einzige Zeile Anwendungscode verändert wurde.
+
+Regel 2 — `refactor_check.py` meldet die sechs Funktionen nach der Änderung nicht mehr als „lang".
+- Beispiel: Given die sechs Namen sind in `FRONTEND_LONG_FN_IGNORELIST` eingetragen, When `python3 tools/refactor_check.py --report` läuft, Then erscheinen `ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel` nicht mehr unter `needs_ticket` / `long_function`.
+
+Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
+- Beispiel: Given es gibt weitere, unabhängige Findings (z.B. TASK-51 zu `backend/main.py`), When der Report nach der Änderung erneut läuft, Then sind diese anderen Findings unverändert vorhanden (die Ignorelist-Ergänzung wirkt ausschließlich auf die sechs benannten Frontend-Funktionsnamen).
+
+⚠️ Annahme: „Identisches Verhalten" wird hier bewusst nicht durch einen Diff der gerenderten HTML-Ausgabe verifiziert, weil gar keine Zeile in `web/index.html` verändert wird — das Null-Diff an dieser Datei ist der eigentliche Beleg.
+
+**Akzeptanzkriterien:**
+- [ ] Die App verhält sich in jedem Bereich exakt wie vor diesem Ticket — Icons (z.B. Kalender-, Wetter-, Kompass-Icons), das Filter-Sheet (insbesondere der Verifikations-Chip „Geprüft/Nicht geprüft/Probleme" in allen drei Zuständen), die Kompass-/Sektor-Grafik im Location-Detail und der Sonnen-Ausrichtungstext („fast genau hinter dem Motiv", „nah am Motiv" etc.) sehen und verhalten sich identisch wie vorher. Das ist hier gleichbedeutend mit: es wurde keine Zeile Anwendungscode verändert.
+- [ ] `python3 tools/refactor_check.py --report` meldet `ic()`, `handler`, `verState()`, `sectorPath()`, `azDiffFn`, `sunAlignmentLabel()` nicht mehr als lange Funktionen.
+- [ ] Keine der sechs Funktionen wurde tatsächlich aufgeteilt (es gibt inhaltlich nichts aufzuteilen — alle sind 1–11 Zeilen lang).
+
+**Pre-Mortem:**
+- 💀 Ein zukünftiger Bearbeiter liest nur die Ticket-Beschreibung (nicht diese Spec) und beginnt trotzdem, `ic()`/`sunAlignmentLabel()` etc. „vorsichtshalber" aufzuteilen, obwohl es dafür keinen Grund gibt → unnötiges Risiko an einem 124× verwendeten Helper (`ic()`) ohne jeden Nutzen. Gegenmaßnahme: Scope-Absatz oben unmissverständlich voranstellen; Ticket-Titel-Ergänzung „(alle sechs False Positive — siehe Scope)" erwägen.
+- 💀 Die Ignorelist-Ergänzung wird versehentlich mit falschem Namen oder an falscher Stelle in `tools/refactor_check.py` eingetragen (z.B. Tippfehler bei `sunAlignmentLabel`) → Finding taucht weiter/fälschlich auf oder unterdrückt den falschen Namen. Gegenmaßnahme: Nach dem Edit `python3 tools/refactor_check.py --report` laufen lassen und explizit prüfen, dass genau diese sechs Namen aus dem Report verschwinden und sonst nichts.
+- 💀 Ein anderswo im Code später neu eingeführter, gleichnamiger Funktion/Variable (`handler`, `azDiffFn` sind generische Namen) wird künftig fälschlich von der Ignorelist mitunterdrückt, obwohl sie diesmal echt lang ist. Gegenmaßnahme: Kommentar an der Ignorelist-Zeile mit Zeilennummer + „Stand 2026-07" ergänzen, damit ein künftiger Bearbeiter die Diskrepanz bei Bedarf erkennt (wie bereits bei den bestehenden Einträgen gehandhabt).
+- 💀 (Ursprünglich befürchtetes Risiko, aber im Code nicht bestätigt) `ic()` liegt scheinbar in einem Hot-Path (124 Aufrufe im gesamten Frontend, u.a. in Filter-Sheet-Renders). Da hier aber kein Code geändert wird, entsteht kein Performance-Risiko durch dieses Ticket — als Hinweis für zukünftige *echte* Refactorings an `ic()` dennoch festgehalten: jede künftige Änderung an `ic()` sollte Performance in Render-Schleifen im Blick behalten.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` — alle sechs Funktionen sind lokale Konstanten/Top-Level-Functions ohne eigenen State; `ic()` ist eine globale Top-Level-Function (124 Aufrufe, u.a. in `FilterSheet`, `oppCard`, `scoutCard`, Location-Detail-Sections); `handler` ist eine lokale Closure innerhalb `ThemeManager.init()` (Media-Query-Change-Listener); `verState` ist eine lokale Closure innerhalb `FilterSheet._render()` (3 Aufrufe in derselben Funktion); `sectorPath` ist eine lokale Closure innerhalb der IIFE `mkCloudCompassSvg()` (3 Aufrufe für Zonen-Pfade); `azDiffFn` ist eine lokale Closure innerhalb eines IIFE im Location-Detail-Rendering (2 Aufrufe direkt danach); `sunAlignmentLabel` ist eine globale Top-Level-Function (3 Aufrufe, u.a. Location-Detail). Keine der sechs teilt State über mehrere Module hinweg — jede ist entweder ein reiner globaler Pure-Helper oder eine eng scope-gebundene lokale Closure.
+- [x] Designer-Check: nein (rein technisches Refactoring, keine visuelle Änderung) — übersprungen
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+- **Option A — Nur Ignorelist-Ergänzung in `tools/refactor_check.py`, kein Edit an `web/index.html` (empfohlen).** Da alle sechs Funktionen echte Zeilenzahlen von 1–11 haben, gibt es funktional nichts aufzuteilen; ein Aufteilen würde nur Risiko erzeugen (insbesondere an `ic()` mit 124 Aufrufen und den vier Closures, deren Aufteilung Scope-Referenzen auf umgebende Variablen wie `s`, `sunAz`, `subAz` gefährden könnte) ohne jeden Lesbarkeits- oder Wartbarkeitsgewinn. Aufwand: minimal (ein Edit in einer Datei, ein Verifikationslauf). Risiko: sehr gering. Testbarkeit: trivial (`--report`-Lauf zeigt sofort ob die sechs Namen verschwunden sind; kein Anwendungscode betroffen, daher kein Regressionsrisiko in der App selbst).
+- **Option B — Alle sechs Funktionen dennoch strukturell „aufteilen" (z.B. Kommentar-Sektionen einziehen), um dem Ticket-Wortlaut „Aufteilen in kleinere Hilfsfunktionen" wörtlich zu folgen.** Nicht empfohlen: Bei Funktionen von 1–11 Zeilen gibt es keine sinnvolle Aufteilung — jeder Versuch würde künstliche Zwischenschritte erzeugen, die die Lesbarkeit eher verschlechtern als verbessern, und bei den vier Closures (`verState`, `sectorPath`, `azDiffFn`, `handler`) unnötiges Risiko an Scope-Referenzen (`s.verificationIncl`, `pt()`, `subAz`, `this.pref()`) erzeugen, ohne jeden Gegenwert. Aufwand: höher, Risiko: höher, Nutzen: keiner.
+- **Empfehlung: Option A**, mit derselben Begründung wie bei TASK-42: das Ticket ist bereits durch die Verifikation beantwortet — die gemeldeten Funktionen existieren in der gemeldeten Form/Länge nicht, das Werkzeug muss korrigiert werden, nicht der Anwendungscode.
+
+**Testplan:**
+- [ ] Automatisiert: `python3 tools/refactor_check.py --report` vor und nach der Ignorelist-Änderung laufen lassen und die Diffs vergleichen — die sechs Namen (`ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel`) dürfen danach nicht mehr unter `long_function` erscheinen, alle anderen Findings (u.a. TASK-51-Fund zu `backend/main.py`) müssen unverändert bestehen bleiben.
+- [ ] Manuell: Da kein Anwendungscode verändert wird, ist kein Klickpfad-Test in der App nötig. Zur Absicherung dennoch ein kurzer Sichttest im lokalen Dev-Server empfohlen (siehe PRODUCT.md-Regressionsmatrix, sofern vorhanden): Filter-Sheet öffnen und den Verifikations-Chip „Geprüft" durch alle drei Zustände klicken (Off → Geprüft → Probleme → Off), ein Location-Detail mit „Goldene Wolken"/„Himmelsröte"-Event öffnen und die Kompass-Grafik sowie den Sonnen-Ausrichtungstext prüfen — erwartetes Ergebnis: alles sieht/verhält sich exakt wie vor diesem Ticket, weil keine Zeile Anwendungscode geändert wurde.
 
 ---
 
@@ -3589,20 +3731,116 @@ Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklapp
 
 ---
 
-### TASK-42 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[ ]`
+### TASK-42 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-25 |
+| **Abgeschlossen** | 2026-07-03 — kein Handlungsbedarf, Falsch-Positiv (siehe Analyse-Spec unten) |
 
 **Beschreibung:** Zwei JS-Funktionen in `web/index.html` überschreiten den Threshold erheblich:
 - `local()` Z. 2674 — ~265 Zeilen
 - `row()` Z. 3531 — ~1034 Zeilen
 
+**Bezug:** TASK-39 deckte denselben `local()`-Teil bereits ab und wurde als Duplikat geschlossen (2026-07-03) — hier mitverfolgen.
+
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-39, 2026-06-25)
+
+---
+
+#### 🔬 Analyse-Spec (TASK-42) · 2026-07-03
+
+### Kernbefund: Ticket beruht auf einem bereits behobenen Mess-Fehler — kein Refactoring nötig
+
+**📎 Code-Verifikation (Pflicht, Schritt 3):** Beide im Ticket genannten Funktionen wurden im aktuellen Stand von `web/index.html` gelesen:
+
+- **`local` (Zeile 3449 und 3466, nicht 2674):** Ist keine Funktion, sondern eine sofort ausgeführte Konstante (`const local = (() => { … })();`) innerhalb von `CameraFOV._loadProfile()`. Sie liest das gespeicherte Kamera-Profil aus dem Browser-Speicher aus. Die komplette Definition passt in **eine einzige Zeile**. Von „~265 Zeilen" keine Spur.
+- **`row` (Zeile 4881, nicht 3531):** Ist eine kleine lokale Hilfsfunktion innerhalb von `AstroMap._draw()` (nicht `AstroMap.render()`, wie ein interner Code-Kommentar fälschlich vermerkt), die eine einzelne Zeile in der Sonne/Mond/Milchstraße-Ausrichtungsanzeige aufbaut. Sie umfasst **12 Zeilen** (Zeile 4881–4893). Von „~1034 Zeilen" keine Spur.
+
+**Ursache des Fehlbefunds:** Das Analyse-Werkzeug `tools/refactor_check.py` misst die Länge einer JS-Funktion über eine Regex-Heuristik, die den Abstand bis zur *nächsten erkannten* Funktionsdefinition zählt — nicht bis zur tatsächlichen schließenden Klammer. Bei kurzen, lokal verschachtelten Hilfsfunktionen (wie `local` und `row`) „läuft" die gemessene Länge bis weit in den nachfolgenden Code hinein und erzeugt Werte, die 100-fach zu hoch sind. Das ist im Werkzeug selbst dokumentiert (Kommentarblock „BEKANNTE LIMITATION (TASK-32)").
+
+**Bereits gefixt:** Beide Namen (`local`, `row`) stehen bereits in der Ausschlussliste des Werkzeugs (`FRONTEND_LONG_FN_IGNORELIST`), mit dem Vermerk „tatsächlich 1 Zeile" bzw. „tatsächlich 12 Zeilen". Ein Refactoring-Ticket wurde also offensichtlich schon einmal analysiert und als Falsch-Alarm eingestuft — TASK-42 ist ein zu diesem Zeitpunkt (2026-06-25) bereits veralteter, nicht mehr zutreffender automatischer Fund, der nie geschlossen wurde.
+
+⚠️ **Kleine offene Unstimmigkeit (unkritisch):** Der Ausschlusslisten-Kommentar im Code verweist auf „TASK-43" als Quelle dieses Fixes. Ein Ticket mit dieser Nummer existiert im aktuellen Backlog nicht (weder offen noch archiviert). Vermutlich ein interner Verweisfehler beim Eintragen des Ausschlusses (z. B. Verwechslung mit einer anderen Ticket-ID) oder das Ticket wurde bei einem früheren Backlog-Cleanup vollständig entfernt statt archiviert. ⚠️ Annahme: Das ist ohne Auswirkung auf TASK-42 — der Ausschluss selbst ist im Code vorhanden und korrekt, unabhängig davon welche Ticket-ID ihn ursprünglich veranlasst hat. Keine weitere Recherche nötig, außer Stephan möchte den Backlog-Verlauf aus anderen Gründen nachvollziehen.
+
+---
+
+### Example Mapping
+
+**Regel 1: Ein Ticket wird nur umgesetzt, wenn sein Befund am aktuellen Code noch zutrifft**
+
+Kontext: Automatisch erzeugte Refactoring-Tickets basieren auf einem Analyse-Lauf zu einem bestimmten Zeitpunkt. Ändert sich der Code (oder wird der Mess-Fehler selbst behoben), kann der ursprüngliche Befund veralten.
+
+- ✅ Positiv: Code-Verifikation zeigt, dass `local` (1 Zeile) und `row` (12 Zeilen) weit unter dem 80-Zeilen-Threshold liegen → kein Refactoring-Bedarf, Ticket wird als „bereits erledigt/falsch-positiv" geschlossen statt umgesetzt.
+- ❌ Negativ: Hätte die Verifikation bestätigt, dass die Funktionen wirklich mehrere hundert Zeilen umfassen, wäre eine Aufteilung wie ursprünglich beschrieben nötig gewesen.
+
+**Regel 2: Kein Refactoring ohne echten Verhaltens-Nutzen für Stephan**
+
+Kontext: TASK-42 ist ein reines Code-Aufräum-Ticket ohne sichtbare App-Wirkung. Wird umgesetzt, obwohl der zugrunde liegende Befund falsch ist, entsteht Aufwand ohne Nutzen und ein unnötiges Regressionsrisiko an zwei funktionierenden, viel genutzten Stellen (Kamera-Profil-Laden, Astro-Ausrichtungsanzeige).
+- ✅ Positiv: Ticket wird geschlossen statt umgesetzt, kein Code wird angefasst, kein Testaufwand entsteht.
+
+---
+
+### Akzeptanzkriterien
+
+Da der Kernbefund lautet „kein Refactoring nötig", gibt es keine App-Verhaltens-AKs für eine Code-Aufteilung. Stattdessen gelten AKs für den korrekten Ticket-Abschluss:
+
+- [x] AK-1: Das Ticket wird **nicht** implementiert — `web/index.html` bleibt an den Stellen `CameraFOV._loadProfile()` und `AstroMap._draw()` unverändert.
+- [x] AK-2: Stephan bestätigt den Befund (Ticket beruht auf veraltetem/fehlerhaftem automatischem Fund), danach wird TASK-42 auf „Done" mit Vermerk „kein Handlungsbedarf — Falsch-Positiv" gesetzt statt normal durch Implementierung/Test/Release zu laufen.
+- [x] AK-3 (Regression, indirekt): Kamera-Profil-Laden (Einstellungen → Kamera-Sensor/Brennweite) und die Astro-Ausrichtungsanzeige (Sonne/Mond/Milchstraße-Zeile in der Karten-/Location-Detailansicht) funktionieren unverändert weiter, weil an ihnen nichts geändert wird — keine gesonderte Testrunde nötig.
+
+---
+
+### Pre-Mortem
+
+**Risiko 1 — Ticket wird trotzdem „nach Vorschrift" umgesetzt, weil die Beschreibung ungeprüft übernommen wird**
+Auslöser: Wer nur die Ticket-Beschreibung liest (nicht den Code), hält „~265 Zeilen" und „~1034 Zeilen" für bare Münze und beginnt eine unnötige Aufteilung an zwei kleinen, funktionierenden Codestellen.
+Gegenmaßnahme: Code-Verifikation ist in dieser Spec bereits dokumentiert und mit Zeilenzahlen belegt (AK-1/AK-2 verhindern die Umsetzung).
+
+**Risiko 2 — Verwechslung mit TASK-49, das echte lange Funktionen in derselben Datei listet**
+Auslöser: TASK-49 (ToDo, noch offen) meldet sechs andere lange Funktionen in `web/index.html` (`ic()`, `handler()`, `verState()`, `sectorPath()`, `azDiffFn()`, `sunAlignmentLabel()` — die längste davon `sunAlignmentLabel()` mit ~1044 Zeilen). Es besteht Verwechslungsgefahr, TASK-42 fälschlich als „das große Refactoring-Ticket" zu behandeln.
+Gegenmaßnahme: Explizit im Ticket-Text vermerken, dass TASK-49 unabhängig und weiterhin gültig ist (dort wurden echte lange Funktionen nicht auf die Ignorelist gesetzt) — TASK-42 betrifft ausschließlich die zwei genannten, bereits widerlegten Funktionen.
+
+**Risiko 3 — Analyse-Werkzeug erzeugt erneut denselben Falsch-Alarm für andere Funktionen**
+Auslöser: Die Regex-Heuristik in `refactor_check.py` hat eine bekannte strukturelle Schwäche (siehe Kommentar „TASK-32"). Weitere Falsch-Positive sind wahrscheinlich, solange kein echter JS-Parser eingesetzt wird.
+Gegenmaßnahme: Kein Handlungsbedarf für TASK-42 selbst; als generelle Beobachtung für künftige `fotoalert-refactor`-Läufe festhalten — nicht Teil dieses Tickets.
+
+---
+
+### Architektur-Analyse
+
+`CameraFOV._loadProfile()` (Kamera-Profil aus Server/localStorage laden, Migration zwischen beiden) und `AstroMap._draw()` (Zeichnen der Sonne/Mond/Milchstraße-Ausrichtungslinien inkl. Text-Zeile pro Himmelskörper) sind beide unauffällig kurz und in sich abgeschlossen. Es gibt keine strukturelle Verflechtung zwischen den beiden — sie liegen an völlig unterschiedlichen Stellen der Datei und haben nichts miteinander zu tun außer der gemeinsamen (falschen) Nennung in diesem Ticket.
+
+---
+
+### Implementierungsoptionen
+
+Da der Befund widerlegt ist, gibt es keine sinnvollen Umsetzungsoptionen im ursprünglichen Sinn. Zur Vollständigkeit dennoch die Handlungsalternativen für den Ticket-Abschluss:
+
+#### Option A — Ticket ohne Codeänderung schließen (empfohlen)
+Vorgehen: TASK-42 wird mit Vermerk „Falsch-Positiv, Code bereits auf Ignorelist" auf Done gesetzt. Kein Codeeingriff, kein Test, kein Release nötig.
+Vorteile: Kein Risiko, kein Aufwand, sauberer Backlog-Zustand.
+Nachteile: Keine.
+Aufwand: minimal (nur Ticket-Pflege).
+
+#### Option B — Trotzdem eine kosmetische Mini-Aufteilung vornehmen
+Vorgehen: `local` in eine benannte Helper-Funktion umwandeln, `row` unverändert lassen oder minimal umbenennen — rein um das Ticket „inhaltlich" zu bedienen.
+Nachteile: Löst kein reales Problem, erzeugt unnötigen Diff und Regressionsrisiko an zwei funktionierenden Stellen, widerspricht dem Grundsatz „kein Scope Creep" und „keine Änderung ohne Nutzen".
+Aufwand: klein, aber ohne Gegenwert.
+
+✅ **Empfehlung: Option A** — der Befund ist durch Code-Lektüre eindeutig widerlegt (1 Zeile bzw. 12 Zeilen statt 265 bzw. 1034), beide Funktionen stehen bereits auf der Ignorelist des Analyse-Werkzeugs. Eine Umsetzung würde funktionierenden Code ohne Nutzen anfassen.
+
+---
+
+### Testplan
+
+- [ ] Automatisiert: kein neuer Testfall nötig, da keine Codeänderung erfolgt.
+- [ ] Manuell: keine Testschritte nötig. Falls Stephan zur Sicherheit gegenprüfen möchte: Einstellungen-Bereich öffnen und Kamera-Sensor/Brennweite ändern (prüft `CameraFOV._loadProfile()`-Pfad indirekt) sowie eine Location-Detailansicht mit Sonnen-/Mond-Ausrichtungsanzeige öffnen (prüft `AstroMap._draw()`/`row()`-Pfad indirekt) — beide sollten sich wie gewohnt verhalten, unverändert gegenüber vor diesem Ticket.
+
+---
 
 ---
 
