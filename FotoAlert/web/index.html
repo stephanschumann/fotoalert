@@ -549,6 +549,29 @@
     .edit-map-fs-header h2 { font-size: 18px; font-weight: 800; }
     .edit-map-fs-container { flex: 1; min-height: 0; position: relative; }
     #edit-map-fs { width: 100%; height: 100%; }
+
+    /* ── US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion ── */
+    /* .fov-map-expand-btn: Klasse statt ID, da der Button pro CameraFOV-prefix
+       (ev/loc) mehrfach im DOM vorkommt (Feed/Kalender/Scout/Location-Detail teilen
+       sich dieselbe Komponente über Detail.open()). */
+    .fov-map-expand-btn { position: absolute; top: 8px; right: 8px; z-index: 1000;
+      width: 36px; height: 36px; min-width: 44px; min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); cursor: pointer; transform: translate(4px, -4px); }
+    #fov-map-fs-sheet { position: fixed; inset: 0; z-index: 130;
+      background: var(--bg); border-radius: 0; overflow-x: hidden;
+      display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #fov-map-fs-sheet.open { transform: translateY(0); }
+    #fov-map-fs-overlay { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 129;
+      opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #fov-map-fs-overlay.open { opacity: 1; pointer-events: auto; }
+    .fov-map-fs-header { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .fov-map-fs-header h2 { font-size: 18px; font-weight: 800; }
+    .fov-map-fs-container { flex: 1; min-height: 0; position: relative; }
+    #fov-map-fs { width: 100%; height: 100%; }
     .form-section { margin-bottom: 16px; }
     .form-section label { display: block; font-size: 11px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
@@ -796,7 +819,7 @@
       #detail-sheet, #loc-detail-sheet, #filter-sheet, #impressum-sheet {
         left: 50%; width: 480px; right: auto; margin-left: -240px;
       }
-      #add-sheet, #edit-map-fs-sheet {
+      #add-sheet, #edit-map-fs-sheet, #fov-map-fs-sheet {
         left: 50%; width: 480px; right: auto; top: 0; bottom: 0; margin-left: -240px;
       }
     }
@@ -1152,6 +1175,19 @@ function ic(id, size, cls){
   </div>
   <div class="edit-map-fs-container">
     <div id="edit-map-fs"></div>
+  </div>
+</div>
+
+<!-- US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion (Chancen-/Kalender-/Scout-/Location-Detail) -->
+<div id="fov-map-fs-overlay" onclick="CameraFOV.closeMapFullscreen()"></div>
+<div id="fov-map-fs-sheet">
+  <div class="fov-map-fs-header">
+    <div class="sheet-handle" style="margin:0"></div>
+    <h2 style="display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-fov"/></svg>Karte &amp; Blickwinkel</h2>
+    <button class="close-btn" onclick="CameraFOV.closeMapFullscreen()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="fov-map-fs-container">
+    <div id="fov-map-fs"></div>
   </div>
 </div>
 
@@ -3563,7 +3599,12 @@ const CameraFOV = {
         </select>
       </div>
       <div id="fov_info_${prefix}" style="font-size:12px;color:var(--muted);margin-bottom:8px">–</div>
-      ${hasSub ? `<div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>
+      ${hasSub ? `<div style="position:relative">
+        <div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>
+        <button class="fov-map-expand-btn" onclick="CameraFOV.openMapFullscreen('${prefix}')" aria-label="Karte im Vollbild öffnen" title="Karte im Vollbild öffnen">
+          <svg style="width:18px;height:18px"><use href="#i-expand"/></svg>
+        </button>
+      </div>
       <div style="margin-top:6px">${MapMarkers.legendHtml()}</div>`
                : `<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten – Karte nicht verfügbar.</p>`}`;
   },
@@ -3578,6 +3619,15 @@ const CameraFOV = {
     const map = L.map(mapId, { zoomControl:true, attributionControl:false });
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
     this._maps[prefix] = map;
+    this._drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon);
+    this._redrawCone(prefix);
+    this._updateInfo(prefix);
+  },
+
+  // Zeichnet Beobachter-Pin, Motiv-Pin und Sichtachse auf eine gegebene Map-Instanz.
+  // Gemeinsam genutzt von der Panel-Karte (initMap) und der US-114-Vollbild-Karte
+  // (_initMapFs), damit beide Instanzen exakt dasselbe Bild zeigen.
+  _drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon) {
     // Observer-Pin (MapMarkers-Standard, BUG-20)
     L.marker([obsLat, obsLon], {icon: MapMarkers.observer()}).addTo(map);
     if (subjLat) {
@@ -3590,25 +3640,36 @@ const CameraFOV = {
     } else {
       map.setView([obsLat, obsLon], 15);
     }
-    this._redrawCone(prefix);
-    this._updateInfo(prefix);
+  },
+
+  // Berechnet Bearing + Kegel-Eckpunkte für einen Datensatz (dataKey in _data) und
+  // zeichnet das Kegel-Polygon auf die übergebene Map-Instanz. mapKey adressiert die
+  // Map/Cone-Instanz getrennt vom Datensatz-Key, damit Panel-Karte (prefix) und
+  // Vollbild-Karte (prefix+'_fs') denselben Datensatz nutzen, aber unabhängige
+  // Layer-Referenzen behalten (US-114).
+  _drawCone(map, cones, mapKey, d, inputs) {
+    if (!map || !d || !d.subjLat) return;
+    if (cones[mapKey]) { try { map.removeLayer(cones[mapKey]); } catch {} }
+    const fovDeg = this._calcFOV(inputs.sensor, inputs.fl, inputs.ori);
+    const bearing = this._bearing(d.obsLat, d.obsLon, d.subjLat, d.subjLon);
+    const half = fovDeg / 2;
+    const lPt = this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM);
+    const rPt = this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM);
+    const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
+    cones[mapKey] = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
+      color:ac2, fillColor:ac2, fillOpacity:0.13, weight:1.5
+    }).addTo(map);
   },
 
   _redrawCone(prefix) {
     const map = this._maps[prefix];
     const d = this._data[prefix];
     if (!map || !d || !d.subjLat) return;
-    if (this._cones[prefix]) { try { map.removeLayer(this._cones[prefix]); } catch {} }
-    const p = this._readInputs(prefix);
-    const fovDeg = this._calcFOV(p.sensor, p.fl, p.ori);
-    const bearing = this._bearing(d.obsLat, d.obsLon, d.subjLat, d.subjLon);
-    const half = fovDeg / 2;
-    const lPt = this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM);
-    const rPt = this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM);
-    const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
-    this._cones[prefix] = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
-      color:ac2, fillColor:ac2, fillOpacity:0.13, weight:1.5
-    }).addTo(map);
+    this._drawCone(map, this._cones, prefix, d, this._readInputs(prefix));
+    // US-114: Vollbild-Karte (falls gerade offen bzw. schon initialisiert) mitziehen,
+    // damit Reglerwertänderungen im Panel auch im Vollbild sofort sichtbar sind.
+    const fsMap = this._maps[prefix + '_fs'];
+    if (fsMap) this._drawCone(fsMap, this._cones, prefix + '_fs', d, this._readInputs(prefix));
   },
 
   _readInputs(prefix) {
@@ -3638,6 +3699,45 @@ const CameraFOV = {
     this._saveProfile(p);
     this._redrawCone(prefix);
     this._updateInfo(prefix);
+  },
+
+  // ── US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion ──────
+  // Reines Ansehen: keine Drag-Handler auf den Markern (anders als US-87
+  // edit-map-fs, das dem Pin-Setzen dient). Die Vollbild-Karte wird bei JEDEM
+  // Öffnen aus dem aktuellen _data[prefix]-Datensatz frisch aufgebaut, damit nie
+  // der Stand einer zuvor angezeigten anderen Chance/Location "einfriert".
+  _fsPrefix: null,
+
+  openMapFullscreen(prefix) {
+    this._fsPrefix = prefix;
+    document.getElementById('fov-map-fs-overlay').classList.add('open');
+    document.getElementById('fov-map-fs-sheet').classList.add('open');
+    // Leaflet-Gotcha (analog AddLocation.initMap()/US-87 _initEditMapFs): Container ist
+    // erst nach der Öffnen-Animation sichtbar — Karteninit + invalidateSize() danach.
+    setTimeout(() => this._initMapFs(prefix), 300);
+  },
+
+  closeMapFullscreen() {
+    document.getElementById('fov-map-fs-overlay').classList.remove('open');
+    document.getElementById('fov-map-fs-sheet').classList.remove('open');
+  },
+
+  _initMapFs(prefix) {
+    const d = this._data[prefix];
+    if (!d) return;
+    const fsKey = prefix + '_fs';
+    // Alte Instanz (von einer zuvor angezeigten Chance/Location) immer verwerfen und
+    // neu aufbauen — verhindert eine "eingefrorene" Vollbild-Karte (Pre-Mortem Edge Case).
+    if (this._maps[fsKey]) { try { this._maps[fsKey].remove(); } catch {} delete this._maps[fsKey]; delete this._cones[fsKey]; }
+    const map = L.map('fov-map-fs', { zoomControl:true, attributionControl:false });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+    this._maps[fsKey] = map;
+    map.invalidateSize();
+    // Keine Drag-Handler: _drawPinsAndLine nutzt L.marker() (nicht draggable), reines Ansehen.
+    this._drawPinsAndLine(map, d.obsLat, d.obsLon, d.subjLat, d.subjLon);
+    this._drawCone(map, this._cones, fsKey, d, this._readInputs(prefix));
+    // Zoom/Pan sollen normal funktionieren (Default von L.map, nichts deaktiviert).
+    setTimeout(() => map.invalidateSize(), 50);
   }
 };
 
@@ -4604,6 +4704,23 @@ const WeatherMap = {
     return this._FALLBACK_BOUNDS;
   },
 
+  // BUG-58: 50-km-Radius-Bounds um einen Mittelpunkt, breitengradkorrigiert
+  // (Δlon = 50km / (111km × cos(lat)), Δlat = 50km/111km), damit der Ausschnitt
+  // bei nördlichen Standorten (z. B. Norwegen, 69°N) nicht optisch größer/kleiner
+  // wirkt als z. B. bei Berlin (52°N). Fallback auf Berlin, falls kein Mittelpunkt
+  // ermittelbar ist (z. B. Karte noch nicht initialisiert) — nie Absturz/leere Karte.
+  _localBounds(center) {
+    const RADIUS_KM = 50;
+    const KM_PER_DEG_LAT = 111;
+    const c = center || { lat: 52.52, lng: 13.40 };
+    const lat = (typeof c.lat === 'number' && !isNaN(c.lat)) ? c.lat : 52.52;
+    const lng = (typeof c.lng === 'number' && !isNaN(c.lng)) ? c.lng : 13.40;
+    const dLat = RADIUS_KM / KM_PER_DEG_LAT;
+    const cosLat = Math.max(0.01, Math.cos(lat * Math.PI / 180)); // Pol-Schutz gegen Division nahe 0
+    const dLng = RADIUS_KM / (KM_PER_DEG_LAT * cosLat);
+    return [[lat - dLat, lng - dLng], [lat + dLat, lng + dLng]];
+  },
+
   // US-112: Quellen-Attribution (CC BY 4.0 Pflicht) ein-/ausblenden.
   _updateAttribution() {
     const el = document.getElementById('map-weather-attribution');
@@ -4628,11 +4745,14 @@ const WeatherMap = {
     if (mode !== 'off') {
       await this._fetch();
       this._ensurePane();
-      // BUG-55: NUR beim Übergang aus→an Ansicht merken + auf das Gitter zoomen.
-      // Bei an→an (clouds↔precip) nicht erneut zoomen / _savedView nicht überschreiben.
+      // BUG-55: NUR beim Übergang aus→an Ansicht merken.
+      // BUG-58: Statt auf die Mehrländer-BBox (_gridBounds) zoomt der Toggle auf
+      // einen 50-km-Radius um die aktuelle Kartenmitte (breitengradkorrigiert,
+      // siehe _localBounds). Bei an→an (clouds↔precip) nicht erneut zoomen /
+      // _savedView nicht überschreiben — Ausschnitt bleibt stabil.
       if (wasOff && MapView.map) {
         this._savedView = { center: MapView.map.getCenter(), zoom: MapView.map.getZoom() };
-        MapView.map.fitBounds(this._gridBounds(), { padding: [20, 20] });
+        MapView.map.fitBounds(this._localBounds(MapView.map.getCenter()), { padding: [20, 20] });
       }
     } else if (this._savedView && MapView.map) {
       // BUG-55: Übergang an→aus — vorherige Ansicht wiederherstellen.

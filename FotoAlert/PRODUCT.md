@@ -175,6 +175,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Sonnenuntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-107); fehlt kommentarlos wenn null |
 | Koordinaten-Sektion | Kein Overflow-Problem (BUG-38 gefixt); Labels korrekt ausgerichtet |
 | Sheet-Header | Kein blaugrauer Strich links (BUG-39 gefixt) |
+| Karte & Blickwinkel im Vollbild | Sobald die FOV-Karte Motivkoordinaten hat, zeigt sie ein Vollbild-Symbol (oben rechts); antippen öffnet dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend, rein zum Ansehen — Pins lassen sich dort NICHT verschieben, Zoomen/Verschieben der Karte funktioniert normal. Kreuz oben oder Antippen des abgedunkelten Hintergrunds schließt zurück zur Detailansicht. Gilt identisch in allen vier Einstiegspunkten: Chancen-Detail, Kalender-Detail, Scout-Detail, Location-Detail (US-114). Ohne Motivkoordinaten erscheint kein Vollbild-Symbol (wie schon der Hinweistext statt Karte). Getrennt vom Bearbeiten-Vollbild-Overlay (US-87), das nur im Location-Detail-Editiermodus zum Pin-Setzen dient. |
 
 **Pflicht-Regression Detail:**
 - [ ] Sheet öffnet sich von unten (slide-up Animation)
@@ -182,6 +183,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Beim Öffnen: alle Sektionen eingeklappt
 - [ ] Close-Button erreichbar (Safe Area, kein Overlap mit Status Bar)
 - [ ] FOV-Karte lädt (Leaflet) und zeigt Verbindungslinie; Zielring-Marker (Ring + Ticks + Mittelpunkt, gold) sichtbar; Legende zeigt Zielring-Icon (US-103)
+- [ ] FOV-Karte mit Motivkoordinaten zeigt Vollbild-Symbol; Antippen öffnet bildschirmfüllende Karte mit Pins + Sichtachse + Sichtfeld-Kegel, Pins darin nicht verschiebbar, Zoomen/Verschieben normal, Kreuz + Hintergrund-Tap schließen zurück (US-114)
+- [ ] FOV-Karte ohne Motivkoordinaten zeigt kein Vollbild-Symbol (US-114)
 - [ ] „Zum Kalender" → `.ics` Download startet
 - [ ] Street-View-Button nur sichtbar wenn Azimut verfügbar
 - [ ] Astronomie-Sektion zeigt Mondaufgang + Monduntergang mit Uhrzeit + Azimut (wenn vorhanden) (US-79)
@@ -246,7 +249,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. |
-| Bearbeiten-Karte im Vollbild | Auf der kleinen Bearbeiten-Karte öffnet ein Symbol (oben rechts) ein bildschirmfüllendes Overlay zum komfortablen Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt die neuen Positionen sofort in die kleine Karte + Koordinatenfelder, gespeichert wird weiterhin erst über „Speichern" (US-87). Die readonly „Karte & Blickwinkel"-Ansicht (US-58) ist davon nicht betroffen. |
+| Bearbeiten-Karte im Vollbild | Auf der kleinen Bearbeiten-Karte öffnet ein Symbol (oben rechts) ein bildschirmfüllendes Overlay zum komfortablen Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt die neuen Positionen sofort in die kleine Karte + Koordinatenfelder, gespeichert wird weiterhin erst über „Speichern" (US-87). Die readonly „Karte & Blickwinkel"-Ansicht (US-58) ist davon getrennt und hat ihr eigenes, rein anzeigendes Vollbild-Symbol ohne Pin-Verschieben (US-114, siehe Abschnitt 4). |
 | Custom Locations | Vom Nutzer gespeicherte Locations erscheinen hier; Namen ohne 📍-Emoji (BUG-42) |
 | Standortverifikation | Verifikationen werden persistiert (BUG-26) |
 
@@ -460,3 +463,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-03 | BUG-56 | Astronomie-Regressionstest korrigiert: falscher Vergleichswert für Sonnenauf-/-untergang Berlin (21.06.2026) im Test berichtigt (01:43→02:43 UTC, 20:25→19:33 UTC); Berechnung selbst war korrekt, nur der Testreferenzwert war falsch; Toleranz unverändert |
 | 2026-07-03 | TASK-49 | Sechs False-Positive-Meldungen in refactor_check.py behoben (Ausnahmeliste ergänzt), kein App-Code geändert |
 | 2026-07-03 | US-87 | Bearbeiten-Karte im Location-Detail: neues Vollbild-Overlay (Symbol oben rechts) zum komfortablen Zoomen/Verschieben und Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt neue Position sofort in kleine Karte + Koordinatenfelder, Speicherung weiterhin nur über „Speichern"; readonly „Karte & Blickwinkel" (US-58) unverändert; verifiziert gegen BUG-34-Zoom-Regression auf iPhone Safari |
+| 2026-07-03 | US-114 | Readonly „Karte & Blickwinkel"-Sektion (`CameraFOV`) bekommt eigenes Vollbild-Symbol, getrennt vom Bearbeiten-Overlay aus US-87: Antippen öffnet dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend nur zum Ansehen, ohne Drag-Handler auf den Pins; Kreuz oder Hintergrund-Tap schließt zurück. Da `CameraFOV` bereits prefix-parametrisiert ist (`ev`/`loc`), wirkt die Änderung automatisch in allen vier Einstiegspunkten (Chancen-, Kalender-, Scout-, Location-Detail). Neue eigenständige IDs (`#fov-map-fs-*`), keine Kollision mit US-87 (`#edit-map-fs-*`); Vollbild-Karte wird bei jedem Öffnen aus dem aktuellen Datensatz neu aufgebaut (kein „eingefrorener" Stand einer zuvor angezeigten anderen Chance/Location); kein Vollbild-Symbol wenn keine Motivkoordinaten vorhanden sind. |

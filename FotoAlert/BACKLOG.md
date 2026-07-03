@@ -34,7 +34,7 @@
 | **🏁 Done** | abgeschlossen + deployed | **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **BUG-58** *(Wolken-/Regen-Icon-Klick zoomt auf Europa statt 50-km-Radius um Standort)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -904,6 +904,74 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 **Testplan:**
 - [ ] Automatisiert (Harness): Nach Entfernen der Datei `pytest backend/tests/ -v` vollständig laufen lassen — erwartet: keine `ImportError`/`AttributeError` mehr zu `fetch_weather_multigrid`/`WEATHER_REGIONS`/`_build_germany_grid`/`fetch_weather_grid`; `test_us112_weather_map.py` weiterhin vollständig grün (Regressionscheck der realen Wetter-Tests); `test_astronomy_regression.py` (BUG-56) weiterhin unberührt grün.
 - [ ] Manuell: `git status` nach der Änderung zeigt ausschließlich die Entfernung der einen Datei, keine Modifikation an `weather.py`/`weather_grib.py`/`main.py`. Kurzer `grep -r "test_us72_weather_map" backend/` vor dem Löschen, um versteckte Referenzen (Config/`conftest.py`) auszuschließen.
+
+---
+
+### BUG-58 · Wolken-/Niederschlag-Umschalter im Karten-Tab soll auf 50-km-Radius statt auf Europa zoomen (Änderung an US-112/BUG-55) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix (bewusste Verhaltensänderung an US-112/BUG-55, kein neuer unabhängiger Bug) |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-03 |
+
+**Beschreibung:** Tippt man im Karten-Tab auf den „Wolken"- oder „Niederschlag"-Umschalter, zentriert und zoomt die Karte auf eine Mehrländer-Ansicht (Frankreich bis Nord-Norwegen). Gewünscht: Die Karte soll stattdessen auf einen Kartenausschnitt von ca. 50 km Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort zoomen.
+
+**Bezug:** Dies ist eine **bestätigte Änderung an bereits abgenommenem Verhalten aus BUG-55** [x] (Wetterkarte: Auto-Zoom beim Ein-/Ausschalten des Wolken-/Niederschlag-Layers im Map-Tab) und **US-112** [x] (Wetter-Overlay DWD/MET, Mehrländer-Ansicht als bewusste Design-Entscheidung). Stephan hat in der Analyse-Klärung bestätigt: Gemeint ist der bestehende „Wolken"/„Niederschlag"-Umschalt-Knopf direkt in der Kartenansicht (`WeatherMap.setMode`), nicht ein neuer Klick-Pfad von Feed/Scout/Detail-Sheet aus. Ihm ist bewusst, dass dies das in US-112 gewünschte „alle vier Gebiete gleichzeitig sichtbar"-Verhalten ersetzt — keine Regression, sondern eine gewollte Verhaltensänderung.
+
+---
+
+**Implementation Spec**
+
+**Klärung erfolgt (2026-07-03):** Stephan hat auf Rückfrage bestätigt, dass er den bestehenden „Wolken"/„Niederschlag"-Umschalt-Knopf direkt im Karten-Tab meint (`WeatherMap.setMode('clouds'|'precip')`, `web/index.html` Zeile 992–994 und 4356–4660). Ihm ist bewusst, dass dieser Knopf seit US-112 absichtlich auf eine Mehrländer-Ansicht zoomt (Server-Bounds `BBOX_S=43.0, BBOX_N=71.5, BBOX_W=3.0, BBOX_E=21.0`, `backend/calculations/weather_grib.py` Zeile 73–76; frontend-seitige `_FALLBACK_BOUNDS`, `web/index.html` Zeile ~4372) — und dass diese Umstellung eine bewusste Änderung an bereits abgenommenem US-112/BUG-55-Verhalten ist, kein neuer, unabhängiger Bug. Gewünschtes neues Verhalten: Der Knopf zoomt künftig auf einen ca. 50-km-Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort statt auf die volle Mehrländer-Bounding-Box.
+
+📎 Code-Verifikation: `web/index.html` (`WeatherMap.setMode`/`_render`/`_gridBounds`, Zeile 4356–4660; `MapView.init`/`loadMarkers`, Zeile 4162–4211) sowie `backend/main.py` (Zeile 738, 1925, 1948: `bounds` kommt immer von `weather_grib.overlay_bounds()`) und `backend/calculations/weather_grib.py` (Zeile 73–76, 553–555) gelesen am 2026-07-03. Bestätigt: Die einzigen Aufrufer von `WeatherMap.setMode` sind die beiden Toggle-Buttons im Karten-Tab (Zeile 992–994) — kein Aufruf aus Feed/Scout/Detail-Sheet/Location-Liste, daher kein weiterer Code-Pfad betroffen.
+
+**Example Mapping:**
+
+📏 **Rule:** Der Wolken-/Niederschlag-Umschalter im Karten-Tab zoomt auf einen ca. 50-km-Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort, statt auf die volle Mehrländer-Bounding-Box.
+- 🟢 Example: Die Karte zeigt gerade Berlin in normaler Ansicht. Ich tippe auf „Wolken". Die Karte zoomt danach auf einen Ausschnitt von ungefähr 50 km rund um Berlin — nicht auf eine Ansicht, die Frankreich bis Norwegen zeigt.
+- 🟢 Example: Ich habe die Karte zuvor auf einen Standort in Norwegen verschoben. Ich tippe auf „Niederschlag". Die Karte zoomt auf einen Ausschnitt von ungefähr 50 km rund um diesen Standort in Norwegen — der Ausschnitt wirkt dabei genauso groß wie bei einem Standort in Berlin, nicht merklich größer oder kleiner.
+- 🟢 Example: Ich habe „Wolken" bereits aktiviert und die Karte zeigt einen 50-km-Ausschnitt. Ich wechsle zu „Niederschlag". Die Karte bleibt auf demselben Ausschnitt zentriert, springt nicht wieder auf die große Mehrländer-Ansicht zurück.
+- 🟢 Example: Es ist noch kein Standort bekannt und die Karte hat keine sinnvolle Mitte (z. B. direkt nach dem Start ohne vorherige Standortwahl). Ich tippe auf „Wolken". Die Karte zeigt einen sinnvollen Ausschnitt (z. B. die zuletzt bekannte oder eine Standard-Ansicht) statt eines Absturzes, einer leeren Karte oder eines Rückfalls auf die alte Europa-Ansicht.
+
+**Akzeptanzkriterien:**
+- [ ] Tippe ich im Karten-Tab auf „Wolken" oder „Niederschlag", zeigt die Karte danach einen Ausschnitt von ungefähr 50 km rund um die aktuell sichtbare Kartenmitte bzw. den zuletzt betrachteten Standort — nicht mehr die bisherige Ansicht, die ganz Mitteleuropa bis Nord-Norwegen zeigt.
+- [ ] Der Kartenausschnitt wirkt bei einem Standort weit im Norden (z. B. Norwegen) genauso groß wie bei einem Standort in Berlin — kein spürbar größerer oder kleinerer Ausschnitt allein wegen der geografischen Breite.
+- [ ] Schalte ich mehrfach hintereinander zwischen „Wolken" und „Niederschlag" um, bleibt der Kartenausschnitt stabil auf derselben Stelle zentriert — es springt nicht bei jedem Umschalten neu oder zurück zur alten Europa-Ansicht.
+- [ ] Ist beim Umschalten kein sinnvoller Standort oder Kartenmittelpunkt bekannt, zeigt die App trotzdem eine sinnvolle Kartenansicht (keine leere Karte, kein Absturz, kein unbeabsichtigter Rücksprung auf die alte Mehrländer-Ansicht).
+- [ ] Diese Änderung ist bewusst gewollt: Der Karten-Tab zeigt beim Wolken-/Niederschlag-Umschalten künftig **nicht mehr automatisch alle vier bisherigen Gebiete gleichzeitig** — das ist die absichtliche Neuerung dieses Tickets und keine Regression zum früheren, in US-112 abgenommenen Verhalten.
+
+**Pre-Mortem:**
+- 💀 Szenario: Der 50-km-Radius wird als fester Zoom-Level umgesetzt (z. B. „immer Zoomstufe 10"), ohne den Breitengrad zu berücksichtigen. Da Kartenzoomstufen in Pixel pro Grad und nicht in Kilometern gemessen werden, wirkt derselbe Zoom-Level bei einem Standort in Norwegen (69°N) deutlich stärker vergrößert/verzerrt als bei Berlin (52°N) — der Ausschnitt wäre dort spürbar zu klein oder zu groß statt überall ungefähr 50 km. → Gegenmaßnahme: Der Ausschnitt wird über ein tatsächlich berechnetes Rechteck um den Mittelpunkt bestimmt (Standort plus/minus einem Abstand, der die geografische Breite berücksichtigt), nicht über eine pauschale Zoomstufe. Als Testschritt: Norwegen-Standort und Berlin-Standort nacheinander prüfen, ob beide Ausschnitte ähnlich groß wirken.
+- 💀 Szenario: Der Nutzer verschiebt die Karte manuell (pannt) und schaltet danach zwischen „Wolken" und „Niederschlag" um. Wenn die neue Zoom-Logik nicht robust auf die jeweils aktuelle Kartenmitte reagiert, könnte der Ausschnitt beim zweiten Umschalten ungewollt auf eine ältere, nicht mehr sichtbare Position zurückspringen statt auf die Position, die der Nutzer gerade sieht. → Gegenmaßnahme: Als Testschritt „mehrfach hintereinander umschalten, dazwischen die Karte verschieben" verankern und prüfen, dass der Ausschnitt konsistent der aktuell sichtbaren Mitte folgt.
+- 💀 Szenario: Beim allerersten Öffnen des Karten-Tabs (oder wenn aus irgendeinem Grund kein Standort/keine Kartenmitte ermittelbar ist) gibt es keinen sinnvollen Mittelpunkt für den 50-km-Ausschnitt. Ohne Absicherung könnte das zu einer leeren Karte, einem JavaScript-Fehler oder einem unbeabsichtigten Rückfall auf die alte, breite Ansicht führen. → Gegenmaßnahme: Ein sinnvoller Rückfall-Mittelpunkt (z. B. zuletzt bekannter Standort oder ein Standard-Ort) wird als Edge-Case-AK verankert und im Testplan geprüft.
+- 💀 Szenario: Die Umstellung wird versehentlich als Regression zu US-112 gemeldet, weil ein Tester (oder Stephan selbst später) das neue, kleinere Kartenbild mit einem Bug verwechselt, da US-112 ausdrücklich „alle vier Gebiete gleichzeitig sichtbar" als Ziel hatte. → Gegenmaßnahme: Explizit als eigenes AK verankert (siehe oben), damit die Änderung klar als gewollt dokumentiert ist und nicht fälschlich zurückgebaut wird.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (final, Annahme A bestätigt durch Stephan)
+- [x] Pre-Mortem durchgeführt (4 Szenarien, zugeschnitten auf die bestätigte Annahme A)
+- [x] Architektur analysiert: `web/index.html` (`WeatherMap.setMode`/`_render`/`_gridBounds`, Zeile 4356–4660; `MapView.init`, Zeile 4162–4211) sowie `backend/main.py` + `backend/calculations/weather_grib.py` als Bounds-Quelle
+- [x] Designer-Check: visuell? → Nein, keine neue UI-Komponente, nur ein bestehender Knopf verhält sich anders (kleinerer statt größerer Kartenausschnitt) — `fotoalert-designer` nicht erforderlich.
+- [x] Implementierungsoption: Eine Option (siehe unten), kein Optionsvergleich mehr nötig
+- [x] Empfehlung: siehe unten
+
+**Implementierungsoption — Bestehenden Karten-Tab-Toggle auf 50-km-Radius statt Mehrländer-BBox umstellen:**
+- App-Wirkung: Der „Wolken"/„Niederschlag"-Knopf im Karten-Tab zoomt künftig nur noch auf die Umgebung der aktuellen Kartenmitte, nicht mehr auf Deutschland–Norwegen gleichzeitig.
+- Vorgehen: In `WeatherMap.setMode` den Aufruf `MapView.map.fitBounds(this._gridBounds(), …)` durch einen 50-km-Bounds-Aufruf um `MapView.map.getCenter()` ersetzen — das Bounds-Rechteck wird breitengradabhängig berechnet (`Δlon = 50km / (111km × cos(lat))`), damit der Ausschnitt bei nördlichen Standorten (z. B. Norwegen) nicht optisch größer/kleiner wirkt als bei Berlin (Mercator-Verzerrung, siehe Pre-Mortem). Für den Fall, dass keine sinnvolle Kartenmitte bekannt ist, greift ein Rückfallwert (zuletzt bekannter Standort oder Standard-Ort) statt eines Absturzes oder Rücksprungs auf die alte Mehrländer-Bounds.
+- Betroffene Datei: `web/index.html` (`WeatherMap.setMode`).
+- Aufwand: klein.
+
+✅ **Empfehlung:** Umsetzung wie oben beschrieben — kleinster Eingriff, direkt am bestätigten Zielort, mit breitengradkorrigierter Radius-Berechnung und abgesichertem Rückfallverhalten für den Fall fehlender Kartenmitte.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Reines Frontend-/Leaflet-Verhalten, nicht über `pytest` prüfbar (analog BUG-55). Falls die Radius-Berechnung als eigenständige, testbare Funktion ausgelagert wird (z. B. „berechne Bounds-Rechteck aus Mittelpunkt + Breitengrad"), dafür einen `pytest`-Fall ergänzen, der für einen Berlin-Breitengrad (~52°N) und einen Nord-Norwegen-Breitengrad (~69°N) prüft, dass beide berechneten Rechtecke einem ähnlichen Kilometer-Radius entsprechen (Toleranzband, kein exakter Wert).
+- [ ] Manuell (unter http://localhost:8000):
+  1. Karten-Tab öffnen, Kartenmitte auf Berlin lassen, „Wolken" antippen — erwartet: Kartenausschnitt zeigt ungefähr 50 km um Berlin, nicht mehr Frankreich–Norwegen.
+  2. Karte manuell auf einen Standort in Norwegen verschieben (falls ein Norwegen-Standort in der App vorhanden ist), „Niederschlag" antippen — erwartet: Ausschnitt wirkt ähnlich groß wie bei Berlin, nicht sichtbar größer/kleiner.
+  3. Mehrfach hintereinander zwischen „Wolken" und „Niederschlag" umschalten, dazwischen die Karte leicht verschieben — erwartet: Ausschnitt bleibt stabil auf der jeweils aktuellen Mitte, kein Zurückspringen zur alten Europa-Ansicht.
+  4. Karten-Tab ohne zuvor gewählten Standort/Kartenmitte öffnen (z. B. direkt nach App-Start) und „Wolken" antippen — erwartet: sinnvolle Kartenansicht statt leerer Karte oder Fehler.
 
 ---
 
@@ -2361,6 +2429,152 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 **Beschreibung:** In der Ansicht „📐 Karte & Blickwinkel" soll der Blickwinkel als Trichter dargestellt werden: durchgezogen (gefüllt) vom Standort bis zum Motiv entsprechend der gewählten Brennweite, und als gestrichelte Linien über das Motiv hinaus verlängert.
 
 **Bezug:** Verfeinert die bereits in US-58[x] umgesetzte FOV-Kegel-Visualisierung; betrifft dieselbe Sektion. Grenzt an BUG-20[x] (Marker in FOV-Karte). Eigenständig, baut auf US-58.
+
+---
+
+### US-114 · Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-03 |
+
+✅ **Testbestätigung (Stephan, 2026-07-03):** Manuelle Testschritte (11 Punkte, alle Einstiegspunkte + Regression + Edge Cases) durchgeführt — passt.
+
+✅ **Weg-Gate-Freigabe (Stephan, 2026-07-03):** Nur eine große, reine Ansichts-Karte (kein Pin-Setzen). US-114 deckt den „Chancendetails: Karte größer"-Teil aus PRODUCT.md §13 mit ab. Umsetzung nach Option A (eigene, einfache Vollbild-Ansicht fürs Ansehen, getrennt vom bestehenden Bearbeiten-Vollbild aus US-87).
+
+**Beschreibung:** Das bildschirmfüllende Karten-Overlay, das US-87 für die Bearbeiten-Karte im Location-Detail eingeführt hat, soll auch in anderen Ansichten verfügbar sein — konkret bei Chancen, im Kalender und bei den Scout-Karten. Ziel: dieselbe großformatige, gut navigierbare Kartendarstellung, dort wo aktuell nur kleine oder weniger komfortable Kartenansichten existieren.
+
+⚠️ **Offene Annahme (nicht von Stephan bestätigt, muss in der Analyse-Phase geklärt werden):** Bei Chancen/Kalender/Scout geht es vermutlich NICHT ums Pin-Setzen (das ist nur beim Bearbeiten einer Location sinnvoll), sondern um eine **readonly, aber großformatige** Kartenansicht — ähnlich der bereits bestehenden readonly „Karte & Blickwinkel"-Ansicht (US-58/`CameraFOV`), nur eben bildschirmfüllend statt klein (aktuell fix 220px hoch). Zu klären: Soll das bestehende Vollbild-Overlay-Muster aus US-87 (technisch: `openMapFullscreen()`/`closeMapFullscreen()`/`_initEditMapFs()`, pin-fähig) wiederverwendet und um eine readonly-Variante ergänzt werden, oder ist eine eigene, einfachere Vollbild-Darstellung für `CameraFOV` gemeint?
+
+**Scope-Hinweis (Ergänzung PM-Intake):** Stephan nennt explizit Chancen, Kalender und Scout. Code-Recherche zeigt zusätzlich zwei weitere Kartenkontexte, die er nicht erwähnt hat und die bei diesem Anliegen mitbedacht werden sollten (auch wenn der Scope am Ende bei den drei genannten Stellen bleibt):
+- Die readonly „Karte & Blickwinkel"-Sektion (`CameraFOV`, US-58) ist bereits eine **wiederverwendbare Komponente** mit zwei Einbindungen: Location-Detail (`prefix='loc'`) und Chancen-Detail (`prefix='ev'`). Kalender und Scout haben laut Recherche aktuell **keine eigene Kartendarstellung** — sie nutzen vermutlich dasselbe Event-/Sheet-Grundgerüst wie der Feed, ggf. muss geprüft werden ob/wo dort überhaupt schon eine Karte sichtbar ist.
+- Der **Haupt-Karten-Tab** (`MapView.init`, eigenständige Leaflet-Implementierung, komplett getrennt von `CameraFOV` und der Edit-Karte) wurde von Stephan nicht genannt und ist vermutlich nicht gemeint (bereits bildschirmfüllend), sollte aber zur Vollständigkeit in der Analyse kurz explizit ausgeschlossen werden.
+
+**Bezug:** Baut auf US-87[x] (Vollbild-Overlay-Muster, bisher nur Bearbeiten-Karte im Location-Detail, pin-fähig) — dieses Ticket überträgt das Erlebnis auf weitere, aktuell kleinere Kartenansichten. **Wichtige Überschneidung:** PRODUCT.md §13 führt US-95 „Chancendetails: Buttons kleiner, Karte größer" als offenen, noch nicht umgesetzten Punkt — dafür existiert kein eigener Ticket-Block in BACKLOG.md (nur eine Nebenerwähnung in Zeile 376 als Kind-Ticket-Kandidat des Bauhaus-Epics US-98). Das Anliegen „Karte größer" bei Chancendetails deckt sich inhaltlich mit einem Teil des Scopes dieses Tickets (Chancen-Karte vergrößern). In der Analyse-Phase klären: Wird US-114 zum Sammelticket, das US-95 (Chancendetails-Teil) mit abdeckt/ersetzt, oder bleiben beide getrennt (US-95 z.B. auch für die Button-Verkleinerung, die über die reine Kartengröße hinausgeht)? Grenzt zusätzlich an US-58[x] (readonly FOV-Karte, technische Basis der Chancen-Karte) und US-85[ ] (Sichtfeld-Trichter in derselben FOV-Sektion, unabhängig von diesem Ticket).
+
+---
+#### Analyse-Phase (2026-07-03)
+
+**Annahmen-Protokoll — Klärung der offenen Fragen aus dem Ticket:**
+
+Alle drei im Ticket offen gelassenen Fragen konnten durch Code-Lektüre (nicht durch Vermutung) beantwortet werden:
+
+1. **Pin vs. readonly:** ✅ Geklärt durch Architektur — es geht eindeutig um **readonly**. Chancen, Kalender-Einträge und Scout-Vorschläge haben keine editierbaren Koordinatenfelder (die gibt es nur beim Bearbeiten einer Location). Das Pin-Setzen aus US-87 ist hier nicht anwendbar.
+2. **Kalender/Scout ohne eigene Karte:** ✅ Bestätigt. Kalender-Klick (`CalendarView.openDetail`) und Scout-Klick (`Scout.openDetail`) laden beide dasselbe zentrale Detail-Sheet (`Detail.open`) wie der Feed. Dieses Sheet rendert für jede Chance dieselbe Sektion „Karte & Blickwinkel" (`CameraFOV.panelHtml('ev')`, fix 220px hoch) — das heißt: Kalender und Scout haben **schon heute** dieselbe kleine Karte wie Chancen, weil sie dasselbe Sheet benutzen. Es gibt keinen separaten Kalender- oder Scout-Karten-Code, der getrennt erweitert werden müsste.
+3. **US-87-Muster wiederverwendbar?** ⚠️ Teilweise. Das bestehende Vollbild-Overlay ist technisch **fest auf den Bearbeiten-Fall zugeschnitten**: eigener, einmaliger DOM-Block mit festem Titel „Pins setzen", eigener Namensraum ausschließlich in der Bearbeiten-Komponente, Logik zum Verschieben von zwei Pins mit Rückschreiben in Formularfelder. Das lässt sich nicht 1:1 auf eine readonly-Ansicht ummünzen — es muss eine **zweite, einfachere Variante** des Vollbild-Overlays entstehen (gleiches optisches Muster: Karte füllt den ganzen Bildschirm, Schließen-Kreuz oben, Klick auf Hintergrund schließt), aber ohne Pin-Zieh-Logik und mit passendem Titel.
+
+⚠️ **Zusätzliche Annahme (Default, bitte bestätigen):** Da Kalender und Scout dasselbe Sheet wie Chancen nutzen, bedeutet „Vollbild-Karte bei Chancen, Kalender und Scout" technisch **eine einzige Änderung an einer Stelle** (der gemeinsamen Karten-Sektion mit `prefix='ev'`) — nicht drei getrennte Umsetzungen. Für das Location-Detail (`prefix='loc'`) wird die readonly-Vollbild-Option ebenfalls automatisch mitgezogen, da dieselbe Komponente verwendet wird; das ist als positiver Nebeneffekt zu werten, nicht als Scope-Erweiterung.
+
+**Scope:**
+- **Eingeschlossen:** Ein „Vollbild öffnen"-Button/Icon an der readonly „Karte & Blickwinkel"-Sektion (überall, wo diese Sektion erscheint: Chancen-Detail, Kalender-Detail, Scout-Detail, Location-Detail). Beim Öffnen erscheint dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend, ohne Zieh-/Bearbeitungsfunktion. Schließen führt zurück zur vorherigen Ansicht, ohne Datenänderung.
+- **Ausgeschlossen:** Der Haupt-Karten-Tab (eigenständige Leaflet-Karte, bereits bildschirmfüllend) — bleibt unverändert, ist nicht Teil dieses Tickets. Das Bearbeiten-Vollbild-Overlay aus US-87 (Pin-Setzen) bleibt unverändert bestehen; es wird nicht angefasst, nur um eine zweite Variante ergänzt.
+- **US-95-Frage (Chancendetails: Karte größer):** Empfehlung **zusammenlegen, nicht separat halten** für den Kartengrößen-Teil — sobald das Vollbild-Overlay verfügbar ist, ist „Karte größer machen" für Chancendetails durch einen Tap erledigt, ein zusätzliches Ticket für dieselbe Karte wäre doppelte Arbeit. Der in US-95 zusätzlich erwähnte Teil „Buttons kleiner" ist ein eigenständiges, rein optisches Anliegen (Button-Größen im Chancen-Detail) ohne technischen Bezug zur Karte — dieser Teil bleibt außerhalb von US-114 und sollte, falls weiter gewünscht, als eigenes kleines Ticket geführt werden.
+
+**Example Mapping:**
+
+📏 **Regel 1 — Vollbild-Zugang an jeder „Karte & Blickwinkel"-Ansicht.** Überall wo die kleine Karten-Sektion mit Beobachter- und Motiv-Pin angezeigt wird, gibt es ein sichtbares Symbol, das die Karte bildschirmfüllend öffnet.
+- 🟢 Beispiel: Stephan öffnet eine Chance aus dem Feed, scrollt zur Sektion „Karte & Blickwinkel" und sieht dort ein Vollbild-Symbol. Er tippt darauf → die Karte füllt den ganzen Bildschirm aus.
+- 🟢 Beispiel: Stephan öffnet dieselbe Chance über den Kalender (Tippen auf einen Kalendertag-Eintrag) → dieselbe Sektion mit demselben Vollbild-Symbol erscheint, Verhalten identisch zum Feed.
+- 🟢 Beispiel: Stephan öffnet einen Scout-Vorschlag → auch dort erscheint dieselbe Sektion mit Vollbild-Symbol und identischem Verhalten.
+
+📏 **Regel 2 — Vollbild-Ansicht ist rein informativ (readonly).** In der bildschirmfüllenden Karte lassen sich Beobachter- und Motiv-Position ansehen, aber nicht verschieben.
+- 🟢 Beispiel: Stephan öffnet die Vollbild-Karte einer Chance und versucht, den Beobachter-Pin zu verschieben → nichts passiert, der Pin bleibt an Ort und Stelle (kein Ziehen möglich).
+- 🟢 Beispiel: Stephan öffnet die Vollbild-Karte, sieht Sichtachse und Sichtfeld-Kegel genauso wie in der kleinen Karte, nur größer und besser erkennbar, und kann hinein-/herauszoomen sowie die Karte verschieben (normale Kartennavigation).
+
+📏 **Regel 3 — Zurück-Verhalten ohne Datenverlust.** Das Schließen der Vollbild-Karte führt verlustfrei zur vorherigen Detailansicht zurück.
+- 🟢 Beispiel: Stephan öffnet die Vollbild-Karte einer Chance, tippt auf das Schließen-Kreuz → er landet wieder im Chancen-Detail, alle anderen Sektionen (Wetter, Kamera-Empfehlung etc.) sind unverändert sichtbar.
+- 🟢 Beispiel (Edge Case): Stephan tippt statt auf das Kreuz auf den abgedunkelten Hintergrund neben der Karte → dieselbe Schließen-Wirkung wie beim Kreuz.
+
+📏 **Regel 4 — Kein Motiv-Pin gesetzt.** Wenn zu einer Chance kein Motiv-Standort hinterlegt ist, verhält sich das Vollbild-Symbol konsistent zur kleinen Karte.
+- 🟢 Beispiel (Edge Case): Stephan öffnet eine Chance ohne Motivkoordinaten. Die kleine Kartensektion zeigt bereits heute den Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar" statt einer Karte. In diesem Fall gibt es konsequenterweise auch kein Vollbild-Symbol, da keine Karte zum Vergrößern existiert.
+
+**Akzeptanzkriterien:**
+- [ ] In der Sektion „Karte & Blickwinkel" (Chancen-Detail, Kalender-Detail, Scout-Detail, Location-Detail) ist ein Vollbild-Symbol sichtbar, sobald eine Karte angezeigt wird.
+- [ ] Tippen auf das Vollbild-Symbol öffnet dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend.
+- [ ] In der Vollbild-Ansicht lassen sich beide Pins **nicht** verschieben (kein Drag-Verhalten).
+- [ ] In der Vollbild-Ansicht funktionieren Zoomen und Verschieben der Karte normal.
+- [ ] Ein Schließen-Symbol (Kreuz) oben in der Vollbild-Ansicht führt zurück zur vorherigen Detailansicht, alle übrigen Sektionen bleiben unverändert erhalten.
+- [ ] Tippen auf den abgedunkelten Hintergrund außerhalb der Karte schließt die Vollbild-Ansicht ebenso wie das Kreuz.
+- [ ] Das Verhalten ist in allen vier Einstiegspunkten identisch: Chancen-Detail (Feed), Kalender-Detail, Scout-Detail, Location-Detail.
+- [ ] Edge Case: Hat eine Chance keine Motivkoordinaten, erscheint kein Vollbild-Symbol (analog zum bestehenden Hinweistext statt Karte).
+- [ ] Edge Case: Das bestehende Bearbeiten-Vollbild-Overlay (Pin-Setzen im Location-Detail-Editiermodus, US-87) funktioniert unverändert weiter — keine Regression.
+- [ ] Edge Case: Wiederholtes Öffnen/Schließen der Vollbild-Karte in derselben Sitzung zeigt konsistent den aktuellen Stand (keine „eingefrorene" Karte von einer zuvor geöffneten anderen Chance).
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-07-03.
+- Bestätigt: `CameraFOV` (Zeilen ~3456–3650) ist bereits eine gemeinsame Komponente mit Instanzen pro `prefix` (`_maps`, `_cones`, `_data` sind Objekte, geschlüsselt nach `prefix`) — technisch also vorbereitet für mehrere gleichzeitig offene Karten.
+- Bestätigt: `CalendarView.openDetail()` (Zeile 2074) und `Scout.openDetail()` (Zeile 1809) rufen beide `Detail.open()` auf; die Sektion „Karte & Blickwinkel" wird in `Detail.open()` einmalig über `CameraFOV.panelHtml('ev')` gerendert (Zeile 3818–3822) — Kalender/Scout haben keinen eigenen Karten-Code.
+- Bestätigt: Das US-87-Overlay (`#edit-map-fs-overlay`, `#edit-map-fs-sheet`, `#edit-map-fs`) ist ein **einziger statischer DOM-Block** (Zeilen 1145–1156), fest mit `LocationDetail._editMapFs`/`_initEditMapFs()` verdrahtet, Header-Titel hart codiert auf „Pins setzen". Es ist keine generische, parametrisierbare Komponente — eine Wiederverwendung für readonly-Fälle erfordert einen zweiten, eigenen DOM-Block plus eigene Init-Funktion in `CameraFOV`, nicht nur einen Adapter-Aufruf.
+- Widerlegt: Die im Ticket vermutete Möglichkeit, dass Kalender/Scout eine „eigene, einfachere" Kartendarstellung bräuchten, weil sie eventuell einen anderen Datenpfad nutzen — das ist nicht der Fall, beide nutzen identische Chancen-Objektstruktur wie der Feed (bei Scout über einen Adapter, der Feldnamen auf das Feed-Format mappt, Zeile 1840–1864; bei Kalender direkt oder per Feed-Zeit-Abgleich, Zeile 2074–2082, BUG-44).
+
+💀 Szenario: Ein Nutzer öffnet die Vollbild-Karte einer Chance, wechselt (ohne zu schließen) direkt zu einer anderen Chance im Hintergrund (z.B. über Kalender-Navigation), und die Vollbild-Karte zeigt weiterhin die alten Pin-Positionen.
+   Auslöser: `CameraFOV._data[prefix]` wird pro Aufruf von `initMap()` neu gesetzt, aber die Vollbild-Instanz müsste bei jedem Öffnen ihre Pins explizit aus dem aktuell offenen Chancen-Objekt neu lesen (analog zum Reload-Muster bei `_reloadEditMapFsFromFields` in US-87 — dort werden die Formularfelder als Quelle der Wahrheit neu eingelesen; bei der readonly-Variante gibt es aber keine Formularfelder, die Quelle wäre direkt das Objekt `o`).
+   Frühwarnung: Beim Testen zwei unterschiedliche Chancen kurz hintereinander im Vollbild öffnen und prüfen, ob sich Pins/Kegel tatsächlich aktualisieren.
+   Gegenmaßnahme: In AK „Wiederholtes Öffnen/Schließen zeigt konsistent den aktuellen Stand" verankert; Implementierung muss die Vollbild-Karte bei jedem Öffnen aus dem aktuell offenen Detail-Objekt neu befüllen, nicht nur beim ersten Mal.
+
+💀 Szenario: Die Vollbild-Karte wird für das Location-Detail (`prefix='loc'`) geöffnet, während gleichzeitig das bestehende Bearbeiten-Vollbild-Overlay (US-87, `prefix`-unabhängig, eigener DOM-Block) existiert — beide Overlays könnten sich im DOM/CSS überschneiden (z-index-Konflikt) oder der Nutzer verwechselt „Pins setzen"-Overlay mit dem neuen readonly-Overlay.
+   Auslöser: Zwei ähnlich aussehende Vollbild-Kartenoverlays im selben Screen-Kontext (Location-Detail hat sowohl eine Bearbeiten-Karte als auch die readonly „Karte & Blickwinkel"-Sektion).
+   Frühwarnung: Im Location-Detail (Anzeige-Modus, nicht Bearbeiten) beide Sektionen durchklicken und prüfen, ob eindeutig erkennbar ist, welches Overlay Pins verschiebt und welches nicht (z.B. durch unterschiedlichen Titel: „Pins setzen" vs. „Karte & Blickwinkel").
+   Gegenmaßnahme: Neuer DOM-Block bekommt eigenen, klar unterscheidbaren Titel (z.B. „Karte & Blickwinkel", nicht „Pins setzen") und eigene IDs, keine Wiederverwendung der US-87-IDs — verhindert CSS-/JS-Kollision und Nutzerverwirrung.
+
+💀 Szenario: Bei einer Chance ohne Motivkoordinaten wird versehentlich trotzdem ein Vollbild-Symbol angezeigt, das beim Antippen eine leere oder fehlerhafte Karte öffnet.
+   Auslöser: Das Vollbild-Symbol wird unabhängig von `hasSub` (vorhandene Motivkoordinaten, siehe `panelHtml()` Zeile 3553) eingebaut, statt an dieselbe Bedingung gekoppelt zu werden, die schon heute entscheidet ob die kleine Karte oder der Hinweistext erscheint.
+   Frühwarnung: Eine Chance ohne Motivkoordinaten (z.B. manche Wetter-/Astronomie-Events ohne festes Motiv) im Detail öffnen und prüfen ob ein Vollbild-Symbol erscheint, obwohl keine Karte da ist.
+   Gegenmaßnahme: In AK „Edge Case: kein Vollbild-Symbol ohne Motivkoordinaten" verankert; Vollbild-Symbol wird nur im `hasSub`-Zweig von `panelHtml()` gerendert.
+
+💀 Szenario: Die Vollbild-Ansicht wird zwar technisch geöffnet, aber der Sichtfeld-Kegel (`_redrawCone`) fehlt, weil dieser bislang nur für die jeweilige `prefix`-Karteninstanz gezeichnet wird und die neue Vollbild-Instanz einen anderen internen Schlüssel bräuchte (z.B. `prefix + '_fs'`), der beim Kegel-Neuzeichnen nicht mitgedacht wird.
+   Auslöser: `_redrawCone(prefix)`, `_updateInfo(prefix)` und `_data[prefix]` sind eng an denselben `prefix`-Schlüssel gekoppelt wie die kleine Karte; eine zweite Karteninstanz mit fremdem Schlüssel muss beim Kegel-Update mitgezogen werden, sonst zeigt das Vollbild nur die Pins ohne Kegel.
+   Frühwarnung: Nach Implementierung Vollbild-Karte öffnen und prüfen ob der eingefärbte Sichtfeld-Kegel (nicht nur die gestrichelte Sichtachse) sichtbar ist.
+   Gegenmaßnahme: Als Implementierungsdetail in Option A/B (unten) berücksichtigen — Kegel-Zeichnung muss auch für die Vollbild-Karteninstanz aufgerufen werden.
+
+💀 Szenario (UX): Zu viele Vollbild-Symbole in ohnehin schon dichten Detail-Sheets (Chancen-Detail hat bereits viele Sektionen) wirken wie visuelles Rauschen, wenn das Symbol nicht klar erkennbar von anderen Icons unterschieden ist.
+   Auslöser: Neues Icon ohne Bauhaus-Konsistenz-Check zur bestehenden Symbolsprache (z.B. Verwechslung mit dem Verifikations- oder Info-Icon).
+   Frühwarnung: Screenshot der Sektion mit Stephan gegenchecken, ob das Symbol sofort als „Vollbild öffnen" verstanden wird.
+   Gegenmaßnahme: Dasselbe Expand-Icon wiederverwenden, das US-87 bereits für den gleichen Zweck einführt (`#i-expand`, Zeile 5093) — Konsistenz statt neuem Icon; Designer-Check vor Umsetzung (siehe unten).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CameraFOV-Komponente Zeile ~3456–3650, US-87-Overlay Zeile 1145–1156 + 5192–5283, Scout Zeile 1729–1904, CalendarView Zeile 1913–2083, Detail.open Zeile 3644ff.)
+- [x] Designer-Check: visuell? → **ja** — neues Icon/Button-Element und neue Vollbild-Kartenansicht sind sichtbare UI-Änderungen. Empfehlung: vor Implementierungsstart `fotoalert-designer` für Icon-Wahl (Wiederverwendung `#i-expand` empfohlen) und Overlay-Optik (Titel, Header-Layout) konsultieren, analog zum bestehenden US-87-Overlay-Stil.
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Readonly-Vollbild als zweite Variante der bestehenden Karten-Sektion (empfohlen)
+- Vorgehen: Die bestehende „Karte & Blickwinkel"-Sektion (`CameraFOV`) bekommt ein Vollbild-Symbol, das einen **neuen, eigenen** Vollbild-DOM-Block öffnet (ähnliches Aussehen wie das US-87-Overlay: Kreuz oben, abgedunkelter Hintergrund, Karte füllt den Bildschirm) — aber ohne Pin-Zieh-Funktion und mit eigenem Titel „Karte & Blickwinkel" statt „Pins setzen". Die Karte wird beim Öffnen direkt aus dem aktuell angezeigten Chancen-/Location-Objekt befüllt (Beobachter, Motiv, Sichtachse, Kegel) — dieselben Zeichenfunktionen wie die kleine Karte, nur in einer zweiten, größeren Karteninstanz. Da alle vier Einstiegspunkte (Feed, Kalender, Scout, Location-Detail) dieselbe Sektion nutzen, wird die Funktion an **einer** Stelle gebaut und wirkt überall automatisch.
+- Betroffene Dateien: nur `web/index.html` (neuer DOM-Block analog Zeile 1145–1156, neue Funktionen in `CameraFOV`, ein Vollbild-Symbol in `panelHtml()`).
+- Vorteile: Ein Bauteil für alle vier Einstiegspunkte; nutzt bereits bestehende Zeichenlogik (Pins, Sichtachse, Kegel) vollständig weiter; visuell konsistent mit dem bereits bekannten US-87-Vollbild-Muster, daher für Stephan sofort vertraut; sauber vom Bearbeiten-Fall getrennt (kein Risiko einer versehentlichen Pin-Verschiebung).
+- Nachteile / Risiken: Etwas Zusatzaufwand, weil ein zweiter DOM-Block + zweite Karteninitialisierung nötig ist (keine 1:1-Wiederverwendung des US-87-Codes, da dieser pin-fähig und Formular-gebunden ist); Kegel-Zeichnung muss für die neue Karteninstanz mitgezogen werden (siehe Pre-Mortem).
+- Aufwand: mittel
+
+### Option B — US-87-Overlay direkt umbauen (Pin-Fähigkeit optional per Flag)
+- Vorgehen: Das bestehende US-87-Overlay wird so erweitert, dass es sowohl den Bearbeiten- als auch den readonly-Fall bedient (z.B. per Flag „pins verschiebbar ja/nein"), statt einen zweiten Block zu bauen.
+- Betroffene Dateien: `web/index.html` (bestehender Overlay-Block + `LocationDetail`-Funktionen umgebaut).
+- Vorteile: Kein zweiter, ähnlicher DOM-Block im Markup.
+- Nachteile / Risiken: Vermischt zwei fachlich unterschiedliche Anliegen (Location bearbeiten vs. Chance ansehen) in einer Komponente, die aktuell fest in `LocationDetail` verankert ist — Chancen/Kalender/Scout haben aber gar keinen Bezug zu `LocationDetail`, eine Kopplung dorthin wäre architektonisch unsauber. Höheres Regressionsrisiko für das bereits produktive, funktionierende US-87-Feature (Pin-Setzen), da an derselben Stelle Code für einen komplett anderen Zweck ergänzt wird. Widerspricht dem Grundsatz, bestehende funktionierende Features nicht für sachfremde Zwecke zu verbiegen.
+- Aufwand: mittel bis groß (wegen Umbaurisiko am bestehenden, produktiven Feature)
+
+✅ **Empfehlung: Option A** — sie hält das bewährte, produktive US-87-Bearbeiten-Overlay unangetastet (kein Regressionsrisiko für ein Done-Feature), bildet die fachliche Trennung (Bearbeiten vs. Ansehen) auch strukturell sauber ab, und da `CameraFOV` bereits als prefix-parametrisierte Komponente gebaut ist, lässt sich die neue Vollbild-Variante an einer Stelle ergänzen und wirkt automatisch in allen vier Einstiegspunkten (Feed, Kalender, Scout, Location-Detail) — genau das vom Ticket gewünschte Ergebnis, ohne Kalender/Scout-spezifischen Sondercode.
+
+**US-95-Überschneidung — Empfehlung:** Zusammenlegen für den Kartenteil (siehe Scope oben). Der Button-Verkleinerungs-Teil aus US-95 bleibt separat, da er keinen technischen Bezug zur Karte hat und sonst den Scope dieses Tickets unnötig aufbläht.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Dieses Ticket ist überwiegend Frontend-UI (kein Backend-Endpoint, keine Datenberechnung) — kein pytest-Fall in `backend/tests/` vorgesehen. Die Akzeptanzkriterien sind manuell im Browser zu prüfen.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Feed öffnen → eine Chance mit Motivkoordinaten antippen → zur Sektion „Karte & Blickwinkel" scrollen → Vollbild-Symbol antippen → prüfen: Karte füllt den Bildschirm, Pins + Sichtachse + Kegel sichtbar, Pins lassen sich nicht verschieben.
+  2. In derselben Vollbild-Ansicht auf das Schließen-Kreuz tippen → prüfen: zurück im Chancen-Detail, alle Sektionen unverändert.
+  3. Denselben Ablauf erneut starten, diesmal auf den abgedunkelten Hintergrund statt das Kreuz tippen → gleiches Schließen-Verhalten.
+  4. Kalender öffnen → einen Tag mit Chance antippen → Vollbild-Symbol prüfen (Schritt 1–3 wiederholen).
+  5. Scout öffnen → einen Vorschlag antippen → Vollbild-Symbol prüfen (Schritt 1–3 wiederholen).
+  6. Location-Detail (Anzeige-Modus, nicht Bearbeiten) öffnen → Vollbild-Symbol an der „Karte & Blickwinkel"-Sektion prüfen (Schritt 1–3 wiederholen) UND separat den Bearbeiten-Modus öffnen → bestehendes „Pins setzen"-Vollbild-Overlay (US-87) testen → muss unverändert funktionieren (Pins verschiebbar, korrekt beschriftet „Pins setzen").
+  7. Chance ohne Motivkoordinaten öffnen (z.B. per Suche nach einem Astronomie-Event ohne festen Motiv-Standort) → prüfen: kein Vollbild-Symbol vorhanden, weiterhin Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar".
+  8. Zwei unterschiedliche Chancen nacheinander im Vollbild öffnen (ohne Browser-Reload dazwischen) → prüfen: zweite Vollbild-Karte zeigt die Pins der zweiten Chance, nicht die der ersten.
 
 ---
 
