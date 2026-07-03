@@ -246,6 +246,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. |
+| Bearbeiten-Karte im Vollbild | Auf der kleinen Bearbeiten-Karte öffnet ein Symbol (oben rechts) ein bildschirmfüllendes Overlay zum komfortablen Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt die neuen Positionen sofort in die kleine Karte + Koordinatenfelder, gespeichert wird weiterhin erst über „Speichern" (US-87). Die readonly „Karte & Blickwinkel"-Ansicht (US-58) ist davon nicht betroffen. |
 | Custom Locations | Vom Nutzer gespeicherte Locations erscheinen hier; Namen ohne 📍-Emoji (BUG-42) |
 | Standortverifikation | Verifikationen werden persistiert (BUG-26) |
 
@@ -258,6 +259,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, kein leerer Abschnitt (US-107)
 - [ ] Edit → Speichern → Änderung sofort in Sheet + Liste sichtbar (kein Reload nötig)
 - [ ] Close-Button erreichbar (Safe Area — BUG-25 gefixt)
+- [ ] Bearbeiten-Karte: Vollbild-Symbol öffnet bildschirmfüllendes Overlay, Pins darin setzbar, Schließen übernimmt Position in kleine Karte (US-87)
 
 ---
 
@@ -456,3 +458,5 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-06-30 | BUG-55 | Wetterkarte: Beim Einschalten von „Wolken"/„Niederschlag" zoomt die Karte automatisch auf das Wetter-Gitter heraus (vorher nur eine senkrechte Linie, weil bei Stadt-Zoom nur 1–2 von 100 Kacheln im Bild lagen); beim Ausschalten zurück zur vorherigen Ansicht (`WeatherMap._savedView`/`_gridBounds`/`fitBounds`, nur Frontend) |
 | 2026-07-02 | US-113 | Himmelsröte-Chance nur noch bei Sichtachse im Gegenpunkt-Sektor der Sonne (±30°), Kompass-Diagramm + Legende entsprechend angepasst |
 | 2026-07-03 | BUG-56 | Astronomie-Regressionstest korrigiert: falscher Vergleichswert für Sonnenauf-/-untergang Berlin (21.06.2026) im Test berichtigt (01:43→02:43 UTC, 20:25→19:33 UTC); Berechnung selbst war korrekt, nur der Testreferenzwert war falsch; Toleranz unverändert |
+| 2026-07-03 | TASK-49 | Sechs False-Positive-Meldungen in refactor_check.py behoben (Ausnahmeliste ergänzt), kein App-Code geändert |
+| 2026-07-03 | US-87 | Bearbeiten-Karte im Location-Detail: neues Vollbild-Overlay (Symbol oben rechts) zum komfortablen Zoomen/Verschieben und Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt neue Position sofort in kleine Karte + Koordinatenfelder, Speicherung weiterhin nur über „Speichern"; readonly „Karte & Blickwinkel" (US-58) unverändert; verifiziert gegen BUG-34-Zoom-Regression auf iPhone Safari |

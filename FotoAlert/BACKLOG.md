@@ -31,10 +31,10 @@
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, US-87, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2364,18 +2364,209 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 
 ---
 
-### US-87 · Locationdetails: größere Karte / Vollbild-Overlay zum Pin-Setzen `[ ]`
+### US-87 · Locationdetails: größere Karte / Vollbild-Overlay zum Pin-Setzen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-06-20 |
+| **Abgeschlossen** | 2026-07-03 |
 
 **Beschreibung:** Die Karte in den Locationdetails ist zu klein für komfortables Navigieren und Setzen der Location-Pins. Sie soll deutlich größer werden — idealerweise in einem bildschirmfüllenden Overlay, das sich per Klick auf ein Symbol wieder schließen lässt.
 
-**Bezug:** Verbessert die Edit-Karte des Location-Details (US-60). Grenzt an US-58[x] (Blickwinkel-Karte) und US-69[x] (GPS-Zentrierung). Eigenständig.
+**Bezug:** Verbessert die Edit-Karte des Location-Details (US-60). Grenzt an US-58[x] (Blickwinkel-Karte) und US-69[x] (GPS-Zentrierung). Eigenständig. **Ergänzung von Stephan (2026-07-03):** Das neue Vollbild-Overlay darf nicht denselben Fehler wie BUG-34[x] zeigen (iPhone Safari: Bearbeitungs-Overlay löste ungewollten Seiten-Zoom aus und ragte rechts aus dem Bildschirm) — das Overlay muss auf dem iPhone vollständig im sichtbaren Bereich bleiben, ohne dass die Seite beim Öffnen/Bedienen automatisch zoomt.
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-07-03)
+
+##### 📐 Example Mapping
+
+**Annahmen-Protokoll:**
+
+| Typ | Punkt |
+|-----|-------|
+| ✅ Klar | Betroffen ist die kleine Bearbeiten-Karte im Location-Detail (aus US-60), auf der Fotograf-Standort und Motiv per Ziehen gesetzt werden — nicht die readonly „Karte & Blickwinkel"-Ansicht (US-58) und nicht der Haupt-Karten-Tab. |
+| ✅ Klar | Es gibt in der App bereits ein bildschirmfüllendes Karten-Overlay mit genau diesem Zweck (Pins per Antippen setzen) — das beim Anlegen einer neuen Location verwendet wird. Dieses Muster lässt sich für die Bearbeiten-Karte wiederverwenden, statt etwas komplett Neues zu bauen. |
+| ⚠️ Annahme: Im Vollbild-Overlay lassen sich die Pins genauso setzen/verschieben wie bisher auf der kleinen Karte (ziehen oder antippen) — das Vollbild ist keine reine Zoom-/Vorschau-Ansicht, sondern die vollwertige Bearbeiten-Karte, nur größer. Bitte bestätigen. |
+| ⚠️ Annahme: Ein Klick auf das Vollbild-Symbol öffnet das Overlay; ein Klick auf das Schließen-Symbol (bereits als „X" in der App etabliert) schließt es wieder und übernimmt automatisch die zuletzt gesetzten Pin-Positionen in die kleine Karte und die Koordinatenfelder darüber. Es gibt kein separates „Übernehmen"/„Verwerfen" — das gespeichert wird ohnehin erst beim Klick auf „Speichern" im Formular, wie bisher. Bitte bestätigen. |
+| ⚠️ Annahme: Das Vollbild-Symbol sitzt oben rechts auf der kleinen Karte (wie die bestehenden Kartensymbole an anderer Stelle in der App) und ist nur beim Bearbeiten sichtbar, nicht in der normalen Locationansicht. Bitte bestätigen. |
+
+📏 **Regel 1 — Von der kleinen Karte ins Vollbild wechseln.**
+Auf der kleinen Bearbeiten-Karte im Location-Detail erscheint ein Symbol, mit dem sich die Karte bildschirmfüllend öffnen lässt.
+
+- 🟢 *Positiv:* Ich bin im Bearbeiten-Modus einer Location, tippe auf das Vollbild-Symbol auf der kleinen Karte → die Karte öffnet sich bildschirmfüllend, beide bereits gesetzten Pins (Fotograf-Standort, Motiv) sind an derselben Stelle sichtbar wie vorher.
+- 🔴 *Negativ:* Ich bin in der normalen Ansicht einer Location (nicht im Bearbeiten-Modus) → kein Vollbild-Symbol sichtbar, da dort auch keine Bearbeiten-Karte existiert.
+- ⚙️ *Edge:* Die Location hat noch keinen Motiv-Pin gesetzt (nur Fotograf-Standort) → im Vollbild ist nur der eine Pin sichtbar, kein Fehler, kein Platzhalter für den fehlenden Pin.
+
+📏 **Regel 2 — Im Vollbild komfortabel navigieren und Pins setzen.**
+Im Vollbild-Overlay lässt sich die Karte wie gewohnt verschieben und zoomen, und beide Pins lassen sich exakt genauso setzen/verschieben wie vorher auf der kleinen Karte.
+
+- 🟢 *Positiv:* Ich ziehe im Vollbild den Motiv-Pin auf ein anderes Gebäude → die Verbindungslinie zwischen Fotograf-Standort und Motiv aktualisiert sich sofort, genau wie bisher auf der kleinen Karte.
+- 🟢 *Positiv:* Ich zoome im Vollbild näher heran, um den Pin präzise auf einen Gebäudeeingang zu setzen → das gelingt spürbar leichter als auf der kleinen Karte.
+- 🔴 *Negativ:* Ich tippe im Vollbild daneben (auf freie Fläche, kein Pin) → nichts passiert außer der normalen Kartennavigation, kein versehentliches Pin-Setzen an der Tippstelle.
+
+📏 **Regel 3 — Vollbild schließen und Stand übernehmen.**
+Ein Klick auf das Schließen-Symbol beendet das Vollbild und die zuletzt gesetzten Pin-Positionen erscheinen sofort auf der kleinen Karte und in den Koordinatenfeldern darüber.
+
+- 🟢 *Positiv:* Ich verschiebe im Vollbild den Fotograf-Standort-Pin, tippe auf „Schließen" → zurück im Bearbeiten-Formular zeigen die Koordinatenfelder und die kleine Karte sofort die neue Position — ohne dass ich vorher „Speichern" gedrückt habe.
+- 🟢 *Positiv:* Ich öffne das Vollbild nur zum Nachschauen, verschiebe nichts, schließe es wieder → auf der kleinen Karte ändert sich nichts.
+- ⚙️ *Edge:* Ich öffne das Vollbild, verschiebe einen Pin, verlasse die Bearbeiten-Ansicht aber über „Abbrechen" statt über „Speichern" → wie bisher beim normalen Bearbeiten-Formular wird nichts dauerhaft gespeichert (Verhalten bleibt unverändert, das Vollbild ändert nichts an der bestehenden Speicherlogik).
+
+---
+
+**📎 Code-Verifikation** (gelesen am 2026-07-03):
+
+- `web/index.html` `LocationDetail.openEdit()` (Z. 5003–5099): rendert das Bearbeiten-Formular inkl. `<div id="edit-mini-map">` (Z. 5053, Höhe 180px).
+- `LocationDetail._initEditMap()` (Z. 5103–5131): initialisiert die kleine Karte (Leaflet, Satellit-Kacheln), setzt draggbare Marker für Fotograf-Standort (`MapMarkers.observerDraggable`) und Motiv (`MapMarkers.subjectDraggable`), zeichnet die Verbindungslinie über `_drawEditLine()`.
+- `LocationDetail._onEditObsInput()` / `_onEditSubjInput()` (Z. 5163–5187): synchronisieren Texteingabe → Marker-Position und umgekehrt (Drag-Ende → Textfeld). Diese Logik ist bereits vom Kartenelement entkoppelt (arbeitet mit den Feldern `edit-obs-coords`/`edit-subj-coords`), lässt sich also unverändert auf eine zweite, größere Karteninstanz anwenden.
+- **Bereits vorhandenes Vollbild-Pattern gefunden:** `AddLocation` (Z. 5453 ff.) nutzt `#add-sheet`/`#add-overlay` als echtes bildschirmfüllendes Overlay (`position:fixed;inset:0`, Z. 505–512 im CSS) mit Header (Titel + Schließen-Button `i-x`, Z. 1055–1059) und Karten-Container `.add-map-container`/`#add-map` (Z. 518–519, 1060–1063). Exaktes Vorbild für ein Vollbild-Kartenoverlay in dieser App.
+- Bekanntes Leaflet-Gotcha bereits im Code dokumentiert: `map.invalidateSize()` nach dem Sichtbarmachen eines zuvor verdeckten Karten-Containers ist Pflicht (Kommentar „Pre-Mortem: 0px-Container" bei Z. 4744; gleiches Muster bei `AddLocation.initMap()` Z. 5478). Das gilt auch für das neue Overlay: Leaflet berechnet beim ersten Rendern die Kartengröße aus dem DOM — ist der Container zu dem Zeitpunkt unsichtbar (`display:none`/`opacity:0`), bleibt die Karte falsch zugeschnitten, bis `invalidateSize()` manuell aufgerufen wird.
+- **BUG-34 (Done, released 2026-06-28)** behob genau dieses Overlay-Muster bereits einmal: Auf dem iPhone Safari löste ein fokussiertes Eingabefeld mit `font-size < 16px` einen automatischen Seiten-Zoom aus, wodurch das Bearbeitungs-Overlay rechts aus dem Bildschirm ragte. Fix damals: `.input-field` und `.coord-pair .input-field` auf `font-size: 16px`, `#loc-detail-content` zusätzlich mit `overflow-x: hidden`. Der Fix-Scope umfasste laut Ticket auch das Add-Sheet — die Vollbild-Vorlage (`#add-sheet`/`#add-overlay`), die dieses Ticket wiederverwendet, sollte den Fix also bereits geerbt haben. Trotzdem vor der Implementierung verifizieren: Enthält das neue Vollbild-Overlay eigene, neue Eingabefelder (z. B. zur Koordinatenanzeige) oder Container ohne die `overflow-x: hidden`-Absicherung, muss der Fix dort explizit nachgezogen werden — nicht stillschweigend voraussetzen, dass „gleiches Pattern" automatisch „gleicher Fix" bedeutet.
+- Icon-Set (Z. 787–841) enthält kein Vollbild-/Expand-Symbol; `i-x` für „Schließen" ist bereits Standard (u.a. `.close-btn` bei `#add-sheet` und `#loc-detail-sheet`).
+- Bestehende Kartensymbol-Positionierung als Vorbild: `#map-layer-toggle`, `#map-gps-btn` (Z. 268, 318) sitzen als `position:absolute` innerhalb des Kartencontainers mit `z-index:1000` — dasselbe Muster passt für ein neues Vollbild-Symbol auf der Bearbeiten-Karte.
+
+---
+
+##### ⚠️ Pre-Mortem
+
+💀 **Szenario 1: Vollbild-Karte bleibt leer/falsch zugeschnitten beim ersten Öffnen**
+- Auslöser: Leaflet berechnet die Kartengröße beim `L.map(...)`-Aufruf aus dem aktuellen DOM. Wird die Karteninstanz erzeugt, während das Overlay noch unsichtbar oder mitten in der Öffnen-Animation ist, bleibt sie auf 0×0 bzw. falscher Größe hängen (bereits bekanntes Muster im Code, siehe Code-Verifikation).
+- Frühwarnung: Beim lokalen Test zeigt das Vollbild eine graue Fläche oder nur einen Kartenausschnitt oben links.
+- Gegenmaßnahme: Karteninitialisierung analog zu `AddLocation.initMap()` erst nach `setTimeout` (Öffnen-Animation abgeschlossen) auslösen, danach `invalidateSize()` aufrufen. Als Testschritt aufnehmen (Vollbild mehrfach öffnen/schließen).
+
+💀 **Szenario 2: Zwei Karteninstanzen (kleine + große) geraten außer Sync**
+- Auslöser: Wird im Vollbild eine komplett neue, unabhängige Leaflet-Instanz mit eigenen Markern erzeugt, muss jede Pin-Bewegung dort manuell auf die kleine Karte und die Koordinatenfelder zurückgespiegelt werden. Vergisst man eine Synchronisationsrichtung, zeigt die kleine Karte nach dem Schließen den alten Stand.
+- Frühwarnung: Im Test: Pin im Vollbild verschieben, schließen → kleine Karte zeigt noch die alte Position.
+- Gegenmaßnahme: Die Koordinatenfelder (`edit-obs-coords`/`edit-subj-coords`) bleiben die „Quelle der Wahrheit". Jede Pin-Bewegung (in welcher Karteninstanz auch immer) schreibt sofort in diese Felder; die jeweils andere Karte liest beim Öffnen/Re-Sync aus denselben Feldern. Als AK/Testschritt verankert (Regel 3).
+
+💀 **Szenario 3: Vollbild-Symbol wird auch außerhalb des Bearbeiten-Modus sichtbar oder in der readonly-FOV-Karte verwechselt**
+- Auslöser: Das Ticket grenzt sich bewusst von US-58 (FOV-Karte) ab; wird das Vollbild-Symbol versehentlich in beide Kartenkomponenten eingebaut oder falsch zugeordnet, entsteht Verwirrung (zwei „Vollbild"-Symbole mit unterschiedlichem Verhalten).
+- Frühwarnung: Im Test: FOV-Karten-Sektion („📐 Karte & Blickwinkel") öffnen → kein neues Vollbild-Symbol vorhanden, nur die Bearbeiten-Karte hat es.
+- Gegenmaßnahme: Implementierung ausschließlich in `LocationDetail.openEdit()`/`_initEditMap()`, keine Änderung an `CameraFOV`.
+
+💀 **Szenario 4: Mobile Bedienung — Vollbild-Symbol zu klein zum Treffen oder von der Tastatur verdeckt**
+- Auslöser: Auf dem Handy ist die kleine Karte nur 180px hoch; ein zu kleines Symbol oder eine Position direkt am Rand kann schwer zu treffen sein, besonders wenn parallel die Bildschirmtastatur eingeblendet ist (Koordinatenfelder direkt darüber).
+- Frühwarnung: Manueller Test auf echtem Gerät/schmaler Fensterbreite: Symbol antippen — trifft es zuverlässig?
+- Gegenmaßnahme: Touch-Ziel mindestens 44×44px (Bauhaus-Vorgabe), Positionierung oben rechts auf der Karte selbst (nicht am äußeren Formularrand), analog zu den bestehenden Karten-Symbolen (`#map-gps-btn` u.ä.).
+
+💀 **Szenario 5: Zurück-Navigation/Android-Zurück-Taste schließt die ganze Bearbeiten-Ansicht statt nur das Vollbild**
+- Auslöser: Wenn das Vollbild-Overlay keinen eigenen Verlaufseintrag/Zustand hat, könnte ein Zurück-Wisch (iOS Safari) oder Zurück-Tap direkt aus dem Vollbild ins Locations-Listing statt zurück zur Bearbeiten-Ansicht springen.
+- Frühwarnung: Test: Vollbild öffnen, System-Zurück-Geste nutzen → landet man in der Bearbeiten-Ansicht oder ganz raus?
+- Gegenmaßnahme: Vollbild nur über das eigene Schließen-Symbol schließen (wie beim bestehenden `#add-sheet` auch – dort gibt es ebenfalls keine History-Integration); Verhalten explizit in AK festhalten und testen, kein zusätzlicher Aufwand nötig da Pattern schon existiert und akzeptiert ist.
+
+💀 **Szenario 6: Vollbild-Overlay löst ungewollten Seiten-Zoom aus und ragt aus dem Bildschirm (Regression von BUG-34)** — von Stephan explizit als Ergänzung genannt (2026-07-03)
+- Auslöser: iOS Safari zoomt die ganze Seite automatisch hinein, sobald ein fokussiertes Eingabefeld eine `font-size < 16px` hat. Baut das neue Vollbild-Overlay eigene Eingabefelder oder Container ein, die den BUG-34-Fix nicht geerbt haben (z. B. weil sie neu geschrieben statt kopiert werden, oder weil ein neuer Container ohne `overflow-x: hidden` entsteht), tritt exakt derselbe Fehler wie bei BUG-34 wieder auf: Das Overlay ragt rechts aus dem sichtbaren Bereich.
+- Frühwarnung: Test auf echtem iPhone (Safari) — nicht nur Desktop-Simulator/Chrome-DevTools, da sich der Auto-Zoom dort anders oder gar nicht verhält: Vollbild öffnen, in ein eventuell vorhandenes Eingabefeld tippen → zoomt die Seite? Ragt das Overlay an einer Seite aus dem Bildschirm?
+- Gegenmaßnahme: Alle neuen Eingabefelder im Overlay von Anfang an mit `font-size: 16px` anlegen (nicht die alten 14px/12px-Werte aus BUG-34 wiederholen); Overlay-Container erbt `overflow-x: hidden` vom `#add-sheet`/`#add-overlay`-Vorbild oder bekommt es explizit gesetzt, falls es strukturell abweicht. Als eigenständiger AK verankert (AK-9) und als Testschritt auf echtem Gerät aufgenommen — nicht nur als Pre-Mortem-Notiz.
+
+---
+
+##### 🏗️ Architektur-Analyse
+
+**Betroffene Dateien:**
+- `web/index.html` — CSS: neue Regeln für ein Vollbild-Overlay der Bearbeiten-Karte (kann `#add-sheet`/`#add-overlay`-Stil direkt kopieren/leicht anpassen); neues Icon `i-expand` (oder ähnlich) im SVG-Sprite (Z. 787 ff.); HTML-Grundgerüst für das neue Overlay (ähnlich Z. 1052–1064); JS: `LocationDetail` um Öffnen-/Schließen-Funktionen und eine zweite Karteninitialisierung erweitern, `edit-mini-map`-Bereich um das Vollbild-Symbol ergänzen (Z. 5053, 5103–5131)
+- Keine Backend-Änderung nötig — reine Frontend-/UI-Änderung, Speicherlogik (`saveEdit`) bleibt unverändert.
+
+**Kein neuer Score/Event-Typ, kein Filter-Chip betroffen** (Schritt 4f entfällt).
+
+---
+
+##### 🔀 Implementierungsoptionen
+
+**Option A — Bestehendes Vollbild-Overlay-Pattern wiederverwenden (empfohlen)**
+
+Was du in der App erlebst: Auf der kleinen Bearbeiten-Karte erscheint oben rechts ein kleines Vollbild-Symbol. Tippst du drauf, füllt die Karte den ganzen Bildschirm aus — du kannst bequem zoomen, verschieben und beide Pins präzise setzen, genau wie vorher, nur mit viel mehr Platz. Ein Tipp auf das Schließen-Symbol (X, oben rechts, wie du es aus anderen Vollbild-Ansichten der App schon kennst) bringt dich zurück zum Formular — die neuen Pin-Positionen sind sofort übernommen.
+
+- Vorgehen: Die vorhandene Vollbild-Overlay-Struktur (aktuell für „Neue Location" genutzt) als Vorlage für ein zweites, gleichartiges Overlay verwenden. Die Bearbeiten-Karte bekommt eine zweite, größere Karteninstanz in diesem Overlay, die beim Öffnen die aktuellen Pin-Positionen aus den Koordinatenfeldern übernimmt und bei jeder Änderung sofort in dieselben Felder zurückschreibt (keine getrennte Datenhaltung). Die kleine Karte liest beim Schließen des Vollbilds denselben Stand erneut ein.
+- Betroffene Dateien: `web/index.html` (CSS, HTML-Grundgerüst, `LocationDetail`-Erweiterung)
+- Vorteile: Nutzt ein bewährtes, bereits getestetes Vollbild-Muster (kein neues Verhalten, das erst erlernt werden muss); Aufwand überschaubar, da Drag-/Sync-Logik der kleinen Karte fast unverändert übernommen werden kann; visuell konsistent mit „Neue Location"
+- Nachteile / Risiken: Zwei Karteninstanzen müssen synchron gehalten werden (Pre-Mortem Szenario 2) — sauber lösbar über die Koordinatenfelder als gemeinsame Quelle
+- Aufwand: mittel
+
+**Option B — Nur die kleine Karte vergrößern (kein Vollbild)**
+
+Was du in der App erlebst: Die Bearbeiten-Karte ist im Formular selbst deutlich größer als bisher (z.B. 350–400px statt 180px), aber es gibt kein eigenes Vollbild — du scrollst weiterhin im normalen Formular.
+
+- Vorgehen: `#edit-mini-map`-Höhe erhöhen, sonst keine strukturelle Änderung.
+- Betroffene Dateien: `web/index.html` (CSS-Wert)
+- Vorteile: Minimaler Aufwand, kein Sync-Risiko zwischen zwei Karten
+- Nachteile / Risiken: Erfüllt die Ticket-Anforderung nur teilweise („idealerweise ein bildschirmfüllendes Overlay" wird explizit im Ticket genannt); auf kleinen Handybildschirmen bleibt die Karte trotzdem eingeschränkt, da sie sich das Formular mit vielen anderen Feldern teilt
+- Aufwand: sehr klein
+
+**Option C — Vollbild-Overlay ohne Pin-Bearbeitung (nur Ansicht/Navigation)**
+
+Was du in der App erlebst: Das Vollbild-Symbol öffnet eine große Kartenansicht nur zum Anschauen/Navigieren (Zoomen, Verschieben) — die Pins lassen sich dort aber nicht verschieben, das geht weiterhin nur auf der kleinen Karte.
+
+- Vorgehen: Reines Anzeige-Overlay ohne draggbare Marker.
+- Betroffene Dateien: `web/index.html`
+- Vorteile: Geringeres Sync-Risiko, da keine Rückschreibe-Logik nötig
+- Nachteile / Risiken: Ticket nennt explizit „komfortables Navigieren **und Setzen** der Location-Pins" als Ziel — diese Option deckt den wichtigeren Teil (Pin-Setzen) nicht ab, wäre nur Teilerfüllung
+- Aufwand: klein
+
+✅ **Empfehlung: Option A** — deckt die Ticket-Anforderung vollständig ab (Navigieren **und** Pin-Setzen im Vollbild), nutzt ein bereits vorhandenes, bewährtes UI-Pattern (kein neuer Stil, kein neues Verhalten zu erlernen) und hält den Mehraufwand dadurch überschaubar. Das einzige nennenswerte Risiko (Sync zwischen zwei Karten) lässt sich sauber über die bestehenden Koordinatenfelder als gemeinsame Datenquelle lösen — dieses Muster existiert im Code bereits für die kleine Karte.
+
+---
+
+**Scope:**
+- Eingeschlossen: Vollbild-Symbol auf der Bearbeiten-Karte im Location-Detail; bildschirmfüllendes Karten-Overlay mit denselben Pin-Setz-/Verschiebe-Möglichkeiten wie die kleine Karte; Schließen-Symbol zum Zurückkehren; automatische Übernahme der Pin-Positionen in die kleine Karte und die Koordinatenfelder
+- Ausgeschlossen: Änderungen an der readonly „Karte & Blickwinkel"-Ansicht (US-58); Änderungen am Haupt-Karten-Tab; Änderungen an der Speicherlogik (`saveEdit` bleibt unverändert — Speichern passiert weiterhin explizit über den „Speichern"-Button); Vollbild-Funktion für die „Neue Location"-Karte (hat bereits ihr eigenes Vollbild-Overlay, unverändert)
+
+**Akzeptanzkriterien:**
+- [x] AK-1: Wenn ich eine Location bearbeite, sehe ich auf der kleinen Karte ein Symbol, mit dem sich die Karte bildschirmfüllend öffnen lässt.
+- [x] AK-2: Beim Öffnen des Vollbilds sehe ich die zuvor gesetzten Pins (Fotograf-Standort, Motiv) an derselben Position wie auf der kleinen Karte — nicht zurückgesetzt auf einen Standardausschnitt.
+- [x] AK-3: Im Vollbild kann ich die Karte flüssig verschieben und zoomen.
+- [x] AK-4: Im Vollbild kann ich beide Pins genauso ziehen/setzen wie bisher auf der kleinen Karte; die Verbindungslinie zwischen Fotograf-Standort und Motiv aktualisiert sich dabei sofort.
+- [x] AK-5: Wenn ich das Vollbild über das Schließen-Symbol verlasse, zeigen die kleine Karte und die Koordinaten-Textfelder sofort die im Vollbild vorgenommenen Änderungen — ohne dass ich vorher „Speichern" gedrückt habe.
+- [x] AK-6: Die endgültige Speicherung passiert weiterhin erst beim Klick auf „Speichern" im Formular — das Vollbild-Öffnen/Schließen allein verändert die gespeicherten Location-Daten nicht.
+- [x] AK-7: Das Vollbild-Symbol ist gut genug zum zuverlässigen Antippen (mindestens fingergroß) und wird von der Bildschirmtastatur nicht verdeckt.
+- [x] AK-8: Die readonly „Karte & Blickwinkel"-Ansicht (US-58) bleibt unverändert — dort erscheint kein neues Vollbild-Symbol.
+- [x] AK-9: Auf dem iPhone (Safari) löst das Öffnen und Bedienen des Vollbilds keinen ungewollten Seiten-Zoom aus; das Overlay bleibt an allen Seiten vollständig innerhalb des sichtbaren Bereichs (keine Wiederholung von BUG-34).
+- [x] Edge Case: Die Location hat noch keinen Motiv-Pin gesetzt → im Vollbild ist nur der Fotograf-Standort-Pin sichtbar, kein Fehler und kein Platzhalter.
+- [x] Edge Case: Ich öffne das Vollbild mehrfach hintereinander (öffnen, schließen, erneut öffnen) → die Karte zeigt jedes Mal korrekt zugeschnitten den aktuellen Stand, keine graue Fläche oder falsches Kartenformat.
+- [x] Edge Case: Ich öffne das Vollbild, verschiebe einen Pin, verlasse die Bearbeiten-Ansicht danach über „Abbrechen" statt „Speichern" → die Änderung wird nicht dauerhaft gespeichert (Verhalten wie beim bisherigen Formular).
+
+**Pre-Mortem (Zusammenfassung):**
+- 💀 Vollbild-Karte bleibt leer/falsch zugeschnitten beim ersten Öffnen → Gegenmaßnahme: Karteninitialisierung nach Öffnen-Animation + `invalidateSize()` (wie beim bestehenden Add-Location-Vollbild)
+- 💀 Kleine und große Karte geraten außer Sync → Gegenmaßnahme: Koordinatenfelder als gemeinsame Datenquelle, beide Karten lesen/schreiben nur darüber
+- 💀 Vollbild-Symbol taucht versehentlich auch in der readonly-FOV-Karte auf → Gegenmaßnahme: Änderung strikt auf die Bearbeiten-Karte begrenzt, als AK-8 verankert
+- 💀 Symbol auf dem Handy zu klein oder von der Tastatur verdeckt → Gegenmaßnahme: Touch-Ziel ≥44px, Position oben rechts auf der Karte, als AK-7 verankert
+- 💀 Zurück-Navigation verlässt versehentlich die ganze Bearbeiten-Ansicht → Gegenmaßnahme: Schließen ausschließlich über eigenes Symbol (Pattern bereits akzeptiert bei Add-Location)
+- 💀 Overlay löst ungewollten Seiten-Zoom aus und ragt aus dem Bildschirm, wie früher bei BUG-34 → Gegenmaßnahme: neue Eingabefelder von Anfang an mit `font-size: 16px`, `overflow-x: hidden` am Overlay-Container sicherstellen, auf echtem iPhone testen (als AK-9 verankert)
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (`LocationDetail.openEdit()` Z. 5003–5099, `_initEditMap()` Z. 5103–5131, `AddLocation`-Vollbild-Pattern Z. 505–529, 1052–1064, 5453 ff.)
+- [x] Designer-Check: visuell? → ja, `fotoalert-designer` aufgerufen (neues Vollbild-Symbol im Bauhaus-Linienstil nötig, Schließen-Symbol `i-x` bereits Standard, Positionierung wie bestehende Karten-Toggles)
+- [x] Implementierungsoption freigegeben: Option A (bestehendes Vollbild-Pattern wiederverwenden) — Stephan, 2026-07-03
+- [x] Empfehlung: Option A
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Diese Änderung ist reine Frontend-UI-Interaktion ohne Backend-Beteiligung — kein pytest-Fall sinnvoll ableitbar. Absicherung erfolgt vollständig über die manuellen Testschritte unten.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Location-Detail einer bestehenden Location öffnen → Bearbeiten (Stift-Symbol) antippen.
+  2. Auf der kleinen Karte das neue Vollbild-Symbol suchen und antippen → Karte öffnet sich bildschirmfüllend, beide Pins an der erwarteten Position (AK-1, AK-2).
+  3. Im Vollbild zoomen und verschieben → Kartennavigation reagiert flüssig (AK-3).
+  4. Im Vollbild den Motiv-Pin an eine andere Stelle ziehen → Verbindungslinie aktualisiert sich sofort (AK-4).
+  5. Schließen-Symbol antippen → zurück im Formular: kleine Karte und Koordinatenfelder zeigen die neue Position, ohne „Speichern" gedrückt zu haben (AK-5).
+  6. „Abbrechen" statt „Speichern" antippen → Location erneut öffnen → alte Position ist noch aktiv, nichts wurde übernommen (AK-6, Edge Case 3).
+  7. Vollbild mehrfach hintereinander öffnen/schließen → jedes Mal korrekt zugeschnittene Karte, keine graue Fläche (Edge Case 2).
+  8. Location ohne Motiv-Pin bearbeiten → Vollbild öffnen → nur ein Pin sichtbar, kein Fehler (Edge Case 1).
+  9. „Karte & Blickwinkel"-Sektion (US-58) einer Location öffnen → dort erscheint kein neues Vollbild-Symbol (AK-8).
+  10. Regression: bestehendes „Neue Location"-Vollbild (Plus-Tab) weiterhin unverändert nutzbar; normales Bearbeiten-Formular (Name, Kategorie, Beschreibung, Schwierigkeit etc.) weiterhin unverändert speicherbar.
+  11. **Auf einem echten iPhone (Safari, nicht nur Desktop-Simulator):** Vollbild öffnen, falls vorhanden in ein Eingabefeld im Overlay tippen → die Seite zoomt nicht automatisch, das Overlay bleibt vollständig im sichtbaren Bereich, kein Ausschnitt ragt rechts oder unten aus dem Bildschirm (AK-9, Regressionstest gegen BUG-34).
+
+**Implementierung (2026-07-03, Option A umgesetzt):**
+- `web/index.html` Icon-Sprite: neues Symbol `i-expand` ergänzt (vier Ecken-Winkel nach außen, Bauhaus-Linienstil, analog `i-target`/`i-compass`).
+- `web/index.html` CSS: neuer Block „US-87: Vollbild-Overlay für die Bearbeiten-Karte" — `#edit-map-expand-btn` (Touch-Ziel 44×44px, oben rechts auf der Mini-Map), `#edit-map-fs-sheet`/`#edit-map-fs-overlay` (`position:fixed;inset:0`, `.open`-Klasse, `overflow-x:hidden` explizit am Sheet), `.edit-map-fs-header`/`.edit-map-fs-container`/`#edit-map-fs` — 1:1 nach dem `#add-sheet`/`#add-overlay`-Vorbild. Responsive-Regel (Desktop-Zentrierung) um `#edit-map-fs-sheet` ergänzt.
+- `web/index.html` HTML: neuer Overlay-Block nach dem Add-Location-Sheet eingefügt (Header mit Titel „Pins setzen", Schließen-Button `i-x`, Kartencontainer `#edit-map-fs`). Auf der kleinen Bearbeiten-Karte (`openEdit()`) wurde der `edit-mini-map`-Container in einen `position:relative`-Wrapper mit dem neuen Vollbild-Button verpackt.
+- `web/index.html` JS (`LocationDetail`): neue Funktionen `openMapFullscreen()`, `closeMapFullscreen()`, `_initEditMapFs()`, `_reloadEditMapFsFromFields()`, `_drawEditLineFs()`. Karteninitialisierung erst nach `setTimeout` (Öffnen-Animation), danach `invalidateSize()` — analog `AddLocation.open()`/`initMap()`. Koordinatenfelder (`edit-obs-coords`/`edit-subj-coords`) bleiben alleinige Quelle der Wahrheit: `dragend` auf der Vollbild-Karte schreibt sofort in die Felder und spiegelt die Position auf die kleine Karte; `closeMapFullscreen()` liest zusätzlich per `_onEditObsInput()`/`_onEditSubjInput()` aus denselben Feldern zurück. `openEdit()` verwirft eine evtl. vorhandene alte Vollbild-Karteninstanz (der Container `#edit-map-fs` ist statisch, nicht Teil des bei jedem Edit neu gerenderten `innerHTML`), `close()` schließt das Vollbild sicherheitshalber mit. Keine Änderung an `saveEdit()`, `CameraFOV`/US-58 oder `AddLocation`.
+- Kein neues Eingabefeld im Vollbild-Overlay (nur Kartencontainer) → AK-9/BUG-34-Risiko strukturell vermieden; zusätzlich `overflow-x: hidden` explizit am `#edit-map-fs-sheet` gesetzt.
+- `node --check` auf den extrahierten Inline-`<script>`-Blöcken lief fehlerfrei.
+- Noch offen/nicht in dieser Phase geprüft: manueller Test (lokal + echtes iPhone Safari für AK-9) — folgt in der Testphase.
 
 ---
 
@@ -3592,14 +3783,15 @@ Logout → als User anmelden → Einstellungen → "User"
 
 ---
 
-### TASK-49 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[~]`
+### TASK-49 · Refactoring: Lange JS-Funktionen aufteilen (web/index.html) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-06-27 |
+| **Abgeschlossen** | 2026-07-03 |
 
 **Beschreibung:** `refactor_check.py` meldet sechs lange JS-Funktionen in `web/index.html`:
 - `ic()` Z. 847 — ~389 Zeilen (Icon-Helper, eingebracht durch US-100)
@@ -3647,9 +3839,9 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 ⚠️ Annahme: „Identisches Verhalten" wird hier bewusst nicht durch einen Diff der gerenderten HTML-Ausgabe verifiziert, weil gar keine Zeile in `web/index.html` verändert wird — das Null-Diff an dieser Datei ist der eigentliche Beleg.
 
 **Akzeptanzkriterien:**
-- [ ] Die App verhält sich in jedem Bereich exakt wie vor diesem Ticket — Icons (z.B. Kalender-, Wetter-, Kompass-Icons), das Filter-Sheet (insbesondere der Verifikations-Chip „Geprüft/Nicht geprüft/Probleme" in allen drei Zuständen), die Kompass-/Sektor-Grafik im Location-Detail und der Sonnen-Ausrichtungstext („fast genau hinter dem Motiv", „nah am Motiv" etc.) sehen und verhalten sich identisch wie vorher. Das ist hier gleichbedeutend mit: es wurde keine Zeile Anwendungscode verändert.
-- [ ] `python3 tools/refactor_check.py --report` meldet `ic()`, `handler`, `verState()`, `sectorPath()`, `azDiffFn`, `sunAlignmentLabel()` nicht mehr als lange Funktionen.
-- [ ] Keine der sechs Funktionen wurde tatsächlich aufgeteilt (es gibt inhaltlich nichts aufzuteilen — alle sind 1–11 Zeilen lang).
+- [x] Die App verhält sich in jedem Bereich exakt wie vor diesem Ticket — Icons (z.B. Kalender-, Wetter-, Kompass-Icons), das Filter-Sheet (insbesondere der Verifikations-Chip „Geprüft/Nicht geprüft/Probleme" in allen drei Zuständen), die Kompass-/Sektor-Grafik im Location-Detail und der Sonnen-Ausrichtungstext („fast genau hinter dem Motiv", „nah am Motiv" etc.) sehen und verhalten sich identisch wie vorher. Das ist hier gleichbedeutend mit: es wurde keine Zeile Anwendungscode verändert.
+- [x] `python3 tools/refactor_check.py --report` meldet `ic()`, `handler`, `verState()`, `sectorPath()`, `azDiffFn`, `sunAlignmentLabel()` nicht mehr als lange Funktionen.
+- [x] Keine der sechs Funktionen wurde tatsächlich aufgeteilt (es gibt inhaltlich nichts aufzuteilen — alle sind 1–11 Zeilen lang).
 
 **Pre-Mortem:**
 - 💀 Ein zukünftiger Bearbeiter liest nur die Ticket-Beschreibung (nicht diese Spec) und beginnt trotzdem, `ic()`/`sunAlignmentLabel()` etc. „vorsichtshalber" aufzuteilen, obwohl es dafür keinen Grund gibt → unnötiges Risiko an einem 124× verwendeten Helper (`ic()`) ohne jeden Nutzen. Gegenmaßnahme: Scope-Absatz oben unmissverständlich voranstellen; Ticket-Titel-Ergänzung „(alle sechs False Positive — siehe Scope)" erwägen.
@@ -3671,8 +3863,8 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 - **Empfehlung: Option A**, mit derselben Begründung wie bei TASK-42: das Ticket ist bereits durch die Verifikation beantwortet — die gemeldeten Funktionen existieren in der gemeldeten Form/Länge nicht, das Werkzeug muss korrigiert werden, nicht der Anwendungscode.
 
 **Testplan:**
-- [ ] Automatisiert: `python3 tools/refactor_check.py --report` vor und nach der Ignorelist-Änderung laufen lassen und die Diffs vergleichen — die sechs Namen (`ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel`) dürfen danach nicht mehr unter `long_function` erscheinen, alle anderen Findings (u.a. TASK-51-Fund zu `backend/main.py`) müssen unverändert bestehen bleiben.
-- [ ] Manuell: Da kein Anwendungscode verändert wird, ist kein Klickpfad-Test in der App nötig. Zur Absicherung dennoch ein kurzer Sichttest im lokalen Dev-Server empfohlen (siehe PRODUCT.md-Regressionsmatrix, sofern vorhanden): Filter-Sheet öffnen und den Verifikations-Chip „Geprüft" durch alle drei Zustände klicken (Off → Geprüft → Probleme → Off), ein Location-Detail mit „Goldene Wolken"/„Himmelsröte"-Event öffnen und die Kompass-Grafik sowie den Sonnen-Ausrichtungstext prüfen — erwartetes Ergebnis: alles sieht/verhält sich exakt wie vor diesem Ticket, weil keine Zeile Anwendungscode geändert wurde.
+- [x] Automatisiert: `python3 tools/refactor_check.py --report` vor und nach der Ignorelist-Änderung laufen lassen und die Diffs vergleichen — die sechs Namen (`ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel`) dürfen danach nicht mehr unter `long_function` erscheinen, alle anderen Findings (u.a. TASK-51-Fund zu `backend/main.py`) müssen unverändert bestehen bleiben.
+- [x] Manuell: Da kein Anwendungscode verändert wird, ist kein Klickpfad-Test in der App nötig. Zur Absicherung dennoch ein kurzer Sichttest im lokalen Dev-Server empfohlen (siehe PRODUCT.md-Regressionsmatrix, sofern vorhanden): Filter-Sheet öffnen und den Verifikations-Chip „Geprüft" durch alle drei Zustände klicken (Off → Geprüft → Probleme → Off), ein Location-Detail mit „Goldene Wolken"/„Himmelsröte"-Event öffnen und die Kompass-Grafik sowie den Sonnen-Ausrichtungstext prüfen — erwartetes Ergebnis: alles sieht/verhält sich exakt wie vor diesem Ticket, weil keine Zeile Anwendungscode geändert wurde.
 
 ---
 
