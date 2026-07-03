@@ -34,7 +34,7 @@
 | **🏁 Done** | abgeschlossen + deployed | **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **BUG-58** *(Wolken-/Regen-Icon-Klick zoomt auf Europa statt 50-km-Radius um Standort)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **BUG-58** *(Wolken-/Regen-Icon-Klick zoomt auf Europa statt 50-km-Radius um Standort)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **BUG-59** *(Kein Wolken-/Regen-Overlay beim Zeitregler sichtbar)* · **TASK-52** *(Wolken-/Regen-Legende: Position nach unten links über Zeitregler)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -913,10 +913,12 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 |------|------|
 | **Typ** | BugFix (bewusste Verhaltensänderung an US-112/BUG-55, kein neuer unabhängiger Bug) |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-03 |
 
 **Beschreibung:** Tippt man im Karten-Tab auf den „Wolken"- oder „Niederschlag"-Umschalter, zentriert und zoomt die Karte auf eine Mehrländer-Ansicht (Frankreich bis Nord-Norwegen). Gewünscht: Die Karte soll stattdessen auf einen Kartenausschnitt von ca. 50 km Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort zoomen.
+
+**Testergebnis (2026-07-03):** Von Stephan im Browser getestet. Kern-AK bestätigt: „Die Funktionalität hat geklappt" — der Umschalter zoomt jetzt auf den ca. 50-km-Ausschnitt statt auf die Europa-Ansicht. Übrige Testschritte (Breitengrad-Vergleich Nord/Berlin, mehrfaches Umschalten, frischer Seitenaufruf, 5-Tabs-Regressionscheck) wurden nicht explizit kommentiert — Annahme: unauffällig, da nicht negativ erwähnt. Zwei unabhängige Zusatzbeobachtungen ausgelagert in eigene Tickets (kein BUG-58-Scope, technisch anderer Codepfad, siehe Bezug): **BUG-59** (Wolken-/Regen-Overlay beim Zeitregler nicht sichtbar) und **TASK-52** (Legende Wolken/Regen von Mitte-links nach unten-links über den Zeitregler verschieben).
 
 **Bezug:** Dies ist eine **bestätigte Änderung an bereits abgenommenem Verhalten aus BUG-55** [x] (Wetterkarte: Auto-Zoom beim Ein-/Ausschalten des Wolken-/Niederschlag-Layers im Map-Tab) und **US-112** [x] (Wetter-Overlay DWD/MET, Mehrländer-Ansicht als bewusste Design-Entscheidung). Stephan hat in der Analyse-Klärung bestätigt: Gemeint ist der bestehende „Wolken"/„Niederschlag"-Umschalt-Knopf direkt in der Kartenansicht (`WeatherMap.setMode`), nicht ein neuer Klick-Pfad von Feed/Scout/Detail-Sheet aus. Ihm ist bewusst, dass dies das in US-112 gewünschte „alle vier Gebiete gleichzeitig sichtbar"-Verhalten ersetzt — keine Regression, sondern eine gewollte Verhaltensänderung.
 
@@ -972,6 +974,21 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
   2. Karte manuell auf einen Standort in Norwegen verschieben (falls ein Norwegen-Standort in der App vorhanden ist), „Niederschlag" antippen — erwartet: Ausschnitt wirkt ähnlich groß wie bei Berlin, nicht sichtbar größer/kleiner.
   3. Mehrfach hintereinander zwischen „Wolken" und „Niederschlag" umschalten, dazwischen die Karte leicht verschieben — erwartet: Ausschnitt bleibt stabil auf der jeweils aktuellen Mitte, kein Zurückspringen zur alten Europa-Ansicht.
   4. Karten-Tab ohne zuvor gewählten Standort/Kartenmitte öffnen (z. B. direkt nach App-Start) und „Wolken" antippen — erwartet: sinnvolle Kartenansicht statt leerer Karte oder Fehler.
+
+---
+
+### BUG-59 · Zeitregler im Karten-Tab: Kein Wolken-/Regen-Overlay sichtbar `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-03 |
+
+**Beschreibung:** Beim Bedienen des Zeitreglers im Karten-Tab (mit dem man durch die Zeitpunkte der Wolken-/Niederschlag-Wettervorhersage blättert) hat Stephan kein Wolken- oder Regen-Overlay auf der Karte gesehen — die erwartete Wetterfläche erscheint visuell nicht.
+
+**Bezug:** Beobachtet als zusätzlicher, unabhängiger Befund beim Testen von **BUG-58** [ ] (Zoom-Umstellung auf 50-km-Radius) — technisch verifiziert **keine Regression durch BUG-58**: Der Kartenzoom-Code (`WeatherMap.setMode`/Zoom-Logik) und das Overlay-Rendering (`WeatherMap._render()` → `L.imageOverlay(url, bounds)`, Bild-URL aus `_frameUrl(this.sliderIdx)`, Bounds aus `this.data.bounds` bzw. `_FALLBACK_BOUNDS`) sind komplett getrennte Codepfade. Offene Fragen für die Analyse-Phase (nicht hier lösen): liefert `_frameUrl()` eine gültige Bild-URL? Ist `this.data.bounds` gesetzt (Cache-Miss/Daten nicht bereit)? Oder ist es ein reines Wahrnehmungsproblem, weil das Overlay im jetzt kleineren 50-km-Ausschnitt kaum auffällt? Klärung per Live-Test/DevTools in der Analyse-Phase nötig. Verwandt mit **US-112** [x] (liefert die Overlay-Daten/-Bilder) und **BUG-55** [x] (früherer Zoom-Fix, anderer Mechanismus).
 
 ---
 
@@ -2432,16 +2449,19 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 
 ---
 
-### US-114 · Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout `[ ]`
+### US-114 · Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-03 |
+| **Abgeschlossen** | 2026-07-03 |
 
 ✅ **Testbestätigung (Stephan, 2026-07-03):** Manuelle Testschritte (11 Punkte, alle Einstiegspunkte + Regression + Edge Cases) durchgeführt — passt.
+
+✅ **Release (2026-07-03):** Commit `3a6dd3c` — GitHub Actions Run #132 (`conclusion: success`, Frontend-Test-Gate + Deploy grün), Live-Health-Check auf https://fotoalert.stephanschumann.com bestätigt. Hinweis: Release lief per direktem `git commit`/`push`, nicht über das dokumentierte `release.sh`-Skript — App-Versionsnummer in index.html wurde daher nicht hochgezählt (funktional ohne Auswirkung, da Deploy bei jedem Push nach main läuft und der Service-Worker-Cache-Name serverseitig neu gestempelt wird).
 
 ✅ **Weg-Gate-Freigabe (Stephan, 2026-07-03):** Nur eine große, reine Ansichts-Karte (kein Pin-Setzen). US-114 deckt den „Chancendetails: Karte größer"-Teil aus PRODUCT.md §13 mit ab. Umsetzung nach Option A (eigene, einfache Vollbild-Ansicht fürs Ansehen, getrennt vom bestehenden Bearbeiten-Vollbild aus US-87).
 
@@ -2575,6 +2595,21 @@ Alle drei im Ticket offen gelassenen Fragen konnten durch Code-Lektüre (nicht d
   6. Location-Detail (Anzeige-Modus, nicht Bearbeiten) öffnen → Vollbild-Symbol an der „Karte & Blickwinkel"-Sektion prüfen (Schritt 1–3 wiederholen) UND separat den Bearbeiten-Modus öffnen → bestehendes „Pins setzen"-Vollbild-Overlay (US-87) testen → muss unverändert funktionieren (Pins verschiebbar, korrekt beschriftet „Pins setzen").
   7. Chance ohne Motivkoordinaten öffnen (z.B. per Suche nach einem Astronomie-Event ohne festen Motiv-Standort) → prüfen: kein Vollbild-Symbol vorhanden, weiterhin Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar".
   8. Zwei unterschiedliche Chancen nacheinander im Vollbild öffnen (ohne Browser-Reload dazwischen) → prüfen: zweite Vollbild-Karte zeigt die Pins der zweiten Chance, nicht die der ersten.
+
+---
+
+### TASK-52 · Wolken-/Regen-Legende im Karten-Tab: Position von Mitte-links nach unten-links über den Zeitregler `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-03 |
+
+**Beschreibung:** Die Wolken-/Regen-Legende im Karten-Tab soll von ihrer aktuellen Position (Mitte links) nach unten links über den Zeitschieberegler verschoben werden, damit die Kartenmitte aufgeräumter/freier wirkt. Reine visuelle Layout-Umpositionierung eines bestehenden Elements, kein neuer Nutzerwert — daher als Task statt User Story eingeordnet.
+
+**Bezug:** Betrifft dieselbe Karten-Visualisierung wie **BUG-58** [ ] und **BUG-59** [ ] (Wolken-/Niederschlag-Overlay im Karten-Tab), aber eigenständig — reine Positionsänderung der Legende, keine Overlay-/Zoom-Logik. **Wichtig:** Da dies eine visuelle Layout-Änderung an einer Karten-Visualisierung ist, MUSS in der Analyse-/Umsetzungsphase der `fotoalert-designer`-Skill (Bauhaus-Designwächter) hinzugezogen werden.
 
 ---
 
