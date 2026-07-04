@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **BUG-59** |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-52** *(Wolken-/Regen-Legende: Position nach unten links über Zeitregler)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -978,14 +978,15 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 
 ---
 
-### BUG-59 · Zeitregler im Karten-Tab: Kein Wolken-/Regen-Overlay sichtbar `[ ]`
+### BUG-59 · Zeitregler im Karten-Tab: Kein Wolken-/Regen-Overlay sichtbar `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-03 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Beim Bedienen des Zeitreglers im Karten-Tab (mit dem man durch die Zeitpunkte der Wolken-/Niederschlag-Wettervorhersage blättert) hat Stephan kein Wolken- oder Regen-Overlay auf der Karte gesehen — die erwartete Wetterfläche erscheint visuell nicht.
 
@@ -1209,6 +1210,23 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 > - Filter-Panel aktualisiert Ergebnisse direkt nach Chip-Tap
 >
 > **Abhängigkeiten:** US-32[x] (Filter-System)
+
+---
+
+### BUG-60 · HINWEISE-Feld wird bei Neuanlage automatisch mit Text vorbelegt `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Beim Anlegen einer Location über Quick Location Capture erscheint automatisch der Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Beobachtet: Das Feld ist von Anfang an vorbelegt, obwohl der Nutzer nichts eingetragen hat. Erwartet: Das Feld bleibt bei Neuanlage leer und wird nur befüllt, wenn der Nutzer selbst explizit einen Hinweis einträgt.
+
+**Bezug:** **BUG-50** [x] (Done, released 2026-06-29) hat einen verwandten, aber anderen Fehler behoben: Dort ließ sich der Text nach dem Löschen nicht dauerhaft entfernen (fehlende `special_notes`-Whitelist im PATCH-Endpoint). BUG-50 hat nur das Symptom „Text kommt nach dem Löschen wieder" behoben — nicht die Ursache, warum der Text bei der Neuanlage überhaupt erst automatisch gesetzt wird (vermutlich im Anlage-Code-Pfad von Quick Location Capture, nicht im PATCH-Endpoint). Kein Duplikat von BUG-50, aber engster Verwandter — beide betreffen dasselbe Feld. Abgrenzung: BUG-60 behandelt die Neuanlage, BUG-50 hat die Bearbeitung/Persistenz behandelt.
+
+---
 
 ## 🔴 Hoch – Kern-Features
 
@@ -2969,18 +2987,156 @@ Alle drei im Ticket offen gelassenen Fragen konnten durch Code-Lektüre (nicht d
 
 ---
 
-### TASK-52 · Wolken-/Regen-Legende im Karten-Tab: Position von Mitte-links nach unten-links über den Zeitregler `[ ]`
+### TASK-52 · Wolken-/Regen-Legende im Karten-Tab: Position von Mitte-links nach unten-links über den Zeitregler `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-03 |
+| **Abgeschlossen** | 2026-07-04 |
+| **Weg-Gate** | Stephan hat Option A (nur Position verschieben) am 2026-07-04 freigegeben. |
+| **Umsetzungsnotiz** | `#map-weather-legend` `bottom` von `200px` auf `100px` gesetzt (Regler-bottom 30px + geschätzte Reglerkasten-Höhe ~55px + 12px Sicherheitsabstand ≈ 97px, auf 100px gerundet); `left: 12px` unverändert. |
 
 **Beschreibung:** Die Wolken-/Regen-Legende im Karten-Tab soll von ihrer aktuellen Position (Mitte links) nach unten links über den Zeitschieberegler verschoben werden, damit die Kartenmitte aufgeräumter/freier wirkt. Reine visuelle Layout-Umpositionierung eines bestehenden Elements, kein neuer Nutzerwert — daher als Task statt User Story eingeordnet.
 
 **Bezug:** Betrifft dieselbe Karten-Visualisierung wie **BUG-58** [x] und **BUG-59** [ ] (Wolken-/Niederschlag-Overlay im Karten-Tab), aber eigenständig — reine Positionsänderung der Legende, keine Overlay-/Zoom-Logik. **Wichtig:** Da dies eine visuelle Layout-Änderung an einer Karten-Visualisierung ist, MUSS in der Analyse-/Umsetzungsphase der `fotoalert-designer`-Skill (Bauhaus-Designwächter) hinzugezogen werden.
+
+---
+
+#### 🔬 Implementation Spec (Analyse 2026-07-04)
+
+##### 📐 Example Mapping
+
+**Annahmen-Protokoll:**
+
+| Typ | Punkt |
+|-----|-------|
+| ✅ Klar | Betroffen ist ausschließlich die Wolken-/Regen-Legende im Karten-Tab (die kleine Box mit Farbverlauf-Balken und Prozent-/mm-Beschriftung, die erscheint sobald Wolken- oder Niederschlags-Overlay aktiv ist). Der Zeitschieberegler selbst, die Ein-/Aus-Knöpfe oben links und das Wetterdaten-Overlay auf der Karte bleiben unverändert. |
+| ✅ Klar | „Über den Zeitschieberegler" bedeutet: Legende erscheint direkt oberhalb des Reglers, linksbündig mit ihm ausgerichtet — nicht daneben, nicht überlappend. |
+| ⚠️ Annahme: Die Legende bleibt weiterhin nur sichtbar, wenn auch der Zeitregler sichtbar ist (also wenn Wolken- oder Niederschlags-Ansicht aktiv ist) — es ändert sich nur die Position, nicht die Sichtbarkeits-Logik. Bitte bestätigen. |
+| ⚠️ Annahme: Der genaue Pixel-Abstand zwischen Legende und Zeitregler-Oberkante wird beim Implementieren am laufenden Bildschirm fein-justiert (Ziel: gleicher optischer Abstand wie zwischen anderen gestapelten Kartenelementen, ca. 10–12px), nicht als starrer Wert vorab festgelegt — da die exakte Höhe des Zeitregler-Kastens von Zeilenumbruch/Gerätebreite abhängt. Bitte bestätigen, dass eine visuelle Fein-Justierung statt eines exakten Vorab-Werts akzeptabel ist. |
+| ⚠️ Annahme: Auf schmalen Bildschirmen (iPhone SE u.ä.) darf die Legende bei Bedarf schmaler werden oder in der Breite auf die Reglerbreite begrenzt werden, damit sie nicht über den rechten Bildschirmrand hinausragt. Bitte bestätigen. |
+
+📏 **Regel 1 — Die Legende erscheint unten links direkt über dem Zeitregler, nicht mehr in der Kartenmitte.**
+
+- 🟢 *Positiv:* Ich öffne den Karten-Tab und schalte die Wolken-Ansicht ein → die Legende mit der Prozent-Skala erscheint unten links, direkt oberhalb des Zeitschiebereglers, nicht mehr auf halber Kartenhöhe.
+- 🟢 *Positiv:* Ich wechsle von Wolken- auf Niederschlags-Ansicht → die Legende bleibt an derselben Position (unten links über dem Regler), nur Inhalt/Beschriftung wechselt auf die Niederschlags-Skala (wie bisher schon).
+- 🔴 *Negativ:* Ich schalte die Wetter-Ansicht wieder aus → weder Legende noch Zeitregler sind sichtbar (unverändertes Verhalten).
+
+📏 **Regel 2 — Legende und Zeitregler überlappen sich nicht und bleiben beide vollständig lesbar/bedienbar.**
+
+- 🟢 *Positiv:* Bei aktiver Wolken-Ansicht sehe ich sowohl die komplette Legende als auch den kompletten Zeitregler inkl. Zeit-Beschriftung darunter — keines der beiden Elemente wird vom anderen verdeckt.
+- 🟢 *Positiv:* Ich ziehe den Zeitregler ganz nach rechts/links durch alle Zeitpunkte → die Legende bleibt an ihrer Position stehen und wird durch die Bedienung nicht verschoben oder verdeckt.
+- ⚙️ *Edge:* Die Quellen-Angabe (Copyright-Hinweis) unten links unter dem Regler bleibt an ihrer bisherigen Position — Legende und Zeitregler rücken zusammen nach oben, ohne die Quellen-Angabe zu verdecken.
+
+📏 **Regel 3 — Die Kartenmitte wirkt aufgeräumter, da dort kein Legenden-Kasten mehr sitzt.**
+
+- 🟢 *Positiv:* Ich betrachte die Karte bei aktiver Wolken-/Regen-Ansicht → im mittleren Kartenbereich (dort wo bisher die Legende links auf halber Höhe saß) ist jetzt freie Kartenfläche/Wolkenbild sichtbar, ohne Beschriftungs-Kasten.
+
+---
+
+**📎 Code-Verifikation** (gelesen am 2026-07-04):
+
+- `web/index.html` Z. 291–294: Legende (`#map-weather-legend`) aktuell `position: absolute; bottom: 200px; left: 12px; z-index: 1000;` — das ist die „Mitte links"-Position aus der Ticketbeschreibung.
+- `web/index.html` Z. 283–286: Zeitschieberegler-Kasten (`#map-weather-slider-wrap`) sitzt bei `position: absolute; bottom: 30px; left: 64px; right: 60px; padding: 8px 16px;` — nimmt fast die volle Kartenbreite ein (nur links/rechts schmale Ränder für andere Elemente frei).
+- `web/index.html` Z. 1024–1035: Im HTML liegen Zeitregler-Block und Legenden-Block direkt nacheinander im selben Karten-Container — technisch unproblematisch, keine Abhängigkeit zueinander im Code.
+- `web/index.html` Z. 309–314: Die Quellen-Angabe (`#map-weather-attribution`, Pflicht-Hinweis „CC BY 4.0" laut US-112) sitzt bereits ganz unten links: `bottom: 6px; left: 8px`. Sie liegt unterhalb des Zeitreglers und bleibt von der Legenden-Verschiebung unberührt — muss beim Hochrücken der Legende nicht verschoben werden, aber die neue Legenden-Position darf diesen Hinweis nicht verdecken.
+- `web/index.html` Z. 276–277: Die Ein-/Aus-Knöpfe für Wolken/Niederschlag (`#map-weather-toggle`) sitzen oben links (`top: 12px; left: 12px`) — bereits mit `left: 12px` ausgerichtet; die Legende übernimmt denselben linken Randabstand, damit alle linksseitigen Kartenelemente auf einer gemeinsamen Linie liegen (Bauhaus-Rasterkonsistenz).
+- `web/index.html` Z. 4626–4632 (`_updateLegend()`): Die Sichtbarkeits-Logik der Legende (`open`-Klasse je nach `mode`) ist reines Zeigen/Verstecken über eine CSS-Klasse, unabhängig von Positionswerten — eine reine CSS-Positionsänderung berührt diese Logik nicht.
+
+---
+
+##### ⚠️ Pre-Mortem
+
+💀 **Szenario 1: Legende überlappt den Zeitregler oder die Quellen-Angabe darunter**
+- Auslöser: Der neue `bottom`-Wert der Legende wird zu knapp über der tatsächlichen Höhe des Zeitregler-Kastens gewählt; die reale Höhe des Regler-Kastens variiert leicht je nach Gerät/Schriftgröße (Label-Zeile kann umbrechen).
+- Frühwarnung: Im Test auf schmalem Bildschirm (iPhone-Breite) wirkt die Legende geklemmt oder schneidet die Zeit-Beschriftung unter dem Regler an.
+- Gegenmaßnahme: Abstand mit ausreichend Sicherheitspuffer wählen (analog zum bereits im Code dokumentierten 12px-Sicherheitspuffer-Muster bei anderen Kartenelementen, siehe Z. 3452–3453) und am laufenden Gerät/Browser visuell verifizieren, nicht nur rechnerisch.
+
+💀 **Szenario 2: Legende ragt auf schmalen Bildschirmen über den rechten Kartenrand oder unter den Zeitregler-Randbereich hinaus**
+- Auslöser: Die Legende hat `min-width: 130px` (Z. 294); bei sehr schmalen Geräten könnte das zusammen mit dem linken Rand-Offset des Zeitreglers (`left: 64px`) optisch unausgewogen wirken, auch wenn keine harte Kollision entsteht.
+- Frühwarnung: Test auf kleinstem unterstützten Bildschirm (iPhone SE-Breite).
+- Gegenmaßnahme: Visuelle Prüfung auf schmalem Viewport als Testschritt aufnehmen; falls nötig `min-width` reduzieren oder `max-width` ergänzen.
+
+💀 **Szenario 3: Andere Kartenelemente (Fehler-Banner, Quellen-Angabe) werden durch die neue Legenden-Position unbeabsichtigt mitverschoben**
+- Auslöser: Copy-Paste-Fehler beim Ändern der CSS-Regel trifft versehentlich eine falsche Element-ID (z.B. `#map-weather-attribution` statt `#map-weather-legend`).
+- Frühwarnung: Regressionstest aller anderen Kartenelemente (Toggle-Knöpfe, Fehler-Banner, Quellen-Angabe, GPS-Button) nach der Änderung.
+- Gegenmaßnahme: Nur die CSS-Regel `#map-weather-legend` anfassen, alle anderen unverändert lassen; im Testplan explizit als Regressionsschritt verankert.
+
+💀 **Szenario 4: Legende wird durch die neue Position auf Dunkel-Modus schlechter lesbar**
+- Auslöser: Reine Positionsänderung sollte keine Farb-/Kontrastwerte berühren, aber ein Verrutschen über einen helleren/dunkleren Kartenbereich könnte den gefühlten Kontrast verändern (Legende hat eigenen `--surface`-Hintergrund, daher eigentlich unabhängig vom darunterliegenden Kartenbild).
+- Frühwarnung: Test im Dunkel-Modus mit aktivem Wolken-Overlay.
+- Gegenmaßnahme: Keine Farbänderung vorgesehen (Legende behält `background: var(--surface)`); als Testschritt trotzdem im Dunkel-Modus gegenprüfen.
+
+---
+
+##### 🏗️ Architektur-Analyse
+
+**Betroffene Dateien:**
+- `web/index.html` — ausschließlich die CSS-Regel `#map-weather-legend` (Z. 292–294): `bottom`-Wert wird von `200px` auf einen Wert knapp oberhalb der Zeitregler-Oberkante geändert (`left: 12px` bleibt unverändert für Rasterkonsistenz mit dem Toggle-Block oben links). Keine HTML-Strukturänderung, keine JS-Änderung, kein Backend betroffen.
+
+**Kein neuer Score/Event-Typ, kein Filter-Chip betroffen** (Schritt 4f entfällt). Kein Datenbezug, keine API-Änderung.
+
+---
+
+##### 🎨 Designer-Check (Bauhaus)
+
+- **Positionierung:** Neue Position `bottom: [Zeitregler-Oberkante + ca. 10–12px Sicherheitsabstand]; left: 12px` — linksbündig mit dem Wolken-/Niederschlag-Toggle oben links, damit alle freistehenden Kartenelemente auf derselben vertikalen Linie liegen (Bauhaus-Rasterprinzip: Elemente an einer gemeinsamen Kante ausrichten statt frei im Raum schweben lassen).
+- **Abstand:** Mindestens 10–12px Luft zwischen Legenden-Unterkante und Zeitregler-Oberkante — genug um beide Elemente optisch klar als getrennte, aber zusammengehörige Einheiten zu lesen (ähnlich dem im Code bereits verwendeten 12px-Sicherheitspuffer-Muster).
+- **Ausrichtung:** Legende linksbündig, keine Zentrierung über dem Regler — der Regler selbst ist breiter (`left: 64px; right: 60px`) als die schmale Legende (`min-width: 130px`); eine zentrierte Legende würde optisch „schweben", eine linksbündige fügt sich ins bestehende Links-Raster (Toggle, Legende, Attribution alle auf einer Kante).
+- **Keine Interaktion mit dem Regler:** Die Legende bleibt ein reines Anzeige-Element ohne Klick-/Touch-Funktion, keine Überlappung mit der Ziehfläche des Reglers — reine Stapelanordnung übereinander, kein Eingriff in die Bedienbarkeit des Sliders.
+- **Farbe/Form/Typografie:** Unverändert (`--surface`-Hintergrund, `--border`-Rahmen, 10px-Radius, 11px-Text) — reine Positionsänderung, kein neues visuelles Element, daher keine Token-Diskussion nötig.
+- **Kein neuer Radius/keine neue Farbe/kein neues Icon** — Checkliste erübrigt sich, da nur ein bestehendes, bereits Bauhaus-konformes Element verschoben wird.
+
+---
+
+##### 🔀 Implementierungsoptionen
+
+**Option A — Nur den `bottom`-Wert der Legende anpassen (empfohlen)**
+
+Was du in der App erlebst: Die Wolken-/Regen-Legende sitzt nicht mehr auf halber Kartenhöhe links, sondern direkt über dem Zeitschieberegler unten links — die Kartenmitte ist frei, Legende und Regler bilden optisch eine zusammengehörige Bedieneinheit unten links.
+
+- Vorgehen: In der CSS-Regel `#map-weather-legend` den Wert `bottom: 200px` durch einen kleineren Wert ersetzen, der die Legende knapp oberhalb des Zeitregler-Kastens platziert; `left: 12px` bleibt bestehen. Abstand am laufenden Bildschirm fein-justieren (siehe Annahme oben).
+- Betroffene Dateien: `web/index.html` (eine CSS-Regel, eine Zeile)
+- Vorteile: Minimalstmöglicher Eingriff, kein Risiko für andere Elemente, sofort umsetzbar, exakt das was das Ticket verlangt
+- Nachteile / Risiken: Keine nennenswerten — einziges Risiko (Überlappung) ist über Pre-Mortem Szenario 1 abgedeckt und durch visuelle Prüfung am Gerät auszuschließen
+- Aufwand: sehr klein
+
+**Option B — Legende und Zeitregler in einen gemeinsamen Container zusammenfassen**
+
+Was du in der App erlebst: Optisch identisches Ergebnis zu Option A — Legende über dem Regler unten links.
+
+- Vorgehen: Neuer umschließender `<div>` um Zeitregler und Legende, gemeinsame Positionierung über den Container statt über zwei einzelne `position: absolute`-Regeln.
+- Betroffene Dateien: `web/index.html` (HTML-Struktur + CSS, mehrere Stellen)
+- Vorteile: Bei künftigen weiteren Layout-Änderungen an dieser Ecke evtl. etwas leichter zu pflegen
+- Nachteile / Risiken: Höherer Eingriff in bestehende, funktionierende Struktur ohne funktionalen Zusatznutzen für dieses Ticket; höheres Regressionsrisiko (Szenario 3) für ein Ticket, das laut Beschreibung „reine Positionsänderung, kein neuer Nutzerwert" ist
+- Aufwand: mittel
+
+✅ **Empfehlung: Option A** — das Ticket verlangt ausdrücklich nur eine Positionsänderung eines bestehenden Elements ohne neuen Nutzerwert; eine Ein-Zeilen-CSS-Änderung erfüllt das vollständig, ohne unnötiges Regressionsrisiko an einer bereits stabilen Kartenstruktur einzugehen (Grundsatz „kein Scope Creep").
+
+---
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Dieses Ticket ist reine Frontend-CSS-Positionierung (keine Datenlogik, kein Backend-Endpoint) — kein pytest-Fall in `backend/tests/` vorgesehen. Die Akzeptanzkriterien sind manuell im Browser zu prüfen.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Karten-Tab öffnen, Wolken-Ansicht einschalten → prüfen: Legende erscheint unten links direkt über dem Zeitregler, Kartenmitte ist frei von der Legende.
+  2. Auf Niederschlags-Ansicht wechseln → prüfen: Legende bleibt an derselben Position, Inhalt wechselt auf die Niederschlags-Skala.
+  3. Zeitregler bei aktiver Wolken-Ansicht ganz nach links und ganz nach rechts ziehen → prüfen: Legende bleibt stehen, keine Überlappung mit Regler oder Zeit-Beschriftung darunter.
+  4. Quellen-Angabe (Copyright-Hinweis) unten links weiterhin sichtbar und nicht von der Legende verdeckt.
+  5. Auf schmalem Bildschirm (iPhone-Breite oder schmales Browserfenster) testen → Legende ragt nicht über den rechten Kartenrand hinaus, bleibt vollständig lesbar.
+  6. Dunkel-Modus aktivieren, Wolken-Ansicht einschalten → Legende weiterhin gut lesbar (Kontrast unverändert).
+  7. Wolken-/Regen-Ansicht ausschalten → weder Legende noch Zeitregler sichtbar (Regressionscheck bestehendes Verhalten).
+  8. Regressionscheck übrige Kartenelemente: Ein-/Aus-Knöpfe oben links, GPS-Button, Fehler-Banner (falls durch Testdaten auslösbar) — alle unverändert an ihrer bisherigen Position.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CSS-Regel `#map-weather-legend`)
+- [x] Designer-Check: visuell? → ja, `fotoalert-designer`-Skill aufgerufen (Bauhaus-Rasterausrichtung, Abstand, keine Interaktion mit dem Regler)
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A
 
 ---
 
@@ -4034,6 +4190,145 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 **Testplan:**
 - [x] Automatisiert (`backend/tests/test_api_regression.py`, Docstring „US-89"): POST→GET Roundtrip (`count/avg/mine`), Upsert (zweiter POST gleiches device_id → count stabil), zwei device_ids → count=2, `value=6`→422, DELETE→count sinkt, leeres Set→`avg=null`, POST ohne Token→401. Plus Vollsystem-Regression (alle bestehenden AK-Tests).
 - [x] Manuell (http://localhost:8000): Bewertung im Detail-Sheet abgeben → in zweitem Browser-Kontext (anderes `fa_device_id`) Ø + Anzahl sichtbar; `minRating`-Filter prüft eigene Bewertung; localStorage-Migration mit Alt-Daten.
+
+---
+
+### US-115 · Mondaufgang-Chance: Mond im passenden Bildausschnitt statt nur 2°-Sichtachse `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich eine Mondaufgang-Chance nicht nur dann sehen, wenn der Mond innerhalb eines engen 2°-Radius um die Sichtachse zum Motiv steht, sondern immer dann, wenn der Mond bei der gewählten Brennweite noch innerhalb des tatsächlichen Bildausschnitts erscheint (Motiv mittig im Bild) — z. B. bei 90 mm ist der Bildwinkel deutlich breiter als 2°, wodurch relevante Mondaufgänge derzeit fälschlich ausgeschlossen werden könnten.
+
+**Bezug:** Prüfung ergab zwei unterschiedliche bestehende Mechanismen, die beide **nicht** identisch mit dieser Anforderung sind: (1) **US-64** [ ] (Live Astro-Visualisierung) definiert einen grünen Alignment-Indikator bei `|Az_Körper − Az_Sichtachse| ≤ 2°` — das ist ein enger, brennweiten-unabhängiger Toleranzwert für die Live-Kartenansicht. (2) **US-108** [x] (Done, released 2026-06-30) filtert Mondauf-/-untergangs-Chancen im Feed nach einer festen 35°-Zone („Vorne") um die Sichtachse — ebenfalls unabhängig von der tatsächlichen Brennweite/dem Bildwinkel. Dieses Ticket ergänzt beide um eine **brennweitenabhängige** Berechnung des tatsächlichen Bildwinkels (Field of View), analog zur bestehenden `CameraFOV`-Kegel-Visualisierung auf der Karte (bereits vorhanden für die manuelle Blickwinkel-Einschätzung, aber bisher nicht mit der Mondaufgang-Chancenlogik verknüpft). Klare Abgrenzung nötig: 2°-Radius (US-64, Live-Anzeige) vs. 35°-Zone (US-108, Feed-Filterung) vs. brennweitenabhängiger FOV-Bildausschnitt (dieses Ticket). Keine Umsetzung ohne weitere Klärung, ob US-108 dadurch abgelöst oder nur ergänzt werden soll.
+
+---
+
+### US-116 · Verständliche In-App-Erklärungen für jede Funktion `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als App-User möchte ich jederzeit ohne Verzögerung verstehen, was eine Funktion aussagt, wie sie funktioniert und wie ich sie praktisch anwende, damit ich die App sicher und selbstständig nutzen kann.
+
+**Bezug:** Deutliche Überschneidung mit **US-21** [ ] („App-Beschreibung & Onboarding" — Onboarding-Slides, „?"-Info-Button, Score-Tooltips, Glossar) sowie **US-55** [x] (Done — Score-Erklärungen via ⓘ-Overlay, aber nur für Astronomie-/Wetter-/Gesamt-Score). US-116 ist breiter gefasst als beide: „jede Funktion" statt nur Scores/Schwierigkeit/Event-Typen, plus die explizite Anforderung „ohne Verzögerung" (also unmittelbar im Kontext, nicht nur über ein zentrales Glossar). Empfehlung zur Klärung mit Stephan: US-21 und US-116 vermutlich **mergen** (US-21 als Kern, US-116 als Scope-Erweiterung „jede Funktion" statt nur die in US-21 genannten Aspekte) — nicht selbst umgebaut, nur vorgeschlagen.
+
+---
+
+### US-117 · Karten-Tab öffnet mit aktuellem Standort + 5-km-Radius `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich, dass der Karten-Tab beim Öffnen immer meinen aktuellen Standort mit 5 km Radius zeigt, damit ich sofort die relevanten Locations in meiner direkten Umgebung sehe.
+
+**Bezug:** Verwandt, aber nicht identisch mit **BUG-58** [x] (Done, released 2026-07-04 — der Wolken-/Niederschlag-Umschalter im Karten-Tab zoomt neuerdings auf einen **50-km**-Radius um die aktuelle Kartenmitte). BUG-58 betrifft nur das Verhalten beim Umschalten auf Wolken/Niederschlag, nicht den initialen Öffnungszustand des Karten-Tabs selbst, und nutzt einen anderen Radius (50 km statt 5 km). Kein Duplikat, klare Abgrenzung: US-117 = initiales Öffnen des Karten-Tabs mit GPS-Standort, BUG-58 = Zoom-Verhalten beim Wetter-Layer-Umschalten.
+
+---
+
+### US-118 · Location-Übersicht nach Entfernung vom Standort sortieren `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich, dass die Location-Übersicht aufsteigend nach Entfernung vom aktuellen Standort sortiert ist (nicht vom Motiv), damit die nächstgelegenen Spots automatisch oben stehen.
+
+**Bezug:** Verwandt zu **BUG-51** [x] (Done, released 2026-06-29 — Entfernungsfilter im Locations-Tab funktioniert, filtert aber nur nach Radius, sortiert nicht). Kein Duplikat: BUG-51 behandelt Filterung (ein-/ausblenden), US-118 behandelt Sortierreihenfolge der sichtbaren Liste. Beide können nebeneinander bestehen (gefiltert UND sortiert).
+
+---
+
+### US-119 · Feed-Standardfilter: nur Chancen mit Wahrscheinlichkeit ≥70% `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich im Feed standardmäßig nur Chancen mit Wahrscheinlichkeit ≥70% sehen, damit ich nicht von unwahrscheinlichen Chancen überflutet werde; reduziere ich den Wahrscheinlichkeits-Filter manuell, sollen auch niedrigere Wahrscheinlichkeiten wieder sichtbar werden.
+
+**Bezug:** Der „Mindest-Wahrscheinlichkeit"-Filter (Slider, Teil des Filter-Systems aus **US-32** [x]/US-18-20/27, siehe auch **BUG-08** [x] Done) existiert bereits, aktueller Standardwert laut Code-Referenzen im Backlog ist **0,35** (35%), nicht 70%. Dieses Ticket ändert vermutlich nur den Default-Wert des bestehenden Sliders (bzw. bestätigt/dokumentiert das Reduzier-Verhalten), kein neuer Mechanismus. Kein Duplikat — reine Wertänderung eines bestehenden Features. Abgrenzung zu prüfen: ob 70% als Feed-Default separat vom Locations-/Karten-Filter-Default gilt.
+
+---
+
+### US-120 · Beispielbild pro Location hochladen (Hoch-/Querformat, Größenlimit) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Host möchte ich pro Location ein Beispielbild hochladen können, das andere Nutzer in Hoch- oder Querformat passend zur Geräteausrichtung sehen (Bild dreht beim Drehen des Handys mit, Hochkant-Bilder vollflächig im Hochkant-Modus), damit Interessierte sofort einen visuellen Eindruck vom Spot bekommen. Bildgröße max. 1 MB, idealerweise serverseitige Kompression auf ca. 500 KB beim Upload, um Performance und Datenvolumen zu schonen.
+
+**Bezug:** Keine Dubletten oder direkt überschneidenden Tickets im Backlog gefunden (Suche nach „Bild", „Upload", „Beispielbild" ergab keine bestehenden Bild-Upload-Tickets). Neues, eigenständiges Feature. Berührt ggf. dieselbe Location-Detail-Sektion wie **US-103** [x] (Karten-Marker & FOV-Legende) und **US-87** [x] (Vollbild-Overlay Bearbeiten-Karte), aber rein layouttechnisch, keine funktionale Überschneidung.
+
+---
+
+### US-121 · Chancen automatisch neu berechnen bei Änderung des Location-Standorts `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich, dass alle Foto-Chancen automatisch neu berechnet werden, wenn der Standort des Motivs oder Fotografen einer bestehenden Location geändert wird, damit die Chancen nie auf veralteten Koordinaten basieren.
+
+**Bezug:** Starke Überschneidung mit **TASK-12** [x] (Done, v1.4.2 — führte bereits automatische Neuberechnung von Feed + Jahreskalender nach Koordinaten-Änderung ein: asynchroner `_run_precompute(location_ids=[id])` direkt nach PATCH `/locations/{id}`) und **US-106** [x] (Done, v1.19.5, baut auf TASK-12 auf und schließt drei weitere Lücken: Wetter sofort, Entdecken-Bereich zeitnah, kein Verlust bei laufendem Großlauf). Nach Aktenlage im Backlog **scheint automatische Neuberechnung bereits zu existieren** — abschließend nur durch Stephan/Live-Test zu bestätigen.
+
+**Klärungsbedarf (nicht selbst entschieden, bitte vor Analyse klären):**
+- (a) Passiert die automatische Neuberechnung bei Standort-Änderung bereits vollständig (TASK-12 + US-106 scheinen das laut Backlog-Text bereits zu leisten) — oder gibt es einen Rest-Fall, der noch nicht abgedeckt ist?
+- (b) Falls doch eine Lücke besteht: Soll die Neuberechnung über denselben „Alignment berechnen"-Button laufen wie bei Neuanlage (Risiko: User löst ihn nach einer Änderung evtl. nicht erneut aus → veraltete Daten bleiben stehen), oder soll sie automatisch bei jeder Änderung erfolgen, mit kurzem Hinweis-Toast („Chancen werden aktualisiert")?
+
+---
+
+### US-122 · Sonnen-Alignment als eigenständige Chance in Feed, Kalender und Scout `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Fotograf möchte ich Sonnen-Alignment als eigenständige Chance im 14-Tage-Feed, im Kalender und bei den Scouts sehen — nach derselben Logik wie das bestehende Mond-Alignment, nur zur goldenen Stunde (blaue Stunde entfällt, da die Sonne dann nicht sichtbar ist) — mit Filterkriterien analog zu den bestehenden Mond-Filtern (Drei-Zustand: aktivieren/ausschließen/neutral).
+
+**Bezug:** Wichtiger Klärungspunkt vor Analyse: Der Event-Typ `SUN_ALIGNMENT` wird laut Code-Referenzen im Backlog (Kontext zu **US-108** [x]) bereits **bestehend** neben `MOON_ALIGNMENT` erwähnt („Golden Hour, Blue Hour, SUN_ALIGNMENT, MOON_ALIGNMENT, Milchstraße, Meteoritenschauer werden durch US-108 nicht verändert"). Zusätzlich ist **US-107** [x] (Done, released 2026-06-29, „Sonnen-Alignment-Planung") bereits umgesetzt — dort aber als Richtungsklassifizierungs-Text im Event-/Location-Detail (z. B. „Sonne geht fast genau hinter dem Motiv auf"), **nicht** explizit als eigenständige Feed-/Kalender-/Scout-Karte mit eigenem Icon wie bei Mond-Alignment. Es ist unklar, ob dieses Ticket eine Dublette von bereits bestehendem `SUN_ALIGNMENT`-Code ist oder eine echte Lücke (fehlende Sichtbarkeit in Feed/Kalender/Scout speziell zur goldenen Stunde) beschreibt — vor Analyse-Start unbedingt am Code prüfen, nicht nur am Backlog-Text. Nur als Kontext/Konsistenz-Hinweis (nicht zur Umsetzung in diesem Intake-Schritt): Das Drei-Zustand-Filterpattern ist bereits etabliert, siehe **BUG-46** [x] (Done — führte aktiv/ausgeschlossen/deaktiviert für mehrere Kriterien ein) und den Verifikationsfilter (`verificationIncl[]`/`verificationExcl[]`).
+
+---
+
+### US-123 · Kartenansicht: Standardansicht (Straßenkarte) als Alternative zur Satellitenansicht `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Als Host möchte ich bei Neuanlage/Bearbeiten einer Location neben der Satellitenansicht auch eine Standardansicht (Straßenkarte) wählen können, mit Umschaltmöglichkeit zwischen beiden, damit ich je nach Situation die besser lesbare Kartendarstellung nutzen kann.
+
+**Bezug:** Die Bearbeiten-Karte nutzt laut Backlog-Referenzen aktuell fix einen Satelliten-Layer (`CameraFOV.initMap()` verwendet `arcgisonline` fix). Der allgemeine Karten-Tab hat laut PRODUCT.md-Regressionshinweis (Zeile „Layer-Umschaltung Nacht/Standard/Satellit") bereits eine Layer-Umschaltung — diese Umschaltmöglichkeit scheint aber nicht für die Location-Anlage-/Bearbeiten-Karte selbst zu gelten, nur für den normalen Karten-Tab. Keine Dublette gefunden; Abgrenzung zu klären: ob die bestehende Karten-Tab-Layer-Umschaltung einfach auf die Bearbeiten-Karte übertragen werden kann (dann kleiner Aufwand) oder ob dort eine eigene Lösung nötig ist.
 
 ---
 
