@@ -251,6 +251,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. |
 | Bearbeiten-Karte im Vollbild | Auf der kleinen Bearbeiten-Karte öffnet ein Symbol (oben rechts) ein bildschirmfüllendes Overlay zum komfortablen Setzen beider Pins (Fotograf-Standort, Motiv); Schließen übernimmt die neuen Positionen sofort in die kleine Karte + Koordinatenfelder, gespeichert wird weiterhin erst über „Speichern" (US-87). Die readonly „Karte & Blickwinkel"-Ansicht (US-58) ist davon getrennt und hat ihr eigenes, rein anzeigendes Vollbild-Symbol ohne Pin-Verschieben (US-114, siehe Abschnitt 4). |
+| Satellit/Straßenkarte-Umschalter (Location-Karten) | Alle Location-bezogenen Karten (Neue Location anlegen, Bearbeiten-Mini-Karte + deren Vollbild, „Karte & Blickwinkel"-Kegel-Vorschau + deren Vollbild) zeigen oben links einen schlanken Umschalter „Satellit"/„Straße". Umschalten wirkt sofort, ohne gesetzte Pins/Linien/Kegel oder den aktuellen Kartenausschnitt (Zoom/Position) zu verlieren; Vollbild-Ansicht übernimmt automatisch denselben Modus wie die zugehörige kleine Karte. Es gibt EINE gemeinsame Einstellung für alle diese Karten (nicht je Kartentyp getrennt), gespeichert nur lokal auf dem Gerät (`localStorage`-Key `fa_loc_map_mode`, kein Server-Sync). Der normale Karten-Tab (`MapView`, Abschnitt 5, mit eigenem Nacht/Standard/Satellit-Umschalter) ist davon komplett getrennt und unverändert (US-123). |
 | Custom Locations | Vom Nutzer gespeicherte Locations erscheinen hier; Namen ohne 📍-Emoji (BUG-42) |
 | Standortverifikation | Verifikationen werden persistiert (BUG-26) |
 
@@ -264,6 +265,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Edit → Speichern → Änderung sofort in Sheet + Liste sichtbar (kein Reload nötig)
 - [ ] Close-Button erreichbar (Safe Area — BUG-25 gefixt)
 - [ ] Bearbeiten-Karte: Vollbild-Symbol öffnet bildschirmfüllendes Overlay, Pins darin setzbar, Schließen übernimmt Position in kleine Karte (US-87)
+- [ ] Location-Karten (Anlegen/Bearbeiten/Kegel-Vorschau) zeigen Satellit/Straße-Umschalter; Umschalten verliert keine Pins/Zoom; gewählte Ansicht bleibt nach Schließen/erneutem Öffnen erhalten; Karten-Tab (`MapView`) unverändert (US-123)
 
 ---
 
@@ -469,3 +471,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-04 | BUG-58 | Wolken-/Niederschlag-Umschalter im Karten-Tab zoomt jetzt auf 50-km-Radius um die Kartenmitte statt auf die Mehrländer-Ansicht (bewusste Änderung an US-112/BUG-55) |
 | 2026-07-04 | BUG-59 | Wetter-Overlay: Sichtbarkeit bei leichtem Wetter verbessert (Schwellwert-Deckkraft) |
 | 2026-07-04 | TASK-52 | Wolken-/Regen-Legende im Karten-Tab von Kartenmitte nach unten-links über den Zeitregler verschoben |
+| 2026-07-04 | US-123 | Alle Location-bezogenen Karten (Neue Location, Bearbeiten-Mini-Karte + Vollbild, „Karte & Blickwinkel"-Kegel-Vorschau + Vollbild) bekommen einen schlanken Satellit/Straße-Umschalter oben links; gemeinsamer Helper `LocMapMode` (Tile-URLs, Toggle-Rendering, Live-Tile-Layer-Tausch ohne Verlust von Pins/Zoom); eine gemeinsame Einstellung für alle diese Karten, nur lokal gespeichert (`localStorage`-Key `fa_loc_map_mode`); Karten-Tab (`MapView`) bewusst unangetastet (eigener, getrennter Nacht/Standard/Satellit-Umschalter). |

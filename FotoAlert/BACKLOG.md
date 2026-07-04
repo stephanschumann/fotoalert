@@ -30,8 +30,8 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · US-123 *(von Stephan getestet, „passt")* |
+| **🏁 Done** | abgeschlossen + deployed | **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
@@ -4283,14 +4283,16 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-121 · Chancen automatisch neu berechnen bei Änderung des Location-Standorts `[ ]`
+### US-121 · Chancen automatisch neu berechnen bei Änderung des Location-Standorts `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
+| **Ergebnis** | Als Dublette geschlossen — kein Code geändert. Automatische Neuberechnung bei Standort-Änderung existiert bereits vollständig (TASK-12 + US-106), siehe Spec unten. |
 
 **Beschreibung:** Als Fotograf möchte ich, dass alle Foto-Chancen automatisch neu berechnet werden, wenn der Standort des Motivs oder Fotografen einer bestehenden Location geändert wird, damit die Chancen nie auf veralteten Koordinaten basieren.
 
@@ -4302,14 +4304,54 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-122 · Sonnen-Alignment als eigenständige Chance in Feed, Kalender und Scout `[ ]`
+#### 📋 Spec (Analyse-Phase, 2026-07-04)
+
+**Code-Befund vorab (bestimmt den gesamten Rest der Analyse):**
+Die Code-Recherche zeigt eindeutig: **Die automatische Neuberechnung bei Standort-Änderung existiert bereits vollständig — für beide im Ticket genannten Fälle.** Dieses Ticket beschreibt keine Lücke, sondern eine **vollständige Dublette** von bereits ausgeliefertem, funktionierendem Code (TASK-12, v1.4.2, + US-106, v1.19.5). Belege:
+
+- `backend/main.py`, PATCH-Route für eine Location (Zeile 2169 ff.): Die Liste der Felder, bei deren Änderung automatisch neu gerechnet wird, umfasst ausdrücklich **beide** Standort-Arten — die Koordinaten des Fotografen-Standpunkts (`observer_lat`, `observer_lon`) **und** die Koordinaten des Motivs (`subject_lat`, `subject_lon`). Es gibt keine Unterscheidung, bei der nur einer der beiden Punkte einen Neustart auslöst — beide tun es, einzeln wie gemeinsam geändert.
+- Direkt nach dem Speichern der Änderung wird — sofern eine der vier Koordinaten (oder Höhenkorrektur/Brennweiten-Empfehlung) betroffen ist — automatisch und ohne weiteres Zutun eine Neuberechnung genau für diese eine Location angestoßen (kein Warten auf den nächsten großen Nachtlauf).
+- Es gibt **keinen zweiten Bearbeitungsweg** für bestehende Locations im Backend außer dieser einen Route — alle Änderungen an Koordinaten einer bestehenden Location laufen über denselben Codepfad, es existiert kein Nebenpfad, der den Trigger umgeht.
+- Sichtbare Nutzer-Rückmeldung ist bereits vorhanden: Die betroffene Location wird sofort in eine „wird noch aktualisiert"-Merkliste aufgenommen, die das Frontend abfragt und daraus ein Banner anzeigt. Laut der US-106-Spec (siehe dort, bereits umgesetzt) bleibt dieses Banner ehrlich stehen, bis Chancen, Kalender **und** Wetter für die Location wirklich fertig sind — es verschwindet nicht vorzeitig bei einem Platzhalterwert.
+- Zusätzlich sorgt US-106 dafür, dass auch der Entdecken-Bereich zeitnah nachzieht und dass eine Änderung während eines laufenden großen Hintergrundlaufs nicht verloren geht, sondern automatisch nachgeholt wird.
+
+**Beantwortung der beiden Klärungsfragen aus dem Ticket:**
+- **(a)** Ja — die automatische Neuberechnung bei Standort-Änderung passiert bereits vollständig, für Fotografen-Standort **und** Motiv-Standort, über den einzigen vorhandenen Bearbeitungsweg, inklusive sichtbarem Hinweis („wird noch aktualisiert") bis alles wirklich fertig ist. Es wurde kein Rest-Fall gefunden, der nicht abgedeckt wäre.
+- **(b)** Entfällt — da keine Lücke besteht, stellt sich die Entscheidungsfrage „Button vs. automatisch mit Toast" nicht. Der bereits gebaute Weg ist ohnehin die zweite genannte Variante (automatisch bei jeder Änderung, mit Hinweis statt Button).
+
+**Empfehlung:** Ticket als Dublette schließen, kein Code ändern. Die untenstehenden Akzeptanzkriterien dienen als **Verifikations-AKs** — ein kurzer Live-Test durch Stephan bestätigt, dass das beschriebene Verhalten tatsächlich so funktioniert, bevor das Ticket auf Done gesetzt wird.
+
+**Akzeptanzkriterien (Verifikation, kein Bau-Auftrag):**
+- [ ] Wird bei einer bestehenden Location der Standpunkt des Fotografen verschoben, erscheint kurz danach ein Hinweis, dass diese Location gerade aktualisiert wird — ohne dass Stephan etwas zusätzlich anstoßen muss.
+- [ ] Wird stattdessen (oder zusätzlich) der Standort des Motivs verschoben, passiert dasselbe: automatischer Hinweis, automatische Neuberechnung, kein Unterschied im Verhalten gegenüber einer Fotografen-Standort-Änderung.
+- [ ] Nach Abschluss der Aktualisierung verschwindet der Hinweis, und die Foto-Chancen dieser Location zeigen Werte, die zu den neuen Koordinaten passen (nicht mehr die alten).
+- [ ] Edge: Werden Fotografen- und Motiv-Standort in einem Zug geändert, läuft nur eine Aktualisierung für diese Location an (kein doppelter/überflüssiger Lauf).
+- [ ] Edge: Ändert Stephan eine Location, während gerade eine große nächtliche Aktualisierung läuft, bleibt der Hinweis stehen und seine Änderung wird automatisch nachgeholt, sobald der große Lauf fertig ist (bereits durch US-106 abgedeckt).
+
+**Analyse & Planung:**
+- [x] Example Mapping: entfällt — keine neue Funktionalität, siehe Code-Befund oben.
+- [x] Pre-Mortem: entfällt aus demselben Grund.
+- [x] Architektur analysiert: `backend/main.py` (PATCH-Route für Locations, Zeilen ~2169–2242), Bezug zu TASK-12- und US-106-Spec (BACKLOG.md, US-106-Abschnitt).
+- [x] Designer-Check: nicht visuell (kein neues UI-Element, bestehendes Banner wird nur bestätigt) → übersprungen.
+- [x] Implementierungsoptionen: entfällt — kein Bau-Auftrag.
+- [x] Empfehlung: Als Dublette schließen nach Stephans Live-Test-Bestätigung.
+
+**Testplan:**
+- [ ] Manuell (unter http://localhost:8000 bzw. live): Bei einer bestehenden Location einmal nur den Fotografen-Standort und einmal nur den Motiv-Standort ändern, jeweils prüfen ob der „wird aktualisiert"-Hinweis erscheint und nach Abschluss wieder verschwindet, und ob die neuen Chancen zu den neuen Koordinaten passen.
+- [ ] Kein neuer automatisierter Test nötig — bestehende Tests zu TASK-12/US-106 (`backend/tests/test_us106.py`) decken den Mechanismus bereits ab.
+
+---
+
+### US-122 · Sonnen-Alignment als eigenständige Chance in Feed, Kalender und Scout `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
+| **Ergebnis** | Als Dublette geschlossen — kein Code geändert. Sonnen-Alignment existiert bereits vollständig (Backend, Feed, Kalender, Scout, Filter-UI), siehe Spec unten. |
 
 **Beschreibung:** Als Fotograf möchte ich Sonnen-Alignment als eigenständige Chance im 14-Tage-Feed, im Kalender und bei den Scouts sehen — nach derselben Logik wie das bestehende Mond-Alignment, nur zur goldenen Stunde (blaue Stunde entfällt, da die Sonne dann nicht sichtbar ist) — mit Filterkriterien analog zu den bestehenden Mond-Filtern (Drei-Zustand: aktivieren/ausschließen/neutral).
 
@@ -4317,18 +4359,246 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-123 · Kartenansicht: Standardansicht (Straßenkarte) als Alternative zur Satellitenansicht `[ ]`
+#### 📋 Spec (Analyse-Phase, 2026-07-04)
+
+**Code-Befund vorab (bestimmt den gesamten Rest der Analyse):**
+Die Code-Recherche zeigt eindeutig: **`SUN_ALIGNMENT` ist bereits vollständig als eigenständige Chance implementiert — identisch zu `MOON_ALIGNMENT` — in Backend-Erzeugung, Feed, Kalender, Scout UND Filter-UI.** Dieses Ticket beschreibt keine Lücke, sondern eine **vollständige Dublette** von bereits ausgeliefertem, funktionierendem Code. Belege:
+- `backend/calculations/opportunity.py` Zeile 45/46: `SUN_ALIGNMENT` und `MOON_ALIGNMENT` sind gleichrangige Werte im `EventType`-Enum.
+- Zeile 504–616: Die 3D-Präzisions-Alignment-Schleife berechnet Sonne UND Mond nach identischer Logik (`for body_key, body_label, event_type_val, is_solar in [("sun", …, EventType.SUN_ALIGNMENT, True), ("moon", …, EventType.MOON_ALIGNMENT, False)]`), inklusive Sonnen-spezifischem Altitude-Filter (Zeile 522: „nicht zu hoch, sonst kein dramatisches Licht" — faktisch golden-hour-artige Einschränkung) und explizitem ND-Filter-Warnhinweis für Sonne.
+- Zeile 618–653: Fallback-Pfad ohne 3D-Gebäudedaten erzeugt `SUN_ALIGNMENT` weiterhin eigenständig über `find_sun_alignment_times()`.
+- Beide Pfade filtern bereits über `_in_photo_window(…, sun)` auf goldene/blaue Stunde — für die Sonne ist blaue Stunde durch den Altitude-Gate (`0 < sun_pos.altitude < 15` bzw. `celestial_altitude > 20` → verworfen) faktisch ausgeschlossen, weil die Sonne in der blauen Stunde bereits unter dem Horizont steht. Die im Ticket geforderte Einschränkung „nur goldene Stunde, keine blaue Stunde" ist also bereits Ist-Verhalten, nicht zu bauen.
+- `backend/discover/sun_pipeline.py` (gesamte Datei, referenziert als „US-81"): eigenständige, zu `moon_pipeline.py` parallele Scout-Pipeline für Sonnen-Alignment-Chancen, inkl. eigener Gauß-Score-Kurve, eigenem Altitude-Gate (`SUN_ALT_MIN_DEG = 0.5`) und eigener Brennweitenberechnung. `backend/discover/pipeline.py` Zeile 39–41 führt `moon_pipeline.run()` und `sun_pipeline.run()` per `asyncio.gather` parallel aus und mischt beide Ergebnislisten für den Scout-Cache.
+- `backend/precompute.py` Zeile 833–839 (Kalender) und Zeile 988–990 (Feed) rufen beide `find_opportunities(...)` bzw. `find_opportunities_multi_day(...)` auf — denselben Generator, der oben `SUN_ALIGNMENT` erzeugt. `astronomy_only=True` schaltet nur die Wetter-Bewertung ab (opportunity.py Zeile 337), nicht die Event-Typ-Erzeugung. Der Qualitätsfilter `_passes_alignment_filter()` (precompute.py Zeile 99–121) prüft Azimut-/Höhentoleranz generisch für alle Alignment-Typen, ohne `SUN_ALIGNMENT` auszunehmen oder zu benachteiligen.
+- `web/index.html` Zeile 1424: eigenes Icon `i-sun` für `Sonnen-Alignment` (analog Zeile 1423 `i-moon` für `Mond-Alignment`).
+- `web/index.html` Zeile 2807–2822 (`FilterSheet._ET`): `Sonnen-Alignment` ist bereits ein eigener Eintrag in derselben Chip-Liste wie `Mond-Alignment` — diese Liste speist Feed-, Kalender- und Scout-Filter gemeinsam (generischer `event_type`-String-Vergleich in `Filter.apply()`, Zeile 2608–2623).
+- `web/index.html` Zeile 2745–2752: Das **Drei-Zustand-Filterpattern** (aktiv/ausgeschlossen/neutral) ist für `Sonnen-Alignment` bereits identisch zu `Mond-Alignment` verdrahtet — sowohl `eventTypes`-Include- als auch `eventTypesExcl`-Exclude-Set (US-71) behandeln beide Alignment-Typen gleich, es gibt keinen separaten `sunAlignmentIncl[]`/`sunAlignmentExcl[]`-State (anders als beim Verifikationsfilter) — die Drei-Zustand-Logik läuft generisch über den `event_type`-String, das bestehende `verificationIncl[]`/`verificationExcl[]`-Pattern ist hier nicht das relevante Vorbild, sondern das bereits aktive generische `eventTypes`/`eventTypesExcl`-Array.
+- `BACKLOG.md` Zeile 6468 (US-108-Spec, Done, released 2026-06-30): listet `SUN_ALIGNMENT` explizit als bereits bestehenden, von US-108 unberührten Event-Typ neben `MOON_ALIGNMENT` — bestätigt unabhängig vom jetzt gelesenen Code, dass die Backlog-Historie korrekt war.
+
+**Einordnung der beiden im Ticket erwähnten Altsysteme:**
+- **US-107** (Done, 2026-06-29) ist unabhängig davon: Richtungsklassifizierungs-Text im Location-/Event-Detail („Sonne geht fast genau hinter dem Motiv auf"). Das ist reine Text-Anreicherung eines bereits geöffneten Details, keine Feed-/Kalender-/Scout-Kartendarstellung — deckt sich nicht mit dem, was dieses Ticket fordert, aber ist auch keine Lücke, weil die Kartendarstellung bereits an anderer Stelle existiert (siehe oben).
+- **US-108** (Done, 2026-06-30) filtert nur `MOON_RISE`/`MOON_SET` nach Azimut-Zonen und erwähnt `SUN_ALIGNMENT` nur beiläufig als unverändert — bestätigt aber dessen Existenz.
+
+**Example Mapping**
+
+Da der Code-Befund zeigt, dass die geforderte Funktionalität bereits vollständig existiert, entfällt ein reguläres Example Mapping für neue Regeln. Stattdessen wird die Ticket-Beschreibung Punkt für Punkt gegen das Ist-Verhalten gespiegelt:
+
+- **Rule 1 — Sonnen-Alignment als eigenständige Chance im 14-Tage-Feed:** ✅ bereits erfüllt. Der Feed (`/opportunities`, gespeist über `find_opportunities_multi_day`) enthält `SUN_ALIGNMENT`-Events mit eigenem Titel, eigener Beschreibung und eigenem `event_type`-Feld — nicht in „Goldene Stunde" verschmolzen.
+  - Beispiel: Fotograf öffnet den 14-Tage-Feed, aktiviert im Filter „Sonnen-Alignment" → sieht Karten mit Titel „Sonne [Ausrichtung] – [Motivname]" und Sonnen-Icon, getrennt von Goldene-Stunde-Karten.
+- **Rule 2 — Sonnen-Alignment im Kalender:** ✅ bereits erfüllt. Derselbe Berechnungspfad speist den Jahreskalender (`compute_calendar_incremental` → `find_opportunities(astronomy_only=True)`).
+  - Beispiel: Fotograf blättert im Kalender zu einem Tag mit Sonnen-Alignment-Chance an einer 3D-vermessenen Location → Kalendertag zeigt einen Sonnen-Alignment-Eintrag mit Sonnen-Icon.
+- **Rule 3 — Sonnen-Alignment bei den Scouts:** ✅ bereits erfüllt. `sun_pipeline.py` läuft parallel zu `moon_pipeline.py` und liefert eigene Scout-Chancen für die Sonne.
+  - Beispiel: Fotograf öffnet den Scout-Tab, filtert auf „Sonne" als Himmelskörper → sieht Sonnen-Alignment-Vorschläge mit Brennweitenempfehlung, unabhängig von Mond-Vorschlägen.
+- **Rule 4 — Nur goldene Stunde, keine blaue Stunde:** ✅ bereits erfüllt, allerdings nicht durch eine explizite Ausschlussregel, sondern als Konsequenz der Astronomie: Der Altitude-Gate für Sonnen-Alignment (Sonne muss über dem Horizont, aber nicht zu hoch stehen) greift nur während der goldenen Stunde; zur blauen Stunde steht die Sonne bereits unter dem Horizont und erzeugt keine Alignment-Treffer.
+  - Beispiel: Fotograf sucht im Feed nach Sonnen-Alignment-Chancen während der blauen Stunde → findet keine, weil die Sonne dann nicht sichtbar ist (physikalisch ausgeschlossen, nicht durch einen Software-Filter).
+- **Rule 5 — Filterkriterien im Drei-Zustand analog zu Mond:** ✅ bereits erfüllt. „Sonnen-Alignment" ist ein Chip in derselben Filterliste wie „Mond-Alignment" mit identischem Include-/Exclude-/Neutral-Verhalten (kein Sonderfall, keine Einschränkung gegenüber Mond).
+  - Beispiel: Fotograf tippt zweimal auf den „Sonnen-Alignment"-Chip → Zustand wechselt von neutral → aktiv → ausgeschlossen, exakt wie beim „Mond-Alignment"-Chip.
+
+Keine offenen ❓ Questions zum Soll-Verhalten — der einzige Klärungsbedarf ist die Konsequenz aus dem Befund (siehe „Empfehlung" unten).
+
+**Akzeptanzkriterien**
+
+Da keine neue Funktionalität fehlt, sind dies **Verifikations-AKs** (Regressionstest gegen den bestehenden Stand), keine Bau-AKs:
+
+- [ ] AK1: Im 14-Tage-Feed erscheinen bei mindestens einer 3D-vermessenen Location eigene Sonnen-Alignment-Karten mit Sonnen-Icon, getrennt von Goldene-Stunde-Karten.
+- [ ] AK2: Im Jahreskalender erscheint an einem Tag mit passender Geometrie ein Sonnen-Alignment-Eintrag mit Sonnen-Icon.
+- [ ] AK3: Im Scout-Tab erscheinen bei Filterung auf „Sonne" eigenständige Sonnen-Alignment-Vorschläge, unabhängig von Mond-Vorschlägen.
+- [ ] AK4: Der Filter-Chip „Sonnen-Alignment" existiert in Feed, Kalender und Scout und verhält sich im Drei-Zustand (aktiv/ausgeschlossen/neutral) identisch zum „Mond-Alignment"-Chip.
+- [ ] Edge Case: Wird „Sonnen-Alignment" ausgeschlossen (Exclude-Zustand), verschwinden alle Sonnen-Alignment-Karten aus Feed/Kalender/Scout, während Mond-Alignment-Karten unverändert sichtbar bleiben.
+- [ ] Edge Case: Für die blaue Stunde erscheint nie eine Sonnen-Alignment-Karte (weder im Feed noch im Kalender noch im Scout), weil die Sonne dann nicht über dem Horizont steht.
+
+**Pre-Mortem (Code-gestützt)**
+
+📎 Code-Verifikation: `backend/calculations/opportunity.py`, `backend/discover/sun_pipeline.py`, `backend/discover/pipeline.py`, `backend/precompute.py`, `web/index.html` (Zeilen wie oben zitiert) gelesen am 2026-07-04. Bestätigt: `SUN_ALIGNMENT` ist in allen drei Einstiegspunkten (Feed, Kalender, Scout) bereits aktiv und im Frontend-Filter identisch zu `MOON_ALIGNMENT` verdrahtet. Widerlegt: die Ticket-Prämisse „Sonnen-Alignment fehlt als eigenständige Chance" — dieser Zustand existiert nicht, das Feature ist bereits im Live-Code (zuletzt laut BACKLOG-Historie über US-107/US-108, jeweils Done, released 2026-06-29/2026-06-30).
+
+1. 💀 Szenario: Ticket wird trotz Dublette wie beschrieben „umgesetzt" — ein Subagent baut versehentlich einen zweiten, parallelen `SUN_ALIGNMENT`-Erzeugungspfad (z. B. weil er den bestehenden `sun_pipeline.py`/`opportunity.py`-Code nicht findet oder für unvollständig hält).
+   Auslöser: Keine Code-Verifikation vor Implementierungsstart, Vertrauen auf den Ticket-Text statt auf den Code.
+   Frühwarnung: Doppelte Sonnen-Alignment-Karten für dieselbe Location/Zeit im Feed, doppelte Einträge im Scout-Cache mit leicht unterschiedlichem Scoring.
+   Gegenmaßnahme: Dieses Ticket wird NICHT implementiert, sondern mit dem Befund an Stephan zurückgespielt (siehe Empfehlung).
+2. 💀 Szenario: Stephan bestätigt versehentlich eine „Implementierung", die in Wahrheit nur bestehenden Code geringfügig umbenennt oder dupliziert, wodurch zwei leicht unterschiedliche Codepfade für dasselbe Konzept entstehen (Wartungslast, Divergenzrisiko bei künftigen Bugfixes).
+   Auslöser: Weg-Gate wird ohne den vollständigen Code-Befund gestellt.
+   Frühwarnung: `grep -rn "SUN_ALIGNMENT"` liefert nach einer „Implementierung" mehr als die aktuell vier Fundstellen-Cluster (opportunity.py, sun_pipeline.py, discover/pipeline.py, index.html).
+   Gegenmaßnahme: Diese Spec macht den Befund explizit und schlägt vor, das Ticket zu schließen statt zu implementieren.
+3. 💀 Szenario: Stephan hat bei Freigabe des Tickets ein *tatsächliches* Verhaltensproblem im Kopf gehabt (z. B. „Sonnen-Alignment-Karten sehen im Feed uninteressant/unauffällig aus" oder „ich sehe sie in der Praxis nie"), das der Ticket-Text unpräzise als „fehlt komplett" beschrieben hat — die Dublette wäre dann nur ein Formulierungsproblem, nicht die eigentliche Anforderung.
+   Auslöser: Ticket wurde vor Analyse nicht gegen den Live-Zustand der App geprüft (nur gegen Backlog-Text).
+   Frühwarnung: Manuelles Nachschauen im Feed/Kalender/Scout zeigt evtl., dass Sonnen-Alignment-Karten zwar technisch erzeugt werden, aber selten/nie auftreten (z. B. weil kaum Locations 3D-Gebäudedaten haben und der Fallback-Pfad selten `min_score` erreicht) — das wäre dann ein Datenabdeckungs- oder Sichtbarkeitsproblem, kein fehlendes Feature.
+   Gegenmaßnahme: Als offene Klärungsfrage an Stephan zurückspielen (siehe unten) statt den Code-Befund unkommentiert als alleinige Antwort zu präsentieren.
+
+**Architektur-Analyse (intern, technische Namen erlaubt)**
+
+Bereits bestehende, vollständige Implementierung von `SUN_ALIGNMENT` (kein Neubau nötig):
+- `backend/calculations/opportunity.py` — `EventType.SUN_ALIGNMENT` (Zeile 45), 3D-Alignment-Schleife (Zeile 504–616, körper-generisch für Sonne+Mond), Fallback-Azimut-Pfad (Zeile 618–653, `find_sun_alignment_times`).
+- `backend/calculations/astronomy.py` — `find_sun_alignment_times()`, `find_precise_alignment_times()` (körper-generisch, `body="sun"`/`"moon"`), `calculate_sun_info()` liefert golden/blue-hour-Fenster.
+- `backend/discover/sun_pipeline.py` — komplette eigenständige Scout-Pipeline für Sonne (Gauß-Score, Altitude-Gate, Brennweitenberechnung), analog `moon_pipeline.py`.
+- `backend/discover/pipeline.py` Zeile 39–62 — führt `moon_pipeline.run()` und `sun_pipeline.run()` parallel aus, mischt Ergebnisse in den Scout-Cache.
+- `backend/precompute.py` Zeile 783–850 (`_compute_calendar_for_location`) und Zeile 983–1000 (`_run_single_location_recompute` Feed-Teil) — rufen den gemeinsamen Generator auf, der `SUN_ALIGNMENT` bereits liefert; `_passes_alignment_filter()` (Zeile 99–121) behandelt alle Alignment-Typen gleich.
+- `web/index.html` — Icon-Mapping Zeile 1420–1429 (`i-sun` für „Sonnen-Alignment"), Filter-Chip-Liste `FilterSheet._ET` Zeile 2807–2822, generische Drei-Zustand-Filterlogik `Filter.apply()`/`applyToScout()` Zeile 2608–2780 (arbeitet auf `event_type`-Strings, kein Sonderfall nötig).
+
+Kein neuer Code, keine neuen Dateien, keine neuen Funktionen identifiziert, die für die im Ticket beschriebene Funktionalität fehlen würden.
+
+**Implementierungsoptionen**
+
+*Option A — Ticket als Dublette schließen, kein Code ändern*
+In Alltagssprache: Die App zeigt Sonnen-Alignment bereits heute als eigenständige Chance im Feed, Kalender und bei den Scouts, mit eigenem Icon und eigenem Drei-Zustand-Filter — Stephan kann das im laufenden Betrieb direkt nachprüfen. Es gibt nichts zu bauen.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | Keine Codeänderung. Ticket-Status auf „Done" bzw. „Verworfen (Dublette)" mit Verweis auf US-107/US-108/US-81 (Scout-Sonnenpipeline) |
+| Aufwand | Keiner |
+| Risiko | Keines — es wird nichts angefasst |
+
+*Option B — Gezielte Prüfung + kleine Sichtbarkeits-/Qualitätsverbesserung, falls sich Rule/AK gegen den Live-Zustand als unzureichend erweist*
+In Alltagssprache: Stephan schaut sich im laufenden Betrieb aktiv im Feed/Kalender/Scout um, ob Sonnen-Alignment-Karten tatsächlich auftauchen. Falls sie technisch zwar existieren, aber in der Praxis kaum sichtbar sind (z. B. weil zu wenige Locations 3D-Gebäudedaten für den präzisen Pfad haben), wird das als neues, eng abgegrenztes Ticket (z. B. „Sonnen-Alignment-Sichtbarkeit erhöhen") separat behandelt — nicht als Neuimplementierung von US-122.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | Manuelle Stichprobe (Feed/Kalender/Scout-Tab, Filter „Sonnen-Alignment" aktivieren) vor endgültiger Entscheidung |
+| Aufwand | Sehr klein (Live-Check, keine Implementierung in diesem Schritt) |
+| Risiko | Keines für den bestehenden Code; verhindert vorschnelles Schließen falls doch ein reales Sichtbarkeitsproblem vorliegt |
+
+**Empfehlung:** Option A, ergänzt um den Live-Check aus Option B als letzten Schritt vor dem Schließen. Der Code-Befund ist eindeutig und mehrfach belegt (Backend-Enum, zwei unabhängige Erzeugungspfade, eigene Scout-Pipeline, Frontend-Icon, Frontend-Filter-Chip, Drei-Zustand-Logik) — eine Implementierung würde bestehenden, funktionierenden Code duplizieren (Pre-Mortem Szenario 1/2). Vor dem endgültigen Schließen empfiehlt sich aber ein kurzer Live-Blick in Feed/Kalender/Scout, um Pre-Mortem-Szenario 3 auszuschließen (Sichtbarkeits- statt Existenzproblem).
+
+**Offene Klärungsfrage an Stephan (statt Weg-Gate):**
+- ❓ Meintest du mit diesem Ticket wirklich, dass Sonnen-Alignment als Konzept komplett fehlt — oder ist dir beim Nutzen der App aufgefallen, dass die bestehenden Sonnen-Alignment-Karten selten/nie auftauchen bzw. sich anders verhalten als erwartet (z. B. seltener als Mond-Alignment, obwohl beide dieselbe Logik nutzen sollten)? Falls Letzteres: bitte kurz beschreiben, wo/wann du das beobachtet hast — dann wird daraus ein neues, präzises Ticket statt einer Neuimplementierung von bereits vorhandenem Code.
+
+**Testplan-Grundgerüst**
+
+- Manuell: Feed-Tab öffnen, Filter „Sonnen-Alignment" aktivieren → mindestens eine Karte mit Sonnen-Icon sichtbar (bei ausreichend Zeitraum/Locations mit 3D-Daten).
+- Manuell: Kalender-Tab, Monat mit bekannter Sonnen-Alignment-Chance öffnen → Eintrag mit Sonnen-Icon sichtbar.
+- Manuell: Scout-Tab, Körper-Filter auf „Sonne" stellen → eigenständige Sonnen-Vorschläge sichtbar, unabhängig von Mond.
+- Manuell: „Sonnen-Alignment"-Chip zweimal antippen (aktiv → ausgeschlossen) → Sonnen-Karten verschwinden aus Feed/Kalender/Scout, Mond-Karten bleiben unverändert.
+- pytest: Kein neuer Testfall nötig, da keine neue Funktionalität entsteht; bestehende Tests (`backend/tests/test_moon_phase_events.py` als Vorbild) könnten um einen analogen `test_sun_alignment_events.py`-Smoke-Test ergänzt werden, falls noch keine Regressionsabdeckung für `SUN_ALIGNMENT` existiert — das wäre optional und nur bei Bedarf, kein Bestandteil dieses Tickets.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (als Ist-Zustand-Abgleich, da keine neuen Regeln nötig)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/calculations/opportunity.py`, `backend/calculations/astronomy.py`, `backend/discover/sun_pipeline.py`, `backend/discover/pipeline.py`, `backend/precompute.py`, `web/index.html`
+- [x] Designer-Check: nicht visuell neu (kein neues Element, bestehendes Icon/Chip) → übersprungen
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A (Ticket als Dublette schließen, kein Code ändern) + kurzer Live-Check vor endgültigem Schließen
+
+---
+
+### US-123 · Kartenansicht: Standardansicht (Straßenkarte) als Alternative zur Satellitenansicht `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Host möchte ich bei Neuanlage/Bearbeiten einer Location neben der Satellitenansicht auch eine Standardansicht (Straßenkarte) wählen können, mit Umschaltmöglichkeit zwischen beiden, damit ich je nach Situation die besser lesbare Kartendarstellung nutzen kann.
 
 **Bezug:** Die Bearbeiten-Karte nutzt laut Backlog-Referenzen aktuell fix einen Satelliten-Layer (`CameraFOV.initMap()` verwendet `arcgisonline` fix). Der allgemeine Karten-Tab hat laut PRODUCT.md-Regressionshinweis (Zeile „Layer-Umschaltung Nacht/Standard/Satellit") bereits eine Layer-Umschaltung — diese Umschaltmöglichkeit scheint aber nicht für die Location-Anlage-/Bearbeiten-Karte selbst zu gelten, nur für den normalen Karten-Tab. Keine Dublette gefunden; Abgrenzung zu klären: ob die bestehende Karten-Tab-Layer-Umschaltung einfach auf die Bearbeiten-Karte übertragen werden kann (dann kleiner Aufwand) oder ob dort eine eigene Lösung nötig ist.
+
+---
+
+#### 📋 Spec (Analyse-Phase, 2026-07-04)
+
+**Example Mapping**
+
+- **Rule 1 — Umschalten in der Bearbeiten-Karte:** Beim Anlegen oder Bearbeiten einer Location kann der Host zwischen Satelliten- und Straßenkartenansicht wechseln.
+  - Beispiel: Host öffnet „Neue Location", tippt auf den Umschalt-Button über der Karte → Ansicht wechselt sofort von Satellitenbild zu Straßenkarte (Pins, Sichtachse und alle bereits gesetzten Punkte bleiben unverändert sichtbar).
+  - Beispiel: Host bearbeitet eine bestehende Location, wechselt auf Straßenkarte, verschiebt den Beobachter-Pin → Pin bleibt an der neuen Position, nur der Kartenhintergrund hat sich geändert.
+- **Rule 2 — Konsistenz zwischen kleiner Karte und Vollbild-Karte derselben Sektion:** Wenn eine Sektion sowohl eine kleine Vorschau-Karte als auch eine dazugehörige Vollbild-Karte hat (z. B. Blickwinkel-Kegel-Vorschau + deren Vollbildansicht, oder Bearbeiten-Mini-Karte + deren Vollbildansicht), zeigen beide denselben Kartentyp.
+  - Beispiel: Host schaltet in der kleinen Kegel-Vorschau auf Straßenkarte, öffnet danach die Vollbildansicht derselben Karte → Vollbild zeigt ebenfalls Straßenkarte, nicht wieder Satellit.
+  - ❓ Noch zu klären: Soll die Wahl auch über verschiedene Sektionen hinweg gelten (z. B. Anlegen-Karte UND Bearbeiten-Karte UND Kegel-Vorschau alle gemeinsam), oder darf jede Sektion ihren eigenen zuletzt gewählten Stand haben? (siehe Pre-Mortem/Optionen unten)
+- **Rule 3 — Merken der Wahl:** Die zuletzt gewählte Ansicht (Satellit oder Straßenkarte) bleibt auch nach Schließen und erneutem Öffnen der Bearbeiten-Karte erhalten, statt bei jedem Öffnen wieder auf Satellit zurückzuspringen.
+  - Beispiel: Host stellt auf Straßenkarte um, schließt das Formular, öffnet später eine andere Location zum Bearbeiten → Karte startet direkt in Straßenkarten-Ansicht.
+  - ❓ Noch zu klären: Soll sich diese Voreinstellung nur auf das jeweilige Gerät beziehen (lokal gespeichert) oder geräteübergreifend gelten? Code-Befund: der bestehende Karten-Tab merkt sich die Wahl aktuell überhaupt nicht (siehe Pre-Mortem Szenario 2) — das ist eine zusätzliche Verbesserung, kein Bestandsverhalten, das einfach übernommen werden kann.
+- **Rule 4 — Abgrenzung zur bestehenden Karten-Tab-Umschaltung:** Die Umschaltung im normalen Karten-Tab bleibt unverändert bestehen; das Ticket betrifft ausschließlich die Karte(n) rund um Location-Anlage/-Bearbeitung.
+  - Beispiel: Host wechselt im normalen Karten-Tab auf „Nacht"-Ansicht, öffnet danach „Neue Location" → die Location-Karte zeigt weiterhin ihre eigene zuletzt gewählte Ansicht (Satellit oder Straßenkarte), nicht die Nachtansicht — „Nacht" ist für die Location-Karten kein vorgesehener Modus (nur Satellit/Straßenkarte laut Ticket-Wortlaut).
+
+**Akzeptanzkriterien**
+
+- AK1: In der Karte beim Anlegen einer neuen Location gibt es einen sichtbaren Umschalter zwischen Satelliten- und Straßenkartenansicht.
+- AK2: In der Karte beim Bearbeiten einer bestehenden Location gibt es denselben Umschalter.
+- AK3: Ein Tippen auf den Umschalter wechselt die Kartenansicht sofort, ohne dass gesetzte Pins, Linien oder der Kartenausschnitt (Zoom/Position) verloren gehen.
+- AK4: Falls zu einer Karte eine Vollbildansicht existiert (z. B. Blickwinkel-Kegel-Karte, Bearbeiten-Vollbildkarte): die Vollbildansicht zeigt denselben Ansichtsmodus wie die zugehörige kleine Karte, nicht wieder standardmäßig Satellit.
+- AK5: Die zuletzt gewählte Ansicht bleibt erhalten, wenn der Host das Formular schließt und später erneut eine Location anlegt oder bearbeitet (auf demselben Gerät).
+- AK6: Der normale Karten-Tab (Nacht/Standard/Satellit) verhält sich exakt wie bisher — keine Regression durch diese Änderung.
+- AK7: ❓ Noch zu klären mit Stephan: Gilt AK5 (Merken) je Kartentyp einzeln (Anlegen-Karte, Bearbeiten-Karte, Kegel-Vorschau jeweils eigener Stand) oder als eine gemeinsame App-weite Einstellung für alle Location-bezogenen Karten? Empfehlung unten unter Option A/B.
+
+**Pre-Mortem (Code-gestützt)**
+
+1. **Vier bis fünf unabhängige Karten-Instanzen, nicht eine gemeinsame:** `CameraFOV.initMap()` (Panel, Zeile 3612–3625) und `CameraFOV._initMapFs()` (Vollbild, Zeile 3725–3741) sowie `AddLocation.initMap()` (Zeile 5737–5759), `LocationDetail._initEditMap()` (Zeile 5271–5299) und `LocationDetail._initEditMapFs()` (Zeile 5335–5353) haben JEDES für sich einen eigenen, wortgleich hartcodierten Aufruf `L.tileLayer('https://server.arcgisonline.com/.../World_Imagery/...')`. Es gibt **keine** gemeinsame Helper-Funktion für die Layer-Wahl (anders als z. B. `MapMarkers` oder `_drawPinsAndLine`, die bereits geteilt sind). Auslöser: naive Umsetzung ändert nur eine Stelle und vergisst die anderen vier. Frühwarnung: Test nur an einer Karte (z. B. nur Anlegen-Karte), Vollbild oder Bearbeiten-Karte bleiben unbemerkt beim alten Satelliten-Layer. Gegenmaßnahme: gemeinsame Helper-Funktion/-Konstante für die Layer-URLs einführen (analog `MapView.layers`) und an allen fünf Stellen einbinden; Testplan muss alle vier/fünf Karten einzeln abdecken.
+2. **Bestehende Karten-Tab-Umschaltung merkt sich nichts:** `MapView.setLayer()` (Zeile 4278–4288) hält den State ausschließlich über die `.active`-CSS-Klasse am Button, es gibt kein `localStorage` oder sonstige Persistenz (Grep nach `localStorage.*Layer` und `mapLayer` ergab keinen Treffer). Auslöser: Team geht davon aus, man könne die bestehende Lösung 1:1 „übertragen" und bekäme Persistenz geschenkt. Frühwarnung: nach Reload/erneutem Öffnen der Location-Karte ist die Wahl wieder auf Satellit, obwohl AK5 das Gegenteil verlangt. Gegenmaßnahme: Persistenz (z. B. lokaler Speicher) ist eine NEUE Ergänzung, kein übernommenes Verhalten — muss explizit mitgeplant und in der Aufwandsschätzung berücksichtigt werden.
+3. **Divergenz zwischen Panel- und Vollbildkarte derselben Sektion:** Die Kegel-Vorschau-Karte und ihre Vollbildvariante werden aus getrennten Funktionen aufgebaut (`initMap` vs. `_initMapFs`; ebenso `_initEditMap` vs. `_initEditMapFs`) und bauen ihre Layer unabhängig auf. Auslöser: Layer-Wahl wird nur an einer der beiden Funktionen geändert. Frühwarnung: Host schaltet in der kleinen Karte auf Straßenkarte, öffnet die Vollbildansicht — die zeigt aber wieder Satellit (Regression zu AK4). Gegenmaßnahme: State (aktueller Modus) muss zentral gehalten und von BEIDEN Init-Funktionen gelesen werden, nicht dupliziert.
+4. **Tile-Filter-Nebenwirkung aus dem Karten-Tab:** `MapView.setLayer()` wendet für den „dark"-Modus einen CSS-Filter auf `.leaflet-tile` an (Zeile 4282–4285: `brightness(.85) saturate(.7)`), zusätzlich existiert eine globale Regel `.leaflet-tile { filter: brightness(.85) saturate(.7); }` (Zeile 266) für alle Karten. Auslöser: Wird beim Bau der Location-Karten-Umschaltung versehentlich derselbe generische Selektor `.leaflet-tile` verwendet, könnte ein Filter-Wechsel ungewollt alle Leaflet-Karten der Seite gleichzeitig beeinflussen (nicht nur die eine Location-Karte), da der Selektor nicht kartenspezifisch ist. Gegenmaßnahme: beim Umsetzen kartenspezifische Selektoren verwenden (z. B. über die Container-ID `#map_fov_${prefix}` statt global `.leaflet-tile`), oder bewusst DOM-Scoping der Query sicherstellen.
+5. **Kein Depot für „welcher Modus ist aktuell aktiv" bei mehrfachem Öffnen/Schließen:** Sowohl `CameraFOV` als auch `AddLocation`/`LocationDetail` bauen ihre Karten bei jedem Öffnen teils komplett neu auf (z. B. `CameraFOV.initMap` zerstört und baut die Instanz neu, Zeile 3618; `_initEditMapFs` prüft dagegen ob schon vorhanden, Zeile 5338–5344 – uneinheitliches Verhalten). Auslöser: der neue Umschalt-State müsste pro Prefix/Instanz sauber mitgeführt werden, sonst „vergisst" die Karte bei jedem Neuaufbau die zuvor gewählte Ansicht, selbst innerhalb derselben Sitzung. Gegenmaßnahme: State pro Location-Formular-Kontext (nicht nur pro Leaflet-Instanz) halten, damit ein Neuaufbau der Karte den zuletzt gewählten Modus wieder anwendet.
+
+**Architektur-Analyse (intern, technische Namen erlaubt)**
+
+Betroffene Karten-Instanzen (jede mit eigenem hartcodiertem `L.tileLayer(arcgisonline...)`-Aufruf):
+- `CameraFOV.initMap(prefix, ...)` — Zeile 3612–3625, Tile-Layer Zeile 3620. Panel-Karte für Blickwinkel-Kegel (bei Location anlegen/bearbeiten UND bei Event-Detail, `ev_fov`/`loc_fov`, Zeile 4123/5147).
+- `CameraFOV._initMapFs(prefix)` — Zeile 3725–3741, Tile-Layer Zeile 3733. Zugehörige Vollbildkarte (US-114).
+- `AddLocation.initMap()` — Zeile 5737–5759, Tile-Layer Zeile 5740. Karte im „Neue Location"-Formular.
+- `LocationDetail._initEditMap()` — Zeile 5271–5299, Tile-Layer Zeile 5275. Mini-Karte im Bearbeiten-Formular einer bestehenden Location.
+- `LocationDetail._initEditMapFs()` — Zeile 5335–5353, Tile-Layer Zeile 5349. Vollbildkarte zur Bearbeiten-Mini-Karte (US-87).
+- (Nicht Teil des Ticket-Scopes, aber gleiches Muster: `AstroLive._init()` Zeile 4887–4891 — Astro-Karte in Event-Detail.)
+
+Bereits vorhandene, wiederverwendbare Layer-Umschaltung (Vorbild, aber NICHT strukturell geteilt):
+- `MapView.layers` — Zeile 4264–4268: Objekt mit drei benannten Tile-URLs (`dark`, `standard`, `satellite`).
+- `MapView.setLayer(name)` — Zeile 4278–4288: entfernt aktuellen `L.tileLayer`, fügt neuen hinzu, aktualisiert `.map-layer-btn.active`-Klasse, wendet bei „dark" einen Tile-Filter an.
+- UI: `#map-layer-toggle` mit drei `.map-layer-btn`-Buttons — Zeile 1007–1010 (HTML), Zeile 267–273 (CSS).
+- **Kein** gemeinsamer State (kein `localStorage`), kein Wiederverwendungs-Hook zwischen `MapView` und den fünf Location-Formular-Karten — diese sind vollständig unabhängiger Code.
+- Bereits vorhandenes Shared-Pattern als Vorbild für sauberen Ansatz: `MapMarkers` (Icon-Helfer) und `CameraFOV._drawPinsAndLine()` (Zeile 3630–3643) sind bewusst als gemeinsame Helfer ausgelagert — genau dieses Muster fehlt für die Layer-Wahl.
+
+**Implementierungsoptionen**
+
+*Option A — Eigener, einfacher Umschalter direkt an den betroffenen Karten (kein Rückgriff auf MapView)*
+In Alltagssprache: Jede Location-bezogene Karte bekommt ihren eigenen kleinen Umschalt-Knopf für Satellit/Straßenkarte, unabhängig vom normalen Karten-Tab. Die Wahl wird direkt für diese Karten gemerkt.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | Neue gemeinsame Helper-Funktion/-Konstante für die zwei Tile-URLs (Straßenkarte + Satellit), an allen fünf Stellen (CameraFOV Panel+FS, AddLocation, LocationDetail Edit+FS) statt der hartcodierten `L.tileLayer(...)`-Zeile eingebunden |
+| Persistenz | Neuer, kleiner State (z. B. eine gemeinsame Variable für „Location-Karten-Modus"), lokal je Gerät gespeichert |
+| Aufwand | Mittel — fünf Stellen anfassen, aber isoliert vom bestehenden Karten-Tab-Code, geringes Regressionsrisiko für den Karten-Tab selbst |
+| Risiko | Gering-mittel, siehe Pre-Mortem 1/3/5 — sauber lösbar durch eine zentrale Helper-Funktion |
+
+*Option B — Bestehende MapView-Layer-Logik erweitern und für die Location-Karten mitnutzen*
+In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab wird technisch so verallgemeinert, dass ihn auch die Location-Formular-Karten mitbenutzen können.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | `MapView.layers`/`setLayer` wird zu einer generischeren, von der konkreten Leaflet-Instanz entkoppelten Funktion umgebaut, die auch von `CameraFOV`/`AddLocation`/`LocationDetail` aufgerufen werden kann |
+| Persistenz | Könnte gleich für den ganzen Karten-Tab mit-verbessert werden (aktuell auch dort nicht gespeichert, Pre-Mortem 2) |
+| Aufwand | Höher — Umbau von bestehendem, produktivem Karten-Tab-Code trifft mehr Stellen als nötig für dieses Ticket |
+| Risiko | Höher — Regressionsgefahr für den unabhängig funktionierenden, bereits stabilen Karten-Tab (AK6); Scope-Creep-Gefahr (Karten-Tab-Persistenz war nicht angefragt) |
+
+**Empfehlung:** Option A. Die Code-Verifikation zeigt klar: Karten-Tab und Location-Formular-Karten sind bereits vollständig getrennter Code ohne gemeinsame Basis. Eine Verallgemeinerung von `MapView` (Option B) würde bestehenden, funktionierenden Code anfassen, den das Ticket gar nicht adressiert, und damit Aufwand sowie Regressionsrisiko unnötig erhöhen (Verstoß gegen „Kein Scope Creep"). Option A hält die Änderung eng am Ticket-Ziel, mit vertretbarem Aufwand (fünf klar identifizierte Stellen) und geringerem Risiko für den bestehenden Karten-Tab.
+
+**Testplan-Grundgerüst**
+
+- Manuell: Neue Location anlegen → Umschalter sichtbar → auf Straßenkarte wechseln → Pins/Ausschnitt bleiben erhalten (AK1, AK3).
+- Manuell: Bestehende Location bearbeiten → Umschalter sichtbar und funktioniert identisch (AK2, AK3).
+- Manuell: Blickwinkel-Kegel-Vorschau auf Straßenkarte umschalten → Vollbildansicht derselben Karte öffnen → zeigt ebenfalls Straßenkarte (AK4).
+- Manuell: Bearbeiten-Mini-Karte auf Straßenkarte umschalten → Vollbildansicht öffnen → zeigt ebenfalls Straßenkarte (AK4).
+- Manuell: Ansicht auf Straßenkarte stellen, Formular schließen, App-Neustart/erneutes Öffnen einer anderen Location → Straßenkarte bleibt aktiv (AK5).
+- Regression: normaler Karten-Tab weiterhin mit Nacht/Standard/Satellit unverändert nutzbar, keine Wechselwirkung mit der neuen Location-Karten-Umschaltung (AK6).
+- pytest: Für dieses Ticket rein clientseitig (HTML/JS), kein Backend-Endpoint betroffen — kein pytest-Fall zu erwarten; falls doch ein Persistenz-Endpoint nötig wird (siehe AK7/Option-Klärung), dort Test für Lesen/Schreiben des gespeicherten Modus ergänzen.
+
+**Entscheidung (Weg-Gate, 2026-07-04, freigegeben von Stephan):**
+- Implementierungsoption: **A** — eigener, schlanker Umschalter direkt an den fünf betroffenen Karten, kein Umbau von `MapView`.
+- AK7 (Merk-Umfang): **eine gemeinsame Einstellung** für alle Location-bezogenen Karten (Anlegen, Bearbeiten, Kegel-Vorschau teilen sich einen Stand — nicht je Kartentyp getrennt).
+- AK5/Rule 3 (Speicherort): **nur lokal auf dem Gerät** (kein geräteübergreifender Sync, kein Server-Endpoint nötig).
+- Status → `Ready for Dev`.
+
+**Umsetzung (Implementierungs-Phase, 2026-07-04):**
+- Neuer gemeinsamer Helper `LocMapMode` in `web/index.html` (vor `CameraFOV`): `TILES` (Satellit = bestehende arcgisonline-URL, Standard = dieselbe OSM-URL wie `MapView.layers.standard`), `get()`/`set()` über `localStorage`, `addTileLayer()`, `toggleHtml()`, `syncAllToggles()`.
+- Persistenz: `localStorage`-Key `fa_loc_map_mode`, Werte `satellite`/`standard`, Default `satellite` (AK5/AK7).
+- Alle fünf Stellen umgestellt: `CameraFOV.initMap`, `CameraFOV._initMapFs`, `AddLocation.initMap` (+ `setLocMapLayer()`), `LocationDetail._initEditMap` (+ `setEditMapLayer()`), `LocationDetail._initEditMapFs`.
+- Neues CSS `.loc-map-mode-toggle`/`.loc-map-mode-btn`, an `.map-layer-btn` angelehnt, eigenständig positioniert (links oben, kollidiert nicht mit Expand-Buttons).
+- `MapView`/normaler Karten-Tab unangetastet verifiziert (AK6).
+- `PRODUCT.md` aktualisiert (Abschnitt Orte-Tab + Changelog-Eintrag US-123).
+- Offener, nicht umgesetzter Vorschlag (kein Scope Creep): Toggle-Buttons könnten je ein kleines Icon bekommen statt nur Text.
+
+**Testfeedback (2026-07-04, Stephan):**
+- 🐛 Der neue Umschalter überlappt bei Neuanlage und Bearbeiten einer Location mit dem Zoom-Menü (+/-), auch beim Zoomen. Umschalter muss weiter nach rechts, damit kein Überlappen mehr entsteht.
+- 🐛 Beschriftung uneinheitlich: Umschalter zeigt „Straße", die übrigen Karten (normaler Karten-Tab) verwenden „Standard" für denselben Modus. Umbenennen für Konsistenz.
+- ✅ Umschalten funktioniert (AK3), restliche Akzeptanzkriterien laut Stephan erfüllt.
+
+**Fixes (2026-07-04):** Umschalter-Position von `top/left` auf `bottom/left` geändert (keine Überlappung mehr mit Zoom-Menü), Label „Straße" → „Standard" (interner Speicherwert unverändert `standard`, kein Migrationsrisiko). Von Stephan erneut getestet: **passt.**
 
 ---
 

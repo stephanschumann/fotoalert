@@ -272,6 +272,19 @@
       font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
     .map-layer-btn.active { background: var(--gold); color: var(--bg); }
 
+    /* US-123: Satellit/Straßenkarte-Umschalter für Location-Formular-Karten
+       (Anlegen/Bearbeiten/Kegel-Vorschau) — eigenständig, orientiert an .map-layer-btn,
+       aber schlanker (2 statt 3 Optionen) und innerhalb des Kartencontainers positioniert.
+       Unten links platziert (statt oben links), da oben links das Leaflet-Zoom-Menü
+       (zoomControl:true, .leaflet-top.leaflet-left) sitzt und oben rechts der
+       Vollbild-Expand-Button (#edit-map-expand-btn / .fov-map-expand-btn). */
+    .loc-map-mode-toggle { position: absolute; bottom: 8px; left: 8px; z-index: 500;
+      display: flex; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; }
+    .loc-map-mode-btn { background: none; border: none; color: var(--muted); font-size: 11px;
+      font-weight: 600; padding: 5px 9px; cursor: pointer; transition: all .15s; }
+    .loc-map-mode-btn.active { background: var(--gold); color: var(--bg); }
+
     /* US-72: Wetter-Toggle */
     #map-weather-toggle { position: absolute; top: 12px; left: 12px; z-index: 1000;
       display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
@@ -1103,6 +1116,7 @@ function ic(id, size, cls){
   </div>
   <div class="add-map-container">
     <div id="add-map"></div>
+    <div id="add-map-mode-toggle"></div>
     <div class="add-map-hint" id="add-map-hint">Modus wählen → dann auf Karte tippen</div>
   </div>
   <div class="map-mode-bar">
@@ -1175,6 +1189,7 @@ function ic(id, size, cls){
   </div>
   <div class="edit-map-fs-container">
     <div id="edit-map-fs"></div>
+    <div id="edit-map-fs-mode-toggle"></div>
   </div>
 </div>
 
@@ -1188,6 +1203,7 @@ function ic(id, size, cls){
   </div>
   <div class="fov-map-fs-container">
     <div id="fov-map-fs"></div>
+    <div id="fov-map-fs-mode-toggle"></div>
   </div>
 </div>
 
@@ -1252,7 +1268,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.19';
+const APP_VERSION = '1.20.20';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3488,6 +3504,59 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
 }
 
 // ═══════════════════════════════════════════════════════
+// US-123 · Satellit/Straßenkarte-Umschalter für Location-Formular-Karten
+// (Anlegen, Bearbeiten, Kegel-Vorschau inkl. Vollbild). Eine gemeinsame
+// Einstellung für alle diese Karten (AK7), nur lokal auf dem Gerät gemerkt
+// (AK5) — bewusst getrennt von MapView/Karten-Tab (AK6, dort NICHT anfassen).
+const LocMapMode = {
+  STORAGE_KEY: 'fa_loc_map_mode',
+  TILES: {
+    // Dieselbe Satellit-URL wie bisher an allen fünf Stellen (unverändert).
+    satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    // Dieselbe Standard-URL wie MapView.layers.standard (Konsistenz, US-123).
+    standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  },
+  get() {
+    const v = localStorage.getItem(this.STORAGE_KEY);
+    return v === 'standard' ? 'standard' : 'satellite'; // Default: Satellit (bisheriges Verhalten)
+  },
+  set(mode) {
+    localStorage.setItem(this.STORAGE_KEY, mode === 'standard' ? 'standard' : 'satellite');
+  },
+  // Erzeugt den Tile-Layer für den aktuell gespeicherten Modus und hängt ihn an die Map.
+  addTileLayer(map) {
+    const mode = this.get();
+    const opts = mode === 'standard' ? { maxZoom: 19, attribution: '© OpenStreetMap' } : { maxZoom: 19 };
+    return L.tileLayer(this.TILES[mode], opts).addTo(map);
+  },
+  // Liefert HTML für den schlanken Umschalter. `callTemplate` ist ein JS-Ausdruck-String
+  // mit Platzhalter %MODE%, der beim Klick anstelle von %MODE% 'satellite'/'standard'
+  // einsetzt, z.B. "CameraFOV.setLocMapLayer('ev', %MODE%)".
+  toggleHtml(callTemplate) {
+    const mode = this.get();
+    const call = m => callTemplate.replace('%MODE%', `'${m}'`);
+    return `<div class="loc-map-mode-toggle">
+      <button type="button" data-mode="satellite" class="loc-map-mode-btn${mode==='satellite'?' active':''}" onclick="${call('satellite')}">Satellit</button>
+      <button type="button" data-mode="standard" class="loc-map-mode-btn${mode==='standard'?' active':''}" onclick="${call('standard')}">Standard</button>
+    </div>`;
+  },
+  // Setzt an allen im DOM vorhandenen Umschaltern (Panel + Vollbild, unabhängig von prefix,
+  // da AK7 EINE gemeinsame Einstellung ist) den aktiv-Zustand auf den übergebenen Modus.
+  syncAllToggles(mode) {
+    document.querySelectorAll('.loc-map-mode-toggle .loc-map-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+  },
+  // Tauscht den Tile-Layer auf einer bestehenden Map-Instanz live aus (AK3: Pins/Linien/
+  // Kegel/Zoom/Position bleiben erhalten, da nur der Tile-Layer entfernt+neu hinzugefügt wird).
+  switchTileLayer(map, currentLayerRef, mode) {
+    this.set(mode);
+    if (currentLayerRef && map) { try { map.removeLayer(currentLayerRef); } catch {} }
+    return this.addTileLayer(map);
+  },
+};
+
+// ═══════════════════════════════════════════════════════
 // US-58 · Kamera-Sichtfeld-Visualisierung
 const CameraFOV = {
   _sensors: {
@@ -3500,6 +3569,7 @@ const CameraFOV = {
   _maps: {},    // Leaflet-Map-Instanzen  { prefix: L.Map }
   _cones: {},   // FOV-Polygon-Layer      { prefix: L.Polygon }
   _data: {},    // Geodaten               { prefix: {obsLat,obsLon,subjLat,subjLon,distM} }
+  _tileLayers: {}, // US-123: aktueller Tile-Layer je Map-Key { prefix|prefix_fs: L.TileLayer }
   _profile: null,   // Server-Profil-Cache (US-90); null = noch nicht geladen
   _saveTimer: null, // Debounce-Timer für Server-POST
 
@@ -3601,6 +3671,7 @@ const CameraFOV = {
       <div id="fov_info_${prefix}" style="font-size:12px;color:var(--muted);margin-bottom:8px">–</div>
       ${hasSub ? `<div style="position:relative">
         <div id="map_fov_${prefix}" style="height:220px;border-radius:8px;overflow:hidden"></div>
+        ${LocMapMode.toggleHtml(`CameraFOV.setLocMapLayer('${prefix}', %MODE%)`)}
         <button class="fov-map-expand-btn" onclick="CameraFOV.openMapFullscreen('${prefix}')" aria-label="Karte im Vollbild öffnen" title="Karte im Vollbild öffnen">
           <svg style="width:18px;height:18px"><use href="#i-expand"/></svg>
         </button>
@@ -3615,13 +3686,25 @@ const CameraFOV = {
     const mapId = `map_fov_${prefix}`;
     if (!document.getElementById(mapId)) return;
     // Destroy existing instance
-    if (this._maps[prefix]) { try { this._maps[prefix].remove(); } catch {} delete this._maps[prefix]; delete this._cones[prefix]; }
+    if (this._maps[prefix]) { try { this._maps[prefix].remove(); } catch {} delete this._maps[prefix]; delete this._cones[prefix]; delete this._tileLayers[prefix]; }
     const map = L.map(mapId, { zoomControl:true, attributionControl:false });
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+    this._tileLayers[prefix] = LocMapMode.addTileLayer(map); // US-123: Satellit/Straße je gespeicherter Präferenz
     this._maps[prefix] = map;
     this._drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon);
     this._redrawCone(prefix);
     this._updateInfo(prefix);
+  },
+
+  // US-123: Kartenmodus umschalten (Satellit/Straße) — gemeinsame Einstellung für alle
+  // Location-Karten (AK7). Tauscht nur den Tile-Layer, Pins/Linie/Kegel/Zoom bleiben (AK3).
+  // Zieht bei geöffneter Vollbild-Karte denselben Modus nach (AK4).
+  setLocMapLayer(prefix, mode) {
+    const map = this._maps[prefix];
+    if (map) this._tileLayers[prefix] = LocMapMode.switchTileLayer(map, this._tileLayers[prefix], mode);
+    const fsKey = prefix + '_fs';
+    const fsMap = this._maps[fsKey];
+    if (fsMap) this._tileLayers[fsKey] = LocMapMode.switchTileLayer(fsMap, this._tileLayers[fsKey], mode);
+    LocMapMode.syncAllToggles(mode); // AK7: eine gemeinsame Einstellung, alle sichtbaren Umschalter synchron
   },
 
   // Zeichnet Beobachter-Pin, Motiv-Pin und Sichtachse auf eine gegebene Map-Instanz.
@@ -3728,9 +3811,9 @@ const CameraFOV = {
     const fsKey = prefix + '_fs';
     // Alte Instanz (von einer zuvor angezeigten Chance/Location) immer verwerfen und
     // neu aufbauen — verhindert eine "eingefrorene" Vollbild-Karte (Pre-Mortem Edge Case).
-    if (this._maps[fsKey]) { try { this._maps[fsKey].remove(); } catch {} delete this._maps[fsKey]; delete this._cones[fsKey]; }
+    if (this._maps[fsKey]) { try { this._maps[fsKey].remove(); } catch {} delete this._maps[fsKey]; delete this._cones[fsKey]; delete this._tileLayers[fsKey]; }
     const map = L.map('fov-map-fs', { zoomControl:true, attributionControl:false });
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+    this._tileLayers[fsKey] = LocMapMode.addTileLayer(map); // US-123: gleicher Modus wie Panel-Karte (AK4)
     this._maps[fsKey] = map;
     map.invalidateSize();
     // Keine Drag-Handler: _drawPinsAndLine nutzt L.marker() (nicht draggable), reines Ansehen.
@@ -3738,6 +3821,9 @@ const CameraFOV = {
     this._drawCone(map, this._cones, fsKey, d, this._readInputs(prefix));
     // Zoom/Pan sollen normal funktionieren (Default von L.map, nichts deaktiviert).
     setTimeout(() => map.invalidateSize(), 50);
+    // US-123: Umschalter im Vollbild-Container injizieren (statisches HTML kennt den prefix nicht)
+    const toggleEl = document.getElementById('fov-map-fs-mode-toggle');
+    if (toggleEl) toggleEl.innerHTML = LocMapMode.toggleHtml(`CameraFOV.setLocMapLayer('${prefix}', %MODE%)`);
   }
 };
 
@@ -5209,6 +5295,7 @@ const LocationDetail = {
         <p id="edit-subj-error" style="font-size:11px;color:var(--red);margin:-8px 0 8px;min-height:14px"></p>
         <div style="position:relative;margin-bottom:16px">
           <div id="edit-mini-map" style="height:180px;border-radius:10px;overflow:hidden;background:var(--surface)"></div>
+          <div id="edit-map-mode-toggle"></div>
           <button id="edit-map-expand-btn" onclick="LocationDetail.openMapFullscreen()" aria-label="Karte im Vollbild öffnen" title="Karte im Vollbild öffnen">
             <svg style="width:18px;height:18px"><use href="#i-expand"/></svg>
           </button>
@@ -5260,20 +5347,33 @@ const LocationDetail = {
     // der nicht bei jedem openEdit() neu gerendert wird – alte Instanz einer evtl. zuvor
     // bearbeiteten Location daher explizit verwerfen, sonst zeigt das Vollbild beim nächsten
     // Öffnen den falschen Stand.
-    if (this._editMapFs) { this._editMapFs.remove(); this._editMapFs = null; }
+    if (this._editMapFs) { this._editMapFs.remove(); this._editMapFs = null; this._editTileLayerFs = null; }
     this._editObsMFs = null; this._editSubjMFs = null; this._editLineFs = null;
     // Init mini-map after DOM ready
     requestAnimationFrame(() => LocationDetail._initEditMap());
   },
 
   _editMap: null, _editObsMarker: null, _editSubjMarker: null, _editLine: null,
+  _editTileLayer: null, _editTileLayerFs: null, // US-123: aktuelle Tile-Layer (Mini-/Vollbild-Karte)
+
+  // US-123: Satellit/Straße-Umschalter für die Bearbeiten-Karten (AK2). Hält Mini- und
+  // Vollbild-Karte synchron (AK4) und tauscht nur den Tile-Layer (AK3, AK7).
+  setEditMapLayer(mode) {
+    if (this._editMap) this._editTileLayer = LocMapMode.switchTileLayer(this._editMap, this._editTileLayer, mode);
+    if (this._editMapFs) this._editTileLayerFs = LocMapMode.switchTileLayer(this._editMapFs, this._editTileLayerFs, mode);
+    LocMapMode.syncAllToggles(mode);
+  },
+  _renderEditMapLayerToggle() {
+    const el = document.getElementById('edit-map-mode-toggle');
+    if (el) el.innerHTML = LocMapMode.toggleHtml(`LocationDetail.setEditMapLayer(%MODE%)`);
+  },
 
   _initEditMap() {
     const loc = this._current;
     const center = [loc.observer_lat, loc.observer_lon];
     this._editMap = L.map('edit-mini-map', {zoomControl:true, attributionControl:false}).setView(center, 14);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      {maxZoom:19}).addTo(this._editMap);
+    this._editTileLayer = LocMapMode.addTileLayer(this._editMap);
+    this._renderEditMapLayerToggle();
     // Observer marker draggable (MapMarkers-Standard, BUG-20)
     this._editObsMarker = null; // nicht mehr benötigt
     this._editObsM = MapMarkers.observerDraggable(center).addTo(this._editMap);
@@ -5335,6 +5435,8 @@ const LocationDetail = {
   _initEditMapFs() {
     const loc = this._current;
     if (!loc) return;
+    const toggleEl = document.getElementById('edit-map-fs-mode-toggle');
+    if (toggleEl) toggleEl.innerHTML = LocMapMode.toggleHtml(`LocationDetail.setEditMapLayer(%MODE%)`);
     if (this._editMapFs) {
       // Bereits initialisiert (mehrfaches Öffnen/Schließen) – nur Größe korrigieren
       // und Marker aus den Koordinatenfeldern neu einlesen (Quelle der Wahrheit).
@@ -5346,8 +5448,7 @@ const LocationDetail = {
       {lat: loc.observer_lat, lon: loc.observer_lon};
     this._editMapFs = L.map('edit-map-fs', {zoomControl:true, attributionControl:false})
       .setView([obsCoords.lat, obsCoords.lon], 15);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      {maxZoom:19}).addTo(this._editMapFs);
+    this._editTileLayerFs = LocMapMode.addTileLayer(this._editMapFs);
     this._editMapFs.invalidateSize();
     this._reloadEditMapFsFromFields();
   },
@@ -5734,11 +5835,25 @@ const AddLocation = {
     };
     document.getElementById('add-map-hint').textContent = hints[mode];
   },
+  _tileLayer: null, // US-123: aktueller Tile-Layer der add-map
+
+  // US-123: rendert/aktualisiert den Satellit/Straße-Umschalter (AK1) und hält ihn
+  // synchron mit der gemeinsamen Einstellung (AK7).
+  _renderMapLayerToggle() {
+    const el = document.getElementById('add-map-mode-toggle');
+    if (el) el.innerHTML = LocMapMode.toggleHtml(`AddLocation.setLocMapLayer(%MODE%)`);
+  },
+  // Tauscht den Tile-Layer der add-map (Satellit/Straße), ohne Pins/Zoom zu verlieren (AK3).
+  setLocMapLayer(mode) {
+    if (this.map) this._tileLayer = LocMapMode.switchTileLayer(this.map, this._tileLayer, mode);
+    LocMapMode.syncAllToggles(mode);
+  },
+
   initMap() {
-    if (this.map) { this.map.invalidateSize(); return; }
+    if (this.map) { this.map.invalidateSize(); this._renderMapLayerToggle(); return; }
     this.map = L.map('add-map', {zoomControl:true}).setView([52.52,13.40], 13);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, attribution: 'Tiles &copy; Esri'}).addTo(this.map);
+    this._tileLayer = LocMapMode.addTileLayer(this.map);
+    this._renderMapLayerToggle();
     // Karte auf aktuelle User-Position zentrieren
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
