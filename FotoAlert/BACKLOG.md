@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
-| **🏁 Done** | abgeschlossen + deployed | **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | BUG-59 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **TASK-53** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **BUG-58** *(Wolken-/Regen-Icon-Klick zoomt auf Europa statt 50-km-Radius um Standort)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **BUG-59** *(Kein Wolken-/Regen-Overlay beim Zeitregler sichtbar)* · **TASK-52** *(Wolken-/Regen-Legende: Position nach unten links über Zeitregler)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-52** *(Wolken-/Regen-Legende: Position nach unten links über Zeitregler)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -907,14 +907,15 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 
 ---
 
-### BUG-58 · Wolken-/Niederschlag-Umschalter im Karten-Tab soll auf 50-km-Radius statt auf Europa zoomen (Änderung an US-112/BUG-55) `[ ]`
+### BUG-58 · Wolken-/Niederschlag-Umschalter im Karten-Tab soll auf 50-km-Radius statt auf Europa zoomen (Änderung an US-112/BUG-55) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix (bewusste Verhaltensänderung an US-112/BUG-55, kein neuer unabhängiger Bug) |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-03 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Tippt man im Karten-Tab auf den „Wolken"- oder „Niederschlag"-Umschalter, zentriert und zoomt die Karte auf eine Mehrländer-Ansicht (Frankreich bis Nord-Norwegen). Gewünscht: Die Karte soll stattdessen auf einen Kartenausschnitt von ca. 50 km Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort zoomen.
 
@@ -983,12 +984,196 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-03 |
 
 **Beschreibung:** Beim Bedienen des Zeitreglers im Karten-Tab (mit dem man durch die Zeitpunkte der Wolken-/Niederschlag-Wettervorhersage blättert) hat Stephan kein Wolken- oder Regen-Overlay auf der Karte gesehen — die erwartete Wetterfläche erscheint visuell nicht.
 
-**Bezug:** Beobachtet als zusätzlicher, unabhängiger Befund beim Testen von **BUG-58** [ ] (Zoom-Umstellung auf 50-km-Radius) — technisch verifiziert **keine Regression durch BUG-58**: Der Kartenzoom-Code (`WeatherMap.setMode`/Zoom-Logik) und das Overlay-Rendering (`WeatherMap._render()` → `L.imageOverlay(url, bounds)`, Bild-URL aus `_frameUrl(this.sliderIdx)`, Bounds aus `this.data.bounds` bzw. `_FALLBACK_BOUNDS`) sind komplett getrennte Codepfade. Offene Fragen für die Analyse-Phase (nicht hier lösen): liefert `_frameUrl()` eine gültige Bild-URL? Ist `this.data.bounds` gesetzt (Cache-Miss/Daten nicht bereit)? Oder ist es ein reines Wahrnehmungsproblem, weil das Overlay im jetzt kleineren 50-km-Ausschnitt kaum auffällt? Klärung per Live-Test/DevTools in der Analyse-Phase nötig. Verwandt mit **US-112** [x] (liefert die Overlay-Daten/-Bilder) und **BUG-55** [x] (früherer Zoom-Fix, anderer Mechanismus).
+**Bezug:** Beobachtet als zusätzlicher, unabhängiger Befund beim Testen von **BUG-58** [x] (Zoom-Umstellung auf 50-km-Radius) — technisch verifiziert **keine Regression durch BUG-58**: Der Kartenzoom-Code (`WeatherMap.setMode`/Zoom-Logik) und das Overlay-Rendering (`WeatherMap._render()` → `L.imageOverlay(url, bounds)`, Bild-URL aus `_frameUrl(this.sliderIdx)`, Bounds aus `this.data.bounds` bzw. `_FALLBACK_BOUNDS`) sind komplett getrennte Codepfade. Verwandt mit **US-112** [x] (liefert die Overlay-Daten/-Bilder) und **BUG-55** [x] (früherer Zoom-Fix, anderer Mechanismus).
+
+---
+
+## Analyse (2026-07-04)
+
+**Annahmen-Protokoll:**
+- ✅ Klar aus Kontext ableitbar: Die Fehlerbeschreibung „kein Overlay sichtbar" bezieht sich auf den normalen App-Betrieb (Server erreichbar, Wetterdaten schon mal erfolgreich gebaut — US-112 ist live), nicht auf einen kompletten Erstlauf ohne jeden Cache.
+- ⚠️ Annahme: Der von Stephan beobachtete Fall ist der Regelfall (Karte auf einen Standort in Deutschland/Mitteleuropa gezoomt, „Wolken" oder „Niederschlag" aktiv, Regler bewegt) — nicht ein Sonderfall wie „Server frisch neu gestartet, Wetterkarten-Cache noch komplett leer". Bitte bestätigen, ob das der beobachtete Fall war, oder ob die App zu dem Zeitpunkt frisch gestartet war.
+- 🔴 Funktional kritisch, aber ohne echten Browser/DevTools-Zugriff nicht abschließend aus dem Code allein entscheidbar: Ob das Overlay tatsächlich technisch fehlt (leeres/fehlerhaftes Bild, keine Bounds) oder ob es korrekt rendert, aber bei geringer Wolken-/Niederschlagsmenge in der Region so blass ist, dass es im jetzt kleinen 50-km-Kartenausschnitt kaum auffällt. Die Code-Lektüre liefert eine belastbare Best-Einschätzung (siehe Pre-Mortem/Root-Cause unten), die per echtem Live-Test noch zu bestätigen ist.
+
+**Scope:** Eingeschlossen ist die Klärung und Behebung, warum das Wetter-Overlay im Karten-Tab nach der 50-km-Zoom-Umstellung (BUG-58) nicht mehr wahrnehmbar ist. Ausdrücklich ausgeschlossen: Änderungen an der Zoom-Logik selbst (BUG-58 bleibt wie freigegeben), Änderungen an der Wetterdaten-Beschaffung/-Qualität (US-112 bleibt wie abgenommen).
+
+**Example Mapping:**
+- 📏 Rule: Wenn im Karten-Tab „Wolken" oder „Niederschlag" aktiv ist und der Zeitregler auf einen Zeitpunkt mit vorhandenen Wetterdaten steht, muss über der Karte eine farbige Wetterfläche sichtbar sein, die im aktuell gezoomten 50-km-Ausschnitt tatsächlich wahrnehmbar ist (nicht nur technisch vorhanden, sondern für Stephan sichtbar).
+  - 🟢 Example: Karte ist auf einen Standort mit deutlicher Bewölkung/Niederschlag gezoomt (z. B. laut Wettervorhersage bewölkt oder regnerisch), „Wolken" bzw. „Niederschlag" ist aktiv → eine deutlich erkennbare, eingefärbte Fläche liegt über der Karte.
+- 📏 Rule: Wenn am aktuellen Kartenausschnitt praktisch keine Bewölkung/kein Niederschlag vorliegt, ist die Fläche zwar technisch vorhanden, aber nahezu unsichtbar (sehr helle/blasse Farbe) — das ist kein Bug, sondern korrekte Darstellung von „kein Wetterphänomen".
+  - 🟢 Example: Klarer Himmel am gezoomten Standort, „Wolken" aktiv → die Fläche ist so hell, dass sie kaum vom Kartenhintergrund zu unterscheiden ist (gewolltes Verhalten laut Farbskala, kein Fehler).
+- 📏 Rule: Wenn die Wetterkarten-Daten für den Server noch nicht bereitstehen (Cache leer/im Aufbau), zeigt die App einen Hinweis „Wetterdaten werden geladen …" statt eines stillen Leerbilds.
+  - 🟢 Example: Server frisch gestartet, noch kein Wetterkarten-Cache gebaut, Stephan tippt auf „Wolken" → Hinweistext erscheint, keine unerklärte leere Karte.
+
+**Keine offenen ❓-Questions mehr, da die kritische Unsicherheit (Ursache technisch vs. Wahrnehmung) als Root-Cause-Einschätzung mit Sicherheitsstufe unten dokumentiert ist und den nachfolgenden Optionen zugrunde liegt.**
+
+**Akzeptanzkriterien:**
+- [ ] Ist am aktuell gezoomten 50-km-Kartenausschnitt tatsächlich Bewölkung bzw. Niederschlag vorhergesagt, sieht Stephan nach Antippen von „Wolken" bzw. „Niederschlag" eine deutlich wahrnehmbare, eingefärbte Fläche über der Karte — nicht nur eine kaum sichtbare, blasse Fläche.
+- [ ] Beim Bewegen des Zeitreglers ändert sich die eingefärbte Fläche sichtbar mit dem gewählten Zeitpunkt (z. B. Fläche wird bei einer Stunde mit mehr Niederschlag sichtbar kräftiger).
+- [ ] Ist am gezoomten Ausschnitt praktisch keine Bewölkung/kein Niederschlag vorhergesagt, bleibt die Fläche bewusst sehr hell/kaum sichtbar — das ist als korrektes Verhalten erkennbar (z. B. weil die Legende unten links weiterhin die aktive Farbskala zeigt), nicht als Fehlzustand.
+- [ ] Edge Case: Sind die Wetterkarten-Daten auf dem Server noch nicht bereit (z. B. kurz nach Serverstart), zeigt die App den Hinweistext „Wetterdaten werden geladen …" statt einer stillen, unerklärten Leerfläche.
+- [ ] Edge Case: Beim Umschalten zwischen „Wolken" und „Niederschlag" sowie beim Bewegen des Zeitreglers bleibt die Legende (Farbskala unten links) korrekt zur aktiven Ansicht passend sichtbar.
+
+**Pre-Mortem (mit Code-Verifikation):**
+
+📎 Code-Verifikation (2026-07-04): `web/index.html` Zeile 4456–4783 (`WeatherMap`) sowie `backend/main.py` Zeile 1895–1970 und `backend/calculations/weather_grib.py` Zeile 73–81/553–641 gelesen.
+
+- Bestätigt: `_frameUrl(idx)` (Zeile 4543–4548) liefert `null`, wenn `this.data`/`this.data.frames` fehlt oder `idx >= arr.length`; in diesem Fall ruft `_render()` (Zeile 4566–4587) sofort `_clearOverlay()` auf und bricht ab — es gibt **keinen** Pfad, der eine syntaktisch kaputte oder 404-URL an `L.imageOverlay` übergibt. Bei gültigem Index liefert das Backend (`main.py` Zeile 1936–1944) entweder eine echte `/weather-map/png/{field}/{idx}`-URL oder explizit `null` (kein Fake-Link) — durch den bestehenden Test `test_weather_map_endpoint_schema` (`backend/tests/test_us112_weather_map.py` Zeile 208–232) mit abgesichert.
+- Bestätigt: `this.data.bounds` wird ausschließlich in `_fetch()` (Zeile 4672–4696) aus der Server-Antwort gesetzt. Vor dem ersten erfolgreichen Fetch ist `this.data === null`; `_render()` prüft das explizit (`!this.data` → sofortiger Abbruch, kein Fallback-Render mit „falschen" Bounds). `setMode()` (Zeile 4735–4766) ruft `await this._fetch()` **vor** `_render()` auf — es gibt keinen erkennbaren Race, bei dem gerendert wird, bevor die Daten (oder zumindest `ready:false` mit leeren Frames) da sind. `_FALLBACK_BOUNDS` (Zeile 4472) wird nur in `_render()`/`_gridBounds()` als Ersatzwert verwendet, falls `this.data.bounds` fehlt, obwohl `this.data` selbst existiert (z. B. `ready:false`-Antwort ohne Bounds-Feld) — dieser Pfad liefert aber ohnehin kein Bild, da `_frameUrl()` bei leeren `frames`-Arrays `null` zurückgibt.
+- **Root-Cause-Einschätzung (beste Einschätzung aus Code-Lektüre, noch per Live-Test zu bestätigen):** `overlay_bounds()` (`weather_grib.py` Zeile 553–555, Konstanten Zeile 73–76) liefert immer die feste Mehrländer-BBox `[[43.0, 3.0], [71.5, 21.0]]` — das sind ca. 2.850 km (Nord-Süd) × ca. 1.350 km (Ost-West, bei 52°N). Das PNG-Overlay wird über exakt diese Fläche gelegt (`render_all_pngs`, Zeile 628–640, Bildgröße `PNG_W=360 × PNG_H=420`). Seit BUG-58 zoomt die Karte beim Aktivieren von „Wolken"/„Niederschlag" aber nur noch auf einen 50-km-Radius (`_localBounds()`, Zeile 4712–4722) um die aktuelle Kartenmitte — das ist gemessen an der Gesamtfläche des Overlays ein sehr kleiner Ausschnitt (grob 100 km Durchmesser von ca. 2.850 km Gesamthöhe, also ca. 3–4 % der Fläche). Das Overlay-Bild wird technisch korrekt geladen und positioniert, ist aber im sichtbaren 50-km-Fenster nur noch ein kleiner, evtl. sehr gleichmäßig eingefärbter Bildausschnitt. Zusätzlich sind die Farbskalen bei niedrigen Werten sehr hell (`_CLOUD_COLORS`/`_PRECIP_MM_COLORS`, Zeile 4475–4486: 0 % Wolken = `#c8e8ff`, 0 mm Niederschlag = `#eaf4ff` — beides sehr helle Pastelltöne). Bei durchschnittlichem oder niedrigem Wolken-/Niederschlagswert am gewählten Ort wirkt die Fläche dadurch nahezu unsichtbar vor dem ohnehin hellen Karten-Tile-Hintergrund. **Das erklärt das beobachtete Verhalten plausibel als Wahrnehmungsproblem (Kombination aus BUG-58-Zoomverkleinerung + heller Farbskala bei Normalwetter), nicht als technischen Datenfehler** — abschließend zu bestätigen ist das nur per echtem Live-Test mit bekannt bewölktem/regnerischem Zielort, da sich Bildinhalt (tatsächliche Wolken-/Niederschlagswerte an dem Tag) nicht aus dem Code ablesen lässt.
+- Kein erkennbarer z-Index-/Pane-Konflikt: `weatherPane` liegt bei `zIndex: 250`, explizit zwischen Tile-Layer (200) und Markern (400, Kommentar Zeile 4529); `L.imageOverlay` wird mit `opacity: 1` (Zeile 4581, Transparenz steckt im PNG-Alphakanal) und `interactive: false` erzeugt — beides unauffällig.
+
+- 💀 Szenario: Ein zukünftiger Test an einem Tag mit wenig Wetteraktivität am Standort wird erneut als „Overlay fehlt" gemeldet, obwohl es korrekt (aber blass) rendert. → Gegenmaßnahme: AK-3 verankert genau diesen Fall als erwartetes, kein fehlerhaftes Verhalten; Testplan schreibt einen Standort mit bekannt hoher Bewölkung/Niederschlag als Testbedingung vor.
+- 💀 Szenario: Die gewählte Option (z. B. Mindest-Deckkraft/kräftigere Farbskala) macht das Overlay bei echtem Klarwetter fälschlich sichtbar und irreführend (Nutzer denkt, es gebe Wolken, wo keine sind). → Gegenmaßnahme: Bei der Umsetzung nur die Wahrnehmbarkeit bei tatsächlich vorhandenen Werten verbessern (z. B. Mindest-Opacity/kräftigerer Kontrast nur oberhalb eines Schwellwerts), nicht die Farbskala bei echten Nullwerten verfälschen — als Vorgabe in die Implementierung geben.
+- 💀 Szenario: Der Cache ist zum Testzeitpunkt tatsächlich leer/im Aufbau (Server kürzlich neu gestartet) und der Hinweistext „Wetterdaten werden geladen …" wurde übersehen oder war zu unauffällig platziert. → Gegenmaßnahme: Edge-Case-AK-4 verankert den Hinweistext explizit; Testplan prüft auch den Fall „Server frisch gestartet".
+- 💀 Szenario: Eine Korrektur an der Farbskala/Opacity wird versehentlich als generelle Wetter-Darstellungsänderung missverstanden und beeinträchtigt die Lesbarkeit bei starkem Wetter (Übersättigung). → Gegenmaßnahme: Regressionscheck der Legende und der bestehenden Farbstopps als Testschritt, nicht nur der Niedrigwert-Fälle.
+
+**Architektur-Analyse:**
+- Frontend: `web/index.html`, Objekt `WeatherMap` (Zeile 4456–4783) — Zustand (`mode`, `sliderIdx`, `data`), Rendering (`_render`, `_frameUrl`, `_colorInterp`/Farbpaletten), Zoom-Interaktion (`setMode`, `_localBounds` aus BUG-58).
+- Backend: `backend/main.py` Endpoints `/weather-map` (Zeile 1895–1955) und `/weather-map/png/{field}/{idx}` (Zeile 1958–1970); Hintergrund-Bau `_build_weather_map()` (Zeile 713–753, alle 3h per Scheduler, Zeile 1316).
+- Datenquelle/Berechnung: `backend/calculations/weather_grib.py` — feste BBox-Konstanten (Zeile 73–81), `overlay_bounds()` (553–555), Farbwerte/PNG-Encoding (~Zeile 500–546), `build_weather_overlay`/`render_all_pngs` (558–640). Datenquellen: DWD ICON-D2/ICON-EU (GRIB) + MET Norway.
+- Kein Cache-Verzeichnis auf Datei-Ebene identifiziert — die Overlay-PNGs liegen laut Code nur im Prozess-Speicher (`_weather_map_png`-Dict in `main.py`, kein Disk-Cache-Pfad im Code sichtbar). Falls es zusätzlich einen Disk-Cache gibt, ist das aus dem gelesenen Code nicht ersichtlich — als offener Punkt markiert, nicht behauptet.
+- Designer-Check: Diese Analyse berührt ggf. Farbintensität/Opacity einer bestehenden Komponente (keine neue UI) — visuell relevant, `fotoalert-designer` wird vor der finalen Farb-/Opacity-Entscheidung in der Implementierungsphase hinzugezogen, sofern Option B/C gewählt wird.
+
+**Implementierungsoptionen:**
+
+Option A — Nur Hinweis/Aufklärung, keine Code-Änderung an der Darstellung:
+- App-Wirkung: Die App bleibt wie sie ist; ergänzt wird lediglich ein kleiner Hinweistext oder eine Tooltip-Erklärung, dass eine sehr helle Fläche „kaum Wolken/Niederschlag" bedeutet.
+- Vorgehen: Kleiner Text-/UI-Hinweis in der Legende oder beim ersten Aktivieren.
+- Vorteile: Minimaler Aufwand, keine Gefahr neuer optischer Fehleinschätzungen.
+- Nachteile: Löst das eigentliche Problem nicht — bei geringem Wetter bleibt die Fläche für Stephan weiterhin praktisch unsichtbar, nur jetzt „erklärt". Wirkt eher wie ein Pflaster als eine Lösung.
+- Aufwand: klein.
+
+Option B — Overlay im gezoomten 50-km-Ausschnitt sichtbarer machen (Kontrast/Mindest-Deckkraft anpassen):
+- App-Wirkung: Wenn am gezoomten Ort tatsächlich Wolken oder Niederschlag vorhergesagt sind, ist die Fläche deutlich als Farbfläche erkennbar — auch bei niedrigen bis mittleren Werten wirkt sie nicht mehr fast unsichtbar. Bei echtem Klarwetter bleibt sie bewusst sehr hell (kein falsches Signal).
+- Vorgehen: Farbskalen (`_CLOUD_COLORS`, `_PRECIP_MM_COLORS`, `_PRECIP_PCT_COLORS`) und/oder eine Mindest-Opacity oberhalb eines kleinen Schwellwerts anpassen, sodass „ein bisschen Wetter" sichtbar wird, ohne bei echten Nullwerten Fehlsignale zu erzeugen. Ggf. zusätzlich prüfen, ob eine geringere Overlay-Transparenz am Kartenrand/generell sinnvoll ist.
+- Betroffene Dateien: `web/index.html` (Farbpaletten + `_render`/`_colorInterp`).
+- Vorteile: Behebt das eigentliche Wahrnehmungsproblem direkt an der Ursache; keine Backend-Änderung nötig, da die Rohdaten bereits korrekt sind.
+- Nachteile/Risiken: Erfordert eine bewusste Designentscheidung (Bauhaus-Farbcheck via `fotoalert-designer`), sonst Gefahr einer irreführenden Übersättigung bei Klarwetter (siehe Pre-Mortem). Etwas Justieraufwand (Testen an mehreren Wetterlagen).
+- Aufwand: mittel.
+
+Option C — Beim Einschalten automatisch weiter herauszoomen, wenn am 50-km-Ausschnitt kaum Wetteraktivität vorliegt:
+- App-Wirkung: Ist am aktuellen Standort kaum Bewölkung/Niederschlag vorhergesagt, würde die Karte selbstständig einen größeren Bereich zeigen, in dem eher Wetteraktivität sichtbar ist.
+- Vorgehen: Serverseitige Datenwerte im gezoomten Bereich müssten clientseitig ausgewertet werden, um zu entscheiden, ob „genug" Wetter da ist; bei Bedarf automatischer Re-Zoom.
+- Vorteile: Würde in jedem Fall etwas Sichtbares zeigen.
+- Nachteile/Risiken: Widerspricht direkt der gerade erst freigegebenen BUG-58-Anforderung (stabiler, vorhersehbarer 50-km-Ausschnitt, kein automatisches Zurückspringen/Verändern der Kartenmitte). Deutlich höherer Aufwand, neue Fehlerquelle (Pre-Mortem: „springt unerwartet"). Löst kein echtes Problem, sondern verschiebt es nur räumlich.
+- Aufwand: groß.
+
+✅ **Empfehlung: Option B.** Sie behebt die plausibelste Ursache (Wahrnehmungsproblem durch Kombination aus BUG-58-Zoomverkleinerung und ohnehin heller Farbskala) direkt an der Wurzel, ohne die gerade erst freigegebene Zoom-Logik aus BUG-58 wieder zu verändern (Option C) und ohne das Problem nur zu beschreiben statt zu lösen (Option A). Vor der finalen Farb-/Opacity-Entscheidung wird `fotoalert-designer` für den Bauhaus-Check hinzugezogen. Die Empfehlung steht unter dem Vorbehalt, dass ein echter Live-Test (bekannt bewölkter/regnerischer Zielort) die Root-Cause-Einschätzung bestätigt — sollte der Live-Test stattdessen einen technischen Datenfehler zeigen (z. B. wirklich leeres Bild trotz vorhandener Werte), wäre stattdessen eine Backend-Korrektur nötig.
+
+**Entscheidung (2026-07-04, Stephan):** Option B wird umgesetzt.
+
+**Re-Analyse-Anlass (2026-07-04):** Beim Implementierungsstart hat sich herausgestellt, dass die Analyse-Annahme zu Option B an einer Stelle nicht zutrifft: Die im Frontend änderbaren Farbwerte (`_CLOUD_COLORS` etc.) steuern nur die kleine Legende, nicht die eigentliche eingefärbte Wetterfläche auf der Karte — diese Fläche ist ein fertiges Bild, das vollständig vom Server geliefert wird. Stephans Entscheidung: Ticket zurück in die Analyse, Scope wird um die serverseitige Bild-/Farberzeugung erweitert (Zoom-Logik aus BUG-58 und Datenqualität aus US-112 bleiben weiterhin ausgeschlossen). Die reine Legenden-Anpassung wurde ausdrücklich verworfen ("die kleine Legende ist nicht das Problem").
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (Code-Verifikation dokumentiert)
+- [x] Architektur analysiert: `web/index.html` (`WeatherMap`, Zeile 4456–4783), `backend/main.py` (Zeile 1895–1970), `backend/calculations/weather_grib.py` (Zeile 73–81, 553–641)
+- [x] Designer-Check: visuell relevant (Farbintensität/Opacity) → `fotoalert-designer` vor finaler Farbentscheidung in der Implementierungsphase hinzuzuziehen
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option B
+
+**Grenzen dieser Analyse:**
+- Kein echter Browser-/DevTools-Zugriff verfügbar — die Root-Cause-Einschätzung (Wahrnehmungsproblem vs. technischer Fehler) beruht auf Code-Lektüre, nicht auf einer beobachteten Live-Karte. Muss per Live-Test an einem Ort mit bekannt aktivem Wetter bestätigt werden.
+- Kein Zugriff auf Git-Historie (Commit-Log) in dieser Analyse-Phase — falls die Root-Cause-Klärung einen Vergleich zum Verhalten vor BUG-58 braucht, müsste das separat per Terminal-Befehl auf Stephans Mac geprüft werden.
+- Ob zusätzlich zum Prozess-Speicher-Cache ein Disk-Cache für die Wetterkarten-PNGs existiert, ließ sich aus dem gelesenen Code nicht abschließend feststellen.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Kein neuer pytest-Fall vorgesehen, da die Ursache rein clientseitige Darstellung (Farbskala/Opacity in `web/index.html`) betrifft, analog zu BUG-55/BUG-58. Bestehender Endpoint-Test (`test_weather_map_endpoint_schema`) deckt weiterhin ab, dass Bounds/Frames korrekt geliefert werden.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Karten-Tab öffnen, auf einen Standort zoomen, an dem laut aktueller Vorhersage nennenswerte Bewölkung oder Niederschlag erwartet wird; „Wolken" bzw. „Niederschlag" antippen — erwartet: deutlich sichtbare, farbige Fläche im 50-km-Ausschnitt.
+  2. Zeitregler bewegen — erwartet: Fläche verändert sich sichtbar mit dem gewählten Zeitpunkt.
+  3. Zum Vergleich einen Standort/Zeitpunkt mit praktisch klarem Himmel wählen — erwartet: Fläche bleibt bewusst sehr hell/kaum sichtbar (kein Fehlzustand, siehe AK-3).
+  4. Falls möglich: Server frisch neu starten und sofort „Wolken" antippen, bevor der Wetterkarten-Cache aufgebaut ist — erwartet: Hinweistext „Wetterdaten werden geladen …" statt stiller Leerfläche.
+
+---
+
+## Re-Analyse (2026-07-04) — Backend im Scope
+
+**Anlass:** Die erste Analyse ging fälschlich davon aus, dass die Frontend-Konstanten `_CLOUD_COLORS`/`_PRECIP_MM_COLORS`/`_PRECIP_PCT_COLORS` in `web/index.html` die sichtbare Wetterfläche einfärben. Ein Implementierungs-Subagent hat verifiziert: Diese Frontend-Werte steuern ausschließlich die kleine Legende. Die eigentliche eingefärbte Fläche ist ein fertiges PNG-Bild, das der Server komplett vorberechnet und liefert (`L.imageOverlay`). Stephan hat den Scope explizit um die serverseitige Bild-/Farberzeugung erweitert und eine reine Legenden-Lösung ausdrücklich ausgeschlossen ("die kleine Legende ist nicht das Problem").
+
+**Code-Befund (verifiziert per Grep/Read am aktuellen Stand, 2026-07-04):**
+
+- `backend/calculations/weather_grib.py` Zeile 73–81: feste BBox-Konstanten (`BBOX_S/N/W/E`, unverändert `43.0/71.5/3.0/21.0`) und PNG-Maße (`PNG_W=360`, `PNG_H=420`) — Zeilenangabe aus Analyse 1 bestätigt.
+- Zeile 101–114: Die tatsächlichen Server-Farbstopps `_CLOUD_STOPS` (5 Stufen, 0→`rgb(200,232,255)` bis 100→`rgb(56,72,88)`) und `_PRECIP_STOPS` (0→`rgb(234,244,255)` bis 10mm→`rgb(10,45,107)`) — das sind die Werte, die tatsächlich das PNG einfärben, nicht die gleichnamigen Frontend-Konstanten. Kommentar in Zeile 100 sagt selbst „spiegeln das Frontend" — die Duplizierung ist Teil des Problems (zwei Farbskalen an zwei Stellen, die auseinanderlaufen können).
+- Zeile 481–496: `_color_for()` — reine Interpolationshilfsfunktion (aktuell laut Code nicht mehr im aktiven Pfad von `field_to_png` verwendet, dort wird stattdessen direkt `np.interp` über die Stop-Arrays genutzt, Zeile 523–529).
+- Zeile 499–546: `field_to_png(arr, field, alpha: int = 150)` — das ist die zentrale Stelle, die Werte in RGBA-Pixel übersetzt. Kernbefund:
+  - Standard-Deckkraft ist **fix `alpha=150`** (von 255) für jedes gültige (nicht-NaN) Pixel, unabhängig vom Wert — d.h. selbst bei starkem Wetter ist das Overlay nie voll deckend.
+  - Zeile 534–536: Für Niederschlag wird zusätzlich jedes Pixel mit Wert `< 0.05mm` komplett transparent (`alpha=0`) gesetzt — Absicht laut Kommentar: „damit die Karte nicht flächig blau überzogen wird".
+  - Für „cloud" gibt es keine entsprechende Trockenheits-/Null-Schwelle; niedrige Werte werden einfach mit der hellsten Stop-Farbe (`(200,232,255)`, sehr helles Pastellblau) bei `alpha=150` gerendert — das ist in Kombination mit dem hellen Karten-Tile-Hintergrund praktisch die Ursache der schlechten Sichtbarkeit bei „wenig, aber vorhandenem" Wetter.
+- Zeile 553–555: `overlay_bounds()` liefert unverändert die feste Mehrländer-BBox — Zeilenangabe aus Analyse 1 bestätigt, keine Änderung seither.
+- Zeile 628–640: `render_all_pngs(overlay, field)` ruft pro Stunde `field_to_png(arr, field)` **ohne expliziten `alpha`-Parameter** auf — nutzt also durchgehend den Default `alpha=150`. Aufgerufen aus `backend/main.py` Zeile 733–734 (`_build_weather_map()`), Ergebnis landet im Prozessspeicher-Dict `_weather_map_png` (kein Disk-Cache identifizierbar, wie schon in Analyse 1 vermerkt).
+- `web/index.html` Zeile 4565–4587 (`_render()`): bestätigt unverändert — `L.imageOverlay(full, bounds, {opacity: 1, pane: 'weatherPane', interactive: false})`. Die `opacity: 1` ist fix im Frontend-Code; die eigentliche Transparenzsteuerung passiert ausschließlich serverseitig im PNG-Alphakanal (`field_to_png`). Das Frontend hat aktuell keinerlei Hebel, um das Overlay kräftiger/blasser zu machen, außer die URL/das Bild selbst zu ändern.
+
+**Kurz gesagt (App-Verhalten):** Der Server malt das Wetterbild bereits von vornherein mit reduzierter, fixer Deckkraft (etwa 60% von voll deckend) und lässt bei Wolken auch schwache Werte in sehr hellem Blau erscheinen. Die Karten-App selbst kann daran nichts mehr drehen — sie zeigt nur das fertige Bild an. Genau das erklärt, warum selbst dort, wo laut Vorhersage etwas Wolken oder Regen sind, auf der Karte kaum etwas zu erkennen ist.
+
+**Überarbeitete Implementierungsoptionen (serverseitig):**
+
+Option D — Mindest-Deckkraft + kräftigere Farbskala direkt im Server-Rendering:
+- App-Wirkung: Sobald am gezoomten Ort spürbare Bewölkung oder Niederschlag vorhergesagt ist, erscheint die Fläche auf der Karte klar erkennbar eingefärbt — auch bei mittleren Werten, nicht erst bei Extremwetter. Echtes Klarwetter/echte Nullwerte bleiben weiterhin nahezu unsichtbar (kein Fehlsignal).
+- Vorgehen: In `field_to_png()` (`backend/calculations/weather_grib.py`) die feste `alpha=150` durch eine wertabhängige Mindest-Deckkraft ersetzen (z. B. Pixel mit spürbarem Wert erhalten alpha 200–230 statt 150), und/oder die hellsten Farbstopps in `_CLOUD_STOPS`/`_PRECIP_STOPS` kräftiger wählen, während der Nullpunkt (0% Wolken, <0,05mm Niederschlag) weiterhin transparent/sehr hell bleibt. Die bestehende Trockenheits-Transparenz-Regel bei Niederschlag (Zeile 534–536) bliebe als Vorbild für eine analoge, sanfte Wolken-Schwelle erhalten.
+- Betroffene Dateien: nur `backend/calculations/weather_grib.py` (Funktion `field_to_png`, Konstanten `_CLOUD_STOPS`/`_PRECIP_STOPS`). Kein Frontend-Eingriff nötig, da die Bilder ohnehin serverseitig neu erzeugt werden.
+- Vorteile: Trifft die Ursache exakt an der Stelle, die tatsächlich das sichtbare Bild erzeugt; Frontend bleibt unangetastet; nutzt bereits vorhandene Muster (Trockenheits-Schwelle) statt neuer Mechanik.
+- Nachteile/Risiken: Erfordert eine bewusste Farb-/Kontrastentscheidung (Bauhaus-Check), sonst Gefahr von Übersättigung bei hohen Werten oder einem irreführenden Signal bei sehr niedrigen, aber ungleich Null-Werten. Bestehende gecachte PNGs im Prozessspeicher (`_weather_map_png`) spiegeln nach der Änderung weiterhin die alte Farbgebung, bis der nächste reguläre Rebuild (alle 3h laut Scheduler) oder ein Serverneustart die Bilder neu erzeugt — ohne manuellen Trigger bliebe es bis zu 3h lang uneinheitlich.
+- Aufwand: mittel (Farbkonstanten + eine Formel in einer Funktion; kein neuer Endpoint, keine neue Datenstruktur).
+
+Option E — Non-linearer Alpha-Verlauf mit fixem Mindestwert oberhalb eines kleinen Schwellwerts (statt linearer Farbinterpolation):
+- App-Wirkung: Wie Option D im Ergebnis für Stephan (Fläche wird bei realem Wetter klar sichtbar), aber die Umsetzung ist gezielter: Nicht die ganze Farbskala wird kräftiger, sondern nur die Transparenz bekommt eine steilere Kurve — z. B. „Sprung" auf eine deutliche Mindest-Deckkraft (z. B. alpha 190) sobald ein Schwellwert (z. B. 10% Bewölkung bzw. 0,3mm Niederschlag) überschritten ist, mit sanftem Anstieg danach bis zum Maximum bei hohen Werten.
+- Vorgehen: In `field_to_png()` eine zusätzliche, vom aktuellen linearen `alpha`-Wert unabhängige Berechnung einbauen (z. B. `alpha = base_alpha + (max_alpha-base_alpha) * min(1, value/schwelle)^0.5` oder ähnliche Kurve), die Farbstopps selbst unverändert lassen.
+- Betroffene Dateien: nur `backend/calculations/weather_grib.py`, isolierter in `field_to_png` als Option D (Farbstopps bleiben unangetastet, nur die Alpha-Berechnung wird ersetzt).
+- Vorteile: Trennt sauber „Farbe" (bleibt wie gehabt, ggf. sogar unverändert im Vergleich zu heute) von „Sichtbarkeit" (wird gezielt für den Wahrnehmungsbereich angehoben); geringeres Risiko einer optischen Farbverfälschung, da nur die Deckkraft-Kurve verändert wird; leichter feinjustierbar (ein Schwellwert + eine Kurve statt fünf Farbstopps).
+- Nachteile/Risiken: Etwas komplexere Formel als eine einzelne Konstante; Schwellwert muss pro Feldtyp (cloud/precip) sinnvoll gewählt werden, sonst wirkt der Sprung an der Schwelle unnatürlich sichtbar („Kante" statt weicher Übergang). Gleiches Cache-Invalidierungs-Thema wie Option D.
+- Aufwand: mittel (etwas mehr Denkarbeit für eine gute Kurve, aber ähnlich lokal begrenzter Eingriff wie Option D).
+
+Beide Optionen D und E ließen sich auch kombinieren (kräftigere Farbstopps UND leicht angehobene Mindest-Deckkraft), falls der Bauhaus-Check in der Umsetzung zeigt, dass eine Maßnahme allein nicht ausreicht.
+
+**Empfehlung:** Option E (non-linearer Alpha-Verlauf mit Mindestwert oberhalb eines kleinen Schwellwerts), optional ergänzt um eine moderate Anhebung der hellsten Farbstopps aus Option D, falls der Bauhaus-Check das für nötig hält. Begründung: Option E löst das eigentliche Wahrnehmungsproblem (schwaches, aber vorhandenes Wetter ist auf der Karte kaum sichtbar) gezielt an der Stelle, die es verursacht — der Deckkraft-Berechnung —, ohne die Farbskala selbst großflächig zu verändern und damit das Risiko einer Farb-Verfälschung bei Klarwetter oder Übersättigung bei Starkwetter zu minimieren. Sie bleibt vollständig im bestehenden Scope (nur `weather_grib.py`), rührt weder die BUG-58-Zoom-Logik noch die US-112-Datenbeschaffung an, und ist als lokal begrenzte Änderung an einer einzelnen Funktion mit überschaubarem Aufwand umsetzbar. Vor der finalen Farb-/Schwellwert-Entscheidung wird in der Implementierungsphase `fotoalert-designer` (Bauhaus-Designwächter) hinzugezogen, um Farbintensität und Kontrast bewusst statt zufällig zu wählen.
+
+**Pre-Mortem-Update (spezifisch für die Server-Änderung):**
+- 💀 Szenario: Die PNGs liegen ausschließlich im Prozessspeicher (`_weather_map_png` in `backend/main.py`, kein Disk-Cache im Code identifizierbar). Nach einer Code-Änderung an `field_to_png`/den Farbstopps zeigen bereits laufende Server-Instanzen weiterhin die alten, alten Bilder, bis entweder der nächste geplante Rebuild (laut Scheduler alle 3h) läuft oder der Prozess neu gestartet wird. → Gegenmaßnahme: Im Testplan/Release-Schritt explizit einen Server-Neustart (oder Warten auf den nächsten Scheduler-Lauf) nach dem Deploy vorsehen, sonst wirkt der Fix „nicht angekommen".
+- 💀 Szenario: Eine zu aggressive Mindest-Deckkraft oder zu kräftige Farbstopps führen bei tatsächlich hohem Wolken-/Niederschlagswert zu einer übersättigten, das Kartenbild dominierenden Fläche (Regression: die Karte wird bei Starkwetter schwer lesbar, Marker/POIs schwer erkennbar). → Gegenmaßnahme: Testplan um einen expliziten Vergleich „hoher Wert vorher/nachher" ergänzen, nicht nur den Niedrigwert-Fall aus Analyse 1.
+- 💀 Szenario: PNG-Neu-Encoding ist CPU-Arbeit (`asyncio.to_thread` in `_build_weather_map()`, `backend/main.py` Zeile 733–734) für 72 Stunden × 2 Felder × 360×420 Pixel. Eine reine Alpha-/Farbwert-Änderung in `field_to_png` selbst ändert an der Rechenkomplexität nichts (gleiche Bildgröße, gleiche Pixelanzahl) — kein zu erwartender Performance-Regressionsfall, aber zur Sicherheit im Testplan als „Job-Laufzeit vorher/nachher vergleichen" aufnehmen, falls die neue Alpha-Formel aufwendiger ist als die bisherige lineare Interpolation.
+- 💀 Szenario: Da `_CLOUD_STOPS`/`_PRECIP_STOPS` in `weather_grib.py` laut Code-Kommentar (Zeile 100) bewusst die Frontend-Farbwerte „spiegeln" sollen, könnte eine reine Server-Änderung die Legende (Frontend) und die tatsächliche Kartenfläche (Server) wieder auseinanderlaufen lassen, wenn nur eine Seite angepasst wird. → Gegenmaßnahme: In der Umsetzung explizit klären/entscheiden, ob die Legenden-Frontend-Werte zur Konsistenz nachgezogen werden sollen (nicht als Lösung des eigentlichen Problems, sondern als Konsistenz-Folgeschritt) — das ist eine bewusste Detailentscheidung für die Implementierungsphase, kein neuer Scope.
+- Designer-Hinweis: `fotoalert-designer` wird vor der finalen Farb-/Schwellwert-Entscheidung in der Implementierungsphase hinzugezogen (nur vorgemerkt, hier nicht durchgeführt).
+
+**Grenzen dieser Re-Analyse:**
+- Wie in Analyse 1: kein echter Browser-/Live-Test möglich; die Einschätzung „alpha=150 + helle Cloud-Stopps erklären die schlechte Sichtbarkeit" ist eine belastbare Code-Lektüre-Einschätzung, aber noch nicht am echten Bild verifiziert.
+- Konkrete Zahlenwerte für Schwellwert/Ziel-Alpha in Option E sind hier als Beispielwerte genannt, nicht als finale Vorgabe — die endgültige Wahl gehört in die Implementierungsphase inkl. Designer-Check.
+
+**Entscheidung (2026-07-04, Stephan):** Option E wird umgesetzt.
+
+---
+
+## Implementierung (2026-07-04)
+
+**Geänderte Datei:** `backend/calculations/weather_grib.py`, Funktion `field_to_png()` (verifiziert per Grep/Read am aktuellen Stand: Funktion beginnt Zeile 546, nicht mehr 499 — Zeilen haben sich durch die neue `_alpha_curve()`-Hilfsfunktion + Konstantenblock direkt davor verschoben; funktional identische Stelle wie in beiden Analysen beschrieben). Keine Änderung an `web/index.html`, an der Zoom-Logik (BUG-58) oder an der Wetterdatenbeschaffung (US-112).
+
+**Was sich ändert:** Der feste Deckkraft-Wert `alpha=150` (Parameter von `field_to_png`) wurde durch eine neue Funktion `_alpha_curve()` ersetzt, die pro Pixel eine wertabhängige, non-lineare Deckkraft berechnet — getrennt für Wolken (`cloud`) und Niederschlag (`precip`). Die Farbstopps selbst (`_CLOUD_STOPS`, `_PRECIP_STOPS`) bleiben unverändert, wie von Option E vorgesehen — nur die Transparenzsteuerung ändert sich. Der `alpha`-Parameter der Funktionssignatur wurde entfernt, da er nirgends mit einem expliziten Wert aufgerufen wurde (verifiziert per Grep: einziger Aufrufer `render_all_pngs()` sowie ein Testaufruf, beide ohne `alpha`-Argument).
+
+**Gewählte Schwellwerte/Alpha-Ziele (nach Designer-Check `fotoalert-designer`, Bauhaus-Prinzip „Farbe/Deckkraft als Signal, nicht Dekoration" + „ruhiger Verlauf statt harter Kante"):**
+
+| Feld | Unterhalb Schwellwert | Schwellwert („spürbares Wetter") | Deckkraft an Schwelle | Kurve bis Maximalwert | Maximal-Deckkraft |
+|---|---|---|---|---|---|
+| Wolken (`cloud`) | alpha 60 (0–15 %) | 15 % Bewölkung | alpha 190 (Sprung) | Wurzel-Anstieg bis 100 % | alpha 235 |
+| Niederschlag (`precip`) | alpha 0 unter 0,05 mm (unverändert), alpha 170 zwischen 0,05–0,3 mm | 0,3 mm/h | alpha 170 (kein zusätzlicher Sprung, da bereits sichtbar) | Wurzel-Anstieg bis 10 mm | alpha 235 |
+
+Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar (kein Fehlsignal bei echtem Klarwetter/Nieselgrenze — erfüllt AK „bleibt bewusst sehr hell/kaum sichtbar" aus Analyse 1). Direkt am Schwellwert springt die Deckkraft deutlich wahrnehmbar nach oben (erfüllt AK „deutlich wahrnehmbare, eingefärbte Fläche" für real vorhandenes, aber leichtes Wetter). Der weitere Anstieg bis zum Maximalwert folgt einer Wurzel-Kurve (Exponent 0,5) statt eines linearen oder harten Sprungs — das vermeidet eine sichtbare „Kante" am Schwellwert und verhindert gleichzeitig Übersättigung bei Starkwetter, da die Deckkraft bewusst nie 255 (voll deckend) erreicht, sondern bei 235 plateaut (Karte bleibt darunter leicht sichtbar, analog zur bestehenden Bauhaus-Regel „Karte als Hintergrund, nicht Showpiece"). Die bestehende Trockenheits-Transparenz-Regel für Niederschlag (<0,05 mm → alpha 0) bleibt unverändert erhalten.
+
+**Bezug zu den Akzeptanzkriterien (aus „## Analyse (2026-07-04)"):**
+- AK 1 (deutlich wahrnehmbare Fläche bei realem Wetter): erfüllt durch den Alpha-Sprung auf 190/170 an der jeweiligen Schwelle.
+- AK 2 (Fläche verändert sich sichtbar mit dem Zeitregler): unverändert gegeben, da pro Stunde weiterhin ein eigenes PNG mit den tatsächlichen Werten dieser Stunde erzeugt wird — die neue Kurve wirkt pro Pixel/Stunde identisch.
+- AK 3 (bei praktisch keinem Wetter bleibt Fläche bewusst kaum sichtbar): erfüllt durch die niedrige Basis-Deckkraft unterhalb des jeweiligen Schwellwerts (60 bzw. 0/170 vor der Precip-Schwelle).
+- AK 4 (Hinweistext bei leerem Cache statt stiller Leerfläche): nicht Teil dieser Code-Änderung — betrifft Frontend-Ladezustand, nicht die Alpha-Berechnung; unverändert, kein Regressionsrisiko durch diese Änderung.
+- AK 5 (Legende bleibt korrekt passend sichtbar): keine Änderung an Legenden-Farbwerten nötig, da Option E bewusst nur die Deckkraft und nicht die Farbstopps ändert — Legende und PNG nutzen weiterhin dieselben Farbwerte, kein Auseinanderlaufen.
+
+**Tests:** Bestehender Test `backend/tests/test_us112_weather_map.py` (`test_interpolate_and_png`, Aufruf `wg.field_to_png(arr, "cloud")`) bleibt unverändert lauffähig, da kein Aufrufer einen expliziten `alpha`-Wert übergeben hat. Ergänzt wurden 6 neue, gezielte Tests für die neue Alpha-Kurve: `test_cloud_alpha_below_threshold_stays_faint`, `test_cloud_alpha_jumps_at_threshold`, `test_cloud_alpha_high_value_near_max_not_oversaturated`, `test_precip_dry_limit_still_fully_transparent`, `test_precip_alpha_jumps_above_dry_limit`, `test_precip_alpha_high_value_near_max_not_oversaturated` — sie lesen den tatsächlichen Alpha-Kanal aus dem erzeugten PNG (via Pillow) und prüfen Basis-, Sprung- und Maximalwert pro Feld. In der Sandbox konnte kein volles `pytest` laufen (kein `eccodes`/`pytest` im Sandbox-Python installiert), die Kernlogik (`_alpha_curve` + `field_to_png`-Alpha-Ausgabe) wurde stattdessen per eigenständigem Python-Skript mit echtem numpy/Pillow gegen die erwarteten Werte verifiziert (Ergebnis deckt sich exakt mit der Tabelle oben: cloud 0%→60, 2%→60, 15%→190, 50%→218, 100%→235; precip 0,01mm→0, 0,1mm→170, 0,3mm→170, 2mm→197, 10mm→235). Empfehlung: Vollen `pytest`-Lauf inkl. eccodes-Tests auf Stephans Mac-Venv oder in CI bestätigen.
+
+**Wichtiger Hinweis für die Testphase:** Die Wetterkarten-PNGs liegen ausschließlich im Arbeitsspeicher des Server-Prozesses (`_weather_map_png`-Dict in `backend/main.py`). Nach dem Deploy dieser Änderung zeigen bereits laufende Server-Instanzen weiterhin die alten Bilder, bis entweder der nächste geplante Rebuild (laut Scheduler alle 3h) läuft oder der Prozess neu gestartet wird. Für den Test sollte daher entweder auf den nächsten Scheduler-Lauf gewartet oder der Server-Prozess neu gestartet werden — sonst wirkt der Fix fälschlich als „nicht angekommen".
 
 ---
 
@@ -1727,6 +1912,181 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
         ──▶ TASK-46 (LLM)       ├──▶ TASK-48 (Cron)
         ──▶ TASK-47 (FL-Calc)   ┘
 ```
+
+---
+
+### TASK-53 · Live-Nutzerdaten periodisch nach Dev spiegeln `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Status** | In Test |
+| **Priorität** | Niedrig |
+| **Status** | Ready for Dev |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Regelmäßiger (idealerweise automatischer) Mechanismus, der die durch Nutzung stetig wachsenden Live-Daten in die Dev-Umgebung überträgt und dortige Testdaten überschreibt. Ziel: realistischere Testdaten in Dev, um Auswirkungen auf Performance, Datenspeicherung und Nutzerverträglichkeit (z. B. längere Ladezeiten oder Berechnungen) sichtbar zu machen, die mit synthetischen Testdaten nicht auffallen würden.
+
+**Bezug:** Grenzt an US-75 [x] (Epic User/Backend-Datensync: QA-Automatisierung für Location-Metadaten wie Azimut, Beschreibungen, Brennweite) — dort werden bestehende Locations inhaltlich angereichert/geprüft, hier geht es um die reine Datenübertragung Live→Dev als Kopie/Snapshot. Keine Dublette, kein direkter Abhängigkeitspfad; beide betreffen Nutzerdaten-Pflege, aber unterschiedliche Ziele.
+
+**Scope:**
+- **Eingeschlossen:** Ein manuell anzustoßender Übertragungsvorgang, der den kompletten aktuellen Datenbestand der Live-App (Standorte, Bewertungen, Vor-Ort-Meldungen, QA-Zustände) als Kopie in die lokale Entwicklungsumgebung von Stephan bringt und dortige Testdaten vollständig ersetzt.
+- **Ausgeschlossen:** Automatischer Zeitplan (Cron) für den ersten Wurf — siehe ⚠️ Annahme unten. Rückrichtung Dev→Live (nie Bestandteil). Anonymisierung/Pseudonymisierung von `device_id` (siehe Datenschutz-Prüfung — nicht nötig, da keine personenbezogenen Daten). Ein Web-UI oder Admin-Knopf für den Sync (v1 ist ein Terminal-Befehl).
+
+**⚠️ Annahme (v1-Slice, bitte bestätigen):** „Regelmäßig (idealerweise automatisch)" wird in dieser ersten Ausbaustufe als **manuell auf Zuruf ausgeführtes Skript** umgesetzt, nicht als automatischer Cron-Job. Begründung: Ein automatischer Job auf dem Live-Server, der unbeaufsichtigt Stephans lokale Testumgebung überschreibt, ist riskanter (Gefahr: manuell angelegte Test-Locations gehen unbemerkt verloren, siehe Pre-Mortem Szenario 1) und für ein Priorität-Niedrig-Task unverhältnismäßig aufwendig (Cron auf Live bräuchte SSH-Vertrauensstellung Live→Stephans Mac oder einen Zwischenspeicher-Endpoint). Automatisierung ist als Ausbaustufe 2 im Options-Abschnitt festgehalten, aber nicht Teil dieses Slices.
+
+---
+
+**Example Mapping:**
+
+📏 **Regel 1 — Der Sync ist eine vollständige Kopie, keine Zusammenführung.** Alle nutzereditierbaren Daten aus der Live-Datenbank (Standorte, Korrekturen, Bewertungen, Vor-Ort-Meldungen, QA-Zustände) ersetzen die entsprechenden Dev-Daten vollständig. Es wird nichts zusammengeführt oder abgeglichen.
+- 🟢 Stephan hat in Dev testweise 5 eigene Test-Standorte angelegt, auf Live gibt es 20 echte Nutzer-Standorte → nach dem Sync sind in Dev die 20 Live-Standorte vorhanden, die 5 Test-Standorte sind weg.
+- 🟢 Ein Standort wurde auf Live von einem Nutzer mit 3 Sternen bewertet → nach dem Sync zeigt Dev dieselbe Bewertung.
+
+📏 **Regel 2 — Der Sync läuft nur in eine Richtung: Live → Dev.** Es gibt keinen Pfad, über den Dev-Daten (auch versehentlich) auf Live landen.
+- 🟢 Stephan verändert in Dev testweise einen Standort-Namen, führt danach den Sync aus → die Änderung wird überschrieben (durch den Live-Stand), Live bleibt komplett unberührt.
+- 🟢 Der Sync-Befehl fragt vor der Ausführung, welche Richtung gemeint ist bzw. ist so gebaut, dass „versehentlich falschrum" technisch gar nicht möglich ist (feste Quelle Live, festes Ziel Dev, keine Parameter-Vertauschung).
+
+📏 **Regel 3 — Der Sync bringt einen Schnappschuss vom aktuellen Live-Stand, keine laufende Synchronisation.** Nach dem Sync entwickeln sich Live und Dev wieder unabhängig, bis der nächste Sync manuell angestoßen wird.
+- 🟢 Direkt nach dem Sync ändert ein Nutzer auf Live eine Bewertung → diese Änderung taucht in Dev erst beim nächsten Sync-Lauf auf, nicht sofort.
+
+📏 **Regel 4 — Der Sync-Vorgang selbst darf die Live-App nicht spürbar verlangsamen.** Die Datenmenge ist heute klein (SQLite-Datei im niedrigen MB-Bereich), das Kopieren geschieht ohne Schreibsperre auf der Live-Datenbank.
+- 🟢 Während des Sync-Vorgangs kann ein Nutzer weiterhin auf Live eine Location bewerten oder eine Meldung abschicken, ohne Fehler oder Wartezeit zu bemerken.
+
+❓ **Questions:** keine offen (v1-Slice als ⚠️-Annahme markiert, blockiert nicht — Bestätigung folgt im Weg-Gate).
+
+---
+
+**Akzeptanzkriterien (erlebbares Verhalten):**
+- [ ] **AK-1 (vollständige Kopie):** Nach einem Sync-Lauf zeigt die lokale Dev-Umgebung exakt die Standorte, Bewertungen, Vor-Ort-Meldungen und QA-Zustände, die zum Sync-Zeitpunkt auf der Live-App vorhanden waren.
+- [ ] **AK-2 (alte Dev-Testdaten sind weg):** Manuell in Dev angelegte Test-Standorte oder Test-Bewertungen, die es auf Live nicht gibt, sind nach dem Sync nicht mehr vorhanden.
+- [ ] **AK-3 (Live bleibt unberührt):** Nach dem Sync sind auf der Live-App keinerlei Veränderungen sichtbar — weder an Standorten noch an sonstigen Daten. Die Live-App war während des gesamten Vorgangs normal nutzbar.
+- [ ] **AK-4 (Sicherheitsnetz vor Überschreiben):** Vor jedem Sync wird der bisherige Dev-Datenstand automatisch weggesichert, sodass er bei Bedarf wiederhergestellt werden kann, falls der Sync versehentlich zur falschen Zeit lief oder ein noch benötigter Testfall verloren ging.
+- [ ] **AK-5 (Rückmeldung):** Nach Abschluss des Sync-Laufs bekommt Stephan eine klare Bestätigung, wie viele Standorte/Bewertungen/Meldungen übertragen wurden bzw. eine klare Fehlermeldung, falls etwas schiefging.
+- [ ] Edge Case: **Live-Datenbank ist zum Sync-Zeitpunkt gerade in Benutzung** (Nutzer schreibt gleichzeitig eine Bewertung) → der Sync-Lauf schlägt dadurch nicht fehl und die Live-Aktion geht nicht verloren.
+- [ ] Edge Case: **Verbindung zum Live-Server bricht während der Übertragung ab** → Dev bleibt beim alten (weggesicherten) Stand, es entsteht kein halb-überschriebener, korrupter Zwischenzustand.
+
+---
+
+**Pre-Mortem:**
+
+📎 **Code-Verifikation (2026-07-04, gelesen, nicht erinnert):**
+- **Umgebungstrennung existiert bereits:** `backend/data/store.py` Z.34–40 liest `FOTOALERT_ENV` (Default `"prod"`) und wählt danach den DB-Pfad: `prod` → `backend/data/fotoalert.db`, alles andere → `backend/data_dev/fotoalert.db`. **Bestätigt:** Live und Dev sind bereits sauber getrennte SQLite-Dateien, keine gemeinsame DB, kein Risiko einer versehentlichen Direktverbindung.
+- **Dev-DB existiert bereits real:** `backend/data_dev/` enthält aktuell `test.db` — Stephans laufende lokale Testdatenbank. Ein Sync würde **genau diese Datei** ersetzen. Zusätzlich enthält der Ordner sehr viele `.fuse_hidden*`-Artefakte (Hinweis auf ein Netzwerk-/Sandbox-Dateisystem mit häufigen Schreib-Locks) — beim Dateiersatz auf dem echten Mac (nicht in der Sandbox) ist das ohne Bedeutung, wird hier nur als Beobachtung festgehalten.
+- **Was „Live-Daten" konkret sind:** `backend/data/store.py` Z.45–122 zeigt die vollständigen Tabellen: `custom_locations` (User-Standorte), `location_overrides` (Korrekturen an Standard-Locations), `location_verifications` (Vor-Ort-Meldungen inkl. Freitext-`comment`), `location_ratings` (Sterne pro `device_id`), `device_tokens` (Push-Token pro `device_id`), `camera_profiles` (Kameraprofil pro `device_id`), `location_qa_state`/`location_qa_values` (Auto-QA-Zustände aus US-75). **Kein** Tabellenfeld für Namen, E-Mail-Adressen, Postanschriften oder Zahlungsdaten.
+- **Datenschutz-Prüfung (Ergebnis):** `backend/auth.py` zeigt ein rollenbasiertes Login (nur zwei globale Passwörter „host"/„user" aus `.env`, Token ist rollen- nicht personengebunden). Es gibt kein Nutzerkonto-Konzept mit Namen/E-Mail. Die einzige personenbezogene-artige Kennung ist `device_id` (ein clientseitig generierter, nicht direkt auf eine Person rückführbarer String) in `location_ratings`, `device_tokens`, `camera_profiles`. Freitext-Felder (`location_verifications.comment`) könnten theoretisch von Nutzern selbst eingegebene Namen enthalten, das ist aber nicht vom System vorgesehen. **Einschätzung: kein klassisches personenbezogenes Datenschutzproblem im Sinne der DSGVO-Betroffenenrechte, aber Freitextfelder sind nicht auszuschließende Restrisiko-Quelle** — sollte im Weg-Gate kurz bestätigt werden, ist aber kein Blocker für v1.
+- **Kein bestehendes Sync-/Export-Skript:** Weder unter `FotoAlert/tools/` noch per Namenssuche (`*sync*`, `*mirror*`) existiert bereits ein Live→Dev-Datenübertragungsmechanismus. `tools/sync_kanban.py` ist ein unabhängiges Skript für das Kanban-Board, nicht für App-Daten. **Bestätigt: TASK-53 baut komplett neu, keine Wiederverwendung eines bestehenden Sync-Wegs.**
+- **Backup-Mechanismus als Vorbild vorhanden:** `backend/data/backup.py` zeigt ein bereits etabliertes Muster für „Datei-Snapshot mit Aufbewahrungslimit" (`snapshot_before_precompute()`, max. 7 lokale Kopien, No-Op wenn `FOTOALERT_ENV != "prod"`). Dasselbe Snapshot-Prinzip lässt sich 1:1 für „Dev-DB vor Überschreiben sichern" wiederverwenden (AK-4).
+- **Server-Zugriff:** Live läuft auf Hetzner (IP 167.233.138.36, App-Root `/opt/fotoalert/app/FotoAlert/`, DB unter `backend/data/fotoalert.db`). Git-Ops laufen laut Memory über den `fotoalert-server`-User; für einen reinen Lesezugriff (DB-Kopie ziehen) ist ebenfalls der `fotoalert-server`-User zu verwenden, nicht root (root nur für systemd/Dateisystem-Notfälle).
+
+💀 **Szenario 1 — Stephans manuell angelegte Dev-Testdaten gehen unbemerkt verloren.**
+   Auslöser: Sync läuft (versehentlich oder geplant), während gerade ein wichtiger, noch nicht dokumentierter Testfall in Dev existiert.
+   Frühwarnung: Stephan sucht nach einem Test-Standort und findet ihn nicht mehr.
+   Gegenmaßnahme: Automatisches Wegsichern des alten Dev-Stands vor jedem Sync (AK-4), plus deutliche Bestätigungsmeldung vor dem eigentlichen Überschreiben (kein „stiller" Lauf ohne Rückfrage in v1).
+
+💀 **Szenario 2 — Sync-Richtung wird verwechselt, Dev überschreibt Live.**
+   Auslöser: Kopier- oder Fernzugriffsbefehl mit vertauschten Quell-/Ziel-Parametern.
+   Frühwarnung: Live-App zeigt plötzlich Stephans Test-Standorte statt echter Nutzerdaten.
+   Gegenmaßnahme: Feste, im Skript fest verdrahtete Richtung (Quelle immer Live-Pfad auf dem Server, Ziel immer der lokale `data_dev`-Pfad), keine Kommandozeilen-Parameter, die die Richtung umkehren könnten; zusätzlich Kopiervorgang nur lesend auf der Live-Seite (Live-Datei wird nie beschrieben, nur gelesen).
+
+💀 **Szenario 3 — Der Sync-Vorgang belastet oder blockiert den Live-Server.**
+   Auslöser: Kopieren einer SQLite-Datei während reger Schreibaktivität, oder ein rechenintensiver Exportschritt im selben Prozess wie der FastAPI-Server.
+   Frühwarnung: Health-Check reagiert während des Sync-Fensters langsamer.
+   Gegenmaßnahme: SQLite läuft bereits im WAL-Modus (`store.py` Z.43 `PRAGMA journal_mode=WAL`) — das erlaubt gleichzeitiges Lesen der Datenbankdatei ohne Schreibsperre; die Kopie wird komplett außerhalb des Server-Prozesses angestoßen (eigener SSH-Befehl/Cronjob, kein neuer FastAPI-Endpoint, der im Event-Loop läuft) → keine Event-Loop-Blockade wie in TASK-48 Szenario 4.
+
+💀 **Szenario 4 — Python-Versionsunterschied (3.9 Live vs. 3.10 Sandbox) bricht ein gemeinsames Skript.**
+   Auslöser: Ein Hilfsskript, das sowohl auf dem Server als auch lokal läuft, nutzt moderne Syntax (`str | None`, `match`-Statement).
+   Frühwarnung: Skript funktioniert lokal, crasht aber auf dem Server mit `SyntaxError`.
+   Gegenmaßnahme: Falls ein Python-Hilfsskript entsteht (nicht zwingend, siehe Optionen), durchgängig 3.9-kompatible Syntax verwenden (`from __future__ import annotations`, `Optional[...]` statt `X | None`) — analog zur bestehenden Konvention in `auth.py`/`backup.py`.
+
+💀 **Szenario 5 — Falsche SSH-Rechte verhindern den Lesezugriff oder erlauben versehentlich mehr als nötig.**
+   Auslöser: Sync-Skript nutzt den root-User statt des vorgesehenen `fotoalert-server`-Users, oder umgekehrt hat `fotoalert-server` keine Leserechte auf die DB-Datei.
+   Frühwarnung: `Permission denied` beim ersten Testlauf, oder (schlimmer) ein Skript mit unnötig weiten Root-Rechten.
+   Gegenmaßnahme: Sync-Skript nutzt ausschließlich `ssh fotoalert-server` für den Lesezugriff auf die DB-Datei (analog zur bestehenden Konvention für Git-Ops); root wird nicht angefasst.
+
+💀 **Szenario 6 — Freitext-Meldungen enthalten unerwartet sensible Angaben.**
+   Auslöser: Ein Nutzer trägt in eine Vor-Ort-Meldung (`location_verifications.comment`) versehentlich einen Namen, eine Telefonnummer o.ä. ein.
+   Frühwarnung: Beim Sichten der Dev-Daten fällt ein ungewöhnlich persönlicher Kommentar auf.
+   Gegenmaßnahme: Kein technischer Automatismus in v1 (Aufwand/Nutzen unverhältnismäßig bei Priorität Niedrig); stattdessen als bekanntes Restrisiko dokumentiert (siehe Datenschutz-Prüfung) — Dev-Umgebung bleibt wie bisher nur für Stephan zugänglich, kein Weitergabe-Szenario.
+
+---
+
+**Architektur-Analyse:**
+- **Betroffene Komponenten (kein bestehender Code wird geändert, nur neue Werkzeuge kommen hinzu):**
+  - `backend/data/store.py` — nur als Referenz für Tabellenstruktur, **keine Codeänderung** nötig (Sync kopiert die Datei als Ganzes, spricht nicht einzelne Tabellen an).
+  - `backend/data/backup.py` — Vorbild für das Snapshot-Prinzip (AK-4); ggf. Erweiterung um eine Dev-Sicherungsfunktion nach demselben Muster, oder eigenständiges kleines Skript in `FotoAlert/tools/`.
+  - Neues Werkzeug (Name/Ort je nach gewählter Option) unter `FotoAlert/tools/` — auf der Mac-Seite ausgeführt, holt die Live-DB-Datei per SSH vom Server und ersetzt die lokale `backend/data_dev/fotoalert.db`.
+  - Server-seitig keine Codeänderung nötig — es wird nur lesend auf die bestehende `backend/data/fotoalert.db` zugegriffen.
+- **Datenmenge:** SQLite-Datei, aktuell überschaubare Nutzerbasis (wenige Standorte/Bewertungen) → Dateigröße im niedrigen MB-Bereich, unkritisch für Übertragungsdauer.
+- **Python-3.9-Konformität:** Falls das Sync-Werkzeug in Python geschrieben wird (statt reinem `scp`/`rsync`-Shellbefehl), muss es 3.9-kompatibel sein, da es potenziell auch serverseitig laufen könnte (auch wenn v1 rein clientseitig von Stephans Mac aus gedacht ist).
+
+---
+
+**Implementierungsoptionen:**
+
+### Option A — Manuelles Kopier-Skript (SCP/rsync) von Stephans Mac aus (Empfehlung)
+- Vorgehen: Ein kleines Skript (Shell oder Python) unter `FotoAlert/tools/`, das Stephan bei Bedarf startet. Es sichert zuerst die aktuelle Dev-Datenbank lokal weg (Zeitstempel-Kopie, Aufbewahrung z.B. letzte 5 Stände — analog zum bestehenden Snapshot-Prinzip in `backup.py`), holt danach die aktuelle Live-Datenbankdatei per `ssh fotoalert-server`/`scp` und ersetzt damit die lokale Dev-Datenbank. Am Ende eine kurze Zusammenfassung (Anzahl Standorte/Bewertungen/Meldungen vorher/nachher).
+- App-Wirkung für Stephan: Ein einziger Befehl im Terminal, danach zeigt der lokale Dev-Server beim nächsten Start exakt den aktuellen Live-Datenstand — alte Testdaten sind weg, aber vorher automatisch gesichert.
+- Betroffene Dateien: neues Skript in `FotoAlert/tools/`, keine Änderung an bestehendem Code.
+- Vorteile: Kleinster Eingriff, kein neuer Server-Prozess, keine neue Angriffsfläche auf der Live-App, volle Kontrolle durch Stephan (läuft nur wenn er es will — vermeidet Szenario 1/2), nutzt bestehende SSH-Konvention (`fotoalert-server`-User).
+- Nachteile/Risiken: Kein automatischer Zeitplan (entspricht der ⚠️-Annahme oben — bewusster Trade-off für Priorität Niedrig).
+- Aufwand: klein.
+
+### Option B — Automatisierter Cron-Job auf dem Live-Server, der periodisch nach Dev pusht
+- Vorgehen: Ein Scheduler-Job auf dem Hetzner-Server exportiert periodisch die Live-DB und überträgt sie aktiv auf Stephans Mac (z.B. per SSH-Push) oder legt sie an einem Zwischenort ab, von dem Stephans Mac sie zieht.
+- App-Wirkung: identisch zu Option A, nur ohne manuellen Anstoß — Dev aktualisiert sich „von selbst".
+- Vorteile: erfüllt die „idealerweise automatisch"-Formulierung im Ticket wörtlich.
+- Nachteile/Risiken: Der Live-Server bräuchte eine Vertrauensstellung/Zugangsdaten Richtung Stephans privatem Mac (SSH-Key vom Server zum Mac, oder der Mac müsste dauerhaft erreichbar sein) — ungewöhnliche und sicherheitstechnisch unschöne Richtung (Server → privates Endgerät); höherer Betriebsaufwand für ein Priorität-Niedrig-Task; erhöht das Risiko aus Szenario 1 (unbeaufsichtigtes Überschreiben zu einem ungünstigen Zeitpunkt).
+- Aufwand: groß.
+
+### Option C — API-basierter Export-/Import-Endpoint
+- Vorgehen: Ein neuer, host-geschützter Endpoint auf der Live-App liefert einen Datenexport (z.B. als JSON oder DB-Datei-Download); ein Gegenstück lokal importiert diesen in die Dev-DB.
+- App-Wirkung: identisch zu Option A, aber über HTTP statt SSH/SCP.
+- Vorteile: kein SSH-Zugriff auf Dateisystemebene nötig.
+- Nachteile/Risiken: Neue Angriffsfläche auf der Live-App (zusätzlicher Endpoint, der die komplette Datenbank exportierbar macht — muss besonders sorgfältig abgesichert sein); mehr Code als Option A für denselben Nutzen, da die SSH-Konvention (`fotoalert-server`-User, siehe Memory) bereits für genau diesen Zweck existiert.
+- Aufwand: mittel.
+
+✅ **Empfehlung: Option A** — sie ist die einfachste Lösung, die alle Akzeptanzkriterien erfüllt, führt keine neue Angriffsfläche auf der Live-App ein, nutzt die bereits etablierte SSH-Konvention und das bereits vorhandene Snapshot-Prinzip aus `backup.py`. Die im Ticket gewünschte Automatisierung wird bewusst als spätere Ausbaustufe zurückgestellt (⚠️ Annahme), da ein automatischer Cron in Richtung eines privaten Mac (Option B) unverhältnismäßig viel Betriebsrisiko für ein Priorität-Niedrig-Task bedeutet. Bei Bedarf kann Option A später um einen lokalen `launchd`/Cron-Aufruf auf Stephans Mac ergänzt werden (Mac zieht periodisch selbst, statt dass der Server pusht) — das wäre eine risikoärmere Variante von „automatisch" als Option B.
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Regeln, Examples belegt, keine offenen Questions, v1-Slice als Annahme markiert)
+- [x] Pre-Mortem durchgeführt (6 Szenarien, je Gegenmaßnahme in AK/Plan verankert)
+- [x] Architektur analysiert: `data/store.py` (Umgebungstrennung + Tabellenstruktur), `data/backup.py` (Snapshot-Vorbild), `auth.py` (Datenschutz-Prüfung), kein bestehendes Sync-Skript gefunden
+- [x] Designer-Check: nicht visuell (reines Dev-Tooling ohne App-UI) → übersprungen
+- [x] Implementierungsoptionen: A (manuelles Kopier-Skript, Empfehlung) / B (automatischer Server-Cron) / C (API-Export-Endpoint)
+- [x] Empfehlung **Option A** — Weg-Gate via Board (Lane „Ready for Dev") freigegeben (2026-07-04), inkl. Annahme „v1 manuell statt automatisch" bestätigt → Ready for Dev
+
+**Testplan:**
+- [ ] Automatisiert (`backend/tests/test_task53_dev_sync.py`, Ticket-ID im Docstring, soweit ohne echten Server-Zugriff testbar):
+  - Sicherungsfunktion legt vor dem Ersetzen eine Zeitstempel-Kopie der alten Dev-DB an (AK-4).
+  - Nach simuliertem Ersetzen enthält die Dev-DB exakt den Inhalt der Quelldatei, alte Dev-only-Einträge sind weg (AK-1/AK-2).
+  - Abbruch mitten im Kopiervorgang (simulierter Fehler) lässt die alte Dev-DB unangetastet zurück, kein korrupter Zwischenzustand (Edge Case „Verbindungsabbruch").
+- [ ] Manuell: Sync-Befehl gegen die echte Live-DB auf dem Server ausführen, danach lokalen Dev-Server starten (`http://localhost:8000`) und prüfen, dass die angezeigten Standorte/Bewertungen dem aktuellen Live-Stand entsprechen; parallel auf der echten Live-App (fotoalert.stephanschumann.com) bestätigen, dass keinerlei Veränderung sichtbar ist (AK-3).
+- [ ] Regression: bestehender lokaler Dev-Workflow (Server-Start, `Application startup complete.`) funktioniert nach dem Sync unverändert; kein bestehender Endpoint oder Cron-Job auf Live wird durch den rein lesenden Zugriff beeinträchtigt.
+
+---
+
+**Umsetzung (2026-07-04, Option A):**
+- Neu: `FotoAlert/tools/sync_dev_from_live.py` — Kommandozeilen-Werkzeug für Stephans Mac. Sichert die lokale Dev-DB per Zeitstempel-Snapshot (max. 5 Stände, `backend/data_dev/snapshots/`), holt danach die Live-DB per `scp` über den `fotoalert-server`-User (rein lesend), lädt sie in eine temporäre Datei und ersetzt die Dev-DB erst bei vollständigem Erfolg atomar (`Path.replace`). Richtung (Live→Dev) sowie Quell-/Zielpfade sind fest im Code verdrahtet, keine CLI-Parameter dafür. Gibt am Ende Zeilenzahlen je Kerntabelle (`custom_locations`, `location_overrides`, `location_verifications`, `location_ratings`) vorher/nachher aus.
+- Neu: `FotoAlert/backend/tests/test_task53_dev_sync.py` — 12 automatisierte Tests (Snapshot-Erstellung + Retention, atomarer Ersatz inkl. WAL/SHM-Bereinigung, Verbindungsabbruch-Simulation über gemocktes `subprocess.run`, Zusammenfassungs-Zählung). Alle 12 grün, keine Regression in Nachbar-Tests (`test_task45_azimuth.py`, `test_task43_qa_model.py` weiterhin grün).
+- Kein bestehender Code geändert (`store.py`, `backup.py` nur als Vorbild/Referenz gelesen, nicht angefasst).
+- Nicht automatisiert testbar (kein Sandbox-Netzwerkzugriff auf den Hetzner-Server): der echte `scp`-Verbindungstest gegen Live sowie der End-to-End-Testplan-Punkt „Manuell" bleiben ein manueller Schritt für Stephan.
+
+---
+
+### TASK-54 · Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Prüfen, ob ein dauerhafter Festplatten-Cache für die Wetterkarten-PNGs auf dem FotoAlert-Server sinnvoll ist. Laut Code-Analyse zu BUG-59 werden die Wetterkarten-PNGs aktuell nur in einem Arbeitsspeicher-Dictionary im Backend-Prozess gehalten (`_weather_map_png` in `backend/main.py`) — kein erkennbarer Disk-Cache im Code gefunden. Das bedeutet: Nach einem Server-Neustart ist der Wetterkarten-Cache leer, bis er neu aufgebaut wird (Dauer abhängig von der Datenquelle). Stephan hat bestätigt, dass auf dem Server ausreichend Speicherplatz vorhanden ist — ein Disk-Cache wäre also machbar.
+
+**Bezug:** Der fehlende Disk-Cache wurde als Nebenbefund in der **BUG-59**-Analyse [ ] (Ready for Dev, „Zeitregler im Karten-Tab: Kein Wolken-/Regen-Overlay sichtbar") dokumentiert (dort Abschnitt „Grenzen dieser Analyse" sowie Architektur-Analyse: „Kein Cache-Verzeichnis auf Datei-Ebene identifiziert"), dort aber bewusst nicht gelöst — BUG-59 behandelt ein Sichtbarkeits-/Wahrnehmungsproblem des Overlays (Zoom + Farbskala), dieses Ticket behandelt die separate Frage der Cache-Persistenz nach einem Neustart. Keine Vermischung mit BUG-59 vorgesehen. Grenzt außerdem ab zu: **US-112** [x] (liefert die Wetter-Overlay-Daten/-Bilder selbst inkl. bestehendem Prozess-Speicher-Cache-Muster, aber kein Disk-Cache) und **BUG-58** [x] (reine Zoom-Umstellung, anderer Codepfad, nicht betroffen). Kein Bezug zu **TASK-50** (Service-Worker Auto-Update — betrifft den Frontend-Browser-Cache der Web-App, nicht den Backend-Wetterkarten-Cache) und keine Überschneidung mit den Feed-/Kalender-/Scout-Caches (`opportunities.json`, `calendar.json`, `discover.json`) — der Wetterkarten-PNG-Cache ist ein eigenständiger, bislang rein prozessgebundener Cache-Mechanismus.
 
 ---
 
@@ -2609,7 +2969,7 @@ Alle drei im Ticket offen gelassenen Fragen konnten durch Code-Lektüre (nicht d
 
 **Beschreibung:** Die Wolken-/Regen-Legende im Karten-Tab soll von ihrer aktuellen Position (Mitte links) nach unten links über den Zeitschieberegler verschoben werden, damit die Kartenmitte aufgeräumter/freier wirkt. Reine visuelle Layout-Umpositionierung eines bestehenden Elements, kein neuer Nutzerwert — daher als Task statt User Story eingeordnet.
 
-**Bezug:** Betrifft dieselbe Karten-Visualisierung wie **BUG-58** [ ] und **BUG-59** [ ] (Wolken-/Niederschlag-Overlay im Karten-Tab), aber eigenständig — reine Positionsänderung der Legende, keine Overlay-/Zoom-Logik. **Wichtig:** Da dies eine visuelle Layout-Änderung an einer Karten-Visualisierung ist, MUSS in der Analyse-/Umsetzungsphase der `fotoalert-designer`-Skill (Bauhaus-Designwächter) hinzugezogen werden.
+**Bezug:** Betrifft dieselbe Karten-Visualisierung wie **BUG-58** [x] und **BUG-59** [ ] (Wolken-/Niederschlag-Overlay im Karten-Tab), aber eigenständig — reine Positionsänderung der Legende, keine Overlay-/Zoom-Logik. **Wichtig:** Da dies eine visuelle Layout-Änderung an einer Karten-Visualisierung ist, MUSS in der Analyse-/Umsetzungsphase der `fotoalert-designer`-Skill (Bauhaus-Designwächter) hinzugezogen werden.
 
 ---
 
