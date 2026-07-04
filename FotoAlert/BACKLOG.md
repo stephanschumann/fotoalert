@@ -4371,12 +4371,166 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass die Location-Übersicht aufsteigend nach Entfernung vom aktuellen Standort sortiert ist (nicht vom Motiv), damit die nächstgelegenen Spots automatisch oben stehen.
 
 **Bezug:** Verwandt zu **BUG-51** [x] (Done, released 2026-06-29 — Entfernungsfilter im Locations-Tab funktioniert, filtert aber nur nach Radius, sortiert nicht). Kein Duplikat: BUG-51 behandelt Filterung (ein-/ausblenden), US-118 behandelt Sortierreihenfolge der sichtbaren Liste. Beide können nebeneinander bestehen (gefiltert UND sortiert).
+
+---
+
+#### Analyse (US-118)
+
+**Datum:** 2026-07-04
+
+📎 **Code-Verifikation:** `web/index.html` gelesen.
+- `Locations.render(locs)` (Zeile 5225–5254) übernimmt die Reihenfolge des übergebenen Arrays unverändert — es gibt aktuell **keine Sortierung**, weder nach Entfernung noch nach etwas anderem. Die Liste erscheint in der Reihenfolge, in der `/locations` sie liefert (Datenbank-/Einfügereihenfolge).
+- `Filter.applyToLocations(locs)` (Zeile 2764–2795) filtert nur (Schwierigkeit, Kategorie, Bewertung, Verifikation, Score, seit BUG-51 auch Entfernungsradius) — verändert die Reihenfolge der verbleibenden Einträge nicht.
+- Location-Objekte besitzen **kein** `distance_m`-Feld von sich aus (anders als manche Event-Objekte in Feed/Kalender/Scout). Sie haben aber `observer_lat`/`observer_lon` (Fotografen-Standpunkt) — dieselben Felder, die BUG-51 bereits für die Radius-Filterung nutzt.
+- `haversineKm(lat1, lon1, lat2, lon2)` (Zeile 2576–2583) ist die vorhandene, wiederverwendbare Distanzfunktion — bereits an drei Stellen im Filter-Code im Einsatz (Map, Locations-Filter, Scout).
+- `Filter._gps` (gesetzt über `Filter.requestGps()`, Zeile 2841–2861) enthält den aktuellen GPS-Standort des Nutzers, aber **nur wenn vorher ein Entfernungsfilter aktiv war** — `Locations.load()` (Zeile 5200–5204) und `Locations.filter()` (Zeile 5212–5224) fragen GPS bislang nur an, wenn `Filter.state.maxDistKm > 0`. Für eine Sortierung nach Entfernung wäre GPS **immer** nötig, unabhängig vom Filterzustand — das ist eine Erweiterung des bestehenden GPS-Anfrage-Pfads.
+- Bestätigt aus BUG-51: „Standort" = GPS-Standort des Nutzers (`observer_lat`/`observer_lon` als Ziel), **nicht** der Motiv-Standort (`subject_lat`/`subject_lon`). Deckt sich mit der Ticket-Formulierung „nicht vom Motiv".
+
+---
+
+##### Example Mapping
+
+**Scope-Check:** Kein Slice-Signal — das Ticket bezieht sich eindeutig auf die gesamte Location-Übersicht (Locations-Tab-Liste), keine Typ-Einschränkung erkennbar.
+
+**Annahmen-Protokoll:**
+
+| # | Punkt | Typ | Entscheidung |
+|---|-------|-----|--------------|
+| 1 | GPS-Anfrage beim Öffnen des Locations-Tabs, auch wenn kein Entfernungsfilter aktiv ist | 🔴 funktional kritisch | ❓ Frage 1 |
+| 2 | Verhalten wenn GPS verweigert/nicht verfügbar ist | 🔴 funktional kritisch | ❓ Frage 2 |
+| 3 | Sortierung wirkt auch während/nach Textsuche im Locations-Tab | ⚪ konventionell | ⚠️ Annahme: Sortierung bleibt bei Textsuche aktiv (Suche filtert nur zusätzlich, ändert Reihenfolge nicht) |
+| 4 | Live-Nachsortierung wenn sich der GPS-Standort während der Nutzung ändert (Nutzer bewegt sich) | ⚪ konventionell | ⚠️ Annahme: Sortierung erfolgt einmalig beim Laden/Öffnen des Tabs, kein Live-Re-Sort bei GPS-Drift (identisches Verhalten zu bestehendem Entfernungsfilter, der auch nicht live nachsortiert) |
+| 5 | Verhalten der Karte (Map-Tab) — wird dort auch sortiert? | ⚪ konventionell | ⚠️ Annahme: Ticket bezieht sich nur auf die Listen-Übersicht (Locations-Tab), nicht auf die Kartenansicht — eine Karte hat keine "Reihenfolge" im UI-Sinn |
+
+**❓ Frage 1 (an Stephan):** Soll die App beim ersten Öffnen des Locations-Tabs automatisch nach dem Standort fragen (GPS-Dialog), auch wenn noch kein Entfernungsfilter gesetzt ist — damit sofort nach Entfernung sortiert werden kann? Oder soll die Sortierung erst greifen, sobald der Standort aus einem anderen Grund (z.B. Entfernungsfilter oder Kartenbesuch) bereits bekannt ist, und vorher bei der bisherigen (unsortierten) Reihenfolge bleiben?
+
+**❓ Frage 2 (an Stephan):** Wenn GPS-Zugriff verweigert wird oder nicht verfügbar ist — soll die Liste dann (a) in der bisherigen unsortierten Reihenfolge bleiben (wie heute, kein Fehler, kein Hinweis), oder (b) ein Hinweis/Toast erscheinen, dass ohne Standort nicht nach Entfernung sortiert werden kann (analog zum bestehenden „GPS nicht verfügbar"-Toast aus BUG-51)?
+
+**📏 Rule 1 — Aufsteigende Sortierung nach Entfernung zum Nutzerstandort**
+Sobald der GPS-Standort des Nutzers bekannt ist, wird die Location-Liste im Locations-Tab aufsteigend nach Entfernung vom Nutzerstandort zum Fotografen-Standpunkt (`observer_lat`/`observer_lon`) jeder Location sortiert — nicht nach Entfernung zum Motiv.
+
+🟢 Beispiel: Stephan steht in Berlin-Mitte. Die Location-Liste zeigt einen Spot in Charlottenburg (6 km) vor einem Spot in Potsdam (25 km) — unabhängig davon, wo sich das jeweilige Fotomotiv befindet.
+
+🟢 Beispiel: Zwei Locations haben denselben Fotografen-Standpunkt (gleiches Gebäude, zwei Motive) → beide erscheinen mit identischer Entfernung direkt hintereinander (Reihenfolge zwischen ihnen beliebig/stabil).
+
+**📏 Rule 2 — Sortierung wirkt zusätzlich zu bestehenden Filtern**
+Die Sortierung verändert nur die Reihenfolge der sichtbaren Liste, nicht welche Locations sichtbar sind. Aktive Filter (Schwierigkeit, Kategorie, Bewertung, Verifikation, Entfernungsradius aus BUG-51, Textsuche) wirken wie bisher; die gefilterte Teilmenge wird zusätzlich nach Entfernung sortiert.
+
+🟢 Beispiel: Stephan hat den Entfernungsfilter auf „< 15 km" gesetzt (BUG-51). Von den verbleibenden Locations innerhalb 15 km erscheint die nächstgelegene zuerst, die am weitesten entfernte (aber noch < 15 km) zuletzt.
+
+**📏 Rule 3 — Verhalten ohne bekannten Standort (⚠️ Annahme-abhängig, siehe Frage 1/2)**
+Ist der GPS-Standort nicht bekannt oder nicht verfügbar, bleibt die Liste in der bisherigen (unsortierten, server-gelieferten) Reihenfolge — die App zeigt keinen Fehlerzustand, sondern degradiert auf das heutige Verhalten.
+
+🟢 Beispiel: Stephan verweigert die Standortfreigabe → Locations-Liste erscheint wie vor diesem Ticket, ohne Absturz oder leere Liste.
+
+---
+
+##### Akzeptanzkriterien
+
+- [x] Wenn der Standort des Nutzers bekannt ist, zeigt die Location-Übersicht die nächstgelegene Location ganz oben und die am weitesten entfernte ganz unten (aufsteigend sortiert).
+- [x] Die Entfernung wird immer zum aktuellen Standort des Nutzers gemessen, nicht zum Motiv der jeweiligen Location.
+- [x] Ist zusätzlich ein Entfernungsfilter oder ein anderer Filter (Schwierigkeit, Kategorie, Bewertung, Verifikation) aktiv, bleibt die gefilterte Liste weiterhin nach Entfernung sortiert.
+- [x] Bei einer Textsuche im Locations-Tab bleiben die Suchtreffer weiterhin nach Entfernung sortiert.
+- [x] Edge Case: Ist der Standort nicht bekannt oder wurde die Standortfreigabe verweigert, wird die Liste trotzdem angezeigt (keine leere Liste, kein Absturz) — Reihenfolge dann wie bisher.
+- [x] Edge Case: Zwei Locations mit identischer Entfernung werden beide angezeigt, keine geht durch die Sortierung verloren.
+- [x] Regression: Karten-Tab, Feed und Scout zeigen weiterhin ihr bisheriges (nicht durch dieses Ticket verändertes) Sortierverhalten.
+
+---
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Sortierung wirkt nur, wenn vorher zufällig schon ein Entfernungsfilter oder Kartenbesuch stattfand**
+Auslöser: `Filter._gps` wird aktuell nur gefüllt, wenn `maxDistKm > 0` beim Laden des Locations-Tabs ist (Zeile 5202/5214). Ohne diese Erweiterung bliebe `Filter._gps` beim reinen Öffnen des Locations-Tabs `null` → keine Sortierung, obwohl das Ticket es verlangt.
+Frühwarnung: Frischer App-Start, Locations-Tab direkt geöffnet (kein Filter gesetzt, keine Karte besucht) → Liste bleibt unsortiert.
+Gegenmaßnahme: GPS-Request in `Locations.load()`/`Locations.filter()` von der Bedingung `maxDistKm > 0` lösen bzw. zusätzlich für die Sortierung unabhängig anfragen (siehe Frage 1) — als eigenes AK/Testfall verankert.
+
+💀 **Szenario 2: GPS-Dialog erscheint jetzt an einer Stelle, wo der Nutzer ihn vorher nicht kannte**
+Auslöser: Wird GPS beim bloßen Öffnen des Locations-Tabs angefragt (Antwort auf Frage 1 = ja), poppt der Browser-Berechtigungsdialog künftig früher/häufiger auf als heute — potenziell irritierend, wenn der Nutzer nur schauen wollte.
+Frühwarnung: Nutzerfeedback „warum fragt die App jetzt schon wieder nach meinem Standort".
+Gegenmaßnahme: BUG-52 („GPS nur einmal pro Session") bleibt in Kraft — der Dialog erscheint dann nur einmal, nicht bei jedem Tab-Wechsel. Zusätzlich in der Test-/Freigabe-Runde explizit gegenprüfen, dass kein Mehrfach-Dialog auftritt.
+
+💀 **Szenario 3: Sortierung bricht bei fehlenden Koordinaten (observer_lat/lon = null/0)**
+Auslöser: Falls eine Location fehlerhafte oder fehlende `observer_lat`/`observer_lon`-Werte hat, liefert `haversineKm()` einen NaN- oder Fantasiewert, der die Location an eine unerwartete Position in der sortierten Liste schiebt (z.B. ganz oben durch NaN-Vergleichslogik).
+Frühwarnung: Eine offensichtlich weit entfernte oder falsch platzierte Location erscheint plötzlich ganz oben in der Liste.
+Gegenmaßnahme: Sortierfunktion so schreiben, dass Locations mit fehlenden/ungültigen Koordinaten ans Ende der Liste fallen (nicht NaN unsortiert vergleichen) — als Edge-Case-Test aufnehmen.
+
+💀 **Szenario 4: Performance-/Re-Render-Kosten bei jedem Filter- oder Suchaufruf**
+Auslöser: Die Sortierung müsste bei jedem `Locations.render()`-Aufruf (Filter ändern, Suche tippen) neu berechnet werden — bei vielen Locations theoretisch spürbar, in der Praxis bei der aktuellen Location-Anzahl (siehe `/locations`, üblicherweise niedrige zweistellige Zahl) vernachlässigbar.
+Frühwarnung: Spürbares Ruckeln beim Tippen im Suchfeld.
+Gegenmaßnahme: Kein Vorab-Fix nötig, da Datenmenge klein; im manuellen Test kurz gegenprüfen, dass Tippen im Suchfeld weiterhin flüssig reagiert.
+
+💀 **Szenario 5: Vermischung mit BUG-51-Filterlogik führt zu Regressionsfehler in `applyToLocations`**
+Auslöser: Wird die Sortierung direkt in `applyToLocations()` eingebaut (die auch filtert), könnte ein Fehler dort gleichzeitig Filterung und Sortierung kaputt machen.
+Frühwarnung: Nach der Änderung filtert der Entfernungsradius plötzlich nicht mehr korrekt (Regression von BUG-51).
+Gegenmaßnahme: Sortierung als eigener, nachgelagerter Schritt nach dem Filtern implementieren (z.B. eigene Funktion `sortByDistance()`, aufgerufen nach `applyToLocations()`), nicht in die bestehende Filterlogik hineinmischen — reduziert Regressionsrisiko und hält BUG-51 unangetastet.
+
+---
+
+##### Architektur-Analyse
+
+**Betroffene Datei:** ausschließlich `web/index.html` (Frontend, keine Backend-Änderung nötig — Locations werden clientseitig sortiert, analog zur clientseitigen Entfernungsfilterung aus BUG-51).
+
+**Betroffene Stellen:**
+- `Locations.load()` (Zeile 5200–5204) — lädt Locations, ruft aktuell GPS nur bei aktivem Radiusfilter an.
+- `Locations.filter(q)` (Zeile 5212–5224) — kombiniert Filter + Textsuche, ruft ebenfalls nur bedingt GPS an.
+- `Locations.render(locs)` (Zeile 5225–5254) — reine Darstellungsfunktion, keine Sortierung enthalten.
+- `Filter.applyToLocations(locs)` (Zeile 2764–2795) — reine Filterfunktion, Reihenfolge unverändert.
+- `haversineKm()` (Zeile 2576–2583) — bestehende Distanzfunktion, wiederverwendbar.
+- `Filter._gps` / `Filter.requestGps()` (Zeile 2614, 2841–2861) — bestehender GPS-State, muss ggf. unabhängig vom Radiusfilter angefragt werden.
+
+**Designer-Check:** Keine visuell neuen Elemente (kein neuer Chip, keine neue Farbe, kein neues Icon) — nur eine veränderte Reihenfolge bestehender Karten. `fotoalert-designer` daher nicht erforderlich.
+
+**Daten-Validierung:** Location-Objekte aus `/locations` enthalten `observer_lat`/`observer_lon` (bereits von BUG-51 bestätigt), aber kein vorgefertigtes `distance_m` — die Entfernung muss wie bei BUG-51 clientseitig per `haversineKm()` berechnet werden, nicht vom Server geliefert.
+
+---
+
+##### Implementierungsoptionen
+
+**Option A — Eigenständige Sortierfunktion nach `applyToLocations()`, GPS-Anfrage von Filterbedingung entkoppeln**
+- Was bedeutet das für Stephan: Die Location-Liste ist ab dem ersten Öffnen des Locations-Tabs nach Entfernung sortiert — unabhängig davon, ob vorher ein Entfernungsfilter gesetzt wurde. Der Standort-Dialog erscheint ggf. etwas früher (einmalig pro Sitzung, dank BUG-52).
+- Vorgehen: Neue Funktion `sortByDistance(locs)`, die nach `Filter.applyToLocations()` aufgerufen wird, sortiert per `haversineKm()` gegen `Filter._gps`. GPS-Anfrage in `Locations.load()`/`filter()` wird unabhängig vom `maxDistKm`-Zustand ausgelöst (immer anfragen, nicht nur wenn Filter aktiv).
+- Betroffene Dateien: `web/index.html` — `Locations.load()`, `Locations.filter()`, neue Hilfsfunktion, Aufruf in `Locations.render()`-Kette.
+- Vorteile: Sortierung greift zuverlässig bei jedem Einstieg in den Locations-Tab; sauber getrennt von der Filterlogik (kein Regressionsrisiko für BUG-51); Standort-Erlebnis konsistent mit der User Story („automatisch sofort sortiert").
+- Nachteile/Risiken: GPS-Dialog kann jetzt auch ohne Filterinteraktion erscheinen (Szenario 2) — muss im Test gegen Mehrfach-Dialog geprüft werden.
+- Aufwand: klein (rund 10–15 Zeilen: 1 Sortierfunktion + 2 angepasste GPS-Aufrufstellen).
+
+**Option B — Sortierung nur, wenn Standort aus anderem Grund bereits bekannt ist (kein zusätzlicher GPS-Request)**
+- Was bedeutet das für Stephan: Ist der Standort schon bekannt (weil z.B. vorher die Karte besucht oder ein Entfernungsfilter gesetzt wurde), sortiert die Liste automatisch. Ohne bekannten Standort bleibt die bisherige Reihenfolge — kein zusätzlicher Standort-Dialog wird ausgelöst.
+- Vorgehen: Gleiche Sortierfunktion wie Option A, aber **kein** unabhängiger GPS-Request — Sortierung nutzt nur `Filter._gps`, falls bereits vorhanden.
+- Betroffene Dateien: `web/index.html` — nur neue Sortierfunktion + Aufruf, keine Änderung an den GPS-Anfragestellen.
+- Vorteile: Kein zusätzlicher/früherer GPS-Dialog; minimalinvasiv.
+- Nachteile/Risiken: Erfüllt die User Story nicht zuverlässig — bei einem frischen App-Start ohne vorherigen Filter/Kartenbesuch bleibt die Liste unsortiert, obwohl der Fotograf laut Story „automatisch sofort" die nächsten Spots oben sehen möchte. Widerspricht Rule 1 in den meisten Alltagsfällen.
+- Aufwand: klein (rund 5 Zeilen).
+
+✅ **Empfehlung: Option A** — nur Option A erfüllt die User Story zuverlässig („automatisch sortiert, ohne manuelles Zutun"); Option B würde in der Praxis meist gar nicht greifen, weil der Locations-Tab oft der erste Einstiegspunkt ist. Das einzige Mehr an Aufwand ist eine unabhängige GPS-Anfrage, die dank BUG-52 (Standort bleibt pro Sitzung gemerkt) nur einmal pro Sitzung sichtbar wird. Voraussetzung: Stephans Antwort auf Frage 1/2 bestätigt diese Richtung — falls Stephan den früheren GPS-Dialog nicht möchte, ist Option B die Alternative.
+
+---
+
+##### Testplan
+
+**Automatisiert:** Kein Backend-Test nötig — reine Frontend-Sortierlogik (analog BUG-51, keine Python-Abbildung vorhanden).
+
+**Manuell (Browser unter http://localhost:8000):**
+1. App frisch öffnen (neue Sitzung, kein vorheriger Filter/Kartenbesuch) → Locations-Tab öffnen → Standort-Dialog erlauben → Liste zeigt nächstgelegene Location oben, am weitesten entfernte unten.
+2. Entfernungsfilter zusätzlich auf „< 15 km" setzen → verbleibende Locations bleiben nach Entfernung sortiert (nächste zuerst).
+3. Im Suchfeld einen Teilbegriff eingeben (z.B. „Schloss") → Treffer bleiben nach Entfernung sortiert.
+4. Standortfreigabe verweigern (oder Browser-Standort deaktivieren) → Liste erscheint weiterhin vollständig, in der bisherigen (unsortierten) Reihenfolge, kein Absturz.
+5. Tab wechseln (Feed → Karte → Locations mehrfach) → Standort-Dialog erscheint nur beim allerersten Mal (BUG-52-Regression prüfen).
+6. Karten-Tab, Feed und Scout gegenprüfen: unverändertes Verhalten (keine neue Sortierung dort, keine Regression aus BUG-51-Filterung).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2 offene Fragen an Stephan, siehe oben)
+- [x] Pre-Mortem durchgeführt (5 Szenarien)
+- [x] Architektur analysiert: `web/index.html` — `Locations.load/filter/render`, `Filter.applyToLocations`, `haversineKm`, `Filter._gps/requestGps`
+- [x] Designer-Check: nicht visuell verändernd → übersprungen
+- [x] Implementierungsoptionen: A (unabhängiger GPS-Request, empfohlen) / B (nur sortieren wenn GPS zufällig schon bekannt)
+- [x] Empfehlung: Option A (vorbehaltlich Antwort auf Frage 1/2)
 
 ---
 

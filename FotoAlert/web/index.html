@@ -1289,7 +1289,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.0';
+const APP_VERSION = '1.21.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2964,7 +2964,7 @@ const FilterSheet = {
   // Sofortiges Re-Render des aktuellen Views ohne Sheet zu schließen
   async _applyLive() {
     const s = Filter.state;
-    if (s.maxDistKm > 0) await Filter.requestGps();
+    await Filter.requestGps();  // US-118: unabhängig vom Radiusfilter anfragen — Sortierung muss bei jedem aktiven Filter erhalten bleiben (analog Locations.load()/filter())
     Filter._updateBadge();
     if (App.current === 'map') {
       MapView.applyFilter();
@@ -5199,7 +5199,7 @@ const Locations = {
   all: [],
   async load() {
     this.all = await API.get('/locations');
-    if (Filter.state.maxDistKm > 0) await Filter.requestGps();  // BUG-51
+    await Filter.requestGps();  // US-118: Standort für Entfernungssortierung immer anfragen (BUG-52-Gate greift automatisch, fragt nur einmal pro Sitzung)
     this.render(Filter.applyToLocations(this.all));
   },
   // BUG-30: Live-Lookup des Locations-Namens — gibt Override-Namen zurück wenn
@@ -5211,7 +5211,7 @@ const Locations = {
   },
   async filter(q) {
     // Filter-Kriterien (Schwierigkeit, Rating, etc.) UND Textsuche kombinieren
-    if (Filter.state.maxDistKm > 0) await Filter.requestGps();  // BUG-51
+    await Filter.requestGps();  // US-118: siehe load() — für Entfernungssortierung immer anfragen
     let f = Filter.applyToLocations(this.all);
     if (q) {
       f = f.filter(l =>
@@ -5222,6 +5222,28 @@ const Locations = {
     }
     this.render(f);
   },
+  // US-118: sortiert eine Location-Liste aufsteigend nach Entfernung vom GPS-Standort
+  // des Nutzers zum Fotografen-Standpunkt (observer_lat/lon) — nicht zum Motiv.
+  // Eigenständig von Filter.applyToLocations() gehalten (Pre-Mortem Szenario 5),
+  // damit die BUG-51-Filterlogik unangetastet bleibt.
+  // Ohne bekannten Standort (Filter._gps === null) bleibt die Reihenfolge unverändert.
+  // Locations mit fehlenden/ungültigen Koordinaten fallen ans Ende statt durch NaN
+  // an eine zufällige Position zu springen (Pre-Mortem Szenario 3).
+  // Array.prototype.sort ist in modernen Browsern stabil → gleich weite Locations
+  // behalten ihre relative Reihenfolge (AK "identische Entfernung").
+  sortByDistance(locs) {
+    if (!Filter._gps) return locs;
+    const gps = Filter._gps;
+    const distOf = (l) => {
+      const lat = l.observer_lat, lon = l.observer_lon;
+      if (typeof lat !== 'number' || typeof lon !== 'number' || Number.isNaN(lat) || Number.isNaN(lon)) {
+        return Infinity;
+      }
+      const d = haversineKm(gps.lat, gps.lon, lat, lon);
+      return Number.isNaN(d) ? Infinity : d;
+    };
+    return locs.slice().sort((a, b) => distOf(a) - distOf(b));
+  },
   render(locs) {
     const catIcon = { 'Schloss & Historisch':'i-castle', 'Wasser & Spiegelung':'i-water',
       'Natur & Landschaft':'i-nature', 'Milchstraße & Astro':'i-milkyway',
@@ -5229,7 +5251,7 @@ const Locations = {
     const diffLabel = {1:'Einfach',2:'Mittel',3:'Anspruchsvoll'};
     const diffCls   = {1:'diff-1',2:'diff-2',3:'diff-3'};
 
-    const html = locs.map(l => {
+    const html = this.sortByDistance(locs).map(l => {
       const fls = l.focal_length_suggestions.slice(0,3).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
       return `<div class="card" onclick="LocationDetail.open('${l.id}')">
         <div class="loc-card">
@@ -6421,7 +6443,17 @@ const App = {
     this.current = page;
     if (page === 'map') MapView.init();
     if (page === 'settings') Settings.render();
-    if (page === 'locations') { if (Locations.all.length) Locations.render(Filter.applyToLocations(Locations.all)); else Locations.load(); }
+    if (page === 'locations') {
+      // US-118/BUG-XX: Wenn Locations.all schon befüllt ist (z.B. durch vorherigen
+      // Feed/Karten-Besuch), lief hier bisher render() direkt ohne Filter.requestGps()
+      // zu awaiten → Filter._gps blieb null, sortByDistance() sortierte nie.
+      // Fix: denselben GPS-Request-Pfad wie Locations.load()/filter() awaiten.
+      if (Locations.all.length) {
+        Filter.requestGps().then(() => Locations.render(Filter.applyToLocations(Locations.all)));
+      } else {
+        Locations.load();
+      }
+    }
   },
   async refresh() { RefreshMenu.toggle(); },  // Rückwärtskompatibilität
   async fullRefresh() {
