@@ -369,6 +369,27 @@
     .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px;
       margin: 10px auto 0; }
     .sheet-hero { padding: 20px 20px 0; }
+    /* US-120: Beispielbild — ganz oben im Hero, vor allem anderen Inhalt.
+       Radius nur oben (Fortsetzung der Sheet-Kante von #loc-detail-sheet: 22px),
+       kein eigener Schatten. object-position:center hält den Bildausschnitt in
+       JEDER Kombination aus Bild- und Geräteausrichtung mittig (hartes AK). */
+    .loc-image-area { position: relative; width: 100%; aspect-ratio: 4/3;
+      border-radius: 22px 22px 0 0; overflow: hidden; background: var(--surface); }
+    .loc-image-area img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .loc-image-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px; border: 2px dashed var(--border);
+      border-radius: 22px 22px 0 0; color: var(--muted); box-sizing: border-box; }
+    .loc-image-placeholder p { font-size: 13px; margin: 0; }
+    .loc-image-upload-btn { display: inline-flex; align-items: center; gap: 6px;
+      background: var(--gold); color: var(--on-accent); border: none; border-radius: 10px;
+      padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .loc-image-edit-btn { position: absolute; top: 10px; right: 10px; display: inline-flex;
+      align-items: center; gap: 6px; background: rgba(0,0,0,.55); color: #fff; border: none;
+      border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .loc-image-processing { position: absolute; inset: 0; display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px; background: rgba(0,0,0,.55);
+      border-radius: 22px 22px 0 0; color: #fff; font-size: 13px; }
+    .loc-image-processing.open { display: flex; }
     .sheet-hero-type { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .sheet-hero-title { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
     .sheet-hero-loc { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
@@ -1268,7 +1289,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.20.20';
+const APP_VERSION = '1.20.21';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1360,6 +1381,15 @@ const API = {
   async delete(path) {
     return this._check(await fetch(CFG.api + path, {
       method: 'DELETE', headers: this._headers()
+    }));
+  },
+  // US-120: Datei-Upload (FormData, kein JSON) — kein 'Content-Type' setzen,
+  // der Browser ergänzt automatisch den multipart-Boundary-Header.
+  async postFile(path, file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this._check(await fetch(CFG.api + path, {
+      method: 'POST', headers: this._headers(), body: fd
     }));
   }
 };
@@ -2554,6 +2584,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 
 const Filter = {
   _KEY: 'fotoalert_filters',
+  _MIGRATED_KEY: 'fotoalert_filters_v119_migrated',  // US-119: Marker für einmaligen minScore-Reset
   _gps: null,
   _gpsPromise: null,
 
@@ -2563,7 +2594,8 @@ const Filter = {
     // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
     // BUG-46: minRatingExcl (bool) = Drei-Zustand für Bewertung (false=≥N, true=<N).
     // verificationIncl/verificationExcl: Arrays mit 'verified'|'unverified'|'issues' (unabhängige Drei-Zustände).
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 0, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0 };
+    // US-119: minScore-Default 0 → 70 (Feed/Kalender/Scout starten standardmäßig bei ≥70% Wahrscheinlichkeit).
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 70, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0 };
   },
 
   get state() {
@@ -2581,6 +2613,28 @@ const Filter = {
     localStorage.removeItem(this._KEY);
     this._gps = null;
     this._updateBadge();
+  },
+
+  // ── US-119: einmaliger Reset des minScore-Werts für Bestandsnutzer ──────
+  // Bereits gespeicherte Filterstände (localStorage) enthalten ggf. noch den
+  // alten Default 0 bzw. einen anderen zuvor gewählten Wert. Der neue Default 70
+  // soll auch bei Bestandsnutzern einmalig ankommen — danach darf ein vom Nutzer
+  // selbst gewählter niedrigerer Wert nie wieder überschrieben werden. Das Flag
+  // in _MIGRATED_KEY stellt sicher, dass das genau einmal passiert.
+  migrateMinScoreDefault() {
+    if (localStorage.getItem(this._MIGRATED_KEY)) return;
+    try {
+      const raw = localStorage.getItem(this._KEY);
+      if (raw) {
+        const stored = JSON.parse(raw);
+        if (stored && typeof stored === 'object' && stored.minScore !== 70) {
+          stored.minScore = 70;
+          localStorage.setItem(this._KEY, JSON.stringify(stored));
+        }
+      }
+      // Kein gespeicherter Zustand vorhanden → _defaults() liefert bereits 70, nichts zu tun.
+    } catch {}
+    localStorage.setItem(this._MIGRATED_KEY, '1');
   },
 
   activeCount() {
@@ -5243,6 +5297,60 @@ const LocationDetail = {
     this._current = null;
   },
 
+  // US-120: Beispielbild — Hero-Bereich ganz oben im Location-Detail.
+  // Host ohne Bild: gestrichelter Platzhalter mit Upload-Button.
+  // Normaler Nutzer ohne Bild: Bereich bleibt komplett unsichtbar (kein Platzhalter).
+  _imageAreaHtml(loc) {
+    if (loc.image_url) {
+      return `
+        <div class="loc-image-area" id="loc-image-area">
+          <img src="${CFG.api}${loc.image_url}" alt="Beispielbild ${loc.name.replace(/"/g,'&quot;')}">
+          ${Auth.isHost() ? `<button class="loc-image-edit-btn" onclick="LocationDetail.triggerImageUpload()">${ic('i-camera',14)} Ersetzen</button>` : ''}
+          <div class="loc-image-processing" id="loc-image-processing"><div class="spinner"></div><span>Bild wird komprimiert …</span></div>
+        </div>
+        <input type="file" id="loc-image-input" accept="image/*" style="display:none" onchange="LocationDetail._onImageFileSelected(event)">`;
+    }
+    if (Auth.isHost()) {
+      return `
+        <div class="loc-image-area" id="loc-image-area">
+          <div class="loc-image-placeholder">
+            ${ic('i-camera',28)}
+            <p>Noch kein Beispielbild</p>
+            <button class="loc-image-upload-btn" onclick="LocationDetail.triggerImageUpload()">${ic('i-camera',14)} Bild hochladen</button>
+          </div>
+          <div class="loc-image-processing" id="loc-image-processing"><div class="spinner"></div><span>Bild wird komprimiert …</span></div>
+        </div>
+        <input type="file" id="loc-image-input" accept="image/*" style="display:none" onchange="LocationDetail._onImageFileSelected(event)">`;
+    }
+    return ''; // normaler Nutzer, kein Bild vorhanden → Bereich komplett unsichtbar
+  },
+
+  triggerImageUpload() {
+    const input = document.getElementById('loc-image-input');
+    if (input) input.click();
+  },
+
+  async _onImageFileSelected(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
+    if (!file || !this._current) return;
+    const loc = this._current;
+
+    const processing = document.getElementById('loc-image-processing');
+    if (processing) processing.classList.add('open');
+
+    try {
+      const res = await API.postFile(`/locations/${loc.id}/image`, file);
+      // Server-Fetch statt In-Memory-Mutation (Pattern 5)
+      Locations.all = await API.get('/locations');
+      toast('✓ Beispielbild hochgeladen');
+      LocationDetail.open(loc.id);
+    } catch (e) {
+      toast('Fehler beim Hochladen: ' + e.message);
+      if (processing) processing.classList.remove('open');
+    }
+  },
+
   openEdit() {
     const loc = this._current;
     if (!loc) return;
@@ -5699,6 +5807,7 @@ const LocationDetail = {
       </div>` : '';
 
     return `
+      ${LocationDetail._imageAreaHtml(loc)}
       <div class="sheet-hero" style="padding-bottom:12px">
         <div class="sheet-hero-type">
           ${ic(catIcon[loc.category]||'i-pin',16)} <span>${loc.category}</span>
@@ -6331,6 +6440,8 @@ const App = {
     }
     // Filter-Badge initialisieren
     Filter._updateBadge();
+    // US-119: minScore-Default (0 → 70) einmalig auch für Bestandsnutzer setzen
+    Filter.migrateMinScoreDefault();
     // BUG-26: localStorage-Verifikationen einmalig migrieren, dann alle laden
     await Verify.migrateFromLocalStorage();
     await Verify.loadAll();

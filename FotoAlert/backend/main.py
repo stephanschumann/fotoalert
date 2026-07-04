@@ -38,10 +38,14 @@ from typing import Optional
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+# US-120: Beispielbild-Upload — Verkleinerung, Kompression, EXIF-Ausrichtungskorrektur
+import io as _io
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 # US-66: .env laden, damit Login-Passwörter & Auth-Secret aus backend/.env kommen
 # (python-dotenv ist in requirements; load_dotenv überschreibt bereits gesetzte Env-Vars nicht).
@@ -101,6 +105,14 @@ _CAL_CACHE          = _CACHE_DIR / "calendar.json"
 _ELEV_CACHE         = _CACHE_DIR / "elevations.json"
 _DISCOVER_CACHE     = _CACHE_DIR / "discover.json"
 
+# US-120: Beispielbild-Verzeichnis (Host-Upload pro Location, ein Bild, ersetzt beim erneuten Upload)
+_IMAGE_DIR          = Path(__file__).parent / "data" / "location_images"
+_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+_IMAGE_MAX_UPLOAD_BYTES = 1 * 1024 * 1024        # 1 MB: bis hier angenommen, automatisch komprimiert
+_IMAGE_HARD_LIMIT_BYTES = 20 * 1024 * 1024       # 20 MB: darüber klare Ablehnung ohne Verarbeitung
+_IMAGE_TARGET_BYTES     = 500 * 1024             # ~500 KB Zielgröße nach Kompression
+_IMAGE_MAX_DIMENSION_PX = 2000                   # lange Kante nach Verkleinerung
+
 # TASK-17: Zentraler SQLite-Store für nutzereditierbare Daten
 _store = LocationStore()
 
@@ -159,6 +171,7 @@ def _load_custom_locations() -> None:
                 focal_length_suggestions=e.get("focal_length_suggestions", []),
                 special_notes=e.get("special_notes", ""), difficulty=e.get("difficulty", 1),
                 observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
+                image_filename=e.get("image_filename"),
             )
             LOCATIONS.append(loc)
             ids_existing.add(loc.id)
@@ -1185,7 +1198,7 @@ def _load_location_overrides() -> None:
             if loc:
                 for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon",
                               "name", "description", "observer_floor_height_m",
-                              "focal_length_suggestions"):
+                              "focal_length_suggestions", "image_filename"):
                     if field in ov:
                         setattr(loc, field, ov[field])
                 applied += 1
@@ -1419,6 +1432,7 @@ def _loc_to_out(loc) -> LocationOut:
         locationscout_url=loc.locationscout_url,
         difficulty=loc.difficulty,
         possible_bodies=_compute_possible_bodies(loc.observer_lat, az_range),
+        image_url=f"/location-images/{loc.image_filename}" if getattr(loc, "image_filename", None) else None,
     )
 
 
@@ -2166,18 +2180,151 @@ async def reverse_geocode_endpoint(lat: float, lon: float) -> dict:
     return {"place": place}
 
 
+# ---------------------------------------------------------------------------
+# US-120: Beispielbild-Upload (nur Host) — Datei-Upload statt JSON-PATCH
+# ---------------------------------------------------------------------------
+
+def _process_uploaded_image(raw: bytes) -> bytes:
+    """
+    Verarbeitet ein hochgeladenes Bild serverseitig (Pre-Mortem 1 + Rule 3):
+    - EXIF-Ausrichtungskorrektur (ImageOps.exif_transpose): dreht die Pixel gemäß
+      der im Foto gespeicherten Kamera-Ausrichtung, statt sich auf das (von vielen
+      Anzeigeprogrammen ignorierte) EXIF-Orientation-Tag zu verlassen.
+    - Verkleinerung auf max. _IMAGE_MAX_DIMENSION_PX an der langen Kante.
+    - Iterative JPEG-Kompression bis ca. _IMAGE_TARGET_BYTES erreicht ist.
+    Wirft ValueError bei ungültigen/nicht dekodierbaren Bilddaten (→ 400 im Endpoint).
+    """
+    try:
+        img = Image.open(_io.BytesIO(raw))
+        img.load()  # erzwingt vollständiges Decodieren (deckt kaputte/Fake-Bilddateien auf)
+    except (UnidentifiedImageError, OSError) as exc:
+        raise ValueError(f"Datei ist kein gültiges Bild: {exc}") from exc
+
+    # EXIF-Ausrichtung anwenden, dann Tag entfernen (Pixel sind jetzt schon richtig herum)
+    img = ImageOps.exif_transpose(img)
+
+    # In RGB konvertieren (JPEG kennt kein Alpha/Palette; PNG mit Transparenz → weißer Hintergrund)
+    if img.mode not in ("RGB", "L"):
+        bg = Image.new("RGB", img.size, (255, 255, 255))
+        if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+            img = img.convert("RGBA")
+            bg.paste(img, mask=img.split()[-1])
+        else:
+            bg.paste(img.convert("RGB"))
+        img = bg
+    elif img.mode == "L":
+        img = img.convert("RGB")
+
+    # Auf sinnvolle Maximalmaße verkleinern (Seitenverhältnis bleibt erhalten)
+    if max(img.size) > _IMAGE_MAX_DIMENSION_PX:
+        img.thumbnail((_IMAGE_MAX_DIMENSION_PX, _IMAGE_MAX_DIMENSION_PX), Image.LANCZOS)
+
+    # Iterative Qualitätsreduktion bis Zielgröße erreicht oder Qualität-Untergrenze
+    quality = 88
+    buf = _io.BytesIO()
+    while True:
+        buf.seek(0)
+        buf.truncate(0)
+        img.save(buf, format="JPEG", quality=quality, optimize=True)
+        if buf.tell() <= _IMAGE_TARGET_BYTES or quality <= 40:
+            break
+        quality -= 8
+
+    return buf.getvalue()
+
+
+def _resolve_location_image_dir_name(loc_id: str) -> str:
+    """Dateiname für das Beispielbild einer Location (eindeutig, kollisionsfrei)."""
+    return f"{loc_id}.jpg"
+
+
+def _delete_location_image_file(filename: Optional[str]) -> None:
+    """Löscht eine vorhandene Bilddatei aktiv (Pre-Mortem 2: keine verwaisten Dateien)."""
+    if not filename:
+        return
+    try:
+        path = _IMAGE_DIR / filename
+        if path.exists():
+            path.unlink()
+            logger.info("Altes Beispielbild gelöscht: %s", filename)
+    except Exception as exc:
+        logger.warning("Konnte altes Beispielbild nicht löschen (%s): %s", filename, exc)
+
+
+@app.post("/locations/{loc_id}/image")
+async def upload_location_image(
+    loc_id: str,
+    file: UploadFile = File(...),
+    _role: str = Depends(auth.require_host),
+) -> dict:
+    """
+    US-120: Lädt ein Beispielbild für eine Location hoch (nur Host).
+    - Nimmt Dateien bis zur harten Obergrenze an (_IMAGE_HARD_LIMIT_BYTES), lehnt
+      deutlich überdimensionierte Uploads klar ab, bevor Rechenzeit investiert wird.
+    - Verarbeitet das Bild serverseitig (EXIF-Ausrichtung, Verkleinerung, Kompression).
+    - Speichert die Datei zuerst vollständig auf der Festplatte, aktualisiert danach
+      erst den Verweis in der Location (Pre-Mortem 3: keine Lese-vor-Schreib-Lücke).
+    - Löscht die alte Bilddatei aktiv, falls vorhanden (Pre-Mortem 2).
+    """
+    target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if not target_loc:
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Datei ist leer.")
+    if len(raw) > _IMAGE_HARD_LIMIT_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Datei zu groß ({len(raw) // 1024} KB). Maximal {_IMAGE_HARD_LIMIT_BYTES // (1024*1024)} MB pro Upload erlaubt.",
+        )
+
+    try:
+        processed = _process_uploaded_image(raw)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    old_filename = getattr(target_loc, "image_filename", None)
+    new_filename = _resolve_location_image_dir_name(loc_id)
+    new_path = _IMAGE_DIR / new_filename
+
+    # Erst vollständig schreiben, dann Verweis aktualisieren (Pre-Mortem 3)
+    tmp_path = new_path.with_suffix(".tmp")
+    tmp_path.write_bytes(processed)
+    tmp_path.replace(new_path)  # atomarer Rename auf demselben Dateisystem
+
+    # Verweis in der Location aktualisieren (beide Location-Arten)
+    if loc_id.startswith("custom_"):
+        _store.update_custom(loc_id, image_filename=new_filename)
+    else:
+        _save_location_override(loc_id, image_filename=new_filename)
+    target_loc.image_filename = new_filename
+
+    # Alte Datei erst NACH erfolgreichem Ersetzen löschen, und nur wenn sie
+    # tatsächlich einen anderen Namen hatte (hier immer gleich, da Dateiname == loc_id;
+    # Pre-Mortem 2 bleibt trotzdem relevant falls das Namensschema sich künftig ändert)
+    if old_filename and old_filename != new_filename:
+        _delete_location_image_file(old_filename)
+
+    if not _NO_BACKGROUND:
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+
+    logger.info("Beispielbild hochgeladen für %s: %s (%d Bytes)", loc_id, new_filename, len(processed))
+    return {"ok": True, "image_url": f"/location-images/{new_filename}", "size_bytes": len(processed)}
+
+
 @app.patch("/locations/{loc_id}")
 async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
     coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
-    text_fields     = {"name", "description", "special_notes"}
+    text_fields     = {"name", "description", "special_notes", "subject_name"}  # BUG-61: Motivname whitelisten
     numeric_fields  = {"observer_floor_height_m"}       # US-62
     list_fields     = {"focal_length_suggestions"}       # BUG-22: list[int], beeinflusst camera_hints
     recompute_fields = coord_fields | {"observer_floor_height_m", "focal_length_suggestions"}
     all_allowed_fields = coord_fields | text_fields | numeric_fields | list_fields
     allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
     if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
 
     # Koordinaten validieren
     for f in coord_fields & allowed.keys():
@@ -2470,6 +2617,16 @@ async def service_worker() -> FileResponse:
         media_type="application/javascript",
         headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
     )
+
+# US-120: Beispielbilder ausliefern — eigenes Verzeichnis, eigener Mount-Punkt,
+# muss ebenfalls vor dem catch-all "/"-Mount stehen (StaticFiles matcht sonst nie).
+# Cache-Control: Bild wird beim Ersetzen umbenannt? Nein (fester Dateiname je Location) —
+# daher kurze TTL statt "immutable", damit ein Ersetzen zeitnah im Browser ankommt.
+app.mount(
+    "/location-images",
+    StaticFiles(directory=str(_IMAGE_DIR)),
+    name="location-images",
+)
 
 if _web_dir.exists():
     app.mount("/", StaticFiles(directory=str(_web_dir), html=True), name="web")

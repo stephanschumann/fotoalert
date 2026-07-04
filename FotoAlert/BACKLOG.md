@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
+| **🔄 In Progress** | wird gerade implementiert | US-119 |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, wartet auf Stephans Test)* · **US-120** *(Beispielbild-Upload implementiert, pytest lokal noch nicht ausgeführt)* |
 | **🏁 Done** | abgeschlossen + deployed | **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **US-124** *(Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1228,6 +1228,100 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
+### BUG-61 · Motiv-Sektion im Location-Detail zeigt nach Umbenennung weiterhin den alten Motivnamen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Im Location-Detail-Sheet zeigt die Sektionsüberschrift „MOTIV – &lt;Name&gt;" nach Umbenennung des Motivs weiterhin den alten Namen (Beispiel: Umbenennung zu „Havelblick von der Wublitzbrücke", angezeigt bleibt „Havelböick von der Wublitzbrücke"). Beobachtet: veraltete, falsche Anzeige trotz erfolgter Umbenennung. Erwartet: Die Sektionsüberschrift zeigt jederzeit den aktuell gespeicherten Motivnamen. Zu prüfen: Ob auch der Beschreibungstext unterhalb dieser Sektion denselben veralteten Namen referenziert.
+
+**Scope-Hinweis (Code-Recherche PM-Intake):** `web/index.html` Zeile 5717 rendert die Sektion als `Motiv – ${loc.subject_name}` direkt aus dem Location-Objekt (`LocationDetail._render`), eine zentrale Datenquelle für diese eine Sektion. `LocationDetail.saveEdit()` (ca. Zeile 5626–5631) lädt nach dem Speichern bereits `Locations.all` neu vom Server und ruft `LocationDetail.open(locId)` erneut auf (Muster aus BUG-30, dort für den Location-Namen gefixt) — trotzdem scheint der Motivname stale zu bleiben, das ist im Kern dieses Bugs zu klären (evtl. anderer Bearbeitungsweg als das Formular, z. B. direkter API-Edit, oder ein separater Cache-Effekt). Zusätzlich verwendet der Chancen-/Feed-/Scout-/Kalender-Datensatz ein **eigenes** `o.subject_name`-Feld (Zeilen 1589, 1877, 1895, 1942), das aus dem Opportunities-Cache (`opportunities.json`/`discover.json`) stammt und unabhängig vom Location-Objekt ist — dort könnte derselbe veraltete Motivname ebenfalls auftauchen, wenn der Cache nach einer Umbenennung nicht neu berechnet wird. Ob das tatsächlich betroffen ist, ist Analysephase-Arbeit, nicht hier entschieden.
+
+**User Story:** Als Nutzer, möchte ich, dass die Motiv-Sektion im Detail-Sheet immer den aktuellen Motivnamen zeigt, sodass ich nicht durch veraltete/falsche Angaben verwirrt werde.
+
+**Bezug:** Keine Dubletten im Backlog gefunden (Grep nach „Motiv", „Detail-Sheet", „stale", „veraltet" ohne Treffer zu diesem Fehlerbild). Architektonisch verwandt: **BUG-47** [x] (Done) — dort war die Ursache fehlendes Re-Render nach State-Änderung (kein reaktives Binding in der App); möglicherweise dieselbe Fehlerklasse, aber nicht zwingend dieselbe Root Cause, muss in der Analyse geprüft werden. **BUG-30** [x] (Done) hat das exakt gleiche Symptom-Muster für den Location-Namen (nicht Motivnamen) bereits gefixt — hier offenbar unvollständig auf `subject_name` übertragen oder ein zusätzlicher Pfad betroffen.
+
+#### 🔬 Analyse & Spec (2026-07-04)
+
+##### Root Cause (verifiziert im Code)
+
+Das Bearbeiten-Formular und der clientseitige Reload-Pfad funktionieren korrekt: Es gibt ein eigenes Eingabefeld für den Motivnamen, es wird beim Speichern mitgesendet, danach lädt die App die komplette Location-Liste neu vom Server und baut das Detail-Sheet komplett neu auf (identischer Mechanismus wie beim bereits gefixten Location-Namen). Der Fehler liegt **nicht** im Frontend.
+
+Die tatsächliche Ursache liegt serverseitig: Der Speicher-Endpunkt für Locations akzeptiert nur eine feste, kleine Liste erlaubter Felder für Text-Änderungen. Der Motivname gehört **nicht** zu dieser Liste. Das bedeutet: Der neue Motivname wird vom Server stillschweigend verworfen, obwohl die App „Speichern erfolgreich" meldet — gespeichert und danach angezeigt wird weiterhin der alte Wert, weil er serverseitig nie aktualisiert wurde. Das erklärt exakt das beobachtete Symptom (stale Name trotz augenscheinlich korrektem Speichervorgang) und warum der BUG-30-Reload-Mechanismus hier nicht greift: Er lädt korrekt neu — aber der neue Wert wurde nie in den Datenbestand geschrieben, es gibt nichts Neues zu laden.
+
+Kein neues 🔴 nötig — Root Cause ist eindeutig lokalisiert.
+
+##### Beispiele (Example Mapping)
+
+**Regel 1: Der Motivname wird beim Speichern serverseitig übernommen.**
+- Given eine Location mit Motivname „Havelböick von der Wublitzbrücke", When ich im Bearbeiten-Formular den Motivnamen zu „Havelblick von der Wublitzbrücke" ändere und speichere, Then zeigt die Motiv-Sektionsüberschrift im Detail-Sheet direkt danach „Havelblick von der Wublitzbrücke".
+- Given dieselbe Änderung, When ich die App komplett neu lade (nicht nur das Sheet erneut öffnen), Then zeigt die Motiv-Sektion weiterhin den neuen Namen (Beweis, dass er wirklich dauerhaft gespeichert wurde, nicht nur clientseitig zwischengespeichert).
+
+**Regel 2: Der bereits funktionierende Location-Namen-Fix (BUG-30) bleibt unverändert korrekt.**
+- Given eine Location, When ich nur den Location-Namen ändere (Motivname unverändert lasse) und speichere, Then zeigt die App überall (Titelzeile, Feed, Suche) sofort den neuen Location-Namen — wie bisher.
+
+**Regel 3 (⚠️ Annahme, aus Scope-Klärung): Der Motivname im Kalender-/Feed-/Scout-Bereich ist nicht Teil dieser Korrektur.**
+- Given eine Umbenennung des Motivnamens, When ich in den Kalender-, Feed- oder Scout-Bereich wechsle, Then kann dort weiterhin der alte Motivname stehen (separater Datenbestand, bewusst außerhalb dieses Tickets — möglicher Kandidat für ein Folgeticket).
+
+##### Akzeptanzkriterien
+
+- Wenn ich den Motivnamen einer Location über das Bearbeiten-Formular ändere und speichere, zeigt das Detail-Sheet direkt danach den neuen Motivnamen in der Motiv-Sektionsüberschrift.
+- Der neue Motivname bleibt auch nach einem kompletten Neuladen der App sichtbar (er ist also wirklich dauerhaft gespeichert, nicht nur kurzzeitig im Browser sichtbar).
+- Das Ändern des Location-Namens (unabhängig vom Motivnamen) funktioniert weiterhin wie bisher zuverlässig sofort überall aktuell.
+- Ausdrücklich außerhalb dieses Tickets: Der Motivname, der im Kalender, im Feed oder beim Scouting angezeigt wird, muss durch diese Korrektur nicht aktualisiert werden — das ist ein separater Datenbestand und wird hier bewusst nicht angefasst.
+
+##### Pre-Mortem
+
+1. **Auslöser:** Die Korrektur öffnet serverseitig zu viele Felder für Änderungen und erlaubt dadurch versehentlich auch Felder, die nicht verändert werden sollten (z. B. Felder, die eine aufwendige Neuberechnung anstoßen, obwohl das gar nicht gewollt ist). **Frühwarnung:** Nach der Änderung testweise nur den Motivnamen ändern und prüfen, ob unerwartet eine Neuberechnung angestoßen wird. **Gegenmaßnahme:** Nur den Motivnamen gezielt freischalten, keine pauschale Öffnung der Feld-Liste.
+2. **Auslöser:** Die Korrektur bricht versehentlich den bereits funktionierenden Location-Namen-Fix (BUG-30), z. B. weil an derselben Stelle im Code etwas verändert wird. **Frühwarnung:** Regressionstest für den Location-Namen (siehe Testplan) direkt nach der Änderung durchführen. **Gegenmaßnahme:** Änderung so klein wie möglich halten, nur die fehlende Freischaltung ergänzen, nichts Bestehendes umbauen.
+3. **Auslöser:** Motivname wird zwar jetzt serverseitig gespeichert, aber ein anderer Cache (z. B. der Bereich, der die Location-Übersicht speist) zeigt trotzdem noch den alten Namen, weil er nicht mit aktualisiert wird. **Frühwarnung:** Nach dem Speichern sowohl das Detail-Sheet als auch die Location-Übersichtsliste prüfen. **Gegenmaßnahme:** Falls das auftritt, denselben Reload-Mechanismus wie beim Detail-Sheet auch dort sicherstellen (im Rahmen dieses Tickets, da noch „Detail-Sheet-Familie").
+4. **Auslöser:** Sonderzeichen im Motivnamen (Anführungszeichen, Umlaute) werden beim Speichern verstümmelt. **Frühwarnung:** Test mit einem Motivnamen, der ein Anführungszeichen oder Sonderzeichen enthält. **Gegenmaßnahme:** Bestehende Zeichen-Behandlung (wie beim Location-Namen bereits vorhanden) unverändert mitnutzen.
+5. **Auslöser:** Leerer Motivname wird akzeptiert und führt zu einer Sektionsüberschrift ohne Namen („Motiv – "). **Frühwarnung:** Test mit leerem Motivnamen-Feld beim Speichern. **Gegenmaßnahme:** Falls das unschön aussieht, als Hinweis vermerken statt zusätzliche Pflichtfeld-Logik in diesem kleinen Bugfix nachzurüsten (Scope klein halten).
+
+##### Architektur-Analyse
+
+Betroffen: `backend/main.py`, Funktion `patch_location` (PATCH-Endpunkt `/locations/{loc_id}`, ca. Zeile 2169 ff.) — dort fehlt `subject_name` in der Menge der erlaubten Text-Felder (`text_fields`), wodurch das Feld vom serverseitigen Feld-Filter verworfen wird, bevor es überhaupt persistiert oder in den In-Memory-Bestand übernommen wird. Frontend (`web/index.html`, `LocationDetail.saveEdit` / `LocationDetail.open` / `LocationDetail._render`) ist bereits korrekt implementiert und braucht keine Änderung.
+
+##### Designer-Check
+
+Übersprungen — reiner Text-Content-Bugfix ohne visuelle oder Layout-Änderung, bestätigt aus vorherigem Durchlauf.
+
+##### Implementierungsoptionen
+
+**Option A (empfohlen):** Den Motivnamen serverseitig gezielt zur Liste der änderbaren Text-Felder hinzufügen, damit er beim Speichern wie der Location-Name dauerhaft übernommen wird. Betroffene Datei: `backend/main.py`. Vorteil: minimale, gezielte Änderung, exakt die Root Cause behoben, kein Nebenwirkungsrisiko auf andere Felder. Nachteil: keiner ersichtlich. Aufwand: klein.
+
+**Option B:** Serverseitig grundsätzlich alle vom Formular gesendeten Felder akzeptieren (Feld-Filter aufweichen/entfernen). Vorteil: würde auch andere, aktuell möglicherweise ebenfalls verworfene Formularfelder (z. B. Kategorie) beheben. Nachteil: deutlich größerer Eingriff, höheres Risiko für unbeabsichtigte Nebenwirkungen (z. B. unerwünschte Neuberechnungen, Validierungslücken) und Scope-Creep über dieses Ticket hinaus. Aufwand: mittel.
+
+**Empfehlung:** Option A. Sie behebt exakt die im Ticket beschriebene Root Cause mit minimalem, gut nachvollziehbarem Eingriff und ohne Regressionsrisiko für den bereits funktionierenden Location-Namen-Fix. Sollte beim Testen auffallen, dass weitere Formularfelder (z. B. Kategorie) ebenfalls nicht ankommen, ist das ein Kandidat für ein separates Folgeticket, nicht für eine Ausweitung hier.
+
+##### Testplan
+
+**Automatisiert:** `backend/tests/test_bug-61.py` — prüft, dass der Speicher-Endpunkt einen geänderten Motivnamen tatsächlich übernimmt und dass ein alleiniges Ändern des Location-Namens weiterhin wie bisher funktioniert (Regressionsschutz für BUG-30).
+
+**Manuell (Browser):**
+1. Location-Detail öffnen, Bearbeiten-Formular öffnen, nur den Motivnamen ändern, speichern. Erwartung: Die Motiv-Sektionsüberschrift im Detail-Sheet zeigt sofort den neuen Namen.
+2. App komplett neu laden (nicht nur Sheet erneut öffnen). Erwartung: Der neue Motivname ist weiterhin sichtbar (dauerhaft gespeichert).
+3. **Regressionscheck (BUG-30):** Bei derselben oder einer anderen Location nur den Location-Namen ändern und speichern. Erwartung: Der neue Location-Name erscheint sofort überall (Titelzeile, Location-Übersicht, Suche) — wie bisher unverändert funktionierend.
+4. Motivname mit Anführungszeichen oder Umlaut testen. Erwartung: Korrekte Darstellung ohne Verstümmelung.
+
+##### Analyse & Planung Checkliste
+
+- [x] Root Cause im Code verifiziert (nicht geraten)
+- [x] Example Mapping mit Given/When/Then
+- [x] Akzeptanzkriterien aus Nutzersicht
+- [x] Pre-Mortem inkl. Regressionsrisiko BUG-30
+- [x] Architektur-Analyse mit konkreter Datei/Funktion
+- [x] Designer-Check (übersprungen, begründet)
+- [x] Mind. 2 Implementierungsoptionen mit Empfehlung
+- [x] Testplan (automatisiert + manuell) inkl. Regressionscheck
+- [x] Scope-Ausschluss Kalender/Feed/Scout-Motivname dokumentiert
+
+---
+
 ## 🔴 Hoch – Kern-Features
 
 
@@ -2119,6 +2213,23 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
+### TASK-55 · Server-Backup um location_images/ erweitern `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Das bestehende Backup-Verfahren (`backend/data/backup.py`) sichert aktuell nur die SQLite-Datenbank bzw. deren JSON-Export (`custom_locations.json`, `location_overrides.json` via `backup_after_edit()`) sowie lokale DB-Snapshots vor Precompute-Läufen (`snapshot_before_precompute()`) — verifiziert per Code-Lesung, `location_images/` wird an keiner Stelle referenziert oder mitgesichert. Der mit US-120 eingeführte Ordner mit hochgeladenen Beispielbildern pro Location ist damit von keinem der beiden Sicherungspfade abgedeckt und ginge bei einem Server-Ausfall verloren.
+
+**User Story:** Als Host/Betreiber der FotoAlert-App, möchte ich, dass hochgeladene Beispielbilder beim Server-Backup mitgesichert werden, sodass ich sie nach einem Server-Ausfall wiederherstellen kann und keine von Nutzern/Admin hochgeladenen Bilder verloren gehen.
+
+**Bezug:** US-120 [~] (In Test) — führte `location_images/` sowie den Upload-Endpoint ein und wies in der Implementierungsnotiz selbst auf diese Lücke hin („Backup sichert bisher nur SQLite, nicht `location_images/` — eigenes Ticket vorschlagen?"). Kein Bezug/keine Überschneidung zu TASK-48 (Epic Datensync — behandelt automatisierte QA/Anreicherung von Location-Metadaten wie Azimut/Beschreibung/Brennweite, nicht Datei-Backup) und zu TASK-53 (Dev-Sync-Werkzeug Live→Dev — nutzt das Snapshot-Prinzip aus `backup.py` nur als Vorbild für einen anderen Zweck, ändert `backup.py` nicht). Kein bestehendes BUG-Ticket zu diesem Thema gefunden.
+
+---
+
 ### TASK-45 · Idealer Azimut automatisch aus Gebäude-Footprints `[x]`
 
 | Feld | Wert |
@@ -2807,6 +2918,21 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
   5. Regression: Mondaufgang/-untergang noch sichtbar? Feed-Filter noch funktionsfähig?
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
+
+### US-124 · Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-04 |
+
+**Beschreibung:** Beim Anlegen eines neuen Standorts (AddLocation-Formular) lässt sich die Karte bislang nur in der kleinen Formular-Vorschau bedienen. Ein eigener Vollbild-Modus mit Zoom sowie Satellit-/Standard-Kartenwahl soll die präzise Positionierung des Standort-Pins erleichtern.
+
+**User Story:** Als Fotograf/in, möchte ich beim Anlegen eines neuen Standorts in den Vollbildmodus wechseln können, in dem sowohl Zoom als auch Satellit- und Standard-Kartenansicht verfügbar sind, sodass ich den Standort-Pin präziser positionieren kann.
+
+**Bezug:** Überträgt das bei US-87[x] (Vollbild-Overlay Bearbeiten-Karte, `openMapFullscreen()`/`_initEditMapFs()`) etablierte Muster auf den Anlege-Flow (`AddLocation`), der laut Code-Stand (Stand 2026-07-04) bislang keine eigene Vollbild-Kartenfunktion besitzt — nur `LocationDetail` (Bearbeiten) und `CameraFOV` (Blickwinkel-Vorschau) haben bereits `openMapFullscreen()`. Ergänzt sich mit US-123[x] (Satellit-/Standard-Umschalter `LocMapMode`, bereits auf der kleinen Anlege-Karte `add-map` vorhanden über `AddLocation.setLocMapLayer()`) — im neuen Vollbild-Modus muss dieser Umschalter mit übernommen werden, analog zu AK4 aus US-123 (Vollbild zeigt denselben Kartentyp wie die zugehörige kleine Karte). Keine Dublette; kein Zusammenhang mit US-114[x] (readonly-Vollbild bei Chancen/Kalender/Scout, dort ausdrücklich ohne Pin-Setzen).
 
 ### US-84 · Passwort-Änderung durch den Host in der App-Oberfläche `[ ]`
 
@@ -4253,18 +4379,130 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-119 · Feed-Standardfilter: nur Chancen mit Wahrscheinlichkeit ≥70% `[ ]`
+### US-119 · Feed-Standardfilter: nur Chancen mit Wahrscheinlichkeit ≥70% `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Fotograf möchte ich im Feed standardmäßig nur Chancen mit Wahrscheinlichkeit ≥70% sehen, damit ich nicht von unwahrscheinlichen Chancen überflutet werde; reduziere ich den Wahrscheinlichkeits-Filter manuell, sollen auch niedrigere Wahrscheinlichkeiten wieder sichtbar werden.
 
 **Bezug:** Der „Mindest-Wahrscheinlichkeit"-Filter (Slider, Teil des Filter-Systems aus **US-32** [x]/US-18-20/27, siehe auch **BUG-08** [x] Done) existiert bereits, aktueller Standardwert laut Code-Referenzen im Backlog ist **0,35** (35%), nicht 70%. Dieses Ticket ändert vermutlich nur den Default-Wert des bestehenden Sliders (bzw. bestätigt/dokumentiert das Reduzier-Verhalten), kein neuer Mechanismus. Kein Duplikat — reine Wertänderung eines bestehenden Features. Abgrenzung zu prüfen: ob 70% als Feed-Default separat vom Locations-/Karten-Filter-Default gilt.
+
+## Spec
+
+**📎 Code-Verifikation (2026-07-04):** `web/index.html` gelesen.
+- Es gibt **zwei unterschiedliche „Score"-Werte**, die im Ticket-Bezugstext vermischt wurden:
+  1. `CFG.minScore = 0.35` (Zeile 1277) — ein **fixer Server-Abfragewert**. Er steuert nur, welche Chancen überhaupt vom Server geladen werden (`/opportunities?min_score=${CFG.minScore}`, Zeile 1626). Kommentar im Code: *„Backend-Minimum; wird nicht mehr per Settings-Slider geändert"*. Das ist **nicht** der Slider, den der Fotograf im Filter-Sheet sieht.
+  2. Der sichtbare **Wahrscheinlichkeits-Slider** im Filter-Sheet (`Filter._defaults()`, Zeile 2566: `minScore: 0`) — das ist der tatsächliche Ein-/Ausblende-Filter. Sein Standardwert ist aktuell **0 % ("Alle")**, nicht 35 % wie im Ticket-Bezugstext vermutet. Die 35 % aus dem Bezugstext beziehen sich auf den unter Punkt 1 genannten, komplett anderen Wert.
+- Der Slider wird angewendet in `Filter.apply()` (Zeile 2669: `if (s.minScore > 0 && o.overall_score < s.minScore / 100) return false;`) und wirkt dadurch sowohl im **Feed** (Zeile 1689) als auch im **Kalender** (Zeile 2065, dort wird nur `skipCloudMood` übersteuert, `minScore` nicht ausgenommen).
+- Im **Locations-Tab und auf der Karte** ist der Slider im UI sichtbar ausgegraut/deaktiviert (`isMapView || isLocationView`, Zeile 3155–3164, Hinweistext „Nur im Chancen-Feed verfügbar"), wird aber technisch trotzdem über `applyToLocations()` (Zeile 2729–2733) angewendet, sofern Feed-Daten bereits geladen sind — eine Location ohne ausreichend wahrscheinliche Chance wird dort ausgeblendet.
+- Der Filter-Zustand wird komplett in `localStorage` unter dem Schlüssel `fotoalert_filters` persistiert (`Filter._KEY`, Zeile 2556) und beim App-Start über `Object.assign(this._defaults(), gespeicherter Zustand)` wiederhergestellt (Zeile 2569–2572). Ein bereits gespeicherter Wert überschreibt also den Code-Default dauerhaft, bis `Filter.reset()` aufgerufen wird (z. B. über den „Zurücksetzen"-Knopf im Filter-Sheet, Zeile 2971).
+- Der Slider selbst reagiert bereits vollständig live: Ziehen nach unten löst `_onScoreSlider()` → `Filter.save()` → sofortige Neu-Filterung aus (Zeile 3014–3022). Das im Ticket verlangte „reduziere ich den Filter manuell, werden niedrigere Werte wieder sichtbar" ist **keine separate Logik, die neu gebaut werden muss** — es ist das bereits bestehende Slider-Verhalten. Es gibt keinen zusätzlichen Mechanismus zu entwickeln, nur der Startwert ändert sich.
+
+**Scope:**
+Eingeschlossen: Der Code-Default des Wahrscheinlichkeits-Sliders (`Filter._defaults().minScore`) wird von `0` auf `70` geändert, sodass ein Fotograf ohne bisher gespeicherte Filtereinstellung den Feed künftig direkt mit „≥ 70 %" gefiltert sieht.
+Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurücksetzen von bereits in `localStorage` gespeicherten Filterständen bestehender Nutzer; Einführung eines eigenen, vom Feed getrennten Default-Werts für Kalender/Scout/Locations-Tab; Änderung des Server-Abfragewerts `CFG.minScore` (0,35) — der bleibt unverändert, da er nur die Rohdatenmenge vom Server begrenzt, nicht das, was der Fotograf sieht.
+
+**Example Mapping:**
+
+📏 **Regel 1:** Beim allerersten Start der App (noch kein gespeicherter Filterstand) zeigt der Feed standardmäßig nur Chancen mit Wahrscheinlichkeit ≥ 70 %.
+- 🟢 Beispiel: Ein Fotograf installiert die App neu und öffnet den Feed zum ersten Mal. Von 20 verfügbaren Chancen haben 6 eine Wahrscheinlichkeit von 70 % oder mehr. Im Feed erscheinen genau diese 6.
+- 🟢 Beispiel: Der Wahrscheinlichkeits-Regler im Filter-Menü steht beim ersten Öffnen bereits auf „≥ 70 %", nicht auf „Alle".
+
+📏 **Regel 2:** Schiebt der Fotograf den Wahrscheinlichkeits-Regler manuell auf einen niedrigeren Wert (oder auf „Alle"), werden auch die weniger wahrscheinlichen Chancen sofort sichtbar — ohne Neuladen der Seite.
+- 🟢 Beispiel: Fotograf zieht den Regler von 70 % auf 40 %. Eine Chance mit 55 % Wahrscheinlichkeit, die vorher ausgeblendet war, erscheint sofort im Feed.
+- 🟢 Beispiel: Fotograf zieht den Regler ganz nach links auf „Alle". Jetzt sind wieder alle geladenen Chancen sichtbar, unabhängig von ihrer Wahrscheinlichkeit.
+
+📏 **Regel 3:** Der eingestellte Wert bleibt erhalten, solange die App nicht durch den Fotografen zurückgesetzt wird — auch über App-Neustarts hinweg.
+- 🟢 Beispiel: Fotograf stellt den Regler einmalig auf „Alle", schließt die App und öffnet sie am nächsten Tag erneut. Der Feed zeigt weiterhin alle Chancen (nicht wieder nur ≥ 70 %).
+- ⚪ Annahme: Das entspricht dem bereits bestehenden Verhalten des gesamten Filter-Menüs (alle anderen Filter-Chips verhalten sich ebenso) — bitte bestätigen, dass für die Wahrscheinlichkeit keine Ausnahme gelten soll.
+
+📏 **Regel 4:** Der neue 70-%-Startwert gilt nur für den Chancen-Feed. Für Kalender-Ansicht, Scout und Karte/Locations-Tab ändert sich nichts an der bisherigen Abgrenzung.
+- 🟢 Beispiel: Ein Nutzer stellt im Feed den Regler auf 40 %. Öffnet er danach den Kalender, sieht er dort ebenfalls ab 40 % gefilterte Chancen (weil Regel und Regler geteilt sind — das ist heute schon so, siehe Frage 2 unten).
+- ❓ Frage: siehe Klärungsfragen unten — ob der 70-%-Startwert absichtlich auch für Kalender/Scout gelten soll oder ob dort weiterhin „Alle" als Start gewünscht ist.
+
+**Akzeptanzkriterien (erlebbares App-Verhalten):**
+- [ ] Bei einer App-Installation ohne vorherige Filter-Einstellung zeigt der Feed direkt nach dem ersten Öffnen nur Chancen mit Wahrscheinlichkeit ≥ 70 %.
+- [ ] Der Wahrscheinlichkeits-Regler im Filter-Menü steht beim allerersten Öffnen bereits auf „≥ 70 %" (nicht auf „Alle").
+- [ ] Zieht der Fotograf den Regler auf einen Wert unter 70 %, erscheinen die entsprechend wahrscheinlicheren UND weniger wahrscheinlichen Chancen sofort im Feed, ohne dass die Seite neu geladen werden muss.
+- [ ] Zieht der Fotograf den Regler auf „Alle" (ganz nach links), sind alle geladenen Chancen unabhängig von ihrer Wahrscheinlichkeit sichtbar.
+- [ ] Nach Schließen und erneutem Öffnen der App bleibt der zuletzt manuell eingestellte Reglerwert erhalten (keine Rückkehr auf 70 % ohne aktives Zurücksetzen).
+- [ ] Edge Case: Gibt es an einem Tag keine einzige Chance mit Wahrscheinlichkeit ≥ 70 %, zeigt der Feed einen leeren Zustand mit Hinweistext (bereits vorhandenes Verhalten, Zeile ~1722 „Keine Chancen gefunden") statt eines Fehlers.
+- [ ] Edge Case: Bereits bestehende Nutzer mit einem zuvor gespeicherten, abweichenden Reglerwert (z. B. „Alle") behalten diesen Wert unverändert bei — der neue Default 70 % gilt ausschließlich für Installationen ohne gespeicherten Zustand (kein rückwirkendes Überschreiben).
+
+**Pre-Mortem:**
+- 💀 Szenario: Fotograf installiert die App neu, Feed zeigt „Keine Chancen gefunden", weil an dem Tag zufällig nichts über 70 % liegt — Eindruck „App ist leer/kaputt" statt „App filtert nur zu streng". Auslöser: 70 % könnte je nach Wetterlage/Saison ein großer Teil der Chancen ausblenden. Frühwarnung: schon beim manuellen Test an einem x-beliebigen Tag prüfen, wie viele der aktuell im Feed sichtbaren Chancen die Schwelle real erreichen. Gegenmaßnahme: als Frage an Stephan (siehe unten) — falls zu viele Tage leer wären, ggf. niedrigeren Default oder deutlicheren Empty-State-Hinweis („Filter lockern") in Betracht ziehen.
+- 💀 Szenario: Der neue Default wirkt ungewollt auch im Kalender und lässt dort ebenfalls nur ≥ 70 % durch, obwohl Stephan dort weiterhin „Alle" erwartet hatte. Auslöser: `Filter.apply()` wird von Feed UND Kalender geteilt genutzt (Code-verifiziert, Zeile 1689 und 2065) — es gibt aktuell keinen separaten Kalender-Default. Gegenmaßnahme: als 🔴 Klärungsfrage gestellt (siehe unten), vor Implementierung zu entscheiden.
+- 💀 Szenario: Ein Test mit bereits vorhandenem `localStorage`-Zustand (z. B. Stephans eigenes Testgerät, auf dem der Filter schon einmal berührt wurde) zeigt weiterhin „Alle" oder „35 %" an, obwohl der Code-Default geändert wurde — Fehleindruck „Fix wirkt nicht". Auslöser: `Filter._KEY` überschreibt den Code-Default dauerhaft, sobald einmal gespeichert wurde (Code-verifiziert, Zeile 2569–2572). Gegenmaßnahme: als Testhinweis in den Testplan aufnehmen — Test entweder auf einem Gerät/Browser ohne vorherigen Filterstand oder nach explizitem „Filter zurücksetzen" durchführen.
+- 💀 Szenario: Der Locations-Tab/die Karte zeigt nach der Änderung plötzlich deutlich weniger Locations an, weil `applyToLocations()` den neuen 70-%-Default übernimmt, sobald Feed-Daten geladen sind — obwohl der Slider dort als „nur im Feed relevant" ausgegraut dargestellt wird und ein Nutzer nicht erwartet, dass er dort trotzdem wirkt. Auslöser: bereits bestehendes Verhalten (nicht neu durch dieses Ticket verursacht, aber durch den höheren Default stärker sichtbar). Gegenmaßnahme: in der Regressionsprüfung Locations-Tab nach Feed-Besuch explizit gegenchecken.
+- 💀 Szenario: Beim Reduzieren des Reglers unter 70 % erscheinen keine zusätzlichen Chancen, weil der Server (`CFG.minScore = 0.35`) von vornherein nur Chancen ≥ 35 % ausliefert — ein Fotograf, der den Regler auf 10–30 % stellt, wundert sich, warum trotzdem nichts Neues erscheint. Auslöser: Verwechslung der beiden Score-Werte (siehe Code-Verifikation oben) — dieses Verhalten besteht bereits heute unabhängig von diesem Ticket, wird aber durch einen höheren sichtbaren Default (70 % statt 0 %) für den Fotografen erstmals bewusst wahrnehmbar, weil er den Regler jetzt aktiv bedienen muss statt bei „Alle" zu bleiben. Gegenmaßnahme: als Edge-Case-AK aufnehmen und im Testplan gezielt mit einem Reglerwert unterhalb von 35 % testen.
+
+**Klärungsfragen an Stephan:**
+1. 🔴 Der Wahrscheinlichkeits-Regler wird laut Code sowohl im Feed als auch im Kalender verwendet (gleicher Filter-Zustand, keine getrennte Logik). Soll der neue 70-%-Startwert **auch für den Kalender** gelten, oder soll der Kalender weiterhin bei „Alle" starten (was eine zusätzliche, heute nicht vorhandene Trennung der beiden Ansichten erfordern würde)? Für Scout gilt laut Code-Verifikation derselbe geteilte Zustand wie für den Feed — falls hier eine Abweichung gewünscht ist, bitte ebenfalls benennen.
+   - ✅ **Entschieden (2026-07-04):** Überall gleich — der 70-%-Startwert gilt geteilt für Feed, Kalender und Scout. Keine Trennung der Ansichten (Option C entfällt).
+2. 🔴 Soll der neue 70-%-Default auch für Nutzer gelten, die die App schon installiert haben und bereits einen eigenen (ggf. niedrigeren) Reglerwert gespeichert haben — oder ausschließlich für Neuinstallationen/erstmaliges Öffnen ohne vorherigen Filterstand? (Technisch bedeutet „auch für Bestandsnutzer": der gespeicherte Wert müsste beim nächsten App-Start einmalig zurückgesetzt werden — ein zusätzlicher Schritt gegenüber der reinen Default-Änderung.)
+   - ✅ **Entschieden (2026-07-04):** Für alle zurücksetzen — auch bereits gespeicherte, abweichende Reglerwerte werden einmalig auf 70 % gesetzt (Option B).
+3. ⚪ Annahme, bitte bestätigen: Der Server liefert weiterhin grundsätzlich Chancen ab 35 % Wahrscheinlichkeit aus (unveränderter Wert `CFG.minScore`); der Regler kann also nur zwischen „35 % bis 100 %" sinnvoll etwas ein-/ausblenden, ein Reglerwert unter 35 % zeigt keine zusätzlichen Chancen, weil der Server sie gar nicht erst liefert. Falls Stephan möchte, dass der Regler auch Werte unter 35 % sinnvoll nutzbar macht, wäre zusätzlich eine Änderung am Server-Abfragewert nötig — das wäre ein größerer Eingriff als im Ticket beschrieben.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation von `web/index.html`)
+- [x] Architektur analysiert: betroffene Datei ausschließlich `web/index.html` (`Filter._defaults()` Zeile 2566, ggf. `Filter._render()`-Beschriftung); kein Backend-Bezug
+- [x] Ticket-Beziehungsanalyse: US-32/US-18-20/27/BUG-08 geprüft — bestätigt reine Wertänderung eines bestehenden, stabilen Features; keine Überlappung mit offenen Tickets gefunden
+- [x] Designer-Check: rein numerische Default-Wert-Änderung eines bestehenden Sliders, keine neue visuelle Komponente → fotoalert-designer nicht erforderlich
+- [x] Implementierungsoptionen: A / B / C (siehe unten) — **Option B gewählt** (Stephan, 2026-07-04: überall gleich + für alle Nutzer zurücksetzen)
+- [x] Empfehlung/Entscheidung: **Option B**, geteilt über Feed/Kalender/Scout, einmaliger Reset für Bestandsnutzer
+- [ ] **Prototyp-Gate:** Stephan möchte vor Implementierung eine Verhaltens-Beschreibung sehen (kein Code-Prototyp nötig, da reine Default-Wert-/Reset-Logik ohne neue UI) — vorgelegt 2026-07-04, Freigabe steht aus
+
+**Implementierungsoptionen:**
+
+### Option A — Reiner Code-Default, bestehender Zustand bleibt unangetastet
+- Vorgehen: Nur der Startwert in `Filter._defaults()` wird von `minScore: 0` auf `minScore: 70` geändert. Nutzer ohne bisherigen `localStorage`-Eintrag starten künftig bei 70 %. Nutzer mit bereits gespeichertem Wert (egal welcher) behalten ihren eigenen Stand unverändert.
+- Betroffene Dateien: `web/index.html`, eine Zeile (`Filter._defaults()`).
+- Vorteile: Minimalinvasiv, kein Risiko für bestehende Nutzer-Einstellungen, entspricht dem Standardverhalten aller anderen Filter-Defaults in dieser App.
+- Nachteile/Risiken: Bestandsnutzer, die die App vor diesem Ticket schon einmal geöffnet haben, sehen den neuen 70-%-Default nie (ihr Zustand ist bereits gespeichert) — falls Stephan das für alle will (Frage 2), erfüllt diese Option das nicht.
+- Aufwand: klein.
+
+### Option B — Code-Default ändern + einmaliger Reset für Bestandsnutzer
+- Vorgehen: Wie Option A, zusätzlich ein einmaliger Migrationsschritt beim App-Start: falls der gespeicherte Filterstand noch nie explizit den Wahrscheinlichkeits-Regler berührt hat (z. B. über ein Versions-Flag erkannt), wird der gespeicherte `minScore`-Wert einmalig auf 70 gesetzt.
+- Betroffene Dateien: `web/index.html` (`Filter._defaults()` + zusätzliche Migrationslogik beim Laden des Filterzustands).
+- Vorteile: Alle Nutzer, auch Bestandsnutzer, sehen den neuen Default.
+- Nachteile/Risiken: Deutlich komplexer als im Ticket beschrieben („vermutlich reine Default-Wert-Änderung"); Gefahr, einen bewusst von einem Nutzer gewählten niedrigen Wert ungewollt zu überschreiben, wenn die Unterscheidung „nie berührt" vs. „bewusst auf 0 gelassen" nicht zuverlässig möglich ist (aktuell gibt es kein Flag dafür, das müsste neu eingeführt werden).
+- Aufwand: mittel.
+
+### Option C — Getrennter Default für Feed vs. Kalender/Scout
+- Vorgehen: Der Wahrscheinlichkeits-Filter wird pro Ansicht getrennt gespeichert (z. B. `minScoreFeed` und `minScoreCalendar`), sodass der Feed bei 70 % startet, der Kalender aber unabhängig bei „Alle" bleibt.
+- Betroffene Dateien: `web/index.html`, mehrere Stellen (`Filter._defaults()`, `Filter.apply()`-Aufrufe in Feed und Kalender, Filter-Sheet-Rendering, Badge-Zählung).
+- Vorteile: Löst Klärungsfrage 1 sauber, falls Stephan getrennte Verhalten für Feed und Kalender wünscht.
+- Nachteile/Risiken: Deutlich größerer Eingriff in ein zentrales, gut funktionierendes Filter-System (Risiko für Regressionen in allen Ansichten, die den Filter nutzen); nur nötig, falls Frage 1 mit „nein, Kalender soll unverändert bleiben" beantwortet wird.
+- Aufwand: groß.
+
+✅ **Empfehlung:** Option A. Sie entspricht exakt dem im Ticket beschriebenen Umfang („vermutlich reine Default-Wert-Änderung", vom Ticket selbst so vermutet und durch Code-Verifikation bestätigt), hat das geringste Regressionsrisiko und passt zum bestehenden Verhalten aller anderen Filter in dieser App (Defaults gelten nur für neue/zurückgesetzte Zustände, nie rückwirkend). Falls Stephan bei Frage 2 „auch für Bestandsnutzer" möchte, empfehle ich, das als eigenes, klar abgegrenztes Ticket zu behandeln statt es hier mit hineinzunehmen — es ändert Aufwand und Risiko erheblich. Bei Frage 1 empfehle ich, den geteilten Zustand beizubehalten (kein Option C), sofern Stephan nicht ausdrücklich einen fachlichen Grund für getrennte Kalender-/Feed-Defaults nennt.
+
+**Testplan:**
+- [ ] Automatisiert: Dieses Ticket betrifft ausschließlich clientseitigen UI-Zustand ohne Server-Logik: kein neuer `pytest`-Fall in `backend/tests/` nötig; Verhalten wird über die manuellen Schritte unten geprüft.
+- [ ] Manuell (nach lokalem Serverstart, siehe `fotoalert-localdev`):
+  1. Browser-Profil ohne vorherigen FotoAlert-Filterstand verwenden (privates Fenster oder `localStorage` für die Seite leeren).
+  2. Feed öffnen → prüfen: nur Chancen mit Wahrscheinlichkeit ≥ 70 % sichtbar, Regler-Beschriftung zeigt „≥ 70 %".
+  3. Regler auf 40 % ziehen → prüfen: zusätzliche, vorher ausgeblendete Chancen erscheinen sofort ohne Neuladen.
+  4. Regler ganz auf „Alle" ziehen → prüfen: alle geladenen Chancen sichtbar.
+  5. Regler auf einen Wert unter 35 % stellen (z. B. 10 %) → prüfen und Stephan rückmelden, ob wie erwartet keine zusätzlichen Chancen erscheinen (Server liefert ohnehin nur ab 35 %) — bestätigt Klärungsfrage 3.
+  6. Seite neu laden (App „neu starten") → prüfen: zuletzt gewählter Reglerwert bleibt erhalten (nicht zurück auf 70 %).
+  7. Kalender-Tab öffnen (mit demselben, zuvor gesetzten Reglerwert) → dokumentieren, ob der Wahrscheinlichkeitsfilter dort ebenfalls wirkt (erwartet: ja, siehe Klärungsfrage 1) — Ergebnis mit Stephan abgleichen.
+  8. Regression: Locations-Tab öffnen nach Feed-Besuch → prüfen, ob weiterhin alle erwarteten Locations sichtbar sind (kein unerwartetes Ausblenden durch `applyToLocations()`).
+  9. Regression: alle übrigen Filter-Chips (Eventtyp, Tageszeit, Schwierigkeit, Entfernung, Verifikation) weiterhin unverändert funktionsfähig.
+
+**Implementierungsnotiz (2026-07-04):**
+- Datei: `web/index.html`.
+- `Filter._defaults()` (Zeile ~2598): `minScore: 0` → `minScore: 70`. Gilt geteilt für Feed, Kalender und Scout (kein separater Wert pro Ansicht, wie entschieden — Option B).
+- Neue Funktion `Filter.migrateMinScoreDefault()` (Zeilen ~2617–2637): liest den gespeicherten Filterstand aus `localStorage` (`Filter._KEY = 'fotoalert_filters'`) und setzt `minScore` einmalig auf 70, falls abweichend. Ein neuer Flag-Key `Filter._MIGRATED_KEY = 'fotoalert_filters_v119_migrated'` markiert, dass die Migration bereits gelaufen ist — danach überschreibt sie einen vom Nutzer selbst gewählten niedrigeren Wert nie wieder.
+- Aufruf der Migration in `App.init()` (Zeile ~6444), direkt nach `Filter._updateBadge()` und vor den bestehenden einmaligen Migrationen (Verify/Rating/CameraFOV) — gleiches etabliertes Muster wie dort.
+- `CFG.minScore = 0.35` (Server-Ladegrenze) unverändert, wie im Scope festgelegt.
+- Umgesetzt: Option B (Code-Default ändern + einmaliger Reset für Bestandsnutzer), wie von Stephan am 2026-07-04 freigegeben.
 
 ---
 
@@ -4274,12 +4512,188 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Host möchte ich pro Location ein Beispielbild hochladen können, das andere Nutzer in Hoch- oder Querformat passend zur Geräteausrichtung sehen (Bild dreht beim Drehen des Handys mit, Hochkant-Bilder vollflächig im Hochkant-Modus), damit Interessierte sofort einen visuellen Eindruck vom Spot bekommen. Bildgröße max. 1 MB, idealerweise serverseitige Kompression auf ca. 500 KB beim Upload, um Performance und Datenvolumen zu schonen.
 
 **Bezug:** Keine Dubletten oder direkt überschneidenden Tickets im Backlog gefunden (Suche nach „Bild", „Upload", „Beispielbild" ergab keine bestehenden Bild-Upload-Tickets). Neues, eigenständiges Feature. Berührt ggf. dieselbe Location-Detail-Sektion wie **US-103** [x] (Karten-Marker & FOV-Legende) und **US-87** [x] (Vollbild-Overlay Bearbeiten-Karte), aber rein layouttechnisch, keine funktionale Überschneidung.
+
+---
+
+#### 📋 Spec (Analyse-Phase, 2026-07-04)
+
+**Annahmen-Protokoll (vor dem Mapping):**
+
+| Punkt | Typ | Entscheidung |
+|---|---|---|
+| Wer darf hochladen? | ✅ klar ableitbar | Ticket sagt „Als Host" — es existiert bereits eine Host-Rolle (`Auth.isHost()` im Frontend, `auth.require_host` im Server, bisher genutzt für „Location löschen"). Hochladen/Ersetzen/Löschen des Beispielbilds ist eine Host-Aktion. |
+| Wo erscheint das Bild im Detail-Bereich? | ⚠️ Annahme | Oben im Hero-Bereich (Titelzone), direkt über oder neben Name/Beschreibung — nicht als eigene aufklappbare Sektion weiter unten, weil es ein Eindrucksbild ist, kein Datenblock. **Bitte bestätigen.** |
+| Erscheint das Bild auch als kleines Vorschaubild in der Locations-Liste (Kartenansicht mit Icon)? | 🔴 funktional kritisch | Ticket nennt nur „Location-Detail" implizit über „Interessierte bekommen einen visuellen Eindruck". Die Liste zeigt aktuell nur ein Kategorie-Icon, kein Bild. **Frage 1 an Stephan.** |
+| Was passiert, wenn kein Bild hochgeladen wurde? | ⚠️ Annahme | Bereich wird nicht angezeigt bzw. zeigt einen neutralen Platzhalter mit „Bild hinzufügen"-Hinweis nur für den Host, für normale Nutzer bleibt der Bereich einfach weg. **Bitte bestätigen.** |
+| Was passiert bei zu großem Bild (> 1 MB) genau? | 🔴 funktional kritisch | Ticket nennt „max. 1 MB" UND „serverseitige Kompression auf ca. 500 KB" im selben Satz — das ist zunächst widersprüchlich (harte Grenze vs. automatische Kompression). **Frage 2 an Stephan.** |
+| Erlaubte Bildformate? | ⚠️ Annahme | JPEG/PNG/HEIC (Standard-Fotoformate von iPhone/Android), Server wandelt intern einheitlich in JPEG um. **Bitte bestätigen.** |
+| Ein Bild pro Location oder mehrere? | ✅ klar ableitbar | Ticket sagt „ein Beispielbild pro Location" — genau eins, kein Galerie-Feature. |
+| Ersetzen eines bestehenden Bilds? | ✅ klar ableitbar | Impliziert („hochladen können") — erneutes Hochladen ersetzt das bisherige Bild, kein Versionsverlauf. |
+| EXIF-Rotation / Ausrichtung des Originalfotos | 🔴 funktional kritisch | Smartphone-Fotos tragen die Ausrichtung oft nur als EXIF-Tag, nicht als tatsächlich gedrehte Pixel. Ohne Korrektur landet ein Hochkant-Foto ggf. seitlich verdreht im Hochkant-Modus. **Frage 3 an Stephan** (technische Klärung, aber mit Auswirkung auf erlebbares Verhalten). |
+
+**Fragen an Stephan (vor Rules — bitte auf Antwort warten):**
+
+1. Soll das Beispielbild nur im aufgeklappten Location-Detail erscheinen, oder zusätzlich auch als kleines Vorschaubild in der Locations-Liste (dort wo aktuell nur ein rundes Kategorie-Icon zu sehen ist)?
+2. Zur Größengrenze: Ist gemeint „Upload wird bei mehr als 1 MB abgelehnt, Nutzer muss selbst verkleinern" — oder „Upload wird bis 1 MB akzeptiert und der Server komprimiert danach automatisch weiter auf ca. 500 KB, damit am Ende immer ein kleines, schnell ladendes Bild gespeichert wird"? (Empfehlung unten: zweite Variante, unten unter Rule 3 begründet.)
+3. Ist es in Ordnung, wenn Fotos, die auf dem Kopf oder seitlich gedreht aufgenommen wurden, automatisch anhand der im Foto gespeicherten Ausrichtungsinformation aufgerichtet werden (Standard-Verhalten von Foto-Apps), bevor sie gespeichert werden?
+
+**Example Mapping** *(vorläufig, unter Vorbehalt der 3 Fragen oben — Rules nutzen die empfohlenen Defaults, werden nach Antwort ggf. angepasst)*
+
+- **Rule 1 — Upload nur für den Host:** Nur ein eingeloggter Host sieht die Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu entfernen. Normale Besucher sehen nur das fertige Bild (falls vorhanden), keine Upload-Steuerung.
+  - Beispiel: Host öffnet eine Location im Bearbeiten-Modus → sieht einen Bereich „Beispielbild" mit einem Button zum Auswählen einer Bilddatei. Ein normaler Nutzer öffnet dieselbe Location → sieht dort keinen Upload-Button, nur das Bild selbst (wenn vorhanden).
+- **Rule 2 — Anzeige passend zur Geräteausrichtung, immer mittig eingepasst:** Das Beispielbild füllt die dafür vorgesehene Fläche im Location-Detail vollständig aus und behält dabei sein Seitenverhältnis — dreht der Nutzer sein Handy, dreht sich auch die Anzeigefläche mit und das Bild passt sich unmittelbar an (kein Umschalten zwischen zwei getrennt hochgeladenen Bildern nötig, ein einziges Originalbild wird flexibel dargestellt). Unabhängig davon, ob das Originalfoto hoch- oder querformatig ist und unabhängig von der aktuellen Geräteausrichtung, wird der sichtbare Bildausschnitt **immer mittig aus dem Originalbild genommen** (Bildmitte bleibt Bildmitte) — nie ein Ausschnitt, der zufällig nach oben, unten oder zur Seite verschoben ist.
+  - Beispiel: Ein Hochformat-Beispielbild wird auf einem Handy im Hochkant-Modus angesehen → Bild füllt die Breite komplett aus, keine schwarzen Balken links/rechts, der obere und untere überschüssige Bildrand wird gleichmäßig abgeschnitten (nicht nur oben oder nur unten).
+  - Beispiel: Derselbe Nutzer dreht sein Handy quer → dieselbe Bilddatei passt sich der neuen, breiteren Fläche an und füllt sie ebenfalls komplett aus, ohne dass ein zweites Bild geladen wird; auch hier bleibt die Bildmitte im Zentrum, links und rechts wird gleichmäßig abgeschnitten.
+  - Beispiel: Ein querformatiges Beispielbild wird im Hochkant-Modus angezeigt (schmale, hohe Fläche) → die Fläche füllt sich vollständig, links und rechts wird entsprechend viel vom Originalbild abgeschnitten, aber die Mitte des Fotos bleibt sichtbar und mittig.
+- **Rule 3 — Größenbegrenzung mit automatischer Verkleinerung:** Der Host kann Fotos direkt vom Smartphone hochladen (oft mehrere MB groß), ohne sie vorher selbst verkleinern zu müssen — der Server übernimmt die Verkleinerung automatisch bis zu einer sinnvollen Zielgröße, damit die App für alle Betrachter schnell lädt.
+  - Beispiel: Host wählt ein 4 MB großes Foto direkt von der Kamera → Upload wird angenommen, der Host sieht kurz „Bild wird verarbeitet …“, danach ist ein deutlich kleineres, aber optisch kaum unterscheidbares Bild sichtbar.
+  - Beispiel: Host versucht ein extrem großes Bild hochzuladen, das die vertretbare Obergrenze für einen einzelnen Upload sprengt (z. B. ein 40-Megapixel-RAW-artiges Foto von vielen zig MB) → Upload wird mit einer verständlichen Fehlermeldung abgelehnt, bevor der Server unnötig Rechenzeit investiert.
+  - ❓ Frage 2 (s.o.) entscheidet den genauen Grenzwert-Mechanismus.
+- **Rule 4 — Kein Bild vorhanden:** Solange kein Host ein Beispielbild hochgeladen hat, bleibt der Bildbereich im Detail schlicht unsichtbar (kein leerer grauer Kasten, kein „Bild fehlt“-Hinweis für normale Nutzer).
+  - Beispiel: Nutzer öffnet eine ältere Location ohne Beispielbild → Detail-Ansicht sieht genauso aus wie heute, kein Platzhalter-Element stört das Layout.
+  - Beispiel: Host öffnet dieselbe Location im Bearbeiten-Modus → sieht dort einen dezenten Hinweis „Noch kein Beispielbild“ mit Upload-Möglichkeit.
+
+**Akzeptanzkriterien**
+
+- [ ] Ein Host kann beim Bearbeiten einer Location ein Foto von seinem Gerät auswählen und hochladen; nach Abschluss ist das Bild direkt im Location-Detail sichtbar.
+- [ ] Lädt derselbe Host später ein neues Foto für dieselbe Location hoch, ersetzt es das bisherige Bild vollständig (kein zweites Bild, keine Galerie).
+- [ ] Ein hochformatiges Beispielbild füllt die Bildfläche im Detail vollständig aus, wenn das Handy im Hochkant-Modus gehalten wird.
+- [ ] Wird dasselbe Handy quer gedreht, passt sich dieselbe Bildfläche unmittelbar an die neue Ausrichtung an und füllt sie ebenfalls komplett aus — ohne dass die Seite neu geladen werden muss.
+- [ ] Das Gleiche funktioniert spiegelbildlich für ein querformatiges Beispielbild (füllt die Fläche im Querformat-Modus voll aus).
+- [ ] Edge: Egal ob das Originalfoto hoch- oder querformatig ist und egal in welcher Ausrichtung das Handy gerade gehalten wird — der sichtbare Bildausschnitt ist immer mittig aus dem Originalbild genommen (überschüssiger Rand wird gleichmäßig auf beiden Seiten abgeschnitten, nie einseitig verschoben).
+- [ ] Lädt der Host ein sehr großes Foto direkt von der Kamera hoch (mehrere MB), wird es automatisch verkleinert; das Ergebnis ist spürbar kleiner als das Original, aber weiterhin gut erkennbar.
+- [ ] Edge: Versucht der Host ein Foto hochzuladen, das die vertretbare Obergrenze für einen Upload deutlich überschreitet, bekommt er eine klare, verständliche Fehlermeldung statt eines unklaren Abbruchs oder eines hängenden Ladebalkens.
+- [ ] Edge: Ein Foto, das auf dem Handy auf dem Kopf oder seitlich liegend aufgenommen wurde, erscheint nach dem Hochladen richtig herum (nicht verdreht), unabhängig davon, wie das Handy beim Fotografieren gehalten wurde.
+- [ ] Edge: Ein normaler Nutzer (nicht Host) sieht in keiner Ansicht eine Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu löschen.
+- [ ] Edge: Bei einer Location ohne Beispielbild bleibt die Detail-Ansicht für normale Nutzer unverändert wie heute, ohne Platzhalter oder Leerfläche.
+- [ ] Edge: Lädt der Host eine Datei hoch, die kein gültiges Bild ist (z. B. ein PDF mit der Endung „.jpg“), wird der Upload mit einer verständlichen Fehlermeldung abgelehnt.
+
+**Pre-Mortem**
+
+1. 💀 **Szenario:** Ein Hochformat-Foto erscheint seitlich gedreht im Detail.
+   **Auslöser:** Smartphone-Fotos speichern die Ausrichtung häufig nur als Zusatzinformation im Bild, nicht als tatsächlich gedrehte Bilddaten. Wird diese Zusatzinformation beim Verkleinern auf dem Server ignoriert, kommt ein falsch herum liegendes Bild heraus.
+   **Frühwarnung:** Beim ersten Test mit einem am Handy hochkant aufgenommenen Foto zeigt sich das sofort visuell.
+   **Gegenmaßnahme:** Ausrichtungskorrektur ist fester Bestandteil der serverseitigen Verarbeitung (siehe AK „auf dem Kopf/seitlich“ oben), Testplan deckt das mit einem echten Handyfoto ab, nicht nur mit einem bereits „geraden“ Testbild.
+2. 💀 **Szenario:** Speicherplatz auf dem Server wächst unbemerkt, bis die Festplatte voll ist.
+   **Auslöser:** Jede Location bekommt potenziell ein Bild, alte ersetzte Bilder werden nicht gelöscht, sondern sammeln sich an.
+   **Frühwarnung:** Erst spürbar, wenn der Server aus Speicherplatzgründen Probleme bekommt — schwer im Normalbetrieb zu bemerken.
+   **Gegenmaßnahme:** Beim Ersetzen eines Bildes wird die alte Bilddatei aktiv gelöscht, nicht nur der Verweis darauf überschrieben. Ein Bild pro Location als Obergrenze (Rule Ticket) verhindert unbegrenztes Wachstum von vornherein.
+3. 💀 **Szenario:** Zwei parallele Uploads für dieselbe Location (Host lädt auf zwei Geräten gleichzeitig hoch, oder tippt versehentlich zweimal) hinterlassen einen inkonsistenten Zustand (z. B. Bilddatei vorhanden, aber Verweis zeigt noch auf die alte).
+   **Auslöser:** Fehlende Reihenfolge-Sicherheit beim Schreiben von Datei + Verweis.
+   **Frühwarnung:** Selten reproduzierbar, macht sich nur bei genau diesem Zufallstiming bemerkbar.
+   **Gegenmaßnahme:** Bild wird zuerst vollständig auf der Festplatte gespeichert, erst danach der Verweis in der Location aktualisiert (ähnliches Muster wie bestehende atomare Schreibvorgänge in der Datenschicht).
+4. 💀 **Szenario:** Sehr viele Nutzer laden gleichzeitig das Location-Detail, das Beispielbild macht die Seite spürbar langsamer als bisher.
+   **Auslöser:** Unkomprimiertes oder zu großes Bild wird bei jedem Seitenaufruf erneut vollständig geladen.
+   **Frühwarnung:** Fühlbar längere Ladezeit beim Öffnen einer Location mit Bild gegenüber einer ohne.
+   **Gegenmaßnahme:** Serverseitige Komprimierung auf die im Ticket genannte Zielgröße (~500 KB) ist keine Kür, sondern Voraussetzung; zusätzlich Cache-Header setzen, damit ein einmal geladenes Bild im Browser wiederverwendet wird.
+5. 💀 **Szenario:** Ein hochgeladenes Bild wird als eigentlich für eine andere Location bestimmtes Bild angezeigt (Verwechslung).
+   **Auslöser:** Wird der Ziel-Ort des Uploads nicht eindeutig an die ID der gerade bearbeiteten Location gebunden (z. B. wenn der Host zwischen Öffnen des Bearbeiten-Formulars und Abschluss des Uploads zu einer anderen Location wechselt), könnte das Bild versehentlich der falschen Location zugeordnet werden.
+   **Frühwarnung:** Fällt nur auf, wenn tatsächlich zwei Locations kurz hintereinander bearbeitet werden.
+   **Gegenmaßnahme:** Die Location-Kennung wird fest in den Upload-Vorgang eingebettet (nicht aus einem globalen „aktuell offen“-Zustand zum Zeitpunkt des Abschlusses neu gelesen), Testplan deckt „zwei Locations kurz hintereinander bearbeiten“ ab.
+
+**Analyse & Planung**
+
+- [x] Example Mapping durchgeführt (3 Fragen an Stephan am Weg-Gate beantwortet — s.u.)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert (Code tatsächlich gelesen, siehe unten)
+- [x] Designer-Check: **visuell** (neues Bild-Element im Location-Detail) → siehe Designer-Hinweis unten
+- [x] Implementierungsoptionen: A / B (siehe unten) — Option A freigegeben (Weg-Gate 2026-07-04)
+- [x] Empfehlung: Option A für Speicherung (Datei statt Base64-in-Datenbank), Option A für Ausrichtung (ein Bild + flexible Anzeige statt zwei getrennter Uploads) — freigegeben durch Stephan (Weg-Gate 2026-07-04)
+
+**Architektur-Analyse (Code tatsächlich gelesen am 2026-07-04):**
+
+- **Datenmodell:** `backend/data/locations.py` — die `PhotoLocation`-Dataclass (Zeile 41–83) hat aktuell **kein** Bild-/Foto-Feld. Für Standard-Locations müsste ein neues optionales Feld (z. B. Bildpfad) ergänzt werden.
+- **Custom Locations (nutzerangelegt):** `backend/data/store.py` — die SQLite-Tabelle `custom_locations` (Zeile 45–62) hat ebenfalls kein Bildfeld. Beide Location-Arten (Standard aus `LOCATIONS`, Custom aus SQLite) brauchen dieselbe neue Fähigkeit — Standard-Locations laufen bereits heute über den bestehenden `location_overrides`-Mechanismus (Zeile 64–67: freies JSON-Feld pro Location-ID), Custom Locations bräuchten eine neue Spalte.
+- **Bearbeiten-Endpoint:** `backend/main.py`, `PATCH /locations/{loc_id}` (Zeile 2169–2242) ist der einzige bestehende Weg, um Felder einer Location zu ändern — er nimmt aktuell ausschließlich JSON-Werte entgegen (`Body(...)` als `dict`), es gibt **keinen** bestehenden Datei-Upload-Mechanismus im gesamten Backend (`UploadFile`/`multipart` kommt im Code kein einziges Mal vor). Ein Bild-Upload braucht also einen neuen, eigenständigen Endpoint (Bilddaten sind kein sinnvoller Teil eines JSON-`PATCH`-Bodys in vertretbarer Größe).
+- **Berechtigung:** `backend/auth.py`, `require_host` (Zeile 76) existiert bereits und wird u. a. beim Löschen einer Location verwendet (`DELETE /locations/{loc_id}`, Zeile 2249). Für den Bild-Upload ist dieselbe Absicherung direkt wiederverwendbar — keine neue Rollenlogik nötig.
+- **Statische Auslieferung:** `backend/main.py` Zeile 2459–2476 mountet den gesamten `web`-Ordner über `StaticFiles`. Für Bilddateien ist ein eigenes, nicht mit dem Web-Code vermischtes Verzeichnis sauberer — als Vorbild dient `_CACHE_DIR = Path(__file__).parent / "data" / "cache"` (Zeile 98), also z. B. ein neues `backend/data/location_images/`-Verzeichnis, das ebenfalls über `StaticFiles` (oder eine dedizierte Route) ausgeliefert wird.
+- **Bildverarbeitung:** `Pillow==10.3.0` ist bereits eine bestehende Backend-Abhängigkeit (`requirements.txt` Zeile 22, aktuell genutzt für die Wetter-Kartenüberlagerung in `calculations/weather_grib.py`, US-112). Für Verkleinerung, Kompression und Ausrichtungskorrektur ist **keine neue Abhängigkeit** nötig, Pillow deckt das ab (inkl. Standardfunktion zum automatischen Aufrichten anhand der Bild-Ausrichtungsinformation).
+- **Frontend — Detail-Ansicht:** `web/index.html`, `LocationDetail._render(loc)` (ab Zeile 5701) baut die Detail-Ansicht aus einem festen Hero-Bereich (Zeile 5702–5713: Titel, Icon, Beschreibung) gefolgt von mehreren aufklappbaren Abschnitten (`mkSec(...)`: Fotograf-Standort, Motiv, Ausrichtung, Karte & Blickwinkel, Links, Events, Bewertung, Verifikation). Ein Beispielbild passt inhaltlich am ehesten oben in den Hero-Bereich (großflächig, sofort sichtbar), nicht als zusätzlicher aufklappbarer Abschnitt weiter unten (siehe Annahmen-Protokoll oben, Frage an Stephan).
+- **Frontend — Bearbeiten-Formular:** `LocationDetail.openEdit()` (ab Zeile 5246) und `saveEdit(locId)` (Zeile 5589) sind der bestehende Bearbeiten-Weg; ein Upload-Steuerelement würde in dieses Formular ergänzt, aber wegen der Dateigröße **nicht** über denselben JSON-`saveEdit`-Aufruf laufen, sondern über einen eigenen, sofortigen Upload-Request beim Auswählen der Datei (ähnlich wie ein separater Button, nicht Teil des „Speichern“-Sammel-Requests).
+- **Kein Vorbild für Datei-Upload im Frontend:** `const API` (Zeile 1333–1365) kennt nur `get`/`post`/`patch`/`delete` mit JSON-Body (`Content-Type: application/json`, `JSON.stringify`). Ein datei-basierter Upload (`FormData`, kein JSON-Header) ist ein neuer Codepfad, keine Wiederverwendung von `API.post`.
+- **Locations-Liste:** `Locations.render(locs)` (ab Zeile 5171) zeigt aktuell nur ein rundes Kategorie-Icon (Zeile 5182) pro Location, kein Bild. Ob das Beispielbild hier ebenfalls als kleines Vorschaubild erscheinen soll, ist die oben gestellte Frage 1 — technisch zusätzlicher, aber kleiner Zusatzaufwand (ein `<img>`-Tag statt/neben dem Icon).
+- **Kein Render-Pfad-Konflikt:** Anders als bei BUG-59 (Wetter-Overlay) gibt es hier keine bestehende Fläche, die bereits von einer anderen Quelle (Server-PNG vs. Frontend-Farbwerte) gerendert wird — der Bildbereich ist komplett neu, kein Konflikt mit bestehendem Rendering.
+
+**Designer-Hinweis (visuell sichtbar → `fotoalert-designer` vor Umsetzung empfohlen):**
+Dieses Ticket führt ein komplett neues visuelles Element ein (erstes Foto-/Bild-Element der App, bisher rein Icon-/Text-/Kartenbasiert). Empfehlung: vor Implementierungsstart kurz den Designer-Skill für Bildrahmen (Eckenradius, Rand/Schatten, Platzierung im Hero, Verhalten des Platzhalters beim Host ohne Bild) konsultieren, damit das neue Element zum bestehenden Bauhaus-Stil passt statt einer Ad-hoc-Lösung.
+
+**Implementierungsoptionen**
+
+*Option A — Bilddatei auf der Festplatte, Verweis als Text-Feld in der Location; ein Upload, flexible Anzeige je Geräteausrichtung; serverseitige Verkleinerung*
+In Alltagssprache: Das Foto wird als normale Bilddatei auf dem Server abgelegt (so wie heute schon die täglichen Wetterkarten-Bilder erzeugt und abgelegt werden), die Location „weiß" nur, unter welchem Namen ihr Bild zu finden ist. Es gibt nur einen Upload-Knopf — dieselbe Datei wird im Hochkant- wie im Querformat-Modus einfach passend in die verfügbare Fläche eingepasst, kein zweiter Upload für die jeweils andere Ausrichtung nötig.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | Neuer Upload-Endpoint (Datei-Upload, nur für Host), Bild wird beim Hochladen serverseitig ausgerichtet, auf sinnvolle Maximalmaße verkleinert und auf die Zielgröße komprimiert, dann als Datei gespeichert; Location bekommt ein neues Text-Feld mit dem Dateinamen/Pfad. Anzeige im Frontend: `object-fit: cover` + `object-position: center` (Bildmitte bleibt immer im Zentrum, egal welche Kante beschnitten wird) |
+| Betroffene Dateien | `backend/main.py` (neuer Endpoint + Feld in PATCH-Erlaubnisliste), `backend/data/locations.py` (neues optionales Feld), `backend/data/store.py` (neue Spalte für Custom Locations + ggf. `location_overrides`-Nutzung für Standard-Locations), `requirements.txt` unverändert (Pillow bereits vorhanden), `web/index.html` (Upload-Steuerelement im Bearbeiten-Formular, Anzeige im Hero-Bereich, CSS für flexible Bildfläche) |
+| Vorteile | Ein Bild, eine Quelle der Wahrheit; einfach zu verstehen und zu testen; Bilddateien bleiben außerhalb der Datenbank (Datenbank bleibt klein und schnell); Löschen/Ersetzen ist ein einfacher Dateisystem-Vorgang |
+| Nachteile / Risiken | Neues Verzeichnis muss bei Server-Backups mitgedacht werden (bestehendes Backup-Verfahren prüft aktuell wohl nur die Datenbank/JSON-Dateien — als offene Frage für die Implementierungsphase vormerken, nicht Teil dieser Analyse) |
+| Aufwand | Mittel — neuer Endpoint, neues Feld in zwei Datenquellen, neues Frontend-Steuerelement, aber keine neue Abhängigkeit nötig |
+
+*Option B — Bild als Base64-Text direkt in der Datenbank/JSON gespeichert*
+In Alltagssprache: Das Foto wird nicht als eigene Datei abgelegt, sondern in einen langen Text umgewandelt und direkt zusammen mit den anderen Location-Daten gespeichert.
+
+| Aspekt | Bewertung |
+|---|---|
+| Technischer Ansatz | Bild wird als Text-Kodierung in dasselbe Datenfeld geschrieben, das auch Name/Beschreibung enthält |
+| Vorteile | Keine separate Dateiverwaltung nötig |
+| Nachteile / Risiken | Macht die Datenbank/JSON-Dateien deutlich größer und langsamer beim Lesen (jede Abfrage aller Locations lädt dann auch alle Bilder mit, selbst wenn nur die Liste ohne Bilder gebraucht wird); textkodierte Bilder sind ca. ein Drittel größer als die Originaldatei; deutlich unüblicher Ansatz, der von bestehenden Mustern in dieser App abweicht |
+| Aufwand | Mittel, aber mit strukturellem Nachteil, der sich bei jedem zukünftigen Location-Bild wiederholt verschlechtert |
+
+*Option C (zu Rule 2/Frage 3) — Zwei getrennte Uploads für Hoch- und Querformat statt einem flexiblen Bild*
+In Alltagssprache: Der Host lädt zwei Fotos hoch, eines eigens fürs Hochkant-Handy, eines eigens fürs Querformat-Handy; die App zeigt je nach Geräteausrichtung das passende der beiden.
+
+| Aspekt | Bewertung |
+|---|---|
+| Vorteile | Jedes Bild kann optisch exakt auf sein Zielformat zugeschnitten sein |
+| Nachteile / Risiken | Verdoppelter Aufwand für den Host (zwei Uploads statt einem), verdoppelter Speicherbedarf, widerspricht der Ticket-Formulierung „ein Beispielbild" (Singular) |
+| Aufwand | Groß gegenüber A, ohne im Ticket geforderten Zusatznutzen |
+
+✅ **Empfehlung:** Option A für die Speicherung (Bilddatei statt Base64/Option B) — deutlich näher an den bestehenden Mustern der App (Wetter-PNGs werden bereits genauso als Dateien abgelegt) und ohne den Lese-Performance-Nachteil von Option B. Zusätzlich Ablehnung von Option C zugunsten eines einzigen, flexibel eingepassten Bildes (Rule 2) — das entspricht der Ticket-Formulierung „ein Beispielbild" wörtlich und spart dem Host doppelten Aufwand.
+
+**Daten-Validierung:** entfällt — kein Berechnungs-/Filterfeature, reine Datenmodell- und Anzeige-Erweiterung.
+
+**Testplan**
+
+- [ ] Automatisiert (Harness): Für jedes automatisierbare AK ein pytest-Fall in `backend/tests/test_us120.py` — insbesondere: Upload durch Nicht-Host wird abgelehnt; Upload über der zulässigen Obergrenze wird abgelehnt; ungültige Datei (falscher Inhalt trotz Bild-Dateiendung) wird abgelehnt; nach erfolgreichem Upload liefert der Location-Datensatz einen Bildverweis; erneuter Upload ersetzt den vorherigen Verweis; nach dem Ersetzen ist die alte Bilddatei nicht mehr vorhanden (Pre-Mortem 2).
+- [ ] Manuell (unter http://localhost:8000): Als Host eine Location öffnen, im Bearbeiten-Formular ein Foto direkt vom Handy hochladen (eines hochformatig, eines querformatig bei zwei Testdurchläufen) → prüfen ob es danach im Detail sichtbar ist und beim Drehen des Handys die Fläche vollständig ausfüllt, ohne Ränder.
+- [ ] Manuell: Dasselbe mit einem absichtlich auf dem Kopf oder seitlich aufgenommenen Handyfoto → prüfen, ob es nach dem Hochladen richtig herum erscheint (Pre-Mortem 1).
+- [ ] Manuell: Ein sehr großes Foto direkt von der Kamera (mehrere MB, nicht vorher verkleinert) hochladen → prüfen ob es angenommen und automatisch verkleinert wird, und ob die Ladezeit der Location-Seite spürbar kurz bleibt.
+- [ ] Manuell: Eine überdimensionierte Datei weit über der Obergrenze hochladen → prüfen ob eine verständliche Fehlermeldung erscheint statt eines hängenden Ladevorgangs.
+- [ ] Manuell: Mit einem normalen Nutzerkonto (nicht Host) dieselbe Location öffnen → prüfen dass keine Upload-Möglichkeit sichtbar ist, aber das Bild (falls vorhanden) normal angezeigt wird.
+- [ ] Regression: Eine Location ohne Beispielbild öffnen → Detail-Ansicht sieht unverändert aus wie vor diesem Ticket.
+- [ ] Regression: Bestehende Bearbeiten-Funktionen (Name, Koordinaten, Kategorie etc. über `saveEdit`) weiterhin unverändert nutzbar, keine Wechselwirkung mit dem neuen Upload-Weg.
+
+**Weg-Gate-Entscheidung (Stephan, 2026-07-04):**
+- ✅ Umsetzungsweg **Option A** (Bilddatei auf dem Server, Verweis in der Location) freigegeben.
+- **Frage 1 (Vorschaubild):** Nur im Detail — kein Vorschaubild in der Locations-Liste.
+- **Frage 2 (Größenlimit):** Automatisch verkleinern — Dateien bis 1 MB werden angenommen und automatisch auf ca. 500 KB komprimiert, kein hartes Ablehnen bei 1 MB.
+- **Frage 3 (Ausrichtung):** Ja, automatische Ausrichtungskorrektur bei verdreht aufgenommenen Fotos.
+
+→ Ready for Dev.
+
+**Prototyp-Freigabe (Stephan, 2026-07-04):** Mockup (Hochformat/Querformat mit Bild + Host-Platzhalter) gezeigt und freigegeben, mit einer Ergänzung: Bildausschnitt muss in JEDER Kombination aus Bild- und Geräteausrichtung mittig aus dem Original genommen werden (`object-fit: cover` + `object-position: center`) — als hartes AK in Rule 2 und Akzeptanzkriterien nachgetragen (s.o.).
+
+**Implementierungsnotiz (2026-07-04):**
+- `backend/data/locations.py`: `PhotoLocation.image_filename: Optional[str] = None`.
+- `backend/data/store.py`: idempotente Spalten-Migration `image_filename TEXT` für `custom_locations`.
+- `backend/models/schemas.py`: `LocationOut.image_url: Optional[str]`.
+- `backend/main.py`: neues Verzeichnis `_IMAGE_DIR`, neuer Endpoint `POST /locations/{id}/image` (nur Host via `require_host`), `_process_uploaded_image` (EXIF-Transpose, Verkleinerung, iterative JPEG-Kompression auf ~500 KB), `StaticFiles`-Mount `/location-images`, alte Bilddatei wird beim Ersetzen aktiv gelöscht (Pre-Mortem 2).
+- `backend/requirements.txt`: `python-multipart==0.0.9` ergänzt (zwingend für `UploadFile`, war bisher nicht vorhanden).
+- `backend/tests/test_us120.py`: neu, 12 pytest-Fälle (Host-Pflicht, Größenobergrenze, ungültige Datei, Kompression, Ersetzen löscht Alt-Datei, EXIF-Rotation u. a.).
+- `web/index.html`: `API.postFile()` (FormData-Upload statt JSON), CSS für Bildfläche/Platzhalter/Verarbeitungs-Overlay, `LocationDetail._imageAreaHtml/triggerImageUpload/_onImageFileSelected`, Einbindung vor dem Hero-Block.
+
+**Validierungsstand:** Kernlogik (`_process_uploaded_image`: Kompression, EXIF-Rotation, RGBA→RGB) isoliert mit Pillow nachgebaut und verifiziert (94 KB→16 KB, 1200×800→800×1200 nach Rotation). Die 12 pytest-Fälle in `test_us120.py` konnten in der Implementierungs-Sandbox **nicht ausgeführt** werden (defektes venv, kein FastAPI im System-Python) — Ausführung steht auf Stephans Rechner noch aus, bevor das Ticket als getestet gilt. Live/manuell (Geräte-Drehung, Ersetzen-Button, Platzhalter-Optik) noch offen.
+
+**Zwei Vorschläge außerhalb des Ticket-Scopes (nicht umgesetzt, Entscheidung bei Stephan):**
+1. Backup (`backend/data/backup.py`) sichert bisher nur SQLite, nicht `location_images/` — eigenes Ticket vorschlagen?
+2. `DELETE /locations/{id}` löscht aktuell die zugehörige Bilddatei nicht mit — soll das ergänzt werden?
 
 ---
 
