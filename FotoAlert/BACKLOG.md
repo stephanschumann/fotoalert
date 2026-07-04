@@ -29,8 +29,8 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | US-119 |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **US-120** *(Beispielbild-Upload implementiert, pytest lokal noch nicht ausgeführt)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **US-120** *(Beispielbild-Upload implementiert, pytest lokal noch nicht ausgeführt)* · **US-119** *(Kernverhalten von Stephan bestätigt 2026-07-04, Regression + Edge-Cases noch offen)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -4386,7 +4386,7 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Fotograf möchte ich im Feed standardmäßig nur Chancen mit Wahrscheinlichkeit ≥70% sehen, damit ich nicht von unwahrscheinlichen Chancen überflutet werde; reduziere ich den Wahrscheinlichkeits-Filter manuell, sollen auch niedrigere Wahrscheinlichkeiten wieder sichtbar werden.
@@ -4448,6 +4448,7 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 2. 🔴 Soll der neue 70-%-Default auch für Nutzer gelten, die die App schon installiert haben und bereits einen eigenen (ggf. niedrigeren) Reglerwert gespeichert haben — oder ausschließlich für Neuinstallationen/erstmaliges Öffnen ohne vorherigen Filterstand? (Technisch bedeutet „auch für Bestandsnutzer": der gespeicherte Wert müsste beim nächsten App-Start einmalig zurückgesetzt werden — ein zusätzlicher Schritt gegenüber der reinen Default-Änderung.)
    - ✅ **Entschieden (2026-07-04):** Für alle zurücksetzen — auch bereits gespeicherte, abweichende Reglerwerte werden einmalig auf 70 % gesetzt (Option B).
 3. ⚪ Annahme, bitte bestätigen: Der Server liefert weiterhin grundsätzlich Chancen ab 35 % Wahrscheinlichkeit aus (unveränderter Wert `CFG.minScore`); der Regler kann also nur zwischen „35 % bis 100 %" sinnvoll etwas ein-/ausblenden, ein Reglerwert unter 35 % zeigt keine zusätzlichen Chancen, weil der Server sie gar nicht erst liefert. Falls Stephan möchte, dass der Regler auch Werte unter 35 % sinnvoll nutzbar macht, wäre zusätzlich eine Änderung am Server-Abfragewert nötig — das wäre ein größerer Eingriff als im Ticket beschrieben.
+   - ✅ **Bestätigt per manuellem Test (2026-07-04):** Regler unter 35 % zeigt erwartungsgemäß keine zusätzlichen Chancen — Annahme trifft zu, kein Server-Eingriff nötig.
 
 **Analyse & Planung:**
 - [x] Example Mapping durchgeführt
@@ -4486,16 +4487,16 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 
 **Testplan:**
 - [ ] Automatisiert: Dieses Ticket betrifft ausschließlich clientseitigen UI-Zustand ohne Server-Logik: kein neuer `pytest`-Fall in `backend/tests/` nötig; Verhalten wird über die manuellen Schritte unten geprüft.
-- [ ] Manuell (nach lokalem Serverstart, siehe `fotoalert-localdev`):
-  1. Browser-Profil ohne vorherigen FotoAlert-Filterstand verwenden (privates Fenster oder `localStorage` für die Seite leeren).
-  2. Feed öffnen → prüfen: nur Chancen mit Wahrscheinlichkeit ≥ 70 % sichtbar, Regler-Beschriftung zeigt „≥ 70 %".
-  3. Regler auf 40 % ziehen → prüfen: zusätzliche, vorher ausgeblendete Chancen erscheinen sofort ohne Neuladen.
-  4. Regler ganz auf „Alle" ziehen → prüfen: alle geladenen Chancen sichtbar.
-  5. Regler auf einen Wert unter 35 % stellen (z. B. 10 %) → prüfen und Stephan rückmelden, ob wie erwartet keine zusätzlichen Chancen erscheinen (Server liefert ohnehin nur ab 35 %) — bestätigt Klärungsfrage 3.
-  6. Seite neu laden (App „neu starten") → prüfen: zuletzt gewählter Reglerwert bleibt erhalten (nicht zurück auf 70 %).
-  7. Kalender-Tab öffnen (mit demselben, zuvor gesetzten Reglerwert) → dokumentieren, ob der Wahrscheinlichkeitsfilter dort ebenfalls wirkt (erwartet: ja, siehe Klärungsfrage 1) — Ergebnis mit Stephan abgleichen.
-  8. Regression: Locations-Tab öffnen nach Feed-Besuch → prüfen, ob weiterhin alle erwarteten Locations sichtbar sind (kein unerwartetes Ausblenden durch `applyToLocations()`).
-  9. Regression: alle übrigen Filter-Chips (Eventtyp, Tageszeit, Schwierigkeit, Entfernung, Verifikation) weiterhin unverändert funktionsfähig.
+- [x] Manuell (nach lokalem Serverstart, siehe `fotoalert-localdev`) — Stephan bestätigt 2026-07-04:
+  1. [x] Browser-Profil ohne vorherigen FotoAlert-Filterstand (privates Fenster) → Regler startet direkt bei „≥ 70 %".
+  2. [x] Feed öffnen → nur Chancen mit Wahrscheinlichkeit ≥ 70 % sichtbar.
+  3. [x] Regler auf 40 % ziehen → zusätzliche, vorher ausgeblendete Chancen erscheinen sofort ohne Neuladen.
+  4. [x] Regler ganz auf „Alle" ziehen → alle geladenen Chancen sichtbar. Stephan bestätigt 2026-07-04.
+  5. [x] Regler auf einen Wert unter 35 % stellen (z. B. 10 %) → keine zusätzlichen Chancen (Server-Grenze). Stephan bestätigt 2026-07-04, Klärungsfrage 3 damit erledigt.
+  6. [x] Seite neu laden → zuletzt gewählter Reglerwert bleibt erhalten (nicht zurück auf 70 %).
+  7. [x] Kalender-Tab → derselbe Reglerwert wirkt dort ebenfalls (geteilter Zustand, wie entschieden).
+  8. [x] Regression: Locations-Tab nach Feed-Besuch. Stephan bestätigt 2026-07-04.
+  9. [x] Regression: übrige Filter-Chips (Eventtyp, Tageszeit, Schwierigkeit, Entfernung, Verifikation). Stephan bestätigt 2026-07-04.
 
 **Implementierungsnotiz (2026-07-04):**
 - Datei: `web/index.html`.
@@ -4504,6 +4505,10 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 - Aufruf der Migration in `App.init()` (Zeile ~6444), direkt nach `Filter._updateBadge()` und vor den bestehenden einmaligen Migrationen (Verify/Rating/CameraFOV) — gleiches etabliertes Muster wie dort.
 - `CFG.minScore = 0.35` (Server-Ladegrenze) unverändert, wie im Scope festgelegt.
 - Umgesetzt: Option B (Code-Default ändern + einmaliger Reset für Bestandsnutzer), wie von Stephan am 2026-07-04 freigegeben.
+
+**Unabhängige Verifikation (2026-07-04, separater Subagent):** **GRÜN** — alle 7 geprüften Akzeptanzkriterien im Code belegt; Migrations-Flag wird nachweislich erst nach erfolgreichem Schreiben des neuen Werts gesetzt (kein Race-Risiko); kaputtes/fehlendes localStorage wird per try/catch sauber abgefangen (kein Crash); übrige Filter-Chips und Kalender/Scout-Logik unangetastet; kein Scope Creep (genau die 4 erwarteten Codestellen geändert, keine weiteren).
+
+**Refactor-Check (2026-07-04):** `tools/refactor_check.py --report` ausgeführt — einziger Fund betrifft `backend/main.py` (`startup()`, 84 Zeilen, Threshold 80), außerhalb des Scopes dieses Tickets, keine Maßnahme hier. Die 4 geänderten Codestellen (`Filter._defaults()`, `Filter._MIGRATED_KEY`, `Filter.migrateMinScoreDefault()`, Aufruf in `App.init()`) wurden mit den bestehenden einmaligen Migrationen (`Verify.migrateFromLocalStorage`, `Rating.migrateFromLocalStorage`, `CameraFOV._loadProfile`) verglichen: gleiches Kommentar-Header-Muster (`// ── … ──`), gleiche Platzierung/Reihenfolge der Aufrufe in `App.init()`, try/catch vorhanden und sauber (Flag wird auch bei Fehler gesetzt, verhindert Endlos-Retry). Die Abweichung „eigenes Flag statt Löschen des Quell-Keys als Migrations-Marker" ist sachlich begründet, da `Filter._KEY` weiterhin die aktiven Filtereinstellungen enthält (im Gegensatz zu Verify/Rating, wo der Quell-Key nach Migration gelöscht wird) — keine Inkonsistenz, keine Code-Änderung nötig. Kein Redundanz- oder Klarheitsproblem gefunden. Keine offenen technischen Schulden aus diesem Ticket.
 
 ---
 
@@ -4574,6 +4579,7 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 - [ ] Edge: Ein normaler Nutzer (nicht Host) sieht in keiner Ansicht eine Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu löschen.
 - [ ] Edge: Bei einer Location ohne Beispielbild bleibt die Detail-Ansicht für normale Nutzer unverändert wie heute, ohne Platzhalter oder Leerfläche.
 - [ ] Edge: Lädt der Host eine Datei hoch, die kein gültiges Bild ist (z. B. ein PDF mit der Endung „.jpg“), wird der Upload mit einer verständlichen Fehlermeldung abgelehnt.
+- [ ] Edge (Nachtrag 2026-07-04): Löscht der Host eine Location, die ein hochgeladenes Beispielbild hatte, wird die Bilddatei automatisch mit entfernt (keine verwaiste Datei bleibt auf dem Server zurück); das Löschen der Location schlägt dabei nicht fehl, selbst wenn die Bilddatei aus irgendeinem Grund bereits nicht mehr vorhanden ist.
 
 **Pre-Mortem**
 
@@ -4689,6 +4695,7 @@ In Alltagssprache: Der Host lädt zwei Fotos hoch, eines eigens fürs Hochkant-H
 - `backend/requirements.txt`: `python-multipart==0.0.9` ergänzt (zwingend für `UploadFile`, war bisher nicht vorhanden).
 - `backend/tests/test_us120.py`: neu, 12 pytest-Fälle (Host-Pflicht, Größenobergrenze, ungültige Datei, Kompression, Ersetzen löscht Alt-Datei, EXIF-Rotation u. a.).
 - `web/index.html`: `API.postFile()` (FormData-Upload statt JSON), CSS für Bildfläche/Platzhalter/Verarbeitungs-Overlay, `LocationDetail._imageAreaHtml/triggerImageUpload/_onImageFileSelected`, Einbindung vor dem Hero-Block.
+- **Nachtrag (2026-07-04, von Stephan ausdrücklich freigegeben, reine Ergänzung):** `DELETE /locations/{id}` in `backend/main.py` entfernt jetzt auch die zugehörige Bilddatei (`image_filename`), sobald eine Location final aus der Datenhaltung entfernt wird (Custom Location: SQLite-Löschung; Standard-Location: Tombstone-Override, gilt hier ebenfalls als final, da die Location für alle Nutzer dauerhaft verschwindet und niemand das Bild wieder sichtbar machen kann). Wiederverwendet dasselbe Lösch-Pattern (`_delete_location_image_file`) wie beim Ersetzen eines Bildes beim Upload — fehlertolerant, kein 500er falls die Datei bereits fehlt. Löst den unten offen notierten Punkt 2.
 
 **Validierungsstand:** Kernlogik (`_process_uploaded_image`: Kompression, EXIF-Rotation, RGBA→RGB) isoliert mit Pillow nachgebaut und verifiziert (94 KB→16 KB, 1200×800→800×1200 nach Rotation). Die 12 pytest-Fälle in `test_us120.py` konnten in der Implementierungs-Sandbox **nicht ausgeführt** werden (defektes venv, kein FastAPI im System-Python) — Ausführung steht auf Stephans Rechner noch aus, bevor das Ticket als getestet gilt. Live/manuell (Geräte-Drehung, Ersetzen-Button, Platzhalter-Optik) noch offen.
 
