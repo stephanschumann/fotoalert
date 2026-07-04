@@ -4365,14 +4365,15 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-118 · Location-Übersicht nach Entfernung vom Standort sortieren `[ ]`
+### US-118 · Location-Übersicht nach Entfernung vom Standort sortieren `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass die Location-Übersicht aufsteigend nach Entfernung vom aktuellen Standort sortiert ist (nicht vom Motiv), damit die nächstgelegenen Spots automatisch oben stehen.
 
