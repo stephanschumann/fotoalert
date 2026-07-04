@@ -112,6 +112,66 @@ def test_interpolate_no_points_returns_none():
 
 
 # ---------------------------------------------------------------------------
+# BUG-59 (Option E): Non-linearer Alpha-Verlauf statt fixem alpha=150.
+# ---------------------------------------------------------------------------
+
+@pillow_required
+def _png_alpha(field: str, value: float) -> int:
+    """Baut ein 1x1-Feld mit `value` und liest den Alpha-Kanal aus dem PNG zurück."""
+    from PIL import Image
+    import io as _io
+    arr = np.full((2, 2), value, dtype=np.float32)
+    png = wg.field_to_png(arr, field)
+    assert png is not None
+    img = Image.open(_io.BytesIO(png)).convert("RGBA")
+    return img.getpixel((0, 0))[3]
+
+
+@pillow_required
+def test_cloud_alpha_below_threshold_stays_faint():
+    # Deutlich unter der Schwelle (15%) → nur Basis-Deckkraft, kein Fehlsignal.
+    a = _png_alpha("cloud", 2.0)
+    assert a == wg._CLOUD_ALPHA_BELOW
+
+
+@pillow_required
+def test_cloud_alpha_jumps_at_threshold():
+    # Direkt an der Schwelle → deutlicher Sprung auf die Mindest-Deckkraft.
+    a = _png_alpha("cloud", wg._CLOUD_ALPHA_THRESHOLD)
+    assert a >= wg._CLOUD_ALPHA_BASE
+    assert a > wg._CLOUD_ALPHA_BELOW + 50  # klar wahrnehmbarer Sprung
+
+
+@pillow_required
+def test_cloud_alpha_high_value_near_max_not_oversaturated():
+    a = _png_alpha("cloud", 100.0)
+    assert a == wg._CLOUD_ALPHA_MAX
+    assert a < 255  # bewusst nie voll deckend (Bauhaus: Karte bleibt durchscheinend)
+
+
+@pillow_required
+def test_precip_dry_limit_still_fully_transparent():
+    # Unverändertes Verhalten aus Analyse 1: <0.05mm bleibt komplett transparent.
+    a = _png_alpha("precip", 0.01)
+    assert a == 0
+
+
+@pillow_required
+def test_precip_alpha_jumps_above_dry_limit():
+    # Zwischen Trockenheitsgrenze und Schwelle: sichtbar, aber moderat.
+    a = _png_alpha("precip", 0.1)
+    assert a == wg._PRECIP_ALPHA_BELOW
+    assert a > 0
+
+
+@pillow_required
+def test_precip_alpha_high_value_near_max_not_oversaturated():
+    a = _png_alpha("precip", 10.0)
+    assert a == wg._PRECIP_ALPHA_MAX
+    assert a < 255
+
+
+# ---------------------------------------------------------------------------
 # Quellen-Merge auf einer Stundenachse + Null-Handling
 # ---------------------------------------------------------------------------
 

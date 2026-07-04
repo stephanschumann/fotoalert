@@ -496,16 +496,66 @@ def _color_for(value: float, stops: List[Tuple[float, Tuple[int, int, int]]]) ->
     return stops[-1][1]
 
 
+# BUG-59 (Option E, 2026-07-04): Non-linearer Alpha-Verlauf statt fixem alpha=150.
+# Ziel: "ein bisschen Wetter" auf der Karte sichtbar machen, ohne bei echten
+# Nullwerten ein Fehlsignal zu erzeugen und ohne bei Starkwetter zu übersättigen.
+# Werte per Designer-Check (Bauhaus: Farbe/Deckkraft als Signal, ruhiger statt
+# harter Übergang) gewählt, siehe BACKLOG.md BUG-59 "## Implementierung (2026-07-04)".
+#
+# Unterhalb des jeweiligen Schwellwerts: sehr niedrige Basis-Deckkraft (praktisch
+# unsichtbar, bewusst kein Fehlsignal bei Klarwetter/Nieselgrenze).
+# Ab dem Schwellwert: Sprung auf eine deutlich wahrnehmbare Mindest-Deckkraft,
+# danach weicher (Wurzel-)Anstieg bis zu einem Maximalwert bei hohen Werten
+# (bewusst < 255, damit die Karte darunter immer noch leicht durchscheint).
+_CLOUD_ALPHA_THRESHOLD = 15.0   # % Bewölkung, ab dem "spürbares Wetter" beginnt
+_CLOUD_ALPHA_BELOW = 60         # Deckkraft unterhalb der Schwelle (kaum sichtbar)
+_CLOUD_ALPHA_BASE = 190         # Deckkraft direkt an der Schwelle (deutlicher Sprung)
+_CLOUD_ALPHA_MAX = 235          # Deckkraft bei 100 % Bewölkung (nie voll deckend)
+_CLOUD_ALPHA_REF = 100.0        # Bezugswert, bei dem die Kurve ihr Maximum erreicht
+
+_PRECIP_ALPHA_THRESHOLD = 0.3   # mm/h, ab dem "spürbarer Niederschlag" beginnt
+_PRECIP_ALPHA_BELOW = 170       # Deckkraft zwischen Trockenheitsgrenze und Schwelle
+_PRECIP_ALPHA_BASE = 170        # Deckkraft direkt an der Schwelle
+_PRECIP_ALPHA_MAX = 235         # Deckkraft bei 10 mm (nie voll deckend)
+_PRECIP_ALPHA_REF = 10.0        # Bezugswert, bei dem die Kurve ihr Maximum erreicht
+_PRECIP_DRY_LIMIT = 0.05        # mm, unverändert: darunter komplett transparent
+
+
+def _alpha_curve(
+    vals: np.ndarray,
+    threshold: float,
+    below: int,
+    base: int,
+    max_alpha: int,
+    ref: float,
+) -> np.ndarray:
+    """Non-linearer Deckkraft-Verlauf: fix niedrig unter der Schwelle, dann Sprung
+    auf `base` und weicher (Wurzel-)Anstieg bis `max_alpha` bei `ref`.
+
+    `vals` ist bereits NaN-frei (0.0 für ungültige Pixel, siehe Aufrufer).
+    """
+    above = vals >= threshold
+    # Fortschritt oberhalb der Schwelle, auf [0, 1] normiert, Wurzel für
+    # abflachenden (statt linearen) Anstieg Richtung Maximalwert.
+    span = max(ref - threshold, 1e-6)
+    progress = np.clip((vals - threshold) / span, 0.0, 1.0) ** 0.5
+    ramped = base + (max_alpha - base) * progress
+    return np.where(above, ramped, float(below))
+
+
 def field_to_png(
     arr: Optional[np.ndarray],
     field: str,
-    alpha: int = 150,
 ) -> Optional[bytes]:
     """Wandelt ein interpoliertes 2-D-Feld in ein RGBA-PNG (weicher Verlauf).
 
-    NaN-Pixel werden voll transparent (kein Loch mit Fehlfarbe). `alpha` ist die
-    Deckkraft der gefüllten Pixel (Overlay-Transparenz). Liefert PNG-Bytes oder
-    None wenn kein Feld / Pillow fehlt.
+    NaN-Pixel werden voll transparent (kein Loch mit Fehlfarbe). Die Deckkraft
+    der gefüllten Pixel folgt einer wertabhängigen Kurve (`_alpha_curve`, BUG-59
+    Option E) statt einer festen Konstante: unterhalb eines kleinen Schwellwerts
+    bleibt die Fläche bewusst kaum sichtbar (kein Fehlsignal bei Nullwetter), ab
+    dem Schwellwert springt sie auf eine deutlich wahrnehmbare Mindest-Deckkraft
+    und steigt weich bis zu einem Maximalwert bei hohen Werten. Liefert PNG-Bytes
+    oder None wenn kein Feld / Pillow fehlt.
     """
     if arr is None or not HAVE_PIL:
         return None
@@ -528,11 +578,22 @@ def field_to_png(
     g = np.interp(vals, sv, sg).astype(np.uint8)
     b = np.interp(vals, sv, sb).astype(np.uint8)
 
-    # Niederschlag: sehr trockene Pixel (≈0 mm) fast transparent lassen, damit
-    # die Karte nicht flächig blau überzogen wird.
-    a = np.where(finite, alpha, 0).astype(np.uint8)
+    if field == "cloud":
+        alpha_vals = _alpha_curve(
+            vals, _CLOUD_ALPHA_THRESHOLD, _CLOUD_ALPHA_BELOW,
+            _CLOUD_ALPHA_BASE, _CLOUD_ALPHA_MAX, _CLOUD_ALPHA_REF,
+        )
+    else:
+        alpha_vals = _alpha_curve(
+            vals, _PRECIP_ALPHA_THRESHOLD, _PRECIP_ALPHA_BELOW,
+            _PRECIP_ALPHA_BASE, _PRECIP_ALPHA_MAX, _PRECIP_ALPHA_REF,
+        )
+    a = np.where(finite, alpha_vals, 0.0).astype(np.uint8)
     if field == "precip":
-        dry = finite & (arr < 0.05)
+        # Niederschlag: sehr trockene Pixel (≈0 mm) weiterhin fast transparent
+        # lassen, damit die Karte nicht flächig blau überzogen wird (unverändert
+        # aus Analyse 1, BUG-59 Trockenheits-Schwelle).
+        dry = finite & (arr < _PRECIP_DRY_LIMIT)
         a = np.where(dry, 0, a).astype(np.uint8)
 
     rgba[..., 0] = r

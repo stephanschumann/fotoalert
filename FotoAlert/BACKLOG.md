@@ -29,9 +29,9 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | BUG-59 |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **TASK-53** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **BUG-59** |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-52** *(Wolken-/Regen-Legende: Position nach unten links über Zeitregler)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **+ alle übrigen offenen Tickets unten** |
@@ -984,7 +984,7 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-03 |
 
 **Beschreibung:** Beim Bedienen des Zeitreglers im Karten-Tab (mit dem man durch die Zeitpunkte der Wolken-/Niederschlag-Wettervorhersage blättert) hat Stephan kein Wolken- oder Regen-Overlay auf der Karte gesehen — die erwartete Wetterfläche erscheint visuell nicht.
@@ -1174,6 +1174,16 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 **Tests:** Bestehender Test `backend/tests/test_us112_weather_map.py` (`test_interpolate_and_png`, Aufruf `wg.field_to_png(arr, "cloud")`) bleibt unverändert lauffähig, da kein Aufrufer einen expliziten `alpha`-Wert übergeben hat. Ergänzt wurden 6 neue, gezielte Tests für die neue Alpha-Kurve: `test_cloud_alpha_below_threshold_stays_faint`, `test_cloud_alpha_jumps_at_threshold`, `test_cloud_alpha_high_value_near_max_not_oversaturated`, `test_precip_dry_limit_still_fully_transparent`, `test_precip_alpha_jumps_above_dry_limit`, `test_precip_alpha_high_value_near_max_not_oversaturated` — sie lesen den tatsächlichen Alpha-Kanal aus dem erzeugten PNG (via Pillow) und prüfen Basis-, Sprung- und Maximalwert pro Feld. In der Sandbox konnte kein volles `pytest` laufen (kein `eccodes`/`pytest` im Sandbox-Python installiert), die Kernlogik (`_alpha_curve` + `field_to_png`-Alpha-Ausgabe) wurde stattdessen per eigenständigem Python-Skript mit echtem numpy/Pillow gegen die erwarteten Werte verifiziert (Ergebnis deckt sich exakt mit der Tabelle oben: cloud 0%→60, 2%→60, 15%→190, 50%→218, 100%→235; precip 0,01mm→0, 0,1mm→170, 0,3mm→170, 2mm→197, 10mm→235). Empfehlung: Vollen `pytest`-Lauf inkl. eccodes-Tests auf Stephans Mac-Venv oder in CI bestätigen.
 
 **Wichtiger Hinweis für die Testphase:** Die Wetterkarten-PNGs liegen ausschließlich im Arbeitsspeicher des Server-Prozesses (`_weather_map_png`-Dict in `backend/main.py`). Nach dem Deploy dieser Änderung zeigen bereits laufende Server-Instanzen weiterhin die alten Bilder, bis entweder der nächste geplante Rebuild (laut Scheduler alle 3h) läuft oder der Prozess neu gestartet wird. Für den Test sollte daher entweder auf den nächsten Scheduler-Lauf gewartet oder der Server-Prozess neu gestartet werden — sonst wirkt der Fix fälschlich als „nicht angekommen".
+
+## Testergebnis (2026-07-04, lokal von Stephan bestätigt)
+
+- Lokale Testumgebung: `eccodes` + `Pillow` fehlten zunächst im lokalen venv (App startete zuvor mit Wetter-Overlay/PNG-Rendering deaktiviert) — nachinstalliert (`pip install eccodes Pillow`), danach Server neu gestartet. Wetterkarte erfolgreich aufgebaut (icon_d2: 92, icon_eu: 44, met: 16 Stützpunkte).
+- AK1 (deutlich sichtbare Fläche bei realem Wetter): ✅ bestätigt.
+- AK2 (Fläche ändert sich mit Zeitregler): ✅ bestätigt.
+- AK3 (bei Klarwetter bleibt Fläche bewusst kaum sichtbar): ✅ bestätigt.
+- AK4 (Hinweistext bei leerem Server-Cache): ⏳ nicht getestet — Zeitfenster (kurz nach Serverstart, vor Cache-Aufbau) war zum Testzeitpunkt bereits verstrichen. Bewusst offene Lücke, kein Fehlzustand unterstellt.
+- AK5 (Legende bleibt passend sichtbar): ✅ bestätigt.
+- Regressionscheck (andere 4 Tabs): ✅ bestätigt, keine Auffälligkeiten.
 
 ---
 
@@ -1915,14 +1925,15 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-53 · Live-Nutzerdaten periodisch nach Dev spiegeln `[ ]`
+### TASK-53 · Live-Nutzerdaten periodisch nach Dev spiegeln `[x]`
 
 | Feld | Wert |
 |------|------|
-| **Status** | In Test |
+| **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | Ready for Dev |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Regelmäßiger (idealerweise automatischer) Mechanismus, der die durch Nutzung stetig wachsenden Live-Daten in die Dev-Umgebung überträgt und dortige Testdaten überschreibt. Ziel: realistischere Testdaten in Dev, um Auswirkungen auf Performance, Datenspeicherung und Nutzerverträglichkeit (z. B. längere Ladezeiten oder Berechnungen) sichtbar zu machen, die mit synthetischen Testdaten nicht auffallen würden.
 
