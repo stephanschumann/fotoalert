@@ -4570,19 +4570,19 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 
 **Akzeptanzkriterien**
 
-- [ ] Ein Host kann beim Bearbeiten einer Location ein Foto von seinem Gerät auswählen und hochladen; nach Abschluss ist das Bild direkt im Location-Detail sichtbar.
-- [ ] Lädt derselbe Host später ein neues Foto für dieselbe Location hoch, ersetzt es das bisherige Bild vollständig (kein zweites Bild, keine Galerie).
-- [ ] Ein hochformatiges Beispielbild füllt die Bildfläche im Detail vollständig aus, wenn das Handy im Hochkant-Modus gehalten wird.
-- [ ] Wird dasselbe Handy quer gedreht, passt sich dieselbe Bildfläche unmittelbar an die neue Ausrichtung an und füllt sie ebenfalls komplett aus — ohne dass die Seite neu geladen werden muss.
-- [ ] Das Gleiche funktioniert spiegelbildlich für ein querformatiges Beispielbild (füllt die Fläche im Querformat-Modus voll aus).
-- [ ] Edge: Egal ob das Originalfoto hoch- oder querformatig ist und egal in welcher Ausrichtung das Handy gerade gehalten wird — der sichtbare Bildausschnitt ist immer mittig aus dem Originalbild genommen (überschüssiger Rand wird gleichmäßig auf beiden Seiten abgeschnitten, nie einseitig verschoben).
-- [ ] Lädt der Host ein sehr großes Foto direkt von der Kamera hoch (mehrere MB), wird es automatisch verkleinert; das Ergebnis ist spürbar kleiner als das Original, aber weiterhin gut erkennbar.
-- [ ] Edge: Versucht der Host ein Foto hochzuladen, das die vertretbare Obergrenze für einen Upload deutlich überschreitet, bekommt er eine klare, verständliche Fehlermeldung statt eines unklaren Abbruchs oder eines hängenden Ladebalkens.
-- [ ] Edge: Ein Foto, das auf dem Handy auf dem Kopf oder seitlich liegend aufgenommen wurde, erscheint nach dem Hochladen richtig herum (nicht verdreht), unabhängig davon, wie das Handy beim Fotografieren gehalten wurde.
-- [ ] Edge: Ein normaler Nutzer (nicht Host) sieht in keiner Ansicht eine Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu löschen.
-- [ ] Edge: Bei einer Location ohne Beispielbild bleibt die Detail-Ansicht für normale Nutzer unverändert wie heute, ohne Platzhalter oder Leerfläche.
-- [ ] Edge: Lädt der Host eine Datei hoch, die kein gültiges Bild ist (z. B. ein PDF mit der Endung „.jpg“), wird der Upload mit einer verständlichen Fehlermeldung abgelehnt.
-- [ ] Edge (Nachtrag 2026-07-04): Löscht der Host eine Location, die ein hochgeladenes Beispielbild hatte, wird die Bilddatei automatisch mit entfernt (keine verwaiste Datei bleibt auf dem Server zurück); das Löschen der Location schlägt dabei nicht fehl, selbst wenn die Bilddatei aus irgendeinem Grund bereits nicht mehr vorhanden ist.
+- [x] Ein Host kann beim Bearbeiten einer Location ein Foto von seinem Gerät auswählen und hochladen; nach Abschluss ist das Bild direkt im Location-Detail sichtbar.
+- [x] Lädt derselbe Host später ein neues Foto für dieselbe Location hoch, ersetzt es das bisherige Bild vollständig (kein zweites Bild, keine Galerie).
+- [x] Ein hochformatiges Beispielbild füllt die Bildfläche im Detail vollständig aus, wenn das Handy im Hochkant-Modus gehalten wird.
+- [x] Wird dasselbe Handy quer gedreht, passt sich dieselbe Bildfläche unmittelbar an die neue Ausrichtung an und füllt sie ebenfalls komplett aus — ohne dass die Seite neu geladen werden muss.
+- [x] Das Gleiche funktioniert spiegelbildlich für ein querformatiges Beispielbild (füllt die Fläche im Querformat-Modus voll aus).
+- [x] Edge: Egal ob das Originalfoto hoch- oder querformatig ist und egal in welcher Ausrichtung das Handy gerade gehalten wird — der sichtbare Bildausschnitt ist immer mittig aus dem Originalbild genommen (überschüssiger Rand wird gleichmäßig auf beiden Seiten abgeschnitten, nie einseitig verschoben).
+- [x] Lädt der Host ein sehr großes Foto direkt von der Kamera hoch (mehrere MB), wird es automatisch verkleinert; das Ergebnis ist spürbar kleiner als das Original, aber weiterhin gut erkennbar.
+- [x] Edge: Versucht der Host ein Foto hochzuladen, das die vertretbare Obergrenze für einen Upload deutlich überschreitet, bekommt er eine klare, verständliche Fehlermeldung statt eines unklaren Abbruchs oder eines hängenden Ladebalkens.
+- [x] Edge: Ein Foto, das auf dem Handy auf dem Kopf oder seitlich liegend aufgenommen wurde, erscheint nach dem Hochladen richtig herum (nicht verdreht), unabhängig davon, wie das Handy beim Fotografieren gehalten wurde.
+- [x] Edge: Ein normaler Nutzer (nicht Host) sieht in keiner Ansicht eine Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu löschen.
+- [x] Edge: Bei einer Location ohne Beispielbild bleibt die Detail-Ansicht für normale Nutzer unverändert wie heute, ohne Platzhalter oder Leerfläche.
+- [x] Edge: Lädt der Host eine Datei hoch, die kein gültiges Bild ist (z. B. ein PDF mit der Endung „.jpg“), wird der Upload mit einer verständlichen Fehlermeldung abgelehnt.
+- [x] Edge (Nachtrag 2026-07-04): Löscht der Host eine Location, die ein hochgeladenes Beispielbild hatte, wird die Bilddatei automatisch mit entfernt (keine verwaiste Datei bleibt auf dem Server zurück); das Löschen der Location schlägt dabei nicht fehl, selbst wenn die Bilddatei aus irgendeinem Grund bereits nicht mehr vorhanden ist.
 
 **Pre-Mortem**
 
@@ -4671,14 +4671,14 @@ In Alltagssprache: Der Host lädt zwei Fotos hoch, eines eigens fürs Hochkant-H
 
 **Testplan**
 
-- [ ] Automatisiert (Harness): Für jedes automatisierbare AK ein pytest-Fall in `backend/tests/test_us120.py` — insbesondere: Upload durch Nicht-Host wird abgelehnt; Upload über der zulässigen Obergrenze wird abgelehnt; ungültige Datei (falscher Inhalt trotz Bild-Dateiendung) wird abgelehnt; nach erfolgreichem Upload liefert der Location-Datensatz einen Bildverweis; erneuter Upload ersetzt den vorherigen Verweis; nach dem Ersetzen ist die alte Bilddatei nicht mehr vorhanden (Pre-Mortem 2).
-- [ ] Manuell (unter http://localhost:8000): Als Host eine Location öffnen, im Bearbeiten-Formular ein Foto direkt vom Handy hochladen (eines hochformatig, eines querformatig bei zwei Testdurchläufen) → prüfen ob es danach im Detail sichtbar ist und beim Drehen des Handys die Fläche vollständig ausfüllt, ohne Ränder.
-- [ ] Manuell: Dasselbe mit einem absichtlich auf dem Kopf oder seitlich aufgenommenen Handyfoto → prüfen, ob es nach dem Hochladen richtig herum erscheint (Pre-Mortem 1).
-- [ ] Manuell: Ein sehr großes Foto direkt von der Kamera (mehrere MB, nicht vorher verkleinert) hochladen → prüfen ob es angenommen und automatisch verkleinert wird, und ob die Ladezeit der Location-Seite spürbar kurz bleibt.
-- [ ] Manuell: Eine überdimensionierte Datei weit über der Obergrenze hochladen → prüfen ob eine verständliche Fehlermeldung erscheint statt eines hängenden Ladevorgangs.
-- [ ] Manuell: Mit einem normalen Nutzerkonto (nicht Host) dieselbe Location öffnen → prüfen dass keine Upload-Möglichkeit sichtbar ist, aber das Bild (falls vorhanden) normal angezeigt wird.
-- [ ] Regression: Eine Location ohne Beispielbild öffnen → Detail-Ansicht sieht unverändert aus wie vor diesem Ticket.
-- [ ] Regression: Bestehende Bearbeiten-Funktionen (Name, Koordinaten, Kategorie etc. über `saveEdit`) weiterhin unverändert nutzbar, keine Wechselwirkung mit dem neuen Upload-Weg.
+- [x] Automatisiert (Harness): 12 pytest-Fälle in `backend/tests/test_us120.py`, alle grün (Stephan, 2026-07-04, `FOTOALERT_ENV=dev python3 -m pytest tests/test_us120.py -v` → 12 passed). Fixture-Bug behoben (Tests legen sich jetzt selbst eine Test-Location an statt eine externe geteilte Fixture-ID vorauszusetzen).
+- [x] Manuell (unter http://127.0.0.1:8000): Host-Upload getestet, Bild im Hero-Bereich sichtbar, Hoch-/Querformat per Fenstergröße simuliert — Bild füllt die Fläche vollständig, mittig eingepasst.
+- [~] Manuell: echtes, auf dem Kopf/seitlich aufgenommenes Handyfoto — nicht separat mit einem echten Handyfoto durchgeführt (nur generisches Testbild ohne EXIF-Rotation); die zugrundeliegende Logik ist aber durch den pytest-Fall `test_exif_orientation_is_applied_to_pixels` automatisiert abgedeckt und grün.
+- [x] Manuell: großes Testbild hochgeladen, automatisch verarbeitet, sichtbar in `GET /locations`.
+- [x] Manuell: Datei über der Obergrenze (21 MB) → Ablehnung mit verständlicher Fehlermeldung, kein Hängen (curl, Stephan, 2026-07-04).
+- [x] Manuell: Upload ohne Host-Rolle (kein Token) → 401 (curl, Stephan, 2026-07-04).
+- [x] Regression: Name/Koordinaten einer Location mit Bild weiterhin änderbar und speicherbar (Berliner Dom Spree, Stephan, 2026-07-04).
+- [x] Zusätzlich verifiziert (über den ursprünglichen Testplan hinaus): Ersetzen eines Bildes hinterlässt keine Dateileiche; Löschen einer Location entfernt ihr Bild automatisch (beides per curl, Stephan, 2026-07-04).
 
 **Weg-Gate-Entscheidung (Stephan, 2026-07-04):**
 - ✅ Umsetzungsweg **Option A** (Bilddatei auf dem Server, Verweis in der Location) freigegeben.
@@ -4700,11 +4700,11 @@ In Alltagssprache: Der Host lädt zwei Fotos hoch, eines eigens fürs Hochkant-H
 - `web/index.html`: `API.postFile()` (FormData-Upload statt JSON), CSS für Bildfläche/Platzhalter/Verarbeitungs-Overlay, `LocationDetail._imageAreaHtml/triggerImageUpload/_onImageFileSelected`, Einbindung vor dem Hero-Block.
 - **Nachtrag (2026-07-04, von Stephan ausdrücklich freigegeben, reine Ergänzung):** `DELETE /locations/{id}` in `backend/main.py` entfernt jetzt auch die zugehörige Bilddatei (`image_filename`), sobald eine Location final aus der Datenhaltung entfernt wird (Custom Location: SQLite-Löschung; Standard-Location: Tombstone-Override, gilt hier ebenfalls als final, da die Location für alle Nutzer dauerhaft verschwindet und niemand das Bild wieder sichtbar machen kann). Wiederverwendet dasselbe Lösch-Pattern (`_delete_location_image_file`) wie beim Ersetzen eines Bildes beim Upload — fehlertolerant, kein 500er falls die Datei bereits fehlt. Löst den unten offen notierten Punkt 2.
 
-**Validierungsstand:** Kernlogik (`_process_uploaded_image`: Kompression, EXIF-Rotation, RGBA→RGB) isoliert mit Pillow nachgebaut und verifiziert (94 KB→16 KB, 1200×800→800×1200 nach Rotation). Die 12 pytest-Fälle in `test_us120.py` konnten in der Implementierungs-Sandbox **nicht ausgeführt** werden (defektes venv, kein FastAPI im System-Python) — Ausführung steht auf Stephans Rechner noch aus, bevor das Ticket als getestet gilt. Live/manuell (Geräte-Drehung, Ersetzen-Button, Platzhalter-Optik) noch offen.
+**Validierungsstand (final, 2026-07-04):** Vollständig getestet und grün — automatisiert (12/12 pytest, nach Behebung eines Test-Fixture-Bugs, siehe Testplan), manuell per curl (Upload, Ersetzen ohne Dateileiche, Ablehnung ohne Token/ungültige Datei/Übergröße, Löschen entfernt Bild) und im Browser (Hero-Anzeige, mittige Einpassung bei Fenstergrößenänderung, Host- vs. Nicht-Host-Ansicht, Platzhalter, Regressionscheck Bearbeiten). Offen bleibt nur ein echter Handyfoto-Test mit tatsächlicher EXIF-Rotation (die zugrundeliegende Logik ist automatisiert getestet, s. Testplan).
 
-**Zwei Vorschläge außerhalb des Ticket-Scopes (nicht umgesetzt, Entscheidung bei Stephan):**
-1. Backup (`backend/data/backup.py`) sichert bisher nur SQLite, nicht `location_images/` — eigenes Ticket vorschlagen?
-2. `DELETE /locations/{id}` löscht aktuell die zugehörige Bilddatei nicht mit — soll das ergänzt werden?
+**Zwei Vorschläge außerhalb des Ticket-Scopes — beide von Stephan entschieden (2026-07-04):**
+1. Backup um `location_images/` erweitern → **Ja** — dafür angelegt: **TASK-55** (Inbox).
+2. `DELETE /locations/{id}` soll die Bilddatei mitlöschen → **Ja** — bereits umgesetzt, siehe Implementierungsnotiz-Nachtrag oben.
 
 ---
 

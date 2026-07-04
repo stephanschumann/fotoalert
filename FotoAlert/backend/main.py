@@ -2408,6 +2408,10 @@ async def delete_location(loc_id: str, _role: str = Depends(auth.require_host)) 
     if not target:
         raise HTTPException(status_code=404, detail="Location nicht gefunden.")
 
+    # US-120-Nachtrag: Dateiname des Beispielbilds vor dem Löschen sichern,
+    # damit die zugehörige Datei danach mitentfernt werden kann (beide Location-Arten).
+    image_filename = getattr(target, "image_filename", None)
+
     if loc_id.startswith("custom_"):
         ok = _store.delete_custom(loc_id)
         if not ok:
@@ -2418,6 +2422,10 @@ async def delete_location(loc_id: str, _role: str = Depends(auth.require_host)) 
 
     # Aus In-Memory-Liste entfernen
     LOCATIONS[:] = [l for l in LOCATIONS if l.id != loc_id]
+
+    # US-120-Nachtrag: verwaiste Bilddatei entfernen, falls vorhanden (Pre-Mortem 2,
+    # gleiches Muster wie beim Ersetzen eines Bildes in upload_location_image)
+    _delete_location_image_file(image_filename)
 
     # Feed- und Kalender-Cache bereinigen (Events dieser Location)
     _feed_cache     = [e for e in _feed_cache     if e.get("location_id") != loc_id]

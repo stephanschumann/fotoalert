@@ -41,6 +41,7 @@ class LocationOut(BaseModel):
     locationscout_url: str
     difficulty: int
     possible_bodies: list[str] = []  # US-35: ["sun","moon","milkyway"] – welche Körper jemals im Azimutbereich erscheinen
+    image_url: Optional[str] = None  # US-120: Beispielbild-URL (None = kein Bild hochgeladen)
 
 
 class OpportunityOut(BaseModel):

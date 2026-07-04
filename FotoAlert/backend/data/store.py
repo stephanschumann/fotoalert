@@ -151,9 +151,11 @@ class LocationStore:
         with self._connect() as conn:
             conn.executescript(_INIT_SQL)
             # TASK-43: Azimut-Spalten in custom_locations ergänzen (idempotent)
+            # US-120: image_filename ergänzen (Beispielbild-Verweis für Custom Locations)
             for col, typedef in [
                 ("ideal_azimuth_min", "REAL DEFAULT NULL"),
                 ("ideal_azimuth_max", "REAL DEFAULT NULL"),
+                ("image_filename", "TEXT DEFAULT NULL"),
             ]:
                 try:
                     conn.execute(

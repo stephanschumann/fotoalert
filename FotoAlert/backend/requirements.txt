@@ -20,3 +20,6 @@ cryptography==42.0.8
 # das System-Paket "libeccodes0"/"libeccodes-tools" via apt installieren, siehe US-112).
 eccodes==2.47.0
 Pillow==10.3.0
+# US-120: Datei-Upload (Beispielbild pro Location) — FastAPI braucht python-multipart
+# als Parser für multipart/form-data-Requests (UploadFile), sonst 500 beim Upload.
+python-multipart==0.0.9

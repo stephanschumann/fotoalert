@@ -81,6 +81,9 @@ class PhotoLocation:
     # Schwierigkeit
     difficulty: int = 2  # 1=einfach, 3=schwer
 
+    # US-120: Beispielbild (Dateiname im Bild-Verzeichnis, kein Base64/Pfad-Traversal)
+    image_filename: Optional[str] = None
+
 
 # ---------------------------------------------------------------------------
 # BERLIN
