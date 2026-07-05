@@ -8,6 +8,9 @@ backend/data/fotoalert.db-shm
 backend/data/fotoalert.db-wal
 backend/data_dev/
 
+# Automatische DB-Snapshots vor jedem Precompute-Lauf (TASK-56)
+backend/data/snapshots/
+
 # Python-Artefakte
 __pycache__/
 *.py[cod]

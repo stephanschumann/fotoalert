@@ -28,10 +28,10 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Option A Icons freigegeben)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking nehmen — .gitignore ergänzt, git rm --cached folgt über Stephans Terminal)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-125** *(Host kann Beispielbild löschen — lokal vollständig getestet (curl + Browser-UI), alle AKs bestanden, bereit für Release)* · **US-126** *(Host kann Bildausschnitt/Crop selbst wählen — lokal vollständig getestet (curl + Browser-UI), alle AKs bestanden, bereit für Release)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking nehmen — .gitignore ergänzt, git rm --cached folgt über Stephans Terminal)* · **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Option A Icons freigegeben, Implementierung läuft)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
@@ -1214,14 +1214,15 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### US-125 · Host kann Beispielbild einer Location löschen `[~]`
+### US-125 · Host kann Beispielbild einer Location löschen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test — Lokal getestet, bereit für Release |
+| **Status** | Done |
 | **Erstellt** | 2026-07-05 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** Als Host möchte ich in der Location-Detailansicht ein bereits hochgeladenes Beispielbild eigenständig löschen können, ohne dafür gleich die ganze Location löschen oder zwingend ein Ersatzbild hochladen zu müssen.
 
@@ -1353,14 +1354,15 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### US-126 · Host kann den angezeigten Bildausschnitt (Crop) des Beispielbilds selbst wählen `[~]`
+### US-126 · Host kann den angezeigten Bildausschnitt (Crop) des Beispielbilds selbst wählen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test — Lokal getestet, bereit für Release |
+| **Status** | Done |
 | **Erstellt** | 2026-07-05 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** Als Host möchte ich den sichtbaren Ausschnitt eines Beispielbilds selbst festlegen können. Aktuell (seit US-120) wird bei Quer- oder Hochformatbildern immer automatisch die Bildmitte als Ausschnitt gewählt (Rule 2 in US-120: „der sichtbare Bildausschnitt wird immer mittig aus dem Originalbild genommen"). Das kann dazu führen, dass bei Bildern, deren Motiv nicht zentriert ist, genau der Teil abgeschnitten wird, der das eigentliche Motiv zeigt.
 
@@ -1502,7 +1504,7 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Im Karten-Tab liegen zwei unabhängig positionierte Button-Gruppen oben im Kartenbereich: der Wetter-Filter (Aus/Wolken/Niederschlag, `#map-weather-toggle`, `top:12px; left:12px`, aus US-72) und der Kartenmodus-Umschalter (Nacht/Standard/Satellit, `#map-layer-toggle`, `top:12px; right:12px`). Beide sind mit festen Text-Buttons und festen Pixel-Abständen zum linken/rechten Rand positioniert, ohne Rücksicht auf schmale Bildschirmbreiten. Auf einem schmalen iPhone-Bildschirm wachsen beide Textgruppen so weit zusammen, dass sie sich in der Mitte überlappen und sich gegenseitig schwer lesbar/bedienbar machen. Auf breiteren Bildschirmen (iPad, größere iPhones) tritt das Problem nicht auf, da dort genug Platz zwischen den beiden Gruppen bleibt.
@@ -1518,8 +1520,8 @@ Stephans Lösungsidee (als Vorschlag, noch nicht entschieden — gehört in die 
 **Example Mapping:**
 
 *Annahmen:*
-- ⚠️ Annahme: „Schmaler Bildschirm" = ab iPhone SE / Mini (375px Breite) aufwärts korrekt darstellbar — bitte bestätigen.
-- ⚠️ Annahme: Die Wetter-Filter-Sub-Zeile („mm/%", erscheint nur wenn „Wolken"/„Niederschlag" aktiv ist) wird als zusätzlicher Kollisions-Faktor mitbetrachtet.
+- ✅ Von Stephan bestätigt (2026-07-05): „Schmaler Bildschirm" = ab iPhone SE / Mini (375px Breite) aufwärts korrekt darstellbar.
+- ✅ Von Stephan bestätigt (2026-07-05): Die Wetter-Filter-Sub-Zeile („mm/%", erscheint nur wenn „Wolken"/„Niederschlag" aktiv ist) wird als zusätzlicher Kollisions-Faktor mitbehandelt.
 - ✅ Aus Code bestätigt: GPS-Button, Zeitregler, Legende liegen im unteren Kartenbereich — keine Überschneidung mit den beiden oberen Gruppen (siehe Scope-Antwort unten).
 
 *Regeln:*
