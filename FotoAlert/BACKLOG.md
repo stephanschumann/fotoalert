@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Icon-Umbau implementiert, wartet auf deine Test-Bestätigung)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, wartet auf deine Test-Bestätigung)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Icon-Umbau implementiert, wartet auf deine Test-Bestätigung)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2841,6 +2841,26 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
+### TASK-57 · refactor_check.py: Wurzelursache der Falsch-Positive bei langen JS-Funktionen behoben `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | Done |
+| **Erstellt** | 2026-07-05 |
+| **Abgeschlossen** | 2026-07-05 |
+
+**Beschreibung:** Aus der Retrospektive zu US-117: Der „lange JS-Funktion"-Check in `tools/refactor_check.py` maß die Länge einer Funktion bisher als Abstand bis zur *nächsten erkannten* Funktion, nicht bis zur tatsächlichen schließenden `}` (TASK-32-Limitation). Das erzeugte bei verschachtelten Closures/IIFEs regelmäßig Falsch-Positive (100–1400 „Zeilen" für tatsächlich 1–12-zeilige Funktionen), die bisher einzeln per Namens-Ignorelist unterdrückt werden mussten (zuletzt bei US-117 für `localBoundsRadius`, davor TASK-42/TASK-49/TASK-43). Diese Wurzelursache wurde jetzt behoben statt erneut nur die Ignorelist zu erweitern.
+
+**Umsetzung:** Neue Hilfsfunktionen `_strip_js_noncode()` (entfernt String-/Kommentarinhalte zeilenübergreifend, State-Machine) und `_function_real_length()` (echte Klammer-Zählung ab Funktionssignatur bis zur schließenden `}`) in `tools/refactor_check.py`. Die alte Distanz-Heuristik dient nur noch als Fallback, wenn keine öffnende `{` gefunden wird (einzeilige Arrow-Functions ohne Block-Body). `FRONTEND_LONG_FN_IGNORELIST` bleibt als Sicherheitsnetz bestehen, sollte aber mit dem Fix nicht mehr wachsen müssen.
+
+**Verifikation:** `python3 tools/refactor_check.py --report` nach dem Fix meldet nur noch 2 Funde: `backend/main.py::startup` (84 Zeilen, bereits bekannt, TASK-51) und neu `web/index.html::mkCloudCompassSvg` (144 Zeilen, **echter** Fund — vorher durch die verschachtelte `sectorPath`-Closure und die alte Distanz-Heuristik verdeckt/falsch zugeordnet, jetzt korrekt der äußeren Funktion zugerechnet). Alle bisher ignorelisteten Funktionsnamen werden jetzt korrekt unter dem 100-Zeilen-Threshold gemessen (kein Rückgriff auf die Ignorelist mehr nötig, sie bleibt nur als Sicherheitsnetz stehen). Kein App-Code geändert, kein Deploy nötig (reines Analyse-Tool).
+
+**Hinweis:** `mkCloudCompassSvg` (144 Zeilen) ist ein neuer, echter Befund und noch nicht bearbeitet — bei Bedarf als eigenes Ticket in die Inbox aufnehmen.
+
+---
+
 ### TASK-45 · Idealer Azimut automatisch aus Gebäude-Footprints `[x]`
 
 | Feld | Wert |
@@ -5075,14 +5095,15 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-117 · Karten-Tab öffnet mit aktuellem Standort + 5-km-Radius `[~]`
+### US-117 · Karten-Tab öffnet mit aktuellem Standort + 5-km-Radius `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass der Karten-Tab beim Öffnen immer meinen aktuellen Standort mit 5 km Radius zeigt, damit ich sofort die relevanten Locations in meiner direkten Umgebung sehe.
 
@@ -6443,6 +6464,24 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 **Testplan:**
 - [x] Automatisiert: `python3 tools/refactor_check.py --report` vor und nach der Ignorelist-Änderung laufen lassen und die Diffs vergleichen — die sechs Namen (`ic`, `handler`, `verState`, `sectorPath`, `azDiffFn`, `sunAlignmentLabel`) dürfen danach nicht mehr unter `long_function` erscheinen, alle anderen Findings (u.a. TASK-51-Fund zu `backend/main.py`) müssen unverändert bestehen bleiben.
 - [x] Manuell: Da kein Anwendungscode verändert wird, ist kein Klickpfad-Test in der App nötig. Zur Absicherung dennoch ein kurzer Sichttest im lokalen Dev-Server empfohlen (siehe PRODUCT.md-Regressionsmatrix, sofern vorhanden): Filter-Sheet öffnen und den Verifikations-Chip „Geprüft" durch alle drei Zustände klicken (Off → Geprüft → Probleme → Off), ein Location-Detail mit „Goldene Wolken"/„Himmelsröte"-Event öffnen und die Kompass-Grafik sowie den Sonnen-Ausrichtungstext prüfen — erwartetes Ergebnis: alles sieht/verhält sich exakt wie vor diesem Ticket, weil keine Zeile Anwendungscode geändert wurde.
+
+---
+
+### TASK-58 · Refactoring: Lange Funktion `mkCloudCompassSvg()` aufteilen (web/index.html) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `web/index.html`:
+- `mkCloudCompassSvg()` Z. 3537 — ~144 Zeilen (Threshold: 100)
+
+Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den TASK-49-Fix der Längen-Messung (echte Klammer-Zählung statt Distanz-Heuristik, siehe Retro-Eintrag Z. 2858–2860). Vorher wurde die Länge durch die verschachtelte `sectorPath`-Closure verdeckt/falsch zugeordnet. Aufteilen in kleinere Hilfsfunktionen (z.B. SVG-Grundgerüst, Zonen-Pfad-Berechnung, Label-Platzierung separieren). Kein inhaltlicher/visueller Umbau — von `fotoalert-designer` bereits abgenommene Optik (US-111) darf sich nicht ändern.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-62-Release-Check, 2026-07-05)
 
 ---
 

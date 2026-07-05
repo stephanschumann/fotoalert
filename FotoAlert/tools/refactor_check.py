@@ -177,6 +177,78 @@ def analyze_backend() -> dict:
 # Frontend-Analyse (Regex-Heuristiken)
 # ---------------------------------------------------------------------------
 
+def _strip_js_noncode(lines: list[str]) -> list[str]:
+    """Entfernt String- und Kommentarinhalte aus JS-Quellzeilen (einfache State-
+    Machine, behandelt auch mehrzeilige Block-Kommentare `/* ... */`), damit eine
+    nachfolgende Klammer-Zählung nicht durch `{`/`}` innerhalb von Strings oder
+    Kommentaren verfälscht wird. Kein echter Tokenizer (Template-Literal-
+    Interpolationen `${...}` werden wie normaler String-Inhalt behandelt, nicht
+    als eingebetteter Code) — für reine Klammer-Balance-Zwecke ausreichend genau."""
+    out: list[str] = []
+    in_block_comment = False
+    for raw in lines:
+        result: list[str] = []
+        i = 0
+        n = len(raw)
+        in_string: str | None = None
+        while i < n:
+            ch = raw[i]
+            if in_block_comment:
+                if ch == '*' and i + 1 < n and raw[i + 1] == '/':
+                    in_block_comment = False
+                    i += 2
+                    continue
+                i += 1
+                continue
+            if in_string:
+                if ch == '\\':
+                    i += 2
+                    continue
+                if ch == in_string:
+                    in_string = None
+                i += 1
+                continue
+            if ch == '/' and i + 1 < n and raw[i + 1] == '/':
+                break  # Rest der Zeile ist Line-Kommentar
+            if ch == '/' and i + 1 < n and raw[i + 1] == '*':
+                in_block_comment = True
+                i += 2
+                continue
+            if ch in ("'", '"', '`'):
+                in_string = ch
+                i += 1
+                continue
+            result.append(ch)
+            i += 1
+        out.append(''.join(result))
+    return out
+
+
+def _function_real_length(code_only_lines: list[str], start_idx0: int) -> int | None:
+    """Ermittelt die tatsächliche Länge einer Funktion ab ihrer Signaturzeile durch
+    Klammer-Zählung auf bereits von Strings/Kommentaren bereinigten Zeilen
+    (`_strip_js_noncode`) — statt der alten Heuristik "Abstand bis zur nächsten
+    erkannten Funktion" (TASK-32-Limitation, erzeugte Falsch-Positive bis 1400
+    Zeilen bei kurzen Utility-Funktionen/Closures neben anderen Funktionen, z.B.
+    `haversineKm`, `localBoundsRadius`). `start_idx0` ist 0-basiert.
+    Gibt die 1-basierte Zeilenanzahl bis zur schließenden `}` zurück, oder `None`
+    wenn keine öffnende `{` gefunden wird (z.B. einzeilige Arrow-Function ohne
+    Block-Body wie `const f = x => x + 1`) — dann greift der Aufrufer auf die
+    alte Distanz-Heuristik als Fallback zurück."""
+    depth = 0
+    seen_open = False
+    for offset, cleaned in enumerate(code_only_lines[start_idx0:]):
+        for c in cleaned:
+            if c == '{':
+                depth += 1
+                seen_open = True
+            elif c == '}':
+                depth -= 1
+                if seen_open and depth <= 0:
+                    return offset + 1
+    return None
+
+
 def analyze_frontend() -> dict:
     """Regex-basierte Analyse von web/index.html."""
     auto_fixable = []
@@ -218,26 +290,22 @@ def analyze_frontend() -> dict:
                 "occurrences": linenos,
             })
 
-    # 3. Sehr lange JS-Funktionen im Frontend (>100 Zeilen zwischen function/=> und })
+    # 3. Sehr lange JS-Funktionen im Frontend (>100 Zeilen realer Funktionskörper)
     #
-    # BEKANNTE LIMITATION (TASK-32, 2026-06-23):
-    # Diese Heuristik misst die Länge einer Funktion als Abstand bis zur *nächsten
-    # erkannten* Funktion — nicht bis zur tatsächlichen schließenden `}`. Das führt
-    # zu massiven Falsch-Positiven bei:
-    #   - Verschachtelten Closures (Arrow-Functions innerhalb von Methoden)
-    #   - Lokalen Arrow-Functions die auf Eltern-Scope-Variablen zugreifen
-    #   - IIFEs mit inneren Funktionen
-    # In diesen Fällen "läuft" die gemessene Länge bis in die nächste Top-Level-Funktion
-    # oder Sektion und kann Werte von 100–1400 Zeilen erzeugen, auch wenn die echte
-    # Funktion nur 2–10 Zeilen hat.
+    # FIX (US-117-Retro, 2026-07-05) — löst die TASK-32-Limitation an der Wurzel:
+    # Die Länge wird jetzt per echter Klammer-Zählung ermittelt (`_function_real_length`
+    # auf `_strip_js_noncode`-bereinigten Zeilen: Klammern in Strings/Kommentaren zählen
+    # nicht mit), nicht mehr als "Abstand bis zur nächsten erkannten Funktion". Die alte
+    # Distanz-Heuristik lief bei verschachtelten Closures/IIFEs oft bis in die nächste
+    # Top-Level-Funktion oder Sektion und erzeugte Werte von 100–1400 Zeilen für
+    # tatsächlich 1–12-zeilige Funktionen (z.B. `haversineKm`, `localBoundsRadius`).
+    # Die Distanz-Heuristik dient nur noch als Fallback, wenn keine öffnende `{`
+    # gefunden wird (z.B. einzeilige Arrow-Function ohne Block-Body).
     #
-    # Bekannte Falsch-Positive (alle manuell verifiziert, alle < 10 echte Zeilen):
-    #   _showError (Zeile ~1179), haversineKm (~1952), onUp (~2232),
-    #   state3 (~2407), mkSec (~2515), axisPhrase (~2779)
-    #
-    # Für eine zuverlässige JS-Analyse wäre ein echter AST-Parser nötig (z.B. via
-    # `node -e "require('acorn').parse(...)"`). Bis dahin: Falsch-Positive per
-    # FRONTEND_LONG_FN_IGNORELIST unterdrücken.
+    # FRONTEND_LONG_FN_IGNORELIST bleibt als Sicherheitsnetz bestehen (z.B. falls die
+    # Klammer-Zählung durch ein Template-Literal mit `${...}`-Interpolation doch einmal
+    # danebenliegt) — mit der Klammer-Zählung sollte sie aber i.d.R. nicht mehr wachsen
+    # müssen, da die zugrunde liegende Fehlmessung behoben ist.
     FRONTEND_LONG_FN_IGNORELIST: set[str] = {
         "_showError",   # lokale Arrow-Function in Feed.load() — tatsächlich 7 Zeilen
         "haversineKm",  # reine Berechnungsfunktion — tatsächlich 7 Zeilen
@@ -264,12 +332,20 @@ def analyze_frontend() -> dict:
             name = m.group(2) or m.group(3) or "anonymous"
             fn_starts.append((i, name))
 
+    code_only_lines = _strip_js_noncode(lines)
+
     for idx, (start, name) in enumerate(fn_starts):
-        end = fn_starts[idx + 1][0] if idx + 1 < len(fn_starts) else len(lines)
-        length = end - start
+        real_length = _function_real_length(code_only_lines, start - 1)
+        if real_length is not None:
+            length = real_length
+        else:
+            # Fallback: keine öffnende '{' gefunden (z.B. einzeilige Arrow-Function
+            # ohne Block-Body) — alte Distanz-Heuristik als Notlösung.
+            end = fn_starts[idx + 1][0] if idx + 1 < len(fn_starts) else len(lines)
+            length = end - start
         if length > 100:
             if name in FRONTEND_LONG_FN_IGNORELIST:
-                continue  # Bekanntes Falsch-Positiv (Heuristik-Limitation) — siehe Kommentar oben
+                continue  # Sicherheitsnetz (siehe Kommentar oben) — sollte mit Klammer-Zählung kaum noch greifen
             needs_ticket.append({
                 "file": rel,
                 "line": start,
