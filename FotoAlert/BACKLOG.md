@@ -25,13 +25,13 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-125** *(Host kann Beispielbild löschen)* · **US-126** *(Host kann Bildausschnitt/Crop selbst wählen)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **US-124** *(Vollbild-Modus Anlege-Karte, Code fertig, wartet auf Testbestätigung)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **BUG-60** *(Backend per API verifiziert, von Stephan bestätigt 2026-07-04; voller UI-Klick-Test folgt nach der parallelen Vollbild-Karten-Arbeit)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
@@ -1213,6 +1213,288 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
+### US-125 · Host kann Beispielbild einer Location löschen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** Als Host möchte ich in der Location-Detailansicht ein bereits hochgeladenes Beispielbild eigenständig löschen können, ohne dafür gleich die ganze Location löschen oder zwingend ein Ersatzbild hochladen zu müssen.
+
+**User Story:** Als Host, möchte ich in der Location-Detailansicht ein hochgeladenes Beispielbild löschen können, sodass ich ein falsches, veraltetes oder nicht mehr passendes Bild entfernen kann, ohne die komplette Location löschen oder sofort ein neues Bild bereithalten zu müssen.
+
+**Bezug:** Direkt verwandt mit **US-120** [x] (Done, 2026-07-04, Beispielbild-Upload) — dort deckt AK „Ein normaler Nutzer sieht in keiner Ansicht eine Möglichkeit, ein Beispielbild hochzuladen, zu ersetzen oder zu löschen" nur die Host-Berechtigung ab, nicht ob ein eigenständiger Löschen-Button (ohne Ersetzen) für den Host existiert. Ebenfalls in US-120 dokumentiert: Löschen einer ganzen Location entfernt automatisch auch deren Bilddatei (AK „Löscht der Host eine Location …") — das ist eine Kaskade beim Location-Löschen, kein eigenständiges Bild-Löschen-Feature. Keine Dublette gefunden. Berührt dieselbe UI-Fläche (Location-Detail/Bearbeiten-Formular) wie **US-126** (Bildausschnitt-Auswahl, neu), beide unabhängig voneinander umsetzbar.
+
+---
+
+#### Analyse (2026-07-05)
+
+**Example Mapping**
+
+📏 **Rule 1 — Pro Location gibt es genau ein Beispielbild.** Es gibt (verifiziert im Code) keine Liste von mehreren Bildern pro Location, sondern immer nur ein einziges. „Löschen" bedeutet deshalb immer: das eine vorhandene Bild entfernen — danach zeigt die Location wieder den bekannten gestrichelten Platzhalter „Noch kein Beispielbild" mit Upload-Button, den es schon seit dem Bild-Upload-Feature gibt.
+- 🟢 Beispiel: Ein Host öffnet eine Location mit Beispielbild, tippt auf „Löschen" und bestätigt. Danach zeigt die Location denselben leeren Platzhalter, den sie vor dem allerersten Hochladen hatte.
+
+📏 **Rule 2 — Löschen fragt vorher sicherheitshalber nach.** Da ein gelöschtes Bild nicht wiederhergestellt werden kann, erscheint vor dem endgültigen Löschen eine kurze Sicherheitsabfrage (genau wie es die App bereits beim Löschen einer ganzen Location tut).
+- 🟢 Beispiel: Der Host tippt auf „Löschen", die App fragt „Beispielbild wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden." — erst nach Bestätigen ist das Bild weg. Tippt der Host stattdessen auf „Abbrechen", bleibt alles wie es war.
+
+📏 **Rule 3 — Das Bild wird wirklich entfernt, nicht nur versteckt.** Die Bilddatei wird von der Festplatte des Servers entfernt (genau wie es beim Ersetzen eines Bildes oder beim Löschen einer ganzen Location bereits passiert) — es bleiben keine verwaisten Altbilder liegen.
+- 🟢 Beispiel: Nach dem Löschen ist das Bild auch dann nicht mehr abrufbar, wenn jemand versucht, die alte Bild-Adresse direkt erneut aufzurufen.
+
+📏 **Rule 4 — Nur die Host-Rolle sieht den Löschen-Button.** Ein normaler Nutzer sieht in der Location-Ansicht weder einen Löschen- noch einen Ersetzen-Button — das Bild ist für ihn nur zum Ansehen da (bereits bestehendes Verhalten aus dem Bild-Upload-Feature, ändert sich hier nicht).
+- 🟢 Beispiel: Ein normaler Nutzer öffnet dieselbe Location — er sieht nur das Bild selbst, keinerlei Bearbeiten- oder Löschen-Möglichkeit.
+
+**Keine offenen 🔴-Fragen** — alle im Auftrag genannten Unklarheiten ließen sich beim Code-Lesen eindeutig klären bzw. mit einem unstrittigen, zum bestehenden Muster passenden Standardverhalten beantworten:
+
+- *„Wer darf löschen — nur der hochladende Host oder jeder Host?"* → Es gibt in der App nur **eine** Host-Rolle (ein gemeinsames Passwort für alle Hosts, keine einzelnen Host-Konten). Die Frage „welcher Host hat es hochgeladen" stellt sich technisch nicht — jeder eingeloggte Host darf es also löschen, genau wie jeder Host auch ersetzen oder die ganze Location löschen darf.
+- *„Was passiert beim letzten Bild — auf 0 runter erlaubt?"* → Ja, ausdrücklich erlaubt und genau der Sinn des Tickets („ohne zwingend ein Ersatzbild hochladen zu müssen").
+- ⚠️ Annahme: Vor dem Löschen erscheint eine Sicherheitsabfrage (wie beim Location-Löschen) — bitte bestätigen.
+- ⚠️ Annahme: Das Bild wird endgültig von der Festplatte entfernt, nicht nur ausgeblendet (konsistent zum bestehenden Verhalten beim Ersetzen/Location-Löschen) — bitte bestätigen.
+- *„Einzeln löschbar bei mehreren Bildern?"* → Entfällt, da es technisch nur ein Bild pro Location gibt.
+
+**Akzeptanzkriterien:**
+- [ ] Ein Host sieht in der Location-Ansicht neben dem vorhandenen Beispielbild einen eigenen Löschen-Button (getrennt vom bestehenden „Ersetzen"-Button).
+- [ ] Tippt der Host auf „Löschen", erscheint zuerst eine Sicherheitsabfrage mit Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
+- [ ] Bestätigt der Host die Abfrage, verschwindet das Bild sofort aus der Ansicht und die Location zeigt wieder den leeren Platzhalter „Noch kein Beispielbild" mit Upload-Möglichkeit.
+- [ ] Bricht der Host die Sicherheitsabfrage ab, bleibt das Bild unverändert sichtbar.
+- [ ] Nach dem Löschen ist das Bild auch über die alte Bild-Adresse nicht mehr abrufbar (Datei ist wirklich weg, nicht nur ausgeblendet).
+- [ ] Ein normaler Nutzer (kein Host) sieht in derselben Ansicht keinerlei Löschen-Möglichkeit — auch nicht über die Serverschnittstelle direkt (Zugriff wird abgelehnt).
+- [ ] Edge Case: Der Host versucht eine Location zu löschen, die aktuell gar kein Beispielbild hat (z. B. per direktem Server-Aufruf ohne Umweg über den Button) — die App lehnt das mit einer verständlichen Fehlermeldung ab, es passiert nichts Unerwartetes.
+- [ ] Edge Case: Der Host löscht das Bild einer Location, die es gar nicht gibt (z. B. bereits gelöschte Location) — die App lehnt das mit einer verständlichen Fehlermeldung ab („Location nicht gefunden").
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `backend/main.py` (Zeilen 2184–2439) und `web/index.html` (Zeilen 5368–5420, 373–392) gelesen am 2026-07-05.
+- Bestätigt: Pro Location existiert genau ein `image_filename`-Feld (kein Array) — Fundstelle `backend/main.py:2287` (`old_filename = getattr(target_loc, "image_filename", None)`).
+- Bestätigt: Es existiert bereits eine funktionierende Lösch-Hilfsfunktion `_delete_location_image_file()` (Zeile 2241–2251), die genau das tut was dieses Ticket braucht — sie wird aktuell nur beim Ersetzen und beim kompletten Location-Löschen aufgerufen, noch nicht eigenständig über einen eigenen Endpunkt.
+- Bestätigt: Es gibt noch **keinen** eigenständigen „Bild löschen"-Endpunkt — nur Upload (`POST /locations/{loc_id}/image`) und die Kaskade beim Location-Löschen. Dieses Ticket muss also einen neuen Endpunkt ergänzen, keinen bestehenden „Lösch-Modus" umschalten.
+- Bestätigt: Es gibt nur eine globale Host-Rolle (`backend/auth.py`, `require_host`), keine Unterscheidung zwischen verschiedenen Hosts — die Rechte-Frage aus dem Auftrag ist damit eindeutig beantwortet (siehe Example Mapping oben).
+- Bestätigt: Ein Bestätigungsdialog-Muster existiert bereits im Frontend fürs Location-Löschen (`web/index.html:5752`, `confirm(...)`) — direkt wiederverwendbar, kein neues Dialog-Konzept nötig.
+
+💀 Szenario: Der Löschen-Button und der bestehende „Ersetzen"-Button liegen so dicht beieinander, dass ein Host aus Versehen das Bild löscht statt es zu ersetzen.
+   Auslöser: Beide Buttons sitzen in derselben kleinen Fläche oben rechts über dem Bild.
+   Frühwarnung: Beim ersten Testen in echter Bildschirmgröße auf dem Handy.
+   Gegenmaßnahme: Bauhaus-Designcheck durchgeführt (siehe unten) — getrennte Buttons mit ausreichend Abstand + Sicherheitsabfrage als zusätzliches Sicherheitsnetz gegen Fehlklicks. In AK 2/3 verankert.
+
+💀 Szenario: Der neue Lösch-Endpunkt vergisst, die Datei auf der Festplatte tatsächlich zu entfernen, und es sammeln sich unsichtbare Karteileichen an.
+   Auslöser: Verweis in der Location wird gelöscht, aber der eigentliche Datei-Löschvorgang wird vergessen (gleicher Fehlertyp wie ursprünglich in US-120 als „Pre-Mortem 2" beschrieben und dort bereits gelöst).
+   Frühwarnung: Speicherplatz auf dem Server wächst unbemerkt über Zeit.
+   Gegenmaßnahme: Die bereits vorhandene, bewährte Funktion `_delete_location_image_file()` wiederverwenden statt eine neue Lösch-Logik zu schreiben. In AK 5 + Testplan verankert.
+
+💀 Szenario: Ein normaler Nutzer findet über die Browser-Konsole heraus, dass er den Server direkt anweisen kann, ein Bild zu löschen — ganz ohne Host-Login.
+   Auslöser: Der neue Endpunkt vergisst die Rechteprüfung, die alle anderen Host-Aktionen bereits haben.
+   Frühwarnung: Ein automatisierter Test, der genau das versucht und eine Ablehnung erwartet.
+   Gegenmaßnahme: Denselben Rechte-Mechanismus verwenden wie beim Hochladen/Ersetzen (`require_host`). In AK 6 + Testplan verankert.
+
+💀 Szenario: Löschen einer Location, die gar kein Bild hat, oder einer Location-ID, die gar nicht existiert, führt zu einem verwirrenden Serverfehler statt einer klaren Rückmeldung.
+   Auslöser: Fehlender Zustands-Check vor dem eigentlichen Löschvorgang.
+   Frühwarnung: Testfall mit „Location ohne Bild" und „Location existiert nicht".
+   Gegenmaßnahme: Beide Fälle als eigene Edge-Case-AKs (7 + 8) und eigene Testfälle verankert.
+
+**Architektur-Analyse:**
+- Betroffene Dateien: `backend/main.py` (neuer Endpunkt analog zu `upload_location_image`, direkt im bestehenden US-120-Abschnitt Zeilen 2183–2314), `web/index.html` (neuer Lösch-Button in `_imageAreaHtml()` Zeile 5368–5394 + neue Klickfunktion analog zu `triggerImageUpload()`/`_onImageFileSelected()`, neue CSS-Klasse analog zu `.loc-image-edit-btn` Zeile 386–388).
+- Render-Pfad-Check (4g, Pflicht bei visuellem Element): Das Beispielbild wird als normales `<img>`-Tag im DOM gerendert (`web/index.html:5375`), keine Server-seitige Grafik/Legende-Trennung wie beim BUG-59-Fall — der Löschen-Button steuert direkt denselben Anzeigepfad, kein zusätzlicher Rendering-Pfad zu beachten.
+- Einstiegspunkt-Check: Das Beispielbild wird ausschließlich in der Location-Detailansicht angezeigt (kein zweiter Entry-Point wie Feed/Kalender/Scout betroffen) — kein Datenquellen-Divergenz-Risiko.
+- Designer-Check (4b, Pflicht da visuell): durchgeführt (`fotoalert-designer`). Ergebnis: Löschen-Button als eigenes Icon (Papierkorb, 2px Linienstil, Bauhaus-Icon-Konvention) in Signalfarbe `--red` auf dem bestehenden halbtransparenten dunklen Button-Hintergrund (`rgba(0,0,0,.55)`, konsistent zu `.loc-image-edit-btn`), mit ausreichendem Abstand zum „Ersetzen"-Button, damit beide Touch-Ziele (≥44px) sich nicht berühren. Bestätigungsdialog per bereits vorhandenem `confirm()`-Muster, kein neues Dialog-UI nötig.
+
+**Analyse & Planung Checkliste:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Pflicht-Code-Verifikation)
+- [x] Architektur analysiert: `backend/main.py`, `web/index.html`
+- [x] Designer-Check: visuell (neuer Button + Icon) → `fotoalert-designer` aufgerufen, Ergebnis eingearbeitet
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Eigenständiger Lösch-Endpunkt + eigener Button (Wiederverwendung bestehender Bausteine)
+- Vorgehen: Neuer Endpunkt `DELETE /locations/{loc_id}/image`, der die bereits vorhandene Funktion `_delete_location_image_file()` aufruft und `image_filename` auf der Location auf „leer" setzt (analog zum bestehenden Muster in `delete_location`). Im Frontend: neuer Löschen-Button in `_imageAreaHtml()`, eigene Klickfunktion mit Sicherheitsabfrage (wiederverwendetes `confirm()`-Muster), danach Location neu laden (bestehendes Server-Fetch-Pattern).
+- Betroffene Dateien: `backend/main.py`, `web/index.html`, neuer Test `backend/tests/test_us_125.py`.
+- Vorteile: Nutzt konsequent bereits vorhandene, bewährte Bausteine (Löschfunktion, Rechteprüfung, Bestätigungsmuster, Server-Fetch-Pattern) — minimales Risiko neuer Fehlerquellen, passt exakt zum bestehenden US-120-Code.
+- Nachteile/Risiken: Keine wesentlichen — kleinste sinnvolle Erweiterung des bestehenden Systems.
+- Aufwand: klein.
+
+### Option B — Löschen nur als Sonderfall des Upload-Endpunkts (z. B. Upload mit leerer Datei signalisiert „löschen")
+- Vorgehen: Kein neuer Endpunkt; stattdessen der bestehende Upload-Endpunkt so erweitert, dass ein bestimmter Spezialwert (z. B. leerer Body) als „lösche das aktuelle Bild" interpretiert wird.
+- Betroffene Dateien: `backend/main.py` (upload_location_image umgebaut).
+- Vorteile: Ein Endpunkt weniger.
+- Nachteile/Risiken: Vermischt zwei fachlich unterschiedliche Aktionen (Hochladen vs. Löschen) in einer Funktion — unklarere Fehlermeldungen, schwerer verständlicher Code, widerspricht dem Grundsatz „ein Endpunkt, eine Aufgabe". Erhöht das Risiko, dass ein normaler Upload versehentlich als Löschen interpretiert wird.
+- Aufwand: mittel (wegen Sonderfall-Logik und höherem Testaufwand).
+
+✅ **Empfehlung: Option A** — nutzt die bereits vorhandene, in US-120 bewährte Löschfunktion direkt wieder, hält Lösch- und Hochlade-Vorgang sauber getrennt (ein Endpunkt, eine Aufgabe) und passt sich nahtlos ins bestehende Rechte-/Bestätigungs-/Fetch-Muster ein. Geringstes Risiko, kleinster Aufwand.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_us_125.py` — deckt AK 5 (Datei wirklich weg), AK 6 (nur Host, 403/401 für andere), AK 7 (Löschen ohne vorhandenes Bild → verständlicher Fehler), AK 8 (Löschen bei nicht existierender Location → 404) ab.
+- [ ] Manuell:
+  1. Als Host einloggen, eine Location mit Beispielbild öffnen. Erwartet: Bild ist sichtbar, daneben zwei getrennte Buttons „Ersetzen" und „Löschen".
+  2. Auf „Löschen" tippen. Erwartet: Eine Sicherheitsabfrage erscheint mit dem Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
+  3. Die Abfrage abbrechen. Erwartet: Das Bild bleibt unverändert sichtbar, nichts ändert sich.
+  4. Erneut auf „Löschen" tippen und diesmal bestätigen. Erwartet: Das Bild verschwindet sofort, die Location zeigt wieder den leeren Platzhalter „Noch kein Beispielbild" mit Upload-Button.
+  5. Die Location schließen und erneut öffnen (oder Seite neu laden). Erwartet: Der leere Platzhalter bleibt bestehen — das Bild ist dauerhaft weg, nicht nur kurzzeitig ausgeblendet.
+  6. Als normaler Nutzer (nicht Host) dieselbe Location öffnen. Erwartet: Kein Ersetzen- und kein Löschen-Button sichtbar, nur das (falls vorhandene) Bild selbst.
+  7. Regression (PRODUCT.md Sektion 12): Nach der Änderung zusätzlich prüfen, dass Bild-Hochladen (US-120) weiterhin normal funktioniert, dass das Löschen der kompletten Location weiterhin auch ein vorhandenes Bild sauber mit entfernt, und dass die Location-Detailansicht insgesamt (andere Sektionen, FOV-Karte) unverändert funktioniert.
+
+#### 🎨 Design-Entscheidung (fotoalert-designer) · 2026-07-05
+
+**So fühlt es sich an:** Über dem Beispielbild sitzt oben rechts weiterhin der bekannte „Ersetzen"-Button (Kamera-Symbol). Direkt daneben — mit spürbarem Abstand, nicht Kante an Kante — steht jetzt ein zweiter, deutlich anders aussehender Button mit einem Papierkorb-Symbol. Während „Ersetzen" wie bisher unauffällig dunkel-transparent bleibt, ist der Papierkorb in Warnrot gehalten: Rot ist in der App immer das Signal für „Achtung, das ist eine endgültige Aktion" (dieselbe Farbe wie beim Löschen einer ganzen Location). Tippt der Host darauf, hält die App kurz inne und fragt nach: „Beispielbild wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden." Erst ein bestätigendes Antippen entfernt das Bild wirklich — danach erscheint sofort wieder der leere, gestrichelte Platzhalter mit der Möglichkeit, ein neues Bild hochzuladen. Bricht der Host die Nachfrage ab, bleibt alles exakt wie vorher, ohne jede sichtbare Veränderung.
+
+**Schritt für Schritt:**
+1. Host öffnet eine Location mit Beispielbild → sieht zwei getrennte Buttons oben auf dem Bild: „Ersetzen" (Kamera) und „Löschen" (Papierkorb, rot).
+2. Host tippt auf „Löschen" → Sicherheitsabfrage erscheint mit Warnhinweis.
+3. Host bestätigt → Bild verschwindet sofort, Platzhalter „Noch kein Beispielbild" erscheint.
+4. Host bricht stattdessen ab → nichts verändert sich, das Bild bleibt wie es war.
+
+**Warum so:** Die beiden Buttons dürfen auf keinen Fall wie zwei gleichwertige Varianten derselben Aktion wirken — ein Host, der eigentlich ersetzen wollte, darf nicht aus Versehen löschen. Deshalb tragen sie unterschiedliche Symbole (Kamera vs. Papierkorb), unterschiedliche Farbgebung (neutral-dunkel vs. Warnrot) und ausreichend räumlichen Abstand. Die Sicherheitsabfrage ist das zusätzliche Sicherheitsnetz für den Fall, dass trotzdem der falsche Button getroffen wird.
+
+**Technische Eckpunkte:** Neuer Button `.loc-image-delete-btn` (gleiche Bauform wie bestehendes `.loc-image-edit-btn`: `position:absolute; top:10px`, aber `left:10px` statt zusammen mit „Ersetzen" auf der rechten Seite — dadurch maximaler Abstand statt nur ein paar Pixel Lücke), Icon `${ic('i-trash',14)}` (bereits im Icon-Set vorhanden, keine Neuanlage nötig), Text-/Icon-Farbe `var(--red)` auf dem bestehenden `rgba(0,0,0,.55)`-Button-Hintergrund (ausreichender Kontrast in Hell- wie Dunkel-Modus, da `--red` in beiden Themes hell genug definiert ist: `#c8472f` / `#e0664f`). Touch-Ziel wie beim bestehenden Edit-Button ≥44px durch Padding sicherstellen. Sicherheitsabfrage per vorhandenem `confirm()`-Muster (analog `deleteLocation`), kein neues Dialog-UI.
+
+---
+
+### US-126 · Host kann den angezeigten Bildausschnitt (Crop) des Beispielbilds selbst wählen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** Als Host möchte ich den sichtbaren Ausschnitt eines Beispielbilds selbst festlegen können. Aktuell (seit US-120) wird bei Quer- oder Hochformatbildern immer automatisch die Bildmitte als Ausschnitt gewählt (Rule 2 in US-120: „der sichtbare Bildausschnitt wird immer mittig aus dem Originalbild genommen"). Das kann dazu führen, dass bei Bildern, deren Motiv nicht zentriert ist, genau der Teil abgeschnitten wird, der das eigentliche Motiv zeigt.
+
+**User Story:** Als Host, möchte ich nach dem Hochladen eines Beispielbilds selbst festlegen können, welcher Bildausschnitt in Hoch- und Querformat-Ansicht sichtbar bleibt, sodass das Motiv auch dann vollständig erkennbar ist, wenn es im Originalfoto nicht mittig sitzt.
+
+**Bezug:** Direkte Erweiterung/Korrektur von **US-120** [x] (Done, 2026-07-04) — konkret dessen Rule 2 und AK „Egal ob das Originalfoto hoch- oder querformatig ist … der sichtbare Bildausschnitt ist immer mittig aus dem Originalbild genommen". Kein Bug an US-120 selbst (die feste Mitten-Logik wurde damals bewusst so spezifiziert und freigegeben), sondern eine bewusste Erweiterung um Host-Steuerung. Keine Dublette gefunden (Suche nach „Ausschnitt", „Crop", „object-fit/object-position" ergab sonst keine Treffer außer US-115 und US-47, beide inhaltlich nicht verwandt: US-115 betrifft den Mond-Sichtachsen-Ausschnitt in der Chancen-Berechnung, US-47 betrifft KI-Kompositions-Vorschläge — beide anderer Fachbereich). Berührt dieselbe UI-Fläche (Location-Detail/Bearbeiten-Formular) wie **US-125** (Bild löschen, neu), beide unabhängig voneinander umsetzbar.
+
+#### 🔬 Analyse & Spec (US-126) · 2026-07-05
+
+##### 📎 Code-Verifikation (Pflicht, durchgeführt 2026-07-05)
+
+- `web/index.html` Zeile 372–378: Kommentar bestätigt die Ticket-Prämisse wörtlich — „US-120: Beispielbild … `object-position:center` hält den Bildausschnitt in JEDER Kombination aus Bild- und Geräteausrichtung mittig (hartes AK)." Die konkrete Regel: `.loc-image-area img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }`. Der Anzeige-Container `.loc-image-area` hat ein festes Seitenverhältnis `aspect-ratio: 4/3` (Zeile 376) — unabhängig vom Seitenverhältnis des Originalbilds.
+- `backend/main.py` Zeile 2187–2233 (`_process_uploaded_image`): Das Originalbild wird serverseitig **nicht** zugeschnitten — nur EXIF-Ausrichtung korrigiert, auf `_IMAGE_MAX_DIMENSION_PX` verkleinert (Seitenverhältnis bleibt erhalten) und als JPEG komprimiert. Das volle, unbeschnittene Bild wird gespeichert. Der eigentliche „Crop" auf 4:3 entsteht **ausschließlich** im Frontend zur Anzeigezeit durch CSS `object-fit:cover`.
+- Bedeutet: Eine Fokuspunkt-/Crop-Lösung kann rein clientseitig über einen dynamischen `object-position`-Wert (z. B. `30% 70%` statt `center`) umgesetzt werden — **ohne** das gespeicherte Bild serverseitig neu zuzuschneiden oder zu ersetzen. Ein voller Crop-Rahmen mit Zoom (Option B unten) würde dagegen echte Pixel-Manipulation brauchen und müsste entweder serverseitig (neues Bild schreiben) oder ebenfalls nur über CSS-Transform gelöst werden.
+- Datenmodell: `image_filename` ist die einzige bild-bezogene Spalte in `backend/data/store.py` Zeile 158 (`TEXT DEFAULT NULL`, SQLite `custom_locations`-Tabelle) sowie im Override-Mechanismus für Standard-Locations (`backend/main.py` Zeile 1199–1201, Feld-Whitelist). Es gibt **keine** Spalte/kein Feld für eine Crop-Position — das müsste neu ergänzt werden (analog zum bestehenden Muster für `image_filename`).
+- `PATCH /locations/{id}` (Zeile 2317–2327): Aktuell erlaubte Felder sind `coord_fields`, `text_fields`, `numeric_fields`, `list_fields` — kein Bildfeld überhaupt. Für eine neue Crop-Position müsste entweder dieser Endpunkt um ein neues Feld erweitert werden, oder der bestehende Bild-Upload-Endpunkt (`POST /locations/{loc_id}/image`, Zeile 2254) würde die Position zusätzlich mit entgegennehmen.
+
+##### Scope & Annahmen-Protokoll
+
+- 🔴 **Kritisch — Geltungsbereich (neu vs. bestehend):** Soll die Crop-Auswahl nur für **neu hochgeladene** Bilder verfügbar sein, oder auch **rückwirkend** für die bereits per US-120 hochgeladenen, bestehenden Beispielbilder nutzbar sein (nachträgliches Verschieben ohne erneuten Upload)? Beeinflusst, ob ein eigener „Ausschnitt anpassen"-Einstieg für bestehende Bilder gebaut werden muss oder ob die Auswahl nur direkt im Upload-Fluss auftaucht.
+- 🔴 **Kritisch — Interaktionstiefe:** Reicht ein **einfacher Fokuspunkt-Klick** auf dem Bild (Host tippt auf die Stelle, die sichtbar bleiben soll → steuert nur `object-position`), oder wird ein **voller Crop-Rahmen mit Ziehen/Zoom** erwartet (Host kann Ausschnittsgröße und -Position frei bestimmen, ähnlich einem Bildzuschneide-Tool)? Beeinflusst den Aufwand massiv (siehe Optionen A/B unten).
+- 🔴 **Kritisch — Zuschnitt-Ort:** Wird der Ausschnitt **clientseitig** (nur Anzeige-CSS, Originalbild bleibt unangetastet) oder **serverseitig** (echtes Zuschneiden/Neuschreiben der Bilddatei) vorgenommen? Beeinflusst die Architektur direkt: rein clientseitig bedeutet nur ein neues gespeichertes Positionsfeld + CSS-Änderung; serverseitig bedeutet Bildverarbeitung, neue Datei, höhere Komplexität.
+- 🔴 **Kritisch — Getrennte Werte für Hoch-/Querformat-Anzeige:** Die App zeigt das Beispielbild aktuell nur in einem festen Seitenverhältnis (`aspect-ratio: 4/3`, Hero-Bereich im Location-Detail). Gibt es weitere Anzeigekontexte mit anderem Seitenverhältnis (z. B. Kartenmarker-Vorschau, Locations-Liste), die ebenfalls einen (ggf. unterschiedlichen) Ausschnitt bräuchten? Falls ja: EIN gemeinsamer Fokuspunkt für alle Kontexte, oder pro Kontext ein eigener Wert? (Codesuche ergab aktuell nur den einen Anzeigeort im Location-Detail-Hero — falls das zutrifft, entfällt die Frage; bitte bestätigen.)
+- ⚠️ **Annahme (Default, unkritisch):** Die Crop-Auswahl ist nur für den Host verfügbar (analog zu allen anderen Beispielbild-Aktionen aus US-120/US-125) — normale Nutzer sehen nur das Ergebnis, keine Auswahl-UI. Bitte bestätigen.
+- ⚠️ **Annahme (Default, unkritisch):** Die gewählte Ausschnittsposition gilt für Hoch- **und** Querformat-Anzeige gemeinsam als ein Wert (bei `object-position` ist das ohnehin ein Punkt, kein pro-Format-Wert) — es gibt in der App aktuell keine unterschiedliche Darstellung des Beispielbilds je nach Geräte-Ausrichtung, sondern nur ein festes Seitenverhältnis im Hero-Bereich. Bitte bestätigen, falls hier eine andere Erwartung besteht (z. B. getrennte Werte für ein zukünftiges Hochformat-Layout).
+
+##### Example Mapping
+
+**📏 Rule 1:** Der Host kann nach dem Hochladen eines Beispielbilds eine Ausschnittsposition festlegen, die bestimmt, welcher Bereich des Originalbilds im Anzeigebereich sichtbar bleibt.
+- 🟢 Beispiel: Ein Host lädt ein Landschaftsfoto hoch, dessen Motiv (ein Turm) am linken Bildrand steht. Er verschiebt den Fokuspunkt nach links. Danach zeigt das Location-Detail den Turm vollständig, nicht mehr den leeren rechten Bildteil.
+- 🟢 Beispiel: Ein Host lädt ein Bild hoch und ändert nichts an der Ausschnittsposition. Das Verhalten bleibt wie bisher (Bildmitte sichtbar) — kein Pflichtschritt, keine Verschlechterung des bisherigen Verhaltens.
+
+**📏 Rule 2:** Die gewählte Ausschnittsposition bleibt dauerhaft gespeichert und wird bei jedem erneuten Öffnen der Location angezeigt (nicht nur für die aktuelle Sitzung).
+- 🟢 Beispiel: Host legt die Ausschnittsposition fest, schließt die App, öffnet sie am nächsten Tag erneut. Die Location zeigt weiterhin denselben angepassten Ausschnitt.
+
+**📏 Rule 3:** Lädt der Host ein neues Bild hoch (Ersetzen-Funktion aus US-120), wird die zuvor gewählte Ausschnittsposition zurückgesetzt, da sie sich auf das alte Bild bezog.
+- 🟢 Beispiel: Host ersetzt ein Beispielbild durch ein neues Foto. Danach zeigt die Location zunächst wieder die Bildmitte des neuen Fotos (Standardverhalten), bis der Host erneut eine Position wählt.
+
+**📏 Rule 4:** Normale Nutzer (nicht Host) sehen keine Möglichkeit, die Ausschnittsposition zu verändern — sie sehen nur das Ergebnis.
+- 🟢 Beispiel: Ein normaler Nutzer öffnet dieselbe Location. Er sieht das Beispielbild mit dem vom Host gewählten Ausschnitt, aber keinerlei Bedienelement dafür.
+
+##### ❓ Offene Fragen an Stephan — ✅ beantwortet 2026-07-05
+
+1. ✅ **Beantwortet:** Soll die Ausschnittswahl nur bei **neuen Uploads** möglich sein, oder auch **nachträglich für bereits vorhandene** Beispielbilder (eigener „Ausschnitt anpassen"-Zugang ohne erneuten Upload)? → **Auch nachträglich für bereits vorhandene Bilder.** Es braucht also einen eigenständigen Einstieg im Location-Detail, der unabhängig vom Upload-Vorgang funktioniert — nicht nur einen Schritt direkt nach dem Hochladen.
+2. ✅ **Beantwortet:** Reicht ein **einfacher Klick auf die gewünschte Bildstelle**, oder soll der Host den Ausschnitt **frei ziehen und zoomen** können? → **Einfacher Klick auf die wichtige Stelle** (Option A, siehe unten — damit ist die Wahl zwischen Option A/B final entschieden, Option B entfällt).
+3. ✅ **Beantwortet:** Soll der Ausschnitt nur **clientseitig gemerkt** werden oder soll das Bild **tatsächlich zugeschnitten** werden? → **Original bleibt unverändert**, nur die Anzeigeposition wird gespeichert. Kein serverseitiges Zuschneiden, keine neue Bilddatei.
+4. ✅ **Beantwortet:** Gibt es weitere Stellen mit ähnlichem Bildformat-Problem, die eine eigene Ausschnittswahl bräuchten? → **Nein**, es bleibt bei dem einen Anzeigeort (Location-Detail-Hero-Bereich).
+
+Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementierung ist freigegeben (Option A, siehe „Implementierungsoptionen" unten).
+
+**Akzeptanzkriterien:**
+- [ ] Der Host sieht im Location-Detail eine Möglichkeit, die sichtbare Bildstelle eines vorhandenen Beispielbilds zu verändern — durch einfachen Klick/Tipp auf die wichtige Stelle im Bild (kein Zieh- oder Zoom-Werkzeug).
+- [ ] Diese Möglichkeit steht nicht nur direkt nach einem neuen Hochladen zur Verfügung, sondern jederzeit auch nachträglich — auch für Beispielbilder, die schon vor diesem Ticket hochgeladen wurden.
+- [ ] Nach dem Festlegen einer neuen Ausschnittsposition zeigt die Location sofort den angepassten Bildausschnitt, ohne dass die Seite neu geladen werden muss.
+- [ ] Die gewählte Ausschnittsposition bleibt erhalten, wenn die Location geschlossen und erneut geöffnet wird (auch nach Neuladen der App).
+- [ ] Das Originalbild selbst wird durch die Ausschnittswahl nicht verändert — es wird nur gemerkt, welche Stelle sichtbar bleiben soll. Ein Herunterladen oder Weiterverwenden des Originalbilds liefert weiterhin das komplette, unveränderte Foto.
+- [ ] Ein normaler Nutzer (nicht Host) sieht keinerlei Bedienelement zur Ausschnittswahl — nur das fertige Bild mit dem vom Host gewählten Ausschnitt.
+- [ ] Edge Case Querformat: Bei einem breiten Panoramafoto mit seitlich sitzendem Motiv zeigt der gewählte Ausschnitt das Motiv vollständig, nicht mehr den leeren Bildbereich.
+- [ ] Edge Case Hochformat: Bei einem hohen Bild mit oben sitzendem Motiv (z. B. Turmspitze) zeigt der gewählte Ausschnitt den oberen Bildbereich, nicht die Mitte.
+- [ ] Edge Case Bild-Ersetzen: Lädt der Host ein neues Bild hoch, startet die Ausschnittsposition wieder bei der Bildmitte (kein „Geister"-Ausschnitt vom vorherigen Bild).
+- [ ] Edge Case ohne Änderung: Wählt der Host keine eigene Position, verhält sich die Anzeige exakt wie vor diesem Ticket (Bildmitte).
+- [ ] Edge Case ältere Bilder ohne gespeicherte Ausschnittsposition: Bei allen Locations, die noch keine eigene Ausschnittsposition haben (weil sie vor diesem Ticket angelegt wurden), zeigt die App weiterhin ganz normal die Bildmitte — kein Fehler, keine leere Anzeige.
+
+**Pre-Mortem:**
+- 💀 Szenario: Die neue Ausschnittsposition wird nur clientseitig im Browser gemerkt (z. B. localStorage) statt serverseitig gespeichert → Gegenmaßnahme: AK „bleibt nach Neuladen/auf anderem Gerät erhalten" verlangt serverseitige Persistenz (neues Feld analog `image_filename`), als Testfall in Harness verankert.
+- 💀 Szenario: Ein Bild-Ersetzen (US-120-Funktion) übernimmt versehentlich die alte Ausschnittsposition für das neue, komplett anders aufgebaute Bild → falscher Ausschnitt sofort nach dem Ersetzen sichtbar → Gegenmaßnahme: Rule 3 + eigener AK, Reset der Position bei jedem Replace-Upload im selben Codepfad wie das Setzen von `image_filename` (Zeile 2301 in `upload_location_image`).
+- 💀 Szenario: Die Klick-/Zieh-Interaktion für die Ausschnittswahl kollidiert mit dem bereits vorhandenen „Ersetzen"-Button (`.loc-image-edit-btn`, oben rechts im Bild) oder mit dem geplanten „Löschen"-Button aus US-125 (dieselbe UI-Fläche) → Buttons überlagern sich oder sind schwer trennbar antippbar → Gegenmaßnahme: Positionierung im Designer-Check klären, Touch-Ziele ≥44px, Buttons klar räumlich getrennt (siehe US-125-Analyse: „ausreichender Abstand zum Ersetzen-Button, damit Touch-Ziele sich nicht berühren" — gleiches Prinzip hier fortsetzen).
+- 💀 Szenario: Nur die Standard-Locations (Override-Mechanismus) bekommen das neue Feld gespeichert, Custom-Locations (SQLite `custom_locations`-Tabelle) nicht oder umgekehrt → Ausschnitt wirkt nur bei einem der beiden Location-Typen → Gegenmaßnahme: Analog zu `image_filename` (das in BEIDEN Pfaden gepflegt wird, Zeile 2297–2300) muss das neue Feld ebenfalls in `_store.update_custom()` UND `_save_location_override()` behandelt werden; als AK/Testfall für beide Location-Typen verankern.
+- 💀 Szenario: Bei Wahl von Option B (voller Crop-Rahmen mit Zoom) wird angenommen, das Originalbild werde tatsächlich zugeschnitten — tatsächlich verkleinert `_process_uploaded_image` das Bild bereits beim Upload auf `_IMAGE_MAX_DIMENSION_PX`; ein nachträglicher Zoom auf einen kleinen Bildausschnitt könnte in schlechter Auflösung enden, wenn nicht am Originalbild vor der Verkleinerung gearbeitet wird → Gegenmaßnahme: bei Wahl von Option B vorab klären, ob mit dem bereits komprimierten/verkleinerten Bild gearbeitet wird oder ein zweiter, unkomprimierter Rohbild-Pfad nötig ist.
+
+**Analyse & Planung Checkliste:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Pflicht-Code-Verifikation)
+- [x] Architektur analysiert: `web/index.html` (Zeile 372–378 CSS, Zeile 5371–5394 `_imageAreaHtml`), `backend/main.py` (Zeile 2254–2313 `upload_location_image`, Zeile 2317–2327 `patch_location`, Zeile 1435 Response-Mapping), `backend/data/store.py` (Zeile 154–160 Custom-Location-Spalten)
+- [x] Designer-Check: visuell (neues Bedienelement für Ausschnittswahl) → siehe Bauhaus-Leitplanken unten (kein separater Designer-Agent-Aufruf möglich in diesem Lauf, daher inline)
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A
+
+**Designer-Leitplanken (Bauhaus, inline statt separatem Designer-Agent-Aufruf):**
+- Interaktive Elemente in `--accent` (aktuell `#2d4ea0` hell / `#7c9bea` dunkel, siehe `web/index.html` Zeile 44/77) statt hartkodierter Farbwerte — konsistent zu bestehenden Buttons (`.loc-image-upload-btn` nutzt bereits `var(--gold)`, ein Alias auf `--accent`, Zeile 384).
+- Klare, kantige Formen ohne verspielte Schatten — passend zum bestehenden `.loc-image-edit-btn`-Stil (schlichter halbtransparenter dunkler Button-Hintergrund `rgba(0,0,0,.55)`, kein Drop-Shadow).
+- Bei einem Fokuspunkt-Klick (Option A): sichtbarer, einfacher Marker (z. B. Kreis mit `--accent`-Rand) an der geklickten Stelle, kein dekoratives Fadenkreuz-Icon-Overdesign.
+- Bei einem vollen Crop-Rahmen (Option B): schlichter rechteckiger Rahmen mit klaren Eckgriffen, keine abgerundeten „soften" Ecken-Handles — im Einklang mit den generell kantigen Radien im Design (`border-radius: 22px 22px 0 0` an Sheet-Kanten, keine verspielten Kreisformen für Kontrollelemente).
+
+**Implementierungsoptionen:**
+
+### Option A — Einfacher Fokuspunkt-Klick (steuert `object-position`) — final bestätigt, wird umgesetzt
+- Vorgehen: Host tippt/klickt auf die Bildstelle, die zentriert bleiben soll. Die Klick-Koordinate wird in einen prozentualen Wert (`x% y%`) umgerechnet und als neues Feld (z. B. `image_focus_x`, `image_focus_y`) an die Location gehängt — gespeichert analog zu `image_filename` in beiden Location-Typen (Custom via `_store.update_custom()`, Standard via `_save_location_override()`). Anzeige: `.loc-image-area img { object-position: ${loc.image_focus_x}% ${loc.image_focus_y}%; }` ersetzt den hartkodierten Wert `center`. Kein Eingriff in die Bildverarbeitung nötig — reine Positionsangabe.
+- Nachträgliche Nutzbarkeit für bestehende Bilder (Antwort auf Frage 1): Das neue Feld muss für **alle** bestehenden Locations **optional/nullable** sein (Default `NULL`/nicht gesetzt), nicht nur für neu angelegte. Fehlt der Wert (bestehende Locations vor diesem Ticket), fällt die Anzeige auf `object-position: center` zurück (heutiges Verhalten) — kein Pflicht-Migrationsschritt, der allen bestehenden Zeilen einen Wert zuweisen müsste. Der Bedienweg zum Setzen/Ändern der Position darf nicht an den Upload-Vorgang gekoppelt sein, sondern muss jederzeit im Location-Detail erreichbar sein (eigener Einstieg, unabhängig von „Ersetzen").
+- Kein serverseitiges Zuschneiden (Antwort auf Frage 3): Es wird ausschließlich die Positionsangabe (`image_focus_x`/`image_focus_y`) persistiert. `_process_uploaded_image` und die gespeicherte Bilddatei selbst bleiben unverändert von diesem Ticket nicht betroffen — kein neuer Bildverarbeitungs-Codepfad nötig.
+- Betroffene Dateien: `web/index.html` (Klick-Handler + dynamisches `object-position`, eigener Einstiegspunkt im Location-Detail unabhängig vom Upload-Fluss), `backend/main.py` (neues Feld in `PATCH /locations/{id}`-Whitelist oder eigener kleiner Endpunkt, Response-Mapping Zeile 1435, Reset bei Replace-Upload Zeile 2301), `backend/data/store.py` (zwei neue, nullable Spalten analog `image_filename`, Zeile 154–160, Default `NULL` für Bestandsdaten), neuer Test `backend/tests/test_us_126.py` (inkl. Testfall: Location ohne gesetztes Feld liefert weiterhin `center`-Verhalten).
+- Vorteile: Kleiner, klar abgegrenzter Eingriff; nutzt exakt den bestehenden Anzeige-Mechanismus (`object-fit:cover`) weiter, nur der fixe `center`-Wert wird variabel; keine Bildverarbeitung nötig; Originalbild bleibt unangetastet (geringes Risiko für Qualitätsverlust); schnell verständliche Interaktion („tippe auf das, was wichtig ist").
+- Nachteile/Risiken: Kein Zoom möglich — bei extremen Seitenverhältnis-Unterschieden zwischen Original und Anzeigebereich (z. B. sehr breites Panorama in 4:3-Anzeige) kann der Fokuspunkt allein nicht verhindern, dass ein großer Teil links/rechts abgeschnitten wird, auch wenn die *Position* stimmt.
+- Aufwand: klein bis mittel.
+
+### Option B — Voller Crop-Rahmen mit Ziehen/Zoom — ❌ verworfen, nicht Teil der Umsetzung (Stephan hat Option A final bestätigt)
+- Vorgehen: Host bekommt ein Bildzuschneide-Werkzeug (rechteckiger, verschieb- und skalierbarer Rahmen über dem Originalbild), das Ausschnitt UND Zoomfaktor bestimmt. Ergebnis wird entweder als vier Koordinaten/Rahmenwerte gespeichert (clientseitig weiterhin über CSS-Transform/`object-position`+Skalierung umgesetzt) oder serverseitig als tatsächlich zugeschnittenes Bild neu geschrieben.
+- Betroffene Dateien: zusätzlich zu Option A ein komplett neues UI-Modul (Crop-Interaktion mit Zieh-/Zoom-Gesten, Touch- und Maus-Handling), ggf. Erweiterung von `_process_uploaded_image` oder ein neuer Zuschneide-Endpunkt im Backend.
+- Vorteile: Präziser — löst auch Fälle, in denen ein reiner Fokuspunkt nicht reicht (starke Formatunterschiede, siehe Nachteil oben).
+- Nachteile/Risiken: Deutlich höherer Aufwand (eigenes Gesten-/Touch-Handling, mehr Testfälle, mehr Fehlerquellen bei Bildqualität falls serverseitig zugeschnitten wird, siehe Pre-Mortem-Szenario 5); deutlich größere UI-Fläche im ohnehin schon dichten Beispielbild-Bereich (Ersetzen-Button, evtl. Löschen-Button aus US-125).
+- Aufwand: groß.
+
+✅ **Empfehlung: Option A** — löst den gemeldeten Bug (nicht-zentriertes Motiv wird abgeschnitten) mit minimalem Aufwand, ohne das Originalbild zu verändern, und passt sich nahtlos in den bestehenden `object-fit:cover`-Mechanismus ein. Ein voller Crop-Rahmen (Option B) wäre nur gerechtfertigt, wenn Stephan in Frage 2 tatsächlich Zoom-Funktionalität für nötig hält — das sollte aber die Ausnahme sein, da die meisten gemeldeten Fälle („Motiv nicht mittig") bereits durch einen reinen Fokuspunkt gelöst werden.
+
+✅ **Final bestätigt durch Stephan (2026-07-05): Option A.** Damit ist Option B endgültig verworfen, keine offene Entscheidung mehr.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_us_126.py` — deckt ab: neues Feld wird korrekt gespeichert und im Response (`image_url`-Nachbarfeld) zurückgegeben (AK 1–3), Feld wird bei Replace-Upload zurückgesetzt (AK 7, Pre-Mortem 2), Feld funktioniert für Custom- UND Standard-Locations gleichermaßen (Pre-Mortem 4), fehlender Host-Zugriff liefert 401/403 (analog bestehendem Auth-Muster).
+- [ ] Manuell:
+  1. Als Host ein Beispielbild mit erkennbar nicht-mittigem Motiv hochladen (z. B. Motiv am linken Bildrand). Erwartet: Zunächst wird wie bisher die Bildmitte angezeigt.
+  2. Auf die Bildstelle mit dem Motiv tippen/klicken (die neue Ausschnittsauswahl). Erwartet: Der sichtbare Ausschnitt verschiebt sich sofort, das Motiv ist jetzt vollständig sichtbar.
+  3. Location schließen und erneut öffnen (oder Seite neu laden). Erwartet: Der angepasste Ausschnitt bleibt erhalten, nicht wieder die Bildmitte.
+  4. Ein neues Bild über „Ersetzen" hochladen. Erwartet: Zunächst wieder Bildmitte des neuen Bilds (kein alter Ausschnitt „durchgereicht").
+  5. Als normaler Nutzer (nicht Host) dieselbe Location öffnen. Erwartet: Kein Bedienelement zur Ausschnittswahl sichtbar, nur das Bild mit dem vom Host gewählten Ausschnitt.
+  6. Regression (PRODUCT.md Sektion 12): Prüfen, dass Bild-Hochladen/-Ersetzen (US-120) weiterhin normal funktioniert, dass ein eventuell parallel gebautes Löschen (US-125) weiterhin unabhängig funktioniert, und dass die restliche Location-Detailansicht (andere Sektionen, FOV-Karte) unverändert bleibt.
+
+#### 🎨 Design-Entscheidung (fotoalert-designer) · 2026-07-05
+
+**So fühlt es sich an:** Über dem Beispielbild erscheint als dritter Button (Kamera „Ersetzen" links, Papierkorb „Löschen" aus US-125 daneben) ein Fadenkreuz-Symbol mit der Beschriftung „Ausschnitt wählen" — in der ruhigen App-Blau-Farbe, weil das eine normale, jederzeit wiederholbare Aktion ist und keine Warnung braucht. Tippt der Host darauf, wechselt die Bildansicht spürbar in einen anderen Modus: Ein dünner blauer Rahmen legt sich um das Bild, und oben erscheint ein Hinweistext „Tippe auf die Stelle, die sichtbar bleiben soll". Der Host tippt einfach auf die für ihn wichtige Stelle im Bild — z. B. auf einen Turm, der bisher an einer Ecke stand. Genau dort erscheint sofort ein kleiner runder Marker (blauer Ring mit Punkt in der Mitte), und das Bild dahinter verschiebt sich in Echtzeit so, dass diese Stelle jetzt mittig im sichtbaren Bereich liegt. Der Host kann beliebig oft neu tippen, um die Position zu korrigieren — jedes Mal springt der sichtbare Ausschnitt sofort zur neuen Stelle. Ist er zufrieden, tippt er auf „Fertig" und verlässt den Auswahl-Modus; die Position ist ab sofort dauerhaft gespeichert, auch nach dem Schließen und späterem Wiederöffnen der Location. Ein „Abbrechen" daneben verlässt den Modus ohne zu speichern und lässt den bisherigen Ausschnitt unangetastet. Bei Locations, deren Bild schon vor diesem Feature hochgeladen wurde, gibt es noch keine gespeicherte Position — das wirkt aber nicht wie ein Fehler oder eine leere Stelle: Der Marker erscheint beim Öffnen des Auswahl-Modus einfach automatisch in der Bildmitte, als wäre dort ganz normal schon einmal eine Wahl getroffen worden. Ein normaler Nutzer (kein Host) sieht von alldem nichts — für ihn gibt es weder den Button noch den Auswahl-Modus, nur das fertige Bild mit dem vom Host gewählten Ausschnitt.
+
+**Schritt für Schritt:**
+1. Host sieht auf dem Beispielbild einen dritten Button „Ausschnitt wählen" (Fadenkreuz-Symbol, blau) neben „Ersetzen" und „Löschen".
+2. Host tippt darauf → Bild bekommt einen sichtbaren blauen Rahmen, ein Hinweistext oben erklärt „Tippe auf die Stelle, die sichtbar bleiben soll", zwei Buttons „Fertig" und „Abbrechen" erscheinen.
+3. Host tippt auf die für ihn wichtige Bildstelle → dort erscheint sofort ein runder Marker, der sichtbare Bildausschnitt verschiebt sich live dorthin.
+4. Host kann beliebig oft neu tippen, um die Stelle zu korrigieren, bevor er sich entscheidet.
+5. Host tippt „Fertig" → Auswahl-Modus schließt sich, neue Position ist gespeichert und bleibt auch nach erneutem Öffnen der Location erhalten.
+6. Alternativ tippt Host „Abbrechen" → Auswahl-Modus schließt sich ohne Änderung, der bisherige Ausschnitt bleibt wie er war.
+7. Bei einer Location mit einem alten Bild ohne gespeicherte Position: Der Marker sitzt beim Öffnen des Auswahl-Modus einfach automatisch in der Bildmitte — für den Host sieht das aus wie ein ganz normaler Startzustand, nicht wie ein Fehler.
+
+**Warum so:** Ein eigener „Ausschnitt wählen"-Modus (statt einfach überall im Bild klickbar zu sein) verhindert, dass ein Host versehentlich beim normalen Betrachten des Bildes die Position verstellt. Die blaue Rahmen-/Hinweis-Optik macht unmissverständlich klar: „Du bist jetzt in einem besonderen Bearbeitungsmodus", genau wie andere Bearbeiten-Zustände in der App auch farblich abgesetzt sind. Die Farbe Blau (statt Rot wie beim Löschen) signalisiert bewusst: Das ist eine unkritische, jederzeit wiederholbare Aktion, kein Risiko wie beim endgültigen Löschen.
+
+**Technische Eckpunkte:** Dritter Button `.loc-image-focus-btn` neben `.loc-image-edit-btn`/`.loc-image-delete-btn`, Icon `${ic('i-target',14)}` (bereits im Icon-Set vorhanden), Farbe `var(--accent)` statt `var(--red)` (Signalfarbe für Primäraktion, nicht Warnung). Auswahl-Modus: Overlay mit `border: 2px solid var(--accent)` um `.loc-image-area`, Hinweistext in Section-Header-Typografie (12px/700/uppercase-ähnlich, aber hier als normaler Hinweis in `--muted`/`--text`), Marker als kleiner SVG-Kreis (Ring `var(--accent)` + gefüllter Mittelpunkt), Klick-Koordinate wird in Prozentwerte umgerechnet und live in `object-position` gespiegelt. Fallback ohne gespeicherten Wert: `image_focus_x`/`image_focus_y` fehlen (`NULL`) → Marker-Startposition und `object-position` defaulten auf `50% 50%` (Bildmitte), identisch zum bisherigen `center`-Verhalten — kein Sonderfall-Styling, das wie ein Fehlerzustand aussieht.
+
+---
+
 ### BUG-62 · Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen `[ ]`
 
 | Feld | Wert |
@@ -1251,14 +1533,15 @@ Stephans Lösungsidee (als Vorschlag, noch nicht entschieden — gehört in die 
 
 ---
 
-### BUG-60 · HINWEISE-Feld wird bei Neuanlage automatisch mit Text vorbelegt `[ ]`
+### BUG-60 · HINWEISE-Feld wird bei Neuanlage automatisch mit Text vorbelegt `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Beim Anlegen einer Location über Quick Location Capture erscheint automatisch der Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Beobachtet: Das Feld ist von Anfang an vorbelegt, obwohl der Nutzer nichts eingetragen hat. Erwartet: Das Feld bleibt bei Neuanlage leer und wird nur befüllt, wenn der Nutzer selbst explizit einen Hinweis einträgt.
 
@@ -3142,14 +3425,15 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
 
-### US-124 · Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts `[~]`
+### US-124 · Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-04 |
 
 **Beschreibung:** Beim Anlegen eines neuen Standorts (AddLocation-Formular) lässt sich die Karte bislang nur in der kleinen Formular-Vorschau bedienen. Ein eigener Vollbild-Modus mit Zoom sowie Satellit-/Standard-Kartenwahl soll die präzise Positionierung des Standort-Pins erleichtern.
 
