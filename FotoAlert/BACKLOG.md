@@ -25,13 +25,13 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-125** *(Host kann Beispielbild löschen)* · **US-126** *(Host kann Bildausschnitt/Crop selbst wählen)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
-| **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Option A Icons freigegeben)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking nehmen — .gitignore ergänzt, git rm --cached folgt über Stephans Terminal)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-125** *(Host kann Beispielbild löschen — lokal vollständig getestet (curl + Browser-UI), alle AKs bestanden, bereit für Release)* · **US-126** *(Host kann Bildausschnitt/Crop selbst wählen — lokal vollständig getestet (curl + Browser-UI), alle AKs bestanden, bereit für Release)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
@@ -815,14 +815,15 @@ Vor der Korrektur per Live-Testlauf (`pytest backend/tests/test_astronomy_regres
 
 ---
 
-### BUG-57 · Weather-Map-Testdatei referenziert nicht existierende Funktion `fetch_weather_multigrid` `[~]`
+### BUG-57 · Weather-Map-Testdatei referenziert nicht existierende Funktion `fetch_weather_multigrid` `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-02 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** `tests/test_us72_weather_map.py` schlägt mit `ImportError`/`AttributeError` fehl, da `backend/main.py` keine Funktion `fetch_weather_multigrid` (mehr) besitzt. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113. Vermutliche Ursache laut US-112-Analyse-Spec (Zeile 1268 f.): Die Testdatei wurde test-first für das nie gebaute US-72-Backend geschrieben (`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_weather_map_cache` kamen laut damaligem Befund ausschließlich in dieser untracked Testdatei vor, nie im Backend implementiert). US-112 hat den `/weather-map`-Endpoint dann tatsächlich gebaut, aber mit anderer Architektur (DWD ICON-D2 + MET Norway statt Open-Meteo-Multigrid) — die alte Testdatei wurde dabei nicht auf die neue Implementierung migriert oder entfernt. Zu klären: Testdatei an die tatsächliche US-112-Implementierung anpassen, oder als obsolet entfernen (US-72 „geht in US-112 auf", siehe US-112-Bezug).
 
@@ -1213,13 +1214,13 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### US-125 · Host kann Beispielbild einer Location löschen `[ ]`
+### US-125 · Host kann Beispielbild einer Location löschen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | In Test — Lokal getestet, bereit für Release |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Als Host möchte ich in der Location-Detailansicht ein bereits hochgeladenes Beispielbild eigenständig löschen können, ohne dafür gleich die ganze Location löschen oder zwingend ein Ersatzbild hochladen zu müssen.
@@ -1255,14 +1256,14 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 - *„Einzeln löschbar bei mehreren Bildern?"* → Entfällt, da es technisch nur ein Bild pro Location gibt.
 
 **Akzeptanzkriterien:**
-- [ ] Ein Host sieht in der Location-Ansicht neben dem vorhandenen Beispielbild einen eigenen Löschen-Button (getrennt vom bestehenden „Ersetzen"-Button).
-- [ ] Tippt der Host auf „Löschen", erscheint zuerst eine Sicherheitsabfrage mit Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
-- [ ] Bestätigt der Host die Abfrage, verschwindet das Bild sofort aus der Ansicht und die Location zeigt wieder den leeren Platzhalter „Noch kein Beispielbild" mit Upload-Möglichkeit.
-- [ ] Bricht der Host die Sicherheitsabfrage ab, bleibt das Bild unverändert sichtbar.
-- [ ] Nach dem Löschen ist das Bild auch über die alte Bild-Adresse nicht mehr abrufbar (Datei ist wirklich weg, nicht nur ausgeblendet).
-- [ ] Ein normaler Nutzer (kein Host) sieht in derselben Ansicht keinerlei Löschen-Möglichkeit — auch nicht über die Serverschnittstelle direkt (Zugriff wird abgelehnt).
-- [ ] Edge Case: Der Host versucht eine Location zu löschen, die aktuell gar kein Beispielbild hat (z. B. per direktem Server-Aufruf ohne Umweg über den Button) — die App lehnt das mit einer verständlichen Fehlermeldung ab, es passiert nichts Unerwartetes.
-- [ ] Edge Case: Der Host löscht das Bild einer Location, die es gar nicht gibt (z. B. bereits gelöschte Location) — die App lehnt das mit einer verständlichen Fehlermeldung ab („Location nicht gefunden").
+- [x] Ein Host sieht in der Location-Ansicht neben dem vorhandenen Beispielbild einen eigenen Löschen-Button (getrennt vom bestehenden „Ersetzen"-Button).
+- [x] Tippt der Host auf „Löschen", erscheint zuerst eine Sicherheitsabfrage mit Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
+- [x] Bestätigt der Host die Abfrage, verschwindet das Bild sofort aus der Ansicht und die Location zeigt wieder den leeren Platzhalter „Noch kein Beispielbild" mit Upload-Möglichkeit.
+- [x] Bricht der Host die Sicherheitsabfrage ab, bleibt das Bild unverändert sichtbar.
+- [x] Nach dem Löschen ist das Bild auch über die alte Bild-Adresse nicht mehr abrufbar (Datei ist wirklich weg, nicht nur ausgeblendet).
+- [x] Ein normaler Nutzer (kein Host) sieht in derselben Ansicht keinerlei Löschen-Möglichkeit — auch nicht über die Serverschnittstelle direkt (Zugriff wird abgelehnt).
+- [x] Edge Case: Der Host versucht eine Location zu löschen, die aktuell gar kein Beispielbild hat (z. B. per direktem Server-Aufruf ohne Umweg über den Button) — die App lehnt das mit einer verständlichen Fehlermeldung ab, es passiert nichts Unerwartetes.
+- [x] Edge Case: Der Host löscht das Bild einer Location, die es gar nicht gibt (z. B. bereits gelöschte Location) — die App lehnt das mit einer verständlichen Fehlermeldung ab („Location nicht gefunden").
 
 **Pre-Mortem:**
 
@@ -1326,8 +1327,8 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 ✅ **Empfehlung: Option A** — nutzt die bereits vorhandene, in US-120 bewährte Löschfunktion direkt wieder, hält Lösch- und Hochlade-Vorgang sauber getrennt (ein Endpunkt, eine Aufgabe) und passt sich nahtlos ins bestehende Rechte-/Bestätigungs-/Fetch-Muster ein. Geringstes Risiko, kleinster Aufwand.
 
 **Testplan:**
-- [ ] Automatisiert (Harness): `backend/tests/test_us_125.py` — deckt AK 5 (Datei wirklich weg), AK 6 (nur Host, 403/401 für andere), AK 7 (Löschen ohne vorhandenes Bild → verständlicher Fehler), AK 8 (Löschen bei nicht existierender Location → 404) ab.
-- [ ] Manuell:
+- [x] Automatisiert (Harness): `backend/tests/test_us_125.py` — deckt AK 5 (Datei wirklich weg), AK 6 (nur Host, 403/401 für andere), AK 7 (Löschen ohne vorhandenes Bild → verständlicher Fehler), AK 8 (Löschen bei nicht existierender Location → 404) ab. **Ergebnis 2026-07-05: 4/5 grün.** Der einzige Fehlschlag (`test_delete_removes_image_url_and_file`, AK 5 physisches Löschen) ist kein Code-Fehler, sondern eine Sandbox-Einschränkung: das gemountete Projektverzeichnis in der Implementierungs-Sandbox ist ein FUSE-Mount, der `unlink()`/`os.remove()` generell mit `PermissionError: Operation not permitted` ablehnt (reproduziert unabhängig vom Testcode per direktem `rm`/`os.remove` auf eine beliebige Datei im Mount). Auf dem echten Server (kein FUSE-Mount) sollte der Test wie erwartet grün laufen — das muss beim ersten echten Testlauf/Deploy verifiziert werden.
+- [x] Manuell: **Von Stephan am 2026-07-05 lokal vollständig getestet, alle Punkte bestanden** (curl-Tests UND Browser-UI-Tests) — inkl. Datei/URL wirklich weg (`image_url` → `None`), 401 ohne Token, 404 „kein Beispielbild" bei erneutem Löschen, 404 „Location nicht gefunden" bei nicht existierender Location.
   1. Als Host einloggen, eine Location mit Beispielbild öffnen. Erwartet: Bild ist sichtbar, daneben zwei getrennte Buttons „Ersetzen" und „Löschen".
   2. Auf „Löschen" tippen. Erwartet: Eine Sicherheitsabfrage erscheint mit dem Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
   3. Die Abfrage abbrechen. Erwartet: Das Bild bleibt unverändert sichtbar, nichts ändert sich.
@@ -1352,13 +1353,13 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### US-126 · Host kann den angezeigten Bildausschnitt (Crop) des Beispielbilds selbst wählen `[ ]`
+### US-126 · Host kann den angezeigten Bildausschnitt (Crop) des Beispielbilds selbst wählen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | In Test — Lokal getestet, bereit für Release |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Als Host möchte ich den sichtbaren Ausschnitt eines Beispielbilds selbst festlegen können. Aktuell (seit US-120) wird bei Quer- oder Hochformatbildern immer automatisch die Bildmitte als Ausschnitt gewählt (Rule 2 in US-120: „der sichtbare Bildausschnitt wird immer mittig aus dem Originalbild genommen"). Das kann dazu führen, dass bei Bildern, deren Motiv nicht zentriert ist, genau der Teil abgeschnitten wird, der das eigentliche Motiv zeigt.
@@ -1411,17 +1412,17 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementierung ist freigegeben (Option A, siehe „Implementierungsoptionen" unten).
 
 **Akzeptanzkriterien:**
-- [ ] Der Host sieht im Location-Detail eine Möglichkeit, die sichtbare Bildstelle eines vorhandenen Beispielbilds zu verändern — durch einfachen Klick/Tipp auf die wichtige Stelle im Bild (kein Zieh- oder Zoom-Werkzeug).
-- [ ] Diese Möglichkeit steht nicht nur direkt nach einem neuen Hochladen zur Verfügung, sondern jederzeit auch nachträglich — auch für Beispielbilder, die schon vor diesem Ticket hochgeladen wurden.
-- [ ] Nach dem Festlegen einer neuen Ausschnittsposition zeigt die Location sofort den angepassten Bildausschnitt, ohne dass die Seite neu geladen werden muss.
-- [ ] Die gewählte Ausschnittsposition bleibt erhalten, wenn die Location geschlossen und erneut geöffnet wird (auch nach Neuladen der App).
-- [ ] Das Originalbild selbst wird durch die Ausschnittswahl nicht verändert — es wird nur gemerkt, welche Stelle sichtbar bleiben soll. Ein Herunterladen oder Weiterverwenden des Originalbilds liefert weiterhin das komplette, unveränderte Foto.
-- [ ] Ein normaler Nutzer (nicht Host) sieht keinerlei Bedienelement zur Ausschnittswahl — nur das fertige Bild mit dem vom Host gewählten Ausschnitt.
-- [ ] Edge Case Querformat: Bei einem breiten Panoramafoto mit seitlich sitzendem Motiv zeigt der gewählte Ausschnitt das Motiv vollständig, nicht mehr den leeren Bildbereich.
-- [ ] Edge Case Hochformat: Bei einem hohen Bild mit oben sitzendem Motiv (z. B. Turmspitze) zeigt der gewählte Ausschnitt den oberen Bildbereich, nicht die Mitte.
-- [ ] Edge Case Bild-Ersetzen: Lädt der Host ein neues Bild hoch, startet die Ausschnittsposition wieder bei der Bildmitte (kein „Geister"-Ausschnitt vom vorherigen Bild).
-- [ ] Edge Case ohne Änderung: Wählt der Host keine eigene Position, verhält sich die Anzeige exakt wie vor diesem Ticket (Bildmitte).
-- [ ] Edge Case ältere Bilder ohne gespeicherte Ausschnittsposition: Bei allen Locations, die noch keine eigene Ausschnittsposition haben (weil sie vor diesem Ticket angelegt wurden), zeigt die App weiterhin ganz normal die Bildmitte — kein Fehler, keine leere Anzeige.
+- [x] Der Host sieht im Location-Detail eine Möglichkeit, die sichtbare Bildstelle eines vorhandenen Beispielbilds zu verändern — durch einfachen Klick/Tipp auf die wichtige Stelle im Bild (kein Zieh- oder Zoom-Werkzeug).
+- [x] Diese Möglichkeit steht nicht nur direkt nach einem neuen Hochladen zur Verfügung, sondern jederzeit auch nachträglich — auch für Beispielbilder, die schon vor diesem Ticket hochgeladen wurden.
+- [x] Nach dem Festlegen einer neuen Ausschnittsposition zeigt die Location sofort den angepassten Bildausschnitt, ohne dass die Seite neu geladen werden muss.
+- [x] Die gewählte Ausschnittsposition bleibt erhalten, wenn die Location geschlossen und erneut geöffnet wird (auch nach Neuladen der App).
+- [x] Das Originalbild selbst wird durch die Ausschnittswahl nicht verändert — es wird nur gemerkt, welche Stelle sichtbar bleiben soll. Ein Herunterladen oder Weiterverwenden des Originalbilds liefert weiterhin das komplette, unveränderte Foto.
+- [x] Ein normaler Nutzer (nicht Host) sieht keinerlei Bedienelement zur Ausschnittswahl — nur das fertige Bild mit dem vom Host gewählten Ausschnitt.
+- [x] Edge Case Querformat: Bei einem breiten Panoramafoto mit seitlich sitzendem Motiv zeigt der gewählte Ausschnitt das Motiv vollständig, nicht mehr den leeren Bildbereich.
+- [x] Edge Case Hochformat: Bei einem hohen Bild mit oben sitzendem Motiv (z. B. Turmspitze) zeigt der gewählte Ausschnitt den oberen Bildbereich, nicht die Mitte.
+- [x] Edge Case Bild-Ersetzen: Lädt der Host ein neues Bild hoch, startet die Ausschnittsposition wieder bei der Bildmitte (kein „Geister"-Ausschnitt vom vorherigen Bild).
+- [x] Edge Case ohne Änderung: Wählt der Host keine eigene Position, verhält sich die Anzeige exakt wie vor diesem Ticket (Bildmitte).
+- [x] Edge Case ältere Bilder ohne gespeicherte Ausschnittsposition: Bei allen Locations, die noch keine eigene Ausschnittsposition haben (weil sie vor diesem Ticket angelegt wurden), zeigt die App weiterhin ganz normal die Bildmitte — kein Fehler, keine leere Anzeige.
 
 **Pre-Mortem:**
 - 💀 Szenario: Die neue Ausschnittsposition wird nur clientseitig im Browser gemerkt (z. B. localStorage) statt serverseitig gespeichert → Gegenmaßnahme: AK „bleibt nach Neuladen/auf anderem Gerät erhalten" verlangt serverseitige Persistenz (neues Feld analog `image_filename`), als Testfall in Harness verankert.
@@ -1467,8 +1468,8 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 ✅ **Final bestätigt durch Stephan (2026-07-05): Option A.** Damit ist Option B endgültig verworfen, keine offene Entscheidung mehr.
 
 **Testplan:**
-- [ ] Automatisiert (Harness): `backend/tests/test_us_126.py` — deckt ab: neues Feld wird korrekt gespeichert und im Response (`image_url`-Nachbarfeld) zurückgegeben (AK 1–3), Feld wird bei Replace-Upload zurückgesetzt (AK 7, Pre-Mortem 2), Feld funktioniert für Custom- UND Standard-Locations gleichermaßen (Pre-Mortem 4), fehlender Host-Zugriff liefert 401/403 (analog bestehendem Auth-Muster).
-- [ ] Manuell:
+- [x] Automatisiert (Harness): `backend/tests/test_us_126.py` — deckt ab: neues Feld wird korrekt gespeichert und im Response (`image_url`-Nachbarfeld) zurückgegeben (AK 1–3), Feld wird bei Replace-Upload zurückgesetzt (AK 7, Pre-Mortem 2), Feld funktioniert für Custom- UND Standard-Locations gleichermaßen (Pre-Mortem 4), fehlender Host-Zugriff liefert 401/403 (analog bestehendem Auth-Muster), Fallback 50/50 ohne gespeicherten Wert, Validierung (422 bei Wertebereich/Typ), 404 ohne Bild/nicht existierende Location. **Ergebnis 2026-07-05: 10/10 grün.**
+- [x] Manuell: **Von Stephan am 2026-07-05 lokal vollständig getestet, alle Punkte bestanden** (curl-Tests UND Browser-UI-Tests) — inkl. Fokuspunkt setzen (PATCH → `ok:true`, Werte korrekt übernommen), Position bleibt nach Neuladen erhalten, 401 ohne Token, Bild-Ersetzen setzt Fokuspunkt auf 50/50 zurück (AK 9), Live-Update ohne Reload im Browser bestätigt, Quer-/Hochformat-Motiv nach Ausschnittwahl vollständig sichtbar, restliche Location-Detailansicht unverändert/nicht doppelt gerendert.
   1. Als Host ein Beispielbild mit erkennbar nicht-mittigem Motiv hochladen (z. B. Motiv am linken Bildrand). Erwartet: Zunächst wird wie bisher die Bildmitte angezeigt.
   2. Auf die Bildstelle mit dem Motiv tippen/klicken (die neue Ausschnittsauswahl). Erwartet: Der sichtbare Ausschnitt verschiebt sich sofort, das Motiv ist jetzt vollständig sichtbar.
   3. Location schließen und erneut öffnen (oder Seite neu laden). Erwartet: Der angepasste Ausschnitt bleibt erhalten, nicht wieder die Bildmitte.
@@ -1501,7 +1502,7 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Ready for Dev |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Im Karten-Tab liegen zwei unabhängig positionierte Button-Gruppen oben im Kartenbereich: der Wetter-Filter (Aus/Wolken/Niederschlag, `#map-weather-toggle`, `top:12px; left:12px`, aus US-72) und der Kartenmodus-Umschalter (Nacht/Standard/Satellit, `#map-layer-toggle`, `top:12px; right:12px`). Beide sind mit festen Text-Buttons und festen Pixel-Abständen zum linken/rechten Rand positioniert, ohne Rücksicht auf schmale Bildschirmbreiten. Auf einem schmalen iPhone-Bildschirm wachsen beide Textgruppen so weit zusammen, dass sie sich in der Mitte überlappen und sich gegenseitig schwer lesbar/bedienbar machen. Auf breiteren Bildschirmen (iPad, größere iPhones) tritt das Problem nicht auf, da dort genug Platz zwischen den beiden Gruppen bleibt.
@@ -1513,6 +1514,91 @@ Stephans Lösungsidee (als Vorschlag, noch nicht entschieden — gehört in die 
 **User Story:** Als App-Nutzer mit einem schmalen iPhone möchte ich im Karten-Tab den Wetter-Filter und den Kartenmodus-Umschalter beide vollständig lesbar und antippbar sehen, sodass ich auf meinem Gerät ungehindert zwischen Wolken/Niederschlag und Standard/Satellit/Nacht wechseln kann, ohne dass sich Beschriftungen überlagern oder Buttons aus Versehen den falschen Modus treffen.
 
 **Bezug:** Kein Duplikat vorhanden — es existiert aktuell kein Ticket, das diese konkrete Überlappung behandelt. Verwandt: **US-123** [x] (Satellit/Standard-Umschalter für Location-Anlage-/Bearbeiten-Karten, `LocMapMode`) ist ein *anderer* Umschalter an anderer Stelle (Location-Formulare, nicht der Haupt-Karten-Tab) und daher keine Dublette — aber dort wurde nach dem Test bereits einmal eine ganz ähnliche Überlappung (mit dem Leaflet-Zoom-Menü) gefixt, indem der Button von `top/left` auf `bottom/left` verschoben wurde; zusätzlich wurde dort explizit der noch offene, nicht umgesetzte Vorschlag „Toggle-Buttons könnten je ein kleines Icon bekommen statt nur Text" notiert (US-123, Testfeedback-Abschnitt) — deckt sich mit Stephans jetziger Idee und sollte in der Analyse als Präzedenzfall herangezogen werden. Ebenfalls verwandt, aber ohne Überschneidung: **BUG-58** [x] (Zoom-Verhalten des Wetter-Umschalters) und **TASK-52** (Legenden-Position) betreffen denselben Karten-Tab, aber andere Elemente/Verhalten, nicht die Button-Überlappung selbst.
+
+**Example Mapping:**
+
+*Annahmen:*
+- ⚠️ Annahme: „Schmaler Bildschirm" = ab iPhone SE / Mini (375px Breite) aufwärts korrekt darstellbar — bitte bestätigen.
+- ⚠️ Annahme: Die Wetter-Filter-Sub-Zeile („mm/%", erscheint nur wenn „Wolken"/„Niederschlag" aktiv ist) wird als zusätzlicher Kollisions-Faktor mitbetrachtet.
+- ✅ Aus Code bestätigt: GPS-Button, Zeitregler, Legende liegen im unteren Kartenbereich — keine Überschneidung mit den beiden oberen Gruppen (siehe Scope-Antwort unten).
+
+*Regeln:*
+- 📏 Regel 1 — Beide oberen Button-Gruppen bleiben auf jeder unterstützten Bildschirmbreite vollständig lesbar und einzeln antippbar.
+  🟢 Beispiel: Auf einem iPhone SE (375px) sieht der Nutzer im Karten-Tab den Wetter-Filter links oben und den Kartenmodus-Umschalter rechts oben nebeneinander, ohne Berührung oder Überlappung.
+- 📏 Regel 2 — Auch wenn die Wetter-Sub-Zeile („mm/%") eingeblendet ist, bleibt die rechte Gruppe unangetastet.
+  🟢 Beispiel: Nutzer tippt „Wolken" an (Sub-Zeile „mm/%" erscheint) → der Kartenmodus-Umschalter rechts bleibt vollständig sichtbar und bedienbar.
+- 📏 Regel 3 — Antippen trifft immer den beabsichtigten Button, nie einen überlappenden Nachbar-Button.
+
+*Offene Fragen an Stephan (vor Umsetzung zu klären, nicht blockierend für die Empfehlung):*
+1. Bevorzugte Lösungsrichtung: Icons statt Text, Zeilenumbruch, eingeklapptes Menü, oder kleinere Schrift/Padding? (Optionen unten, Empfehlung: Icons)
+2. Reicht iPhone SE (375px) als schmalstes Referenzgerät für den Test?
+
+**Scope:**
+Eingeschlossen: Layout-Fix der beiden oberen Button-Gruppen (`#map-weather-toggle`, `#map-layer-toggle`) inkl. der bedingt sichtbaren Wetter-Sub-Zeile („mm/%"), auf allen Bildschirmbreiten.
+Ausgeschlossen: Alle anderen Karten-Overlay-Elemente — siehe Scope-Antwort unten, keine Kollision festgestellt, daher nicht Teil dieses Tickets.
+
+**Scope-Frage beantwortet (weitere betroffene Elemente?):** Nein. Code-Prüfung von GPS-Button (`bottom:30px; left:12px`), Wetter-Zeitregler (`bottom:30px`), Wetter-Legende (`bottom:100px; left:12px`) und Fehler-Banner (`top:100px`, zentriert) zeigt: Diese Elemente teilen sich nicht den oberen `top:12px`-Bereich der beiden Toggle-Gruppen und kollidieren auf schmalen Screens nicht zusätzlich. Einzige zu beachtende Nebenwirkung: Der Fehler-Banner („Wetterdaten nicht verfügbar", `top:100px`, zentriert) darf durch den Fix nicht neu überlappt werden — als Edge-Case-AK aufgenommen.
+
+**Akzeptanzkriterien:**
+- [ ] Auf einem iPhone SE (375px Breite) sieht der Nutzer im Karten-Tab den Wetter-Filter links oben und den Kartenmodus-Umschalter rechts oben vollständig nebeneinander, ohne dass sich Beschriftungen oder Buttons berühren oder überlagern.
+- [ ] Wenn der Nutzer im Wetter-Filter „Wolken" oder „Niederschlag" antippt (wodurch die zusätzliche Zeile „mm/%" erscheint), bleibt der Kartenmodus-Umschalter rechts weiterhin vollständig sichtbar und bedienbar.
+- [ ] Der Nutzer kann auf einem schmalen Bildschirm jeden der sechs Buttons (aus/Wolken/Niederschlag/Nacht/Standard/Satellit) einzeln und ohne Fehltreffer antippen.
+- [ ] Auf breiteren Bildschirmen (iPhone Pro Max, iPad) sieht die Kartenansicht weiterhin so aus wie bisher — keine unnötige Änderung des bestehenden Erscheinungsbilds dort.
+- [ ] Edge Case: Ist zusätzlich die Fehlermeldung „Wetterdaten nicht verfügbar" (zentriert oben) eingeblendet, bleibt sie weiterhin lesbar und überlappt nicht neu mit einer der beiden Gruppen.
+
+**Pre-Mortem:**
+📎 Code-Verifikation: `web/index.html` Z. 261–336 (CSS) und Z. 1063–1100 (Markup) gelesen am 2026-07-05. Bestätigt: beide Gruppen exakt auf `top:12px`, feste `left:12px`/`right:12px`, keine `@media`-Anpassung vorhanden. Wetter-Filter hat bedingt sichtbare zweite Zeile („mm/%"). GPS-Button/Zeitregler/Legende im unteren Kartenbereich — keine Überschneidung.
+
+- 💀 Fix behebt nur den Grundzustand, die Wetter-Sub-Zeile („mm/%") wird beim Testen übersehen und bricht das Layout erneut sobald „Wolken" aktiv ist → Gegenmaßnahme: eigenes AK + Testschritt.
+- 💀 Fix wird nur an einem größeren Referenzgerät getestet, das schmalste unterstützte Gerät (SE/Mini) bleibt kaputt → Gegenmaßnahme: Testplan verlangt explizit 375px-Breite.
+- 💀 Icons ersetzen Text, aber ohne Tooltip/Beschriftung wird unklar, welches Icon welchen Modus bedeutet (Verwechslungsgefahr Wolke/Regenwolke) → Gegenmaßnahme: Tooltip/aria-label Pflicht bei Icon-Wahl.
+- 💀 Fix funktioniert im Hochformat, bricht im Querformat erneut, weil dort die Breite anders verteilt ist → Gegenmaßnahme: Querformat als zusätzlicher Testschritt.
+- 💀 Der ähnliche, bereits gelöste Fall US-123 wird 1:1 kopiert, obwohl dort eine andere Kollisionsursache (Leaflet-Zoom-Menü) vorlag → Gegenmaßnahme: US-123 nur als Inspiration behandelt, nicht als Vorlage übernommen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (CSS Z. 268–295, Markup Z. 1066–1082) — reiner Frontend-Layout-Bug, kein Backend-Bezug
+- [x] Designer-Check: visuell? → ja — Kernaussage: bei Icon-Wahl klare geometrische Symbole (kein Emoji-Look), Pflicht-Tooltip/aria-label
+- [x] Implementierungsoptionen: A (Icons) / B (kleinere Schrift/Padding) / C (Zeilenumbruch) / D (eingeklapptes Menü)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+*Option A — Icons statt Text (Stephans Vorschlag):* Text-Buttons durch kompakte Icons ersetzen (Sonne/Wolke/Regenwolke links; Mond/Karte/Satellit rechts) mit Tooltip/aria-label. Betrifft `web/index.html` CSS (Z. 268–295) + Markup (Z. 1066–1082). Vorteil: deutlich schmaler, skaliert auf jede Breite, deckt sich mit dem in US-123 bereits notierten offenen Wunsch. Nachteil: Bedeutung ohne Tooltip evtl. unklar (mitigiert), Wolke/Regenwolke-Verwechslungsgefahr. Aufwand: mittel.
+
+*Option B — Kleinere Schrift/Padding nur auf schmalen Screens (Media Query):* Text-Buttons bleiben, Schriftgröße/Padding wird auf schmalen Screens per `@media` reduziert. Vorteil: minimal-invasiv. Nachteil: skaliert nicht beliebig, wirkt nur wie Symptombekämpfung, insbesondere bei „Niederschlag" als längstem Label. Aufwand: klein.
+
+*Option C — Umbruch in zweite Zeile auf schmalen Screens:* Kartenmodus-Umschalter bricht auf schmalen Screens in zwei Zeilen um. Nachteil: bricht die kompakte Optik, blockiert mehr Kartenfläche, kollidiert potenziell mit der Wetter-Sub-Zeile. Aufwand: mittel.
+
+*Option D — Eingeklapptes Menü:* Nur aktiver Modus sichtbar, Antippen öffnet Auswahl. Größte Verhaltensänderung, Overkill für dieses Layout-Problem. Aufwand: groß.
+
+✅ **Empfehlung: Option A (Icons)** — deckt sich mit Stephans eigenem Vorschlag und dem bereits in US-123 notierten offenen Wunsch, skaliert zuverlässig auf jede Bildschirmbreite (anders als B), ohne die kompakte Optik aufzugeben (anders als C/D). Tooltip/aria-label schließt das Pre-Mortem-Risiko der Bedeutungs-Unklarheit.
+
+**Testplan:**
+- [ ] Manuell (Browser, http://localhost:8000): Karten-Tab öffnen, Browserfenster/iPhone-Simulator auf 375px Breite stellen (iPhone SE) → prüfen, ob sich Wetter-Filter (links oben) und Kartenmodus-Umschalter (rechts oben) berühren oder überlappen.
+- [ ] Manuell: Im Wetter-Filter „Wolken" antippen (Sub-Zeile „mm/%" erscheint) → prüfen, ob der Kartenmodus-Umschalter rechts weiterhin vollständig sichtbar und bedienbar bleibt.
+- [ ] Manuell: Jeden der sechs Buttons einzeln antippen → prüfen, ob jeweils der richtige Modus aktiviert wird (kein Fehltreffer durch Nachbar-Button).
+- [ ] Manuell: Breiteres Gerät (iPhone Pro Max oder iPad-Simulation) → prüfen, dass sich am bisherigen Erscheinungsbild nichts Unerwartetes ändert.
+- [ ] Manuell: Fehler-Banner „Wetterdaten nicht verfügbar" provozieren (z.B. Wetterdaten-Fetch offline) → prüfen, ob er weiterhin lesbar bleibt und nicht neu überlappt.
+- [ ] Manuell: Gerät ins Querformat drehen → prüfen, ob die Überlappung dort ebenfalls behoben bleibt (Beobachtung, nicht hartes AK).
+
+#### 🎨 Design-Entscheidung (fotoalert-designer) · 2026-07-05
+
+Option A (Icons statt Text) bestätigt. Erste Icon-Entwürfe (abstrakte Kreis-Formen)
+wurden von Stephan als nicht erkennbar zurückgewiesen — Wolke, Regenwolke und
+Satellit waren nicht als solche zu identifizieren. Überarbeitete Fassung mit
+etablierten, klar erkennbaren Symbolformen (durchgehende Wolken-Kontur statt
+zweier loser Kreise; gestaffelte Regentropfen unter der Wolke; Satellit als
+schräg gestellter Korpus mit zwei Solar-Panels und kurzer Antenne) von Stephan
+freigegeben. Nacht (Mond-Sichel) und Karte (2×2-Raster) blieben gegenüber dem
+ersten Entwurf unverändert.
+
+Finale Icon-Zuordnung:
+- Links (Wetter-Filter): Aus (durchgestrichener Kreis) · Wolken (Wolken-Kontur) · Regenwolken (Wolken-Kontur + drei gestaffelte Tropfen)
+- Rechts (Kartenmodus): Nacht (Mond-Sichel) · Karte (2×2-Raster) · Satellit (schräger Korpus mit Solar-Panels + Antenne)
+
+Alle sechs Icons: Linien-Stil, 2px Strich, monochrom (`currentColor`), Touch-Target ≥44px in der finalen Umsetzung (Mockup zeigte 34px nur zur Platzdemonstration). Pflicht-Tooltip/aria-label je Button bleibt bestehen (Pre-Mortem-Gegenmaßnahme).
 
 ---
 
@@ -2733,6 +2819,22 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 **User Story:** Als Host/Betreiber der FotoAlert-App, möchte ich, dass hochgeladene Beispielbilder beim Server-Backup mitgesichert werden, sodass ich sie nach einem Server-Ausfall wiederherstellen kann und keine von Nutzern/Admin hochgeladenen Bilder verloren gehen.
 
 **Bezug:** US-120 [~] (In Test) — führte `location_images/` sowie den Upload-Endpoint ein und wies in der Implementierungsnotiz selbst auf diese Lücke hin („Backup sichert bisher nur SQLite, nicht `location_images/` — eigenes Ticket vorschlagen?"). Kein Bezug/keine Überschneidung zu TASK-48 (Epic Datensync — behandelt automatisierte QA/Anreicherung von Location-Metadaten wie Azimut/Beschreibung/Brennweite, nicht Datei-Backup) und zu TASK-53 (Dev-Sync-Werkzeug Live→Dev — nutzt das Snapshot-Prinzip aus `backup.py` nur als Vorbild für einen anderen Zweck, ändert `backup.py` nicht). Kein bestehendes BUG-Ticket zu diesem Thema gefunden.
+
+---
+
+### TASK-56 · DB-Snapshot-Ordner aus Git-Tracking nehmen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-05 |
+| **In Progress seit** | 2026-07-05 |
+
+**Beschreibung:** Vor jedem Precompute-Lauf legt `snapshot_before_precompute()` (`backend/data/backup.py`) automatisch eine DB-Kopie unter `backend/data/snapshots/` an (max. 7, ältere räumt das Skript selbst weg). Der Ordner fehlte in `.gitignore`, dadurch wurden bei früheren Commits (`10ce891`, `4225991`) einzelne Snapshots versehentlich mitgecheckt. Räumt das Skript sie später lokal auf, zeigt Git sie als „deleted"; neue, noch ungecheckte Snapshots als „untracked" — das sorgte bei Releases für Verwirrung. Kein Datenverlust, reines Ignore-/Tracking-Problem, ~0,8 MB Historie betroffen.
+
+**Umsetzung:** `.gitignore` um `backend/data/snapshots/` ergänzt. Die 7 bereits getrackten (aber lokal schon wieder gelöschten) Snapshot-Einträge müssen noch per `git rm --cached` aus der Versionsverfolgung genommen und committet werden — dieser Schritt läuft über Stephans eigenes Terminal, nicht in der Sandbox.
 
 ---
 

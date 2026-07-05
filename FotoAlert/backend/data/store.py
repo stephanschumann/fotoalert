@@ -152,10 +152,13 @@ class LocationStore:
             conn.executescript(_INIT_SQL)
             # TASK-43: Azimut-Spalten in custom_locations ergänzen (idempotent)
             # US-120: image_filename ergänzen (Beispielbild-Verweis für Custom Locations)
+            # US-126: image_focus_x/y ergänzen (Fokuspunkt für Bildausschnitt, nullable)
             for col, typedef in [
                 ("ideal_azimuth_min", "REAL DEFAULT NULL"),
                 ("ideal_azimuth_max", "REAL DEFAULT NULL"),
                 ("image_filename", "TEXT DEFAULT NULL"),
+                ("image_focus_x", "REAL DEFAULT NULL"),
+                ("image_focus_y", "REAL DEFAULT NULL"),
             ]:
                 try:
                     conn.execute(

@@ -42,6 +42,10 @@ class LocationOut(BaseModel):
     difficulty: int
     possible_bodies: list[str] = []  # US-35: ["sun","moon","milkyway"] – welche Körper jemals im Azimutbereich erscheinen
     image_url: Optional[str] = None  # US-120: Beispielbild-URL (None = kein Bild hochgeladen)
+    # US-126: Fokuspunkt für den Bildausschnitt (Prozentwerte 0-100). Fallback 50/50
+    # (Bildmitte) wenn der Host noch keine eigene Position gewählt hat.
+    image_focus_x: float = 50.0
+    image_focus_y: float = 50.0
 
 
 class OpportunityOut(BaseModel):

@@ -84,6 +84,12 @@ class PhotoLocation:
     # US-120: Beispielbild (Dateiname im Bild-Verzeichnis, kein Base64/Pfad-Traversal)
     image_filename: Optional[str] = None
 
+    # US-126: Fokuspunkt für die Bildausschnitt-Anzeige (Prozentwerte 0-100).
+    # Optional/nullable — fehlt der Wert (ältere Bilder vor diesem Ticket), fällt
+    # die Anzeige auf 50/50 (Bildmitte) zurück, identisch zum bisherigen Verhalten.
+    image_focus_x: Optional[float] = None
+    image_focus_y: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # BERLIN

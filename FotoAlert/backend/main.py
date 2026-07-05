@@ -172,6 +172,8 @@ def _load_custom_locations() -> None:
                 special_notes=e.get("special_notes", ""), difficulty=e.get("difficulty", 1),
                 observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
                 image_filename=e.get("image_filename"),
+                image_focus_x=e.get("image_focus_x"),
+                image_focus_y=e.get("image_focus_y"),
             )
             LOCATIONS.append(loc)
             ids_existing.add(loc.id)
@@ -1198,7 +1200,8 @@ def _load_location_overrides() -> None:
             if loc:
                 for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon",
                               "name", "description", "observer_floor_height_m",
-                              "focal_length_suggestions", "image_filename"):
+                              "focal_length_suggestions", "image_filename",
+                              "image_focus_x", "image_focus_y"):
                     if field in ov:
                         setattr(loc, field, ov[field])
                 applied += 1
@@ -1433,6 +1436,9 @@ def _loc_to_out(loc) -> LocationOut:
         difficulty=loc.difficulty,
         possible_bodies=_compute_possible_bodies(loc.observer_lat, az_range),
         image_url=f"/location-images/{loc.image_filename}" if getattr(loc, "image_filename", None) else None,
+        # US-126: Fallback auf 50/50 (Bildmitte), falls kein Fokuspunkt gespeichert ist
+        image_focus_x=getattr(loc, "image_focus_x", None) if getattr(loc, "image_focus_x", None) is not None else 50.0,
+        image_focus_y=getattr(loc, "image_focus_y", None) if getattr(loc, "image_focus_y", None) is not None else 50.0,
     )
 
 
@@ -2293,12 +2299,17 @@ async def upload_location_image(
     tmp_path.write_bytes(processed)
     tmp_path.replace(new_path)  # atomarer Rename auf demselben Dateisystem
 
-    # Verweis in der Location aktualisieren (beide Location-Arten)
+    # Verweis in der Location aktualisieren (beide Location-Arten).
+    # US-126 Rule 3: Fokuspunkt bezieht sich auf das alte Bild und wird bei jedem
+    # Ersetzen zurückgesetzt (NULL → Anzeige fällt auf Bildmitte 50/50 zurück),
+    # damit kein "Geister"-Ausschnitt vom vorherigen Bild übernommen wird.
     if loc_id.startswith("custom_"):
-        _store.update_custom(loc_id, image_filename=new_filename)
+        _store.update_custom(loc_id, image_filename=new_filename, image_focus_x=None, image_focus_y=None)
     else:
-        _save_location_override(loc_id, image_filename=new_filename)
+        _save_location_override(loc_id, image_filename=new_filename, image_focus_x=None, image_focus_y=None)
     target_loc.image_filename = new_filename
+    target_loc.image_focus_x = None
+    target_loc.image_focus_y = None
 
     # Alte Datei erst NACH erfolgreichem Ersetzen löschen, und nur wenn sie
     # tatsächlich einen anderen Namen hatte (hier immer gleich, da Dateiname == loc_id;
@@ -2311,6 +2322,86 @@ async def upload_location_image(
 
     logger.info("Beispielbild hochgeladen für %s: %s (%d Bytes)", loc_id, new_filename, len(processed))
     return {"ok": True, "image_url": f"/location-images/{new_filename}", "size_bytes": len(processed)}
+
+
+@app.delete("/locations/{loc_id}/image")
+async def delete_location_image(loc_id: str, _role: str = Depends(auth.require_host)) -> dict:
+    """
+    US-125: Löscht das Beispielbild einer Location eigenständig (nur Host),
+    ohne dass gleich die ganze Location gelöscht oder ein Ersatzbild hochgeladen
+    werden muss.
+    - Wiederverwendet die in US-120 gebaute _delete_location_image_file() (Pre-Mortem 2:
+      keine verwaisten Dateien), statt eine eigene Lösch-Logik zu duplizieren.
+    - Setzt image_filename auf der Location zurück (beide Location-Arten), analog zum
+      bestehenden Aktualisierungs-Muster in upload_location_image / delete_location.
+    - Edge Case (AK 7): Location ohne aktuell vorhandenes Bild → 404 statt Absturz.
+    - Edge Case (AK 8): Location-ID existiert nicht → 404 "Location nicht gefunden".
+    """
+    target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if not target_loc:
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+
+    old_filename = getattr(target_loc, "image_filename", None)
+    if not old_filename:
+        raise HTTPException(status_code=404, detail="Diese Location hat aktuell kein Beispielbild.")
+
+    # Verweis zuerst zurücksetzen (beide Location-Arten), danach Datei löschen —
+    # gleiche Reihenfolge wie beim Ersetzen/Location-Löschen bereits etabliert.
+    if loc_id.startswith("custom_"):
+        _store.update_custom(loc_id, image_filename=None)
+    else:
+        _save_location_override(loc_id, image_filename=None)
+    target_loc.image_filename = None
+
+    _delete_location_image_file(old_filename)
+
+    if not _NO_BACKGROUND:
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+
+    logger.info("Beispielbild gelöscht für %s: %s", loc_id, old_filename)
+    return {"ok": True, "deleted": True}
+
+
+@app.patch("/locations/{loc_id}/image-focus")
+async def update_location_image_focus(
+    loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_host)
+) -> dict:
+    """
+    US-126: Setzt/aktualisiert den Fokuspunkt für den angezeigten Bildausschnitt
+    (nur Host). Rein clientseitige Anzeigeposition — das Originalbild bleibt
+    unverändert, es wird nur die Position (Prozentwerte 0-100) persistiert.
+    - Jederzeit nutzbar, auch nachträglich für Bilder, die schon vor diesem Ticket
+      hochgeladen wurden (kein Kopplung an den Upload-Vorgang).
+    - Gilt für Custom- UND Standard-Locations gleichermaßen (analog image_filename).
+    - Edge Case: Location ohne Beispielbild → 404 (Fokuspunkt ohne Bild ergibt keinen Sinn).
+    """
+    target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if not target_loc:
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+
+    if not getattr(target_loc, "image_filename", None):
+        raise HTTPException(status_code=404, detail="Diese Location hat aktuell kein Beispielbild.")
+
+    x = body.get("image_focus_x")
+    y = body.get("image_focus_y")
+    if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+        raise HTTPException(status_code=422, detail="image_focus_x/image_focus_y müssen Zahlen sein.")
+    if not (0 <= x <= 100) or not (0 <= y <= 100):
+        raise HTTPException(status_code=422, detail="image_focus_x/image_focus_y müssen zwischen 0 und 100 liegen.")
+    x, y = float(x), float(y)
+
+    if loc_id.startswith("custom_"):
+        _store.update_custom(loc_id, image_focus_x=x, image_focus_y=y)
+    else:
+        _save_location_override(loc_id, image_focus_x=x, image_focus_y=y)
+    target_loc.image_focus_x = x
+    target_loc.image_focus_y = y
+
+    if not _NO_BACKGROUND:
+        asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
+
+    logger.info("Bildausschnitt-Fokuspunkt gesetzt für %s: (%.1f, %.1f)", loc_id, x, y)
+    return {"ok": True, "image_focus_x": x, "image_focus_y": y}
 
 
 @app.patch("/locations/{loc_id}")

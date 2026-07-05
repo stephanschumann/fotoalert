@@ -386,10 +386,51 @@
     .loc-image-edit-btn { position: absolute; top: 10px; right: 10px; display: inline-flex;
       align-items: center; gap: 6px; background: rgba(0,0,0,.55); color: #fff; border: none;
       border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    /* US-125: eigener Lösch-Button, bewusst links statt neben "Ersetzen" platziert
+       (max. Abstand statt nur ein paar Pixel Lücke), damit die beiden Touch-Ziele
+       sich nicht berühren und nicht verwechselt werden können (Designer-Check). */
+    .loc-image-delete-btn { position: absolute; top: 10px; left: 10px; display: inline-flex;
+      align-items: center; gap: 6px; background: rgba(0,0,0,.55); color: var(--red); border: none;
+      border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    /* US-126: dritter Button "Ausschnitt wählen" — unter dem Löschen-Button links
+       platziert (eigene Zeile, top:52px), damit alle drei Touch-Ziele getrennt
+       bleiben. Ruhiges --accent-Blau statt Rot/Neutral, da unkritische, jederzeit
+       wiederholbare Aktion (Designer-Entscheidung). */
+    .loc-image-focus-btn { position: absolute; top: 52px; left: 10px; display: inline-flex;
+      align-items: center; gap: 6px; background: rgba(0,0,0,.55); color: var(--accent); border: none;
+      border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .loc-image-processing { position: absolute; inset: 0; display: none; flex-direction: column;
       align-items: center; justify-content: center; gap: 10px; background: rgba(0,0,0,.55);
       border-radius: 22px 22px 0 0; color: #fff; font-size: 13px; }
     .loc-image-processing.open { display: flex; }
+    /* US-126: Ausschnitt-Auswahl-Modus — während dieses Modus ist Letterboxing
+       (Rand/Buchstabenbalken) ausdrücklich okay, da hier das GANZE Foto sichtbar
+       sein muss, um den Fokuspunkt frei wählen zu können (gilt NUR hier, nicht in
+       der fertigen randlosen Anzeige). */
+    .loc-image-focus-overlay { position: absolute; inset: 0; display: none; flex-direction: column;
+      background: rgba(0,0,0,.85); border-radius: 22px 22px 0 0; z-index: 5; }
+    .loc-image-focus-overlay.open { display: flex; }
+    .loc-image-focus-hint { color: #fff; font-size: 12px; text-align: center; padding: 10px 14px 4px; }
+    .loc-image-focus-stage { position: relative; flex: 1; display: flex; align-items: center;
+      justify-content: center; overflow: hidden; margin: 4px 10px; border: 2px solid var(--accent);
+      border-radius: 10px; cursor: crosshair; background: #000; }
+    .loc-image-focus-stage img { max-width: 100%; max-height: 100%; display: block;
+      object-fit: contain; pointer-events: none; }
+    .loc-image-focus-marker { position: absolute; width: 26px; height: 26px;
+      border: 2px solid var(--accent); border-radius: 50%; transform: translate(-50%,-50%);
+      pointer-events: none; box-shadow: 0 0 0 2px rgba(255,255,255,.9); }
+    .loc-image-focus-marker::after { content: ''; position: absolute; top: 50%; left: 50%;
+      width: 6px; height: 6px; background: var(--accent); border-radius: 50%; transform: translate(-50%,-50%); }
+    .loc-image-focus-preview-wrap { padding: 6px 10px 4px; display: flex; align-items: center; gap: 8px; }
+    .loc-image-focus-preview { width: 56px; height: 42px; border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.4); flex-shrink: 0; background: #000; }
+    .loc-image-focus-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .loc-image-focus-preview-label { color: rgba(255,255,255,.8); font-size: 11px; }
+    .loc-image-focus-actions { display: flex; gap: 8px; padding: 8px 10px 12px; }
+    .loc-image-focus-actions button { flex: 1; border: none; border-radius: 8px;
+      padding: 9px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .loc-image-focus-done { background: var(--accent); color: var(--on-accent); }
+    .loc-image-focus-cancel { background: rgba(255,255,255,.15); color: #fff; }
     .sheet-hero-type { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .sheet-hero-title { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
     .sheet-hero-loc { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
@@ -1335,7 +1376,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.2';
+const APP_VERSION = '1.21.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5370,11 +5411,18 @@ const LocationDetail = {
   // Normaler Nutzer ohne Bild: Bereich bleibt komplett unsichtbar (kein Platzhalter).
   _imageAreaHtml(loc) {
     if (loc.image_url) {
+      // US-126: Fokuspunkt steuert object-position; Fallback 50/50 (Bildmitte)
+      // wenn kein Wert gespeichert ist (ältere Bilder vor diesem Ticket).
+      const fx = (loc.image_focus_x != null ? loc.image_focus_x : 50);
+      const fy = (loc.image_focus_y != null ? loc.image_focus_y : 50);
       return `
         <div class="loc-image-area" id="loc-image-area">
-          <img src="${CFG.api}${loc.image_url}" alt="Beispielbild ${loc.name.replace(/"/g,'&quot;')}">
+          <img src="${CFG.api}${loc.image_url}" alt="Beispielbild ${loc.name.replace(/"/g,'&quot;')}" style="object-position:${fx}% ${fy}%">
+          ${Auth.isHost() ? `<button class="loc-image-delete-btn" onclick="LocationDetail.deleteImage('${loc.id}')" title="Beispielbild löschen">${ic('i-trash',14)}</button>` : ''}
           ${Auth.isHost() ? `<button class="loc-image-edit-btn" onclick="LocationDetail.triggerImageUpload()">${ic('i-camera',14)} Ersetzen</button>` : ''}
+          ${Auth.isHost() ? `<button class="loc-image-focus-btn" onclick="LocationDetail.openFocusPicker('${loc.id}')" title="Ausschnitt wählen">${ic('i-target',14)} Ausschnitt wählen</button>` : ''}
           <div class="loc-image-processing" id="loc-image-processing"><div class="spinner"></div><span>Bild wird komprimiert …</span></div>
+          ${Auth.isHost() ? LocationDetail._focusOverlayHtml(loc) : ''}
         </div>
         <input type="file" id="loc-image-input" accept="image/*" style="display:none" onchange="LocationDetail._onImageFileSelected(event)">`;
     }
@@ -5416,6 +5464,102 @@ const LocationDetail = {
     } catch (e) {
       toast('Fehler beim Hochladen: ' + e.message);
       if (processing) processing.classList.remove('open');
+    }
+  },
+
+  // US-125: Beispielbild eigenständig löschen (nur Host), ohne die ganze Location
+  // zu löschen oder sofort ein Ersatzbild bereithalten zu müssen.
+  async deleteImage(locId) {
+    if (!confirm('Beispielbild wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) return;
+    try {
+      await API.delete(`/locations/${locId}/image`);
+      // Server-Fetch statt In-Memory-Mutation (Pattern 5)
+      Locations.all = await API.get('/locations');
+      toast('Beispielbild gelöscht.');
+      LocationDetail.open(locId);
+    } catch (e) {
+      toast('Fehler beim Löschen: ' + e.message);
+    }
+  },
+
+  // US-126: Ausschnitt-Auswahl-Modus (nur Host). Einfacher Fokuspunkt-Klick,
+  // kein Zieh-/Zoom-Rahmen. Während dieses Modus wird das GANZE Foto sichtbar
+  // gezeigt (Letterboxing hier ausdrücklich okay) — die fertige Anzeige bleibt
+  // immer randlos (object-fit:cover-artig).
+  _focusPick: null, // { x, y } während der Auswahl, null = noch nicht getippt
+
+  _focusOverlayHtml(loc) {
+    const fx = (loc.image_focus_x != null ? loc.image_focus_x : 50);
+    const fy = (loc.image_focus_y != null ? loc.image_focus_y : 50);
+    return `
+      <div class="loc-image-focus-overlay" id="loc-image-focus-overlay">
+        <p class="loc-image-focus-hint">Tippe auf die Stelle, die sichtbar bleiben soll</p>
+        <div class="loc-image-focus-stage" id="loc-image-focus-stage" onclick="LocationDetail._onFocusStageClick(event)">
+          <img src="${CFG.api}${loc.image_url}" alt="" id="loc-image-focus-stage-img">
+          <div class="loc-image-focus-marker" id="loc-image-focus-marker" style="left:${fx}%; top:${fy}%"></div>
+        </div>
+        <div class="loc-image-focus-preview-wrap">
+          <div class="loc-image-focus-preview">
+            <img src="${CFG.api}${loc.image_url}" alt="" id="loc-image-focus-preview-img" style="object-position:${fx}% ${fy}%">
+          </div>
+          <span class="loc-image-focus-preview-label">So sieht der Ausschnitt fertig aus</span>
+        </div>
+        <div class="loc-image-focus-actions">
+          <button class="loc-image-focus-cancel" onclick="LocationDetail.cancelFocusPicker()">Abbrechen</button>
+          <button class="loc-image-focus-done" onclick="LocationDetail.saveFocusPicker('${loc.id}')">Fertig</button>
+        </div>
+      </div>`;
+  },
+
+  openFocusPicker(locId) {
+    const loc = this._current;
+    if (!loc) return;
+    this._focusPick = {
+      x: (loc.image_focus_x != null ? loc.image_focus_x : 50),
+      y: (loc.image_focus_y != null ? loc.image_focus_y : 50),
+    };
+    const overlay = document.getElementById('loc-image-focus-overlay');
+    if (overlay) overlay.classList.add('open');
+  },
+
+  cancelFocusPicker() {
+    this._focusPick = null;
+    const overlay = document.getElementById('loc-image-focus-overlay');
+    if (overlay) overlay.classList.remove('open');
+  },
+
+  _onFocusStageClick(evt) {
+    const stage = document.getElementById('loc-image-focus-stage');
+    const img = document.getElementById('loc-image-focus-stage-img');
+    if (!stage || !img) return;
+    // Klick-Koordinate relativ zur tatsächlich gerenderten Bildfläche (object-fit:contain
+    // kann Letterboxing erzeugen) in Prozent umrechnen — nicht relativ zur Stage.
+    const stageRect = stage.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+    let px = (evt.clientX - imgRect.left) / imgRect.width * 100;
+    let py = (evt.clientY - imgRect.top) / imgRect.height * 100;
+    px = Math.max(0, Math.min(100, px));
+    py = Math.max(0, Math.min(100, py));
+    this._focusPick = { x: px, y: py };
+
+    const marker = document.getElementById('loc-image-focus-marker');
+    if (marker) { marker.style.left = px + '%'; marker.style.top = py + '%'; }
+    const previewImg = document.getElementById('loc-image-focus-preview-img');
+    if (previewImg) previewImg.style.objectPosition = `${px}% ${py}%`;
+  },
+
+  async saveFocusPicker(locId) {
+    if (!this._focusPick) { this.cancelFocusPicker(); return; }
+    const { x, y } = this._focusPick;
+    try {
+      await API.patch(`/locations/${locId}/image-focus`, { image_focus_x: x, image_focus_y: y });
+      this._focusPick = null;
+      // Server-Fetch statt In-Memory-Mutation (Pattern 5)
+      Locations.all = await API.get('/locations');
+      toast('Ausschnitt gespeichert.');
+      LocationDetail.open(locId);
+    } catch (e) {
+      toast('Fehler beim Speichern: ' + e.message);
     }
   },
 
