@@ -253,6 +253,7 @@ def analyze_frontend() -> dict:
         "sectorPath",       # Closure in IIFE mkCloudCompassSvg() — tatsächlich 11 Zeilen (TASK-49)
         "azDiffFn",         # Closure in Location-Detail-IIFE — tatsächlich 1 Zeile, komplett einzeilig (TASK-49)
         "sunAlignmentLabel",  # globale Top-Level-Function — tatsächlich 9 Zeilen (TASK-49)
+        "localBoundsRadius",  # reine Berechnungsfunktion neben haversineKm — tatsächlich 10 Zeilen (US-117)
     }
 
     fn_pattern = re.compile(r'^\s*(async\s+)?function\s+(\w+)|(\w+)\s*[:=]\s*(async\s+)?(?:function|\([^)]*\)\s*=>)')

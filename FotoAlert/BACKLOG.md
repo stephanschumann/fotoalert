@@ -29,9 +29,9 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking nehmen — .gitignore ergänzt, git rm --cached folgt über Stephans Terminal)* · **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Option A Icons freigegeben, Implementierung läuft)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Icon-Umbau implementiert, wartet auf deine Test-Bestätigung)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, wartet auf deine Test-Bestätigung)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
@@ -2824,15 +2824,16 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-56 · DB-Snapshot-Ordner aus Git-Tracking nehmen `[~]`
+### TASK-56 · DB-Snapshot-Ordner aus Git-Tracking nehmen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-05 |
 | **In Progress seit** | 2026-07-05 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** Vor jedem Precompute-Lauf legt `snapshot_before_precompute()` (`backend/data/backup.py`) automatisch eine DB-Kopie unter `backend/data/snapshots/` an (max. 7, ältere räumt das Skript selbst weg). Der Ordner fehlte in `.gitignore`, dadurch wurden bei früheren Commits (`10ce891`, `4225991`) einzelne Snapshots versehentlich mitgecheckt. Räumt das Skript sie später lokal auf, zeigt Git sie als „deleted"; neue, noch ungecheckte Snapshots als „untracked" — das sorgte bei Releases für Verwirrung. Kein Datenverlust, reines Ignore-/Tracking-Problem, ~0,8 MB Historie betroffen.
 
@@ -5074,18 +5075,102 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-117 · Karten-Tab öffnet mit aktuellem Standort + 5-km-Radius `[ ]`
+### US-117 · Karten-Tab öffnet mit aktuellem Standort + 5-km-Radius `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als Fotograf möchte ich, dass der Karten-Tab beim Öffnen immer meinen aktuellen Standort mit 5 km Radius zeigt, damit ich sofort die relevanten Locations in meiner direkten Umgebung sehe.
 
 **Bezug:** Verwandt, aber nicht identisch mit **BUG-58** [x] (Done, released 2026-07-04 — der Wolken-/Niederschlag-Umschalter im Karten-Tab zoomt neuerdings auf einen **50-km**-Radius um die aktuelle Kartenmitte). BUG-58 betrifft nur das Verhalten beim Umschalten auf Wolken/Niederschlag, nicht den initialen Öffnungszustand des Karten-Tabs selbst, und nutzt einen anderen Radius (50 km statt 5 km). Kein Duplikat, klare Abgrenzung: US-117 = initiales Öffnen des Karten-Tabs mit GPS-Standort, BUG-58 = Zoom-Verhalten beim Wetter-Layer-Umschalten.
+
+---
+
+**Implementation Spec**
+
+**Root Cause / Ist-Zustand (verifiziert am Code, 2026-07-05):**
+📎 Code-Verifikation: `web/index.html` gelesen — `MapView.init` (Z. 4514–4522), `MapView.locateMe` (Z. 4664–4695), `App.nav` (Z. 6738–6759), `Filter.requestGps`/`Filter._gps` (Z. 2946–2966), `Locations.load`/`sortByDistance` (Z. 5303–5349), `WeatherMap._localBounds` (Z. 4952–4967).
+- Bestätigt: Der Karten-Tab startet **immer** fix auf Berlin-Zentrum (`setView([52.52, 13.40], 10)`), unabhängig vom Nutzerstandort. Kein GPS-Bezug beim Öffnen.
+- Bestätigt: Es gibt bereits einen manuellen „Mein Standort"-Button auf der Karte (US-69, `MapView.locateMe()`), der beim Klick per eigenem `navigator.geolocation.getCurrentPosition`-Aufruf auf den GPS-Standort zoomt (Zoom-Stufe 13, kein definierter km-Radius). Dieser Weg ist **komplett unabhängig** vom bestehenden `Filter.requestGps()`/`Filter._gps`-Mechanismus — eigene Fehlerbehandlung, eigenes Caching (keins), kein Toast-Text-Abgleich mit dem Rest der App.
+- Bestätigt: `App.nav('map')` ruft bei jedem Tab-Wechsel zur Karte `MapView.init()` auf — aber `init()` hat einen Guard (`if (this.map) return;`). D.h. **nur der allererste** Tab-Wechsel zur Karte in der Session initialisiert sie; jeder weitere Wechsel ist ein No-op, die Leaflet-Karte bleibt exakt im zuletzt aktiven Zustand (Zoom/Pan), inklusive manueller Nutzer-Verschiebungen.
+- Bestätigt: `Filter.requestGps()`/`Filter._gps` ist der App-weit etablierte GPS-Mechanismus (genutzt von US-118 Locations-Sortierung, BUG-51 Entfernungsfilter, Kartenmarker-Distanzfilter Z. 2894/4651). Er fragt nur einmal pro Sitzung (cached in `_gps`), zeigt bei Verweigerung/Fehler einen einheitlichen Toast („📍 GPS nicht verfügbar") und wirft keinen Fehler, sondern liefert `true`/`false` zurück.
+- Bestätigt: `WeatherMap._localBounds(center)` (BUG-58) ist eine breitengradkorrigierte Radius-Bounds-Funktion, aktuell fest auf 50 km und an das `WeatherMap`-Objekt gebunden — kein generisches, wiederverwendbares Utility. Für einen 5-km-Radius um GPS-Koordinaten (statt um die Kartenmitte) müsste eine eigene, mit Radius parametrisierte Variante existieren; das Muster (Δlat, Δlon mit `cos(lat)`-Korrektur) ist aber 1:1 übertragbar.
+- Widerlegt: Es gibt **kein** bestehendes Konzept eines „5-km-Radius" als Zoom-Definition auf der Karte. Der einzige bestehende km-Radius-Begriff auf der Karte ist BUG-58 mit 50 km und dient einem anderen Zweck (Wetter-Mosaik-Sichtbarkeit, nicht initialer Standort-Fokus).
+
+**Scope:**
+- Eingeschlossen: Beim **erstmaligen** Öffnen des Karten-Tabs in einer Session (erster `App.nav('map')`-Aufruf, `MapView.map` existiert noch nicht) wird der GPS-Standort angefragt (über den bestehenden `Filter.requestGps()`-Mechanismus, nicht über eine neue Parallel-Implementierung) und die Karte auf ein Sichtfeld zentriert, das einem 5-km-Radius um diesen Standort entspricht.
+- Eingeschlossen: Web-App (`web/index.html`) — reines Frontend-Verhalten, keine Backend-Änderung.
+- Ausgeschlossen: BUG-58 (50-km-Radius-Zoom beim Wetter-Layer-Umschalten) — bleibt unverändert, eigener Codepfad (`WeatherMap.setMode`/`_localBounds`).
+- Ausgeschlossen (offen, siehe Fragen unten): Verhalten bei jedem weiteren Tab-Wechsel zur Karte (nicht nur beim allerersten), Verhalten bei verweigerter/fehlender GPS-Berechtigung, Verhältnis zum bestehenden „Mein Standort"-Button (US-69).
+- Ausgeschlossen: iOS-App — Ticket bezieht sich nur auf den Web-Karten-Tab (kein Hinweis im Ticket auf iOS-Pendant, `ios/FotoAlert/` nicht Teil dieser Analyse).
+
+**Entscheidungen von Stephan (2026-07-05, Weg-Gate):**
+1. **GPS verweigert/nicht erteilt:** Fallback auf den letzten bekannten Standort (falls z. B. aus dem Locations-Tab oder einer früheren Anfrage schon ein GPS-Punkt bekannt ist). Ist gar kein Standort bekannt, bleibt es beim bisherigen Berlin-Fallback.
+2. **Bedeutung „5-km-Radius":** Exakt berechnet — dynamische Bounding-Box analog zum BUG-58-Muster (`_localBounds`, breitengradkorrigiert, per `fitBounds`), nicht nur ein fixer Zoom-Level.
+3. **Zeitpunkt:** Nur beim allerersten Öffnen der Session — der bestehende `init()`-Guard bleibt wie er ist, kein Zurückspringen bei späteren Tab-Wechseln, auch wenn der Nutzer zwischendurch manuell woanders hingezoomt hatte.
+4. **„Mein Standort"-Button (US-69):** Bleibt unangetastet — keine Konsolidierung in diesem Ticket, verhindert Scope Creep.
+
+→ **Gewählte Implementierung: Option A** (siehe unten).
+
+**Akzeptanzkriterien (final):**
+- [x] Öffne ich den Karten-Tab zum ersten Mal in einer Sitzung und erlaube GPS-Zugriff, zeigt die Karte sofort meinen aktuellen Standort in der Mitte, mit einem Ausschnitt, der einem 5-km-Radius um mich herum entspricht (nicht mehr Berlin-Zentrum).
+- [x] Edge Case: Verweigere ich beim ersten Kartenöffnen den GPS-Zugriff, aber es ist bereits ein GPS-Standort aus einer früheren Anfrage bekannt (z. B. vom Locations-Tab) → Karte zentriert auf diesen zuletzt bekannten Standort mit 5-km-Ausschnitt.
+- [x] Edge Case: Kein GPS-Zugriff möglich UND kein früherer Standort bekannt → Karte zeigt wie bisher die Berlin-Ansicht, kein Fehler, kein Absturz.
+- [x] Edge Case: Ich wechsle vom Karten-Tab weg und wieder zurück, ohne manuell etwas an der Karte verändert zu haben → Karte zeigt weiterhin denselben GPS-5-km-Ausschnitt (kein ungewollter Sprung).
+- [x] Edge Case: Ich habe nach dem ersten Öffnen manuell woanders hingezoomt/gescrollt, wechsle den Tab und komme zurück → Ausschnitt bleibt wie von mir manuell gewählt (kein Zurückspringen auf GPS+5km bei weiteren Tab-Wechseln).
+- [x] Regression: Der „Mein Standort"-Button (US-69) funktioniert weiterhin unverändert wie bisher.
+- [x] Regression: BUG-58 (50-km-Zoom beim Wetter-Layer-Umschalten) bleibt unverändert funktionsfähig, unabhängig vom neuen initialen 5-km-Verhalten.
+
+**Pre-Mortem:**
+- 💀 Szenario: Der neue GPS-Zentrierungs-Code läuft bei **jedem** `App.nav('map')`-Aufruf statt nur beim ersten, weil der bestehende `init()`-Guard umgangen/entfernt wird → Karte springt dem Nutzer bei jedem Tab-Wechsel unter dem manuell gewählten Ausschnitt weg. → Auslöser: Frage 3 nicht geklärt, Guard-Logik falsch angefasst. → Gegenmaßnahme: Guard-Verhalten explizit in AK verankern (Edge Cases oben), Implementierung so bauen, dass der GPS-Zentrierungscode nur im „echten" Erstinitialisierungspfad läuft (dort wo aktuell `setView([52.52,13.40],10)` steht), nicht in `App.nav`.
+- 💀 Szenario: GPS-Anfrage blockiert das Öffnen des Karten-Tabs spürbar (Ladeverzögerung), weil `await Filter.requestGps()` vor dem ersten Rendern der Karte steht und der Browser-Berechtigungsdialog den Hauptthread/die UI blockiert wahrnehmbar verzögert. → Auslöser: Synchrones Warten auf GPS-Antwort vor `L.map(...)`. → Gegenmaßnahme: Karte sofort mit vorläufiger Ansicht (z.B. letzte bekannte oder Fallback) rendern, GPS-Zentrierung asynchron nachziehen sobald `requestGps()` auflöst (Pattern existiert schon in `Locations.load()` — Rendern läuft nach `await`, hier müsste stattdessen ein Zwei-Phasen-Ansatz geprüft werden: erst Karte mit Fallback zeigen, dann per `setView`/`fitBounds` nachjustieren, sobald GPS da ist). Getrennt von Nutzer-Wahrnehmung testen (spürt sich Ladezeit an wie vorher?).
+- 💀 Szenario: Zwei parallele, aber unterschiedliche GPS-Zugriffe (`Filter.requestGps()` für diesen Zentrierungs-Fall, `MapView.locateMe()` für den bestehenden Button) fragen den Browser nacheinander unabhängig nach Standort → doppelter Berechtigungsdialog oder inkonsistentes Verhalten (einer nutzt gecachtes `_gps`, der andere fragt immer neu). → Auslöser: Frage 4 nicht geklärt, keine Konsolidierung. → Gegenmaßnahme: mindestens sicherstellen, dass der neue Code `Filter.requestGps()`/`Filter._gps` wiederverwendet (kein dritter, neuer `navigator.geolocation`-Aufruf), damit das gecachte Ergebnis geteilt wird und kein zweiter Dialog erscheint, falls der Nutzer vorher schon (z.B. im Locations-Tab) GPS erlaubt hatte.
+- 💀 Szenario: 5-km-Radius als fixer Zoom-Level (statt `fitBounds`) sieht bei extremen Breitengraden (z.B. Norwegen) optisch anders aus als in Berlin, weil ein fixer Leaflet-Zoom keine reale km-Entsprechung hat (BUG-58-Lehre). → Auslöser: Frage 2 mit „fixer Zoom" statt „dynamische Bounding-Box" beantwortet. → Gegenmaßnahme: bei Bestätigung von „dynamischer Radius" das `_localBounds`-Muster (breitengradkorrigiert) wiederverwenden/generisch mit Radius-Parameter extrahieren statt eine zweite feste Zoom-Zahl zu hardcoden.
+- 💀 Szenario: Kein Marker/keine Locations sichtbar im 5-km-Ausschnitt (Nutzer wohnt weit außerhalb der erfassten Locations), Karte wirkt nach dem Öffnen „leer". → Auslöser: 5-km-Radius ist klein, `Locations`-Datensatz ist ortsgebunden (aktuell primär Berlin/Brandenburg). → Gegenmaßnahme: kein Blocker für dieses Ticket (Ticket verlangt explizit den engen Radius), aber als bekanntes UX-Verhalten im Test protokollieren, nicht als Bug werten.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Annahmen-Protokoll ergab 4 🔴-kritische Fragen, s.o. — Rules/Examples final erst nach Antworten formulierbar)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen s.o.)
+- [x] Architektur analysiert: `web/index.html` — `MapView.init` (Startansicht), `MapView.locateMe` (bestehender manueller GPS-Button, US-69), `App.nav` (Tab-Wechsel-Guard), `Filter.requestGps`/`Filter._gps` (wiederverwendbarer GPS-Mechanismus aus US-118/BUG-51), `WeatherMap._localBounds` (Radius-Bounds-Muster aus BUG-58)
+- [x] Designer-Check: nicht visuell im Sinne von Farbe/Layout (kein neues UI-Element, keine Farb-/Größenänderung) — betrifft nur Kartenausschnitt/Zoom beim Öffnen. Kein `fotoalert-designer`-Aufruf nötig.
+- [x] Implementierungsoptionen: A / B (siehe unten) — Stephan hat Option A gewählt (2026-07-05)
+- [x] Empfehlung: Option A (dynamische Bounding-Box analog BUG-58-Muster) — bestätigt
+
+**Implementierungsoptionen:**
+
+### Option A — Standort + 5-km-Ausschnitt über wiederverwendetes Radius-Bounds-Muster (`fitBounds`)
+- App-Wirkung: Beim ersten Öffnen der Karte sieht Stephan sofort seinen eigenen Standort in der Mitte, mit einem Ausschnitt, der überall auf der Welt gleich „nah" wirkt (5 km in jede Richtung) — unabhängig davon, ob er in Berlin oder z.B. in Norwegen fotografiert.
+- Vorgehen: Beim allerersten Karten-Öffnen `Filter.requestGps()` awaiten (denselben Mechanismus wie Locations-Tab/US-118 nutzen, kein neuer GPS-Aufruf). Bei Erfolg: Karte mit einer auf 5 km parametrisierten, breitengradkorrigierten Bounding-Box zentrieren (Muster aus `WeatherMap._localBounds` generisch mit Radius-Parameter, z.B. als eigenständige Hilfsfunktion, die von beiden Stellen genutzt werden kann). Bei Fehlschlag: Fallback gemäß Antwort auf Frage 1.
+- Betroffene Dateien: `web/index.html` (`MapView.init`, ggf. neue kleine gemeinsame Bounds-Hilfsfunktion referenziert von `MapView` und `WeatherMap`).
+- Vorteile: Exakte, überall gleich wirkende 5-km-Ansicht; nutzt bestehenden GPS-Mechanismus (kein doppelter Berechtigungsdialog, konsistentes Fehlerverhalten/Toast); Muster bereits im Code etabliert und getestet (BUG-58).
+- Nachteile / Risiken: Etwas mehr Umbauaufwand, da `init()` aktuell synchron/einfach ist und async gemacht werden muss (ist es durch `try { await this.loadMarkers(); }` bereits teilweise); Pre-Mortem-Szenario „Ladeverzögerung" muss beachtet werden (Karte ggf. erst mit Fallback zeigen, dann nachjustieren).
+- Aufwand: klein–mittel.
+
+### Option B — Fixer Zoom-Level auf GPS-Koordinate (kein `fitBounds`)
+- App-Wirkung: Beim ersten Öffnen zentriert die Karte auf den eigenen Standort, aber mit einer festen Zoom-Stufe (z.B. Zoom 13, wie beim bestehenden „Mein Standort"-Button) statt einer exakt berechneten 5-km-Fläche.
+- Vorgehen: `Filter.requestGps()` awaiten, dann `this.map.setView([gps.lat, gps.lon], ZOOM)` mit einer fest gewählten Zoom-Zahl, die bei einem Standard-Breitengrad ungefähr 5 km Sichtfeld ergibt.
+- Betroffene Dateien: `web/index.html` (`MapView.init`).
+- Vorteile: Einfachster Eingriff, kleinster Aufwand, kein neues Bounds-Utility nötig.
+- Nachteile / Risiken: Nicht wirklich „5 km" — ein fixer Zoom-Level zeigt je nach Bildschirmgröße und Breitengrad einen unterschiedlich großen realen Radius (BUG-58-Lehre: bei nördlichen Standorten wirkt ein Kartenausschnitt bei gleichem Zoom größer/kleiner). Würde die im Ticket explizit genannte „5 km"-Angabe nur ungefähr erfüllen.
+- Aufwand: klein.
+
+✅ Empfehlung: **Option A** — das Ticket nennt explizit einen Radius („5 km"), nicht einen Zoom-Level; ein `fitBounds`-Ansatz erfüllt das exakt und wiederverwendet ein bereits im Code etabliertes, getestetes Muster (BUG-58). Der Mehraufwand gegenüber Option B ist gering, da die Kernlogik (Bounds-Berechnung) schon existiert und nur generisch parametrisiert werden muss. Voraussetzung: Frage 2 wird mit „dynamische Bounding-Box" beantwortet — falls Stephan stattdessen bewusst einen einfachen fixen Zoom will, wird Option B gewählt.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Kartenzoom/-zentrierung ist reines Leaflet-/Browser-Frontend-Verhalten (wie bei BUG-55/BUG-58), nicht über `pytest`/`backend/tests/` abdeckbar. Kein Backend-Test nötig, da keine Backend-Änderung.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Karten-Tab zum ersten Mal in einer neuen Sitzung öffnen, GPS-Zugriff erlauben → Erwartung: Karte zentriert sofort auf eigenen Standort, Ausschnitt entspricht ca. 5 km Radius (nicht mehr Berlin-Fixansicht).
+  2. GPS-Zugriff beim ersten Öffnen verweigern, aber vorher schon einmal (z. B. im Locations-Tab) ein GPS-Standort ermittelt → Erwartung: Karte zentriert auf diesen zuletzt bekannten Standort mit 5-km-Ausschnitt.
+  3. GPS-Zugriff verweigern UND kein früherer Standort bekannt (ganz frische Sitzung) → Erwartung: Karte zeigt wie bisher Berlin.
+  4. Tab wechseln (z.B. zu Feed) und zurück zur Karte, ohne manuell etwas verändert zu haben → Erwartung: gleicher GPS-Ausschnitt wie beim ersten Öffnen (kein Sprung).
+  5. Nach dem ersten Öffnen manuell an einen anderen Ort zoomen/scrollen, Tab wechseln und zurückkehren → Erwartung: Ausschnitt bleibt wie manuell gewählt (kein Zurückspringen).
+  6. „Mein Standort"-Button (US-69) danach testen → Erwartung: weiterhin funktionsfähig (Regression).
+  7. Wetter-Layer (Wolken/Niederschlag) einschalten → Erwartung: weiterhin 50-km-Zoom wie bei BUG-58 (Regression, unabhängiger Codepfad).
+  8. Regression (PRODUCT.md §12, Karten-/CSS-Bereich): Marker, Layer-Umschaltung (Nacht/Standard/Satellit), Filter-Anwendung auf Kartenmarker weiterhin funktionsfähig.
 
 ---
 

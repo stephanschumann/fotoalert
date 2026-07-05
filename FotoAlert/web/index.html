@@ -265,12 +265,16 @@
     .leaflet-container { background: var(--map-bg) !important; }
     .leaflet-tile { filter: brightness(.85) saturate(.7); }
     /* Map layer toggle */
+    /* BUG-62: Text-Buttons durch Icon-Buttons ersetzt (schmaler, kollisionsfrei
+       auf schmalen Screens ab 375px). Feste 44×44px-Touch-Fläche (Bauhaus-Vorgabe),
+       Icon zentriert statt Text-Padding. */
     #map-layer-toggle { position: absolute; top: 12px; right: 12px; z-index: 1000;
       display: flex; background: var(--surface); border: 1px solid var(--border);
       border-radius: 10px; overflow: hidden; }
-    .map-layer-btn { background: none; border: none; color: var(--muted); font-size: 12px;
-      font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
-    .map-layer-btn.active { background: var(--gold); color: var(--bg); }
+    .map-layer-btn { background: none; border: none; color: var(--muted);
+      width: 44px; height: 44px; padding: 0; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; transition: all .15s; }
+    .map-layer-btn.active { background: var(--gold); color: var(--on-accent); }
 
     /* US-123: Satellit/Straßenkarte-Umschalter für Location-Formular-Karten
        (Anlegen/Bearbeiten/Kegel-Vorschau) — eigenständig, orientiert an .map-layer-btn,
@@ -286,13 +290,20 @@
     .loc-map-mode-btn.active { background: var(--gold); color: var(--bg); }
 
     /* US-72: Wetter-Toggle */
+    /* BUG-62: Text-Buttons durch Icon-Buttons ersetzt, feste 44×44px-Touch-Fläche.
+       Die mm/%-Sub-Zeile (id=map-weather-sub) bleibt Text (nicht Teil der
+       Icon-Umstellung) und ist seit US-112 dauerhaft ausgeblendet
+       (_updateSubRow() in WeatherMap setzt display:none unconditional) —
+       daher keine zusätzliche Höhen-/Kollisionsbetrachtung für sie nötig. */
     #map-weather-toggle { position: absolute; top: 12px; left: 12px; z-index: 1000;
       display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
     #map-weather-toggle .wtoggle-row { display: flex; background: var(--surface);
       border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .map-weather-btn { background: none; border: none; color: var(--muted); font-size: 12px;
-      font-weight: 600; padding: 7px 12px; cursor: pointer; transition: all .15s; }
-    .map-weather-btn.active { background: var(--gold); color: var(--bg); }
+    .map-weather-btn { background: none; border: none; color: var(--muted);
+      width: 44px; height: 44px; padding: 0; display: flex; align-items: center;
+      justify-content: center; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s; }
+    .map-weather-btn.active { background: var(--gold); color: var(--on-accent); }
     /* US-72: Zeit-Slider */
     #map-weather-slider-wrap { position: absolute; bottom: 30px; left: 64px; right: 60px;
       z-index: 1000; padding: 8px 16px; background: var(--surface);
@@ -983,6 +994,13 @@
   <symbol id="i-folder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 h6 l2 2 h8 v11 H4 Z"/></g></symbol>
   <symbol id="i-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 h3 l2-2 h6 l2 2 h3 v11 H4 Z"/><circle cx="12" cy="13" r="3.6"/></g></symbol>
   <symbol id="i-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5 H21 L14 13 V20 L10 18 V13 Z"/></g></symbol>
+  <!-- BUG-62: Icon-Set Wetter-Filter / Kartenmodus (Karten-Tab, Icon statt Text) -->
+  <symbol id="i-mapoff" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.5 5.5 18.5 18.5"/></g></symbol>
+  <symbol id="i-mapclouds" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18 a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.7-1.5 A3.8 3.8 0 0 1 18 18 Z"/></g></symbol>
+  <symbol id="i-mapprecip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 14.5 a3.6 3.6 0 0 1 0-7.2 5 5 0 0 1 9.7-1.4 A3.4 3.4 0 0 1 16 14.5 Z"/><path d="M8.5 18 8.5 19.6 M12 18 12 20.6 M15.5 18 15.5 19.6"/></g></symbol>
+  <symbol id="i-mapnight" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
+  <symbol id="i-mapgrid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></g></symbol>
+  <symbol id="i-mapsat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.7" y="8.7" width="6.6" height="6.6" rx="1.2" transform="rotate(45 12 12)"/><path d="M3 8 6.3 11.3 M8 3 11.3 6.3 M21 16 17.7 12.7 M16 21 12.7 17.7"/><path d="M17 7 19 3 M19 3 21 5"/><circle cx="20.2" cy="3.8" r="0.8" fill="currentColor" stroke="none"/></g></symbol>
 </defs></svg>
 <script>
 // US-100: zentraler Icon-Helper. Erzeugt <use>-Referenz auf die Inline-Sprite.
@@ -1105,20 +1123,20 @@ function ic(id, size, cls){
     <div id="page-map" class="page">
       <div id="map"></div>
       <div id="map-layer-toggle">
-        <button class="map-layer-btn" onclick="MapView.setLayer('dark')">Nacht</button>
-        <button class="map-layer-btn active" onclick="MapView.setLayer('standard')">Standard</button>
-        <button class="map-layer-btn" onclick="MapView.setLayer('satellite')">Satellit</button>
+        <button class="map-layer-btn" onclick="MapView.setLayer('dark')" aria-label="Nacht" title="Nacht"><svg style="width:20px;height:20px"><use href="#i-mapnight"/></svg></button>
+        <button class="map-layer-btn active" onclick="MapView.setLayer('standard')" aria-label="Standard" title="Standard"><svg style="width:20px;height:20px"><use href="#i-mapgrid"/></svg></button>
+        <button class="map-layer-btn" onclick="MapView.setLayer('satellite')" aria-label="Satellit" title="Satellit"><svg style="width:20px;height:20px"><use href="#i-mapsat"/></svg></button>
       </div>
       <!-- US-72: Wetter-Toggle -->
       <div id="map-weather-toggle">
         <div class="wtoggle-row">
-          <button class="map-weather-btn active" onclick="WeatherMap.setMode('off')">aus</button>
-          <button class="map-weather-btn" onclick="WeatherMap.setMode('clouds')">Wolken</button>
-          <button class="map-weather-btn" onclick="WeatherMap.setMode('precip')">Niederschlag</button>
+          <button class="map-weather-btn active" onclick="WeatherMap.setMode('off')" aria-label="Aus" title="Aus"><svg style="width:20px;height:20px"><use href="#i-mapoff"/></svg></button>
+          <button class="map-weather-btn" onclick="WeatherMap.setMode('clouds')" aria-label="Wolken" title="Wolken"><svg style="width:20px;height:20px"><use href="#i-mapclouds"/></svg></button>
+          <button class="map-weather-btn" onclick="WeatherMap.setMode('precip')" aria-label="Niederschlag" title="Niederschlag"><svg style="width:20px;height:20px"><use href="#i-mapprecip"/></svg></button>
         </div>
         <div class="wtoggle-row" id="map-weather-sub" style="display:none">
-          <button class="map-weather-btn active" onclick="WeatherMap.setSub('mm')">mm</button>
-          <button class="map-weather-btn" onclick="WeatherMap.setSub('pct')">%</button>
+          <button class="map-weather-btn active" onclick="WeatherMap.setSub('mm')" aria-label="mm" title="mm">mm</button>
+          <button class="map-weather-btn" onclick="WeatherMap.setSub('pct')" aria-label="Prozent" title="Prozent">%</button>
         </div>
       </div>
       <!-- US-72: Zeit-Slider -->
@@ -1376,7 +1394,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.3';
+const APP_VERSION = '1.21.4';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2667,6 +2685,23 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   const a = Math.sin(dLat/2)**2 +
     Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
   return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+// US-117: Generische, breitengradkorrigierte Radius-Bounds um einen Mittelpunkt
+// (Δlon = radiusKm / (111km × cos(lat)), Δlat = radiusKm/111km) — dasselbe Muster
+// wie WeatherMap._localBounds (BUG-58, dort fest 50 km), hier mit Radius-Parameter,
+// damit MapView.init (5 km) und WeatherMap (50 km) dieselbe Berechnung nutzen können,
+// ohne WeatherMap._localBounds selbst anzufassen (Risiko für BUG-58 vermeiden).
+// Fallback auf Berlin, falls kein Mittelpunkt ermittelbar ist.
+function localBoundsRadius(center, radiusKm) {
+  const KM_PER_DEG_LAT = 111;
+  const c = center || { lat: 52.52, lng: 13.40 };
+  const lat = (typeof c.lat === 'number' && !isNaN(c.lat)) ? c.lat : 52.52;
+  const lng = (typeof c.lng === 'number' && !isNaN(c.lng)) ? c.lng : 13.40;
+  const dLat = radiusKm / KM_PER_DEG_LAT;
+  const cosLat = Math.max(0.01, Math.cos(lat * Math.PI / 180)); // Pol-Schutz gegen Division nahe 0
+  const dLng = radiusKm / (KM_PER_DEG_LAT * cosLat);
+  return [[lat - dLat, lng - dLng], [lat + dLat, lng + dLng]];
 }
 
 const Filter = {
@@ -4495,12 +4530,37 @@ const MapView = {
   },
   async init() {
     if (this.map) return;
-    this.map = L.map('map', { zoomControl: false }).setView([52.52, 13.40], 10);
+    // US-117: Erst mit Fallback-Ansicht zeigen (Berlin oder bereits bekannter GPS-Stand),
+    // damit das Rendern der Karte nicht auf die GPS-Antwort wartet (Pre-Mortem: keine
+    // spürbare Ladeverzögerung). Danach per fitBounds auf 5-km-Radius nachjustieren,
+    // sobald Filter.requestGps() aufgelöst hat — nutzt den bestehenden, gecachten
+    // GPS-Mechanismus (kein zweiter/dritter navigator.geolocation-Aufruf, siehe
+    // MapView.locateMe/US-69, das bleibt unangetastet).
+    const hadGpsAtInit = !!Filter._gps;
+    this.map = L.map('map', { zoomControl: false });
+    if (hadGpsAtInit) {
+      this.map.fitBounds(localBoundsRadius({ lat: Filter._gps.lat, lng: Filter._gps.lon }, 5));
+    } else {
+      this.map.setView([52.52, 13.40], 10);
+    }
     this.currentLayer = L.tileLayer(this.layers.standard, {
       attribution: '© OpenStreetMap', maxZoom: 19
     }).addTo(this.map);
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
     try { await this.loadMarkers(); } catch(e) {}
+    // US-117: GPS asynchron nachziehen, falls beim Init noch kein Standort bekannt war.
+    // Nur beim allerersten Init relevant (Guard oben) — kein Zurückspringen bei
+    // späteren Tab-Wechseln oder nach manuellem Wegzoomen.
+    if (!hadGpsAtInit) {
+      try {
+        const ok = await Filter.requestGps();
+        if (ok && Filter._gps && this.map) {
+          this.map.fitBounds(localBoundsRadius({ lat: Filter._gps.lat, lng: Filter._gps.lon }, 5));
+        }
+        // Kein bekannter Standort verfügbar (verweigert/fehlgeschlagen) und kein
+        // früherer GPS-Punkt bekannt → bleibt beim Berlin-Fallback, kein Fehler.
+      } catch(e) {}
+    }
   },
   setLayer(name) {
     if (!this.map) return;
