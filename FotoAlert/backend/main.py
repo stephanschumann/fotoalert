@@ -84,7 +84,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="FotoAlert API",
-    description="Intelligente Foto-Chancen für Berlin & Brandenburg",
+    description="Intelligente Foto-Chancen",
     version="2.0.0",
 )
 

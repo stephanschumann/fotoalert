@@ -1,4 +1,4 @@
-# FotoAlert – Intelligente Foto-Chancen für Berlin & Brandenburg
+# FotoAlert – Intelligente Foto-Chancen
 
 > **Du stellst dich vor Schloss Babelsberg. Die App sagt dir: heute um 20:09 Uhr, 135mm,  
 > partielle Sonnenfinsternis über dem Belvedere auf dem Pfingstberg.**

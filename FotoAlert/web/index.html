@@ -345,6 +345,15 @@
       color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center;
       box-shadow: 0 2px 8px rgba(0,0,0,.5); transition: background .15s; }
     .map-gps-btn:active { background: var(--gold-dim); }
+    /* US-21: ⓘ-Button für Kartensymbol-Legende — daneben platziert wie .map-gps-btn.
+       Scope-Erweiterung (2026-07-05): Ruhezustand kleiner + dezenter gemacht (analog .el-info-btn),
+       Hover-Verhalten (Rand/Farbe → gold) unverändert gelassen. */
+    .map-legend-info-btn { position: absolute; bottom: 38px; left: 66px; z-index: 1000;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--muted);
+      color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.5); transition: all .15s; font-size: 11px; font-weight: 700; }
+    .map-legend-info-btn:hover, .map-legend-info-btn:active { border-color: var(--gold); color: var(--gold); }
     /* pulsierender GPS-Marker */
     @keyframes gps-pulse {
       0%   { transform: scale(1);   opacity: 1; }
@@ -459,6 +468,80 @@
     #score-info-box p, #score-info-box li { font-size: 13px; color: var(--muted); line-height: 1.55; }
     #score-info-box ul { padding-left: 16px; margin-top: 6px; }
     #score-info-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; padding: 0; }
+    /* US-21: Element-Info-Overlay — globales ⓘ-Overlay analog Score-Info (US-55), aber fixed
+       statt absolute, da es aus jedem Kontext (Feed, Locations, Filter-Sheet, Karte) erreichbar
+       sein muss und über allen Sheets liegen soll (z-index über Filter-Sheet 1101). */
+    #element-info-overlay { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; background: var(--overlay-bg); padding: 20px; }
+    #element-info-overlay.open { display: flex; }
+    #element-info-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; max-width: 320px; width: 100%; position: relative; }
+    #element-info-box h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    #element-info-box p, #element-info-box li { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    #element-info-box ul { padding-left: 16px; margin-top: 6px; }
+    #element-info-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; padding: 0; }
+    /* Wiederverwendbarer ⓘ-Button, identisch zu .sc-info-btn (US-55), generischer Name für alle US-21-Stellen */
+    .el-info-btn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--muted); background: none; color: var(--muted); font-size: 9px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; }
+    .el-info-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ═══ US-21: Onboarding-Slides (erster App-Start) ═══ */
+    #onboarding-overlay { display: none; position: fixed; inset: 0; z-index: 5000;
+      background: var(--bg); flex-direction: column; }
+    #onboarding-overlay.open { display: flex; }
+    .onb-skip { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 16px; z-index: 5;
+      background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
+    .onb-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 28px 0; text-align: center; gap: 22px; }
+    .onb-glyph { width: 104px; height: 104px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .onb-title { font-size: 20px; font-weight: 800; letter-spacing: -.2px; }
+    .onb-text { font-size: 15px; line-height: 1.55; color: var(--muted); max-width: 280px; }
+    .onb-footer { padding: 0 28px calc(env(safe-area-inset-bottom, 0px) + 26px); display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
+    .onb-dots { display: flex; justify-content: center; gap: 8px; }
+    .onb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); transition: .18s ease; }
+    .onb-dot.active { width: 22px; border-radius: 4px; background: var(--accent); }
+    .onb-nextrow { display: flex; align-items: center; gap: 10px; }
+    .onb-back { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface);
+      color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .onb-next-btn { flex: 1; height: 44px; border-radius: 12px; border: none; background: var(--accent); color: var(--on-accent);
+      font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* ═══ US-21: Header „?"-Button (gleiche Optik wie Suche/Filter/Refresh, keine Sonderstellung) ═══ */
+    #help-btn { background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 8px; border-radius: 50%; transition: color .2s;
+      font-weight: 700; font-size: 15px; width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    #help-btn:hover { color: var(--gold); }
+
+    /* ═══ US-21: Glossar-Overlay (Bottom-Sheet, gleicher Radius wie Filter-/Detail-Sheet) ═══ */
+    #glossary-overlay { position: fixed; inset: 0; background: var(--overlay-bg);
+      z-index: 1100; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #glossary-overlay.open { opacity: 1; pointer-events: auto; }
+    #glossary-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1101;
+      background: var(--bg); border-radius: 22px 22px 0 0;
+      max-height: 88vh; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #glossary-sheet.open { transform: translateY(0); }
+    .glossary-head { display: flex; align-items: center; justify-content: space-between;
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px; flex-shrink: 0; }
+    .glossary-head h2 { font-size: 17px; font-weight: 700; }
+    .glossary-search { margin: 4px 20px 8px; display: flex; align-items: center; gap: 8px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; flex-shrink: 0; }
+    .glossary-search svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+    .glossary-search input { border: none; background: none; outline: none; font-size: 14px; color: var(--text); width: 100%; font-family: inherit; }
+    .glossary-search input::placeholder { color: var(--muted); }
+    #glossary-list { overflow-y: auto; flex: 1; min-height: 0; padding: 4px 20px calc(20px + env(safe-area-inset-bottom, 0px)); }
+    .glossary-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+      color: var(--muted); margin: 14px 0 6px; }
+    .glossary-item { border-bottom: 1px solid var(--border); }
+    .glossary-item:last-child { border-bottom: none; }
+    .glossary-q { width: 100%; background: none; border: none; text-align: left; padding: 13px 0; display: flex;
+      align-items: center; justify-content: space-between; cursor: pointer; font-family: inherit; gap: 10px; color: var(--text); }
+    .glossary-q-text { font-size: 14px; font-weight: 600; color: var(--text); }
+    .glossary-q svg { width: 16px; height: 16px; color: var(--muted); transition: transform .18s ease; flex-shrink: 0; }
+    .glossary-item.open .glossary-q svg { transform: rotate(180deg); }
+    .glossary-a { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
+    .glossary-item.open .glossary-a { max-height: 400px; }
+    .glossary-a-inner { font-size: 13px; color: var(--muted); line-height: 1.55; padding: 0 0 14px; }
+    .glossary-empty { padding: 24px 0; text-align: center; color: var(--muted); font-size: 13px; }
+
     .sheet-section { padding: 14px 20px; border-bottom: 1px solid var(--border); }
     .sheet-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase;
       letter-spacing: .8px; color: var(--muted); margin-bottom: 0;
@@ -963,6 +1046,8 @@
   <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18 M18 6 6 18"/></g></symbol>
   <symbol id="i-expand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 H4 V9 M15 4 H20 V9 M4 15 V20 H9 M20 15 V20 H15"/></g></symbol>
   <symbol id="i-chevright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 16 12 9 19"/></g></symbol>
+  <symbol id="i-chevleft" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12 15 19"/></g></symbol>
+  <symbol id="i-chevdown" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9 12 15 18 9"/></g></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 V18 M6 12 H18"/></g></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12 H18"/></g></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2 V4 M12 20 V22 M2 12 H4 M20 12 H22 M5 5 6.5 6.5 M17.5 17.5 19 19 M19 5 17.5 6.5 M6.5 17.5 5 19"/></g></symbol>
@@ -1042,7 +1127,7 @@ function ic(id, size, cls){
       <div style="width:36px;height:36px;flex-shrink:0"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="16" style="stroke:var(--accent)" stroke-width="2.8"/><path d="M18 2 A16 16 0 0 1 34 18 L18 18 Z" style="fill:var(--accent)"/><rect x="12.5" y="12.5" width="11" height="11" transform="rotate(45 18 18)" style="fill:var(--accent-2)"/></svg></div>
       <div>
         <h1>FotoAlert</h1>
-        <div class="subtitle" id="header-subtitle">Berlin &amp; Brandenburg</div>
+        <div class="subtitle" id="header-subtitle">Capture moments that matter.</div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:2px">
@@ -1091,6 +1176,8 @@ function ic(id, size, cls){
           </div>
         </div>
       </div>
+      <!-- US-21: zentraler Hilfe-Button, öffnet das Glossar-Overlay -->
+      <button id="help-btn" title="Hilfe &amp; Glossar" aria-label="Hilfe &amp; Glossar" onclick="Glossary.open()">?</button>
     </div>
     <!-- Search bar overlay -->
     <div id="search-bar">
@@ -1162,6 +1249,8 @@ function ic(id, size, cls){
           <circle cx="12" cy="12" r="8" stroke-dasharray="none"/>
         </svg>
       </button>
+      <!-- US-21: ⓘ öffnet die Kartensymbol-Legende (bewusst nicht direkt auf jedem Marker, damit die Karte ruhig bleibt) -->
+      <button class="map-legend-info-btn" onclick="ElementInfo.show('mapLegend')" title="Kartensymbole erklären" aria-label="Kartensymbole erklären">i</button>
     </div>
 
     <!-- LOCATIONS -->
@@ -1370,6 +1459,33 @@ function ic(id, size, cls){
   </div>
 </div>
 
+<!-- US-21: Element-Info-Overlay (globales ⓘ-Overlay, analog US-55 ScoreInfo) -->
+<div id="element-info-overlay" onclick="if(event.target===this)ElementInfo.close()">
+  <div id="element-info-box">
+    <button id="element-info-close" onclick="ElementInfo.close()"><svg style="width:16px;height:16px"><use href="#i-x"/></svg></button>
+    <div id="element-info-body"></div>
+  </div>
+</div>
+
+<!-- US-21: Onboarding-Slides (4 Screens, nur beim allerersten App-Start; erneut aufrufbar über Glossar) -->
+<div id="onboarding-overlay">
+  <div id="onboarding-screen"></div>
+</div>
+
+<!-- US-21: Glossar-Overlay (Bottom-Sheet, Suchfeld + Accordion, gruppiert nach Themen) -->
+<div id="glossary-overlay" onclick="Glossary.close()"></div>
+<div id="glossary-sheet">
+  <div class="glossary-head">
+    <h2>Hilfe &amp; Glossar</h2>
+    <button class="close-btn" onclick="Glossary.close()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="glossary-search">
+    <svg viewBox="0 0 24 24"><use href="#i-search"/></svg>
+    <input id="glossary-search-input" type="search" placeholder="Begriff suchen, z. B. Alignment…" oninput="Glossary.onSearch(this.value)">
+  </div>
+  <div id="glossary-list"></div>
+</div>
+
 <!-- Impressum Sheet (TASK-11) -->
 <div id="impressum-overlay" onclick="Impressum.close()"></div>
 <div id="impressum-sheet">
@@ -1394,7 +1510,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.5';
+const APP_VERSION = '1.21.6';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1897,7 +2013,7 @@ const Feed = {
     const today = data.filter(o => formatDate(o.shoot_time) === 'Heute');
     const best = today.length ? Math.max(...today.map(o=>o.overall_score)) : null;
     document.getElementById('header-subtitle').textContent =
-      best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Berlin & Brandenburg';
+      best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Capture moments that matter.';
   }
 };
 
@@ -2354,10 +2470,10 @@ const Verify = {
     if (v.status === 'issue') {
       const type = v.issue_type ? ` · ${v.issue_type}` : '';
       const cmt  = v.comment ? ` – „${v.comment}"` : '';
-      return `<div class='verified-badge-issue' style='display:flex;align-items:center;gap:5px'>${ic('i-warn',14)} Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt}</div>`;
+      return `<div class='verified-badge-issue' style='display:flex;align-items:center;gap:5px'>${ic('i-warn',14)} Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt} <button class="el-info-btn" onclick="ElementInfo.show('verification')">i</button></div>`;
     }
     const cmt = v.comment ? ` · „${v.comment}"` : '';
-    return `<div class='verified-badge' style='display:flex;align-items:center;gap:5px'>${ic('i-check',14)} Vor Ort geprüft am ${this.formatDate(v.date)}${cmt}</div>`;
+    return `<div class='verified-badge' style='display:flex;align-items:center;gap:5px'>${ic('i-check',14)} Vor Ort geprüft am ${this.formatDate(v.date)}${cmt} <button class="el-info-btn" onclick="ElementInfo.show('verification')">i</button></div>`;
   },
 
   // Kompakter Card-Tag: zeigt letzten Status + Gesamtzähler
@@ -3328,9 +3444,13 @@ const FilterSheet = {
     // Brennweite: Locations-Eigenschaft → weder auf der Karte noch im Locations-Tab ausgrauen
     const dimFocalOnMap = false;
 
+    // US-21: EIN ⓘ pro Filter-Chip-GRUPPE (nicht pro Einzel-Chip); stopPropagation, damit
+    // der Klick auf das ⓘ nicht die h4-Section (collapsible) mit auf-/zuklappt, falls relevant.
+    const fInfoBtn = key => `<button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('filterGroup','${key}')">i</button>`;
+
     const scoreSection = (isMapView || isLocationView)
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit ${fInfoBtn('wahrscheinlichkeit')}</h4>
           <div class="filter-slider-val">Nur im Chancen-Feed verfügbar</div>
           <div class="filter-slider-wrap">
             <input type="range" class="filter-slider" disabled
@@ -3338,7 +3458,7 @@ const FilterSheet = {
             <div class="filter-slider-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
           </div>
         </div>`
-      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit</h4>
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Mindest-Wahrscheinlichkeit ${fInfoBtn('wahrscheinlichkeit')}</h4>
           <div class="filter-slider-val" id="filter-score-val">${scoreLabel}</div>
           <div class="filter-slider-wrap">
             <input type="range" class="filter-slider" id="score-slider"
@@ -3351,15 +3471,15 @@ const FilterSheet = {
 
     const tzSection = dimOnLocAndMap
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit ${fInfoBtn('tageszeit')}</h4>
           <div class="filter-chips">${tzChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed verfügbar (an Shoot-Zeitpunkt gebunden)</p>
         </div>`
-      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit</h4><div class="filter-chips">${tzChips}</div></div>`;
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-clock',15)} Tageszeit ${fInfoBtn('tageszeit')}</h4><div class="filter-chips">${tzChips}</div></div>`;
 
     const focalSection = dimFocalOnMap
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite ${fInfoBtn('brennweite')}</h4>
           <div class="filter-slider-val">Nur im Chancen-Feed und Locations-Tab verfügbar</div>
           <div class="dual-range-wrap">
             <div class="dual-range-track" id="focal-track">
@@ -3370,7 +3490,7 @@ const FilterSheet = {
             <div class="filter-slider-labels"><span>0 mm</span><span>200 mm</span><span>800 mm</span></div>
           </div>
         </div>`
-      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite</h4>
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-viewpoint',15)} Brennweite ${fInfoBtn('brennweite')}</h4>
           <div class="filter-slider-val" id="focal-val">${focalLabel}</div>
           <div class="dual-range-wrap">
             <div class="dual-range-track" id="focal-track">
@@ -3387,11 +3507,11 @@ const FilterSheet = {
     // Auf Locations-Tab: kein direkter Effekt → ausgrauen.
     const etSection = isLocationView
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp ${fInfoBtn('eventtyp')}</h4>
           <div class="filter-chips">${etChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed und auf der Karte verfügbar</p>
         </div>`
-      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp</h4><div class="filter-chips">${etChips}</div>
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-camera',15)} Eventtyp ${fInfoBtn('eventtyp')}</h4><div class="filter-chips">${etChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Gilt auch für Tageszeit & Schwierigkeit.</p></div>`;
 
     const verNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`;
@@ -3407,18 +3527,18 @@ const FilterSheet = {
     const cloudNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Nur für Goldene-Stunde-Chancen mit Wetter-Overlay (nächste 3 Tage). Chancen ohne Wolkendaten werden ausgeblendet.</p>`;
     const cloudSection = (isMapView || isLocationView)
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
           <div class="filter-chips">${cloudMoodChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed verfügbar</p>
         </div>`
       : isScoutView
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
           <div class="filter-chips">${cloudMoodChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Feed verfügbar</p>
         </div>`
       : `<div class="filter-section">
-          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung</h4>
+          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
           <div class="filter-chips">${cloudMoodChips}</div>
           ${cloudNote}
         </div>`;
@@ -3429,11 +3549,11 @@ const FilterSheet = {
       scoreSection +
       cloudSection +
       focalSection +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Schwierigkeitsgrad</h4><div class="filter-chips">${diffChips}</div></div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie</h4><div class="filter-chips">${catChips}</div></div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung</h4><div class="filter-chips">${ratingChips}</div>${ratingNote}</div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS)</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus</h4><div class="filter-chips">${verChips}</div>${verNote}</div>`;
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-target',15)} Schwierigkeitsgrad ${fInfoBtn('schwierigkeitsgrad')}</h4><div class="filter-chips">${diffChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie ${fInfoBtn('kategorie')}</h4><div class="filter-chips">${catChips}</div></div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung ${fInfoBtn('bewertung')}</h4><div class="filter-chips">${ratingChips}</div>${ratingNote}</div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS) ${fInfoBtn('entfernung')}</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus ${fInfoBtn('verifikationsstatus')}</h4><div class="filter-chips">${verChips}</div>${verNote}</div>`;
   },
 
   // BUG-46: Drei-Zustand-Zyklus für Bewertung: Off(Alle) → Include(≥N) → Exclude(<N) → Off(Alle)
@@ -4049,7 +4169,7 @@ const Detail = {
 
     document.getElementById('detail-content').innerHTML = `
       <div class="sheet-hero">
-        <div class="sheet-hero-type" style="display:flex;align-items:center;gap:6px">${icon} ${o.event_type}</div>
+        <div class="sheet-hero-type" style="display:flex;align-items:center;gap:6px">${icon} ${o.event_type} <button class="el-info-btn" onclick="ElementInfo.show('eventType','${o.event_type.replace(/'/g, "\\'")}')">i</button></div>
         <div class="sheet-hero-title">${o.title}</div>
         ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>` : ''}
         ${o.location_id ? `<div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>` : ''}
@@ -4066,10 +4186,10 @@ const Detail = {
         </div>
       </div>
       ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
-      ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('idealWindow')">i</button>`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
       ${(() => {
         const wd = o.weather_details;
-        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
+        if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('weather')">i</button>`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
         const windDirs = ['N','NO','O','SO','S','SW','W','NW'];
         const windDir = windDirs[Math.round(wd.wind_direction_deg / 45) % 8];
         const bft = wd.wind_speed_kmh < 1 ? 0 : wd.wind_speed_kmh < 6 ? 1 : wd.wind_speed_kmh < 12 ? 2
@@ -4096,7 +4216,7 @@ const Detail = {
         const cloudLowRow = (wd.cloud_cover_low_pct != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${wd.cloud_cover_low_pct} %</span></div>` : '';
         const cloudMidRow = (wd.cloud_cover_mid_pct != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${wd.cloud_cover_mid_pct} %</span></div>` : '';
         const cloudHighRow = (wd.cloud_cover_high_pct != null) ? `<div class="info-row"><span class="ir-label">Hohe Wolken</span><span class="ir-val">${wd.cloud_cover_high_pct} %</span></div>` : '';
-        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div>${goldenCloudRow}<div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div>${cloudLowRow}${cloudMidRow}${cloudHighRow}<div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
+        return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('weather')">i</button>`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div>${goldenCloudRow}<div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div>${cloudLowRow}${cloudMidRow}${cloudHighRow}<div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
       })()}
       ${(() => {
         // US-109: Erklärungssektion für Goldene Wolken und Himmelsröte (AK-3)
@@ -4129,7 +4249,7 @@ const Detail = {
             ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${azDiff.toFixed(1)}° ≤ 30° ✓</span></div>`
             : '';
           const compassHtmlGC = (sunAz != null)
-            ? mkSec('ev_compass_gc',`${ic('i-compass',15)} Wolken & Himmelsrichtung`,
+            ? mkSec('ev_compass_gc',`${ic('i-compass',15)} Wolken & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
                 mkCloudCompassSvg(sunAz, subAz, false,
                   o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
             : '';
@@ -4149,7 +4269,7 @@ const Detail = {
           const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
           const rsSunAz = o.sunset_azimuth ?? o.sunrise_azimuth ?? null;
           const compassHtmlRS = (rsSunAz != null)
-            ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung`,
+            ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
                 mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, true,
                   o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
             : '';
@@ -4180,7 +4300,7 @@ const Detail = {
       ${(() => {
         CameraFOV._data['ev'] = { obsLat:o.observer_lat, obsLon:o.observer_lon, subjLat:o.subject_lat||null, subjLon:o.subject_lon||null,
           distM: (o.subject_lat && o.subject_lon) ? haversineKm(o.observer_lat,o.observer_lon,o.subject_lat,o.subject_lon)*1000 : 0 };
-        return mkSec('ev_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('ev'));
+        return mkSec('ev_fov',`${ic('i-fov',15)} Karte & Blickwinkel <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('fov')">i</button>`, CameraFOV.panelHtml('ev'));
       })()}
       ${(() => {
         const ca = o.composition_analysis;
@@ -4235,7 +4355,7 @@ const Detail = {
         const footNote = hasHeight
           ? `<p style="font-size:10px;color:var(--muted);margin-top:4px">Versätze bezogen auf Entfernung zum Motiv · ${ca.body_name} Ø ${ca.body_apparent_diameter_m.toFixed(1)} m bei ${ca.subject_height_m} m Motivhöhe${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`
           : `<p style="font-size:10px;color:var(--muted);margin-top:4px">Keine Motivhöhe eingetragen – Höhenversatz nicht berechenbar${ca.moon_earth_distance_km ? ` · Mond–Erde ${ca.moon_earth_distance_km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')} km` : ''}</p>`;
-                return mkSec('ev_kompo',`${ic('i-target',15)} Kompositions-Analyse`,`<div style="${labelBg};margin-bottom:10px">
+                return mkSec('ev_kompo',`${ic('i-target',15)} Kompositions-Analyse <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('composition')">i</button>`,`<div style="${labelBg};margin-bottom:10px">
             <div style="font-size:14px;font-weight:600">${ca.altitude_label || ca.azimuth_label}</div>
             <div style="font-size:12px;color:var(--muted);margin-top:3px">${ca.azimuth_label}</div>
           </div>
@@ -4249,7 +4369,7 @@ const Detail = {
           ${footNote}
         </div>`);
       })()}
-      ${mkSec('ev_coords',`${ic('i-pin',15)} Koordinaten`,`
+      ${mkSec('ev_coords',`${ic('i-pin',15)} Koordinaten <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('coords')">i</button>`,`
         <div class="coords-grid">
           <div class="coords-row">
             <div class="coords-top">
@@ -4335,10 +4455,10 @@ const Detail = {
         const secHtml = secRows.length
           ? `<div style="margin-top:10px">${secRows.join('')}</div>`
           : '';
-        return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
+        return mkSec('ev_skypos',`${ic('i-compass',15)} Himmelsposition <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('skyPosition')">i</button>`,`<p style="font-size:14px;line-height:1.6;margin:0">${sentence}</p>${secHtml}`);
       })()}
       ${hints ? mkSec('ev_kamera',`${ic('i-camera',15)} Kamera-Empfehlungen`,hints) : ''}
-      ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie`,astro)}
+      ${mkSec('ev_astro',`${ic('i-star',15)} Astronomie <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('skyPosition')">i</button>`,astro)}
       ${(() => {
         const hasSub = o.subject_lat && o.subject_lon;
         const distKm = hasSub ? haversineKm(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null;
@@ -6083,7 +6203,7 @@ const LocationDetail = {
       <div class="sheet-hero" style="padding-bottom:12px">
         <div class="sheet-hero-type">
           ${ic(catIcon[loc.category]||'i-pin',16)} <span>${loc.category}</span>
-          <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto">${diffLabel[loc.difficulty]||'Mittel'}</span>
+          <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px">${diffLabel[loc.difficulty]||'Mittel'} <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('difficulty')">i</button></span>
           <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">${ic('i-edit',16)}</button>
           ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:var(--red);font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">${ic('i-trash',16)}</button>` : ''}
         </div>
@@ -6093,24 +6213,24 @@ const LocationDetail = {
         ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
       </div>
 
-      ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
+      ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
 
-      ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name}`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
+      ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name} <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
-      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}<div id="loc-sun-today"></div>`)}
+      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}<div id="loc-sun-today"></div>`)}
 
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
-        return mkSec('loc_fov',`${ic('i-fov',15)} Karte & Blickwinkel`, CameraFOV.panelHtml('loc'));
+        return mkSec('loc_fov',`${ic('i-fov',15)} Karte & Blickwinkel <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('fov')">i</button>`, CameraFOV.panelHtml('loc'));
       })()}
 
       ${loc.locationscout_url ? mkSec('loc_links',`${ic('i-link',15)} Links`,`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">${ic('i-camera',13)} Locationscout</a>`) : ''}
 
-      ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events`,`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
+      ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locEvents')">i</button>`,`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
 
       ${mkSec('loc_rating',`${ic('i-starfill',15)} Bewertung`,`${Rating.inputHtml(loc.id)}`)}
 
-      ${mkSec('loc_verify',`${ic('i-check',15)} Verifikation`,`${Verify.verifySection(loc.id, loc.name)}`)}
+      ${mkSec('loc_verify',`${ic('i-check',15)} Verifikation <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locVerify')">i</button>`,`${Verify.verifySection(loc.id, loc.name)}`)}
     `;
   },
 
@@ -6743,6 +6863,374 @@ const ScoreInfo = {
 };
 
 // ═══════════════════════════════════════════════════════
+// ELEMENT-INFO-OVERLAY (US-21) — ⓘ-Erklärungen für Schwierigkeitsgrad, Event-Typ,
+// Verifikations-Status, Filter-Chip-Gruppen und Kartensymbol-Legende.
+// Gleiches Klick-Overlay-Muster wie ScoreInfo (US-55), aber global (fixed, eigenes
+// DOM-Element außerhalb des Detail-Sheets), da diese Elemente auch außerhalb des
+// Detail-Sheets vorkommen (Feed-Card, Location-Card, Filter-Sheet, Karte).
+// ═══════════════════════════════════════════════════════
+const ElementInfo = {
+  _difficulty: {
+    title: 'Schwierigkeitsgrad',
+    html: `<p>Beschreibt, wie aufwändig es ist, den Standort zu erreichen und dort zu fotografieren:</p>
+      <ul>
+        <li><b>Einfach:</b> gut erreichbar, keine besondere Ausrüstung oder Vorbereitung nötig</li>
+        <li><b>Mittel:</b> etwas Fußweg oder leichte Hindernisse (z. B. eingeschränkter Zugang, Stativ empfohlen)</li>
+        <li><b>Anspruchsvoll:</b> längerer/schwieriger Zugang, besondere Ausrüstung, Zeitplanung oder körperliche Fitness nötig</li>
+      </ul>`,
+  },
+  _verification: {
+    title: 'Verifikationsstatus',
+    html: `<p>Zeigt, ob und wie der Standort zuletzt durch einen echten Vor-Ort-Besuch geprüft wurde:</p>
+      <ul>
+        <li><b>Geprüft:</b> ein Nutzer war vor Ort und hat die Angaben (Zugang, Sicht, Motiv) bestätigt</li>
+        <li><b>Nicht geprüft:</b> noch keine Vor-Ort-Rückmeldung vorhanden — Angaben basieren auf Kartendaten/Erstanlage</li>
+        <li><b>Probleme gemeldet:</b> ein Nutzer war vor Ort und hat ein Problem gemeldet (z. B. Zugang versperrt, Sicht verstellt)</li>
+      </ul>`,
+  },
+  _eventTypes: {
+    'Goldene Stunde Abend':  { title: 'Goldene Stunde (Abend)', html: '<p>Die Zeit kurz vor Sonnenuntergang mit warmem, weichem Licht — ideal für stimmungsvolle Aufnahmen mit langen Schatten und goldenem Licht.</p>' },
+    'Goldene Stunde Morgen': { title: 'Goldene Stunde (Morgen)', html: '<p>Die Zeit kurz nach Sonnenaufgang mit warmem, weichem Licht — ruhige Stimmung, oft klare Luft und wenig Betrieb.</p>' },
+    'Blaue Stunde':          { title: 'Blaue Stunde', html: '<p>Die Dämmerungsphase kurz vor Sonnenaufgang bzw. nach Sonnenuntergang mit tiefblauem Himmel — beliebt für Stadt- und Architekturaufnahmen mit Kunstlicht im Kontrast zum Himmel.</p>' },
+    'Blaue Stunde Morgen':   { title: 'Blaue Stunde (Morgen)', html: '<p>Dämmerungsphase vor Sonnenaufgang mit tiefblauem Himmel — Kontrast zwischen Kunstlicht und Himmelsblau.</p>' },
+    'Blaue Stunde Abend':    { title: 'Blaue Stunde (Abend)', html: '<p>Dämmerungsphase nach Sonnenuntergang mit tiefblauem Himmel — Kontrast zwischen Kunstlicht und Himmelsblau.</p>' },
+    'Mondaufgang':           { title: 'Mondaufgang', html: '<p>Der Mond geht am Horizont auf — je nach Mondphase und Sichtachse ein Motiv für große, nah am Horizont stehende Mondaufnahmen.</p>' },
+    'Monduntergang':         { title: 'Monduntergang', html: '<p>Der Mond geht am Horizont unter — analog zum Mondaufgang, oft mit warmem Licht kombinierbar.</p>' },
+    'Mond-Alignment':        { title: 'Mond-Alignment', html: '<p>Der Mond erscheint exakt in der Sichtachse zwischen Fotograf-Standort und Motiv — z. B. hinter einem Gebäude oder Wahrzeichen. Je nach Mondphase unterschiedlich hochwertig (Vollmond = optimal).</p>' },
+    'Sonnen-Alignment':      { title: 'Sonnen-Alignment', html: '<p>Die Sonne erscheint exakt in der Sichtachse zwischen Fotograf-Standort und Motiv — z. B. beim Auf- oder Untergang genau hinter einem Wahrzeichen.</p>' },
+    'Milchstraße':           { title: 'Milchstraße', html: '<p>Das galaktische Zentrum ist bei ausreichend dunklem Himmel und geringer Mondstörung sichtbar — Chance für Astro-Aufnahmen.</p>' },
+    'Meteoritenschauer':     { title: 'Meteoritenschauer', html: '<p>Ein bekannter Sternschnuppen-Schauer erreicht sein Aktivitätsmaximum — Chance auf sichtbare Meteore, am besten bei dunklem Himmel.</p>' },
+    'Sonnenfinsternis':      { title: 'Sonnenfinsternis', html: '<p>Der Mond schiebt sich vor die Sonne — ein seltenes, zeitlich sehr präzises Ereignis.</p>' },
+    'Goldene Wolken':        { title: 'Goldene Wolken', html: '<p>Die Wolkenverteilung zur Goldenen Stunde steht günstig, um golden angeleuchtet zu werden — die Wolken stehen dabei hinter dem Motiv in Sonnenrichtung (± 30°).</p>' },
+    'Himmelsröte':           { title: 'Himmelsröte', html: '<p>Hohe Wolken (Cirrus) streuen das tief stehende Sonnenlicht warm ein — der Himmel färbt sich rot/orange, die Wolken stehen dabei in Sonnenrichtung hinter dem Motiv (± 30°).</p>' },
+  },
+  _eventTypeFallback: { title: 'Event-Typ', html: '<p>Diese Chance basiert auf einem astronomischen oder wetterbedingten Ereignis zum angegebenen Zeitpunkt.</p>' },
+  _filterGroups: {
+    eventtyp: {
+      title: 'Filter: Eventtyp',
+      html: `<p>Wählt aus, welche Art von Foto-Chance angezeigt wird (z. B. Goldene Stunde, Mond-Alignment, Milchstraße).</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
+    },
+    tageszeit: {
+      title: 'Filter: Tageszeit',
+      html: `<p>Grenzt Chancen auf eine Tageszeit ein (Morgens, Tagsüber, Abends, Nacht) — bezogen auf den Shoot-Zeitpunkt der Chance.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus.</p>`,
+    },
+    wahrscheinlichkeit: {
+      title: 'Filter: Mindest-Wahrscheinlichkeit',
+      html: `<p>Blendet Chancen mit einem Gesamt-Score unterhalb der eingestellten Schwelle aus. Höherer Wert = nur die aussichtsreichsten Chancen werden gezeigt.</p>`,
+    },
+    wolkenstimmung: {
+      title: 'Filter: Wolkenstimmung',
+      html: `<p>Grenzt Goldene-Stunde-Chancen nach ihrem Potenzial für goldene Wolken/Himmelsröte ein (siehe ⓘ bei „Wolkenstimmung" im Detail-Sheet). Nur verfügbar, wenn Wetterdaten vorliegen (nächste 3 Tage).</p>`,
+    },
+    brennweite: {
+      title: 'Filter: Brennweite',
+      html: `<p>Grenzt Locations/Chancen nach der empfohlenen Brennweite ein. Linker Regler = Minimum, rechter Regler = Maximum. 800 mm steht für „kein Limit nach oben".</p>`,
+    },
+    schwierigkeitsgrad: {
+      title: 'Filter: Schwierigkeitsgrad',
+      html: `<p>Grenzt Locations nach Zugangs-/Ausrüstungsaufwand ein — siehe ⓘ beim Schwierigkeitsgrad-Badge für die Bedeutung von Einfach/Mittel/Anspruchsvoll.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus.</p>`,
+    },
+    kategorie: {
+      title: 'Filter: Kategorie',
+      html: `<p>Grenzt Locations nach Motiv-Kategorie ein (z. B. Schloss & Historisch, Skyline & Architektur, Natur & Landschaft).</p>`,
+    },
+    bewertung: {
+      title: 'Filter: Mindest-Bewertung',
+      html: `<p>Blendet Locations mit einer Nutzerbewertung unterhalb der gewählten Sternezahl aus.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">≥ N Sterne</span> → <span style="color:var(--red)">weniger als N Sterne</span> → aus.</p>`,
+    },
+    entfernung: {
+      title: 'Filter: Entfernung (GPS)',
+      html: `<p>Blendet Locations aus, die weiter als der gewählte Radius von deinem aktuellen GPS-Standort entfernt liegen.</p>`,
+    },
+    verifikationsstatus: {
+      title: 'Filter: Verifikationsstatus',
+      html: `<p>Grenzt Locations nach Prüfstatus ein — siehe ⓘ beim Verifikations-Chip für die Bedeutung von Geprüft/Nicht geprüft/Probleme.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
+    },
+  },
+  // Lazy statt statisch: MapMarkers.legendHtml() erst beim tatsächlichen Öffnen auswerten,
+  // nicht schon beim Parsen dieses Objektliterals (robuster gegen Ladereihenfolge).
+  _mapLegendData() {
+    // US-21-Korrektur (2026-07-05, zweiter Durchlauf): Die Fotograf-Standort/Motiv/
+    // Sichtachse-Sektion wurde komplett entfernt (nicht nur der Text repariert) — sie
+    // ist auf dieser Übersichtskarte schlicht nicht relevant (existiert nur in der
+    // "Karte & Blickwinkel"-Sektion im Location-/Chancen-Detail). Root Cause des zuvor
+    // kaputten Renderings: MapMarkers.legendHtml() liefert ein Block-Element (<div
+    // style="display:flex">...) zurück, das hier in einen <span style="display:inline-flex">
+    // innerhalb eines <p> eingebettet wurde — Block-in-Inline-in-Fließtext bei 320px
+    // Overlay-Breite (#element-info-box, siehe CSS) erzeugte unvorhersehbare Umbrüche
+    // (Bold-Tags/Komma auf eigener Zeile). Die verbleibenden Punkte unten binden nur noch
+    // reine SVG-Strings (kein <div>) direkt ein — kein Block-in-Inline-Nesting mehr.
+    //
+    // Layer-Switcher (MapView.setLayer, #map-layer-toggle) und GPS-Button (MapView.locateMe,
+    // .map-gps-btn) sind beide verifiziert Teil von #page-map (Haupt-Karten-Tab, siehe
+    // index.html ~Z.1210-1253) — eigenständige, klickbare Buttons, kein reines
+    // Auto-Zentrieren. Bleiben daher unverändert in der Legende stehen.
+    const pinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="19" viewBox="0 0 28 38" style="vertical-align:middle">
+      <path d="M14 2C7 2 2 8 2 15c0 9 12 21 12 21s12-12 12-21C26 8 21 2 14 2z"
+            style="fill:var(--accent);stroke:var(--surface)" stroke-width="2.5"/>
+      <circle cx="14" cy="14" r="5" style="fill:var(--surface)"/>
+    </svg>`;
+    return {
+      title: 'Kartensymbole',
+      html: `<div style="display:flex;flex-direction:column;gap:10px">
+          <p><span style="display:inline-flex;align-items:center;gap:8px">${pinSvg} <b>Jeder Pin markiert eine Foto-Location.</b></span> Tippe auf einen Pin, um Namen und eine kurze Beschreibung zu sehen — von dort kommst du mit einem weiteren Klick direkt zu allen Details dieser Location.</p>
+          <p>Mit diesen drei Knöpfen wechselst du die Kartenansicht: Standard-Karte, Satellitenbild oder eine abgedunkelte Nachtansicht, die z. B. beim Blick auf Sternenlocations weniger blendet.</p>
+          <p>Dieser Knopf zentriert die Karte auf deinen aktuellen Standort, damit du siehst, welche Locations in deiner Nähe sind.</p>
+        </div>`,
+    };
+  },
+  // Scope-Erweiterung (2026-07-05): 10 neue Erklärungen für bisher nicht erklärte
+  // Sektionen im Chancen- und Location-Detail. Texte 1:1 aus dem US-21-Ticket übernommen.
+  _weather: {
+    title: 'Wetterwerte',
+    html: `<p>Diese Werte zeigen die vorhergesagte Wetterlage zum Zeitpunkt der Chance: Temperatur, Regenwahrscheinlichkeit, Windgeschwindigkeit und Sichtweite. Sie stammen von einem Wetterdienst und werden regelmäßig aktualisiert, sind aber wie jede Vorhersage nicht hundertprozentig sicher.</p>`,
+  },
+  _idealWindow: {
+    title: 'Ideales Zeitfenster',
+    html: `<p>Das ist die Zeitspanne, in der Licht, Himmel und Ausrichtung am besten zusammenpassen, um das Motiv optimal zu fotografieren. Außerhalb dieses Fensters ist ein Foto oft trotzdem möglich, aber die Bedingungen sind weniger günstig.</p>`,
+  },
+  _cloudCompass: {
+    title: 'Wolken & Kompass-Ausrichtung',
+    html: `<p>Hier siehst du, wie wahrscheinlich eine goldene oder rote Himmelsfärbung ist, und in welche Himmelsrichtung du dafür schauen solltest. Die Kompassnadel zeigt dir die passende Blickrichtung direkt an.</p>`,
+  },
+  _fov: {
+    title: 'Karte & Blickwinkel',
+    html: `<p>Diese Karte zeigt, von wo aus du fotografierst, wohin dein Motiv liegt, und wie viel dein Objektiv bei der gewählten Brennweite tatsächlich einfängt. So siehst du vorab, ob das Motiv im Bild Platz hat.</p>`,
+  },
+  _composition: {
+    title: 'Kompositions-Analyse',
+    html: `<p>Diese Einschätzung hilft dir zu sehen, wie das Motiv im Bildausschnitt wirkt — zum Beispiel ob es zentriert oder eher am Rand steht. Sie ist ein Hinweis für die Bildgestaltung, kein festes Muss.</p>`,
+  },
+  _coords: {
+    title: 'Koordinaten',
+    html: `<p>Das sind die genauen GPS-Koordinaten des Standorts. Du kannst sie in eine Kartenapp kopieren oder direkt über die Maps-Buttons öffnen, um dorthin zu navigieren.</p>`,
+  },
+  _skyPosition: {
+    title: 'Himmelsposition/Astronomie',
+    html: `<p>Hier wird angezeigt, wo Sonne, Mond oder andere Himmelskörper zum jeweiligen Zeitpunkt am Himmel stehen. Das hilft dir einzuschätzen, ob z. B. der Mond gerade in einer für dein Motiv passenden Position aufgeht oder untergeht.</p>`,
+  },
+  _locStandpoint: {
+    title: 'Fotograf-Standort, Motiv &amp; Ausrichtung',
+    html: `<p>Hier findest du, von wo aus fotografiert wird, was das Motiv ist, wie weit beides auseinanderliegt und in welche Richtung die Kamera zeigen sollte. Die Maps-Buttons bringen dich direkt zu beiden Punkten.</p>`,
+  },
+  _locEvents: {
+    title: 'Nächste Events',
+    html: `<p>Diese Liste zeigt dir die nächsten Termine, an denen an diesem Standort besonders gute Fotobedingungen erwartet werden — praktisch, um direkt von der Location aus zum passenden Termin zu springen.</p>`,
+  },
+  _locVerify: {
+    title: 'Verifikationsbereich',
+    html: `<p>Hier siehst du, ob und wann andere Nutzer diesen Standort schon vor Ort geprüft haben, und kannst selbst eine Prüfung eintragen oder ein Problem melden (z. B. versperrter Zugang). So bleibt die Info über den Standort aktuell und verlässlich.</p>`,
+  },
+  show(category, key) {
+    let t;
+    if (category === 'difficulty') t = this._difficulty;
+    else if (category === 'verification') t = this._verification;
+    else if (category === 'eventType') t = this._eventTypes[key] || this._eventTypeFallback;
+    else if (category === 'filterGroup') t = this._filterGroups[key];
+    else if (category === 'mapLegend') t = this._mapLegendData();
+    else if (category === 'weather') t = this._weather;
+    else if (category === 'idealWindow') t = this._idealWindow;
+    else if (category === 'cloudCompass') t = this._cloudCompass;
+    else if (category === 'fov') t = this._fov;
+    else if (category === 'composition') t = this._composition;
+    else if (category === 'coords') t = this._coords;
+    else if (category === 'skyPosition') t = this._skyPosition;
+    else if (category === 'locStandpoint') t = this._locStandpoint;
+    else if (category === 'locEvents') t = this._locEvents;
+    else if (category === 'locVerify') t = this._locVerify;
+    if (!t) return;
+    document.getElementById('element-info-body').innerHTML = `<h4>${t.title}</h4>${t.html}`;
+    document.getElementById('element-info-overlay').classList.add('open');
+  },
+  close() {
+    document.getElementById('element-info-overlay')?.classList.remove('open');
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// ONBOARDING (US-21) — 4 Einführungs-Slides beim allerersten App-Start.
+// Erscheint nur einmal (localStorage-Flag fa_onboarding_seen), ist aber jederzeit
+// über den Glossar-Eintrag „Onboarding erneut ansehen" erneut aufrufbar.
+// ═══════════════════════════════════════════════════════
+const Onboarding = {
+  _STORAGE_KEY: 'fa_onboarding_seen',
+  _idx: 0,
+
+  _slides: [
+    {
+      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="52" cy="52" r="30" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M52 6 A46 46 0 0 1 98 52 L52 52 Z" fill="var(--accent-2)"/><circle cx="52" cy="52" r="6" fill="var(--accent)"/></svg>`,
+      title: 'Willkommen bei FotoAlert',
+      text: 'FotoAlert zeigt dir, wann und wo gerade gutes Licht, spannende Himmelsereignisse oder besondere Fotomomente auf dich warten.',
+    },
+    {
+      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><rect x="22" y="22" width="26" height="26" fill="var(--accent)"/><rect x="56" y="22" width="26" height="26" fill="none" stroke="var(--accent-2)" stroke-width="3"/><circle cx="35" cy="69" r="13" fill="var(--accent-2)"/><rect x="56" y="56" width="26" height="26" fill="none" stroke="var(--muted)" stroke-width="3" transform="rotate(45 69 69)"/></svg>`,
+      title: 'Scores auf einen Blick',
+      text: 'Jede Foto-Chance bekommt einen Astronomie- und Wetter-Score von 0–100 %. Ein ⓘ neben jedem Wert erklärt dir jederzeit, wie er berechnet wird.',
+    },
+    {
+      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="35" cy="40" r="16" fill="var(--green)"/><circle cx="70" cy="40" r="16" fill="var(--orange)"/><circle cx="52" cy="75" r="16" fill="var(--red)"/></svg>`,
+      title: 'Schwierigkeitsgrade &amp; Event-Typen',
+      text: 'Farbige Badges zeigen dir sofort, wie anspruchsvoll ein Ort ist und um welche Art von Ereignis es sich handelt — vom Sonnenuntergang bis zur Sternennacht.',
+    },
+    {
+      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="52" cy="52" r="34" fill="none" stroke="var(--accent)" stroke-width="3"/><text x="52" y="61" text-anchor="middle" font-size="34" font-weight="800" fill="var(--accent)" font-family="-apple-system,sans-serif">?</text></svg>`,
+      title: 'Hilfe ist immer griffbereit',
+      text: 'Fragen tauchen später auf? Der „?"-Button oben im Header öffnet jederzeit das Glossar mit allen Erklärungen — auch dieses Onboarding kannst du dort erneut aufrufen.',
+    },
+  ],
+
+  // Beim App-Boot aufgerufen: zeigt Onboarding nur, wenn es noch nie gesehen wurde.
+  initialShowIfNeeded() {
+    if (!localStorage.getItem(this._STORAGE_KEY)) this.open();
+  },
+
+  // Manueller Re-Start (aus dem Glossar-Eintrag „Onboarding erneut ansehen").
+  restart() {
+    Glossary.close();
+    this.open();
+  },
+
+  open() {
+    this._idx = 0;
+    this._render();
+    document.getElementById('onboarding-overlay').classList.add('open');
+  },
+
+  close() {
+    localStorage.setItem(this._STORAGE_KEY, '1');
+    document.getElementById('onboarding-overlay').classList.remove('open');
+  },
+
+  next() {
+    if (this._idx >= this._slides.length - 1) { this.close(); return; }
+    this._idx++;
+    this._render();
+  },
+
+  back() {
+    if (this._idx <= 0) return;
+    this._idx--;
+    this._render();
+  },
+
+  _render() {
+    const s = this._slides[this._idx];
+    const isFirst = this._idx === 0;
+    const isLast = this._idx === this._slides.length - 1;
+    const dots = this._slides.map((_, i) => `<div class="onb-dot${i === this._idx ? ' active' : ''}"></div>`).join('');
+    const backBtn = isFirst ? '' : `<button class="onb-back" onclick="Onboarding.back()" aria-label="Zurück"><svg style="width:18px;height:18px"><use href="#i-chevleft"/></svg></button>`;
+    const nextLabel = isLast
+      ? `Los geht's`
+      : `Weiter <svg style="width:16px;height:16px"><use href="#i-chevright"/></svg>`;
+    const skipBtn = isLast ? '' : `<button class="onb-skip" onclick="Onboarding.close()">Überspringen</button>`;
+    document.getElementById('onboarding-screen').innerHTML = `
+      ${skipBtn}
+      <div class="onb-body">
+        ${s.glyph}
+        <div class="onb-title">${s.title}</div>
+        <div class="onb-text">${s.text}</div>
+      </div>
+      <div class="onb-footer">
+        <div class="onb-dots">${dots}</div>
+        <div class="onb-nextrow">
+          ${backBtn}
+          <button class="onb-next-btn" onclick="Onboarding.next()">${nextLabel}</button>
+        </div>
+      </div>`;
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// GLOSSAR (US-21) — zentrales Nachschlagewerk über den Header-„?"-Button.
+// Bottom-Sheet mit Suchfeld + Accordion, Einträge nach Themen gruppiert.
+// Erster Eintrag startet das Onboarding erneut (deckt AK „jederzeit wieder aufrufbar" ab).
+// ═══════════════════════════════════════════════════════
+const Glossary = {
+  _query: '',
+
+  // Reine Lese-Einträge (Text kommt aus den bereits gepflegten ScoreInfo/ElementInfo-Texten,
+  // damit bei künftigen Score-/Typ-Änderungen nur eine Stelle aktuell gehalten werden muss).
+  _entries() {
+    return [
+      { section: 'Einführung', special: 'onboarding', q: 'Onboarding erneut ansehen', html: '' },
+      { section: 'Scores', q: 'Gesamt-Score', html: ScoreInfo._texts.gesamt.html },
+      { section: 'Scores', q: 'Astronomie-Score', html: ScoreInfo._texts.astro.html },
+      { section: 'Scores', q: 'Wetter-Score', html: ScoreInfo._texts.wetter.html },
+      { section: 'Scores', q: 'Wolkenstimmung', html: ScoreInfo._texts.wolkenstimmung.html },
+      { section: 'Kernbegriffe', q: 'Schwierigkeitsgrade', html: ElementInfo._difficulty.html },
+      { section: 'Kernbegriffe', q: 'Verifikationsstatus', html: ElementInfo._verification.html },
+      { section: 'Kernbegriffe', q: 'Kartensymbole', html: ElementInfo._mapLegendData().html },
+      // Scope-Erweiterung (2026-07-05): 2 neue Glossar-Einträge, Texte 1:1 aus dem US-21-Ticket.
+      { section: 'Kernbegriffe', q: 'Wie unterscheiden sich Feed, Kalender und Scout?', html: '<p>Der Feed zeigt dir als 14-Tage-Vorschau laufend aktuelle Foto-Chancen in zeitlicher Nähe. Der Kalender zeigt eine Monatsübersicht, durch die du frei vor- und zurückblättern kannst, um auch weiter in der Zukunft oder Vergangenheit liegende Chancen zu sehen. Scout (Betaversion) errechnet eigene Chancen unabhängig von deinen angelegten Standorten und schlägt dir mögliche neue Perspektiven auf bekannte Motive vor — diese Vorschläge sollen zum Erkunden einladen, sind aber nicht verifiziert und können fehlerhaft sein.</p>' },
+      { section: 'Kernbegriffe', q: 'Wie funktionieren die Filter?', html: '<p>Wählst du mehrere Optionen innerhalb derselben Filtergruppe (z. B. zwei Event-Typen), werden dir Chancen gezeigt, die mindestens eine davon erfüllen. Kombinierst du dagegen mehrere Filtergruppen (z. B. Event-Typ UND Schwierigkeitsgrad), müssen beide Bedingungen gleichzeitig zutreffen. Beim Verifikations-Filter kannst du zusätzlich gezielt geprüfte oder ungeprüfte Standorte ausschließen.</p>' },
+    ];
+  },
+
+  open() {
+    this._query = '';
+    document.getElementById('glossary-search-input').value = '';
+    this._render();
+    document.getElementById('glossary-overlay').classList.add('open');
+    document.getElementById('glossary-sheet').classList.add('open');
+  },
+
+  close() {
+    document.getElementById('glossary-overlay').classList.remove('open');
+    document.getElementById('glossary-sheet').classList.remove('open');
+  },
+
+  onSearch(val) {
+    this._query = (val || '').trim().toLowerCase();
+    this._render();
+  },
+
+  toggle(idx) {
+    const item = document.getElementById('glossary-item-' + idx);
+    item?.classList.toggle('open');
+  },
+
+  _render() {
+    const q = this._query;
+    const entries = this._entries().filter(e => !q || e.q.toLowerCase().includes(q));
+    const list = document.getElementById('glossary-list');
+    if (!entries.length) {
+      list.innerHTML = `<div class="glossary-empty">Kein Eintrag gefunden für „${q}".</div>`;
+      return;
+    }
+    let html = '';
+    let lastSection = null;
+    entries.forEach((e, i) => {
+      if (e.section !== lastSection) {
+        html += `<div class="glossary-section-label">${e.section}</div>`;
+        lastSection = e.section;
+      }
+      if (e.special === 'onboarding') {
+        html += `<div class="glossary-item">
+          <button class="glossary-q" onclick="Onboarding.restart()">
+            <span class="glossary-q-text">${e.q}</span>
+            <svg style="width:16px;height:16px"><use href="#i-chevright"/></svg>
+          </button>
+        </div>`;
+      } else {
+        html += `<div class="glossary-item" id="glossary-item-${i}">
+          <button class="glossary-q" onclick="Glossary.toggle(${i})">
+            <span class="glossary-q-text">${e.q}</span>
+            <svg style="width:16px;height:16px"><use href="#i-chevdown"/></svg>
+          </button>
+          <div class="glossary-a"><div class="glossary-a-inner">${e.html}</div></div>
+        </div>`;
+      }
+    });
+    list.innerHTML = html;
+  },
+};
+
+// ═══════════════════════════════════════════════════════
 // SEARCH (US-53)
 // ═══════════════════════════════════════════════════════
 const Search = {
@@ -6841,6 +7329,8 @@ const App = {
     setTimeout(async () => {
       await Feed.load();
     }, 12000);
+    // US-21: Onboarding nur beim allerersten Start zeigen (localStorage-Flag)
+    Onboarding.initialShowIfNeeded();
   }
 };
 

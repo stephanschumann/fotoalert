@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | US-09 |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen — Icon-Umbau implementiert, wartet auf deine Test-Bestätigung)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-21 |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -1498,14 +1498,15 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 
 ---
 
-### BUG-62 · Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen `[ ]`
+### BUG-62 · Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-05 |
+| **Abgeschlossen** | 2026-07-05 |
 
 **Beschreibung:** Im Karten-Tab liegen zwei unabhängig positionierte Button-Gruppen oben im Kartenbereich: der Wetter-Filter (Aus/Wolken/Niederschlag, `#map-weather-toggle`, `top:12px; left:12px`, aus US-72) und der Kartenmodus-Umschalter (Nacht/Standard/Satellit, `#map-layer-toggle`, `top:12px; right:12px`). Beide sind mit festen Text-Buttons und festen Pixel-Abständen zum linken/rechten Rand positioniert, ohne Rücksicht auf schmale Bildschirmbreiten. Auf einem schmalen iPhone-Bildschirm wachsen beide Textgruppen so weit zusammen, dass sie sich in der Mitte überlappen und sich gegenseitig schwer lesbar/bedienbar machen. Auf breiteren Bildschirmen (iPad, größere iPhones) tritt das Problem nicht auf, da dort genug Platz zwischen den beiden Gruppen bleibt.
 
@@ -1542,11 +1543,15 @@ Ausgeschlossen: Alle anderen Karten-Overlay-Elemente — siehe Scope-Antwort unt
 **Scope-Frage beantwortet (weitere betroffene Elemente?):** Nein. Code-Prüfung von GPS-Button (`bottom:30px; left:12px`), Wetter-Zeitregler (`bottom:30px`), Wetter-Legende (`bottom:100px; left:12px`) und Fehler-Banner (`top:100px`, zentriert) zeigt: Diese Elemente teilen sich nicht den oberen `top:12px`-Bereich der beiden Toggle-Gruppen und kollidieren auf schmalen Screens nicht zusätzlich. Einzige zu beachtende Nebenwirkung: Der Fehler-Banner („Wetterdaten nicht verfügbar", `top:100px`, zentriert) darf durch den Fix nicht neu überlappt werden — als Edge-Case-AK aufgenommen.
 
 **Akzeptanzkriterien:**
-- [ ] Auf einem iPhone SE (375px Breite) sieht der Nutzer im Karten-Tab den Wetter-Filter links oben und den Kartenmodus-Umschalter rechts oben vollständig nebeneinander, ohne dass sich Beschriftungen oder Buttons berühren oder überlagern.
-- [ ] Wenn der Nutzer im Wetter-Filter „Wolken" oder „Niederschlag" antippt (wodurch die zusätzliche Zeile „mm/%" erscheint), bleibt der Kartenmodus-Umschalter rechts weiterhin vollständig sichtbar und bedienbar.
-- [ ] Der Nutzer kann auf einem schmalen Bildschirm jeden der sechs Buttons (aus/Wolken/Niederschlag/Nacht/Standard/Satellit) einzeln und ohne Fehltreffer antippen.
-- [ ] Auf breiteren Bildschirmen (iPhone Pro Max, iPad) sieht die Kartenansicht weiterhin so aus wie bisher — keine unnötige Änderung des bestehenden Erscheinungsbilds dort.
-- [ ] Edge Case: Ist zusätzlich die Fehlermeldung „Wetterdaten nicht verfügbar" (zentriert oben) eingeblendet, bleibt sie weiterhin lesbar und überlappt nicht neu mit einer der beiden Gruppen.
+- [x] Auf einem iPhone SE (375px Breite) sieht der Nutzer im Karten-Tab den Wetter-Filter links oben und den Kartenmodus-Umschalter rechts oben vollständig nebeneinander, ohne dass sich Beschriftungen oder Buttons berühren oder überlagern.
+- [x] Wenn der Nutzer im Wetter-Filter „Wolken" oder „Niederschlag" antippt (wodurch die zusätzliche Zeile „mm/%" erscheint), bleibt der Kartenmodus-Umschalter rechts weiterhin vollständig sichtbar und bedienbar.
+- [x] Der Nutzer kann auf einem schmalen Bildschirm jeden der sechs Buttons (aus/Wolken/Niederschlag/Nacht/Standard/Satellit) einzeln und ohne Fehltreffer antippen.
+- [x] Auf breiteren Bildschirmen (iPhone Pro Max, iPad) sieht die Kartenansicht weiterhin so aus wie bisher — keine unnötige Änderung des bestehenden Erscheinungsbilds dort.
+- [x] Edge Case: Ist zusätzlich die Fehlermeldung „Wetterdaten nicht verfügbar" (zentriert oben) eingeblendet, bleibt sie weiterhin lesbar und überlappt nicht neu mit einer der beiden Gruppen.
+
+**Test bestätigt (Stephan, 2026-07-05):** „alles wie erwartet" — manueller Test auf schmalem Fenster (375px) durchgeführt, alle Kriterien oben visuell geprüft.
+
+**Deploy-Hinweis:** Der Icon-Code wurde technisch bereits mit dem Release v1.21.4 (US-117) ausgeliefert — `release.sh` committet immer den vollständigen Dateistand von `web/index.html`, und zu diesem Zeitpunkt lag der BUG-62-Code bereits ungetestet im Arbeitsverzeichnis. Release v1.21.5 hat daher inhaltlich nur den Versions-Bump für `index.html`/`sw.js` plus PRODUCT.md-Nachtrag und TASK-57 committet. Funktional kein Problem (derselbe Code wurde soeben getestet und bestätigt), aber die Reihenfolge Test→Refactor→Release war für BUG-62 nicht sauber eingehalten — siehe Retro.
 
 **Pre-Mortem:**
 📎 Code-Verifikation: `web/index.html` Z. 261–336 (CSS) und Z. 1063–1100 (Markup) gelesen am 2026-07-05. Bestätigt: beide Gruppen exakt auf `top:12px`, feste `left:12px`/`right:12px`, keine `@media`-Anpassung vorhanden. Wetter-Filter hat bedingt sichtbare zweite Zeile („mm/%"). GPS-Button/Zeitregler/Legende im unteren Kartenbereich — keine Überschneidung.
@@ -4458,16 +4463,187 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 > - Gewählte Sprache bleibt nach App-Neustart erhalten
 > - Locations-Beschreibungen: Fallback auf Deutsch wenn EN fehlt
 
-### US-21 · App-Beschreibung & Onboarding
-> **Als neuer Nutzer** möchte ich verstehen wie FotoAlert funktioniert – was die Scores bedeuten, wie Schwierigkeitsgrade definiert sind, und wie ich die App optimal nutze.
->
-> **Akzeptanzkriterien:**
+### US-21 · App-Beschreibung, Onboarding & verständliche Erklärungen für jede Funktion `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | ursprünglich vor 2026-07-04, erweitert 2026-07-05 |
+
+**Weg-Gate-Entscheidung (2026-07-05):**
+- Implementierungsweg: **Option C** — Onboarding + zentrales Glossar bleiben erhalten, zusätzlich bekommt jedes bedeutungstragende Element (Schwierigkeitsgrad, Event-Typ, Verifikations-Status, Filter-Chips, Kartensymbole) ein eigenes ⓘ nach dem bewährten US-55-Muster (Score-Erklärungen via ⓘ-Overlay).
+- Scope: **nur Web-App** (iOS-App vorerst ausgenommen, ggf. eigenes Folge-Ticket).
+- Symbol: **einheitliches ⓘ-Symbol** für alle Elementtypen (keine Symbol-Varianten je Kontext).
+
+**Beschreibung:** Als App-Nutzer (neu oder erfahren) möchte ich jederzeit und ohne Verzögerung verstehen, was eine Funktion der App aussagt, wie sie funktioniert und wie ich sie praktisch anwende, sodass ich FotoAlert sicher und selbstständig nutzen kann — vom ersten Start an und bei jeder einzelnen Funktion, nicht nur bei den Scores.
+
+**Herkunft / Merge-Hinweis:** Dieses Ticket ist der Merge aus dem ursprünglichen US-21 („App-Beschreibung & Onboarding") und **US-116** (Gemerged 2026-07-05, siehe dort). US-116 hat den Scope bewusst erweitert: nicht nur Scores/Schwierigkeitsgrade/Event-Typen, sondern **jede** Funktion/jedes UI-Element — plus die explizite Anforderung „ohne Verzögerung" (Erklärung direkt im Kontext sichtbar, nicht nur über ein zentrales Glossar, das erst gesucht werden muss).
+
+**Baustein US-55 (Done, nicht duplizieren):** US-55 liefert bereits einen ⓘ-Info-Button je Score-Wert (Gesamt-, Astronomie-, Wetter-Score, inzwischen auch Wolkenstimmung) im Detail-Sheet einer Chance. Klick öffnet ein zentrales Overlay mit der Berechnungserklärung; Schließen über „×" oder Klick auf den Hintergrund (v1.2.1). Diese Spec baut auf diesem Muster auf und **erweitert es auf alle übrigen Funktionen/UI-Elemente der App** (Filter, Schwierigkeitsgrade, Event-Typen, Karten-Symbole, Verifikations-Status usw.) statt es zu ersetzen.
+
+> **Ursprüngliche Akzeptanzkriterien (US-21, beibehalten):**
 > - Onboarding-Screen beim ersten Start (3–4 Slides)
 > - „?" Info-Button im Header → erklärt Score-System, Schwierigkeitsgrade, Event-Typen
-> - Jeder Score-Wert (Astronomie, Wetter, Gesamt) hat ein Tooltip mit Erklärung
+> - Jeder Score-Wert (Astronomie, Wetter, Gesamt) hat eine Erklärung (bereits umgesetzt via US-55 ⓘ-Overlay)
 > - Glossar: Was ist ein Alignment? Was bedeutet Quality-Score?
 
+**Akzeptanzkriterien (final, nach Merge mit US-116):**
+- [ ] Beim allerersten App-Start erscheint eine kurze Einführung (3–4 Screens), die erklärt, wofür FotoAlert grundsätzlich da ist und wie die wichtigsten Bereiche (Feed, Kalender, Karte, Locations) funktionieren.
+- [ ] Ein „?"-Button im Header ist jederzeit erreichbar und öffnet eine Übersicht mit Erklärungen zu Score-System, Schwierigkeitsgraden und Event-Typen (Glossar-Charakter, zentrale Nachschlagestelle).
+- [ ] Jeder Score-Wert (Astronomie, Wetter, Gesamt, Wolkenstimmung) bleibt wie in US-55 direkt per ⓘ-Button erklärbar — kein Rückbau.
+- [ ] Zusätzlich zu Scores: **jedes weitere zentrale UI-Element mit eigener Bedeutung** (z. B. Schwierigkeitsgrad-Badge, Event-Typ-Icon, Verifikations-Status, Filter-Chips, Kartensymbole) hat eine eigene, direkt an der Stelle abrufbare Erklärung — nicht nur im zentralen Glossar nachschlagbar.
+- [ ] Die Erklärung ist ohne Verzögerung erreichbar: höchstens ein Antippen/Klick von der jeweiligen Funktion entfernt, keine Navigation durch mehrere Menüs nötig.
+- [ ] Onboarding-Screens erscheinen nur beim ersten Start; wiederkehrende Nutzer werden nicht erneut damit konfrontiert, können sie aber über den „?"-Button jederzeit erneut aufrufen.
+- [ ] Edge Case: Auf kleinen Bildschirmen (iPhone SE-Größe) verdeckt keine Erklärungs-Anzeige (Tooltip/Overlay) dauerhaft wichtige Inhalte darunter — sie lässt sich leicht wieder schließen.
+- [ ] Edge Case: Wird eine erklärte Funktion später fachlich geändert (z. B. Score-Formel, neuer Event-Typ), ist im Entwicklungsprozess verankert, dass der zugehörige Erklärungstext mit aktualisiert wird (kein „vergessenes" veraltetes Erklär-Overlay).
 
+**Scope-Erweiterung nach initialem Test-Feedback (2026-07-05):** Stephan hat den ersten Umsetzungsstand („In Test") gegengeprüft und weitere Lücken sowie ein Design-Korrektur gefunden. Die folgenden AKs erweitern den Scope, bevor das Ticket final getestet wird:
+
+- [ ] **Optik bestehender ⓘ-Icons korrigiert:** Die 5 bereits vorhandenen ⓘ-Icons (Schwierigkeitsgrad, Event-Typ, Verifikation-Badge, Filter-Gruppen, Kartenlegende) werden kleiner und grau dargestellt, damit sie sich dezent einfügen und nicht neben anderen Elementen auffallen. Der „?"-Header-Button bleibt bewusst wie bisher (soll auffallen).
+- [ ] **Neue ⓘ-Erklärungen ergänzt** an folgenden bisher nicht erklärten Sektionen in den Detail-Sheets (Chance und Location):
+  - Wetterwerte (Temperatur/Regen/Wind/Sicht) im Chancen-Detail
+  - Ideales Zeitfenster im Chancen-Detail
+  - Wolken/Himmelsröte-Bereich inkl. Kompass-Ausrichtung im Chancen-Detail
+  - Karte & Blickwinkel (Sichtfeld-Darstellung) im Chancen-Detail
+  - Kompositions-Analyse im Chancen-Detail
+  - Koordinaten-Anzeige im Chancen-Detail
+  - Himmelsposition/Astronomie-Bereich im Chancen-Detail
+  - Fotograf-Standort, Motiv und Ausrichtung im Location-Detail
+  - Nächste Events im Location-Detail
+  - Verifikationsbereich im Location-Detail
+- [ ] **Kartenlegende erweitert** um die bisher nicht erklärten Bedienelemente: Kartenebenen-Umschalter (Nacht/Standard/Satellit), GPS-Standort-Button, Klickverhalten der Standort-Symbole auf der Karte (Popup mit Detail-Link), sowie ein Verweis auf die separate Wetter-Legende (US-72).
+- [ ] **Neuer Glossar-Eintrag „Wie unterscheiden sich Feed, Kalender und Scout?"** erklärt die drei Ansichten anhand ihres tatsächlichen Zeithorizonts (siehe Erklärtexte unten, verifiziert im Code — nicht die ursprüngliche Vermutung).
+- [ ] **Neuer Glossar-Eintrag „Wie funktionieren die Filter?"** erklärt anhand eines konkreten App-Beispiels, dass Auswahlen innerhalb einer Filtergruppe sich addieren (ODER), Filter über verschiedene Gruppen hinweg sich kombinieren (UND), und dass es bei manchen Filtern (z. B. Verifikation) einen dritten „Ausschließen"-Zustand gibt.
+
+📎 Code-Verifikation zur Scope-Erweiterung (2026-07-05):
+- `difficulty` einer Location wird ausschließlich über das Bearbeiten-Formular im Location-Detail gesetzt (Radio-Buttons `edit-difficulty`, `web/index.html` ~Zeile 5820-5825, übernommen in `saveEdit` ~Zeile 6110-6113). Ein separates Add-Formular mit eigenem Schwierigkeits-Feld wurde nicht gefunden — Locations werden über die API angelegt und danach im Edit-Formular nachjustiert.
+- Der Verifikationsbereich im Location-Detail (`Verify.verifySection`, ~Zeile 2546, eingebunden ~Zeile 6229) hat aktuell **kein** eigenes ⓘ — anders als der Verifikations-**Badge** im Sheet-Header, der bereits eins hat. Beide sind zu unterscheiden: Badge = Kurzstatus-Anzeige (schon erklärt), Bereich = die Timeline + Formulare zum Melden/Bestätigen (noch nicht erklärt).
+- Scout (`/discover`, `backend/main.py` ~Zeile 1804-1819): liefert laut Code-Kommentar „Mond-Alignment-Chancen für die nächsten 14 Tage" aus einem vorberechneten Cache, Parameter `days: int = 14`. Scout zeigt also gezielt Mond-Ausrichtungs-Chancen in einem festen 14-Tage-Vorschaufenster — nicht ein allgemeines Entdecken ohne Zeitgrenze.
+- Kalender (`CalendarView`, ~Zeile 2212-2270): lädt und rendert **einen Monat pro Aufruf** (nicht das ganze Jahr), mit Monats-Navigation (`prev()`/`next()`) und Cache pro Monat. Der Ladetext „Jahreskalender wird geladen" ist etwas irreführend, tatsächlich wird monatsweise nachgeladen — für den Erklärtext wird der Fokus auf „Monatsübersicht mit freier Navigation" gelegt.
+- Marker auf der Hauptkarte (`MapView.loadMarkers`, ~Zeile 4692-4714): alle Location-Marker verwenden dieselbe Farbe (`--accent`-Token), es gibt **keine** Farbdifferenzierung nach Kategorie. Die Kartenlegende darf das also nicht behaupten.
+
+**Erklärtexte (final, für die Implementierung):**
+- Wetterwerte im Chancen-Detail: „Diese Werte zeigen die vorhergesagte Wetterlage zum Zeitpunkt der Chance: Temperatur, Regenwahrscheinlichkeit, Windgeschwindigkeit und Sichtweite. Sie stammen von einem Wetterdienst und werden regelmäßig aktualisiert, sind aber wie jede Vorhersage nicht hundertprozentig sicher."
+- Ideales Zeitfenster: „Das ist die Zeitspanne, in der Licht, Himmel und Ausrichtung am besten zusammenpassen, um das Motiv optimal zu fotografieren. Außerhalb dieses Fensters ist ein Foto oft trotzdem möglich, aber die Bedingungen sind weniger günstig."
+- Wolken/Himmelsröte + Kompass-Ausrichtung: „Hier siehst du, wie wahrscheinlich eine goldene oder rote Himmelsfärbung ist, und in welche Himmelsrichtung du dafür schauen solltest. Die Kompassnadel zeigt dir die passende Blickrichtung direkt an."
+- Karte & Blickwinkel (FOV): „Diese Karte zeigt, von wo aus du fotografierst, wohin dein Motiv liegt, und wie viel dein Objektiv bei der gewählten Brennweite tatsächlich einfängt. So siehst du vorab, ob das Motiv im Bild Platz hat."
+- Kompositions-Analyse: „Diese Einschätzung hilft dir zu sehen, wie das Motiv im Bildausschnitt wirkt — zum Beispiel ob es zentriert oder eher am Rand steht. Sie ist ein Hinweis für die Bildgestaltung, kein festes Muss."
+- Koordinaten: „Das sind die genauen GPS-Koordinaten des Standorts. Du kannst sie in eine Kartenapp kopieren oder direkt über die Maps-Buttons öffnen, um dorthin zu navigieren."
+- Himmelsposition/Astronomie: „Hier wird angezeigt, wo Sonne, Mond oder andere Himmelskörper zum jeweiligen Zeitpunkt am Himmel stehen. Das hilft dir einzuschätzen, ob z. B. der Mond gerade in einer für dein Motiv passenden Position aufgeht oder untergeht."
+- Fotograf-Standort/Motiv/Ausrichtung (Location-Detail): „Hier findest du, von wo aus fotografiert wird, was das Motiv ist, wie weit beides auseinanderliegt und in welche Richtung die Kamera zeigen sollte. Die Maps-Buttons bringen dich direkt zu beiden Punkten."
+- Nächste Events (Location-Detail): „Diese Liste zeigt dir die nächsten Termine, an denen an diesem Standort besonders gute Fotobedingungen erwartet werden — praktisch, um direkt von der Location aus zum passenden Termin zu springen."
+- Verifikationsbereich (Location-Detail): „Hier siehst du, ob und wann andere Nutzer diesen Standort schon vor Ort geprüft haben, und kannst selbst eine Prüfung eintragen oder ein Problem melden (z. B. versperrter Zugang). So bleibt die Info über den Standort aktuell und verlässlich."
+- Kartenlegende, Ebenen-Umschalter: „Mit diesen drei Knöpfen wechselst du die Kartenansicht: Standard-Karte, Satellitenbild oder eine abgedunkelte Nachtansicht, die z. B. beim Blick auf Sternenlocations weniger blendet."
+- Kartenlegende, GPS-Button: „Dieser Knopf zentriert die Karte auf deinen aktuellen Standort, damit du siehst, welche Locations in deiner Nähe sind."
+- Kartenlegende, Klickverhalten: „Tippe auf ein Standort-Symbol, um Namen und eine kurze Beschreibung zu sehen — von dort kommst du mit einem weiteren Klick direkt zu allen Details dieser Location."
+- Kartenlegende, Wetter-Legende-Verweis: „Zusätzlich zu den Standort-Symbolen gibt es eine eigene Wetter-Legende, die Wolken- und Regenanzeigen auf der Karte erklärt — die findest du direkt bei der Wetteranzeige."
+- Glossar „Feed, Kalender und Scout": „Der Feed zeigt dir laufend aktuelle Foto-Chancen in zeitlicher Nähe. Der Kalender zeigt eine Monatsübersicht, durch die du frei vor- und zurückblättern kannst, um auch weiter in der Zukunft oder Vergangenheit liegende Chancen zu sehen. Scout ist ein spezieller Ausblick auf besondere Mond-Ausrichtungs-Chancen in den nächsten 14 Tagen."
+- Glossar „Wie funktionieren die Filter?": „Wählst du mehrere Optionen innerhalb derselben Filtergruppe (z. B. zwei Event-Typen), werden dir Chancen gezeigt, die mindestens eine davon erfüllen. Kombinierst du dagegen mehrere Filtergruppen (z. B. Event-Typ UND Schwierigkeitsgrad), müssen beide Bedingungen gleichzeitig zutreffen. Beim Verifikations-Filter kannst du zusätzlich gezielt geprüfte oder ungeprüfte Standorte ausschließen."
+
+**Pre-Mortem:**
+- 💀 Szenario: Ein Score oder Event-Typ wird später fachlich geändert (neue Berechnung, neuer Schwellwert), aber der zugehörige Erklärungstext bleibt unverändert stehen → Nutzer bekommt eine falsche Erklärung angezeigt.
+  Auslöser: Erklärungstexte liegen getrennt vom fachlichen Code, ohne Verknüpfung/Reminder.
+  Frühwarnung: Bei künftigen Score-/Typ-Änderungen wird der Erklärungstext nicht im gleichen Umbau-Schritt geprüft.
+  Gegenmaßnahme: Erklärungstexte an einer zentralen, klar benannten Stelle bündeln + als Prüfpunkt in die Test-/Review-Checkliste für Score-/Typ-Änderungen aufnehmen.
+- 💀 Szenario: Ein Tooltip oder Overlay legt sich auf kleinen Bildschirmen über wichtige Inhalte (Buttons, Werte) und lässt sich nicht leicht wegtippen → Nutzer fühlt sich blockiert statt informiert.
+  Auslöser: Neues Erklärungs-UI-Muster wird nicht gegen kleine Viewport-Größen getestet.
+  Frühwarnung: Test nur auf großem Testgerät/Desktop-Breite.
+  Gegenmaßnahme: Manueller Test auf kleiner Bildschirmgröße als AK/Testschritt aufnehmen.
+- 💀 Szenario: Es entstehen zwei unterschiedliche Erklär-Interaktionen nebeneinander (US-55-Overlay für Scores, ein neues Tooltip-Muster für alles andere) → App wirkt uneinheitlich, Nutzer muss zwei Bedienweisen lernen.
+  Auslöser: Neues UI-Muster wird ohne Rücksicht auf das bestehende US-55-Overlay entworfen.
+  Frühwarnung: Kein Abgleich mit bestehendem `ScoreInfo`-Overlay vor Designentscheidung.
+  Gegenmaßnahme: Designer-Check (fotoalert-designer) vor der Wegwahl einholen, damit ein einheitliches Erklär-Muster für die ganze App entsteht.
+- 💀 Szenario: Wiederkehrende Nutzer werden bei jedem App-Start erneut mit dem Onboarding konfrontiert, weil der „schon gesehen"-Zustand nicht sauber gespeichert wird → Onboarding nervt statt zu helfen.
+  Auslöser: Fehlender oder fehlerhafter Speicherzustand (z. B. bei App-Update zurückgesetzt).
+  Frühwarnung: Kein Test über App-Neustart hinweg.
+  Gegenmaßnahme: Als eigenes AK/Testschritt: Onboarding erscheint nach dem ersten Start nicht erneut, auch nach Neuladen/Update.
+
+📎 Code-Verifikation (2026-07-05): `web/index.html` gelesen. Bestätigt: US-55 liefert einen fertigen, wiederverwendbaren Mechanismus — `ScoreInfo.show('gesamt'|'astro'|'wetter'|'wolkenstimmung')` öffnet `#score-info-overlay` (zentrales Overlay, CSS-Klasse `.open`, Schließen via `ScoreInfo.close()` durch „×"-Button oder Klick auf Overlay-Hintergrund). Kein Tooltip-Mechanismus (Hover) ist vorhanden — das bestehende Muster ist ein Klick-Overlay, kein reines Hover-Tooltip. Diese Spec sollte dieses Overlay-Muster als Basis nehmen statt ein neues Tooltip-System parallel zu bauen (vermeidet das dritte Pre-Mortem-Szenario oben).
+
+📎 Implementierungs-Notiz (2026-07-05): Onboarding-Slides, „?"-Header-Button und Glossar-Overlay jetzt zusätzlich implementiert (`web/index.html`: `Onboarding`-Objekt, `Glossary`-Objekt, `#help-btn`, neue CSS-Blöcke + zwei neue SVG-Symbole `i-chevleft`/`i-chevdown`). Designer-Prototyp wurde gezeigt und exakt so freigegeben. Die fünf ⓘ-Element-Erklärungen (Schwierigkeitsgrad, Event-Typ, Verifikation, Filter-Gruppen, Kartenlegende) waren bereits vorher fertig und wurden nicht angefasst. Status bleibt „In Test" bis Stephan manuell getestet hat.
+
+Scope-Erweiterung implementiert, 2026-07-05.
+
+**Korrekturen nach zweitem Testdurchlauf, 2026-07-05:**
+
+Stephan hat beim erneuten Testen vier Korrekturen gemeldet, die den obigen Implementierungsstand berichtigen (Ticket bleibt „In Test", kein Status-Wechsel):
+
+1. **„?"-Header-Button — Kurskorrektur ggü. „soll auffallen":** Stephan hat die vorherige Design-Entscheidung („Der „?"-Header-Button bleibt bewusst wie bisher, soll auffallen", siehe AK oben) zurückgenommen. Der Button ist jetzt **gleich groß und gleich grau** wie die anderen Header-Icons (Suche, Filter, Refresh) — kein blauer Kreis-Outline mehr, keine optische Sonderstellung. Umgesetzt in `web/index.html`, `#help-btn`-CSS (~Zeile 507-511): identisches Muster wie `#search-btn`/`#filter-btn`/`#refresh-btn` (`background:none; border:none; color:var(--muted)`, 20×20px Icon-Box, Hover auf `var(--gold)`).
+
+2. **Kartenlegende war ein Realitäts-Abgleich-Fehler, keine Formulierungssache:** Der zuvor implementierte Legendentext behauptete eine Darstellung von „Fotograf-Standort/Motiv-Symbol/Sichtachse-Linie" auf der Haupt-Karte — das stimmt nicht mit dem tatsächlichen Rendering überein. Verifiziert im Code: `MapView.loadMarkers()` (`web/index.html` ~Zeile 4700-4708) zeichnet auf der Übersichtskarte nur EIN einheitliches Pin-Symbol pro Location, immer in `--accent`-Farbe, keine Kategorie-Unterscheidung. Die Fotograf-Standort/Motiv/Sichtachse-Darstellung (`MapMarkers._obsIcon()`/`_subjIcon()`, ~Zeile 4568-4638, über `CameraFOV.panelHtml()`) existiert ausschließlich in der Mini-Karte im Abschnitt „Karte & Blickwinkel" innerhalb des Chancen-/Location-Detail-Sheets — NICHT auf dieser Übersichtskarte.
+   Korrigierter Legendentext (`ElementInfo._mapLegendData()`, ~Zeile 6957-6979): „Jeder Pin markiert eine Foto-Location. Tippe auf einen Pin, um Namen und eine kurze Beschreibung zu sehen — von dort kommst du mit einem weiteren Klick direkt zu allen Details dieser Location." + Hinweis, dass die Fotograf-Standort/Motiv/Sichtachse-Darstellung NICHT auf der Übersichtskarte, sondern erst im Detail einer Location/Chance unter „Karte & Blickwinkel" zu sehen ist. Die Punkte zu Kartenebenen-Umschalter und GPS-Zentrierung blieben unverändert (waren bereits korrekt).
+   Zusätzlich: Neben jedem Textpunkt steht jetzt ein kleines visuelles Symbol-Beispiel (Inline-SVG des echten Pins in `--accent`-Farbe bzw. Wiederverwendung von `MapMarkers.legendHtml()` für die Detail-Sheet-Symbole) — nicht mehr nur Fließtext.
+   Der Wetter-Legende-Satz („Zusätzlich zu den Standort-Symbolen gibt es eine eigene Wetter-Legende...") wurde komplett aus dem Text gelöscht (Stephan: „--> löschen").
+
+3. **Glossar-Eintrag „Wie unterscheiden sich Feed, Kalender und Scout?" fachlich korrigiert:** Der vorherige Text („Scout ist ein spezieller Ausblick auf besondere Mond-Ausrichtungs-Chancen in den nächsten 14 Tagen") war ungenau. Von Stephan korrigierte Fakten: Feed = 14-Tage-Feed (laufend aktuelle Chancen in zeitlicher Nähe); Kalender unverändert korrekt (Monatsübersicht, frei navigierbar); Scout errechnet **eigene** Chancen, basiert **nicht** auf von Nutzern angelegten Standorten, ist eine **Betaversion** und generiert **mögliche neue Perspektiven auf bekannte Motive**, die zum Erkunden einladen sollen, **nicht verifiziert** sind und **fehlerhaft sein können**.
+   Neuer Text (`web/index.html` ~Zeile 7162): „Der Feed zeigt dir als 14-Tage-Vorschau laufend aktuelle Foto-Chancen in zeitlicher Nähe. Der Kalender zeigt eine Monatsübersicht, durch die du frei vor- und zurückblättern kannst, um auch weiter in der Zukunft oder Vergangenheit liegende Chancen zu sehen. Scout (Betaversion) errechnet eigene Chancen unabhängig von deinen angelegten Standorten und schlägt dir mögliche neue Perspektiven auf bekannte Motive vor — diese Vorschläge sollen zum Erkunden einladen, sind aber nicht verifiziert und können fehlerhaft sein."
+
+Alle drei Korrekturen sind in `web/index.html` umgesetzt. Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlauf durch Stephan.
+
+**Korrektur nach drittem Testdurchlauf, 2026-07-05 (Kartenlegende, Screenshot-Feedback):**
+
+Die zweite Korrektur oben (Punkt 2) war selbst noch falsch: Der Absatz zu Fotograf-Standort/Motiv/Sichtachse wurde nicht entfernt, sondern nur textlich umformuliert — und rendete dabei kaputt (Bold-Tags mitten im Fließtext, einsames Komma auf eigener Zeile). Stephan hat per Screenshot des echten Overlays gegengeprüft und verlangt: ganze Sektion löschen, nicht nur Text reparieren.
+
+- **Root Cause des Render-Bugs (behoben):** `ElementInfo._mapLegendData()` (`web/index.html`, damals ~Zeile 6974) bettete `MapMarkers.legendHtml()` — das ein Block-Element (`<div style="display:flex">…`) zurückgibt — in einen `<span style="display:inline-flex">` innerhalb eines `<p>` ein. Dieses Block-in-Inline-Nesting in der schmalen Overlay-Box (`#element-info-box`, `max-width: 320px`) erzeugte bei den `<b>`-lastigen Textteilen unvorhersehbare Zeilenumbrüche (Bold-Wort und das folgende Komma landeten getrennt auf eigenen Zeilen). Alle übrigen Legendenpunkte binden nur reine SVG-Strings direkt ein (kein `<div>`) und sind von diesem Muster nicht betroffen — geprüft, kein weiteres Vorkommen gefunden.
+- **Fix:** Der komplette Absatz zu Fotograf-Standort/Motiv/Sichtachse (inkl. der Icon-Zeile mit `MapMarkers.legendHtml()`) wurde aus `_mapLegendData()` entfernt — nicht nur der Text, die ganze `<p>`-Zeile. `MapMarkers.legendHtml()` bleibt unverändert an ihrer ursprünglichen Stelle (Detail-Sheet-Mini-Karte, `web/index.html` ~Zeile 3975) im Einsatz, dort ohne Nesting-Problem.
+- **Layer-Switcher verifiziert (echt, nicht entfernt):** `#map-layer-toggle` mit den drei Buttons `MapView.setLayer('dark'|'standard'|'satellite')` steht im Markup direkt innerhalb von `#page-map` (`web/index.html` ~Zeile 1210-1216) — das ist der Haupt-Karten-Tab, nicht die Location-Detail-Mini-Karte. Zu verwechseln wäre das nur mit `LocMapMode`/US-123 (~Zeile 3803-3853), das laut eigenem Code-Kommentar explizit „eigenständig … bewusst getrennt von MapView/Karten-Tab" für die Location-Formular-Karten gilt. CSS (`#map-layer-toggle`, `.map-layer-btn`, ~Zeile 271-277) zeigt keine Auffälligkeit (kein `display:none`, korrekte Position `top:12px;right:12px`, `z-index:1000`, 44×44px Touch-Fläche) — kein Anzeige-Bug gefunden. Legendentext dazu bleibt unverändert stehen.
+- **GPS-Button verifiziert (echter Knopf, nicht nur Auto-Zentrieren):** `.map-gps-btn` (`onclick="MapView.locateMe()"`) steht ebenfalls direkt in `#page-map` (~Zeile 1246). `MapView.locateMe()` (~Zeile 4828) fragt bei Klick aktiv `navigator.geolocation.getCurrentPosition` ab und zentriert die Karte neu — das ist zusätzlich zum automatischen Init-Zentrieren aus US-117 ein eigenständiger, dauerhaft klickbarer Button. CSS (~Zeile 342-347) zeigt ebenfalls keine Auffälligkeit (sichtbarer Kreis, `bottom:30px;left:12px`, `z-index:1000`, goldene Farbe). Kein Anzeige-Bug gefunden. Legendentext dazu bleibt unverändert stehen.
+- **Finaler Legendentext (`_mapLegendData()`, jetzt 3 statt 4 Punkte):**
+  1. „Jeder Pin markiert eine Foto-Location. Tippe auf einen Pin, um Namen und eine kurze Beschreibung zu sehen — von dort kommst du mit einem weiteren Klick direkt zu allen Details dieser Location." (mit Pin-SVG-Symbol davor)
+  2. „Mit diesen drei Knöpfen wechselst du die Kartenansicht: Standard-Karte, Satellitenbild oder eine abgedunkelte Nachtansicht, die z. B. beim Blick auf Sternenlocations weniger blendet."
+  3. „Dieser Knopf zentriert die Karte auf deinen aktuellen Standort, damit du siehst, welche Locations in deiner Nähe sind."
+
+Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlauf durch Stephan.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (siehe Rules/Examples unten)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: betroffen wäre `web/index.html` (bestehendes `ScoreInfo`-Overlay-Muster ab Zeile ~4062/6691, Header-Bereich für „?"-Button, neue Erklär-Buttons an weiteren UI-Elementen wie Schwierigkeitsgrad-Badges, Event-Typ-Icons, Filter-Chips); ggf. `ios/FotoAlert/` falls die native App dieselben Erklärungen braucht (noch offen, siehe Fragen unten)
+- [x] Designer-Check: visuell? → ja, mehrere sichtbar unterschiedliche UI-Muster (Tooltip/Overlay/Glossar/Inline-Hinweis) stehen zur Wahl. **`fotoalert-designer` sollte vor der endgültigen Wegwahl hinzugezogen werden**, um visuelle Varianten für das neue einheitliche Erklär-Muster zu zeigen (Memory-Regel „Icon-/Logo-Varianten zeigen" gilt sinngemäß für neue UI-Muster) — noch nicht durchgeführt, folgt nach Stephans Entscheidung für eine der drei Optionen unten.
+- [x] Implementierungsoptionen: A / B / C (siehe unten)
+- [x] Empfehlung: Option C (siehe unten)
+
+**Beispiel-Szenarien (Example Mapping):**
+- 📏 Regel: Jeder Score-Wert bleibt wie bisher per ⓘ-Klick erklärbar (US-55, kein Rückbau).
+  🟢 Beispiel: Nutzer öffnet eine Chance im Detail-Sheet, tippt auf das ⓘ neben „Gesamt 82%" → Overlay mit Erklärung der Gesamt-Score-Berechnung öffnet sich, wie heute schon.
+- 📏 Regel: Auch Nicht-Score-Elemente mit eigener Bedeutung (Schwierigkeitsgrad, Event-Typ, Verifikations-Status) sind direkt an ihrer Stelle erklärbar.
+  🟢 Beispiel: Nutzer sieht einen Schwierigkeitsgrad-Badge „Schwer" auf einer Location-Karte, tippt darauf/auf ein kleines ⓘ daneben → kurze Erklärung was „Schwer" bedeutet (z. B. Zugang, Ausrüstung) erscheint sofort, ohne erst ins Glossar wechseln zu müssen.
+- 📏 Regel: Das zentrale Glossar/„?"-Header-Button bleibt als Nachschlage-Übersicht zusätzlich bestehen.
+  🟢 Beispiel: Nutzer tippt auf „?" im Header → Übersicht mit allen Score-Erklärungen, Schwierigkeitsgraden und Event-Typen an einem Ort.
+- 📏 Regel: Onboarding erscheint nur einmal (erster Start), ist aber jederzeit über „?" erneut aufrufbar.
+  🟢 Beispiel: Nutzer installiert die App neu → sieht beim ersten Öffnen 3–4 Einführungs-Screens. Beim zweiten Start erscheinen sie nicht mehr, sind aber über den „?"-Button abrufbar.
+- ❓ Frage (offen, an Stephan): Sollen auch die iOS-App-Screens (`ios/FotoAlert/`) dieselben Inline-Erklärungen bekommen, oder ist der Scope zunächst auf die Web-App beschränkt? ⚠️ Annahme: zunächst nur Web-App (`web/index.html`), da dort auch US-55 umgesetzt wurde — bitte bestätigen.
+- ❓ Frage (offen, an Stephan): Reicht ein kleines „ⓘ" pro Element (wie bei Scores) als einheitliches Symbol für „hier gibt's eine Erklärung", oder sollen manche Elemente (z. B. Filter-Chips) einen anderen visuellen Hinweis bekommen? ⚠️ Annahme: einheitliches ⓘ-Symbol überall, für Wiedererkennbarkeit — bitte bestätigen, ggf. im Designer-Check klären.
+
+**Implementierungsoptionen:**
+
+### Option A — Zentrales Glossar + Onboarding (ursprünglicher US-21-Scope)
+- Vorgehen: Nur Onboarding-Slides + zentrales „?"-Glossar ausbauen; Scores bleiben wie in US-55, keine weiteren Inline-Erklärungen an einzelnen UI-Elementen.
+- Vorteile: Kleinster Aufwand, ein Ort für alle Erklärungen, leicht pflegbar.
+- Nachteile/Risiken: Erfüllt die US-116-Kernanforderung „ohne Verzögerung" nicht — Nutzer muss für jede Erklärung ins Glossar wechseln, verliert den Kontext zur gerade betrachteten Funktion.
+- Aufwand: klein
+
+### Option B — Kontextuelle Inline-Hilfe an jedem UI-Element
+- Vorgehen: An jedem erklärungsbedürftigen UI-Element (Schwierigkeitsgrad, Event-Typ-Icon, Filter-Chip, Kartensymbol usw.) ein eigenes ⓘ/Tooltip direkt am Element, kein zentrales Glossar.
+- Vorteile: Erklärung erscheint exakt dort, wo die Frage entsteht — deckt „ohne Verzögerung" am besten ab.
+- Nachteile/Risiken: Kein zentraler Überblick für Neu-Nutzer, die sich erst orientieren wollen; höherer Pflegeaufwand, da Erklärtexte über viele Stellen verteilt sind (Pre-Mortem-Risiko „veraltete Texte" steigt).
+- Aufwand: groß
+
+### Option C — Kombination: Onboarding + zentrales Glossar + kontextuelle Inline-Erklärungen (empfohlen)
+- Vorgehen: Onboarding-Slides und „?"-Header-Glossar wie in Option A bleiben als Einstieg/Nachschlagewerk erhalten. Zusätzlich bekommt jedes zentrale UI-Element (nicht nur Scores) sein eigenes ⓘ nach dem bestehenden US-55-Overlay-Muster — Inline-Erklärung direkt am Element, ohne Kontextwechsel.
+- Vorteile: Deckt sowohl Neu-Nutzer (Onboarding + Glossar-Überblick) als auch die „ohne Verzögerung"-Anforderung (Inline-ⓘ überall) ab; nutzt ein bereits bewährtes, konsistentes UI-Muster (US-55) statt ein neues zu erfinden.
+- Nachteile/Risiken: Größter Umfang, mehr Texte zu pflegen und aktuell zu halten (siehe Pre-Mortem); erfordert Sorgfalt, damit die Erklärtexte an zentraler Stelle gepflegt werden.
+- Aufwand: groß
+
+✅ **Empfehlung: Option C** — nur diese Kombination erfüllt sowohl den ursprünglichen US-21-Bedarf (Einstieg für neue Nutzer) als auch die von US-116 zusätzlich geforderte „ohne Verzögerung"-Anforderung, ohne ein zweites, inkonsistentes Erklär-Muster neben dem bewährten US-55-Overlay einzuführen. Vor der endgültigen Wegwahl sollte `fotoalert-designer` herangezogen werden, um konkrete visuelle Varianten des ⓘ-Inline-Musters an mehreren UI-Elementtypen zu zeigen (Badges, Icons, Chips sehen jeweils anders aus).
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Prüfbar sind vor allem strukturelle Aspekte (z. B. „Onboarding-Flag wird nach erstem Durchlauf gesetzt und bleibt nach Reload bestehen") — als pytest-/Frontend-Test in der Implementierungsphase konkretisieren.
+- [ ] Manuell: Neuinstallation/erster Start prüfen (Onboarding erscheint), zweiter Start prüfen (Onboarding erscheint nicht mehr), „?"-Button im Header prüfen (Glossar öffnet), je ein Beispiel-ⓘ bei einem Score (US-55-Bestand) und einem neuen Element (z. B. Schwierigkeitsgrad) prüfen, Test auf kleiner Bildschirmgröße (iPhone SE) gegen Verdeckung.
+
+---
 
 ### US-07 · Goldene Wolken & Himmelsröte Scoring `[x]`
 > **Status:** Done
@@ -4973,8 +5149,230 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 >
 > *Navigation & Fahrtzeit-Indikation → US-51 (separate Story)*
 
-### US-09 · Sichtachsen-Check – Hinderniserkennung
-> Raycast-Algorithmus via OpenTopoData + OSM Buildings. Technisch aufwendig, hohe Priorität für Genauigkeit.
+### US-09 · Sichtachsen-Check – Hinderniserkennung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | Ready for Dev |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** Aktuell wird die Sichtachse Fotograf→Motiv nur als reine Richtungslinie (Bearing) behandelt — ob dazwischen tatsächlich Gebäude oder Gelände/Topographie die Sicht blockieren, wird nicht geprüft. Ein Raycast-Algorithmus (Höhendaten via OpenTopoData + Gebäudedaten via OSM Buildings) soll Hindernisse entlang der Sichtachse erkennen, damit Stephan nicht zu Standorten geleitet wird, an denen das Motiv tatsächlich verdeckt ist.
+
+**User Story:** Als App-Nutzer möchte ich, dass die App erkennt und mir anzeigt, wenn zwischen meinem Fotostandort und dem Motiv Hindernisse (Gebäude oder Geländeerhebungen) die Sicht versperren, sodass ich nicht zu einem Standort fahre, von dem aus das Motiv gar nicht sichtbar ist.
+
+**Bezug:** Keine Dublette gefunden. Verwandt, aber kein Scope-Overlap: **US-113** (Done) und **US-58** (Done) behandeln „Sichtachse" bisher nur als reinen Azimut-Winkelvergleich (Richtung Fotograf→Motiv bzw. Wolken-/Sonnenrichtung relativ dazu) — keines davon prüft, ob die Sichtlinie geometrisch tatsächlich frei ist. **TASK-45** (Done, „Idealer Azimut automatisch aus Gebäude-Footprints") hat bereits eine OSM-Gebäudedaten-Anbindung für einen anderen Zweck (Azimut-Vorschlag) gebaut — mögliche technische Grundlage/Wiederverwendung für dieses Ticket, aber keine inhaltliche Überschneidung. **US-51** (Navigation & Fahrtzeit) ist fachlich unabhängig (Routing, nicht Sichtprüfung). Empfehlung: eigenständiges Ticket, keine Merge/Split nötig.
+
+#### 🔬 Analyse (fotoalert-analyze, 2026-07-05)
+
+**Code-Verifikation (Pflicht vor Pre-Mortem/Optionen) — gelesen am 2026-07-05:**
+- `backend/calculations/weather.py:182-268` (`should_generate_red_sky_event()` u.a.): bestätigt — der bisherige „Sichtachsen-Filter" ist ein reiner Azimut-Winkelvergleich (Antisolarpunkt ± 30°), keine Geometrie/Distanz/Höhe im Spiel. US-09 ist fachlich neu, kein Duplikat.
+- `backend/data/qa_azimuth.py:127-234` (TASK-45): bestätigt — es existiert bereits ein produktiver Overpass-Client (`_fetch_overpass_footprint()`, POST an `overpass-api.de/api/interpreter`, Timeout 8s, Suchradius 40m, via `httpx`). Er ermittelt aktuell nur die Gebäudekante am Motiv selbst (für den Idealazimut), fragt aber keine Gebäude *entlang* der Sichtlinie ab. Wiederverwendbar als Query-Vorlage, nicht als fertige Lösung.
+- `backend/data/elevation.py`: bestätigt — es existiert bereits ein produktiver OpenTopoData-Client (`api.opentopodata.org/v1`, Dataset-Kette `eudem25m → srtm30m → mapzen`, Rate-Limit-Pause 1.1s zwischen Calls, persistenter JSON-Tile-Cache unter `backend/data/cache/elevation_tiles.json`, async `httpx`, stiller Fallback `(0.0, incomplete=True)` bei Fehlern). Aktuell nur für den Höhenunterschied zwischen den zwei Endpunkten (Fotograf/Motiv) genutzt (US-31) — nicht für ein Höhenprofil mit Zwischenpunkten.
+- `backend/data/locations.py:41-91` (`PhotoLocation`-Dataclass): bestätigt — Felder für Koordinaten, Distanz, Höhendifferenz, Idealazimut-Bereich vorhanden; **kein** Feld für einen vorberechneten Sichtachsen-Status.
+- `backend/precompute.py:1087-1152`: bestätigt — täglicher Ablauf lädt Locations, wendet QA-Werte (Azimut) und Overrides an, danach Snapshot. Ein Sichtachsen-Check passt strukturell **pro Location einmalig** neben die bestehende Azimut-QA — nicht pro Event in die tägliche Feed-Berechnung, da sich Gebäude/Gelände nicht täglich ändern.
+- `web/index.html`: bestätigt vorhandene Infrastruktur — „Sichtachsen-Profil"-Box im Preview-Sheet (Azimut/Distanz/Höhenwinkel, reine Anzeige, ca. Z. 6512), Kompass mit Sichtachsen-Pfeil (`mkCloudCompassSvg()`, ca. Z. 3562, aus US-111), gestrichelte Sichtachsen-Linie auf der Karte (`_drawPinsAndLine()`, ca. Z. 3911). Zusätzlich existiert bereits die manuelle Meldeoption „Sichtachse blockiert" (ca. Z. 2298) als Nutzer-Feedback-Kanal — aber kein automatischer Check. Die Visualisierungs-Bausteine für ein „frei/blockiert"-Badge sind vorhanden, es fehlt nur der Daten-Wert dahinter.
+- `backend/requirements.txt`: bestätigt — einzige HTTP-Lib im Projekt ist `httpx==0.27.0` (kein `requests`/`aiohttp`).
+
+**Externe API-Recherche (Pflicht, analog LLM-Gate) — verifiziert am 2026-07-05:**
+
+*OpenTopoData (öffentliche Instanz `api.opentopodata.org`):*
+- Kostenlos nutzbar, kein API-Key nötig (Quelle: github.com/ajnisbet/opentopodata README, opentopodata.org/api/).
+- Rate-Limit für die öffentliche Instanz ist in der offiziellen Doku **nicht explizit als Zahl dokumentiert** (nur der Software-Default `max_locations_per_request: 100` als Serverparameter, keine bestätigte „X Requests/Sekunde"-Angabe für die konkrete Public-Instanz). Der bereits im Code vorhandene Client pausiert defensiv 1.1s zwischen Calls — das ist die bisherige, bewährte Vorsichtsmaßnahme.
+- Kein SLA, Ein-Personen-Betrieb, Best-Effort. Bei dauerhaft höherem Bedarf verweist der Betreiber selbst auf Self-Hosting oder das kostenpflichtige Schwesterprojekt GPXZ.io.
+
+*Overpass API (`overpass-api.de`):*
+- Kostenlos nutzbar, kein API-Key zwingend (Quelle: dev.overpass-api.de/overpass-doc/en/preface/commons.html, offizielles User-Manual).
+- Dokumentierter Richtwert: max. **~10.000 Requests/Tag** und **<1 GB Downloadvolumen/Tag** pro Nutzer/IP; Timeout-Default 180s, Max-Memory 512 MiB/Request; bei ausgelasteten Servern Warteschlange bis 15s, danach HTTP 429/504.
+- **Wichtiger Befund:** Die Doku benennt explizit als unerwünschtes Nutzungsmuster „eine App bauen, die dauerhaft die öffentlichen Instanzen als Backend für mehr als reine OSM-Mapping-Zwecke nutzt" und empfiehlt in diesem Fall ausdrücklich Self-Hosting einer eigenen Instanz.
+- Kein SLA, Best-Effort mit Load-Shedding (Heavy User werden zuerst gedrosselt).
+
+**Einordnung für US-09:** Bei ~mehreren hundert Locations × mehreren Sample-Punkten pro Sichtlinie (grob 10–50 für ein Höhenprofil) würde ein **Live-Check pro Nutzeranfrage** built-in in beiden APIs an die fair-use-Grenzen stoßen — vor allem bei Overpass, wo Dauerbetrieb als App-Backend ausdrücklich als Fehlnutzung benannt wird. Ein **einmaliger Precompute pro Location** (ähnlich wie die bestehende Azimut-QA/Elevation-Nutzung) bleibt dagegen weit unter beiden Grenzwerten, weil Gebäude/Gelände sich praktisch nie ändern.
+
+##### Annahmen-Protokoll
+
+| # | Punkt | Typ | Einordnung |
+|---|-------|-----|------------|
+| 1 | Wird der Check einmalig pro Location vorberechnet (wie Azimut-QA) oder live bei jeder Chancen-Anzeige neu gerechnet? | 🔴 funktional kritisch | **Frage 1** unten |
+| 2 | Gilt der Check nur für Alignment-Events (Sonne/Mond/Himmelsrichtung, wie im Ticket-Titel „Sichtachsen-Check" impliziert) oder auch für Wetter-Chancen (Golden Hour, Himmelsröte) die auch eine Blickrichtung haben? | 🔴 funktional kritisch | **Frage 2** unten |
+| 3 | Was zeigt die App bei „teilweise blockiert" (z.B. Gebäude verdeckt nur die untere Hälfte der Sonnenscheibe kurz nach Aufgang)? | ⚪ konventionell | ⚠️ Annahme: Ampel-Modell mit 3 Stufen — frei / teilweise verdeckt (informativ) / komplett blockiert (warnend) — analog zum bestehenden Sichtachsen-Profil-UI. Bitte bestätigen. |
+| 4 | Woher kommt die Beobachterhöhe (Augenhöhe/Stativhöhe) für den Raycast-Startpunkt? | ⚪ konventionell | ⚠️ Annahme: bereits vorhandenes Feld `observer_floor_height_m` (US-62) + Standard-Augenhöhe 1,6 m wird addiert. Bitte bestätigen. |
+| 5 | Soll das Ergebnis nur am Standort selbst angezeigt werden (Location-Detail) oder auch als Filter-Chip nutzbar sein (z.B. „nur freie Sichtachse zeigen")? | ⚪ konventionell | ⚠️ Annahme: Für diesen ersten Schnitt nur Anzeige, kein Filter-Chip (Aufwand + gemäß Schritt 4f separat zu klären, wenn gewünscht). Bitte bestätigen. |
+| 6 | Reicht eine 2D-Prüfung (Höhenprofil entlang der Linie ignoriert Erdkrümmung) oder muss Erdkrümmung ab welcher Distanz berücksichtigt werden? | ⚪ konventionell | ⚠️ Annahme: Erdkrümmungskorrektur ab 5 km Distanz einbauen (bei üblichen Motiv-Distanzen von wenigen hundert Metern bis 2-3 km i.d.R. vernachlässigbar, aber bei Fernmotiven wie Bergen relevant). Bitte bestätigen. |
+
+**Offene Fragen (blockierend, bitte vor Freigabe beantworten):**
+1. ❓ Soll der Sichtachsen-Check **einmalig vorberechnet** werden (Ergebnis ändert sich nur, wenn sich Standort/Motiv/Gebäude ändern — passt zu Empfehlung Option A unten) oder **live bei jeder Anzeige** neu gerechnet werden (aktueller, aber deutlich teurer und mit Blick auf Overpass-Fair-Use riskanter)?
+2. ❓ Soll der Check nur für Alignment-Events (Sonnenuntergang/-aufgang, Mondauf-/-untergang, Himmelsrichtung) gelten, oder auch für Wetter-Chancen (Golden Hour, Blaue Stunde, Himmelsröte), die ebenfalls eine Blickrichtung haben?
+
+**✅ Beantwortet durch Stephan (2026-07-05):**
+1. **Prüf-Zeitpunkt:** Einmalig beim Anlegen/Ändern einer Location (Option A, wie empfohlen), Ergebnis wird gespeichert — kein Live-Check bei jeder Anzeige. Zusätzlich: Stephan möchte einen **manuellen "Jetzt aktualisieren"-Menüpunkt** für den Host im Refresh-Menü oben rechts, analog zu den bestehenden Einträgen für Wetter/14-Tage-Feed/Kalender, um den Sichtachsen-Check bei Bedarf bewusst selbst neu anzustoßen (z.B. wenn sich ein Gebäude in der Nähe verändert hat). Siehe neuer Baustein „Manueller Refresh-Trigger" unten.
+2. **Geltungsbereich:** Der Check gilt nicht nur für Sonne/Mond/Himmelsrichtung-Alignment-Events, sondern zusätzlich für Wetter-Chancen mit Sichtachsen-Bezug — insbesondere Himmelsröte im Gegenpunkt-Sektor der Sonne (aus US-113, `should_generate_red_sky_event()` in `backend/calculations/weather.py:182-268`). Größerer Umfang für konsistentere Abdeckung über alle Event-Typen mit Blickrichtungsbezug hinweg.
+
+##### Example Mapping
+
+📏 **Regel 1:** Wenn zwischen Fotostandort und Motiv auf Höhe der Sichtlinie ein Gebäude oder eine Geländeerhebung höher liegt als die direkte Sichtlinie, gilt die Sicht als blockiert.
+- 🟢 Beispiel: Fotostandort auf einem Hügel, Motiv (Sonnenuntergang-Richtung) liegt hinter einem 40m hohen Gebäude, das 200m vor dem Fotostandort in der Sichtlinie steht und höher ist als die gedachte Linie Auge→Horizont an dieser Stelle → Status „blockiert".
+- 🟢 Beispiel: Freies Feld, kein Gebäude und keine Geländeerhebung zwischen Standort und Horizont in Zielrichtung → Status „frei".
+
+📏 **Regel 2:** Eine teilweise Verdeckung (z.B. Sonnenscheibe wird erst kurz über dem Horizont von einem Hindernis verdeckt, danach frei) wird separat von einer vollständigen Blockade ausgewiesen.
+- 🟢 Beispiel: Sonnenuntergang-Alignment, Hindernis verdeckt nur den untersten Teil des Sonnenuntergangs (erste 2° über Horizont) → Status „teilweise verdeckt", mit Hinweis „Sonnenuntergang erst ab ca. X° Höhe sichtbar".
+- 🟢 Beispiel: Hindernis überdeckt die komplette Zielrichtung inkl. des gesamten Alignment-Zeitfensters → Status „blockiert".
+
+📏 **Regel 3:** Der Check wird pro Location einmalig vorberechnet (nicht pro einzelner Chance/Event), da sich Gebäude/Gelände praktisch nie ändern — analog zur bestehenden Azimut-QA. Zusätzlich kann der Host den Check jederzeit manuell über einen neuen Menüpunkt im Refresh-Menü erneut anstoßen.
+- 🟢 Beispiel: Neue Location wird angelegt/bearbeitet → Sichtachsen-Check läuft einmalig im Zuge der QA-Vorberechnung, Ergebnis wird an der Location gespeichert.
+- 🟢 Beispiel: Location bleibt unverändert → beim täglichen Precompute wird der bereits gespeicherte Sichtachsen-Status wiederverwendet, kein erneuter externer API-Call.
+- 🟢 Beispiel: Stephan öffnet als Host das Refresh-Menü oben rechts und klickt „Sichtachsen aktualisieren" (weil in der Nähe einer Location ein Neubau entstanden ist) → Check läuft für alle Locations neu, Ergebnis wird überschrieben, sobald der Job fertig ist (Statusanzeige im Menü wie bei Wetter/Feed/Kalender).
+
+📏 **Regel 3b (Geltungsbereich):** Der Sichtachsen-Status wird nicht nur bei Alignment-Events (Sonne/Mond/Himmelsrichtung) angezeigt, sondern auch bei Wetter-Chancen mit Sichtachsen-Bezug — insbesondere Himmelsröte im Gegenpunkt-Sektor der Sonne (US-113).
+- 🟢 Beispiel: Eine Himmelsröte-Chance (Wetter-Event) wird für eine Location mit bekanntem Hindernis in der Gegenpunkt-Sichtlinie angezeigt → Event-Detail zeigt denselben Sichtachsen-Status („blockiert"/„teilweise verdeckt"/„frei"/„nicht geprüft") wie ein Sonnenuntergangs-Alignment.
+- 🟢 Beispiel: Golden-Hour-Chance ohne festen Sichtachsen-Bezug (keine spezifische Blickrichtung im Event) → kein Sichtachsen-Status nötig, da keine feste Ziellinie vorliegt (Regel gilt nur für Events mit Blickrichtungsbezug, nicht pauschal für jede Wetter-Chance).
+
+📏 **Regel 4:** Schlägt die externe Höhen- oder Gebäudedaten-Abfrage fehl (Timeout, Datenlücke), wird das dem Nutzer ehrlich als „nicht geprüft" angezeigt — nicht stillschweigend als „frei" interpretiert.
+- 🟢 Beispiel: OpenTopoData liefert für eine abgelegene Location keine Daten (ländliche Lücke) → Status „nicht prüfbar", kein falsches „frei"-Signal.
+- 🟢 Beispiel: Overpass-Anfrage läuft in Timeout → Status bleibt „nicht geprüft" bis zum nächsten Precompute-Lauf, alte Anzeige (falls vorhanden) bleibt bestehen statt auf „blockiert" zu kippen.
+
+*(Fragen 1 und 2 oben sind Voraussetzung für die finale Fassung von Regel 2 und den Anwendungsbereich von Regel 1 — nach Antwort ggf. Regeln nachschärfen.)*
+
+##### Akzeptanzkriterien
+
+- [ ] Für eine Location mit einem bekannten Gebäude in der Sichtlinie zeigt die App am Standort „Sichtachse blockiert" statt nur die reine Richtungslinie.
+- [ ] Für eine Location mit freiem Blick zeigt die App „Sichtachse frei".
+- [ ] Bei teilweiser Verdeckung zeigt die App „teilweise verdeckt" mit einem verständlichen Zusatz (z.B. ab welcher Höhe über dem Horizont das Motiv sichtbar wird), nicht nur ein pauschales Blockiert/Frei.
+- [ ] Edge Case: Kann der Check für eine Location nicht durchgeführt werden (externe Daten nicht verfügbar), zeigt die App „nicht geprüft" statt fälschlich „frei" oder „blockiert".
+- [ ] Edge Case: Für eine sehr weit entfernte Location (>5 km zum Motiv, z.B. Bergsilhouette) berücksichtigt der Check die Erdkrümmung, sodass keine falschen „blockiert"-Meldungen durch einen rechnerisch falschen, zu geraden Sichtstrahl entstehen.
+- [ ] Der Check läuft automatisch beim Anlegen/Ändern einer Location bzw. beim regulären täglichen Vorberechnungslauf, nicht bei jedem einzelnen Aufruf einer Chance im Feed/Kalender (Performance, siehe Pre-Mortem).
+- [ ] Bestehende Sichtachsen-Anzeigen (Profil-Box, Kompass-Pfeil, gestrichelte Linie auf der Karte) funktionieren unverändert weiter; das neue Blockiert/Frei-Ergebnis ergänzt sie, ersetzt sie nicht.
+- [ ] **(neu, 2026-07-05)** Der Host findet im Refresh-Menü oben rechts einen neuen Menüpunkt „Sichtachsen aktualisieren" (analog zu Wetter/Feed/Kalender), über den er den Sichtachsen-Check für alle Locations manuell neu anstoßen kann; der Menüpunkt zeigt denselben Lauf-/Fertig-/Fehler-Status wie die bestehenden drei Einträge (Spinner während des Laufs, „vor X Min." nach Abschluss, Fehlertext bei Störung).
+- [ ] **(neu, 2026-07-05)** Nicht nur Alignment-Events (Sonne/Mond/Himmelsrichtung), sondern auch Wetter-Chancen mit Sichtachsen-Bezug — insbesondere Himmelsröte im Gegenpunkt-Sektor der Sonne (US-113) — zeigen denselben Sichtachsen-Status (frei/teilweise verdeckt/blockiert/nicht geprüft) im Event-Detail an.
+- [ ] **(neu, 2026-07-05, Design)** Der Sichtachsen-Status wird als vierfarbige Status-Pille dargestellt (Frei=Grün+Häkchen, Teilweise verdeckt=Orange+Halbdreieck-Icon, Blockiert=Rot+Warndreieck, Nicht geprüft=Grau+Fragezeichen) — sichtbar sowohl auf der Feed-Karte (`oppCard()`) als auch im Detail-Sheet der Chance; die Pille folgt optisch dem bestehenden Muster der `tag-verified`/`tag-issue`-Tags (kein neues Farbsystem).
+- [ ] **(neu, 2026-07-05, Design)** Die vorhandene Sichtachsen-Linie/Kompass-Darstellung (Astro-Kompass-Linie, Sichtachsen-Profil-Box) ändert je nach Status ihren Linienstil: durchgezogen (Frei), gestrichelt (Teilweise verdeckt), unterbrochen/mit Balken markiert (Blockiert), gepunktet (Nicht geprüft) — reine Stil-Anpassung an bestehenden Elementen, kein neues Icon-Set.
+- [ ] **(neu, 2026-07-05, Design)** Ein neuer Filter-Chip „Sichtachse" erlaubt das gezielte Ein-/Ausblenden nach Sichtachsen-Status (z.B. „nur Frei zeigen" oder „Blockiert ausschließen"), analog zum bestehenden Verifikationsfilter: Drei-Zustand-Zyklus (Off → Include → Exclude → Off) pro Chip, Badge-Zähler in der Filter-Kopfzeile bei aktivem Filter, und Ausgrauen des Chips auf Ansichten ohne Sichtachsen-Bezug (z.B. reine Location-Attribute-Kontexte), analog zur bestehenden Ausgrauen-Regel (BUG-46).
+
+##### Pre-Mortem
+
+- 💀 **Szenario:** Die App zeigt für dutzende Locations dauerhaft „nicht geprüft" an, weil die öffentliche Overpass- oder OpenTopoData-Instanz zeitweise überlastet ist oder den täglichen Bulk-Check als Fehlnutzung einstuft und blockiert.
+  - Auslöser: Precompute fragt für alle Locations an einem Tag gebündelt ab, überschreitet Fair-Use-Muster.
+  - Frühwarnung: Häufung von Timeout-/429-Fehlern im Precompute-Log.
+  - Gegenmaßnahme: Ergebnis dauerhaft cachen (kein täglicher Re-Check, nur bei Standort-/Motiv-Änderung), Anfragen zeitlich entzerren (analog bestehender 1.1s-Pause bei OpenTopoData), Fallback „letzter bekannter Status" statt sofort „nicht geprüft" zu zeigen.
+- 💀 **Szenario:** Für ländliche Locations in Brandenburg liefert OSM keine oder unvollständige Gebäudedaten → Check meldet fälschlich „frei", obwohl z.B. ein Wald oder eine Böschung (die OSM nicht als Gebäude, sondern nur als Fläche kennt) die Sicht blockiert.
+  - Auslöser: Raycast prüft nur Gebäude-Footprints, nicht Wald/Vegetation/Geländekanten außerhalb des Höhenmodells.
+  - Frühwarnung: Manuelle Nutzer-Meldung „Sichtachse blockiert" (bereits vorhandene Funktion) widerspricht dem automatischen „frei"-Status.
+  - Gegenmaßnahme: In der Anzeige transparent machen, dass der Check auf Höhendaten + Gebäude basiert, nicht auf Vegetation — plus die bestehende manuelle Meldefunktion als Korrektiv explizit erwähnen/verlinken.
+- 💀 **Szenario:** Präzision der Höhendaten (SRTM 30m-Raster) ist zu grob für kurze Distanzen (z.B. Gebäude 30m entfernt) → kleine, aber sichtrelevante Erhebungen werden nicht erkannt, oder Rauschen erzeugt falsche Blockaden.
+  - Auslöser: Datensätze wie `eudem25m`/`srtm30m` haben Rasterauflösung von 25–30m, kleinere Objekte „verschwinden" zwischen den Stützpunkten.
+  - Frühwarnung: Bekannte Location mit sicher freiem Blick wird fälschlich als „blockiert" markiert (False Positive) oder umgekehrt.
+  - Gegenmaßnahme: Gebäude-Footprints (Overpass, punktgenauer als das Höhenraster) für den Nahbereich (<200m) primär nutzen, Höhendaten für den Gelände-Ferner-Bereich; Grenzfälle als „teilweise verdeckt" statt hartem „blockiert" ausweisen (konservativ in Richtung „nicht sicher" statt Falschmeldung).
+- 💀 **Szenario:** Bei mehreren hundert Locations dauert der einmalige Precompute-Durchlauf sehr lange (jede Location = 1 Overpass-Call + mehrere OpenTopoData-Calls mit 1.1s-Pause), blockiert den ohnehin schon langen `--full`-Precompute-Lauf zusätzlich.
+  - Auslöser: Sequenzielle externe Calls addieren sich (bei z.B. 300 Locations × ~2s im Schnitt ≈ 10 Minuten zusätzlich — grobe Schätzung, nicht gemessen).
+  - Frühwarnung: Auffällig verlängerte Precompute-Laufzeit nach Rollout.
+  - Gegenmaßnahme: Check nur einmalig bei Neuanlage/Änderung einer Location ausführen (nicht bei jedem täglichen Precompute-Lauf erneut), Ergebnis persistent speichern — deckt sich mit Regel 3 oben.
+- 💀 **Szenario:** Erdkrümmung wird bei weit entfernten Motiven (z.B. Bergpanorama 20km entfernt) ignoriert → Sichtlinie wird als „blockiert durch Horizont" gewertet, obwohl in Realität durch die Erdkrümmungskorrektur der Blick frei wäre (oder umgekehrt).
+  - Auslöser: Einfache lineare Höhenprofil-Berechnung ohne Erdradius-Korrektur.
+  - Frühwarnung: Bekannte Fernmotive (Alpen-Sichtungen, hohe Sendemasten) werden falsch bewertet.
+  - Gegenmaßnahme: Standard-Erdkrümmungs-/Refraktionskorrektur-Formel ab 5 km Distanz einbauen (siehe Annahme 6).
+
+**Betroffene Nachbarbereiche für die Regression:** Location-Detail-Anzeige (Sichtachsen-Profil-Box), Event-Detail-Sheets mit Kompass-Pfeil (auch für Wetter-/Himmelsröte-Events, siehe Entscheidung 2), Karten-Darstellung der gestrichelten Sichtlinie, Precompute-Laufzeit gesamt, bestehende manuelle „Sichtachse blockiert"-Meldefunktion, **(neu, 2026-07-05)** bestehendes Refresh-Menü und dessen drei Einträge Wetter/Feed/Kalender (neuer vierter Eintrag darf deren Verhalten nicht stören).
+
+##### Architektur-Analyse
+
+**Betroffene Backend-Module:**
+- `backend/data/elevation.py` — Erweiterung um Höhenprofil-Abfrage mit mehreren Zwischenpunkten (statt nur 2 Endpunkten), Wiederverwendung von Cache-/Rate-Limit-Pattern.
+- `backend/data/qa_azimuth.py` — Erweiterung/neue Funktion für Gebäude-Footprint-Abfrage entlang der gesamten Sichtlinie (nicht nur am Motiv), Wiederverwendung der bestehenden Overpass-Query-Vorlage.
+- `backend/data/locations.py` — neues Feld an `PhotoLocation` für den Sichtachsen-Status (z.B. Enum frei/teilweise/blockiert/nicht geprüft) + optionalem Detailwert (Verdeckungshöhe in Grad).
+- `backend/precompute.py` — neuer Schritt neben der bestehenden Azimut-QA (`_apply_qa_values()`), der den Sichtachsen-Check einmalig pro Location/Motiv-Kombination ausführt und persistiert.
+- `backend/main.py` — Location-Antwort um das neue Feld ergänzen; zusätzlich neuer Endpoint für den manuellen Refresh-Trigger (siehe Baustein unten).
+- `backend/calculations/weather.py:182-268` (`should_generate_red_sky_event()`) — Erweiterung, damit auch für Himmelsröte-Chancen (US-113) der Sichtachsen-Status aus der Location mitgegeben wird, nicht nur für Alignment-Events (siehe Entscheidung 2 unten).
+- `backend/calculations/` — neue Raycast-/Geometrie-Funktion (Höhenprofil + Erdkrümmung + Gebäudehöhen kombinieren, Sichtwinkel gegen Horizont berechnen).
+
+**Betroffene Frontend-Teile:**
+- `web/index.html` — „Sichtachsen-Profil"-Box (ca. Z. 6512) um Statusanzeige (frei/teilweise/blockiert/nicht geprüft) ergänzen; keine neue Sektion nötig, Erweiterung der bestehenden. Zusätzlich: neuer Menüpunkt im Refresh-Menü (siehe Baustein unten). Event-Detail-Sheets für Himmelsröte-Chancen zeigen künftig ebenfalls den Sichtachsen-Status (nicht nur Alignment-Event-Sheets).
+- Optional: Badge/Icon am Location-Eintrag in der Locations-Liste (separates Designer-Thema, siehe unten).
+
+**Neue Datenquellen/Dependencies:** Keine neue Library nötig (`httpx` bereits vorhanden). Neue externe Datenabfragen: erweiterte OpenTopoData-Höhenprofile (mehr Punkte pro Call, bereits unterstütztes API-Feature), erweiterte Overpass-Gebäudeabfragen entlang der Linie (größerer Suchradius/Bounding-Box statt nur 40m am Motiv).
+
+**Designer-Check:** Ja, visuell sichtbar (neue Statusanzeige/Badge in bestehender UI-Box). `fotoalert-designer` sollte vor der Implementierung für die konkrete Darstellung (Icon/Farbe/Text der 4 Status frei/teilweise/blockiert/nicht geprüft) hinzugezogen werden — noch nicht durchgeführt, siehe Empfehlung unten.
+
+**Neuer Baustein (2026-07-05): Manueller Refresh-Trigger**
+
+Stephan möchte den Sichtachsen-Check zusätzlich manuell über das bestehende Refresh-Menü (oben rechts, `#refresh-menu-wrap` in `web/index.html`) anstoßen können — analog zu den drei bereits vorhandenen Menüpunkten. Am Code verifiziertes Muster (`web/index.html:7258-7370`, `backend/main.py:1887-1912`):
+
+- **Frontend:** `RefreshMenu._cfg` (Objekt ca. Z. 7265-7269) definiert je Job `{ endpoint, label, doneMsg, reloadFeed }`. Ein neuer Eintrag `sightlines: { endpoint: '/sightline-refresh', label: 'Sichtachsen aktualisieren', doneMsg: '✅ Sichtachsen aktualisiert', reloadFeed: true }` reiht sich hier ein. Dazu ein neues `<div class="refresh-menu-item" id="rmi-sightlines" onclick="RefreshMenu.trigger('sightlines')">` im Menü-HTML (ca. Z. 1139-1166, neben den bestehenden `rmi-weather`/`rmi-feed`/`rmi-calendar`-Blöcken), inkl. `<div class="rmi-status" id="rms-sightlines">`. `RefreshMenu.trigger()` und `_applyStatus()` sind generisch (arbeiten über den `key`/`_cfg`-Mechanismus) und brauchen keine Änderung.
+- **Backend:** Neuer Endpoint nach dem Muster von `@app.post("/refresh-calendar")` bzw. `@app.post("/weather-refresh")` (`backend/main.py:1887-1912`): `@app.post("/sightline-refresh")` mit `background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)` (Host-only, wie alle drei bestehenden Refresh-Endpoints), Guard gegen parallelen Lauf über `_precompute_running` (wie bei Feed/Kalender) oder einen eigenen Lock, `background_tasks.add_task(...)` stößt den Sichtachsen-Check für alle Locations neu an.
+- **Status-Polling:** Läuft über den bereits generischen `_job_status`-Mechanismus (`backend/main.py:265-292`, Endpoint `GET /job-status` Z. 2012) — neuer Job-Key `"sightlines"` reiht sich dort ein, keine Änderung an `job-status` selbst nötig, nur `_job_status`-Dict um den neuen Key ergänzen (analog `weather`/`feed`/`calendar`).
+- Damit ist der neue Menüpunkt strukturell identisch zu den drei bestehenden: gleicher Auth-Schutz (Host-Rolle), gleiches Spinner-/Status-/Fehler-Verhalten im Menü, gleiches Polling-Muster (`setInterval`, 3s) im Frontend.
+
+##### Implementierungsoptionen
+
+**Option A — Precompute mit persistentem Status (empfohlen)**
+- Vorgehen: Sichtachsen-Check läuft einmalig beim Anlegen/Ändern einer Location bzw. beim nächsten regulären Precompute-Lauf, wenn noch kein Ergebnis vorliegt. Ergebnis (frei/teilweise/blockiert/nicht geprüft + Detailwinkel) wird an der Location gespeichert und in allen Ansichten (Feed, Kalender, Location-Detail) einfach mitgelesen — kein Live-Call bei jeder Chancen-Anzeige.
+- Betroffene Dateien: `backend/data/elevation.py`, `backend/data/qa_azimuth.py`, `backend/data/locations.py`, `backend/precompute.py`, `backend/main.py`, `web/index.html`.
+- Vorteile: Bleibt weit unter den Fair-Use-Grenzen beider externer APIs (siehe Recherche oben); schnelle Anzeige in der App (kein Warten auf externe Calls); Ergebnis stabil und nachvollziehbar; nutzt bestehende Precompute-Infrastruktur.
+- Nachteile/Risiken: Ergebnis ist nicht „live" — wenn sich real ein neues Gebäude baut, merkt die App das erst beim nächsten manuellen Location-Update, nicht automatisch (aber: Gebäude entstehen nicht über Nacht, unkritisch).
+- Aufwand: mittel bis groß (neue Geometrie-Berechnung + Precompute-Integration + Datenmodell-Erweiterung + UI-Anzeige).
+
+**Option B — Live-Check bei jeder Anfrage**
+- Vorgehen: Sichtachsen-Check wird bei jedem Öffnen einer Chance/eines Location-Details neu berechnet (Live-Call an OpenTopoData + Overpass).
+- Betroffene Dateien: zusätzlich zu Option A auch neue Live-Endpoints in `backend/main.py`, keine Persistenz in `locations.py` nötig.
+- Vorteile: Immer aktuell, auch bei kurzfristigen Geländeänderungen.
+- Nachteile/Risiken: Verstößt gegen die von Overpass explizit benannte Fair-Use-Regel „keine App, die dauerhaft öffentliche Instanzen als Live-Backend nutzt"; spürbar langsamere Ladezeit beim Öffnen einer Chance (mehrere externe Calls mit Timeout-Risiko); höheres Ausfallrisiko bei Rate-Limiting.
+- Aufwand: mittel (weniger Precompute-Integration), aber mit strukturellem Betriebsrisiko.
+
+**Option C — Vereinfachter Nur-Gebäude-Check ohne Geländehöhen (kein Raycast über Terrain)**
+- Vorgehen: Nur Overpass-Gebäudedaten entlang der Sichtlinie prüfen (Gebäudehöhe vs. Sichtlinienhöhe an dem Punkt), Geländehöhen/Erdkrümmung ignorieren.
+- Betroffene Dateien: nur `backend/data/qa_azimuth.py`, `backend/data/locations.py`, `backend/precompute.py`, `web/index.html`.
+- Vorteile: Deutlich weniger Aufwand, keine OpenTopoData-Erweiterung nötig.
+- Nachteile/Risiken: Erfüllt den Ticket-Wortlaut nicht (explizit „Gebäude ODER Gelände"); in Brandenburg mit viel offener Landschaft/Hügeln wäre gerade die Geländeerhebung oft der relevantere Blocker als Gebäude — Kernnutzen des Tickets ginge verloren.
+- Aufwand: klein bis mittel.
+
+✅ **Empfehlung: Option A (Precompute mit persistentem Status).** Sie deckt den vollen Ticket-Scope (Gebäude UND Gelände) ab, bleibt bei beiden externen Diensten sicher innerhalb der recherchierten Fair-Use-Grenzen (Overpass warnt ausdrücklich vor Dauerbetrieb als Live-Backend), passt strukturell zur bestehenden Precompute-Pipeline (Azimut-QA läuft bereits nach demselben Muster) und liefert dem Nutzer eine sofortige Anzeige ohne Wartezeit. Option C wäre günstiger, verfehlt aber die im Ticket explizit geforderte Geländeerkennung.
+
+##### Testplan
+
+- **Automatisiert (Harness):** `backend/tests/test_us09.py` — Testfälle für: (1) bekanntes Gebäude in der Sichtlinie → Status „blockiert"; (2) freie Sichtlinie → Status „frei"; (3) simulierter API-Fehler (Mock-Timeout) → Status „nicht geprüft", nie „frei"; (4) Distanz >5km mit Erdkrümmungskorrektur → erwarteter Grenzwinkel stimmt mit Referenzrechnung überein; (5) teilweise Verdeckung (Hindernishöhe schneidet unteren Teil des Alignment-Fensters) → Status „teilweise verdeckt" mit korrektem Grenzwinkel; (6) **(neu, 2026-07-05)** Himmelsröte-Chance (US-113, `should_generate_red_sky_event()`) für eine Location mit bekanntem Sichtachsen-Status → Event trägt denselben Status wie ein Alignment-Event derselben Location.
+- **Manuell:** Nach Implementierung unter `http://localhost:8000` an mind. 2 realen Brandenburg-Locations mit bekannter Sichtsituation (eine mit bekanntem Gebäude in Sichtlinie, eine mit freiem Feld) prüfen, ob die Anzeige im Location-Detail den erwarteten Status zeigt; zusätzlich eine Location ohne verfügbare Höhendaten (falls bekannt) auf „nicht geprüft" statt Fehlanzeige prüfen. Regressionsprüfung: bestehende Sichtachsen-Profil-Box, Kompass-Pfeil und Kartenlinie weiterhin unverändert sichtbar.
+- **Manuell (neu, 2026-07-05) — manueller Refresh-Menüpunkt:** Als Host einloggen → Refresh-Menü oben rechts öffnen → neuer Eintrag „Sichtachsen aktualisieren" ist sichtbar, neben Wetter/Feed/Kalender → Klick darauf startet den Lauf (Spinner „Läuft…" erscheint, analog zu den drei bestehenden Einträgen) → nach Abschluss zeigt der Eintrag „vor X Min. (Ys)" und ein Toast „✅ Sichtachsen aktualisiert" erscheint → erneuter Aufruf einer Location bestätigt, dass der Sichtachsen-Status neu berechnet wurde (bzw. unverändert bleibt, wenn sich nichts geändert hat).
+- **Manuell (neu, 2026-07-05) — Geltungsbereich Wetter-Chancen:** Eine Himmelsröte-Chance (Wetter-Event, nicht Sonnenuntergang-Alignment) für eine Location mit bekanntem Sichtachsen-Status im Feed/Kalender öffnen → Event-Detail zeigt denselben Status (frei/teilweise verdeckt/blockiert/nicht geprüft) wie bei einem Alignment-Event derselben Location — nicht nur bei Sonne/Mond/Himmelsrichtung-Ereignissen.
+- **Manuell (neu, 2026-07-05) — Design: Status-Pille:** Feed öffnen, eine Chance mit Sichtachsen-Status „Blockiert" suchen → auf der Karte (`oppCard()`) erscheint neben den bestehenden Tags (Priorität/Brennweite/Wetter/Stativ/Geprüft) eine rote Pille mit Warndreieck-Icon und Text „Blockiert"; Klick öffnet Detail-Sheet → dieselbe Pille erscheint auch dort. Wiederholen für „Frei" (grün, Häkchen), „Teilweise verdeckt" (orange, Halbdreieck-Icon) und „Nicht geprüft" (grau, Fragezeichen-Icon) — alle vier Zustände optisch klar unterscheidbar, Farben konsistent mit dem bestehenden „Geprüft"-Tag (grün) bzw. „Problem"-Tag (rot).
+- **Manuell (neu, 2026-07-05) — Design: Linienstil je Status:** Für je eine Location mit bekanntem Status „Frei", „Teilweise verdeckt", „Blockiert" und „Nicht geprüft" das Astro-/Kompass-Sheet bzw. die Sichtachsen-Profil-Box öffnen → die Sichtachsen-Linie zeigt den passenden Stil (durchgezogen/gestrichelt/unterbrochen-mit-Balken/gepunktet); Kompass-Legende „Sichtachse → Motiv" bleibt lesbar und eindeutig einem Zustand zuordenbar.
+- **Manuell (neu, 2026-07-05) — Design: Filter-Chip:** Filter-Sheet öffnen → neuer Chip „Sichtachse" ist sichtbar (analog Verifikationsstatus-Sektion) → Tippen einmal → nur Chancen mit „Frei" werden angezeigt (Include-Zustand, Chip farblich hervorgehoben), Badge-Zähler oben in der Filter-Kopfzeile erhöht sich um 1 → nochmal tippen → Exclude-Zustand (Chancen mit diesem Status werden ausgeblendet, Chip in Warnfarbe) → drittes Tippen → zurück auf Aus. Prüfen, ob der Chip auf Ansichten ohne Sichtachsen-Bezug (falls zutreffend) ausgegraut/deaktiviert dargestellt wird, analog zur bestehenden Ausgrauen-Regel (BUG-46).
+
+#### 🎨 Design-Entscheidung (fotoalert-designer, 2026-07-05)
+
+Stephan hat die folgenden drei Design-Punkte final bestätigt. Code-Referenzen unten wurden am 2026-07-05 im laufenden Code verifiziert (nicht angenommen).
+
+**1. Status-Pille (vier Zustände)**
+- Die vier Sichtachsen-Zustände (Frei / Teilweise verdeckt / Blockiert / Nicht geprüft) werden als Tag/Pille dargestellt — analog zum bestehenden „Geprüft"-Tag-Muster.
+- Verifiziertes Referenzmuster: `oppCard()` (`web/index.html:1772-1809`) baut die bestehenden Karten-Tags zusammen; Zeile 1790-1791 zeigt das Muster `Verify.getLast(o.location_id) ? '<span class="tag tag-verified">' + ic('i-check',12) + ' Geprüft</span>' : ''`, eingehängt in `<div class="opp-tags">` (Zeile 1805). Die CSS-Klassen `.tag-verified` / `.tag-issue` (Zeile 575-576) sowie `.verified-badge` / `.verified-badge-issue` (Zeile 573-574, fürs Detail-Sheet, siehe `ElementInfo`/Verify-Rendering Zeile 2469-2484) sind die bestehenden Farbbausteine, die wiederverwendet werden.
+- Neue Pille folgt demselben Muster: ein neuer `tag-sightline-*`-Klassensatz (vier Varianten) analog zu `tag-verified`/`tag-issue`, eingehängt in `oppCard()` neben den bestehenden Tags sowie im Detail-Sheet der Chance (gleiche Position wie der „Geprüft"-Tag, damit Status-Infos gebündelt an einer Stelle erscheinen).
+- Farben/Icons: Frei = Grün (`--green`, wie `.tag-verified`) + Häkchen-Icon (`i-check`, bereits vorhanden und im Code genutzt, Zeile 1791/3408); Teilweise verdeckt = Orange (neuer Ton, an bestehende Warn-/Gold-Paletten anlehnen) + Halbdreieck-Icon (neu anzulegen, kein bestehendes Icon-Kürzel gefunden); Blockiert = Rot (`--red`, wie `.tag-issue`) + Warndreieck-Icon (`i-warn`, bereits vorhanden und mehrfach genutzt, z.B. Zeile 2469/2483); Nicht geprüft = Grau (`--muted`) + Fragezeichen-Icon (neu anzulegen, kein bestehendes Icon-Kürzel gefunden).
+- Sichtbar auf: Feed-Karte (`oppCard()`, Ergänzung analog zu Zeile 1790-1791/1805) und im Detail-Sheet der Chance (Detail-Sheet-Bereich ab `web/index.html:3608` „DETAIL SHEET" — exakte Einfügeposition erst bei Implementierung festzulegen, da abhängig vom finalen Sheet-Layout).
+
+**2. Sichtachsen-Linie/Kompass je Zustand anpassen**
+- Betroffene, verifizierte Code-Stellen:
+  - Astro-Kompass-Legende „Sichtachse → Motiv": `web/index.html:5285` (`<span><i style="background:${this.COL.axis}"></i>Sichtachse → Motiv</span>`).
+  - Tatsächliche Linien-Zeichnung der Sichtachse: `web/index.html:5407-5416`, konkret `this._ln(p, axisAz, C.axis, axisDist, 3, false)` (Zeile 5416). Die Zeichenfunktion `_ln(p, az, color, distM, weight, dashed)` (Zeile 5386-5390) setzt aktuell nur binär `dashArray: dashed ? '4 7' : null` — für vier Linienstile muss der `dashed`-Boolean-Parameter zu einem Stil-Parameter erweitert werden (z.B. `dashArray`-String direkt übergeben: `null` durchgezogen, `'4 7'` gestrichelt, `'1 4'` gepunktet, sowie ein separates Muster für „unterbrochen/mit Balken" für Blockiert — konkrete `dashArray`-Werte sind Implementierungsdetail, hier nur die Stelle benannt).
+  - „Sichtachsen-Profil"-Box im Location-Anlegen-Preview: `web/index.html:6604-6611` (`AddLocation.renderPreview()`) — das ist eine statische Text-/Stat-Box (Azimut, Distanz, Höhenwinkel), **kein** SVG/Linien-Rendering; die Zeile im Ticket-Analyse-Abschnitt (Z. 6512) war ungenau — verifizierte Fundstelle ist Z. 6604-6611. Für diese Box selbst ist kein Linienstil anpassbar (keine Linie vorhanden), nur die Astro-Kompass-Linie (Punkt oben) trägt einen sichtbaren Linienstil.
+  - Anpassung: durchgezogen (Frei, Standard wie bisher `dashed:false`), gestrichelt (Teilweise verdeckt), unterbrochen/durch Balken markiert (Blockiert, neues Muster), gepunktet (Nicht geprüft) — reine `stroke-dasharray`-Anpassung an der bereits bestehenden `_ln()`-Aufrufstelle für die Sichtachse (Zeile 5416), kein neues Icon-Set nötig.
+
+**3. Zusätzlicher Filter-Chip „Sichtachse"**
+- Analog zum bestehenden Verifizierungsfilter (`verificationIncl[]`/`verificationExcl[]`, siehe Memory-Referenz `reference_fotoalert_verification_filter`), verifiziertes Code-Pattern in `web/index.html`:
+  - State: `verificationIncl: [], verificationExcl: []` im Default-State (Zeile 2832); neues Analogon z.B. `sightlineIncl: [], sightlineExcl: []`.
+  - Zustandslogik: `verState()` (Zeile 3402-3406, liest ob ein Wert in Incl/Excl steckt) und `_cycleVerification(v)` (Zeile 3577-3596, Off→Incl→Excl→Off-Zyklus, ruft `Filter.save()`) sind die 1:1-Vorlage für eine neue `_cycleSightline(v)`-Funktion.
+  - Rendering: `verChips` (Zeile 3407-3411, drei `chip3(...)`-Aufrufe für die drei Verifikations-Werte) sowie die Einbindung im Filter-Sheet-HTML (Zeile 3552, eigene `<div class="filter-section">` mit `fInfoBtn('verifikationsstatus')`) sind die Vorlage für die neue Sektion „Sichtachse" mit vier Chips (Frei/Teilweise verdeckt/Blockiert/Nicht geprüft).
+  - Filteranwendung an den Datenquellen: Verifikationsfilter wirkt aktuell an drei Stellen — Zeile 2967-2973, 3011-3015 und 4794-4798 (jeweils `if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) return false/visible=false; if (s.verificationExcl.includes(cat)) return false/visible=false;`) — der neue Sichtachsen-Filter muss an denselben drei Stellen analog ergänzt werden.
+  - Badge-Zähler: Zeile 2885 zählt `((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0)` in die Gesamtsumme der aktiven Filter für den Badge in der Filter-Kopfzeile — der neue Sichtachsen-Filter zählt nach demselben Muster mit.
+  - Ausgrauen-Regel: Die bestehende BUG-46-Logik unterscheidet zwischen Location-Attributen (u.a. auch auf Karte/Locations-Tab wirksam) und Chancen-Attributen (nur Feed/Kalender/Scout wirksam), siehe `isMapView`/`isLocationView`/`isChancenOnly` (Zeile 3433-3441) sowie die Memory-Referenz `reference_fotoalert_filter_criteria`. Da der Sichtachsen-Status an der Location hängt (Precompute-Ergebnis, siehe Analyse oben), ist er fachlich näher an einem Location-Attribut als an einem Chancen-Attribut — sollte also (wie z.B. Schwierigkeitsgrad/Kategorie) NICHT auf Karte/Locations-Tab ausgegraut werden, sondern dort ebenfalls wirken. Diese Einordnung ist eine Designer-Empfehlung basierend auf der Datenherkunft, keine von Stephan explizit bestätigte Entscheidung — bei Implementierung kurz gegenprüfen.
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/elevation.py`, `backend/data/qa_azimuth.py`, `backend/data/locations.py`, `backend/precompute.py`, `backend/main.py`, `web/index.html`
+- [x] Designer-Check: visuell ja → `fotoalert-designer` durchgeführt am 2026-07-05, siehe Abschnitt „Design-Entscheidung" oben (Status-Pille, Linienstil je Zustand, Filter-Chip)
+- [x] Implementierungsoptionen: A (empfohlen) / B / C
+- [x] Empfehlung: Option A
+
+**Offen vor Weg-Gate:** ~~Fragen 1 und 2 oben (Precompute vs. Live — Empfehlung: Precompute; Scope nur Alignment-Events oder auch Wetter-Chancen) müssen von Stephan bestätigt werden, bevor die Implementierung startet.~~ **Beide Fragen von Stephan beantwortet am 2026-07-05** (siehe „✅ Beantwortet durch Stephan" oben): Precompute-Ansatz bestätigt + manueller Refresh-Menüpunkt gewünscht; Geltungsbereich auf Wetter-Chancen mit Sichtachsen-Bezug (insb. Himmelsröte, US-113) erweitert. ~~Verbleibend offen vor Weg-Gate: Designer-Check (Statusanzeige-Darstellung) noch nicht durchgeführt.~~ **Designer-Check am 2026-07-05 abgeschlossen und von Stephan final bestätigt** (Status-Pille, Linienstil je Zustand, Filter-Chip — siehe Abschnitt „Design-Entscheidung" oben). Keine offenen Punkte mehr vor dem Weg-Gate.
 
 ### US-10 · Polarlichter / Aurora-Warnung
 > NOAA SWPC Kp-Index, Push bei Kp ≥ 5. *(Offen)*
@@ -5065,33 +5463,20 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 
 ---
 
-### US-115 · Mondaufgang-Chance: Mond im passenden Bildausschnitt statt nur 2°-Sichtachse `[ ]`
+### US-116 · Verständliche In-App-Erklärungen für jede Funktion `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
-| **Erstellt** | 2026-07-04 |
-
-**Beschreibung:** Als Fotograf möchte ich eine Mondaufgang-Chance nicht nur dann sehen, wenn der Mond innerhalb eines engen 2°-Radius um die Sichtachse zum Motiv steht, sondern immer dann, wenn der Mond bei der gewählten Brennweite noch innerhalb des tatsächlichen Bildausschnitts erscheint (Motiv mittig im Bild) — z. B. bei 90 mm ist der Bildwinkel deutlich breiter als 2°, wodurch relevante Mondaufgänge derzeit fälschlich ausgeschlossen werden könnten.
-
-**Bezug:** Prüfung ergab zwei unterschiedliche bestehende Mechanismen, die beide **nicht** identisch mit dieser Anforderung sind: (1) **US-64** [ ] (Live Astro-Visualisierung) definiert einen grünen Alignment-Indikator bei `|Az_Körper − Az_Sichtachse| ≤ 2°` — das ist ein enger, brennweiten-unabhängiger Toleranzwert für die Live-Kartenansicht. (2) **US-108** [x] (Done, released 2026-06-30) filtert Mondauf-/-untergangs-Chancen im Feed nach einer festen 35°-Zone („Vorne") um die Sichtachse — ebenfalls unabhängig von der tatsächlichen Brennweite/dem Bildwinkel. Dieses Ticket ergänzt beide um eine **brennweitenabhängige** Berechnung des tatsächlichen Bildwinkels (Field of View), analog zur bestehenden `CameraFOV`-Kegel-Visualisierung auf der Karte (bereits vorhanden für die manuelle Blickwinkel-Einschätzung, aber bisher nicht mit der Mondaufgang-Chancenlogik verknüpft). Klare Abgrenzung nötig: 2°-Radius (US-64, Live-Anzeige) vs. 35°-Zone (US-108, Feed-Filterung) vs. brennweitenabhängiger FOV-Bildausschnitt (dieses Ticket). Keine Umsetzung ohne weitere Klärung, ob US-108 dadurch abgelöst oder nur ergänzt werden soll.
-
----
-
-### US-116 · Verständliche In-App-Erklärungen für jede Funktion `[ ]`
-
-| Feld | Wert |
-|------|------|
-| **Typ** | User Story |
-| **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done (gemerged in US-21) |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Als App-User möchte ich jederzeit ohne Verzögerung verstehen, was eine Funktion aussagt, wie sie funktioniert und wie ich sie praktisch anwende, damit ich die App sicher und selbstständig nutzen kann.
 
-**Bezug:** Deutliche Überschneidung mit **US-21** [ ] („App-Beschreibung & Onboarding" — Onboarding-Slides, „?"-Info-Button, Score-Tooltips, Glossar) sowie **US-55** [x] (Done — Score-Erklärungen via ⓘ-Overlay, aber nur für Astronomie-/Wetter-/Gesamt-Score). US-116 ist breiter gefasst als beide: „jede Funktion" statt nur Scores/Schwierigkeit/Event-Typen, plus die explizite Anforderung „ohne Verzögerung" (also unmittelbar im Kontext, nicht nur über ein zentrales Glossar). Empfehlung zur Klärung mit Stephan: US-21 und US-116 vermutlich **mergen** (US-21 als Kern, US-116 als Scope-Erweiterung „jede Funktion" statt nur die in US-21 genannten Aspekte) — nicht selbst umgebaut, nur vorgeschlagen.
+**Gemerged in US-21 am 2026-07-05, kein eigenständiger Code, siehe US-21.** US-21 wurde auf das aktuelle Ticket-Format gehoben, um den hier geforderten Scope („jede Funktion" statt nur Scores/Schwierigkeit/Event-Typen, plus „ohne Verzögerung"/Erklärung direkt im Kontext) erweitert und trägt jetzt die vollständige Analyse inkl. Implementierungsoptionen. Dieses Ticket bleibt nur als Herkunftsnachweis stehen, wird nicht separat weiterverfolgt.
+
+**Bezug (Original, zur Nachvollziehbarkeit erhalten):** Deutliche Überschneidung mit **US-21** [ ] („App-Beschreibung & Onboarding" — Onboarding-Slides, „?"-Info-Button, Score-Tooltips, Glossar) sowie **US-55** [x] (Done — Score-Erklärungen via ⓘ-Overlay, aber nur für Astronomie-/Wetter-/Gesamt-Score). US-116 ist breiter gefasst als beide: „jede Funktion" statt nur Scores/Schwierigkeit/Event-Typen, plus die explizite Anforderung „ohne Verzögerung" (also unmittelbar im Kontext, nicht nur über ein zentrales Glossar). Empfehlung zur Klärung mit Stephan: US-21 und US-116 vermutlich **mergen** (US-21 als Kern, US-116 als Scope-Erweiterung „jede Funktion" statt nur die in US-21 genannten Aspekte) — nicht selbst umgebaut, nur vorgeschlagen.
 
 ---
 
