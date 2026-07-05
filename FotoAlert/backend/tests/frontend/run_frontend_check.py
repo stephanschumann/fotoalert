@@ -72,45 +72,38 @@ def _commit_sha() -> str:
         return "unknown"
 
 
-def _install_onboarding_guard(page) -> None:
-    """US-21, DRITTER CI-Fix-Versuch — echte Root Cause: Race Condition, kein Timing-
-    Problem von add_init_script selbst.
+def _dismiss_onboarding_if_present(page) -> None:
+    """US-21, VIERTER CI-Fix-Versuch — Strategiewechsel weg von Timing-Prävention.
 
-    Analyse (siehe BACKLOG.md-Nachtrag): Onboarding.initialShowIfNeeded() läuft NICHT
-    beim goto() (Nutzer ist da noch nicht eingeloggt, App.init() läuft erst nach
-    LoginScreen.submit()), sondern als LETZTER Schritt von App.init() — NACHDEM mehrere
-    await-Netzwerk-Calls (Verify/Rating/CameraFOV/Locations/Feed) durchgelaufen sind.
-    Der Test wartet aber nur auf Auth.isLoggedIn() (wird schon beim Setzen des Tokens
-    wahr, weit VOR App.init()-Ende) und läuft dann sofort weiter. Dadurch kann das
-    Overlay JEDERZEIT bis weit nach dem Login aufgehen — auch in der Lücke zwischen
-    einem einmaligen best-effort-Schließen (zweiter Fix-Versuch, _force_close_onboarding)
-    und dem eigentlichen page.click(): klassische Race Condition, kein reproduzierbarer,
-    aber ein nicht-deterministischer Fehler (weshalb der zweite Fix "meistens", aber
-    nicht immer half).
+    Die ersten beiden Verteidigungslinien (localStorage-Flag per add_init_script,
+    dann ein MutationObserver-Guard) versuchten das Erscheinen des Overlays zu
+    VERHINDERN bzw. es reaktiv sofort wieder zu schließen. Beide wurden nur per
+    Code-Lesen/jsdom-Simulation geprüft, nie per echtem Browserlauf — und der echte
+    CI-Lauf schlug beide Male mit demselben Fehler fehl: das Overlay blieb mit Klasse
+    "open" sichtbar und blockierte page.click(_spec.LOCATION_CARD_SELECTOR) in
+    _check_detail_sheet ("<div class='onb-title'>...</div> ... subtree intercepts
+    pointer events").
 
-    Fix: statt einmalig zu schließen, wird ein MutationObserver PER add_init_script
-    (läuft im Seitenkontext selbst, vor jedem Seiten-Skript) installiert, der die
-    Klasse 'open' auf #onboarding-overlay sofort wieder entfernt, sobald sie
-    hinzugefügt wird — unabhängig davon, WANN Onboarding.initialShowIfNeeded()
-    tatsächlich feuert. Das schließt die Race Condition endgültig aus, weil der Guard
-    im selben synchronen JS-Tick reagiert wie classList.add('open'), nicht erst beim
-    nächsten Python/Playwright-Roundtrip.
+    Neuer Ansatz: statt das Erscheinen zu verhindern, wird aktiv und explizit
+    weggeklickt, FALLS das Overlay da ist — mit Playwrights robusten Wartefunktionen
+    (wait_for_selector) statt eines selbstgebauten Timing-/Observer-Tricks. Das ist
+    unabhängig davon, WANN Onboarding.initialShowIfNeeded() (web/index.html, Zeile
+    ~7088) tatsächlich feuert: Onboarding.close() (web/index.html, Zeile ~7104) setzt
+    sowohl das localStorage-Flag 'fa_onboarding_seen' als auch entfernt die Klasse
+    'open' von #onboarding-overlay. Dieselbe Funktion wird hier per page.evaluate im
+    Seitenkontext aufgerufen (kein Button-Klick auf den dynamisch gerenderten
+    ".onb-skip"-Button nötig, der zudem auf der letzten Slide gar nicht existiert).
+
+    Best-effort: falls das Overlay in den kurzen Wartefenstern nie erscheint (Flag
+    aus vorherigem Lauf bereits gesetzt) oder schon zu ist, greift die Exception und
+    die Funktion kehrt ohne Fehler zurück.
     """
-    page.add_init_script(
-        "() => {"
-        "  const closeIfOpen = (el) => { if (el && el.classList.contains('open')) "
-        "el.classList.remove('open'); };"
-        "  const start = () => {"
-        "    const el = document.getElementById('onboarding-overlay');"
-        "    if (!el) { return; }"
-        "    closeIfOpen(el);"
-        "    new MutationObserver(() => closeIfOpen(el)).observe(el, "
-        "{ attributes: true, attributeFilter: ['class'] });"
-        "  };"
-        "  if (document.readyState === 'loading') { "
-        "document.addEventListener('DOMContentLoaded', start); } else { start(); }"
-        "}"
-    )
+    try:
+        page.wait_for_selector("#onboarding-overlay.open", timeout=5000)
+        page.evaluate("() => { if (typeof Onboarding !== 'undefined') Onboarding.close(); }")
+        page.wait_for_selector("#onboarding-overlay:not(.open)", timeout=3000)
+    except Exception:
+        pass  # Overlay ist gar nicht erschienen oder schon zu.
 
 
 # --- Browser-Lauf ------------------------------------------------------------------
@@ -154,20 +147,12 @@ def run_checks(
             lambda m: console_errors.append(m.text) if m.type == "error" else None,
         )
 
-        # US-21: Onboarding-Overlay unterdrücken (Verteidigungslinie 1, TASK-20/21
-        # erster Fix-Versuch). Onboarding.initialShowIfNeeded() prüft localStorage
-        # truthy — dieses Flag reicht bereits aus, WENN es rechtzeitig gesetzt ist.
-        page.add_init_script(
-            "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
-        )
-        # Verteidigungslinie 2 (dritter Fix-Versuch, siehe _install_onboarding_guard):
-        # Onboarding.initialShowIfNeeded() läuft als LETZTER Schritt von App.init(),
-        # NACHDEM der Test schon auf Auth.isLoggedIn() (wird weit früher wahr) weiter-
-        # gelaufen ist — race-frei nur durch einen im Seitenkontext laufenden
-        # MutationObserver zu schließen, der sofort reagiert statt einmalig zu prüfen.
-        _install_onboarding_guard(page)
-
         page.goto(base_url, wait_until="domcontentloaded")
+
+        # US-21, vierter Fix-Versuch: Overlay könnte bereits hier (vor dem Login)
+        # erscheinen — aktiv wegklicken statt Timing-Prävention (siehe Docstring
+        # von _dismiss_onboarding_if_present).
+        _dismiss_onboarding_if_present(page)
 
         # 1) Login-Precondition (AK4) — Fail-Fast bei Infra-Problem.
         page.fill("#login-pw", password)
@@ -191,6 +176,12 @@ def run_checks(
             browser.close()
             # Fail-Fast: 1 Infra-Finding statt N Folgefehler.
             return findings
+
+        # US-21, vierter Fix-Versuch: Onboarding.initialShowIfNeeded() läuft als
+        # letzter Schritt von App.init(), NACHDEM Auth.isLoggedIn() bereits wahr
+        # wurde (siehe Docstring von _dismiss_onboarding_if_present) — daher hier
+        # nach dem Login nochmal aktiv wegklicken, bevor die Views navigiert werden.
+        _dismiss_onboarding_if_present(page)
 
         # 2) Views durchgehen (AK1).
         for view in _spec.VIEWS:
@@ -302,10 +293,11 @@ def _check_detail_sheet(page, commit: str, shot) -> List["Finding"]:
         )
         return findings
 
-    # Kein zusätzlicher einmaliger Schließen-Aufruf mehr nötig: der MutationObserver
-    # aus _install_onboarding_guard() (add_init_script, siehe run_checks()-Start) läuft
-    # kontinuierlich im Seitenkontext und hält #onboarding-overlay race-frei geschlossen,
-    # unabhängig davon, wann Onboarding.initialShowIfNeeded() tatsächlich feuert.
+    # US-21, vierter Fix-Versuch: zusätzliche Absicherung direkt vor dem Klick auf die
+    # Location-Karte — das Overlay könnte auch erst hier (asynchron, nach den Views-
+    # Navigationen) aufgehen. Aktives Wegklicken statt Timing-Prävention, siehe
+    # Docstring von _dismiss_onboarding_if_present.
+    _dismiss_onboarding_if_present(page)
     page.click(_spec.LOCATION_CARD_SELECTOR)
     try:
         # Das Sheet ist permanent im DOM (display:flex), nur die .open-Klasse macht es
@@ -429,17 +421,11 @@ def run_mobile_checks(
         page = ctx.new_page()
         page.set_default_timeout(timeout_ms)
 
-        # US-21: siehe Kommentar in run_checks() — Onboarding-Overlay würde sonst
-        # auch hier den Klick auf die Location-Karte (Schritt 2 unten) blockieren.
-        # Verteidigungslinie 1 (localStorage) + Verteidigungslinie 2 (MutationObserver,
-        # race-frei — siehe _install_onboarding_guard-Docstring für die Root-Cause-
-        # Analyse, warum Verteidigungslinie 1 allein nicht ausreichte).
-        page.add_init_script(
-            "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
-        )
-        _install_onboarding_guard(page)
-
         page.goto(base_url, wait_until="domcontentloaded")
+
+        # US-21, vierter Fix-Versuch: siehe Docstring von _dismiss_onboarding_if_present
+        # in run_checks() — Overlay könnte schon vor dem Login erscheinen.
+        _dismiss_onboarding_if_present(page)
 
         # Login
         page.fill("#login-pw", password)
@@ -460,6 +446,10 @@ def run_mobile_checks(
             browser.close()
             return findings
 
+        # US-21, vierter Fix-Versuch: Onboarding läuft als letzter Schritt von
+        # App.init(), NACHDEM Auth.isLoggedIn() wahr wurde — nochmal wegklicken.
+        _dismiss_onboarding_if_present(page)
+
         # --- 1) App-Container überschreitet Viewport nicht -----------------------
         app_width = page.eval_on_selector("#app", "el => el.getBoundingClientRect().width")
         if app_width > IPHONE_WIDTH + 5:  # 5px Toleranz für sub-pixel rendering
@@ -478,8 +468,9 @@ def run_mobile_checks(
         page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "locations")
         try:
             page.wait_for_selector(_spec.LOCATION_CARD_SELECTOR, timeout=12000)
-            # Kein einmaliger Schließen-Aufruf mehr nötig — MutationObserver aus
-            # _install_onboarding_guard() hält das Overlay race-frei geschlossen.
+            # US-21, vierter Fix-Versuch: zusätzliche Absicherung direkt vor dem Klick,
+            # siehe Docstring von _dismiss_onboarding_if_present.
+            _dismiss_onboarding_if_present(page)
             page.click(_spec.LOCATION_CARD_SELECTOR)
             page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, timeout=12000)
             _shot("mobile-detail-sheet-open")
