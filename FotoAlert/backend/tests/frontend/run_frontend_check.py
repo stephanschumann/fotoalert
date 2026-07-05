@@ -72,6 +72,47 @@ def _commit_sha() -> str:
         return "unknown"
 
 
+def _install_onboarding_guard(page) -> None:
+    """US-21, DRITTER CI-Fix-Versuch — echte Root Cause: Race Condition, kein Timing-
+    Problem von add_init_script selbst.
+
+    Analyse (siehe BACKLOG.md-Nachtrag): Onboarding.initialShowIfNeeded() läuft NICHT
+    beim goto() (Nutzer ist da noch nicht eingeloggt, App.init() läuft erst nach
+    LoginScreen.submit()), sondern als LETZTER Schritt von App.init() — NACHDEM mehrere
+    await-Netzwerk-Calls (Verify/Rating/CameraFOV/Locations/Feed) durchgelaufen sind.
+    Der Test wartet aber nur auf Auth.isLoggedIn() (wird schon beim Setzen des Tokens
+    wahr, weit VOR App.init()-Ende) und läuft dann sofort weiter. Dadurch kann das
+    Overlay JEDERZEIT bis weit nach dem Login aufgehen — auch in der Lücke zwischen
+    einem einmaligen best-effort-Schließen (zweiter Fix-Versuch, _force_close_onboarding)
+    und dem eigentlichen page.click(): klassische Race Condition, kein reproduzierbarer,
+    aber ein nicht-deterministischer Fehler (weshalb der zweite Fix "meistens", aber
+    nicht immer half).
+
+    Fix: statt einmalig zu schließen, wird ein MutationObserver PER add_init_script
+    (läuft im Seitenkontext selbst, vor jedem Seiten-Skript) installiert, der die
+    Klasse 'open' auf #onboarding-overlay sofort wieder entfernt, sobald sie
+    hinzugefügt wird — unabhängig davon, WANN Onboarding.initialShowIfNeeded()
+    tatsächlich feuert. Das schließt die Race Condition endgültig aus, weil der Guard
+    im selben synchronen JS-Tick reagiert wie classList.add('open'), nicht erst beim
+    nächsten Python/Playwright-Roundtrip.
+    """
+    page.add_init_script(
+        "() => {"
+        "  const closeIfOpen = (el) => { if (el && el.classList.contains('open')) "
+        "el.classList.remove('open'); };"
+        "  const start = () => {"
+        "    const el = document.getElementById('onboarding-overlay');"
+        "    if (!el) { return; }"
+        "    closeIfOpen(el);"
+        "    new MutationObserver(() => closeIfOpen(el)).observe(el, "
+        "{ attributes: true, attributeFilter: ['class'] });"
+        "  };"
+        "  if (document.readyState === 'loading') { "
+        "document.addEventListener('DOMContentLoaded', start); } else { start(); }"
+        "}"
+    )
+
+
 # --- Browser-Lauf ------------------------------------------------------------------
 def run_checks(
     base_url: str,
@@ -113,14 +154,18 @@ def run_checks(
             lambda m: console_errors.append(m.text) if m.type == "error" else None,
         )
 
-        # US-21: Onboarding-Overlay unterdrücken, BEVOR die Seite lädt. Der Check
-        # (Onboarding.initialShowIfNeeded()) läuft synchron in App.init() beim
-        # Boot — ein page.evaluate() NACH page.goto() käme dafür zu spät.
-        # add_init_script läuft vor jedem Seiten-Skript, simuliert also einen
-        # wiederkehrenden Nutzer statt das reale Erstnutzer-Verhalten zu ändern.
+        # US-21: Onboarding-Overlay unterdrücken (Verteidigungslinie 1, TASK-20/21
+        # erster Fix-Versuch). Onboarding.initialShowIfNeeded() prüft localStorage
+        # truthy — dieses Flag reicht bereits aus, WENN es rechtzeitig gesetzt ist.
         page.add_init_script(
             "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
         )
+        # Verteidigungslinie 2 (dritter Fix-Versuch, siehe _install_onboarding_guard):
+        # Onboarding.initialShowIfNeeded() läuft als LETZTER Schritt von App.init(),
+        # NACHDEM der Test schon auf Auth.isLoggedIn() (wird weit früher wahr) weiter-
+        # gelaufen ist — race-frei nur durch einen im Seitenkontext laufenden
+        # MutationObserver zu schließen, der sofort reagiert statt einmalig zu prüfen.
+        _install_onboarding_guard(page)
 
         page.goto(base_url, wait_until="domcontentloaded")
 
@@ -257,6 +302,10 @@ def _check_detail_sheet(page, commit: str, shot) -> List["Finding"]:
         )
         return findings
 
+    # Kein zusätzlicher einmaliger Schließen-Aufruf mehr nötig: der MutationObserver
+    # aus _install_onboarding_guard() (add_init_script, siehe run_checks()-Start) läuft
+    # kontinuierlich im Seitenkontext und hält #onboarding-overlay race-frei geschlossen,
+    # unabhängig davon, wann Onboarding.initialShowIfNeeded() tatsächlich feuert.
     page.click(_spec.LOCATION_CARD_SELECTOR)
     try:
         # Das Sheet ist permanent im DOM (display:flex), nur die .open-Klasse macht es
@@ -382,9 +431,13 @@ def run_mobile_checks(
 
         # US-21: siehe Kommentar in run_checks() — Onboarding-Overlay würde sonst
         # auch hier den Klick auf die Location-Karte (Schritt 2 unten) blockieren.
+        # Verteidigungslinie 1 (localStorage) + Verteidigungslinie 2 (MutationObserver,
+        # race-frei — siehe _install_onboarding_guard-Docstring für die Root-Cause-
+        # Analyse, warum Verteidigungslinie 1 allein nicht ausreichte).
         page.add_init_script(
             "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
         )
+        _install_onboarding_guard(page)
 
         page.goto(base_url, wait_until="domcontentloaded")
 
@@ -425,6 +478,8 @@ def run_mobile_checks(
         page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "locations")
         try:
             page.wait_for_selector(_spec.LOCATION_CARD_SELECTOR, timeout=12000)
+            # Kein einmaliger Schließen-Aufruf mehr nötig — MutationObserver aus
+            # _install_onboarding_guard() hält das Overlay race-frei geschlossen.
             page.click(_spec.LOCATION_CARD_SELECTOR)
             page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, timeout=12000)
             _shot("mobile-detail-sheet-open")
