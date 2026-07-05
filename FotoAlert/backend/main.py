@@ -2062,7 +2062,7 @@ async def _save_alignment_as_location(
         subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
         distance_m=dist_m,
         focal_length_suggestions=[focal_length_mm],
-        special_notes="Automatisch erfasst via Quick Location Capture.",
+        special_notes="",  # BUG-60: keine automatische Notiz mehr bei Quick Location Capture
         difficulty=1,
     )
     LOCATIONS.append(new_loc)

@@ -564,6 +564,31 @@
     .add-form { padding: 12px 20px; overflow-y: auto; flex-shrink: 0; max-height: 42dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
 
+    /* ── US-124: Vollbild-Overlay für die Anlege-Karte (AddLocation) ─────────── */
+    #add-map-expand-btn { position: absolute; top: 8px; right: 8px; z-index: 1000;
+      width: 36px; height: 36px; min-width: 44px; min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); cursor: pointer; }
+    #add-map-fs-sheet { position: fixed; inset: 0; z-index: 130;
+      background: var(--bg); border-radius: 0; overflow-x: hidden;
+      display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+    #add-map-fs-sheet.open { transform: translateY(0); }
+    #add-map-fs-overlay { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 129;
+      opacity: 0; pointer-events: none; transition: opacity .25s; }
+    #add-map-fs-overlay.open { opacity: 1; pointer-events: auto; }
+    .add-map-fs-header { padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 8px;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .add-map-fs-header h2 { font-size: 18px; font-weight: 800; }
+    /* Beobachter/Motiv-Umschalter im Vollbild: eigene Zeile unterhalb Titel/X (Designer-Vorgabe
+       US-124 — funktional getrennt von der Ansichts-Einstellung Satellit/Standard unten). */
+    .add-map-fs-mode-bar { display: flex; gap: 6px; padding: 0 20px 10px; flex-shrink: 0; }
+    .add-map-fs-container { flex: 1; min-height: 0; position: relative; }
+    #add-map-fs { width: 100%; height: 100%; }
+    #add-map-fs .leaflet-grab { cursor: crosshair; }
+    #add-map-fs .leaflet-dragging .leaflet-grab { cursor: grabbing; }
+
     /* ── US-87: Vollbild-Overlay für die Bearbeiten-Karte (Edit-Mini-Map) ────── */
     #edit-map-expand-btn { position: absolute; top: 8px; right: 8px; z-index: 1000;
       width: 36px; height: 36px; min-width: 44px; min-height: 44px;
@@ -853,7 +878,7 @@
       #detail-sheet, #loc-detail-sheet, #filter-sheet, #impressum-sheet {
         left: 50%; width: 480px; right: auto; margin-left: -240px;
       }
-      #add-sheet, #edit-map-fs-sheet, #fov-map-fs-sheet {
+      #add-sheet, #edit-map-fs-sheet, #fov-map-fs-sheet, #add-map-fs-sheet {
         left: 50%; width: 480px; right: auto; top: 0; bottom: 0; margin-left: -240px;
       }
     }
@@ -1139,6 +1164,9 @@ function ic(id, size, cls){
     <div id="add-map"></div>
     <div id="add-map-mode-toggle"></div>
     <div class="add-map-hint" id="add-map-hint">Modus wählen → dann auf Karte tippen</div>
+    <button id="add-map-expand-btn" onclick="AddLocation.openMapFullscreen()" aria-label="Karte im Vollbild öffnen" title="Karte im Vollbild öffnen">
+      <svg style="width:18px;height:18px"><use href="#i-expand"/></svg>
+    </button>
   </div>
   <div class="map-mode-bar">
     <button class="map-mode-btn active" id="mode-obs" onclick="AddLocation.setMapMode('obs')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 28 38" style="vertical-align:middle;margin-right:4px"><path d="M14 2 C6 2 2 8 2 14 C2 24 14 36 14 36 C14 36 26 24 26 14 C26 8 22 2 14 2Z" style="fill:var(--accent-2);stroke:var(--surface)" stroke-width="2.5"/><circle cx="14" cy="14" r="5" style="fill:var(--surface)"/></svg>Mein Standort setzen</button>
@@ -1197,6 +1225,24 @@ function ic(id, size, cls){
       </div>
     </div>
     <div id="add-preview" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- US-124: Vollbild-Overlay für die Anlege-Karte (AddLocation, neue Location anlegen) -->
+<div id="add-map-fs-overlay" onclick="AddLocation.closeMapFullscreen()"></div>
+<div id="add-map-fs-sheet">
+  <div class="add-map-fs-header">
+    <div class="sheet-handle" style="margin:0"></div>
+    <h2 style="display:flex;align-items:center;gap:7px"><svg style="width:18px;height:18px"><use href="#i-expand"/></svg>Pins setzen</h2>
+    <button class="close-btn" onclick="AddLocation.closeMapFullscreen()" aria-label="Schließen"><svg style="width:18px;height:18px"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="add-map-fs-mode-bar">
+    <button class="map-mode-btn active" id="fs-mode-obs" onclick="AddLocation.setMapMode('obs')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 28 38" style="vertical-align:middle;margin-right:4px"><path d="M14 2 C6 2 2 8 2 14 C2 24 14 36 14 36 C14 36 26 24 26 14 C26 8 22 2 14 2Z" style="fill:var(--accent-2);stroke:var(--surface)" stroke-width="2.5"/><circle cx="14" cy="14" r="5" style="fill:var(--surface)"/></svg>Mein Standort setzen</button>
+    <button class="map-mode-btn" id="fs-mode-subj" onclick="AddLocation.setMapMode('subj')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 32 32" style="vertical-align:middle;margin-right:4px"><line x1="16" y1="2" x2="16" y2="30" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="16" x2="30" y2="16" style="stroke:var(--accent-2)" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="16" r="5" style="fill:var(--accent-2);stroke:var(--surface)" stroke-width="2.5"/></svg>Motiv setzen</button>
+  </div>
+  <div class="add-map-fs-container">
+    <div id="add-map-fs"></div>
+    <div id="add-map-fs-mode-toggle"></div>
   </div>
 </div>
 
@@ -1289,7 +1335,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.1';
+const APP_VERSION = '1.21.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5958,8 +6004,15 @@ const AddLocation = {
   },
   setMapMode(mode) {
     this.mapMode = mode;
+    // US-124: hält beide Umschalter-Paare (kleine Karte + Vollbild) synchron —
+    // analog zum bestehenden LocMapMode.syncAllToggles()-Muster für den Kartentyp,
+    // damit die beiden Beobachter/Motiv-Umschalter nicht auseinanderlaufen (Pre-Mortem Szenario 2).
     document.getElementById('mode-obs').classList.toggle('active', mode === 'obs');
     document.getElementById('mode-subj').classList.toggle('active', mode === 'subj');
+    const fsObs = document.getElementById('fs-mode-obs');
+    const fsSubj = document.getElementById('fs-mode-subj');
+    if (fsObs) fsObs.classList.toggle('active', mode === 'obs');
+    if (fsSubj) fsSubj.classList.toggle('active', mode === 'subj');
     const hints = {
       obs:  'Auf Karte tippen, um deinen Standort zu setzen',
       subj: 'Auf Karte tippen, um das Motiv zu setzen',
@@ -5967,16 +6020,23 @@ const AddLocation = {
     document.getElementById('add-map-hint').textContent = hints[mode];
   },
   _tileLayer: null, // US-123: aktueller Tile-Layer der add-map
+  _tileLayerFs: null, // US-124: aktueller Tile-Layer der add-map-fs (Vollbild)
 
   // US-123: rendert/aktualisiert den Satellit/Straße-Umschalter (AK1) und hält ihn
   // synchron mit der gemeinsamen Einstellung (AK7).
   _renderMapLayerToggle() {
     const el = document.getElementById('add-map-mode-toggle');
     if (el) el.innerHTML = LocMapMode.toggleHtml(`AddLocation.setLocMapLayer(%MODE%)`);
+    // US-124: derselbe Umschalter-HTML-Baustein auch im Vollbild-Toggle-Container.
+    const elFs = document.getElementById('add-map-fs-mode-toggle');
+    if (elFs) elFs.innerHTML = LocMapMode.toggleHtml(`AddLocation.setLocMapLayer(%MODE%)`);
   },
   // Tauscht den Tile-Layer der add-map (Satellit/Straße), ohne Pins/Zoom zu verlieren (AK3).
+  // US-124: zieht auch die Vollbild-Karteninstanz (falls initialisiert) nach — sonst zeigt die
+  // kleine Karte nach dem Schließen des Vollbilds einen anderen Kartentyp (Pre-Mortem Szenario 3).
   setLocMapLayer(mode) {
     if (this.map) this._tileLayer = LocMapMode.switchTileLayer(this.map, this._tileLayer, mode);
+    if (this.mapFs) this._tileLayerFs = LocMapMode.switchTileLayer(this.mapFs, this._tileLayerFs, mode);
     LocMapMode.syncAllToggles(mode);
   },
 
@@ -6021,6 +6081,7 @@ const AddLocation = {
     this.obsMarker = L.marker([lat,lng], {icon: MapMarkers.observer()}).addTo(this.map);
     if (flyTo && this.map) this.map.setView([lat, lng], 14);
     this.drawLine();
+    this._syncFsMarkers(); // US-124: Vollbild-Karte (falls offen) sofort nachziehen
   },
   setSubject(lat, lng, flyTo = false) {
     this.subj = {lat, lng};
@@ -6033,6 +6094,7 @@ const AddLocation = {
     document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
     if (flyTo && this.map) this.map.setView([lat, lng], 14);
     this.drawLine();
+    this._syncFsMarkers(); // US-124: Vollbild-Karte (falls offen) sofort nachziehen
   },
   _validateLatLon(lat, lon) {
     if (isNaN(lat) || isNaN(lon)) return 'Ungültige Koordinaten';
@@ -6092,6 +6154,7 @@ const AddLocation = {
     if (this.obsMarker) this.obsMarker.remove();
     this.obsMarker = L.marker([coords.lat, coords.lon], {icon: MapMarkers.observer()}).addTo(this.map);
     this.drawLine();
+    this._syncFsMarkers(); // US-124: Vollbild-Karte (falls offen) sofort nachziehen
   },
   _onSubjInput() {
     const errEl = document.getElementById('subj-error');
@@ -6107,6 +6170,7 @@ const AddLocation = {
     this.subjMarker = L.marker([coords.lat, coords.lon], {icon: MapMarkers.subject()}).addTo(this.map);
     document.getElementById('add-map-hint').textContent = 'Motiv gesetzt – oder Modus wechseln zum Ändern';
     this.drawLine();
+    this._syncFsMarkers(); // US-124: Vollbild-Karte (falls offen) sofort nachziehen
   },
   drawLine() {
     if (this._line) this._line.remove();
@@ -6114,6 +6178,76 @@ const AddLocation = {
       this._line = L.polyline([[this.obs.lat,this.obs.lng],[this.subj.lat,this.subj.lng]],
         {color:'#f0a030', weight:2, dashArray:'6 4', opacity:.7}).addTo(this.map);
     }
+  },
+
+  // ── US-124: Vollbild-Modus für die Anlege-Karte ─────────────────────────
+  // Baustein-Wiederverwendung (Pre-Mortem Szenario 4): setObserver()/setSubject()
+  // bleiben alleinige Schreibquelle für this.obs/this.subj. Diese Methode pflegt
+  // zusätzlich die parallelen Marker auf der Vollbild-Karteninstanz (falls offen),
+  // analog zu LocationDetail._editObsMFs/_editSubjMFs (US-87).
+  mapFs: null, obsMarkerFs: null, subjMarkerFs: null, _lineFs: null,
+
+  _syncFsMarkers() {
+    if (!this.mapFs) return; // Vollbild noch nicht initialisiert → nichts zu tun
+    if (this.obsMarkerFs) { this.obsMarkerFs.remove(); this.obsMarkerFs = null; }
+    if (this.obs) {
+      this.obsMarkerFs = L.marker([this.obs.lat, this.obs.lng], {icon: MapMarkers.observer()}).addTo(this.mapFs);
+    }
+    if (this.subjMarkerFs) { this.subjMarkerFs.remove(); this.subjMarkerFs = null; }
+    if (this.subj) {
+      this.subjMarkerFs = L.marker([this.subj.lat, this.subj.lng], {icon: MapMarkers.subject()}).addTo(this.mapFs);
+    }
+    this._drawLineFs();
+  },
+  _drawLineFs() {
+    if (this._lineFs) { this._lineFs.remove(); this._lineFs = null; }
+    if (this.mapFs && this.obs && this.subj) {
+      this._lineFs = L.polyline([[this.obs.lat,this.obs.lng],[this.subj.lat,this.subj.lng]],
+        {color:'#f0a030', weight:2, dashArray:'6 4', opacity:.7}).addTo(this.mapFs);
+    }
+  },
+
+  openMapFullscreen() {
+    document.getElementById('add-map-fs-overlay').classList.add('open');
+    document.getElementById('add-map-fs-sheet').classList.add('open');
+    // Pre-Mortem Szenario 1 (0px-Container): Karteninitialisierung erst nach
+    // Öffnen-Animation, danach invalidateSize() – analog LocationDetail/US-87.
+    setTimeout(() => this._initAddMapFs(), 300);
+  },
+  closeMapFullscreen() {
+    document.getElementById('add-map-fs-overlay').classList.remove('open');
+    document.getElementById('add-map-fs-sheet').classList.remove('open');
+    // this.obs/this.subj sind bereits die Quelle der Wahrheit (von setObserver()/setSubject()
+    // beim Antippen im Vollbild gepflegt) — kleine Karte + Koordinatenfelder sind daher schon
+    // aktuell, kein zusätzlicher Rückschreib-Schritt nötig (anders als beim Drag-Muster US-87).
+  },
+  _initAddMapFs() {
+    const toggleEl = document.getElementById('add-map-fs-mode-toggle');
+    if (toggleEl) toggleEl.innerHTML = LocMapMode.toggleHtml(`AddLocation.setLocMapLayer(%MODE%)`);
+    if (this.mapFs) {
+      // Pre-Mortem Szenario 5 (mehrfaches Öffnen/Schließen): Instanz wiederverwenden,
+      // nur Größe korrigieren + Marker aus this.obs/this.subj neu einlesen.
+      this.mapFs.invalidateSize();
+      this._syncFsMarkers();
+      return;
+    }
+    // Beim ersten Öffnen: gleicher Kartenausschnitt wie die kleine Karte (bereits gesetzter
+    // Zoom/Center), keine zurückgesetzte Standardansicht (bestätigte Annahme).
+    const center = this.map ? this.map.getCenter() : {lat: 52.52, lng: 13.40};
+    const zoom = this.map ? this.map.getZoom() : 13;
+    this.mapFs = L.map('add-map-fs', {zoomControl:true}).setView([center.lat, center.lng], zoom);
+    this._tileLayerFs = LocMapMode.addTileLayer(this.mapFs);
+    this.mapFs.on('click', e => {
+      // Gleiches Antippen-Muster wie bei der kleinen Karte (kein Draggable, bestätigt Stephan).
+      if (this.mapMode === 'obs') {
+        this.setObserver(e.latlng.lat, e.latlng.lng);
+        if (!this.subj) this.setMapMode('subj');
+      } else {
+        this.setSubject(e.latlng.lat, e.latlng.lng);
+      }
+    });
+    this.mapFs.invalidateSize();
+    this._syncFsMarkers();
   },
   async preview() {
     if (!this.obs || !this.subj) { toast('Bitte Standort und Motiv setzen'); return; }
@@ -6190,6 +6324,12 @@ const AddLocation = {
     if (this._line)      { this._line.remove();      this._line      = null; }
     // Map zerstören → sauberer Neuaufbau beim nächsten open()
     if (this.map) { this.map.remove(); this.map = null; }
+    // US-124: Vollbild-Karte + ihre Marker/Linie ebenfalls zerstören → sauberer
+    // Neuaufbau beim nächsten Öffnen des Vollbilds (analog zur kleinen Karte oben).
+    if (this.obsMarkerFs)  { this.obsMarkerFs.remove();  this.obsMarkerFs  = null; }
+    if (this.subjMarkerFs) { this.subjMarkerFs.remove(); this.subjMarkerFs = null; }
+    if (this._lineFs)      { this._lineFs.remove();      this._lineFs      = null; }
+    if (this.mapFs) { this.mapFs.remove(); this.mapFs = null; }
     // Formularfelder leeren
     ['obs-coords','subj-coords','subj-name','subj-height','subj-width'].forEach(id => {
       const el = document.getElementById(id);

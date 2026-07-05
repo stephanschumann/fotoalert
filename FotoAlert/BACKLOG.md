@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** |
+| **🔄 In Progress** | wird gerade implementiert | **US-124** *(Vollbild-Modus Anlege-Karte, Code fertig, wartet auf Testbestätigung)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-57** · **BUG-60** *(Backend per API verifiziert, von Stephan bestätigt 2026-07-04; voller UI-Klick-Test folgt nach der parallelen Vollbild-Karten-Arbeit)* |
 | **🏁 Done** | abgeschlossen + deployed | **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **US-124** *(Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1213,18 +1213,240 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### BUG-60 · HINWEISE-Feld wird bei Neuanlage automatisch mit Text vorbelegt `[ ]`
+### BUG-62 · Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen `[ ]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
 | **Status** | ToDo |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** Im Karten-Tab liegen zwei unabhängig positionierte Button-Gruppen oben im Kartenbereich: der Wetter-Filter (Aus/Wolken/Niederschlag, `#map-weather-toggle`, `top:12px; left:12px`, aus US-72) und der Kartenmodus-Umschalter (Nacht/Standard/Satellit, `#map-layer-toggle`, `top:12px; right:12px`). Beide sind mit festen Text-Buttons und festen Pixel-Abständen zum linken/rechten Rand positioniert, ohne Rücksicht auf schmale Bildschirmbreiten. Auf einem schmalen iPhone-Bildschirm wachsen beide Textgruppen so weit zusammen, dass sie sich in der Mitte überlappen und sich gegenseitig schwer lesbar/bedienbar machen. Auf breiteren Bildschirmen (iPad, größere iPhones) tritt das Problem nicht auf, da dort genug Platz zwischen den beiden Gruppen bleibt.
+
+Stephans Lösungsidee (als Vorschlag, noch nicht entschieden — gehört in die Analyse-Phase): Statt Textbeschriftung Icons/Bilder verwenden, um die Buttons schmaler zu machen — links Aus/Wolken/Regenwolken-Symbol, rechts Nacht/Karte/Satellit-Symbol.
+
+**Offene Frage (Scope):** Nicht abschließend geprüft, ob auf schmalen Screens noch weitere UI-Elemente im Karten-Tab kollidieren könnten (z. B. GPS-Button `#map-gps-btn`, Wetter-Zeitregler `#map-weather-slider-wrap`, Wetter-Legende `#map-weather-legend`). Diese sitzen laut Code an anderen Kanten (unten/GPS separat) und wurden von Stephan nicht gemeldet — sollte in der Analyse-Phase kurz mitgeprüft werden, ist aber vermutlich kein Problem, da nur die beiden oberen Button-Gruppen denselben vertikalen Bereich (`top:12px`) teilen.
+
+**User Story:** Als App-Nutzer mit einem schmalen iPhone möchte ich im Karten-Tab den Wetter-Filter und den Kartenmodus-Umschalter beide vollständig lesbar und antippbar sehen, sodass ich auf meinem Gerät ungehindert zwischen Wolken/Niederschlag und Standard/Satellit/Nacht wechseln kann, ohne dass sich Beschriftungen überlagern oder Buttons aus Versehen den falschen Modus treffen.
+
+**Bezug:** Kein Duplikat vorhanden — es existiert aktuell kein Ticket, das diese konkrete Überlappung behandelt. Verwandt: **US-123** [x] (Satellit/Standard-Umschalter für Location-Anlage-/Bearbeiten-Karten, `LocMapMode`) ist ein *anderer* Umschalter an anderer Stelle (Location-Formulare, nicht der Haupt-Karten-Tab) und daher keine Dublette — aber dort wurde nach dem Test bereits einmal eine ganz ähnliche Überlappung (mit dem Leaflet-Zoom-Menü) gefixt, indem der Button von `top/left` auf `bottom/left` verschoben wurde; zusätzlich wurde dort explizit der noch offene, nicht umgesetzte Vorschlag „Toggle-Buttons könnten je ein kleines Icon bekommen statt nur Text" notiert (US-123, Testfeedback-Abschnitt) — deckt sich mit Stephans jetziger Idee und sollte in der Analyse als Präzedenzfall herangezogen werden. Ebenfalls verwandt, aber ohne Überschneidung: **BUG-58** [x] (Zoom-Verhalten des Wetter-Umschalters) und **TASK-52** (Legenden-Position) betreffen denselben Karten-Tab, aber andere Elemente/Verhalten, nicht die Button-Überlappung selbst.
+
+---
+
+### BUG-63 · „Alignments berechnen" blockiert den Server für alle Nutzer ca. 20–25 Sekunden `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-05 |
+
+**Beschreibung:** Beim Klick auf „Alignments berechnen" in der Anlage-Maske (Quick Location Capture, `POST /preview-alignment`) wirkt der Server für ca. 20–25 Sekunden blockiert — auch andere Requests (z. B. einfaches Laden der Startseite `GET /`) hängen währenddessen. Beobachtet in zwei Testdurchläufen während der BUG-60-Tests am 2026-07-04, Ursache nicht verifiziert. Erwartet: Andere Nutzer/Requests werden von einer laufenden Alignment-Berechnung nicht spürbar ausgebremst.
+
+**User Story:** Als App-Nutzer möchte ich, dass die Berechnung von Alignments in der Anlage-Maske andere Nutzer und meine eigenen weiteren Aktionen nicht für mehrere Sekunden blockiert, sodass die App für alle durchgängig reaktionsfähig bleibt, auch während jemand eine neue Location anlegt.
+
+**Bezug:** Entstand als dokumentierter Nebenbefund im BUG-60-Ticket (siehe dort, Abschnitt „Nachgeholter UI-Klick-Test", 2026-07-04: „separat per Intake ins Backlog aufgenommen"). Keine Dublette gefunden — kein anderes Ticket behandelt diese konkrete Blockade von `/preview-alignment` bzw. `find_precise_alignment_times`. Verwandtes Lösungsmuster bereits an anderer Stelle etabliert: **TASK-48** (Szenario 4, Empfehlung) und die QA-Beschreibungs-Pipeline lagern vergleichbare rechenintensive/synchrone Aufrufe explizit per `asyncio.to_thread` aus dem Event-Loop aus — als Präzedenzfall für die Analyse-Phase relevant, aber kein Überschneidungs- oder Merge-Kandidat, da dort andere Endpunkte betroffen sind. Abgrenzung zu BUG-60: BUG-60 behandelt das automatisch vorbelegte Hinweise-Feld (bereits in Test), dieses Ticket behandelt ausschließlich die Blockade-Performance desselben Endpunkts.
+
+---
+
+### BUG-60 · HINWEISE-Feld wird bei Neuanlage automatisch mit Text vorbelegt `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Beim Anlegen einer Location über Quick Location Capture erscheint automatisch der Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Beobachtet: Das Feld ist von Anfang an vorbelegt, obwohl der Nutzer nichts eingetragen hat. Erwartet: Das Feld bleibt bei Neuanlage leer und wird nur befüllt, wenn der Nutzer selbst explizit einen Hinweis einträgt.
 
+**User Story:** Als Nutzer, der über Quick Location Capture eine neue Location anlegt, möchte ich, dass das Hinweise-Feld leer bleibt, sodass ich nicht fälschlich denke, ich hätte schon etwas eingetragen, und das Feld nur zeigt, was ich selbst geschrieben habe.
+
 **Bezug:** **BUG-50** [x] (Done, released 2026-06-29) hat einen verwandten, aber anderen Fehler behoben: Dort ließ sich der Text nach dem Löschen nicht dauerhaft entfernen (fehlende `special_notes`-Whitelist im PATCH-Endpoint). BUG-50 hat nur das Symptom „Text kommt nach dem Löschen wieder" behoben — nicht die Ursache, warum der Text bei der Neuanlage überhaupt erst automatisch gesetzt wird (vermutlich im Anlage-Code-Pfad von Quick Location Capture, nicht im PATCH-Endpoint). Kein Duplikat von BUG-50, aber engster Verwandter — beide betreffen dasselbe Feld. Abgrenzung: BUG-60 behandelt die Neuanlage, BUG-50 hat die Bearbeitung/Persistenz behandelt.
+
+#### 🔬 Analyse & Spec (BUG-60) · 2026-07-04
+
+##### 📎 Code-Verifikation (durchgeführt 2026-07-04)
+
+- `backend/main.py` Zeile 2032–2078, Funktion `_save_alignment_as_location()`: Diese Funktion wird beim Speichern einer Quick-Capture-Location aufgerufen (ausgelöst durch `POST /preview-alignment` mit `save: true`).
+- Zeile 2054–2067: Beim Anlegen des neuen Location-Objekts wird `special_notes="Automatisch erfasst via Quick Location Capture."` fest (hartkodiert, ohne Bedingung) gesetzt — bei **jeder** Quick-Capture-Neuanlage, ausnahmslos.
+- Das Objekt wird direkt danach über `_save_custom_location(new_loc)` (Zeile 2069) in die Datenhaltung geschrieben (Custom-Locations-Datei, bestätigt durch Fund in `backend/data/custom_locations.json` Zeile 19: `"special_notes": "Automatisch erfasst via Quick Location Capture."`). Der Text wird also **direkt persistiert**, nicht nur als Platzhalter im Formular angezeigt.
+- Frontend-Seite geprüft: `web/index.html` Zeile 5467–5469 rendert das Hinweisfeld korrekt aus dem geladenen Location-Objekt (`${loc.special_notes||''}`) — kein zusätzliches Vorbefüllen im Frontend, kein serverseitig unabhängiger zweiter Schreibpfad. Das Feld zeigt exakt das, was die Location-Datenstruktur enthält.
+- Bestätigt: **ein einziger Schreibort.** Der Text entsteht ausschließlich in `_save_alignment_as_location()` beim Anlegen und wird 1:1 durchgereicht bis in die Anzeige. Kein bedingter Code (z. B. „nur wenn Nutzer nichts einträgt") — der Text wird unbedingt bei jeder Neuanlage über diesen Pfad gesetzt.
+- Zum Vergleich: normale (nicht per Quick Capture angelegte) Standard-Locations in `backend/data/locations.py` haben ebenfalls `special_notes`, dort aber jeweils echte, individuelle Fotografie-Hinweise (z. B. „Bortle-Klasse ~3–4…", „Kranichzug: Oktober–November…") — das Feld ist konzeptionell für nützliche Zusatzinfos gedacht, nicht für Herkunfts-Metadaten. Das stützt die Vermutung, dass der Quick-Capture-Text ein Debug-/Herkunfts-Vermerk aus der Entwicklungsphase war, der nie für die Endnutzer-Sicht gedacht war.
+- ⚠️ Annahme: Es gibt keinen erkennbaren fachlichen Grund (z. B. Support-Ticket, Auswertung, Filter), der aktuell auf den exakten Text „Automatisch erfasst via Quick Location Capture." als Marker angewiesen ist — im Code wurde keine Stelle gefunden, die diesen String liest oder darauf filtert (nur die Stelle, die ihn schreibt). Falls Stephan diesen Text als Herkunfts-Kennzeichnung nutzt (z. B. um Quick-Capture-Locations später wiederzufinden), müsste das vor der Umsetzung genannt werden.
+
+##### Example Mapping
+
+**📏 Rule 1:** Bei Neuanlage einer Location über Quick Location Capture bleibt das Hinweise-Feld leer, solange der Nutzer nichts einträgt.
+
+🟢 Beispiel: Stephan nimmt ein Motiv per Quick Location Capture auf und speichert die Location, ohne im Hinweise-Feld etwas einzutragen. Beim Öffnen der neu angelegten Location ist das Hinweise-Feld leer.
+
+🟢 Beispiel: Stephan legt eine Location per Quick Capture an und trägt direkt beim Anlegen (falls das Formular das zulässt) „Zugang nur zu Fuß" ein. Nach dem Speichern zeigt das Feld genau „Zugang nur zu Fuß" — nichts zusätzlich.
+
+**📏 Rule 2:** Bereits bestehende Locations, die den automatischen Text schon enthalten, werden durch die Änderung nicht rückwirkend verändert.
+
+🟢 Beispiel: Location „Ehrenhof-Kollonaden" (vor dem Fix per Quick Capture angelegt, Text noch vorhanden oder von Stephan per BUG-50-Fix bereits gelöscht) bleibt nach dem Fix unverändert — der Fix wirkt nur auf künftige Neuanlagen, kein rückwirkendes Aufräumen bestehender Daten.
+
+❓ Question: Sollen bestehende Locations, die den automatischen Text noch enthalten (falls es davon noch welche gibt), im Rahmen dieses Tickets bereinigt werden, oder ist das bewusst außerhalb des Scopes (Nutzer löscht sie bei Bedarf selbst, wie in BUG-50 bereits ermöglicht)? ⚠️ Annahme (bis zur Klärung): Scope ist nur die Neuanlage, keine Datenbereinigung — passend zur Abgrenzung im Ticket „BUG-60 = Neuanlage".
+
+**📏 Rule 3:** Die Herkunft „per Quick Location Capture angelegt" geht durch den Fix nicht verloren, falls sie an anderer Stelle als dem Hinweise-Feld gebraucht wird.
+
+🟢 Beispiel: Nach dem Fix lässt sich weiterhin (falls technisch vorhanden) nachvollziehen, dass eine Location per Quick Capture entstanden ist — z. B. über die ID-Konvention `custom_<timestamp>` oder ein separates Feld, nicht aber über einen für den Nutzer sichtbaren Text im Hinweise-Feld.
+
+⚠️ Annahme: Aktuell gibt es kein separates, unsichtbares Herkunftsfeld — die einzige Markierung war bislang der sichtbare Text selbst. Falls Stephan Wert auf eine (unsichtbare) Nachverfolgbarkeit legt, wäre das ein zusätzlicher Diskussionspunkt vor Umsetzung (siehe Pre-Mortem Szenario 1).
+
+##### Akzeptanzkriterien
+
+- [ ] AK-1: Stephan legt über Quick Location Capture eine neue Location an, ohne im Hinweise-Feld etwas einzutragen. Beim anschließenden Öffnen der Location ist das Hinweise-Feld leer — kein automatischer Text erscheint.
+- [ ] AK-2: Stephan legt über Quick Location Capture eine neue Location an und trägt currently während/nach der Anlage einen eigenen Hinweis ein. Nach dem Speichern zeigt das Feld exakt diesen eigenen Text — unverändert, ohne zusätzlichen automatischen Text davor oder danach.
+- [ ] AK-3 (Edge Case): Der neue automatische Leer-Zustand verhält sich identisch zum bewusst geleerten Zustand aus BUG-50 — Stephan kann das Feld jederzeit leeren und es bleibt dauerhaft leer (keine Rückkehr des alten Textes, auch nicht nach Server-Neustart).
+- [ ] AK-4 (Regression): Alle anderen bei der Quick-Capture-Neuanlage automatisch gesetzten Werte (Name, Beschreibung, Kategorie, Distanz, Brennweitenvorschlag, Schwierigkeit) funktionieren unverändert wie bisher — nur das Hinweise-Feld wird leer statt vorbelegt.
+- [ ] AK-5 (Regression): Normale Standard-Locations (nicht per Quick Capture angelegt) zeigen weiterhin ihre echten, individuellen Hinweistexte unverändert an.
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Der Text war absichtlich als Herkunfts-/Debug-Marker gedacht — komplettes Entfernen ist Informationsverlust.**
+Auslöser: Der Text diente ursprünglich dazu, im Nachhinein zu erkennen, welche Locations automatisiert per Quick Capture entstanden sind (z. B. zur Qualitätskontrolle, weil Quick-Capture-Daten evtl. ungenauer sind als von Hand kuratierte Standard-Locations).
+Frühwarnung: Nach dem Fix lässt sich für neue Locations nicht mehr auf einen Blick unterscheiden „von Hand kuratiert" vs. „automatisch erfasst" — außer über die technische ID-Konvention `custom_<timestamp>`, die im Alltag nicht sichtbar ist.
+Gegenmaßnahme: Vor Umsetzung mit Stephan klären, ob diese Unterscheidung gebraucht wird. Falls ja: Herkunft nicht im nutzersichtbaren Hinweise-Feld, sondern in einem separaten, nicht angezeigten Metadatenfeld festhalten (kein Scope Creep — nur falls Stephan das bestätigt, sonst ausschließlich Feld leeren).
+
+💀 **Szenario 2: Halbe Lösung — Text verschwindet nur im Formular, bleibt aber in der Datenstruktur/DB bestehen.**
+Auslöser: Fix wird nur im Frontend vorgenommen (z. B. Platzhalter statt echtem Wert), obwohl die Root Cause serverseitig liegt.
+Frühwarnung: Beim direkten Abfragen der Location über die API (z. B. `GET /locations/{id}`) taucht der Text weiterhin auf, nur die Anzeige im Formular wäre kosmetisch leer.
+Gegenmaßnahme: Fix zwingend an der Quelle in `_save_alignment_as_location()` (backend/main.py) ansetzen, nicht im Frontend kaschieren. AK-Test muss die tatsächlich gespeicherte Location prüfen, nicht nur die Bildschirmanzeige.
+
+💀 **Szenario 3: Der Fix wirkt sich unbeabsichtigt auch auf den Import-Pfad „Locationscout-Import" aus.**
+Auslöser: `tools/import_locationscout.py` Zeile 555 setzt ebenfalls einen automatischen `special_notes`-Text („Locationscout-Import. Tags: …“) — ein ähnliches Muster, aber ein anderer Code-Pfad und explizit nicht Teil dieses Tickets.
+Frühwarnung: Falls in der Umsetzung versehentlich eine gemeinsame Hilfsfunktion angefasst wird, könnte sich das Verhalten auch beim Locationscout-Import ändern, was niemand angefordert hat.
+Gegenmaßnahme: Änderung strikt auf `_save_alignment_as_location()` begrenzen; `import_locationscout.py` nicht anfassen (kein Scope Creep, dort ist der Text zudem inhaltlich nützlich – enthält echte Tags, keine reine Herkunftsfloskel).
+
+💀 **Szenario 4: Bestehende Locations mit dem alten Text verwirren weiterhin, weil sie fälschlich als „bereits behoben" angenommen werden.**
+Auslöser: Nutzer/Stephan geht nach dem Fix davon aus, dass auch ältere, bereits angelegte Locations automatisch bereinigt wurden.
+Frühwarnung: Beim Durchsehen alter Quick-Capture-Locations taucht der alte Text weiterhin auf (siehe Rule 2 / Question oben).
+Gegenmaßnahme: In der Test-/Freigabe-Kommunikation explizit klarstellen, dass der Fix nur künftige Neuanlagen betrifft, keine rückwirkende Bereinigung vornimmt.
+
+##### Architektur-Analyse
+
+**Betroffene Stelle:**
+1. `backend/main.py`, Funktion `_save_alignment_as_location()`, Zeile 2065 — hartkodierte Zuweisung `special_notes="Automatisch erfasst via Quick Location Capture."` beim Anlegen des `PhotoLocation`-Objekts, das direkt danach persistiert wird.
+
+**Nicht betroffen (geprüft, kein Änderungsbedarf):**
+- `web/index.html` Zeile 5467–5469 — Formular-Rendering liest das Feld korrekt aus der Datenstruktur, kein eigenständiges Vorbefüllen.
+- PATCH-Endpoint (`backend/main.py`, Whitelist `text_fields`/`all_allowed_fields`) — bereits durch BUG-50 korrekt für Bearbeiten/Persistenz gefixt, hier nicht erneut zu ändern.
+- `store.py` `update_custom()` — unterstützt `special_notes` bereits korrekt, keine Änderung nötig.
+- `tools/import_locationscout.py` Zeile 555 — eigener, unabhängiger Pfad mit eigenem (inhaltlich sinnvollem) Text, bewusst außerhalb des Scopes.
+
+##### Implementierungsoptionen
+
+**Was bedeutet das für die App:**
+
+Option A: Beim Anlegen per Quick Capture bleibt das Hinweise-Feld leer, genau wie bei jedem anderen neu angelegten Textfeld ohne Nutzereingabe — der Nutzer sieht ein leeres Feld und weiß, dass es „seins" ist, sobald er etwas einträgt.
+
+Option B: Gleiches Nutzererlebnis wie Option A, zusätzlich bleibt die Information „automatisch per Quick Capture erfasst" für Stephan im Hintergrund nachvollziehbar (z. B. über ein zusätzliches, nicht angezeigtes Feld) — nur relevant, falls Szenario 1 im Pre-Mortem tatsächlich zutrifft.
+
+---
+
+### Option A — Hartkodierten Text ersatzlos entfernen (leerer Default)
+
+- **Vorgehen:** Zeile 2065 in `_save_alignment_as_location()` von `special_notes="Automatisch erfasst via Quick Location Capture."` auf `special_notes=""` (bzw. Feld beim Objekt-Aufbau ganz weglassen, Standardwert der Datenklasse ist bereits `""`) ändern.
+- **Betroffene Dateien:** `backend/main.py` (1 Zeile)
+- **Vorteile:** Minimalinvasiv, exakt das im Ticket beschriebene Nutzerverhalten, kein neuer Code-Pfad, kein Risiko für bestehende Whitelist/Persistenz-Logik (die durch BUG-50 bereits sauber ist).
+- **Nachteile/Risiken:** Falls der Text doch als Herkunfts-Marker gebraucht wurde (Pre-Mortem Szenario 1), geht diese Information ersatzlos verloren — nicht rückgängig machbar für künftige Locations, sobald der Fix aktiv ist (alte Locations bleiben unberührt).
+- **Aufwand:** klein
+
+### Option B — Text entfernen + Herkunft in separatem, nicht sichtbarem Feld festhalten
+
+- **Vorgehen:** Wie Option A, zusätzlich ein neues Feld (z. B. `source: "quick_capture"`) am Location-Objekt ergänzen, das nicht im Hinweise-Feld, sondern nur intern/technisch sichtbar ist.
+- **Betroffene Dateien:** `backend/main.py`, `backend/data/locations.py` (Datenklasse erweitern), `backend/data/store.py` (neue Spalte/Persistenz), potenziell `web/index.html` falls die Information doch irgendwo angezeigt werden soll.
+- **Vorteile:** Kein Informationsverlust — Herkunft bleibt nachvollziehbar, ohne den Nutzer im Hinweise-Feld zu verwirren.
+- **Nachteile/Risiken:** Deutlich höherer Aufwand für eine Information, für die aktuell kein bestätigter Bedarf gefunden wurde (siehe ⚠️ Annahme oben); neue Datenbank-Spalte nötig; Scope-Erweiterung gegenüber dem eng gefassten Ticket-Titel.
+- **Aufwand:** mittel
+
+✅ **Empfehlung: Option A** — solange Stephan nicht bestätigt, dass die Herkunfts-Information tatsächlich gebraucht wird (Pre-Mortem Szenario 1), ist der 1-Zeilen-Fix die richtige, unaufgeblähte Lösung: Er behebt exakt das gemeldete Problem, ohne Scope Creep, und ist konsistent mit „Feld bleibt leer bis Nutzer selbst etwas einträgt" aus der User Story. Falls Stephan die Nachverfolgbarkeit doch braucht, kann Option B als eigenes, separates Ticket nachgezogen werden.
+
+##### Designer-Check
+
+Übersprungen: Dies ist ein reiner Bugfix ohne neue UI-Elemente, Farben oder Layout-Änderungen (nur eine Werteänderung eines bereits bestehenden Feldes) — der Designer-Check ist damit nicht einschlägig.
+
+##### Scope
+
+**Eingeschlossen:** Hinweise-Feld bleibt bei Quick-Capture-Neuanlage leer, solange der Nutzer nichts einträgt.
+
+**Ausgeschlossen:** Änderungen am Locationscout-Import-Pfad; Herkunfts-Tracking (Option B, nicht gewünscht).
+
+##### Offene Fragen vor Freigabe (durch Stephan geklärt, 2026-07-04)
+
+- ❓ Braucht Stephan die Information „diese Location wurde automatisch per Quick Capture erfasst" an anderer Stelle (z. B. zur Qualitätskontrolle)? → **Nein.**
+- ❓ Sollen bestehende Locations mit dem alten Text im Rahmen dieses Tickets bereinigt werden? → **Ja, rückwirkend bereinigen** (damit ins Scope aufgenommen, s. u.).
+
+##### ⛔ Weg-Gate-Entscheidung (2026-07-04)
+
+Freigegeben: **Option A** (Zeile 2065 auf leeren Text ändern) **+ zusätzlich Altbestand-Bereinigung** bestehender Locations, deren `special_notes` **exakt** dem Text „Automatisch erfasst via Quick Location Capture." entspricht (einmaliges Cleanup-Skript, nur bei exaktem Text-Match — keine Locations mit abweichendem/eigenem Text anfassen, damit keine echten Nutzer-Notizen verloren gehen). Betrifft `backend/data/custom_locations.json` (und ggf. `custom_locations.db`, falls die Location-API zusätzlich SQLite nutzt — vom Implementierungs-Subagenten zu prüfen).
+
+Erwartetes Verhalten (Stephan bestätigt): Neue Quick-Capture-Location → Hinweise-Feld leer. Bestehende Locations mit exakt diesem Default-Text → Feld wird einmalig geleert. Alles andere bleibt unverändert.
+
+→ Status: **Ready for Dev**.
+
+##### Testplan
+
+- [ ] **Manuell:** Neue Location per Quick Location Capture anlegen (ohne eigenen Hinweistext einzutragen) → Location öffnen → Hinweise-Feld muss leer sein.
+- [ ] **Manuell:** Neue Location per Quick Location Capture anlegen und dabei einen eigenen Hinweistext eintragen → Location öffnen → Feld zeigt exakt den eigenen Text, nichts zusätzlich.
+- [ ] **Regression:** Bestehende Standard-Locations mit echten Hinweistexten (z. B. „Bortle-Klasse …") weiterhin unverändert sichtbar.
+- [ ] **Regression:** Bearbeiten/Löschen des Hinweisfeldes (BUG-50-Verhalten) weiterhin korrekt — Feld bleibt nach Löschen dauerhaft leer, auch nach Server-Neustart.
+- [ ] **Cleanup-Skript:** Nach Ausführung sind alle Locations mit vormals exakt dem Default-Text jetzt leer; Locations mit abweichendem/eigenem Text unverändert.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Akzeptanzkriterien abgeleitet
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert
+- [x] Implementierungsoptionen erarbeitet + Empfehlung ausgesprochen
+- [x] Weg-Gate von Stephan freigegeben (2026-07-04) — Option A + Altbestand-Bereinigung
+
+##### 🔧 Implementierung (2026-07-04)
+
+- `backend/main.py` Zeile 2065: `special_notes=""` statt hartkodiertem Text (Kommentar `# BUG-60: keine automatische Notiz mehr bei Quick Location Capture` ergänzt).
+- Neu: `FotoAlert/tools/cleanup_bug60_special_notes.py` — einmaliges, idempotentes Cleanup-Skript (mit `--dry-run`), bereinigt exakte Treffer des alten Default-Texts sowohl in `backend/data/custom_locations.json` als auch in der SQLite-Tabelle `custom_locations` (`backend/data/fotoalert.db`).
+- **Abweichung von der ursprünglichen Spec:** Es gibt keine separate `custom_locations.db` — die Daten liegen zusätzlich zur JSON-Datei in der gemeinsamen `fotoalert.db` (seit TASK-17-Migration). Das Skript deckt beide real existierenden Quellen ab.
+- Lokaler Testlauf (Sandbox-Checkout): Dry-run fand 3 Treffer (1× JSON, 2× DB), Live-Lauf hat alle 3 bereinigt, zweiter Lauf meldet 0 Treffer (idempotent bestätigt).
+- ⚠️ Vor Ausführung auf dem Prod-Server (Hetzner): prüfen, ob dort dieselbe Datei-Konstellation vorliegt (insbesondere ob dort zusätzlich ein `data_dev`-Pfad existiert) — noch nicht verifiziert.
+
+##### 🧪 Testergebnis (2026-07-04, lokal von Stephan bestätigt)
+
+- **Test 1 (Feld leer bei Neuanlage):** ✅ Direkt über `POST /preview-alignment` (save:true) neue Location angelegt → `special_notes` in der DB exakt `""`.
+- **Test 2 (eigener Text bleibt erhalten):** ✅ Per `PATCH /locations/{id}` eigenen Text „Testnotiz BUG-60" gesetzt → exakt so gespeichert, kein zusätzlicher/alter Text.
+- **Test 3 (Regression, bestehende Locations mit echtem Hinweistext):** ✅ `stechlin_see` weiterhin mit vollständigem Original-Hinweistext („Bortle-Klasse ~3–4…") unverändert.
+- **Test 4 (Regression BUG-50, Feld bleibt nach Löschen + Neustart leer):** ✅ Feld geleert, Server neu gestartet, Feld weiterhin leer.
+- **Test 5 (Cleanup-Skript):** ✅ Dry-Run + Live-Lauf lokal ausgeführt, 0 Treffer (Stephans lokaler Datenbestand enthält keine Locations mit dem alten Default-Text — plausibel, echte Bereinigung folgt beim Prod-Release).
+
+**Abweichung vom ursprünglichen Testplan:** Testschritt 2 aus der Spec („mit eigenem Hinweistext anlegen") war so nicht durchführbar — die Anlage-Maske (Quick Location Capture) hat kein Eingabefeld für einen Hinweistext; der Text lässt sich nur nachträglich über „Bearbeiten" eintragen. Ersetzt durch den oben beschriebenen Test 2.
+
+**Bekannter, unabhängiger Blocker für den vollen UI-Klick-Test:** Der eigentliche Klick auf „Speichern" in der Anlage-Maske im Browser hat bei Stephans manuellem Test nicht reagiert (kein Toast, kein Konsolenfehler, aber ein Netzwerk-Request ging raus). Ursache sehr wahrscheinlich Stephans parallele Arbeit an **US-124** (Vollbild-Modus für dieselbe Anlage-Maske) — der lokale Dev-Server liefert dabei einen unfertigen Zwischenstand von `web/index.html` aus. Der identische Backend-Codepfad wurde deshalb direkt per API verifiziert (s. o.) und bestätigt fehlerfrei. **Empfehlung:** den vollen UI-Klick-Durchlauf erneut prüfen, sobald US-124 abgeschlossen/stabil ist — blockiert BUG-60 nicht.
+
+**Von Stephan bestätigt:** „passt" (2026-07-04) — Backend-Verifikation ausreichend, UI-Klick-Test wird nach US-124 nachgeholt. Test-Location (`custom_1783238816`) wurde danach wieder aus der lokalen Datenbank entfernt (bestätigt: `gefunden: []`).
+
+##### ✅ Verifikation (separater Subagent, 2026-07-04)
+
+Code stimmt mit dokumentiertem Testergebnis und AKs überein. Zeile 2065 einziger Schreibort (keine zweite Überschreibung), Cleanup-Skript deckt beide Datenquellen ab, 3.9-kompatibel, idempotent. Keine Code-Stelle erwartet/filtert noch den alten Default-Text. Scope sauber eingehalten (nur die eine Zeile + das neue Cleanup-Skript geändert). Restrisiken: Prod-Cleanup-Lauf steht noch aus (geplant beim Release), UI-Klick-Test steht nach US-124 noch aus — beides bereits oben vermerkt, kein verstecktes Risiko.
+
+##### 🧹 Refactor-Check (2026-07-04)
+
+`tools/refactor_check.py --report` ausgeführt: 1 Finding, aber unrelated zu BUG-60 (`startup()` in `main.py` Zeile 1250, 84 statt max. 80 Zeilen — bestand schon vorher, nicht Teil dieses Tickets). Für die BUG-60-Änderung selbst keine Findings. Namenskonvention, Docstrings, Fehlerbehandlung und Python-3.9-Kompatibilität passen zum Repo-Stil. **Release-Freigabe aus Code-Qualitätssicht: ja.**
+
+##### ⏸️ Release-Gate (2026-07-04) — zurückgestellt
+
+Code ist release-bereit (Verifikation + Refactor-Check bestanden). Release aber bewusst **zurückgestellt**: `git status` zeigt bereits Änderungen an `web/index.html` aus Stephans paralleler Arbeit an der Vollbild-Karten-Funktion (noch ungetestet). `release.sh` committet automatisch immer den kompletten Stand von `web/index.html` + `web/sw.js` — ein Release jetzt würde diesen unfertigen Code ungewollt mit ausliefern. **Entscheidung (Stephan, 2026-07-04):** warten, bis die parallele Arbeit fertig und getestet ist, dann BUG-60 gemeinsam mit dieser Arbeit releasen. Status bleibt `In Test`, kein Deploy bis dahin.
+
+##### ✅ Nachgeholter UI-Klick-Test (2026-07-04)
+
+Der zuvor blockierte UI-Klick-Test wurde nachgeholt, nachdem der Klick auf „Speichern" in der Anlage-Maske diesmal funktionierte: Neue Location „bornstedt test" über die echte Anlage-Maske (Standort+Motiv setzen → Alignments berechnen → Speichern) angelegt, Bestätigung „✅ Location gespeichert!" erschien. Im Detail-Sheet ist das Hinweise-Feld leer (von Stephan bestätigt) — Beschreibung enthält erwartungsgemäß den automatisch generierten Text „Sichtachse auf …", das ist ein separates, gewolltes Feld und nicht Teil von BUG-60. **Alle Testpunkte damit auch über den echten UI-Pfad bestätigt, kein offener Punkt mehr außer dem zurückgestellten Release.**
+
+**Nebenbefund (unabhängig von BUG-60, nicht vertieft):** „Alignments berechnen" wirkte spürbar langsam/blockierend, mit spürbarer Verzögerung auch bei anderen Requests kurz danach — vermutlich rechenintensive, synchrone Schleife (14 Tage × Sonne/Mond) im Request-Handler, die den Server blockiert statt in einem Thread zu laufen. Nicht weiter untersucht (außerhalb Scope), separat per Intake ins Backlog aufgenommen.
+
+Test-Locations „bornstedt test" (`custom_1783243478`, `custom_1783243546` — zwei Einträge, vermutlich durch einen früheren Klick-Versuch, der doch durchging) danach wieder aus der lokalen Datenbank entfernt (bestätigt: `gefunden: []`).
 
 ---
 
@@ -2920,13 +3142,13 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 
 <!-- ===== INBOX: neue Tickets 2026-06-20 (warten auf Stephans Gate → Ready for Analysis) ===== -->
 
-### US-124 · Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts `[ ]`
+### US-124 · Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-04 |
 
 **Beschreibung:** Beim Anlegen eines neuen Standorts (AddLocation-Formular) lässt sich die Karte bislang nur in der kleinen Formular-Vorschau bedienen. Ein eigener Vollbild-Modus mit Zoom sowie Satellit-/Standard-Kartenwahl soll die präzise Positionierung des Standort-Pins erleichtern.
@@ -2934,6 +3156,120 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 **User Story:** Als Fotograf/in, möchte ich beim Anlegen eines neuen Standorts in den Vollbildmodus wechseln können, in dem sowohl Zoom als auch Satellit- und Standard-Kartenansicht verfügbar sind, sodass ich den Standort-Pin präziser positionieren kann.
 
 **Bezug:** Überträgt das bei US-87[x] (Vollbild-Overlay Bearbeiten-Karte, `openMapFullscreen()`/`_initEditMapFs()`) etablierte Muster auf den Anlege-Flow (`AddLocation`), der laut Code-Stand (Stand 2026-07-04) bislang keine eigene Vollbild-Kartenfunktion besitzt — nur `LocationDetail` (Bearbeiten) und `CameraFOV` (Blickwinkel-Vorschau) haben bereits `openMapFullscreen()`. Ergänzt sich mit US-123[x] (Satellit-/Standard-Umschalter `LocMapMode`, bereits auf der kleinen Anlege-Karte `add-map` vorhanden über `AddLocation.setLocMapLayer()`) — im neuen Vollbild-Modus muss dieser Umschalter mit übernommen werden, analog zu AK4 aus US-123 (Vollbild zeigt denselben Kartentyp wie die zugehörige kleine Karte). Keine Dublette; kein Zusammenhang mit US-114[x] (readonly-Vollbild bei Chancen/Kalender/Scout, dort ausdrücklich ohne Pin-Setzen).
+
+**Bereits geklärte Fragen (Stephan, 2026-07-04):**
+1. Pin-Setzmechanismus im Vollbild: Antippen (wie bisher beim Anlegen) — NICHT Ziehen/Draggable wie bei US-87. Der aktive Punkt (Beobachter oder Motiv) springt beim Antippen der Karte dorthin.
+2. Modus-Umschalter "Beobachter/Motiv setzen": Ja, auch im Vollbild sichtbar/bedienbar — man muss dafür nicht zur kleinen Karte zurück.
+
+**Bestätigte Annahmen (Stephan, 2026-07-04):**
+- Vollbild öffnet sich über das bereits bekannte Vollbild-Symbol (gleiches Icon wie beim Bearbeiten, US-87) auf der kleinen Anlege-Karte.
+- Geschlossen wird über ein "X"-Symbol.
+- Die im Vollbild gesetzte Position wird beim Schließen automatisch auf die kleine Karte + Koordinatenfelder übernommen, ohne extra Bestätigungsschritt.
+- Beim Öffnen zeigt das Vollbild den aktuellen Kartenausschnitt (Zoom, Kartentyp) und bereits gesetzte Punkte — keine zurückgesetzte Standardansicht.
+- Ist noch kein Punkt gesetzt, zeigt das Vollbild einfach keinen Punkt (kein Fehler).
+
+**Example Mapping (Kurzfassung):**
+- 📏 Regel 1: Von kleiner Anlege-Karte per Symbol ins Vollbild wechseln, bestehende Pins bleiben sichtbar.
+- 📏 Regel 2: Im Vollbild zoomen/verschieben + Satellit/Standard-Umschalter (US-123) verfügbar, zeigt denselben Kartentyp wie die kleine Karte.
+- 📏 Regel 3: Pin im Vollbild per Antippen setzen (aktiver Punkt je nach Beobachter/Motiv-Umschalter).
+- 📏 Regel 4: Vollbild schließen (X) → letzter Stand (Pin-Position, Kartentyp) erscheint sofort auf der kleinen Karte, ohne Speichern des Formulars.
+
+**Scope:**
+Eingeschlossen: Vollbild-Symbol auf der kleinen Anlege-Karte (`add-map`), Vollbild-Overlay mit großer Karte, Satellit/Standard-Umschalter (US-123) und Beobachter/Motiv-Umschalter im Vollbild, Antippen-basiertes Pin-Setzen im Vollbild, automatische Übernahme auf die kleine Karte + Koordinatenfelder beim Schließen.
+Ausgeschlossen: Draggable Pins im Vollbild (bleibt Antippen wie bisher). Keine Änderung am bestehenden Bearbeiten-Vollbild (US-87) oder am readonly-Vollbild (US-114) — beide bleiben unverändert bestehen, nur als Vorbild/Musterquelle genutzt. Kein Speichern des Formulars beim Schließen des Vollbilds (nur Übernahme in die Formularfelder, wie beim bisherigen Verhalten der kleinen Karte).
+
+**Akzeptanzkriterien:**
+- [ ] Auf der kleinen Karte im "Neue Location"-Formular ist ein Vollbild-Symbol sichtbar (gleiches Icon/Position wie beim Bearbeiten einer Location, US-87).
+- [ ] Tippen auf das Vollbild-Symbol öffnet eine bildschirmfüllende Kartenansicht; bereits gesetzte Beobachter-/Motiv-Punkte sind darin sofort sichtbar, an derselben Position wie auf der kleinen Karte.
+- [ ] Im Vollbild lässt sich zoomen und die Karte verschieben.
+- [ ] Im Vollbild ist der Satellit/Standard-Umschalter (aus US-123) vorhanden und zeigt beim Öffnen denselben Kartentyp, der auch auf der kleinen Karte aktiv war.
+- [ ] Im Vollbild ist der Umschalter "Mein Standort setzen" / "Motiv setzen" vorhanden und bedienbar, ohne dass man dafür das Vollbild verlassen muss.
+- [ ] Tippen auf eine Stelle der Vollbild-Karte setzt den aktuell aktiven Punkt (Beobachter oder Motiv, je nach Umschalter-Stellung) dorthin — genau wie bisher bei der kleinen Karte.
+- [ ] Das Vollbild lässt sich über ein "X"-Symbol schließen.
+- [ ] Nach dem Schließen zeigt die kleine Karte sofort die im Vollbild zuletzt gesetzte(n) Position(en) sowie den zuletzt gewählten Kartentyp (Satellit/Standard); die Koordinatenfelder ("Mein Standort", "Motiv") sind mit denselben Werten befüllt.
+- [ ] Das Formular wird durch das Öffnen/Schließen des Vollbilds nicht automatisch gespeichert — "Location dauerhaft speichern" bleibt ein separater, expliziter Schritt.
+- [ ] Edge Case: Ist beim Öffnen des Vollbilds noch kein Beobachter- und/oder Motiv-Punkt gesetzt, zeigt die Vollbild-Karte einfach keinen Pin für den jeweils fehlenden Punkt (kein Fehler, keine Blockade).
+- [ ] Edge Case: Wechselt man im Vollbild den Kartentyp (Satellit/Standard), übernimmt auch die kleine Karte (und alle anderen sichtbaren Umschalter, gemeinsame Einstellung laut US-123 AK7) diesen Kartentyp nach dem Schließen.
+- [ ] Edge Case: Wechselt man im Vollbild den Beobachter/Motiv-Modus und tippt danach auf die Karte, wird ausschließlich der gerade aktive Punkt verändert; der jeweils andere bereits gesetzte Punkt bleibt unangetastet.
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation (gelesen 2026-07-04, `web/index.html`):
+- Bestätigt: Es existieren bereits zwei Vollbild-Varianten desselben visuellen Musters: `LocationDetail.openMapFullscreen()` (Zeile 5549, US-87, draggable Pins, Formularfelder als Quelle der Wahrheit, DOM-IDs `edit-map-fs-*`) und `CameraFOV.openMapFullscreen(prefix)` (Zeile 3848, US-114, readonly, keine Drag-Handler, DOM-IDs `fov-map-fs-*`, prefix-parametrisiert). Beide sind eigene, vollständig ausprogrammierte Funktionen mit eigenem statischen DOM-Block (kein generischer, wiederverwendbarer Kern) — jede Komponente (`LocationDetail`, `CameraFOV`) hat ihre eigene `openMapFullscreen()`-Methode und ihren eigenen State (`_editMapFs`/`_editObsMFs` bzw. eigene `_maps[fsKey]`-Struktur).
+- Widerlegt: `openMapFullscreen()` ist **nicht** generisch genug, um 1:1 für `AddLocation` wiederverwendet zu werden. Sie ist fest an `LocationDetail._current`, die Bearbeiten-Formularfelder (`edit-obs-coords`/`edit-subj-coords`) und ihre eigenen DOM-IDs gekoppelt (Zeile 5565–5622: `_initEditMapFs()`, `_reloadEditMapFsFromFields()` lesen explizit aus den Edit-Feldern). `AddLocation` hat andere Feld-IDs (`obs-coords`/`subj-coords`) und einen eigenen State (`this.obs`/`this.subj`, `this.obsMarker`/`this.subjMarker`, `this.mapMode`). Eine echte 1:1-Wiederverwendung ohne Parametrisierung ist nicht möglich.
+- Klick-Handler fürs Pin-Setzen beim Anlegen (bereits vorhanden, Zeile 5995–6003): `this.map.on('click', e => { if (this.mapMode === 'obs') { this.setObserver(...); ... } else { this.setSubject(...); } })` — ein einfacher Leaflet-`click`-Event auf der kleinen `add-map`-Instanz, kein Drag. Dieses Pattern (Antippen, kein Draggable) ist bereits exakt das von Stephan bestätigte Verhalten fürs Vollbild — es muss nur auf eine zweite Karten-Instanz (`add-map-fs`) übertragen werden, mit denselben `setObserver()`/`setSubject()`-Aufrufen (diese schreiben bereits in `this.obs`/`this.subj` + Koordinatenfelder + Marker, unabhängig davon welche Karteninstanz den Klick ausgelöst hat).
+- Modus-Umschalter (`AddLocation.setMapMode()`, Zeile 5959–5968) ist bereits komponentenweit (nicht kleine-Karte-lokal): er schreibt `this.mapMode`, aktualisiert die Buttons `#mode-obs`/`#mode-subj` und den Hinweistext `#add-map-hint`. Diese IDs existieren nur einmal im DOM (nicht prefix-parametrisiert) — ein zweiter, baugleicher Umschalter im Vollbild-Overlay muss eigene IDs bekommen und `setMapMode()` so erweitern, dass er beide Button-Paare (klein + Vollbild) synchron hält, analog zum bestehenden `LocMapMode.syncAllToggles()`-Muster für den Kartentyp-Umschalter.
+- Satellit/Standard-Umschalter (`LocMapMode`, Zeile 3565ff.): bereits vollständig generisch und komponentenübergreifend nutzbar (`toggleHtml()`, `switchTileLayer()`, `syncAllToggles()`); `AddLocation.setLocMapLayer()` (Zeile 5978) nutzt dieses Muster bereits für die kleine Karte. Für die Vollbild-Karte reicht ein zweiter `LocMapMode.addTileLayer()`-Aufruf auf der neuen Karteninstanz plus ein zweiter `toggleHtml()`-Container, exakt wie bei US-87/US-114 bereits gelöst.
+
+💀 Szenario 1: Vollbild-Karten-Container hat beim Öffnen 0px Höhe (Leaflet-Gotcha, bereits bei US-87/US-114 bekannt), weil die Öffnen-Animation noch läuft.
+   Auslöser: Karteninitialisierung direkt beim Klick, nicht nach Abschluss der CSS-Transition.
+   Frühwarnung: Vollbild-Karte zeigt nur graue Kacheln oder ist leer, obwohl `map.invalidateSize()` aufgerufen wurde.
+   Gegenmaßnahme: Gleiches Muster wie US-87/US-114 übernehmen — `setTimeout(() => this._initAddMapFs(), 300)` nach dem Öffnen, danach `invalidateSize()`. In AK/Testplan als manueller Testschritt verankert.
+
+💀 Szenario 2: Die beiden Beobachter/Motiv-Umschalter (klein + Vollbild) laufen auseinander — z.B. Vollbild zeigt "Motiv setzen" aktiv, kleine Karte noch "Mein Standort setzen".
+   Auslöser: `setMapMode()` aktualisiert bisher nur die eine bekannte Button-Paar-ID; ein zweites Button-Paar im Vollbild wird beim Umschalten nicht mitgezogen.
+   Frühwarnung: Nach Modus-Wechsel im Vollbild zeigt die kleine Karte (nach Schließen) einen anderen Hinweistext/Button-Zustand als zuletzt im Vollbild gewählt.
+   Gegenmaßnahme: `setMapMode()` erweitern, sodass sie alle im DOM vorhandenen Button-Paare synchron hält (analog `LocMapMode.syncAllToggles()`), nicht nur `#mode-obs`/`#mode-subj`. Als eigenes AK (Edge Case Modus-Wechsel) verankert.
+
+💀 Szenario 3: Kartentyp (Satellit/Standard) wird im Vollbild gewechselt, aber die kleine Karte zeigt nach dem Schließen weiterhin den alten Kartentyp.
+   Auslöser: `setLocMapLayer()` aktualisiert nur die Karteninstanz, auf der der Umschalter geklickt wurde, ohne die andere Instanz (`this.map` vs. neue Vollbild-Instanz) nachzuziehen.
+   Frühwarnung: Nach Schließen zeigt kleine Karte einen anderen Kartenhintergrund als zuletzt im Vollbild sichtbar.
+   Gegenmaßnahme: Analog zum bereits bei US-87/US-114 gelösten Muster beide Tile-Layer-Referenzen (`this._tileLayer` für klein, neue `this._tileLayerFs` fürs Vollbild) bei jedem Umschalten über `LocMapMode.switchTileLayer()` je Instanz aktualisieren + `syncAllToggles()` nutzen. Bereits als AK (Kartentyp-Konsistenz) verankert.
+
+💀 Szenario 4: Punkt wird im Vollbild gesetzt, aber beim Schließen erscheint er nicht auf der kleinen Karte (oder umgekehrt: doppelte/verwaiste Marker).
+   Auslöser: Vollbild-Klick-Handler setzt eigene, von der kleinen Karte unabhängige Marker-Referenzen statt der bestehenden `setObserver()`/`setSubject()`-Methoden zu nutzen, die bereits Koordinatenfelder + `this.obsMarker`/`this.subjMarker` pflegen.
+   Frühwarnung: Nach Schließen fehlt der Pin auf der kleinen Karte, obwohl die Koordinatenfelder befüllt sind (oder umgekehrt).
+   Gegenmaßnahme: Vollbild-Klick-Handler ruft dieselben `setObserver()`/`setSubject()`-Methoden auf wie die kleine Karte (diese sind bereits kartenunabhängig implementiert — sie schreiben in `this.obs`/`this.subj` + Felder + `this.obsMarker`/`this.subjMarker` auf `this.map`). Für die Vollbild-Karte selbst braucht es einen zusätzlichen, parallel gepflegten Marker (analog zu `_editObsMFs`/`_editSubjMFs` bei US-87), der bei jedem Setzen auf beiden Karten aktualisiert wird. Als AK ("kleine Karte zeigt sofort denselben Stand") verankert.
+
+💀 Szenario 5: Vollbild wird mehrfach geöffnet/geschlossen (Formular bleibt offen, mehrere Versuche) — alte Karteninstanz/Marker/Event-Handler sammeln sich an (Memory-Leak / doppelte Klick-Handler).
+   Auslöser: Bei jedem Öffnen wird eine neue `L.map()`-Instanz erzeugt, ohne die vorherige zu prüfen/wiederzuverwenden (anders als bei `LocationDetail`, die bereits `if (this._editMapFs) { ...invalidateSize(); return; }` prüft).
+   Frühwarnung: Nach mehrfachem Öffnen/Schließen reagiert das Vollbild träge oder ein Klick löst mehrere `setObserver()`-Aufrufe gleichzeitig aus.
+   Gegenmaßnahme: Gleiches Wiederverwendungs-Muster wie `LocationDetail._initEditMapFs()` übernehmen — Karteninstanz nur einmal erzeugen, bei erneutem Öffnen nur `invalidateSize()` + Neu-Einlesen der aktuellen Punkte. Als manueller Testschritt (mehrfaches Öffnen/Schließen) im Testplan verankert.
+
+**Render-Pfad-Check (Schritt 4g):** Die Vollbild-Karte ist eine client-seitig gerenderte Leaflet-Instanz (`L.map(...)`), exakt wie die kleine `add-map`-Karte und wie die bestehenden Vollbild-Karten aus US-87/US-114. Keine Server-Assets (kein PNG/Rendering-Endpoint) beteiligt. Die Steuerelemente (Satellit/Standard-Umschalter, Beobachter/Motiv-Umschalter) sind HTML/JS-Overlays über der Leaflet-Karte, nutzen denselben Rendering-Pfad wie auf der kleinen Karte (kein separater/abweichender Pfad wie bei BUG-59). Kein zusätzliches Risiko in diesem Bereich.
+
+**Designer-Check:** Visuell sichtbar (neues Vollbild-Symbol, neues Overlay, zwei Umschalter im Vollbild) → `fotoalert-designer` konsultiert. Ergebnis: Vollbild-Symbol und Grundstruktur (Header + X, große Karte, Satellit/Standard-Umschalter unten) 1:1 wie bei US-87/US-114 übernehmen — reine Wiederverwendung, keine Designabweichung nötig. Für den zusätzlich benötigten Beobachter/Motiv-Umschalter (den es bei US-87/US-114 nicht gibt, da dort Drag statt Antippen): als eigene Zeile **unterhalb der Titel/X-Zeile im Header** platzieren (bestehende `.map-mode-bar`-Optik 1:1 übernehmen), NICHT neben dem Satellit/Standard-Umschalter unten auf der Karte. Begründung: funktional unterschiedliche Steuerungsebenen (Vor-Aktion "was setze ich" oben vs. Ansichts-Einstellung "wie sehe ich die Karte" unten) werden räumlich getrennt statt in einer Leiste vermischt — kein neuer Radius, keine neue Farbe, keine Kollision mit dem Schließen-Button.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (Code-Verifikation gegen `web/index.html`, 5 Versagensszenarien)
+- [x] Architektur analysiert: betroffene Datei `web/index.html` — neue DOM-Blöcke `add-map-fs-overlay`/`add-map-fs-sheet` (analog Zeile 1204–1227), neue CSS-Regeln (analog Zeile 573–608), Erweiterung `AddLocation` um `openMapFullscreen()`/`closeMapFullscreen()`/`_initAddMapFs()`/`_reloadAddMapFsFromFields()` (analog Zeile 5549–5633), Erweiterung `setMapMode()`/`setLocMapLayer()` um Zwei-Instanzen-Sync
+- [x] Designer-Check: visuell? → ja, `fotoalert-designer` aufgerufen (Ergebnis siehe oben)
+- [ ] Implementierungsoptionen: A / B
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Vollbild-Muster aus US-87 auf AddLocation übertragen (Wiederverwendung per Anpassung)
+- Alltagssprache: Die Anlege-Karte bekommt genau das gleiche Vollbild-Erlebnis, das es beim Bearbeiten einer Location schon gibt — nur eben mit Antippen statt Ziehen, und mit dem zusätzlichen Beobachter/Motiv-Umschalter direkt im Vollbild. Sieht für Stephan vertraut aus, verhält sich aber an die richtige Stelle angepasst.
+- Vorgehen: Neuer DOM-Block `add-map-fs-overlay`/`add-map-fs-sheet` (analog zu `edit-map-fs-*`), neue Methoden in `AddLocation`: `openMapFullscreen()`, `closeMapFullscreen()`, `_initAddMapFs()` (Karteninstanz + Klick-Handler analog zum bestehenden `initMap()`-Klick-Handler, ruft dieselben `setObserver()`/`setSubject()` auf), Marker auf der Vollbild-Instanz parallel zu `obsMarker`/`subjMarker` pflegen. `setMapMode()` und `setLocMapLayer()` werden erweitert, um beide Karteninstanzen + beide Umschalter-Paare synchron zu halten (Muster bereits durch `LocMapMode.syncAllToggles()` vorgegeben).
+- Betroffene Dateien: nur `web/index.html` (HTML-Block, CSS-Block, `AddLocation`-Objekt).
+- Vorteile: Visuell und funktional konsistent mit bereits etabliertem, bewährtem Muster (US-87/US-114); nutzt bestehende `setObserver()`/`setSubject()`/`LocMapMode`-Bausteine vollständig weiter; kein Risiko für die bestehenden Vollbild-Overlays (eigener, neuer DOM-Block, keine Änderung an `LocationDetail`/`CameraFOV`).
+- Nachteile / Risiken: Etwas Zusatzaufwand für den neuen Beobachter/Motiv-Umschalter-Sync (gibt es bei US-87/US-114 nicht) — siehe Pre-Mortem Szenario 2. Zwei parallele Karteninstanzen (klein + Vollbild) müssen bei jedem Setzen/Umschalten synchron gehalten werden (Szenario 3+4).
+- Aufwand: mittel.
+
+**Warum keine Alternative (Option B) sinnvoll ist:** Die Code-Verifikation (Pre-Mortem) zeigt keinen technischen Grund, der gegen die Wiederverwendung des Musters spricht — im Gegenteil, alle benötigten Bausteine (`setObserver()`/`setSubject()`, `LocMapMode`, das Leaflet-Click-Handler-Muster) existieren bereits und sind bereits kartenunabhängig nutzbar. Eine "eigene, schlankere" Vollbild-Logik nur für `AddLocation` würde denselben Code (Karteninit, Tile-Layer, Klick-Handler, Marker-Sync) im Wesentlichen erneut schreiben, ohne einen Vorteil zu bieten — das widerspräche der Skill-Regel "Wiederverwendung bestehender Komponenten ist immer Option A" ohne einen nachvollziehbaren Grund dagegen. Deshalb wird hier keine Option B als echte Alternative aufgeführt.
+
+✅ **Empfehlung: Option A** — einzige sinnvolle Option, da kein technischer Grund für eine Alternative vorliegt; alle Bausteine sind bereits vorhanden und kartenunabhängig, die Erweiterung ist eine reine Anpassung/Parametrisierung des etablierten Musters.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Kein sinnvoller Backend-Testpunkt — das Feature ist rein Frontend/DOM/Leaflet (Kartenanzeige, Klick-Events, Overlay-Sichtbarkeit). Kein pytest-Testfall für US-124; siehe `backend/tests/test_us-124.py` (Hinweis-Datei statt Testfällen).
+- [ ] Manuell (unter http://localhost:8000):
+  1. Tab "+" öffnen (neue Location anlegen). Kleine Karte muss sichtbar sein.
+  2. Auf der kleinen Karte auf das Vollbild-Symbol tippen → Vollbild-Ansicht öffnet sich, Karte füllt den Bildschirm.
+  3. Ohne vorher einen Punkt gesetzt zu haben: Vollbild zeigt keinen Pin, keine Fehlermeldung (Edge Case).
+  4. Im Vollbild auf eine Stelle tippen (Modus "Mein Standort setzen" ist per Default aktiv) → Beobachter-Pin erscheint an der angetippten Stelle.
+  5. Im Vollbild auf "Motiv setzen" umschalten, dann erneut auf eine andere Stelle tippen → Motiv-Pin erscheint dort, Beobachter-Pin bleibt unverändert stehen.
+  6. Im Vollbild den Satellit/Standard-Umschalter betätigen → Kartenhintergrund wechselt sichtbar.
+  7. Im Vollbild zoomen und die Karte verschieben → funktioniert wie erwartet.
+  8. Vollbild über das "X" schließen → kleine Karte zeigt sofort dieselben zwei Pins an denselben Stellen, denselben Kartentyp (Satellit/Standard) wie zuletzt im Vollbild gewählt; Koordinatenfelder "Mein Standort" und "Motiv" sind mit denselben Werten befüllt wie im Vollbild gesetzt.
+  9. Formular NICHT speichern, sondern erneut das Vollbild-Symbol antippen → Vollbild öffnet sich erneut mit demselben Zoom/Kartentyp/denselben Pins wie zuletzt (kein Reset).
+  10. Vollbild mehrfach hintereinander öffnen/schließen (mind. 3x) → Karte bleibt reaktionsschnell, kein doppeltes Setzen bei einem einzelnen Klick, keine sichtbaren Fehler in der Browser-Konsole.
+  11. Regression: Bestehendes Bearbeiten-Vollbild (US-87, Location-Detail → Bearbeiten → Vollbild-Symbol) weiterhin mit Drag-Funktion prüfen — unverändert funktionsfähig.
+  12. Regression: Bestehendes readonly-Vollbild (US-114, Chance/Kalender/Scout → "Karte & Blickwinkel" → Vollbild-Symbol) weiterhin ohne Pin-Setzen funktionsfähig.
+  13. Regression: Kleine Anlege-Karte (ohne Vollbild) weiterhin wie bisher bedienbar — Modus-Umschalter, Satellit/Standard-Umschalter, GPS-Button, Koordinaten einfügen/eintippen.
+
+---
 
 ### US-84 · Passwort-Änderung durch den Host in der App-Oberfläche `[ ]`
 
