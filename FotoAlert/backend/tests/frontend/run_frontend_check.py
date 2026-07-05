@@ -113,6 +113,15 @@ def run_checks(
             lambda m: console_errors.append(m.text) if m.type == "error" else None,
         )
 
+        # US-21: Onboarding-Overlay unterdrücken, BEVOR die Seite lädt. Der Check
+        # (Onboarding.initialShowIfNeeded()) läuft synchron in App.init() beim
+        # Boot — ein page.evaluate() NACH page.goto() käme dafür zu spät.
+        # add_init_script läuft vor jedem Seiten-Skript, simuliert also einen
+        # wiederkehrenden Nutzer statt das reale Erstnutzer-Verhalten zu ändern.
+        page.add_init_script(
+            "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
+        )
+
         page.goto(base_url, wait_until="domcontentloaded")
 
         # 1) Login-Precondition (AK4) — Fail-Fast bei Infra-Problem.
@@ -370,6 +379,12 @@ def run_mobile_checks(
         )
         page = ctx.new_page()
         page.set_default_timeout(timeout_ms)
+
+        # US-21: siehe Kommentar in run_checks() — Onboarding-Overlay würde sonst
+        # auch hier den Klick auf die Location-Karte (Schritt 2 unten) blockieren.
+        page.add_init_script(
+            "() => window.localStorage.setItem('fa_onboarding_seen', '1')"
+        )
 
         page.goto(base_url, wait_until="domcontentloaded")
 

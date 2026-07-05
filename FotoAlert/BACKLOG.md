@@ -4643,6 +4643,8 @@ Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlau
 - [ ] Automatisiert (Harness): Prüfbar sind vor allem strukturelle Aspekte (z. B. „Onboarding-Flag wird nach erstem Durchlauf gesetzt und bleibt nach Reload bestehen") — als pytest-/Frontend-Test in der Implementierungsphase konkretisieren.
 - [ ] Manuell: Neuinstallation/erster Start prüfen (Onboarding erscheint), zweiter Start prüfen (Onboarding erscheint nicht mehr), „?"-Button im Header prüfen (Glossar öffnet), je ein Beispiel-ⓘ bei einem Score (US-55-Bestand) und einem neuen Element (z. B. Schwierigkeitsgrad) prüfen, Test auf kleiner Bildschirmgröße (iPhone SE) gegen Verdeckung.
 
+📎 **CI-Nachbesserung nach erstem Release-Versuch (2026-07-05):** Der automatisierte GitHub-Actions-Frontend-Check (`backend/tests/frontend/run_frontend_check.py`) schlug nach dem Release von v1.21.6 fehl (`Page.click` Timeout beim Klick auf eine Location-Karte). Root Cause: In der frischen CI-Browser-Umgebung ist `localStorage` leer, wodurch das neue Onboarding-Overlay automatisch erscheint (wie für echte Erstnutzer beabsichtigt) und die eigentliche Test-Interaktion verdeckt. Fix: Der Test setzt jetzt vor jedem `page.goto()` per `page.add_init_script(...)` das Flag `fa_onboarding_seen='1'` in `localStorage`, simuliert also einen wiederkehrenden Nutzer, ohne das reale Erstnutzer-Verhalten zu verändern. Betrifft beide Testpässe (Desktop `run_checks` und Mobile `run_mobile_checks`).
+
 ---
 
 ### US-07 · Goldene Wolken & Himmelsröte Scoring `[x]`
