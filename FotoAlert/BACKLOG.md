@@ -34,7 +34,7 @@
 | **🏁 Done** | abgeschlossen + deployed | **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **BUG-65** *(Hinweise-Feld fehlt in Detailansicht und Neuanlage-Maske)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1609,6 +1609,177 @@ Alle sechs Icons: Linien-Stil, 2px Strich, monochrom (`currentColor`), Touch-Tar
 
 ---
 
+### BUG-64 · Produktions-Locations enthalten noch den Platzhaltertext „Automatisch erfasst via Quick Location Capture." im Hinweise-Feld `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-06 |
+
+**Beschreibung:** Auf der Produktion (nicht Dev) existieren echte Locations, deren Hinweise-Feld noch den alten Platzhaltertext „Automatisch erfasst via Quick Location Capture." enthält, statt echter Hinweise. Vermutlicher Datenrest aus der Quick-Location-Capture-Funktion, der nie bereinigt wurde.
+
+**User Story:** Als Host, der eine Location betrachtet, möchte ich im Hinweise-Feld nur echte, selbst eingetragene Hinweise sehen, sodass ich nicht durch einen technischen Platzhaltertext irregeführt werde.
+
+**Bezug:** BUG-60 (Done, released v1.21.2) hat exakt dieses Problem bereits bearbeitet: Root Cause behoben (`backend/main.py` Zeile 2065, kein hartkodierter Text mehr bei Neuanlage) **und** ein einmaliges Cleanup-Skript `FotoAlert/tools/cleanup_bug60_special_notes.py` gebaut, das Bestandslocations mit exaktem Text-Match bereinigt. Laut BUG-60-Dokumentation („⏸️ Release-Gate" / „✅ Verifikation") wurde das Skript lokal erfolgreich getestet (Dry-Run + Live-Lauf, idempotent), aber der **Prod-Lauf war zum Zeitpunkt des Release explizit als offener Restpunkt vermerkt** („Prod-Cleanup-Lauf steht noch aus, geplant beim Release") — im weiteren Backlog-Verlauf nach BUG-63 keine Bestätigung gefunden, dass dieser Lauf auf dem Live-Server tatsächlich ausgeführt wurde. Dieses Ticket vermutlich keine neue Fehlerursache, sondern der nachzuholende Prod-Cleanup-Lauf des bereits gebauten BUG-60-Skripts — das ist in der Analysephase zu verifizieren (Live-Datenbestand prüfen, ob das vorhandene Skript ausreicht oder erneut/angepasst laufen muss). Keine Überschneidung mit US-112 (Wetter-Overlay-Ticket, thematisch nicht verwandt — geprüft und verworfen).
+
+#### 🔬 Analyse & Spec (BUG-64) · 2026-07-06
+
+##### 📎 Code-Verifikation (durchgeführt 2026-07-06)
+
+- `FotoAlert/tools/cleanup_bug60_special_notes.py` **existiert wirklich** (per `find`/`ls` geprüft, nicht nur behauptet) und wurde vollständig gelesen. Zielstring exakt: `"Automatisch erfasst via Quick Location Capture."` (Zeile 41). Match ausschließlich per `==` (exakte Gleichheit), kein Teilstring-/Substring-Match — Zeile 68 (JSON) und Zeile 100/112 (SQL `WHERE special_notes = ?`).
+- Das Skript prüft **beide** real existierenden Datenquellen: `backend/data/custom_locations.json` (Legacy-JSON) und die Tabelle `custom_locations` in `backend/data/fotoalert.db` (seit TASK-17 der eigentliche Schreibort). Es hat einen `--dry-run`-Modus (nur zählen, nichts schreiben) und ist idempotent (zweiter Lauf = 0 Treffer, kein Schaden).
+- **Datenpfad-Weiche bestätigt** (`backend/data/store.py` Zeile 34–40): `FOTOALERT_ENV` steuert, ob `data/fotoalert.db` (prod) oder `data_dev/fotoalert.db` (dev) verwendet wird. Im gemounteten Projektordner existieren **beide** Verzeichnisse (`backend/data/` und `backend/data_dev/`) nebeneinander — das bestätigt exakt die in BUG-60 offen gelassene Prüfpflicht („noch nicht verifiziert, ob auf dem Prod-Server dieselbe Datei-Konstellation vorliegt"). Das Cleanup-Skript verwendet standardmäßig die Prod-Pfade (`backend/data/…`, unabhängig von `FOTOALERT_ENV`) — das ist auf dem echten Server korrekt, aber vor dem Lauf dort einmal per `ls` zu bestätigen, dass es keinen dritten, abweichenden Pfad gibt.
+- Stichprobe im gemounteten (lokalen) Datenbestand: 1 Eintrag in `custom_locations.json`, 9 Einträge in `custom_locations`-Tabelle — **0 exakte Treffer, 0 Teiltreffer** des Zielstrings in beiden Quellen. Das ist **nicht** der echte Produktions-Datenbestand (Hetzner-Server), sondern nur der lokal gemountete Checkout — sagt also nichts darüber aus, ob auf dem Live-Server noch Treffer vorhanden sind. Der eigentliche Live-Check muss auf dem Server selbst erfolgen (siehe Testplan).
+- Kein Code gefunden, der den exakten Zielstring irgendwo *liest* oder als Marker auswertet (nur die längst entfernte Schreibstelle in `main.py` Zeile 2065 hat ihn früher geschrieben) — bestätigt die BUG-60-Annahme, dass der Text kein aktiv genutzter Herkunfts-Marker ist.
+
+##### Annahmen-Protokoll
+
+- 🔴 **Funktional kritisch, als Question gestellt:** Ist auf dem Produktionsserver zusätzlich ein `data_dev`-Pfad oder eine andere Verzeichniskonstellation vorhanden, die das Skript nicht abdeckt? → Muss vor dem Lauf per `ls` auf dem Server geprüft werden (nicht annehmbar, siehe Frage 1 unten).
+- ⚪ **Konventionell, Default:** Nur **exakte** Textgleichheit gilt als „Platzhaltertext" — eine Location, deren Hinweise-Feld den Text als Teil eines längeren, vom Nutzer ergänzten Textes enthält (z. B. „Automatisch erfasst via Quick Location Capture. Zugang nur bei Ebbe."), wird **nicht** angefasst. ⚠️ Annahme: Das ist erwünscht, weil sonst ein echter Nutzerzusatz mitgelöscht würde — bitte bestätigen.
+- ✅ **Klar ableitbar:** Das bereits gebaute Skript ist inhaltlich passend für den Cleanup-Bedarf dieses Tickets (gleicher Zielstring, gleiche Datenquellen) — es fehlt nur der tatsächliche Ausführungslauf auf Prod.
+
+##### Example Mapping
+
+**📏 Rule 1:** Nach dem Cleanup-Lauf enthält keine Location auf dem Produktionsserver mehr exakt den Text „Automatisch erfasst via Quick Location Capture." im Hinweise-Feld.
+
+🟢 Beispiel: Eine Location, deren Hinweise-Feld exakt „Automatisch erfasst via Quick Location Capture." enthält, hat nach dem Lauf ein leeres Hinweise-Feld.
+
+🟢 Beispiel: Eine Location, die nie diesen Text hatte (z. B. eine von Hand kuratierte Standard-Location mit echtem Hinweistext), bleibt unverändert.
+
+**📏 Rule 2:** Echte, vom Nutzer ergänzte Hinweise werden durch den Cleanup nicht angetastet — auch nicht, wenn der alte Platzhaltertext als Teil eines längeren Textes vorkommt.
+
+🟢 Beispiel: Eine Location mit dem Text „Automatisch erfasst via Quick Location Capture. Zugang nur über den Nordweg." wird vom Cleanup **nicht** verändert (kein exakter Match) — der Hinweis bleibt vollständig erhalten.
+
+❓ Question 1: Soll vor dem Live-Lauf zusätzlich ein `--dry-run` auf dem Produktionsserver ausgeführt und Stephan das Ergebnis (Anzahl + betroffene IDs) zur Bestätigung vorgelegt werden, bevor der echte Schreib-Lauf erfolgt? ⚠️ Empfehlung: Ja, siehe Implementierungsoption unten — zusätzliche Sicherheitsstufe ohne nennenswerten Mehraufwand.
+
+❓ Question 2: Ist die vom Skript bereits abgedeckte Datenquelle (`backend/data/custom_locations.json` + `backend/data/fotoalert.db`) auf dem Server tatsächlich die einzige/richtige — oder gibt es dort einen dritten Pfad (z. B. ein Backup-/Snapshot-Verzeichnis), der ebenfalls Location-Daten enthält und mit-geprüft werden müsste? ⚠️ Annahme (bis zur Live-Prüfung): Nein, nur die zwei bekannten Quellen — wird in der Implementierungsphase per `ls` auf dem Server verifiziert, bevor der Lauf startet.
+
+##### Akzeptanzkriterien
+
+**Update 2026-07-06 (Weg-Gate-Entscheidungen Stephan):**
+1. Vorgehen zweistufig: Zuerst Probelauf (Dry-Run, keine Schreiboperation), Ergebnis wird Stephan vorgelegt. Erst nach seinem Okay erfolgt der echte Bereinigungslauf.
+2. Grenzfall-Entscheidung geändert (ersetzt die bisherige AK-3-Fassung „bleibt automatisch unangetastet"): Locations, deren Hinweise-Feld den alten Platzhaltertext NICHT exakt und ausschließlich enthält, sondern zusätzlichen, vermutlich von Stephan selbst ergänzten Text (z. B. „…Quick Location Capture. Zugang nur bei Ebbe."), werden NICHT automatisch übersprungen, sondern dem Dry-Run-Report als eigene Liste mit dem jeweiligen vollen Hinweise-Text beigefügt, damit Stephan pro Fall einzeln entscheidet, was damit passiert.
+
+- [ ] AK-1: Stephan öffnet in der App eine zuvor betroffene Location (die vorher den Platzhaltertext zeigte). Das Hinweise-Feld ist jetzt leer statt des technischen Textes.
+- [ ] AK-2: Stephan öffnet eine Location, die schon vorher einen echten, selbst eingetragenen Hinweis hatte (z. B. „Bortle-Klasse ~3–4…"). Dieser Text ist unverändert vorhanden — der Cleanup hat ihn nicht angerührt.
+- [ ] AK-3 (Edge Case, aktualisiert): Eine Location, bei der Stephan den Platzhaltertext früher selbst um einen eigenen Zusatz ergänzt hat (z. B. „Automatisch erfasst via Quick Location Capture. Zugang nur bei Ebbe."), wird vom automatischen Cleanup NICHT verändert — sie erscheint aber im Dry-Run-Report als eigener Eintrag in einer separaten Liste („Grenzfälle — bitte einzeln entscheiden") mit dem vollständigen aktuellen Hinweise-Text, damit Stephan selbst festlegt, ob und wie der Text angepasst wird.
+- [ ] AK-4 (Regression): Alle anderen Felder der bereinigten Locations (Name, Koordinaten, Kategorie, Schwierigkeit, Beispielbilder etc.) bleiben unverändert — der Cleanup rührt ausschließlich das Hinweise-Feld an.
+- [ ] AK-5: Ein zweiter Cleanup-Lauf direkt nach dem ersten meldet 0 bereinigte Einträge (Idempotenz bestätigt, kein Doppel-Effekt).
+- [ ] AK-6 (neu, Prozess-Gate): Der echte Schreib-Lauf (ohne `--dry-run`) wird erst gestartet, nachdem Stephan den Dry-Run-Report (Liste A: exakte Treffer: Liste B: Grenzfälle mit vollem Text) gesehen und ausdrücklich sein Okay gegeben hat. Kein automatischer Übergang von Dry-Run zu Live-Lauf.
+- [ ] AK-7 (neu, Werkzeug-Verhalten): Das Cleanup-Werkzeug liefert im Dry-Run-Modus zwei getrennte Ergebnislisten statt einer Gesamtzahl: Liste A (exakte, ausschließliche Platzhaltertext-Treffer, automatische Kandidaten) und Liste B (Grenzfälle mit Platzhaltertext als Teil eines längeren Textes, inkl. jeweils vollständigem Hinweise-Text). Im Dry-Run-Modus wird nichts geschrieben — auch nicht bei Liste-A-Treffern.
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Der Live-Server hat eine abweichende Verzeichniskonstellation, die das Skript nicht erfasst — Cleanup läuft „erfolgreich" mit 0 Treffern, obwohl noch Datenreste existieren.**
+Auslöser: Server hat z. B. zusätzlich einen dritten Datenpfad oder eine andere `FOTOALERT_ENV`-Konfiguration als angenommen.
+Frühwarnung: Dry-Run auf dem Server meldet 0 Treffer, obwohl Stephan in der App sichtbar noch den Platzhaltertext sieht.
+Gegenmaßnahme: Vor dem Lauf auf dem Server per `ls backend/data/` und `ls backend/data_dev/` (falls vorhanden) die tatsächliche Konstellation bestätigen; zusätzlich den Dry-Run-Output mit einer manuellen Stichprobe (eine bekannt betroffene Location über die API/App) gegenchecken, bevor der Schreib-Lauf erfolgt.
+
+💀 **Szenario 2: Eine Location hat den Platzhaltertext als Teil eines längeren, selbst ergänzten Hinweises — der exakte Match greift nicht, Stephan erwartet aber, dass auch dieser Fall bereinigt wird.**
+Auslöser: Erwartungslücke zwischen „nur exakte Treffer" (Skript-Design) und „jede Location, die den Text irgendwo enthält" (mögliche Stephan-Erwartung).
+Frühwarnung: Nach dem Lauf zeigt eine Location weiterhin einen Teil des alten Textes, Stephan empfindet das als nicht vollständig behoben.
+Gegenmaßnahme: Bereits als ❓ Question 2 / AK-3 explizit geklärt und als bewusste Grenze dokumentiert (Sicherheit vor Vollständigkeit) — falls Stephan das anders möchte, vor Implementierungsstart klären, nicht erst beim Testen.
+
+💀 **Szenario 3: Der Lauf verändert versehentlich auch Standard-Locations (aus `locations.py`) statt nur Custom-Locations.**
+Auslöser: Missverständnis, dass „alle Locations mit diesem Text" gemeint sind, nicht nur die per Quick Capture angelegten.
+Frühwarnung: Das Skript hat laut Code (Zeile 44–46) nur Zugriff auf `custom_locations.json`/`custom_locations`-Tabelle — Standard-Locations aus `backend/data/locations.py` sind python-Code, keine Datenbankeinträge, und werden vom Skript strukturell gar nicht erreicht.
+Gegenmaßnahme: Bereits durch die Architektur ausgeschlossen (kein gemeinsamer Schreibpfad) — trotzdem AK-2 als Regressionstest gegen eine Standard-Location behalten, um das explizit zu belegen.
+
+💀 **Szenario 4: Cache-/JSON-Exporte (Feed, Kalender, Scout) zeigen den alten Text weiterhin, obwohl die Datenquelle bereits bereinigt ist.**
+Auslöser: Laut Memory (`reference_fotoalert_caches`) existieren separate Cache-Dateien (`calendar.json`, `opportunities.json`, `discover.json`), die aus den Locations abgeleitete Daten enthalten können.
+Frühwarnung: Location-Detail zeigt nach Cleanup leeres Feld, aber ein Feed-/Kalender-Eintrag zeigt an anderer Stelle noch den alten Text.
+Gegenmaßnahme: Nach dem Live-Lauf gezielt prüfen, ob `special_notes` in einem der Cache-Exporte dupliziert vorkommt (Grep auf den Zielstring in den Cache-Dateien); falls ja, betroffene Caches invalidieren/neu erzeugen (siehe `reference_migrations_checklist`: SQLite → JSON → Live-API → Caches invalidieren → Frontend prüfen).
+
+💀 **Szenario 5: Der Live-Lauf wird ohne vorherigen Dry-Run direkt scharf geschaltet und ein unerwarteter Treffer (z. B. falsch klassifizierte Location) wird unwiederbringlich überschrieben.**
+Auslöser: Zeitdruck oder Annahme „das Skript ist ja schon getestet, kann sofort scharf laufen".
+Frühwarnung: Kein Vorab-Protokoll, welche IDs betroffen sein werden — Überraschung erst nach dem Schreiben.
+Gegenmaßnahme: Zwingend zweistufig vorgehen: erst `--dry-run` auf dem Server, Ergebnis (Anzahl + IDs) Stephan zur Bestätigung vorlegen, erst danach den echten Lauf starten (siehe Implementierungsoption unten).
+
+##### Architektur-Analyse
+
+- **Datenhaltung:** Custom-Locations (per Quick Location Capture angelegt) leben in zwei parallelen Quellen: `backend/data/custom_locations.json` (Legacy) und der SQLite-Tabelle `custom_locations` in `backend/data/fotoalert.db` (seit TASK-17 der aktive Schreibort). Standard-Locations (`backend/data/locations.py`) sind Python-Code, nicht betroffen.
+- **Bereinigungswerkzeug:** `FotoAlert/tools/cleanup_bug60_special_notes.py` existiert bereits (verifiziert per Dateisystem-Check, nicht nur laut Backlog-Text), deckt beide Datenquellen ab, hat `--dry-run`, ist idempotent, Python-3.9-kompatibel. Kein neues Werkzeug nötig — nur der tatsächliche Ausführungslauf auf dem Produktionsserver fehlt.
+- **Live-Server-Zugriff:** Läuft über `ssh fotoalert-server` als Nicht-root-User (siehe Memory `feedback_fotoalert_server_users`), Skript-Pfad und Server-Pfade vorher gegen `reference_fotoalert_server_paths` prüfen.
+- **Caches:** Feed (`opportunities.json`), Kalender (`calendar.json`), Scout (`discover.json`) sind separate Ableitungen — potenziell zu prüfen, ob sie `special_notes` duplizieren (Szenario 4).
+
+##### Implementierungsoptionen
+
+**Option A — Bestehendes Skript direkt scharf auf Prod laufen lassen**
+- Vorgehen: `python3 tools/cleanup_bug60_special_notes.py` ohne vorherigen Dry-Run direkt auf dem Server ausführen.
+- Vorteile: Am schnellsten erledigt, ein Schritt.
+- Nachteile/Risiken: Kein Sicherheitsnetz gegen Szenario 1 (abweichende Verzeichniskonstellation) oder unerwartete Treffer — passt nicht zum bisherigen sorgfältigen Vorgehen bei SQLite-Migrationen (Memory `reference_sqlite_migrations`: „Test-SELECT vor UPDATE").
+- Aufwand: klein.
+
+**Option B — Zweistufig: erst Dry-Run auf Prod, Ergebnis Stephan vorlegen, dann erst der echte Lauf (empfohlen)**
+- Vorgehen: 1) `python3 tools/cleanup_bug60_special_notes.py --dry-run` auf dem Server ausführen, Anzahl Treffer + betroffene IDs protokollieren. 2) Ergebnis Stephan zeigen („X Locations betroffen, das sind konkret: …“). 3) Nach seiner Bestätigung den echten Lauf ohne `--dry-run` ausführen. 4) Danach zweiten Lauf zur Idempotenz-Bestätigung (0 Treffer erwartet).
+- Vorteile: Kein Überraschungsmoment, Stephan sieht vorab genau, welche Locations betroffen sind, bevor unwiderruflich geschrieben wird; deckt Szenario 1 und 5 ab.
+- Nachteile/Risiken: Ein zusätzlicher Schritt (Server-Login + Ergebnis-Rückmeldung), minimal mehr Zeitaufwand.
+- Aufwand: klein (kein neuer Code, nur ein zusätzlicher Ausführungsschritt).
+
+**Option C — Manuelle Sichtung jeder betroffenen Location einzeln vor dem Löschen**
+- Vorgehen: Für jede über den Dry-Run gefundene Location einzeln in der App/API prüfen, ob der Text wirklich nur der exakte Platzhalter ist (kein Zusatztext), erst dann manuell per `PATCH` leeren.
+- Vorteile: Höchste Kontrolle, keinerlei Automatismus.
+- Nachteile/Risiken: Unnötiger Mehraufwand, da das Skript ohnehin nur exakte Treffer anfasst (echte Zusatztexte sind durch das `==`-Matching bereits strukturell ausgeschlossen, siehe Code-Verifikation) — manuelle Einzelsichtung bringt hier keinen zusätzlichen Schutz, nur mehr Aufwand.
+- Aufwand: mittel bis groß (abhängig von Trefferzahl, unbekannt bis zum Dry-Run).
+
+✅ **Empfehlung: Option B** — zweistufig (Dry-Run zeigen, dann erst schreiben). Das bestehende Skript ist bereits so konservativ gebaut (exakter Match, keine Teiltreffer), dass Option C keinen echten Zusatznutzen bringt, aber Option A verzichtet auf ein günstiges Sicherheitsnetz, das genau die in Szenario 1 und 5 beschriebenen Risiken abfängt.
+
+**Scope:**
+Eingeschlossen: Einmaliger Cleanup-Lauf des bestehenden Skripts auf dem Produktionsserver (Custom-Locations, beide Datenquellen), vorab Dry-Run zur Bestätigung, Nachprüfung auf Cache-Reste (Szenario 4).
+Explizit ausgeschlossen: Kein neues Cleanup-Werkzeug, keine Änderung am Skript selbst (es sei denn, die Live-Verzeichnisprüfung zeigt eine dritte, unbekannte Datenquelle), keine Änderung an Standard-Locations, keine erneute Änderung an `_save_alignment_as_location()` (bereits durch BUG-60 gefixt).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/custom_locations.json`, `backend/data/fotoalert.db` (Tabelle `custom_locations`), `FotoAlert/tools/cleanup_bug60_special_notes.py`
+- [x] Designer-Check: nicht visuell (reiner Daten-Cleanup ohne UI-Änderung) → übersprungen
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option B
+
+**Testplan:**
+- [x] Automatisiert (Harness): Bestehende Cleanup-Logik ist bereits durch lokale Dry-Run/Live-Lauf-Tests aus BUG-60 abgedeckt (siehe dort); für dieses Ticket kein neuer pytest-Fall nötig, da kein Code geändert wird — nur ein Ausführungslauf. Falls die Live-Prüfung eine Skriptanpassung nötig macht, wird das in der Implementierungsphase nachgezogen.
+- [ ] Manuell: 1) Auf dem Server per `ssh fotoalert-server` einloggen. 2) `--dry-run` ausführen, Trefferanzahl + IDs Stephan zeigen. 3) Nach Bestätigung echten Lauf ausführen. 4) Eine zuvor betroffene Location in der App öffnen — Hinweise-Feld muss leer sein. 5) Eine Location mit echtem Hinweistext öffnen — Text muss unverändert sein. 6) Zweiten Lauf zur Idempotenz-Kontrolle ausführen (0 Treffer erwartet). 7) Cache-Dateien (`opportunities.json`, `calendar.json`, `discover.json`) auf Restvorkommen des Zielstrings prüfen.
+
+##### 🧪 Testprotokoll (BUG-64) · 2026-07-06
+
+Werkzeug-Verhalten gegen selbst gebaute Testdaten geprüft (isoliert, nicht gegen echte Projekt- oder Prod-Daten — eigenes Test-JSON + eigene Test-SQLite-Datenbank mit denselben Feldnamen wie `custom_locations`). Geprüfte Fälle:
+
+1. Location mit exakt nur dem Platzhaltertext → landete in Liste A, wurde im echten Lauf korrekt geleert. ✅
+2. Location mit Platzhaltertext + eigenem Zusatztext → landete in Liste B mit vollständigem Text, blieb im echten Lauf unverändert. ✅
+3. Location mit einem völlig anderen, echten Hinweistext → erschien in keiner Liste, blieb unverändert. ✅
+4. Leeres Hinweise-Feld → erschien in keiner Liste, blieb unverändert. ✅
+5. Zusatzfall (Feld ohne Wert/`NULL`) → ebenfalls unauffällig, kein Absturz, unverändert. ✅
+6. Zweiter Durchlauf direkt nach dem echten Bereinigungslauf → meldete 0 Treffer, keine erneute Veränderung. ✅
+7. Regression: Name-Feld bei allen Testfällen unverändert (Cleanup rührt ausschließlich `special_notes` an). ✅
+8. Dry-Run-Modus schreibt nachweislich nichts (JSON + DB nach Dry-Run bitidentisch zum Ausgangszustand). ✅
+
+**Nachtrag (Verifikation):** Bei der Verifikation zeigte sich ein echter Fehler — sobald die `id`-Spalte der Datenbank-Tabelle numerisch statt textuell ist UND mindestens ein exakter Platzhaltertext-Treffer vorliegt, stürzte das Werkzeug beim Zusammenbau der Ausgabezeile mit den betroffenen IDs ab. Behoben, indem jede ID vor der Verkettung explizit in Text umgewandelt wird. Erneut mit eigens angelegten Wegwerf-Testdatenbanken (nicht Projekt-/Prod-Daten) im Probelauf-Modus geprüft: einmal mit rein numerischen IDs (kein Absturz mehr, Liste A/Liste B weiterhin korrekt unterschieden) und einmal mit Text-IDs als Regressionstest (Verhalten unverändert korrekt). ✅
+
+Ergebnis: Werkzeug verhält sich exakt wie in den AKs gefordert. Kein weiterer Nachbesserungsbedarf am Skript selbst gefunden. Offen bleibt ausschließlich der manuelle Testplan-Teil (Server-Dry-Run + Bestätigung + echter Lauf auf Prod, siehe oben) — das ist kein UI-Test, sondern ein Produktions-Ausführungsschritt außerhalb dieser Testphase.
+
+**Refactor-Check (BUG-64) · 2026-07-06 (korrigiert):** Die vorherige Notiz an dieser Stelle war falsch — `tools/refactor_check.py` existiert im Repo (verifiziert per `ls`/`find`) und wurde jetzt tatsächlich automatisiert ausgeführt, nicht nur manuell durchgesehen. Ergebnis des echten Checks: `tools/cleanup_bug60_special_notes.py` steht nicht in der festen Backend-Dateiliste von `refactor_check.py` (diese Liste umfasst nur die Kern-Backend-Module wie main.py, precompute.py, auth.py etc.), wurde deshalb gezielt mit derselben Prüflogik (pyflakes + AST-Analyse auf lange Funktionen/fehlende Return-Annotationen) einzeln durchlaufen — Ergebnis: keine Findings, Datei ist sauber (der tote `Optional`-Import war bereits vorher entfernt worden). Der reguläre `--report`-Lauf über die Kern-Backend-Dateien lief ebenfalls fehlerfrei durch und lieferte die üblichen, von diesem Ticket unabhängigen Findings (ungenutzte Imports/Globals in main.py, weather.py, moon_pipeline.py, subjects.py sowie zwei Funktionen leicht über dem Längen-Schwellwert) — diese gehören nicht zu BUG-64 und wurden nicht angefasst. Danach erneut mit selbst gebauten Wegwerf-Testdaten (JSON + SQLite, u. a. numerische IDs, Grenzfälle, Leer-/Null-Werte) verifiziert — Dry-Run, echter Lauf und zweiter Lauf (Idempotenz) verhalten sich weiterhin exakt wie erwartet, kein Fehler. Keine weiteren risikoarmen Verbesserungen an der Zieldatei gefunden; keine strukturellen Vorschläge, die ein eigenes Ticket rechtfertigen würden.
+
+---
+
+### BUG-65 · Hinweise-Feld nur im Bearbeiten-Modus sichtbar, fehlt in Detailansicht und Neuanlage-Maske `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-06 |
+
+**Beschreibung:** Das Feld „Hinweise (Zugang, beste Jahreszeit etc.)" ist aktuell nur im Bearbeiten-Modus einer Location sichtbar. Stephan möchte es zusätzlich in der Detailansicht (read-only) und in der Neuanlage-Maske sehen, damit bereits vorhandene bzw. eingetragene Hinweise nicht nur über den Umweg „Bearbeiten öffnen" einsehbar sind.
+
+**User Story:** Als Nutzer, der sich eine Location ansieht oder neu anlegt, möchte ich vorhandene bzw. eingetragene Hinweise direkt in der Detailansicht und in der Anlage-Maske sehen, sodass ich nicht extra in den Bearbeiten-Modus wechseln muss, um an diese Information zu kommen.
+
+**Bezug:** Klassifiziert als BugFix (nicht User Story), da die Daten bereits existieren und lediglich an den passenden Stellen nicht angezeigt werden — analog zu bisherigen Backlog-Einordnungen fehlender Sichtbarkeit vorhandener Felder als Darstellungsfehler (z. B. BUG-54: Section fehlt im Default-Rendering, obwohl Daten vorhanden sind). Geprüft: BUG-54 selbst ist inhaltlich nicht verwandt (behandelt fehlende `Sections._def`-Einträge für „Goldene Wolken"/„Himmelsröte", nicht das Hinweise-Feld) — kein Merge-Kandidat, nur strukturelle Analogie zur Typ-Einordnung. Keine weiteren Tickets zu Hinweise-Feld-Sichtbarkeit in Detailansicht/Neuanlage gefunden (BUG-50/BUG-60 behandeln Speicherverhalten bzw. Vorbelegung des Felds, nicht dessen Sichtbarkeit an zusätzlichen Stellen — eigenständiges Anliegen, keine Dublette). Abgrenzung zu BUG-64: BUG-64 betrifft die Datenbereinigung bestehender Platzhaltertexte, dieses Ticket die Anzeige-Sichtbarkeit des Feldes selbst.
+
+---
+
 ### BUG-63 · „Alignments berechnen" blockiert den Server für alle Nutzer ca. 20–25 Sekunden `[ ]`
 
 | Feld | Wert |
@@ -2812,14 +2983,15 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 
 ---
 
-### TASK-55 · Server-Backup um location_images/ erweitern `[~]`
+### TASK-55 · Server-Backup um location_images/ erweitern `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-04 |
+| **Abgeschlossen** | 2026-07-06 |
 
 **Weg-Gate-Entscheidung (Stephan, 2026-07-06):** Option A (Bilder huckepack im bestehenden Git-Backup-Zyklus, gleicher Auslöser wie die Metadaten-Sicherung). Gelöschte/ersetzte Bilder werden auch aus alten Sicherungsständen entfernt (kein Sicherheitsnetz für Altstände). Sicherung läuft sofort bei jedem Upload, jeweils als volle Kopie (kein Zeitplan, keine inkrementelle Sicherung). Kein Prototyp-Gate nötig (reine Backend-Änderung ohne beobachtbares Verhalten für Stephan) — direkt in Implementierung.
 
@@ -2951,7 +3123,11 @@ Manuelle Durchsicht von `_sync_image_dir_to_repo()` im Vergleich zu den Nachbarf
 
 **Tests nach der Ergänzung erneut geprüft:** `bash -n deploy/restore.sh` fehlerfrei, `python3 -m py_compile` auf `backup.py` und die Testdatei fehlerfrei, alle 7 Tests in `test_task55_image_backup.py` laufen weiterhin grün durch. `backup.py` selbst wurde nicht verändert (nur `deploy/restore.sh`).
 
-**Release zurückgestellt (2026-07-06):** TASK-55 ist releasefertig (Verifikation + Refactor-Check grün), das Release selbst wartet aber, weil `web/index.html` aktuell unveröffentlichte Frontend-Änderungen aus **US-09** enthält und `release.sh` grundsätzlich den kompletten aktuellen Stand von `web/index.html`/`sw.js` mit committet — unabhängig vom `git add`-Umfang. Stephan hat entschieden, TASK-55 nicht isoliert zu releasen, solange US-09 nicht getestet/bestätigt ist (Bundle-Release beider Tickets geplant, sobald US-09 testbar ist). Kein Codeproblem bei TASK-55 selbst, reines Sequenzierungs-Thema.
+**Release zurückgestellt (2026-07-06):** ~~TASK-55 ist releasefertig (Verifikation + Refactor-Check grün), das Release selbst wartet aber, weil `web/index.html` aktuell unveröffentlichte Frontend-Änderungen aus **US-09** enthält und `release.sh` grundsätzlich den kompletten aktuellen Stand von `web/index.html`/`sw.js` mit committet — unabhängig vom `git add`-Umfang.~~ **Gelöst:** US-09-Dateien wurden vor dem Release per `git stash` beiseitegelegt (nur diese, TASK-55-Dateien unberührt), danach zurückgeholt — US-09s Arbeitsstand ist unverändert erhalten, nur nicht mitreleased.
+
+**✅ Released (2026-07-06):** v1.21.10, Commit `ba2df40`. Health-Check auf Prod bestätigt (`{"status":"ok",...}`). Deploy verifiziert.
+
+**✅ Prod-Bestätigung durch Stephan (2026-07-06):** Testbild an Location „Normannischer Sturm auf dem Ruinenberg" hochgeladen und wieder gelöscht. Backup-Repo-Ordner zeigt danach zwei neue Commits (`6aeabd7`, `0afb327` — Hinzufügen + Löschen, jeweils Sekunden nach der Aktion), das gelöschte Bild ist im Ordner nicht mehr vorhanden. Upload/Löschen fühlte sich nicht spürbar langsamer an als vorher. Damit alle 7 Akzeptanzkriterien vollständig bestätigt (AK 1–4, 6, 7 automatisiert; AK 5 + finale Bestätigung von AK 6 jetzt live durch Stephan). Ticket auf Done.
 
 ---
 
