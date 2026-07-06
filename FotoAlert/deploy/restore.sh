@@ -2,18 +2,24 @@
 # =============================================================================
 # FotoAlert – Restore aus Backup-Repo
 #
-# Stellt die Nutzerdaten (custom_locations + location_overrides) aus dem
-# privaten fotoalert-backup-Repo wieder her.
+# Stellt die Nutzerdaten (custom_locations + location_overrides) sowie die
+# hochgeladenen Beispielbilder (location_images/) aus dem privaten
+# fotoalert-backup-Repo wieder her.
 #
 # Verwendung (auf dem Server):
 #   ./deploy/restore.sh
 #   ./deploy/restore.sh --commit abc1234   # bestimmten Commit wiederherstellen
+#
+# Hinweis --commit: checkt nur die JSON-Dateien auf diesen Commit aus; der
+# Bildordner-Restore weiter unten nutzt danach immer den aktuellen Arbeitsstand
+# des Backup-Repos (kein Commit-genaues Zurückspielen der Bilder).
 #
 # Voraussetzung:
 #   - fotoalert-backup-Repo ist unter /opt/fotoalert/backup-repo geklont
 #   - Deploy-Key ~/.ssh/fotoalert_backup ist konfiguriert
 #
 # TASK-18: Backup RPO≈0 + Restore
+# TASK-55: location_images/ ins Restore aufgenommen
 # =============================================================================
 set -euo pipefail
 
@@ -63,6 +69,18 @@ fi
 echo ">>> JSON-Dateien nach backend/data/ kopieren..."
 cp "$BACKUP_REPO/custom_locations.json"   "$BACKEND_DIR/data/custom_locations.json"
 cp "$BACKUP_REPO/location_overrides.json" "$BACKEND_DIR/data/location_overrides.json"
+
+# Beispielbilder zurückspielen (TASK-55) — muss vor dem Service-Neustart passieren,
+# sonst zeigen Locations auf Bilder, die lokal noch fehlen. Reihenfolge relativ zur
+# JSON-/SQLite-Wiederherstellung ist unkritisch, da Bildordner und DB unabhängig sind.
+IMAGE_BACKUP_DIR="$BACKUP_REPO/location_images"
+if [ -d "$IMAGE_BACKUP_DIR" ]; then
+    echo ">>> Beispielbilder (location_images/) zurückspielen..."
+    mkdir -p "$BACKEND_DIR/data/location_images"
+    cp -a "$IMAGE_BACKUP_DIR/." "$BACKEND_DIR/data/location_images/"
+else
+    echo "⚠️  Kein location_images/-Unterordner im Backup-Repo gefunden — übersprungen."
+fi
 
 # In SQLite importieren (Migration)
 echo ">>> SQLite-Migration (idempotent)..."

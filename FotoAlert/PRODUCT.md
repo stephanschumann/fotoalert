@@ -406,6 +406,23 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 
 ---
 
+## 11b. Automatische Server-Sicherung (Backup)
+
+**Was der Nutzer davon hat:** Standort-Daten und Standort-Fotos sind gegen Datenverlust abgesichert — bei jeder Änderung sichert der Server automatisch im Hintergrund, ohne dass jemand daran denken muss.
+
+| Funktion | Verhalten |
+|----------|-----------|
+| Automatische Sicherung bei jeder Änderung | Nach jeder Bearbeitung (Standort-Daten, Standort-Fotos) läuft im Hintergrund sofort eine Sicherung mit, ohne dass ein Test oder eine Aktion von Stephan nötig ist. |
+| Standort-Fotos Teil der Sicherung (TASK-55) | Seit TASK-55 sichert der Server auch die hochgeladenen Standort-Fotos vollständig mit, nicht mehr nur die Standort-Daten selbst. Wird ein Foto ersetzt oder gelöscht, verschwindet es auch aus der Sicherung — die Sicherung spiegelt also immer den aktuellen Stand, sie ist kein Archiv alter Foto-Versionen. |
+| Wiederherstellung schließt Fotos ein | Beim Zurückspielen einer Sicherung (Restore) werden seit TASK-55 auch die Standort-Fotos mit wiederhergestellt, vorher nur die Standort-Daten. |
+
+**Pflicht-Regression Backup:**
+- [ ] Foto hochladen → im Hintergrund läuft die Sicherung mit (keine sichtbare Wartezeit für Stephan)
+- [ ] Foto löschen/ersetzen → alte Version verschwindet auch aus der Sicherung
+- [ ] Restore spielt Standort-Daten UND Standort-Fotos zurück
+
+---
+
 ## 12. Regressions-Matrix (nach Ticket-Typ)
 
 Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
@@ -502,3 +519,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-05 | US-21 (Onboarding + Glossar) | Vier Onboarding-Slides beim allerersten App-Start (`Onboarding`-Objekt, localStorage-Flag `fa_onboarding_seen`); zentraler „?"-Header-Button (optisch abgehoben, Kreis-Outline in Akzentfarbe) öffnet ein Glossar-Bottom-Sheet (`Glossary`-Objekt, gleicher Radius wie Filter-/Detail-Sheet) mit Suchfeld + Accordion, gruppiert nach Einführung/Scores/Kernbegriffe; erster Eintrag startet das Onboarding erneut. Die bereits vorher fertigen ⓘ-Element-Erklärungen (Schwierigkeitsgrad, Event-Typ, Verifikation, Filter-Gruppen, Kartenlegende, `ElementInfo`/`ScoreInfo`) bleiben unverändert. Zwei neue SVG-Symbole `i-chevleft`/`i-chevdown` ergänzt. |
 | 2026-07-05 | US-21 (Korrekturen nach 2. Testdurchlauf) | „?"-Header-Button optisch zurückgebaut auf gleiches Muster wie Suche/Filter/Refresh (kein Kreis-Outline/Sonderfarbe mehr, Kurskorrektur ggü. „soll auffallen"); Kartenlegende-Text korrigiert (Realitäts-Abgleich-Fehler: Haupt-Karte zeigt nur einheitliches Pin-Symbol, Fotograf-Standort/Motiv/Sichtachse existiert nur im Detail-Sheet „Karte & Blickwinkel") + Inline-SVG-Symbolbeispiele je Legendenpunkt ergänzt + Wetter-Legende-Verweis-Satz gelöscht; Glossar-Eintrag „Feed, Kalender, Scout" fachlich präzisiert (Feed = 14-Tage-Feed, Scout errechnet eigene Chancen unabhängig von Nutzer-Standorten, Betaversion, nicht verifiziert). |
 | 2026-07-05 | US-21 (Korrektur nach 3. Testdurchlauf) | Kartenlegende: Fotograf-Standort/Motiv/Sichtachse-Absatz komplett entfernt statt nur textlich korrigiert (auf Haupt-Karte nicht relevant) — behebt zugleich ein Rendering-Problem (Bold-Tags/Komma auf eigener Zeile), das durch Einbetten eines Block-Elements (`MapMarkers.legendHtml()`) in einen inline-flex-Span innerhalb eines `<p>` in der schmalen Overlay-Box entstand. Legende zeigt jetzt nur noch Pin-Symbol, Kartenebenen-Umschalter, GPS-Button. Layer-Switcher (`#map-layer-toggle`/`MapView.setLayer`) und GPS-Button (`.map-gps-btn`/`MapView.locateMe`) im Code verifiziert: beide sind eigenständige Buttons direkt im Haupt-Karten-Tab (`#page-map`), CSS zeigt keine Sichtbarkeits-Auffälligkeit. |
+| 2026-07-06 | TASK-55 | Automatische Server-Sicherung umfasst jetzt auch die Standort-Fotos, nicht mehr nur die Standort-Daten; Wiederherstellung spielt Fotos ebenfalls zurück. |

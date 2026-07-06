@@ -3,7 +3,7 @@ FotoAlert Backup — RPO≈0 + lokale Snapshots
 
 Drei öffentliche Funktionen:
 
-  backup_after_edit(loc_id)       — nach jedem User-Edit; JSON-Export + git commit/push
+  backup_after_edit(loc_id)       — nach jedem User-Edit; JSON-Export + Bildordner-Sync + git commit/push
   snapshot_before_precompute()    — vor jedem Precompute-Lauf; lokale DB-Kopie (7 Versionen)
   last_backup_age_hours()         — Stunden seit letztem Git-Commit (für Health-Signal US-38)
 
@@ -13,6 +13,10 @@ Backup-Repo-Pfad: Env-Variable FOTOALERT_BACKUP_REPO,
                   Default /opt/fotoalert/backup-repo
 
 TASK-18: Backup RPO≈0 + Restore (privates Git-Repo)
+TASK-55: location_images/ huckepack im selben Backup-Zyklus (Unterordner
+         location_images/ im Backup-Repo, per Verzeichnis-Sync auf exakten
+         Live-Stand gebracht — gelöschte/ersetzte Bilder verschwinden auch
+         aus dem aktuellen Sicherungsstand, keine Altstände als Sicherheitsnetz)
 """
 
 from __future__ import annotations
@@ -37,6 +41,10 @@ _BACKUP_REPO = Path(os.getenv("FOTOALERT_BACKUP_REPO", "/opt/fotoalert/backup-re
 _DATA_DIR    = Path(__file__).parent          # backend/data/
 _SNAPSHOTS   = _DATA_DIR / "snapshots"
 _RETAIN      = 7                               # maximale Anzahl lokaler Snapshots
+
+# TASK-55: Bildordner (US-120) — Live-Quelle und Zielordner im Backup-Repo
+_IMAGE_DIR        = _DATA_DIR / "location_images"
+_IMAGE_BACKUP_DIR = _BACKUP_REPO / "location_images"
 
 
 def _is_active() -> bool:
@@ -82,6 +90,42 @@ def _export_to_repo() -> bool:
         return True
     except Exception as exc:
         logger.error("Backup-Export fehlgeschlagen: %s", exc)
+        return False
+
+
+# ---------------------------------------------------------------------------
+# TASK-55: Bildordner-Sync (location_images/)
+# ---------------------------------------------------------------------------
+
+def _sync_image_dir_to_repo() -> bool:
+    """
+    Bringt den Unterordner location_images/ im Backup-Repo exakt auf den
+    aktuellen Live-Stand von backend/data/location_images/:
+    - neue/geänderte Dateien werden hineinkopiert
+    - Dateien, die live nicht mehr existieren (gelöscht/ersetzt), werden aus
+      dem Backup-Repo-Unterordner entfernt (kein Sicherheitsnetz für Altstände,
+      Ticket-Entscheidung TASK-55)
+    Gibt True zurück bei Erfolg (auch wenn location_images/ live leer/nicht
+    vorhanden ist — dann wird nur ein leerer Zielordner sichergestellt).
+    """
+    try:
+        _IMAGE_BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+
+        live_files = set()
+        if _IMAGE_DIR.exists():
+            live_files = {p.name for p in _IMAGE_DIR.iterdir() if p.is_file()}
+
+            for name in live_files:
+                shutil.copy2(_IMAGE_DIR / name, _IMAGE_BACKUP_DIR / name)
+
+        # Alte Dateien im Backup-Repo entfernen, die live nicht mehr existieren
+        backup_files = {p.name for p in _IMAGE_BACKUP_DIR.iterdir() if p.is_file()}
+        for stale_name in backup_files - live_files:
+            (_IMAGE_BACKUP_DIR / stale_name).unlink()
+
+        return True
+    except Exception as exc:
+        logger.error("Backup-Bildsync fehlgeschlagen: %s", exc)
         return False
 
 
@@ -138,8 +182,9 @@ def _git_commit_and_push(message: str) -> None:
 def backup_after_edit(loc_id: str) -> None:
     """
     Nach jedem User-Edit aufrufen (in asyncio.to_thread, nicht direkt awaiten).
-    Exportiert DB als JSON → git commit + push ins Backup-Repo.
-    No-Op im Dev-Modus oder wenn Backup-Repo nicht eingerichtet ist.
+    Exportiert DB als JSON, bringt location_images/ auf den exakten Live-Stand
+    (TASK-55 — neue Bilder rein, gelöschte/ersetzte raus) → git commit + push
+    ins Backup-Repo. No-Op im Dev-Modus oder wenn Backup-Repo nicht eingerichtet ist.
     """
     if not _is_active():
         return
@@ -154,6 +199,10 @@ def backup_after_edit(loc_id: str) -> None:
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     if not _export_to_repo():
         return
+    # TASK-55: Bildordner-Stand mitsichern, bevor committet wird — Fehler hier
+    # sollen die JSON-Sicherung nicht verhindern, daher nur geloggt (siehe
+    # _sync_image_dir_to_repo, gleiche Fehlerbehandlung wie _export_to_repo).
+    _sync_image_dir_to_repo()
     _git_commit_and_push(f"backup: edit {loc_id} {ts}")
 
 
