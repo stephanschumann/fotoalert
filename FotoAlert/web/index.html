@@ -578,6 +578,10 @@
     .verified-badge-issue { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--red); background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.35); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .tag-verified { background: rgba(76,175,80,.15); color: var(--green); }
     .tag-issue { background: rgba(224,80,80,.15); color: var(--red); }
+    /* US-09: Sichtachsen-Status-Pille — Basisklasse ohne feste Farbe (Farbe je
+       Status per Inline-Style gesetzt: Grün/Orange/Rot/Grau), dezenter Hintergrund
+       passend zu currentColor (folgt tag-verified/tag-issue-Muster). */
+    .tag-sightline { background: color-mix(in srgb, currentColor 15%, transparent); }
 
     /* ── Star Rating (US-24) ─────────────────────────────────────── */
     .star-input { display: flex; gap: 6px; padding: 4px 0; }
@@ -1166,6 +1170,13 @@ function ic(id, size, cls){
               <div class="rmi-status" id="rms-calendar">–</div>
             </div>
           </div>
+          <div class="refresh-menu-item" id="rmi-sightlines" onclick="RefreshMenu.trigger('sightlines')">
+            <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-eye"/></svg></span>
+            <div class="rmi-body">
+              <div class="rmi-label">Sichtachsen aktualisieren</div>
+              <div class="rmi-status" id="rms-sightlines">–</div>
+            </div>
+          </div>
           <div class="refresh-menu-divider"></div>
           <div class="refresh-menu-item" style="opacity:.4;pointer-events:none">
             <span class="rmi-icon"><svg style="width:18px;height:18px"><use href="#i-search"/></svg></span>
@@ -1510,7 +1521,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.21.11';
+const APP_VERSION = '1.22.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1773,6 +1784,37 @@ function bearingLabel(spLat, spLon, subLat, subLon) {
 // ═══════════════════════════════════════════════════════
 // OPPORTUNITY CARD
 // ═══════════════════════════════════════════════════════
+// US-09: Sichtachsen-Status als Pille — konstantes Augen-Icon + farbig eingefärbter
+// Text (KEIN wechselndes Zustands-Icon, siehe Design-Entscheidung/Prototyp-Korrektur
+// 2026-07-05). Folgt dem tag-verified/tag-issue-Muster (eine Basis-Klasse tag-sightline,
+// Farbe via Inline-Style je Status statt vier Icon-Varianten).
+const SIGHTLINE_LABELS = {
+  frei: 'Frei',
+  teilweise_verdeckt: 'Teilweise verdeckt',
+  blockiert: 'Blockiert',
+  nicht_geprueft: 'Nicht geprüft',
+};
+const SIGHTLINE_COLORS = {
+  frei: 'var(--green)',
+  teilweise_verdeckt: 'var(--orange)',
+  blockiert: 'var(--red)',
+  nicht_geprueft: 'var(--muted)',
+};
+// US-09 Regel 3b: Sichtachsen-Status gilt für Sonne/Mond/Himmelsrichtung-
+// Alignments UND Himmelsröte (Gegenpunkt-Sichtachse, US-113) — NICHT für
+// Golden Hour/Blaue Stunde/Milchstraße/Meteore ohne festen Sichtachsen-Bezug.
+const SIGHTLINE_RELEVANT_TYPES = new Set([
+  'Sonnen-Alignment', 'Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Himmelsröte',
+]);
+function sightlineTagHtml(status, withInfo) {
+  const s = status || 'nicht_geprueft';
+  const label = SIGHTLINE_LABELS[s] || SIGHTLINE_LABELS.nicht_geprueft;
+  const color = SIGHTLINE_COLORS[s] || SIGHTLINE_COLORS.nicht_geprueft;
+  const info = withInfo
+    ? `<button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('sightlineStatus')">i</button>` : '';
+  return `<span class="tag tag-sightline" style="color:${color}">${ic('i-eye',12)} ${label}</span>${info}`;
+}
+
 function oppCard(o) {
   const icon = eventIcon(o.event_type, 15, 'ct');
   // US-106: Wetter-Tag mit drei ehrlichen Zuständen:
@@ -1794,6 +1836,8 @@ function oppCard(o) {
   const verified = Verify.getLast(o.location_id)
     ? `<span class="tag tag-verified">${ic('i-check',12)} Geprüft</span>` : '';
   const rated = Rating.feedTagHtml(o.location_id);
+  const sightline = SIGHTLINE_RELEVANT_TYPES.has(o.event_type)
+    ? sightlineTagHtml(o.sightline_status, false) : '';
 
   return `<div class="card" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
     <div class="opp-card">
@@ -1806,7 +1850,7 @@ function oppCard(o) {
         </div>
         <div class="opp-title">${o.title}</div>
         <div class="opp-location">${ic('i-pin',13)} ${Locations.nameFor(o.location_id, o.location_name)}</div>
-        <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${rated}</div>
+        <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${sightline}${rated}</div>
       </div>
     </div>
   </div>`;
@@ -2833,7 +2877,9 @@ const Filter = {
     // BUG-46: minRatingExcl (bool) = Drei-Zustand für Bewertung (false=≥N, true=<N).
     // verificationIncl/verificationExcl: Arrays mit 'verified'|'unverified'|'issues' (unabhängige Drei-Zustände).
     // US-119: minScore-Default 0 → 70 (Feed/Kalender/Scout starten standardmäßig bei ≥70% Wahrscheinlichkeit).
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 70, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0 };
+    // US-09: sightlineIncl/sightlineExcl analog zu verificationIncl/verificationExcl
+    // (Arrays mit 'frei'|'teilweise_verdeckt'|'blockiert'|'nicht_geprueft').
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 70, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0, sightlineIncl: [], sightlineExcl: [] };
   },
 
   get state() {
@@ -2887,7 +2933,8 @@ const Filter = {
            (s.minFocal > 0 || s.maxFocal > 0 ? 1 : 0) +
            (s.maxDistKm > 0 ? 1 : 0) +
            ((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0) +
-           (s.minCloudMood > 0 ? 1 : 0);
+           (s.minCloudMood > 0 ? 1 : 0) +
+           ((s.sightlineIncl.length || s.sightlineExcl.length) ? 1 : 0);
   },
 
   _updateBadge() {
@@ -2976,6 +3023,12 @@ const Filter = {
         // Excl: diese Kategorie explizit ausschließen
         if (s.verificationExcl.includes(cat)) return false;
       }
+      // US-09: Sichtachsen-Filter — Location-Attribut, gilt analog zum Verifikationsfilter
+      if (s.sightlineIncl.length || s.sightlineExcl.length) {
+        const cat = o.sightline_status || 'nicht_geprueft';
+        if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) return false;
+        if (s.sightlineExcl.includes(cat)) return false;
+      }
       // US-07: Wolkenstimmungs-Filter — nur im Feed (Kalender und skipCloudMood=true ignorieren)
       if (s.minCloudMood > 0 && !skipCloudMood) {
         const gcs = o.golden_cloud_score;
@@ -3017,6 +3070,12 @@ const Filter = {
         const cat = !last ? 'unverified' : last.status === 'ok' ? 'verified' : 'issues';
         if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) return false;
         if (s.verificationExcl.includes(cat)) return false;
+      }
+      // US-09: Sichtachsen-Filter — Location-Attribut, wirkt auch auf Locations-Tab
+      if (s.sightlineIncl.length || s.sightlineExcl.length) {
+        const cat = l.sightline_status || 'nicht_geprueft';
+        if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) return false;
+        if (s.sightlineExcl.includes(cat)) return false;
       }
       if (s.minScore > 0 && Feed.data && Feed.data.length) {
         // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
@@ -3414,6 +3473,19 @@ const FilterSheet = {
       ['issues',       `${ic('i-warn',13)} Probleme`],
     ].map(([v,l]) => chip3(l, verState(v), `FilterSheet._cycleVerification('${v}')`)).join('');
 
+    // US-09: Sichtachsen-Status — vier unabhängige Chips, je drei Zustände (off → incl → excl → off)
+    const sightlineState = (v) => {
+      if (s.sightlineIncl.includes(v)) return 'incl';
+      if (s.sightlineExcl.includes(v)) return 'excl';
+      return 'off';
+    };
+    const sightlineChips = [
+      ['frei',               `${ic('i-eye',13)} Frei`],
+      ['teilweise_verdeckt', 'Teilweise verdeckt'],
+      ['blockiert',          'Blockiert'],
+      ['nicht_geprueft',     'Nicht geprüft'],
+    ].map(([v,l]) => chip3(l, sightlineState(v), `FilterSheet._cycleSightline('${v}')`)).join('');
+
     const gpsNote = s.maxDistKm > 0
       ? `<p style="font-size:11px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px">${ic('i-pin',13)} GPS wird beim Anwenden abgefragt</p>` : '';
 
@@ -3553,7 +3625,8 @@ const FilterSheet = {
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-folder',15)} Kategorie ${fInfoBtn('kategorie')}</h4><div class="filter-chips">${catChips}</div></div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung ${fInfoBtn('bewertung')}</h4><div class="filter-chips">${ratingChips}</div>${ratingNote}</div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS) ${fInfoBtn('entfernung')}</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
-      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus ${fInfoBtn('verifikationsstatus')}</h4><div class="filter-chips">${verChips}</div>${verNote}</div>`;
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus ${fInfoBtn('verifikationsstatus')}</h4><div class="filter-chips">${verChips}</div>${verNote}</div>` +
+      `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-eye',15)} Sichtachse ${fInfoBtn('sichtachsenstatus')}</h4><div class="filter-chips">${sightlineChips}</div>${verNote}</div>`;
   },
 
   // BUG-46: Drei-Zustand-Zyklus für Bewertung: Off(Alle) → Include(≥N) → Exclude(<N) → Off(Alle)
@@ -3594,6 +3667,25 @@ const FilterSheet = {
       incl.push(v);
     }
     Filter.save({ verificationIncl: incl, verificationExcl: excl });
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
+  // US-09: Sichtachsen-Status — jeder Chip unabhängig, off → incl → excl → off (analog Verifikation)
+  _cycleSightline(v) {
+    const s = Filter.state;
+    const incl = [...(s.sightlineIncl || [])];
+    const excl = [...(s.sightlineExcl || [])];
+    if (incl.includes(v)) {
+      incl.splice(incl.indexOf(v), 1);
+      excl.push(v);
+    } else if (excl.includes(v)) {
+      excl.splice(excl.indexOf(v), 1);
+    } else {
+      incl.push(v);
+    }
+    Filter.save({ sightlineIncl: incl, sightlineExcl: excl });
     this._render();
     requestAnimationFrame(() => this.initDualSlider());
     this._applyLive();
@@ -3654,7 +3746,19 @@ function _haversineM(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
+// US-09: sightlineStatus (optional, 5. Parameter) steuert den Linienstil der Sichtachse
+// (subjLine unten) — durchgezogen (frei), gestrichelt (teilweise_verdeckt), unterbrochen
+// mit Balken (blockiert), gepunktet (nicht_geprueft/undefined). Reine Stil-Anpassung,
+// kein neues Icon-Set (siehe Design-Entscheidung BACKLOG.md US-09).
+function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM, sightlineStatus) {
+  const SIGHTLINE_DASH = {
+    frei: null,
+    teilweise_verdeckt: '5 4',
+    blockiert: '9 3 2 3',
+    nicht_geprueft: '1.5 4',
+  };
+  const axisDash = SIGHTLINE_DASH[sightlineStatus] !== undefined
+    ? SIGHTLINE_DASH[sightlineStatus] : SIGHTLINE_DASH.nicht_geprueft;
   // H erweitert (US-113-Folgefix): Sicherheitsabstand zw. Kreisrand (inkl. Cardinal-Labels bei S,
   // äußerster Punkt = cy+R+18+4.5 = 250.5) und Legende, damit Pfeilspitzen (max. r=107) die Legende
   // bei keinem Winkel erreichen. Puffer 12px = etabliertes Bauhaus-Spacing-Muster im File
@@ -3723,9 +3827,11 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM) {
     const sAh1y = (s1y - 9 * Math.sin(sAng) + 4.5 * Math.sin(sPerpA)).toFixed(2);
     const sAh2x = (s1x - 9 * Math.cos(sAng) - 4.5 * Math.cos(sPerpA)).toFixed(2);
     const sAh2y = (s1y - 9 * Math.sin(sAng) - 4.5 * Math.sin(sPerpA)).toFixed(2);
+    // US-09: dasharray je Sichtachsen-Status statt fest "5 4" (siehe axisDash oben).
+    const axisDashAttr = axisDash ? ` stroke-dasharray="${axisDash}"` : '';
     subjLine = `
       <line x1="${s2x.toFixed(2)}" y1="${s2y.toFixed(2)}" x2="${(s1x - 7 * Math.cos(sAng)).toFixed(2)}" y2="${(s1y - 7 * Math.sin(sAng)).toFixed(2)}"
-        stroke="#5272c0" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.85"/>
+        stroke="#5272c0" stroke-width="1.8"${axisDashAttr} stroke-linecap="round" opacity="0.85"/>
       <polygon points="${s1x.toFixed(2)},${s1y.toFixed(2)} ${sAh1x},${sAh1y} ${sAh2x},${sAh2y}" fill="#5272c0" opacity="0.85"/>`;
     // (Entfernung wird als HTML unterhalb des SVG angezeigt, nicht im SVG)
   }
@@ -3976,8 +4082,10 @@ const CameraFOV = {
                : `<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten – Karte nicht verfügbar.</p>`}`;
   },
 
-  initMap(prefix, obsLat, obsLon, subjLat, subjLon, distM) {
-    this._data[prefix] = { obsLat, obsLon, subjLat, subjLon,
+  // US-09: sightlineStatus (optionaler 7. Parameter) wird durchgereicht an _drawPinsAndLine,
+  // damit die Kartenlinie denselben statusabhängigen Stil zeigt wie der Astro-Kompass.
+  initMap(prefix, obsLat, obsLon, subjLat, subjLon, distM, sightlineStatus) {
+    this._data[prefix] = { obsLat, obsLon, subjLat, subjLon, sightlineStatus,
       distM: distM || (subjLat ? haversineKm(obsLat, obsLon, subjLat, subjLon) * 1000 : 0) };
     const mapId = `map_fov_${prefix}`;
     if (!document.getElementById(mapId)) return;
@@ -3986,7 +4094,7 @@ const CameraFOV = {
     const map = L.map(mapId, { zoomControl:true, attributionControl:false });
     this._tileLayers[prefix] = LocMapMode.addTileLayer(map); // US-123: Satellit/Straße je gespeicherter Präferenz
     this._maps[prefix] = map;
-    this._drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon);
+    this._drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon, sightlineStatus);
     this._redrawCone(prefix);
     this._updateInfo(prefix);
   },
@@ -4006,7 +4114,10 @@ const CameraFOV = {
   // Zeichnet Beobachter-Pin, Motiv-Pin und Sichtachse auf eine gegebene Map-Instanz.
   // Gemeinsam genutzt von der Panel-Karte (initMap) und der US-114-Vollbild-Karte
   // (_initMapFs), damit beide Instanzen exakt dasselbe Bild zeigen.
-  _drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon) {
+  // US-09: sightlineStatus (optionaler 6. Parameter) bestimmt den dashArray-Stil der
+  // Sichtachsen-Linie — durchgezogen (frei), gestrichelt (teilweise_verdeckt), unterbrochen/
+  // mit Balken (blockiert), gepunktet (nicht_geprueft bzw. kein Status übergeben).
+  _drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon, sightlineStatus) {
     // Observer-Pin (MapMarkers-Standard, BUG-20)
     L.marker([obsLat, obsLon], {icon: MapMarkers.observer()}).addTo(map);
     if (subjLat) {
@@ -4014,7 +4125,15 @@ const CameraFOV = {
       L.marker([subjLat, subjLon], {icon: MapMarkers.subject()}).addTo(map);
       // Sichtachse
       const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
-      L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:ac2, weight:1.5, dashArray:'6,4', opacity:0.7}).addTo(map);
+      const SIGHTLINE_MAP_DASH = {
+        frei: null,
+        teilweise_verdeckt: '5,4',
+        blockiert: '9,3,2,3',
+        nicht_geprueft: '1.5,4',
+      };
+      const dashArray = SIGHTLINE_MAP_DASH[sightlineStatus] !== undefined
+        ? SIGHTLINE_MAP_DASH[sightlineStatus] : SIGHTLINE_MAP_DASH.nicht_geprueft;
+      L.polyline([[obsLat, obsLon],[subjLat, subjLon]], {color:ac2, weight:1.5, dashArray, opacity:0.7}).addTo(map);
       map.fitBounds([[obsLat,obsLon],[subjLat,subjLon]], {padding:[30,30]});
     } else {
       map.setView([obsLat, obsLon], 15);
@@ -4113,7 +4232,7 @@ const CameraFOV = {
     this._maps[fsKey] = map;
     map.invalidateSize();
     // Keine Drag-Handler: _drawPinsAndLine nutzt L.marker() (nicht draggable), reines Ansehen.
-    this._drawPinsAndLine(map, d.obsLat, d.obsLon, d.subjLat, d.subjLon);
+    this._drawPinsAndLine(map, d.obsLat, d.obsLon, d.subjLat, d.subjLon, d.sightlineStatus);
     this._drawCone(map, this._cones, fsKey, d, this._readInputs(prefix));
     // Zoom/Pan sollen normal funktionieren (Default von L.map, nichts deaktiviert).
     setTimeout(() => map.invalidateSize(), 50);
@@ -4173,6 +4292,7 @@ const Detail = {
         <div class="sheet-hero-title">${o.title}</div>
         ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>` : ''}
         ${o.location_id ? `<div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>` : ''}
+        ${SIGHTLINE_RELEVANT_TYPES.has(o.event_type) ? `<div style="margin-top:6px">${sightlineTagHtml(o.sightline_status, true)}</div>` : ''}
       </div>
       <div class="sheet-score-bar">
         <div class="score-col"><div class="sc-val" style="color:${col}">${Math.round(o.overall_score*100)}%</div><div class="sc-lbl">Gesamt <button class="sc-info-btn" onclick="ScoreInfo.show('gesamt')">i</button></div></div>
@@ -4251,7 +4371,8 @@ const Detail = {
           const compassHtmlGC = (sunAz != null)
             ? mkSec('ev_compass_gc',`${ic('i-compass',15)} Wolken & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
                 mkCloudCompassSvg(sunAz, subAz, false,
-                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
+                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null),
+                  o.sightline_status))
             : '';
           return compassHtmlGC + mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
             `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
@@ -4271,7 +4392,8 @@ const Detail = {
           const compassHtmlRS = (rsSunAz != null)
             ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
                 mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, true,
-                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null)))
+                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null),
+                  o.sightline_status))
             : '';
           const rsSubAz = o.subject_azimuth ?? null;
           // US-113-Korrektur (2026-07-02): Himmelsröte liegt am Gegenpunkt der Sonne
@@ -4502,8 +4624,8 @@ const Detail = {
     document.getElementById('detail-overlay').classList.add('open');
     document.getElementById('detail-sheet').classList.add('open');
     // US-58: FOV-Karte wenn Sektion bereits offen (localStorage)
-    Sections.registerOnOpen('ev_fov', () => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0));
-    if (Sections.isOpen('ev_fov')) setTimeout(() => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0), 80);
+    Sections.registerOnOpen('ev_fov', () => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0, o.sightline_status));
+    if (Sections.isOpen('ev_fov')) setTimeout(() => CameraFOV.initMap('ev', o.observer_lat, o.observer_lon, o.subject_lat||null, o.subject_lon||null, 0, o.sightline_status), 80);
   },
   close() {
     document.getElementById('detail-overlay').classList.remove('open');
@@ -4800,6 +4922,13 @@ const MapView = {
         const cat = !last ? 'unverified' : last.status === 'ok' ? 'verified' : 'issues';
         if (s.verificationIncl.length && !s.verificationIncl.includes(cat)) visible = false;
         if (s.verificationExcl.includes(cat)) visible = false;
+      }
+
+      // US-09: Sichtachsen-Status — Location-Attribut, wirkt auch auf der Karte
+      if (visible && (s.sightlineIncl.length || s.sightlineExcl.length)) {
+        const cat = loc.sightline_status || 'nicht_geprueft';
+        if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) visible = false;
+        if (s.sightlineExcl.includes(cat)) visible = false;
       }
 
       // Brennweite (Locations-Eigenschaft, gilt auch auf der Karte)
@@ -5387,10 +5516,17 @@ const AstroLive = {
 
   // ---- Render ----
   _clear() { this.lines.forEach(l => this.map.removeLayer(l)); this.lines = []; },
+  // US-09: `dashed` bleibt wie bisher Boolean (false=durchgezogen, true='4 7' gestrichelt,
+  // unveränderte Bedeutung für alle bestehenden Aufrufe z.B. Sonnen-/Mond-Auf-/Untergang).
+  // Zusätzlich akzeptiert `dashed` jetzt auch direkt einen dashArray-String (z.B. '9 3 2 3'),
+  // damit die Sichtachsen-Linie (Aufruf unten) einen vierten, eigenen Stil ("blockiert") nutzen
+  // kann, den das reine Boolean-Muster nicht abdeckt.
   _ln(p, az, color, distM, weight, dashed) {
     if (az == null || !isFinite(az)) return;
     const e = this._dest(p.lat, p.lng, az, distM);
-    this.lines.push(L.polyline([[p.lat, p.lng], e], { color, weight, opacity: dashed ? 0.45 : 0.95, dashArray: dashed ? '4 7' : null }).addTo(this.map));
+    const dashArray = typeof dashed === 'string' ? dashed : (dashed ? '4 7' : null);
+    const opacity = dashArray ? 0.45 : 0.95;
+    this.lines.push(L.polyline([[p.lat, p.lng], e], { color, weight, opacity, dashArray }).addTo(this.map));
   },
 
   render() {
@@ -5417,7 +5553,17 @@ const AstroLive = {
     } else if (this.loc.ideal_azimuth_range) {
       axisAz = (this.loc.ideal_azimuth_range[0] + this.loc.ideal_azimuth_range[1]) / 2;
     }
-    if (axisAz != null) this._ln(p, axisAz, C.axis, axisDist, 3, false);
+    // US-09: Linienstil der Sichtachse je Status — durchgezogen (frei), gestrichelt
+    // (teilweise_verdeckt), unterbrochen/mit Balken (blockiert), gepunktet (nicht_geprueft
+    // bzw. kein Status bekannt, z.B. Scout-Standpunkt ohne Location-Datensatz).
+    const AXIS_DASH_BY_STATUS = {
+      frei: false,
+      teilweise_verdeckt: '5 4',
+      blockiert: '9 3 2 3',
+      nicht_geprueft: '1.5 4',
+    };
+    const axisDashStyle = AXIS_DASH_BY_STATUS[this.loc && this.loc.sightline_status] ?? AXIS_DASH_BY_STATUS.nicht_geprueft;
+    if (axisAz != null) this._ln(p, axisAz, C.axis, axisDist, 3, axisDashStyle);
 
     // Voller Tagesbogen der Sonne (Azimut-Fächer; nur Stützpunkte über Horizont)
     for (let m = 0; m < 1440; m += 15) {
@@ -5572,7 +5718,7 @@ const LocationDetail = {
     document.getElementById('loc-detail-sheet').classList.add('open');
     this._loadEvents(locId);
     // US-58: FOV-Karte
-    const _fovArgs = [loc.observer_lat, loc.observer_lon, loc.subject_lat||null, loc.subject_lon||null, loc.distance_m||0];
+    const _fovArgs = [loc.observer_lat, loc.observer_lon, loc.subject_lat||null, loc.subject_lon||null, loc.distance_m||0, loc.sightline_status];
     Sections.registerOnOpen('loc_fov', () => CameraFOV.initMap('loc', ..._fovArgs));
     if (Sections.isOpen('loc_fov')) setTimeout(() => CameraFOV.initMap('loc', ..._fovArgs), 80);
   },
@@ -6210,7 +6356,7 @@ const LocationDetail = {
         <div class="sheet-hero-title">${loc.name}</div>
         <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button>
         <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${loc.description}</p>
-        ${fls ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}</div>` : ''}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}${sightlineTagHtml(loc.sightline_status, true)}</div>
       </div>
 
       ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
@@ -6888,6 +7034,18 @@ const ElementInfo = {
         <li><b>Probleme gemeldet:</b> ein Nutzer war vor Ort und hat ein Problem gemeldet (z. B. Zugang versperrt, Sicht verstellt)</li>
       </ul>`,
   },
+  // US-09: Sichtachsen-Status-Pille (Feed-Karte + Detail-Sheet). Vorbild: _verification oben.
+  _sightlineStatus: {
+    title: 'Sichtachsen-Status',
+    html: `<p>Zeigt, ob die Sichtlinie vom Fotostandort zum Motiv frei ist oder durch Gebäude/Gelände blockiert wird. Wird einmalig beim Anlegen/Ändern des Standorts automatisch geprüft (Höhendaten + Gebäudedaten):</p>
+      <ul>
+        <li><b>Frei:</b> keine Hindernisse auf der Sichtlinie gefunden</li>
+        <li><b>Teilweise verdeckt:</b> ein Hindernis verdeckt nur den unteren Teil des Sichtfensters (z. B. knapp über dem Horizont), der obere Teil bleibt sichtbar</li>
+        <li><b>Blockiert:</b> ein Hindernis verdeckt die komplette Ziellinie zum Motiv</li>
+        <li><b>Nicht geprüft:</b> die externen Höhen-/Gebäudedaten waren beim letzten Versuch nicht verfügbar — kein verlässliches Ergebnis, absichtlich nicht als „frei" gewertet</li>
+      </ul>
+      <p style="margin-top:8px">Der Status basiert auf Höhendaten und Gebäude-Umrissen, nicht auf Bäumen/Wald — bei Zweifeln hilft die manuelle Meldung „Sichtachse blockiert".</p>`,
+  },
   _eventTypes: {
     'Goldene Stunde Abend':  { title: 'Goldene Stunde (Abend)', html: '<p>Die Zeit kurz vor Sonnenuntergang mit warmem, weichem Licht — ideal für stimmungsvolle Aufnahmen mit langen Schatten und goldenem Licht.</p>' },
     'Goldene Stunde Morgen': { title: 'Goldene Stunde (Morgen)', html: '<p>Die Zeit kurz nach Sonnenaufgang mit warmem, weichem Licht — ruhige Stimmung, oft klare Luft und wenig Betrieb.</p>' },
@@ -6949,6 +7107,11 @@ const ElementInfo = {
     verifikationsstatus: {
       title: 'Filter: Verifikationsstatus',
       html: `<p>Grenzt Locations nach Prüfstatus ein — siehe ⓘ beim Verifikations-Chip für die Bedeutung von Geprüft/Nicht geprüft/Probleme.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
+    },
+    sichtachsenstatus: {
+      title: 'Filter: Sichtachse',
+      html: `<p>Grenzt Locations nach Sichtachsen-Status ein — siehe ⓘ bei der Sichtachsen-Pille für die Bedeutung von Frei/Teilweise verdeckt/Blockiert/Nicht geprüft.</p>
         <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
     },
   },
@@ -7030,6 +7193,7 @@ const ElementInfo = {
     let t;
     if (category === 'difficulty') t = this._difficulty;
     else if (category === 'verification') t = this._verification;
+    else if (category === 'sightlineStatus') t = this._sightlineStatus;
     else if (category === 'eventType') t = this._eventTypes[key] || this._eventTypeFallback;
     else if (category === 'filterGroup') t = this._filterGroups[key];
     else if (category === 'mapLegend') t = this._mapLegendData();
@@ -7346,6 +7510,7 @@ const RefreshMenu = {
     weather:  { endpoint: '/weather-refresh', label: 'Wetter aktualisieren',        doneMsg: '✅ Wetterdaten aktualisiert', reloadFeed: true  },
     feed:     { endpoint: '/refresh-feed',    label: '14-Tage-Feed berechnet',      doneMsg: '✅ Feed neu berechnet',       reloadFeed: true  },
     calendar: { endpoint: '/refresh-calendar',label: 'Jahreskalender berechnet',    doneMsg: '✅ Kalender neu berechnet',   reloadFeed: false },
+    sightlines: { endpoint: '/sightline-refresh', label: 'Sichtachsen aktualisiert', doneMsg: '✅ Sichtachsen aktualisiert', reloadFeed: true },
   },
 
   toggle(e) {

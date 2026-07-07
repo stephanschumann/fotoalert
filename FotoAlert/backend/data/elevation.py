@@ -43,6 +43,32 @@ RATE_LIMIT_PAUSE_S: float = 1.1
 _CACHE_FILE = Path(__file__).resolve().parent / "cache" / "elevation_tiles.json"
 _CACHE_PRECISION = 4  # ~11 m Raster — fein genug, klein genug für den Cache
 
+# Modul-weiter Rate-Limit-Tracker für Netzanfragen an OpenTopoData: hält den
+# Abstand zur letzten tatsächlichen Netzanfrage auch ÜBER mehrere Punkte hinweg
+# ein (nicht nur innerhalb der Dataset-Kette eines einzelnen Punkts), z. B. wenn
+# elevation_profile() 21 Punkte hintereinander abfragt. Lock macht das gegen
+# gleichzeitige async-Aufrufe sicher; Cache-Treffer laufen NIE hier durch.
+_rate_limit_lock = asyncio.Lock()
+_last_request_ts: Optional[float] = None
+
+
+async def _respect_rate_limit() -> None:
+    """Wartet bei Bedarf, bis seit der letzten Netzanfrage mindestens
+    RATE_LIMIT_PAUSE_S vergangen ist. Nur vor tatsächlichen Netzanfragen
+    aufrufen (Cache-Treffer dürfen hier nicht durchlaufen)."""
+    global _last_request_ts
+    if RATE_LIMIT_PAUSE_S <= 0:
+        return
+    async with _rate_limit_lock:
+        loop = asyncio.get_running_loop()
+        now = loop.time()
+        if _last_request_ts is not None:
+            elapsed = now - _last_request_ts
+            wait = RATE_LIMIT_PAUSE_S - elapsed
+            if wait > 0:
+                await asyncio.sleep(wait)
+        _last_request_ts = loop.time()
+
 
 def _key(lat: float, lon: float) -> str:
     return f"{round(lat, _CACHE_PRECISION)},{round(lon, _CACHE_PRECISION)}"
@@ -75,9 +101,8 @@ class ElevationProvider:
         kommt (weltweit). None erst, wenn KEIN Dataset Abdeckung hat."""
         try:
             async with httpx.AsyncClient(timeout=30) as client:
-                for idx, dataset in enumerate(DATASET_CHAIN):
-                    if idx > 0 and RATE_LIMIT_PAUSE_S > 0:
-                        await asyncio.sleep(RATE_LIMIT_PAUSE_S)  # 1 req/s-Limit
+                for dataset in DATASET_CHAIN:
+                    await _respect_rate_limit()  # 1 req/s-Limit, auch über Punkte hinweg
                     try:
                         resp = await client.get(f"{_TOPODATA_BASE}/{dataset}",
                                                 params={"locations": f"{lat},{lon}"})
@@ -117,6 +142,50 @@ class ElevationProvider:
         if obs is None or sub is None:
             return 0.0, True
         return round(sub - obs, 1), False
+
+    async def elevation_profile(
+        self,
+        observer_lat: float, observer_lon: float,
+        subject_lat: float, subject_lon: float,
+        num_samples: int = 20,
+    ) -> Tuple[List[Optional[float]], bool]:
+        """
+        US-09: Höhenprofil entlang der Sichtlinie Fotograf → Motiv.
+
+        Liefert eine Liste von `num_samples + 1` Geländehöhen (m) für
+        äquidistante Zwischenpunkte zwischen Standort (Index 0) und Motiv
+        (Index -1), inklusive beider Endpunkte.
+
+        Rückgabe: (heights, incomplete). `incomplete=True` sobald mindestens
+        ein ZWISCHEN-Stützpunkt (Index 1..num_samples-1) keine Höhe liefert
+        (transparent als „nicht geprüft" markiert, kein stiller 0.0-Fallback
+        einzelner Punkte, da eine fehlende Zwischenhöhe das gesamte Profil
+        unzuverlässig macht).
+
+        BUG-Fix (US-09, 2026-07-06): Die beiden Endpunkte (Index 0 = Beobachter-
+        Standort, Index -1 = Motiv-Standort) fließen NIE in die Hindernis-
+        Erkennung ein (siehe evaluate_sightline(): `terrain_heights_m[1:-1]`).
+        Sie durften trotzdem `incomplete=True` auslösen, was in der Praxis dazu
+        führte, dass der Sichtachsen-Check für praktisch jede Location dauerhaft
+        "nicht_geprueft" blieb — OpenTopoData liefert für exakte Standort-/
+        Gebäudekoordinaten (oft knapp neben dem DEM-Raster) überdurchschnittlich
+        häufig keine Höhe, obwohl alle tatsächlich benötigten Zwischenpunkte
+        vollständig vorhanden waren. Jetzt zählen nur noch die Zwischenpunkte.
+        """
+        from discover.geometry import bearing_between  # lokaler Import: zirkulär vermeiden
+
+        heights: List[Optional[float]] = []
+        incomplete = False
+        last_idx = num_samples  # Index des letzten Punkts (Liste hat num_samples+1 Einträge)
+        for i in range(num_samples + 1):
+            frac = i / num_samples
+            lat = observer_lat + (subject_lat - observer_lat) * frac
+            lon = observer_lon + (subject_lon - observer_lon) * frac
+            h = await self.get_elevation(lat, lon)
+            if h is None and 0 < i < last_idx:
+                incomplete = True
+            heights.append(h)
+        return heights, incomplete
 
 
 # Modul-weiter Singleton (teilt den Tile-Cache prozessweit)

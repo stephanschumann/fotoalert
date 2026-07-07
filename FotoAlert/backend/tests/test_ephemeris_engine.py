@@ -150,6 +150,7 @@ def test_edge_missing_elevation_fallback():
     """Edge/AK: ohne DEM-Abdeckung → difference 0.0 + incomplete=True, kein Crash."""
     import tempfile
     from pathlib import Path
+    from unittest.mock import patch
     from data.elevation import ElevationProvider
     p = ElevationProvider(cache_file=Path(tempfile.mktemp()))
     # Cache-Hit-Pfad ist deterministisch (kein Netz):
@@ -157,8 +158,11 @@ def test_edge_missing_elevation_fallback():
     p._cache["52.42,13.07"] = 90.0
     diff, inc = asyncio.run(p.elevation_difference(52.40, 13.10, 52.42, 13.07))
     assert diff == 50.0 and inc is False
-    # Fehlende Punkte (kein Netz im Harness) → Fallback
-    diff2, inc2 = asyncio.run(p.elevation_difference(0.0, 0.0, 0.1, 0.1))
+    # Fehlende Abdeckung deterministisch simulieren (nicht von echter DEM-Lücke
+    # abhängig, die je nach Netzzugang/Datensatz-Stand variiert): _fetch_elevation
+    # gemockt, liefert garantiert None → Fallback-Pfad in elevation_difference().
+    with patch.object(ElevationProvider, "_fetch_elevation", return_value=None):
+        diff2, inc2 = asyncio.run(p.elevation_difference(0.0, 0.0, 0.1, 0.1))
     assert diff2 == 0.0 and inc2 is True
 
 

@@ -46,6 +46,9 @@ class LocationOut(BaseModel):
     # (Bildmitte) wenn der Host noch keine eigene Position gewählt hat.
     image_focus_x: float = 50.0
     image_focus_y: float = 50.0
+    # US-09: Sichtachsen-Check (Raycast-Hinderniserkennung, einmalig vorberechnet)
+    sightline_status: str = "nicht_geprueft"
+    sightline_angle_deg: Optional[float] = None
 
 
 class OpportunityOut(BaseModel):
@@ -88,6 +91,9 @@ class OpportunityOut(BaseModel):
     blue_hour_evening_end: Optional[datetime] = None
     # US-07: Goldene Wolken & Himmelsröte Scoring (nur für GOLDEN_HOUR_MORNING/EVENING)
     golden_cloud_score: Optional[float] = None
+    # US-09: Sichtachsen-Status der Location (frei/teilweise_verdeckt/blockiert/nicht_geprueft)
+    sightline_status: Optional[str] = "nicht_geprueft"
+    sightline_angle_deg: Optional[float] = None
 
 
 class DailyBriefingOut(BaseModel):

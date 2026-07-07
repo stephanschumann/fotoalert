@@ -63,10 +63,12 @@ from calculations.astronomy import (
 )
 from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
+from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
 from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
 from data.store import LocationStore, compute_geo_hash
 from data import backup
 from data import qa_azimuth, qa_focal, qa_description  # TASK-45/46/47: Auto-QA (Azimut, Beschreibung, Brennweite)
+from data.elevation import provider as _elevation_provider  # US-09: Höhenprofil für Sichtachsen-Check
 from models.schemas import (
     CameraHintOut,
     DailyBriefingOut,
@@ -267,7 +269,12 @@ _job_status: dict = {
     "feed":     {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
     "calendar": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
     "weather-map": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},  # US-112
+    "sightlines": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},  # US-09
 }
+
+# US-09: Single-Flight-Guard für den manuellen Sichtachsen-Refresh (analog zu
+# _precompute_running/_qa_pass_running — verhindert parallele Läufe).
+_sightline_refresh_running: bool = False
 
 def _job_start(job: str) -> float:
     """Markiert Job als laufend, gibt Startzeit zurück."""
@@ -307,7 +314,13 @@ _NO_BACKGROUND = _os.getenv("FOTOALERT_NO_BACKGROUND") == "1"
 # ---------------------------------------------------------------------------
 
 def _backfill_coords(events: list[dict]) -> None:
-    """Ergänzt subject_lat/lon aus LOCATIONS falls im Cache noch nicht vorhanden."""
+    """Ergänzt subject_lat/lon aus LOCATIONS falls im Cache noch nicht vorhanden.
+
+    US-09: Ergänzt zusätzlich sightline_status/-angle, falls der Cache aus einem
+    Stand vor diesem Ticket geladen wird (Feld fehlt komplett im JSON) — sonst
+    würde ein alter Cache-Eintrag ohne das Feld fälschlich als "nicht_geprueft"
+    im Frontend interpretiert werden erst NACH dem nächsten Precompute-Lauf.
+    """
     loc_map = {loc.id: loc for loc in LOCATIONS}
     for e in events:
         if "subject_lat" not in e:
@@ -315,6 +328,10 @@ def _backfill_coords(events: list[dict]) -> None:
             if loc:
                 e["subject_lat"] = loc.subject_lat
                 e["subject_lon"] = loc.subject_lon
+        if "sightline_status" not in e:
+            loc = loc_map.get(e.get("location_id", ""))
+            e["sightline_status"] = getattr(loc, "sightline_status", None) or "nicht_geprueft" if loc else "nicht_geprueft"
+            e["sightline_angle_deg"] = getattr(loc, "sightline_angle_deg", None) if loc else None
 
 
 def _load_caches() -> bool:
@@ -1242,6 +1259,12 @@ def _load_qa_values() -> None:
                 loc.ideal_azimuth_range = (qv["ideal_azimuth_min"], qv["ideal_azimuth_max"])
             if qv.get("focal_length_suggestions") is not None:
                 loc.focal_length_suggestions = qv["focal_length_suggestions"]
+            # US-09: Sichtachsen-Status/Winkel anwenden (Default "nicht_geprueft"
+            # bleibt bestehen, solange kein QA-Wert gespeichert ist).
+            if qv.get("sightline_status") is not None:
+                loc.sightline_status = qv["sightline_status"]
+            if qv.get("sightline_angle_deg") is not None:
+                loc.sightline_angle_deg = qv["sightline_angle_deg"]
             applied += 1
         if applied:
             logger.info("QA-Values geladen: %d Locations gepatcht", applied)
@@ -1439,6 +1462,9 @@ def _loc_to_out(loc) -> LocationOut:
         # US-126: Fallback auf 50/50 (Bildmitte), falls kein Fokuspunkt gespeichert ist
         image_focus_x=getattr(loc, "image_focus_x", None) if getattr(loc, "image_focus_x", None) is not None else 50.0,
         image_focus_y=getattr(loc, "image_focus_y", None) if getattr(loc, "image_focus_y", None) is not None else 50.0,
+        # US-09: Sichtachsen-Status/Winkel (Default "nicht_geprueft", siehe PhotoLocation)
+        sightline_status=getattr(loc, "sightline_status", None) or "nicht_geprueft",
+        sightline_angle_deg=getattr(loc, "sightline_angle_deg", None),
     )
 
 
@@ -1910,6 +1936,49 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
     """
     background_tasks.add_task(_weather_overlay)
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
+
+
+async def _run_sightline_refresh() -> None:
+    """US-09: Manueller Refresh — Sichtachsen-Check für ALLE Locations neu ausführen.
+
+    Analog zu _weather_overlay (Hintergrund-Job, Status via _job_status).
+    Läuft sequenziell mit kurzer Pause zwischen Locations (Drosselung der
+    externen Overpass-/OpenTopoData-Aufrufe, gleiches Muster wie der
+    nächtliche QA-Lauf _QA_PASS_THROTTLE_S) — kein paralleler Sturm auf die
+    beiden externen Dienste.
+    """
+    global _sightline_refresh_running
+    t0 = _job_start("sightlines")
+    _sightline_refresh_running = True
+    try:
+        for loc in LOCATIONS:
+            try:
+                await sightline_calc.update_location_sightline(_store, loc, _elevation_provider)
+            except Exception as exc:
+                logger.warning("Sichtachsen-Refresh: %s übersprungen (%s)", loc.id, exc)
+            await asyncio.sleep(1.0)  # Drosselung externer Dienste
+        # Aktualisierten Stand aus dem Store erneut auf LOCATIONS anwenden (Konsistenz
+        # mit dem Start-Verhalten von _load_qa_values) und Feed/Kalender-Caches neu laden,
+        # damit die neuen Werte sofort in Feed/Kalender-Events sichtbar sind.
+        _load_qa_values()
+        _load_caches()
+        _job_done("sightlines", t0)
+    except Exception as exc:
+        _job_error("sightlines", t0, str(exc))
+        logger.error("Sichtachsen-Refresh fehlgeschlagen: %s", exc)
+    finally:
+        _sightline_refresh_running = False
+
+
+@app.post("/sightline-refresh")
+async def trigger_sightline_refresh(background_tasks: BackgroundTasks, _role: str = Depends(auth.require_host)) -> dict:
+    """US-09: Stößt den Sichtachsen-Check für alle Locations manuell neu an
+    (Host-only, analog zu /weather-refresh/-feed/-calendar). Dauert je nach
+    Location-Anzahl mehrere Minuten (sequenzielle externe Calls, gedrosselt)."""
+    if _sightline_refresh_running:
+        return {"status": "already_running", "message": "Sichtachsen-Check läuft bereits."}
+    background_tasks.add_task(_run_sightline_refresh)
+    return {"status": "started", "message": "Sichtachsen-Check gestartet (kann mehrere Minuten dauern)."}
 
 
 @app.get("/weather-map")

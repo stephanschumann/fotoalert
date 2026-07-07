@@ -25,6 +25,8 @@ Python-3.9-kompatibel.
 from __future__ import annotations
 
 import logging
+import threading
+import time
 from typing import List, Optional, Tuple
 
 from discover.geometry import bearing_between
@@ -37,14 +39,82 @@ DEFAULT_TOLERANCE_DEG: float = 15.0
 
 # Overpass: öffentlicher Endpoint + kurzes Timeout, damit ein langsamer/down
 # Server den QA-Lauf nicht hängen lässt (Pre-Mortem-Gegenmaßnahme).
-OVERPASS_URL: str = "https://overpass-api.de/api/interpreter"
+OVERPASS_URL: str = "https://overpass.kumi.systems/api/interpreter"
+# Mirror-Liste für Fallback bei Serverblockade/-ausfall: Kumi zuerst (aktuell
+# bestätigt funktionierend), overpass-api.de als Fallback falls Kumi down ist.
+OVERPASS_MIRRORS: List[str] = [
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+]
 OVERPASS_TIMEOUT_S: float = 8.0
 # Suchradius um die Motiv-Koordinate für den Gebäude-Footprint (Meter).
 OVERPASS_SEARCH_RADIUS_M: int = 40
 
+# Live-Bug (US-09): Der kostenlose Overpass-Server lehnt bei zu schneller
+# Anfragefolge Verbindungen ab ([Errno 61] Connection refused), wodurch der
+# Sichtachsen-Check für praktisch alle Locations auf "nicht_geprueft" zurückfiel.
+# Overpass empfiehlt bei Bulk-Nutzung nicht schneller als ~1 Anfrage/Sekunde;
+# 1.2s ist ein konservativer Puffer darüber (analog RATE_LIMIT_PAUSE_S in
+# elevation.py für OpenTopoData). Dieser Client ist synchron (httpx.Client,
+# kein async/await) — daher threading.Lock + time.sleep() statt asyncio.
+OVERPASS_RATE_LIMIT_PAUSE_S: float = 1.2
+
 # Obergrenze für die Toleranz: knapp unter 180°, damit ein gepuffertes Band nie
 # zum Vollkreis (min == max) entartet.
 MAX_TOLERANCE_DEG: float = 179.999
+
+# Modul-weiter Rate-Limit-Tracker für Overpass-Netzanfragen: hält den Abstand
+# zur letzten tatsächlichen Netzanfrage auch ÜBER beide Aufrufer hinweg ein
+# (_fetch_overpass_footprint UND fetch_buildings_along_line treffen denselben
+# Server). Lock macht das gegen gleichzeitige Aufrufe aus verschiedenen Threads
+# sicher (synchrones Pendant zu _rate_limit_lock in elevation.py).
+_overpass_rate_limit_lock = threading.Lock()
+_last_overpass_request_ts: Optional[float] = None
+
+
+def _respect_overpass_rate_limit() -> None:
+    """Wartet bei Bedarf, bis seit der letzten Overpass-Netzanfrage mindestens
+    OVERPASS_RATE_LIMIT_PAUSE_S vergangen ist. Vor JEDER tatsächlichen
+    Overpass-Netzanfrage aufrufen (Cache-Treffer gibt es hier nicht)."""
+    global _last_overpass_request_ts
+    if OVERPASS_RATE_LIMIT_PAUSE_S <= 0:
+        return
+    with _overpass_rate_limit_lock:
+        now = time.monotonic()
+        if _last_overpass_request_ts is not None:
+            elapsed = now - _last_overpass_request_ts
+            wait = OVERPASS_RATE_LIMIT_PAUSE_S - elapsed
+            if wait > 0:
+                time.sleep(wait)
+        _last_overpass_request_ts = time.monotonic()
+
+
+def _fetch_from_mirrors(query: str, timeout_s: float, log_context: str) -> Optional[dict]:
+    """Versucht die gegebene Overpass-Query nacheinander gegen jeden Eintrag in
+    OVERPASS_MIRRORS (je EIN Versuch pro Mirror, kein Retry auf demselben
+    Mirror). Vor JEDEM Versuch wird _respect_overpass_rate_limit() aufgerufen —
+    beide Mirrors sind kostenlose Community-Server und werden gleich behandelt.
+
+    Gibt das geparste JSON-Payload des ersten erfolgreichen Mirrors zurück,
+    oder None, wenn alle Mirrors fehlschlagen (der Aufrufer loggt dann und
+    fällt still auf die Bearing-Basis zurück)."""
+    import httpx  # lokaler Import: QA ohne Overpass braucht httpx nie
+
+    last_error: Optional[Exception] = None
+    for mirror_url in OVERPASS_MIRRORS:
+        _respect_overpass_rate_limit()
+        try:
+            with httpx.Client(timeout=timeout_s) as client:
+                resp = client.post(mirror_url, data={"data": query})
+                resp.raise_for_status()
+                return resp.json()
+        except Exception as e:
+            last_error = e
+            logger.info("Overpass-Mirror %s für %s fehlgeschlagen (%s)",
+                        mirror_url, log_context, e)
+    logger.info("Alle Overpass-Mirrors für %s fehlgeschlagen (letzter Fehler: %s)",
+                log_context, last_error)
+    return None
 
 
 def _norm(deg: float) -> float:
@@ -146,16 +216,11 @@ def _fetch_overpass_footprint(
         lat=subject_lat,
         lon=subject_lon,
     )
-    try:
-        import httpx  # lokaler Import: QA ohne Overpass braucht httpx nie
-
-        with httpx.Client(timeout=timeout_s) as client:
-            resp = client.post(overpass_url, data={"data": query})
-            resp.raise_for_status()
-            payload = resp.json()
-    except Exception as e:  # noqa: BLE001 — bewusst: jeder Fehler → Fallback
-        logger.info("Overpass-Footprint (%s,%s) nicht abrufbar: %s",
-                    subject_lat, subject_lon, e)
+    payload = _fetch_from_mirrors(
+        query, timeout_s,
+        log_context="Overpass-Footprint ({},{})".format(subject_lat, subject_lon),
+    )
+    if payload is None:
         return None
 
     elements = payload.get("elements") or []
@@ -177,6 +242,95 @@ def _fetch_overpass_footprint(
             best_dist = d
             best_nodes = nodes
     return best_nodes
+
+
+# US-09: Suchradius/Timeout für Gebäudeabfragen ENTLANG der ganzen Sichtlinie
+# (nicht nur am Motiv wie bei TASK-45). Radius wird pro Aufruf anhand der
+# tatsächlichen Standort-Motiv-Distanz gewählt (siehe fetch_buildings_along_line).
+LINE_OVERPASS_TIMEOUT_S: float = 10.0
+# Default-Höhe (m) für Gebäude ohne "height"/"building:levels"-Tag in OSM —
+# konservative Annahme (2-3 Stockwerke), damit ein untaggtes Gebäude nicht
+# fälschlich als 0m (= "kein Hindernis") gewertet wird.
+DEFAULT_BUILDING_HEIGHT_M: float = 9.0
+LEVEL_HEIGHT_M: float = 3.0  # m pro Stockwerk, wenn nur building:levels bekannt ist
+
+
+def _building_height(tags: dict) -> float:
+    """Schätzt die Gebäudehöhe aus OSM-Tags. Fällt auf DEFAULT_BUILDING_HEIGHT_M
+    zurück, wenn weder "height" noch "building:levels" vorhanden/parsebar ist."""
+    height_raw = tags.get("height")
+    if height_raw:
+        try:
+            return float(str(height_raw).replace("m", "").strip())
+        except (ValueError, TypeError):
+            pass
+    levels_raw = tags.get("building:levels")
+    if levels_raw:
+        try:
+            return float(levels_raw) * LEVEL_HEIGHT_M
+        except (ValueError, TypeError):
+            pass
+    return DEFAULT_BUILDING_HEIGHT_M
+
+
+def fetch_buildings_along_line(
+    observer_lat: float,
+    observer_lon: float,
+    subject_lat: float,
+    subject_lon: float,
+    overpass_url: str = OVERPASS_URL,
+    timeout_s: float = LINE_OVERPASS_TIMEOUT_S,
+) -> Optional[List[dict]]:
+    """US-09: Holt alle OSM-Gebäude in der Bounding-Box zwischen Standort und
+    Motiv (mit kleinem Rand), samt geschätzter Höhe.
+
+    Gibt eine Liste von Dicts {"nodes": [(lat,lon),...], "height_m": float}
+    zurück, oder None bei jedem Fehler/Timeout — der Aufrufer wertet das als
+    "nicht geprüft", NIE als "frei" (Regel 4 der Spec).
+
+    Wiederverwendet die Overpass-Query-Vorlage aus TASK-45
+    (_fetch_overpass_footprint), aber mit Bounding-Box statt Radius-um-Punkt,
+    da hier die gesamte Sichtlinie abgedeckt werden muss, nicht nur ein
+    40m-Umkreis um das Motiv.
+    """
+    lat_min = min(observer_lat, subject_lat) - 0.001   # ~110m Rand
+    lat_max = max(observer_lat, subject_lat) + 0.001
+    lon_min = min(observer_lon, subject_lon) - 0.001
+    lon_max = max(observer_lon, subject_lon) + 0.001
+
+    query = (
+        "[out:json][timeout:{t}];"
+        "("
+        'way["building"]({s},{w},{n},{e});'
+        ");out geom;"
+    ).format(
+        t=int(timeout_s),
+        s=lat_min, w=lon_min, n=lat_max, e=lon_max,
+    )
+    payload = _fetch_from_mirrors(
+        query, timeout_s,
+        log_context="Overpass-Linienabfrage ({},{})→({},{})".format(
+            observer_lat, observer_lon, subject_lat, subject_lon
+        ),
+    )
+    if payload is None:
+        return None
+
+    elements = payload.get("elements") or []
+    buildings: List[dict] = []
+    for el in elements:
+        geom = el.get("geometry")
+        if not geom or len(geom) < 3:
+            continue
+        nodes = [(g["lat"], g["lon"]) for g in geom if "lat" in g and "lon" in g]
+        if len(nodes) < 3:
+            continue
+        tags = el.get("tags") or {}
+        buildings.append({
+            "nodes": nodes,
+            "height_m": _building_height(tags),
+        })
+    return buildings
 
 
 def compute_ideal_azimuth_range(

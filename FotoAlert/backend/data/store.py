@@ -118,7 +118,11 @@ CREATE TABLE IF NOT EXISTS location_qa_values (
     description              TEXT,
     ideal_azimuth_min        REAL,
     ideal_azimuth_max        REAL,
-    focal_length_suggestions TEXT            -- JSON-Array
+    focal_length_suggestions TEXT,           -- JSON-Array
+    -- US-09: Sichtachsen-Check (Raycast-Hinderniserkennung)
+    sightline_status          TEXT,           -- 'frei'|'teilweise_verdeckt'|'blockiert'|'nicht_geprueft'
+    sightline_angle_deg       REAL,           -- Verdeckungswinkel (Grad), None wenn nicht ermittelbar
+    sightline_checked_at      TEXT            -- ISO-Timestamp des letzten Sichtachsen-Checks
 );
 """
 
@@ -166,6 +170,21 @@ class LocationStore:
                     )
                     conn.commit()
                     logger.info("Migration TASK-43: custom_locations.%s ergänzt", col)
+                except sqlite3.OperationalError:
+                    pass  # Spalte existiert bereits
+            # US-09: Sichtachsen-Spalten in location_qa_values ergänzen (idempotent,
+            # gleiches Muster wie oben — nötig für DBs, die vor US-09 angelegt wurden).
+            for col, typedef in [
+                ("sightline_status", "TEXT DEFAULT NULL"),
+                ("sightline_angle_deg", "REAL DEFAULT NULL"),
+                ("sightline_checked_at", "TEXT DEFAULT NULL"),
+            ]:
+                try:
+                    conn.execute(
+                        f"ALTER TABLE location_qa_values ADD COLUMN {col} {typedef}"
+                    )
+                    conn.commit()
+                    logger.info("Migration US-09: location_qa_values.%s ergänzt", col)
                 except sqlite3.OperationalError:
                     pass  # Spalte existiert bereits
         logger.info("LocationStore initialisiert: %s", self.db_path)
@@ -701,7 +720,8 @@ class LocationStore:
         """Speichert auto-generierte Felder für eine Location (Upsert).
 
         Unterstützte Felder: description, ideal_azimuth_min, ideal_azimuth_max,
-        focal_length_suggestions (list → JSON).
+        focal_length_suggestions (list → JSON), sightline_status,
+        sightline_angle_deg, sightline_checked_at.
         """
         if not fields:
             return

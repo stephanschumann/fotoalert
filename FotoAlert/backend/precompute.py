@@ -280,9 +280,15 @@ def _apply_qa_values() -> int:
                           (qv["ideal_azimuth_min"], qv["ideal_azimuth_max"]))
         if qv.get("focal_length_suggestions") is not None:
             _set_loc_attr(loc, "focal_length_suggestions", qv["focal_length_suggestions"])
+        # US-09: Sichtachsen-Status/Winkel anwenden (Default bleibt "nicht_geprueft",
+        # solange kein QA-Wert gespeichert ist — siehe PhotoLocation-Default).
+        if qv.get("sightline_status") is not None:
+            _set_loc_attr(loc, "sightline_status", qv["sightline_status"])
+        if qv.get("sightline_angle_deg") is not None:
+            _set_loc_attr(loc, "sightline_angle_deg", qv["sightline_angle_deg"])
         applied += 1
     if applied:
-        logger.info("QA-Values angewendet: %d Locations gepatcht (Auto-Azimut/Brennweite/Beschreibung)", applied)
+        logger.info("QA-Values angewendet: %d Locations gepatcht (Auto-Azimut/Brennweite/Beschreibung/Sichtachse)", applied)
     return applied
 
 
@@ -471,6 +477,12 @@ def _serialize(o) -> dict:
         "alert_priority": o.alert_priority,
         "weather_description": "",
         "elevation_difference_m": getattr(o.location, 'elevation_difference_m', 0.0),
+        # US-09: Sichtachsen-Status der Location (frei/teilweise_verdeckt/blockiert/
+        # nicht_geprueft) — wird 1:1 mit dem Event ausgeliefert, damit sowohl
+        # Alignment-Events als auch daraus abgeleitete Wetter-Chancen (Himmelsröte,
+        # via deepcopy in main._generate_cloud_mood_events) denselben Status tragen.
+        "sightline_status": getattr(o.location, 'sightline_status', None) or "nicht_geprueft",
+        "sightline_angle_deg": getattr(o.location, 'sightline_angle_deg', None),
         "moon_phase": o.astronomy_report.moon.phase_name if o.astronomy_report else None,
         "moon_illumination_pct": (
             round(o.astronomy_report.moon.illumination_pct, 1)
@@ -980,6 +992,17 @@ async def _run_single_location_flow(
         except Exception:
             setattr(loc, "elevation_difference_m", elev_val)
         logger.info("  ✅ Elevation: Δ%+.1f m", elev_val)
+
+    # US-09: Sichtachsen-Check (Raycast) — einmalig bei Anlegen/Ändern der Location
+    # (Regel 3 der Spec), NICHT bei jedem täglichen Standard-Precompute-Lauf.
+    logger.info("  Sichtachsen-Check …")
+    try:
+        from calculations.sightline import update_location_sightline
+        from data.elevation import provider as _elev_provider
+        sl_result = await update_location_sightline(LocationStore(), loc, _elev_provider)
+        logger.info("  ✅ Sichtachse: %s", sl_result.get("status"))
+    except Exception as e:
+        logger.warning("  Sichtachsen-Check fehlgeschlagen für %s: %s", loc.name, e)
 
     if run_feed:
         logger.info("  14-Tage Feed für %s …", loc.name)
