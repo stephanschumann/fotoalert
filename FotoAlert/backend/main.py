@@ -2102,6 +2102,7 @@ class PreviewAlignmentRequest(BaseModel):
     days: int = 14
     save: bool = False
     category: str = "SKYLINE"  # US-76: LocationCategory-Key, Default = SKYLINE
+    special_notes: str = ""  # BUG-65: optionaler Hinweise-Text aus der Anlage-Maske
 
 
 async def _save_alignment_as_location(
@@ -2137,7 +2138,7 @@ async def _save_alignment_as_location(
         subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
         distance_m=dist_m,
         focal_length_suggestions=[focal_length_mm],
-        special_notes="",  # BUG-60: keine automatische Notiz mehr bei Quick Location Capture
+        special_notes=req.special_notes,  # BUG-65: Nutzer-Hinweistext aus der Anlage-Maske durchreichen (BUG-60: weiterhin keine automatische Notiz)
         difficulty=1,
     )
     LOCATIONS.append(new_loc)

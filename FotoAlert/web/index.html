@@ -1375,6 +1375,8 @@ function ic(id, size, cls){
         <input class="input-field" id="subj-height" type="number" placeholder="Höhe (m)" min="0">
         <input class="input-field" id="subj-width"  type="number" placeholder="Breite (m)" min="0">
       </div>
+      <textarea class="input-field" id="subj-notes" rows="2" style="margin-top:8px"
+        placeholder="Hinweise (Zugang, beste Jahreszeit etc.)"></textarea>
     </div>
     <div style="display:flex;align-items:flex-start;gap:10px">
       <button class="btn-secondary" onclick="AddLocation.reset();AddLocation.close()" style="flex-shrink:0;width:auto;padding:13px 16px">Abbrechen</button>
@@ -1521,7 +1523,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.0';
+const APP_VERSION = '1.22.1';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3710,7 +3712,7 @@ const Sections = {
     ev_desc:false, ev_zeit:false, ev_wetter:false, ev_kamera:false,
     ev_astro:false, ev_topo:false, ev_skypos:false, ev_kompo:false, ev_fov:false, ev_coords:false,
     ev_astro_live:false, ev_golden_clouds:false, ev_red_sky:false, ev_compass_gc:true, ev_compass_rs:true,
-    loc_obs:true, loc_subj:true, loc_azimut:true, loc_links:false,
+    loc_obs:true, loc_subj:true, loc_azimut:true, loc_notes:true, loc_links:false,
     loc_fov:false, loc_events:true, loc_rating:false, loc_verify:false
   },
   _onOpen: {},
@@ -6365,6 +6367,8 @@ const LocationDetail = {
 
       ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}<div id="loc-sun-today"></div>`)}
 
+      ${(loc.special_notes||'').trim() ? mkSec('loc_notes', ic('i-doc',15)+' Hinweise', `<p style="font-size:15px;color:var(--text);line-height:1.5">${loc.special_notes}</p>`) : ''}
+
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
         return mkSec('loc_fov',`${ic('i-fov',15)} Karte & Blickwinkel <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('fov')">i</button>`, CameraFOV.panelHtml('loc'));
@@ -6730,6 +6734,7 @@ const AddLocation = {
         subject_name: document.getElementById('subj-name').value || 'Unbenannt',
         subject_height_m: parseFloat(document.getElementById('subj-height').value) || 0,
         subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
+        special_notes: document.getElementById('subj-notes')?.value || '',
         days: 14
       };
       this.previewData = await API.post('/preview-alignment', body);
@@ -6770,6 +6775,7 @@ const AddLocation = {
         subject_name: document.getElementById('subj-name').value || 'Unbenannt',
         subject_height_m: parseFloat(document.getElementById('subj-height').value) || 0,
         subject_width_m:  parseFloat(document.getElementById('subj-width').value)  || 0,
+        special_notes: document.getElementById('subj-notes')?.value || '',
         category: document.getElementById('add-category').value,  // US-76
         save: true
       };
@@ -6801,7 +6807,7 @@ const AddLocation = {
     if (this._lineFs)      { this._lineFs.remove();      this._lineFs      = null; }
     if (this.mapFs) { this.mapFs.remove(); this.mapFs = null; }
     // Formularfelder leeren
-    ['obs-coords','subj-coords','subj-name','subj-height','subj-width'].forEach(id => {
+    ['obs-coords','subj-coords','subj-name','subj-height','subj-width','subj-notes'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });

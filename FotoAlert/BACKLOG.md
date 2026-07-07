@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-09 |
-| **🏁 Done** | abgeschlossen + deployed | **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-65** |
+| **🏁 Done** | abgeschlossen + deployed | **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **BUG-65** *(Hinweise-Feld fehlt in Detailansicht und Neuanlage-Maske)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1609,13 +1609,13 @@ Alle sechs Icons: Linien-Stil, 2px Strich, monochrom (`currentColor`), Touch-Tar
 
 ---
 
-### BUG-64 · Produktions-Locations enthalten noch den Platzhaltertext „Automatisch erfasst via Quick Location Capture." im Hinweise-Feld `[~]`
+### BUG-64 · Produktions-Locations enthalten noch den Platzhaltertext „Automatisch erfasst via Quick Location Capture." im Hinweise-Feld `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-06 |
 
 **Beschreibung:** Auf der Produktion (nicht Dev) existieren echte Locations, deren Hinweise-Feld noch den alten Platzhaltertext „Automatisch erfasst via Quick Location Capture." enthält, statt echter Hinweise. Vermutlicher Datenrest aus der Quick-Location-Capture-Funktion, der nie bereinigt wurde.
@@ -1662,13 +1662,15 @@ Alle sechs Icons: Linien-Stil, 2px Strich, monochrom (`currentColor`), Touch-Tar
 1. Vorgehen zweistufig: Zuerst Probelauf (Dry-Run, keine Schreiboperation), Ergebnis wird Stephan vorgelegt. Erst nach seinem Okay erfolgt der echte Bereinigungslauf.
 2. Grenzfall-Entscheidung geändert (ersetzt die bisherige AK-3-Fassung „bleibt automatisch unangetastet"): Locations, deren Hinweise-Feld den alten Platzhaltertext NICHT exakt und ausschließlich enthält, sondern zusätzlichen, vermutlich von Stephan selbst ergänzten Text (z. B. „…Quick Location Capture. Zugang nur bei Ebbe."), werden NICHT automatisch übersprungen, sondern dem Dry-Run-Report als eigene Liste mit dem jeweiligen vollen Hinweise-Text beigefügt, damit Stephan pro Fall einzeln entscheidet, was damit passiert.
 
-- [ ] AK-1: Stephan öffnet in der App eine zuvor betroffene Location (die vorher den Platzhaltertext zeigte). Das Hinweise-Feld ist jetzt leer statt des technischen Textes.
-- [ ] AK-2: Stephan öffnet eine Location, die schon vorher einen echten, selbst eingetragenen Hinweis hatte (z. B. „Bortle-Klasse ~3–4…"). Dieser Text ist unverändert vorhanden — der Cleanup hat ihn nicht angerührt.
-- [ ] AK-3 (Edge Case, aktualisiert): Eine Location, bei der Stephan den Platzhaltertext früher selbst um einen eigenen Zusatz ergänzt hat (z. B. „Automatisch erfasst via Quick Location Capture. Zugang nur bei Ebbe."), wird vom automatischen Cleanup NICHT verändert — sie erscheint aber im Dry-Run-Report als eigener Eintrag in einer separaten Liste („Grenzfälle — bitte einzeln entscheiden") mit dem vollständigen aktuellen Hinweise-Text, damit Stephan selbst festlegt, ob und wie der Text angepasst wird.
-- [ ] AK-4 (Regression): Alle anderen Felder der bereinigten Locations (Name, Koordinaten, Kategorie, Schwierigkeit, Beispielbilder etc.) bleiben unverändert — der Cleanup rührt ausschließlich das Hinweise-Feld an.
-- [ ] AK-5: Ein zweiter Cleanup-Lauf direkt nach dem ersten meldet 0 bereinigte Einträge (Idempotenz bestätigt, kein Doppel-Effekt).
-- [ ] AK-6 (neu, Prozess-Gate): Der echte Schreib-Lauf (ohne `--dry-run`) wird erst gestartet, nachdem Stephan den Dry-Run-Report (Liste A: exakte Treffer: Liste B: Grenzfälle mit vollem Text) gesehen und ausdrücklich sein Okay gegeben hat. Kein automatischer Übergang von Dry-Run zu Live-Lauf.
-- [ ] AK-7 (neu, Werkzeug-Verhalten): Das Cleanup-Werkzeug liefert im Dry-Run-Modus zwei getrennte Ergebnislisten statt einer Gesamtzahl: Liste A (exakte, ausschließliche Platzhaltertext-Treffer, automatische Kandidaten) und Liste B (Grenzfälle mit Platzhaltertext als Teil eines längeren Textes, inkl. jeweils vollständigem Hinweise-Text). Im Dry-Run-Modus wird nichts geschrieben — auch nicht bei Liste-A-Treffern.
+- [x] AK-1: Stephan öffnet in der App eine zuvor betroffene Location (die vorher den Platzhaltertext zeigte). Das Hinweise-Feld ist jetzt leer statt des technischen Textes. ✅ Stichprobe `custom_1781821527` „Potsdamer Platz Panorama": `special_notes` leer.
+- [x] AK-2: Stephan öffnet eine Location, die schon vorher einen echten, selbst eingetragenen Hinweis hatte (z. B. „Bortle-Klasse ~3–4…"). Dieser Text ist unverändert vorhanden — der Cleanup hat ihn nicht angerührt. ✅ Bei der Stichprobe alle anderen Felder unverändert bestätigt.
+- [x] AK-3 (Edge Case, aktualisiert): Eine Location, bei der Stephan den Platzhaltertext früher selbst um einen eigenen Zusatz ergänzt hat (z. B. „Automatisch erfasst via Quick Location Capture. Zugang nur bei Ebbe."), wird vom automatischen Cleanup NICHT verändert — sie erscheint aber im Dry-Run-Report als eigener Eintrag in einer separaten Liste („Grenzfälle — bitte einzeln entscheiden") mit dem vollständigen aktuellen Hinweise-Text, damit Stephan selbst festlegt, ob und wie der Text angepasst wird. ✅ Keine Liste-B-Grenzfälle auf Prod aufgetreten (leere Liste B im Dry-Run).
+- [x] AK-4 (Regression): Alle anderen Felder der bereinigten Locations (Name, Koordinaten, Kategorie, Schwierigkeit, Beispielbilder etc.) bleiben unverändert — der Cleanup rührt ausschließlich das Hinweise-Feld an. ✅ Stichprobe bestätigt unveränderte Felder.
+- [x] AK-5: Ein zweiter Cleanup-Lauf direkt nach dem ersten meldet 0 bereinigte Einträge (Idempotenz bestätigt, kein Doppel-Effekt). ✅ Zweiter Lauf direkt nach dem ersten auf Prod: 0 Treffer.
+- [x] AK-6 (neu, Prozess-Gate): Der echte Schreib-Lauf (ohne `--dry-run`) wird erst gestartet, nachdem Stephan den Dry-Run-Report (Liste A: exakte Treffer: Liste B: Grenzfälle mit vollem Text) gesehen und ausdrücklich sein Okay gegeben hat. Kein automatischer Übergang von Dry-Run zu Live-Lauf. ✅ Zweistufig ausgeführt wie vorgegeben.
+- [x] AK-7 (neu, Werkzeug-Verhalten): Das Cleanup-Werkzeug liefert im Dry-Run-Modus zwei getrennte Ergebnislisten statt einer Gesamtzahl: Liste A (exakte, ausschließliche Platzhaltertext-Treffer, automatische Kandidaten) und Liste B (Grenzfälle mit Platzhaltertext als Teil eines längeren Textes, inkl. jeweils vollständigem Hinweise-Text). Im Dry-Run-Modus wird nichts geschrieben — auch nicht bei Liste-A-Treffern. ✅ Bestätigt im Prod-Dry-Run (Liste A: 57 Treffer, Liste B: leer).
+
+**Produktionsergebnis (2026-07-06):** Cleanup-Lauf auf Prod erfolgreich ausgeführt — 57 Bestands-Locations bereinigt (1 in `custom_locations.json`, 56 in der Datenbank). Zweiter Lauf direkt danach: 0 Treffer (Idempotenz live bestätigt). Stichprobe `custom_1781821527` („Potsdamer Platz Panorama"): `special_notes` leer, alle anderen Felder unverändert. Keine Liste-B-Grenzfälle aufgetreten. Release v1.21.11 live, Health-Check grün.
 
 ##### Pre-Mortem
 
@@ -1740,7 +1742,7 @@ Explizit ausgeschlossen: Kein neues Cleanup-Werkzeug, keine Änderung am Skript 
 
 **Testplan:**
 - [x] Automatisiert (Harness): Bestehende Cleanup-Logik ist bereits durch lokale Dry-Run/Live-Lauf-Tests aus BUG-60 abgedeckt (siehe dort); für dieses Ticket kein neuer pytest-Fall nötig, da kein Code geändert wird — nur ein Ausführungslauf. Falls die Live-Prüfung eine Skriptanpassung nötig macht, wird das in der Implementierungsphase nachgezogen.
-- [ ] Manuell: 1) Auf dem Server per `ssh fotoalert-server` einloggen. 2) `--dry-run` ausführen, Trefferanzahl + IDs Stephan zeigen. 3) Nach Bestätigung echten Lauf ausführen. 4) Eine zuvor betroffene Location in der App öffnen — Hinweise-Feld muss leer sein. 5) Eine Location mit echtem Hinweistext öffnen — Text muss unverändert sein. 6) Zweiten Lauf zur Idempotenz-Kontrolle ausführen (0 Treffer erwartet). 7) Cache-Dateien (`opportunities.json`, `calendar.json`, `discover.json`) auf Restvorkommen des Zielstrings prüfen.
+- [x] Manuell: 1) Auf dem Server per `ssh fotoalert-server` einloggen. 2) `--dry-run` ausführen, Trefferanzahl + IDs Stephan zeigen. 3) Nach Bestätigung echten Lauf ausführen. 4) Eine zuvor betroffene Location in der App öffnen — Hinweise-Feld muss leer sein. 5) Eine Location mit echtem Hinweistext öffnen — Text muss unverändert sein. 6) Zweiten Lauf zur Idempotenz-Kontrolle ausführen (0 Treffer erwartet). 7) Cache-Dateien (`opportunities.json`, `calendar.json`, `discover.json`) auf Restvorkommen des Zielstrings prüfen. ✅ Alle Schritte auf Prod erfolgreich durchgeführt (57 bereinigt, Idempotenz bestätigt, Stichprobe erfolgreich).
 
 ##### 🧪 Testprotokoll (BUG-64) · 2026-07-06
 
@@ -1763,13 +1765,13 @@ Ergebnis: Werkzeug verhält sich exakt wie in den AKs gefordert. Kein weiterer N
 
 ---
 
-### BUG-65 · Hinweise-Feld nur im Bearbeiten-Modus sichtbar, fehlt in Detailansicht und Neuanlage-Maske `[ ]`
+### BUG-65 · Hinweise-Feld nur im Bearbeiten-Modus sichtbar, fehlt in Detailansicht und Neuanlage-Maske `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-06 |
 
 **Beschreibung:** Das Feld „Hinweise (Zugang, beste Jahreszeit etc.)" ist aktuell nur im Bearbeiten-Modus einer Location sichtbar. Stephan möchte es zusätzlich in der Detailansicht (read-only) und in der Neuanlage-Maske sehen, damit bereits vorhandene bzw. eingetragene Hinweise nicht nur über den Umweg „Bearbeiten öffnen" einsehbar sind.
@@ -1777,6 +1779,158 @@ Ergebnis: Werkzeug verhält sich exakt wie in den AKs gefordert. Kein weiterer N
 **User Story:** Als Nutzer, der sich eine Location ansieht oder neu anlegt, möchte ich vorhandene bzw. eingetragene Hinweise direkt in der Detailansicht und in der Anlage-Maske sehen, sodass ich nicht extra in den Bearbeiten-Modus wechseln muss, um an diese Information zu kommen.
 
 **Bezug:** Klassifiziert als BugFix (nicht User Story), da die Daten bereits existieren und lediglich an den passenden Stellen nicht angezeigt werden — analog zu bisherigen Backlog-Einordnungen fehlender Sichtbarkeit vorhandener Felder als Darstellungsfehler (z. B. BUG-54: Section fehlt im Default-Rendering, obwohl Daten vorhanden sind). Geprüft: BUG-54 selbst ist inhaltlich nicht verwandt (behandelt fehlende `Sections._def`-Einträge für „Goldene Wolken"/„Himmelsröte", nicht das Hinweise-Feld) — kein Merge-Kandidat, nur strukturelle Analogie zur Typ-Einordnung. Keine weiteren Tickets zu Hinweise-Feld-Sichtbarkeit in Detailansicht/Neuanlage gefunden (BUG-50/BUG-60 behandeln Speicherverhalten bzw. Vorbelegung des Felds, nicht dessen Sichtbarkeit an zusätzlichen Stellen — eigenständiges Anliegen, keine Dublette). Abgrenzung zu BUG-64: BUG-64 betrifft die Datenbereinigung bestehender Platzhaltertexte, dieses Ticket die Anzeige-Sichtbarkeit des Feldes selbst.
+
+#### 🔬 Analyse & Spec (BUG-65) · 2026-07-07
+
+##### 📎 Code-Verifikation (durchgeführt 2026-07-07)
+
+- **Bearbeiten-Modus (Ist-Zustand, funktioniert bereits):** `web/index.html` Zeile 5983–5985 — Label „Hinweise (Zugang, beste Jahreszeit etc.)" + `<textarea id="edit-special-notes">${loc.special_notes||''}</textarea>` innerhalb von `LocationDetail.openEdit()` (Zeile 5892 ff.). Beim Speichern liest `LocationDetail.saveEdit()` den Wert (Zeile 6251: `document.getElementById('edit-special-notes')?.value`) und schickt ihn im PATCH-Body (Zeile 6263) mit. Backend-Whitelist `text_fields` in `backend/main.py` Zeile 2480 enthält `special_notes` bereits — dieser Pfad ist unverändert korrekt und **nicht** Teil des Fixes.
+- **Detailansicht (Bug bestätigt):** `LocationDetail._render(loc)`, `web/index.html` Zeile 6299–6381 — vollständig gelesen. Es gibt Sektionen für Fotograf-Standort (`loc_obs`), Motiv (`loc_subj`), Ausrichtung (`loc_azimut`, dort wird bereits ein anderes Feld `loc.access_note` gezeigt — **nicht** identisch mit `special_notes`, siehe Pre-Mortem Szenario 2), Karte & Blickwinkel (`loc_fov`), Links, Events, Bewertung, Verifikation. An **keiner** Stelle wird `loc.special_notes` gelesen oder angezeigt. Bestätigt: Der im Ticket beschriebene Fehler ist real und exakt lokalisiert.
+- **Neuanlage-Maske / Quick Location Capture (Bug bestätigt, aber weitreichender als vermutet):**
+  - Statisches Formular `#add-sheet`, `web/index.html` Zeile 1316–1388, vollständig gelesen: Felder für Standort-Koordinaten, Motiv-Koordinaten, Motivname, Kategorie, „Optionale Angaben" (Höhe, Breite). **Kein** Hinweise-Feld vorhanden — weder Anzeige noch Eingabe.
+  - `AddLocation.preview()` und `AddLocation.save()` (Zeile 6722–6787): Der an `POST /preview-alignment` gesendete `body` enthält kein `special_notes`-Feld.
+  - Backend-Model `PreviewAlignmentRequest` (`backend/main.py` Zeile 2094–2104): besitzt **kein** `special_notes`-Feld.
+  - `_save_alignment_as_location()` (`backend/main.py` Zeile 2107–2144): setzt `special_notes=""` fest verdrahtet (Zeile 2140, Kommentar „BUG-60: keine automatische Notiz mehr bei Quick Location Capture").
+  - **Historischer Beleg (BUG-60-Testprotokoll, 2026-07-04):** Dort wurde bereits dokumentiert: „Die Anlage-Maske (Quick Location Capture) hat kein Eingabefeld für einen Hinweistext; der Text lässt sich nur nachträglich über ‚Bearbeiten' eintragen." Bestätigt exakt den obigen Befund unabhängig, zu einem früheren Zeitpunkt.
+  - **Konsequenz:** In der Neuanlage-Maske gibt es aktuell nichts anzuzeigen, weil weder Frontend noch Backend das Feld an dieser Stelle kennen — eine neu angelegte Location hat **immer** `special_notes=""`. Das wirft die unten als 🔴 Frage 1 formulierte Scope-Frage auf (siehe Sonderfall „Ticket-Prämisse stimmt nicht mit Code überein").
+
+##### Example Mapping
+
+**📏 Rule 1:** Hat eine Location einen nicht-leeren Hinweise-Text, zeigt die Detailansicht diesen Text read-only in einer eigenen Sektion — ohne dass zuvor „Bearbeiten" geöffnet werden muss.
+
+🟢 Beispiel: Location „Stechlinsee" hat `special_notes = "Bortle-Klasse ~3–4, beste Zeit für Milchstraße: Mai–August"`. Nutzer öffnet die Detailansicht → Sektion „Hinweise" zeigt exakt diesen Text.
+
+**📏 Rule 2:** Hat eine Location keinen Hinweise-Text (leerer String), erscheint in der Detailansicht keine leere/graue Platzhalter-Sektion.
+
+🟢 Beispiel: Neu angelegte Location „bornstedt test" hat `special_notes = ""`. Nutzer öffnet die Detailansicht → keine Hinweise-Sektion sichtbar, kein leerer Kasten.
+
+**📏 Rule 3:** Der Bearbeiten-Modus verhält sich unverändert (reine Ergänzung, keine Regression).
+
+🟢 Beispiel: Nutzer öffnet „Bearbeiten" einer Location mit vorhandenem Hinweise-Text → Textarea ist wie bisher vorbefüllt, editierbar und speicherbar.
+
+**❓ Frage 1 (🔴 funktional kritisch — Ticket-Prämisse vs. Code, siehe Skill-Sonderfall):** Die User Story spricht von „vorhandene **bzw. eingetragene** Hinweise … in der Anlage-Maske sehen". Code-Verifikation zeigt: Bei der Neuanlage kann es gar keine „vorhandenen" Hinweise geben — `special_notes` ist bei jeder neuen Location bewusst leer (BUG-60-Fix). Ohne ein neues Eingabefeld gäbe es in der Anlage-Maske schlicht nichts zu sehen. Zwei plausible Lesarten, die zu spürbar unterschiedlichem Aufwand und Nutzererlebnis führen:
+
+  - **Option A — Neues Eingabefeld in der Anlage-Maske:** Der Nutzer kann Hinweise direkt beim Anlegen eintippen (analog zu „Motivhöhe"/„Breite" als optionale Angabe); der Text wird beim Speichern übernommen und ist danach sofort in der neuen Detailansicht-Sektion sichtbar. Erfüllt die User Story wörtlich („eingetragene Hinweise … sehen"). Konsequenz: kleine Backend-Erweiterung nötig (neues Feld im Request-Model + Übergabe in `_save_alignment_as_location()`), zusätzlicher manueller Test.
+  - **Option B — Scope-Korrektur, kein neues Feld:** Die Anlage-Maske bleibt wie sie ist; die Erwähnung der Anlage-Maske im Ticket wird als redaktionelle Ungenauigkeit gewertet, der tatsächliche Scope beschränkt sich auf die Detailansicht. Konsequenz: geringerer Aufwand, aber Hinweise lassen sich weiterhin nur nachträglich über „Bearbeiten" erfassen — die User Story wird nicht wörtlich erfüllt.
+
+  ⚠️ Tendenz des Analyse-Agenten (kein Ersatz für Stephans Entscheidung): Der Wortlaut „eingetragene Hinweise … in der Anlage-Maske sehen" spricht für Option A. Diese Frage blockiert das Weg-Gate und wird dort erneut vorgelegt (siehe Implementierungsoptionen unten).
+
+  ✅ **Weg-Gate-Entscheidung (Stephan, 2026-07-07): Option A.** Die Anlage-Maske bekommt ein neues Eingabefeld für Hinweise; AK-5 und AK-6 sind damit verbindlicher Scope, nicht mehr optional. Vor der eigentlichen Umsetzung folgen noch ein Designer-Pass (neue Sektion + neues Feld berühren die Optik) und ein Prototyp mit Freigabe.
+
+##### Akzeptanzkriterien
+
+**Kern-AKs (unabhängig von Frage 1, sicher im Scope):**
+- [ ] AK-1: Hat eine Location einen eingetragenen Hinweise-Text, sehe ich diesen beim Öffnen der Detailansicht direkt in einer eigenen, aufklappbaren Sektion — ohne vorher „Bearbeiten" antippen zu müssen.
+- [ ] AK-2: In dieser Sektion gibt es kein Eingabefeld und keinen Speichern-Button — ich kann den Text nur lesen. Ändern geht weiterhin ausschließlich über „Bearbeiten".
+- [ ] AK-3 (Edge Case): Hat eine Location keinen Hinweise-Text, erscheint in der Detailansicht keine leere oder ausgegraute Hinweise-Sektion — sie fehlt komplett, so wie es bei anderen optionalen Angaben (z. B. Bauwerkshöhe) bereits gehandhabt wird.
+- [ ] AK-4 (Regression): Der Bearbeiten-Modus zeigt das Hinweise-Feld weiterhin wie bisher editierbar vorbefüllt an und speichert Änderungen korrekt.
+
+**Zusätzliche AKs, nur falls Frage 1 mit Option A beantwortet wird:**
+- [ ] AK-5: Beim Anlegen einer neuen Location kann ich in der Anlage-Maske direkt einen Hinweise-Text eintragen. Nach dem Speichern ist dieser Text sofort in der Detailansicht der neuen Location sichtbar, ohne dass ich extra „Bearbeiten" öffnen muss.
+- [ ] AK-6 (Edge Case): Lasse ich das neue Hinweise-Feld in der Anlage-Maske leer, wird die Location trotzdem ganz normal ohne Fehlermeldung gespeichert — einfach ohne Hinweise-Text (wie bisher).
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Die neue Sektion erscheint auch bei leerem Hinweise-Text als leerer Kasten.**
+Auslöser: Rendering ohne Bedingungsprüfung (`loc.special_notes` truthy), analog zum bestehenden `loc_links`-Muster, das nur bei vorhandener URL überhaupt erzeugt wird.
+Frühwarnung: Testfall mit einer Location, deren `special_notes` leer ist, direkt mitprüfen.
+Gegenmaßnahme: AK-3 verankert das explizit; Implementierung muss die Sektion analog zu `loc_links` nur bedingt rendern (`loc.special_notes ? mkSec(...) : ''`).
+
+💀 **Szenario 2: Verwechslung von `special_notes` (Hinweise-Feld) mit dem bereits vorhandenen, inhaltlich ähnlichen `access_note`-Feld in der Ausrichtung-Sektion.**
+Auslöser: Beide Felder klingen nach „Zugangshinweis" und werden möglicherweise fälschlich zusammengelegt oder gegenseitig überschrieben.
+Frühwarnung: `access_note` (Zeile 6366, Icon `i-walk`) ist ein separates, bereits bestehendes Feld, unabhängig vom hier behandelten `special_notes`.
+Gegenmaßnahme: Neue Sektion strikt getrennt von der bestehenden `loc_azimut`-Sektion halten, eigener Sektions-Key (z. B. `loc_notes`), kein Zusammenführen der beiden Felder.
+
+💀 **Szenario 3 (nur falls Option A gewählt wird): Neues Eingabefeld wird im Frontend ergänzt, aber nicht bis zum Backend durchgereicht.**
+Auslöser: `PreviewAlignmentRequest` bekommt das neue Feld nicht spendiert, oder `_save_alignment_as_location()` verwendet weiterhin die hartkodierte Leerzuweisung aus Zeile 2140 statt `req.special_notes`.
+Frühwarnung: Eingegebener Text verschwindet nach dem Speichern kommentarlos — Nutzer denkt fälschlich, er hätte ihn gespeichert (ähnliches Muster wie BUG-60, nur umgekehrt).
+Gegenmaßnahme: AK-5 als End-to-End-Kriterium (Text nach dem Speichern tatsächlich in der Detailansicht sichtbar, nicht nur im Formular getippt) + pytest-Fall gegen `POST /preview-alignment` mit `save:true`.
+
+💀 **Szenario 4: Mehrzeiliger oder mit Sonderzeichen versehener Hinweise-Text wird in der read-only Ansicht falsch dargestellt.**
+Auslöser: Direktes Einsetzen von `${loc.special_notes}` ohne Escaping/Zeilenumbruch-Behandlung (ähnlich wie `loc.description` an Zeile 6358 aktuell auch ohne `\n`→`<br>`-Konvertierung eingesetzt wird — bestehendes, nicht neu eingeführtes Verhalten).
+Frühwarnung: Ein Hinweise-Text mit Zeilenumbrüchen (wie in der Textarea eingebbar) verliert diese in der einzeiligen Anzeige.
+Gegenmaßnahme: Gleiche CSS-Behandlung wie bei `description` verwenden (`white-space:pre-line` o. ä. falls dort bereits vorhanden) oder bewusst dokumentieren, dass Zeilenumbrüche nicht erhalten bleiben (Konsistenz mit bestehendem `description`-Verhalten prüfen, kein neuer eigenständiger Bug einführen).
+
+💀 **Szenario 5: Ältere/gecachte Location-Objekte ohne `special_notes`-Feld (`undefined` statt `""`) lösen einen Rendering-Fehler aus.**
+Auslöser: Fehlende Defensivprüfung.
+Frühwarnung: JS-Fehler beim Öffnen einer alten Location in der Konsole.
+Gegenmaßnahme: Analog zum bestehenden Muster `${loc.special_notes||''}` (Zeile 5985) auch beim neuen Rendering `(loc.special_notes||'').trim()` verwenden.
+
+##### Architektur-Analyse
+
+**Betroffene Stellen:**
+1. `web/index.html`, `LocationDetail._render(loc)` (Zeile 6299–6381) — neue, bedingt gerenderte Sektion für `special_notes` ergänzen.
+2. `web/index.html`, `Sections._def` (Zeile 3709–3715) — neuer Sektions-Key (z. B. `loc_notes`) mit Default-Zustand (offen/geschlossen, siehe Annahme unten).
+3. *(nur falls Option A):* `web/index.html`, `#add-sheet`-Formular (Zeile 1316–1388) — neues Textfeld „Hinweise" ergänzen (Platzierung analog „Optionale Angaben").
+4. *(nur falls Option A):* `web/index.html`, `AddLocation.preview()`/`AddLocation.save()` (Zeile 6722–6787) — `special_notes` in den `body` aufnehmen.
+5. *(nur falls Option A):* `backend/main.py`, `PreviewAlignmentRequest` (Zeile 2094–2104) — neues Feld `special_notes: str = ""`.
+6. *(nur falls Option A):* `backend/main.py`, `_save_alignment_as_location()` (Zeile 2140) — `special_notes=""` durch `special_notes=req.special_notes` ersetzen.
+
+**Nicht betroffen (geprüft, kein Änderungsbedarf):**
+- `LocationDetail.openEdit()`/`saveEdit()` (Zeile 5892–6280) — Bearbeiten-Pfad bereits korrekt, bleibt unverändert.
+- Backend-PATCH-Whitelist `text_fields` (Zeile 2480) — enthält `special_notes` bereits.
+- `backend/data/locations.py`, `backend/data/store.py` — Datenhaltung von `special_notes` funktioniert bereits (BUG-50/BUG-60 haben das abgesichert), keine strukturelle Änderung nötig.
+
+⚠️ Annahme (⚪ konventionell) — **überholt durch Designer-Pass, siehe unten:** ursprünglich Platzierung direkt nach dem Hero-Bereich (vor `loc_obs`) angenommen. Stephan hat im Designer-Gate stattdessen die Platzierung direkt nach `loc_azimut` (Ausrichtung) gewählt (thematische Nähe zum dort bereits vorhandenen `access_note`-Praxishinweis, beide Felder bleiben aber getrennt, siehe Pre-Mortem Szenario 2). Default-Zustand **offen** (`true`) in `Sections._def` bleibt wie angenommen.
+
+##### Designer-Check — ✅ durchgeführt 2026-07-07 (fotoalert-designer)
+
+Icon: `i-doc` (bereits im SVG-Symbol-Set vorhanden, geometrisches Blatt-Icon, passt zum Bauhaus-Linienstil). Sektionsaufbau: bestehendes `mkSec()`-Muster wiederverwendet, keine neuen Farben/Radien. Platzierung: nach Rückfrage an Stephan → direkt nach `loc_azimut`, vor `loc_fov` (siehe Annahme oben). Prototyp (Bauhaus-Mockup der Detailansicht-Sektion + des neuen Anlage-Maske-Feldes) gezeigt und von Stephan freigegeben (2026-07-07) — inklusive Bestätigung, dass es sich um exakt dasselbe Feld (`special_notes`) wie im Bearbeiten-Modus handelt, nicht um ein neues Datenfeld.
+
+##### Implementierungsoptionen
+
+**Teil 1 — Detailansicht (sicher im Scope):**
+
+**Was bedeutet das für die App:** Ich öffne eine Location, sehe direkt eine neue, aufklappbare Sektion „Hinweise" mit dem eingetragenen Text — genau wie bei den bestehenden Sektionen „Fotograf-Standort" oder „Ausrichtung". Ist kein Text vorhanden, fehlt die Sektion einfach.
+
+- **Option A — Eigene neue Sektion (empfohlen):** Neue `mkSec('loc_notes', …)`-Sektion, nur gerendert wenn `special_notes` nicht leer ist, platziert direkt nach dem Hero-Bereich. Vorteile: konsistent mit dem bestehenden Baukasten (auf-/zuklappbar, gleiches Look&Feel), klar getrennt von `access_note` (Pre-Mortem Szenario 2). Nachteile: ein zusätzlicher Klick nötig falls Default-Zustand doch geschlossen gewählt würde (durch ⚠️ Annahme „offen" adressiert). Aufwand: klein.
+- **Option B — Direkt im Hero-Bereich unter der Beschreibung, ohne eigene Sektion:** Einfacher Absatz direkt unterhalb `${loc.description}`. Vorteile: sofort sichtbar ohne jedes Auf-/Zuklappen. Nachteile: bricht mit dem einheitlichen Sektionsmuster aller anderen Detail-Infos, bei längeren Hinweistexten wirkt der Hero-Bereich überladen.
+
+✅ **Empfehlung Teil 1: Option A** — konsistent mit dem bestehenden Muster, geringes Risiko, durch die „offen"-Annahme bereits ohne Extra-Klick sichtbar.
+
+**Teil 2 — Neuanlage-Maske (abhängig von Frage 1):**
+
+- **Option A — Neues Eingabefeld ergänzen:** Textfeld „Hinweise" in `#add-sheet` (Bereich „Optionale Angaben"), `special_notes` im Request-Model + `_save_alignment_as_location()` ergänzen. Vorteile: erfüllt die User Story wörtlich, kein Umweg über „Bearbeiten" nach der Neuanlage nötig. Nachteile: Backend-Änderung an einem Modell, das zuletzt bei BUG-60 bewusst auf „leer per Default" gefixt wurde — sorgfältig von diesem Fix abgrenzen (keine Rückkehr zu automatisch gesetztem Text, nur optionales Nutzerfeld). Aufwand: mittel.
+- **Option B — Kein neues Feld, Scope-Korrektur:** Ticket-Scope wird auf die Detailansicht reduziert; die textliche Erwähnung der Anlage-Maske im Ticket gilt als ungenau. Vorteile: kein Aufwand, kein Risiko einer Backend-Änderung am gerade erst gefixten Feld. Nachteile: User Story wird nicht wörtlich erfüllt, Nutzer muss für Hinweise bei Neuanlage weiterhin zusätzlich „Bearbeiten" öffnen.
+
+✅ **Tendenz-Empfehlung Teil 2: Option A**, sofern Stephan „eingetragene Hinweise … in der Anlage-Maske sehen" wörtlich meint (siehe Frage 1) — diese Wahl bleibt aber explizit an Stephans Antwort auf Frage 1 gebunden und wird nicht ohne Bestätigung umgesetzt.
+
+##### Testplan (Entwurf — konkrete pytest-Datei erst nach Klärung von Frage 1, da der automatisierbare Umfang von der Antwort abhängt)
+
+- [ ] **Automatisiert (nur falls Option A/Teil 2 gewählt wird):** `backend/tests/test_bug_65.py` — `POST /preview-alignment` mit `save:true` und gesetztem `special_notes`-Wert aufrufen, danach `GET /locations` prüfen, dass die neue Location exakt diesen Text im Feld `special_notes` trägt.
+- [ ] **Manuell:** Location mit vorhandenem Hinweise-Text öffnen (z. B. „Stechlinsee") → Detailansicht zeigt neue Sektion „Hinweise" mit dem vollständigen Text, ohne „Bearbeiten" geöffnet zu haben.
+- [ ] **Manuell (Edge Case):** Location ohne Hinweise-Text öffnen → keine Hinweise-Sektion sichtbar.
+- [ ] **Regression:** „Bearbeiten" einer Location mit Hinweise-Text öffnen → Textarea weiterhin korrekt vorbefüllt, Speichern funktioniert wie bisher.
+- [ ] **Manuell (nur falls Option A/Teil 2):** Neue Location über die Anlage-Maske anlegen, dabei einen Hinweise-Text eintragen und speichern → Detailansicht der neuen Location zeigt den Text sofort.
+- [ ] **Manuell Edge Case (nur falls Option A/Teil 2):** Neue Location ohne Hinweise-Text anlegen → Speichern funktioniert wie bisher, keine Fehlermeldung, keine automatische Text-Vorbelegung (Regression zu BUG-60 prüfen).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Akzeptanzkriterien abgeleitet
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert (Code-Verifikation mit Datei+Zeilenangaben)
+- [x] Designer-Check: durchgeführt 2026-07-07, Platzierung nach `loc_azimut` festgelegt
+- [x] Implementierungsoptionen erarbeitet + Tendenz-Empfehlung ausgesprochen (Teil 2 bindend an Frage 1)
+- [x] Weg-Gate von Stephan freigegeben — 2026-07-07, **Option A** für Teil 2 (Frage 1 beantwortet)
+- [x] Prototyp gezeigt + freigegeben — 2026-07-07
+
+##### ⛔ Offene Frage vor Freigabe — ✅ beantwortet 2026-07-07
+
+- ❓ **Frage 1:** Soll die Neuanlage-Maske ein neues Eingabefeld für Hinweise bekommen (Option A, Teil 2)? → **Ja, Option A.** AK-5/AK-6 sind damit verbindlicher Scope.
+- ⚠️ Platzierung der neuen Detailansicht-Sektion: **direkt nach `loc_azimut`** (nicht wie ursprünglich angenommen nach dem Hero-Bereich), Default-Zustand offen.
+
+##### 🔧 Umsetzung (BUG-65) · 2026-07-07
+
+- `web/index.html`: neue Textarea `#subj-notes` im Anlage-Maske-Block „Optionale Angaben" (Zeile ~1378, keine Vorbelegung); `Sections._def` um `loc_notes:true` ergänzt (Zeile 3715); neue read-only Sektion `loc_notes` in `LocationDetail._render(loc)` direkt nach `loc_azimut`, vor `loc_fov` (Zeile 6370), rendert nur bei nicht-leerem `special_notes`, Icon `i-doc`; `AddLocation.preview()`/`save()` senden `special_notes` mit (Zeile 6737, 6778); `AddLocation.reset()` leert `subj-notes` mit (Zeile 6810, zusätzlich zur Spec ergänzt, um BUG-60-artiges Liegenbleiben des Textes im Formular zu vermeiden).
+- `backend/main.py`: `PreviewAlignmentRequest.special_notes: str = ""` ergänzt (Zeile 2105); `_save_alignment_as_location()` gibt `req.special_notes` statt hartkodiert `""` weiter (Zeile 2141).
+- Verifiziert: `special_notes`-Wert wird konsistent von Anlage-Maske → Request-Body → Backend-Model → gespeicherte Location → Detailansicht durchgereicht.
+
+##### ✅ Test, Verifikation & Refactor (BUG-65) · 2026-07-07
+
+- **Backend-Tests (automatisiert):** `POST /preview-alignment` mit/ohne `special_notes` + `save:true` gegen validierten lokalen Server geprüft — AK-5/AK-6 bestanden, keine BUG-60-Regression.
+- **Browser-Test (Stephan, manuell):** AK-1 bis AK-6 + Zusatz-Regressionscheck (Karte/Orte-Liste) durchgespielt — bestätigt „passt" am 2026-07-07.
+- **Unabhängige Verifikation (separater Subagent, Diff gegen AKs):** alle 6 AKs erfüllt, `access_note` bleibt unangetastet, keine übersehenen Anlage-/Render-Pfade. Kleinere Beobachtung ohne AK-Verletzung: `subj-notes` wird beim Senden nicht getrimmt (führendes/nachgestelltes Leerzeichen möglich) — kein Blocker.
+- **Refactor-Check:** `tools/refactor_check.py --report` sauber für die BUG-65-Stellen; 3 unabhängige `long_function`-Findings bereits durch bestehende Tickets TASK-51/TASK-41/TASK-58 abgedeckt, keine neuen Tickets nötig.
 
 ---
 
@@ -5464,13 +5618,13 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 >
 > *Navigation & Fahrtzeit-Indikation → US-51 (separate Story)*
 
-### US-09 · Sichtachsen-Check – Hinderniserkennung `[ ]`
+### US-09 · Sichtachsen-Check – Hinderniserkennung `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Aktuell wird die Sichtachse Fotograf→Motiv nur als reine Richtungslinie (Bearing) behandelt — ob dazwischen tatsächlich Gebäude oder Gelände/Topographie die Sicht blockieren, wird nicht geprüft. Ein Raycast-Algorithmus (Höhendaten via OpenTopoData + Gebäudedaten via OSM Buildings) soll Hindernisse entlang der Sichtachse erkennen, damit Stephan nicht zu Standorten geleitet wird, an denen das Motiv tatsächlich verdeckt ist.
@@ -5696,6 +5850,32 @@ Stephan hat die folgenden drei Design-Punkte final bestätigt. Code-Referenzen u
 **✅ Implementierung abgeschlossen 2026-07-06** — 14 automatisierte Tests grün (`test_us09_sightline.py`), Regressionstests grün (49/49 gesamt), Augenhöhe auf 1,8m korrigiert (Stephan-Vorgabe). Wartet auf manuellen Test.
 
 **⚠️ Manueller Test abgebrochen (2026-07-06) — echter Befund, nicht nur Testumgebung:** Lokaler Lauf über den neuen Menüpunkt „Sichtachsen aktualisieren" (`POST /sightline-refresh`, host-only) durchgeführt: Job lief 232s durch, `job-status` meldete `done` ohne Fehler — aber **alle 68 Locations blieben auf `sightline_status: nicht_geprueft"`**, keine einzige zeigte ein tatsächliches Ergebnis (frei/blockiert/teilweise_verdeckt). Ursache laut Code-Prüfung: In `backend/data/elevation.py` (`elevation_profile()`) markiert eine zu strenge Bedingung das Höhenprofil als „unvollständig", sobald für einen Zwischenpunkt keine Höhe von OpenTopoData zurückkommt — dadurch bricht `evaluate_sightline()` sofort auf „nicht geprüft" ab (Regel 4 des Tickets greift zwar korrekt defensiv, aber dadurch faktisch bei praktisch jeder Location). Ein Code-Kommentar vom selben Tag beschreibt exakt dieses Symptom, es blieb aber unklar/nicht verifiziert, ob der beschriebene Fix tatsächlich bereits vollständig wirkt — der Test lief nach diesem Kommentar-Stand und zeigte weiterhin 0/68. Weitere Diagnose (Server-Log auf konkrete `logger.warning`-Zeilen) konnte nicht mehr durchgeführt werden: Stephans lokale IP wurde von der externen Höhendaten-/Gebäude-API währenddessen wegen zu vieler erfolgloser Versuche in kurzer Zeit temporär gesperrt. **Nächster Schritt (später, wenn Sperre abgelaufen):** `elevation_profile()`/`evaluate_sightline()` gezielt an 1-2 Locations isoliert nachvollziehen (z.B. via Python-Konsole statt vollem 68-Location-Lauf, um nicht erneut gesperrt zu werden), dann erst den vollen manuellen Testplan durchgehen. Ticket bleibt in „In Test", Release verbunden mit TASK-55 (siehe dort) auf danach verschoben.
+
+##### Testergebnis (2026-07-06, lokal von Stephan bestätigt)
+
+**Automatisierte Tests:** 14/14 grün (`test_us09_sightline.py`); Regressionstests gesamt 29/29 grün, inkl. `test_task45_azimuth.py`.
+
+**Backend-Bugs während der Testphase gefunden UND behoben:**
+1. Rate-Limit-Lücke in `elevation.py` zwischen verschiedenen Punkten (nicht nur innerhalb der Dataset-Kette) — führte zu unnötigen 429-Fehlern gegen OpenTopoData. Behoben mit modulweitem Tracker + Lock.
+2. „Incomplete"-Logik in `elevation_profile()` wertete fehlende Endpunkt-Höhen fälschlich als Gesamt-unvollständig, obwohl nur Zwischenpunkte für die Hinderniserkennung relevant sind. Behoben.
+3. Augenhöhe von 1,6 m auf 1,8 m korrigiert (Stephans Vorgabe).
+4. Overpass-Gebäudeabfrage: fehlende Pause zwischen Anfragen ergänzt (analog Höhendaten), Retry-Logik ergänzt.
+5. Overpass-Server `overpass-api.de` blockiert Stephans IP aktuell dauerhaft (HTTP 406, vermutlich wegen Testlast) — Code auf Mirror `overpass.kumi.systems` umgestellt (`OVERPASS_MIRRORS`-Liste mit Fallback auf `overpass-api.de`), Query-Syntax dabei als korrekt verifiziert (auf Kumi funktionierte dieselbe Abfrage mit echten Gebäudedaten).
+
+**Manuelle Browser-Tests (alle bestätigt „ja"):**
+1. Pille zeigt „Nicht geprüft" (grau, Augen-Icon) korrekt auf Feed-Karte und in beiden Detail-Sheets (Location + Event) — aktueller echter Datenstand, da noch keine Location einen anderen Status hat.
+2. ⓘ-Button neben der Pille gefunden (saß im Sheet-Header, nicht in „Karte & Blickwinkel" — nach Rückfrage von Stephan als korrekt bestätigt, keine Änderung nötig) — Erklärtext funktioniert.
+3. Filter-Chip „Sichtachse": Drei-Zustand-Zyklus (aus→einschließen→ausschließen→aus) funktioniert, Badge-Zähler korrekt, eigener ⓘ-Text.
+4. Menüpunkt „Sichtachsen aktualisieren" im Refresh-Menü sichtbar und auslösbar.
+5. Regressions-Check (Wetter-Tag, bestehende „Geprüft"-Pille, bestehender Verifikationsfilter, die drei bisherigen Refresh-Menüpunkte): alle unverändert funktionsfähig.
+
+**⚠️ Offener Punkt vor Done (kein Blocker für Release, aber zu vermerken):** Die Live-Verifikation der Zustände „Blockiert" und „Teilweise verdeckt" mit ECHTEN Gebäudedaten (nicht nur „Nicht geprüft") konnte noch nicht abgeschlossen werden, weil beide öffentlichen Overpass-Server (`overpass-api.de` und der neue Mirror `overpass.kumi.systems`) am 2026-07-06 zeitweise nicht zuverlässig erreichbar waren (406-Block bzw. Timeout) — vermutlich Folge der intensiven Testlast während dieses Tickets. Das Verhalten bei Datenausfall ist korrekt verifiziert (isolierter Test + automatisierte Tests zeigen: fehlende Gebäudedaten → ehrlich „Nicht geprüft", nie fälschlich „Frei"). **Empfehlung:** vor dem finalen Release noch einmal (an einem ruhigeren Zeitpunkt) den kompletten „Sichtachsen aktualisieren"-Lauf wiederholen und prüfen, ob jetzt echte „Blockiert"/„Teilweise verdeckt"-Zustände zustande kommen.
+
+#### ✅ Abschluss (2026-07-06)
+
+Released als v1.22.0 (2026-07-06), GitHub Actions grün, Live-Health-Check bestätigt.
+
+**⚠️ Weiterhin offen (auch nach Done, kein Release-Blocker):** Die Live-Verifikation der Zustände „Blockiert" und „Teilweise verdeckt" mit echten Gebäudedaten steht weiterhin aus (s. Testergebnis oben) — bisher zeigen alle Locations nur „Nicht geprüft", da die öffentlichen Overpass-Server während der Testphase nicht zuverlässig erreichbar waren. Empfehlung: bei Gelegenheit (ruhigerer Zeitpunkt) den „Sichtachsen aktualisieren"-Lauf erneut anstoßen und prüfen, ob echte „Blockiert"/„Teilweise verdeckt"-Zustände zustande kommen — ggf. als kleines Nachfolge-Ticket (Verifikation, kein neuer Funktionsumfang) erfassen, damit der Punkt nicht in Vergessenheit gerät.
 
 ### US-10 · Polarlichter / Aurora-Warnung
 > NOAA SWPC Kp-Index, Push bei Kp ≥ 5. *(Offen)*

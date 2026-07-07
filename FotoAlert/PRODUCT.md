@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-07-03 · Basis: abgeschlossene Tickets bis BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-07-07 · Basis: abgeschlossene Tickets bis BUG-65, BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -237,7 +237,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Koordinaten-Eingabe | Manuell via Textfeld (US-56) |
 | „Alignments berechnen" | POST `/preview-alignment`; zeigt Preview-Box mit Profil + Alignment-Liste |
 | Ohne Punkte | Toast: „Bitte Standort und Motiv setzen" |
-| „Location speichern" | Toast: „✅ Location gespeichert!"; Location erscheint in Orte-Tab. HINWEISE-Feld (`special_notes`) bleibt dabei leer, solange der Nutzer nichts einträgt — kein automatischer Vorbelegungstext mehr (BUG-60; vorher: „Automatisch erfasst via Quick Location Capture."); ein eigener Hinweis lässt sich nur nachträglich über „Location bearbeiten" eintragen. |
+| „Location speichern" | Toast: „✅ Location gespeichert!"; Location erscheint in Orte-Tab. HINWEISE-Feld (`special_notes`) bleibt dabei leer, solange der Nutzer nichts einträgt — kein automatischer Vorbelegungstext mehr (BUG-60; vorher: „Automatisch erfasst via Quick Location Capture."). |
+| Hinweise-Eingabe in der Anlage-Maske | Im Bereich „Optionale Angaben" gibt es ein Textfeld „Hinweise (Zugang, beste Jahreszeit etc.)" — derselbe Wert (`special_notes`) wie im Bearbeiten-Modus. Eingetragener Text wird beim Speichern übernommen und erscheint sofort in der Hinweise-Sektion der neuen Location; bleibt das Feld leer, wird ganz normal ohne Fehler gespeichert (BUG-65). |
 | Höhe-Korrektur | Fotografenstandort-Höhe einstellbar (US-62) |
 
 **Pflicht-Regression Quick-Add:**
@@ -247,6 +248,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] „Ohne Punkte" → Toast erscheint (kein Absturz)
 - [ ] „Mit Punkten" → Preview-Box mit Azimut, Distanz, Höhenwinkel
 - [ ] Gespeicherte Location erscheint danach im Orte-Tab
+- [ ] Hinweise-Text in „Optionale Angaben" eingetragen → nach dem Speichern sofort in der Hinweise-Sektion der neuen Location sichtbar (BUG-65)
+- [ ] Hinweise-Feld leer gelassen → Speichern funktioniert normal, keine automatische Notiz, keine Hinweise-Sektion sichtbar (BUG-65, Regression zu BUG-60)
 
 ---
 
@@ -259,6 +262,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Suche | Live-Textsuche filtert nach Standortname — Sucheinstieg über das Lupensymbol im Header (BUG-49; lokales Suchfeld im Panel entfernt) |
 | Location antippen | Öffnet Location-Detail-Sheet |
 | Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, Sonnen-Ausrichtung heute, zukünftige Events |
+| Hinweise-Sektion (Location-Detail) | Ist ein Hinweise-Text (`special_notes`) vorhanden, erscheint direkt nach dem Abschnitt „Ausrichtung" eine eigene, rein lesende Sektion „Hinweise" mit dem vollständigen Text — ohne dass zuvor „Bearbeiten" geöffnet werden muss. Ist kein Text vorhanden, fehlt die Sektion komplett (kein leerer Kasten). Dasselbe Feld lässt sich weiterhin nur über „Bearbeiten" ändern (BUG-65). |
 | Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **Motivname (`subject_name`)** (BUG-61), **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. Der Motivname wird nach dem Speichern sofort in der Motiv-Sektionsüberschrift des Detail-Sheets angezeigt und bleibt auch nach komplettem App-Neuladen erhalten (BUG-61). |
@@ -282,6 +286,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Host kann Beispielbild hochladen/ersetzen, Bild füllt Hero-Bereich mittig in Hoch- und Querformat; ohne Bild kein Platzhalter für normale Nutzer; Nicht-Host sieht keine Upload-Steuerung (US-120)
 - [ ] Host kann vorhandenes Beispielbild über eigenen Löschen-Button entfernen, Sicherheitsabfrage erscheint vorher, danach wieder Platzhalter (US-125)
 - [ ] Host kann über „Ausschnitt wählen" per Klick einen Fokuspunkt setzen, sichtbarer Bildausschnitt verschiebt sich entsprechend in Hoch- und Querformat; gilt auch nachträglich für bereits vorhandene Bilder; wird beim Ersetzen des Bildes zurückgesetzt (US-126)
+- [ ] Location mit Hinweise-Text: eigene Sektion „Hinweise" direkt nach „Ausrichtung" sichtbar, ohne „Bearbeiten" zu öffnen; rein lesend, kein Eingabefeld (BUG-65)
+- [ ] Location ohne Hinweise-Text: keine Hinweise-Sektion sichtbar, kein leerer Kasten (BUG-65)
 
 ---
 
@@ -520,3 +526,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-05 | US-21 (Korrekturen nach 2. Testdurchlauf) | „?"-Header-Button optisch zurückgebaut auf gleiches Muster wie Suche/Filter/Refresh (kein Kreis-Outline/Sonderfarbe mehr, Kurskorrektur ggü. „soll auffallen"); Kartenlegende-Text korrigiert (Realitäts-Abgleich-Fehler: Haupt-Karte zeigt nur einheitliches Pin-Symbol, Fotograf-Standort/Motiv/Sichtachse existiert nur im Detail-Sheet „Karte & Blickwinkel") + Inline-SVG-Symbolbeispiele je Legendenpunkt ergänzt + Wetter-Legende-Verweis-Satz gelöscht; Glossar-Eintrag „Feed, Kalender, Scout" fachlich präzisiert (Feed = 14-Tage-Feed, Scout errechnet eigene Chancen unabhängig von Nutzer-Standorten, Betaversion, nicht verifiziert). |
 | 2026-07-05 | US-21 (Korrektur nach 3. Testdurchlauf) | Kartenlegende: Fotograf-Standort/Motiv/Sichtachse-Absatz komplett entfernt statt nur textlich korrigiert (auf Haupt-Karte nicht relevant) — behebt zugleich ein Rendering-Problem (Bold-Tags/Komma auf eigener Zeile), das durch Einbetten eines Block-Elements (`MapMarkers.legendHtml()`) in einen inline-flex-Span innerhalb eines `<p>` in der schmalen Overlay-Box entstand. Legende zeigt jetzt nur noch Pin-Symbol, Kartenebenen-Umschalter, GPS-Button. Layer-Switcher (`#map-layer-toggle`/`MapView.setLayer`) und GPS-Button (`.map-gps-btn`/`MapView.locateMe`) im Code verifiziert: beide sind eigenständige Buttons direkt im Haupt-Karten-Tab (`#page-map`), CSS zeigt keine Sichtbarkeits-Auffälligkeit. |
 | 2026-07-06 | TASK-55 | Automatische Server-Sicherung umfasst jetzt auch die Standort-Fotos, nicht mehr nur die Standort-Daten; Wiederherstellung spielt Fotos ebenfalls zurück. |
+| 2026-07-07 | BUG-65 | Hinweise-Feld (`special_notes`) zusätzlich an zwei Stellen sichtbar/eingebbar gemacht: neue, rein lesende Sektion „Hinweise" in der Location-Detailansicht direkt nach „Ausrichtung" (nur wenn Text vorhanden, sonst keine Sektion); neues Eingabefeld in der Anlage-Maske („Optionale Angaben"), Text wird beim Speichern übernommen und ist sofort in der Detailansicht sichtbar; leer lassen speichert weiterhin ohne automatische Notiz (keine Regression zu BUG-60). Bearbeiten-Modus unverändert. |
