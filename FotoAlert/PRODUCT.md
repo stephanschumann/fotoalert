@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-07-07 · Basis: abgeschlossene Tickets bis BUG-65, BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-07-07 · Basis: abgeschlossene Tickets bis BUG-65, US-09, BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
 
 ---
 
@@ -66,6 +66,7 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 | Feed-Filter | Filter-Panel (Sheet) mit 9 Kriterien; wirkt auf alle Ansichten (Details siehe Sektion 3a) |
 | Mondaufgang-Events | Eigenständige Karten im Feed mit Typ `"Mondaufgang"`, Score-Ring, Uhrzeit und Location (US-79); werden nur angezeigt wenn Mond ≤ 35° zur Sichtachse liegt (vordere Zone) — seitlich oder hinter dem Fotografen werden unterdrückt (US-108) |
 | Monduntergang-Events | Eigenständige Karten im Feed mit Typ `"Monduntergang"`, Score-Ring, Uhrzeit und Location (US-79); werden nur angezeigt wenn Mond ≤ 35° zur Sichtachse liegt (vordere Zone) — seitlich oder hinter dem Fotografen werden unterdrückt (US-108) |
+| Sichtachsen-Check-Pille (US-09) | Auf der Feed-Karte zeigt eine Pille (Augen-Icon + farbiger Text) den Hinderniserkennungs-Status der Sichtachse zwischen Fotostandort und Motiv: **Grün** „Frei", **Orange** „Teilweise verdeckt", **Rot** „Blockiert", **Grau** „Nicht geprüft". Gilt für Sonne-/Mond-/Himmelsrichtung-Ereignisse UND Golden-Hour-/Himmelsröte-Wetter-Chancen. „Nicht geprüft" ist ein ehrlicher Unsicherheits-Status bei fehlenden Höhen-/Gebäudedaten — **wird niemals fälschlich als „Frei" angezeigt.** ⓘ-Erklärtext neben der Pille. |
 | Alert-Banner | Sichtbar wenn relevante Chancen heute oder morgen |
 | Tipp: Chance antippen | Öffnet Detail-Sheet (Pflicht: Detail schließt mit Overlay-Tap) |
 | Event-Typ-Verteilung | Round-Robin-Cap im `/opportunities`-Endpoint: alle Event-Typen (Goldene Stunde, Blaue Stunde, Mondaufgang, Monduntergang, Milchstraße) sind proportional im Feed vertreten — kein Typ verdrängt einen anderen vollständig (BUG-48) |
@@ -83,14 +84,17 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 - [ ] Filter-Chips „Mondaufgang" / „Monduntergang" filtern Feed korrekt (US-79)
 - [ ] Mondaufgang-/Monduntergang-Events erscheinen als eigenständige Karten im Feed (US-79)
 - [ ] Feed enthält sowohl Goldene Stunde als auch Blaue Stunde (nicht nur Mond-Events) — Round-Robin-Cap (BUG-48)
+- [ ] Feed-Karten zeigen Sichtachsen-Check-Pille (Augen-Icon + Grün/Orange/Rot/Grau je nach Status) für Sonne/Mond/Himmelsrichtung UND Golden-Hour/Himmelsröte-Karten (US-09)
+- [ ] Fehlen Höhen-/Gebäudedaten: Pille zeigt „Nicht geprüft" (grau), niemals „Frei" (US-09)
 
 ---
 
 ## 3a. Filter (BUG-46 — vollständige Spezifikation)
 
-Der Filter hat 9 Kriterien. Vier davon haben **Drei-Zustände** (Off → Einschließen → Ausschließen → Off):
+Der Filter hat 10 Kriterien. Vier davon haben **Drei-Zustände** (Off → Einschließen → Ausschließen → Off):
 Eventtyp, Tageszeit, Schwierigkeit, Kategorie.
 Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
+Seit US-09 hat auch der Sichtachsen-Check-Status Drei-Zustände.
 
 ### Kriterien und ihre Zustände
 
@@ -105,6 +109,7 @@ Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
 | **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51). GPS-Dialog erscheint pro Session maximal einmal — laufende Anfragen werden dedupliziert via `Filter._gpsPromise`-Caching (BUG-52) |
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
+| **Sichtachsen-Check** (US-09) | Ja: Off → nur diesen Status zeigen → diesen Status ausschließen → Off; Statuswerte: Frei / Teilweise verdeckt / Blockiert / Nicht geprüft | Gilt für Chancen-Feed, Kalender, Scout, Locations-Tab, Karte (Sichtachsen-Ergebnis ist Location-Eigenschaft); ⓘ-Erklärtext am Filter-Chip |
 
 ### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
 
@@ -142,6 +147,7 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 | Mindest-Bewertung | ✓ | ✓ | — | ✓ | ✓ |
 | Entfernung (GPS) | ✓ | — | ✓ | — | ✓ |
 | Verifikation | ✓ | ✓ | — | ✓ | ✓ |
+| Sichtachsen-Check (US-09) | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 **Pflicht-Regression Filter (BUG-46):**
 - [ ] Filter-Badge zeigt korrekte Anzahl aktiver Kriterien
@@ -152,6 +158,8 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 - [ ] Karte zeigt nach Schwierigkeits-Filter nur passende Pins
 - [ ] Karte zeigt nach Kategorie-Filter nur passende Pins
 - [ ] Karte zeigt nach Verifikations-Filter nur passende Pins
+- [ ] Sichtachsen-Check-Chip: Off → nur diesen Status → diesen Status ausschließen → Off (drei Tipp-Schritte, US-09)
+- [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab) — nicht ausgegraut (US-09)
 
 ---
 
@@ -186,6 +194,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Koordinaten-Sektion | Kein Overflow-Problem (BUG-38 gefixt); Labels korrekt ausgerichtet |
 | Sheet-Header | Kein blaugrauer Strich links (BUG-39 gefixt) |
 | Karte & Blickwinkel im Vollbild | Sobald die FOV-Karte Motivkoordinaten hat, zeigt sie ein Vollbild-Symbol (oben rechts); antippen öffnet dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend, rein zum Ansehen — Pins lassen sich dort NICHT verschieben, Zoomen/Verschieben der Karte funktioniert normal. Kreuz oben oder Antippen des abgedunkelten Hintergrunds schließt zurück zur Detailansicht. Gilt identisch in allen vier Einstiegspunkten: Chancen-Detail, Kalender-Detail, Scout-Detail, Location-Detail (US-114). Ohne Motivkoordinaten erscheint kein Vollbild-Symbol (wie schon der Hinweistext statt Karte). Getrennt vom Bearbeiten-Vollbild-Overlay (US-87), das nur im Location-Detail-Editiermodus zum Pin-Setzen dient. |
+| Sichtachsen-Check-Pille (US-09) | Im Detail-Sheet (analog Feed-Karte) erscheint dieselbe Pille (Augen-Icon + Grün/Orange/Rot/Grau) mit dem Hinderniserkennungs-Status der Sichtachse. Zusätzlich wird die bestehende Sichtachsen-Linie/Kompass-Darstellung (FOV-Karte + Kompass-Diagramm bei Golden-Hour/Himmelsröte, US-111) im Linienstil an den Status angepasst: **durchgezogen** = Frei, **gestrichelt** = Teilweise verdeckt, **unterbrochen** = Blockiert, **gepunktet** = Nicht geprüft. ⓘ-Erklärtext neben der Pille. Gilt für alle Einstiegspunkte (Feed, Kalender, Scout, Location-Detail). |
+| Sichtachsen-Check-Auslöser | Die Sichtachsen-Prüfung läuft automatisch einmalig beim Anlegen/Ändern einer Location (Raycast über Höhendaten OpenTopoData + Gebäudedaten OSM/Overpass). Zusätzlich manuell auslösbar über den neuen Menüpunkt „Sichtachsen aktualisieren" im Location-Detail (Orte-Tab, siehe Abschnitt 7). Ergebnis wird je Location gespeichert, nicht bei jedem Feed-Aufruf neu berechnet. |
 
 **Pflicht-Regression Detail:**
 - [ ] Sheet öffnet sich von unten (slide-up Animation)
@@ -201,6 +211,9 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Kein Fehler / keine leere Zeile wenn Mondaufgang/-untergang null (US-79)
 - [ ] Astronomie-Sektion zeigt Sonnenaufgang + Sonnenuntergang mit Uhrzeit + Azimut in Grad (US-107)
 - [ ] Kein Azimut-Wert wenn `sunrise_utc`/`sunset_utc` null (kein Placeholder „0°") (US-107)
+- [ ] Sichtachsen-Check-Pille sichtbar mit korrekter Farbe/Text (Grün/Orange/Rot/Grau) — in allen vier Einstiegspunkten identisch (US-09)
+- [ ] Sichtachsen-Linie in FOV-Karte + Kompass-Diagramm zeigt korrekten Linienstil je Status (durchgezogen/gestrichelt/unterbrochen/gepunktet) (US-09)
+- [ ] Fehlende Höhen-/Gebäudedaten → Status „Nicht geprüft" (grau, gepunktet), niemals „Frei" (US-09)
 
 ---
 
@@ -237,7 +250,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Koordinaten-Eingabe | Manuell via Textfeld (US-56) |
 | „Alignments berechnen" | POST `/preview-alignment`; zeigt Preview-Box mit Profil + Alignment-Liste |
 | Ohne Punkte | Toast: „Bitte Standort und Motiv setzen" |
-| „Location speichern" | Toast: „✅ Location gespeichert!"; Location erscheint in Orte-Tab. HINWEISE-Feld (`special_notes`) bleibt dabei leer, solange der Nutzer nichts einträgt — kein automatischer Vorbelegungstext mehr (BUG-60; vorher: „Automatisch erfasst via Quick Location Capture."). |
+| „Location speichern" | Toast: „✅ Location gespeichert!"; Location erscheint in Orte-Tab. HINWEISE-Feld (`special_notes`) bleibt dabei leer, solange der Nutzer nichts einträgt — kein automatischer Vorbelegungstext mehr (BUG-60; vorher: „Automatisch erfasst via Quick Location Capture."). Seit BUG-64 (Stand 2026-07-06) ist zusätzlich der historische Altbestand auf Produktion bereinigt — 57 zuvor betroffene Bestands-Locations wurden per Cleanup-Lauf geleert (idempotent bestätigt, keine anderen Felder verändert). |
 | Hinweise-Eingabe in der Anlage-Maske | Im Bereich „Optionale Angaben" gibt es ein Textfeld „Hinweise (Zugang, beste Jahreszeit etc.)" — derselbe Wert (`special_notes`) wie im Bearbeiten-Modus. Eingetragener Text wird beim Speichern übernommen und erscheint sofort in der Hinweise-Sektion der neuen Location; bleibt das Feld leer, wird ganz normal ohne Fehler gespeichert (BUG-65). |
 | Höhe-Korrektur | Fotografenstandort-Höhe einstellbar (US-62) |
 
@@ -261,8 +274,10 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Sortierung nach Entfernung (US-118) | Sobald der GPS-Standort des Nutzers bekannt ist, ist die Location-Liste aufsteigend nach Entfernung vom aktuellen Standort des Fotografen sortiert (Fotografen-Standpunkt, nicht das Motiv) — die nächstgelegene Location erscheint oben. Aktive Filter und die Textsuche bleiben zusätzlich wirksam, die gefilterte/gefundene Teilmenge bleibt dabei nach Entfernung sortiert. Ist der Standort nicht bekannt oder wird die Standortfreigabe verweigert, bleibt die Liste in der bisherigen (unsortierten) Reihenfolge — kein Fehler, keine leere Liste. |
 | Suche | Live-Textsuche filtert nach Standortname — Sucheinstieg über das Lupensymbol im Header (BUG-49; lokales Suchfeld im Panel entfernt) |
 | Location antippen | Öffnet Location-Detail-Sheet |
-| Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, Sonnen-Ausrichtung heute, zukünftige Events |
+| Location-Detail | Zeigt: Name, Koordinaten, Azimut, Brennweiten-Empfehlung, Sonnen-Ausrichtung heute, zukünftige Events, Sichtachsen-Check-Pille (US-09) |
 | Hinweise-Sektion (Location-Detail) | Ist ein Hinweise-Text (`special_notes`) vorhanden, erscheint direkt nach dem Abschnitt „Ausrichtung" eine eigene, rein lesende Sektion „Hinweise" mit dem vollständigen Text — ohne dass zuvor „Bearbeiten" geöffnet werden muss. Ist kein Text vorhanden, fehlt die Sektion komplett (kein leerer Kasten). Dasselbe Feld lässt sich weiterhin nur über „Bearbeiten" ändern (BUG-65). |
+| Sichtachsen-Check-Pille (Location-Detail, US-09) | Zeigt denselben Status wie im Feed/Chancen-Detail (Augen-Icon + Grün „Frei" / Orange „Teilweise verdeckt" / Rot „Blockiert" / Grau „Nicht geprüft"), ⓘ-Erklärtext daneben. Ergebnis stammt aus der zuletzt gelaufenen Raycast-Prüfung (Höhendaten OpenTopoData + Gebäudedaten OSM/Overpass) dieser Location. |
+| Menüpunkt „Sichtachsen aktualisieren" (US-09) | Neuer Menüpunkt im Location-Detail; löst die Raycast-Sichtachsenprüfung manuell erneut aus (zusätzlich zum automatischen Lauf beim Anlegen/Ändern der Location). Nützlich z. B. nach Neubau eines Gebäudes in der Sichtachse oder bei zunächst fehlenden Höhen-/Gebäudedaten. |
 | Sonnen-Ausrichtung im Location-Detail | Abschnitt „Ausrichtung": Sonnenaufgang und -untergang heute mit Azimut in Grad + Richtungsklassifizierung relativ zum Motiv (US-107). Bei Locations ohne Motiv-Koordinaten: nur Uhrzeit + Azimut ohne Motivvergleich. |
 | Richtungsklassifizierung | Lesbare Einschätzung: „Sonne geht fast genau hinter dem Motiv auf (nur X° Abweichung)" / „Gegenlicht" / Grad-Differenz zum Motiv-Azimut (±15°-Toleranz für „nah am Motiv") (US-107) |
 | Location bearbeiten | Edit-Modus in Location-Detail; Änderungen persistieren via PATCH + Server-Fetch. Editierbare Felder: Name, Beschreibung, Koordinaten, Brennweiten-Empfehlung, Stockwerkshöhe, **Motivname (`subject_name`)** (BUG-61), **HINWEISE (`special_notes`)** (BUG-50). Das HINWEISE-Feld kann beliebig geändert oder geleert werden — der ursprüngliche Text kehrt nach dem Speichern nicht zurück. Der Motivname wird nach dem Speichern sofort in der Motiv-Sektionsüberschrift des Detail-Sheets angezeigt und bleibt auch nach komplettem App-Neuladen erhalten (BUG-61). |
@@ -279,6 +294,9 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Abschnitt „Ausrichtung" zeigt Sonnenaufgang/-untergang mit Azimut für heute (US-107)
 - [ ] Locations mit Motiv-Koordinaten zeigen Richtungsklassifizierung relativ zum Motiv (US-107)
 - [ ] Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, kein leerer Abschnitt (US-107)
+- [ ] Location-Detail zeigt Sichtachsen-Check-Pille mit korrektem Status + ⓘ-Erklärtext (US-09)
+- [ ] Menüpunkt „Sichtachsen aktualisieren" löst neue Prüfung aus, Pille aktualisiert sich mit dem Ergebnis (US-09)
+- [ ] Anlegen/Ändern einer Location löst automatisch eine Sichtachsenprüfung aus (US-09)
 - [ ] Edit → Speichern → Änderung sofort in Sheet + Liste sichtbar (kein Reload nötig)
 - [ ] Close-Button erreichbar (Safe Area — BUG-25 gefixt)
 - [ ] Bearbeiten-Karte: Vollbild-Symbol öffnet bildschirmfüllendes Overlay, Pins darin setzbar, Schließen übernimmt Position in kleine Karte (US-87)
@@ -516,6 +534,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-04 | US-120 | Host kann pro Location ein Beispielbild hochladen/ersetzen (nur Host), serverseitige Verkleinerung/Kompression (~500 KB) + EXIF-Ausrichtungskorrektur, mittige Einpassung in Hoch- und Querformat (`object-fit: cover` + `object-position: center`), Platzhalter für Host ohne Bild, Löschen einer Location entfernt ihr Bild automatisch. Hinweis: Frontend-Code kam technisch bereits mit dem US-119-Release (v1.20.22) live, da `release.sh` den kompletten `index.html`-Stand committet — bis zu diesem Backend-Release war der Upload-Button auf der Live-Seite sichtbar, aber ohne funktionierenden Endpunkt (404). Dieser Eintrag + der zugehörige Backend-Release schließen die Lücke. |
 | 2026-07-04 | US-118 | Location-Übersicht nach Entfernung vom Standort sortiert |
 | 2026-07-04 | BUG-60 | Hinweise-Feld bleibt bei Neuanlage über Quick Location Capture leer, statt automatisch mit „Automatisch erfasst via Quick Location Capture." vorbelegt zu werden; einmaliges Cleanup-Skript (`tools/cleanup_bug60_special_notes.py`) bereinigt bestehende Locations mit exaktem alten Text (JSON + SQLite) |
+| 2026-07-06 | BUG-64 | Nachgeholter Prod-Cleanup-Lauf des BUG-60-Skripts: 57 Bestands-Locations auf Produktion vom alten Platzhaltertext im Hinweise-Feld befreit (1 in `custom_locations.json`, 56 in der Datenbank); zweiter Lauf direkt danach fand 0 Treffer (Idempotenz live bestätigt); Stichprobe (`custom_1781821527`, „Potsdamer Platz Panorama") zeigte leeres Hinweise-Feld, alle anderen Felder unverändert; keine Liste-B-Grenzfälle aufgetreten |
 | 2026-07-04 | US-124 | Vollbild-Modus für die Karte beim Anlegen eines neuen Standorts: Vollbild-Symbol auf der kleinen Anlege-Karte (analog Bearbeiten-Vollbild US-87, aber Antippen statt Ziehen der Pins); Satellit/Standard-Umschalter (US-123) und ein neuer Beobachter/Motiv-Umschalter im Header sind im Vollbild verfügbar; Schließen übernimmt Position(en) + Kartentyp sofort in die kleine Karte, ohne das Formular zu speichern |
 | 2026-07-05 | US-125 | Host kann ein vorhandenes Beispielbild einer Location über einen eigenen Löschen-Button eigenständig entfernen (Sicherheitsabfrage vor dem endgültigen Löschen, analog zum Löschen einer ganzen Location); Bilddatei wird serverseitig wirklich entfernt, danach wieder Platzhalter „Noch kein Beispielbild" |
 | 2026-07-05 | US-126 | Host kann den sichtbaren Bildausschnitt (Fokuspunkt) eines Beispielbilds über „Ausschnitt wählen" per Klick auf die wichtige Bildstelle selbst festlegen, statt der bisherigen festen Bildmitte (US-120 Rule 2); rein clientseitige Anzeigeposition (`image_focus_x`/`image_focus_y`), Originalbild bleibt unverändert; gilt auch nachträglich für bereits vorhandene Bilder (Default Bildmitte); wird beim Ersetzen des Bildes zurückgesetzt |
@@ -526,4 +545,5 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-05 | US-21 (Korrekturen nach 2. Testdurchlauf) | „?"-Header-Button optisch zurückgebaut auf gleiches Muster wie Suche/Filter/Refresh (kein Kreis-Outline/Sonderfarbe mehr, Kurskorrektur ggü. „soll auffallen"); Kartenlegende-Text korrigiert (Realitäts-Abgleich-Fehler: Haupt-Karte zeigt nur einheitliches Pin-Symbol, Fotograf-Standort/Motiv/Sichtachse existiert nur im Detail-Sheet „Karte & Blickwinkel") + Inline-SVG-Symbolbeispiele je Legendenpunkt ergänzt + Wetter-Legende-Verweis-Satz gelöscht; Glossar-Eintrag „Feed, Kalender, Scout" fachlich präzisiert (Feed = 14-Tage-Feed, Scout errechnet eigene Chancen unabhängig von Nutzer-Standorten, Betaversion, nicht verifiziert). |
 | 2026-07-05 | US-21 (Korrektur nach 3. Testdurchlauf) | Kartenlegende: Fotograf-Standort/Motiv/Sichtachse-Absatz komplett entfernt statt nur textlich korrigiert (auf Haupt-Karte nicht relevant) — behebt zugleich ein Rendering-Problem (Bold-Tags/Komma auf eigener Zeile), das durch Einbetten eines Block-Elements (`MapMarkers.legendHtml()`) in einen inline-flex-Span innerhalb eines `<p>` in der schmalen Overlay-Box entstand. Legende zeigt jetzt nur noch Pin-Symbol, Kartenebenen-Umschalter, GPS-Button. Layer-Switcher (`#map-layer-toggle`/`MapView.setLayer`) und GPS-Button (`.map-gps-btn`/`MapView.locateMe`) im Code verifiziert: beide sind eigenständige Buttons direkt im Haupt-Karten-Tab (`#page-map`), CSS zeigt keine Sichtbarkeits-Auffälligkeit. |
 | 2026-07-06 | TASK-55 | Automatische Server-Sicherung umfasst jetzt auch die Standort-Fotos, nicht mehr nur die Standort-Daten; Wiederherstellung spielt Fotos ebenfalls zurück. |
-| 2026-07-07 | BUG-65 | Hinweise-Feld (`special_notes`) zusätzlich an zwei Stellen sichtbar/eingebbar gemacht: neue, rein lesende Sektion „Hinweise" in der Location-Detailansicht direkt nach „Ausrichtung" (nur wenn Text vorhanden, sonst keine Sektion); neues Eingabefeld in der Anlage-Maske („Optionale Angaben"), Text wird beim Speichern übernommen und ist sofort in der Detailansicht sichtbar; leer lassen speichert weiterhin ohne automatische Notiz (keine Regression zu BUG-60). Bearbeiten-Modus unverändert. |
+| 2026-07-07 | US-09 | Sichtachsen-Check (Hinderniserkennung): Raycast-Prüfung über Höhendaten (OpenTopoData) + Gebäudedaten (OSM/Overpass), ob Gebäude/Gelände die Sichtachse Fotostandort↔Motiv blockieren. Läuft automatisch einmalig beim Anlegen/Ändern einer Location, zusätzlich manuell über neuen Menüpunkt „Sichtachsen aktualisieren" im Location-Detail. Vier Zustände: Frei (grün) / Teilweise verdeckt (orange) / Blockiert (rot) / Nicht geprüft (grau, bei fehlenden Daten — **wird niemals fälschlich als „Frei" angezeigt**, das ist die zentrale Verhaltens-Garantie und Regressionsbasis für künftige Tickets). Gilt für Sonne-/Mond-/Himmelsrichtung-Ereignisse UND Golden-Hour-/Himmelsröte-Wetter-Chancen. Sichtbar als Pille (Augen-Icon + farbiger Text) auf Feed-Karte + in Chancen-Detail + Location-Detail; zusätzlich angepasster Linienstil der bestehenden Sichtachsen-Linie/Kompass-Darstellung (durchgezogen/gestrichelt/unterbrochen/gepunktet je Status). Neuer Drei-Zustands-Filter-Chip (Off → nur Status zeigen → Status ausschließen → Off), wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab). Je ein ⓘ-Erklärtext für Pille und Filter-Chip. Released als v1.22.0. |
+| 2026-07-07 | BUG-65 | Hinweise-Feld (`special_notes`) zusätzlich an zwei Stellen sichtbar/eingebbar gemacht: neue, rein lesende Sektion „Hinweise" in der Location-Detailansicht direkt nach „Ausrichtung" (nur wenn Text vorhanden, sonst keine Sektion); neues Eingabefeld in der Anlage-Maske („Optionale Angaben"), Text wird beim Speichern übernommen und ist sofort in der Detailansicht sichtbar; leer lassen speichert weiterhin ohne automatische Notiz (keine Regression zu BUG-60). Bearbeiten-Modus unverändert. Released als v1.22.1. |
