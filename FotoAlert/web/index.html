@@ -1523,7 +1523,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.1';
+const APP_VERSION = '1.22.2';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4099,6 +4099,13 @@ const CameraFOV = {
     this._drawPinsAndLine(map, obsLat, obsLon, subjLat, subjLon, sightlineStatus);
     this._redrawCone(prefix);
     this._updateInfo(prefix);
+    // US-85 AK6: beim initialen Kartenaufbau (nicht bei Reglerwechsel) so weit herauszoomen,
+    // dass die komplette gestrichelte Verlängerung sichtbar ist. Bewusst hier und nicht in
+    // _redrawCone/_drawCone, damit das Verstellen der Regler die Karte nicht dauernd neu zoomt.
+    if (subjLat) {
+      const ext = this._coneExtPoints(this._data[prefix], this._readInputs(prefix));
+      map.fitBounds([[obsLat, obsLon], ext.lFar, ext.rFar], {padding:[30,30]});
+    }
   },
 
   // US-123: Kartenmodus umschalten (Satellit/Straße) — gemeinsame Einstellung für alle
@@ -4147,18 +4154,37 @@ const CameraFOV = {
   // Map/Cone-Instanz getrennt vom Datensatz-Key, damit Panel-Karte (prefix) und
   // Vollbild-Karte (prefix+'_fs') denselben Datensatz nutzen, aber unabhängige
   // Layer-Referenzen behalten (US-114).
-  _drawCone(map, cones, mapKey, d, inputs) {
-    if (!map || !d || !d.subjLat) return;
-    if (cones[mapKey]) { try { map.removeLayer(cones[mapKey]); } catch {} }
+  // US-85: Berechnet Kegel-Eckpunkte UND die verlängerten Endpunkte (doppelte Entfernung
+  // Standort→Motiv) der beiden Kegelkanten. Gemeinsam genutzt von _drawCone (Zeichnen) und
+  // vom initialen Kartenaufbau (Zoom-Fit auf die komplette Verlängerung, AK6).
+  _coneExtPoints(d, inputs) {
     const fovDeg = this._calcFOV(inputs.sensor, inputs.fl, inputs.ori);
     const bearing = this._bearing(d.obsLat, d.obsLon, d.subjLat, d.subjLon);
     const half = fovDeg / 2;
-    const lPt = this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM);
-    const rPt = this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM);
+    return {
+      lPt: this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM),
+      rPt: this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM),
+      lFar: this._destPoint(d.obsLat, d.obsLon, bearing - half, d.distM * 2),
+      rFar: this._destPoint(d.obsLat, d.obsLon, bearing + half, d.distM * 2),
+    };
+  },
+
+  _drawCone(map, cones, mapKey, d, inputs) {
+    if (!map || !d || !d.subjLat) return;
+    if (cones[mapKey]) { try { map.removeLayer(cones[mapKey]); } catch {} }
+    const { lPt, rPt, lFar, rFar } = this._coneExtPoints(d, inputs);
     const ac2 = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim();
-    cones[mapKey] = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
+    const cone = L.polygon([[d.obsLat,d.obsLon], lPt, rPt], {
       color:ac2, fillColor:ac2, fillOpacity:0.13, weight:1.5
-    }).addTo(map);
+    });
+    // US-85: gestrichelte Verlängerung der Kegelkanten über das Motiv hinaus bis zur
+    // doppelten Entfernung — eigenes, gleichmäßiges Strichmuster, keine Fläche (nur Linien).
+    const extOpts = {color:ac2, weight:1.5, dashArray:'6,6'};
+    const lExt = L.polyline([lPt, lFar], extOpts);
+    const rExt = L.polyline([rPt, rFar], extOpts);
+    // Als LayerGroup verwalten: ein removeLayer/Neuzeichnen-Zyklus ersetzt Kegel + Verlängerung
+    // gemeinsam — verhindert "Geister"-Verlängerungslinien beim Reglerwechsel (Pre-Mortem-Risiko).
+    cones[mapKey] = L.layerGroup([cone, lExt, rExt]).addTo(map);
   },
 
   _redrawCone(prefix) {
@@ -4236,6 +4262,12 @@ const CameraFOV = {
     // Keine Drag-Handler: _drawPinsAndLine nutzt L.marker() (nicht draggable), reines Ansehen.
     this._drawPinsAndLine(map, d.obsLat, d.obsLon, d.subjLat, d.subjLon, d.sightlineStatus);
     this._drawCone(map, this._cones, fsKey, d, this._readInputs(prefix));
+    // US-85 AK6: Vollbild-Karte wird bei jedem Öffnen komplett neu aufgebaut (siehe Kommentar
+    // oben) — zählt daher als initialer Aufbau, nicht als Reglerwechsel. Zoom-Fit auch hier.
+    if (d.subjLat) {
+      const ext = this._coneExtPoints(d, this._readInputs(prefix));
+      map.fitBounds([[d.obsLat, d.obsLon], ext.lFar, ext.rFar], {padding:[30,30]});
+    }
     // Zoom/Pan sollen normal funktionieren (Default von L.map, nichts deaktiviert).
     setTimeout(() => map.invalidateSize(), 50);
     // US-123: Umschalter im Vollbild-Container injizieren (statisches HTML kennt den prefix nicht)

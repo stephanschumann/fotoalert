@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | US-85 |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, US-85, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -4163,12 +4163,144 @@ Ausgeschlossen: Draggable Pins im Vollbild (bleibt Antippen wie bisher). Keine �
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-20 |
+
+✅ **Weg-Gate-Freigabe (Stephan, 2026-07-08):** Frage 1 (Kartenausschnitt) → Option B: Karte zoomt beim Öffnen automatisch etwas weiter raus, damit die gestrichelte Verlängerung immer komplett sichtbar ist. Frage 2 (Länge der Verlängerung) → Option A: Verlängerung ist doppelt so lang wie die Strecke bis zum Motiv. Beide gemäß Empfehlung aus der Analyse.
+
+✅ **Design-/Prototyp-Freigabe (Stephan, 2026-07-08):** Mockup gezeigt (Kegel bleibt gold, Verlängerung gleiche Goldfarbe mit eigenem gleichmäßigem Strichmuster 6/6, unterscheidbar von der blauen Sichtachsen-Linie; kein neuer Farbton eingeführt). Freigegeben wie gezeigt.
 
 **Beschreibung:** In der Ansicht „📐 Karte & Blickwinkel" soll der Blickwinkel als Trichter dargestellt werden: durchgezogen (gefüllt) vom Standort bis zum Motiv entsprechend der gewählten Brennweite, und als gestrichelte Linien über das Motiv hinaus verlängert.
 
 **Bezug:** Verfeinert die bereits in US-58[x] umgesetzte FOV-Kegel-Visualisierung; betrifft dieselbe Sektion. Grenzt an BUG-20[x] (Marker in FOV-Karte). Eigenständig, baut auf US-58.
+
+---
+
+#### Analyse-Phase (2026-07-07)
+
+**Annahmen-Protokoll — Klärung der offenen Punkte im Ticket:**
+
+1. ✅ Klar aus Code-Verifikation: Die im Ticket beschriebene „durchgezogene, gefüllte" Kegelfläche vom Standort bis zum Motiv existiert bereits vollständig seit US-58 (`_drawCone`, `web/index.html` Z. 4150–4162) — sie berechnet Bearing + FOV-Winkel aus Sensor/Brennweite/Ausrichtung und zeichnet ein gefülltes Dreieck von Standort bis exakt zur Distanz des Motivs. Der tatsächlich **neue** Teil dieses Tickets ist ausschließlich die **gestrichelte Verlängerung über das Motiv hinaus** — das reduziert den Scope gegenüber der Ticketbeschreibung auf einen kleineren, klar umrissenen Zusatz.
+2. ✅ Klar: Beide Einbindungen (`prefix='loc'` und `prefix='ev'`) sowie die kleine und die Vollbild-Karte (US-114) laufen technisch durch dieselbe Zeichenfunktion `_drawCone()` — eine Änderung an dieser einen Stelle wirkt automatisch überall (kein separater Code je Kontext nötig).
+3. ⚠️ Annahme: Die gestrichelte Verlängerung bekommt dieselbe Akzentfarbe wie die gefüllte Kegelfläche (`--accent-2`), nur ohne Füllung, in einem von der bestehenden Sichtachsen-Gestrichelung optisch unterscheidbaren Dash-Muster (siehe Pre-Mortem Szenario 5). Bitte bestätigen bzw. im Designer-Check final festlegen.
+4. ⚠️ Annahme: Es wird keine neue Legenden-Zeile für die Verlängerung ergänzt (aktuell zeigt `MapMarkers.legendHtml()` nur Fotograf-Standort und Motiv, keine Linien-Legende) — die Verlängerung erklärt sich durch die sichtbare Fortsetzung der Kegelform selbst. Bitte bestätigen; alternativ könnte eine kurze Erklärung im bestehenden „i"-Infotext zur Sektion (`ElementInfo._fov`) ergänzt werden.
+
+**❓ Offene Fragen (Grenzfälle mit mehreren sinnvollen Verhaltensweisen — Antwort nötig vor Implementierungsstart):**
+
+❓ **Frage 1 — Soll der sichtbare Kartenausschnitt beim Öffnen automatisch so gewählt werden, dass die komplette gestrichelte Verlängerung sichtbar ist?**
+   Option A — Kartenausschnitt bleibt wie bisher (nur Standort + Motiv): Die Verlängerung kann teilweise oder ganz außerhalb des sichtbaren Bereichs liegen; Stephan müsste manuell herauszoomen, um sie vollständig zu sehen. Kein Eingriff ins bestehende Zoom-Verhalten.
+   Option B — Kartenausschnitt wird beim Öffnen erweitert, sodass auch die Enden der gestrichelten Verlängerung im sichtbaren Bereich liegen: Die Verlängerung ist sofort komplett sichtbar, aber die Karte zeigt Standort/Motiv dafür automatisch etwas kleiner/weiter herausgezoomt als bisher gewohnt.
+   → Empfehlung: Option B, da der Sinn des Tickets (die Verlängerung tatsächlich sehen) sonst oft ins Leere liefe.
+
+❓ **Frage 2 — Wie weit soll die gestrichelte Verlängerung über das Motiv hinausreichen?**
+   Option A — Feste Verlängerung um denselben Betrag wie die Distanz zum Motiv (Kegel insgesamt doppelt so lang wie bis zum Motiv): einfach, vorhersehbares Verhältnis, unabhängig von Zoom/Kartenausschnitt.
+   Option B — Feste Verlängerung um einen kleineren Prozentsatz (z.B. 50% der Motiv-Distanz zusätzlich): kürzer, ggf. bei nahen Motiven kaum als „Verlängerung" wahrnehmbar.
+   Option C — Verlängerung bis zum Rand des aktuell sichtbaren Kartenausschnitts (abhängig von Zoomstufe, müsste bei jedem Zoomen/Verschieben neu berechnet werden): immer bis zum Kartenrand sichtbar, aber spürbar aufwendiger (Zoom-/Pan-Listener nötig, Abweichen vom bisherigen „nur bei Eingabeänderung neu zeichnen"-Muster).
+   → Empfehlung: Option A — einfachste, vorhersehbare Umsetzung ohne Zusatzaufwand für Zoom-/Pan-Listener.
+
+**Scope:**
+- **Eingeschlossen:** Ergänzung einer gestrichelten Fortsetzung der beiden äußeren Kegellinien über das Motiv hinaus, an der bestehenden Kegel-Zeichenstelle (`_drawCone`) — wirkt dadurch automatisch in allen vier Kontexten (Chancen-/Kalender-/Scout-Detail über `prefix='ev'`, Location-Detail über `prefix='loc'`, jeweils kleine Karte und Vollbild-Karte aus US-114).
+- **Ausgeschlossen:** Die bereits bestehende gefüllte Kegelfläche vom Standort bis zum Motiv (unverändert, seit US-58 vorhanden). Keine Änderung an Sichtachsen-Linie, Pins oder sonstigen Kartenelementen. Kein Eingriff in den Hauptkarten-Tab (`MapView`, eigenständige Komponente).
+
+**Example Mapping:**
+
+📏 **Regel 1 — Die gefüllte Kegelfläche vom Standort bis zum Motiv bleibt unverändert sichtbar.**
+- 🟢 Beispiel: Stephan öffnet eine Chance mit Motivkoordinaten → wie bisher sieht er die eingefärbte Fläche zwischen Standort und Motiv, passend zur eingestellten Brennweite.
+
+📏 **Regel 2 — Über das Motiv hinaus setzen sich die beiden äußeren Kegellinien gestrichelt fort.**
+- 🟢 Beispiel: Stephan öffnet dieselbe Chance → zusätzlich zur gefüllten Fläche sieht er zwei gestrichelte Linien, die vom Motiv aus in derselben Blickrichtung weiterlaufen.
+- 🟢 Beispiel: Stephan ändert die Brennweite von 24mm auf 200mm → der Kegel wird enger, gleichzeitig ändert sich auch der Winkel der gestrichelten Verlängerung passend mit (Fläche und Verlängerung laufen nie auseinander).
+
+📏 **Regel 3 — Die Verlängerung erscheint überall identisch, wo die Sektion „Karte & Blickwinkel" vorkommt.**
+- 🟢 Beispiel: Stephan sieht die Verlängerung in der kleinen Karte im Chancen-Detail — öffnet er dieselbe Karte im Vollbild (US-114), sieht er exakt dasselbe Bild, nur größer.
+- 🟢 Beispiel: Dasselbe gilt für die Location-Detail-Ansicht.
+
+📏 **Regel 4 — Ohne Motivkoordinaten gibt es weiterhin weder Kegel noch Verlängerung.**
+- 🟢 Beispiel (Edge Case): Stephan öffnet eine Chance ohne hinterlegte Motivkoordinaten → wie bisher erscheint der Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar", keine Kegelfläche, keine Verlängerung.
+
+**Akzeptanzkriterien:**
+- [ ] In der Sektion „Karte & Blickwinkel" ist zwischen Standort und Motiv weiterhin die farbig gefüllte Kegelfläche sichtbar (unverändertes Verhalten aus US-58).
+- [ ] Zusätzlich setzen sich die beiden äußeren Kegellinien über das Motiv hinaus als gestrichelte Linie in derselben Blickrichtung fort.
+- [ ] Ändert Stephan Brennweite, Sensor oder Ausrichtung (Quer-/Hochformat), passen sich gefüllte Fläche und gestrichelte Verlängerung gemeinsam und ohne Verzögerung an den neuen Wert an.
+- [ ] Die gestrichelte Verlängerung sieht identisch aus in allen vier Kontexten: Chancen-Detail (Feed/Kalender/Scout teilen sich dieselbe Sektion), Location-Detail, jeweils kleine Karte und Vollbild-Karte.
+- [ ] Edge Case: Bei einer Chance/Location ohne Motivkoordinaten erscheinen weder Kegelfläche noch Verlängerung (nur der bestehende Hinweistext).
+- [ ] Edge Case: Bei einem sehr nahen Motiv (wenige Meter Entfernung) bleibt die gestrichelte Verlängerung als klar erkennbare, nicht verschwindend kurze Linie sichtbar.
+- [ ] Edge Case: Mehrfaches Ändern der Brennweite hintereinander zeigt immer nur eine gestrichelte Verlängerung — keine „Geister"-Linien von vorherigen Einstellungen bleiben stehen.
+- [ ] Abhängig von Frage 1: Beim Öffnen der Karte ist die komplette gestrichelte Verlängerung sichtbar, ohne dass Stephan manuell herauszoomen muss (nur falls Option B gewählt wird).
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-07-07.
+- Bestätigt: `_drawCone(map, cones, mapKey, d, inputs)` (Z. 4150–4162) berechnet Bearing + FOV-Halbwinkel und zeichnet aktuell nur ein gefülltes Dreieck `[obs, lPt, rPt]` mit `lPt`/`rPt` exakt auf Distanz `d.distM` (Motiv-Entfernung) — es gibt noch keinerlei Verlängerung über diesen Punkt hinaus.
+- Bestätigt: Sowohl `initMap()` (Z. 4089–4102) als auch `_redrawCone()` (Z. 4164–4173) als auch `_initMapFs()` (Z. 4225–4244, US-114-Vollbild) rufen letztlich `_drawCone()` auf — eine Änderung an dieser einen Funktion wirkt automatisch in Panel- und Vollbild-Karte, für `prefix='loc'` und `prefix='ev'` gleichermaßen.
+- Bestätigt: `map.fitBounds([[obsLat,obsLon],[subjLat,subjLon]], {padding:[30,30]})` in `_drawPinsAndLine()` (Z. 4139) bezieht ausschließlich Standort- und Motiv-Koordinaten ein — die Kegel-Verlängerungspunkte sind darin nicht enthalten (relevant für Frage 1).
+- Bestätigt: `cones[mapKey]` verwaltet aktuell genau einen Leaflet-Layer pro Kontext-Schlüssel; das bestehende Lösch-Muster (`if (cones[mapKey]) map.removeLayer(...)`) müsste bei einer Erweiterung um zusätzliche Verlängerungs-Layer als gemeinsame Gruppe behandelt werden, sonst bleiben beim Neuzeichnen alte Verlängerungslinien stehen.
+
+💀 Szenario 1: Beim Ändern von Brennweite/Sensor/Ausrichtung wird nur die gefüllte Fläche ausgetauscht, die gestrichelte Verlängerung aber nicht mit entfernt — mehrere alte Verlängerungslinien verschiedener vorheriger Einstellungen bleiben gleichzeitig sichtbar („Fächer"-Effekt).
+   Auslöser: Verlängerung wird als eigener, zusätzlicher Layer gezeichnet, aber nicht demselben `mapKey`-Löschzyklus wie die Fläche unterstellt.
+   Frühwarnung: Nach mehrfachem Ändern der Brennweite prüfen, ob wirklich nur eine gestrichelte Verlängerung sichtbar ist.
+   Gegenmaßnahme: Fläche + Verlängerung als eine gemeinsame Layer-Gruppe unter demselben `mapKey` verwalten, ein einziger Lösch-Aufruf entfernt beide zusammen. In AK „keine Geister-Linien" verankert.
+
+💀 Szenario 2: Die Vollbild-Karte (US-114) zeigt die Verlängerung nicht, weil sie nur in einem Aufrufpfad ergänzt wird, den die Vollbild-Karte nicht durchläuft.
+   Auslöser: Verlängerung wird nicht zentral in `_drawCone()` selbst ergänzt, sondern in einer der drei aufrufenden Stellen (`initMap`, `_redrawCone`, `_initMapFs`) einzeln nachgezogen — leicht, eine der drei Stellen zu vergessen.
+   Frühwarnung: Vollbild-Karte gezielt öffnen und auf die gestrichelte Linie prüfen, nicht nur die kleine Karte.
+   Gegenmaßnahme: Verlängerung wird als Teil derselben `_drawCone()`-Funktion gezeichnet, die bereits von allen drei Stellen genutzt wird — kein separater Aufrufpfad nötig (AK „identisch in allen vier Kontexten").
+
+💀 Szenario 3 (Frage 1): Der Kartenausschnitt bleibt beim Öffnen exakt auf Standort+Motiv fixiert, die neue Verlängerung liegt dadurch meist außerhalb des sichtbaren Bereichs und ist für Stephan gar nicht wahrnehmbar, obwohl sie korrekt gezeichnet wurde.
+   Frühwarnung: Direkt nach dem Öffnen ohne manuelles Zoomen prüfen, ob die Verlängerung zu sehen ist.
+   Gegenmaßnahme: Mit Frage 1 (oben) explizit klären, ob `fitBounds` um die Verlängerungs-Endpunkte erweitert wird.
+
+💀 Szenario 4: Bei extremen Eingabewerten (sehr kurze Brennweite → sehr weiter FOV-Winkel, oder sehr große Motiv-Distanz über mehrere Kilometer) verhält sich die Verlängerungsberechnung geometrisch unerwartet.
+   Frühwarnung: Test mit Brennweite 8mm und einem weit entfernten Motiv (mehrere km) durchführen, Verlängerung visuell prüfen.
+   Gegenmaßnahme: Als Testfall aufnehmen; die Berechnung nutzt dieselbe bereits produktiv genutzte `_destPoint()`-Geodäsie-Funktion wie die bestehende Kegelfläche, daher kein neues geometrisches Risiko, aber Testfall zur Absicherung.
+
+💀 Szenario 5 (Design/Verwechslung): Die neue gestrichelte Verlängerung sieht der bereits bestehenden gestrichelten Sichtachsen-Linie (Status „teilweise verdeckt") zum Verwechseln ähnlich, obwohl beide fachlich etwas anderes bedeuten — Sichtachse zeigt Hindernis-Status zum Motiv, Kegel-Verlängerung zeigt den weiterlaufenden Blickwinkel.
+   Frühwarnung: Screenshot mit beiden Elementen gleichzeitig sichtbar mit Stephan gegenchecken.
+   Gegenmaßnahme: Vor Umsetzung `fotoalert-designer` konsultieren — eigenes, von der Sichtachsen-Gestrichelung unterscheidbares Dash-Muster für die Kegel-Verlängerung festlegen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html`, Komponente `CameraFOV` — insbesondere `_drawCone()` (Z. 4150–4162), `_redrawCone()` (Z. 4164–4173), `initMap()` (Z. 4089–4102), `_initMapFs()` (Z. 4225–4244), `_drawPinsAndLine()` (Z. 4122–4143, `fitBounds`)
+- [x] Designer-Check: visuell? → **ja** — neue sichtbare Linienart auf der Karte. Empfehlung: vor Umsetzung `fotoalert-designer` für Dash-Muster/Farbe der Verlängerung konsultieren (Abgrenzung zur Sichtachsen-Gestrichelung, siehe Pre-Mortem Szenario 5).
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Verlängerung als Teil derselben Kegel-Zeichenstelle (empfohlen)
+- Vorgehen: Die eine Stelle, die heute die gefüllte Kegelfläche zeichnet, wird so erweitert, dass sie direkt im selben Zug auch die gestrichelte Verlängerung mitzeichnet und beide zusammen als ein Bauteil verwaltet (gemeinsames Entfernen beim Neuzeichnen). Weil alle vier Kontexte (Chancen-/Kalender-/Scout-Detail, Location-Detail, kleine Karte, Vollbild-Karte) bereits heute genau diese eine Stelle nutzen, wirkt die Erweiterung automatisch überall — es muss nirgends zusätzlich „angeschlossen" werden.
+- Betroffene Dateien: nur `web/index.html` (Erweiterung der bestehenden Kegel-Zeichenfunktion in `CameraFOV`).
+- Vorteile: Kein Risiko, eine der drei Aufrufstellen zu vergessen (siehe Pre-Mortem Szenario 2); kein Risiko für „Geister"-Linien beim Neuzeichnen (Szenario 1), da Fläche und Verlängerung eine gemeinsame Einheit bilden; geringster Aufwand, da die bestehende Geodäsie-Berechnung (`_destPoint`, `_bearing`) direkt weiterverwendet wird.
+- Nachteile / Risiken: Keine wesentlichen — die einzige zusätzliche Arbeit ist die in Frage 1/2 zu klärende Reichweite/Sichtbarkeit der Verlängerung.
+- Aufwand: klein bis mittel (abhängig davon, ob Frage 1 mit Bounds-Erweiterung beantwortet wird).
+
+### Option B — Separate Zeichenfunktion für die Verlängerung, zusätzlich an jeder Aufrufstelle
+- Vorgehen: Eine neue, eigenständige Funktion zeichnet ausschließlich die Verlängerung; sie wird zusätzlich an allen drei bestehenden Aufrufstellen (`initMap`, `_redrawCone`, `_initMapFs`) separat aufgerufen.
+- Betroffene Dateien: `web/index.html` (neue Funktion + drei zusätzliche Aufrufstellen).
+- Vorteile: Fläche und Verlängerung technisch klar getrennt.
+- Nachteile / Risiken: Genau das Muster, das Pre-Mortem-Szenario 2 als Risiko beschreibt — eine der drei Aufrufstellen zu vergessen (am wahrscheinlichsten die seltener getestete Vollbild-Karte); zusätzlicher, unnötiger Verwaltungsaufwand für einen zweiten Layer-Satz ohne echten Vorteil gegenüber Option A.
+- Aufwand: mittel (mehr Fehleranfälligkeit als A, ohne Gegenwert).
+
+✅ **Empfehlung: Option A** — nutzt die bestehende, bereits an allen vier Kontexten hängende Zeichenstelle weiter, vermeidet das in Option B unvermeidbare Risiko einer vergessenen Aufrufstelle (insbesondere Vollbild-Karte), und braucht keine neue Datenstruktur.
+
+**Offene Grenzfall-Wahlfragen (gehören ins selbe Weg-Gate):**
+- Frage 1 — Kartenausschnitt automatisch erweitern? Empfehlung: Option B (erweitern).
+- Frage 2 — Reichweite der Verlängerung? Empfehlung: Option A (doppelte Gesamtlänge).
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Dieses Ticket ist reines Frontend-Rendering (keine Backend-Berechnung, kein neuer Endpoint) — kein pytest-Fall in `backend/tests/` vorgesehen. Alle Akzeptanzkriterien sind manuell im Browser zu prüfen.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Feed öffnen → eine Chance mit Motivkoordinaten antippen → zur Sektion „Karte & Blickwinkel" scrollen → prüfen: gefüllte Kegelfläche wie bisher UND zusätzlich gestrichelte Verlängerung über das Motiv hinaus sichtbar.
+  2. Brennweite im Eingabefeld ändern (z.B. von 85mm auf 24mm, dann auf 300mm) → prüfen: Fläche UND Verlängerung passen sich gemeinsam an, keine alte Verlängerung bleibt stehen.
+  3. Sensor wechseln (z.B. Vollformat → APS-C) und Ausrichtung wechseln (Quer-/Hochformat) → gleiche Prüfung wie Schritt 2.
+  4. Vollbild-Symbol antippen (US-114) → prüfen: Vollbild-Karte zeigt exakt dieselbe Verlängerung wie die kleine Karte.
+  5. Location-Detail (Anzeige-Modus) mit Motivkoordinaten öffnen → Schritte 1–4 wiederholen.
+  6. Kalender-Eintrag bzw. Scout-Vorschlag mit Motivkoordinaten öffnen → prüfen: identisches Verhalten wie im Feed (dieselbe Sektion).
+  7. Chance/Location ohne Motivkoordinaten öffnen → prüfen: weder Kegelfläche noch Verlängerung, nur bestehender Hinweistext.
+  8. Extremwerte testen: Brennweite auf 8mm stellen bei einem weit entfernten Motiv (mehrere km) → Verlängerung visuell auf Plausibilität prüfen (keine verzerrten/sich kreuzenden Linien).
+  9. Falls Frage 1 mit Option B beantwortet wird: direkt nach dem Öffnen ohne manuelles Zoomen prüfen, ob die komplette Verlängerung sichtbar ist.
+  10. Regression: Sichtachsen-Linie (durchgezogen/gestrichelt je nach Status) und beide Pins (Standort, Motiv) sehen weiterhin wie bisher aus — keine versehentliche Vermischung mit dem neuen Verlängerungs-Dash-Muster.
 
 ---
 
