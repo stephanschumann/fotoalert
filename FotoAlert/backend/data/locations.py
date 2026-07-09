@@ -90,6 +90,12 @@ class PhotoLocation:
     image_focus_x: Optional[float] = None
     image_focus_y: Optional[float] = None
 
+    # US-09: Sichtachsen-Check (Raycast-Hinderniserkennung, einmalig vorberechnet).
+    # 'frei' | 'teilweise_verdeckt' | 'blockiert' | 'nicht_geprueft' (Default vor
+    # dem ersten QA-Lauf: 'nicht_geprueft', NIE fälschlich 'frei' interpretieren).
+    sightline_status: str = "nicht_geprueft"
+    sightline_angle_deg: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # BERLIN

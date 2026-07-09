@@ -11,6 +11,17 @@ backend/data_dev/
 # Automatische DB-Snapshots vor jedem Precompute-Lauf (TASK-56)
 backend/data/snapshots/
 
+# Nutzer-Uploads (Beispielbilder, US-120) — Server-Daten, keine Code-Assets
+backend/data/location_images/
+
+# FUSE-Reste (entstehen bei gleichzeitigem Datei-Zugriff über den gemounteten
+# Cowork-Ordner, z.B. während paralleler Server-/Precompute-Läufe)
+backend/data/.fuse_hidden*
+
+# Kanban-Sync-Zwischenordner (tools/sync_kanban.py)
+tools/_kanban_out/
+tools/_kanban_tmp/
+
 # Python-Artefakte
 __pycache__/
 *.py[cod]
