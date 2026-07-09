@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-66** |
 | **🏁 Done** | abgeschlossen + deployed | **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **BUG-66** *(Höhenwinkel Spitze in Anlage-Vorschau immer 0°, fehlender Geländeunterschied)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2334,13 +2334,13 @@ Betroffen: `backend/main.py`, Funktion `patch_location` (PATCH-Endpunkt `/locati
 
 ---
 
-### BUG-66 · „Höhenwinkel Spitze" in Location-Anlage-Vorschau zeigt immer 0°, weil Geländeunterschied nicht einfließt `[ ]`
+### BUG-66 · „Höhenwinkel Spitze" in Location-Anlage-Vorschau zeigt immer 0°, weil Geländeunterschied nicht einfließt `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-09 |
 
 **Beschreibung:** Beim Anlegen einer neuen Location zeigt die Vorschau („Alignments berechnen") das Feld „Höhenwinkel Spitze" (`profile.angular_altitude_top_deg`). Dieser Wert ist bei Stephan immer 0,0°. Ursache: Der Endpoint `POST /preview-alignment` (`backend/main.py`, Funktion `preview_alignment`) ruft `calculate_subject_angular_profile` (`backend/calculations/astronomy.py`) nur mit `subject_lat/lon`, `observer_lat/lon`, `subject_height_m` und `subject_width_m` auf — der Parameter `elevation_difference_m` (Geländeunterschied Motiv-Basis vs. Fotograf-Standort) wird in dieser Vorschau nie übergeben und bleibt beim Funktionsdefault 0.0. Zusätzlich wird `observer_height_m` fix mit 1.6 m (Augenhöhe) angenommen. Trägt Stephan im Anlage-Formular keine Motivhöhe ein (Feld bleibt leer → Frontend-Fallback `|| 0` in `web/index.html`, Zeile ~6839), ergibt `effective_height = max(0, 0 + 0 - 1.6) = 0` → Winkel = 0,0°. Erwartet: Der Winkel berücksichtigt die tatsächliche Motivhöhe und den Geländeunterschied — aktuell fehlt im Anlage-Formular komplett die Möglichkeit, einen Geländeunterschied einzugeben, und dieser fließt serverseitig auch nicht ein.
@@ -2358,10 +2358,10 @@ Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kenn
 
 ##### Akzeptanzkriterien
 
-- [ ] Bei einer Location mit echtem Höhenunterschied (Fotograf-Standort und Motiv-Standort auf unterschiedlicher Geländehöhe) zeigt „Höhenwinkel Spitze" nach Klick auf „Alignments berechnen" einen Wert ungleich 0°, der den tatsächlichen Höhenunterschied widerspiegelt.
-- [ ] Bei Locations ohne nennenswerten Höhenunterschied bleibt der Wert weiterhin nahe 0° (kein falscher positiver Ausschlag).
-- [ ] Edge Case: Wenn für die Gegend keine Höhendaten verfügbar sind (Datenlücke), stürzt die Vorschau nicht ab (kein 500er), sondern zeigt einen sinnvollen Rückfallwert (0°).
-- [ ] Edge Case / Regressionsschutz zu BUG-63: Der Geländeunterschied-Abruf passiert genau einmal pro Vorschau-Anfrage, nicht einmal pro Tag/Himmelskörper-Iteration der Alignment-Berechnung — sonst vervielfachen sich externe Netzwerk-Calls und verschärfen die in BUG-63 beschriebene Blockade.
+- [~] Bei einer Location mit echtem Höhenunterschied (Fotograf-Standort und Motiv-Standort auf unterschiedlicher Geländehöhe) zeigt „Höhenwinkel Spitze" nach Klick auf „Alignments berechnen" einen Wert ungleich 0°, der den tatsächlichen Höhenunterschied widerspiegelt.
+- [~] Bei Locations ohne nennenswerten Höhenunterschied bleibt der Wert weiterhin nahe 0° (kein falscher positiver Ausschlag).
+- [~] Edge Case: Wenn für die Gegend keine Höhendaten verfügbar sind (Datenlücke), stürzt die Vorschau nicht ab (kein 500er), sondern zeigt einen sinnvollen Rückfallwert (0°).
+- [~] Edge Case / Regressionsschutz zu BUG-63: Der Geländeunterschied-Abruf passiert genau einmal pro Vorschau-Anfrage, nicht einmal pro Tag/Himmelskörper-Iteration der Alignment-Berechnung — sonst vervielfachen sich externe Netzwerk-Calls und verschärfen die in BUG-63 beschriebene Blockade.
 
 ##### Pre-Mortem
 
@@ -2379,8 +2379,14 @@ Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kenn
 
 ##### Testplan
 
-- [ ] Automatisiert (Harness): `backend/tests/test_bug66.py` — 4 Testfälle (echter Höhenunterschied → Winkel ungleich 0°; kein Höhenunterschied → Winkel bleibt 0°; fehlende Höhendaten → kein Crash, Rückfallwert 0°; Abruf passiert genau einmal pro Anfrage). Aktuell erwartungsgemäß fehlschlagend (TDD, Implementierung folgt in der nächsten Phase).
+- [x] Automatisiert (Harness): `backend/tests/test_bug66.py` — 4 Testfälle (echter Höhenunterschied → Winkel ungleich 0°; kein Höhenunterschied → Winkel bleibt 0°; fehlende Höhendaten → kein Crash, Rückfallwert 0°; Abruf passiert genau einmal pro Anfrage). Alle 4 Tests grün (`4 passed`, verifiziert 2026-07-09).
 - [ ] Manuell: Location mit bekanntem Höhenunterschied im Browser anlegen (z.B. Fotograf im Tal, Motiv auf einem Hügel/Turm mit deutlichem Geländeunterschied) → „Alignments berechnen" klicken → „Höhenwinkel Spitze" muss einen plausiblen Wert ungleich 0° zeigen. Zusätzlich: bestehende Locations ohne Höhenunterschied weiterhin unauffällig prüfen (Regressionscheck).
+
+##### 🛠️ Implementierung (2026-07-09)
+
+`backend/main.py`, Funktion `preview_alignment()`: Geländeunterschied wird jetzt einmal pro Anfrage über `_elevation_provider.elevation_difference(...)` (bestehender Singleton aus `data/elevation.py`) ermittelt und als `elevation_difference_m` an `calculate_subject_angular_profile()` übergeben — vor der Alignment-Schleife platziert, damit kein Mehrfach-Abruf entsteht (Regressionsschutz BUG-63). Keine weitere Datei geändert.
+
+**Hinweis zum Release-Scope:** Im selben Arbeitsverzeichnis liegt zusätzlich eine unfertige, unabhängige Änderung in `backend/data/locations.py` (`sightline_status`/`sightline_angle_deg`-Felder für US-09, noch nicht vollständig released). Diese gehört **nicht** zu BUG-66 und darf beim Release dieses Tickets nicht mitgestaged werden — nur `backend/main.py` gehört zum BUG-66-Commit.
 
 ---
 
@@ -9627,3 +9633,28 @@ Diese Änderung hat **sichtbare** Auswirkungen (Kompass-Diagramm-Zone ändert si
 - [x] Empfehlung: Option A mit eigener, leicht änderbarer Toleranzwinkel-Konstante
 - [x] 🔴 Offene Fragen Q1–Q4 von Stephan im Weg-Gate pauschal mit "ja" zur empfohlenen Option A bestätigt (2026-07-02) — alle Best-Effort-Annahmen (Q1 volle Rücknahme, Q2 30°, Q3 Sonnenazimut-Proxy, Q4 Diagramm im Scope) gelten damit als freigegeben
 - [x] Weg-Gate: Option A gewählt (2026-07-02) — Implementierung gestartet
+
+---
+
+### TASK-59 · Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-09 |
+
+**User Story:** Als Betreiber der FotoAlert-App, möchte ich einen eigenen, selbst gehosteten Overpass-API-Server betreiben, sodass der Sichtachsen-Check (US-09) zuverlässig Gebäudedaten bekommt und nicht mehr von instabilen kostenlosen öffentlichen Overpass-Mirrors abhängt.
+
+**Beschreibung:** `backend/data/qa_azimuth.py` nutzt aktuell zwei kostenlose öffentliche Overpass-Mirrors (`OVERPASS_MIRRORS`: `overpass.kumi.systems` und `overpass-api.de` als Fallback), die sich beide als unzuverlässig erwiesen haben: Kumi liefert wiederholte Timeouts nach 10s, overpass-api.de blockiert Stephans IP dauerhaft mit HTTP 406 (über mehrere Tage reproduziert, zuletzt 2026-07-07 und 2026-07-09 — volle Diagnose-Historie in US-09).
+
+Idee (aus Recherche mit Stephan, 2026-07-09): Ein eigener kleiner Overpass-Server (z. B. Docker-Image `wiktorn/overpass-api`), der einmalig einen REGIONALEN OpenStreetMap-Auszug lädt (z. B. Berlin/Brandenburg-Extract von Geofabrik, deutlich kleiner als der komplette Planet-Datensatz) und sich über tägliche Diff-Updates automatisch aktuell hält. FotoAlert würde dann nur `OVERPASS_MIRRORS`/`OVERPASS_URL` in `qa_azimuth.py` auf die eigene Server-Adresse umstellen — am übrigen Code ändert sich nichts.
+
+Aufwand-Einschätzung: Die aufgebaute Datenbank ist ca. 4–5× größer als der komprimierte Auszug — für einen regionalen Auszug ein niedriger bis mittlerer einstelliger GB-Bereich. Braucht entweder einen zusätzlichen kleinen Server oder Mitlaufen auf dem bestehenden Hetzner-Server (falls Kapazität reicht). Laufender Aufwand: Server am Laufen halten, Speicherplatz/Updates im Blick behalten.
+
+Ziel/Nutzen: Unabhängigkeit von den unzuverlässigen kostenlosen Overpass-Servern, damit der US-09-Sichtachsen-Check (Gebäude-basierte Verfeinerung: „Blockiert"/„Teilweise verdeckt") tatsächlich funktioniert statt dauerhaft auf „Nicht geprüft" zurückzufallen.
+
+**Bezug:** **US-09** [x] (Done, released v1.22.0) — führte den Overpass-basierten Sichtachsen-Check ein und dokumentiert in seiner Analyse/Retro die aktuellen Mirror-Probleme (Kumi-Timeouts, overpass-api.de HTTP-406-Block). TASK-59 ist keine Dublette, sondern die Infrastruktur-Konsequenz daraus: US-09 behandelt die fachliche Logik des Sichtachsen-Checks, TASK-59 behandelt die Zuverlässigkeit der externen Datenquelle, von der diese Logik abhängt. Keine Überschneidung mit TASK-45 (Azimut via Overpass, Done) — nutzt dieselbe Datenquelle, aber eigenständiges Ticket zur Infrastruktur, kein Code-Umbau an TASK-45 vorgesehen.
+
+**Quelle:** fotoalert-intake (Recherche mit Stephan, 2026-07-09)

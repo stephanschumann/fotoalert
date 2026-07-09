@@ -2161,10 +2161,17 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Motiv-Koordinaten.")
 
+    # BUG-66: Geländeunterschied genau einmal pro Anfrage ermitteln (nicht in der
+    # Alignment-Schleife weiter unten) und in die Winkelberechnung einfließen lassen.
+    # Fehlende DEM-Abdeckung liefert automatisch (0.0, incomplete=True) statt Crash.
+    elevation_difference_m, _elevation_incomplete = await _elevation_provider.elevation_difference(
+        req.observer_lat, req.observer_lon, req.subject_lat, req.subject_lon)
+
     profile = calculate_subject_angular_profile(
         observer_lat=req.observer_lat, observer_lon=req.observer_lon,
         subject_lat=req.subject_lat, subject_lon=req.subject_lon,
         subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
+        elevation_difference_m=elevation_difference_m,
     )
 
     if profile.angular_width_deg > 0.01:
