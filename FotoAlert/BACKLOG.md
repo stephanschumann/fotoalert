@@ -29,7 +29,7 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | BUG-67 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
@@ -2388,6 +2388,131 @@ Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kenn
 `backend/main.py`, Funktion `preview_alignment()`: Geländeunterschied wird jetzt einmal pro Anfrage über `_elevation_provider.elevation_difference(...)` (bestehender Singleton aus `data/elevation.py`) ermittelt und als `elevation_difference_m` an `calculate_subject_angular_profile()` übergeben — vor der Alignment-Schleife platziert, damit kein Mehrfach-Abruf entsteht (Regressionsschutz BUG-63). Keine weitere Datei geändert.
 
 **Hinweis zum Release-Scope:** Im selben Arbeitsverzeichnis liegt zusätzlich eine unfertige, unabhängige Änderung in `backend/data/locations.py` (`sightline_status`/`sightline_angle_deg`-Felder für US-09, noch nicht vollständig released). Diese gehört **nicht** zu BUG-66 und darf beim Release dieses Tickets nicht mitgestaged werden — nur `backend/main.py` gehört zum BUG-66-Commit.
+
+---
+
+### BUG-67 · Neu angelegte Location erscheint nicht direkt in Karte oder Locations-Liste `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-09 |
+
+**Beschreibung:** Nach der Neuanlage einer Location taucht diese weder in der Kartenübersicht noch in der Locations-Liste auf. Beobachtet: Erst wenn Stephan die App komplett neu lädt und den Standort erneut bestätigt, erscheint die neu angelegte Location in Liste und Karte. Erwartet: Die neu angelegte Location ist sofort nach dem Speichern in beiden Ansichten sichtbar, ohne manuellen Reload.
+
+**User Story:** Als Fotograf, der gerade eine neue Location anlegt, möchte ich sie direkt danach in der Karte und in der Locations-Liste sehen, sodass ich ohne Umweg über einen App-Neustart weiterarbeiten kann (z. B. Details prüfen oder die Location sofort auf der Karte einordnen).
+
+**Bezug:** Vermutete Nähe zum bekannten Render-Nachzieh-Muster aus **BUG-28** (kein separates Ticket im Backlog auffindbar, nur als Referenz in Analyse-Texten anderer Tickets, z. B. Zeile 6211/8443 — dort ging es um Cap/Sort-Verdrängung bzw. asynchron geladenen Rating-Cache, nicht um Location-Neuanlage; strukturell verwandt, aber keine Dublette). Ebenfalls denkbare Nähe zum Edit-Fall (`Locations.all` wird nach `saveEdit` nicht automatisch neu geladen + gerendert) — Code-Verifikation zeigt: Neuanlage nutzt einen eigenen Schreibpfad (`AddLocation.save()` → `POST /preview-alignment` mit `save:true`), nicht den Edit-Pfad (`PATCH /locations/{id}`). Keine bestehende offene Ticket-ID mit demselben Scope gefunden.
+
+##### Example Mapping
+
+**Scope-Check:** Kein „erster Slice" — das Ticket betrifft eine vollständige, bereits existierende Funktion (Add-Location-Formular im Tab „Neu"). Kein Hinweis auf bewusst eingeschränkten Funktionsumfang.
+
+**Annahmen-Protokoll:**
+- ⚠️ Annahme: Betroffen ist ausschließlich der Web-App-Pfad (`web/index.html`), nicht die iOS-App — im Ticket nicht erwähnt, iOS-Code nicht Teil dieser Analyse.
+- ⚠️ Annahme: „Karte" meint die Haupt-Kartenansicht (Tab „Karte", `MapView`), nicht die Mini-Karte im Add-Formular selbst.
+
+**Wichtiger Befund (Sonderfall „Ticket-Prämisse vs. Code"):** Memory `reference_fotoalert_location_api` (Locations werden aktuell nur per Chrome-Console angelegt) ist **veraltet**. Es existiert bereits ein vollständiges Add-Formular in der App (Tab „Neu" → `AddLocation.open()`/`preview()`/`save()`, `web/index.html` Zeile ~1306–1417, 6830–6915), das über `POST /preview-alignment` mit `save:true` speichert.
+
+📏 **Rule 1:** Nach dem Speichern einer neuen Location über das Add-Formular wird die Kartenansicht so aktualisiert, dass der neue Marker sichtbar ist, sobald der Karten-Tab (erneut) geöffnet wird — ohne App-Neustart.
+🟢 Example: Given Karten-Tab wurde vorher schon einmal besucht (Map-Objekt existiert bereits) When eine neue Location gespeichert und danach der Karten-Tab erneut geöffnet wird Then der neue Marker erscheint, ohne dass die App neu geladen werden muss.
+
+📏 **Rule 2:** Nach dem Speichern einer neuen Location wird die Locations-Liste so aktualisiert, dass der neue Eintrag sichtbar ist, sobald der Locations-Tab (erneut) geöffnet wird — ohne App-Neustart.
+🟢 Example: Given Locations-Tab wurde vorher schon besucht (`Locations.all` bereits gefüllt) When eine neue Location gespeichert und der Locations-Tab erneut geöffnet wird Then der neue Eintrag ist sofort in der Liste sichtbar.
+
+❓ **Frage 1 (🔴 funktional kritisch — Ticket-Prämisse-Diskrepanz, siehe Pre-Mortem-Code-Verifikation unten):** Betrifft der Bug tatsächlich noch die Locations-**Liste**, oder wurde das beim aktuellen Codestand bereits durch `Locations.load()` (ruft nach dem Speichern automatisch `render()` auf) korrekt gelöst und Stephans Beobachtung bezog sich auf einen älteren Stand / einen aktiven Entfernungsfilter / einen gecachten Service Worker? Da der gelesene Code für die Liste bereits korrekt aussieht, aber der Ticket-Text das Gegenteil beschreibt, wird dies nicht geraten, sondern als Frage zurückgespiegelt.
+   Empfehlung: Unabhängig von der Antwort wird der Fix defensiv **beide** Wege (Karte + Liste) explizit anstoßen (siehe Option B unten) — das schließt die Lücke so oder so, ohne auf eine weitere Verifikationsrunde warten zu müssen.
+
+❓ **Frage 2 (Grenzfall mit mehreren sinnvollen Verhaltensweisen):** Was soll passieren, wenn der Karten-Tab beim Speichern bereits aktiv/sichtbar ist (Stephan schaut schon auf die Karte, während er speichert)?
+   - **Option A** — Kein sofortiges Update während die Karte schon offen ist; der neue Marker erscheint erst beim nächsten Verlassen-und-Zurückkehren zum Karten-Tab. Konsequenz: minimaler Aufwand, aber falls Stephan direkt nach dem Speichern auf die bereits offene Karte schaut, sieht er den neuen Marker noch nicht sofort.
+   - **Option B** — Marker werden sofort nachgeladen, auch wenn der Karten-Tab bereits aktiv ist (der Save-Vorgang selbst stößt `MapView.loadMarkers()` an, unabhängig vom aktuell sichtbaren Tab). Konsequenz: etwas mehr Aufwand (ein zusätzlicher Marker-Neuaufbau pro Save), aber garantiert konsistentes „sofort sichtbar"-Verhalten, wie es das Ticket fordert.
+   → Vorschlag: Option B (deckt sich mit der Implementierungsempfehlung unten).
+
+**Fertig:** Beide Rules sind durch je 1 Example belegt. Frage 1 und Frage 2 sind offen und werden Stephan im Weg-Gate vorgelegt.
+
+##### Akzeptanzkriterien
+
+- [~] Nach dem Speichern einer neuen Location über das Add-Formular ist sie ohne App-Neustart auf der Karte sichtbar, sobald der Karten-Tab (erneut) geöffnet wird — auch wenn die Karte vorher schon einmal initialisiert war.
+- [~] Nach dem Speichern einer neuen Location ist sie ohne App-Neustart in der Locations-Liste sichtbar, sobald der Locations-Tab (erneut) geöffnet wird.
+- [~] Edge Case (Frage 2): Ist der Karten-Tab beim Speichern bereits aktiv, erscheint der neue Marker gemäß der mit Stephan gewählten Option (A: erst beim nächsten Tab-Wechsel / B: sofort ohne Tab-Wechsel).
+- [~] Regression: Nach dem Speichern einer neuen Location bleiben alle bisherigen Marker auf der Karte und alle bisherigen Einträge in der Liste unverändert sichtbar (keine Duplikate, keine verschwundenen Einträge).
+- [~] Regression: Aktive Karten-Filter (Eventtyp, Schwierigkeit, Kategorie etc.) wirken nach dem Nachladen weiterhin korrekt auf alte UND neue Marker (kein „Filter wird beim Reload vergessen").
+- [x] Backend: Eine per `POST /preview-alignment` (`save:true`) neu gespeicherte Location ist unmittelbar danach (ohne Wartezeit) über `GET /locations` auffindbar (bereits bestätigt, siehe Pre-Mortem-Code-Verifikation — als Regressionsschutz automatisiert getestet).
+
+##### Pre-Mortem
+
+📎 **Code-Verifikation** (gelesen am 2026-07-09, `web/index.html` + `backend/main.py`):
+- **Bestätigt (Root Cause Karte):** `AddLocation.save()` (Zeile ~6873–6914) ruft nach dem Speichern `Locations.load()` und `Feed.load()` auf, aber **nie** `MapView.loadMarkers()`. `MapView.init()` (aufgerufen bei jedem Tab-Wechsel zu „Karte", Zeile 7576) hat einen frühen Return `if (this.map) return;` (Zeile 4840) — sobald die Karte einmal initialisiert wurde, werden die Marker bei jedem weiteren Tab-Besuch **nicht** neu geladen. Das ist die eindeutige Ursache dafür, dass neue Locations auf der Karte fehlen, bis die App komplett neu geladen wird (Map-Objekt verworfen).
+- **Widerlegt/unklar (Liste):** `Locations.load()` (Zeile 5679–5683) setzt `this.all` neu UND ruft direkt `this.render(...)` auf; `App.nav('locations')` (Zeile 7578–7587) rendert bei erneutem Tab-Besuch ebenfalls aus dem bereits aktualisierten `Locations.all`. Anhand des gelesenen Codes sollte die neue Location in der Liste bereits jetzt korrekt erscheinen — das widerspricht der Ticket-Beobachtung (siehe Frage 1 oben). Nicht geraten, welche der möglichen Erklärungen (alter Codestand, aktiver Entfernungsfilter `Filter.state.maxDistKm`, gecachter Service Worker) zutrifft.
+- **Bestätigt (Backend ist NICHT die Ursache):** `_save_alignment_as_location()` (Zeile 2108–2154) hängt die neue Location synchron per `LOCATIONS.append(new_loc)` an, **bevor** der Endpoint antwortet. `GET /locations` (Zeile 1567–1572) liest direkt aus `LOCATIONS`. Ein sofortiger `GET /locations`-Aufruf nach dem Speichern liefert die neue Location bereits zuverlässig zurück — der Bug liegt rein im Frontend-Renderpfad, nicht im Backend/der Datenhaltung.
+- **Bestätigt (Render-Pfad, Schritt 4g):** Kartenmarker sind client-seitig als Leaflet `L.marker`/`L.divIcon` (Inline-SVG) gerendert (Zeile 4884–4906), kein Server-Asset/PNG. Kein abweichender Legenden-Pfad wie bei BUG-59.
+
+💀 **Szenario 1:** Doppelte Marker auf der Karte, weil ein erneuter `loadMarkers()`-Aufruf die alten Marker nicht entfernt, bevor neue hinzugefügt werden.
+   Auslöser: `loadMarkers()` pusht in `this.markers`, ohne vorher bestehende Marker per `removeLayer`/`marker.remove()` zu entfernen.
+   Frühwarnung: Nach dem zweiten Speichern zeigt die Karte sichtbar mehr Marker als Locations existieren.
+   Gegenmaßnahme: Vor dem Neuaufbau alle bestehenden Marker entfernen (analog zum bestehenden Muster in `setLayer()`, das schon `removeLayer` nutzt) → als Regressions-AK oben aufgenommen.
+
+💀 **Szenario 2:** Zusätzlicher `/locations`-API-Call bei jedem Save, weil `Locations.load()` und `MapView.loadMarkers()` beide unabhängig `/locations` abrufen.
+   Gegenmaßnahme: Für dieses Bugfix akzeptabel (kleine Locations-Liste, kein Performance-Ticket) — keine Umstrukturierung nötig, nur als Beobachtung vermerkt.
+
+💀 **Szenario 3:** Aktive Karten-Filter (Eventtyp/Schwierigkeit/Kategorie) werden nach dem Marker-Neuaufbau nicht erneut angewendet, wodurch alte UND neue Marker plötzlich ungefiltert erscheinen.
+   Gegenmaßnahme: Sicherstellen, dass `loadMarkers()` am Ende weiterhin `this.applyFilter()` aufruft (bereits im bestehenden Code so, Zeile 4905) — als Regressions-AK oben aufgenommen, im Testplan manuell geprüft.
+
+💀 **Szenario 4:** Die Ticket-Prämisse zur Liste stimmt nicht mit dem Code überein (siehe Frage 1) — falls unentdeckt geblieben, hätte ein Fix, der sich nur auf die Karte konzentriert, die eigentliche Beschwerde nicht vollständig behoben.
+   Gegenmaßnahme: Defensiver expliziter Re-Render-Aufruf für die Liste direkt in `AddLocation.save()` (Empfehlung Option B unten), unabhängig davon ob die vermutete Root Cause zutrifft.
+
+##### Architektur-Analyse
+
+**Betroffene Dateien:** `FotoAlert/web/index.html` — Funktionen `AddLocation.save()` (~6873–6914), `MapView.init()`/`loadMarkers()` (~4838–4906), `Locations.load()`/`render()` (5679–5756), `App.nav()` (7568–7589). Kein Backend-Code betroffen (siehe Pre-Mortem: `/preview-alignment` liefert bereits korrekt `location_id` zurück, Datenhaltung ist synchron).
+
+**Render-Pfad-Check (4g):** Client-seitig gerendert (Leaflet-Marker, Inline-SVG), siehe Pre-Mortem-Code-Verifikation oben.
+
+**Designer-Check (4b):** Nicht visuell sichtbar im Sinne eines neuen/geänderten Design-Elements — derselbe bestehende Marker-/Karten-Stil, nur der Zeitpunkt des Neuladens ändert sich. Kein neues Icon, keine neue Farbe, kein neues Sheet. → **Designer-Check übersprungen** (reiner Timing-/Datenaktualisierungs-Bug).
+
+##### Implementierungsoptionen
+
+**Option A — Nur Karte reparieren (minimal):**
+- Vorgehen: In `AddLocation.save()` nach `Locations.load()`/`Feed.load()` zusätzlich `MapView.loadMarkers()` aufrufen (nur wirksam falls `MapView.map` bereits existiert; sonst harmlos, da der nächste `MapView.init()`-Aufruf ohnehin lädt).
+- Betroffene Dateien: `web/index.html` (`AddLocation.save()`).
+- Vorteile: Kleinstmöglicher Diff, geringstes Regressionsrisiko.
+- Nachteile: Falls Frage 1 sich als „Liste ist doch betroffen" herausstellt, bleibt dieser Teil ungelöst.
+- Aufwand: klein.
+
+**Option B — Karte + defensiver Listen-Refresh (empfohlen):**
+- Vorgehen: Zusätzlich zu Option A in `AddLocation.save()` explizit `Locations.render(Filter.applyToLocations(Locations.all))` aufrufen — unabhängig vom aktuell aktiven Tab, direkt im Anschluss an `Locations.load()`. Deckt Frage 2 (Karte bereits offen) ebenfalls ab, da beide Render-Aufrufe direkt beim Speichern passieren, nicht erst beim nächsten Tab-Wechsel.
+- Betroffene Dateien: `web/index.html` (`AddLocation.save()`).
+- Vorteile: Schließt den bestätigten Kartenbug UND hedged die ungeklärte Listen-Frage (Frage 1) mit minimalem Zusatzaufwand; beantwortet Frage 2 mit „sofort", ohne Tab-Wechsel abzuwarten.
+- Nachteile: Ein zusätzlicher, ggf. redundanter Render-Call falls die Liste ohnehin schon korrekt war — kein funktionales Risiko, minimal mehr Code.
+- Aufwand: klein.
+
+✅ **Empfehlung: Option B** — schließt den bestätigten Map-Bug und hedged die ungeklärte Listen-Frage mit minimalem Zusatzaufwand, ohne auf eine weitere Verifikationsrunde warten zu müssen. Beantwortet außerdem Frage 2 im Sinne von „sofort sichtbar, auch bei bereits offener Karte".
+
+**Scope:**
+Eingeschlossen: Web-App (`index.html`) — sofortiger Refresh von Karte und Locations-Liste direkt nach dem Speichern einer neuen Location über das bestehende Add-Formular.
+Ausgeschlossen: iOS-App (kein entsprechender Code in dieser Analyse betrachtet, im Ticket nicht erwähnt); Verhalten bei Location-**Edit** (bereits durch bestehendes `saveEdit`-Pattern abgedeckt, kein Teil dieses Bugs); Performance-Optimierung des doppelten `/locations`-Abrufs (Pre-Mortem Szenario 2, bewusst nicht angegangen).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2 Rules, 2 offene Fragen)
+- [x] Pre-Mortem durchgeführt (inkl. Pflicht-Code-Verifikation)
+- [x] Architektur analysiert: `web/index.html` (`AddLocation.save()`, `MapView.init()`/`loadMarkers()`, `Locations.load()`/`render()`, `App.nav()`); kein Backend betroffen
+- [x] Designer-Check: nicht visuell sichtbar → übersprungen
+- [x] Implementierungsoptionen: A (nur Karte) / B (Karte + defensiver Listen-Refresh, empfohlen)
+- [x] Empfehlung: Option B — von Stephan am Weg-Gate freigegeben (2026-07-09)
+
+**Freigabe-Vermerk (Weg-Gate, 2026-07-09):**
+- ✅ Implementierungsweg: Option B — Karte reparieren (`MapView.loadMarkers()` nach Speichern) UND expliziter, defensiver Listen-Refresh, unabhängig vom aktiven Tab.
+- ✅ Frage 2 (Grenzfall Karte bereits offen): Option B — Marker werden sofort nachgeladen, auch wenn der Karten-Tab beim Speichern schon aktiv ist (kein Warten auf nächsten Tab-Wechsel).
+- ✅ Frage 1 (Listen-Bug real oder veraltet?): Von Stephan bestätigt — das Problem mit der Locations-Liste (nicht sichtbar ohne Reload) tritt aktuell noch auf, ist also real und keine überholte Beobachtung.
+
+**Testplan:**
+- [x] Automatisiert (Harness): `backend/tests/test_bug67.py` — 2 Testfälle (neue Location sofort über `GET /locations` auffindbar; Name/Koordinaten stimmen). Sichert die Backend-Voraussetzung ab, auf der der Frontend-Fix aufbaut.
+- [ ] Manuell (nach Implementierung, unter `http://localhost:8000`):
+  1. Karten-Tab einmal öffnen (Marker laden), dann zum „Neu"-Tab wechseln, eine Test-Location speichern, danach zurück zum Karten-Tab wechseln → neuer Marker muss ohne Reload sichtbar sein.
+  2. Locations-Tab einmal öffnen, dann eine Test-Location speichern, danach zurück zum Locations-Tab wechseln → neuer Eintrag muss ohne Reload sichtbar sein.
+  3. (Frage-2-Fall) Karten-Tab bereits offen lassen, in einem zweiten Fenster/Tab eine Location speichern → prüfen ob Marker gemäß gewählter Option (A oder B) erscheint.
+  4. Regressionscheck (PRODUCT.md Sektion 12, „Navigation/Tabs" + „Feed-Rendering"): alle 5 Tabs weiterhin erreichbar, kein Tab zeigt doppelten Inhalt, aktive Filter (Eventtyp, Kategorie, Schwierigkeit) wirken nach dem Reload weiterhin korrekt auf Karte und Liste, bestehende Locations bleiben unverändert sichtbar.
 
 ---
 

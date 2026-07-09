@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.4';
+const APP_VERSION = '1.22.5';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4882,6 +4882,15 @@ const MapView = {
     document.querySelector(`[onclick="MapView.setLayer('${name}')"]`).classList.add('active');
   },
   async loadMarkers() {
+    // BUG-67: Bei wiederholtem Aufruf (z.B. nach dem Speichern einer neuen Location)
+    // erst die bereits auf der Karte liegenden Marker entfernen, bevor neu aufgebaut
+    // wird — sonst bleiben die alten Layer-Objekte auf der Karte hängen und es
+    // entstehen doppelte Marker (Pre-Mortem Szenario 1).
+    if (this.markers && this.markers.length) {
+      for (const { marker } of this.markers) {
+        if (this.map.hasLayer(marker)) this.map.removeLayer(marker);
+      }
+    }
     const locs = await API.get('/locations');
     this.markers = [];
     const col = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
@@ -6291,7 +6300,10 @@ const LocationDetail = {
       LocationDetail.close();
       Locations.all = await API.get('/locations');
       Locations.render(Filter.applyToLocations(Locations.all));
-      if (typeof MapView !== 'undefined') MapView.refresh();
+      // BUG-67-Pattern: Karte nur neu laden wenn sie schon initialisiert ist (MapView.map
+      // vorhanden) — MapView.refresh() existiert nicht und führte zu einem stillen JS-Fehler,
+      // der den Erfolgs-Toast unterdrückte.
+      if (MapView.map) await MapView.loadMarkers();
       toast('Location gelöscht.');
     } catch(e) {
       toast('Fehler beim Löschen: ' + e.message);
@@ -6892,6 +6904,14 @@ const AddLocation = {
       this.reset();
       this.close();
       await Locations.load();
+      // BUG-67: Karte + Liste sofort aktualisieren, unabhängig vom aktiven Tab —
+      // Karte nur neu laden wenn sie schon initialisiert ist (MapView.map vorhanden,
+      // sonst lädt der nächste MapView.init()-Aufruf ohnehin frisch). Der explizite
+      // Locations.render()-Aufruf ist zusätzlich zum Rendering in Locations.load()
+      // ein bewusst defensiver Re-Render (Weg-Gate-Option B), unabhängig davon ob der
+      // Locations-Tab gerade aktiv ist.
+      if (MapView.map) await MapView.loadMarkers();
+      Locations.render(Filter.applyToLocations(Locations.all));
       // BUG-35: Feed sofort neu laden + Polling starten wenn Recompute läuft
       await Feed.load();
       if (result && result.location_id) {

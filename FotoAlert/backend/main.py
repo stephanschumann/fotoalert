@@ -2128,7 +2128,7 @@ async def _save_alignment_as_location(
         desc = f"Sichtachse auf {req.subject_name}, {dist_txt} Entfernung."
 
     new_loc = PhotoLocation(
-        id=f"custom_{int(datetime.now().timestamp())}",
+        id=f"custom_{int(datetime.now().timestamp() * 1000)}",
         name=req.subject_name,
         description=desc,
         category=LocationCategory[req.category] if req.category in LocationCategory.__members__ else LocationCategory.SKYLINE,  # US-76
