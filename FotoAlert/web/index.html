@@ -401,7 +401,7 @@
       border-radius: 22px 22px 0 0; color: var(--muted); box-sizing: border-box; }
     .loc-image-placeholder p { font-size: 13px; margin: 0; }
     .loc-image-upload-btn { display: inline-flex; align-items: center; gap: 6px;
-      background: var(--gold); color: var(--on-accent); border: none; border-radius: 10px;
+      background: var(--accent-2); color: var(--on-accent); border: none; border-radius: 10px;
       padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .loc-image-edit-btn { position: absolute; top: 10px; right: 10px; display: inline-flex;
       align-items: center; gap: 6px; background: rgba(0,0,0,.55); color: #fff; border: none;
@@ -451,6 +451,24 @@
       padding: 9px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .loc-image-focus-done { background: var(--accent); color: var(--on-accent); }
     .loc-image-focus-cancel { background: rgba(255,255,255,.15); color: #fff; }
+    /* US-127: Beispielbild-Bereich im Neuanlage-Formular — optisch 1:1 wie
+       .loc-image-area/.loc-image-placeholder (Bearbeiten-Modus, oben), einziger
+       Unterschied: Radius 14px rundum (Card-Radius) statt 22px-oben, da diese
+       Fläche hier keine Sheet-Kante fortsetzt, sondern als eigenständige Card im
+       Formularfluss sitzt (Designer-Entscheidung, US-127). */
+    .add-image-area { position: relative; width: 100%; aspect-ratio: 4/3;
+      border-radius: 14px; overflow: hidden; background: var(--surface); margin-top: 8px; }
+    .add-image-area img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .add-image-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px; border: 2px dashed var(--border);
+      border-radius: 14px; color: var(--muted); box-sizing: border-box; }
+    .add-image-placeholder p { font-size: 13px; margin: 0; }
+    .add-image-upload-btn { display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-2); color: var(--on-accent); border: none; border-radius: 10px;
+      padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .add-image-staged-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+      color: var(--muted); background: var(--border); white-space: nowrap; }
     .sheet-hero-type { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .sheet-hero-title { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
     .sheet-hero-loc { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
@@ -1378,6 +1396,20 @@ function ic(id, size, cls){
       <textarea class="input-field" id="subj-notes" rows="2" style="margin-top:8px"
         placeholder="Hinweise (Zugang, beste Jahreszeit etc.)"></textarea>
     </div>
+    <!-- US-127: Beispielbild optional bereits bei der Neuanlage auswählen. Die Datei
+         wird hier nur client-seitig gestaged (kein location_id vorhanden) und erst nach
+         erfolgreichem Speichern automatisch hochgeladen (AddLocation.save()). -->
+    <div class="form-section">
+      <label>Beispielbild (optional)</label>
+      <div class="add-image-area" id="add-image-area">
+        <div class="add-image-placeholder">
+          <svg style="width:28px;height:28px"><use href="#i-camera"/></svg>
+          <p>Noch kein Beispielbild</p>
+          <button class="add-image-upload-btn" onclick="AddLocation.triggerImageUpload()"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"><use href="#i-camera"/></svg>Bild hochladen</button>
+        </div>
+      </div>
+      <input type="file" id="add-image-input" accept="image/*" style="display:none" onchange="AddLocation._onImageFileSelected(event)">
+    </div>
     <div style="display:flex;align-items:flex-start;gap:10px">
       <button class="btn-secondary" onclick="AddLocation.reset();AddLocation.close()" style="flex-shrink:0;width:auto;padding:13px 16px">Abbrechen</button>
       <div style="flex:1;display:flex;flex-direction:column;gap:8px">
@@ -1523,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.2';
+const APP_VERSION = '1.22.3';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -6498,6 +6530,10 @@ const AddLocation = {
   map: null, obsMarker: null, subjMarker: null,
   obs: null, subj: null, previewData: null,
   mapMode: 'obs',  // 'obs' | 'subj'
+  // US-127: Beispielbild-Staging — Datei wird bis zum erfolgreichen save() nur
+  // client-seitig gehalten, da vorher keine location_id existiert.
+  _stagedImageFile: null,
+  _stagedImagePreviewUrl: null,
 
   open() {
     document.getElementById('add-overlay').classList.add('open');
@@ -6507,6 +6543,42 @@ const AddLocation = {
   close() {
     document.getElementById('add-overlay').classList.remove('open');
     document.getElementById('add-sheet').classList.remove('open');
+  },
+  // US-127: öffnet die Dateiauswahl für das Beispielbild (analog LocationDetail.triggerImageUpload()).
+  triggerImageUpload() {
+    const input = document.getElementById('add-image-input');
+    if (input) input.click();
+  },
+  // US-127: Datei wird NICHT sofort hochgeladen (keine location_id vorhanden), nur
+  // client-seitig gestaged + lokale Vorschau angezeigt. Der eigentliche Upload folgt
+  // automatisch in save(), sobald eine location_id vorliegt.
+  _onImageFileSelected(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
+    if (!file) return;
+    if (this._stagedImagePreviewUrl) URL.revokeObjectURL(this._stagedImagePreviewUrl);
+    this._stagedImageFile = file;
+    this._stagedImagePreviewUrl = URL.createObjectURL(file);
+    this._renderImageArea();
+  },
+  // US-127: rendert den Bild-Bereich abhängig vom Staging-Zustand — Placeholder
+  // (optisch identisch zu LocationDetail._imageAreaHtml(), nur Radius 14px rundum)
+  // oder lokale Vorschau mit Hinweis-Chip "wird beim Speichern hochgeladen".
+  _renderImageArea() {
+    const el = document.getElementById('add-image-area');
+    if (!el) return;
+    if (this._stagedImageFile) {
+      el.innerHTML = `
+        <img src="${this._stagedImagePreviewUrl}" alt="Beispielbild-Vorschau">
+        <div class="add-image-staged-hint">Wird beim Speichern hochgeladen</div>`;
+    } else {
+      el.innerHTML = `
+        <div class="add-image-placeholder">
+          ${ic('i-camera',28)}
+          <p>Noch kein Beispielbild</p>
+          <button class="add-image-upload-btn" onclick="AddLocation.triggerImageUpload()">${ic('i-camera',14)} Bild hochladen</button>
+        </div>`;
+    }
   },
   setMapMode(mode) {
     this.mapMode = mode;
@@ -6813,6 +6885,10 @@ const AddLocation = {
       };
       const result = await API.post('/preview-alignment', body);
       toast('✅ Location gespeichert!');
+      // US-127: gestagtes Beispielbild (falls vorhanden) VOR reset() sichern —
+      // reset() leert die Staging-Variable, damit beim nächsten Öffnen keine
+      // "Geister-Auswahl" hängen bleibt.
+      const stagedImageFile = this._stagedImageFile;
       this.reset();
       this.close();
       await Locations.load();
@@ -6820,12 +6896,34 @@ const AddLocation = {
       await Feed.load();
       if (result && result.location_id) {
         Feed.startPendingPoll(result.location_id);
+        // US-127: automatischer Bild-Upload direkt im Anschluss, sobald die
+        // location_id vorliegt — eigener try/catch, damit ein Upload-Fehler die
+        // bereits erfolgreiche Location-Anlage nicht zurücknimmt (AK „Bild-Upload
+        // schlägt fehl"). Kein Upload-Versuch falls kein Bild gestaged wurde.
+        if (stagedImageFile) {
+          try {
+            await API.postFile('/locations/' + result.location_id + '/image', stagedImageFile);
+            // Server-Fetch statt In-Memory-Mutation (Pattern 5) — Bild ist danach
+            // sofort im Location-Detail sichtbar.
+            await Locations.load();
+          } catch (e) {
+            toast('Beispielbild konnte nicht automatisch hochgeladen werden – bitte im Bearbeiten-Modus nachholen.');
+          }
+        }
       }
     } catch(e) { toast('Fehler beim Speichern: ' + e.message); }
   },
   reset() {
     // State
     this.obs = null; this.subj = null; this.previewData = null;
+    // US-127: gestagtes Beispielbild verwerfen (Pre-Mortem: keine „Geister-Auswahl"
+    // beim nächsten Öffnen des Formulars). Object-URL freigeben, sonst Memory-Leak.
+    if (this._stagedImagePreviewUrl) URL.revokeObjectURL(this._stagedImagePreviewUrl);
+    this._stagedImageFile = null;
+    this._stagedImagePreviewUrl = null;
+    const imgInput = document.getElementById('add-image-input');
+    if (imgInput) imgInput.value = '';
+    this._renderImageArea();
     // Marker + Linie
     if (this.obsMarker)  { this.obsMarker.remove();  this.obsMarker  = null; }
     if (this.subjMarker) { this.subjMarker.remove(); this.subjMarker = null; }

@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | US-127 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **BUG-66** *(Höhenwinkel Spitze in Anlage-Vorschau immer 0°, fehlender Geländeunterschied)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -1498,6 +1498,92 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 
 ---
 
+### US-127 · Beispielbild bereits bei der Neuanlage einer Location hochladen können `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-09 |
+
+**Beschreibung:** Als Host möchte ich beim Anlegen einer neuen Location direkt ein Beispielbild mit hochladen können, statt die Location erst ohne Bild zu speichern und das Bild danach über den separaten Bearbeiten-Modus nachzupflegen.
+
+**User Story:** Als Host, möchte ich bei der Neuanlage einer Location gleichzeitig ein Beispielbild mit zur Verfügung stellen können, sodass andere Nutzer sofort eine visuelle Referenz zur neuen Location haben und ich nicht erst eine bildlose Location anlegen und den Bild-Upload in einem separaten zweiten Schritt nachholen muss.
+
+**Bezug:** Direkte Abhängigkeit/Überschneidung mit **US-120** [x] (Done, 2026-07-04, Beispielbild-Upload) — dort ist der Upload (inkl. Größenlimit/Kompression, EXIF-Rotation, Hoch-/Querformat-Darstellung) laut AK ausdrücklich nur „beim Bearbeiten einer Location" verfügbar, nicht im separaten Neuanlage-Formular (`AddLocation`, `web/index.html` ~Zeile 5737). Dieses Ticket überträgt dieselbe Upload-Funktionalität zusätzlich auf den Neuanlage-Flow. Ebenfalls verwandt: **US-125** [x] (Löschen des Beispielbilds) und **US-126** [x] (Bildausschnitt/Fokuspunkt wählen) — beide setzen ein bereits hochgeladenes Bild voraus und sind von diesem Ticket unabhängig umsetzbar. Keine Dublette gefunden.
+
+**Technische Entscheidung (bestätigt):** „Location zuerst, Bild folgt automatisch" — die Location wird wie bisher über `AddLocation.save()` → `POST /preview-alignment` (`save:true`) angelegt; erst wenn die Antwort eine `location_id` liefert, folgt automatisch (ohne weiteren Klick) der bestehende Bild-Upload-Call `POST /locations/{id}/image`. Kein Upload-Versuch vor dem Speichern möglich, da vorher keine `location_id` existiert.
+
+**Designer-Check (durchgeführt, separater Subagent):** Ergebnis „1:1 wie beim Bearbeiten" — der neue Bild-Bereich im Neuanlage-Formular übernimmt exakt die bestehende Optik aus `LocationDetail._imageAreaHtml()` (gestrichelter Rahmen, Kamera-Icon 28px, Text „Noch kein Beispielbild", goldener Button „Bild hochladen"). Einzige bewusste Abweichung: Radius 14px rundum (Card-Radius) statt 22px-oben, weil die Fläche hier — anders als im Bearbeiten-Sheet — keine Sheet-Kante fortsetzt, sondern als eigenständige Card im Formularfluss sitzt. Position: direkt nach dem Formularabschnitt „Optionale Angaben" (nach Zeile ~1380), vor der Button-Zeile („Abbrechen" / „Alignments berechnen" / „Location dauerhaft speichern", ab Zeile ~1381).
+
+**Nachtrag Farb-Token (2026-07-09):** Der „goldene" Bild-hochladen-Button ist in beiden Kontexten (`.loc-image-upload-btn` Bearbeiten-Modus, `.add-image-upload-btn` Neuanlage aus diesem Ticket) explizit auf `var(--accent-2)` (echtes Gold) umgestellt worden, statt weiterhin den global falsch benannten `--gold`-Alias (`--gold: var(--accent);`, tatsächlich Blau) zu verwenden. Der globale Alias selbst bleibt unangetastet — er wird an ~90 anderen Stellen in `web/index.html` verwendet, und eine App-weite Umstellung wäre eine eigene, separate Entscheidung.
+
+**Technischer Zusatzbefund (Pflicht für Implementierung):** Das Bild kann NICHT wie im Bearbeiten-Modus sofort hochgeladen werden, weil im Neuanlage-Formular zum Auswahlzeitpunkt noch keine `location_id` existiert. Die ausgewählte Datei muss client-seitig als File-Objekt zwischengehalten werden („Staging", z. B. `AddLocation._stagedImageFile`), bis `save()` erfolgreich eine `location_id` zurückliefert — erst dann erfolgt der tatsächliche `API.postFile('/locations/{id}/image', file)`-Aufruf. Nicht versehentlich versuchen, vor dem Speichern hochzuladen.
+
+**Scope:**
+Eingeschlossen:
+- Neuer Bild-Upload-Bereich im Neuanlage-Formular (`AddLocation`, `web/index.html`), optisch 1:1 aus dem Bearbeiten-Modus übernommen (nur Radius 14px rundum statt 22px-oben), Position nach „Optionale Angaben".
+- Client-seitiges Staging der ausgewählten Datei bis zum erfolgreichen Speichern.
+- Automatischer Bild-Upload direkt im Anschluss an erfolgreiches `save()`, sobald `location_id` vorliegt — kein zusätzlicher Klick nötig.
+- Wiederverwendung des bestehenden, unveränderten Backend-Endpoints `POST /locations/{id}/image` (US-120) — kein Backend-Code wird geändert.
+- Sauberes Zurücksetzen der gestagten Datei bei „Abbrechen"/Formular-Reset, damit keine „Geister-Auswahl" beim nächsten Öffnen erscheint.
+
+Explizit ausgeschlossen:
+- **Pflicht-Bild:** Das Bild bleibt optional, genau wie beim Bearbeiten. Die Location muss weiterhin auch ohne Bild speicherbar sein.
+- **Vorab-Upload-Mechanismus** (z. B. Datei schon vor dem Speichern der Location auf den Server hochladen und erst danach verknüpfen): bewusst nicht umgesetzt, da dies eine „Location zuerst"-Architekturentscheidung verletzen würde und unnötige Komplexität (verwaiste Dateien, Zuordnungslogik) einführt.
+- **Fix der ID-Kollisionsgefahr:** Custom-Location-IDs werden serverseitig als `custom_{unix_timestamp_sekundengenau}` vergeben (`backend/main.py` Zeile ~2131). Werden zwei Locations innerhalb derselben Sekunde angelegt, können sie theoretisch dieselbe ID erhalten. Dieses vorbestehende, unabhängige Risiko im ID-Schema wird hier NICHT behoben (siehe Pre-Mortem) — dafür ggf. eigenes Ticket vorschlagen, nicht Teil dieses Scopes.
+
+**Akzeptanzkriterien:**
+- [~] Im Neuanlage-Formular erscheint nach „Optionale Angaben" und vor der Button-Zeile ein neuer Bild-Bereich: gestrichelter Rahmen, Kamera-Icon, Text „Noch kein Beispielbild", goldener Button „Bild hochladen" — optisch identisch zum Platzhalter im Bearbeiten-Modus, mit dem einzigen Unterschied, dass der Radius 14px rundum beträgt statt 22px nur oben.
+- [~] Ein Klick auf „Bild hochladen" öffnet die Dateiauswahl, bereits bevor die Location gespeichert wurde (kein Login/Speichern-Zwang vorher nötig, außer dem generellen Host-Login).
+- [~] Nach Auswahl einer Datei zeigt der Bereich erkennbar, dass ein Bild ausgewählt wurde (z. B. Vorschau oder Auswahlbestätigung), ohne dass bereits ein Netzwerk-Upload stattfindet.
+- [~] Erst nach erfolgreichem Klick auf „Location dauerhaft speichern" (sobald die Antwort eine `location_id` enthält) wird das gestagte Bild automatisch hochgeladen — ohne weiteren Klick des Nutzers.
+- [~] Nach dem Speichern zeigt die neu angelegte Location im Location-Detail sofort das hochgeladene Bild (kein leerer Platzhalter mehr).
+- [~] Wählt der Nutzer kein Bild aus, funktioniert das Speichern der Location unverändert wie bisher — das Bild bleibt optional, kein Pflichtfeld.
+- [~] Schlägt der automatische Bild-Upload nach dem Speichern fehl (z. B. Netzwerkfehler oder vom Server abgelehnte Datei), bleibt die Location trotzdem gespeichert; der Nutzer bekommt eine eigene, vom „Location gespeichert"-Erfolg klar unterscheidbare Fehlermeldung zum Bild-Upload.
+- [~] Bricht der Nutzer die Neuanlage ab (Button „Abbrechen") nachdem er bereits ein Bild ausgewählt hatte, wird kein Bild hochgeladen, und beim nächsten Öffnen des Neuanlage-Formulars ist keine „Geister-Auswahl" vom vorherigen Versuch mehr sichtbar.
+- [~] Die bestehenden Validierungsregeln aus US-120 (harte Größenobergrenze, Ablehnung leerer/ungültiger Dateien) greifen im Neuanlage-Flow identisch wie im Bearbeiten-Modus — keine Umgehung der Regeln nur weil der Weg über die Neuanlage läuft.
+
+**Pre-Mortem:**
+📎 Code-Verifikation: `web/index.html` Z. 5769–5828 (`LocationDetail._imageAreaHtml`, `triggerImageUpload`, `_onImageFileSelected`), Z. 392–425 (CSS `.loc-image-area`/`.loc-image-placeholder`/`.loc-image-upload-btn`), Z. 1372–1387 (`AddLocation`-Formular, Abschnitt „Optionale Angaben" bis Button-Zeile), Z. 1622–1628 (`API.postFile`), Z. 6801–6850 (`AddLocation.save()`/`reset()`) sowie `backend/main.py` Z. 2131 (Custom-Location-ID-Vergabe) und Z. 2330–2394 (`POST /locations/{id}/image`, unverändert) gelesen am 2026-07-09.
+
+- 💀 Das gestagte File-Objekt geht verloren, wenn der Nutzer zwischen Dateiauswahl und Speichern das Formular unbeabsichtigt schließt oder neu öffnet → Bild fehlt nach dem Speichern ohne erkennbaren Grund. Gegenmaßnahme: `reset()` räumt die gestagte Datei explizit mit auf (AK 8 deckt den Test dafür ab).
+- 💀 `save()` liefert erfolgreich eine `location_id`, der nachfolgende Bild-Upload schlägt aber separat fehl (Netzwerk/Serverfehler) — die Location ist gespeichert, aber ohne Bild, während der Nutzer nur einen einzigen „Speichern"-Klick ausgeführt hat und annehmen könnte, alles sei inklusive Bild gespeichert. Gegenmaßnahme: eigene, vom Speichern-Erfolg getrennte Fehlermeldung Pflicht (AK 7).
+- 💀 ID-Kollision bei sehr schneller Doppel-Anlage: Da Custom-IDs nur sekundengenau vergeben werden (`custom_{timestamp}`), könnten zwei innerhalb derselben Sekunde gespeicherte Locations dieselbe ID erhalten — der automatische Bild-Upload würde dann versehentlich der falschen Location zugeordnet. Gegenmaßnahme: bewusst nicht in diesem Ticket gefixt (siehe Scope-Ausschluss), da vorbestehendes, von diesem Ticket unabhängiges Risiko im ID-Schema; als eigenes Ticket vorzuschlagen, nicht hier mitzulösen.
+- 💀 Beim Übernehmen des Bearbeiten-Codes wird versehentlich die bestehende CSS-Klasse mit 22px-oben-Radius 1:1 wiederverwendet statt einer eigenen Variante mit 14px rundum → visuell inkonsistent zu den übrigen Card-Ecken im Neuanlage-Formular. Gegenmaßnahme: eigene CSS-Klasse/Override für den Neuanlage-Kontext, Radius als expliziter Prüfpunkt im manuellen Test (AK 1).
+- 💀 „Abbrechen" räumt zwar sichtbare Formularfelder zurück, aber nicht den `<input type="file">`-internen Browser-Zustand bzw. die Staging-Variable, sodass beim nächsten Öffnen des Neuanlage-Formulars fälschlich noch eine „alte" Auswahl aktiv wirkt. Gegenmaßnahme: `reset()` muss `input.value = ''` UND die Staging-Variable explizit leeren (AK 8 als Testfall).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (`LocationDetail._imageAreaHtml`/`triggerImageUpload`/`_onImageFileSelected` Z. 5769–5828, CSS Z. 392–425, `AddLocation`-Formular Z. 1372–1387, `API.postFile` Z. 1622–1628, `AddLocation.save()`/`reset()` Z. 6801–6850) sowie `backend/main.py` (`POST /locations/{id}/image` Z. 2330–2394, Custom-ID-Vergabe Z. 2131) — reine Frontend-Wiederverwendung bestehender Endpoints, kein Backend-Code wird geändert.
+- [x] Designer-Check: visuell? → ja — Ergebnis „1:1 wie beim Bearbeiten", Radius 14px rundum statt 22px-oben (separater Subagent, siehe Abschnitt oben).
+- [x] Implementierungsoptionen: eine bestätigte Option (Design bereits entschieden, technischer Ansatz bereits als „Location zuerst, Bild folgt automatisch" festgelegt) — keine Alternativoptionen offen zu bewerten.
+- [x] Empfehlung: die eine bestätigte Option.
+
+**Implementierungsoption (bestätigt, keine Alternativen zu bewerten):**
+
+*Client-seitiges Staging + 1:1-Optik aus dem Bearbeiten-Modus:* Neuer Bild-Bereich im `AddLocation`-Formular (`web/index.html`, nach Z. 1380, vor Z. 1381) mit identischem Markup/Verhalten wie `LocationDetail._imageAreaHtml()` (Platzhalter-Variante), aber eigener CSS-Klasse mit Radius 14px rundum. Ausgewählte Datei wird in einer neuen `AddLocation`-Instanzvariable (File-Objekt) zwischengehalten, nicht sofort hochgeladen. `AddLocation.save()` wird erweitert: nach erfolgreichem `POST /preview-alignment` (`save:true`) und vorhandener `result.location_id` folgt automatisch `API.postFile('/locations/' + result.location_id + '/image', stagedFile)` — nur falls eine Datei gestaged wurde. Fehler beim Bild-Upload werden separat abgefangen und gemeldet, ohne die bereits erfolgreiche Location-Anlage zu beeinträchtigen. `AddLocation.reset()` wird um das Leeren der Staging-Variable und des `<input type="file">`-Werts ergänzt. Betrifft ausschließlich `web/index.html` (Frontend), keine Backend-Änderung. Aufwand: klein bis mittel.
+
+**Testplan:**
+
+*Automatisiert (Backend/pytest):* Keine neuen automatisierbaren Backend-Fälle für dieses Ticket. Begründung: Es wird kein Backend-Code geändert — die Implementierung verkettet client-seitig ausschließlich zwei bereits bestehende, bereits getestete Endpoints (`POST /preview-alignment` mit `save:true` und `POST /locations/{id}/image`, letzterer abgedeckt in `backend/tests/test_us120.py`). Das eigentlich neue Verhalten dieses Tickets (Staging im Browser, automatischer Folge-Upload nach dem Speichern, UI-Platzhalter) ist reines Frontend-/UI-Verhalten und lässt sich nicht sinnvoll durch einen Backend-pytest-Fall abbilden — kein `backend/tests/test_us127.py` mit erfundenen Fake-Fällen. Der Haupttestweg ist der manuelle Browser-Test unten.
+
+*Manuell (Browser, `localhost:8000`, als Host eingeloggt):*
+1. Server starten, Health-Check bestätigen lassen, dann im Browser `localhost:8000` öffnen und als Host einloggen.
+2. Tab „+" (Neue Location) öffnen.
+3. Beobachterstandort und Zielobjekt wie gewohnt setzen (GPS/Einfügen), Namen eingeben.
+4. Runterscrollen zum Abschnitt „Optionale Angaben" → direkt darunter, vor den Buttons „Abbrechen"/„Alignments berechnen", muss der neue Bild-Bereich sichtbar sein: gestrichelter Rahmen rundum (Radius sichtbar an allen vier Ecken, nicht nur oben), Kamera-Icon, Text „Noch kein Beispielbild", goldener Button „Bild hochladen". Erwartung: sieht optisch wie der Platzhalter beim Bearbeiten aus, nur mit Rundung an allen Ecken.
+5. Auf „Bild hochladen" tippen → Dateiauswahl öffnet sich. Ein Testfoto (JPG, normale Handyfoto-Größe) auswählen. Erwartung: der Bereich zeigt erkennbar eine Auswahl/Vorschau, aber im Netzwerk-Tab der Browser-DevTools ist noch KEIN Upload-Request zu sehen.
+6. „Alignments berechnen" tippen, Ergebnis abwarten, dann „Location dauerhaft speichern" tippen. Erwartung: Erfolgsmeldung „Location gespeichert" erscheint, kurz danach lädt das Bild automatisch hoch (kein weiterer Klick nötig).
+7. Die neu angelegte Location im Locations-Tab bzw. Location-Detail öffnen. Erwartung: Das hochgeladene Bild ist sofort sichtbar, kein leerer Platzhalter mehr.
+8. Edge Case „ohne Bild": Eine zweite Location anlegen, OHNE ein Bild auszuwählen, direkt speichern. Erwartung: Speichern funktioniert unverändert wie bisher, kein Fehler, kein erzwungenes Bild.
+9. Edge Case „Abbrechen nach Auswahl": Neue Location anfangen, ein Bild auswählen, dann „Abbrechen" tippen. Formular erneut öffnen. Erwartung: kein Bild mehr „ausgewählt", Bild-Bereich zeigt wieder den leeren Platzhalter ohne Reste der vorherigen Auswahl.
+10. Edge Case „zu große Datei": Eine Datei auswählen, die über dem bestehenden Größenlimit aus US-120 liegt, Location speichern. Erwartung: Location wird trotzdem gespeichert, aber es erscheint eine eigene Fehlermeldung zum Bild-Upload (nicht stillschweigend ignoriert, nicht die ganze Location-Anlage rückgängig gemacht).
+
+---
+
 ### BUG-62 · Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen `[x]`
 
 | Feld | Wert |
@@ -2244,6 +2330,56 @@ Betroffen: `backend/main.py`, Funktion `patch_location` (PATCH-Endpunkt `/locati
 - [x] Mind. 2 Implementierungsoptionen mit Empfehlung
 - [x] Testplan (automatisiert + manuell) inkl. Regressionscheck
 - [x] Scope-Ausschluss Kalender/Feed/Scout-Motivname dokumentiert
+
+---
+
+### BUG-66 · „Höhenwinkel Spitze" in Location-Anlage-Vorschau zeigt immer 0°, weil Geländeunterschied nicht einfließt `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-07-09 |
+
+**Beschreibung:** Beim Anlegen einer neuen Location zeigt die Vorschau („Alignments berechnen") das Feld „Höhenwinkel Spitze" (`profile.angular_altitude_top_deg`). Dieser Wert ist bei Stephan immer 0,0°. Ursache: Der Endpoint `POST /preview-alignment` (`backend/main.py`, Funktion `preview_alignment`) ruft `calculate_subject_angular_profile` (`backend/calculations/astronomy.py`) nur mit `subject_lat/lon`, `observer_lat/lon`, `subject_height_m` und `subject_width_m` auf — der Parameter `elevation_difference_m` (Geländeunterschied Motiv-Basis vs. Fotograf-Standort) wird in dieser Vorschau nie übergeben und bleibt beim Funktionsdefault 0.0. Zusätzlich wird `observer_height_m` fix mit 1.6 m (Augenhöhe) angenommen. Trägt Stephan im Anlage-Formular keine Motivhöhe ein (Feld bleibt leer → Frontend-Fallback `|| 0` in `web/index.html`, Zeile ~6839), ergibt `effective_height = max(0, 0 + 0 - 1.6) = 0` → Winkel = 0,0°. Erwartet: Der Winkel berücksichtigt die tatsächliche Motivhöhe und den Geländeunterschied — aktuell fehlt im Anlage-Formular komplett die Möglichkeit, einen Geländeunterschied einzugeben, und dieser fließt serverseitig auch nicht ein.
+
+**User Story:** Als Nutzer, der eine neue Location anlegt, möchte ich, dass der berechnete Höhenwinkel zur Motivspitze den tatsächlichen Geländeunterschied zwischen meinem Standort und dem Motiv berücksichtigt, sodass die Vorschau (Winkel + empfohlene Brennweite) auch bei Locations mit Höhenunterschied realistische Werte zeigt statt fälschlich 0°.
+
+**Bezug:** **BUG-63** *(offen, Inbox)* — betrifft denselben Endpunkt `POST /preview-alignment`, aber eine andere Ursache (Server-Blockade ~20–25 Sek. während der Berechnung). Keine Überschneidung, reine Endpunkt-Nachbarschaft; beide Fixes können unabhängig voneinander umgesetzt werden. **US-31** *(Done)* hat `elevation_difference_m` bereits als Konzept eingeführt (OpenTopoData EUDEM 25 m) und zeigt es in Location-Detail + Event-Detail an — bestätigt, dass der Parameter im System existiert und an anderer Stelle bereits fließt, nur eben nicht in diesem Anlage-Vorschau-Pfad. Kein Merge-Kandidat, sondern Präzedenzfall für die Analyse-Phase. **BUG-43** — im Pipeline-Steuerung-Board (Inbox-Zeile) als bloße ID ohne Beschreibung gelistet; kein zugehöriger Ticket-Body im Backlog auffindbar (Grep nach „BUG-43" liefert nur diesen einen Board-Eintrag). Keine erkennbare fachliche Überschneidung feststellbar — vermutlich ein verwaister/unvollständiger Eintrag (Backlog-Hygiene-Hinweis, nicht Teil dieses Tickets).
+
+#### 🔬 Analyse & Spec (2026-07-09)
+
+##### Scope
+
+Eingeschlossen: `elevation_difference_m` wird im Anlage-Vorschau-Pfad (`POST /preview-alignment` → `preview_alignment()` in `backend/main.py`) automatisch über den bestehenden Höhendaten-Mechanismus (`data/elevation.py`, `ElevationProvider.elevation_difference()`, Präzedenzfall bereits genutzt in `backend/main.py` ~Zeile 1617-1667) ermittelt und an `calculate_subject_angular_profile()` übergeben.
+Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kennt so ein Feld nirgends — Wert ist immer automatisch berechnet); keine Änderung an `calculate_subject_angular_profile()` selbst (Parameter existiert bereits); keine Änderung am Bearbeiten-Formular (zeigt den Wert bereits read-only, unverändert).
+
+##### Akzeptanzkriterien
+
+- [ ] Bei einer Location mit echtem Höhenunterschied (Fotograf-Standort und Motiv-Standort auf unterschiedlicher Geländehöhe) zeigt „Höhenwinkel Spitze" nach Klick auf „Alignments berechnen" einen Wert ungleich 0°, der den tatsächlichen Höhenunterschied widerspiegelt.
+- [ ] Bei Locations ohne nennenswerten Höhenunterschied bleibt der Wert weiterhin nahe 0° (kein falscher positiver Ausschlag).
+- [ ] Edge Case: Wenn für die Gegend keine Höhendaten verfügbar sind (Datenlücke), stürzt die Vorschau nicht ab (kein 500er), sondern zeigt einen sinnvollen Rückfallwert (0°).
+- [ ] Edge Case / Regressionsschutz zu BUG-63: Der Geländeunterschied-Abruf passiert genau einmal pro Vorschau-Anfrage, nicht einmal pro Tag/Himmelskörper-Iteration der Alignment-Berechnung — sonst vervielfachen sich externe Netzwerk-Calls und verschärfen die in BUG-63 beschriebene Blockade.
+
+##### Pre-Mortem
+
+- 💀 Szenario: Der neue Höhendaten-Abruf wird versehentlich innerhalb der Alignment-Schleife (pro Tag × Himmelskörper) statt einmal pro Anfrage platziert → vervielfacht externe Netzwerk-Calls → verschärft die in BUG-63 bereits bekannte Blockade des selben Endpunkts. Gegenmaßnahme: eigener AK + eigener Testfall (`TestElevationLookupHappensOncePerRequest` in `test_bug66.py`), der die Aufrufzahl exakt zählt.
+- 💀 Szenario: Für abgelegene/exotische Koordinaten liefert der Höhendaten-Dienst keine Abdeckung → ohne Fallback würde die Vorschau mit einem Serverfehler abbrechen, obwohl das Anlegen der Location sonst funktioniert hätte. Gegenmaßnahme: bestehender `(0.0, incomplete=True)`-Rückfallpfad von `ElevationProvider.elevation_difference()` wird auch hier genutzt statt eine neue Fehlerbehandlung zu bauen.
+
+##### Analyse & Planung Checkliste
+
+- [x] Example Mapping durchgeführt (keine kritischen offenen Fragen — klar bevorzugter Weg anhand bestehenden Präzedenzfalls identifiziert)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`preview_alignment`), `backend/data/elevation.py` (`ElevationProvider.elevation_difference`), `backend/calculations/astronomy.py` (`calculate_subject_angular_profile`, unverändert)
+- [x] Designer-Check: nicht visuell sichtbar (keine neue UI, bestehende Anzeige zeigt künftig nur einen korrekten statt eines falschen Werts) → übersprungen
+- [x] Implementierungsoptionen: Option A — bestehenden automatischen Abruf auch im Anlage-Vorschau-Pfad nutzen (gewählt); Option B — manuelles Eingabefeld ergänzen (verworfen, da systemweit inkonsistent, Stephan gibt diesen Wert nirgends sonst manuell ein)
+- [x] Empfehlung: Option A
+
+##### Testplan
+
+- [ ] Automatisiert (Harness): `backend/tests/test_bug66.py` — 4 Testfälle (echter Höhenunterschied → Winkel ungleich 0°; kein Höhenunterschied → Winkel bleibt 0°; fehlende Höhendaten → kein Crash, Rückfallwert 0°; Abruf passiert genau einmal pro Anfrage). Aktuell erwartungsgemäß fehlschlagend (TDD, Implementierung folgt in der nächsten Phase).
+- [ ] Manuell: Location mit bekanntem Höhenunterschied im Browser anlegen (z.B. Fotograf im Tal, Motiv auf einem Hügel/Turm mit deutlichem Geländeunterschied) → „Alignments berechnen" klicken → „Höhenwinkel Spitze" muss einen plausiblen Wert ungleich 0° zeigen. Zusätzlich: bestehende Locations ohne Höhenunterschied weiterhin unauffällig prüfen (Regressionscheck).
 
 ---
 
