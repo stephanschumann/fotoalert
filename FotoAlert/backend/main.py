@@ -64,7 +64,11 @@ from calculations.astronomy import (
 from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
 from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
-from data.locations import LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory
+from data.locations import (
+    LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory,
+    COORD_FIELDS, TEXT_FIELDS, NUMERIC_FIELDS, LIST_FIELDS,
+    PATCHABLE_LOCATION_FIELDS, RECOMPUTE_TRIGGER_FIELDS, OVERRIDE_RELOAD_FIELDS,
+)
 from data.store import LocationStore, compute_geo_hash
 from data import backup
 from data import qa_azimuth, qa_focal, qa_description  # TASK-45/46/47: Auto-QA (Azimut, Beschreibung, Brennweite)
@@ -1215,10 +1219,9 @@ def _load_location_overrides() -> None:
                 continue  # Tombstone – kein Feld-Apply
             loc = loc_map.get(loc_id)
             if loc:
-                for field in ("observer_lat", "observer_lon", "subject_lat", "subject_lon",
-                              "name", "description", "observer_floor_height_m",
-                              "focal_length_suggestions", "image_filename",
-                              "image_focus_x", "image_focus_y"):
+                # US-128: Feld-Tupel jetzt aus data/locations.py:LOCATION_FIELD_RULES
+                # abgeleitet (OVERRIDE_RELOAD_FIELDS) statt hier hartkodiert dupliziert.
+                for field in OVERRIDE_RELOAD_FIELDS:
                     if field in ov:
                         setattr(loc, field, ov[field])
                 applied += 1
@@ -1447,6 +1450,7 @@ def _loc_to_out(loc) -> LocationOut:
         ideal_azimuth_range=az_range,
         subject_name=loc.subject_name,
         subject_height_m=loc.subject_height_m,
+        subject_width_m=getattr(loc, 'subject_width_m', None),  # US-128
         elevation_difference_m=getattr(loc, 'elevation_difference_m', 0.0),
         observer_floor_height_m=getattr(loc, 'observer_floor_height_m', 0.0),
         distance_m=loc.distance_m,
@@ -2484,15 +2488,18 @@ async def update_location_image_focus(
 @app.patch("/locations/{loc_id}")
 async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
-    coord_fields    = {"observer_lat", "observer_lon", "subject_lat", "subject_lon"}
-    text_fields     = {"name", "description", "special_notes", "subject_name"}  # BUG-61: Motivname whitelisten
-    numeric_fields  = {"observer_floor_height_m"}       # US-62
-    list_fields     = {"focal_length_suggestions"}       # BUG-22: list[int], beeinflusst camera_hints
-    recompute_fields = coord_fields | {"observer_floor_height_m", "focal_length_suggestions"}
-    all_allowed_fields = coord_fields | text_fields | numeric_fields | list_fields
+    # US-128: Die drei vormals redundant gepflegten Feld-Listen (hier + main.py
+    # _load_location_overrides + precompute.py _OVERRIDE_FIELDS) sind jetzt aus
+    # data/locations.py:LOCATION_FIELD_RULES abgeleitet (eine gemeinsame Quelle).
+    coord_fields    = COORD_FIELDS
+    text_fields     = TEXT_FIELDS  # BUG-61: Motivname whitelisten
+    numeric_fields  = NUMERIC_FIELDS       # US-62 + US-128 (subject_height_m/subject_width_m)
+    list_fields     = LIST_FIELDS       # BUG-22: list[int], beeinflusst camera_hints
+    recompute_fields = RECOMPUTE_TRIGGER_FIELDS
+    all_allowed_fields = PATCHABLE_LOCATION_FIELDS
     allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
     if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, focal_length_suggestions).")
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, subject_height_m, subject_width_m, focal_length_suggestions).")
 
     # Koordinaten validieren
     for f in coord_fields & allowed.keys():
@@ -2504,14 +2511,16 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
         if "lon" in f and not (-180 <= val <= 180):
             raise HTTPException(status_code=422, detail=f"{f} außerhalb ±180°.")
 
-    # observer_floor_height_m validieren (US-62)
-    if "observer_floor_height_m" in allowed:
-        val = allowed["observer_floor_height_m"]
+    # Numerische Felder validieren: observer_floor_height_m (US-62), subject_height_m/
+    # subject_width_m (US-128) — Zahl, ≥ 0, 0 ist ein gültiger Bestandswert (z.B.
+    # geltow_havelblick ohne vertikales Motiv).
+    for f in numeric_fields & allowed.keys():
+        val = allowed[f]
         if not isinstance(val, (int, float)):
-            raise HTTPException(status_code=422, detail="observer_floor_height_m muss eine Zahl sein.")
+            raise HTTPException(status_code=422, detail=f"{f} muss eine Zahl sein.")
         if val < 0:
-            raise HTTPException(status_code=422, detail="observer_floor_height_m muss ≥ 0 sein.")
-        allowed["observer_floor_height_m"] = float(val)
+            raise HTTPException(status_code=422, detail=f"{f} muss ≥ 0 sein.")
+        allowed[f] = float(val)
 
     # focal_length_suggestions validieren (BUG-22)
     if "focal_length_suggestions" in allowed:
@@ -2530,16 +2539,30 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     if not target_loc:
         raise HTTPException(status_code=404, detail="Location nicht gefunden.")
 
+    # US-128 (Frage 1, Option B): Eine bewusste Korrektur von subject_height_m markiert den
+    # Wert als recherchiert, nicht mehr als unbearbeiteten Locationscout-Import-Platzhalter
+    # (discover/subjects.py:_is_placeholder()). Bewusst getrennt von `allowed` gehalten, damit
+    # dieser interne Seiteneffekt-Flag nicht in der API-Response ("updated") auftaucht.
+    if "subject_height_m" in allowed:
+        persist_fields = dict(allowed, subject_height_researched=True)
+    else:
+        persist_fields = allowed
+
     if loc_id.startswith("custom_"):
-        ok = _update_custom_location_file(loc_id, **allowed)
+        # subject_height_researched ist keine Spalte in custom_locations (Custom-Locations
+        # werden nie mit False angelegt, Default bleibt beim Neu-Laden ohnehin True) — nicht an
+        # die dynamische SQL-UPDATE-Kwargs durchreichen, sonst "no such column"-Fehler.
+        db_fields = {k: v for k, v in persist_fields.items() if k != "subject_height_researched"}
+        ok = _update_custom_location_file(loc_id, **db_fields)
         if not ok:
             raise HTTPException(status_code=404, detail="Custom Location nicht in Datei gefunden.")
     else:
-        # Standard-Location: Overrides in location_overrides.json persistieren
-        _save_location_override(loc_id, **allowed)
+        # Standard-Location: Overrides in SQLite persistieren (location_overrides speichert
+        # Felder generisch als JSON-Blob, kein Schema-Problem für subject_height_researched).
+        _save_location_override(loc_id, **persist_fields)
 
-    # In-Memory-Liste aktualisieren
-    for k, v in allowed.items():
+    # In-Memory-Liste aktualisieren (inkl. Seiteneffekt-Flag, falls gesetzt)
+    for k, v in persist_fields.items():
         setattr(target_loc, k, v)
 
     # TASK-12: Koordinaten oder observer_floor_height_m geändert → Single-Location Recompute

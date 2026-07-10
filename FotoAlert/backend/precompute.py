@@ -47,7 +47,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from calculations.opportunity import find_opportunities, find_opportunities_multi_day
 from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM, get_body_position
-from data.locations import LOCATIONS, PhotoLocation, LocationCategory
+from data.locations import (
+    LOCATIONS, PhotoLocation, LocationCategory, PRECOMPUTE_OVERRIDE_FIELDS,
+)
 from data.store import LocationStore
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -135,12 +137,11 @@ def _location_hash(loc) -> str:
     return hashlib.md5(raw.encode()).hexdigest()[:8]
 
 
-# Felder, die ein Location-Override überschreiben darf — identisch zur Whitelist in
-# main.py:_load_location_overrides (TASK-17), damit Server und Recompute denselben Stand sehen.
-_OVERRIDE_FIELDS = (
-    "observer_lat", "observer_lon", "subject_lat", "subject_lon",
-    "name", "description", "observer_floor_height_m", "focal_length_suggestions",
-)
+# Felder, die ein Location-Override überschreiben darf — jetzt aus
+# data/locations.py:LOCATION_FIELD_RULES abgeleitet (US-128: vorher hier hartkodiert
+# dupliziert, jetzt eine gemeinsame Quelle mit main.py:_load_location_overrides,
+# TASK-17), damit Server und Recompute-Subprozess denselben Stand sehen.
+_OVERRIDE_FIELDS = PRECOMPUTE_OVERRIDE_FIELDS
 
 
 def _apply_location_overrides() -> int:

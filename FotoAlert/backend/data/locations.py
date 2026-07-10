@@ -96,6 +96,94 @@ class PhotoLocation:
     sightline_status: str = "nicht_geprueft"
     sightline_angle_deg: Optional[float] = None
 
+    # US-128: Unterscheidet einen bewusst recherchierten/korrigierten subject_height_m-Wert
+    # von einem unbearbeiteten Default-Platzhalter (siehe LOCATIONSCOUT-IMPORT-Einträge unten
+    # mit `subject_height_m=20.0, # TODO: anpassen`). Default True, weil die meisten kuratierten
+    # Locations echte, recherchierte Maße tragen (z.B. Wikipedia); die bekannten Platzhalter
+    # setzen dieses Feld unten explizit auf False. discover/subjects.py:_is_placeholder()
+    # nutzt dieses Flag statt der reinen Magic-Number-Heuristik `height == 20`.
+    subject_height_researched: bool = True
+
+
+# ---------------------------------------------------------------------------
+# US-128: Zentrale Feld-Metadaten für PATCH /locations/{id} + Override-Reload
+# (main.py:_load_location_overrides) + precompute-Subprozess-Reload
+# (precompute.py:_apply_location_overrides). Vorher drei redundante, unabhängig
+# gepflegte Feld-Listen (main.py patch_location, main.py _load_location_overrides,
+# precompute.py _OVERRIDE_FIELDS) — jetzt eine gemeinsame Quelle.
+#
+# WICHTIG: Die drei Verwendungsstellen waren historisch NICHT deckungsgleich
+# (z.B. fehlen special_notes/subject_name im Override-Reload — bekannte Lücke,
+# siehe BUG-68 — und image_filename/image_focus_x/y fehlen im precompute-Reload).
+# Diese bestehenden Unterschiede werden hier bewusst NICHT angeglichen (kein
+# Verhalten bestehender Felder ändern), sondern über die Flags je Feld exakt
+# nachgebildet. Ein neues Feld (wie subject_height_m/subject_width_m) muss nur
+# hier einmal eingetragen werden, um an allen drei Stellen konsistent zu greifen.
+#
+#   kind              — "coord" | "text" | "numeric" | "list" | "image"
+#                        (steuert Validierung + PATCH-Zugehörigkeit in main.py)
+#   recompute         — löst PATCH einen Single-Location-Recompute aus?
+#   override_reload   — wird das Feld beim main.py-Serverstart aus dem
+#                        Override zurückgeschrieben? (_load_location_overrides)
+#   precompute_reload — wird das Feld vom precompute.py-Subprozess aus dem
+#                        Override angewendet? (_apply_location_overrides)
+# ---------------------------------------------------------------------------
+LOCATION_FIELD_RULES: dict[str, dict] = {
+    "observer_lat":  {"kind": "coord", "recompute": True,  "override_reload": True,  "precompute_reload": True},
+    "observer_lon":  {"kind": "coord", "recompute": True,  "override_reload": True,  "precompute_reload": True},
+    "subject_lat":   {"kind": "coord", "recompute": True,  "override_reload": True,  "precompute_reload": True},
+    "subject_lon":   {"kind": "coord", "recompute": True,  "override_reload": True,  "precompute_reload": True},
+
+    "name":          {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
+    "description":   {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
+    # BUG-68 (bekannte, hier bewusst NICHT gefixte Lücke): special_notes/subject_name
+    # überstehen aktuell weder einen Server-Neustart noch den precompute-Subprozess.
+    "special_notes": {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
+    "subject_name":  {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
+
+    "observer_floor_height_m": {"kind": "numeric", "recompute": True, "override_reload": True, "precompute_reload": True},
+    # US-128: neu ergänzt (bislang weder patchbar noch reload-fähig).
+    "subject_height_m": {"kind": "numeric", "recompute": True, "override_reload": True, "precompute_reload": True},
+    "subject_width_m":  {"kind": "numeric", "recompute": True, "override_reload": True, "precompute_reload": True},
+
+    "focal_length_suggestions": {"kind": "list", "recompute": True, "override_reload": True, "precompute_reload": True},
+
+    # Nur über main.py:_load_location_overrides() reload-fähig, NICHT über den generischen
+    # PATCH-Endpoint (eigener Endpoint /locations/{id}/image_focus) und NICHT über den
+    # precompute-Subprozess (bestehendes Verhalten, unverändert).
+    "image_filename": {"kind": "image", "recompute": False, "override_reload": True, "precompute_reload": False},
+    "image_focus_x":  {"kind": "image", "recompute": False, "override_reload": True, "precompute_reload": False},
+    "image_focus_y":  {"kind": "image", "recompute": False, "override_reload": True, "precompute_reload": False},
+
+    # US-128: Kein direkt patchbares Feld (Host setzt keinen Bool-Wert selbst über den
+    # PATCH-Body) — reiner Seiteneffekt-Flag, den patch_location automatisch auf True
+    # setzt, sobald subject_height_m korrigiert wird (siehe patch_location). Muss trotzdem
+    # den Server-Neustart überleben (main.py-Reload), sonst fällt eine korrigierte
+    # Standard-Location nach dem nächsten Deploy auf den alten Platzhalter-Zustand zurück.
+    # precompute.py braucht dieses Feld nicht (build_subjects()/_is_placeholder() laufen
+    # ausschließlich im main.py-Serverprozess, nie im precompute-Subprozess).
+    "subject_height_researched": {"kind": "flag", "recompute": False, "override_reload": True, "precompute_reload": False},
+}
+
+# Abgeleitete Sichten (jeweils zur Laufzeit aus LOCATION_FIELD_RULES berechnet,
+# damit ein neues Feld nur einmal oben eingetragen werden muss):
+COORD_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "coord")
+TEXT_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "text")
+NUMERIC_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "numeric")
+LIST_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "list")
+# Über den generischen PATCH-Endpoint akzeptierte Felder (main.py:patch_location) —
+# "image"- und "flag"-Felder bewusst ausgeschlossen (eigener Endpoint bzw. reiner
+# Seiteneffekt, kein direkt vom Host patchbarer Wert; unverändertes Verhalten für image).
+PATCHABLE_LOCATION_FIELDS = frozenset(
+    f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] not in ("image", "flag")
+)
+RECOMPUTE_TRIGGER_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["recompute"])
+# Als Tupel (nicht Set) belassen, weil main.py/precompute.py die bisherigen Stellen
+# als Tupel definiert hatten (Iterationsreihenfolge ohne Bedeutung, aber kein
+# unnötiger Typwechsel im Diff).
+OVERRIDE_RELOAD_FIELDS = tuple(f for f, r in LOCATION_FIELD_RULES.items() if r["override_reload"])
+PRECOMPUTE_OVERRIDE_FIELDS = tuple(f for f, r in LOCATION_FIELD_RULES.items() if r["precompute_reload"])
+
 
 # ---------------------------------------------------------------------------
 # BERLIN
@@ -998,6 +1086,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.51425,  subject_lon=13.40739,  # TODO: Motiv-GPS verfeinern
         subject_name="Berlin Skyline from Fischerinsel Skyscraper",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Television Tower, Rooftop, River, Viewpoint, Architecture",
@@ -1016,6 +1105,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.51623,  subject_lon=13.37452,  # TODO: Motiv-GPS verfeinern
         subject_name="Brandenburg Gate from behind, Berlin",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: City, History, Monument, traffic, Gate",
@@ -1034,6 +1124,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.51753,  subject_lon=13.36537,  # TODO: Motiv-GPS verfeinern
         subject_name="Haus der Kulturen der Welt, Berlin",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Architecture",
@@ -1052,6 +1143,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.51823,  subject_lon=13.39899,  # TODO: Motiv-GPS verfeinern
         subject_name="Berlin Cathedral (Berliner Dom)",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: night photography, Sunset, Berlin Cathedral, Lustgarten, Berliner Dom",
@@ -1070,6 +1162,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.50110,  subject_lon=13.38080,  # TODO: Motiv-GPS verfeinern
         subject_name="Tempodrom, Berlin",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Modern Architecture, Architecture, fineart",
@@ -1088,6 +1181,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.50325,  subject_lon=13.32719,  # TODO: Motiv-GPS verfeinern
         subject_name="Staircase of Hotel Bristol Berlin",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Urban Architecture, Minimalism, Modern Architecture, Architektur, Architecture",
@@ -1106,6 +1200,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.51442,  subject_lon=13.37942,  # TODO: Motiv-GPS verfeinern
         subject_name="Holocaust-Memorial, Berlin",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: War memorial, Cloudy, Monument, Concrete, Field",
@@ -1124,6 +1219,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=51.75994,  subject_lon=13.80340,  # TODO: Motiv-GPS verfeinern
         subject_name="Castle Fürstlich Drehna",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: moat, Lake, reflection, Water, Castle",
@@ -1142,6 +1238,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=51.52680,  subject_lon=14.10003,  # TODO: Motiv-GPS verfeinern
         subject_name="Rostiger Nagel - Rusty Nail",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Monument, steel",
@@ -1160,6 +1257,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.39630,  subject_lon=14.16663,  # TODO: Motiv-GPS verfeinern
         subject_name="Schloss Steinhöfel",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Lake, Castel, Landscape",
@@ -1179,6 +1277,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=53.15949,  subject_lon=12.48728,  # TODO: Motiv-GPS verfeinern
         subject_name="Wittstock Stadtmauer & Skyline",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: dramatic sky, dramatic, clouds, Citywall, Sunset",
@@ -1197,6 +1296,7 @@ LOCATIONS: list[PhotoLocation] = [
         subject_lat=52.39510,  subject_lon=13.05949,  # TODO: Motiv-GPS verfeinern
         subject_name="Brandenburg Landtag",
         subject_height_m=20.0,    # TODO: anpassen
+        subject_height_researched=False,  # US-128: unbearbeiteter Locationscout-Import-Platzhalter
         distance_m=200.0,         # TODO: anpassen
         focal_length_suggestions=[50, 85, 135, 200],
         special_notes="Locationscout-Import. Tags: Architecture, Potsdam, Church",

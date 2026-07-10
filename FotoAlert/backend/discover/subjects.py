@@ -94,8 +94,20 @@ def _kategorie_label(category: LocationCategory) -> str:
 
 
 def _is_placeholder(loc) -> bool:
-    """True wenn height/width offensichtlich Defaultwerte ohne echte Daten sind."""
-    return loc.subject_height_m == 20 and loc.subject_width_m is None
+    """True wenn height/width offensichtlich Defaultwerte ohne echte Daten sind.
+
+    US-128 (Example Mapping, Frage 1, Option B): Die reine Magic-Number-Heuristik
+    `height == 20 and width is None` kollidierte mit einem echten, recherchierten
+    Höhenwert von exakt 20m. Zusätzliches Kriterium: `subject_height_researched`
+    (Default True bei normalen Locations, explizit False bei den unbearbeiteten
+    Locationscout-Import-Platzhaltern in data/locations.py sowie bei einer Korrektur
+    per PATCH automatisch wieder auf True gesetzt) muss ebenfalls False sein.
+    """
+    return (
+        loc.subject_height_m == 20
+        and loc.subject_width_m is None
+        and not getattr(loc, "subject_height_researched", True)
+    )
 
 
 # ---------------------------------------------------------------------------

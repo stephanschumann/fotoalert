@@ -30,6 +30,9 @@ class LocationOut(BaseModel):
     ideal_azimuth_range: Optional[list[float]]
     subject_name: str
     subject_height_m: Optional[float]
+    # US-128: fehlte bislang komplett in der Response (nur subject_height_m war vorhanden) —
+    # ohne dieses Feld wäre eine per PATCH korrigierte Breite über GET /locations unsichtbar.
+    subject_width_m: Optional[float] = None
     elevation_difference_m: float = 0.0
     observer_floor_height_m: float = 0.0  # US-62: vertikaler Offset (Dach/Etage)
     distance_m: Optional[float]

@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | BUG-67 |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **BUG-68** *(Hinweise-Feld/Motivname übersteht vermutlich keinen Server-Neustart, vermutlich nicht vom precompute-Lauf gesehen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2391,14 +2391,15 @@ Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kenn
 
 ---
 
-### BUG-67 · Neu angelegte Location erscheint nicht direkt in Karte oder Locations-Liste `[~]`
+### BUG-67 · Neu angelegte Location erscheint nicht direkt in Karte oder Locations-Liste `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-09 |
+| **Abgeschlossen** | 2026-07-10 |
 
 **Beschreibung:** Nach der Neuanlage einer Location taucht diese weder in der Kartenübersicht noch in der Locations-Liste auf. Beobachtet: Erst wenn Stephan die App komplett neu lädt und den Standort erneut bestätigt, erscheint die neu angelegte Location in Liste und Karte. Erwartet: Die neu angelegte Location ist sofort nach dem Speichern in beiden Ansichten sichtbar, ohne manuellen Reload.
 
@@ -2434,11 +2435,11 @@ Ausgeschlossen: kein manuelles Eingabefeld für Geländeunterschied (System kenn
 
 ##### Akzeptanzkriterien
 
-- [~] Nach dem Speichern einer neuen Location über das Add-Formular ist sie ohne App-Neustart auf der Karte sichtbar, sobald der Karten-Tab (erneut) geöffnet wird — auch wenn die Karte vorher schon einmal initialisiert war.
-- [~] Nach dem Speichern einer neuen Location ist sie ohne App-Neustart in der Locations-Liste sichtbar, sobald der Locations-Tab (erneut) geöffnet wird.
-- [~] Edge Case (Frage 2): Ist der Karten-Tab beim Speichern bereits aktiv, erscheint der neue Marker gemäß der mit Stephan gewählten Option (A: erst beim nächsten Tab-Wechsel / B: sofort ohne Tab-Wechsel).
-- [~] Regression: Nach dem Speichern einer neuen Location bleiben alle bisherigen Marker auf der Karte und alle bisherigen Einträge in der Liste unverändert sichtbar (keine Duplikate, keine verschwundenen Einträge).
-- [~] Regression: Aktive Karten-Filter (Eventtyp, Schwierigkeit, Kategorie etc.) wirken nach dem Nachladen weiterhin korrekt auf alte UND neue Marker (kein „Filter wird beim Reload vergessen").
+- [x] Nach dem Speichern einer neuen Location über das Add-Formular ist sie ohne App-Neustart auf der Karte sichtbar, sobald der Karten-Tab (erneut) geöffnet wird — auch wenn die Karte vorher schon einmal initialisiert war.
+- [x] Nach dem Speichern einer neuen Location ist sie ohne App-Neustart in der Locations-Liste sichtbar, sobald der Locations-Tab (erneut) geöffnet wird.
+- [x] Edge Case (Frage 2): Ist der Karten-Tab beim Speichern bereits aktiv, erscheint der neue Marker gemäß der mit Stephan gewählten Option (A: erst beim nächsten Tab-Wechsel / B: sofort ohne Tab-Wechsel).
+- [x] Regression: Nach dem Speichern einer neuen Location bleiben alle bisherigen Marker auf der Karte und alle bisherigen Einträge in der Liste unverändert sichtbar (keine Duplikate, keine verschwundenen Einträge).
+- [x] Regression: Aktive Karten-Filter (Eventtyp, Schwierigkeit, Kategorie etc.) wirken nach dem Nachladen weiterhin korrekt auf alte UND neue Marker (kein „Filter wird beim Reload vergessen").
 - [x] Backend: Eine per `POST /preview-alignment` (`save:true`) neu gespeicherte Location ist unmittelbar danach (ohne Wartezeit) über `GET /locations` auffindbar (bereits bestätigt, siehe Pre-Mortem-Code-Verifikation — als Regressionsschutz automatisiert getestet).
 
 ##### Pre-Mortem
@@ -2508,11 +2509,13 @@ Ausgeschlossen: iOS-App (kein entsprechender Code in dieser Analyse betrachtet, 
 
 **Testplan:**
 - [x] Automatisiert (Harness): `backend/tests/test_bug67.py` — 2 Testfälle (neue Location sofort über `GET /locations` auffindbar; Name/Koordinaten stimmen). Sichert die Backend-Voraussetzung ab, auf der der Frontend-Fix aufbaut.
-- [ ] Manuell (nach Implementierung, unter `http://localhost:8000`):
+- [x] Manuell (nach Implementierung, unter `http://localhost:8000`): Alle 4 Schritte von Stephan erfolgreich bestätigt (2026-07-10), inkl. Nebenfix (Löschen-Toast) und Duplikat-/Filter-Regressionschecks.
   1. Karten-Tab einmal öffnen (Marker laden), dann zum „Neu"-Tab wechseln, eine Test-Location speichern, danach zurück zum Karten-Tab wechseln → neuer Marker muss ohne Reload sichtbar sein.
   2. Locations-Tab einmal öffnen, dann eine Test-Location speichern, danach zurück zum Locations-Tab wechseln → neuer Eintrag muss ohne Reload sichtbar sein.
   3. (Frage-2-Fall) Karten-Tab bereits offen lassen, in einem zweiten Fenster/Tab eine Location speichern → prüfen ob Marker gemäß gewählter Option (A oder B) erscheint.
   4. Regressionscheck (PRODUCT.md Sektion 12, „Navigation/Tabs" + „Feed-Rendering"): alle 5 Tabs weiterhin erreichbar, kein Tab zeigt doppelten Inhalt, aktive Filter (Eventtyp, Kategorie, Schwierigkeit) wirken nach dem Reload weiterhin korrekt auf Karte und Liste, bestehende Locations bleiben unverändert sichtbar.
+
+**Nebenfix (nicht Teil des ursprünglichen Scopes, von Stephan während des Tests freigegeben):** `deleteLocation()` rief `MapView.refresh()` auf (Methode existierte nicht, stiller Fehler verhinderte den Erfolgs-Toast) — korrigiert zu `MapView.loadMarkers()` mit demselben Defensiv-Pattern. Zusätzlich wurde ein vorbestehender ID-Kollisions-Bug in `_save_alignment_as_location()` (`backend/main.py`) behoben: Location-IDs liefen auf Sekundengenauigkeit (`custom_<sekunden>`), wodurch zwei Speichervorgänge innerhalb derselben Sekunde einen `sqlite3.IntegrityError` auslösten — live von Stephan reproduziert. Fix: Millisekundengenauigkeit (`custom_<millisekunden>`).
 
 ---
 
@@ -9784,3 +9787,221 @@ Ziel/Nutzen: Unabhängigkeit von den unzuverlässigen kostenlosen Overpass-Serve
 **Bezug:** **US-09** [x] (Done, released v1.22.0) — führte den Overpass-basierten Sichtachsen-Check ein und dokumentiert in seiner Analyse/Retro die aktuellen Mirror-Probleme (Kumi-Timeouts, overpass-api.de HTTP-406-Block). TASK-59 ist keine Dublette, sondern die Infrastruktur-Konsequenz daraus: US-09 behandelt die fachliche Logik des Sichtachsen-Checks, TASK-59 behandelt die Zuverlässigkeit der externen Datenquelle, von der diese Logik abhängt. Keine Überschneidung mit TASK-45 (Azimut via Overpass, Done) — nutzt dieselbe Datenquelle, aber eigenständiges Ticket zur Infrastruktur, kein Code-Umbau an TASK-45 vorgesehen.
 
 **Quelle:** fotoalert-intake (Recherche mit Stephan, 2026-07-09)
+
+---
+
+### US-128 · Bauwerkshöhe und -breite (`subject_height_m` / `subject_width_m`) nachträglich bearbeitbar machen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-10 |
+
+**User Story:** Als Host, der für ein Bauwerk (z. B. Kirchturmspitze, Fernsehturm) nachträglich eine genauere Höhen- und/oder Breitenangabe recherchiert hat, möchte ich diese Maße (`subject_height_m` und `subject_width_m`) über die Location-Bearbeitung korrigieren können, sodass die Sonnen-/Mond-Alignment-Berechnung (exakte Sichtachse zur Bauwerksspitze und Kompositions-/FOV-Berechnung zur Bauwerksbreite) automatisch neu gerechnet wird und wieder korrekte Zeitfenster liefert.
+
+**Beschreibung:** FotoAlert unterscheidet rein horizontale Ereignisse (Mondaufgang, Sonnenaufgang, Golden/Blue Hour — brauchen keine Gebäudemaße) von konkreten Alignment-/Kompositions-Berechnungen (Sonne/Mond exakt auf einer Bauwerksspitze bzw. im Bildausschnitt neben/über dem Bauwerk), die `subject_height_m` (`backend/calculations/sightline.py`, Zeilen ~98, 188, 225–263) bzw. `subject_width_m` (`backend/calculations/opportunity.py` Zeile ~502, `backend/calculations/astronomy.py` Zeilen ~638–763, `backend/discover/pipeline_base.py` Zeile ~138–145) benötigen. Der PATCH-Endpoint `/locations/{id}` (`backend/main.py`, `patch_location`, Zeilen ~2484–2557) erlaubt aktuell nur Koordinaten, Name/Beschreibung/Hinweise/Motivname, `observer_floor_height_m` und `focal_length_suggestions` (`all_allowed_fields`, Zeile ~2492) — sowohl `subject_height_m` als auch `subject_width_m` fehlen in dieser Feld-Whitelist und in der Recompute-Trigger-Liste (`recompute_fields`, Zeile ~2491). Dadurch gibt es aktuell keinen Weg, eine bereits erfasste Bauwerkshöhe/-breite nachträglich zu korrigieren: weder sind die Felder editierbar, noch würde eine direkte Datenänderung einen automatischen Alignment-/Kompositions-Recompute auslösen. Präzedenzfall im Code: `observer_floor_height_m` (US-62) hat dieses Muster (editierbar + recompute-auslösend) bereits vollständig umgesetzt; beide neuen Felder folgen strukturell demselben Muster, benötigen aber zusätzlich Anpassungen an zwei weiteren Stellen, die in der Analyse gefunden wurden (siehe Architektur-Analyse unten): dem Overrides-Reload beim Server-Start und der Overrides-Anwendung im `precompute.py`-Subprozess.
+
+**Bezug:** Keine Dublette gefunden. Verwandte Tickets:
+- **BUG-50** (HINWEISE-Feld überschreibt sich, Done, 2026-06-29) ist der direkte Präzedenzfall derselben Fehlerklasse: dort fehlte `special_notes` in derselben PATCH-Whitelist (`all_allowed_fields`). US-128 betrifft strukturell dasselbe Muster, aber ein anderes Feld (`subject_height_m`) mit zusätzlicher Recompute-Notwendigkeit — kein Merge, da unterschiedliche Felder/Ursachen, aber die Fix-Vorlage aus BUG-50 ist direkt übertragbar.
+- **US-62** (`observer_floor_height_m` editierbar + recompute-auslösend) ist im aktuellen BACKLOG.md nicht mehr als eigenes `### US-62`-Ticket auffindbar (vermutlich vor Einführung der aktuellen Ticket-Konvention umgesetzt oder in einem Sammel-Release aufgegangen) — dient aber als unmittelbares funktionales Vorbild für die Implementierung von US-128 (gleicher Endpunkt, gleiches Recompute-Muster).
+- **US-09** (Sichtachsen-Check – Hinderniserkennung, Done) nutzt `observer_floor_height_m` als Ausgangshöhe für den Raycast — keine Überschneidung, da US-09 die Beobachterhöhe behandelt, nicht die Bauwerkshöhe.
+- **US-107 / US-122** (Sonnen-Alignment als Chance) und **US-79** (Mondauf-/-untergang) nutzen `subject_height_m` in der laufenden Berechnung, behandeln aber nicht dessen Editierbarkeit — keine Überschneidung, aber fachliche Abhängigkeit: eine spätere Korrektur der Höhe wirkt sich auf deren Ergebnisse aus, was US-128 gerade ermöglichen soll.
+
+**Quelle:** fotoalert-intake (Code-Prüfung durch Stephan, 2026-07-10)
+
+---
+
+**Example Mapping:**
+
+⚠️ Annahmen (Default, blockiert nicht):
+- ⚠️ Annahme: Validierung für beide Felder analog zu `observer_floor_height_m` — Zahl, `>= 0`, keine Obergrenze. Begründung: `subject_height_m=0` ist ein realer, gültiger Bestandswert (`geltow_havelblick`, kein vertikales Motiv, nur Horizont-Ereignisse) — 0 darf nicht abgelehnt werden.
+- ⚠️ Annahme: Beide Felder sind unabhängig voneinander patchbar (nur Höhe, nur Breite, oder beides in einem Request) — kein erzwungenes Koppeln, analog zu allen anderen PATCH-Feldern.
+- ⚠️ Annahme: `subject_width_m=0` wird technisch akzeptiert (wie 0 bei Höhe), verhält sich aber wegen des bestehenden `or`-Fallbacks in `opportunity.py` Zeile 502 (`location.subject_width_m or (location.subject_height_m * 0.3)`) weiterhin wie „nicht gesetzt" (0 ist falsy) — dieses bestehende Fallback-Verhalten wird durch US-128 nicht verändert, nur die Editierbarkeit wird ergänzt.
+- ⚠️ Annahme: Die US-09-Sichtachsen-Prüfung (`sightline_status`) wird durch eine Höhen-/Breitenkorrektur NICHT automatisch neu getriggert (bleibt bis zum nächsten manuellen/nächtlichen Sightline-Refresh auf altem Stand) — konsistent mit dem bestehenden Verhalten bei Koordinaten-Korrekturen (auch dort kein Auto-Trigger für `_run_sightline_refresh`), keine Verschlechterung ggü. Status quo.
+- ⚠️ Annahme: Die vorbestehende Lücke, dass `special_notes`/`subject_name` beim Server-Neustart bzw. im precompute-Subprozess nicht aus dem Override wiederhergestellt werden (gefunden bei der Code-Verifikation, siehe Architektur-Analyse), ist NICHT Teil des US-128-Scopes (anderes Feld-Paar) — wird nur als Fund gemeldet, nicht mitgefixt.
+
+❓ Frage 1 (Grenzfall mit zwei sinnvollen Verhaltensweisen — Pflicht-Format):
+Der Scout-Tab (`backend/discover/subjects.py`, Zeile 96–98) markiert eine Location als „Platzhalter ohne echte Daten" über die Magic-Number-Heuristik `subject_height_m == 20 and subject_width_m is None` und schließt sie dann von den Scout-Kandidaten aus (Zeile 181–184). Korrigiert ein Host `subject_height_m` zufällig auf genau `20` und lässt `subject_width_m` dabei leer, bleibt die Location weiterhin fälschlich als Platzhalter markiert und taucht nicht im Scout-Tab auf — obwohl der Host gerade einen echten, recherchierten Wert eingetragen hat.
+   Option A — Bestehendes Verhalten unverändert lassen: Kein Zusatzaufwand in US-128, die Heuristik bleibt wie sie ist. Konsequenz: der sehr seltene Fall (Höhe exakt 20 UND Breite leer) bleibt ein bekanntes, aber unwahrscheinliches Verhalten — betrifft nur den Scout-Tab, nicht Feed/Kalender/Alignment-Berechnung selbst.
+   Option B — Heuristik im selben Zug reparieren (z. B. zusätzliches „ist echter Wert"-Flag statt Magic Number): Sauberer, aber Mehraufwand + Änderung an einer Stelle außerhalb des ursprünglichen Ticket-Scopes (Scope Creep), zusätzliches Testrisiko in einer laufenden Scout-Pipeline.
+   *(Empfehlung der Analyse: Option A, da sehr geringe Eintrittswahrscheinlichkeit und kein Datenintegritätsrisiko — aber gemäß Skill-Vorgabe als offene Frage vorgelegt, nicht selbst entschieden.)*
+   **Stephans Entscheidung:** Option B — Heuristik wird im selben Zug repariert (siehe neues AK unten).
+
+📏 Rule 1: PATCH `/locations/{id}` akzeptiert `subject_height_m` und `subject_width_m` als editierbare Zahlenfelder — für Custom- UND Standard-Locations, einzeln oder gemeinsam.
+🟢 Example: Given Custom-Location mit `subject_height_m=98`, When `PATCH {"subject_height_m": 105}`, Then `200`, `updated: {"subject_height_m": 105.0}`.
+
+📏 Rule 2: Eine Änderung an `subject_height_m` oder `subject_width_m` löst automatisch einen Single-Location-Recompute (Feed + Kalender) aus.
+🟢 Example: Given beliebige Location, When `PATCH {"subject_width_m": 40}`, Then `recompute_triggered: true`.
+
+📏 Rule 3: Ungültige Werte werden mit 422 abgelehnt; 0 ist gültig.
+🟢 Example: Given `PATCH {"subject_height_m": -5}`, Then `422` „subject_height_m muss ≥ 0 sein."
+🟢 Example: Given `PATCH {"subject_height_m": "zehn"}`, Then `422` Typfehler.
+🟢 Example: Given `PATCH {"subject_height_m": 0}`, Then `200` (Havel-Horizont-Fall).
+
+📏 Rule 4: Für Standard-Locations überlebt die Korrektur einen Server-Neustart UND wird vom precompute-Subprozess (Einzel- wie Voll-Recompute) gesehen.
+🟢 Example: Given Standard-Location-Override mit korrigiertem `subject_height_m`, When `main._load_location_overrides()` erneut läuft (Server-Neustart-Simulation), Then der In-Memory-Wert zeigt den korrigierten Stand, nicht den Basiswert aus `data/locations.py`.
+🟢 Example: Given derselbe Override, When `precompute._apply_location_overrides()` läuft, Then der Subprozess sieht denselben korrigierten Wert.
+
+---
+
+**Akzeptanzkriterien:**
+- [~] Ein Host kann über die Location-Bearbeitung `subject_height_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
+- [~] Ein Host kann über die Location-Bearbeitung `subject_width_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
+- [~] Beide Felder sind unabhängig voneinander änderbar (nur Höhe / nur Breite / beides gemeinsam in einem Request).
+- [~] Nach einer Korrektur wird automatisch eine Neuberechnung angestoßen (`recompute_triggered: true`), die Feed UND Kalender für diese Location aktualisiert.
+- [~] Funktioniert identisch für Custom-Locations (SQLite `custom_locations`-Tabelle) und Standard-Locations (Override-Mechanismus).
+- [~] Edge Case: Ein Wert von `0` wird akzeptiert (z. B. Location ohne vertikales Motiv, nur Horizont-Ereignisse).
+- [~] Edge Case: Ein negativer Wert wird mit HTTP 422 und einer verständlichen Fehlermeldung abgelehnt.
+- [~] Edge Case: Ein nicht-numerischer Wert (String, Liste) wird mit HTTP 422 abgelehnt.
+- [~] Edge Case: Bei einer Standard-Location überlebt die Korrektur einen Server-Neustart (kein Zurückfallen auf den hartkodierten Basiswert aus `data/locations.py`).
+- [~] Edge Case: Bei einer Standard-Location wird die Korrektur auch vom nächtlichen/manuellen Recompute-Subprozess (`precompute.py`) berücksichtigt, nicht nur vom laufenden Server-Prozess.
+- [~] Eine Location mit korrigierter Bauwerkshöhe von genau 20 Metern und leerer Breitenangabe erscheint weiterhin korrekt im Scout-Tab (wird nicht mehr fälschlich als unvollständiger Platzhalter behandelt und ausgeblendet).
+
+---
+
+**Pre-Mortem:**
+📎 Code-Verifikation (2026-07-10, `backend/main.py`, `backend/precompute.py`, `backend/data/store.py`, `backend/calculations/sightline.py`, `backend/discover/subjects.py`, `backend/data/locations.py` gelesen):
+   - Bestätigt: `all_allowed_fields`/`recompute_fields` in `patch_location` (main.py ~2487–2492) enthalten weder `subject_height_m` noch `subject_width_m`.
+   - Bestätigt: `custom_locations`-Tabelle (store.py) hat bereits echte Spalten `subject_height_m`/`subject_width_m` — `_update_custom_location_file`/`update_custom` reicht beliebige kwargs als dynamisches SQL-`SET` durch, keine zusätzliche Whitelist auf DB-Ebene nötig für Custom-Locations.
+   - **Widerlegt / erweitert gegenüber Ausgangsstand:** Für Standard-Locations reicht es NICHT, nur die PATCH-Whitelist zu erweitern. Zwei weitere, unabhängige Whitelists müssen ebenfalls ergänzt werden, sonst geht die Korrektur nach einem Neustart bzw. beim Recompute wieder verloren (identisches Muster zu BUG-29/BUG-50, aber an zwei bislang nicht genannten Stellen):
+     1. `main.py:_load_location_overrides()` (Zeile ~1218–1221): Feste Feld-Tupel-Whitelist, die beim Server-Start Overrides aus SQLite auf die In-Memory-`LOCATIONS` zurückschreibt. `subject_height_m`/`subject_width_m` fehlen hier — ohne Ergänzung würde ein Server-Neustart die Korrektur für Standard-Locations (nicht Custom-Locations) unsichtbar machen, obwohl sie in der DB bleibt.
+     2. `precompute.py:_OVERRIDE_FIELDS` (Zeile ~140–143): Bewusst identische Spiegel-Whitelist für den precompute-Subprozess (`_apply_location_overrides()`), der über `_run_precompute_single` (nach PATCH) UND den nächtlichen Vollkalauf aufgerufen wird. Fehlen die Felder hier, rechnet sowohl der Einzel- als auch der Vollrecompute für Standard-Locations weiterhin mit dem alten Höhen-/Breitenwert aus `data/locations.py` — exakt das BUG-29-Muster (Koordinaten-Fix wirkte lokal sofort, aber Recompute sah ihn nicht).
+   - Bestätigt: `_run_precompute_single` → `_recompute_one` → `_run_precompute_single_subproc` startet `precompute.py --location-id <id>` als **echten Subprozess** (kein In-Memory-Zugriff auf den laufenden Server) — bestätigt die Notwendigkeit von Punkt 2.
+   - Bestätigt: `precompute.py` lädt seit BUG-33 auch Custom-Locations (eigene `_load_custom_locations()`-Funktion, liest alle Spalten direkt aus der Tabelle) — insofern ist die ältere Memory-Notiz „precompute lädt keine Custom-Locations" für den aktuellen Codestand **überholt**; Custom-Locations sind über den Recompute-Subprozess bereits vollständig abgedeckt, nur Standard-Location-Overrides fehlen den beiden neuen Feldern.
+   - Bestätigt: `subject_height_m=0` ist ein realer Bestandswert (`geltow_havelblick`, Zeile 645) → Validierung darf 0 nicht ablehnen.
+   - Bestätigt: `subjects.py`-Platzhalter-Heuristik (Zeile 96–98) → siehe ❓ Frage 1 oben.
+   - Bestätigt: US-09-Sichtachsen-Refresh (`_run_sightline_refresh`) wird von PATCH generell nicht getriggert (auch nicht bei Koordinaten heute) — kein neues Verhalten, nur bestehende Einschränkung.
+
+- 💀 Szenario: Host korrigiert die Höhe einer Standard-Location, Feed/Detail-Ansicht zeigen sofort den neuen Wert — nach dem nächsten Server-Neustart (z. B. Release-Deploy) springt die Höhe unbemerkt zurück auf den alten Basiswert.
+  Auslöser: `_load_location_overrides()`-Whitelist wurde nicht um die neuen Felder ergänzt.
+  Frühwarnung: Direkter Unit-Test gegen `main._load_location_overrides()` mit gemocktem Override (siehe Test unten).
+  Gegenmaßnahme: Feld-Tupel in main.py Zeile ~1218–1221 erweitern; Testfall deckt das ab.
+
+- 💀 Szenario: Host korrigiert die Höhe, `recompute_triggered: true` kommt zurück, aber Feed/Kalender zeigen weiterhin die alten Alignment-Zeitfenster, weil der Recompute-Subprozess mit dem alten Basiswert rechnet.
+  Auslöser: `precompute.py:_OVERRIDE_FIELDS` wurde nicht erweitert (BUG-29-Wiederholung, nur mit anderen Feldern).
+  Frühwarnung: Direkter Unit-Test gegen `precompute._apply_location_overrides()` (Muster aus `test_bug29_calendar_single_recompute.py`).
+  Gegenmaßnahme: Feld-Tupel in precompute.py Zeile ~140–143 erweitern; Testfall deckt das ab.
+
+- 💀 Szenario: Ein Host setzt `subject_width_m` explizit auf `0`, erwartet „kein Breitenwert / auf Default zurücksetzen", aber Kalender/Feed zeigen weiterhin eine Kompositionsbreite ungleich 0.
+  Auslöser: `opportunity.py`-Fallback `location.subject_width_m or (location.subject_height_m * 0.3)` behandelt `0` als falsy und rechnet mit dem Höhen-Fallback weiter — bestehendes Verhalten, nicht neu durch US-128 verursacht.
+  Frühwarnung: Testfall, der `subject_width_m=0` setzt und die Downstream-Fallback-Formel gegenprüft.
+  Gegenmaßnahme: Kein Code-Fix (out of scope), aber als Annahme dokumentiert + im manuellen Testplan als Beobachtungspunkt vermerkt.
+
+- 💀 Szenario: Bei genau `subject_height_m == 20` und leerem `subject_width_m` verschwindet eine Location unbemerkt aus dem Scout-Tab.
+  Auslöser: Magic-Number-Heuristik `_is_placeholder()` in `discover/subjects.py`.
+  Frühwarnung: siehe ❓ Frage 1.
+  Gegenmaßnahme: abhängig von Stephans Antwort auf Frage 1 (Default: unverändert lassen, dokumentiert).
+
+- 💀 Szenario: Ein Refactor/späteres Ticket liest `all_allowed_fields`/`recompute_fields` als vollständige Quelle der Wahrheit und übersieht, dass zwei weitere Whitelists (main.py Reload, precompute.py Reload) synchron gehalten werden müssen.
+  Auslöser: Drei statt einer Stelle, die bei jedem neuen editierbaren Feld synchron erweitert werden müssen (bestehendes Architekturmuster, keine US-128-Neuerung).
+  Frühwarnung: Code-Kommentare an allen drei Stellen verweisen bereits aufeinander (main.py Zeile 1218, precompute.py Zeile 138–139) — bei der Implementierung an allen drei Stellen kommentieren, dass die Felder zusammengehören.
+  Gegenmaßnahme: Implementierungsplan listet alle drei Stellen explizit auf (siehe Optionen unten).
+
+---
+
+**Architektur-Analyse:**
+
+Betroffene Dateien (alle gelesen, nicht nur überflogen):
+- `backend/main.py`: `patch_location` (~2484–2557, drei Whitelists erweitern + Validierungsblock ergänzen), `_load_location_overrides()` (~1181–1228, Feld-Tupel ~1218–1221 erweitern).
+- `backend/precompute.py`: `_OVERRIDE_FIELDS` (~140–143) + `_apply_location_overrides()` (~146–182, nutzt das Tupel automatisch, keine Logikänderung nötig, nur Tupel-Erweiterung).
+- `backend/data/store.py`: keine Änderung nötig — `custom_locations`-Tabelle hat beide Spalten bereits, `location_overrides`-Tabelle speichert Fields generisch als JSON-Blob (kein DB-seitiges Whitelisting).
+- `backend/calculations/sightline.py`, `backend/calculations/opportunity.py`, `backend/calculations/astronomy.py`, `backend/discover/pipeline_base.py`, `backend/discover/subjects.py`: nur lesend betroffen (nutzen die Felder bereits) — keine Änderung, aber `subjects.py`-Heuristik als Frage 1 markiert.
+
+Einstiegspunkt-Datenquellen-Check (Pflicht bei mehreren Entry-Points): Dieses Ticket hat nur einen Entry-Point (`PATCH /locations/{id}`), kein Cross-Entry-Point-Datenabgleich nötig.
+
+4d Subprozess-Datenquelle (Pflicht-Check, Ergebnis): `_run_precompute_single` startet `precompute.py` als **eigenen Subprozess** — dieser hat sein eigenes `LOCATIONS`-Modul-Objekt (frischer Python-Import), liest die Basis-Werte aus `data/locations.py`, wendet dann `_apply_location_overrides()` (Standard-Locations) und `_load_custom_locations()` (Custom-Locations, liest volle DB-Zeile) an. Ohne Erweiterung von `_OVERRIDE_FIELDS` sieht der Subprozess die korrigierte Höhe/Breite einer Standard-Location NICHT — unabhängig davon, dass der laufende Server-Prozess (`main.py`) sie bereits korrekt im Speicher hat. Dies ist der zentrale, in der Aufgabenstellung bereits vermutete Prüfpunkt — hiermit bestätigt und um zwei konkrete Fundstellen (main.py Reload + precompute.py Reload) präzisiert.
+
+Cap+Sort / Cross-Collection-Lookup: nicht anwendbar (kein Listen-Cap, kein Cross-Collection-Lookup in diesem Ticket).
+
+4f Filter-Chip-Check: `subject_height_m`/`subject_width_m` sind keine Score-Felder/Event-Typen, kein Filter-Chip-Bezug.
+
+4g Render-Pfad-Check: Ticket ist rein Backend/API, kein visuelles Element betroffen — Schritt entfällt.
+
+**Designer-Check (Schritt 4b):** Übersprungen. Dieses Ticket ändert ausschließlich Backend-Validierung/-Persistenz/-Recompute-Logik über einen bestehenden PATCH-Endpoint; es gibt keine neue/veränderte UI-Komponente, Farbe, Icon oder Kartenvisualisierung. Kein visuell sichtbarer Effekt in der App (abgesehen von indirekt korrigierten Zeitfenstern, die bereits über bestehende UI-Elemente angezeigt werden).
+
+---
+
+**Implementierungsoptionen:**
+
+### Option A — Whitelist-Erweiterung an allen drei Stellen (empfohlen)
+- Vorgehen: `subject_height_m`/`subject_width_m` zu `numeric_fields` + `recompute_fields` in `patch_location` hinzufügen, Validierungsblock analog `observer_floor_height_m` (Zahl, `>=0`) ergänzen; Feld-Tupel in `main.py:_load_location_overrides()` UND `precompute.py:_OVERRIDE_FIELDS` um beide Felder erweitern.
+- Betroffene Dateien: `backend/main.py` (2 Stellen), `backend/precompute.py` (1 Stelle).
+- Vorteile: Vollständig konsistent mit dem etablierten `observer_floor_height_m`/BUG-29-Muster; kein Risiko einer „scheinbar erledigten, aber nach Neustart kaputten" Lösung; kleine, gut isolierte Diffs.
+- Nachteile/Risiken: Drei statt eine Stelle im Code (bestehende Architektur-Schwäche, siehe Pre-Mortem-Szenario „Refactor übersieht"), aber keine Alternative reduziert dieses Risiko strukturell ohne größeren Umbau.
+- Aufwand: klein.
+
+### Option B — Whitelists zusammenführen (strukturelle Bereinigung im selben Zug)
+- Vorgehen: Zusätzlich zu Option A: die drei parallel gepflegten Feld-Listen (`main.py` PATCH-Whitelist, `main.py` Reload-Tupel, `precompute.py` Reload-Tupel) auf eine gemeinsame, importierte Konstante zusammenführen, damit zukünftige Felder nur an einer Stelle ergänzt werden müssen.
+- Betroffene Dateien: zusätzlich ein neues gemeinsames Modul/Konstante, Anpassung aller drei Aufrufstellen plus Rückwirkung auf bestehende Felder (`observer_floor_height_m`, Koordinaten, `focal_length_suggestions`, `name`, `description`, `image_filename`, `image_focus_x/y`).
+- Vorteile: Behebt die strukturelle Schwäche dauerhaft, reduziert Risiko für alle künftigen Tickets dieser Art.
+- Nachteile/Risiken: Deutlich größerer Diff, berührt bestehende, produktiv genutzte Felder außerhalb des US-128-Scopes (Scope Creep), höheres Regressionsrisiko kurz vor Release, kein zusätzlicher Nutzen für die AKs dieses Tickets.
+- Aufwand: mittel.
+
+✅ Empfehlung: **Option A** — deckt alle Akzeptanzkriterien und alle im Pre-Mortem gefundenen Risiken vollständig ab, ohne bestehende, funktionierende Felder außerhalb des Ticket-Scopes anzufassen. Die strukturelle Vereinheitlichung aus Option B ist ein sinnvoller separater Vorschlag (z. B. als eigenes Tech-Debt-Ticket), aber laut „Kein Scope Creep"-Regel nicht Teil von US-128.
+
+**Stephans Entscheidung (Weg-Gate, 2026-07-10):** Option B — abweichend von der Analyse-Empfehlung (Option A). Umsetzung erfolgt inkl. struktureller Zusammenführung der drei Feld-Listen.
+
+**Offene Grenzfall-Wahlfrage aus dem Example Mapping (gehört ins selbe Weg-Gate):** ❓ Frage 1 (Scout-Platzhalter-Heuristik bei `subject_height_m == 20`) — siehe oben, Option A/B dort.
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Pflicht-Code-Verifikation)
+- [x] Architektur analysiert: `backend/main.py`, `backend/precompute.py`, `backend/data/store.py` (nur lesend geprüft), `backend/calculations/sightline.py`, `backend/calculations/opportunity.py`, `backend/calculations/astronomy.py`, `backend/discover/pipeline_base.py`, `backend/discover/subjects.py`
+- [x] 4d Subprozess-Datenquelle geprüft: precompute.py läuft als eigener Subprozess, Standard-Location-Overrides brauchen eigene Whitelist-Erweiterung (main.py Reload + precompute.py Reload), Custom-Locations sind bereits vollständig abgedeckt (BUG-33)
+- [x] Designer-Check: visuell? → nein, rein Backend/API → übersprungen
+- [x] Implementierungsoptionen: A / B — Stephan wählt Option B
+- [x] Empfehlung: Option A — Stephan entscheidet sich abweichend für Option B (strukturelle Zusammenführung)
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_us_128.py` — PATCH-Whitelist (Höhe/Breite einzeln/gemeinsam), Recompute-Trigger, Validierung (negativ → 422, Typfehler → 422, 0 → 200), Custom-Location-Persistenz, Standard-Location-Reload (`main._load_location_overrides()`), precompute-Override-Anwendung (`precompute._apply_location_overrides()`)
+- [ ] Automatisiert (Harness, zusätzlicher Fall in derselben Datei `backend/tests/test_us_128.py`, aus der Weg-Gate-Entscheidung „Frage 1 → Option B"): neue, verlässliche Platzhalter-Erkennung in `backend/discover/subjects.py` gegen den alten `subject_height_m == 20`-Grenzfall prüfen — Location mit `subject_height_m=20` und `subject_width_m=None`, aber korrekt gesetztem „ist recherchierter Wert"-Flag, muss weiterhin als Scout-Kandidat erscheinen (nicht mehr fälschlich als Platzhalter ausgeschlossen).
+- [ ] Manuell:
+  1. Server lokal starten (siehe `fotoalert-localdev`), unter `http://localhost:8000/docs` einloggen (Host-Passwort).
+  2. `curl -X PATCH http://localhost:8000/locations/<standard-location-id> -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"subject_height_m": 105, "subject_width_m": 75}'` → erwartete Response: `{"ok": true, "updated": {"subject_height_m": 105.0, "subject_width_m": 75.0}, "recompute_triggered": true}`.
+  3. `curl http://localhost:8000/locations` → dieselbe Location zeigt sofort die neuen Werte.
+  4. Negativtest: `curl -X PATCH ... -d '{"subject_height_m": -5}'` → HTTP 422.
+  5. Regressions-Matrix (`PRODUCT.md` Sektion 12, Ticket-Typ „Backend/API"): zusätzlich prüfen, dass bestehende PATCH-Felder (`observer_floor_height_m`, Koordinaten, `focal_length_suggestions`, `name`/`description`) weiterhin unverändert funktionieren (Regressionsschutz gegen die Whitelist-Erweiterung).
+- [ ] **Release-Hinweis (Pflicht vor Ticket-Abschluss):** Nach erfolgreichem Test einmalig einen vollständigen Neuberechnungslauf (`precompute.py --full`) über ALLE Locations anstoßen — nicht nur die während der Implementierung/des Tests bearbeiteten. Grund: Bestandslocations können aktuell falsch berechnete Alignment-Zeitfenster haben, deren Höhen-/Breitenwerte bisher nicht korrigierbar waren. Laufzeit ca. 8 Stunden (siehe `reference_fotoalert_server_paths`) — rechtzeitig vor dem geplanten Release-Zeitpunkt einplanen, nicht spontan kurz vor Deploy starten.
+
+---
+
+### BUG-68 · Hinweise-Feld und Motivname überstehen vermutlich keinen Server-Neustart und werden vermutlich nicht vom precompute-Lauf gesehen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-10 |
+
+**Beschreibung:** Bei der US-128-Code-Verifikation fiel auf, dass `special_notes` (Hinweise) und `subject_name` (Motivname) zwar über `PATCH /locations/{id}` korrekt editierbar sind (BUG-50, BUG-61 — Done), aber vermutlich in zwei weiteren Whitelists fehlen, die für Standard-Locations denselben Korrekturwert dauerhaft sichtbar halten müssen: `main.py:_load_location_overrides()` (Reload-Tupel, Zeile ~1218–1221) und `precompute.py:_OVERRIDE_FIELDS` (Zeile ~140–143). Falls das zutrifft, würde eine Korrektur für Standard-Locations einen Server-Neustart nicht überleben und vom precompute-Subprozess (Einzel- wie Vollrecompute) nicht gesehen — noch nicht selbst geprüft, ob das tatsächlich zutrifft.
+
+**User Story:** Als Host, der das Hinweise-Feld oder den Motivnamen einer Standard-Location nachträglich korrigiert, möchte ich, dass meine Korrektur auch einen Server-Neustart und den nächtlichen/manuellen Neuberechnungslauf übersteht, sodass mein editierter Text nicht unbemerkt wieder auf den alten Wert zurückfällt.
+
+**Bezug:**
+- **BUG-50** (Done, 2026-06-29) und **BUG-61** (Done, 2026-07-04) sind die direkten Vorgänger derselben Fehlerklasse: dort fehlten `special_notes` bzw. `subject_name` in der PATCH-Endpunkt-Whitelist (`all_allowed_fields`) selbst — das wurde bereits behoben. Dieses Ticket vermutet dieselbe Fehlerklasse eine Ebene tiefer: in den beiden Reload-Whitelists, die den PATCH-Fix für Standard-Locations dauerhaft machen.
+- **US-128** (Ready for Dev, 2026-07-10) hat bei der eigenen Code-Verifikation exakt dieselben zwei Whitelist-Stellen (main.py-Reload-Tupel, precompute.py `_OVERRIDE_FIELDS`) für ein anderes Feld-Paar (`subject_height_m`/`subject_width_m`) bereits identifiziert und behebt sie dort. Kein Merge (unterschiedliche Felder, unterschiedliche Fehlerauswirkung — Zahlen vs. Text, mit vs. ohne Recompute-Trigger), aber die technische Lösung aus US-128 (Whitelist-Erweiterung an beiden Stellen, ggf. bereits zusammengeführt gemäß Stephans Options-B-Entscheidung dort) ist als Vorlage direkt auf `special_notes`/`subject_name` übertragbar.
+
+**Quelle:** fotoalert-intake (Fund bei US-128-Code-Verifikation, 2026-07-10)
+
+---
+
+### TASK-60 · Refactoring: Lange Funktion `patch_location()` aufteilen (backend/main.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-10 |
+
+**Beschreibung:** `refactor_check.py` meldet eine neue lange Funktion in `backend/main.py`:
+- `patch_location()` Z. 2489 — 91 Zeilen (Threshold: 80)
+
+Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`/`subject_width_m` inkl. Validierung und Recompute-Trigger in derselben Funktion) — vorher lag `patch_location()` unter dem Threshold. Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betrifft `startup()`, TASK-41 betrifft `precompute.py`, TASK-58 betrifft `mkCloudCompassSvg()` in `web/index.html` — alle andere Funktionen/Dateien). Aufteilen in kleinere Hilfsfunktionen (z. B. Feld-Whitelist-Validierung, Recompute-Trigger-Ermittlung, Persistierung separieren). Kein Verhaltensumbau — reine Struktur, PATCH-Endpunkt-Verhalten muss unverändert bleiben.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-128, 2026-07-10)
