@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.7';
+const APP_VERSION = '1.22.8';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2913,7 +2913,9 @@ const Filter = {
     // US-119: minScore-Default 0 → 70 (Feed/Kalender/Scout starten standardmäßig bei ≥70% Wahrscheinlichkeit).
     // US-09: sightlineIncl/sightlineExcl analog zu verificationIncl/verificationExcl
     // (Arrays mit 'frei'|'teilweise_verdeckt'|'blockiert'|'nicht_geprueft').
-    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 70, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0, sightlineIncl: [], sightlineExcl: [] };
+    // US-129: hasImage (bool, Filter aktiv?) + hasImageExcl (bool, Drei-Zustand:
+    // false=nur mit Bild, true=nur ohne Bild) — analog minRating/minRatingExcl.
+    return { eventTypes: [], eventTypesExcl: [], tageszeit: [], tageszeitExcl: [], difficulty: [], difficultyExcl: [], category: [], categoryExcl: [], minRating: 0, minRatingExcl: false, minScore: 70, minFocal: 0, maxFocal: 0, maxDistKm: 0, verificationIncl: [], verificationExcl: [], minCloudMood: 0, sightlineIncl: [], sightlineExcl: [], hasImage: false, hasImageExcl: false };
   },
 
   get state() {
@@ -2968,7 +2970,8 @@ const Filter = {
            (s.maxDistKm > 0 ? 1 : 0) +
            ((s.verificationIncl.length || s.verificationExcl.length) ? 1 : 0) +
            (s.minCloudMood > 0 ? 1 : 0) +
-           ((s.sightlineIncl.length || s.sightlineExcl.length) ? 1 : 0);
+           ((s.sightlineIncl.length || s.sightlineExcl.length) ? 1 : 0) +
+           (s.hasImage ? 1 : 0);  // US-129
   },
 
   _updateBadge() {
@@ -3063,6 +3066,14 @@ const Filter = {
         if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) return false;
         if (s.sightlineExcl.includes(cat)) return false;
       }
+      // US-129 (Scope-Erweiterung): "Hat Bild" wirkt jetzt auch auf Feed/Kalender.
+      // Chance ohne auflösbare location_id zählt als "ohne Bild" (bestätigte Edge-Case-Entscheidung).
+      if (s.hasImage) {
+        const loc = (Locations.all || []).find(l => l.id === o.location_id);
+        const has = !!(loc && loc.image_url);
+        if (!s.hasImageExcl && !has) return false;
+        if (s.hasImageExcl && has) return false;
+      }
       // US-07: Wolkenstimmungs-Filter — nur im Feed (Kalender und skipCloudMood=true ignorieren)
       if (s.minCloudMood > 0 && !skipCloudMood) {
         const gcs = o.golden_cloud_score;
@@ -3110,6 +3121,12 @@ const Filter = {
         const cat = l.sightline_status || 'nicht_geprueft';
         if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) return false;
         if (s.sightlineExcl.includes(cat)) return false;
+      }
+      // US-129: "Hat Bild" — Drei-Zustand, nur Locations-Tab + Karte (nicht Feed/Kalender/Scout)
+      if (s.hasImage) {
+        const has = !!l.image_url;
+        if (!s.hasImageExcl && !has) return false;
+        if (s.hasImageExcl && has) return false;
       }
       if (s.minScore > 0 && Feed.data && Feed.data.length) {
         // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
@@ -3507,6 +3524,11 @@ const FilterSheet = {
       ['issues',       `${ic('i-warn',13)} Probleme`],
     ].map(([v,l]) => chip3(l, verState(v), `FilterSheet._cycleVerification('${v}')`)).join('');
 
+    // US-129: "Hat Bild" — ein Chip, drei Zustände (off → incl "Hat Bild" → excl "Ohne Bild" → off)
+    const hasImageState = () => !s.hasImage ? 'off' : (s.hasImageExcl ? 'excl' : 'incl');
+    const hasImageLabel = !s.hasImage ? 'Bild' : (s.hasImageExcl ? 'Ohne Bild' : 'Hat Bild');
+    const hasImageChips = chip3(`${ic('i-image',13)} ${hasImageLabel}`, hasImageState(), `FilterSheet._cycleHasImage()`);
+
     // US-09: Sichtachsen-Status — vier unabhängige Chips, je drei Zustände (off → incl → excl → off)
     const sightlineState = (v) => {
       if (s.sightlineIncl.includes(v)) return 'incl';
@@ -3543,6 +3565,9 @@ const FilterSheet = {
     const isMapView      = App.current === 'map';
     const isLocationView = App.current === 'locations';
     const isChancenOnly  = !isMapView && !isLocationView;  // Feed/Kalender/Scout
+    // US-129 (Scope-Erweiterung 2026-07-10): "Hat Bild" ist jetzt in Feed/Kalender aktiv,
+    // nur noch Entdecken (Scout) bleibt ausgegraut (dort keine location_id-Zuordnung möglich).
+    const isScoutOnly    = App.current === 'scout';
 
     // Chancen-spezifische Kriterien: Tageszeit, Mindest-Wahrscheinlichkeit
     // → ausgegraut auf Locations-Tab und Karte
@@ -3622,6 +3647,16 @@ const FilterSheet = {
 
     const verNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`;
     const ratingNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">≥ N Sterne</span> → <span style="color:var(--red)">weniger als N Sterne</span> → aus</p>`;
+    // US-129 (Scope-Erweiterung): aktiv auf Locations-Tab, Karte, Feed und Kalender —
+    // nur noch bei Entdecken (Scout) ausgegraut, da Scout-Chancen keine location_id tragen.
+    const hasImageNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">Hat Bild</span> → <span style="color:var(--red)">Ohne Bild</span> → aus.</p>`;
+    const hasImageSection = isScoutOnly
+      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
+          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-image',15)} Beispielbild ${fInfoBtn('hatbild')}</h4>
+          <div class="filter-chips">${hasImageChips}</div>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">Bei Entdecken nicht verfügbar (Chancen ohne festen Ort)</p>
+        </div>`
+      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-image',15)} Beispielbild ${fInfoBtn('hatbild')}</h4><div class="filter-chips">${hasImageChips}</div>${hasImageNote}</div>`;
 
     // US-07: Wolkenstimmungs-Filter
     const isScoutView = App.current === 'scout';
@@ -3660,6 +3695,7 @@ const FilterSheet = {
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-starfill',15)} Mindest-Bewertung ${fInfoBtn('bewertung')}</h4><div class="filter-chips">${ratingChips}</div>${ratingNote}</div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-pin',15)} Entfernung (GPS) ${fInfoBtn('entfernung')}</h4><div class="filter-chips">${distChips}</div>${gpsNote}</div>` +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-check',15)} Verifikationsstatus ${fInfoBtn('verifikationsstatus')}</h4><div class="filter-chips">${verChips}</div>${verNote}</div>` +
+      hasImageSection +
       `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-eye',15)} Sichtachse ${fInfoBtn('sichtachsenstatus')}</h4><div class="filter-chips">${sightlineChips}</div>${verNote}</div>`;
   },
 
@@ -3720,6 +3756,22 @@ const FilterSheet = {
       incl.push(v);
     }
     Filter.save({ sightlineIncl: incl, sightlineExcl: excl });
+    this._render();
+    requestAnimationFrame(() => this.initDualSlider());
+    this._applyLive();
+  },
+
+  // US-129: "Hat Bild" — Drei-Zustand-Zyklus: Off → Include(Hat Bild) → Exclude(Ohne Bild) → Off
+  // (Option A: schlankes Zwei-Werte-Modell, analog _cycleRating statt Array-Modell)
+  _cycleHasImage() {
+    const s = Filter.state;
+    if (!s.hasImage) {
+      Filter.save({ hasImage: true, hasImageExcl: false });
+    } else if (!s.hasImageExcl) {
+      Filter.save({ hasImage: true, hasImageExcl: true });
+    } else {
+      Filter.save({ hasImage: false, hasImageExcl: false });
+    }
     this._render();
     requestAnimationFrame(() => this.initDualSlider());
     this._applyLive();
@@ -5004,6 +5056,13 @@ const MapView = {
         const cat = loc.sightline_status || 'nicht_geprueft';
         if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) visible = false;
         if (s.sightlineExcl.includes(cat)) visible = false;
+      }
+
+      // US-129: "Hat Bild" — Drei-Zustand, wirkt auch auf der Karte
+      if (visible && s.hasImage) {
+        const has = !!loc.image_url;
+        if (!s.hasImageExcl && !has) visible = false;
+        if (s.hasImageExcl && has) visible = false;
       }
 
       // Brennweite (Locations-Eigenschaft, gilt auch auf der Karte)
@@ -7264,6 +7323,11 @@ const ElementInfo = {
       title: 'Filter: Verifikationsstatus',
       html: `<p>Grenzt Locations nach Prüfstatus ein — siehe ⓘ beim Verifikations-Chip für die Bedeutung von Geprüft/Nicht geprüft/Probleme.</p>
         <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
+    },
+    hatbild: {
+      title: 'Filter: Beispielbild',
+      html: `<p>Grenzt Locations bzw. Foto-Chancen danach ein, ob die zugehörige Location bereits ein Beispielbild hat (Bildausschnitt-Feature). Wirkt auf Locations-Tab, Karte, Feed und Kalender. Bei Entdecken nicht verfügbar, da diese Chancen keinem festen Ort zugeordnet sind.</p>
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">Hat Bild</span> → <span style="color:var(--red)">Ohne Bild</span> → aus.</p>`,
     },
     sichtachsenstatus: {
       title: 'Filter: Sichtachse',

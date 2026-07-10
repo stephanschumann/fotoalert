@@ -30,7 +30,7 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-129** *(Filter „Hat Beispielbild" für Locations, Option A implementiert)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-129** *(Scope-Erweiterung implementiert: Filter „Hat Bild" wirkt jetzt auch in Feed + Kalender, Kern für Locations/Karte bereits vorher getestet; Entdecken weiterhin ausgegraut)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -10063,7 +10063,7 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 ---
 
-### US-129 · Filter „Hat Beispielbild" für Locations `[ ]`
+### US-129 · Filter „Hat Beispielbild" für Locations `[~]`
 
 | Feld | Wert |
 |------|------|
@@ -10073,6 +10073,8 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 | **Erstellt** | 2026-07-10 |
 
 **Beschreibung:** Im Locations-Tab bzw. in der Filterleiste soll ein neuer Filter-Chip „Hat Bild" hinzukommen, mit dem Locations danach gefiltert werden können, ob sie ein Beispielbild (`image_url`) haben oder nicht — als dreistufiger Toggle nach demselben Muster wie der bestehende Verifikationsfilter (Aus → Nur mit Bild → Nur ohne Bild → Aus, ein Klick pro Stufe).
+
+**Scope-Erweiterung (2026-07-10, während Test-Phase, Done-Gate pausiert auf Wunsch von Stephan):** Der Kern (Locations-Tab + Karte) ist implementiert und von Stephan live bestätigt (Drei-Zustand-Chip funktioniert korrekt). Stephan wortwörtlich: „Passt, aber eigentlich will ich den Filter auch bei den Chancen im Feed/Kalender." Scope wird um Feed + Kalender erweitert; Entdecken (Scout) bleibt außen vor (Begründung siehe Scope unten). Analyse-Update ab hier; bestehende, bereits getestete AKs zu Locations-Tab/Karte bleiben unverändert.
 
 **User Story:** Als Host, möchte ich Locations im Locations-Tab danach filtern, ob sie bereits ein Beispielbild haben, sodass ich schnell erkenne, für welche Standorte noch ein Bild fehlt (oder gezielt nur die mit Bild sehen kann).
 
@@ -10086,16 +10088,27 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 **Example Mapping — Rules:**
 1. Der Chip „Hat Bild" hat drei Zustände, durchlaufen per wiederholtem Antippen: Aus (alle Locations) → Nur mit Bild (Rahmen blau/`--accent`) → Nur ohne Bild (Rahmen rot/`--red`, Label wechselt zu „Ohne Bild") → Aus.
-2. Der Filter wirkt auf den Locations-Tab UND die Kartenansicht (Marker-Sichtbarkeit) — NICHT auf Feed, Kalender oder Entdecken. Diese Ansichten zeigen einzelne Foto-Chancen, nicht die Location selbst; „Hat Bild" ist ein Location-Attribut wie Schwierigkeit/Kategorie/Verifikation/Sichtachse/Entfernung, kein Chancen-Attribut. *(⚠️ Annahme, aus dem Ticket selbst klar ableitbar: Titel „...für Locations", Beschreibung „Im Locations-Tab".)*
+2. Der Filter wirkt auf den Locations-Tab UND die Kartenansicht (Marker-Sichtbarkeit) — Kernversion getestet und bestätigt. *(Ursprüngliche Annahme „NICHT auf Feed/Kalender/Entdecken" durch Scope-Erweiterung 2026-07-10 für Feed/Kalender überholt, siehe Regeln 5–6.)*
 3. Ob eine Location „ein Bild hat" bestimmt ausschließlich das serverseitige `image_url`-Feld (befüllt sobald ein Beispielbild hochgeladen wurde, US-120/125/126/127) — unabhängig ob Standard- oder Custom-Location.
 4. Der Filter ist mit allen bestehenden Location-Filtern UND-kombinierbar und zählt in der Filter-Badge mit, sobald aktiv (Incl oder Excl).
+
+**Example Mapping — Scope-Erweiterung Feed/Kalender (2026-07-10):**
+5. „Hat Bild" bedeutet für eine Foto-Chance: die Location, auf die sich die Chance über `location_id` bezieht, hat ein Beispielbild (`image_url` gesetzt). Der Lookup läuft exakt nach dem bereits produktiven Muster, das `Filter.apply()` schon für Schwierigkeit/Kategorie nutzt: `(Locations.all || []).find(l => l.id === o.location_id)` (Zeile 3031).
+6. Feed und Kalender teilen sich dieselbe Filterfunktion `Filter.apply()` (Feed-Render Zeile 2018, Kalender-Monatsansicht Zeile 2394) — eine einzige Code-Änderung deckt beide Ansichten ab, kein separater Kalender-Pfad nötig.
+7. Entdecken (Scout) bleibt ausgeschlossen: Scout nutzt eine eigene, komplett getrennte Filterfunktion `Filter.applyToScout()` (Zeile 3140), und Scout-Chancen tragen laut Code-Verifikation kein `location_id`-Feld, sondern `subject_id` + eigene Koordinaten (`standpoint_lat/lon`) — sie sind nicht zuverlässig einer gespeicherten Location zuordenbar. Deckt sich mit Stephans Anfrage, die explizit nur „Feed/Kalender" nennt, nicht Entdecken.
+8. Der erweiterte Filter bleibt additiv UND-kombinierbar mit allen bestehenden Chancen-Filtern (Eventtyp, Tageszeit, Wahrscheinlichkeit, Brennweite, Wolkenstimmung) — automatisch, da alle Filter innerhalb derselben `Filter.apply()`-Kette geprüft werden.
+
+**🔴 Offene Frage (Klärung mit Stephan vor Implementierungsstart empfohlen):** Wie soll eine Chance behandelt werden, deren `location_id` sich nicht mehr auf eine vorhandene Location auflösen lässt (seltener Edge Case, z. B. gelöschte Custom-Location, deren Chancen-Cache noch nicht neu berechnet wurde)?
+- Option A (Vorschlag/Default): gilt als „ohne Bild" — bei „Nur mit Bild" ausgeblendet, bei „Nur ohne Bild" sichtbar. Eindeutig, jede Chance landet in genau einem Filterzustand.
+- Option B: Filter hat auf diese Chance keine Wirkung, sie bleibt in beiden Filterzuständen sichtbar — konsistent mit dem bestehenden Verhalten von Schwierigkeit/Kategorie im selben Code (dort wird der Filterblock bei fehlender Location übersprungen, Zeile 3032 `if (loc) {...}`), aber inhaltlich unsauberer für „Hat Bild" (Chance rutscht durch statt eindeutig zugeordnet).
+Nicht blockierend für die weitere Analyse, aber vor Implementierungsstart zu bestätigen.
 
 **Examples (Auszug):**
 - Given Chip auf „Aus", When 1× tippen, Then nur Locations mit Bild sichtbar, Rahmen blau.
 - Given Chip auf „Nur mit Bild", When erneut tippen, Then nur Locations ohne Bild sichtbar, Rahmen rot, Label „Ohne Bild".
 - Given Chip auf „Nur ohne Bild", When 3. Mal tippen, Then Filter aus, alle Locations sichtbar.
 - Given „Nur mit Bild" aktiv, When zur Karte wechseln, Then nur Marker von Locations mit Bild sichtbar.
-- Given „Nur mit Bild" aktiv, When in den Feed wechseln, Then keine Änderung — alle Chancen weiterhin sichtbar.
+- Given „Nur mit Bild" aktiv, When in den Feed wechseln, Then Filter wirkt dort ebenfalls (Scope-Erweiterung 2026-07-10) — nur Chancen mit Beispielbild-Location sichtbar. *(Bei Entdecken weiterhin keine Änderung, siehe Scope.)*
 
 **Weitere ⚠️ Annahmen (Default gewählt, siehe Designer-Check unten):**
 - Icon: bestehendes, bislang ungenutztes Symbol `i-image` (Zeile 1102) — bewusst gewählt statt Neuentwicklung.
@@ -10103,11 +10116,12 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 - Label wechselt dynamisch „Hat Bild" ↔ „Ohne Bild" beim Zustandswechsel (wie beim Bewertungs-Chip `≥ N★`/`< N★`), statt nur die Rahmenfarbe zu ändern.
 - Kein neues visuelles Bild-Badge auf der Location-Karte/Popup — das Ticket umfasst nur den Filter, keine Bildvorschau in Listen/Popups.
 
-Keine offenen 🔴-Questions — Ticket + Code-Verifikation lassen alle Punkte eindeutig klären.
+Für die Kernversion (Locations-Tab/Karte): keine offenen 🔴-Questions, bereits getestet. Für die Scope-Erweiterung: 1 offene 🔴-Frage (Edge-Case-Verhalten, siehe oben) — sonst eindeutig klärbar.
 
 **Scope:**
-- Eingeschlossen: neuer Drei-Zustand-Filter-Chip „Hat Bild" im Filter-Sheet, wirkt auf Locations-Tab (`Filter.applyToLocations()`) und Karte (`MapView.applyFilter()`); ⓘ-Erklärung analog allen anderen Filter-Gruppen (US-21-Konvention); Filter-Badge-Zählung; Persistenz in localStorage (automatisch über bestehenden `Filter.state`-Mechanismus).
-- Explizit ausgeschlossen: Feed, Kalender, Entdecken (Chancen-Attribute, kein `image_url` auf Chancen-Objekten); Bild-Thumbnail/Vorschau in der Location-Card-Liste oder im Karten-Popup (nicht Teil des Tickets); Backend-Änderungen (nicht nötig — `image_url` existiert bereits vollständig und korrekt, siehe Code-Verifikation).
+- Eingeschlossen (Kernversion, getestet): Drei-Zustand-Filter-Chip „Hat Bild" im Filter-Sheet, wirkt auf Locations-Tab (`Filter.applyToLocations()`) und Karte (`MapView.applyFilter()`); ⓘ-Erklärung analog allen anderen Filter-Gruppen (US-21-Konvention); Filter-Badge-Zählung; Persistenz in localStorage (automatisch über bestehenden `Filter.state`-Mechanismus).
+- Eingeschlossen (Scope-Erweiterung 2026-07-10): Filter wirkt zusätzlich auf Feed und Kalender über `Filter.apply()` (Zeile 2989–3089, gemeinsame Filterquelle für beide Ansichten), Location-Lookup per `location_id` analog dem bestehenden Schwierigkeit/Kategorie-Muster (Zeile 3030–3038); die Ausgrauen-Regel im Filter-Sheet für „Hat Bild" (`isChancenOnly`-Bedingung, Zeile 3559 + 3641–3647) wird so umgebaut, dass sie nur noch Entdecken (Scout) betrifft, nicht mehr Feed/Kalender — Chip dort aktiv nutzbar statt ausgegraut.
+- Explizit ausgeschlossen: Entdecken/Scout (eigene Filterfunktion `Filter.applyToScout()`, Scout-Chancen ohne `location_id`-Äquivalent — siehe Example-Mapping-Regel 7; Umsetzung dort würde Backend-Änderungen erfordern und ist nicht Teil dieser Erweiterung); Bild-Thumbnail/Vorschau in der Location-Card-Liste, im Karten-Popup oder im Feed/Kalender (nicht Teil des Tickets); Backend-Änderungen (nicht nötig — `image_url` existiert bereits vollständig und korrekt, siehe Code-Verifikation).
 
 **Akzeptanzkriterien:**
 - [ ] Im Filter-Sheet des Locations-Tabs erscheint ein neuer Chip „Hat Bild" (mit Bild-Icon) in einer eigenen Sektion zwischen „Verifikationsstatus" und „Sichtachse".
@@ -10116,7 +10130,13 @@ Keine offenen 🔴-Questions — Ticket + Code-Verifikation lassen alle Punkte e
 - [ ] 3× antippen: Filter ist wieder aus, alle Locations sichtbar, Chip im Ausgangszustand.
 - [ ] Bei aktivem „Nur mit Bild" zeigt auch die Kartenansicht nur noch Marker von Locations mit Beispielbild.
 - [ ] Bei aktivem „Nur ohne Bild" zeigt die Kartenansicht nur noch Marker von Locations ohne Beispielbild.
-- [ ] Im Feed, Kalender und bei Entdecken hat der Filter keine sichtbare Wirkung — weiterhin alle Chancen sichtbar, unabhängig vom Bild-Status der zugehörigen Location.
+- [ ] *(Scope-Erweiterung)* Im Feed ist der Chip „Hat Bild" aktiv nutzbar (nicht mehr ausgegraut): 1× tippen zeigt nur noch Chancen, deren zugehörige Location ein Beispielbild hat; Chip-Rahmen wird blau.
+- [ ] *(Scope-Erweiterung)* 2× tippen (in Folge) im Feed zeigt nur noch Chancen, deren zugehörige Location KEIN Beispielbild hat; Chip-Rahmen wird rot, Label „Ohne Bild".
+- [ ] *(Scope-Erweiterung)* 3× tippen im Feed schaltet den Filter wieder aus, alle Chancen wieder sichtbar.
+- [ ] *(Scope-Erweiterung)* Dieselbe Filterwirkung (beide Zustände) gilt in der Kalender-Monatsansicht.
+- [ ] *(Scope-Erweiterung)* Bei Entdecken bleibt der Chip weiterhin ausgegraut und ohne Wirkung — dort technisch nicht sinnvoll umsetzbar (siehe Scope/Example-Mapping-Regel 7).
+- [ ] *(Scope-Erweiterung)* Der Filter ist im Feed/Kalender additiv UND-kombinierbar mit den bestehenden Chancen-Filtern (Eventtyp, Tageszeit, Wahrscheinlichkeit, Brennweite, Wolkenstimmung).
+- [ ] *(Scope-Erweiterung, 🔴 Edge Case — Verhalten vor Implementierung mit Stephan bestätigen)* Chance ohne auflösbare `location_id`-Referenz: Default-Vorschlag zählt als „ohne Bild" (siehe offene Frage oben).
 - [ ] Der Filter ist mit bestehenden Location-Filtern (Schwierigkeit, Kategorie, Bewertung, Verifikation, Sichtachse, Entfernung) UND-kombinierbar.
 - [ ] Die Filter-Badge-Zahl erhöht sich um 1, sobald „Hat Bild" aktiv ist (Incl oder Excl).
 - [ ] Tippen auf das ⓘ neben „Hat Bild" zeigt eine kurze Erklärung des Filterverhaltens.
@@ -10131,6 +10151,11 @@ Keine offenen 🔴-Questions — Ticket + Code-Verifikation lassen alle Punkte e
 - 💀 Neu hochgeladenes Bild wird durch In-Memory-Mutation statt Server-Refetch nicht sichtbar (Antimuster aus `feedback_fotoalert_frontend_edits`) → Code-Verifikation zeigt, dass US-120/125/126/127 bereits korrekt `Locations.all = await API.get('/locations')` nach jeder Bildaktion aufrufen; kein neuer Code nötig, nur Regressionstest.
 - 💀 Optische Verwechslung des neuen `i-image`-Icons mit dem bereits vorhandenen, geometrisch identischen `i-camera`-Icon (Eventtyp-Sektion, im selben Filter-Sheet sichtbar, dort aber ausgegraut) → laut Designer-Check tolerierbar (Präzedenzfall `i-moon`/`i-moonsmall`, Text-Label trägt die Unterscheidung), nur beobachten.
 
+**Pre-Mortem — Scope-Erweiterung Feed/Kalender (2026-07-10):**
+- 💀 Performance: Lookup pro Chance (`Locations.all.find(...)`, linear) bei bis zu ~500 gecappten Feed-Chancen (BUG-32-Cap) × ~59 Locations → identisches Muster wird bereits für Schwierigkeit/Kategorie in derselben Funktion produktiv genutzt (Zeile 3031), kein neues Risiko, aber im Testplan mit vollem Feed spürbar prüfen statt nur anzunehmen.
+- 💀 BUG-28-Klasse (Locations.all-Ladereihenfolge): `App.init()` lädt `Locations.all` per try/catch VOR `Feed.load()` (Zeile 7693–7699) — bei /locations-Fehler (401/500) bleibt `Locations.all` leer, dann würde „Nur mit Bild" fälschlich ALLE Feed-Chancen ausblenden (0 Treffer) statt korrekt zu filtern, weil keine Location mehr auflösbar ist → bereits bestehendes Risiko für Schwierigkeit/Kategorie, jetzt zusätzlich für „Hat Bild" relevant; Kaltstart-Test (wie bereits für die Kernversion, Testplan-Szenario 10) auch für Feed verankern.
+- 💀 Ausgrauen-Logik falsch umgebaut: Die Bedingung `isChancenOnly` (Zeile 3559/3641) muss für „Hat Bild" so geändert werden, dass sie nur noch Scout betrifft — im selben Codeblock stehen aber mehrere andere `is*`-Flags (`isMapView`, `isLocationView`, `dimOnLocAndMap`), die weiterhin unverändert bleiben müssen (z. B. Tageszeit/Score bleiben auf Locations-Tab/Karte ausgegraut) → Gegenmaßnahme: Regressionstest aller anderen Ausgrauen-Sektionen im selben Filter-Sheet, nicht nur „Hat Bild" isoliert testen.
+
 📎 **Code-Verifikation** (`web/index.html`, `backend/main.py` gelesen am 2026-07-10):
 - Bestätigt: `Filter.applyToLocations()` (Zeile 3089–3126) ist die zentrale Filterquelle für den Locations-Tab; `MapView.applyFilter()` (Zeile 4920–5028) für die Karte. Beide iterieren über Location-Objekte, die `image_url` bereits als Property tragen.
 - Bestätigt: `image_url` wird serverseitig in `backend/main.py::_loc_to_out()` (Zeile 1465) berechnet: `f"/location-images/{loc.image_filename}"` oder `None` — für Standard- und Custom-Locations gleichermaßen, bereits korrekt und vollständig (kein Backend-Change nötig).
@@ -10140,6 +10165,13 @@ Keine offenen 🔴-Questions — Ticket + Code-Verifikation lassen alle Punkte e
 - Bestätigt: `Filter.apply()` (Zeile 2986–3086, für Feed/Kalender/Scout) prüft `image_url` nicht — Chancen-Objekte tragen dieses Feld nicht; Scope-Entscheidung „nicht auf Chancen-Ansichten" ist damit auch architektonisch stimmig, nicht nur UX-seitig.
 - Bestätigt: Drei-Zustand-Chip-Muster (`chip3`/`state3`-Helfer, Zeile 3449–3454; CSS `.filter-chip.active`→`--accent`, `.filter-chip.exclude`→`--red`, Zeile 639–645) 1:1 wiederverwendbar.
 - Bestätigt: Icon `<symbol id="i-image">` (Zeile 1102) existiert bereits im SVG-Sprite, korrekt mit `stroke="currentColor"` als `g`-Attribut (Safari-sicher), aktuell ungenutzt.
+
+📎 **Code-Verifikation — Scope-Erweiterung Feed/Kalender** (`web/index.html` neu geprüft am 2026-07-10):
+- Bestätigt: Das Referenz-Feld im Chancen-Objekt heißt `location_id` — konsistent über den gesamten Feed/Kalender-Code verwendet (u. a. Zeile 3031, 3041, 3056, 3064, 3081, 2384), nicht geraten sondern per Grep verifiziert.
+- Bestätigt: `App.init()` (Zeile 7672–7706) lädt `Locations.all = await API.get('/locations')` (Zeile 7694) VOR `await Feed.load()` (Zeile 7699), mit try/catch-Fallback (Kommentar verweist explizit auf BUG-28/BUG-30) — `Locations.all` ist beim ersten Feed/Kalender-Rendering bereits befüllt. Frühere Memory-Notiz „lädt erst beim Locations-Tab" ist wie schon in der Kernversion vermerkt veraltet.
+- Bestätigt: Die „Ausgrauen-Regel" für „Hat Bild" in Feed/Kalender/Scout sitzt in `FilterSheet._render()`, konkret in der Bedingung `isChancenOnly = !isMapView && !isLocationView` (Zeile 3559) und deren Verwendung im Ternary für `hasImageSection` (Zeile 3641–3647). Das ist die Stelle, die für die Erweiterung umgebaut werden muss (künftig nur noch Scout ausgrauen, nicht mehr Feed/Kalender).
+- Bestätigt: Feed und Kalender sind EIN gemeinsamer Render-/Filter-Pfad — beide rufen `Filter.apply()` auf (Feed: Zeile 2018 `Feed.render()`; Kalender: Zeile 2394 Monatsansicht, mit `skipCloudMood:true`). Eine Änderung an `Filter.apply()` deckt automatisch beide Ansichten ab. Entdecken/Scout ist dagegen ein DRITTER, komplett getrennter Pfad über `Filter.applyToScout()` (Zeile 3140), der auf Scout-eigenen Daten operiert.
+- Bestätigt (Architektur-Beleg für Scope-Ausschluss Scout): Stichprobe aus `backend/data/cache/discover.json` zeigt Scout-Opportunity-Felder (`body_name`, `subject_id`, `subject_name`, `standpoint_lat/lon`, `focal_length_equiv_mm`, `score`, …) — **kein** `location_id`-Feld vorhanden. Scout-Chancen sind an Alignment-Berechnungen zu „Subjects" gebunden, nicht an gespeicherte Locations.
 
 **Designer-Check (fotoalert-designer aufgerufen, 2026-07-10):**
 - Icon `i-image`: unbedenklich trotz Formgleichheit mit `i-camera` — Präzedenzfall `i-moon`/`i-moonsmall` existiert bereits, Text-Label trägt die Unterscheidung.
@@ -10154,13 +10186,24 @@ Beide Optionen erzeugen für Stephan exakt dasselbe sichtbare Verhalten (identis
 - **Option B — Array-Modell** (Vorbild: Verifikationsstatus-Chips): `hasImageIncl`/`hasImageExcl` als Arrays, `_cycleHasImage()` analog `_cycleVerification()`. Strukturell 100 % identisch zum vom Ticket genannten Vorbild, minimal mehr Code als nötig für eine reine Ja/Nein-Unterscheidung.
 - ✅ **Empfehlung: Option A** — schlankeres, zur Datenlage passendes Modell, funktional und optisch nicht von Option B unterscheidbar; Option B nur relevant, falls „Hat Bild" jemals mehr als 2 Kategorien bekäme (nicht absehbar).
 
+**Implementierungsoptionen — Scope-Erweiterung Feed/Kalender:**
+Beide Optionen führen zum selben sichtbaren Ziel (Chip in Feed/Kalender aktiv nutzbar); Unterschied liegt in der Behandlung des Edge Cases „Chance ohne auflösbare Location" (siehe 🔴 offene Frage oben) — für Stephan in Alltagssprache beschrieben, keine Funktionsnamen:
+
+- **Option A — Eindeutige Zuordnung („kein Ort gefunden = kein Bild"):** Jede Foto-Chance landet immer eindeutig in genau einem der beiden Filterzustände. Der (sehr seltene) Fall, dass eine Chance zu keinem bekannten Ort mehr gehört, wird wie „hat kein Bild" behandelt — bei „Nur mit Bild" verschwindet sie, bei „Nur ohne Bild" bleibt sie sichtbar. Klar nachvollziehbar, aber neues Verhalten (die anderen Chancen-Filter wie Schwierigkeit/Kategorie tun das nicht).
+- **Option B — Gleiches Verhalten wie die bestehenden Orts-Filter im Feed:** Eine Chance ohne auflösbaren Ort wird vom „Hat Bild"-Filter einfach nicht angefasst und bleibt in jedem Filterzustand sichtbar — genau wie es die Schwierigkeits- und Kategorie-Filter im Feed heute schon machen. Konsistenter mit dem bestehenden Verhalten, aber der Sonderfall „taucht überall auf" statt eindeutig zugeordnet zu sein.
+- ✅ **Empfehlung: Option A** — für einen Ja/Nein-Filter wie „Hat Bild" ist eine eindeutige Zuordnung intuitiver und leichter zu testen; der Edge Case ist ohnehin extrem selten (verwaiste `location_id`). Trotzdem: da dies ein echtes Verhaltens-Detail und keine reine Geschmacksfrage ist, bitte vor Implementierungsstart kurz bestätigen.
+
 **Analyse & Planung:**
-- [x] Example Mapping durchgeführt (4 Rules, 0 offene Questions)
-- [x] Pre-Mortem durchgeführt (4 Szenarien, alle in AKs/Testplan verankert)
+- [x] Example Mapping durchgeführt (4 Rules, 0 offene Questions) — Kernversion
+- [x] Pre-Mortem durchgeführt (4 Szenarien, alle in AKs/Testplan verankert) — Kernversion
 - [x] Architektur analysiert: ausschließlich `web/index.html` (`Filter._defaults()` Zeile 2916, `Filter.activeCount()` Zeile 2958–2972, `Filter.applyToLocations()` Zeile 3089–3126, `FilterSheet._render()` Zeile 3444–3663, neue `FilterSheet._cycleHasImage()`, `MapView.applyFilter()` Zeile 4920–5028, `ElementInfo._filterGroups` Zeile 7222 ff.) — kein Backend-Change
 - [x] Designer-Check: visuell sichtbar (neuer Chip) → fotoalert-designer aufgerufen, siehe oben
 - [x] Implementierungsoptionen: A / B
 - [x] Empfehlung: Option A
+- [x] Scope-Erweiterung (2026-07-10): Example Mapping (4 neue Rules, 1 offene 🔴-Frage), Pre-Mortem (3 neue Szenarien), Code-Verifikation (`location_id`-Feldname, `Locations.all`-Ladereihenfolge, Ausgrauen-Regel-Fundstelle, gemeinsamer vs. getrennter Render-Pfad) durchgeführt
+- [x] Scope-Erweiterung: Architektur analysiert — `Filter.apply()` Zeile 2989–3089 (neuer `hasImage`-Block analog `applyToLocations()` Zeile 3117–3122), `FilterSheet._render()` Zeile 3559/3641–3647 (Ausgrauen-Bedingung umbauen) — kein Backend-Change, Entdecken/Scout bewusst ausgeschlossen (kein `location_id`)
+- [ ] Scope-Erweiterung: Designer-Check für den Wechsel „ausgegraut → aktiv" in Feed/Kalender noch nicht erneut aufgerufen — vor Implementierung nachholen, falls sich optisch etwas ändert (z. B. Hinweistext „Nur im Locations-Tab und auf der Karte verfügbar" entfällt)
+- [x] Scope-Erweiterung: Implementierungsoptionen A / B (Edge-Case-Verhalten) — Empfehlung A, Bestätigung durch Stephan ausstehend
 
 **Testplan:**
 - [ ] Automatisiert (Harness): `backend/tests/test_us-129.py` — Regressions-Absicherung des Datenvertrags: `GET /locations` liefert für jede Location ein `image_url`-Feld, das entweder `null` oder ein String beginnend mit `/location-images/` ist (Standard- + Custom-Location). Die eigentliche Filterlogik ist reines Frontend-JS und nicht pytest-testbar — dafür der manuelle Testplan unten.
@@ -10171,9 +10214,21 @@ Beide Optionen erzeugen für Stephan exakt dasselbe sichtbare Verhalten (identis
   4. 3× tippen → Filter aus, alle Locations sichtbar.
   5. Bei „Nur mit Bild" zur Karte wechseln → nur Marker mit Bild sichtbar.
   6. Bei „Nur ohne Bild" zur Karte wechseln → nur Marker ohne Bild sichtbar.
-  7. Bei aktivem Filter in Feed/Kalender/Entdecken wechseln → keine Änderung, alle Chancen weiterhin da.
+  7. Bei aktivem Filter in Entdecken wechseln → weiterhin keine Änderung, Chip dort weiterhin ausgegraut.
   8. Kombinationstest: „Nur mit Bild" + „Schwierigkeit: Einfach" gleichzeitig → nur Locations, die beides erfüllen.
   9. Regression Pre-Mortem Szenario 1/3: Location ohne Bild öffnen, Beispielbild hochladen, zurück zum Locations-Tab, Filter aus/an tippen → Location erscheint sofort ohne App-Neustart.
   10. Regression Pre-Mortem Szenario 2 (Kaltstart): App neu laden, direkt zur Karte (ohne Locations-Tab-Besuch), Filter „Hat Bild" testen → funktioniert bereits beim ersten Aufruf.
   11. ⓘ neben „Hat Bild" antippen → Erklärungstext erscheint.
   12. Regressionsmatrix (PRODUCT.md Sektion 12): bestehende Filter-Chips (Verifikationsstatus, Sichtachse, Bewertung, Schwierigkeit, Kategorie) auf Locations-Tab UND Karte gegentesten — unverändert funktionsfähig.
+- [ ] Manuell — Scope-Erweiterung Feed/Kalender (unter http://localhost:8000):
+  13. Feed öffnen, Filter-Sheet öffnen → Chip „Hat Bild" ist NICHT mehr ausgegraut (voller Kontrast, klickbar).
+  14. Im Feed 1× tippen → nur noch Chancen sichtbar, deren Location ein Beispielbild hat; Rahmen blau.
+  15. Im Feed 2× tippen → nur noch Chancen sichtbar, deren Location KEIN Beispielbild hat; Rahmen rot, Label „Ohne Bild".
+  16. Im Feed 3× tippen → Filter aus, alle Chancen wieder sichtbar.
+  17. Dieselben drei Zustände im Kalender (Monatsansicht) wiederholen → identisches Verhalten.
+  18. Kombinationstest im Feed: „Nur mit Bild" + „Eventtyp: Goldene Stunde" gleichzeitig → nur Chancen, die beides erfüllen.
+  19. Kaltstart-Regression (Pre-Mortem Szenario „Ladereihenfolge"): App neu laden, direkt in den Feed (kein vorheriger Locations-Tab- oder Karten-Besuch), Filter „Hat Bild" im Feed testen → funktioniert bereits beim ersten Aufruf, keine 0-Treffer-Situation.
+  20. Regressionstest Ausgrauen-Sektionen im selben Filter-Sheet: Tageszeit + Mindest-Wahrscheinlichkeit sind auf Locations-Tab/Karte weiterhin korrekt ausgegraut (nicht versehentlich durch den Umbau mit aktiviert).
+  21. Entdecken erneut prüfen: Chip „Hat Bild" bleibt dort ausgegraut, keine Wirkung.
+  22. Performance-Stichprobe: Feed mit möglichst vollem Datenstand (kein Zeitraum-/Textfilter aktiv) + „Hat Bild" aktivieren → spürbar keine Verzögerung beim Filtern.
+  23. Edge Case (abhängig von finaler Entscheidung Option A/B): falls im System eine Chance mit nicht mehr auflösbarer Location existiert (oder künstlich erzeugbar) → Verhalten wie in AKs festgelegt gegentesten.
