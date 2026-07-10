@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-129** *(Filter „Hat Beispielbild" für Locations, Option A implementiert)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **BUG-68** *(Hinweise-Feld/Motivname übersteht vermutlich keinen Server-Neustart, vermutlich nicht vom precompute-Lauf gesehen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **BUG-69** *(Bildausschnitt-Tab-Menü: Kontrastproblem bei dunklem Hintergrund)* · **US-129** *(Filter „Hat Beispielbild" für Locations)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **BUG-68** *(Hinweise-Feld/Motivname übersteht vermutlich keinen Server-Neustart, vermutlich nicht vom precompute-Lauf gesehen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -10008,14 +10008,15 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 ---
 
-### BUG-69 · Bildausschnitt-Tab-Menü: Kontrastproblem bei dunklem Hintergrund `[~]`
+### BUG-69 · Bildausschnitt-Tab-Menü: Kontrastproblem bei dunklem Hintergrund `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-10 |
+| **Abgeschlossen** | 2026-07-10 |
 
 **Beschreibung:** Im Bearbeiten-Menü einer Location zeigt das kleine Tab-Menü oben links, mit dem der Bildausschnitt des Vorschaubilds verändert wird, aktuell graue Schrift auf blauem Grund. Diese Farbkombination ist schlecht lesbar, besonders wenn der Hintergrund dunkel ist. Erwartet: ein an das Bauhaus-Design mit nordischen Farben angepasster, kontrastreicherer Farb-/Formaufbau, der auf jedem Hintergrund gut lesbar bleibt.
 
@@ -10068,7 +10069,7 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-10 |
 
 **Beschreibung:** Im Locations-Tab bzw. in der Filterleiste soll ein neuer Filter-Chip „Hat Bild" hinzukommen, mit dem Locations danach gefiltert werden können, ob sie ein Beispielbild (`image_url`) haben oder nicht — als dreistufiger Toggle nach demselben Muster wie der bestehende Verifikationsfilter (Aus → Nur mit Bild → Nur ohne Bild → Aus, ein Klick pro Stufe).
@@ -10078,3 +10079,101 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 **Bezug:** Baut auf dem `image_url`-Feld der Location auf, eingeführt durch **US-120** [x] (Beispielbild-Upload), ergänzt durch **US-125** [x] (Löschen), **US-126** [x] (Bildausschnitt/Crop) und **US-127** [x] (Upload bereits bei Neuanlage) — alle Done, Feature ist live, keine Abhängigkeits-Blocker. Folgt dem etablierten Drei-Zustand-Filtermuster aus **BUG-46** [x] (führte den Verifikationsfilter als Drei-Zustand ein, `Filter.applyToLocations()` als zentrale Filterquelle für Locations-Tab + Karte, Ausgrauen-Regel für auf einer Ansicht nicht relevante Kriterien). Keine Dublette gefunden — kein bestehendes „hat Bild"-Filter-Ticket im Backlog (Grep nach „Filter", „Chip", „Bild", „Toggle" ergab keinen Treffer).
 
 **Quelle:** fotoalert-intake, 2026-07-10
+
+---
+
+**Implementation Spec** *(Analyse-Phase, 2026-07-10)*
+
+**Example Mapping — Rules:**
+1. Der Chip „Hat Bild" hat drei Zustände, durchlaufen per wiederholtem Antippen: Aus (alle Locations) → Nur mit Bild (Rahmen blau/`--accent`) → Nur ohne Bild (Rahmen rot/`--red`, Label wechselt zu „Ohne Bild") → Aus.
+2. Der Filter wirkt auf den Locations-Tab UND die Kartenansicht (Marker-Sichtbarkeit) — NICHT auf Feed, Kalender oder Entdecken. Diese Ansichten zeigen einzelne Foto-Chancen, nicht die Location selbst; „Hat Bild" ist ein Location-Attribut wie Schwierigkeit/Kategorie/Verifikation/Sichtachse/Entfernung, kein Chancen-Attribut. *(⚠️ Annahme, aus dem Ticket selbst klar ableitbar: Titel „...für Locations", Beschreibung „Im Locations-Tab".)*
+3. Ob eine Location „ein Bild hat" bestimmt ausschließlich das serverseitige `image_url`-Feld (befüllt sobald ein Beispielbild hochgeladen wurde, US-120/125/126/127) — unabhängig ob Standard- oder Custom-Location.
+4. Der Filter ist mit allen bestehenden Location-Filtern UND-kombinierbar und zählt in der Filter-Badge mit, sobald aktiv (Incl oder Excl).
+
+**Examples (Auszug):**
+- Given Chip auf „Aus", When 1× tippen, Then nur Locations mit Bild sichtbar, Rahmen blau.
+- Given Chip auf „Nur mit Bild", When erneut tippen, Then nur Locations ohne Bild sichtbar, Rahmen rot, Label „Ohne Bild".
+- Given Chip auf „Nur ohne Bild", When 3. Mal tippen, Then Filter aus, alle Locations sichtbar.
+- Given „Nur mit Bild" aktiv, When zur Karte wechseln, Then nur Marker von Locations mit Bild sichtbar.
+- Given „Nur mit Bild" aktiv, When in den Feed wechseln, Then keine Änderung — alle Chancen weiterhin sichtbar.
+
+**Weitere ⚠️ Annahmen (Default gewählt, siehe Designer-Check unten):**
+- Icon: bestehendes, bislang ungenutztes Symbol `i-image` (Zeile 1102) — bewusst gewählt statt Neuentwicklung.
+- Platzierung im Filter-Sheet: eigene Sektion zwischen „Verifikationsstatus" und „Sichtachse".
+- Label wechselt dynamisch „Hat Bild" ↔ „Ohne Bild" beim Zustandswechsel (wie beim Bewertungs-Chip `≥ N★`/`< N★`), statt nur die Rahmenfarbe zu ändern.
+- Kein neues visuelles Bild-Badge auf der Location-Karte/Popup — das Ticket umfasst nur den Filter, keine Bildvorschau in Listen/Popups.
+
+Keine offenen 🔴-Questions — Ticket + Code-Verifikation lassen alle Punkte eindeutig klären.
+
+**Scope:**
+- Eingeschlossen: neuer Drei-Zustand-Filter-Chip „Hat Bild" im Filter-Sheet, wirkt auf Locations-Tab (`Filter.applyToLocations()`) und Karte (`MapView.applyFilter()`); ⓘ-Erklärung analog allen anderen Filter-Gruppen (US-21-Konvention); Filter-Badge-Zählung; Persistenz in localStorage (automatisch über bestehenden `Filter.state`-Mechanismus).
+- Explizit ausgeschlossen: Feed, Kalender, Entdecken (Chancen-Attribute, kein `image_url` auf Chancen-Objekten); Bild-Thumbnail/Vorschau in der Location-Card-Liste oder im Karten-Popup (nicht Teil des Tickets); Backend-Änderungen (nicht nötig — `image_url` existiert bereits vollständig und korrekt, siehe Code-Verifikation).
+
+**Akzeptanzkriterien:**
+- [ ] Im Filter-Sheet des Locations-Tabs erscheint ein neuer Chip „Hat Bild" (mit Bild-Icon) in einer eigenen Sektion zwischen „Verifikationsstatus" und „Sichtachse".
+- [ ] 1× antippen: Locations-Tab zeigt nur noch Locations mit hochgeladenem Beispielbild; Chip-Rahmen wird blau, Label bleibt „Hat Bild".
+- [ ] 2× antippen (in Folge): Locations-Tab zeigt nur noch Locations OHNE Beispielbild; Chip-Rahmen wird rot, Label wechselt zu „Ohne Bild".
+- [ ] 3× antippen: Filter ist wieder aus, alle Locations sichtbar, Chip im Ausgangszustand.
+- [ ] Bei aktivem „Nur mit Bild" zeigt auch die Kartenansicht nur noch Marker von Locations mit Beispielbild.
+- [ ] Bei aktivem „Nur ohne Bild" zeigt die Kartenansicht nur noch Marker von Locations ohne Beispielbild.
+- [ ] Im Feed, Kalender und bei Entdecken hat der Filter keine sichtbare Wirkung — weiterhin alle Chancen sichtbar, unabhängig vom Bild-Status der zugehörigen Location.
+- [ ] Der Filter ist mit bestehenden Location-Filtern (Schwierigkeit, Kategorie, Bewertung, Verifikation, Sichtachse, Entfernung) UND-kombinierbar.
+- [ ] Die Filter-Badge-Zahl erhöht sich um 1, sobald „Hat Bild" aktiv ist (Incl oder Excl).
+- [ ] Tippen auf das ⓘ neben „Hat Bild" zeigt eine kurze Erklärung des Filterverhaltens.
+- [ ] Edge Case: Haben alle Locations kein Bild und „Nur mit Bild" ist aktiv, zeigt der Locations-Tab den bestehenden Leerzustand („Keine Locations gefunden").
+- [ ] Edge Case: Filter gilt für Standard- und Custom-Locations gleichermaßen.
+- [ ] Edge Case: Nach Bild-Upload/-Löschen (US-120/125/126) zeigt der bereits aktive Filter ohne App-Neustart sofort den korrekten Stand (Locations-Tab neu betreten oder Filter kurz aus/an).
+- [ ] Der Filterzustand übersteht einen Seiten-Reload (Persistenz wie alle anderen Filter über `localStorage`).
+
+**Pre-Mortem:**
+- 💀 Karte zeigt nach Bild-Upload nicht sofort den korrekten Filter-Stand, weil `MapView.applyFilter()` nur Sichtbarkeit umschaltet, aber nicht neu von `/locations` lädt → Gegenmaßnahme: AK „nach Upload/Löschen sofort korrekt" + manueller Test (Upload → zurück zur Karte → Filter aus/an).
+- 💀 Karte zeigt fälschlich alle Marker (Filter wirkungslos), wenn `image_url` beim ersten Kartenaufruf fehlt (BUG-28-Verdacht) → Code-Verifikation widerlegt dieses Risiko (siehe unten), trotzdem Kaltstart-Test im Testplan verankert, um es empirisch zu bestätigen.
+- 💀 Neu hochgeladenes Bild wird durch In-Memory-Mutation statt Server-Refetch nicht sichtbar (Antimuster aus `feedback_fotoalert_frontend_edits`) → Code-Verifikation zeigt, dass US-120/125/126/127 bereits korrekt `Locations.all = await API.get('/locations')` nach jeder Bildaktion aufrufen; kein neuer Code nötig, nur Regressionstest.
+- 💀 Optische Verwechslung des neuen `i-image`-Icons mit dem bereits vorhandenen, geometrisch identischen `i-camera`-Icon (Eventtyp-Sektion, im selben Filter-Sheet sichtbar, dort aber ausgegraut) → laut Designer-Check tolerierbar (Präzedenzfall `i-moon`/`i-moonsmall`, Text-Label trägt die Unterscheidung), nur beobachten.
+
+📎 **Code-Verifikation** (`web/index.html`, `backend/main.py` gelesen am 2026-07-10):
+- Bestätigt: `Filter.applyToLocations()` (Zeile 3089–3126) ist die zentrale Filterquelle für den Locations-Tab; `MapView.applyFilter()` (Zeile 4920–5028) für die Karte. Beide iterieren über Location-Objekte, die `image_url` bereits als Property tragen.
+- Bestätigt: `image_url` wird serverseitig in `backend/main.py::_loc_to_out()` (Zeile 1465) berechnet: `f"/location-images/{loc.image_filename}"` oder `None` — für Standard- und Custom-Locations gleichermaßen, bereits korrekt und vollständig (kein Backend-Change nötig).
+- Bestätigt: `MapView.render()` (Zeile 4894) lädt bei jedem Aufruf frisch `await API.get('/locations')` und hält das komplette Location-Objekt pro Marker in `this.markers` — **kein** Bezug zu `Locations.all`, also kein BUG-28-Risiko für die Karte.
+- Bestätigt: `Locations.load()`/`Locations.filter()` (Zeile 5686 ff.) laden bei jedem Besuch des Locations-Tabs ebenfalls frisch `/locations` — `image_url` immer aktuell.
+- **Memory-Korrektur:** Die bisherige Notiz „Locations.all lädt erst beim Locations-Tab (nicht beim Boot)" ist veraltet — seit BUG-30 lädt `App.init()` (Zeile 7637–7645) `Locations.all` bereits beim App-Start (mit try/catch-Fallback), noch vor `Feed.load()`. Für dieses Ticket ohnehin ohne Belang, da Locations-Tab + Karte unabhängig eigene frische Aufrufe machen.
+- Bestätigt: `Filter.apply()` (Zeile 2986–3086, für Feed/Kalender/Scout) prüft `image_url` nicht — Chancen-Objekte tragen dieses Feld nicht; Scope-Entscheidung „nicht auf Chancen-Ansichten" ist damit auch architektonisch stimmig, nicht nur UX-seitig.
+- Bestätigt: Drei-Zustand-Chip-Muster (`chip3`/`state3`-Helfer, Zeile 3449–3454; CSS `.filter-chip.active`→`--accent`, `.filter-chip.exclude`→`--red`, Zeile 639–645) 1:1 wiederverwendbar.
+- Bestätigt: Icon `<symbol id="i-image">` (Zeile 1102) existiert bereits im SVG-Sprite, korrekt mit `stroke="currentColor"` als `g`-Attribut (Safari-sicher), aktuell ungenutzt.
+
+**Designer-Check (fotoalert-designer aufgerufen, 2026-07-10):**
+- Icon `i-image`: unbedenklich trotz Formgleichheit mit `i-camera` — Präzedenzfall `i-moon`/`i-moonsmall` existiert bereits, Text-Label trägt die Unterscheidung.
+- Dynamischer Label-Wechsel „Hat Bild"↔„Ohne Bild": beibehalten, entspricht dem etablierten Bewertungs-Chip-Muster, Farbe allein wäre ein schwächeres Signal.
+- Platzierung nach „Verifikationsstatus", vor „Sichtachse": bestätigt — nächster konzeptueller Nachbar (beide Ja/Nein-Metadaten zur Dokumentationsvollständigkeit).
+- Keine weiteren Bauhaus-Verstöße: Radius (20px Pill), Farben (`--accent`/`--red`), Touch-Target folgen exakt dem bestehenden `.filter-chip`-Muster; ⓘ-Info-Button nicht vergessen (US-21-Konvention).
+
+**Implementierungsoptionen:**
+Beide Optionen erzeugen für Stephan exakt dasselbe sichtbare Verhalten (identischer Chip, identischer 3-Klick-Zyklus) — der Unterschied ist rein intern/technisch, ohne App-Wirkung.
+
+- **Option A — Schlankes Zwei-Werte-Modell** (Vorbild: Mindest-Bewertung-Chip): ein Feld `hasImage` (Filter aktiv? ja/nein) + ein Feld `hasImageExcl` (Incl- oder Excl-Zustand), ein `_cycleHasImage()` analog `_cycleRating()`. Passt exakt zur binären Natur von „hat Bild ja/nein", geringster Code, kein ungenutztes Array.
+- **Option B — Array-Modell** (Vorbild: Verifikationsstatus-Chips): `hasImageIncl`/`hasImageExcl` als Arrays, `_cycleHasImage()` analog `_cycleVerification()`. Strukturell 100 % identisch zum vom Ticket genannten Vorbild, minimal mehr Code als nötig für eine reine Ja/Nein-Unterscheidung.
+- ✅ **Empfehlung: Option A** — schlankeres, zur Datenlage passendes Modell, funktional und optisch nicht von Option B unterscheidbar; Option B nur relevant, falls „Hat Bild" jemals mehr als 2 Kategorien bekäme (nicht absehbar).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Rules, 0 offene Questions)
+- [x] Pre-Mortem durchgeführt (4 Szenarien, alle in AKs/Testplan verankert)
+- [x] Architektur analysiert: ausschließlich `web/index.html` (`Filter._defaults()` Zeile 2916, `Filter.activeCount()` Zeile 2958–2972, `Filter.applyToLocations()` Zeile 3089–3126, `FilterSheet._render()` Zeile 3444–3663, neue `FilterSheet._cycleHasImage()`, `MapView.applyFilter()` Zeile 4920–5028, `ElementInfo._filterGroups` Zeile 7222 ff.) — kein Backend-Change
+- [x] Designer-Check: visuell sichtbar (neuer Chip) → fotoalert-designer aufgerufen, siehe oben
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_us-129.py` — Regressions-Absicherung des Datenvertrags: `GET /locations` liefert für jede Location ein `image_url`-Feld, das entweder `null` oder ein String beginnend mit `/location-images/` ist (Standard- + Custom-Location). Die eigentliche Filterlogik ist reines Frontend-JS und nicht pytest-testbar — dafür der manuelle Testplan unten.
+- [ ] Manuell (unter http://localhost:8000):
+  1. Locations-Tab öffnen, Filter-Sheet öffnen → Chip „Hat Bild" sichtbar zwischen „Verifikationsstatus" und „Sichtachse".
+  2. 1× tippen → nur Locations mit Bild, Rahmen blau.
+  3. 2× tippen → nur Locations ohne Bild, Rahmen rot, Label „Ohne Bild".
+  4. 3× tippen → Filter aus, alle Locations sichtbar.
+  5. Bei „Nur mit Bild" zur Karte wechseln → nur Marker mit Bild sichtbar.
+  6. Bei „Nur ohne Bild" zur Karte wechseln → nur Marker ohne Bild sichtbar.
+  7. Bei aktivem Filter in Feed/Kalender/Entdecken wechseln → keine Änderung, alle Chancen weiterhin da.
+  8. Kombinationstest: „Nur mit Bild" + „Schwierigkeit: Einfach" gleichzeitig → nur Locations, die beides erfüllen.
+  9. Regression Pre-Mortem Szenario 1/3: Location ohne Bild öffnen, Beispielbild hochladen, zurück zum Locations-Tab, Filter aus/an tippen → Location erscheint sofort ohne App-Neustart.
+  10. Regression Pre-Mortem Szenario 2 (Kaltstart): App neu laden, direkt zur Karte (ohne Locations-Tab-Besuch), Filter „Hat Bild" testen → funktioniert bereits beim ersten Aufruf.
+  11. ⓘ neben „Hat Bild" antippen → Erklärungstext erscheint.
+  12. Regressionsmatrix (PRODUCT.md Sektion 12): bestehende Filter-Chips (Verifikationsstatus, Sichtachse, Bewertung, Schwierigkeit, Kategorie) auf Locations-Tab UND Karte gegentesten — unverändert funktionsfähig.
