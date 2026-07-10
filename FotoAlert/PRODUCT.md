@@ -91,10 +91,11 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 
 ## 3a. Filter (BUG-46 — vollständige Spezifikation)
 
-Der Filter hat 10 Kriterien. Vier davon haben **Drei-Zustände** (Off → Einschließen → Ausschließen → Off):
+Der Filter hat 11 Kriterien. Vier davon haben **Drei-Zustände** (Off → Einschließen → Ausschließen → Off):
 Eventtyp, Tageszeit, Schwierigkeit, Kategorie.
 Seit BUG-46 haben auch Verifikationsstatus und Mindest-Bewertung Drei-Zustände.
 Seit US-09 hat auch der Sichtachsen-Check-Status Drei-Zustände.
+Seit US-129 hat auch „Hat Beispielbild" Drei-Zustände.
 
 ### Kriterien und ihre Zustände
 
@@ -109,6 +110,7 @@ Seit US-09 hat auch der Sichtachsen-Check-Status Drei-Zustände.
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
 | **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51). GPS-Dialog erscheint pro Session maximal einmal — laufende Anfragen werden dedupliziert via `Filter._gpsPromise`-Caching (BUG-52) |
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
+| **Hat Beispielbild** (US-129) | Ja: Off → Nur mit Bild (Rahmen `--accent`) → Nur ohne Bild (Rahmen `--red`, Label „Ohne Bild") → Off | Gilt für Locations-Tab, Karte, Chancen-Feed, Kalender (Lookup der Location über `location_id`); **ausgegraut bei Entdecken/Scout** (Scout-Chancen haben kein `location_id`-Äquivalent); ⓘ-Erklärtext am Filter-Chip |
 | **Sichtachsen-Check** (US-09) | Ja: Off → nur diesen Status zeigen → diesen Status ausschließen → Off; Statuswerte: Frei / Teilweise verdeckt / Blockiert / Nicht geprüft | Gilt für Chancen-Feed, Kalender, Scout, Locations-Tab, Karte (Sichtachsen-Ergebnis ist Location-Eigenschaft); ⓘ-Erklärtext am Filter-Chip |
 
 ### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
@@ -124,6 +126,13 @@ Seit US-09 hat auch der Sichtachsen-Check-Status Drei-Zustände.
 - Off: keine Filterung
 - Chips „Nicht geprüft" und „Probleme" bleiben einfache Selekt-Chips
 
+**Hat Beispielbild (US-129):**
+- Rahmen `--accent` (Einschließen, „Hat Bild"): zeigt nur Locations/Chancen, deren Location ein Beispielbild hat (`image_url` gesetzt)
+- Rahmen `--red` (Ausschließen, Label wechselt zu „Ohne Bild"): zeigt nur Locations/Chancen ohne Beispielbild
+- Off: keine Filterung
+- Für Chancen im Feed/Kalender bestimmt die zugehörige Location (`location_id`-Lookup) den Bildstatus; eine Chance ohne auflösbare Location zählt als „ohne Bild" (eindeutige Zuordnung)
+- Bei Entdecken/Scout ist der Chip ausgegraut ohne Wirkung — Scout-Chancen haben kein `location_id`-Feld
+
 ### Ausgrauen-Verhalten (BUG-46)
 
 Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 0.45, pointer-events none) — sie bleiben sichtbar, sind aber nicht bedienbar:
@@ -132,7 +141,8 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 |---|---|
 | **Karte** | Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
 | **Locations-Tab** | Eventtyp, Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
-| **Chancen-Feed / Kalender / Scout** | Nichts ausgegraut |
+| **Chancen-Feed / Kalender** | Nichts ausgegraut |
+| **Scout (Entdecken)** | Hat Beispielbild (US-129, kein `location_id`-Äquivalent bei Scout-Chancen) |
 
 ### Wirkungs-Übersicht nach Ansicht
 
@@ -147,6 +157,7 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 | Mindest-Bewertung | ✓ | ✓ | — | ✓ | ✓ |
 | Entfernung (GPS) | ✓ | — | ✓ | — | ✓ |
 | Verifikation | ✓ | ✓ | — | ✓ | ✓ |
+| Hat Beispielbild (US-129) | ✓ | ✓ | — (ausgegraut) | ✓ | ✓ |
 | Sichtachsen-Check (US-09) | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 **Pflicht-Regression Filter (BUG-46):**
@@ -160,6 +171,9 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 - [ ] Karte zeigt nach Verifikations-Filter nur passende Pins
 - [ ] Sichtachsen-Check-Chip: Off → nur diesen Status → diesen Status ausschließen → Off (drei Tipp-Schritte, US-09)
 - [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab) — nicht ausgegraut (US-09)
+- [ ] „Hat Beispielbild"-Chip: Off → gold „Hat Bild" → rot „Ohne Bild" → Off (drei Tipp-Schritte, US-129)
+- [ ] „Hat Beispielbild" wirkt auf Locations-Tab, Karte, Feed und Kalender (nur mit/nur ohne Bild korrekt gefiltert); im Feed/Kalender additiv UND-kombinierbar mit den übrigen Chancen-Filtern (US-129)
+- [ ] „Hat Beispielbild" bleibt bei Entdecken/Scout ausgegraut ohne Wirkung (US-129)
 
 ---
 
@@ -563,5 +577,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-09 | US-127 | Host kann bereits beim Anlegen einer neuen Location optional ein Beispielbild auswählen; automatischer Upload direkt nach erfolgreichem Speichern mit gleicher Validierung/Verkleinerung/Kompression wie im Bearbeiten-Modus (US-120). |
 | 2026-07-09 | BUG-66 | „Höhenwinkel Spitze" in der Anlage-Vorschau zeigte immer 0,0°, weil der Geländeunterschied nie ermittelt wurde. Vorschau nutzt jetzt denselben automatischen Höhendaten-Abruf wie bereits gespeicherte Locations (einmal pro Anfrage, kein Mehrfach-Call). Released als v1.22.4. |
 | 2026-07-09 | BUG-67 | Neu angelegte Location erscheint jetzt sofort ohne App-Neustart auf der Karte UND in der Locations-Liste, auch wenn der Karten-Tab beim Speichern bereits offen war: `AddLocation.save()` stößt nach dem Speichern zusätzlich zu `Locations.load()` explizit `MapView.loadMarkers()` (nur falls Karte schon initialisiert) und einen defensiven `Locations.render()` an. Nebenbei behoben: `MapView.loadMarkers()` entfernte bislang die vorher geladenen Marker nicht von der Karte, bevor neue hinzugefügt wurden — bei wiederholtem Aufruf wären doppelte Marker entstanden; jetzt werden alte Marker vor dem Neuaufbau korrekt per `removeLayer` entfernt. Aktive Kartenfilter werden nach dem Neuladen weiterhin angewendet (bestehender `applyFilter()`-Aufruf am Ende von `loadMarkers()`). Status In Progress — Test ausstehend. |
+| 2026-07-10 | US-129 | Filter "Hat Beispielbild" für Locations, Karte, Feed und Kalender |
 | 2026-07-10 | US-128 | Bauwerkshöhe (`subject_height_m`) und Bauwerksbreite (`subject_width_m`) sind jetzt im Bearbeiten-Modus nachträglich korrigierbar (analog zur bestehenden Fotografen-Standhöhe), für Custom- und Standard-Locations; eine Korrektur löst automatisch eine Neuberechnung (Feed + Kalender) aus, analog zur Koordinatenkorrektur, und übersteht jetzt zuverlässig sowohl Server-Neustart als auch den precompute-Subprozess. Nebenbefund im selben Ticket: Scout-Platzhalter-Erkennung von einer 20-Meter-Heuristik auf ein explizites Feld `subject_height_researched` umgestellt (verhinderte vorher fälschlichen Ausschluss korrekt recherchierter Locations aus der Scout-Pipeline). Code-Release als v1.22.6 (Health-Check auf Produktion bestätigt) — Ticket bleibt offen, bis der aktuell laufende ca. 9-stündige Neuberechnungslauf über alle Bestandslocations abgeschlossen ist. |
 | 2026-07-10 | BUG-69 | Bildausschnitt-Button jetzt gut lesbar auf jedem Foto-Hintergrund |
+| 2026-07-11 | BUG-70 | Datenbank-Korruption in `location_qa_values` durch einen harten Prozess-Abbruch (OOM-Kill) repariert. Code-Härtung: `LocationStore.integrity_check()` liefert jetzt eine vollständige Fehlerliste statt nur einer einzelnen Zeile und wirft auch bei stark beschädigten Datenbanken keine ungefangene Exception mehr; Ladefehler beim Server-Start werden jetzt als ERROR statt WARNING geloggt (fällt beim Monitoring auf statt unterzugehen); zusätzlich läuft beim Start jetzt generell eine Integritätsprüfung. Für eine eventuelle erneute Reparatur steht das Skript `tools/repair_bug70_qa_values.py` bereit. |

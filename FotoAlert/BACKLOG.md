@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-129** *(Scope-Erweiterung implementiert: Filter „Hat Bild" wirkt jetzt auch in Feed + Kalender, Kern für Locations/Karte bereits vorher getestet; Entdecken weiterhin ausgegraut)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, Option 1 freigegeben durch Stephan, 2026-07-10)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A freigegeben durch Stephan, 2026-07-10, Umsetzung gestartet)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **BUG-68** *(Hinweise-Feld/Motivname übersteht vermutlich keinen Server-Neustart, vermutlich nicht vom precompute-Lauf gesehen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -9969,13 +9969,13 @@ Cap+Sort / Cross-Collection-Lookup: nicht anwendbar (kein Listen-Cap, kein Cross
 
 ---
 
-### BUG-68 · Hinweise-Feld und Motivname überstehen vermutlich keinen Server-Neustart und werden vermutlich nicht vom precompute-Lauf gesehen `[ ]`
+### BUG-68 · Hinweise-Feld und Motivname überstehen vermutlich keinen Server-Neustart und werden vermutlich nicht vom precompute-Lauf gesehen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-10 |
 
 **Beschreibung:** Bei der US-128-Code-Verifikation fiel auf, dass `special_notes` (Hinweise) und `subject_name` (Motivname) zwar über `PATCH /locations/{id}` korrekt editierbar sind (BUG-50, BUG-61 — Done), aber vermutlich in zwei weiteren Whitelists fehlen, die für Standard-Locations denselben Korrekturwert dauerhaft sichtbar halten müssen: `main.py:_load_location_overrides()` (Reload-Tupel, Zeile ~1218–1221) und `precompute.py:_OVERRIDE_FIELDS` (Zeile ~140–143). Falls das zutrifft, würde eine Korrektur für Standard-Locations einen Server-Neustart nicht überleben und vom precompute-Subprozess (Einzel- wie Vollrecompute) nicht gesehen — noch nicht selbst geprüft, ob das tatsächlich zutrifft.
@@ -9987,6 +9987,58 @@ Cap+Sort / Cross-Collection-Lookup: nicht anwendbar (kein Listen-Cap, kein Cross
 - **US-128** (Ready for Dev, 2026-07-10) hat bei der eigenen Code-Verifikation exakt dieselben zwei Whitelist-Stellen (main.py-Reload-Tupel, precompute.py `_OVERRIDE_FIELDS`) für ein anderes Feld-Paar (`subject_height_m`/`subject_width_m`) bereits identifiziert und behebt sie dort. Kein Merge (unterschiedliche Felder, unterschiedliche Fehlerauswirkung — Zahlen vs. Text, mit vs. ohne Recompute-Trigger), aber die technische Lösung aus US-128 (Whitelist-Erweiterung an beiden Stellen, ggf. bereits zusammengeführt gemäß Stephans Options-B-Entscheidung dort) ist als Vorlage direkt auf `special_notes`/`subject_name` übertragbar.
 
 **Quelle:** fotoalert-intake (Fund bei US-128-Code-Verifikation, 2026-07-10)
+
+---
+
+**Scope-Verifikation (fotoalert-analyze, 2026-07-10):** Verdacht direkt am Code bestätigt — mit einer wichtigen Präzisierung gegenüber der Ticket-Beschreibung. Die zwei ursprünglich vermuteten *unabhängig gepflegten* Whitelist-Stellen existieren als Codestellen zwar weiterhin, sind aber inzwischen (durch die bereits im Code vorhandene, noch nicht released US-128-Umsetzung) keine zwei getrennten Listen mehr, sondern beide aus einer einzigen zentralen Tabelle abgeleitet: `backend/data/locations.py:LOCATION_FIELD_RULES` (Zeilen 131–166). `main.py` importiert daraus `OVERRIDE_RELOAD_FIELDS` (Import Zeile 69–70, Verwendung Zeile 1224: `for field in OVERRIDE_RELOAD_FIELDS:` in `_load_location_overrides()`); `precompute.py` importiert `PRECOMPUTE_OVERRIDE_FIELDS` und weist es `_OVERRIDE_FIELDS` zu (Zeile 51 Import, Zeile 144 `_OVERRIDE_FIELDS = PRECOMPUTE_OVERRIDE_FIELDS`, Verwendung Zeile 174 in `_apply_location_overrides()`).
+
+In genau dieser zentralen Tabelle ist der Verdacht exakt bestätigt und sogar bereits im Code als bekannte, bewusst offen gelassene Lücke dokumentiert — `backend/data/locations.py` Zeilen 139–142:
+```python
+# BUG-68 (bekannte, hier bewusst NICHT gefixte Lücke): special_notes/subject_name
+# überstehen aktuell weder einen Server-Neustart noch den precompute-Subprozess.
+"special_notes": {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
+"subject_name":  {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
+```
+Beide Felder sind über `PATCH /locations/{id}` bereits korrekt editierbar (`kind: "text"` zählt zu `PATCHABLE_LOCATION_FIELDS`/`TEXT_FIELDS`, bestätigt BUG-50/BUG-61 Done) und werden beim Speichern korrekt in die SQLite-Overrides geschrieben (`_save_location_override()`, `main.py` Zeile 2562) — aber `override_reload: False` und `precompute_reload: False` verhindern, dass dieser gespeicherte Wert beim nächsten Server-Neustart bzw. beim nächsten precompute-Lauf zurückgelesen wird. Der im Ticket beschriebene Verdacht ist damit vollständig bestätigt.
+
+Wichtiger Zusatzbefund: US-128 hat den Umbau auf die zentrale Tabelle bereits umgesetzt (Ticket-Status „In Test", 2026-07-10) — die im Ticket noch beschriebene „zwei getrennte Whitelists"-Architektur ist damit bereits überholt. Der Fix für BUG-68 ist dadurch **einfacher** als ursprünglich angenommen: Es genügt eine Ein-Zeilen-Änderung an genau einer zentralen Stelle (siehe Implementierungsoptionen unten) statt zwei Stellen synchron zu pflegen.
+
+**Example Mapping:**
+- Regel: Eine Korrektur am Hinweise-Feld oder am Motivnamen einer Standard-Location bleibt dauerhaft erhalten — sie übersteht sowohl einen Server-Neustart als auch einen Recompute-Lauf (Einzel- wie Vollrecompute), genauso wie es bei Name/Beschreibung bereits funktioniert.
+  - Positiv 1: Ein Host korrigiert das Hinweise-Feld einer Standard-Location über die Bearbeiten-Funktion; danach wird der Server neu gestartet (z. B. durch ein Deploy) — der korrigierte Text bleibt sichtbar, nicht der alte.
+  - Positiv 2: Ein Host korrigiert den Motivnamen einer Standard-Location; danach läuft für dieselbe Location ein Einzel-Recompute (z. B. weil zusätzlich eine Koordinate korrigiert wurde) — der korrigierte Name bleibt erhalten.
+  - Negativ (heutiger Bug, vor dem Fix): Ein Host korrigiert das Hinweise-Feld; nach dem nächsten Server-Neustart zeigt die Location wieder den alten, ursprünglichen Text — die Korrektur wirkt „verschwunden", obwohl sie weiterhin in der Datenbank gespeichert ist.
+  - Edge 1: Bei Custom-Locations (selbst angelegte Locations, keine Standard-Locations) bleibt eine Korrektur an Hinweise-Feld/Motivname schon heute stabil, weil sie direkt in der eigenen Datei gespeichert wird statt über den Override-Mechanismus — an diesem bereits funktionierenden Verhalten darf sich durch den Fix nichts ändern.
+  - Edge 2: Auch beim vollständigen nächtlichen Recompute-Lauf über alle Standard-Locations (nicht nur beim gezielten Einzel-Recompute) bleibt der korrigierte Text erhalten.
+  - Edge 3: Ein Host hatte schon vor diesem Fix einmal das Hinweise-Feld oder den Motivnamen korrigiert — dieser alte Korrekturwert liegt bereits „schlafend" in der Datenbank. Nach dem Fix erscheint dieser alte Wert beim nächsten Neustart/Recompute erstmals sichtbar. Das ist das gewünschte Verhalten, kann für Stephan aber überraschend wirken, wenn eine vermeintlich verlorene, längst vergessene Korrektur plötzlich wieder auftaucht (siehe Pre-Mortem).
+
+**Akzeptanzkriterien:**
+1. Ändert ein Host das Hinweise-Feld einer Standard-Location, bleibt der neue Text auch nach einem Server-Neustart sichtbar (nicht der alte Wert).
+2. Ändert ein Host den Motivnamen einer Standard-Location, bleibt der neue Name auch nach einem Server-Neustart sichtbar.
+3. Nach einem gezielten Einzel-Recompute für eine Standard-Location (z. B. ausgelöst durch eine zusätzliche Koordinaten-Korrektur an derselben Location) bleiben Hinweise-Feld und Motivname unverändert auf dem zuletzt korrigierten Wert.
+4. Nach einem vollständigen nächtlichen Recompute-Lauf über alle Standard-Locations bleiben Hinweise-Feld und Motivname jeder betroffenen Location auf dem zuletzt korrigierten Wert.
+5. Edge Case: Bei Custom-Locations ändert sich am bestehenden, bereits korrekten Verhalten nichts — Korrekturen bleiben wie bisher stabil.
+6. Edge Case: Weder die reine Korrektur des Hinweise-Felds noch die des Motivnamens löst einen Recompute (Astronomie-Neuberechnung) aus — dieses bestehende Verhalten bleibt unverändert.
+7. Edge Case: Bereits vor dem Fix in der Datenbank gespeicherte, bisher „schlafende" Korrekturen an Hinweise-Feld/Motivname werden nach dem Fix beim nächsten Neustart erstmals angezeigt (kein Datenverlust, sondern verzögert sichtbar gewordene Korrektur).
+
+**Pre-Mortem — was könnte schiefgehen:**
+- 💀 Nach dem Fix taucht bei einer oder mehreren Standard-Locations plötzlich ein alter Hinweise-/Motivname-Text auf, den ein Host vor längerer Zeit probeweise eingegeben und für „verworfen" gehalten hatte (weil er nach dem nächsten Neustart bisher immer wieder verschwand) → wirkt auf den ersten Blick wie eine neue Datenkorruption, ist aber nur ein längst gespeicherter, bisher nie zurückgelesener Korrekturwert. Auslöser: `_save_location_override()` hat das Feld schon immer korrekt in SQLite gespeichert (der BUG-50/BUG-61-Fix betraf nur die PATCH-Whitelist selbst) — nur der Reload-Pfad hat den Wert nie zurückgelesen. Gegenmaßnahme: AK 7 verankert dieses Verhalten explizit als erwartet; vor dem Rollout die Standard-Location-Overrides in SQLite auf abweichende, bisher unsichtbare Werte für `special_notes`/`subject_name` sichten, damit es keine Überraschung gibt.
+- 💀 Der Fix wird — wie ursprünglich im Ticket beschrieben — an zwei vermeintlich getrennten Stellen (`main.py`- und `precompute.py`-eigene Tupel) nachgebaut, obwohl beide seit US-128 nur noch von derselben zentralen Tabelle in `data/locations.py` abgeleitet werden. Auslöser: Der Ticket-Text (Stand Intake) beschreibt noch die alte, bereits abgelöste Architektur. Gegenmaßnahme: Diese Scope-Verifikation und die Implementierungsoptionen unten benennen exakt die eine richtige Stelle (Zeilen 141–142) — kein Nachbau einer zweiten Abstraktion.
+- 💀 Der BUG-68-Fix wird zeitgleich mit der noch nicht released US-128-Änderung bearbeitet (US-128 Status „In Test") und überschreibt versehentlich benachbarte US-128-Zeilen im selben Dict-Block (`subject_height_m`/`subject_width_m`, Zeilen 144–147 direkt neben 141–142). Gegenmaßnahme: `data/locations.py` unmittelbar vor dem Edit frisch lesen und ausschließlich die zwei Flag-Werte in den bestehenden Zeilen 141–142 ändern, ohne die umgebende Struktur oder benachbarte Zeilen anzufassen.
+- 💀 Beim Fix wird zusätzlich `recompute` für diese beiden Felder auf `True` gesetzt (Verwechslung „muss den Reload überstehen" mit „muss einen Recompute auslösen") → jede reine Text-Korrektur würde unnötig einen astronomischen Recompute anstoßen, ohne fachlichen Nutzen (Text beeinflusst keine Astronomie-Berechnung), nur Performance-Kosten. Gegenmaßnahme: AK 6 verankert explizit, dass kein Recompute ausgelöst wird; die Implementierungsoption unten benennt exakt die zwei zu ändernden Flags (nicht drei).
+
+**Betroffene Architektur:**
+- `backend/data/locations.py` — `LOCATION_FIELD_RULES` (Zeilen 131–166), konkret die Einträge für `special_notes`/`subject_name` (Zeilen 141–142), sowie die daraus abgeleiteten Tupel `OVERRIDE_RELOAD_FIELDS` (Zeile 184) und `PRECOMPUTE_OVERRIDE_FIELDS` (Zeile 185). Dies ist die einzige Stelle, die geändert werden muss.
+- `backend/main.py` — `_load_location_overrides()` (Zeilen 1185–1231, insb. Zeile 1224 `for field in OVERRIDE_RELOAD_FIELDS:`) sowie `patch_location()` (Zeilen 2488ff., PATCH-Whitelist bereits korrekt via `PATCHABLE_LOCATION_FIELDS`/`TEXT_FIELDS`, keine Änderung nötig). Liest die zentrale Tabelle nur, wird durch den Fix automatisch mitversorgt.
+- `backend/precompute.py` — `_apply_location_overrides()` (Zeilen 147–183, insb. Zeile 144 `_OVERRIDE_FIELDS = PRECOMPUTE_OVERRIDE_FIELDS`, Zeile 174 `for field in _OVERRIDE_FIELDS:`). Liest ebenfalls nur die zentrale Tabelle, keine Änderung nötig.
+- `backend/tests/test_us_128.py` — enthält bereits das direkt übertragbare Testmuster für genau diese zwei Reload-Pfade (Unit-Tests gegen `main._load_location_overrides()` und `precompute._apply_location_overrides()`, ohne API-Roundtrip), als Vorlage für die BUG-68-Tests in der Implementierungsphase.
+- Geprüft, keine weiteren Konsumenten: `OVERRIDE_RELOAD_FIELDS`/`PRECOMPUTE_OVERRIDE_FIELDS`/`LOCATION_FIELD_RULES` werden ausschließlich in diesen drei Backend-Dateien referenziert (Grep-Check), kein Frontend- oder sonstiger Backend-Konsument betroffen.
+
+**Implementierungsoptionen:**
+- (a) Flag-Flip in der zentralen Tabelle: In `backend/data/locations.py`, Zeilen 141–142, die beiden Flags `override_reload` und `precompute_reload` von `False` auf `True` setzen (für `special_notes` und `subject_name`). `recompute` bleibt `False` (reiner Text löst keine Astronomie-Neuberechnung aus). Keine weitere Codeänderung nötig, da `main.py` und `precompute.py` bereits generisch aus dieser Tabelle lesen. Aufwand: sehr klein (zwei Wertänderungen in einer Zeile).
+- (b) Separate neue gemeinsame Konstante extrahieren: Wäre die richtige Lösung gewesen, falls `main.py`/`precompute.py` tatsächlich noch zwei unabhängige, eigene Tupel gehabt hätten (wie ursprünglich im Ticket vermutet). Das ist jedoch bereits durch US-128 geschehen (siehe Scope-Verifikation) — diese Option ist für BUG-68 bereits erledigt/obsolet und würde nur eine zweite, konkurrierende Abstraktion neben der bestehenden `LOCATION_FIELD_RULES`-Tabelle schaffen.
+- (c) Vollständiger Audit aller Textfelder in `LOCATION_FIELD_RULES` auf ähnliche unbeabsichtigte Lücken (zusätzlich zu `special_notes`/`subject_name` alle anderen Felder auf `False`/`False`-Kombinationen prüfen, die keinen dokumentierten Absichtsgrund haben — z. B. ist bei `image_filename`/`image_focus_x`/`image_focus_y` ein `precompute_reload: False` bereits bewusst dokumentiert, also kein Bug). Würde evtl. weitere, bisher unentdeckte Lücken derselben Fehlerklasse aufdecken, ist aber eine Scope-Erweiterung über dieses Ticket hinaus und sollte, falls gewünscht, als eigenes Ticket nach Rückfrage bei Stephan verfolgt werden.
+- **Empfehlung: Option (a).** Ein-Zeilen-Flip an der bereits von US-128 gebauten zentralen Stelle — nutzt die vorhandene, geprüfte Infrastruktur exakt wie vorgesehen, erzeugt kein Risiko neuer Architektur-Divergenz und deckt exakt den im Ticket beschriebenen Fehler ab. Option (c) als optionaler Folge-Vorschlag (eigenes Ticket) an Stephan, nicht Teil dieses Fixes.
 
 ---
 
@@ -10063,14 +10115,15 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 ---
 
-### US-129 · Filter „Hat Beispielbild" für Locations `[~]`
+### US-129 · Filter „Hat Beispielbild" für Locations `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-10 |
+| **Abgeschlossen** | 2026-07-10 |
 
 **Beschreibung:** Im Locations-Tab bzw. in der Filterleiste soll ein neuer Filter-Chip „Hat Bild" hinzukommen, mit dem Locations danach gefiltert werden können, ob sie ein Beispielbild (`image_url`) haben oder nicht — als dreistufiger Toggle nach demselben Muster wie der bestehende Verifikationsfilter (Aus → Nur mit Bild → Nur ohne Bild → Aus, ein Klick pro Stufe).
 
@@ -10232,3 +10285,199 @@ Beide Optionen führen zum selben sichtbaren Ziel (Chip in Feed/Kalender aktiv n
   21. Entdecken erneut prüfen: Chip „Hat Bild" bleibt dort ausgegraut, keine Wirkung.
   22. Performance-Stichprobe: Feed mit möglichst vollem Datenstand (kein Zeitraum-/Textfilter aktiv) + „Hat Bild" aktivieren → spürbar keine Verzögerung beim Filtern.
   23. Edge Case (abhängig von finaler Entscheidung Option A/B): falls im System eine Chance mit nicht mehr auflösbarer Location existiert (oder künstlich erzeugbar) → Verhalten wie in AKs festgelegt gegentesten.
+
+---
+
+### BUG-70 · Journal-Warnung beim Service-Start: „database disk image is malformed" (QA-Values) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-10 |
+
+**Beschreibung:** Beim Start von `fotoalert.service` auf dem Produktionsserver (2026-07-10, 20:45:47 UTC) erschien im systemd-Journal die Warnung „Fehler beim Laden der QA-Values: database disk image is malformed". Das deutet auf eine beschädigte SQLite-Datenbankdatei hin (vermutlich `backend/data/fotoalert.db`, Bereich QA-Values). Der Neustart selbst war regulär/sauber, kein Crash — der Fund entstand beiläufig bei einer Ad-hoc-Diagnose und ist unabhängig vom Neustart-Anlass. Priorität Hoch, da eine korrupte Produktionsdatenbank potenziell Datenverlust bedeutet und die Ursache noch ungeklärt ist.
+
+**User Story:** Als Host, möchte ich dass die Produktionsdatenbank verlässlich intakt bleibt und Ladefehler beim Start nicht stillschweigend auftreten, sodass ich mich auf korrekte QA-Werte verlassen kann und keine Daten verliere.
+
+**Bezug:** Keine Dublette gefunden. Lose thematische Nähe zu **TASK-51** (Refactoring der `startup()`-Funktion in `backend/main.py`, in der laut Beschreibung auch das „QA-Values-Laden" als abzutrennender Teilschritt genannt wird) — TASK-51 ist aber ein reines Struktur-Refactoring ohne Bezug zur hier gemeldeten Datenkorruption, kein Merge-Kandidat. Berührt außerdem **US-38** (Observability & Self-Healing, aktuell In Analysis): US-38 baut den `/health`-Endpoint zu einem Subsystem-Status aus — die hier vorgeschlagene Präventionsmaßnahme (lauteres Signal statt stiller WARNING) sollte an diese Infrastruktur andocken, sobald sie existiert, statt sie doppelt zu bauen. BUG-70 selbst bleibt auf Diagnose + Reparatur der Korruption + minimale Sofort-Härtung (lautere Log-Stufe) beschränkt.
+
+**Quelle:** fotoalert-intake, 2026-07-10
+
+---
+
+#### 🔬 Analyse & Spec (2026-07-10)
+
+##### Example Mapping
+
+**📏 Rule 1 — Der Startup-Fehler ist ein Symptom, keine Diagnose.**
+Die Warnung entsteht in `_load_qa_values()` (`backend/main.py`), die `_store.load_all_qa_values()` aufruft und jede Exception nur als WARNING loggt, ohne den Fehler zu klassifizieren oder Umfang zu prüfen. Ob nur die Tabelle `location_qa_values` betroffen ist oder auch andere Tabellen in derselben Datei (`custom_locations`, `location_overrides`, `location_verifications`, `location_ratings`, `location_qa_state`, `device_tokens`, `camera_profiles`), lässt sich aus dem Log allein nicht ableiten — SQLite-Korruption ist meist seiten-/tabellenspezifisch, nicht zwingend die ganze Datei.
+- 🟢 Given eine SQLite-Datei mit einer beschädigten Seite in `location_qa_values`, When der Server startet, Then wird nur diese eine Tabelle betroffen sein können — muss aber per `PRAGMA integrity_check` verifiziert werden, nicht angenommen.
+
+**📏 Rule 2 — Nicht jede verlorene QA-Value ist unwiederbringlich, aber Sicherungslage ist lückenhaft.**
+`location_qa_values` enthält laut Code-Kommentar „auto-generierte Felder" (TASK-43), erzeugt von `qa_description.py`, `qa_focal.py`, `qa_azimuth.py`, `sightline.py` und nächtlich neu befüllt von `_run_qa_pass()` (Cron 01:00 Uhr). Das bestehende Backup (`backend/data/backup.py::_export_to_repo()`) sichert jedoch **nur** `custom_locations` und `location_overrides` als JSON — `location_qa_values`, `location_qa_state` (inkl. manueller Locks), `location_verifications`, `location_ratings`, `device_tokens`, `camera_profiles` haben **kein** JSON-Backup.
+- 🟢 Given `location_qa_values` ist beschädigt/leer, When der nächste QA-Cron-Lauf startet, Then werden nur die Locations neu verarbeitet, deren `geo_hash` sich geändert hat oder die laut `location_qa_state` noch nie geprüft wurden — Locations mit unverändertem Geo-Fingerabdruck werden **übersprungen**, obwohl ihre Werte fehlen. Ohne gezieltes Zurücksetzen von `geo_hash`/`qa_checked_at` bleiben die Werte dauerhaft leer, ohne dass ein Fehler mehr auftritt.
+- 🟢 Given `location_ratings` oder `location_verifications` wären betroffen, When ein Restore aus JSON-Backup versucht wird, Then ist das nicht möglich — diese Nutzerdaten existieren in keiner Sicherung außerhalb der Live-DB.
+
+**📏 Rule 3 — Reparatur darf nicht auf einer ungeprüften Ursachen-Annahme basieren.**
+„Malformed" kann u.a. durch Diskfehler, unsauberen Prozess-Kill während eines Schreibvorgangs, oder gleichzeitigen Zugriff zweier Prozesse auf dieselbe Datei entstehen. Ohne die tatsächliche Journal-/Systemumgebung um 20:45:47 UTC zu prüfen, bleibt die Ursache Spekulation.
+- 🟢 Given Stephan prüft `journalctl`/`dmesg` um den Vorfallzeitpunkt, When dort ein OOM-Kill, Diskfehler oder unsauberer Stop sichtbar ist, Then ist das ein Hinweis auf die Root Cause — fehlt ein solcher Hinweis, bleibt die Ursache offen und muss als Risiko (erneutes Auftreten möglich) dokumentiert bleiben.
+
+**❓ Frage 1 (🔴 funktional kritisch, ✅ beantwortet 2026-07-10):** Wie ist das Ergebnis von `PRAGMA integrity_check` (volle Ausgabe, nicht nur erste Zeile) auf der Live-DB `backend/data/fotoalert.db`? Kann Stephan das im Server-Terminal ausführen und zurückmelden? — Siehe **„Diagnose-Ergebnis"** unten für die volle Auswertung.
+
+**❓ Frage 2 (🔴 funktional kritisch, ✅ beantwortet 2026-07-10):** Zeigt `journalctl -u fotoalert.service --since "2026-07-10 20:40"` bzw. `dmesg` rund um 20:45:47 UTC Hinweise auf Diskfehler, OOM-Kill oder unsauberen Prozess-Stop? Klärt, ob die Ursache ein einmaliges Ereignis war oder strukturell (z. B. Disk-Health) und sich wiederholen kann. — Siehe **„Diagnose-Ergebnis Frage 2"** unten für die volle Auswertung.
+
+**⚠️ Annahme:** Die App lief trotz der Warnung normal weiter (laut Ticket-Kontext bestätigt) — es gibt aktuell keinen akuten Ausfall, nur ein Datenintegritätsrisiko. Reparatur kann daher in einem geplanten Wartungsfenster erfolgen, nicht als Notfall-Hotfix. Bitte bestätigen.
+
+##### Diagnose-Ergebnis (2026-07-10, `PRAGMA integrity_check` durch Stephan direkt am Server ausgeführt)
+
+`PRAGMA integrity_check` auf `/opt/fotoalert/app/FotoAlert/backend/data/fotoalert.db` meldet ausschließlich Fehler innerhalb der Tabelle `location_qa_values`:
+- B-Tree-Korruption: „Tree 22 page 32 cell 1: Rowid 86 out of order".
+- Der zugehörige Auto-Index `sqlite_autoindex_location_qa_values_1` fehlt komplett — alle 86 Zeilen der Tabelle werden als „missing from index" gemeldet.
+- Wiederholte „NUMERIC value"-Typwarnungen für die Spalten `focal_length_suggestions`, `sightline_status`, `sightline_checked_at` (je 4×).
+
+Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_overrides`, `location_verifications`, `location_ratings`, `location_qa_state`, `device_tokens`, `camera_profiles` sind laut Diagnose **nicht** betroffen.
+
+**Bewertung gegen Rule 1 / Pre-Mortem-Szenario 1:** Bestätigt die Annahme aus der Analyse — die Korruption ist auf `location_qa_values` begrenzt, kein flächendeckender Schaden. Damit entfällt das in Option B beschriebene Risiko (Datenverlust bei 6 ungesicherten Tabellen), weil genau diese Tabellen laut Diagnose intakt sind. Option B bleibt damit weiterhin unnötig — nicht durch den Befund ausgelöst.
+
+**Auswirkung auf AK-1/AK-2:** AK-1 (vollständige, dokumentierte Diagnose mit Benennung der betroffenen Tabelle) ist mit diesem Befund erfüllt. Für AK-2 gilt laut Rule 2: `location_qa_values` kann grundsätzlich automatisch neu entstehen (nächtlicher QA-Lauf), sofern `geo_hash`/`qa_checked_at` für die betroffenen Locations gezielt zurückgesetzt werden (Pre-Mortem Szenario 3) — kein Hinweis auf Betroffenheit von Bewertungen, Verifikationen, Device-Tokens oder Kamera-Profilen, für die es kein Backup gibt.
+
+##### Diagnose-Ergebnis Frage 2 (2026-07-10, `dmesg`-Check im Rahmen einer vorangegangenen Server-Diagnose an einem anderen, kurzzeitigen Vorfall am selben Tag)
+
+`dmesg` wurde auf OOM-Kills geprüft. Am 10.07.2026 (dem Tag des aktuellen Neustarts) gibt es **keine** OOM-Kills. Historisch finden sich jedoch fünf OOM-Kills:
+- 01.07.2026, 06:42, 06:46, 06:49, 06:54 UTC: jeweils der `uvicorn`-Prozess (Hauptserver) hart gekillt, RSS jeweils ca. 3,4–3,5 GB.
+- 09.07.2026, 06:05 UTC: der `python3.12`-Prozess (vermutlich der Precompute-Hintergrundjob) hart gekillt, RSS ca. 2,2 GB.
+
+**Wahrscheinlichste Root-Cause-Hypothese:** Einer dieser harten Kills traf den Prozess mitten in einem Schreibvorgang auf `location_qa_values`, was die B-Tree-Struktur und den Index beschädigt hat. Der Neustart am 10.07. um 20:45:46 UTC war dagegen nachweislich sauber (systemd: „Deactivated successfully" → regulärer Stop/Start ohne Fehler) und damit nicht die Ursache — die Korruption war zu dem Zeitpunkt vermutlich schon vorhanden und wurde beim Neustart nur sichtbar/geloggt.
+
+**Bewertung gegen Rule 3 / Pre-Mortem-Szenario 5:** Es gibt einen konkreten Hinweis auf die Root Cause (harter OOM-Kill während eines Schreibvorgangs), keine Spekulation ohne Beleg mehr. Die Ursache ist damit potenziell strukturell (Memory-Druck auf dem Server), nicht rein zufällig — ein erneutes Auftreten ist möglich, solange die Speicherlage nicht adressiert wird. Das bleibt als Risiko für die Sofort-Härtung (AK-7) und für eine mögliche Folge-Betrachtung (Memory-Kapazität/-Monitoring) relevant.
+
+**Weiterhin offen:** Keine der beiden Diagnosefragen ist mehr offen — beide sind beantwortet. Das Weg-Gate ist nicht mehr durch fehlende Diagnose blockiert, sondern wartet auf Stephans Entscheidung zwischen den Implementierungsoptionen (siehe unten).
+
+##### Akzeptanzkriterien
+
+- [ ] **AK-1 Diagnose vollständig:** Es liegt eine vollständige, dokumentierte `PRAGMA integrity_check`-Ausgabe der Produktions-DB vor, aus der hervorgeht, welche Tabelle(n)/Bereiche konkret betroffen sind (nicht nur „ok"/„nicht ok").
+- [ ] **AK-2 Schadensbild bewertet:** Für jede laut Diagnose betroffene Tabelle ist dokumentiert, ob ihr Inhalt automatisch neu entstehen kann (z. B. QA-Werte über den nächtlichen Auto-Lauf) oder ob echter, nicht wiederherstellbarer Datenverlust droht (z. B. Bewertungen, Vor-Ort-Verifikationen, Geräte-Tokens — dafür existiert keine Sicherung).
+- [~] **AK-3 Reparatur wirksam:** Nach der Reparatur liefert `PRAGMA integrity_check` für die gesamte Datenbank „ok".
+- [~] **AK-4 Startup sauber:** Beim nächsten Neustart von `fotoalert.service` erscheint die Journal-Warnung „database disk image is malformed" nicht mehr.
+- [~] **AK-5 QA-Werte vollständig:** Für alle betroffenen, nicht manuell gesperrten Locations sind Beschreibung, Blickwinkel-Empfehlung und Brennweiten-Empfehlung nach dem nächsten QA-Lauf wieder vollständig befüllt (Row-Count-Vergleich vor/nach).
+- [~] **AK-6 Manuelle Sperren unangetastet:** Locations mit gesetztem `description_lock`/`azimuth_lock`/`focal_length_lock` haben nach der Reparatur exakt denselben Wert wie vor dem Vorfall — der Auto-QA-Lauf überschreibt sie nicht.
+- [~] **AK-7 Lauteres Signal (Sofort-Härtung):** Tritt künftig bei irgendeinem Startup-Ladevorgang (nicht nur QA-Values) ein Datenbankfehler auf, wird das als ERROR (nicht mehr nur WARNING) geloggt und enthält das Ergebnis eines Integritätschecks — sodass ein solcher Vorfall beim routinemäßigen Log-Blick auffällt, statt nur bei einer Ad-hoc-Diagnose wie diesmal.
+- [ ] Edge Case: Zeigt die Diagnose, dass auch Tabellen ohne jegliches Backup (Bewertungen, Verifikationen, Geräte-Tokens, Kamera-Profile) betroffen sind, wird das Stephan als expliziter, benannter Datenverlust vorgelegt, bevor irgendeine Reparaturmaßnahme ausgeführt wird — kein stilles Überschreiben oder Verwerfen.
+
+##### Pre-Mortem
+
+- 💀 **Szenario 1 — Voreilige Reparatur ohne volle Diagnose.** Auslöser: Annahme „nur QA-Values betroffen" wird ungeprüft übernommen, eine Reparatur-Methode (z. B. `.recover`) wird direkt angesetzt. Frühwarnung: `PRAGMA integrity_check` liefert mehr als eine betroffene Tabelle/Seite. Gegenmaßnahme: AK-1/AK-2 sind Pflicht-Vorstufe vor jeder Schreiboperation auf die Live-DB.
+- 💀 **Szenario 2 — Neu-Migration aus JSON als vermeintlich „sauberer" Weg gewählt.** Auslöser: Rebuild der DB aus `migrate_json_to_sqlite.py` wirkt einfacher als gezielte Reparatur. Frühwarnung: Das Backup deckt nachweislich nur 2 von 8 Tabellen ab (`custom_locations`, `location_overrides`) — Bewertungen, Verifikationen, QA-Werte/-Locks, Device-Tokens, Kamera-Profile hätten danach keinen Stand mehr. Gegenmaßnahme: Vollständiger Rebuild ist nur Notfall-Fallback (Option C unten), nicht der Standardweg.
+- 💀 **Szenario 3 — Blindes Vertrauen auf „regeneriert sich von selbst".** Auslöser: QA-Values gelten als „auto-generiert", daher Annahme, der nächtliche Lauf würde alles automatisch heilen. Frühwarnung: `_run_qa_pass()` verarbeitet laut Code nur Locations mit geändertem `geo_hash` oder ohne vorherigen Check — bei unverändertem Geo-Fingerabdruck bleiben gelöschte/verlorene Werte für immer leer, ohne erneuten Fehler. Gegenmaßnahme: Für betroffene Locations `geo_hash`/`qa_checked_at` gezielt zurücksetzen, damit der nächste Lauf sie tatsächlich neu verarbeitet.
+- 💀 **Szenario 4 — Reparatur bei laufendem Service.** Auslöser: Reparatur wird ausgeführt während `fotoalert.service` aktiv Schreibzugriffe (WAL-Mode) auf dieselbe Datei macht. Frühwarnung: keine Wartungsfenster-Ankündigung im Plan. Gegenmaßnahme: Service vor jeder Reparatur stoppen, Integritäts-Check danach vor Neustart verifizieren.
+- 💀 **Szenario 5 — Root Cause bleibt ungeklärt, Korruption tritt erneut auf.** Auslöser: Reparatur behebt nur das Symptom (Datei), nicht die Ursache (z. B. Disk-Fehler, unsauberer Kill, Doppelzugriff). Frühwarnung: Frage 2 bleibt unbeantwortet. Gegenmaßnahme: `journalctl`/`dmesg`-Check um den Vorfallzeitpunkt ist Teil der Diagnose, nicht optional.
+
+##### Architektur-Analyse
+
+**Betroffene Stellen (gelesen, nicht überflogen):**
+- `backend/main.py::_load_qa_values()` (~Z.1239–1275) — lädt via `_store.load_all_qa_values()`, jede Exception nur `logger.warning(...)`, Prozess läuft weiter (kein Fatal).
+- `backend/data/store.py::LocationStore` — definiert 8 Tabellen (`_INIT_SQL`, Z.42–127): `custom_locations`, `location_overrides`, `location_verifications`, `location_ratings`, `device_tokens`, `camera_profiles`, `location_qa_state`, `location_qa_values`. Alle in derselben Datei `backend/data/fotoalert.db` (WAL-Mode, `_DEFAULT_DB` Z.36–40).
+- `backend/data/store.py::integrity_check()` (Z.641–645) — führt `PRAGMA integrity_check` aus, **existiert bereits**, wird aber nur in `migrate_json_to_sqlite.py` (einmaliges Migrationsskript) und in Tests aufgerufen — **nicht** beim regulären Server-Startup.
+- `backend/data/backup.py::_export_to_repo()` (Z.64–93) — sichert per Git-Commit ausschließlich `custom_locations` + `location_overrides` als JSON. Alle anderen 6 Tabellen (inkl. `location_qa_values`, `location_qa_state`, Bewertungen, Verifikationen, Device-Tokens, Kamera-Profile) haben **keine** JSON-Sicherung.
+- `backend/main.py::_run_qa_pass()` (Z.989ff, TASK-48) — nächtlicher Cron um 01:00 Uhr; verarbeitet laut Docstring „nur die Spots, deren Geo-Fingerabdruck sich geändert hat oder die noch nie geprüft wurden" — Change-Detection über `location_qa_state.geo_hash`. Das bedeutet: Regeneration ist **nicht automatisch vollständig**, wenn nur die Werte-Tabelle beschädigt ist, der Zustands-/Hash-Datensatz aber intakt bleibt.
+- `backend/migrate_json_to_sqlite.py` (Z.96–102) — einziger bestehender Aufrufer von `integrity_check()`, bricht bei Korruption mit `sys.exit(1)` ab.
+
+**Nicht betroffen / bewusst nicht angefasst:** TASK-51 (Startup-Refactoring von `main.py`) — hier nicht verändert, auch wenn dieselbe Funktion `_load_qa_values()` betrifft. US-38 (Observability) — hier nicht dupliziert, siehe Bezug.
+
+##### Implementierungsoptionen
+
+**Option A — Diagnose-geführte gezielte Reparatur + Sofort-Härtung (empfohlen)**
+- Vorgehen: (1) Stephan führt auf dem Server `PRAGMA integrity_check` (voll) + Zeilenzahl je Tabelle aus, Service dafür gestoppt. (2) Je nach Befund: nur betroffene Tabelle(n) gezielt reparieren — bei SQLite meist über Export der intakten Tabellen + Neuaufbau der beschädigten (z. B. `sqlite3 fotoalert.db ".recover" | sqlite3 fotoalert_neu.db`, danach Datei tauschen) statt Totalverlust hinzunehmen. (3) Für `location_qa_values`: falls Zeilen fehlen aber `location_qa_state` intakt ist, `geo_hash`/`qa_checked_at` der betroffenen Locations gezielt zurücksetzen, damit der nächste QA-Lauf sie neu befüllt (Locks bleiben unangetastet). (4) Code: `integrity_check()` (bereits vorhanden) beim Server-Startup einmalig aufrufen und bei Abweichung als ERROR loggen statt nur die Einzel-Tabellen-Exceptions als WARNING.
+- Betroffene Dateien: `backend/main.py` (`startup()`/`_load_qa_values()` — ERROR-Logging + `integrity_check()`-Aufruf), keine Schema-Änderung in `backend/data/store.py`. Reparatur selbst läuft auf dem Server, nicht im Repo.
+- Vorteile: minimaler Blast-Radius, kein unnötiger Verlust bei Tabellen die nicht betroffen sind, nutzt bereits vorhandenen Code (`integrity_check()`).
+- Nachteile/Risiken: Aufwand hängt vom tatsächlichen Diagnosebefund ab (Szenario 1/4 aus Pre-Mortem); erfordert Stephans Terminal-Zugriff auf den Server.
+- Aufwand: mittel (abhängig von Diagnoseergebnis).
+
+**Option B — Vollständiger DB-Rebuild aus JSON-Migration**
+- Vorgehen: `fotoalert.db` verwerfen, per `migrate_json_to_sqlite.py` aus den Backup-JSONs (`custom_locations.json`, `location_overrides.json`) neu aufbauen.
+- Betroffene Dateien: keine Code-Änderung nötig, nur Ausführung des bestehenden Skripts.
+- Vorteile: schnell, nutzt bestehende Tooling.
+- Nachteile/Risiken: **echter, unwiederbringlicher Datenverlust** bei allen 6 nicht gesicherten Tabellen — Bewertungen, Vor-Ort-Verifikationen, QA-Werte/-Locks, Device-Tokens, Kamera-Profile. Nur vertretbar, wenn Diagnose zeigt, dass die Datei als Ganzes unbrauchbar ist und keine gezielte Rettung möglich ist.
+- Aufwand: klein — aber Risiko sehr hoch.
+
+**Option C — Nur Prävention, Reparatur zurückstellen**
+- Vorgehen: Ausschließlich `integrity_check()` beim Startup aktivieren + lauter loggen; laufende (scheinbar funktionierende) DB unangetastet lassen.
+- Betroffene Dateien: `backend/main.py`.
+- Vorteile: kein Risiko durch Schreibeingriffe.
+- Nachteile/Risiken: quantifiziert den aktuellen Schaden nicht, birgt Risiko dass sich Korruption auf weitere Seiten ausbreitet (Szenario 5).
+- Aufwand: klein.
+
+✅ **Empfehlung: Option A** — sie ist die einzige, die Diagnose vor Reparatur erzwingt (verhindert Szenario 1/2 aus dem Pre-Mortem), nutzt mit `integrity_check()` bereits vorhandenen, ungenutzten Code für die Sofort-Härtung, und vermeidet den in Option B belegten, unnötigen Datenverlust bei sechs ungesicherten Tabellen. Option B bleibt als dokumentierter Notfall-Fallback, falls die Diagnose eine flächendeckende Korruption zeigt.
+
+**Zusätzliche Empfehlung (separat zu entscheiden, kein Teil des Weg-Gates):** Die Backup-Lücke (6 von 8 Tabellen ungesichert, siehe Pre-Mortem Szenario 2) sollte als eigenes Ticket nachgezogen werden — das ist über den Korruptions-Vorfall hinaus ein strukturelles Risiko.
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py`, `backend/data/store.py`, `backend/data/backup.py`, `backend/migrate_json_to_sqlite.py`
+- [x] Designer-Check: nicht visuell (reines Backend/Ops-Thema) → übersprungen
+- [x] Diagnose Frage 1 (`PRAGMA integrity_check`) beantwortet, siehe „Diagnose-Ergebnis" — nur `location_qa_values` betroffen
+- [x] Diagnose Frage 2 (journalctl/dmesg, Root Cause) beantwortet, siehe „Diagnose-Ergebnis Frage 2" — 5 historische OOM-Kills (01.07. uvicorn ×4, 09.07. python3.12 ×1), keiner am 10.07.; Neustart 20:45:46 UTC nachweislich sauber; wahrscheinlichste Root Cause: harter Kill während Schreibvorgang auf `location_qa_values`
+- [x] Beide Diagnosefragen beantwortet, bereit für Stephans Weg-Gate-Entscheidung
+- [x] **Weg-Gate-Entscheidung (2026-07-10):** Stephan hat Option A (gezielte Reparatur + Sofort-Härtung) freigegeben.
+- [ ] Implementierungsoptionen: A (empfohlen) / B (Notfall-Fallback) / C (nur Prävention)
+- [x] Empfehlung: Option A — durch Stephan freigegeben (2026-07-10)
+- [~] **Umsetzung gestartet (2026-07-10):** Stephan hat den vorgelegten Reparaturplan (Option A) freigegeben. Die Umsetzung läuft jetzt in zwei Teilen: (a) Datenreparatur direkt auf dem Produktionsserver durch Stephan, anhand von Claude bereitgestellter Befehle (Diagnose, Reparatur, Verifikation); (b) Code-Härtung (lauteres ERROR-Logging + `integrity_check()`-Aufruf beim Server-Start) als lokale Code-Änderung in `backend/main.py`.
+
+##### Testplan
+
+**Automatisiert (Harness, `backend/tests/test_bug70_qa_integrity.py`):**
+- [ ] AK-7: `_load_qa_values()`/Startup loggt bei simuliertem `sqlite3.DatabaseError` auf ERROR-Level (nicht WARNING) und enthält das `integrity_check()`-Ergebnis im Log-Text (Mock von `_store`, kein echter DB-Zugriff nötig).
+- [ ] AK-6: `set_qa_values()` überschreibt keine Felder, für die laut `location_qa_state` ein Lock gesetzt ist (Regressionstest gegen bestehende Lock-Logik, falls noch nicht durch TASK-43/47-Tests abgedeckt — sonst nur referenzieren).
+
+**Manuell (auf dem Produktionsserver, Terminal-Fenster-Modell beachten):**
+1. `fotoalert.service` stoppen.
+2. `sqlite3 backend/data/fotoalert.db "PRAGMA integrity_check;"` ausführen → volle Ausgabe an Claude zurückmelden (AK-1).
+3. Je Tabelle Zeilenzahl prüfen (`SELECT COUNT(*) FROM location_qa_values;` usw.) → Vergleich vor/nach Reparatur (AK-2, AK-5).
+4. `journalctl -u fotoalert.service --since "2026-07-10 20:40" --until "2026-07-10 20:50"` sowie `dmesg` um den Vorfallzeitpunkt prüfen (Frage 2).
+5. Reparatur gemäß freigegebener Option durchführen.
+6. `PRAGMA integrity_check;` erneut ausführen → muss „ok" liefern (AK-3).
+7. `fotoalert.service` starten, Journal auf die Warnung prüfen — darf nicht mehr erscheinen (AK-4).
+8. Nach dem nächsten QA-Lauf (01:00 Uhr) Row-Count von `location_qa_values` + Stichprobe der Lock-Flags gegen den Vorzustand prüfen (AK-5, AK-6).
+
+---
+
+### TASK-61 · Backup-Mechanismus auf alle 8 Datenbank-Tabellen erweitern `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-10 |
+
+**Beschreibung:** Der bestehende Backup-Mechanismus (`backend/data/backup.py::_export_to_repo()`) sichert per Git-Commit ausschließlich zwei der acht Tabellen der Produktionsdatenbank (`custom_locations`, `location_overrides`) als JSON. Die übrigen sechs Tabellen — `location_qa_values`, `location_qa_state` (inkl. manueller Sperren/gesperrter Werte), `location_verifications`, `location_ratings`, `device_tokens`, `camera_profiles` — haben aktuell keine JSON-Sicherung außerhalb der Live-Datenbank. Bei einer Beschädigung oder einem Verlust der Live-DB wären Bewertungen, Vor-Ort-Verifikationen, Geräte-Tokens und Kamera-Profile unwiederbringlich verloren. Der Befund entstand bei der Diagnose von BUG-70 (Journal-Warnung „database disk image is malformed" durch eine beschädigte `location_qa_values`-Tabelle) — dort war laut Diagnose zwar nur diese eine, grundsätzlich automatisch neu erzeugbare Tabelle betroffen, die Lücke selbst betrifft aber strukturell alle sechs ungesicherten Tabellen und besteht unabhängig vom konkreten Vorfall weiter.
+
+**User Story:** Als Betreiber der App, möchte ich, dass alle Datenbestände gesichert werden, sodass bei einem Ausfall oder einer Datenbank-Beschädigung keine Daten unwiederbringlich verloren gehen.
+
+**Bezug:** Ausgelöst durch die Diagnose von **BUG-70** (Journal-Warnung „database disk image is malformed", QA-Values) — dort explizit als separat zu entscheidende Folge-Empfehlung vermerkt („Die Backup-Lücke (6 von 8 Tabellen ungesichert) sollte als eigenes Ticket nachgezogen werden — das ist über den Korruptions-Vorfall hinaus ein strukturelles Risiko"). Keine Dublette zu **TASK-55** (Server-Backup um `location_images/` erweitern, Done) — TASK-55 sichert hochgeladene Bilddateien im Dateisystem, nicht die Datenbank-Tabellen selbst; beide Tickets ergänzen sich, kein Überschneidungsbereich. Keine Dublette zu US-34 (bereits umgesetzt: liefert `backup.hours_since_last_backup()` als Health-Signal für US-38/Observability) — US-34 misst, ob überhaupt ein Backup-Lauf stattgefunden hat, TASK-61 erweitert, was dabei inhaltlich gesichert wird.
+
+**Quelle:** fotoalert-intake, 2026-07-10
+
+---
+
+### TASK-62 · Klären: 60 Locations ohne QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Rückstand oder Datenproblem? `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-11 |
+
+**Beschreibung:** Auf der Produktionsdatenbank enthält die Tabelle `location_qa_state` 136 Location-Einträge, aber nur 91 Einträge existieren in `location_qa_values`. Von diesen 91 haben nur 76 eine passende Location-ID in `location_qa_state` — die übrigen 15 `location_qa_values`-Einträge referenzieren Location-IDs, die in `location_qa_state` gar nicht mehr vorkommen (vermutlich alte/entfernte Locations, deren QA-Werte nie aufgeräumt wurden). Insgesamt 60 Location-IDs aus `location_qa_state` haben aktuell keinen passenden Eintrag in `location_qa_values` und damit keine automatisch erzeugten Werte (Beschreibung, Blickwinkel-/Brennweiten-Empfehlung). Unklar ist, ob das ein normaler Rückstand des nächtlichen QA-Laufs ist (`_run_qa_pass()` verarbeitet laut TASK-48/BUG-70-Analyse nur Locations mit geändertem `geo_hash` oder ganz ohne bisherigen Check — manche Locations wurden dadurch schlicht noch nie erreicht), oder ob es sich um ein eigenständiges Datenproblem handelt (z. B. verwaiste Einträge, die beim Löschen/Tombstonen einer Location nicht mitentfernt werden, oder ein Fehler in der Change-Detection). Der Befund entstand beiläufig bei der Reparatur von **BUG-70** und ist von der dortigen Datenbank-Korruption unabhängig — die Zeilenanzahl 91 in `location_qa_values` war während der gesamten BUG-70-Reparatur unverändert, die Diskrepanz bestand also bereits vorher.
+
+**User Story:** Als Betreiber der App, möchte ich verstehen, warum ein Teil der Locations keine QA-Werte hat, sodass ich entscheiden kann, ob das ein Bug ist oder erwartetes Verhalten des nächtlichen QA-Laufs.
+
+**Bezug:** Beiläufiger Befund aus der Reparatur von **BUG-70** (Journal-Warnung „database disk image is malformed", QA-Values) — ausdrücklich unabhängig von dessen Korruptions-Ursache, siehe Beschreibung. Berührt denselben Mechanismus wie **TASK-48** (QA-Lauf automatisieren, Done — `_run_qa_pass()`/Change-Detection über `location_qa_state.geo_hash`, dort als „Bestätigt — Change-Detection-Basis vollständig vorhanden" dokumentiert) und **TASK-51** (Refactoring `startup()`/`backend/main.py`, in dem auch `_load_qa_values()` liegt) — beides reine Nähe über dieselben Code-Stellen, kein Merge-Kandidat, da TASK-62 eine reine Klärungs-/Diagnoseaufgabe ist, keine Implementierung. Keine Dublette zu **TASK-61** (Backup-Mechanismus auf alle 8 Tabellen erweitern) — TASK-61 behandelt fehlende Sicherung, TASK-62 einen inhaltlichen Datenbestand-Rückstand; beide ergänzen sich, kein Überschneidungsbereich.
+
+**Quelle:** fotoalert-intake, 2026-07-11
+
+---

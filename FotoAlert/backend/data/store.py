@@ -638,11 +638,35 @@ class LocationStore:
             ).fetchone()
         return dict(row) if row else None
 
-    def integrity_check(self) -> str:
-        """Führt PRAGMA integrity_check aus. Gibt 'ok' zurück bei Erfolg."""
-        with self._connect() as conn:
-            row = conn.execute("PRAGMA integrity_check").fetchone()
-            return row[0] if row else "unknown"
+    def integrity_check(self) -> list[str]:
+        """Führt PRAGMA integrity_check aus.
+
+        BUG-70: liest per fetchall() statt fetchone(), damit bei mehreren
+        Fehlermeldungen (z.B. mehrere betroffene Zeilen/Tabellen) alle erfasst
+        werden — vorher wurde nur die erste Zeile zurückgegeben, weitere
+        Fehler blieben unsichtbar.
+
+        Gibt eine Liste zurück. Bei Erfolg `["ok"]`, sonst eine Zeile pro
+        gemeldetem Integritätsproblem.
+
+        BUG-70-Nachfix: PRAGMA integrity_check kann bei ausreichend schwerer
+        Korruption selbst eine sqlite3.DatabaseError ("database disk image
+        is malformed") werfen statt sauber Zeilen zurückzugeben. Diese
+        Exception wurde bisher NICHT abgefangen und propagierte ungefangen
+        nach oben — das hätte den Serverstart zum Absturz gebracht, obwohl
+        die alte (vor-BUG-70) Implementierung in diesem Fall nur einen
+        stillen Fehler produzierte. Damit die neue laute Fehlerbehandlung
+        (AK-7) eine Verbesserung bleibt und keine Verschlechterung, fangen
+        wir hier ab und melden das Problem als Teil der Ergebnisliste.
+        """
+        try:
+            with self._connect() as conn:
+                rows = conn.execute("PRAGMA integrity_check").fetchall()
+                return [row[0] for row in rows] if rows else ["unknown"]
+        except sqlite3.DatabaseError as e:
+            return [f"integrity_check fehlgeschlagen: {e}"]
+        except sqlite3.Error as e:
+            return [f"integrity_check fehlgeschlagen: {e}"]
 
     # ------------------------------------------------------------------
     # TASK-43: QA-Datenmodell — Lock-Flags, QA-Values, Geo-Hash

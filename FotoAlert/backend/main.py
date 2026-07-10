@@ -1272,12 +1272,35 @@ def _load_qa_values() -> None:
         if applied:
             logger.info("QA-Values geladen: %d Locations gepatcht", applied)
     except Exception as exc:
-        logger.warning("Fehler beim Laden der QA-Values: %s", exc)
+        # BUG-70: war zuvor logger.warning — eine korrupte location_qa_values-Tabelle
+        # (SQLite "database disk image is malformed") blieb dadurch beim routinemäßigen
+        # Log-Blick unsichtbar. Jetzt ERROR + zusätzlicher Integritätscheck zur Einordnung.
+        check = _store.integrity_check()
+        logger.error(
+            "Fehler beim Laden der QA-Values: %s | PRAGMA integrity_check: %s",
+            exc, check,
+        )
 
 
 @app.on_event("startup")
 async def startup() -> None:
     logger.info("FotoAlert Backend v2 startet (Cache-First)...")
+
+    # BUG-70: genereller Integritätscheck der SQLite-Datenbank beim Start —
+    # unabhängig von einem konkreten Ladefehler (z.B. QA-Values). Eine "malformed"-
+    # Datenbank soll beim routinemäßigen Log-Blick auffallen, nicht erst bei einer
+    # Ad-hoc-Diagnose wie beim ursprünglichen Vorfall.
+    try:
+        _startup_check = _store.integrity_check()
+        if _startup_check != ["ok"]:
+            logger.error(
+                "PRAGMA integrity_check meldet Abweichungen beim Server-Start "
+                "(DB: %s): %s — mindestens eine Tabelle/Seite ist beschädigt. "
+                "Bitte zeitnah prüfen (siehe BUG-70).",
+                _store.db_path, _startup_check,
+            )
+    except Exception as _exc:
+        logger.error("Startup-Integritätscheck konnte nicht ausgeführt werden: %s", _exc)
 
     # 0. Custom Locations laden (persistent gespeicherte User-Spots)
     _load_custom_locations()

@@ -124,7 +124,7 @@ def test_migration_idempotent(tmp_path: Path) -> None:
     db = tmp_path / "idem.db"
     s1 = LocationStore(db_path=db)
     s2 = LocationStore(db_path=db)  # darf nicht crashen
-    assert s2.integrity_check() == "ok"
+    assert s2.integrity_check() == ["ok"]  # BUG-70: integrity_check() gibt jetzt eine Liste zurück
 
 
 def test_migration_existing_rows_preserved(store: LocationStore) -> None:

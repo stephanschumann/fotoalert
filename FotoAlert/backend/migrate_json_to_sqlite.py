@@ -96,8 +96,8 @@ def migrate() -> None:
     # ------------------------------------------------------------------ #
     # 3. Integrity Check
     # ------------------------------------------------------------------ #
-    check = store.integrity_check()
-    if check != "ok":
+    check = store.integrity_check()  # BUG-70: liefert jetzt eine Liste (fetchall)
+    if check != ["ok"]:
         logger.error("PRAGMA integrity_check: %s — DB möglicherweise beschädigt!", check)
         sys.exit(1)
 
