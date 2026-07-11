@@ -28,13 +28,13 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **BUG-71** *(Fix funktioniert auf Mac/Safari, NICHT auf iPhone — vorzeitig auf Done gesetzt, zurückgestuft 2026-07-11, siehe Nachtrag im Ticket)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-65** *(Generischer Feld-Rundreise-Test für alle Location-Felder)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **TASK-65** *(Generischer Feld-Rundreise-Test für alle Location-Felder)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -10499,14 +10499,15 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 
 ---
 
-### BUG-71 · Beispielbild wird nicht mehr gespeichert (Regression) `[~]`
+### BUG-71 · Beispielbild wird nicht mehr gespeichert (Regression) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
 
 **Beschreibung:** Beobachtet: Bilder werden aktuell nicht mehr gespeichert — laut Stephan war das vorher zuverlässig der Fall, es handelt sich also um eine Regression, keinen von Anfang an bestehenden Fehler. Erwartet: Bilder werden wie zuvor beim Hochladen zuverlässig gespeichert und bleiben erhalten. Der Report ist noch unpräzise formuliert; welcher genaue Schritt betroffen ist (Upload schlägt fehl, Datei landet nicht im Dateisystem, Verknüpfung in der Datenbank fehlt, oder nur bestimmte Locations/Formate betroffen) ist ungeklärt und Aufgabe der Analyse-Phase, nicht dieses Tickets.
 
@@ -10539,12 +10540,12 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 ⚠️ **Annahme (konventionell):** Bei fehlendem Location-Kontext lautet der Fehlertext „Bitte Location erneut öffnen und Bild noch einmal hochladen" (statt einer technischen Meldung) — passend zum bestehenden Toast-Stil der anderen Fehlerfälle in `_onImageFileSelected` (Z. 5925: „Fehler beim Hochladen: …"). *(bitte bestätigen)*
 
 **Akzeptanzkriterien:**
-- [~] Nach Auswahl eines Bildes für eine Location (Location-Detail offen, Kontext vorhanden) wird das Bild zuverlässig gespeichert und ist danach sofort im Location-Detail sichtbar.
-- [~] Die Location erscheint danach im Bild-Filter korrekt als „mit Bild", nicht mehr als „ohne Bild".
-- [~] Falls ein Upload aus irgendeinem Grund fehlschlägt (inkl. fehlendem Location-Kontext), sieht der Nutzer immer eine Fehlermeldung als Toast — nie einen stillen Fehlschlag ohne jede Rückmeldung.
-- [~] Edge Case: Mehrere Upload-Versuche hintereinander für dieselbe Location funktionieren zuverlässig (jeder Versuch entweder mit sichtbarem Erfolg oder sichtbarem Fehler, nie stillschweigend wirkungslos).
-- [~] Edge Case: Uploads für andere, nicht betroffene Locations funktionieren nach dem Fix unverändert weiter (Regressionsschutz).
-- [~] Edge Case: Nach einem sichtbaren Fehlschlag kann der Nutzer die Location erneut öffnen und den Upload direkt danach erfolgreich wiederholen, ohne die Seite neu laden zu müssen.
+- [x] Nach Auswahl eines Bildes für eine Location (Location-Detail offen, Kontext vorhanden) wird das Bild zuverlässig gespeichert und ist danach sofort im Location-Detail sichtbar.
+- [x] Die Location erscheint danach im Bild-Filter korrekt als „mit Bild", nicht mehr als „ohne Bild".
+- [x] Falls ein Upload aus irgendeinem Grund fehlschlägt (inkl. fehlendem Location-Kontext), sieht der Nutzer immer eine Fehlermeldung als Toast — nie einen stillen Fehlschlag ohne jede Rückmeldung.
+- [x] Edge Case: Mehrere Upload-Versuche hintereinander für dieselbe Location funktionieren zuverlässig (jeder Versuch entweder mit sichtbarem Erfolg oder sichtbarem Fehler, nie stillschweigend wirkungslos).
+- [x] Edge Case: Uploads für andere, nicht betroffene Locations funktionieren nach dem Fix unverändert weiter (Regressionsschutz).
+- [x] Edge Case: Nach einem sichtbaren Fehlschlag kann der Nutzer die Location erneut öffnen und den Upload direkt danach erfolgreich wiederholen, ohne die Seite neu laden zu müssen.
 
 **Pre-Mortem:**
 - 💀 Szenario 1: Der Fix für den Location-Kontext wird nur in `LocationDetail._onImageFileSelected()` verankert, aber `AddLocation.triggerImageUpload()` (Z. 6619, eigenständiger, ähnlicher Upload-Flow für neue Locations, Z. 6978ff.) nutzt einen anderen, ebenfalls flüchtigen State-Mechanismus für sein „gestagtes" Bild — und bleibt beim selben stillen Abbruchmuster anfällig, ohne dass es auffällt, weil es ein separates Ticket/Feature ist. Auslöser: Beide Flows sehen im Code ähnlich aus, sind aber unabhängige Objekte mit eigenem State. Frühwarnung: Beim Testen wird nur der LocationDetail-Pfad (Schloss Pfaueninsel) geprüft, nicht der Neuanlage-Pfad. Gegenmaßnahme: Regressionscheck erweitert um einen kurzen Test des `AddLocation`-Upload-Pfads (siehe Testplan); falls dort ein strukturell identisches Risiko gefunden wird, als Folge-Beobachtung (nicht stillschweigend mitfixen) vermerken.
@@ -10588,6 +10589,8 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 - Alle bestehenden Fehlerfälle (Netzwerk-/Server-Fehler) behalten ihren bisherigen Text unverändert.
 
 **Nachtrag (2026-07-11, nach Release v1.22.11):** Fix funktioniert auf Mac/Safari (manuell von Stephan bestätigt), NICHT auf iPhone. Auf dem iPhone: Fotoauswahl öffnet sich normal, nach Bildauswahl passiert weiterhin nichts (identisches Verhalten wie vor dem Fix). Verifiziert nach vollständigem Cache-Leeren + App-Neustart auf dem iPhone — kein Cache-Artefakt. Vermutung (noch nicht verifiziert): Die auf iOS auftretende Seiten-Neuladung während der nativen Fotoauswahl könnte gravierender sein als angenommen (vollständiger Reload statt Hintergrund-Pause), sodass weder die Closure- noch die sessionStorage-basierte Absicherung greift, WEIL der Change-Event-Handler nach einem echten Reload möglicherweise gar nicht mehr an das ursprüngliche `<input type="file">`-Element gebunden ist. Braucht Live-Debugging via Safari Web Inspector (iPhone an Mac angeschlossen) um den echten Ablauf zu sehen, statt weiter zu spekulieren.
+
+**Nachtrag 2 (2026-07-11, nach Release v1.22.14):** Echte Ursache gefunden: web/sw.js fing per `respondWith()` AUCH nicht-GET-Anfragen ab (kein Methodenfilter) — bekannter WebKit/iOS-Bug, bei dem Service-Worker-Interception den Body von POST-Requests mit binärem FormData-Inhalt leert. Auf dem Mac trat der Bug nicht auf, auf iOS zuverlässig reproduzierbar (Netzwerk-Mitschnitt zeigte 0-Byte-Datei im Request-Body trotz korrektem Location-Kontext). Fix: `if (e.request.method !== 'GET') return;` als erste Zeile im fetch-Handler — alle non-GET-Requests laufen jetzt direkt ans Netzwerk, ohne Service-Worker-Interception. Verifiziert auf echtem iPhone: Bild-Upload (beide Pfade: LocationDetail + AddLocation) funktioniert und bleibt nach Neuladen gespeichert; Regressionscheck (Location-Bearbeitung/PATCH) weiterhin fehlerfrei. Release v1.22.14.
 
 ---
 
@@ -10869,21 +10872,166 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 
 ---
 
-### TASK-65 · Generischer Feld-Rundreise-Test für alle Location-Felder `[ ]`
+### TASK-65 · Generischer Feld-Rundreise-Test für alle Location-Felder `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-11 |
 
 **Beschreibung:** Ein einzelner, generischer Test, der für **jedes** Feld einer Location automatisch die volle Rundreise prüft: Wert ändern → speichern → Sicht nach Server-Neustart/Reload und aus Sicht des Precompute-Laufs prüfen → die Änderung muss überall überlebt haben. Damit ist die dreimal aufgetretene Fehlerklasse „Feld fehlt in einer Whitelist → Änderung wird still verworfen" (BUG-50, BUG-61, BUG-68) dauerhaft abgedeckt — auch für Felder, die erst in Zukunft dazukommen, denn der Test läuft über die Feldliste statt über handgepflegte Einzelfälle.
 
 **User Story:** Als Betreiber der App, möchte ich, dass jede gespeicherte Änderung an einer Location nachweislich auch Neustart und nächtliche Neuberechnung übersteht, sodass nie wieder Eingaben stillschweigend verloren gehen — auch nicht bei Feldern, die es heute noch gar nicht gibt.
 
-**Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting). Direkte Nachfolge zu **BUG-50** ✅, **BUG-61** ✅ und **BUG-68** (In Progress) — alle drei sind Einzelinstanzen derselben Whitelist-Fehlerklasse; dieses Ticket verallgemeinert die Absicherung. **Abhängigkeit/Sequenz:** erst nach Abschluss von BUG-68 umsetzen, da BUG-68 gerade dieselbe zentrale Feldregel-Tabelle (`LOCATION_FIELD_RULES`) ändert und der Test auf dem bereinigten Stand aufsetzen soll. Läuft nach Umsetzung automatisch im CI-Gate aus **TASK-64** mit. Verwandt (Wissensbasis, keine Überschneidung): `reference_fotoalert_precompute_dataload` — Precompute ist ein eigener Subprozess mit eigener Datensicht, genau deshalb braucht die Rundreise beide Sichten.
+**Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting). Direkte Nachfolge zu **BUG-50** ✅, **BUG-61** ✅ und **BUG-68** (In Progress) — alle drei sind Einzelinstanzen derselben Whitelist-Fehlerklasse; dieses Ticket verallgemeinert die Absicherung. **Abhängigkeit/Sequenz:** erst nach Abschluss von BUG-68 umsetzen, da BUG-68 gerade dieselbe zentrale Feldregel-Tabelle (`LOCATION_FIELD_RULES`) ändert und der Test auf dem bereinigten Stand aufsetzen soll. Läuft nach Umsetzung automatisch im CI-Gate aus **TASK-64** mit. Verwandt (Wissensbasis, keine Überschneidung): `reference_fotoalert_precompute_dataload` — Precompute ist ein eigener Subprozess mit eigener Datensicht, genau deshalb braucht die Rundreise beide Sichten. **Korrektur ggü. Wissensbasis (bei Code-Verifikation entdeckt):** Der Hinweis „precompute lädt keine Custom-Locations" ist überholt — seit BUG-33 hat `precompute.py` eine eigene `_load_custom_locations()`, die Custom-Locations aus SQLite nachlädt. Custom-Locations gehören also in den Testumfang, nur über einen anderen Speicherweg als Standard-Locations (siehe Architektur-Analyse unten).
+
+---
+
+## Analyse (fotoalert-analyze, 2026-07-11)
+
+### Example Mapping
+
+**Annahmen-Protokoll:**
+- 🔴 **Kritische Vorfrage (musste vor dem Mapping geklärt werden):** Woher weiß der generische Test, welche Felder „überleben sollten"? Ein Test, der seine Erwartungsliste direkt aus `LOCATION_FIELD_RULES` abliest, kann die Fehlerklasse aus BUG-50/61/68 nicht erkennen — genau diese Fälle waren „Feld fehlt komplett in der Tabelle/den drei Vorgänger-Listen". Ein Test, der nur die Tabelle selbst abfragt, ist blind für ein Feld, das nie eingetragen wurde. Deshalb muss der Test einen von der Tabelle **unabhängigen** Anker haben: alle tatsächlich existierenden Location-Felder im Datenmodell (`PhotoLocation`-Datenklasse). Das ist keine Rückfrage an Stephan, sondern eine Architekturentscheidung — als Rule 1 unten verankert.
+- ⚠️ **Annahme:** Felder, die bewusst NIE die volle Rundreise machen sollen (z.B. reine Bild-Fokuspunkt-Felder beim precompute-Lauf, der interne Automatik-Vermerk `subject_height_researched`, sowie rein strukturelle Felder wie `id`/`category`/`distance_m`/`difficulty`, die gar nicht über den generischen PATCH-Endpoint laufen), werden auf eine kurze, kommentierte Ausnahmeliste gesetzt statt in die Rundreise gezwungen. Bitte bestätigen, dass diese Abgrenzung so gewollt ist.
+- ✅ Klar aus Kontext: Standard-Locations und Custom-Locations nutzen unterschiedliche Speicherwege (Override-Tabelle in SQLite vs. eigene Custom-Location-Datei/-Tabelle) — der Test muss beide getrennt prüfen, keine Annahme nötig, das ist bereits im bestehenden Code (`test_bug_68.py`) so angelegt.
+
+**Rules:**
+
+📏 **Rule 1 — Vollständigkeits-Check (unabhängig von der Regel-Tabelle):** Jedes Feld, das auf der `PhotoLocation`-Datenklasse existiert, muss entweder in `LOCATION_FIELD_RULES` eingetragen sein oder auf einer expliziten, begründeten Ausnahmeliste stehen. Fehlt beides, schlägt der Test fehl.
+- 🟢 Beispiel: Ein Entwickler ergänzt ein neues Feld `weather_confidence` auf `PhotoLocation`, vergisst aber den Eintrag in `LOCATION_FIELD_RULES` → der Vollständigkeits-Check schlägt sofort fehl, mit Klarnamen des fehlenden Felds.
+- 🟢 Beispiel: Alle heute existierenden Felder sind entweder in `LOCATION_FIELD_RULES` oder auf der Ausnahmeliste → der Check ist grün.
+
+📏 **Rule 2 — Server-Neustart-Rundreise:** Jedes Feld mit `override_reload: True` muss nach einer PATCH-Änderung und einem simulierten Server-Neustart (`main._load_location_overrides()`) den neuen Wert zeigen, nicht den alten Basiswert.
+- 🟢 Beispiel: `special_notes` einer Standard-Location wird per PATCH geändert, Neustart simuliert → neuer Wert ist da (Regressionsschutz für BUG-68).
+- 🟢 Beispiel: `observer_lat` wird geändert, Neustart simuliert → neue Koordinate ist da.
+
+📏 **Rule 3 — Precompute-Rundreise:** Jedes Feld mit `precompute_reload: True` muss vom separaten precompute-Subprozess (`precompute._apply_location_overrides()`) nach einer PATCH-Änderung übernommen werden, nicht mit dem alten Wert weiterrechnen.
+- 🟢 Beispiel: `subject_name` wird geändert, precompute-Lauf simuliert → precompute sieht den neuen Namen (Regressionsschutz für BUG-68/BUG-29-Muster).
+- 🟢 Beispiel: Ein Feld mit `precompute_reload: False` (z.B. `image_filename`) wird geändert → precompute-Lauf zeigt bewusst weiterhin den alten Wert, das ist **kein** Fehlschlag, weil es laut Tabelle nicht vorgesehen ist.
+
+📏 **Rule 4 — Custom-Location-Pfad separat geprüft:** Für Custom-Locations läuft die Rundreise über den eigenen Speicherweg (`_update_custom_location_file` + `precompute._load_custom_locations()`), nicht über die Override-Tabelle — beide Pfade werden im Test getrennt abgedeckt.
+- 🟢 Beispiel: `subject_name` einer Custom-Location wird per PATCH geändert → nach simuliertem Neustart UND nach simuliertem precompute-Lauf ist der neue Wert da.
+
+**Fragen:** keine offenen 🔴-Fragen mehr — die einzige kritische Vorfrage (Anker unabhängig von der Tabelle) ist durch Rule 1 beantwortet.
+
+---
+
+### Akzeptanzkriterien
+
+*Hinweis: Dies ist Test-Tooling ohne sichtbares App-Verhalten für Endnutzer. Der Effekt zeigt sich beim Testlauf/CI-Gate (TASK-64), nicht beim Benutzen der App — deshalb sind die Kriterien als „was der Testlauf zeigt" statt als App-Erlebnis formuliert.*
+
+- [~] Jedes Feld, das eine Location laut Datenmodell tatsächlich besitzt, taucht entweder in der Feldregel-Tabelle oder auf der begründeten Ausnahmeliste auf. Wird ein neues Feld ergänzt, ohne es einzutragen, meldet der nächste Testlauf genau dieses Feld als fehlend — nicht erst wenn eine Änderung in der App verschwindet.
+- [~] Für jedes Feld, das laut Tabelle einen Server-Neustart überstehen soll: Testwert ändern → simulierten Neustart auslösen → geänderter Wert ist danach da (nicht der alte Ausgangswert).
+- [~] Für jedes Feld, das laut Tabelle vom nächtlichen precompute-Lauf gesehen werden soll: Testwert ändern → simulierten precompute-Lauf auslösen → precompute rechnet mit dem neuen Wert weiter.
+- [~] Die Rundreise läuft einmal für eine Standard-Location und einmal für eine Custom-Location, weil beide unterschiedliche Speicherwege benutzen.
+- [~] Felder auf der Ausnahmeliste (z.B. Bild-Fokuspunkt-Felder beim precompute-Lauf, interner Automatik-Vermerk `subject_height_researched`) lösen keinen Fehlalarm aus — jede Ausnahme ist im Test mit einem Grund kommentiert.
+- [~] Edge Case: Ein Feld, das weder in der Tabelle noch auf der Ausnahmeliste steht, lässt genau einen Testfall mit verständlicher Fehlermeldung (Feldname) fehlschlagen.
+- [~] Edge Case: Ein Feld mit falsch gesetztem Flag (z.B. `override_reload: False`, obwohl es eigentlich überleben soll) lässt den zugehörigen Rundreise-Testfall fehlschlagen, nicht den Vollständigkeits-Check.
+- [~] Der komplette Testlauf über alle Felder bleibt in derselben Größenordnung wie die bisherigen Einzel-Tests (Sekunden, kein echter Serverneustart, kein echter nächtlicher precompute-Lauf, kein echter API-Roundtrip nötig — Unit-Test-Muster wie in `test_bug_68.py`).
+- [~] Der Test räumt seine eigene Test-Location nach jedem Lauf wieder auf (kein Seiteneffekt auf echte Locations, wiederholbar und parallelisierbar).
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation:** `backend/data/locations.py` (Zeilen 108–185, `LOCATION_FIELD_RULES` + abgeleitete Sichten), `backend/main.py` (`_load_location_overrides`, `patch_location`, `_update_custom_location_file`), `backend/precompute.py` (`_apply_location_overrides`, `_load_custom_locations`) und `backend/tests/test_bug_68.py` (bestehendes Testmuster) gelesen am 2026-07-11.
+- Bestätigt: `LOCATION_FIELD_RULES` ist bereits die zentrale, um BUG-68 bereinigte Quelle; alle abgeleiteten Sichten (`COORD_FIELDS`, `TEXT_FIELDS`, `NUMERIC_FIELDS`, `LIST_FIELDS`, `PATCHABLE_LOCATION_FIELDS`, `RECOMPUTE_TRIGGER_FIELDS`, `OVERRIDE_RELOAD_FIELDS`, `PRECOMPUTE_OVERRIDE_FIELDS`) werden daraus berechnet.
+- Bestätigt: Es gibt bereits bewusste, dauerhafte Ausnahmen — `image_filename`/`image_focus_x`/`image_focus_y` haben `precompute_reload: False` (eigener Endpoint, precompute braucht sie nicht), `subject_height_researched` ist gar nicht über den generischen PATCH-Endpoint erreichbar (reiner Seiteneffekt-Flag, `kind: flag`).
+- Widerlegt (ggü. Wissensbasis): precompute lädt **doch** Custom-Locations (`_load_custom_locations()`, seit BUG-33) — der Test muss diesen Pfad einschließen, nicht ausschließen.
+
+💀 **Szenario 1 — Der Test ist blind, weil er sich selbst zitiert.**
+Auslöser: Testcode leitet seine Feldliste direkt aus `LOCATION_FIELD_RULES` ab (`for field, rule in LOCATION_FIELD_RULES.items(): ...`), statt unabhängig vom Datenmodell zu starten.
+Frühwarnung: Ein komplett vergessenes Feld (die eigentliche BUG-50/61/68-Fehlerklasse) führt nie zu einem roten Test, weil Test und Code dieselbe (lückenhafte) Quelle teilen.
+Gegenmaßnahme: Rule 1 / AK 1 — Anker ist die `PhotoLocation`-Datenklasse (`dataclasses.fields(...)`), nicht die Regel-Tabelle. Vollständigkeits-Check und Rundreise-Check sind zwei getrennte Testbausteine.
+
+💀 **Szenario 2 — Bewusste Ausnahmen erzeugen Dauer-Rot und werden ignoriert.**
+Auslöser: Ein naiver „alle Felder müssen überall überleben"-Test behandelt `image_filename`/`subject_height_researched` als Fehler, weil sie laut Tabelle bewusst nicht überall reload-fähig sind.
+Frühwarnung: Test ist von Anfang an rot, Team gewöhnt sich an „der schlägt halt immer fehl" → genau die Situation, die generische Tests wertlos macht.
+Gegenmaßnahme: Explizite, kommentierte Ausnahmeliste (AK 5); Vollständigkeits-Check verlangt nur „eingetragen ODER auf Ausnahmeliste", nicht „überlebt überall".
+
+💀 **Szenario 3 — Falscher Testwert je Feldtyp lässt den Test an der falschen Stelle scheitern.**
+Auslöser: Ein generischer Dummy-Wert (z.B. String) wird auf ein Koordinatenfeld oder ein numerisches Feld angewendet → PATCH schlägt schon mit 422 fehl, bevor die eigentliche Rundreise geprüft wird.
+Frühwarnung: Testfehler zeigt „ungültiger Wert", nicht „Feld überlebt nicht" — falsche Diagnose.
+Gegenmaßnahme: Testwert-Erzeugung ist „kind"-bewusst (coord: gültige Lat/Lon-Verschiebung, numeric: neue Zahl ≥ 0, text: neue Zeichenkette, list: neue Brennweiten-Liste 8–1200mm) — nutzt dieselbe Validierungslogik wie `patch_location`.
+
+💀 **Szenario 4 — Custom-Location-Pfad wird übersehen oder fälschlich gleich behandelt.**
+Auslöser: Der Test prüft nur den Override-Tabellen-Pfad (Standard-Locations) und überträgt das Ergebnis stillschweigend auf Custom-Locations, obwohl diese über `_update_custom_location_file` + `precompute._load_custom_locations()` einen komplett anderen Mechanismus nutzen.
+Frühwarnung: Ein zukünftiger Custom-Location-spezifischer Bug (analog BUG-33) würde vom Test nicht erkannt.
+Gegenmaßnahme: Rule 4 / AK 4 — beide Pfade getrennt und explizit getestet, wie bereits in `test_bug_68.py` (AK 5) vorgezeichnet.
+
+💀 **Szenario 5 — Testdaten-Isolation schlägt fehl, echte Locations werden verändert.**
+Auslöser: Der generische Test läuft über viele Felder hinweg gegen dieselbe Test-Location; ein Fehler in der Cleanup-Logik lässt Reste (Override-Einträge, Custom-Location-Datei-Zeilen) zurück, die nachfolgende Testläufe oder sogar die echte App verfälschen.
+Frühwarnung: Nachfolgende, unabhängige Tests werden flaky oder echte Location-Listen zeigen Test-Datensätze.
+Gegenmaßnahme: Gleiches Fixture-Muster wie `test_bug_68.py` (eigene UUID-Test-Location pro Lauf, Teardown im Fixture, kein Shared State) — AK 9.
+
+💀 **Szenario 6 — Performance explodiert durch echte Subprozess-/Serverneustarts.**
+Auslöser: Der Test startet für jedes der ~15+ Felder tatsächlich den Server neu oder ruft den echten precompute-Cron auf.
+Frühwarnung: Testlauf dauert Minuten statt Sekunden, CI-Gate (TASK-64) wird unbrauchbar langsam.
+Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrides()` bzw. `precompute._apply_location_overrides()`/`_load_custom_locations()`, kein echter Prozess-Restart) — bereits bewährt in `test_bug_68.py`, `test_us_128.py`, `test_bug29_calendar_single_recompute.py` — AK 8.
+
+---
+
+### Architektur-Analyse
+
+**Zentrale Stelle:** `backend/data/locations.py` Zeilen 108–185. `LOCATION_FIELD_RULES` ist ein Dict `Feldname → {kind, recompute, override_reload, precompute_reload}` (aktuell 16 Felder: 4× coord, 4× text, 3× numeric, 1× list, 3× image, 1× flag). Daraus werden zur Laufzeit alle Sichten abgeleitet (`COORD_FIELDS` … `PRECOMPUTE_OVERRIDE_FIELDS`).
+
+**Verwendungsstellen:**
+- `main.py:patch_location()` (Zeile ~2511) — generischer PATCH-Endpoint, nutzt `PATCHABLE_LOCATION_FIELDS`/`COORD_FIELDS`/`NUMERIC_FIELDS`/`LIST_FIELDS` zur Validierung; „image"- und „flag"-Felder sind bewusst NICHT über diesen Endpoint patchbar (eigener Endpoint für Bild-Fokus, `subject_height_researched` ist reiner Seiteneffekt).
+- `main.py:_load_location_overrides()` (Zeile 1185) — beim Serverstart, nutzt `OVERRIDE_RELOAD_FIELDS`, wendet Overrides aus SQLite auf Standard-Locations an (simulierbar durch direkten Aufruf mit gemocktem `_store`, kein echter Neustart nötig — Muster in `test_bug_68.py`).
+- `precompute.py:_apply_location_overrides()` (Zeile 147) — eigener Subprozess, nutzt `PRECOMPUTE_OVERRIDE_FIELDS`, spiegelt bewusst dieselbe Whitelist+setattr-Logik wie `main.py`, damit Server und Recompute denselben Stand sehen.
+- `precompute.py:_load_custom_locations()` (Zeile 186) — lädt Custom-Locations aus SQLite in den precompute-Subprozess (seit BUG-33; korrigiert die ältere Annahme „precompute sieht keine Custom-Locations").
+- `main.py:_update_custom_location_file()` (Zeile 228) — separater Speicherweg für Custom-Locations, komplett unabhängig von der Override-Tabelle.
+
+**Fehlerklasse (BUG-50/61/68):** Ein Feld existiert auf `PhotoLocation`, ist über PATCH änderbar, fehlt aber in einer der (früher drei, heute einer) Whitelists → Wert wird beim nächsten Neustart/precompute-Lauf stillschweigend auf den Basiswert zurückgesetzt. Seit US-128 ist die Tabelle konsolidiert; das Ticket TASK-65 baut die dauerhafte Absicherung *gegen ein erneutes Vergessen*, nicht gegen den aktuellen (bereinigten) Stand.
+
+**Bestehendes Testmuster (Vorlage):** `backend/tests/test_bug_68.py` — isolierte Fixture-Location, Unit-Tests direkt gegen `main._load_location_overrides()` und `precompute._apply_location_overrides()` mit gemocktem `_store`/`LocationStore`, kein echter API-Roundtrip nötig für die Reload-Pfade. TASK-65 verallgemeinert genau dieses Muster über alle Felder statt über ein Feldpaar.
+
+---
+
+### Implementierungsoptionen
+
+**Option A — Reine Introspektion (Testfelder ausschließlich aus `PhotoLocation`-Datenklasse ableiten)**
+- Vorgehen: `dataclasses.fields(PhotoLocation)` liefert alle echten Felder; jedes wird gegen `LOCATION_FIELD_RULES` + eine kleine Ausnahmeliste abgeglichen; für verbleibende Felder wird automatisch ein passender Testwert je „kind" erzeugt und die volle Rundreise geprüft.
+- Betroffene Dateien: neu `backend/tests/test_task_65_field_roundtrip.py`; liest aus `data/locations.py`, `main.py`, `precompute.py`.
+- Vorteile: Erkennt automatisch auch Felder, die morgen erst hinzukommen — erfüllt den Kern der User Story „auch nicht bei Feldern, die es heute noch gar nicht gibt".
+- Nachteile/Risiken: Automatische Testwert-Erzeugung je „kind" muss robust sein (Szenario 3); mehr Erstaufwand als eine einfache Parametrisierung.
+- Aufwand: mittel
+
+**Option B — Explizite Parametrisierung über `LOCATION_FIELD_RULES.items()`**
+- Vorgehen: `@pytest.mark.parametrize` direkt über die bestehende Tabelle, ein Testfall pro Feld mit `override_reload`/`precompute_reload`-Flag.
+- Betroffene Dateien: gleiche neue Testdatei, aber ohne Introspektions-Baustein.
+- Vorteile: Wenig Code, schnell geschrieben, nutzt vorhandene Flags direkt.
+- Nachteile/Risiken: **Selbstreferentiell** (Szenario 1) — deckt die eigentliche Fehlerklasse „Feld fehlt komplett in der Tabelle" nicht ab, weil Testliste und Code-Liste identisch sind. Erfüllt die Kernanforderung des Tickets nicht.
+- Aufwand: klein, aber unzureichend
+
+**Option C — Kombination: Introspektions-Diff + parametrisierte Rundreise (empfohlen)**
+- Vorgehen: Zwei Testbausteine. (1) Ein Vollständigkeits-Check: `dataclasses.fields(PhotoLocation)` gegen `LOCATION_FIELD_RULES`-Keys + Ausnahmeliste abgleichen (fängt „Feld komplett vergessen"). (2) Ein parametrisierter Rundreise-Test über `LOCATION_FIELD_RULES.items()` mit „kind"-bewusster Testwert-Erzeugung, getrennt für Standard- und Custom-Location (fängt „Feld eingetragen, aber Flag falsch/Reload-Code kaputt").
+- Betroffene Dateien: neue Testdatei `backend/tests/test_task_65_field_roundtrip.py`; keine Produktivcode-Änderung nötig (reines Test-Tooling).
+- Vorteile: Deckt **beide** Varianten der bisher dreimal aufgetretenen Fehlerklasse ab (komplett vergessenes Feld UND falsch gesetztes Flag); baut direkt auf dem bewährten Unit-Test-Muster aus `test_bug_68.py` auf; bleibt wartbar, weil neue Felder nur an der bestehenden zentralen Stelle (`LOCATION_FIELD_RULES`) ergänzt werden müssen.
+- Nachteile/Risiken: Etwas mehr Code als Option B (zwei Bausteine statt einem), aber überschaubar.
+- Aufwand: mittel
+
+✅ **Empfehlung: Option C.** Nur die Kombination aus Introspektions-Diff und parametrisierter Rundreise erfüllt die eigentliche Ticket-Anforderung „auch für Felder, die es heute noch gar nicht gibt" — Option B allein wäre selbstreferentiell und hätte BUG-50/61/68 nie erkannt, Option A allein deckt zwar die Vollständigkeit ab, aber der zweite, ebenso wichtige Fehlerpfad (Flag eingetragen, aber falsch/Reload-Code ignoriert es) ist ohne den parametrisierten Rundreise-Teil nicht abgesichert.
+
+---
+
+### Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/locations.py`, `backend/main.py`, `backend/precompute.py`, `backend/tests/test_bug_68.py`
+- [x] Designer-Check: nicht visuell (reines Backend-Test-Tooling) → übersprungen
+- [ ] Implementierungsoptionen: A / B / C
+- [ ] Empfehlung: Option C
+
+### Testplan
+
+- [ ] Automatisiert (Harness): neue Datei `backend/tests/test_task_65_field_roundtrip.py` — Vollständigkeits-Check (Introspektion vs. Tabelle) + parametrisierter Rundreise-Test je Feld × {Standard-Location, Custom-Location}, Unit-Test-Muster wie `test_bug_68.py` (kein echter Serverneustart/precompute-Lauf).
+- [ ] Manuell: kein manueller Testpfad in der App vorhanden (reines Dev-Tooling) — Wirksamkeit zeigt sich am nächsten `pytest`-Lauf bzw. im CI-Gate (TASK-64); Stephan kann den Effekt sehen, indem probeweise ein Feld aus `LOCATION_FIELD_RULES` entfernt wird und der Testlauf daraufhin rot wird.
 
 **Quelle:** fotoalert-intake, 2026-07-11
 
@@ -10896,7 +11044,7 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Ready for Dev |
 | **Erstellt** | 2026-07-11 |
 
 **Beschreibung:** Der bestehende Playwright-Frontend-Check im CI prüft heute nur oberflächlich, ob die App lädt (Smoke-Check). Er wird um echte Bedien-Durchläufe erweitert, wie ein Nutzer sie macht: Location anlegen → erscheint auf der Karte; Bild hochladen → ist danach wieder abrufbar; Filter setzen → der Feed reagiert entsprechend. Die Durchläufe laufen im CI-Gate mit — schlägt einer fehl, wird nicht deployt.
@@ -10906,6 +11054,106 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 **Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting); baut auf dem Gate aus **TASK-64** auf (gemeinsamer CI-Ablauf). Erweitert den bestehenden Playwright-Check, ersetzt ihn nicht. Der Durchlauf „Bild hochladen → wieder abrufbar" hätte **BUG-71** (Beispielbild wird nicht mehr gespeichert, Inbox) automatisch gefangen — BUG-71 selbst bleibt ein eigenständiger Bugfix, dieses Ticket verhindert Wiederholungen. Erfahrungswissen zu Playwright-Timing-Fallen aus US-21 (echte `wait_for_selector` statt Timing-Tricks) beachten.
 
 **Quelle:** fotoalert-intake, 2026-07-11
+
+#### Analyse (fotoalert-analyze, 2026-07-11)
+
+📎 **Code-Verifikation:** Gelesen: `.github/workflows/deploy.yml` (Job `test-frontend`, Z. 24–95), `backend/tests/frontend/run_frontend_check.py` (vollständig, 589 Z.), `backend/tests/frontend/spec.py` (vollständig). Zusätzlich `backend/main.py` (Endpunkte `POST /locations/{loc_id}/image` Z. 2364, `PATCH /locations/{loc_id}` Z. 2511, `POST /preview-alignment` Z. 2184, `GET /locations` Z. 1594) sowie `web/index.html` (`AddLocation`-Objekt ab Z. 6623 inkl. `preview()`/`save()`/`triggerImageUpload()`/`_pasteCoords()`, `LocationDetail`-Objekt Z. 5842–5928 inkl. `triggerImageUpload()`/`_onImageFileSelected()`, `Filter`-Objekt inkl. `apply()` Z. 2018, `defaultState()` Z. 2918).
+
+&nbsp;&nbsp;**Bestätigt:**
+- Der bestehende Check läuft als eigener CI-Job `test-frontend` **vor** `deploy` (`needs: [test-frontend]`) — ein rotes Ergebnis blockiert bereits heute den Deploy. Dieses Ticket muss also nur den *Inhalt* des Checks erweitern, nicht die Gate-Verdrahtung (die liefert TASK-64 bereits).
+- Aktuell geprüft wird ausschließlich: Login-Precondition, alle 4 Views werden `.active` + Pflicht-Selektoren vorhanden, Location-Detail öffnet sich + externe Maps-Links sind wohlgeformt, keine `pageerror`/`console.error`. Kein echter Schreib-Durchlauf (Location anlegen, Bild-Upload, Filter) ist heute enthalten — die Ticket-Prämisse „nur Smoke-Check" ist korrekt.
+- **Location anlegen:** existiert als eigener UI-Fluss `AddLocation` (Tab „+"), zweistufig: `AddLocation.preview()` (POST `/preview-alignment`, berechnet Alignments, zeigt „Location dauerhaft speichern"-Button) → erst danach `AddLocation.save()` speichert dauerhaft. Koordinaten lassen sich per Text-Input (`#loc-obs`, `oninput="_onObsInput()"`) und einem „Einfügen"-Paste-Button setzen — ein echter Kartenklick auf die Leaflet-Karte ist **nicht** zwingend nötig, das Textfeld reicht für einen Playwright-`fill()`.
+- **Bild-Upload:** Es gibt **zwei** Upload-Pfade mit demselben Funktionsnamen `triggerImageUpload()`, aber unterschiedlichem Code: einen im `AddLocation`-Fluss (direkt beim Anlegen) und einen im `LocationDetail`-Sheet (nachträglich, bei bereits existierender Location). **BUG-71** (der Anlass für diesen Durchlauf) betraf nachweislich den `LocationDetail`-Pfad (`_onImageFileSelected()`, Z. 5909–5928, Kontext-Verlust bei `this._current`). Der E2E-Durchlauf sollte daher gezielt den `LocationDetail`-Pfad abdecken, damit er BUG-71-artige Regressionen wirklich fängt — nicht nur den Upload beim Neuanlegen.
+- **Filter:** `Filter.apply(this.data)` (Z. 2018) wird im Feed aufgerufen; der State hat u. a. `minScore` (Default 70) und kategoriale Include/Exclude-Chips (`eventTypes`, `difficulty`, …). Es gibt keinen dedizierten „leer"-Selektor (`no-results`/`empty-state` wurden per Grep nicht gefunden) — ein leerer Feed zeigt vermutlich schlicht ein leeres `#feed-content`. Prüfbar ist das über die Kindelement-Anzahl vor/nach Filteränderung, nicht über einen speziellen Text.
+- Der CI-Job setzt `FOTOALERT_ENV=dev`; jeder CI-Lauf checkt den Code frisch aus (`actions/checkout`), der Server startet aus dem Checkout heraus. Ob die Dev-SQLite-DB dabei leer/seed-basiert **neu entsteht** oder eine committete Datei mit Bestandsdaten nutzt, ließ sich durch reines Code-Lesen nicht abschließend klären (kein `.db`-Commit im Diff-Scope geprüft) — als offene Frage unten aufgenommen, weil davon abhängt, ob durch den E2E-Lauf angelegte Test-Location dauerhaft in einer geteilten DB landet oder pro Lauf verschwindet.
+
+**Example Mapping**
+
+✅ **Entschieden (Stephan, 2026-07-11):** Alle drei Durchläufe laufen als **Erweiterung des bestehenden Desktop-Passes** in `run_checks()` (nach dem bisherigen Ablauf, vor dem Mobile-Pass) — kein neuer CI-Job, keine neue Datei-Struktur außerhalb von `backend/tests/frontend/`. War zunächst als Annahme markiert, ist jetzt durch die Implementierungsoptions-Entscheidung (Option A, siehe unten) bestätigt.
+
+📏 **Regel 1 — Location anlegen:** Legt der Check über den `AddLocation`-Fluss (Koordinaten-Eingabe + „Alignments berechnen" + „Location dauerhaft speichern") eine neue Test-Location an, muss diese danach über `GET /locations` auffindbar sein UND auf der Kartenansicht (`#page-map`) als Marker erscheinen.
+🟢 Given: Check ist eingeloggt, auf dem „+"-Tab. When: Koordinaten werden per Text-Input gesetzt, „Alignments berechnen" und danach „Location dauerhaft speichern" geklickt. Then: `GET /locations` enthält die neue Location (per eindeutigem Test-Namen), UND nach `App.nav('map')` erscheint ein zusätzlicher Leaflet-Marker (Anzahl `.leaflet-marker-icon` ist um 1 gestiegen gegenüber der Zählung vor dem Anlegen).
+
+📏 **Regel 2 — Bild hochladen (BUG-71-Regressionsschutz):** Lädt der Check über das `LocationDetail`-Sheet einer bestehenden Location ein Bild hoch, muss dieses Bild danach über die API abrufbar UND im Detail-Sheet sichtbar sein.
+🟢 Given: `LocationDetail` einer Location ist geöffnet (Location ohne Bild, z. B. die im Durchlauf neu angelegte Test-Location). When: über „Bild hochladen" eine Testbild-Datei ausgewählt wird. Then: nach kurzer Wartezeit zeigt das Detail-Sheet ein `<img>` mit dem neuen Bild, UND `GET /locations` bzw. `GET /locations/{id}` liefert ein gesetztes `image_filename`-Feld für diese Location.
+
+📏 **Regel 3 — Filter setzen:** Ändert der Check einen Filter-Chip im Feed, muss sich die sichtbare Trefferzahl im Feed nachweisbar ändern (nicht nur der State im Hintergrund).
+🟢 Given: Feed zeigt eine Ausgangsmenge X an Karten (`#feed-content` Kindelemente zählen). When: ein Filter gesetzt wird, der garantiert eine andere Teilmenge liefert (siehe Frage 3). Then: Trefferzahl im Feed weicht nachweisbar von X ab; wird der Filter zurückgesetzt, ist die Trefferzahl wieder = X.
+
+❓ **Frage 1 (🔴 funktional kritisch — Testdaten-Isolation):** Landet eine im CI-Lauf per `AddLocation.save()` angelegte Test-Location in einer **geteilten** Dev-Datenbank (die z. B. auch für manuelle lokale Tests genutzt wird) oder in einer **pro CI-Lauf frischen** DB? Das entscheidet, ob nach dem Test aufgeräumt werden muss (Location + hochgeladenes Bild wieder löschen) oder ob das irrelevant ist, weil der Container nach dem Job verworfen wird.
+&nbsp;&nbsp;Option A — geteilte/persistente Dev-DB: der Check **muss** die angelegte Test-Location + das Bild am Ende wieder entfernen (Cleanup-Schritt, per direktem SQLite-Zugriff analog zum bestehenden Lösch-Workaround, da kein DELETE-Endpoint existiert), sonst sammeln sich bei jedem CI-Lauf weitere Test-Locations an.
+&nbsp;&nbsp;Option B — frische DB pro Lauf: kein Cleanup nötig, der Check kann die Location einfach stehen lassen.
+&nbsp;&nbsp;✅ **Entschieden (Stephan, 2026-07-11): Option B.** Verifiziert: `backend/data_dev/` ist komplett per `.gitignore` ausgeschlossen, es gibt keine geteilte/dauerhafte Dev-Datenbank in CI. `store.py` legt die DB per `CREATE TABLE IF NOT EXISTS` + `mkdir(parents=True, exist_ok=True)` bei jedem Lauf frisch an, jeder Actions-Lauf checkt frisch aus. Kein Cleanup-Schritt nötig — der zugehörige Edge-Case-AK entfällt (siehe Akzeptanzkriterien unten).
+
+❓ **Frage 2 (🔴 funktional kritisch — Testbild-Quelle):** Woher kommt die Bilddatei für den Upload-Durchlauf? Playwright braucht eine lokale Datei zum Hochladen (`set_input_files`).
+&nbsp;&nbsp;Option A — kleines Test-Fixture-Bild wird neu ins Repo gelegt (z. B. `backend/tests/frontend/fixtures/test-image.jpg`, wenige KB) und von dort hochgeladen — reproduzierbar, unabhängig von Live-Daten.
+&nbsp;&nbsp;Option B — ein zur Laufzeit generiertes Dummy-Bild (z. B. per `PIL`/Pillow 1×1-Pixel-JPEG in `/tmp` erzeugen) — kein zusätzliches Repo-Asset, aber eine neue Abhängigkeit (Pillow) im CI-Requirements.
+&nbsp;&nbsp;✅ **Entschieden (Stephan, 2026-07-11): Option A.** Feste Test-Fixture-Bilddatei im Repo unter `backend/tests/frontend/fixtures/test-image.jpg`.
+
+❓ **Frage 3 (🔴 funktional kritisch — welcher Filter):** Welcher konkrete Filter soll im Durchlauf gesetzt werden? Ein Filter auf reale Feed-Inhalte (z. B. „nur Mond-Alignment") ist nicht deterministic-sicher, weil er von der aktuellen Datenlage abhängt (kann an manchen Tagen 0 Treffer liefern, auch ohne Filter).
+&nbsp;&nbsp;Option A — deterministischer Extremfilter: `minScore` auf einen sehr hohen Wert setzen (z. B. 99), der garantiert (fast) alle Treffer ausblendet, danach zurücksetzen auf den Default (70) und prüfen, dass wieder mehr Treffer da sind. Robust gegen Tagesdaten, testet aber nur „Filter wirkt überhaupt", nicht eine spezifische Chip-Logik.
+&nbsp;&nbsp;Option B — konkreter Event-Typ-Chip (z. B. „Goldene Stunde" ausschließen) mit vorheriger Prüfung per `GET /opportunities`, dass aktuell mindestens 1 Treffer dieses Typs existiert (Skip/Soft-Fail falls nicht) — testet die tatsächliche Chip-Logik, ist aber datenabhängiger und komplexer (Vorab-Check nötig).
+&nbsp;&nbsp;✅ **Entschieden (Stephan, 2026-07-11): Option A.** Deterministischer Extremfilter: `minScore` auf sehr hohen Wert setzen, danach zurück auf Default (70).
+
+**Akzeptanzkriterien:**
+- [ ] Nach Setzen von Koordinaten + „Alignments berechnen" + „Location dauerhaft speichern" im „+"-Tab erscheint die neue Location in `GET /locations` UND als zusätzlicher Marker auf der Kartenansicht.
+- [ ] Nach Hochladen eines Testbilds über das Location-Detail-Sheet einer bestehenden Location zeigt das Sheet danach ein Bild UND `GET /locations/{id}` liefert ein gesetztes `image_filename`.
+- [ ] Nach Setzen des Test-Filters (siehe Frage 3) weicht die sichtbare Trefferzahl im Feed nachweisbar von der Ausgangszahl ab; nach Zurücksetzen des Filters ist die ursprüngliche Trefferzahl wieder erreicht.
+- [ ] Schlägt einer der drei neuen Durchläufe fehl, bekommt der bestehende Findings-Mechanismus (`Finding`-Objekte, `findings.json`) einen entsprechenden Eintrag — der CI-Job `test-frontend` endet mit Exit-Code 1 und blockiert (`needs: [test-frontend]`) den `deploy`-Job, exakt wie bei den bestehenden Findings.
+- [ ] Edge Case: Schlägt der Location-Anlegen-Durchlauf fehl (z. B. `save()` liefert keine neue Location), werden die nachfolgenden Durchläufe (Bild-Upload, der auf dieser Location aufbaut) übersprungen bzw. mit einem eigenen, klar erkennbaren Finding markiert statt mit einer verwirrenden Folgefehler-Kaskade — analog zum bestehenden Fail-Fast-Muster bei der Login-Precondition.
+- [x] Edge Case entfällt: Ein Cleanup-Schritt für die Test-Location (Löschen nach dem CI-Lauf) ist **nicht nötig**. Entschieden (Frage 1 → Option B, 2026-07-11): `backend/data_dev/` ist per `.gitignore` ausgeschlossen, jeder CI-Lauf legt die Dev-DB frisch an (`store.py`: `CREATE TABLE IF NOT EXISTS`, `mkdir(parents=True, exist_ok=True)`), es gibt keine geteilte/dauerhafte Dev-Datenbank. Die Test-Location kann nach dem Lauf einfach stehen bleiben, da der Container/das Checkout beim nächsten Lauf ohnehin verworfen wird.
+
+**Pre-Mortem:**
+- 💀 Szenario: Der neue Location-Anlegen-Durchlauf hängt am Klick auf die Leaflet-Karte (statt Text-Input), der Klick trifft in CI (headless, andere Fenstergröße) einen leicht verschobenen Pixel → Test flakt zufällig, blockiert Deploys ohne echten Bug.
+&nbsp;&nbsp;Auslöser: Kartenklick-basierte statt textfeldbasierte Koordinaten-Eingabe.
+&nbsp;&nbsp;Frühwarnung: Wiederholte, scheinbar zufällige rote CI-Läufe ohne Code-Änderung im betroffenen Bereich.
+&nbsp;&nbsp;Gegenmaßnahme: Koordinaten ausschließlich per Text-Input (`fill()`) setzen, keinen Kartenklick verwenden (siehe Code-Verifikation oben) — in AK/Implementierung festschreiben.
+- 💀 Szenario: Der Upload-Durchlauf testet versehentlich den `AddLocation`-Upload-Pfad statt den `LocationDetail`-Pfad — der Check wird grün, aber genau der Pfad, der bei BUG-71 kaputt war, bleibt weiterhin ungetestet.
+&nbsp;&nbsp;Auslöser: Namensgleichheit `triggerImageUpload()` in beiden Objekten verwechselt.
+&nbsp;&nbsp;Frühwarnung: Ein manuell reproduzierter BUG-71-artiger Fehler würde vom CI-Check nicht erkannt.
+&nbsp;&nbsp;Gegenmaßnahme: Explizit `LocationDetail.triggerImageUpload()`-Pfad ansteuern (Detail-Sheet einer bereits gespeicherten Location öffnen, dort hochladen), im Testkommentar auf BUG-71 verweisen.
+- 💀 Szenario: Der Filter-Durchlauf nutzt einen inhaltlichen Chip-Filter, an einem Tag mit ungünstiger Datenlage liefert der ungefilterte Feed bereits 0 Treffer → Test kann die „vorher andere Anzahl als nachher"-Prüfung nicht sauber durchführen, flakt tagesabhängig.
+&nbsp;&nbsp;Auslöser: Datenabhängiger statt strukturell-deterministischer Filtertest.
+&nbsp;&nbsp;Frühwarnung: CI wird rot ohne Code-Änderung, korreliert mit Tageszeit/Datum.
+&nbsp;&nbsp;Gegenmaßnahme: Frage 3 klären (Empfehlung: Option A, `minScore`-Extremfilter) — Test unabhängig von Live-Feed-Inhalt machen.
+- 💀 Szenario: Test-Locations/-Bilder aus wiederholten CI-Läufen sammeln sich in einer geteilten Dev-DB an, verzerren spätere manuelle Tests oder Screenshots (z. B. Location-Anzahl-Assertions in `verify-deploy`, das „≥ 10 Locations" nach Deploy prüft — irrelevant hier, aber zeigt dass Nebenwirkungen auf andere Checks nicht ausgeschlossen sind).
+&nbsp;&nbsp;Auslöser: Fehlendes Cleanup nach dem Testlauf.
+&nbsp;&nbsp;Frühwarnung: Wachsende, sichtlich künstliche Location-Namen in der Locations-Übersicht über die Zeit.
+&nbsp;&nbsp;Gegenmaßnahme: Frage 1 klären; bei geteilter DB Cleanup-Schritt einbauen und testen, dass er auch bei fehlgeschlagenem Durchlauf greift.
+- 💀 Szenario: Der zweistufige `AddLocation`-Fluss (`preview()` muss vor `save()` laufen, „Location dauerhaft speichern"-Button ist per `style="display:none"` erst nach erfolgreichem Preview sichtbar) wird im Test übersprungen oder zu früh geklickt → `save()` schlägt fehl, weil der Button noch nicht sichtbar/aktiv ist.
+&nbsp;&nbsp;Auslöser: Fehlendes Warten auf den Sichtbarkeitswechsel des „Speichern"-Buttons nach `preview()`.
+&nbsp;&nbsp;Frühwarnung: Immer gleicher, reproduzierbarer roter Schritt direkt nach „Alignments berechnen".
+&nbsp;&nbsp;Gegenmaßnahme: `page.wait_for_selector("#save-location-btn:not([style*='display: none'])")` bzw. äquivalent nach dem Preview-Klick, bevor `save()` geklickt wird — echtes Warten statt Timing-Trick, konsistent mit dem US-21-Muster (`_dismiss_onboarding_if_present`).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `.github/workflows/deploy.yml`, `backend/tests/frontend/run_frontend_check.py`, `backend/tests/frontend/spec.py`, `backend/main.py` (Location-/Image-Endpunkte), `web/index.html` (`AddLocation`, `LocationDetail`, `Filter`)
+- [x] Designer-Check: visuell? → Nein, reines Test-/CI-Tooling ohne sichtbare App-Änderung — übersprungen
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A — entschieden (Stephan, 2026-07-11)
+
+**Implementierungsoptionen:**
+
+### Option A — Neue Durchlauf-Funktionen im bestehenden Modul (empfohlen)
+- Vorgehen: Drei neue Funktionen `_check_location_create()`, `_check_image_upload()`, `_check_filter_feed()` nach dem Muster von `_check_detail_sheet()` in `run_frontend_check.py` ergänzen, in `run_checks()` nach dem bestehenden Ablauf aufgerufen (Desktop-Pass). Neue Spec-Konstanten (Selektoren, Test-Fixture-Pfad) in `spec.py`. Findings folgen exakt dem bestehenden `Finding`-Schema.
+- Betroffene Dateien: `backend/tests/frontend/run_frontend_check.py`, `backend/tests/frontend/spec.py`, neu: `backend/tests/frontend/fixtures/test-image.jpg` (falls Frage 2 → Option A), `backend/tests/test_task-66.py` (pytest-Wrapper analog bestehendem Test-Harness-Muster).
+- Vorteile: Nutzt die vorhandene Infrastruktur (Findings, Screenshots, Fail-Fast-Muster, US-21-Timing-Lösung) vollständig weiter; kein neuer CI-Job nötig; Reviewer sieht die Erweiterung im Kontext des bestehenden Checks.
+- Nachteile/Risiken: `run_checks()` wird länger und macht mehr Seiteneffekte (echte Schreiboperationen) als bisher — bei Fehlschlägen in neuen Durchläufen ist Fail-Fast (siehe AK Edge Case) wichtig, damit Folgefehler nicht verwirren.
+- Aufwand: Mittel.
+
+### Option B — Eigenständiges zweites Playwright-Skript für schreibende Durchläufe
+- Vorgehen: Neue Datei `backend/tests/frontend/run_write_checks.py`, eigener CI-Schritt/Job parallel oder nach dem bestehenden Smoke-Check, komplett getrennte Findings-Datei.
+- Betroffene Dateien: neue Datei(en) unter `backend/tests/frontend/`, `.github/workflows/deploy.yml` (neuer Job + `needs`-Kette).
+- Vorteile: Trennt lesende (Smoke) von schreibenden (Durchlauf) Checks sauber; ein Absturz in den State-Mutationen kann den Smoke-Check nicht verunreinigen (unabhängige Browser-Session).
+- Nachteile/Risiken: Zusätzlicher Server-Start/Login-Overhead (zweite Browser-Session, zweiter Login), mehr CI-Laufzeit; widerspricht der Ticket-Formulierung „erweitert den bestehenden Check, ersetzt ihn nicht" tendenziell stärker als Option A; mehr Verdrahtungsaufwand in `deploy.yml` (zusätzlicher `needs`-Eintrag für `deploy`).
+- Aufwand: Groß.
+
+✅ **Empfehlung: Option A** — passt zur expliziten Ticket-Vorgabe „erweitert den bestehenden Check, ersetzt ihn nicht", nutzt die bereits bewährte Findings-/Timing-Infrastruktur (inkl. US-21-Lösung) direkt weiter und hält den CI-Overhead (nur 1 Server-Start, 1 Login) niedrig.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_task-66.py` — pytest-Fälle mit `pytest.importorskip("playwright")` analog bestehendem Muster, decken die drei neuen `_check_*`-Funktionen inkl. der Edge Cases (Fail-Fast bei fehlgeschlagenem Location-Anlegen, Cleanup bei Option A/Frage 1) ab.
+- [ ] Manuell: Lokal `python3 backend/tests/frontend/run_frontend_check.py --base-url http://localhost:8000 --headed` laufen lassen (Terminal-Fenster-Modell beachten), Console-Output auf die drei neuen Findings-Kategorien prüfen; danach im Browser (`http://localhost:8000`) den „+"-Tab öffnen und denselben Ablauf einmal von Hand nachvollziehen, um zu bestätigen, dass die vom Skript geklickten Elemente den echten UI-Text/Reihenfolge treffen.
 
 ---
 
