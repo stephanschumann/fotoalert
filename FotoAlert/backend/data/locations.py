@@ -136,10 +136,9 @@ LOCATION_FIELD_RULES: dict[str, dict] = {
 
     "name":          {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
     "description":   {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
-    # BUG-68 (bekannte, hier bewusst NICHT gefixte Lücke): special_notes/subject_name
-    # überstehen aktuell weder einen Server-Neustart noch den precompute-Subprozess.
-    "special_notes": {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
-    "subject_name":  {"kind": "text", "recompute": False, "override_reload": False, "precompute_reload": False},
+    # BUG-68: behoben — special_notes/subject_name überstehen jetzt Reload und precompute.
+    "special_notes": {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
+    "subject_name":  {"kind": "text", "recompute": False, "override_reload": True,  "precompute_reload": True},
 
     "observer_floor_height_m": {"kind": "numeric", "recompute": True, "override_reload": True, "precompute_reload": True},
     # US-128: neu ergänzt (bislang weder patchbar noch reload-fähig).
