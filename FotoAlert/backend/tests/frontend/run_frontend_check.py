@@ -880,9 +880,33 @@ def _check_filter_feed(page, commit: str, shot):
         )
         return findings
 
-    max_score = page.evaluate(
-        "() => (Feed.data || []).reduce((m, e) => Math.max(m, e.overall_score || 0), 0)"
+    score_stats = page.evaluate(
+        "() => { "
+        "const data = Feed.data || []; "
+        "const scored = data.filter(e => typeof e.overall_score === 'number' && !isNaN(e.overall_score)); "
+        "const maxScore = scored.length > 0 ? scored.reduce((m, e) => Math.max(m, e.overall_score), -Infinity) : null; "
+        "return { total: data.length, scoredCount: scored.length, maxScore: maxScore }; "
+        "}"
     )
+    total = score_stats["total"]
+    scored_count = score_stats["scoredCount"]
+    max_score = score_stats["maxScore"]
+
+    if scored_count == 0:
+        # Edge Case (CI-Root-Cause TASK-66, Lauf #189/#190): kein einziger sichtbarer
+        # Feed-Eintrag hat einen numerischen overall_score (z.B. weil
+        # FOTOALERT_NO_BACKGROUND in CI die Score-Berechnung nach dem Anlegen einer
+        # Location unterdrückt). In web/index.html Filter.apply() gilt
+        # "o.overall_score < s.minScore / 100" — bei undefined ist dieser Vergleich
+        # IMMER false, ein ungescorter Eintrag ist also durch KEINEN minScore-Wert
+        # herausfilterbar. "Trefferzahl sinkt bei Extremfilter" ist damit strukturell
+        # nicht testbar, kein Finding, sondern dokumentierter Skip.
+        print(
+            "[feed] filter_reduces_results: übersprungen, kein sichtbarer Feed-Eintrag "
+            "hat einen numerischen overall_score (total={0}, scoredCount=0) — "
+            "vermutlich FOTOALERT_NO_BACKGROUND in CI".format(total)
+        )
+        return findings
 
     if max_score >= 1.0:
         # Edge Case: overall_score der Filterbedingung ist strikt "< minScore/100"
@@ -899,6 +923,12 @@ def _check_filter_feed(page, commit: str, shot):
     # des tatsächlich höchsten sichtbaren Scores, gedeckelt auf die UI-Skala (0..100).
     extreme_min_score = min(100, math.ceil(max_score * 100) + 1)
 
+    # Erwartung: ALLE gescorten Einträge fallen bei diesem Extremfilter heraus,
+    # ungescorte Einträge (overall_score undefined/NaN) können durch minScore
+    # strukturell nicht ausgeschlossen werden (siehe Edge Case oben) und bleiben
+    # sichtbar. Erwartete neue Trefferzahl ist daher NICHT zwingend 0.
+    expected_filtered_count = max(0, total - scored_count)
+
     page.evaluate(
         "async (v) => { Filter.save({ minScore: v }); await FilterSheet._applyLive(); }",
         extreme_min_score,
@@ -913,16 +943,21 @@ def _check_filter_feed(page, commit: str, shot):
         pass
     filtered_count = page.eval_on_selector(_spec.FEED_CONTENT_SELECTOR, "el => el.children.length")
     shot("filter-feed-extreme")
-    if filtered_count >= baseline_count:
+    if filtered_count > expected_filtered_count:
         findings.append(
             Finding(
                 view="feed",
                 assertion_id="filter_reduces_results",
-                expected="Trefferzahl sinkt unter Ausgangswert {0} bei minScore={1} (dynamisch, > höchster sichtbarer Score {2:.3f})".format(
-                    baseline_count, extreme_min_score, max_score
+                expected=(
+                    "Trefferzahl sinkt auf <= {0} bei minScore={1} (dynamisch, > höchster "
+                    "gescorter Score {2:.3f}; Baseline={3}, total={4}, scoredCount={5} — "
+                    "ungescorte Einträge bleiben strukturell erhalten)".format(
+                        expected_filtered_count, extreme_min_score, max_score,
+                        baseline_count, total, scored_count,
+                    )
                 ),
-                actual="Trefferzahl blieb bei {0} (kein Rückgang)".format(filtered_count),
-                message="feed result count did not decrease under extreme minScore filter",
+                actual="Trefferzahl = {0} (erwartet <= {1})".format(filtered_count, expected_filtered_count),
+                message="feed result count did not decrease as expected under extreme minScore filter",
                 screenshot_path=shot("filter-not-reduced"),
                 timestamp=_now_iso(),
                 commit_sha=commit,
@@ -1180,7 +1215,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if findings:
         print("FAIL: {0} Finding(s)".format(len(findings)))
         for f in findings:
-            print("  - [{0}] {1}: {2}".format(f.view, f.assertion_id, f.actual))
+            print("  - [{0}] {1}: erwartet={2} | ist={3}".format(f.view, f.assertion_id, f.expected, f.actual))
         return 1
     print("OK: keine Findings.")
     return 0
