@@ -187,8 +187,10 @@ def test_ak1_latency_14day():
 
 @pytest.mark.slow
 def test_ak1b_latency_365day():
-    """AK1b: 365-Tage-Plan einer Location. Aktuell ~21 s (4,6× schneller als alt).
-    Schranke 45 s als Regressionsguard; Zielwert (5 s) ist noch zu kalibrieren."""
+    """AK1b: 365-Tage-Plan einer Location. Aktuell ~21 s lokal (4,6× schneller als alt).
+    Schranke 60 s als Regressionsguard (TASK-64: auf GitHub-Actions-Runnern gemessen
+    51,4 s statt der lokal kalibrierten 45 s — Puffer für langsamere/variable CI-Hardware);
+    Zielwert (5 s) ist noch zu kalibrieren."""
     from calculations.opportunity import find_opportunities_multi_day
     from calculations.weather import WeatherForecast
     loc = _LOCS_3D[0]
@@ -201,4 +203,4 @@ def test_ak1b_latency_365day():
         dt = time.time() - t
     finally:
         A.clear_active_window()
-    assert dt < 45.0, f"365-Tage-Plan {dt:.1f}s > 45s"
+    assert dt < 60.0, f"365-Tage-Plan {dt:.1f}s > 60s"
