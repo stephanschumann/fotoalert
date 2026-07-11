@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-75** *(Live-Astro-Übersicht: falsches Datum/falsche Uhrzeit bei Ereignissen)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -11038,14 +11038,14 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 
 ---
 
-### TASK-66 · E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check `[ ]`
+### TASK-66 · E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-11 |
 
 **Beschreibung:** Der bestehende Playwright-Frontend-Check im CI prüft heute nur oberflächlich, ob die App lädt (Smoke-Check). Er wird um echte Bedien-Durchläufe erweitert, wie ein Nutzer sie macht: Location anlegen → erscheint auf der Karte; Bild hochladen → ist danach wieder abrufbar; Filter setzen → der Feed reagiert entsprechend. Die Durchläufe laufen im CI-Gate mit — schlägt einer fehl, wird nicht deployt.
@@ -11076,7 +11076,7 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 🟢 Given: Check ist eingeloggt, auf dem „+"-Tab. When: Koordinaten werden per Text-Input gesetzt, „Alignments berechnen" und danach „Location dauerhaft speichern" geklickt. Then: `GET /locations` enthält die neue Location (per eindeutigem Test-Namen), UND nach `App.nav('map')` erscheint ein zusätzlicher Leaflet-Marker (Anzahl `.leaflet-marker-icon` ist um 1 gestiegen gegenüber der Zählung vor dem Anlegen).
 
 📏 **Regel 2 — Bild hochladen (BUG-71-Regressionsschutz):** Lädt der Check über das `LocationDetail`-Sheet einer bestehenden Location ein Bild hoch, muss dieses Bild danach über die API abrufbar UND im Detail-Sheet sichtbar sein.
-🟢 Given: `LocationDetail` einer Location ist geöffnet (Location ohne Bild, z. B. die im Durchlauf neu angelegte Test-Location). When: über „Bild hochladen" eine Testbild-Datei ausgewählt wird. Then: nach kurzer Wartezeit zeigt das Detail-Sheet ein `<img>` mit dem neuen Bild, UND `GET /locations` bzw. `GET /locations/{id}` liefert ein gesetztes `image_filename`-Feld für diese Location.
+🟢 Given: `LocationDetail` einer Location ist geöffnet (Location ohne Bild, z. B. die im Durchlauf neu angelegte Test-Location). When: über „Bild hochladen" eine Testbild-Datei ausgewählt wird. Then: nach kurzer Wartezeit zeigt das Detail-Sheet ein `<img>` mit dem neuen Bild, UND `GET /locations` bzw. `GET /locations/{id}` liefert ein gesetztes `image_url`-Feld für diese Location.
 
 📏 **Regel 3 — Filter setzen:** Ändert der Check einen Filter-Chip im Feed, muss sich die sichtbare Trefferzahl im Feed nachweisbar ändern (nicht nur der State im Hintergrund).
 🟢 Given: Feed zeigt eine Ausgangsmenge X an Karten (`#feed-content` Kindelemente zählen). When: ein Filter gesetzt wird, der garantiert eine andere Teilmenge liefert (siehe Frage 3). Then: Trefferzahl im Feed weicht nachweisbar von X ab; wird der Filter zurückgesetzt, ist die Trefferzahl wieder = X.
@@ -11098,7 +11098,7 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 
 **Akzeptanzkriterien:**
 - [ ] Nach Setzen von Koordinaten + „Alignments berechnen" + „Location dauerhaft speichern" im „+"-Tab erscheint die neue Location in `GET /locations` UND als zusätzlicher Marker auf der Kartenansicht.
-- [ ] Nach Hochladen eines Testbilds über das Location-Detail-Sheet einer bestehenden Location zeigt das Sheet danach ein Bild UND `GET /locations/{id}` liefert ein gesetztes `image_filename`.
+- [ ] Nach Hochladen eines Testbilds über das Location-Detail-Sheet einer bestehenden Location zeigt das Sheet danach ein Bild UND `GET /locations/{id}` liefert ein gesetztes `image_url`.
 - [ ] Nach Setzen des Test-Filters (siehe Frage 3) weicht die sichtbare Trefferzahl im Feed nachweisbar von der Ausgangszahl ab; nach Zurücksetzen des Filters ist die ursprüngliche Trefferzahl wieder erreicht.
 - [ ] Schlägt einer der drei neuen Durchläufe fehl, bekommt der bestehende Findings-Mechanismus (`Finding`-Objekte, `findings.json`) einen entsprechenden Eintrag — der CI-Job `test-frontend` endet mit Exit-Code 1 und blockiert (`needs: [test-frontend]`) den `deploy`-Job, exakt wie bei den bestehenden Findings.
 - [ ] Edge Case: Schlägt der Location-Anlegen-Durchlauf fehl (z. B. `save()` liefert keine neue Location), werden die nachfolgenden Durchläufe (Bild-Upload, der auf dieser Location aufbaut) übersprungen bzw. mit einem eigenen, klar erkennbaren Finding markiert statt mit einer verwirrenden Folgefehler-Kaskade — analog zum bestehenden Fail-Fast-Muster bei der Login-Precondition.
@@ -11156,6 +11156,36 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 - [ ] Automatisiert (Harness): `backend/tests/test_task-66.py` — pytest-Fälle mit `pytest.importorskip("playwright")` analog bestehendem Muster, decken die drei neuen `_check_*`-Funktionen inkl. der Edge Cases (Fail-Fast bei fehlgeschlagenem Location-Anlegen, Cleanup bei Option A/Frage 1) ab.
 - [ ] Manuell: Lokal `python3 backend/tests/frontend/run_frontend_check.py --base-url http://localhost:8000 --headed` laufen lassen (Terminal-Fenster-Modell beachten), Console-Output auf die drei neuen Findings-Kategorien prüfen; danach im Browser (`http://localhost:8000`) den „+"-Tab öffnen und denselben Ablauf einmal von Hand nachvollziehen, um zu bestätigen, dass die vom Skript geklickten Elemente den echten UI-Text/Reihenfolge treffen.
 
+#### Implementierungsnotiz (2026-07-11)
+
+**Geänderte/neue Dateien:**
+- `backend/tests/frontend/run_frontend_check.py`: drei neue Funktionen `_check_location_create()`, `_check_image_upload()`, `_check_filter_feed()` nach dem Muster von `_check_detail_sheet()`; in `run_checks()` nach dem Detail-Sheet-Check und vor der Konsolen-/Page-Error-Auswertung aufgerufen (Desktop-Pass, vor dem Mobile-Pass — unverändert). `run_checks()` hat einen neuen optionalen Parameter `host_password`; CLI hat einen neuen `--host-password`-Schalter (Default aus `FOTOALERT_HOST_PASSWORD`, wie beim bestehenden `--password`/`FOTOALERT_USER_PASSWORD`).
+- `backend/tests/frontend/spec.py`: neue Selektor-/Text-/Timeout-Konstanten für alle drei Durchläufe (Add-Tab, Koordinaten-Inputs, Save-Button, Marker-Selektor, Bild-Upload-Selektoren, Fixture-Pfad, Filter-Extremwert/Default).
+- `backend/tests/frontend/fixtures/test-image.jpg` (neu): 64×64px, 692 Byte, valides JPEG (Fixture für Regel 2, Frage 2 → Option A).
+- `backend/tests/test_task-66.py` (neu): pytest-Wrapper mit `pytest.importorskip("playwright")` + Server-Erreichbarkeitscheck (`/health`, überspringt das Modul sauber ohne laufenden Dev-Server statt rot zu werden). Drei Testfälle: Fixture-Validität, End-to-End-Lauf gegen die drei neuen Assertion-IDs, isolierter Test des Fail-Fast-Edge-Case ohne Server/Browser.
+
+**Wichtige technische Entscheidung, die über den Ticket-Text hinausgeht (bitte gegenlesen):** Beim Code-Lesen zeigte sich, dass der Bild-Upload-Button im `LocationDetail`-Sheet nur für `Auth.isHost()` gerendert wird (`_imageAreaHtml()`, web/index.html) UND der Server-Endpunkt `POST /locations/{id}/image` serverseitig `auth.require_host` verlangt (backend/main.py, Zeile ~2368) — beides war in Analyse/Pre-Mortem nicht berücksichtigt. Der bestehende Check loggt sich aber mit der User-Rolle ein (`--password` → `FOTOALERT_USER_PASSWORD`). Der reguläre Login hätte den Bild-Upload-Pfad also nie erreichen können (weder Button im DOM noch 200er vom Server).
+Lösung: `_check_image_upload()` öffnet eine ZUSÄTZLICHE, isolierte Browser-Seite (`browser.new_page()`) mit einem separaten Host-Login (`FOTOALERT_HOST_PASSWORD`, in CI bereits als Secret im `test-frontend`-Job vorhanden — keine Workflow-Änderung nötig), ausschließlich für diesen einen Durchlauf. Die reguläre Desktop-Pass-Session (User-Rolle) bleibt für alle anderen Checks (Views, Detail-Sheet-Links, Location-Anlegen, Filter) unverändert. Location-Anlegen (Regel 1) und Filter (Regel 3) laufen wie spezifiziert in der regulären User-Session, da `/preview-alignment` nur `auth.require_auth` verlangt.
+
+**Noch nicht automatisch getestet / manuell zu prüfen:**
+- Kein Live-Lauf gegen einen echten Server erfolgt (Vorgabe: kein lokaler Server-Start durch die Implementierung). Nur Syntax-/Importprüfung (`py_compile`, `ast.parse`, Modul-Import) durchgeführt — alle drei Dateien sauber.
+- `backend/tests/test_task-66.py` wurde nur mit `--collect-only` gegen die Sandbox geprüft (skippt dort mangels installiertem Playwright, wie erwartet) — noch nicht gegen einen laufenden Dev-Server mit Playwright ausgeführt.
+- Die neue Host-Login-Logik in `_check_image_upload()` ist ungetestet gegen den echten Server (insbesondere `Auth.isHost()` nach Login mit `FOTOALERT_HOST_PASSWORD`).
+- Manueller Nachvollzug laut Testplan oben weiterhin ausstehend.
+
+**Bugfix aus Live-Test (2026-07-11):** Stephan hat beim manuellen Ausführen von `run_frontend_check.py` einen `playwright._impl._errors.TimeoutError` beim Klick auf `#tab-add` reproduziert (`Page.click: Timeout 15000ms exceeded ... <div class="info-row"> ... from <div class="open" id="loc-detail-sheet"> subtree intercepts pointer events`). Ursache: `_check_detail_sheet()` (Zeile ~292) öffnet in `run_checks()` das Location-Detail-Sheet (`LocationDetail.open(...)` per Klick auf die Location-Karte) zum Prüfen der Maps-Links, schloss es danach aber nie wieder — auf derselben Page/Session lief direkt danach `_check_location_create()` und deren `page.click(_spec.ADD_TAB_SELECTOR)` scheiterte, weil das noch offene Sheet die Klicks abfing.
+Fix (zwei Stellen, beide mit echtem `wait_for_function` statt Sleep, kein Timing-Trick):
+1. `_check_detail_sheet()` schließt das Sheet jetzt am Ende ihres eigenen Ablaufs selbst: `page.evaluate(...)` ruft `LocationDetail.close()` auf (bestehende Funktion in `web/index.html`, Zeile 5870, entfernt die `.open`-Klasse von `#loc-detail-overlay` und `#loc-detail-sheet`), danach `page.wait_for_function(...)`, das wartet bis `#loc-detail-sheet` keine `.open`-Klasse mehr hat (Timeout 5000ms). Bleibt es offen, wird ein eigenes Finding (`detail_sheet_closed`) erzeugt statt eines verwirrenden Folgefehlers.
+2. `_check_location_create()` schließt zusätzlich defensiv am Anfang jedes offene Sheet (derselbe `LocationDetail.close()` + `wait_for_function`-Ablauf), damit künftige Reihenfolge-Änderungen in `run_checks()` denselben Bug nicht wiederholen können, auch wenn `_check_detail_sheet()` selbst irgendwann anders aufgerufen wird.
+
+**Bugfix aus Live-Test #2 (2026-07-11): falsche Analyse-Annahme `image_filename` statt `image_url`.** Stephan hat live reproduziert, dass der Bild-Upload-Check in `_check_image_upload()` (`run_frontend_check.py`) IMMER fehlschlug, unabhängig davon ob der Upload tatsächlich funktionierte. Ursache: Die ursprüngliche Analyse/Spec (Regel 2, AK2) ging fälschlich davon aus, dass `GET /locations/{id}` ein Feld `image_filename` liefert. Tatsächlich exponiert `_loc_to_out()` (`backend/main.py`, Zeile 1488) dieses Feld nie — die API liefert stattdessen `image_url` (berechnet als `/location-images/{filename}` oder `None`), so auch im Pydantic-Schema `LocationOut` (`backend/models/schemas.py`, Zeile 47: `image_url: Optional[str] = None`). Das war ein Analysefehler, kein Backend-Bug.
+Fix: `_check_image_upload()` prüft jetzt `loc.get("image_url")` (truthy + Plausibilitätscheck, dass der String mit `/location-images/` beginnt) statt `image_filename`; Finding-Assertion-ID umbenannt zu `assertion_id="image_url_set"`. `backend/tests/test_task-66.py` (Assertion-ID-Liste im End-to-End-Test) und die Regel-2-/AK2-Texte oben entsprechend korrigiert. Syntaxprüfung (`python3 -m py_compile`) für beide Python-Dateien erfolgreich, kein Server-Start, kein echter Playwright-Lauf.
+Nur Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check.py`) durchgeführt, sauber. Kein Server gestartet, kein echter Playwright-Lauf — das führt Stephan als Nächstes manuell aus.
+
+**Bugfix aus Live-Test #3 (2026-07-11): zu kurzes Timeout beim Warten auf den Speichern-Button.** Stephan hat live gemessen, dass die echte Berechnung nach „Alignments berechnen" (`POST /preview-alignment` — Geländehöhen-Abfrage + Alignment-Suche über 14 Tage × Sonne/Mond) real ca. 20 Sekunden dauert. Das bisherige Timeout in `_check_location_create()` (`page.wait_for_function(...)` auf `#save-location-btn`) stand hart im Code bei 15000ms — zu knapp bemessen, führte zu einem Falsch-Negativ (Finding `save_button_visible`), obwohl die App korrekt funktionierte. Kein App-Bug, sondern ein zu kurzes Test-Timeout.
+Fix: Neue benannte Konstante `PREVIEW_ALIGNMENT_TIMEOUT_MS = 35000` in `backend/tests/frontend/spec.py` (gemessene reale Dauer ~20s + Sicherheitspuffer für langsamere Umgebungen wie CI) statt der harten Zahl im Check-Code; `_check_location_create()` in `run_frontend_check.py` referenziert jetzt `_spec.PREVIEW_ALIGNMENT_TIMEOUT_MS`. Geprüft, ob `_check_image_upload()`/`_check_filter_feed()` denselben Preview-Mechanismus betreffen: nein — `_check_image_upload()` öffnet nur das Detail-Sheet einer bereits gespeicherten Location (kein neuer `/preview-alignment`-Aufruf), `_check_filter_feed()` legt keine Location an. Daher nur diese eine Stelle angepasst.
+Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check.py backend/tests/frontend/spec.py`) erfolgreich, kein Server-Start, kein echter Playwright-Lauf.
+
 ---
 
 ### TASK-67 · PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen `[ ]`
@@ -11173,6 +11203,166 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 **User Story:** Als Betreiber der App, möchte ich, dass die Pflicht-Regressionsliste so weit wie möglich automatisch geprüft wird, sodass ich bei jeder Änderung nur noch das von Hand ansehen muss, was eine Maschine nicht beurteilen kann.
 
 **Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting); letztes Glied der Kette — setzt sinnvollerweise auf **TASK-64** (Gate) und **TASK-66** (Klick-Durchläufe) auf, weil viele PRODUCT.md-Punkte Bedien-Abläufe sind. Verwandt: Memory-Regeln `feedback_regression_testing` und `feedback_product_md` (PRODUCT.md ist die Basis der Regression) — dieses Ticket automatisiert genau diese Pflicht, hebt sie aber nicht auf: PRODUCT.md bleibt die inhaltliche Quelle.
+
+**Quelle:** fotoalert-intake, 2026-07-11
+
+---
+
+### BUG-75 · Live-Astro-Übersicht zeigt falsches Datum/falsche Uhrzeit bei Mond-Alignment-Ereignissen `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-11 |
+
+**Beschreibung:** Öffnet man aus der Detailkarte eines Ereignisses (z. B. „Mond-Alignment" für die Location Kirche Bornstedt, Ereignisdatum 18. Juli 2026, ideales Zeitfenster 22:04–22:34 Uhr, Optimum 22:19 Uhr) über den Button „Live-Astro" die Himmelsbahnen-Übersicht, zeigt diese fälschlich das heutige Datum an statt des tatsächlichen Ereignisdatums. Zusätzlich ist die Uhrzeit auf dem Zeit-Schieberegler falsch berechnet (ca. 2 Stunden Versatz). Dadurch zeigt die Übersicht Sonne, Mond und Milchstraßenzentrum fälschlich als „nicht sichtbar" an (z. B. den Mond bei ca. −6,4° Höhe statt korrekt bei +5,2° Höhe), obwohl das zugrunde liegende Alignment-Fenster in der Detailkarte astronomisch korrekt berechnet ist — unabhängig nachgerechnet und bestätigt: Der Mond steht am 18.7.2026 um 22:19 Uhr Berliner Zeit bei +5,2° Höhe klar über dem Horizont, der Monduntergang folgt erst gegen 22:57 Uhr. Das führt zu dem irreführenden Eindruck, das berechnete Zeitfenster sei falsch, obwohl nur die nachträgliche Übersicht fehlerhaft ist.
+
+**User Story:** Als Fotograf, möchte ich, dass die Live-Astro-Übersicht beim Öffnen aus einem Ereignis genau das Datum und die Uhrzeit dieses Ereignisses zeigt, sodass ich der Anzeige vertrauen kann und nicht denke, das berechnete Zeitfenster sei falsch.
+
+**Akzeptanzkriterien:**
+- [ ] Öffne ich aus der Detailkarte eines Ereignisses die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
+- [ ] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
+- [ ] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
+- [ ] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
+- [ ] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum und die aktuelle Uhrzeit.
+- [ ] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Ich kann von dort aus in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren, ohne dass sich das Fenster verschiebt oder ich den Regler an einen Rand bewege, der schon vor dem eigentlichen Ereignisfenster liegt.
+
+**Bezug:** Betrifft die in **US-64** ✅ (Live Astro-Visualisierung) gebaute Übersicht — dort wurde die Kernfunktion umgesetzt, dieser Bug betrifft nur die Übernahme von Datum/Uhrzeit beim Öffnen aus einem Ereignis. Keine weiteren überlappenden oder verwandten offenen Tickets zu Live-Astro, Astro-Übersicht, Mond-Alignment oder Datums-/Zeitzonen-Fehlern im Backlog gefunden (geprüft u. a. gegen BUG-56, US-79, TASK-10, BUG-48, US-108 — alle behandeln andere Aspekte der Astronomie-Berechnung, keine Dublette).
+
+**Technische Notiz (intern, nicht für Testanweisungen):** `web/index.html`, `AstroLive.openForDate()` (Zeile ~4725) ruft intern `_init()`/`setNow()` auf (Zeile ~5632–5635), das Datum wird dabei nie auf das Ereignisdatum umgestellt. Die Zeit-Umrechnung in `_curDate()` (Zeile ~5627–5631) nutzt UTC-Ziffern der Ereigniszeit fälschlich als Ortszeit (Setzung der Schieberegler-Minuten ca. Zeile 5491–5492). Es existiert bereits eine ungenutzte Variable `this._t` (Zeile ~5494), die den korrekten vollen Zeitstempel hält, aber nirgends verwendet wird — möglicher Ansatzpunkt für die Reparatur.
+
+**Technische Notiz Nachtrag (2026-07-11, Mittelpunkt-Slider):** Der Zeit-Schieberegler (`#astro-time`, min 0 / max 1439) bildet aktuell immer „Minuten seit 00:00 von `this._day`" ab — ein reiner Kalendertag. Für den Mittelpunkt-Anspruch beim Ereignis-Öffnen reicht die reine Datum/Uhrzeit-Korrektur aus Option A nicht aus: `_curDate()` braucht beim Event-Pfad einen Fenster-Anfang (`this._windowStart` = Ereigniszeit −12h) statt eines Kalendertags als Referenz, der Slider startet dann auf Wert 720 (Mittelpunkt) statt auf der reinen Uhrzeit-in-Minuten. Für den „jetzt"/Live-Pfad (`open()`, `setNow()`, `_startLive()`-Timer) bleibt das bisherige Kalendertag-Modell unverändert — `setNow()` setzt `this._windowStart` explizit auf `null` zurück, damit `_curDate()` dort immer in den alten, unveränderten Zweig fällt. Dadurch bleibt `_curDate()` selbst zwar technisch berührt (Abweichung von Pre-Mortem-Szenario 4, das eine unveränderte `_curDate()` empfahl), aber rein additiv/abwärtskompatibel: ohne `_windowStart` exakt das alte Verhalten.
+
+**Quelle:** fotoalert-intake, 2026-07-11
+
+---
+
+## Analyse (fotoalert-analyze, 2026-07-11)
+
+**Example Mapping:**
+
+📏 **Regel 1** — Öffnet man Live-Astro aus der Detailkarte eines Ereignisses, übernimmt die Übersicht dessen Datum und Ortszeit (Berlin) exakt — nicht das heutige Datum.
+- 🟢 Positiv: Ereignis „Mond-Alignment" am 18.7.2026, Optimum 22:19 Uhr Berliner Zeit → Live-Astro öffnet mit Datum 18.7.2026, Schieberegler auf 22:19 Uhr.
+- 🔴 Negativ (aktueller Bug): Übersicht zeigt stattdessen das heutige Datum und eine Uhrzeit mit ca. 2 Stunden Versatz.
+
+📏 **Regel 2** — Öffnet man Live-Astro ohne Ereignis-Bezug (aus der Orts-Übersicht, „jetzt"-Modus), bleibt das bisherige Verhalten unverändert: aktuelles Datum, aktuelle Uhrzeit, live mitlaufend.
+- 🟢 Beispiel: Standort-Detail → „Live-Astro" → Datum/Uhrzeit = jetzt, Anzeige läuft alle 30 Sekunden automatisch weiter („● Live" aktiv).
+
+📏 **Regel 3** — Auch bei Ereigniszeiten nahe Mitternacht oder in einer anderen Jahreszeit (Sommer-/Winterzeit) bleibt das übernommene Datum korrekt; es darf nicht auf den Vor- oder Folgetag springen.
+- 🟢 Beispiel Mitternacht: Ereignis um 23:50 Uhr Berliner Zeit am 18.7. → Datum bleibt 18.7., Schieberegler auf 23:50.
+- 🟢 Beispiel Winterzeit: Ereignis um 00:15 Uhr Berliner Zeit am 5.1. (UTC+1) → Datum 5.1., Uhrzeit 00:15 — nicht der UTC-Wert 23:15 Vortag.
+
+📏 **Regel 4** — Die Sichtbarkeits-/Höhenwerte für Sonne, Mond und Milchstraße in der Übersicht stimmen danach mit der bereits in der Detailkarte berechneten Sichtbarkeit überein.
+- 🟢 Beispiel: Detailkarte berechnet Mond bei +5,2° Höhe fürs ideale Zeitfenster → Live-Astro-Übersicht zeigt den Mond ebenfalls oberhalb des Horizonts (nicht −6,4°, nicht „nicht sichtbar").
+
+**Annahmen-Protokoll:**
+- ✅ **Frage A — geklärt (Stephan, 2026-07-11):** Der gleiche Fehler steckt auch im zweiten, technisch identischen Aufrufpfad für Chancen ohne hinterlegten Ort (Entdecken-Modus/Scout-Ergebnisse, die den gleichen „Live-Astro"-Button auf derselben Detailkarte nutzen, nur ohne gespeicherten Ort). **Entscheidung: Ja, mitkorrigieren — beide Aufrufpfade werden im selben Ticket behoben.**
+- ✅ **Frage B — geklärt (Stephan, 2026-07-11):** Die aktuell ungenutzte interne Hilfsvariable, die im Ticket bereits als möglicher Reparatur-Ansatzpunkt genannt wurde. **Entscheidung: Entfernen — die Hilfsvariable wird nicht genutzt, sondern beim Fix ersatzlos entfernt.**
+
+Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden (s. o.), Ursache und Zielsetzung sind eindeutig.
+
+**Akzeptanzkriterien** (bestätigt aus dem Ticket, keine Widersprüche zu den Antworten oben — Stephans Entscheidung zu Frage A erweitert AK1 sinngemäß auf den zweiten Einstiegspunkt):
+- [ ] Öffnet man aus der Detailkarte eines Ereignisses (egal ob mit gespeichertem Ort oder aus dem Entdecken-Modus) die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
+- [ ] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
+- [ ] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
+- [ ] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
+- [ ] Edge Case: Das gilt auch über den Sommer-/Winterzeit-Wechsel hinweg (Ereignis im Winterhalbjahr wird nicht um eine Stunde verschoben dargestellt).
+- [ ] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt aus der Orts-Übersicht (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum, die aktuelle Uhrzeit und läuft weiterhin automatisch mit („Live"-Anzeige aktiv).
+- [ ] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Von dort kann ich in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren (Achse = Ereigniszeit −12h bis Ereigniszeit +12h, Ereigniszeit exakt mittig). Der „jetzt"-Modus (Regressionscheck oben) ist von diesem Nachtrag nicht betroffen — dort bleibt der Regler wie bisher ein voller Kalendertag (00:00–23:59).
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation (gelesen am 2026-07-11, `web/index.html`): Bestätigt und präzisiert gegenüber der technischen Notiz im Ticket:
+- `AstroLive.openForDate()` (Zeile 5505–5528) und der strukturell identische `AstroLive.openForLatLon()` (Zeile 5483–5503, betrifft Entdecken-Modus-Chancen ohne gespeicherten Ort) rufen beide zuerst `_init()` (Zeile 5557) auf. `_init()` ruft `setNow()` (Zeile 5632) auf, das setzt `this._day` auf **heute** und den Schieberegler auf die **aktuelle** Uhrzeit.
+- Danach berechnen beide Funktionen zwar den Schieberegler-Wert korrekt aus der Ereigniszeit, aber mit `d.getUTCHours()`/`d.getUTCMinutes()` (Zeile 5492 bzw. 5517) — das liest die UTC-Ziffern der Ereigniszeit und behandelt sie fälschlich als Ortszeit-Ziffern. Das erklärt den ca. 2-Stunden-Versatz (Berlin liegt im Sommer bei UTC+2).
+- `this._day` (das Kalenderdatum) wird in keiner der beiden Funktionen auf das Ereignisdatum umgestellt — es bleibt bei „heute" aus `setNow()`. Das erklärt den Datumsfehler unabhängig vom Zeitfehler.
+- `_curDate()` (Zeile 5627–5630) baut daraus die tatsächlich zur Berechnung verwendete Zeit: `this._day`s Kalendertag + Schieberegler-Minuten als lokale Stunde/Minute. Da `this._day` „heute" ist, entsteht IMMER das heutige Datum mit einer falsch interpretierten Uhrzeit — unabhängig vom übergebenen Ereignis.
+- Die im Ticket erwähnte ungenutzte Variable `this._t` (Zeile 5494/5519) hält den korrekten vollen Zeitstempel (`d.getTime()`), wird aber nirgends gelesen — weder in `_curDate()` noch in `render()`.
+- Der „jetzt"-Einstiegspunkt `AstroLive.open()` (Zeile 5472–5481, aufgerufen aus der Orts-Übersicht, Zeile 6517) ruft `_init()`/`setNow()` auf und überschreibt danach nichts — dieser Pfad ist vom Bug nicht betroffen und dient als Regressions-Anker.
+- Das bestehende Live-Update (`_startLive()`, Zeile 5637–5642) setzt bei jedem Tick erneut `setNow()` — d. h. sobald „Live" wieder aktiviert wird, springt die Anzeige korrekt auf „jetzt" zurück. Das ist gewolltes Verhalten, kein Nebenfall des Bugs.
+- Es gibt genau einen Aufrufort für beide betroffenen Funktionen im Code (Zeile 4725, Ereignis-Detailkarte) — dieselbe Karte wird laut `PRODUCT.md` identisch für Feed-, Kalender- und Scout-Chancen verwendet, es gibt also keinen dritten, versteckten Aufrufpfad zu berücksichtigen.
+
+💀 **Szenario 1:** Der Fix behebt zwar Datum und Uhrzeit für Sommerzeit-Ereignisse, aber ein Ereignis im Winterhalbjahr (UTC+1 statt UTC+2) zeigt weiterhin einen 1-Stunden-Versatz, weil die Korrektur versehentlich einen festen Offset statt einer echten Zeitzone-Umrechnung verwendet.
+→ Gegenmaßnahme: Fix arbeitet mit der vollständigen Zeitangabe (`new Date(isoDate)`) und deren eingebauten Orts-Zeit-Bestandteilen, nicht mit einem hartkodierten Stunden-Offset — dadurch automatisch für beide Jahreszeiten korrekt. Als eigenes AK/Testfall (Winterzeit-Beispiel) abgesichert.
+
+💀 **Szenario 2:** Der Fix behebt den Detailkarten-Pfad (`openForDate`), aber der zweite, strukturell identische Pfad für Chancen ohne gespeicherten Ort (`openForLatLon`, Entdecken-Modus) wird übersehen, weil er nicht wörtlich im Ticket genannt ist — Scout-Chancen zeigen den Bug danach weiter.
+→ Gegenmaßnahme: Beide Funktionen werden im selben Zug korrigiert (Stephans Entscheidung zu Frage A oben); eigener Testschritt für eine Entdecken-Modus-Chance im Testplan.
+
+💀 **Szenario 3:** Die Korrektur setzt das Kalenderdatum (`this._day`) korrekt, vergisst aber, dass danach weiter am Schieberegler gezogen werden kann (Scrubbing) — wenn die Minuten-Berechnung beim Scrubben weiterhin fälschlich UTC-Ziffern nutzt, bleibt der Zeit-Versatz beim manuellen Verschieben bestehen, auch wenn der initiale Öffnen-Zustand korrekt aussieht.
+→ Gegenmaßnahme: `_curDate()` selbst (die Funktion, die bei jedem Scrubben und jedem Live-Tick neu aufgerufen wird) bleibt unverändert und war nie das Problem — sie interpretiert Schieberegler-Minuten schon immer als Ortszeit-Minuten. Der Fix muss also dafür sorgen, dass der Schieberegler beim Öffnen mit Ortszeit-Minuten (nicht UTC-Minuten) befüllt wird — dann ist auch jedes spätere Scrubben korrekt, ohne `_curDate()` selbst anzufassen. Als Testschritt: nach dem Öffnen den Regler einmal bewegen und prüfen, dass die Uhrzeit-Anzeige weiterhin stimmig bleibt.
+
+💀 **Szenario 4:** Die Korrektur ändert `_curDate()` oder `setNow()` direkt, um den Fix „zentral" zu lösen — das betrifft dann auch den „jetzt"-Pfad (`open()`) und den Live-Modus, mit dem Risiko einer neuen, schwerer zu entdeckenden Regression in einem bisher fehlerfreien Bereich.
+→ Gegenmaßnahme: Fix beschränkt sich auf die beiden Ereignis-Einstiegspunkte (`openForDate`, `openForLatLon`); `_curDate()`, `setNow()`, `open()` und der Live-Timer bleiben unverändert. Regressionscheck („jetzt"-Modus) ist eigenes AK.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Annahmen-Protokoll durchgeführt (2 Annahmen, s.o.)
+- [x] Pre-Mortem durchgeführt (4 Szenarien, Code gegen `web/index.html` verifiziert)
+- [x] Architektur analysiert: `web/index.html` (`AstroLive.openForDate`, `AstroLive.openForLatLon`, `AstroLive._curDate`, `AstroLive.setNow` als Referenz) — reines Frontend, kein Backend-Endpoint betroffen
+- [x] Designer-Check: nicht visuell (keine neue/geänderte Optik, nur korrekte Datenübernahme) → übersprungen
+- [x] Klärungsfragen mit Stephan entschieden: Frage A (beide Aufrufpfade mitkorrigieren) → Ja; Frage B (ungenutzte Hilfsvariable) → entfernen
+- [x] Implementierungsoptionen: A / B (s.u.)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+*In Alltagssprache:* Beide Optionen führen zum selben sichtbaren Ergebnis für Stephan — die Live-Astro-Übersicht zeigt beim Öffnen aus einem Ereignis korrekt dessen Datum und Uhrzeit. Der Unterschied liegt darin, wie „robust" die Lösung gegen einen zukünftigen Sonderfall ist (z. B. falls die App irgendwann auf einem Gerät läuft, dessen Uhrzeit nicht auf Berlin eingestellt ist) — und wie viel vom bestehenden, funktionierenden Code dafür angefasst wird.
+
+### Option A — Datum und Uhrzeit beim Öffnen korrekt aus dem Ereignis-Zeitstempel übernehmen (kleinstmöglicher, gezielter Fix)
+- Vorgehen: Beim Öffnen aus einem Ereignis wird sowohl das angezeigte Kalenderdatum als auch die Schieberegler-Uhrzeit direkt aus dem vollständigen, korrekten Ereignis-Zeitstempel abgeleitet — in derselben Weise, wie es die App an anderer Stelle für „jetzt" bereits tut. Das gilt für beide Einstiegspunkte (`openForDate()` mit gespeichertem Ort und `openForLatLon()` für Entdecken-Modus-Chancen ohne gespeicherten Ort — Stephans Entscheidung zu Frage A). Die bisher unbenutzte Hilfsvariable wird ersatzlos entfernt (Stephans Entscheidung zu Frage B, kein Nutzungsversuch).
+- Betroffene Dateien: `web/index.html` — ausschließlich innerhalb der beiden Funktionen `AstroLive.openForDate()` und `AstroLive.openForLatLon()`.
+- Vorteile: Kleinster Eingriff; nutzt exakt das bereits bestehende, im „jetzt"-Modus bewährte Muster (Kalendertag + Ortszeit-Uhrzeit); kein Risiko für den unveränderten Live-Modus; behebt Datum, Uhrzeit und Mitternacht-/Jahreszeiten-Sonderfall in einem Zug, weil die volle Zeitangabe verwendet wird statt einzelner Ziffern.
+- Nachteile / Risiken: Setzt weiterhin voraus, dass das Gerät, auf dem die App läuft, auf die Berliner Zeitzone eingestellt ist — das ist aber keine neue Einschränkung, sondern exakt dieselbe Grundannahme, auf der der gesamte „jetzt"-Live-Modus dieser Übersicht schon heute beruht.
+- Aufwand: klein
+
+### Option B — Zeitzonen-Umrechnung explizit und unabhängig vom Geräte-Zeitzone machen
+- Vorgehen: Zusätzlich zur Korrektur wird die Uhrzeit-Übernahme so gebaut, dass sie unabhängig von der Zeitzonen-Einstellung des Geräts immer auf „Berlin" umrechnet (wie es an zwei anderen Stellen der App für Anzeige-Texte bereits gemacht wird).
+- Betroffene Dateien: `web/index.html` — dieselben zwei Funktionen wie Option A, zusätzlich eine neue kleine Hilfsfunktion für die Zeitzonen-Umrechnung.
+- Vorteile: Theoretisch robuster, falls die App jemals auf einem Gerät mit anderer Zeitzone genutzt wird.
+- Nachteile / Risiken: Größerer Eingriff für einen Sonderfall, der aktuell nirgends sonst in der App vorkommt — der „jetzt"-Live-Modus derselben Übersicht bliebe weiterhin von der Geräte-Zeitzone abhängig, wodurch die Übersicht dann zwei unterschiedliche Zeit-Logiken je nach Öffnungsart hätte (Inkonsistenz statt Verbesserung). Höherer Test- und Pflegeaufwand ohne erkennbaren Nutzen für den aktuellen Bug.
+- Aufwand: mittel
+
+✅ **Empfehlung: Option A** — sie behebt exakt die im Ticket beschriebenen Symptome (Datum + Uhrzeit + Sichtbarkeits-Widerspruch) mit dem kleinsten, risikoärmsten Eingriff, deckt beide Einstiegspunkte sowie Mitternacht- und Jahreszeiten-Sonderfälle vollständig ab (weil die volle Zeitangabe statt einzelner Ziffern verwendet wird) und bleibt konsistent mit der bereits bestehenden, funktionierenden Zeit-Logik des Live-Modus in derselben Übersicht. Option B würde eine Inkonsistenz zwischen Ereignis- und „jetzt"-Öffnung einführen und ist für dieses Ticket nicht nötig.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Nicht anwendbar — reine Frontend-JavaScript-Logik ohne Backend-Endpoint; es gibt kein `pytest`-Testziel dafür. Ein automatisierter Browser-Test für die Live-Astro-Übersicht ist nicht Teil dieses Tickets (siehe TASK-69/TASK-63 für den generellen Ausbau automatisierter Oberflächen-Tests).
+- [ ] Manuell (unter http://localhost:8000, mit lokal laufendem Server — Fenster-Modell beachten):
+  1. Ein Ereignis mit bekanntem Datum/Uhrzeit öffnen (z. B. das Mond-Alignment für Kirche Bornstedt, 18.7.2026, Optimum 22:19 Uhr) → auf „Live-Astro" tippen → erwartet: Datum 18.7.2026, Schieberegler/Uhrzeit-Anzeige auf 22:19 Uhr, Mond wird oberhalb des Horizonts angezeigt (nicht „nicht sichtbar").
+  2. Denselben Test für eine Chance aus dem Entdecken-Modus (ohne gespeicherten Ort) wiederholen → gleiches erwartetes Ergebnis.
+  3. Ein Ereignis mit Zeitfenster nahe Mitternacht (z. B. 23:5x Uhr) öffnen → Datum darf nicht auf den Folgetag springen.
+  4. Falls im Winterhalbjahr getestet wird (oder ein Winter-Ereignis simuliert werden kann): Uhrzeit darf nicht um eine Stunde verschoben sein.
+  5. Nach dem Öffnen den Zeit-Schieberegler einmal bewegen → Uhrzeit-Anzeige bleibt stimmig (kein erneuter Versatz).
+  6. Regressionscheck: Live-Astro direkt aus der Orts-Übersicht („jetzt"-Modus, ohne Ereignis) öffnen → zeigt weiterhin das aktuelle Datum/die aktuelle Uhrzeit und läuft automatisch weiter („● Live" bleibt aktiv, Anzeige aktualisiert sich alle 30 Sekunden).
+
+---
+
+### TASK-69 · Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Epic** | TASK-63 |
+| **Priorität** | Mittel |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-07-11 |
+
+**Beschreibung:** 13 von 34 Backend-Endpunkten (u. a. Bewertungen, Tagesübersicht, Empfehlungsplan, alle Refresh-Varianten) haben keinen automatisierten Test, 4 weitere nur auf Logik- statt echter Endpunkt-Ebene; im Playwright-Frontend-Check fehlen Kalender, Entdecken-Modus, Filter-Chips, Schnell-Anlegen, Event-Detail-Sheet und Wetter-Kartenbedienung vollständig. Mehrere dokumentierte Bugs (u. a. BUG-44, BUG-46, BUG-51, BUG-55, BUG-58, BUG-59, BUG-62, BUG-67) traten genau in diesen ungetesteten Bereichen auf, was die Priorität für automatisierte Absicherung belegt.
+
+**User Story:** Als Entwickler, möchte ich automatisierte Regressions-/Smoke-Tests für die bisher ungetesteten Kernbereiche der App, sodass künftige Änderungen an diesen Bereichen automatisch auf Regressionen geprüft werden, bevor ein Deploy passiert.
+
+**Akzeptanzkriterien:**
+- [ ] AK1: Kalender-Ansicht hat einen automatisierten Test, der bestätigt dass sie fehlerfrei lädt und die richtigen Termine zeigt.
+- [ ] AK2: Die Filter-Funktionen für Orte und für die Chancen-Übersicht haben automatisierte Tests für Ein- und Ausschluss-Verhalten.
+- [ ] AK3: Die Bewertungsfunktion für Orte hat automatisierte Tests für Anlegen, Abrufen und Löschen einer Bewertung.
+- [ ] AK4: Das Detail-Fenster, das sich beim Antippen einer Chance in der Übersicht öffnet, hat einen automatisierten Test.
+- [ ] AK5: Die Wetter-Kartenansicht hat einen automatisierten Test für die Grundbedienung (Zeitregler, Ebenen-Umschalter).
+- [ ] AK6: Der Schnell-Anlegen-Ablauf für neue Orte hat einen durchgängigen automatisierten Test vom Öffnen des Formulars bis zum erfolgreichen Speichern.
+- [ ] AK7: Der Entdecken-Modus hat einen automatisierten Test.
+- [ ] AK8: Die fünf noch ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen) haben jeweils mindestens einen automatisierten Basistest.
+
+**Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting) — Analyse in der Analysephase (fotoalert-analyze) prüfen: Ticket kann bei Bedarf gesplittet werden, falls zu groß für einen Durchlauf. Teilüberschneidung mit **TASK-66** (E2E-Ausbau Playwright: deckt bereits Location-Anlegen-Flow und einen Extremwert-Filtertest ab) — bei der Analyse gegen TASK-66 abgrenzen, damit AK2/AK6 nicht doppelt umgesetzt werden. Cross-Reference zu den Bugs, die genau in diesen ungetesteten Bereichen auftraten: **BUG-44** (Kalender-Event-Detail), **BUG-46** und **BUG-51** (Filter), **BUG-55**, **BUG-58**, **BUG-59**, **BUG-62** (Wetter-Overlay), **BUG-67** (Location-Rendering nach Anlegen).
 
 **Quelle:** fotoalert-intake, 2026-07-11
 

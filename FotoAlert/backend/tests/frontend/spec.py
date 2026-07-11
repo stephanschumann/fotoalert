@@ -15,6 +15,7 @@ web/index.html (Stand 2026-06-20):
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from typing import Dict, List, NamedTuple, Pattern
 
 
@@ -109,6 +110,14 @@ LINK_SCHEMAS: Dict[str, LinkSchema] = {
 # wait_for_selector mit diesem Timeout verhindert Falsch-Negative (Finding 1).
 REQUIRED_SELECTOR_TIMEOUT_MS = 8000
 
+# Timeout (ms) für das Warten auf #save-location-btn nach Klick auf "Alignments
+# berechnen" in _check_location_create (TASK-66). POST /preview-alignment fragt
+# Geländehöhen ab und sucht Sonne-/Mond-Alignments über 14 Tage — Stephan hat die
+# reale Dauer lokal mit ~20s gemessen (altes Timeout von 15000ms war zu knapp,
+# führte zu Falsch-Negativen). 35000ms = gemessene Dauer + Sicherheitspuffer für
+# langsamere Umgebungen (z. B. CI).
+PREVIEW_ALIGNMENT_TIMEOUT_MS = 35000
+
 # Externe Maps-/SV-Links liegen im LOCATION-Detail (#loc-detail-sheet), das über
 # LocationDetail.open(id) aus der Locations-View geöffnet wird. Dort sind es echte
 # <a class="loc-maps-btn" href=...>-Links (Apple/Google/Street View). Das EVENT-Detail
@@ -123,6 +132,48 @@ LOCATIONS_NAV_ARG = "locations"
 LOCATION_CARD_SELECTOR = "#locations-content [onclick^='LocationDetail.open']"
 # Das Sheet ist im DOM permanent vorhanden; sichtbar wird es über die Klasse .open.
 DETAIL_SHEET_OPEN_SELECTOR = "#loc-detail-sheet.open"
+
+
+# --- TASK-66: echte Klick-Durchläufe (Location anlegen / Bild-Upload / Filter) -----
+# Regel 1 — Location anlegen über den "+"-Tab (AddLocation-Fluss). Koordinaten werden
+# per Text-Input gesetzt (KEIN Kartenklick, siehe Pre-Mortem TASK-66), erst danach wird
+# "Alignments berechnen" und "Location dauerhaft speichern" geklickt.
+ADD_TAB_SELECTOR = "#tab-add"
+ADD_MAP_READY_SELECTOR = "#add-map.leaflet-container"
+OBS_COORDS_INPUT_SELECTOR = "#obs-coords"
+SUBJ_COORDS_INPUT_SELECTOR = "#subj-coords"
+SUBJ_NAME_INPUT_SELECTOR = "#subj-name"
+PREVIEW_BTN_SELECTOR = '[onclick="AddLocation.preview()"]'
+SAVE_LOCATION_BTN_SELECTOR = "#save-location-btn"
+# Beliebige, aber gültige Berlin-Koordinaten (Dezimalformat, von AddLocation._parseCoords
+# unterstützt) — Distanz zwischen den beiden Punkten reicht für eine Alignment-Vorschau.
+TEST_OBS_COORDS_TEXT = "52.4900, 13.3900"
+TEST_SUBJ_COORDS_TEXT = "52.5050, 13.4200"
+TEST_LOCATION_NAME_PREFIX = "E2E-Test-Location-"
+
+# Kartenansicht: Marker-Icons werden von Leaflet als .leaflet-marker-icon gerendert
+# (L.divIcon in MapView.loadMarkers()). Anzahl vorher/nachher vergleichen (kein Cleanup
+# nötig, siehe Entscheidung Frage 1 im Ticket — jeder CI-Lauf startet mit frischer DB).
+MAP_PAGE_READY_SELECTOR = "#map.leaflet-container"
+MAP_MARKER_SELECTOR = ".leaflet-marker-icon"
+
+# Regel 2 — Bild-Upload GEZIELT über das LocationDetail-Sheet (BUG-71-Regressionsschutz).
+# WICHTIG: Der Upload-Button ist nur für Auth.isHost() im DOM (_imageAreaHtml in
+# web/index.html), UND der Server-Endpunkt POST /locations/{id}/image verlangt
+# auth.require_host — der reguläre Test-Login des bestehenden Checks (test-user-pw,
+# Rolle "user") kann diesen Pfad technisch nicht erreichen. _check_image_upload() öffnet
+# deshalb eine ZUSÄTZLICHE, isolierte Browser-Seite mit Host-Login, ausschließlich für
+# diesen einen Durchlauf — die reguläre Desktop-Pass-Session (User-Rolle) bleibt für
+# alle anderen Checks unverändert.
+LOC_IMAGE_UPLOAD_BTN_SELECTOR = "#loc-detail-sheet .loc-image-upload-btn"
+LOC_IMAGE_AREA_IMG_SELECTOR = "#loc-detail-sheet .loc-image-area img"
+TEST_IMAGE_FIXTURE_PATH = str(Path(__file__).resolve().parent / "fixtures" / "test-image.jpg")
+
+# Regel 3 — Filter setzen: minScore auf einen deterministischen Extremwert setzen
+# (unabhängig von der aktuellen Live-Datenlage, siehe Frage 3 / Pre-Mortem TASK-66).
+FEED_CONTENT_SELECTOR = "#feed-content"
+FILTER_MIN_SCORE_EXTREME = 100
+FILTER_MIN_SCORE_DEFAULT = 70  # Filter.defaultState() in web/index.html
 
 
 def classify_href(href: str) -> str:

@@ -113,6 +113,7 @@ def run_checks(
     screenshot_root: Path,
     headless: bool = True,
     timeout_ms: int = 15000,
+    host_password: Optional[str] = None,
 ) -> List["Finding"]:
     """Führt den vollständigen Frontend-Check aus und gibt die Findings zurück.
 
@@ -230,7 +231,33 @@ def run_checks(
         # 3) Detail-Sheet öffnen + Links prüfen (AK1/AK3).
         findings.extend(_check_detail_sheet(page, commit, _shot))
 
-        # 4) Konsolen-/Page-Errors → Findings (AK2).
+        # 4) TASK-66: Location über den "+"-Tab anlegen (AddLocation-Fluss) + prüfen dass
+        #    sie in GET /locations UND als zusätzlicher Kartenmarker erscheint.
+        create_findings, new_loc_id = _check_location_create(page, commit, _shot)
+        findings.extend(create_findings)
+
+        # 5) TASK-66: Bild-Upload GEZIELT über das LocationDetail-Sheet (BUG-71-Regres-
+        #    sionsschutz). Läuft in einer eigenen, isoliert Host-eingeloggten Browser-Seite
+        #    (siehe Docstring/Kommentar in spec.py: Upload-Button + Server-Endpunkt sind
+        #    host-only, der reguläre Check-Login ist Rolle "user"). Fail-Fast: ohne
+        #    new_loc_id (Location-Anlage fehlgeschlagen) wird der Durchlauf mit einem
+        #    eigenen, klar erkennbaren Finding übersprungen statt einer Folgefehler-Kaskade.
+        findings.extend(
+            _check_image_upload(
+                browser,
+                base_url,
+                host_password or os.environ.get("FOTOALERT_HOST_PASSWORD", "test-host-pw"),
+                new_loc_id,
+                commit,
+                shot_dir,
+                timeout_ms,
+            )
+        )
+
+        # 6) TASK-66: Filter setzen (minScore-Extremwert, deterministisch) + zurücksetzen.
+        findings.extend(_check_filter_feed(page, commit, _shot))
+
+        # 7) Konsolen-/Page-Errors → Findings (AK2).
         for err in page_errors:
             findings.append(
                 Finding(
@@ -366,6 +393,530 @@ def _check_detail_sheet(page, commit: str, shot) -> List["Finding"]:
                     commit_sha=commit,
                 )
             )
+
+    # TASK-66: Sheet wieder schließen, bevor der nächste Check (z. B.
+    # _check_location_create) auf derselben Seite weiterläuft — sonst blockiert das
+    # noch offene #loc-detail-sheet (z. B. dessen .info-row) nachfolgende Klicks
+    # (Playwright "intercepts pointer events"). Echtes Warten auf das Verschwinden
+    # der .open-Klasse statt eines Sleeps (US-21-Muster).
+    page.evaluate(
+        "() => { if (typeof LocationDetail !== 'undefined') LocationDetail.close(); }"
+    )
+    try:
+        page.wait_for_function(
+            "() => { const el = document.querySelector('#loc-detail-sheet'); "
+            "return !el || !el.classList.contains('open'); }",
+            timeout=5000,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="locations",
+                assertion_id="detail_sheet_closed",
+                expected="#loc-detail-sheet ohne .open nach LocationDetail.close()",
+                actual="Location-Detail-Sheet blieb offen (.open weiterhin gesetzt)",
+                message="location detail sheet did not close after LocationDetail.close()",
+                screenshot_path=shot("detail-not-closed"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+    return findings
+
+
+# --- TASK-66: Location anlegen ------------------------------------------------------
+def _check_location_create(page, commit: str, shot):
+    """Legt über den "+"-Tab (AddLocation-Fluss) eine neue Test-Location an.
+
+    Koordinaten werden AUSSCHLIESSLICH per Text-Input gesetzt (kein Kartenklick,
+    siehe Pre-Mortem TASK-66: Kartenklick-Koordinaten sind in CI headless flaky).
+    Wartet mit echtem wait_for_function auf das Sichtbarwerden des Speichern-Buttons
+    (US-21-Muster) statt auf einen Timing-Trick.
+
+    Gibt (findings, location_id_oder_None) zurück. location_id ist None wenn der
+    Durchlauf an irgendeiner Stelle fehlschlug — der Aufrufer nutzt das für den
+    Fail-Fast beim Bild-Upload-Durchlauf (AK Edge Case).
+    """
+    findings: List[Finding] = []
+
+    # TASK-66: defensive Absicherung — falls ein vorheriger Check (z. B.
+    # _check_detail_sheet) auf derselben Seite ein Location-Detail-Sheet offen
+    # gelassen hat, blockiert dessen Overlay/Inhalt (z. B. .info-row) den Klick auf
+    # den "+"-Tab weiter unten ("intercepts pointer events"). Unabhängig davon, ob
+    # _check_detail_sheet ihrerseits schon aufräumt, hier zusätzlich schließen, damit
+    # künftige Reihenfolge-Änderungen in run_checks() denselben Bug nicht wiederholen.
+    page.evaluate(
+        "() => { if (typeof LocationDetail !== 'undefined') LocationDetail.close(); }"
+    )
+    try:
+        page.wait_for_function(
+            "() => { const el = document.querySelector('#loc-detail-sheet'); "
+            "return !el || !el.classList.contains('open'); }",
+            timeout=5000,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="add-location",
+                assertion_id="location_create_pre_sheet_closed",
+                expected="#loc-detail-sheet ohne .open vor Start der Location-Anlage",
+                actual="Location-Detail-Sheet blieb offen (.open weiterhin gesetzt)",
+                message="location detail sheet still open before location create flow started",
+                screenshot_path=shot("location-create-pre-sheet-not-closed"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    # Baseline: Kartenansicht laden (initialisiert MapView.map + lädt die aktuellen
+    # Marker), damit vorher/nachher verglichen werden kann.
+    page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "map")
+    try:
+        page.wait_for_selector(_spec.MAP_PAGE_READY_SELECTOR, timeout=12000)
+        page.wait_for_function(
+            "() => typeof MapView !== 'undefined' && MapView.map && Array.isArray(MapView.markers)",
+            timeout=12000,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="map",
+                assertion_id="location_create_map_baseline",
+                expected="Kartenansicht + MapView.markers initialisiert vor der Location-Anlage",
+                actual="Karte/MapView wurde nicht rechtzeitig bereit",
+                message="map baseline not ready before location create",
+                screenshot_path=shot("location-create-map-baseline-fail"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    baseline_marker_count = page.eval_on_selector_all(_spec.MAP_MARKER_SELECTOR, "els => els.length")
+
+    # "+"-Tab öffnen (AddLocation.open(), baut die Anlege-Karte per setTimeout auf).
+    page.click(_spec.ADD_TAB_SELECTOR)
+    try:
+        page.wait_for_selector(_spec.ADD_MAP_READY_SELECTOR, timeout=12000)
+    except Exception:
+        findings.append(
+            Finding(
+                view="add-location",
+                assertion_id="add_map_ready",
+                expected=_spec.ADD_MAP_READY_SELECTOR + " nach Öffnen des \"+\"-Tabs",
+                actual="Anlege-Karte (AddLocation.initMap()) wurde nicht initialisiert",
+                message="add-location map not ready after opening the add tab",
+                screenshot_path=shot("add-map-not-ready"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    test_name = _spec.TEST_LOCATION_NAME_PREFIX + _run_id()
+    page.fill(_spec.OBS_COORDS_INPUT_SELECTOR, _spec.TEST_OBS_COORDS_TEXT)
+    page.fill(_spec.SUBJ_COORDS_INPUT_SELECTOR, _spec.TEST_SUBJ_COORDS_TEXT)
+    page.fill(_spec.SUBJ_NAME_INPUT_SELECTOR, test_name)
+
+    page.click(_spec.PREVIEW_BTN_SELECTOR)
+    try:
+        # Pre-Mortem TASK-66: echtes Warten auf den Sichtbarkeitswechsel des Speichern-
+        # Buttons statt eines Timing-Tricks (US-21-Muster). Timeout siehe
+        # _spec.PREVIEW_ALIGNMENT_TIMEOUT_MS (Bugfix: reale Berechnungsdauer ~20s,
+        # altes Limit von 15000ms war zu knapp bemessen).
+        page.wait_for_function(
+            "() => { const b = document.getElementById('save-location-btn'); "
+            "return !!b && b.style.display !== 'none'; }",
+            timeout=_spec.PREVIEW_ALIGNMENT_TIMEOUT_MS,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="add-location",
+                assertion_id="save_button_visible",
+                expected="#save-location-btn wird nach \"Alignments berechnen\" sichtbar",
+                actual="Speichern-Button blieb verborgen (Preview evtl. fehlgeschlagen)",
+                message="save-location-btn did not become visible after AddLocation.preview()",
+                screenshot_path=shot("save-btn-not-visible"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    shot("add-location-preview")
+    page.click(_spec.SAVE_LOCATION_BTN_SELECTOR)
+    try:
+        # AddLocation.save() ruft nach erfolgreichem Speichern intern
+        # MapView.loadMarkers() auf (falls MapView.map bereits initialisiert ist,
+        # siehe Baseline oben) — echtes Warten auf die dadurch gestiegene
+        # MapView.markers.length statt eines Sleeps.
+        page.wait_for_function(
+            "(n) => typeof MapView !== 'undefined' && MapView.markers && MapView.markers.length > n",
+            arg=baseline_marker_count,
+            timeout=20000,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="add-location",
+                assertion_id="location_saved_marker",
+                expected="MapView.markers.length > {0} nach AddLocation.save()".format(baseline_marker_count),
+                actual="Markeranzahl stieg nicht (Speichern evtl. fehlgeschlagen)",
+                message="marker count did not increase after AddLocation.save()",
+                screenshot_path=shot("location-not-saved"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    # GET /locations prüfen — per fetch im Seitenkontext (nutzt den vorhandenen Token,
+    # kein separater HTTP-Client nötig).
+    try:
+        locs = page.evaluate(
+            "async () => { const r = await fetch('/locations'); return await r.json(); }"
+        )
+    except Exception:
+        locs = []
+    match = next((loc for loc in locs if loc.get("name") == test_name), None)
+    if match is None:
+        findings.append(
+            Finding(
+                view="add-location",
+                assertion_id="location_in_get_locations",
+                expected="GET /locations enthält die neue Location (Name: {0})".format(test_name),
+                actual="Location nicht in GET /locations gefunden",
+                message="new location missing from GET /locations",
+                screenshot_path=shot("location-missing-in-api"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings, None
+
+    # Kartenansicht erneut prüfen: zusätzlicher .leaflet-marker-icon muss sichtbar sein.
+    page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "map")
+    try:
+        page.wait_for_selector(_spec.MAP_PAGE_READY_SELECTOR, timeout=12000)
+        page.wait_for_function(
+            "(n) => document.querySelectorAll('.leaflet-marker-icon').length > n",
+            arg=baseline_marker_count,
+            timeout=12000,
+        )
+        shot("map-with-new-marker")
+    except Exception:
+        findings.append(
+            Finding(
+                view="map",
+                assertion_id="location_marker_visible",
+                expected="zusätzlicher .leaflet-marker-icon nach der Location-Anlage (> {0})".format(
+                    baseline_marker_count
+                ),
+                actual="Markeranzahl auf der Kartenansicht stieg nicht",
+                message="no additional leaflet marker visible on map after location create",
+                screenshot_path=shot("map-marker-missing"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        # Location existiert laut API bereits — kein Fail-Fast für den Bild-Upload
+        # nötig, daher wird die location_id trotzdem zurückgegeben.
+
+    return findings, match.get("id")
+
+
+# --- TASK-66: Bild-Upload über LocationDetail (BUG-71-Regressionsschutz) -----------
+def _check_image_upload(
+    browser,
+    base_url: str,
+    host_password: str,
+    loc_id: Optional[str],
+    commit: str,
+    shot_dir: Path,
+    timeout_ms: int,
+):
+    """Lädt ein Testbild GEZIELT über LocationDetail.triggerImageUpload() hoch.
+
+    WICHTIG (siehe spec.py-Kommentar): Der Upload-Button ist im DOM nur für
+    Auth.isHost() vorhanden, und der Server-Endpunkt POST /locations/{id}/image
+    verlangt auth.require_host. Der reguläre Check-Login läuft mit der User-Rolle
+    (test-user-pw) — dieser Durchlauf öffnet deshalb eine ZUSÄTZLICHE, isolierte
+    Browser-Seite mit Host-Login, ausschließlich für diesen einen Check. Die
+    reguläre Desktop-Pass-Session (User-Rolle) bleibt für alle anderen Checks
+    unverändert (kein Seiteneffekt auf AK1–AK4/Location-Anlage/Filter).
+
+    Fail-Fast (AK Edge Case): schlug _check_location_create fehl (loc_id is None),
+    wird dieser Durchlauf mit einem eigenen, klar erkennbaren Finding übersprungen
+    statt einer verwirrenden Folgefehler-Kaskade.
+    """
+    findings: List[Finding] = []
+    if not loc_id:
+        findings.append(
+            Finding(
+                view="location-detail",
+                assertion_id="image_upload_skipped_no_location",
+                expected="Bild-Upload-Durchlauf läuft mit der zuvor angelegten Test-Location",
+                actual="Location-Anlage ist vorher fehlgeschlagen (Fail-Fast) — Durchlauf übersprungen",
+                message="image upload check skipped: no location id from _check_location_create",
+                screenshot_path="",
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    def _shot(host_page, name: str) -> str:
+        target = shot_dir / (name + ".png")
+        try:
+            host_page.screenshot(path=str(target), full_page=False)
+        except Exception:
+            return ""
+        return str(target)
+
+    host_page = browser.new_page()
+    host_page.set_default_timeout(timeout_ms)
+    try:
+        host_page.goto(base_url, wait_until="domcontentloaded")
+        _dismiss_onboarding_if_present(host_page)
+
+        host_page.fill("#login-pw", host_password)
+        host_page.click(".login-btn")
+        try:
+            host_page.wait_for_function(
+                "() => typeof Auth !== 'undefined' && Auth.isLoggedIn() && Auth.isHost()",
+                timeout=timeout_ms,
+            )
+        except Exception:
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_upload_host_login",
+                    expected="Host-Login (Auth.isHost() === true) für den Bild-Upload-Durchlauf",
+                    actual="Host-Login fehlgeschlagen oder Rolle ist nicht 'host'",
+                    message="host login failed for image upload check "
+                    "(BUG-71 regression path requires host role)",
+                    screenshot_path=_shot(host_page, "image-upload-host-login-fail"),
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+            return findings
+
+        _dismiss_onboarding_if_present(host_page)
+
+        host_page.evaluate(
+            "(v) => { if (typeof App !== 'undefined') App.nav(v); }", _spec.LOCATIONS_NAV_ARG
+        )
+        try:
+            host_page.wait_for_selector("#locations-content", timeout=timeout_ms)
+        except Exception:
+            pass
+
+        host_page.evaluate(
+            "(id) => { if (typeof LocationDetail !== 'undefined') LocationDetail.open(id); }",
+            loc_id,
+        )
+        try:
+            host_page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, timeout=timeout_ms)
+        except Exception:
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_upload_detail_open",
+                    expected=_spec.DETAIL_SHEET_OPEN_SELECTOR + " nach LocationDetail.open(...)",
+                    actual="Location-Detail-Sheet öffnete sich nicht für die Test-Location",
+                    message="location detail sheet did not open for image upload target",
+                    screenshot_path=_shot(host_page, "image-upload-detail-not-open"),
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+            return findings
+
+        try:
+            host_page.wait_for_selector(_spec.LOC_IMAGE_UPLOAD_BTN_SELECTOR, timeout=timeout_ms)
+        except Exception:
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_upload_btn_present",
+                    expected=_spec.LOC_IMAGE_UPLOAD_BTN_SELECTOR + " sichtbar (Host, Location ohne Bild)",
+                    actual="Upload-Button nicht gefunden",
+                    message="LocationDetail image upload button missing",
+                    screenshot_path=_shot(host_page, "image-upload-btn-missing"),
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+            return findings
+
+        # BUG-71-relevanter Pfad: LocationDetail.triggerImageUpload() öffnet den nativen
+        # Datei-Dialog über input.click() — Playwrights expect_file_chooser() fängt das ab.
+        try:
+            with host_page.expect_file_chooser() as fc_info:
+                host_page.click(_spec.LOC_IMAGE_UPLOAD_BTN_SELECTOR)
+            file_chooser = fc_info.value
+            file_chooser.set_files(_spec.TEST_IMAGE_FIXTURE_PATH)
+        except Exception as e:
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_upload_file_chooser",
+                    expected="Datei-Dialog öffnet sich über LocationDetail.triggerImageUpload()",
+                    actual="Datei-Auswahl fehlgeschlagen: {0}".format(e),
+                    message="file chooser interaction failed for image upload",
+                    screenshot_path=_shot(host_page, "image-upload-file-chooser-fail"),
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+            return findings
+
+        try:
+            # _onImageFileSelected() ruft nach erfolgreichem Upload LocationDetail.open()
+            # erneut auf, das Sheet rendert dann ein <img> mit dem neuen Bild — echtes
+            # Warten auf dieses Element statt eines Sleeps.
+            host_page.wait_for_selector(_spec.LOC_IMAGE_AREA_IMG_SELECTOR, timeout=timeout_ms)
+        except Exception:
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_upload_img_visible",
+                    expected=_spec.LOC_IMAGE_AREA_IMG_SELECTOR + " nach Upload sichtbar",
+                    actual="Kein <img> im Detail-Sheet nach dem Upload (BUG-71-artige Regression)",
+                    message="no image visible in location detail sheet after upload",
+                    screenshot_path=_shot(host_page, "image-upload-no-img"),
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+            return findings
+
+        _shot(host_page, "image-upload-success")
+
+        try:
+            loc = host_page.evaluate(
+                "async (id) => { const r = await fetch('/locations/' + id); return await r.json(); }",
+                loc_id,
+            )
+        except Exception:
+            loc = None
+        image_url = loc.get("image_url") if loc else None
+        if not loc or not image_url or not str(image_url).startswith("/location-images/"):
+            findings.append(
+                Finding(
+                    view="location-detail",
+                    assertion_id="image_url_set",
+                    expected="GET /locations/{0} liefert ein gesetztes image_url-Feld".format(loc_id),
+                    actual="image_url fehlt, leer, unplausibel oder Location nicht abrufbar",
+                    message="image_url not set after upload for location {0}".format(loc_id),
+                    screenshot_path="",
+                    timestamp=_now_iso(),
+                    commit_sha=commit,
+                )
+            )
+        return findings
+    finally:
+        host_page.close()
+
+
+# --- TASK-66: Filter setzen (deterministischer minScore-Extremwert) ----------------
+def _check_filter_feed(page, commit: str, shot):
+    """Setzt minScore auf einen Extremwert und prüft, dass die Feed-Trefferzahl sinkt.
+
+    Bewusst KEIN inhaltlicher Chip-Filter (Pre-Mortem TASK-66: datenabhängige Filter
+    können an manchen Tagen 0-Treffer-Ausgangslagen haben und flaken tagesabhängig).
+    Setzt/liest den Filter-State direkt über die App-eigenen Funktionen (Filter.save +
+    FilterSheet._applyLive) — dieselbe Funktionskette, die auch der reale Score-Slider
+    (FilterSheet._onScoreSlider) auslöst.
+    """
+    findings: List[Finding] = []
+    page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "feed")
+    try:
+        page.wait_for_selector(_spec.FEED_CONTENT_SELECTOR, timeout=12000)
+        page.wait_for_function(
+            "() => typeof Feed !== 'undefined' && Array.isArray(Feed.data)", timeout=12000
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="filter_feed_baseline",
+                expected=_spec.FEED_CONTENT_SELECTOR + " + Feed.data bereit vor dem Filtertest",
+                actual="Feed wurde nicht rechtzeitig bereit",
+                message="feed not ready before filter check",
+                screenshot_path=shot("filter-feed-baseline-fail"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    baseline_count = page.eval_on_selector(_spec.FEED_CONTENT_SELECTOR, "el => el.children.length")
+
+    page.evaluate(
+        "async (v) => { Filter.save({ minScore: v }); await FilterSheet._applyLive(); }",
+        _spec.FILTER_MIN_SCORE_EXTREME,
+    )
+    try:
+        page.wait_for_function(
+            "(n) => document.getElementById('feed-content').children.length < n",
+            arg=baseline_count,
+            timeout=12000,
+        )
+    except Exception:
+        pass
+    filtered_count = page.eval_on_selector(_spec.FEED_CONTENT_SELECTOR, "el => el.children.length")
+    shot("filter-feed-extreme")
+    if filtered_count >= baseline_count:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="filter_reduces_results",
+                expected="Trefferzahl sinkt unter Ausgangswert {0} bei minScore={1}".format(
+                    baseline_count, _spec.FILTER_MIN_SCORE_EXTREME
+                ),
+                actual="Trefferzahl blieb bei {0} (kein Rückgang)".format(filtered_count),
+                message="feed result count did not decrease under extreme minScore filter",
+                screenshot_path=shot("filter-not-reduced"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+
+    # Zurücksetzen auf Default (70) — Trefferzahl muss wieder dem Ausgangswert entsprechen.
+    page.evaluate(
+        "async (v) => { Filter.save({ minScore: v }); await FilterSheet._applyLive(); }",
+        _spec.FILTER_MIN_SCORE_DEFAULT,
+    )
+    try:
+        page.wait_for_function(
+            "(n) => document.getElementById('feed-content').children.length === n",
+            arg=baseline_count,
+            timeout=12000,
+        )
+    except Exception:
+        pass
+    restored_count = page.eval_on_selector(_spec.FEED_CONTENT_SELECTOR, "el => el.children.length")
+    shot("filter-feed-reset")
+    if restored_count != baseline_count:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="filter_reset_restores_results",
+                expected="Trefferzahl nach Zurücksetzen auf minScore={0} wieder = {1}".format(
+                    _spec.FILTER_MIN_SCORE_DEFAULT, baseline_count
+                ),
+                actual="Trefferzahl nach Reset = {0}".format(restored_count),
+                message="feed result count did not return to baseline after resetting filter",
+                screenshot_path=shot("filter-not-restored"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+
     return findings
 
 
@@ -534,6 +1085,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--password",
         default=os.environ.get("FOTOALERT_USER_PASSWORD", "test-user-pw"),
     )
+    parser.add_argument(
+        "--host-password",
+        default=os.environ.get("FOTOALERT_HOST_PASSWORD", "test-host-pw"),
+        help="TASK-66: Host-Login für den Bild-Upload-Durchlauf (LocationDetail-Sheet "
+        "ist host-only, siehe _check_image_upload). In CI bereits als Secret "
+        "FOTOALERT_HOST_PASSWORD vorhanden (deploy.yml, test-frontend-Job).",
+    )
     parser.add_argument("--headed", action="store_true", help="Browser sichtbar (Debug)")
     parser.add_argument(
         "--screenshot-root",
@@ -557,6 +1115,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         password=args.password,
         screenshot_root=Path(args.screenshot_root),
         headless=not args.headed,
+        host_password=args.host_password,
     )
 
     # TASK-35: Mobile-Pass (iPhone 14 Viewport) — fängt iOS-Layout-Bugs ab:
