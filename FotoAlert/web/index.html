@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.12';
+const APP_VERSION = '1.22.13';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5921,6 +5921,8 @@ const LocationDetail = {
   async _onImageFileSelected(evt, capturedLocId) {
     const file = evt.target.files && evt.target.files[0];
     evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
+    // TEMP-DIAGNOSE BUG-71 iPhone 0-Byte-Upload, siehe Ticket — vor Abschluss wieder entfernen
+    toast(`Datei ausgewählt: ${file ? file.size + ' Bytes, ' + file.type : 'KEINE DATEI'}`);
     if (!file) return;
 
     let locId = capturedLocId || (this._current && this._current.id);
@@ -6658,6 +6660,8 @@ const AddLocation = {
   _onImageFileSelected(evt, capturedContextValid) {
     const file = evt.target.files && evt.target.files[0];
     evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
+    // TEMP-DIAGNOSE BUG-71 iPhone 0-Byte-Upload, siehe Ticket — vor Abschluss wieder entfernen
+    toast(`Datei ausgewählt: ${file ? file.size + ' Bytes, ' + file.type : 'KEINE DATEI'}`);
     if (!file) return;
 
     const sheetEl = document.getElementById('add-sheet');
