@@ -23,3 +23,6 @@ Pillow==10.3.0
 # US-120: Datei-Upload (Beispielbild pro Location) — FastAPI braucht python-multipart
 # als Parser für multipart/form-data-Requests (UploadFile), sonst 500 beim Upload.
 python-multipart==0.0.9
+# TASK-64: Backend-Testsuite als CI-Pflicht-Gate — pytest ist nur lokal vorausgesetzt,
+# fehlte hier bisher als deklarierte Abhängigkeit für den CI-Runner.
+pytest==8.2.2

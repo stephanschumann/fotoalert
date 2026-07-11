@@ -65,6 +65,15 @@ class TestLoginEndpoint:
 @pytest.mark.api
 @pytest.mark.regression
 class TestEndpointProtection:
+    """Nutzt LOC (custom_1781560330) — daher Klassen-lokales autouse statt
+    Datei-weitem autouse: TestAuthCore oben braucht bewusst KEINEN
+    App-Startup, ein modulweites autouse würde das via `client`-Abhängigkeit
+    der ensure_seed_location-Fixture erzwingen."""
+
+    @pytest.fixture(autouse=True)
+    def _seed_test_location(self, ensure_seed_location):
+        pass
+
     def test_protected_endpoint_without_token(self, client):
         # Schreibender Endpoint ohne Token → 401 (Pre-Mortem-Risiko 2 geschlossen).
         r = client.patch(f"/locations/{LOC}", json={"name": "X"})

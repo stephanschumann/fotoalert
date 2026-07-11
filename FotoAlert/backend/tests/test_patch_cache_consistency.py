@@ -24,9 +24,18 @@ import pytest
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
-# Custom-Location aus data_dev (via TASK-19-Seed).
-# Muss in data_dev vorhanden sein — wird in conftest.py auf dev-Umgebung festgelegt.
+# Custom-Location aus data_dev (via TASK-19-Seed, jetzt via ensure_seed_location
+# in conftest.py idempotent sichergestellt).
 LOC = "custom_1781560330"
+
+
+@pytest.fixture(autouse=True)
+def _seed_test_location(ensure_seed_location):
+    """Stellt custom_1781560330 vor jedem Test dieser Datei sicher (conftest.py).
+
+    Lokaler autouse-Wrapper statt globalem autouse in conftest.py: der Seed
+    ist nur für diese vier Dateien relevant, die die ID hart referenzieren.
+    """
 
 
 class TestBug30NamePersistence:

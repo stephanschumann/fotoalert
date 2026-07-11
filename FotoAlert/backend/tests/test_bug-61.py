@@ -23,6 +23,15 @@ pytestmark = [pytest.mark.api, pytest.mark.regression]
 LOC = "custom_1781560330"
 
 
+@pytest.fixture(autouse=True)
+def _seed_test_location(ensure_seed_location):
+    """Stellt custom_1781560330 vor jedem Test dieser Datei sicher (conftest.py).
+
+    Lokaler autouse-Wrapper statt globalem autouse in conftest.py: der Seed
+    ist nur für diese vier Dateien relevant, die die ID hart referenzieren.
+    """
+
+
 class TestBug61SubjectNamePersistence:
     """BUG-61: PATCH auf `subject_name` muss nach GET sichtbar sein.
 

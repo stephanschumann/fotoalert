@@ -20,7 +20,7 @@ on:
 
 jobs:
   # TASK-21: Frontend-Test-Gate — läuft VOR dem Deploy.
-  # Deploy startet nur wenn dieser Job grün ist (needs: [test-frontend]).
+  # Deploy startet nur wenn dieser Job UND test-backend (TASK-64) grün sind.
   test-frontend:
     name: Frontend-Check (Playwright)
     runs-on: ubuntu-latest
@@ -93,10 +93,34 @@ jobs:
             kill "$(cat /tmp/fotoalert-ci-server.pid)" 2>/dev/null || true
           fi
 
+  # TASK-64: Backend-Test-Gate — läuft parallel zum Frontend-Check.
+  # Deploy startet nur wenn beide Jobs grün sind (needs: [test-frontend, test-backend]).
+  test-backend:
+    name: Backend-Tests (pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4.2.2
+
+      - name: Python 3.9 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Abhängigkeiten installieren
+        working-directory: FotoAlert/backend
+        run: pip install -r requirements.txt
+
+      - name: Backend-Testsuite ausführen
+        working-directory: FotoAlert/backend
+        run: python3 -m pytest tests/ -v
+
   deploy:
     name: Deploy FotoAlert
     runs-on: ubuntu-latest
-    needs: [test-frontend]
+    needs: [test-frontend, test-backend]
 
     steps:
       - name: Code auschecken

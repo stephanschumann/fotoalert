@@ -1036,6 +1036,10 @@ Ausgeschlossen: Cron-Scheduling-Mechanismus (US-34), Push-Notifications.
 
 **Bezug (2026-06-20):** Owner der Recompute-Trigger-Whitelist für das Epic TASK-16 (Rule 4). Fix umgesetzt und **am 2026-06-20 manuell verifiziert** (4/4 AKs grün: focal_length + observer_floor_height → `recompute_triggered: true`; name/description → `false`; PATCH ohne Token → 401). Aus 🧪 In Test entfernt → Done.
 
+**⚠️ Regression gefunden am 2026-07-11 (TASK-64 CI-Testlauf):** Drei Tests in `backend/tests/test_api_regression.py::TestBug22RecomputeWhitelist` schlagen aktuell fehl: `test_focal_length_triggers_recompute`, `test_floor_height_triggers_recompute`, `test_name_does_not_trigger_recompute` — genau die AKs dieses Tickets. Alle drei nutzen dieselbe Test-Location `custom_1781560330` und dieselbe `auth_headers`-Fixture wie mehrere andere gleichzeitig fehlschlagende Tests (BUG-29, BUG-30, BUG-61, US-66-Endpoint-Schutz-Test) — **Verdacht (nicht verifiziert, lokale Testausführung im Sandbox nicht möglich):** gemeinsames Test-Fixture-/Seed-Datenproblem statt einer echten Code-Regression der Recompute-Whitelist selbst. Muss anhand der echten CI-Fehlermeldung/-Traceback bestätigt werden, bevor an der Whitelist-Logik selbst etwas verändert wird.
+**Dieses Ticket ist als „Done" markiert (Status-Feld oben) — bei Bestätigung eines echten Regressionsbefunds müsste der Status zurückgesetzt werden. Das ist eine Status-Änderung, die Stephans Freigabe braucht — hier nur vorgeschlagen, nicht selbst umgesetzt.**
+Fix: ensure_seed_location-Fixture in backend/conftest.py, verifiziert 2026-07-11 (2x grün).
+
 
 ### BUG-23 · Kartenfilter-Sync: Eventtyp-Filter wirkt nicht in Kartenansicht `[x]`
 
@@ -3196,6 +3200,10 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 - Python-3.9-sicher (`from __future__ import annotations` vorhanden; kein neuer Runtime-PEP604-Code).
 - **Offen / separater Scope:** `precompute.py` lädt Custom-Locations (`custom_*`) nicht (importiert nur die Basis-`LOCATIONS`) → Single-Recompute einer Custom-Location greift noch nicht. Vorbestehende Lücke, nicht Teil der gemeldeten Standard-Location. → eigenes Ticket erwägen.
 
+**⚠️ Regression gefunden am 2026-07-11 (TASK-64 CI-Testlauf):** `backend/tests/test_patch_cache_consistency.py::TestBug29CoordinatesConsistency::test_coordinates_patch_visible_in_get` schlägt aktuell fehl — genau der Test, der die BUG-29-Root-Cause (Override-Anwendung im precompute-Subprozess) als Regression absichert. Nutzt dieselbe Test-Location `custom_1781560330` und dieselbe `auth_headers`-Fixture wie mehrere weitere gleichzeitig fehlschlagende Tests (BUG-22, BUG-30, BUG-61, US-66-Endpoint-Schutz-Test) — **Verdacht (nicht verifiziert, lokale Testausführung im Sandbox nicht möglich):** gemeinsames Test-Fixture-/Seed-Datenproblem statt einer echten Code-Regression der Override-Anwendung selbst. Muss anhand der echten CI-Fehlermeldung/-Traceback bestätigt werden.
+**Dieses Ticket ist als „Done" markiert (Status-Feld oben) — bei Bestätigung eines echten Regressionsbefunds müsste der Status zurückgesetzt werden. Das ist eine Status-Änderung, die Stephans Freigabe braucht — hier nur vorgeschlagen, nicht selbst umgesetzt.**
+Fix: ensure_seed_location-Fixture in backend/conftest.py, verifiziert 2026-07-11 (2x grün).
+
 ---
 
 
@@ -3279,6 +3287,10 @@ Was noch fehlt: Das Ticket steht auf `ToDo`, der Fix ist nicht verifiziert, kein
 **Testplan:**
 - [ ] Automatisiert (`backend/tests/`, FOTOALERT_NO_BACKGROUND=1): Regression `BUG-30` — `PATCH /locations/{id}` mit `{"name":"X"}` (custom + Standard), dann `GET /locations` prüfen `name=="X"`; zweiter Test: Override in DB schreiben, `_load_location_overrides` ausführen, Name-Anwendung prüfen. (Backend-Persistenz absichern, damit keine künftige Regression sie bricht.)
 - [ ] Manuell (http://localhost:8000): Name im Location-Detail ändern → speichern → in den Feed/Kalender wechseln → Chance dieser Location öffnen → Opportunity-Detail zeigt den neuen Namen. Anschließend App neu laden → Name bleibt überall neu.
+
+**⚠️ Regression gefunden am 2026-07-11 (TASK-64 CI-Testlauf):** Drei Tests in `backend/tests/test_patch_cache_consistency.py::TestBug30NamePersistence` schlagen aktuell fehl: `test_name_patch_visible_in_get`, `test_name_patch_does_not_overwrite_other_fields`, `test_second_name_patch_overwrites_first` — genau die AKs dieses Tickets. Nutzen dieselbe Test-Location `custom_1781560330` und dieselbe `auth_headers`-Fixture wie mehrere weitere gleichzeitig fehlschlagende Tests (BUG-22, BUG-29, BUG-61, US-66-Endpoint-Schutz-Test) — **Verdacht (nicht verifiziert, lokale Testausführung im Sandbox nicht möglich):** gemeinsames Test-Fixture-/Seed-Datenproblem statt einer echten Code-Regression des Name-Persistenz-Fixes selbst. Muss anhand der echten CI-Fehlermeldung/-Traceback bestätigt werden.
+**Dieses Ticket ist als „Done" markiert (Status-Feld oben) — bei Bestätigung eines echten Regressionsbefunds müsste der Status zurückgesetzt werden. Das ist eine Status-Änderung, die Stephans Freigabe braucht — hier nur vorgeschlagen, nicht selbst umgesetzt.**
+Fix: ensure_seed_location-Fixture in backend/conftest.py, verifiziert 2026-07-11 (2x grün).
 
 ---
 
