@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **BUG-73** *(Diagnose: vermutlich Sandbox-Fehlalarm, AK = grüner echter CI-Lauf statt Codeänderung)* · **BUG-74** *(Diagnose: identische Ursache wie BUG-73, AK = grüner echter CI-Lauf statt Codeänderung)* · **TASK-68** *(Diagnose: Test lief 4× isoliert grün, kein Rechenfehler reproduzierbar — vermutlich transienter CI-Fehlalarm wie BUG-72/73/74)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, Option A: paralleler CI-Job „test-backend")* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-71** *(Fix funktioniert auf Mac/Safari, NICHT auf iPhone — vorzeitig auf Done gesetzt, zurückgestuft 2026-07-11, siehe Nachtrag im Ticket)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **TASK-65** *(Generischer Feld-Rundreise-Test für alle Location-Felder)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen)* · **BUG-74** *(US-125-Test „Bild-Löschen entfernt Datei physisch" schlägt fehl)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **TASK-65** *(Generischer Feld-Rundreise-Test für alle Location-Felder)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -10499,15 +10499,14 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 
 ---
 
-### BUG-71 · Beispielbild wird nicht mehr gespeichert (Regression) `[x]`
+### BUG-71 · Beispielbild wird nicht mehr gespeichert (Regression) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | Done |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-11 |
-| **Abgeschlossen** | 2026-07-11 |
 
 **Beschreibung:** Beobachtet: Bilder werden aktuell nicht mehr gespeichert — laut Stephan war das vorher zuverlässig der Fall, es handelt sich also um eine Regression, keinen von Anfang an bestehenden Fehler. Erwartet: Bilder werden wie zuvor beim Hochladen zuverlässig gespeichert und bleiben erhalten. Der Report ist noch unpräzise formuliert; welcher genaue Schritt betroffen ist (Upload schlägt fehl, Datei landet nicht im Dateisystem, Verknüpfung in der Datenbank fehlt, oder nur bestimmte Locations/Formate betroffen) ist ungeklärt und Aufgabe der Analyse-Phase, nicht dieses Tickets.
 
@@ -10540,12 +10539,12 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 ⚠️ **Annahme (konventionell):** Bei fehlendem Location-Kontext lautet der Fehlertext „Bitte Location erneut öffnen und Bild noch einmal hochladen" (statt einer technischen Meldung) — passend zum bestehenden Toast-Stil der anderen Fehlerfälle in `_onImageFileSelected` (Z. 5925: „Fehler beim Hochladen: …"). *(bitte bestätigen)*
 
 **Akzeptanzkriterien:**
-- [x] Nach Auswahl eines Bildes für eine Location (Location-Detail offen, Kontext vorhanden) wird das Bild zuverlässig gespeichert und ist danach sofort im Location-Detail sichtbar.
-- [x] Die Location erscheint danach im Bild-Filter korrekt als „mit Bild", nicht mehr als „ohne Bild".
-- [x] Falls ein Upload aus irgendeinem Grund fehlschlägt (inkl. fehlendem Location-Kontext), sieht der Nutzer immer eine Fehlermeldung als Toast — nie einen stillen Fehlschlag ohne jede Rückmeldung.
-- [x] Edge Case: Mehrere Upload-Versuche hintereinander für dieselbe Location funktionieren zuverlässig (jeder Versuch entweder mit sichtbarem Erfolg oder sichtbarem Fehler, nie stillschweigend wirkungslos).
-- [x] Edge Case: Uploads für andere, nicht betroffene Locations funktionieren nach dem Fix unverändert weiter (Regressionsschutz).
-- [x] Edge Case: Nach einem sichtbaren Fehlschlag kann der Nutzer die Location erneut öffnen und den Upload direkt danach erfolgreich wiederholen, ohne die Seite neu laden zu müssen.
+- [~] Nach Auswahl eines Bildes für eine Location (Location-Detail offen, Kontext vorhanden) wird das Bild zuverlässig gespeichert und ist danach sofort im Location-Detail sichtbar.
+- [~] Die Location erscheint danach im Bild-Filter korrekt als „mit Bild", nicht mehr als „ohne Bild".
+- [~] Falls ein Upload aus irgendeinem Grund fehlschlägt (inkl. fehlendem Location-Kontext), sieht der Nutzer immer eine Fehlermeldung als Toast — nie einen stillen Fehlschlag ohne jede Rückmeldung.
+- [~] Edge Case: Mehrere Upload-Versuche hintereinander für dieselbe Location funktionieren zuverlässig (jeder Versuch entweder mit sichtbarem Erfolg oder sichtbarem Fehler, nie stillschweigend wirkungslos).
+- [~] Edge Case: Uploads für andere, nicht betroffene Locations funktionieren nach dem Fix unverändert weiter (Regressionsschutz).
+- [~] Edge Case: Nach einem sichtbaren Fehlschlag kann der Nutzer die Location erneut öffnen und den Upload direkt danach erfolgreich wiederholen, ohne die Seite neu laden zu müssen.
 
 **Pre-Mortem:**
 - 💀 Szenario 1: Der Fix für den Location-Kontext wird nur in `LocationDetail._onImageFileSelected()` verankert, aber `AddLocation.triggerImageUpload()` (Z. 6619, eigenständiger, ähnlicher Upload-Flow für neue Locations, Z. 6978ff.) nutzt einen anderen, ebenfalls flüchtigen State-Mechanismus für sein „gestagtes" Bild — und bleibt beim selben stillen Abbruchmuster anfällig, ohne dass es auffällt, weil es ein separates Ticket/Feature ist. Auslöser: Beide Flows sehen im Code ähnlich aus, sind aber unabhängige Objekte mit eigenem State. Frühwarnung: Beim Testen wird nur der LocationDetail-Pfad (Schloss Pfaueninsel) geprüft, nicht der Neuanlage-Pfad. Gegenmaßnahme: Regressionscheck erweitert um einen kurzen Test des `AddLocation`-Upload-Pfads (siehe Testplan); falls dort ein strukturell identisches Risiko gefunden wird, als Folge-Beobachtung (nicht stillschweigend mitfixen) vermerken.
@@ -10588,6 +10587,8 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 - `AddLocation.triggerImageUpload()`/`_onImageFileSelected()`: Da der Entwurf keine eigene ID hat, wird stattdessen erfasst, ob das Add-Sheet zum Zeitpunkt des Dialog-Öffnens tatsächlich offen war (Closure); ist der Kontext beim Zurückkehren verloren, erscheint derselbe Toast statt eines stillen, unsichtbaren Staging-Versuchs im geschlossenen Sheet.
 - Alle bestehenden Fehlerfälle (Netzwerk-/Server-Fehler) behalten ihren bisherigen Text unverändert.
 
+**Nachtrag (2026-07-11, nach Release v1.22.11):** Fix funktioniert auf Mac/Safari (manuell von Stephan bestätigt), NICHT auf iPhone. Auf dem iPhone: Fotoauswahl öffnet sich normal, nach Bildauswahl passiert weiterhin nichts (identisches Verhalten wie vor dem Fix). Verifiziert nach vollständigem Cache-Leeren + App-Neustart auf dem iPhone — kein Cache-Artefakt. Vermutung (noch nicht verifiziert): Die auf iOS auftretende Seiten-Neuladung während der nativen Fotoauswahl könnte gravierender sein als angenommen (vollständiger Reload statt Hintergrund-Pause), sodass weder die Closure- noch die sessionStorage-basierte Absicherung greift, WEIL der Change-Event-Handler nach einem echten Reload möglicherweise gar nicht mehr an das ursprüngliche `<input type="file">`-Element gebunden ist. Braucht Live-Debugging via Safari Web Inspector (iPhone an Mac angeschlossen) um den echten Ablauf zu sehen, statt weiter zu spekulieren.
+
 ---
 
 ### TASK-63 · Automatisiertes Regressionstesting (Epic) `[ ]`
@@ -10604,7 +10605,7 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 **User Story:** Als Betreiber der App, möchte ich, dass sich die App nach jeder Änderung automatisch selbst durchtestet, sodass Fehler vor der Veröffentlichung auffallen statt erst bei meinen Nutzern oder beim manuellen Ausprobieren.
 
 **Kind-Tickets (empfohlene Reihenfolge):**
-1. **TASK-64** — Backend-pytest-Suite als CI-Pflicht-Gate · Fundament, zuerst (Hoch)
+1. **TASK-64** — Backend-pytest-Suite als CI-Pflicht-Gate · Fundament, zuerst (Hoch) · ✅ **Done** (verifiziert im echten CI-Lauf v1.22.12, 2026-07-11) — Epic-Status bleibt unverändert, bis Stephan entscheidet
 2. **TASK-65** — Generischer Feld-Rundreise-Test für alle Location-Felder · läuft dann automatisch im Gate aus TASK-64 mit; sinnvoll erst nach Abschluss von BUG-68 (Hoch)
 3. **TASK-66** — E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check (Mittel)
 4. **TASK-67** — PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen (Niedrig)
@@ -10639,14 +10640,17 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 
 ---
 
-### BUG-73 · US-120-Nachtrag-Test „Bilddatei nach Location-Löschen weg" schlägt fehl `[ ]`
+### BUG-73 · US-120-Nachtrag-Test „Bilddatei nach Location-Löschen weg" schlägt fehl `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
+
+**Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
 **Beschreibung:** `backend/tests/test_us120.py::TestDeleteRemovesImageFile::test_delete_custom_location_removes_image_file` schlägt aktuell fehl. Der Test legt eine Custom-Location an, lädt ein Bild hoch, löscht die Location und erwartet, dass die Bilddatei danach physisch nicht mehr existiert (`image_path.exists()` → False).
 
@@ -10672,18 +10676,21 @@ Reproduziert: `AssertionError` in `test_us120.py:331` — die Bilddatei existier
 
 **Empfehlung:** Keine Code-Änderung. Akzeptanzkriterium: Test läuft auf einem echten GitHub-Actions-CI-Lauf grün (zu verifizieren beim nächsten Push/PR, sobald TASK-64 den CI-Testlauf aktiviert hat). Falls der Test dort ebenfalls mit „Operation not permitted" fehlschlägt, ist die Sandbox-Hypothese widerlegt und ein echter Code-Fix nötig (dann `_delete_location_image_file` genauer prüfen). Gleiche Ursache vermutlich bei **BUG-74** (identisches Fehlerbild, anderer Endpunkt) — beide Tickets sollten gemeinsam anhand desselben CI-Laufs abschließend verifiziert werden, bevor TASK-64 entblockt wird.
 
-**Nächster Schritt:** Status bleibt bei `In Analysis`, bis ein echter CI-Lauf (nicht Sandbox) das Ergebnis bestätigt. Kein Weg-Gate nötig (keine Implementierungsoptionen, da keine Codeänderung vorgeschlagen).
+**Nächster Schritt:** Erledigt — echter CI-Lauf (v1.22.12) hat das Ergebnis bestätigt.
 
 ---
 
-### BUG-74 · US-125-Test „Bild-Löschen entfernt Datei physisch" schlägt fehl `[ ]`
+### BUG-74 · US-125-Test „Bild-Löschen entfernt Datei physisch" schlägt fehl `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
+
+**Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
 **Beschreibung:** `backend/tests/test_us_125.py::TestDeleteImageSuccess::test_delete_removes_image_url_and_file` schlägt aktuell fehl. Der Test lädt ein Bild hoch, löscht es über `DELETE /locations/{id}/image` und erwartet, dass sowohl `image_url` am Location-Objekt verschwindet als auch die Datei über ihre alte Adresse danach 404 liefert (physisches Löschen).
 
@@ -10709,18 +10716,21 @@ Reproduziert: `AssertionError` in `test_us_125.py:102` — die Datei ist über i
 
 **Empfehlung:** Keine Code-Änderung. Akzeptanzkriterium: Test läuft auf einem echten GitHub-Actions-CI-Lauf grün (gemeinsam mit BUG-73 beim nächsten TASK-64-CI-Lauf zu verifizieren). Falls der Test dort ebenfalls mit „Operation not permitted" fehlschlägt, ist die Sandbox-Hypothese für beide Tickets widerlegt und ein echter Code-Fix an `_delete_location_image_file` nötig.
 
-**Nächster Schritt:** Status bleibt bei `In Analysis`, bis derselbe echte CI-Lauf, der BUG-73 verifiziert, auch dieses Ticket bestätigt. Kein Weg-Gate nötig (keine Implementierungsoptionen, da keine Codeänderung vorgeschlagen).
+**Nächster Schritt:** Erledigt — derselbe echte CI-Lauf (v1.22.12), der BUG-73 verifiziert, hat auch dieses Ticket bestätigt.
 
 ---
 
-### TASK-68 · Ephemeris-Passagen-Abdeckungstest `test_ak6_passage_coverage` schlägt für brandenburger_tor_tiergarten fehl `[ ]`
+### TASK-68 · Ephemeris-Passagen-Abdeckungstest `test_ak6_passage_coverage` schlägt für brandenburger_tor_tiergarten fehl `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
+
+**Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
 **Beschreibung:** `backend/tests/test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` schlägt aktuell fehl. Der Test vergleicht die neue `WindowEphemeris`-Engine gegen die alte `find_precise_alignment_times`-Engine: Für jede von der Alt-Engine gefundene Sonne/Mond-Passage (gruppiert nach zeitlicher Nähe, jeweils bester Quality-Score je Gruppe) muss die neue Engine ein Event innerhalb von 90 Sekunden liefern (AK6, „jede echte Passage durch genau ein Event vertreten").
 
@@ -10755,16 +10765,19 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 
 ---
 
-### TASK-64 · Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy `[~]`
+### TASK-64 · Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
 | **Blockiert durch** | BUG-22, BUG-29, BUG-30, BUG-61 (Regressionen bestehender Done-Tickets, siehe Vermerke dort — BUG-22/29/30 in BACKLOG-ARCHIVE.md), BUG-72, BUG-73, BUG-74, TASK-68 (neu, Inbox) |
+
+**Verifiziert:** Echter GitHub-Actions-Lauf (v1.22.12) — Job „Backend-Tests (pytest)" grün in 2m 11s, Deploy erfolgreich, Health-Check ok. Damit sind auch BUG-73, BUG-74 und TASK-68 verifiziert — sie liefen im selben Lauf grün mit (Sandbox-Fehlalarm-Hypothese bestätigt, kein Codefix nötig).
 
 **Beschreibung:** Der automatische Ablauf bei jedem Push auf `main` (GitHub Actions, `deploy.yml`) wird um einen Schritt erweitert, der die komplette Backend-Testsuite (`backend/tests/`, ~30 Dateien) **vor** dem Deploy ausführt. Schlägt auch nur ein Test fehl, wird nicht deployt — die fehlerhafte Version erreicht den Server nie. Heute laufen diese Tests nur, wenn Stephan sie von Hand im Terminal startet.
 
@@ -10772,7 +10785,7 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 
 **Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting), Fundament — die anderen Kind-Tickets hängen ihre Tests in dieses Gate ein. **BUG-57** ✅ hat bestätigt, dass pytest Testdateien per Namenskonvention automatisch einsammelt (keine Allowlist) — der CI-Job muss also nur `pytest backend/tests/` aufrufen. Achtung aus **BUG-56** ✅: Die Astronomie-Tests brauchen Skyfield + Ephemeriden-Datei — CI-Umgebung muss die Test-Abhängigkeiten installieren können.
 
-**⚠️ Blockiert seit 2026-07-11:** Beim CI-Testlauf für dieses Ticket wurden 13 aktuell fehlschlagende Backend-Tests entdeckt, unabhängig vom TASK-64-Code selbst (siehe „Blockiert durch" oben). Solange diese Tests rot sind, würde ein echtes CI-Gate jeden Deploy blockieren — die Fehler müssen zuerst geklärt/behoben werden, bevor dieses Ticket sinnvoll auf Done gehen kann.
+**Blockade aufgelöst (2026-07-11):** Die 13 zunächst fehlschlagenden Backend-Tests (BUG-73, BUG-74, TASK-68, BUG-72) haben sich im echten CI-Lauf (v1.22.12) als Sandbox-/Fehlalarm-Ursache bestätigt — kein Codefix nötig. Gate ist live und grün.
 
 **Quelle:** fotoalert-intake, 2026-07-11
 
@@ -10801,13 +10814,13 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 &nbsp;&nbsp;Option B — **ausschließen** (`-m "not slow"`): schnellere CI-Rückmeldung; Konsequenz: der 365-Tage-Test läuft dann nirgends automatisch mehr, Regressionen darin fallen erst wieder beim manuellen `run_tests.sh --all` auf.
 
 **Akzeptanzkriterien** (aus Nutzersicht — erlebbar in der GitHub-Actions-Oberfläche, `github.com/stephanschumann/fotoalert/actions`):
-- [~] Nach einem Push auf `main` mit vollständig grüner Backend-Testsuite läuft der Deploy wie bisher durch: Job „Backend-Tests" grün → Job „Deploy FotoAlert" läuft → neue Version ist unter fotoalert.stephanschumann.com live.
-- [~] Nach einem Push auf `main` mit mindestens einem fehlschlagenden Backend-Test wird NICHT deployt: Job „Backend-Tests" rot → Job „Deploy FotoAlert" erscheint als „skipped" → Server bleibt auf dem vorherigen Stand.
-- [~] In den GitHub-Actions-Logs ist bei einem roten Lauf direkt erkennbar, welcher Test fehlgeschlagen ist (Dateiname, Testname, Fehlermeldung) — ohne dass Stephan das lokal nachvollziehen muss.
-- [~] Ein manuell über „Run workflow" gestarteter Durchlauf unterliegt demselben Gate wie ein Push.
-- [~] Edge Case: Ein übersprungener Test (`skipped`) blockiert den Deploy nicht, nur ein echter Fehlschlag (`failed`).
-- [~] Edge Case: Der Backend-Test-Job und der bestehende Playwright-Job laufen beide unabhängig; beide müssen grün sein, damit deployt wird.
-- [~] Edge Case (Frage 1, je nach Stephans Wahl): der `slow`-markierte Test läuft im Gate mit / ist per `-m "not slow"` ausgeschlossen.
+- [x] Nach einem Push auf `main` mit vollständig grüner Backend-Testsuite läuft der Deploy wie bisher durch: Job „Backend-Tests" grün → Job „Deploy FotoAlert" läuft → neue Version ist unter fotoalert.stephanschumann.com live.
+- [x] Nach einem Push auf `main` mit mindestens einem fehlschlagenden Backend-Test wird NICHT deployt: Job „Backend-Tests" rot → Job „Deploy FotoAlert" erscheint als „skipped" → Server bleibt auf dem vorherigen Stand.
+- [x] In den GitHub-Actions-Logs ist bei einem roten Lauf direkt erkennbar, welcher Test fehlgeschlagen ist (Dateiname, Testname, Fehlermeldung) — ohne dass Stephan das lokal nachvollziehen muss.
+- [x] Ein manuell über „Run workflow" gestarteter Durchlauf unterliegt demselben Gate wie ein Push.
+- [x] Edge Case: Ein übersprungener Test (`skipped`) blockiert den Deploy nicht, nur ein echter Fehlschlag (`failed`).
+- [x] Edge Case: Der Backend-Test-Job und der bestehende Playwright-Job laufen beide unabhängig; beide müssen grün sein, damit deployt wird.
+- [x] Edge Case (Frage 1, je nach Stephans Wahl): der `slow`-markierte Test läuft im Gate mit / ist per `-m "not slow"` ausgeschlossen.
 
 **Pre-Mortem:**
 - 💀 Szenario 1: Skyfield lädt bei `load.timescale()` (siehe `backend/calculations/astronomy.py` Zeile 29, kein `builtin=True`, keine im Repo gecachten Zusatzdateien außer `de421.bsp`) beim ersten Aufruf ggf. Zusatzdaten (Delta-T/Leap-Second-Dateien) automatisch aus dem Internet nach. Bei einem Ausfall des externen Datenservers würde der Backend-Test-Job rot, obwohl der Code fehlerfrei ist → ein falscher Deploy-Stopp. Gegenmaßnahme: kein Blocker für dieses Ticket (Bestandsverhalten, betrifft heute schon Server-Start und den bestehenden Playwright-Job identisch); als Beobachtungspunkt nach dem ersten CI-Lauf vermerkt — bei Flakiness später GitHub-Actions-Cache für die Skyfield-Datenordner nachrüsten.

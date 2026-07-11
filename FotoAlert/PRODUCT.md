@@ -473,6 +473,21 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 
 ---
 
+## 11c. Automatisiertes Testen (CI/CD)
+
+**Was der Nutzer davon hat:** Fehler werden vor dem Deploy erkannt, nicht erst danach — jeder Release ist automatisch gegen die bestehende Backend-Logik geprüft.
+
+| Funktion | Verhalten |
+|----------|-----------|
+| Backend-pytest-Suite als Pflicht-Gate (TASK-64) | Bei jedem Release läuft in GitHub Actions ein eigener, paralleler Job „Backend-Tests (pytest)" (~2 Minuten Laufzeit). Schlägt die Test-Suite fehl, wird nicht deployt — der Job ist ein Pflicht-Gate, kein optionaler Hinweis. Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests): Job grün in 2m 11s, Deploy erfolgreich, Health-Check ok. |
+
+**Pflicht-Regression CI/Deploy-Testing:**
+- [ ] Release-Push löst den Job „Backend-Tests (pytest)" parallel zu den übrigen CI-Schritten aus
+- [ ] Test-Suite grün → Deploy läuft normal weiter
+- [ ] Test-Suite rot → Deploy wird nicht ausgeführt (Gate greift)
+
+---
+
 ## 12. Regressions-Matrix (nach Ticket-Typ)
 
 Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
@@ -581,3 +596,4 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-10 | US-128 | Bauwerkshöhe (`subject_height_m`) und Bauwerksbreite (`subject_width_m`) sind jetzt im Bearbeiten-Modus nachträglich korrigierbar (analog zur bestehenden Fotografen-Standhöhe), für Custom- und Standard-Locations; eine Korrektur löst automatisch eine Neuberechnung (Feed + Kalender) aus, analog zur Koordinatenkorrektur, und übersteht jetzt zuverlässig sowohl Server-Neustart als auch den precompute-Subprozess. Nebenbefund im selben Ticket: Scout-Platzhalter-Erkennung von einer 20-Meter-Heuristik auf ein explizites Feld `subject_height_researched` umgestellt (verhinderte vorher fälschlichen Ausschluss korrekt recherchierter Locations aus der Scout-Pipeline). Code-Release als v1.22.6 (Health-Check auf Produktion bestätigt) — Ticket bleibt offen, bis der aktuell laufende ca. 9-stündige Neuberechnungslauf über alle Bestandslocations abgeschlossen ist. |
 | 2026-07-10 | BUG-69 | Bildausschnitt-Button jetzt gut lesbar auf jedem Foto-Hintergrund |
 | 2026-07-11 | BUG-70 | Datenbank-Korruption in `location_qa_values` durch einen harten Prozess-Abbruch (OOM-Kill) repariert. Code-Härtung: `LocationStore.integrity_check()` liefert jetzt eine vollständige Fehlerliste statt nur einer einzelnen Zeile und wirft auch bei stark beschädigten Datenbanken keine ungefangene Exception mehr; Ladefehler beim Server-Start werden jetzt als ERROR statt WARNING geloggt (fällt beim Monitoring auf statt unterzugehen); zusätzlich läuft beim Start jetzt generell eine Integritätsprüfung. Für eine eventuelle erneute Reparatur steht das Skript `tools/repair_bug70_qa_values.py` bereit. |
+| 2026-07-11 | TASK-64 | Backend-pytest-Suite läuft jetzt als Pflicht-Gate vor jedem Deploy (paralleler CI-Job, ~2 Min Laufzeit) |
