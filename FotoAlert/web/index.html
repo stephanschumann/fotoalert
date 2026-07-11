@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.10';
+const APP_VERSION = '1.22.11';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5901,26 +5901,49 @@ const LocationDetail = {
     return ''; // normaler Nutzer, kein Bild vorhanden → Bereich komplett unsichtbar
   },
 
+  // BUG-71: Location-ID wird beim Öffnen des nativen Datei-Dialogs per Closure
+  // eingefangen (statt sich später auf this._current zu verlassen, das mobile
+  // Browser während der asynchronen Foto-Auswahl unter Speicherdruck zurücksetzen
+  // können) UND zusätzlich in sessionStorage gespiegelt, damit die ID selbst einen
+  // kompletten JS-Neustart der Seite überlebt (change-Event feuert nach Reload
+  // trotzdem auf dem wiederhergestellten <input>).
   triggerImageUpload() {
     const input = document.getElementById('loc-image-input');
-    if (input) input.click();
+    if (!input) return;
+    const locId = this._current && this._current.id;
+    if (locId) {
+      try { sessionStorage.setItem('faLocImageUploadTarget', locId); } catch (e) {}
+    }
+    input.onchange = (evt) => this._onImageFileSelected(evt, locId);
+    input.click();
   },
 
-  async _onImageFileSelected(evt) {
+  async _onImageFileSelected(evt, capturedLocId) {
     const file = evt.target.files && evt.target.files[0];
     evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
-    if (!file || !this._current) return;
-    const loc = this._current;
+    if (!file) return;
+
+    let locId = capturedLocId || (this._current && this._current.id);
+    if (!locId) {
+      try { locId = sessionStorage.getItem('faLocImageUploadTarget'); } catch (e) {}
+    }
+    if (!locId) {
+      // BUG-71: kein Location-Kontext mehr vorhanden (z.B. Seite wurde während der
+      // Foto-Auswahl im Hintergrund neu geladen) — statt stillem Abbruch sichtbar melden.
+      toast('Bitte Location erneut öffnen und Bild noch einmal hochladen');
+      return;
+    }
 
     const processing = document.getElementById('loc-image-processing');
     if (processing) processing.classList.add('open');
 
     try {
-      const res = await API.postFile(`/locations/${loc.id}/image`, file);
+      const res = await API.postFile(`/locations/${locId}/image`, file);
       // Server-Fetch statt In-Memory-Mutation (Pattern 5)
       Locations.all = await API.get('/locations');
+      try { sessionStorage.removeItem('faLocImageUploadTarget'); } catch (e) {}
       toast('✓ Beispielbild hochgeladen');
-      LocationDetail.open(loc.id);
+      LocationDetail.open(locId);
     } catch (e) {
       toast('Fehler beim Hochladen: ' + e.message);
       if (processing) processing.classList.remove('open');
@@ -6616,17 +6639,38 @@ const AddLocation = {
     document.getElementById('add-sheet').classList.remove('open');
   },
   // US-127: öffnet die Dateiauswahl für das Beispielbild (analog LocationDetail.triggerImageUpload()).
+  // BUG-71: Das add-sheet-Entwurfsobjekt hat keine eigene ID — der einzig verlässliche
+  // Kontext-Indikator ist, ob das add-sheet gerade tatsächlich offen ist. Dieser Zustand
+  // wird beim Öffnen des nativen Datei-Dialogs per Closure eingefangen, statt sich beim
+  // späteren change-Event blind auf den DOM-Zustand zu verlassen (der nach einem
+  // Hintergrund-Reload der Seite wieder auf "geschlossen" zurückfällt).
   triggerImageUpload() {
     const input = document.getElementById('add-image-input');
-    if (input) input.click();
+    if (!input) return;
+    const sheetEl = document.getElementById('add-sheet');
+    const contextValid = !!(sheetEl && sheetEl.classList.contains('open'));
+    input.onchange = (evt) => this._onImageFileSelected(evt, contextValid);
+    input.click();
   },
   // US-127: Datei wird NICHT sofort hochgeladen (keine location_id vorhanden), nur
   // client-seitig gestaged + lokale Vorschau angezeigt. Der eigentliche Upload folgt
   // automatisch in save(), sobald eine location_id vorliegt.
-  _onImageFileSelected(evt) {
+  _onImageFileSelected(evt, capturedContextValid) {
     const file = evt.target.files && evt.target.files[0];
     evt.target.value = ''; // erneutes Auswählen derselben Datei löst wieder 'change' aus
     if (!file) return;
+
+    const sheetEl = document.getElementById('add-sheet');
+    const contextValid = (capturedContextValid !== undefined)
+      ? capturedContextValid
+      : !!(sheetEl && sheetEl.classList.contains('open'));
+    if (!contextValid) {
+      // BUG-71: kein gültiger Entwurfs-Kontext mehr (z.B. Seite wurde während der
+      // Foto-Auswahl im Hintergrund neu geladen) — statt stillem Abbruch sichtbar melden.
+      toast('Bitte Location erneut öffnen und Bild noch einmal hochladen');
+      return;
+    }
+
     if (this._stagedImagePreviewUrl) URL.revokeObjectURL(this._stagedImagePreviewUrl);
     this._stagedImageFile = file;
     this._stagedImagePreviewUrl = URL.createObjectURL(file);
