@@ -171,8 +171,14 @@ TEST_IMAGE_FIXTURE_PATH = str(Path(__file__).resolve().parent / "fixtures" / "te
 
 # Regel 3 — Filter setzen: minScore auf einen deterministischen Extremwert setzen
 # (unabhängig von der aktuellen Live-Datenlage, siehe Frage 3 / Pre-Mortem TASK-66).
+# CI-Fix (Workflow-Lauf #189, v1.22.15): ein fester Extremwert (vormals hier als
+# FILTER_MIN_SCORE_EXTREME = 100 hinterlegt) war NICHT strukturell deterministisch —
+# bei nur 1 Baseline-Eintrag (frischer CI-Checkout ohne vorberechneten Datenbestand)
+# konnte dessen Score zufällig genau am Extremwert liegen, sodass kein Rückgang
+# gemessen wurde. Ersetzt durch einen zur Laufzeit aus Feed.data berechneten
+# Schwellwert in run_frontend_check.py::_check_filter_feed — der Konstante wurde
+# dadurch überflüssig und deshalb entfernt (kein toter Fallback ohne Nutzung).
 FEED_CONTENT_SELECTOR = "#feed-content"
-FILTER_MIN_SCORE_EXTREME = 100
 FILTER_MIN_SCORE_DEFAULT = 70  # Filter.defaultState() in web/index.html
 
 

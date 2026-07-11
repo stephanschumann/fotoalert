@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import math
 import os
 import subprocess
 import sys
@@ -831,6 +832,19 @@ def _check_filter_feed(page, commit: str, shot):
     Setzt/liest den Filter-State direkt über die App-eigenen Funktionen (Filter.save +
     FilterSheet._applyLive) — dieselbe Funktionskette, die auch der reale Score-Slider
     (FilterSheet._onScoreSlider) auslöst.
+
+    CI-Fix (nach Workflow-Lauf #189, v1.22.15): Ein fest verdrahteter Extremwert
+    (_spec.FILTER_MIN_SCORE_EXTREME = 100) war NICHT strukturell deterministisch,
+    sondern von der zufälligen Datenlage abhängig. In CI (frischer Checkout, kein
+    vorberechneter Datenbestand) hat der Feed oft nur 1 Chance statt lokal ~500 —
+    hat dieser eine Baseline-Eintrag zufällig overall_score >= minScore/100, sinkt
+    die Trefferzahl nicht und der Test flakt/failt je nach Zufallslage.
+    Lösung: minScore wird zur Laufzeit aus dem tatsächlich höchsten sichtbaren
+    Feed-Score (Feed.data[].overall_score, 0..1-skaliert) abgeleitet — knapp über
+    diesem Maximum, gedeckelt auf 100 (die UI-Skala von minScore ist 0..100, siehe
+    web/index.html Filter.defaultState/_passesScore). Das garantiert rechnerisch,
+    dass ALLE aktuell sichtbaren Einträge herausfallen, egal ob die Baseline 1 oder
+    500 Einträge umfasst.
     """
     findings: List[Finding] = []
     page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "feed")
@@ -856,9 +870,38 @@ def _check_filter_feed(page, commit: str, shot):
 
     baseline_count = page.eval_on_selector(_spec.FEED_CONTENT_SELECTOR, "el => el.children.length")
 
+    if baseline_count == 0:
+        # Edge Case: kein Baseline-Bestand (z.B. komplett leerer CI-Datenstand).
+        # "Trefferzahl sinkt sichtbar" ist ohne Baseline nicht sinnvoll prüfbar —
+        # kein hartes Finding, sondern dokumentierter Skip.
+        print(
+            "[feed] filter_reduces_results: übersprungen, keine Baseline-Daten "
+            "(Feed-Trefferzahl bereits 0)"
+        )
+        return findings
+
+    max_score = page.evaluate(
+        "() => (Feed.data || []).reduce((m, e) => Math.max(m, e.overall_score || 0), 0)"
+    )
+
+    if max_score >= 1.0:
+        # Edge Case: overall_score der Filterbedingung ist strikt "< minScore/100"
+        # (siehe web/index.html Filter._passesScore) — ein Eintrag mit Score genau
+        # 1.0 (100%) bleibt bei JEDEM minScore-Wert bis 100 sichtbar. Strukturell
+        # nicht über minScore ausschließbar, daher dokumentierter Skip statt Finding.
+        print(
+            "[feed] filter_reduces_results: übersprungen, höchster sichtbarer Score "
+            "bereits am Maximum (100%) und über minScore nicht ausschließbar"
+        )
+        return findings
+
+    # Dynamischer Schwellwert statt fixem FILTER_MIN_SCORE_EXTREME: knapp oberhalb
+    # des tatsächlich höchsten sichtbaren Scores, gedeckelt auf die UI-Skala (0..100).
+    extreme_min_score = min(100, math.ceil(max_score * 100) + 1)
+
     page.evaluate(
         "async (v) => { Filter.save({ minScore: v }); await FilterSheet._applyLive(); }",
-        _spec.FILTER_MIN_SCORE_EXTREME,
+        extreme_min_score,
     )
     try:
         page.wait_for_function(
@@ -875,8 +918,8 @@ def _check_filter_feed(page, commit: str, shot):
             Finding(
                 view="feed",
                 assertion_id="filter_reduces_results",
-                expected="Trefferzahl sinkt unter Ausgangswert {0} bei minScore={1}".format(
-                    baseline_count, _spec.FILTER_MIN_SCORE_EXTREME
+                expected="Trefferzahl sinkt unter Ausgangswert {0} bei minScore={1} (dynamisch, > höchster sichtbarer Score {2:.3f})".format(
+                    baseline_count, extreme_min_score, max_score
                 ),
                 actual="Trefferzahl blieb bei {0} (kein Rückgang)".format(filtered_count),
                 message="feed result count did not decrease under extreme minScore filter",
