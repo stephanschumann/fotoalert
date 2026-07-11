@@ -88,7 +88,18 @@ def parse_backlog(text):
     return tickets
 
 def main():
-    out_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+    if len(sys.argv) < 2 or not sys.argv[1].strip():
+        print(
+            "⛔ Fehlendes Ausgabeverzeichnis-Argument.\n"
+            "Aufruf:  python3 gen_kanban.py <outputs-dir>\n"
+            "Ohne explizites Verzeichnis würde früher still ins aktuelle Arbeitsverzeichnis\n"
+            "geschrieben — das hat bereits einmal versehentlich eine getrackte Repo-Datei\n"
+            "überschrieben (BUG-67). Bitte den Cowork-Outputs-Pfad angeben, niemals dieses\n"
+            "Skript direkt ohne Argument aufrufen — nutze stattdessen sync_kanban.py <outputs-dir>.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    out_dir = sys.argv[1]
     text = read_backlog()
     tickets = parse_backlog(text)
     template = open(TEMPLATE, encoding="utf-8").read()

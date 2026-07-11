@@ -11,7 +11,17 @@ sicher, dass NIE generiert/gepusht wird, solange der Lint rot ist.
 """
 import sys, os, subprocess
 HERE = os.path.dirname(os.path.abspath(__file__))
-out_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+if len(sys.argv) < 2 or not sys.argv[1].strip():
+    print(
+        "⛔ Fehlendes Ausgabeverzeichnis-Argument.\n"
+        "Aufruf:  python3 sync_kanban.py <outputs-dir>\n"
+        "Ohne explizites Verzeichnis würde früher still ins aktuelle Arbeitsverzeichnis\n"
+        "geschrieben — das hat bereits einmal versehentlich eine getrackte Repo-Datei\n"
+        "überschrieben (BUG-67). Bitte den Cowork-Outputs-Pfad angeben.",
+        file=sys.stderr,
+    )
+    sys.exit(2)
+out_dir = sys.argv[1]
 backlog = os.path.join(HERE, "..", "BACKLOG.md")
 
 print("→ Lint BACKLOG.md …")
