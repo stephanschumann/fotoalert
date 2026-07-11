@@ -1,5 +1,5 @@
 // FotoAlert Service Worker – Offline-Cache + Push Notifications
-const CACHE_NAME = 'fotoalert-v1.22.13';
+const CACHE_NAME = 'fotoalert-v1.22.14';
 const STATIC_ASSETS = ['/', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,7 @@ self.addEventListener('activate', e => {
 
 // Network-first für API, Cache-first für Assets
 self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
   if (e.request.url.includes('/api/') || e.request.url.includes('/opportunities') ||
       e.request.url.includes('/locations') || e.request.url.includes('/daily-briefing')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
