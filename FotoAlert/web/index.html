@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.17';
+const APP_VERSION = '1.22.18';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5457,7 +5457,7 @@ const WeatherMap = {
 // ═══════════════════════════════════════════════════════
 const AstroLive = {
   map: null, obs: null, subj: null, lines: [], timer: null, loc: null,
-  _live: true, _day: null, _pending: false,
+  _live: true, _day: null, _pending: false, _windowStart: null,
   GC: { ra: 17.7611, dec: -29.0078 },       // Milchstraßenzentrum (Sgr A*), J2000
   get COL() {
     const cs = getComputedStyle(document.documentElement);
@@ -5486,20 +5486,7 @@ const AstroLive = {
     document.getElementById('astro-content').innerHTML = this._html();
     document.getElementById('astro-overlay').classList.add('open');
     document.getElementById('astro-sheet').classList.add('open');
-    requestAnimationFrame(() => {
-      this._init();
-      const d = new Date(isoDate);
-      const minutes = d.getUTCHours() * 60 + d.getUTCMinutes();
-      this._stopLive();
-      this._t = d.getTime();
-      const slider = document.getElementById('astro-time');
-      if (slider) slider.value = minutes;
-      this.render();
-      const clock = document.getElementById('astro-clock');
-      if (clock) clock.textContent = formatTime(isoDate);
-      const liveBtn = document.getElementById('astro-live');
-      if (liveBtn) { liveBtn.classList.remove('on'); liveBtn.textContent = '● Live'; }
-    });
+    requestAnimationFrame(() => this._focusOnEventTime(isoDate));
   },
 
   openForDate(locId, isoDate) {
@@ -5510,21 +5497,26 @@ const AstroLive = {
     document.getElementById('astro-content').innerHTML = this._html();
     document.getElementById('astro-overlay').classList.add('open');
     document.getElementById('astro-sheet').classList.add('open');
-    requestAnimationFrame(() => {
-      this._init();
-      // Slider auf Shoot-Zeitpunkt der Chance setzen (UTC → Minuten des Tages)
-      const d = new Date(isoDate);
-      const minutes = d.getUTCHours() * 60 + d.getUTCMinutes();
-      this._stopLive();
-      this._t = d.getTime();
-      const slider = document.getElementById('astro-time');
-      if (slider) slider.value = minutes;
-      this.render();
-      const clock = document.getElementById('astro-clock');
-      if (clock) clock.textContent = formatTime(isoDate);
-      const liveBtn = document.getElementById('astro-live');
-      if (liveBtn) { liveBtn.classList.remove('on'); liveBtn.textContent = '● Live'; }
-    });
+    requestAnimationFrame(() => this._focusOnEventTime(isoDate));
+  },
+
+  // BUG-75: gemeinsame Nach-Init-Logik für openForLatLon/openForDate — Datum + Uhrzeit exakt
+  // aus dem vollen Ereignis-Zeitstempel übernehmen (statt "heute" aus setNow()) und den
+  // Zeit-Schieberegler auf ein Fenster Ereigniszeit ±12h zentrieren (Ereigniszeit =
+  // Slider-Mittelpunkt 720), statt auf UTC-Ziffern der Ereigniszeit.
+  _focusOnEventTime(isoDate) {
+    this._init();
+    const d = new Date(isoDate);
+    this._stopLive();
+    this._day = d;
+    this._windowStart = new Date(d.getTime() - 12 * 60 * 60000);
+    const slider = document.getElementById('astro-time');
+    if (slider) slider.value = 720;
+    this.render();
+    const clock = document.getElementById('astro-clock');
+    if (clock) clock.textContent = this._clockText(d);
+    const liveBtn = document.getElementById('astro-live');
+    if (liveBtn) { liveBtn.classList.remove('on'); liveBtn.textContent = '● Live'; }
   },
 
   close() {
@@ -5626,11 +5618,16 @@ const AstroLive = {
   // ---- Zeit-Steuerung ----
   _curDate() {
     const m = +document.getElementById('astro-time').value;
+    // BUG-75-Nachtrag: Ereignis-Öffnen zentriert den Schieberegler auf ein Fenster
+    // Ereigniszeit ±12h (_windowStart = Ereigniszeit −12h, Slider-Minuten = Offset ab dort).
+    // Der "jetzt"/Live-Pfad setzt _windowStart in setNow() immer auf null zurück und bleibt
+    // dadurch unverändert beim bisherigen Kalendertag-Modell.
+    if (this._windowStart) return new Date(this._windowStart.getTime() + m * 60000);
     const d = this._day || new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate(), Math.floor(m / 60), m % 60);
   },
   setNow() {
-    const n = new Date(); this._day = n;
+    const n = new Date(); this._day = n; this._windowStart = null;
     const el = document.getElementById('astro-time'); if (el) el.value = n.getHours() * 60 + n.getMinutes();
   },
   toggleLive() { this._live ? this._stopLive() : this._startLive(); },
@@ -5646,6 +5643,15 @@ const AstroLive = {
     if (this.timer) { clearInterval(this.timer); this.timer = null; }   // Pre-Mortem: kein Interval-Leak
   },
   onScrub() { this._stopLive(); this.render(); },
+  // BUG-75-Nachtrag: Datum neben der Uhrzeit an der Zeitleiste anzeigen (Format TT.MM. · HH:MM Uhr),
+  // damit der Nutzer dem intern korrekten Datum nicht nur vertrauen muss, sondern es auch sieht.
+  // Gilt für alle Render-Pfade (Live-Timer, Scrub, Pin-Drag, Event-Öffnen) einheitlich.
+  _clockText(date) {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const hm = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    return `${dd}.${mm}. · ${hm} Uhr`;
+  },
   _scheduleRender() { if (this._pending) return; this._pending = true; requestAnimationFrame(() => { this._pending = false; this.render(); }); },
 
   // ---- Render ----
@@ -5735,7 +5741,7 @@ const AstroLive = {
     document.getElementById('astro-readout').innerHTML =
       row(sun, 'Sonne', C.sun) + row(moon, 'Mond', C.moon) + row(mw, 'Milchstr.-Zentrum', C.mw) +
       `<div class="ar-row"><i style="background:transparent"></i>Mondphase<b>${Math.round(phase * 100)}% beleuchtet</b></div>`;
-    document.getElementById('astro-clock').textContent = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('astro-clock').textContent = this._clockText(date);
   },
 };
 

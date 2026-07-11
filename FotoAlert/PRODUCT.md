@@ -74,18 +74,18 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 | Kalender-Modus | Button „Jahreskalender" im Feed schaltet auf Monatskalender-Ansicht um; Tap auf Kalender-Event sucht passenden Feed-Eintrag (location_id + ±1h) und übergibt vollständiges Objekt (inkl. weather_details) an Detail-Sheet (BUG-44) |
 
 **Pflicht-Regression Feed:**
-- [ ] Mindestens 1 Karte sichtbar (bei min_score 0.2)
+- [ ] Mindestens 1 Karte sichtbar (bei min_score 0.2) (automatisiert: `test_task67_feed_regression.py`, prüft `main._filter_feed()` direkt — Karten-Rendering selbst bleibt manuell/Etappe 3)
 - [ ] Chance antippen → Detail-Sheet öffnet
 - [ ] Overlay antippen → Sheet schließt sich
 - [ ] Filter-Sheet öffnet und schließt
 - [ ] Score-Ring korrekt (visuelle Überprüfung: 75% = ring 3/4 gefüllt)
-- [ ] Karten nicht doppelt vorhanden
+- [ ] Karten nicht doppelt vorhanden (automatisiert: `test_task67_feed_regression.py`, prüft `main._dedup_best_per_day()`/`_filter_feed()`)
 - [ ] Routine-Events-Filter entfernt Goldene/Blaue-Stunde-Karten
 - [ ] Filter-Chips „Mondaufgang" / „Monduntergang" filtern Feed korrekt (US-79)
-- [ ] Mondaufgang-/Monduntergang-Events erscheinen als eigenständige Karten im Feed (US-79)
-- [ ] Feed enthält sowohl Goldene Stunde als auch Blaue Stunde (nicht nur Mond-Events) — Round-Robin-Cap (BUG-48)
-- [ ] Feed-Karten zeigen Sichtachsen-Check-Pille (Augen-Icon + Grün/Orange/Rot/Grau je nach Status) für Sonne/Mond/Himmelsrichtung UND Golden-Hour/Himmelsröte-Karten (US-09)
-- [ ] Fehlen Höhen-/Gebäudedaten: Pille zeigt „Nicht geprüft" (grau), niemals „Frei" (US-09)
+- [ ] Mondaufgang-/Monduntergang-Events erscheinen als eigenständige Karten im Feed (US-79) (automatisiert: `test_us79_moon_rise_set.py`, Event-Erzeugung + Serialisierung geprüft — Karten-Rendering selbst bleibt manuell/Etappe 3)
+- [ ] Feed enthält sowohl Goldene Stunde als auch Blaue Stunde (nicht nur Mond-Events) — Round-Robin-Cap (BUG-48) (automatisiert: `test_task67_feed_regression.py`, Kernszenario: dominanter Typ verdrängt seltenen Typ nicht aus dem Cap)
+- [ ] Feed-Karten zeigen Sichtachsen-Check-Pille (Augen-Icon + Grün/Orange/Rot/Grau je nach Status) für Sonne/Mond/Himmelsrichtung UND Golden-Hour/Himmelsröte-Karten (US-09) (Datengarantie automatisiert: `test_us09_sightline.py` — Pillen-Darstellung selbst bleibt manuell/Etappe 3)
+- [ ] Fehlen Höhen-/Gebäudedaten: Pille zeigt „Nicht geprüft" (grau), niemals „Frei" (US-09) (automatisiert: `test_us09_sightline.py`)
 
 ---
 
@@ -205,6 +205,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Monduntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-79); fehlt kommentarlos wenn null |
 | Sonnenaufgang in Astronomie-Sektion | Zeigt Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-107); fehlt kommentarlos wenn null (z.B. Polarsommer) |
 | Sonnenuntergang in Astronomie-Sektion | Analog: Uhrzeit (Berliner Zeit) + Azimut in Grad, wenn vorhanden (US-107); fehlt kommentarlos wenn null |
+| Live-Astro-Übersicht aus Ereignis öffnen | Übernimmt exakt Datum + Ortszeit (Berlin) des Ereignisses (nicht „heute"); Zeit-Schieberegler startet zentriert auf der Ereigniszeit und lässt sich ±12h davon navigieren, ohne dass sich das Fenster verschiebt; gilt für Feed-/Kalender-Chancen mit gespeichertem Ort und für Entdecken-Modus-Chancen ohne Ort (BUG-75); Live-Astro direkt aus der Orts-Übersicht („jetzt"-Modus) bleibt unverändert: aktuelles Datum/Uhrzeit, läuft automatisch weiter |
+| Zeitanzeige an der Zeitleiste (Live-Astro) | Zeigt neben der Uhrzeit zusätzlich das Datum, Format „TT.MM. · HH:MM Uhr" (z.B. „18.07. · 22:17 Uhr"); gilt einheitlich in allen Anzeige-Situationen: Ereignis-Öffnen, Schieberegler-Bedienung, Pin-Ziehen und „jetzt"-Live-Modus (BUG-75-Nachtrag) |
 | Koordinaten-Sektion | Kein Overflow-Problem (BUG-38 gefixt); Labels korrekt ausgerichtet |
 | Sheet-Header | Kein blaugrauer Strich links (BUG-39 gefixt) |
 | Karte & Blickwinkel im Vollbild | Sobald die FOV-Karte Motivkoordinaten hat, zeigt sie ein Vollbild-Symbol (oben rechts); antippen öffnet dieselbe Karte (Beobachter-Pin, Motiv-Pin, Sichtachse, Sichtfeld-Kegel) bildschirmfüllend, rein zum Ansehen — Pins lassen sich dort NICHT verschieben, Zoomen/Verschieben der Karte funktioniert normal. Kreuz oben oder Antippen des abgedunkelten Hintergrunds schließt zurück zur Detailansicht. Gilt identisch in allen vier Einstiegspunkten: Chancen-Detail, Kalender-Detail, Scout-Detail, Location-Detail (US-114). Ohne Motivkoordinaten erscheint kein Vollbild-Symbol (wie schon der Hinweistext statt Karte). Getrennt vom Bearbeiten-Vollbild-Overlay (US-87), das nur im Location-Detail-Editiermodus zum Pin-Setzen dient. |
@@ -223,13 +225,13 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] FOV-Karte ohne Motivkoordinaten zeigt kein Vollbild-Symbol (US-114)
 - [ ] „Zum Kalender" → `.ics` Download startet
 - [ ] Street-View-Button nur sichtbar wenn Azimut verfügbar
-- [ ] Astronomie-Sektion zeigt Mondaufgang + Monduntergang mit Uhrzeit + Azimut (wenn vorhanden) (US-79)
-- [ ] Kein Fehler / keine leere Zeile wenn Mondaufgang/-untergang null (US-79)
-- [ ] Astronomie-Sektion zeigt Sonnenaufgang + Sonnenuntergang mit Uhrzeit + Azimut in Grad (US-107)
-- [ ] Kein Azimut-Wert wenn `sunrise_utc`/`sunset_utc` null (kein Placeholder „0°") (US-107)
-- [ ] Sichtachsen-Check-Pille sichtbar mit korrekter Farbe/Text (Grün/Orange/Rot/Grau) — in allen vier Einstiegspunkten identisch (US-09)
+- [ ] Astronomie-Sektion zeigt Mondaufgang + Monduntergang mit Uhrzeit + Azimut (wenn vorhanden) (US-79) (automatisiert: `test_us79_moon_rise_set.py`)
+- [ ] Kein Fehler / keine leere Zeile wenn Mondaufgang/-untergang null (US-79) (automatisiert: `test_us79_moon_rise_set.py`)
+- [ ] Astronomie-Sektion zeigt Sonnenaufgang + Sonnenuntergang mit Uhrzeit + Azimut in Grad (US-107) (automatisiert: `test_task67_detail_regression.py`, prüft `precompute._serialize()` end-to-end — Anzeige selbst bleibt manuell/Etappe 3)
+- [ ] Kein Azimut-Wert wenn `sunrise_utc`/`sunset_utc` null (kein Placeholder „0°") (US-107) (automatisiert: `test_task67_detail_regression.py`)
+- [ ] Sichtachsen-Check-Pille sichtbar mit korrekter Farbe/Text (Grün/Orange/Rot/Grau) — in allen vier Einstiegspunkten identisch (US-09) (Datengarantie automatisiert: `test_us09_sightline.py` — Pillen-Darstellung selbst bleibt manuell/Etappe 3)
 - [ ] Sichtachsen-Linie in FOV-Karte + Kompass-Diagramm zeigt korrekten Linienstil je Status (durchgezogen/gestrichelt/unterbrochen/gepunktet) (US-09)
-- [ ] Fehlende Höhen-/Gebäudedaten → Status „Nicht geprüft" (grau, gepunktet), niemals „Frei" (US-09)
+- [ ] Fehlende Höhen-/Gebäudedaten → Status „Nicht geprüft" (grau, gepunktet), niemals „Frei" (US-09) (automatisiert: `test_us09_sightline.py`)
 
 ---
 
@@ -251,7 +253,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] ≥10 Pins sichtbar
 - [ ] Pin antippen → Popup erscheint
 - [ ] Karte nicht leer nach Theme-Wechsel
-- [ ] Wetter-Overlay „Wolken"/„Niederschlag": weicher Verlauf über DE + Norwegen sichtbar (nicht leer), 72-h-Schieber zeigt Berliner Zeit und ändert die Fläche, Quellenangabe sichtbar (US-112)
+- [ ] Wetter-Overlay „Wolken"/„Niederschlag": weicher Verlauf über DE + Norwegen sichtbar (nicht leer), 72-h-Schieber zeigt Berliner Zeit und ändert die Fläche, Quellenangabe sichtbar (US-112) (Teil automatisiert: `test_us112_weather_map.py` deckt die Datenebene ab — Endpoint liefert Frames/PNG-Bytes statt leer, Attribution-String vorhanden, Cache-Verhalten; ob der Verlauf optisch „weich und gut lesbar" wirkt, bleibt Regel-2-Grenzfall, siehe Example Mapping — manuell/Etappe 3)
 
 ---
 
@@ -282,10 +284,10 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Hinweise-Feld leer gelassen → Speichern funktioniert normal, keine automatische Notiz, keine Hinweise-Sektion sichtbar (BUG-65, Regression zu BUG-60)
 - [ ] Beispielbild in „Optionale Angaben" ausgewählt → nach dem Speichern automatisch hochgeladen, erscheint sofort im Hero-Bereich der neuen Location (US-127)
 - [ ] Kein Beispielbild ausgewählt → Speichern funktioniert normal, Platzhalter „Noch kein Beispielbild" für den Host sichtbar (US-127, Regression)
-- [ ] Standort und Motiv mit echtem Höhenunterschied gesetzt → „Höhenwinkel Spitze" in der Preview-Box zeigt einen Wert ungleich 0,00° (BUG-66)
-- [ ] Standort und Motiv ohne nennenswerten Höhenunterschied gesetzt → „Höhenwinkel Spitze" bleibt nahe 0,00° (BUG-66, Regression)
-- [ ] Neue Location gespeichert, Karten-Tab war vorher schon einmal geöffnet → neuer Marker sofort ohne Reload sichtbar, keine doppelten Marker, aktive Kartenfilter wirken weiterhin (BUG-67)
-- [ ] Neue Location gespeichert, Locations-Tab war vorher schon einmal geöffnet → neuer Eintrag sofort ohne Reload in der Liste sichtbar (BUG-67)
+- [ ] Standort und Motiv mit echtem Höhenunterschied gesetzt → „Höhenwinkel Spitze" in der Preview-Box zeigt einen Wert ungleich 0,00° (BUG-66) (automatisiert: `test_bug66.py`, `TestAngularAltitudeReflectsElevationDifference`)
+- [ ] Standort und Motiv ohne nennenswerten Höhenunterschied gesetzt → „Höhenwinkel Spitze" bleibt nahe 0,00° (BUG-66, Regression) (automatisiert: `test_bug66.py`, `TestAngularAltitudeStaysNearZeroWithoutElevationDifference`)
+- [ ] Neue Location gespeichert, Karten-Tab war vorher schon einmal geöffnet → neuer Marker sofort ohne Reload sichtbar, keine doppelten Marker, aktive Kartenfilter wirken weiterhin (BUG-67) (Datenebene automatisiert: `test_bug67.py`, `TestNewLocationImmediatelyAvailableViaGetLocations` — neue Location ist sofort über `GET /locations` sichtbar; Marker-Rendering auf der Karte selbst bleibt manuell/Etappe 3)
+- [ ] Neue Location gespeichert, Locations-Tab war vorher schon einmal geöffnet → neuer Eintrag sofort ohne Reload in der Liste sichtbar (BUG-67) (Datenebene automatisiert: `test_bug67.py`, siehe oben)
 
 ---
 
@@ -312,25 +314,25 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Beispielbild (Location-Detail) | Host kann pro Location genau ein Beispielbild hochladen/ersetzen (nur Host sieht die Upload-Steuerung); erscheint oben im Hero-Bereich, füllt die Fläche in Hoch- wie Querformat vollständig aus und bleibt dabei immer mittig zum Originalbild zentriert (`object-fit: cover` + `object-position: center`). Server verkleinert/komprimiert automatisch auf ~500 KB und korrigiert die Ausrichtung anhand der EXIF-Information. Ohne Bild bleibt der Bereich für normale Nutzer komplett unsichtbar, für den Host erscheint ein Platzhalter „Noch kein Beispielbild". Ersetzen entfernt die alte Bilddatei; Löschen der Location entfernt ihr Beispielbild ebenfalls automatisch (US-120). Kein Vorschaubild in der Locations-Liste (bewusste Abgrenzung). Zusätzlich kann der Host ein vorhandenes Beispielbild über einen eigenen Löschen-Button eigenständig entfernen (mit Sicherheitsabfrage vor dem endgültigen Löschen, analog zum Löschen einer ganzen Location) — danach erscheint wieder der leere Platzhalter, ohne dass die Location selbst gelöscht werden muss (US-125). Über einen „Ausschnitt wählen"-Button kann der Host außerdem per Klick auf die wichtige Bildstelle selbst festlegen, welcher Bereich in Hoch-/Querformat-Ansicht sichtbar bleibt (Fokuspunkt) — eine rein clientseitige Anzeigeposition, das Originalbild bleibt unverändert; gilt auch nachträglich für bereits vorhandene Bilder (Standard: Bildmitte) und wird beim Ersetzen des Bildes zurückgesetzt (US-126). Der Button selbst ist kontraststark gestaltet (deckende Bauhaus-Akzentfarbe mit dazu passender Textfarbe, gleiches Muster wie der „Fertig"-Knopf im selben Editor) und bleibt dadurch auf jedem Foto-Hintergrund gut lesbar, egal ob sehr dunkel oder sehr hell (BUG-69). Seit BUG-71 bleibt der Bezug zur gerade geöffneten Location auch über die asynchrone Fotoauswahl hinweg zuverlässig erhalten (übersteht auch einen zwischenzeitlichen Neustart der Seite); geht der Bezug ausnahmsweise doch verloren, erscheint immer der Toast „Bitte Location erneut öffnen und Bild noch einmal hochladen" statt eines stillen Abbruchs. Die eigentliche Ursache des ursprünglichen BUG-71-Fehlbilds (Bild-Upload auf iPhone/iOS scheiterte, auf Mac/Safari nicht) lag im Service Worker (`web/sw.js`): dieser fing bislang jede Anfrage per `respondWith()` ab, auch POST-Uploads mit binärem Datei-Inhalt — ein bekannter WebKit/iOS-Bug, der dabei den Request-Body leert. Fix: expliziter Methodenfilter, non-GET-Anfragen laufen jetzt direkt am Service Worker vorbei ans Netzwerk. Released als v1.22.14, auf echtem iPhone verifiziert. |
 
 **Pflicht-Regression Orte:**
-- [ ] ≥15 Karten sichtbar
+- [ ] ≥15 Karten sichtbar (automatisiert: `test_task67_orte_regression.py`)
 - [ ] Suche „Babelsberg" filtert korrekt
 - [ ] Location-Detail-Sheet öffnet und schließt
-- [ ] Abschnitt „Ausrichtung" zeigt Sonnenaufgang/-untergang mit Azimut für heute (US-107)
+- [ ] Abschnitt „Ausrichtung" zeigt Sonnenaufgang/-untergang mit Azimut für heute (US-107) (Datenebene automatisiert: `test_task67_detail_regression.py`, dieselbe `precompute._serialize()`-Logik — Anzeige im Abschnitt „Ausrichtung" selbst bleibt manuell/Etappe 3)
 - [ ] Locations mit Motiv-Koordinaten zeigen Richtungsklassifizierung relativ zum Motiv (US-107)
 - [ ] Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, kein leerer Abschnitt (US-107)
-- [ ] Location-Detail zeigt Sichtachsen-Check-Pille mit korrektem Status + ⓘ-Erklärtext (US-09)
+- [ ] Location-Detail zeigt Sichtachsen-Check-Pille mit korrektem Status + ⓘ-Erklärtext (US-09) (Datengarantie automatisiert: `test_us09_sightline.py` — Pillen-Darstellung selbst bleibt manuell/Etappe 3)
 - [ ] Menüpunkt „Sichtachsen aktualisieren" löst neue Prüfung aus, Pille aktualisiert sich mit dem Ergebnis (US-09)
-- [ ] Anlegen/Ändern einer Location löst automatisch eine Sichtachsenprüfung aus (US-09)
+- [ ] Anlegen/Ändern einer Location löst automatisch eine Sichtachsenprüfung aus (US-09) *(Grenzfall, siehe AK „Edge Case" in TASK-67: Auto-Trigger läuft im precompute-Subprozess (`precompute.py`, Zeile ~1001), ist aber bisher durch keine bestehende oder neue Testdatei abgedeckt — echte Lücke, nicht automatisiert, für eine spätere Etappe vorgemerkt statt stillschweigend als erledigt markiert)*
 - [ ] Edit → Speichern → Änderung sofort in Sheet + Liste sichtbar (kein Reload nötig)
 - [ ] Close-Button erreichbar (Safe Area — BUG-25 gefixt)
 - [ ] Bearbeiten-Karte: Vollbild-Symbol öffnet bildschirmfüllendes Overlay, Pins darin setzbar, Schließen übernimmt Position in kleine Karte (US-87)
 - [ ] Location-Karten (Anlegen/Bearbeiten/Kegel-Vorschau) zeigen Satellit/Straße-Umschalter; Umschalten verliert keine Pins/Zoom; gewählte Ansicht bleibt nach Schließen/erneutem Öffnen erhalten; Karten-Tab (`MapView`) unverändert (US-123)
-- [ ] Host kann Beispielbild hochladen/ersetzen, Bild füllt Hero-Bereich mittig in Hoch- und Querformat; ohne Bild kein Platzhalter für normale Nutzer; Nicht-Host sieht keine Upload-Steuerung (US-120)
-- [ ] Host kann vorhandenes Beispielbild über eigenen Löschen-Button entfernen, Sicherheitsabfrage erscheint vorher, danach wieder Platzhalter (US-125)
-- [ ] Host kann über „Ausschnitt wählen" per Klick einen Fokuspunkt setzen, sichtbarer Bildausschnitt verschiebt sich entsprechend in Hoch- und Querformat; gilt auch nachträglich für bereits vorhandene Bilder; wird beim Ersetzen des Bildes zurückgesetzt (US-126)
+- [ ] Host kann Beispielbild hochladen/ersetzen, Bild füllt Hero-Bereich mittig in Hoch- und Querformat; ohne Bild kein Platzhalter für normale Nutzer; Nicht-Host sieht keine Upload-Steuerung (US-120) (Datenebene automatisiert: `test_us120.py` — Upload/Resize/EXIF-Korrektur; Hero-Bereich-Darstellung selbst bleibt manuell/Etappe 3)
+- [ ] Host kann vorhandenes Beispielbild über eigenen Löschen-Button entfernen, Sicherheitsabfrage erscheint vorher, danach wieder Platzhalter (US-125) (Datenebene automatisiert: `test_us_125.py` — Lösch-Endpoint entfernt `image_url` + Datei; Sicherheitsabfrage-Dialog selbst bleibt manuell/Etappe 3)
+- [ ] Host kann über „Ausschnitt wählen" per Klick einen Fokuspunkt setzen, sichtbarer Bildausschnitt verschiebt sich entsprechend in Hoch- und Querformat; gilt auch nachträglich für bereits vorhandene Bilder; wird beim Ersetzen des Bildes zurückgesetzt (US-126) (Datenebene automatisiert: `test_us_126.py` — `image_focus_x`/`image_focus_y`-Persistenz + Reset beim Ersetzen; Klick-Interaktion selbst bleibt manuell/Etappe 3)
 - [ ] Location mit Hinweise-Text: eigene Sektion „Hinweise" direkt nach „Ausrichtung" sichtbar, ohne „Bearbeiten" zu öffnen; rein lesend, kein Eingabefeld (BUG-65)
 - [ ] Location ohne Hinweise-Text: keine Hinweise-Sektion sichtbar, kein leerer Kasten (BUG-65)
-- [ ] Bauwerkshöhe/-breite im Bearbeiten-Modus geändert → löst automatisch Neuberechnung aus (Feed + Kalender); Wert bleibt nach Server-Neustart UND nach einem precompute-Lauf erhalten (US-128)
+- [ ] Bauwerkshöhe/-breite im Bearbeiten-Modus geändert → löst automatisch Neuberechnung aus (Feed + Kalender); Wert bleibt nach Server-Neustart UND nach einem precompute-Lauf erhalten (US-128) (automatisiert: `test_us_128.py`, `TestRecomputeTriggered` + `TestStandardLocationOverrideReloadSurvivesRestart` + `TestPrecomputeSubprocessSeesHeightAndWidthOverride`)
 
 ---
 
@@ -378,8 +380,8 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Slider auf 80% → Feed-Reload → weniger Karten
 - [ ] Theme-Umschalter ändert sofort das Erscheinungsbild
 - [ ] Theme-Auswahl überlebt App-Reload
-- [ ] Nach Host-Login sofort „Host" sichtbar (kein Browser-Refresh nötig) (BUG-47)
-- [ ] Nach Logout und erneutem Login als User → „User" sichtbar
+- [ ] Nach Host-Login sofort „Host" sichtbar (kein Browser-Refresh nötig) (BUG-47) (Serverseitiger Vertrag automatisiert: `test_task67_auth_regression.py`/`test_us66_login.py` — Rollenvergabe + Token-Präfix-Ableitung; sichtbarer Text im Tab bleibt manuell/Etappe 3)
+- [ ] Nach Logout und erneutem Login als User → „User" sichtbar (Serverseitiger Vertrag automatisiert: `test_task67_auth_regression.py`/`test_us66_login.py`, siehe oben)
 
 ---
 
@@ -395,11 +397,11 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Rollen-Ableitung | `CFG.role` wird als Getter aus dem Token-Präfix (`fa_token`) gelesen — kein Fallback auf `fa_role` localStorage-Key; nach Login `App.init()` + `App.nav('feed')` sorgen für korrektes Re-Render des Settings-Tabs (BUG-47) |
 
 **Pflicht-Regression Auth:**
-- [ ] Nicht-eingeloggter Zugriff → Login-Screen erscheint
-- [ ] Login als Host → alle Tabs erreichbar, Einstellungen zeigen sofort „Host"
-- [ ] Login als User → Einstellungen zeigen „User"
-- [ ] App-Reload nach Host-Login → Einstellungen zeigen weiterhin „Host" (Token-Präfix-Auswertung)
-- [ ] Geschützte Endpoints ohne Token → HTTP 401
+- [ ] Nicht-eingeloggter Zugriff → Login-Screen erscheint (automatisiert: `test_task67_auth_regression.py`, serverseitiger Vertrag geprüft — DOM-Sichtbarkeit selbst bleibt manuell, s. Datei-Docstring)
+- [ ] Login als Host → alle Tabs erreichbar, Einstellungen zeigen sofort „Host" (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`, Rollenvergabe + Endpunktschutz geprüft — sichtbarer Tab/Text bleibt manuell)
+- [ ] Login als User → Einstellungen zeigen „User" (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`, Rollenvergabe geprüft — sichtbarer Text bleibt manuell)
+- [ ] App-Reload nach Host-Login → Einstellungen zeigen weiterhin „Host" (Token-Präfix-Auswertung) (automatisiert: `test_task67_auth_regression.py`, Token-Decodierstabilität über wiederholte "Reloads" geprüft — sichtbarer Text bleibt manuell)
+- [ ] Geschützte Endpoints ohne Token → HTTP 401 (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`)
 
 ---
 
@@ -419,7 +421,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | `/login` | POST | JWT-Token (Prod only; lokal: `auth.issue_token()`) |
 | `/run-qa-pass` | POST | Stößt den Standort-Qualitätslauf sofort an, statt auf die Nacht zu warten (auth: host) |
 
-**Pflicht-Regression Backend:**
+**Pflicht-Regression Backend:** (automatisiert: `test_task67_backend_regression.py`, läuft im CI-Gate mit)
 ```bash
 # Schnell-Check (alle 5 in einem Durchlauf):
 curl -s http://localhost:8000/health | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['status']=='ok'; print('✅ Health OK')"
@@ -428,6 +430,11 @@ curl -s "http://localhost:8000/opportunities?min_score=0.1&days=14" | python3 -c
 curl -s http://localhost:8000/discover | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✅ Scout OK ({len(d)} Events)')"
 curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✅ Kalender OK ({len(d)} Events)')"
 ```
+- Health → 1:1 automatisiert (`test_health`).
+- Locations → 1:1 automatisiert (`test_locations`).
+- Feed (`/opportunities`) → automatisiert (`test_feed_opportunities`, prüft Liste + Status statt Event-Anzahl).
+- Scout (`/discover`) → automatisiert (`test_scout_discover`); **Befund bei Gelegenheit dieser Etappe:** `/discover` liefert ein dict (`{"status", "opportunities", ...}`), keine flache Liste — der obige curl-Einzeiler zählt daher fälschlich `len(d)` über die Dict-Keys (immer 4), nicht über die Events; der automatisierte Test prüft stattdessen korrekt, dass `d["opportunities"]` eine Liste ist.
+- Kalender (`/calendar`) → automatisiert (`test_calendar`); gleicher Befund wie bei Scout (`/calendar` liefert ebenfalls ein dict mit `"events"`-Liste, kein flaches Array).
 
 ---
 
@@ -446,13 +453,13 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 | Sofort-Auslöser | Ein geschützter Auslöser (nur für den Host) startet diesen Qualitätslauf bei Bedarf sofort, ohne auf die Nacht zu warten. |
 
 **Pflicht-Regression Standort-Automatik:**
-- [ ] Neuer Standort ohne Blickrichtung erhält nach dem Lauf eine automatische Blickrichtung
-- [ ] Standort ohne Brennweiten-Empfehlung erhält nach dem Lauf eine Empfehlung
-- [ ] Standort ohne Beschreibung erhält nach dem Lauf einen automatisch erzeugten deutschen Text
-- [ ] Manuell gesetzte/gesperrte Werte (inkl. Beschreibung) bleiben nach dem Lauf unverändert
-- [ ] Unveränderte Standorte werden nicht erneut durchgerechnet (nur geänderte/neue)
-- [ ] Automatische Werte erscheinen nach der Neuberechnung in Feed + Kalender
-- [ ] Sofort-Auslöser ohne Host-Token → HTTP 401
+- [ ] Neuer Standort ohne Blickrichtung erhält nach dem Lauf eine automatische Blickrichtung (automatisiert: `test_task45_azimuth.py`, `test_unlocked_is_written`)
+- [ ] Standort ohne Brennweiten-Empfehlung erhält nach dem Lauf eine Empfehlung (automatisiert: `test_task47_focal.py`, `test_unlocked_empty_is_written`)
+- [ ] Standort ohne Beschreibung erhält nach dem Lauf einen automatisch erzeugten deutschen Text (automatisiert: `test_task46_descriptions.py`, `test_description_written_when_empty`)
+- [ ] Manuell gesetzte/gesperrte Werte (inkl. Beschreibung) bleiben nach dem Lauf unverändert (automatisiert: `test_task45_azimuth.py`/`test_task46_descriptions.py`/`test_task47_focal.py`, je `test_lock_is_respected`/`test_description_lock_respected`)
+- [ ] Unveränderte Standorte werden nicht erneut durchgerechnet (nur geänderte/neue) (automatisiert: `test_task48_qa_cron.py`, `test_unchanged_checked_is_skipped`)
+- [ ] Automatische Werte erscheinen nach der Neuberechnung in Feed + Kalender (automatisiert: `test_task48_qa_cron.py`, `test_apply_qa_values_patches_location` + `test_apply_qa_values_merge_order`)
+- [ ] Sofort-Auslöser ohne Host-Token → HTTP 401 (automatisiert: `test_task48_qa_ondemand.py`, `TestRunQaPassEndpoint::test_without_token_rejected`)
 
 ---
 
@@ -467,9 +474,9 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 | Wiederherstellung schließt Fotos ein | Beim Zurückspielen einer Sicherung (Restore) werden seit TASK-55 auch die Standort-Fotos mit wiederhergestellt, vorher nur die Standort-Daten. |
 
 **Pflicht-Regression Backup:**
-- [ ] Foto hochladen → im Hintergrund läuft die Sicherung mit (keine sichtbare Wartezeit für Stephan)
-- [ ] Foto löschen/ersetzen → alte Version verschwindet auch aus der Sicherung
-- [ ] Restore spielt Standort-Daten UND Standort-Fotos zurück
+- [ ] Foto hochladen → im Hintergrund läuft die Sicherung mit (keine sichtbare Wartezeit für Stephan) (automatisiert: `test_task55_image_backup.py`, `test_new_image_is_copied_to_backup` + `test_replaced_image_content_is_updated_in_backup`)
+- [ ] Foto löschen/ersetzen → alte Version verschwindet auch aus der Sicherung (automatisiert: `test_task55_image_backup.py`, `test_deleted_image_is_removed_from_backup`)
+- [ ] Restore spielt Standort-Daten UND Standort-Fotos zurück *(Grenzfall: im Code existiert aktuell keine Restore-Funktion — Wiederherstellung ist ein manueller Ops-Vorgang auf dem Server (git checkout aus dem Backup-Repo), kein automatisierbarer Code-Pfad. Bleibt bewusst manuell/Server-Ops, nicht Etappe-3-Playwright-Scope, da keine App-UI involviert ist)*
 
 ---
 
@@ -599,7 +606,9 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-10 | BUG-69 | Bildausschnitt-Button jetzt gut lesbar auf jedem Foto-Hintergrund |
 | 2026-07-11 | BUG-70 | Datenbank-Korruption in `location_qa_values` durch einen harten Prozess-Abbruch (OOM-Kill) repariert. Code-Härtung: `LocationStore.integrity_check()` liefert jetzt eine vollständige Fehlerliste statt nur einer einzelnen Zeile und wirft auch bei stark beschädigten Datenbanken keine ungefangene Exception mehr; Ladefehler beim Server-Start werden jetzt als ERROR statt WARNING geloggt (fällt beim Monitoring auf statt unterzugehen); zusätzlich läuft beim Start jetzt generell eine Integritätsprüfung. Für eine eventuelle erneute Reparatur steht das Skript `tools/repair_bug70_qa_values.py` bereit. |
 | 2026-07-11 | BUG-71 | Beispielbild-Upload (Location-Detail + Anlage-Formular) behält den Location-/Draft-Bezug jetzt robust über die asynchrone Fotoauswahl hinweg; fehlt der Bezug dennoch, erscheint ein Toast statt eines stillen Abbruchs. Released als v1.22.11. |
+| 2026-07-11 | BUG-75 | Live-Astro-Übersicht übernimmt beim Öffnen aus einem Ereignis (Feed/Kalender-Chance mit gespeichertem Ort UND Entdecken-Modus-Chance ohne Ort) jetzt exakt Datum + Ortszeit (Berlin) des Ereignisses statt „heute"; behebt zusätzlich einen ca. 2-Stunden-Versatz durch fälschlich als Ortszeit interpretierte UTC-Ziffern. Nachtrag: Zeit-Schieberegler startet beim Ereignis-Öffnen zentriert genau auf der Ereigniszeit und lässt sich ±12h in beide Richtungen navigieren (`_windowStart`-Fensterlogik in `AstroLive._curDate()`, additiv/abwärtskompatibel — ohne gesetztes Fenster exakt das alte Kalendertag-Verhalten). Zweiter Nachtrag: Die Zeitanzeige an der Zeitleiste zeigt jetzt zusätzlich das Datum (Format „TT.MM. · HH:MM Uhr“, `AstroLive._clockText()`), einheitlich in allen Render-Pfaden (Live-Timer, Scrub, Pin-Drag, Event-Öffnen). „Jetzt"-Live-Modus (Orts-Übersicht) unverändert außer der neuen Datumsanzeige. Status In Progress — Test/Release ausstehend. |
 | 2026-07-11 | TASK-64 | Backend-pytest-Suite läuft jetzt als Pflicht-Gate vor jedem Deploy (paralleler CI-Job, ~2 Min Laufzeit) |
 | 2026-07-11 | BUG-71 | Nachtrag: Service-Worker-Methodenfilter behebt 0-Byte-Bild-Upload auf iOS |
 | 2026-07-11 | TASK-66 | Bestehender Playwright-Frontend-Check im CI-Gate (TASK-64) um drei echte Bedien-Durchläufe erweitert: Location über den „+"-Tab anlegen (erscheint danach in `GET /locations` + als zusätzlicher Kartenmarker), Beispielbild gezielt über das Location-Detail-Sheet hochladen (BUG-71-Regressionsschutz, eigener isolierter Host-Login), Wahrscheinlichkeits-Filter auf einen deterministischen Extremwert setzen und zurücksetzen. Kein Cleanup nötig (jeder CI-Lauf startet mit frischer, nicht geteilter Dev-Datenbank). Reines Test-Tooling, keine sichtbare App-Änderung. |
 | 2026-07-11 | TASK-65 | Neuer generischer Feld-Rundreise-Test (`test_task_65_field_roundtrip.py`, 65 Testfälle) sichert dauerhaft ab, dass jedes Location-Feld einen Server-Neustart und einen precompute-Lauf übersteht — auch Felder, die es heute noch nicht gibt (Regressionsschutz gegen die BUG-50/61/68-Fehlerklasse). Reines Test-Tooling, keine Produktivcode-Änderung. |
+| 2026-07-11 | TASK-67 (Etappe 2) | PRODUCT.md-Pflichtliste weiter automatisiert: neue Testdateien `test_task67_feed_regression.py` (Round-Robin-Cap BUG-48, Dedup, Min-Score-Filter direkt auf `main._filter_feed()`), `test_task67_detail_regression.py` (Sonnenaufgang/-untergang-Azimut inkl. Null-Guard, US-107, end-to-end über `precompute._serialize()`) und `test_task67_orte_regression.py` (≥15 Locations). Für den überwiegenden Rest der 11 restlichen PRODUCT.md-Abschnitte (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) bestand bereits Testabdeckung an anderer Stelle (u.a. `test_us09_sightline.py`, `test_us79_moon_rise_set.py`, `test_us112_weather_map.py`, `test_bug66.py`, `test_bug67.py`, `test_us120.py`/`test_us_125.py`/`test_us_126.py`, `test_us_128.py`, `test_task45/46/47/48_*.py`, `test_task55_image_backup.py`) — diese wurde in PRODUCT.md referenziert statt dupliziert. Standort-Automatik-Abschnitt (11a) ist damit vollständig referenziert automatisiert, Backup-Abschnitt (11b) bis auf die reine Server-Ops-Restore-Funktion (kein Code-Pfad vorhanden). Zwei Grenzfälle bewusst NICHT als automatisiert markiert: (1) automatischer Sichtachsen-Trigger beim Anlegen/Ändern einer Location (Orte-Abschnitt, läuft im precompute-Subprozess, aber ungetestet), (2) Wetter-Overlay-optische Beurteilung (Karte-Abschnitt, nur Teil automatisiert). Reines Test-/Dokumentations-Tooling, keine Produktivcode-Änderung. Filter (3a) und Global UI (Abschnitt 2) bleiben in dieser Etappe komplett unautomatisiert, da alle dortigen Pflicht-Regression-Punkte echte Klick-/DOM-Interaktion oder rein optische Beurteilung voraussetzen (Etappe 3, Playwright). |

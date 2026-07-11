@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **BUG-75** *(Live-Astro-Übersicht: falsches Datum/falsche Uhrzeit bei Ereignissen)* |
+| **🔄 In Progress** | wird gerade implementiert | **BUG-75** *(Live-Astro-Übersicht: falsches Datum/falsche Uhrzeit bei Ereignissen)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope, Implementierung gestartet 2026-07-11)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -11202,23 +11202,142 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 
 ---
 
-### TASK-67 · PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen `[ ]`
+### TASK-67 · PRODUCT.md-Pflicht-Regression in automatisierte Tests überführen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-11 |
 
-**Beschreibung:** Die Pflicht-Regressionsliste in PRODUCT.md (nach jeder Implementierung alle bestehenden Funktionen prüfen) wird heute komplett manuell abgearbeitet. Dieses Ticket überführt die automatisierbaren Punkte schrittweise in echte Tests (pytest bzw. Playwright-Durchläufe, je nach Punkt), die dann im CI-Gate mitlaufen. Am Ende bleibt in PRODUCT.md nur noch eine kleine Restliste, die wirklich Menschenaugen braucht: rein Visuelles und iOS-Haptik.
+**Beschreibung:** Die Pflicht-Regressionsliste in PRODUCT.md (nach jeder Implementierung alle bestehenden Funktionen prüfen) wird heute komplett manuell abgearbeitet. Dieses Ticket überführt die automatisierbaren Punkte in echte Tests (pytest bzw. Playwright-Durchläufe, je nach Punkt), die dann im CI-Gate mitlaufen. Am Ende bleibt in PRODUCT.md nur noch eine kleine Restliste, die wirklich Menschenaugen braucht: rein Visuelles und iOS-Haptik.
 
-**User Story:** Als Betreiber der App, möchte ich, dass die Pflicht-Regressionsliste so weit wie möglich automatisch geprüft wird, sodass ich bei jeder Änderung nur noch das von Hand ansehen muss, was eine Maschine nicht beurteilen kann.
+**Scope-Erweiterung (Stephan, 2026-07-11):** TASK-69 („Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche") wurde inhaltlich in dieses Ticket aufgenommen. TASK-67 deckt damit zusätzlich zu den PRODUCT.md-Pflicht-Abschnitten auch die bisher komplett ungetesteten Kernbereiche ab: Kalender-Ansicht, Filter (Orte + Chancen-Übersicht, Ein-/Ausschluss), Bewertungsfunktion für Orte (Anlegen/Abrufen/Löschen), das Detail-Fenster einer Chance, die Wetter-Kartenansicht (Zeitregler, Ebenen-Umschalter), der Schnell-Anlegen-Ablauf für neue Orte, der Entdecken-Modus sowie die fünf weiteren ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen). TASK-69 wird dadurch als Duplikat/Teilmenge geschlossen (siehe dort). Der gesamte Umfang (alle 13 PRODUCT.md-Abschnitte + die genannten TASK-69-Bereiche) wird **in einem Zug** umgesetzt, nicht abschnittsweise — siehe Entscheidung zu Frage 1 + Frage 2 unten.
 
-**Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting); letztes Glied der Kette — setzt sinnvollerweise auf **TASK-64** (Gate) und **TASK-66** (Klick-Durchläufe) auf, weil viele PRODUCT.md-Punkte Bedien-Abläufe sind. Verwandt: Memory-Regeln `feedback_regression_testing` und `feedback_product_md` (PRODUCT.md ist die Basis der Regression) — dieses Ticket automatisiert genau diese Pflicht, hebt sie aber nicht auf: PRODUCT.md bleibt die inhaltliche Quelle.
+**User Story:** Als Betreiber der App, möchte ich, dass die Pflicht-Regressionsliste so weit wie möglich automatisch geprüft wird — inklusive der bisher komplett ungetesteten Kernbereiche wie Kalender, Filter, Bewertungen, Detail-Fenster, Wetterkarte, Schnell-Anlegen und Entdecken-Modus —, sodass ich bei jeder Änderung nur noch das von Hand ansehen muss, was eine Maschine nicht beurteilen kann.
+
+**Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting); setzt sinnvollerweise auf **TASK-64** (Gate) und **TASK-66** (Klick-Durchläufe) auf, weil viele PRODUCT.md-Punkte Bedien-Abläufe sind. Nimmt **TASK-69** inhaltlich vollständig auf (Stephans Entscheidung 2026-07-11, s. Scope-Erweiterung oben) — TASK-69 wird als Duplikat geschlossen, bleibt aber inhaltlich stehen (Bezug: BUG-44, BUG-46, BUG-51, BUG-55, BUG-58, BUG-59, BUG-62, BUG-67, die genau in diesen Bereichen auftraten). Verwandt: Memory-Regeln `feedback_regression_testing` und `feedback_product_md` (PRODUCT.md ist die Basis der Regression) — dieses Ticket automatisiert genau diese Pflicht, hebt sie aber nicht auf: PRODUCT.md bleibt die inhaltliche Quelle.
 
 **Quelle:** fotoalert-intake, 2026-07-11
+
+---
+
+## Analyse (fotoalert-analyze, 2026-07-11)
+
+📎 **Code-Verifikation vor dem Mapping:** `FotoAlert/PRODUCT.md` vollständig gelesen (13 „Pflicht-Regression"-Abschnitte, insgesamt rund 90 Einzelpunkte: Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Auth, Backend, Standort-Automatik, Backup, CI/Deploy-Testing). Bestehende Test-Infrastruktur geprüft: `backend/tests/` enthält bereits ~35 pytest-Dateien (u. a. `test_api_smoke.py`, `test_api_regression.py`, `test_us66_login.py` für Auth, `test_task48_qa_cron.py`/`test_task48_qa_ondemand.py` für Standort-Automatik, `test_task55_image_backup.py` für Backup) sowie den erweiterten Playwright-Check aus TASK-66 (`backend/tests/frontend/run_frontend_check.py` + `spec.py`, deckt inzwischen Location-Anlegen, Bild-Upload, Filter-Reduktion ab). Vieles aus der PRODUCT.md-Liste hat also schon *irgendeine* Testabdeckung an anderer Stelle — dieses Ticket muss in erster Linie **abgleichen und Lücken benennen**, nicht bei null anfangen.
+
+**Wichtiger Befund vor dem Mapping — Überschneidung mit TASK-69:** Am selben Tag wurde **TASK-69** angelegt („Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche") mit inhaltlich sehr ähnlichem Ziel: fehlende automatisierte Tests für Kalender, Filter, Bewertungen, Detail-Sheet, Wetterkarte, Schnell-Anlegen, Entdecken-Modus zu ergänzen. Das sind **dieselben App-Bereiche**, die auch in der PRODUCT.md-Pflicht-Regressionsliste stehen. TASK-69 nähert sich der Sache von „welche Endpunkte/Abläufe haben noch GAR KEINEN Test" (Bottom-up, aus Bug-Historie abgeleitet); TASK-67 nähert sich von „welche der bestehenden manuellen Pflicht-Prüfpunkte in PRODUCT.md lassen sich automatisieren" (Top-down, aus der Checkliste abgeleitet). Ohne Abgrenzung drohen doppelt gebaute Tests für z. B. Filter, Detail-Sheet und Quick-Add.
+
+**Annahmen-Protokoll:**
+
+✅ **Frage 1 — beantwortet (Stephan, 2026-07-11):** Verhältnis zu TASK-69.
+  **Entscheidung: Option A — Zusammenlegen.** TASK-69 wird inhaltlich in TASK-67 aufgenommen (ein gemeinsamer Umsetzungsstrang); TASK-69 wird als Duplikat/Teilmenge geschlossen (Status-Verweis in TASK-69, Inhalt bleibt zur Nachvollziehbarkeit dort stehen). Die ursprünglich im Weg-Gate erwogene Option B („sauber trennen nach Reihenfolge") wurde damit nicht gewählt.
+  *(Ursprüngliche Optionen zur Nachvollziehbarkeit erhalten:)*
+  Option A — **Zusammenlegen:** TASK-69 wird in TASK-67 aufgenommen (ein gemeinsamer Umsetzungsstrang), TASK-69 wird als Duplikat/Teilmenge geschlossen. Vorteil: keine doppelte Planung. Nachteil: TASK-67 wird dadurch sehr groß.
+  Option B — **Sauber trennen nach Reihenfolge:** TASK-69 zuerst (baut Tests für Bereiche, die *komplett* ungetestet sind — Kalender, Bewertungen, Wetterkarte, Entdecken-Modus, Tagesübersicht etc.). TASK-67 kommt danach und arbeitet strikt die PRODUCT.md-Checkliste ab; überall wo TASK-69 bereits einen Test gebaut hat, verweist TASK-67 nur noch per Kommentar in PRODUCT.md darauf, statt ihn neu zu schreiben. TASK-67 deckt zusätzlich die Punkte ab, die TASK-69 nicht anfasst (Backend/Auth-Schnellchecks, Standort-Automatik, Backup, globale UI-Zustände).
+  Option C — **Unabhängig parallel laufen lassen**, mit der Vorgabe „wer zuerst einen Bereich testet, gewinnt" und späterer manueller Bereinigung von Überschneidungen. Höchstes Duplikat-Risiko, nicht empfohlen.
+  *(Für die weitere Spec unten wurde vorläufig mit Option B geplant — überholt durch Stephans Entscheidung oben.)*
+
+✅ **Frage 2 — beantwortet (Stephan, 2026-07-11):** Scope-Slice — kompletter Umbau oder abschnittsweise?
+  **Entscheidung: Option B — Alles auf einmal.** Der komplette Umfang (alle 13 PRODUCT.md-Pflicht-Abschnitte / ~90 Einzelpunkte, inklusive der TASK-69-Bereiche) wird in diesem einen Ticket TASK-67 umgesetzt, nicht abschnittsweise. Die ursprünglich empfohlene Option A (kleiner erster Schritt Backend+Auth, Rest als Folge-Tickets) wurde damit bewusst überstimmt.
+  *(Ursprüngliche Optionen zur Nachvollziehbarkeit erhalten:)*
+  Option A — **Ein Ticket, ein Abschnitt zuerst** (ursprünglich empfohlen): TASK-67 liefert in diesem Durchlauf nur Backend+Auth automatisiert + die PRODUCT.md-Markierungslogik (wie ein automatisierter Punkt kenntlich gemacht wird) als wiederverwendbares Muster; für jeden weiteren Abschnitt entsteht ein eigenes kleines Folge-Ticket.
+  Option B — **Alles in einem Rutsch**: Ein einziger, sehr großer Implementierungsschritt für alle 13 Abschnitte.
+
+**Example Mapping:**
+
+📏 **Regel 1** — Ein Pflicht-Regressions-Punkt aus PRODUCT.md wird automatisiert, wenn er sich rein über Daten/Zustände prüfen lässt (API-Antwortwerte, Vorhandensein/Text eines DOM-Elements, Zähler, Umschalt-Zustände) — unabhängig davon, ob die Prüfung technisch als Backend-pytest oder als Playwright-Klick-Test läuft.
+- 🟢 Positiv: „Geschützte Endpoints ohne Token → HTTP 401" (Pflicht-Regression Auth) → wird zu einem pytest-Fall, der einen geschützten Endpunkt ohne Token aufruft und den Statuscode prüft.
+- 🔴 Negativ: „Score-Ring korrekt (visuelle Überprüfung: 75% = ring 3/4 gefüllt)" (Pflicht-Regression Feed) bleibt manuell — das ist eine optische Beurteilung eines gefüllten Kreisrings, kein Text/Zahlenwert, den ein Test ohne Bildvergleich sauber prüfen könnte.
+
+📏 **Regel 2** — Ein Punkt bleibt bewusst in der manuellen Restliste, wenn er echtes menschliches Sehen (Farbverlauf-Optik, Kontrast, Bildausschnitt) oder ein Verhalten voraussetzt, das der automatisierte Check-Browser (Chromium/Playwright) technisch gar nicht abbilden kann (z. B. Safari-/WebKit-spezifisches Rendering, iOS-native Haptik).
+- 🟢 Beispiel: „Alle Icons sichtbar in Safari (SVG `<use>` + `currentColor`-Attribute)" bleibt manuell — der bestehende Playwright-Check läuft auf Chromium, nicht auf WebKit; genau dieser Fehlerklasse (Icon in Safari unsichtbar, in Chrome sichtbar) begegnet die Projekt-Erfahrung bereits (Memory `reference_svg_use_currentcolor_webkit`) — ein grüner Chromium-Test hätte den Bug nicht gefangen.
+- 🟢 Edge-Beispiel: „Wetter-Overlay: weicher, fließender Verlauf sichtbar (nicht leer)" (Pflicht-Regression Karte) ist ein Grenzfall — „nicht leer" (Bild-Response vorhanden, Größe > 0 Byte) ist automatisierbar, „weich und fließend wirkend" ist eine optische Beurteilung. Der Punkt wird deshalb in zwei Teile zerlegt: automatisierter Teil (Response kommt, ist kein leeres/graues Bild) + manueller Rest (wirkt der Verlauf gut lesbar).
+
+📏 **Regel 3** — Die Umsetzung erfolgt abschnittsweise (siehe Frage 2); jeder umgesetzte PRODUCT.md-Punkt wird direkt an seiner Stelle mit einem Verweis auf die zuständige Testdatei markiert, damit für Stephan jederzeit ohne Nachfragen sichtbar ist, was schon automatisch geprüft wird und was noch manuell bleibt.
+- 🟢 Beispiel: „Nicht-eingeloggter Zugriff → Login-Screen erscheint" bekommt in PRODUCT.md den Zusatz „(automatisiert: `test_task67_auth_regression.py`)".
+
+**Akzeptanzkriterien** *(erweitert auf den vollen, zusammengelegten Scope — Stephans Entscheidung zu Frage 1 + Frage 2: alles auf einmal, inklusive TASK-69-Bereiche; in Alltagssprache, technische Umsetzungsdetails siehe „Technische Notiz" weiter unten)*:
+
+*Ursprünglicher Kernbereich (PRODUCT.md-Pflichtliste):*
+- [x] Jeder der 5 Punkte unter „Pflicht-Regression Backend" (Health, Locations, Feed, Kalender, Scout jeweils per curl-Schnellcheck) hat einen automatisierten Test, der im CI-Gate mitläuft. *(Etappe 1, 2026-07-11: `test_task67_backend_regression.py`, lokal grün)*
+- [x] Jeder der 5 Punkte unter „Pflicht-Regression Auth" (Login-Screen ohne Session, Host sieht alle Tabs, User sieht „User", Rolle übersteht Reload, geschützter Endpoint ohne Token → 401) hat einen automatisierten Test. *(Etappe 1, 2026-07-11: `test_task67_auth_regression.py` + bestehende `test_us66_login.py`, lokal grün; DOM-Sichtbarkeit selbst bleibt Playwright-Scope einer späteren Etappe)*
+- [~] Alle übrigen automatisierbaren Punkte aus den restlichen 11 PRODUCT.md-Pflicht-Abschnitten (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) haben ebenfalls einen automatisierten Test, soweit sie sich laut Regel 1 rein über Daten/Zustände prüfen lassen. *(Etappe 2, 2026-07-11: alle pytest-fähigen Punkte, die sich ohne Browser-Klick prüfen lassen, sind jetzt erledigt — neue Dateien `test_task67_feed_regression.py` (Round-Robin/Dedup/Min-Score), `test_task67_detail_regression.py` (Sonnenaufgang/-untergang-Azimut, US-107), `test_task67_orte_regression.py` (≥15 Locations); der weit überwiegende Rest der elf Abschnitte war bereits an anderer Stelle abgedeckt und wurde referenziert statt dupliziert (u.a. `test_us09_sightline.py`, `test_us79_moon_rise_set.py`, `test_us112_weather_map.py`, `test_bug66/67.py`, `test_us120/125/126/128.py`, `test_task45/46/47/48_*.py`, `test_task55_image_backup.py`). Global UI (Abschnitt 2) und Filter (3a) bleiben komplett unautomatisiert — dort setzt jeder Pflicht-Regression-Punkt echte Klick-/DOM-Interaktion voraus (Playwright, Etappe 3). Zwei bewusste Grenzfälle NICHT als erledigt markiert (siehe PRODUCT.md): der automatische Sichtachsen-Trigger beim Anlegen/Ändern einer Location (läuft im precompute-Subprozess, aber bisher ungetestet) und die Backup-Restore-Funktion (kein Code-Pfad im Repo vorhanden, reiner Server-Ops-Vorgang). Damit ist dieses AK noch nicht zu 100% erfüllt — Playwright-Anteil + der Sichtachsen-Trigger-Test folgen in Etappe 3.)*
+- [~] In PRODUCT.md steht bei jedem automatisierten Punkt ein sichtbarer Verweis auf die zuständige Testdatei.
+- [~] Am Ende von PRODUCT.md existiert eine kompakte „Nur manuell prüfbar"-Restliste mit den Punkten, die laut Regel 2 bewusst nicht automatisiert werden (rein Visuelles, Safari-/WebKit-Besonderheiten, iOS-Haptik).
+- [~] Edge Case: Ein neuer Pflicht-Regressions-Punkt, der weder eindeutig automatisierbar noch eindeutig „nur Menschenaugen" ist (siehe Regel 2, Wetter-Overlay-Beispiel), wird nicht stillschweigend einer Kategorie zugeschlagen, sondern im Ticket-Text als Grenzfall benannt.
+- [~] Regressionscheck: Die bestehenden ~35 pytest-Dateien und der TASK-66-Playwright-Check laufen nach diesem Ticket unverändert weiter grün (keine bestehende Testdatei wird durch die neuen Tests verdrängt oder überschrieben).
+
+*Zusätzlich übernommen aus TASK-69 (vollständig ungetestete Kernbereiche, jetzt Teil desselben Tickets):*
+- [~] Die Kalender-Ansicht hat einen automatisierten Test, der bestätigt, dass sie fehlerfrei lädt und die richtigen Termine zeigt.
+- [~] Die Filter-Funktionen für Orte und für die Chancen-Übersicht haben automatisierte Tests für Ein- und Ausschluss-Verhalten.
+- [~] Die Bewertungsfunktion für Orte hat automatisierte Tests für Anlegen, Abrufen und Löschen einer Bewertung.
+- [~] Das Detail-Fenster, das sich beim Antippen einer Chance in der Übersicht öffnet, hat einen automatisierten Test.
+- [~] Die Wetter-Kartenansicht hat einen automatisierten Test für die Grundbedienung (Zeitregler, Ebenen-Umschalter).
+- [~] Der Schnell-Anlegen-Ablauf für neue Orte hat einen durchgängigen automatisierten Test vom Öffnen des Formulars bis zum erfolgreichen Speichern.
+- [~] Der Entdecken-Modus hat einen automatisierten Test.
+- [~] Die fünf noch ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen) haben jeweils mindestens einen automatisierten Basistest.
+- [~] Überschneidungen mit bereits bestehenden Tests aus TASK-66 (Location-Anlegen-Flow, ein Extremwert-Filtertest) werden nicht doppelt gebaut, sondern wiederverwendet/referenziert.
+
+**Technische Notiz (intern, nicht für Testanweisungen):** Testdateien folgen der bestehenden Namenskonvention `test_task67_<bereich>.py` unter `backend/tests/`; UI-Klickverhalten (Kalender, Filter-Chips, Detail-Sheet, Quick-Add, Entdecken-Modus, Wetterkarten-Bedienung) wird nach dem in TASK-66 bewährten Playwright-Muster (`backend/tests/frontend/run_frontend_check.py` + `spec.py`, echtes `wait_for_selector`/`wait_for_function`, keine Sleep-Tricks) erweitert statt ein neues Test-Skript aufzusetzen.
+
+**Pre-Mortem:**
+
+💀 **Szenario 1:** TASK-67 und TASK-69 werden unabhängig voneinander umgesetzt, beide bauen einen Test für denselben Bereich (z. B. Filter-Verhalten) mit leicht unterschiedlicher Prüflogik → doppelter Pflegeaufwand, CI wird langsamer, bei einer künftigen Änderung muss an zwei Stellen synchron nachgezogen werden.
+→ Gegenmaßnahme: Frage 1 vor Implementierungsstart mit Stephan klären (Reihenfolge/Abgrenzung); empfohlene Option B sorgt dafür, dass TASK-67 auf TASK-69-Tests verweist statt sie zu duplizieren.
+
+💀 **Szenario 2:** Ein PRODUCT.md-Punkt wird fälschlich als „automatisierbar" eingestuft, obwohl der eigentliche Kern eine optische Beurteilung ist (z. B. „Kontrast gut lesbar") → der Test wird grün, das eigentliche Problem (schlecht lesbar) fällt aber nicht mehr auf, weil sich alle auf den grünen Test verlassen — falsches Sicherheitsgefühl.
+→ Gegenmaßnahme: Regel 2 konsequent anwenden (Default: reine Pixel-/Farb-/Kontrast-/Safari-Beurteilung bleibt manuell); Grenzfälle werden laut AK-Edge-Case explizit benannt statt automatisch einsortiert.
+
+💀 **Szenario 3:** Neue Playwright-Erweiterungen werden flaky (Timing-Probleme), wie es bei TASK-66 mehrfach vorkam (drei Nachbesserungsrunden wegen offenem Sheet, falschem API-Feld, zu kurzem Timeout) → ein roter Test ohne echten Bug blockiert künftig Deploys.
+→ Gegenmaßnahme: Gleiches, bereits bewährtes Muster wie TASK-66 verwenden (echtes `wait_for_selector`/`wait_for_function`, keine Sleep-/Timing-Tricks — Memory `feedback_playwright_timing_fixes`).
+
+💀 **Szenario 4:** Der komplette Umfang (~90 Einzelpunkte über 13 Abschnitte, plus die TASK-69-Bereiche) wird in einem einzigen Implementierungsschritt versucht → das Ticket wird unübersichtlich groß, Review/Test wird unpraktikabel, das Ticket bleibt wochenlang „In Progress" hängen.
+→ **Stephans bewusste Entscheidung (2026-07-11):** Genau dieses Risiko wird in Kauf genommen — Stephan hat sich explizit gegen die ursprünglich empfohlene Option A (abschnittsweise) entschieden und für den vollen Umfang in einem Zug (Option B). Als Gegenmaßnahme innerhalb der Umsetzung: Fortschritt in Etappen sichtbar machen (z. B. Abschnitt für Abschnitt committen/testen, auch wenn das Ticket als Ganzes erst am Ende auf Done geht), damit das Risiko „wochenlang In Progress ohne sichtbaren Fortschritt" trotz Vollumfang begrenzt bleibt.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Annahmen-Protokoll durchgeführt (2 Fragen, s. o. — beide von Stephan am 2026-07-11 entschieden)
+- [x] Pre-Mortem durchgeführt (4 Szenarien)
+- [x] Architektur analysiert (s. u.)
+- [x] Designer-Check: nicht visuell (reines Test-/Dokumentations-Tooling, keine App-Optik betroffen) → übersprungen
+- [x] Implementierungsoptionen: A / B (s. u.) — Stephan hat sich bewusst gegen die Empfehlung entschieden und Option B (voller Scope) gewählt, Freigabe erteilt am 2026-07-11
+- [x] Klärungsfragen 1 + 2 mit Stephan entschieden (2026-07-11): Frage 1 → Zusammenlegen mit TASK-69; Frage 2 → alles auf einmal — **Implementierungsstart freigegeben**
+
+**Betroffene Architektur:**
+- `FotoAlert/PRODUCT.md` — alle 13 „Pflicht-Regression"-Abschnitte + neue „Nur manuell prüfbar"-Restliste am Ende jedes bearbeiteten Abschnitts.
+- `backend/tests/` — neue Testdateien je Abschnitt (Namenskonvention wie bestehend: `test_task67_<abschnitt>.py`), z. B. `test_task67_backend_regression.py`, `test_task67_auth_regression.py`, sowie je TASK-69-Bereich (Kalender, Filter, Bewertungen, Detail-Sheet, Wetterkarte, Quick-Add, Entdecken-Modus, Zusatzfunktionen); nutzt dieselbe pytest-Infrastruktur wie TASK-64/TASK-65.
+- `backend/tests/frontend/run_frontend_check.py` + `spec.py` — für alle Abschnitte, die UI-Klickverhalten statt reiner API-Werte prüfen (Filter-Chip-Drei-Zustände, Sheet-Öffnen/Schließen, Kalender, Quick-Add, Entdecken-Modus, Wetterkarten-Bedienung), Erweiterung nach demselben Muster wie TASK-66 statt eines neuen Skripts.
+- `.github/workflows/deploy.yml` — keine Änderung nötig, Gate-Verdrahtung existiert bereits durch TASK-64/TASK-66.
+- Keine Backend-Logik-Änderung (`main.py`, `calculations/` etc.) — dieses Ticket schreibt ausschließlich Tests + Dokumentation, verändert kein Produktverhalten.
+
+**Implementierungsoptionen:**
+
+📌 **Stephans Entscheidung (2026-07-11):** Stephan hat sich bewusst für **Option B (voller Scope, alles auf einmal)** und für das **Zusammenlegen mit TASK-69** entschieden — Freigabe erteilt am 2026-07-11. Damit wurde die ursprüngliche Empfehlung (Option A, kleiner erster Schritt Backend+Auth, Rest als Folge-Tickets) bewusst überstimmt. Die ursprüngliche Analyse bleibt unten zur Nachvollziehbarkeit stehen, ist aber durch diese Entscheidung überholt.
+
+*In Alltagssprache:* Für Stephan als Nutzer der App ändert sich durch dieses Ticket nichts Sichtbares — es ist reines Entwickler-Werkzeug. Der Unterschied zwischen den Optionen lag darin, wie groß der nächste Arbeitsschritt ausfällt und wie viel Überschneidung mit dem (jetzt zusammengelegten) Ticket TASK-69 entsteht.
+
+### Option A — Abschnittsweise, zuerst Backend + Auth (ursprünglich empfohlen, von Stephan bewusst überstimmt)
+- Vorgehen: Nur die zwei Abschnitte mit dem geringsten Aufwand und der größten bestehenden Vorarbeit (Backend-Schnellchecks, Auth) werden in diesem Durchlauf automatisiert und in PRODUCT.md markiert. Alle übrigen 11 Abschnitte (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) werden NICHT in diesem Ticket angefasst, sondern als eigene, kleine Folge-Tickets vorgeschlagen (analog zur Empfehlung, die TASK-69 bereits für sich selbst ausspricht: „kann bei Bedarf gesplittet werden").
+- Betroffene Dateien: wie oben unter „Betroffene Architektur" für den Backend/Auth-Teil.
+- Vorteile: Kleiner, schnell abschließbarer erster Schritt; passt zur „schrittweise"-Formulierung im Ticket-Text selbst; Überschneidungsrisiko mit TASK-69 bleibt für diesen Slice praktisch bei null (TASK-69 behandelt Kalender/Filter/Bewertungen/Detail/Wetterkarte/Quick-Add/Entdecken-Modus, nicht Backend-Schnellchecks/Auth).
+- Nachteile: Die PRODUCT.md-Liste ist nach diesem Ticket noch lange nicht vollständig automatisiert — TASK-67 bleibt ein „Dach" über mehrere weitere Schritte, ähnlich wie TASK-63 selbst ein Dach über TASK-64/65/66/67 ist.
+- Aufwand: klein (für diesen Slice); Gesamtvorhaben über alle Folge-Tickets: groß.
+
+### Option B — Alle 13 Abschnitte in einem Durchlauf (gewählt, jetzt inkl. TASK-69-Bereiche)
+- Vorgehen: Kompletter Umbau der PRODUCT.md-Pflicht-Regressionsliste in einem einzigen Implementierungsschritt — erweitert um die vollständig ungetesteten Kernbereiche aus TASK-69 (Kalender, Filter, Bewertungen, Detail-Sheet, Wetterkarte, Quick-Add, Entdecken-Modus, fünf Zusatzfunktionen).
+- Betroffene Dateien: alle unter „Betroffene Architektur" genannten Bereiche gleichzeitig, plus PRODUCT.md vollständig überarbeitet.
+- Vorteile: Ein Ticket, ein sichtbarer Abschluss; PRODUCT.md ist am Ende in einem Rutsch bereinigt; keine doppelte Planung zwischen zwei Tickets zum selben Themenfeld.
+- Nachteile: Sehr große Implementierung (~90 PRODUCT.md-Einzelpunkte + 8 TASK-69-AKs); entspricht dem Pre-Mortem-Szenario 4 — bewusst von Stephan in Kauf genommen, Gegenmaßnahme: etappenweise sichtbarer Fortschritt während der Umsetzung (s. Szenario 4 oben).
+- Aufwand: groß.
+
+✅ **Ursprüngliche Empfehlung: Option A** (kleiner, risikoarmer erster Schritt) — **von Stephan bewusst überstimmt zugunsten von Option B** (voller Scope, alles auf einmal, inkl. Zusammenlegung mit TASK-69). Freigabe erteilt am 2026-07-11. Beide Klärungsfragen (Frage 1: Verhältnis zu TASK-69 → Zusammenlegen; Frage 2: Scope-Slice → alles auf einmal) sind entschieden, der Implementierungsstart ist freigegeben.
+
+**Testplan** *(erweitert auf den vollen, zusammengelegten Scope)*:
+- [ ] Automatisiert (Harness): neue Testdatei(en) unter `backend/tests/`, decken alle 13 PRODUCT.md-Pflicht-Abschnitte (Backend, Auth, Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) sowie alle TASK-69-Bereiche (Kalender, Filter Ein-/Ausschluss, Bewertungen, Detail-Fenster, Wetterkarte, Schnell-Anlegen, Entdecken-Modus, fünf Zusatzfunktionen) ab; laufen im bestehenden CI-Gate aus TASK-64 mit.
+- [ ] Manuell: kein manueller Testpfad in der App vorhanden (reines Dev-Tooling ohne sichtbares App-Verhalten) — Stephan kann die Wirksamkeit sehen, indem er nach dem Umbau `pytest backend/tests/test_task67_*.py -v` lokal laufen lässt und die grünen Fälle mit den PRODUCT.md-Markierungen abgleicht.
 
 ---
 
@@ -11242,6 +11361,7 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 - [ ] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
 - [ ] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum und die aktuelle Uhrzeit.
 - [ ] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Ich kann von dort aus in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren, ohne dass sich das Fenster verschiebt oder ich den Regler an einen Rand bewege, der schon vor dem eigentlichen Ereignisfenster liegt.
+- [ ] **Nachtrag (2026-07-11, Stephan):** Die Uhrzeitanzeige an der Zeitleiste zeigt zusätzlich das Datum an (Format TT.MM. · HH:MM Uhr), nicht nur die Uhrzeit.
 
 **Bezug:** Betrifft die in **US-64** ✅ (Live Astro-Visualisierung) gebaute Übersicht — dort wurde die Kernfunktion umgesetzt, dieser Bug betrifft nur die Übernahme von Datum/Uhrzeit beim Öffnen aus einem Ereignis. Keine weiteren überlappenden oder verwandten offenen Tickets zu Live-Astro, Astro-Übersicht, Mond-Alignment oder Datums-/Zeitzonen-Fehlern im Backlog gefunden (geprüft u. a. gegen BUG-56, US-79, TASK-10, BUG-48, US-108 — alle behandeln andere Aspekte der Astronomie-Berechnung, keine Dublette).
 
@@ -11352,15 +11472,17 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 
 ---
 
-### TASK-69 · Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche `[ ]`
+### TASK-69 · Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | Done (Duplikat geschlossen, in TASK-67 aufgegangen, kein eigener Code, 2026-07-11) |
 | **Erstellt** | 2026-07-11 |
+
+**Hinweis (2026-07-11):** Stephan hat entschieden, dieses Ticket inhaltlich in **TASK-67** aufzunehmen (ein gemeinsamer Umsetzungsstrang statt zwei getrennter Tickets zum selben Themenfeld). Der komplette Inhalt dieses Tickets (Beschreibung, AK1–AK8, Bezüge) ist unverändert in TASK-67 aufgegangen — siehe dort. Dieses Ticket bleibt zur Nachvollziehbarkeit unverändert stehen und wird nicht separat weiterbearbeitet.
 
 **Beschreibung:** 13 von 34 Backend-Endpunkten (u. a. Bewertungen, Tagesübersicht, Empfehlungsplan, alle Refresh-Varianten) haben keinen automatisierten Test, 4 weitere nur auf Logik- statt echter Endpunkt-Ebene; im Playwright-Frontend-Check fehlen Kalender, Entdecken-Modus, Filter-Chips, Schnell-Anlegen, Event-Detail-Sheet und Wetter-Kartenbedienung vollständig. Mehrere dokumentierte Bugs (u. a. BUG-44, BUG-46, BUG-51, BUG-55, BUG-58, BUG-59, BUG-62, BUG-67) traten genau in diesen ungetesteten Bereichen auf, was die Priorität für automatisierte Absicherung belegt.
 
