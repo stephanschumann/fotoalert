@@ -665,6 +665,7 @@ async def _weather_overlay() -> None:
     # Unique Locations aus den nahen Events
     seen: set = set()
     loc_forecasts: dict = {}
+    failed_locations: list = []  # BUG-77: Namen der Locations mit fehlgeschlagenem Abruf
     for e in near_events:
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
         if key not in seen:
@@ -675,6 +676,7 @@ async def _weather_overlay() -> None:
                 logger.info("  Wetter für %s: OK", e["location_name"])
             except Exception as err:
                 logger.warning("  Wetter für %s fehlgeschlagen: %s", e["location_name"], err)
+                failed_locations.append(e["location_name"])
 
     # Scores in _feed_cache aktualisieren
     updated = 0
@@ -688,7 +690,17 @@ async def _weather_overlay() -> None:
 
     _weather_updated_at = now_utc
     logger.info("Wetter-Overlay: %d Events aktualisiert (%d unique Locations)", updated, len(seen))
-    _job_done("weather", t0)
+
+    # BUG-77: Teil- oder Totalausfall des Wetter-Abrufs sichtbar machen, statt
+    # unbedingt "done" zu melden — bestehenden Statuswert "error" wiederverwenden.
+    if failed_locations:
+        names = ", ".join(failed_locations[:5])
+        if len(failed_locations) > 5:
+            names += f" …und {len(failed_locations) - 5} weitere"
+        msg = f"Wetter: Fehler — Wetterdaten fehlgeschlagen für: {names}"
+        _job_error("weather", t0, msg)
+    else:
+        _job_done("weather", t0)
 
 
 async def _weather_overlay_single(loc_id: str) -> bool:
