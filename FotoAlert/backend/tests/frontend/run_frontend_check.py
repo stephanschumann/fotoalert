@@ -1053,6 +1053,11 @@ def _close_any_open_sheet(page) -> None:
         "() => { if (typeof Detail !== 'undefined') Detail.close(); }",
         "() => { if (typeof FilterSheet !== 'undefined') FilterSheet.close(); }",
         "() => { if (typeof Glossary !== 'undefined') Glossary.close(); }",
+        # CI-Fund (TASK-67, run #195): AddLocation.save() schliesst #add-sheet nur im
+        # Erfolgspfad (index.html ~Zeile 7014); schlaegt der API-Call fehl (z.B. CI-
+        # Timing), bleibt das Quick-Add-Sheet offen und blockiert nachfolgende Checks
+        # (_check_scout_mode etc.) beim Klick auf #fmb-feed. Defensiv hier mitschliessen.
+        "() => { if (typeof AddLocation !== 'undefined') AddLocation.close(); }",
     ):
         try:
             page.evaluate(expr)
@@ -1060,7 +1065,7 @@ def _close_any_open_sheet(page) -> None:
             pass
     try:
         page.wait_for_function(
-            "() => !['loc-detail-sheet','detail-sheet','filter-sheet','glossary-overlay']"
+            "() => !['loc-detail-sheet','detail-sheet','filter-sheet','glossary-overlay','add-sheet']"
             ".some(id => { const el = document.getElementById(id); "
             "return el && el.classList.contains('open'); })",
             timeout=4000,
