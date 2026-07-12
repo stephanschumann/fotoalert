@@ -14,6 +14,8 @@ import sys
 import os
 import copy
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from calculations.weather import (
@@ -21,6 +23,8 @@ from calculations.weather import (
     should_generate_red_sky_event,
     calculate_golden_cloud_score,
 )
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 # ---------------------------------------------------------------------------
 # should_generate_golden_clouds_event

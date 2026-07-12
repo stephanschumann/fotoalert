@@ -31,6 +31,8 @@ import main
 from data.store import LocationStore, compute_geo_hash
 import precompute
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 # ---------------------------------------------------------------------------
 # Test-Doubles

@@ -29,6 +29,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "tools"))
 
 import sync_dev_from_live as sync_tool
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 # ---------------------------------------------------------------------------
 # Hilfsfunktionen für Test-Datenbanken

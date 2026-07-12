@@ -20,7 +20,7 @@ import uuid
 
 import pytest
 
-pytestmark = [pytest.mark.api]
+pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 PIL = pytest.importorskip("PIL", reason="Pillow nicht installiert")
 from PIL import Image  # noqa: E402

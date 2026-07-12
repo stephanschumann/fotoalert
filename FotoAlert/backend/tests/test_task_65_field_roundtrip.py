@@ -34,7 +34,7 @@ import pytest
 
 from data.locations import PhotoLocation, LOCATION_FIELD_RULES
 
-pytestmark = [pytest.mark.api]
+pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
 # ---------------------------------------------------------------------------

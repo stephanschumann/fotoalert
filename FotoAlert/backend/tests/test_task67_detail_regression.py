@@ -50,7 +50,7 @@ from calculations.astronomy import (  # noqa: E402
 )
 import precompute  # noqa: E402
 
-pytestmark = [pytest.mark.regression]
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 
 @pytest.fixture(autouse=True)

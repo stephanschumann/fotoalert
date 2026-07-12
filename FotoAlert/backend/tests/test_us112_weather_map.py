@@ -20,6 +20,12 @@ import pytest
 
 from calculations import weather_grib as wg
 
+pytestmark = [pytest.mark.regression]
+# TASK-72: `regression` gilt datei-weit (US-112-AK-Bezug). `offline`/`api` sind gemischt
+# (13 reine Berechnungstests vs. 3 echte Endpoint-Tests) und werden daher NICHT pauschal
+# auf Modulebene vergeben, sondern einzeln je Testfunktion (siehe Klassifikationstabelle,
+# BACKLOG.md TASK-72, Regel 2 Grenzfall).
+
 
 # ---------------------------------------------------------------------------
 # GRIB-Fixture (klein, regular_ll GRIB2, via eccodes-Sample erzeugt)
@@ -52,6 +58,7 @@ pillow_required = pytest.mark.skipif(not wg.HAVE_PIL, reason="Pillow nicht insta
 # GRIB-Dekodierung → Stützpunkte
 # ---------------------------------------------------------------------------
 
+@pytest.mark.offline
 @eccodes_required
 def test_grib_decode_and_samples():
     raw = _make_grib_fixture(42.0)
@@ -73,6 +80,7 @@ def test_grib_decode_and_samples():
         assert wg.BBOX_W <= s.lon <= wg.BBOX_E
 
 
+@pytest.mark.offline
 def test_deaccumulate_precip():
     sp = wg.SamplePoint(50.0, 10.0, 5)
     sp.precip[:5] = [0.0, 0.5, 0.5, 2.0, 2.0]  # akkumuliert
@@ -85,6 +93,7 @@ def test_deaccumulate_precip():
     assert abs(float(sp.precip[4]) - 0.0) < 1e-5
 
 
+@pytest.mark.offline
 @pillow_required
 def test_interpolate_and_png():
     samples = [
@@ -104,6 +113,7 @@ def test_interpolate_and_png():
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
 
 
+@pytest.mark.offline
 def test_interpolate_no_points_returns_none():
     samples = [wg.SamplePoint(52.0, 9.0, 4)]  # alle NaN für Stunde 0
     gl, go = wg._build_grids()
@@ -127,6 +137,7 @@ def _png_alpha(field: str, value: float) -> int:
     return img.getpixel((0, 0))[3]
 
 
+@pytest.mark.offline
 @pillow_required
 def test_cloud_alpha_below_threshold_stays_faint():
     # Deutlich unter der Schwelle (15%) → nur Basis-Deckkraft, kein Fehlsignal.
@@ -134,6 +145,7 @@ def test_cloud_alpha_below_threshold_stays_faint():
     assert a == wg._CLOUD_ALPHA_BELOW
 
 
+@pytest.mark.offline
 @pillow_required
 def test_cloud_alpha_jumps_at_threshold():
     # Direkt an der Schwelle → deutlicher Sprung auf die Mindest-Deckkraft.
@@ -142,6 +154,7 @@ def test_cloud_alpha_jumps_at_threshold():
     assert a > wg._CLOUD_ALPHA_BELOW + 50  # klar wahrnehmbarer Sprung
 
 
+@pytest.mark.offline
 @pillow_required
 def test_cloud_alpha_high_value_near_max_not_oversaturated():
     a = _png_alpha("cloud", 100.0)
@@ -149,6 +162,7 @@ def test_cloud_alpha_high_value_near_max_not_oversaturated():
     assert a < 255  # bewusst nie voll deckend (Bauhaus: Karte bleibt durchscheinend)
 
 
+@pytest.mark.offline
 @pillow_required
 def test_precip_dry_limit_still_fully_transparent():
     # Unverändertes Verhalten aus Analyse 1: <0.05mm bleibt komplett transparent.
@@ -156,6 +170,7 @@ def test_precip_dry_limit_still_fully_transparent():
     assert a == 0
 
 
+@pytest.mark.offline
 @pillow_required
 def test_precip_alpha_jumps_above_dry_limit():
     # Zwischen Trockenheitsgrenze und Schwelle: sichtbar, aber moderat.
@@ -164,6 +179,7 @@ def test_precip_alpha_jumps_above_dry_limit():
     assert a > 0
 
 
+@pytest.mark.offline
 @pillow_required
 def test_precip_alpha_high_value_near_max_not_oversaturated():
     a = _png_alpha("precip", 10.0)
@@ -229,6 +245,7 @@ def _make_fake_client(dwd_ok=True, met_ok=True):
     return _Client()
 
 
+@pytest.mark.offline
 @eccodes_required
 def test_merge_common_axis_both_sources():
     overlay = asyncio.run(
@@ -240,6 +257,7 @@ def test_merge_common_axis_both_sources():
     assert overlay["n_points"] > len(wg.MET_NORWAY_POINTS)  # DWD-Punkte zusätzlich
 
 
+@pytest.mark.offline
 @eccodes_required
 def test_dwd_fails_met_still_valid():
     """DWD-Abruf scheitert (404), MET liefert → andere Quelle bleibt gültig, kein Raise."""
@@ -252,6 +270,7 @@ def test_dwd_fails_met_still_valid():
     assert overlay["n_points"] == len(wg.MET_NORWAY_POINTS)
 
 
+@pytest.mark.offline
 def test_all_sources_fail_no_crash():
     overlay = asyncio.run(
         wg.build_weather_overlay(_make_fake_client(dwd_ok=False, met_ok=False), n_hours=72)

@@ -15,6 +15,8 @@ import pytest
 import main
 from calculations.weather import HourlyWeather, WeatherForecast
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 # ---------------------------------------------------------------------------
 # Helfer

@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import pytest
 
-pytestmark = [pytest.mark.api]
+pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
 def _save_payload(observer_lat, observer_lon, subject_lat, subject_lon, subject_name, **overrides):

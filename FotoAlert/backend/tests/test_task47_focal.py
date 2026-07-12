@@ -30,6 +30,8 @@ from data.store import LocationStore
 from data import qa_focal
 from calculations.opportunity import _FOCAL_STEPS
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 @pytest.fixture
 def store(tmp_path: Path) -> LocationStore:

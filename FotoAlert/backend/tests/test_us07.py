@@ -12,9 +12,13 @@ Deckt alle AKs aus der Spec ab:
 import sys
 import os
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from calculations.weather import _golden_cloud_score, calculate_golden_cloud_score
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 
 def test_sweet_spot():

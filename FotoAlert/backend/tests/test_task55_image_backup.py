@@ -32,6 +32,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import data.backup as backup  # noqa: E402
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 @pytest.fixture
 def image_dirs(tmp_path, monkeypatch):

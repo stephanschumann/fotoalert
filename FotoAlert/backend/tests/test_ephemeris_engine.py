@@ -19,7 +19,7 @@ from calculations import query_engine as qe
 from calculations.window_engine import WindowEphemeris
 from data.locations import LOCATIONS
 
-pytestmark = [pytest.mark.offline]
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 START = date(2026, 6, 22)
 _LOCS_3D = [l for l in LOCATIONS if getattr(l, "subject_height_m", 0)]

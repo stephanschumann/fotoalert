@@ -11,6 +11,10 @@ import re
 import os
 from pathlib import Path
 
+import pytest
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.frontend]
+
 # Pfad relativ zu diesem Skript
 THIS_DIR = Path(__file__).parent
 INDEX_HTML = THIS_DIR.parent.parent / "web" / "index.html"

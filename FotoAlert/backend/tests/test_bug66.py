@@ -32,7 +32,7 @@ import pytest
 
 from data.elevation import ElevationProvider, provider
 
-pytestmark = [pytest.mark.api]
+pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
 def _cache_key(lat: float, lon: float) -> str:

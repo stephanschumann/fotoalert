@@ -20,6 +20,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from data.store import LocationStore, compute_geo_hash
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 @pytest.fixture
 def store(tmp_path: Path) -> LocationStore:

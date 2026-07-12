@@ -10,10 +10,14 @@ Drei Szenarien aus den Akzeptanzkriterien:
 import sys
 import os
 
+import pytest
+
 # Backend-Verzeichnis in den Suchpfad aufnehmen
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from calculations.weather import calculate_golden_cloud_score
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 
 def test_scattered_clouds_sweet_spot():

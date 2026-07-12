@@ -35,6 +35,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from calculations import sightline as sl
 from data.store import LocationStore
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 @pytest.fixture
 def store(tmp_path: Path) -> LocationStore:

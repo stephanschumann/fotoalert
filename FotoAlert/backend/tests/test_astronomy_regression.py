@@ -15,11 +15,15 @@ import pytest
 
 from calculations import astronomy as A
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression]
+pytestmark = [pytest.mark.regression]
+# TASK-72: kein pauschales `offline` auf Modulebene mehr (siehe Pre-Mortem-Szenario 3,
+# BACKLOG.md TASK-72) — die drei @pytest.mark.online-Tests unten sollen NICHT gleichzeitig
+# `offline` tragen. Die deterministischen Tests bekommen `offline` daher explizit einzeln.
 
 
 # --- BUG-18: Mond-Erde-Distanz muss physikalisch plausibel sein -------------------
 # AK: Anzeige zeigt ~384.400 km, nicht ~370 km. Perigäum ~356.500, Apogäum ~406.700 km.
+@pytest.mark.offline
 @pytest.mark.parametrize("month", [1, 4, 7, 10])
 def test_moon_earth_distance_in_physical_range(month):
     dt = datetime(2026, month, 15, 20, 0, tzinfo=timezone.utc)
@@ -38,6 +42,7 @@ def _reference_haversine(lat1, lon1, lat2, lon2):
     return R * 2 * math.asin(math.sqrt(a))
 
 
+@pytest.mark.offline
 @pytest.mark.parametrize("coords", [
     (52.40, 13.00, 52.41, 13.01),
     (52.5163, 13.3777, 52.5186, 13.4083),  # Brandenburger Tor → Berliner Dom (~grob)
@@ -50,6 +55,7 @@ def test_haversine_matches_reference(coords):
 
 # --- BUG-01: Brennweiten-Empfehlung folgt der Motiventfernung ---------------------
 # AK: < 500 m → Weitwinkel/Standard, > 2 km → Tele. Mindestens: monoton steigend mit Distanz.
+@pytest.mark.offline
 def test_focal_length_increases_with_distance():
     near = A.calculate_focal_length_for_subject(50, 500)
     mid = A.calculate_focal_length_for_subject(50, 1000)
@@ -57,6 +63,7 @@ def test_focal_length_increases_with_distance():
     assert near < mid < far, f"Brennweite nicht monoton: {near:.0f} / {mid:.0f} / {far:.0f}"
 
 
+@pytest.mark.offline
 def test_focal_length_far_subject_is_tele():
     # Großes, weit entferntes Motiv → klar im Telebereich (> 135 mm).
     f = A.calculate_focal_length_for_subject(subject_size_m=50, distance_m=3000)
@@ -65,6 +72,7 @@ def test_focal_length_far_subject_is_tele():
 
 # --- BUG-03 / US-58: Winkelprofil des Motivs konsistent ---------------------------
 # AK: Azimut des Motivs entspricht der Peilung; Winkelbreite positiv und realistisch klein.
+@pytest.mark.offline
 def test_subject_profile_azimuth_matches_bearing():
     obs = (52.40, 13.00)
     sub = (52.41, 13.01)
@@ -79,6 +87,7 @@ def test_subject_profile_azimuth_matches_bearing():
         f"Profil-Azimut {profile.azimuth_deg:.2f}° ≠ Peilung {bearing:.2f}°")
 
 
+@pytest.mark.offline
 def test_subject_angular_width_realistic():
     profile = A.calculate_subject_angular_profile(52.40, 13.00, 52.41, 13.01,
                                                   subject_height_m=50, subject_width_m=30)

@@ -12,6 +12,8 @@ from unittest.mock import patch, MagicMock
 from enum import Enum
 from typing import Optional
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 # ---------------------------------------------------------------------------
 # EventType und Helper direkt aus opportunity.py extrahieren (ohne skyfield)

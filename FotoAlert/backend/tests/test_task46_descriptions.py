@@ -19,6 +19,8 @@ from data.qa_description import (
     update_location_description,
 )
 
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
+
 
 # ---------------------------------------------------------------------------
 # Hilfsfunktionen für Store-Mocks

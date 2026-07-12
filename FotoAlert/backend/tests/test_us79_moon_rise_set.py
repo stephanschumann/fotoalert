@@ -21,8 +21,12 @@ from unittest.mock import MagicMock, patch
 from dataclasses import dataclass, field
 from enum import Enum
 
+import pytest
+
 # Sicherstellen, dass Backend-Importe funktionieren
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.frontend]
 
 
 # ─────────────────────────────────────────────────────────────────────────────

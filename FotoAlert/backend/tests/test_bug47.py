@@ -26,6 +26,7 @@ VALID_ROLES = ("host", "user")
 # ---------------------------------------------------------------------------
 
 @pytest.mark.offline
+@pytest.mark.regression
 class TestTokenRoleEncoding:
     """Das Token kodiert die Rolle als erstes Segment vor dem ersten Punkt."""
 
@@ -83,6 +84,7 @@ class TestTokenRoleEncoding:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.api
+@pytest.mark.regression
 class TestLoginRoleResponse:
     """BUG-47: /login muss role='host' zurückgeben wenn das Host-Passwort korrekt ist."""
 

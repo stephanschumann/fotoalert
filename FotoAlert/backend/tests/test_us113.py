@@ -26,12 +26,16 @@ import sys
 import os
 import copy
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from calculations.weather import (
     should_generate_golden_clouds_event,
     should_generate_red_sky_event,
 )
+
+pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 # ---------------------------------------------------------------------------
 # should_generate_red_sky_event — neue Signatur mit Azimut-Parametern,

@@ -31,7 +31,7 @@ from types import SimpleNamespace as NS
 
 import pytest
 
-pytestmark = [pytest.mark.api]
+pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
 # ---------------------------------------------------------------------------

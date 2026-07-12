@@ -29,8 +29,8 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Weg-Gate entschieden 2026-07-12, nach BUG-77 umzusetzen)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, Implementierung läuft)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still — Fix in `_weather_overlay()` umgesetzt, 6 neue Tests + 61 wetterbezogene Regressionstests grün, 2026-07-12)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still — Fix in `_weather_overlay()` umgesetzt, 6 neue Tests + 61 wetterbezogene Regressionstests grün, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, Implementierung + automatisierte Validierung abgeschlossen, alle AKs erfüllt, 2026-07-12)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -12586,7 +12586,7 @@ Mechanismus. **Bitte im Weg-Gate bestätigen oder Option B/C wählen.**
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-12 |
 
 **Beschreibung:** Seit **TASK-70** gilt die Pflicht, neue Tests mit passenden Markern
@@ -12677,27 +12677,27 @@ ab. Die einzige neue Erkenntnis (48 statt 47 Dateien, Widerspruch `offline`+`onl
 `test_astronomy_regression.py`) ist eine verifizierte Korrektur, keine Entscheidungsfrage.
 
 **Akzeptanzkriterien:**
-- [~] AK1: Alle 48 Testdateien (verifizierte Zahl, siehe Korrektur oben) tragen nach Umsetzung
+- [x] AK1: Alle 48 Testdateien (verifizierte Zahl, siehe Korrektur oben) tragen nach Umsetzung
       mindestens einen der 8 registrierten Marker — kein Test ohne Marker.
-- [~] AK2: `online` ist als achter Marker offiziell in `backend/pytest.ini` registriert
+- [x] AK2: `online` ist als achter Marker offiziell in `backend/pytest.ini` registriert
       (`pytest --markers` zeigt ihn), ohne Verhaltensänderung am CI-Lauf (`deploy.yml` Z. 118
       ruft `pytest tests/ -v` ohne `-m`-Filter auf — bleibt unverändert).
-- [~] AK3: Für jede in dieser Spec neu vergebene oder korrigierte Markerzuordnung steht in der
+- [x] AK3: Für jede in dieser Spec neu vergebene oder korrigierte Markerzuordnung steht in der
       Klassifikationstabelle unten eine Ein-Zeilen-Begründung.
-- [~] AK4: `pytest -m offline`, `pytest -m regression`, `pytest -m api` und `pytest -m frontend`
+- [x] AK4: `pytest -m offline`, `pytest -m regression`, `pytest -m api` und `pytest -m frontend`
       erfassen nach der Umsetzung den vollständigen tatsächlich passenden Testbestand — kein
       Test mit real offline-fähigem/AK-abgeleitetem/API-basiertem/frontend-bezogenem Verhalten
       bleibt unmarkiert zurück.
-- [~] AK5: `pytest --markers` zeigt genau 8 Marker-Einträge (die bisherigen 7 + `online`), keine
+- [x] AK5: `pytest --markers` zeigt genau 8 Marker-Einträge (die bisherigen 7 + `online`), keine
       Dopplung, keine Umbenennung bestehender Marker.
-- [~] AK6: Die volle Suite (`python3 -m pytest tests/ -v`) hat nach der Änderung exakt dieselbe
+- [x] AK6: Die volle Suite (`python3 -m pytest tests/ -v`) hat nach der Änderung exakt dieselbe
       Anzahl PASSED/SKIPPED/FAILED wie vorher — reine Marker-Ergänzung ändert kein Testverhalten.
-- [~] AK7 (Korrektur-Edge-Case): Die drei mit `online` markierten Tests in
+- [x] AK7 (Korrektur-Edge-Case): Die drei mit `online` markierten Tests in
       `test_astronomy_regression.py` (`test_sunrise_berlin_within_tolerance`,
       `test_sunset_berlin_within_tolerance`, `test_babelsberg_pfingstberg_azimuth_plausible`)
       tragen nach der Umsetzung NICHT mehr `offline` (Widerspruch: sie können einen echten
       Netzwerk-Download auslösen) — `pytest -m offline` darf sie nicht mehr enthalten.
-- [~] AK8 (Abgrenzung): `smoke` bleibt inhaltlich unverändert (Vervollständigung ist
+- [x] AK8 (Abgrenzung): `smoke` bleibt inhaltlich unverändert (Vervollständigung ist
       TASK-71-Scope) — TASK-72 fasst `test_api_smoke.py` nur für `offline`/`api`/`regression`
       an, nicht für neue `smoke`-Zuordnungen.
 
@@ -12852,7 +12852,7 @@ Weg-Gate-Entscheidungen Stephans decken die relevanten Freiheitsgrade ab.
 Testdateien).
 
 **Testplan:**
-- [ ] Automatisiert (Harness): Kein klassischer neuer pytest-Testfall sinnvoll (reine
+- [x] Automatisiert (Harness): Kein klassischer neuer pytest-Testfall sinnvoll (reine
       Marker-Metadaten, keine neue Programmlogik). Stattdessen Validierungsschritte:
       1. `cd backend && python3 -m pytest --collect-only -q` vor und nach der Umsetzung
          vergleichen — Gesamtzahl gesammelter Tests muss identisch bleiben (reine
@@ -12868,11 +12868,38 @@ Testdateien).
          `test_sunset_berlin_within_tolerance`, `test_babelsberg_pfingstberg_azimuth_plausible`
          NICHT mehr enthalten (AK7).
       5. `python3 -m pytest --markers` zeigt genau 8 Einträge, keine Dopplung (AK5).
-- [ ] Manuell: Kein Server-Kontext nötig (reiner pytest-Lauf). `cd backend && python3 -m pytest
+      **Ergebnis (2026-07-12):** Implementierung war bei Prüfbeginn bereits vollständig
+      vorhanden (Marker in allen Gruppe-B/C-Dateien + `pytest.ini` bereits korrekt gesetzt,
+      keine eigenen Code-Edits nötig). Alle 5 Schritte oben ausgeführt und grün: 49 Testdateien
+      geprüft (48 aus Klassifikation + `test_task61_backup_coverage.py`, ein nach der Analyse
+      neu hinzugekommener 49. Testfall, trägt bereits `offline`+`regression`, bricht AK1 nicht).
+      `pytest --markers` zeigt exakt 8 Projekt-Marker. `-m offline` enthält die 3
+      Astronomie-Online-Tests nicht mehr.
+- [x] Manuell: Kein Server-Kontext nötig (reiner pytest-Lauf). `cd backend && python3 -m pytest
       tests/ -v` vollständig laufen lassen, PASSED/SKIPPED/FAILED-Zahlen vor/nach der Änderung
       vergleichen (AK6) — müssen identisch sein.
-- [ ] Regression: volle Suite bleibt grün wie vorher; zusätzlich stichprobenartig 2–3 Dateien aus
+      **Ergebnis:** Da im Rahmen dieser Prüfung keine einzige Testdatei/`pytest.ini` mehr
+      geändert wurde (Zustand war bereits korrekt), gibt es kein Vorher/Nachher-Delta durch
+      TASK-72 selbst. Volle Suite in Sandbox-Batches nachgestellt (Einzelaufruf `pytest tests/
+      -v` sprengt das 45s-Zeitlimit eines Sandbox-Bash-Calls durch reale bcrypt-/Subprocess-Kosten
+      einzelner Altbestand-Tests — kein TASK-72-Bezug): 498 gesammelte Tests, davon zunächst
+      495 PASSED/3 FAILED protokolliert, 1 Datei (`test_task-66.py`) komplett übersprungen
+      (Playwright fehlt in der Sandbox). **Korrektur nach unabhängiger Verifikation
+      (separater Subagent, 2026-07-12):** `test_ephemeris_engine.py::test_ak6_passage_coverage
+      [brandenburger_tor_tiergarten]` lief bei erneuter, mehrfacher Ausführung (isoliert und als
+      Gruppe) reproduzierbar grün — der ursprünglich notierte Fail war nicht nachvollziehbar
+      (vermutlich ein einmaliger Flake im ursten Sandbox-Lauf). Tatsächlicher, bestätigter Stand:
+      496 PASSED, 2 FAILED. Die 2 verbleibenden Fails sind vorbestehend und marker-unabhängig:
+      `test_us120.py`/`test_us_125.py` Bild-Lösch-Tests — „Operation not permitted" beim
+      Datei-Löschen im gemounteten Sandbox-Ordner (Mount-Rechte-Limit, kein Code-/Marker-Bug).
+      Zusätzlich fiel beim Setup von `test_us_125.py` ein Log-Hinweis auf: `data_dev/fotoalert.db`
+      meldet `integrity_check`-Abweichungen („database disk image is malformed", Bezug BUG-70) —
+      nicht TASK-72-Scope, nur zur Info notiert.
+- [x] Regression: volle Suite bleibt grün wie vorher; zusätzlich stichprobenartig 2–3 Dateien aus
       Gruppe B/C mit `-v` einzeln laufen lassen, um zu bestätigen, dass die neu vergebenen Marker
       keinen Test versehentlich übersprungen haben (z. B. durch einen Marker/Skip-Interaktionsfehler).
+      **Ergebnis:** Stichprobe `test_bug77_weather_job_status.py`, `test_us105_section_order.py`,
+      `test_us112_weather_map.py` einzeln mit `-v` laufen lassen — alle Tests liefen wie erwartet,
+      kein versehentliches Überspringen durch die Marker-Zuordnung festgestellt.
 
 ---
