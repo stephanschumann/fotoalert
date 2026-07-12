@@ -3567,7 +3567,11 @@ const FilterSheet = {
     const isChancenOnly  = !isMapView && !isLocationView;  // Feed/Kalender/Scout
     // US-129 (Scope-Erweiterung 2026-07-10): "Hat Bild" ist jetzt in Feed/Kalender aktiv,
     // nur noch Entdecken (Scout) bleibt ausgegraut (dort keine location_id-Zuordnung möglich).
-    const isScoutOnly    = App.current === 'scout';
+    // BUG-76 (gefunden TASK-67 Etappe 6): Scout ist KEIN eigener App.nav()-Tab, sondern ein
+    // Unter-Modus des Feed-Tabs (Feed.setMode('scout')) — App.current bleibt dabei 'feed',
+    // die alte Bedingung "App.current === 'scout'" konnte daher nie zutreffen. Korrekt ist
+    // der tatsächliche Feed-Unter-Modus.
+    const isScoutOnly    = App.current === 'feed' && Feed.mode === 'scout';
 
     // Chancen-spezifische Kriterien: Tageszeit, Mindest-Wahrscheinlichkeit
     // → ausgegraut auf Locations-Tab und Karte

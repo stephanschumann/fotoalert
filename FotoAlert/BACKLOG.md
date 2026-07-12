@@ -11222,6 +11222,8 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 - `hasimage_dimmed_on_scout`: bereits bekannt, siehe BUG-76 — bleibt als Finding stehen (echter App-Bug, kein Skip).
 `py_compile` grün. Beide Skip-Umwandlungen sind Test-Robustheit gegen die CI-Datenlage, keine Abschwächung einer echten Prüfung — mit echten Daten (lokal, wie in den vorherigen lokalen Läufen) testen beide Fälle weiterhin scharf.
 
+**BUG-76 direkt mitgefixt (Stephans Entscheidung, 2026-07-12):** statt separat einzuplanen, wurde der Scout-Ausgrauen-Bug direkt behoben — siehe BUG-76 für Details. Damit sollte der nächste CI-Lauf ohne verbleibende Findings durchlaufen.
+
 **Beschreibung:** Die Pflicht-Regressionsliste in PRODUCT.md (nach jeder Implementierung alle bestehenden Funktionen prüfen) wird heute komplett manuell abgearbeitet. Dieses Ticket überführt die automatisierbaren Punkte in echte Tests (pytest bzw. Playwright-Durchläufe, je nach Punkt), die dann im CI-Gate mitlaufen. Am Ende bleibt in PRODUCT.md nur noch eine kleine Restliste, die wirklich Menschenaugen braucht: rein Visuelles und iOS-Haptik.
 
 **Scope-Erweiterung (Stephan, 2026-07-11):** TASK-69 („Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche") wurde inhaltlich in dieses Ticket aufgenommen. TASK-67 deckt damit zusätzlich zu den PRODUCT.md-Pflicht-Abschnitten auch die bisher komplett ungetesteten Kernbereiche ab: Kalender-Ansicht, Filter (Orte + Chancen-Übersicht, Ein-/Ausschluss), Bewertungsfunktion für Orte (Anlegen/Abrufen/Löschen), das Detail-Fenster einer Chance, die Wetter-Kartenansicht (Zeitregler, Ebenen-Umschalter), der Schnell-Anlegen-Ablauf für neue Orte, der Entdecken-Modus sowie die fünf weiteren ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen). TASK-69 wird dadurch als Duplikat/Teilmenge geschlossen (siehe dort). Der gesamte Umfang (alle 13 PRODUCT.md-Abschnitte + die genannten TASK-69-Bereiche) wird **in einem Zug** umgesetzt, nicht abschnittsweise — siehe Entscheidung zu Frage 1 + Frage 2 unten.
@@ -11524,14 +11526,16 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 
 ---
 
-### BUG-76 · „Hat Beispielbild"-Filter wird im Entdecken-Modus nie ausgegraut `[ ]`
+### BUG-76 · „Hat Beispielbild"-Filter wird im Entdecken-Modus nie ausgegraut `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test (auf Stephans Wunsch direkt im Zuge von TASK-67 gefixt statt separat eingeplant, 2026-07-12; wird zusammen mit TASK-67 releast und danach gemeinsam abgeschlossen) |
 | **Erstellt** | 2026-07-12 |
+
+**Fix (2026-07-12):** `isScoutOnly` (`web/index.html` ~Zeile 3570) von `App.current === 'scout'` (kann strukturell nie zutreffen) auf `App.current === 'feed' && Feed.mode === 'scout'` geändert — Scout ist ein Unter-Modus des Feed-Tabs (`Feed.setMode('scout')`), nicht ein eigener `App.nav()`-Tab. `FilterSheet.open()` ruft `_render()` bei jedem Öffnen frisch auf, die Korrektur greift also sofort beim nächsten Öffnen des Filter-Sheets im Entdecken-Modus. Verifiziert: Der bestehende automatisierte Test `_check_has_image_chip_tristate_and_effect` (`hasimage_dimmed_on_scout`) deckt genau diesen Fall ab — noch nicht erneut gelaufen, wird mit dem nächsten CI-Lauf von TASK-67 mitverifiziert.
 
 **Beschreibung:** Laut PRODUCT.md soll der „Hat Beispielbild"-Filter-Abschnitt im Entdecken-Modus (Scout) ausgegraut und nicht bedienbar sein, weil Scout-Chancen kein `location_id`-Äquivalent haben (US-129). Die zuständige Bedingung im Code prüft `App.current === 'scout'` (`web/index.html` ~Zeile 3570, `isScoutOnly`) — Scout ist aber gar kein eigener oberster Reiter, sondern nur ein Modus innerhalb des Feeds (`Feed.setMode('scout')`), der `App.current` nie auf `'scout'` setzt. Die Bedingung kann dadurch in der laufenden App nie zutreffen: der Filter bleibt im Entdecken-Modus immer normal bedienbar statt ausgegraut.
 
