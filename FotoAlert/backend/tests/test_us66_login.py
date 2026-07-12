@@ -48,6 +48,7 @@ class TestLoginEndpoint:
         assert r.json()["role"] == "host"
         assert r.json()["token"]
 
+    @pytest.mark.smoke
     def test_user_login(self, client):
         r = client.post("/login", json={"password": "test-user-pw"})
         assert r.status_code == 200, r.text

@@ -20,7 +20,20 @@ Tickets ergänzen ihre Tests nach demselben Muster (Datei nach Bereich, z. B.
 | Datei | Bereich | Läuft im Sandbox | Marker |
 |-------|---------|------------------|--------|
 | `test_astronomy_regression.py` | Berechnungen (Mond/Sonne/Geometrie/Brennweite) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
-| `test_api_smoke.py` | FastAPI-Endpoints gegen `data_dev` | ⏳ sobald Stack + Startup sandbox-sicher | `api`, `network` |
+| `test_api_smoke.py` | FastAPI-Endpoints gegen `data_dev` | ⏳ sobald Stack + Startup sandbox-sicher | `api`, `network`, `smoke` |
+
+**Marker `smoke` (TASK-70, erweitert in TASK-71):** kleine, handverlesene Auswahl der
+wichtigsten/schnellsten Tests (Health/Locations/Feed/Auth, ein Kernpfad pro Hauptfunktion) für
+einen Sekunden-Schnellcheck vor der vollen Suite — Aufruf via `pytest -m smoke`. Getaggt sind
+`test_health_ok` (`test_api_smoke.py`), `test_locations`/`test_feed_opportunities`
+(`test_task67_backend_regression.py`) sowie `test_user_login` (`test_us66_login.py`) —
+bewusst als Marker auf bestehenden Tests statt als neue, duplizierte Tests in
+`test_api_smoke.py` (TASK-71, Option A).
+
+**Marker-Pflicht:** Zusätzlich zur Ticket-ID im Docstring bekommt jeder neue Test mindestens
+einen passenden Marker aus der Tabelle oben (`offline`/`network`/`api`/`regression`/`frontend`/
+`slow`/`smoke`) — kein Test ohne Marker. Das hält die Suite selektiv ausführbar (z. B. schneller
+Regressionslauf vs. vollständiger Netzwerk-/API-Lauf).
 
 ## Sicherheit: niemals Prod-Daten
 

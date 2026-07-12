@@ -31,6 +31,7 @@ class TestBackendQuickChecks:
         assert "version" in body
         assert "locations_count" in body
 
+    @pytest.mark.smoke
     def test_locations(self, client):
         """PRODUCT.md-Punkt 2: /locations liefert mehr als 10 Einträge (Basis + Overrides + Custom)."""
         r = client.get("/locations")
@@ -39,6 +40,7 @@ class TestBackendQuickChecks:
         assert isinstance(data, list)
         assert len(data) > 10
 
+    @pytest.mark.smoke
     def test_feed_opportunities(self, client):
         """PRODUCT.md-Punkt 3: /opportunities antwortet mit einer (ggf. leeren) Liste, kein Fehler."""
         r = client.get("/opportunities", params={"min_score": 0.1, "days": 14})
