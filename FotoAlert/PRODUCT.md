@@ -3,7 +3,7 @@
 > **Zweck:** Kanonischer Ist-Stand aller freigegebenen Funktionen.  
 > **Pflege:** Nach jedem abgeschlossenen Ticket aktualisieren (vor „Done").  
 > **Regression:** Diese Datei ist die Grundlage für den Regressionstest nach jeder Änderung.  
-> Zuletzt aktualisiert: 2026-07-07 · Basis: abgeschlossene Tickets bis BUG-65, US-09, BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53
+> Zuletzt aktualisiert: 2026-07-11 · Basis: abgeschlossene Tickets bis BUG-65, US-09, BUG-56, US-113, US-108, US-07, US-107, US-79, US-102, US-100, US-96, BUG-42, BUG-47, BUG-48, BUG-49, BUG-50, BUG-51, BUG-52, BUG-53, TASK-67 (Etappe 4: „Nur manuell prüfbar"-Restliste, Abschnitt 15)
 
 ---
 
@@ -37,13 +37,13 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 | Inline-ⓘ-Erklärungen (`.el-info-btn`, US-21) | 14px, dezent grau (`var(--muted)`), Hover→Gold. Bestehende 5 Stellen: Schwierigkeitsgrad-Badge, Event-Typ, Verifikations-Badge, Filter-Gruppen, Kartenlegende. Seit Scope-Erweiterung (2026-07-05) zusätzlich 10 Stellen im Chancen-Detail (Wetterwerte, Ideales Zeitfenster, Wolken/Kompass-Ausrichtung, Karte & Blickwinkel, Kompositions-Analyse, Koordinaten, Himmelsposition/Astronomie) und Location-Detail (Fotograf-Standort/Motiv/Ausrichtung — 3 Sektionen mit demselben Erklärtext, Nächste Events, Verifikationsbereich). Kartenlegende (`.map-legend-info-btn`) im gleichen Zug kleiner (22px statt 44px) und dezenter gemacht; Hover-Verhalten unverändert. Legendentext (`ElementInfo._mapLegendData()`) seit drittem Testdurchlauf (2026-07-05) nur noch 3 Punkte: Pin-Symbol (mit Inline-SVG-Beispiel), Kartenebenen-Umschalter, GPS-Zentrier-Button — der Fotograf-Standort/Motiv/Sichtachse-Absatz wurde komplett entfernt (auf dieser Übersichtskarte nicht relevant, nicht nur textlich korrigiert; verursachte zudem ein Block-in-Inline-Rendering-Problem, siehe Ticket). Layer-Switcher und GPS-Button sind beide verifiziert Teil des Haupt-Karten-Tabs (`#page-map`), keine Anzeige-Bugs gefunden. |
 
 **Pflicht-Regression globale UI:**
-- [ ] Tab-Wechsel funktioniert (alle 5 Tabs)
+- [ ] Tab-Wechsel funktioniert (alle 5 Tabs) (Teilabdeckung automatisiert: `run_frontend_check.py`-VIEWS-Loop deckt Feed/Karte/Orte/Einstellungen; Kalender-/Scout-Modus zusätzlich über `_check_calendar_view`/`_check_scout_mode` (TASK-67 Etappe 3, Playwright-Code geschrieben — lokaler Browser-Lauf durch Stephan noch ausstehend, Sandbox hat kein Playwright/Chromium); „+"-Tab bereits über TASK-66 `_check_location_create` abgedeckt)
 - [ ] Kein Tab zeigt seinen Inhalt doppelt
 - [ ] Kein Sheet öffnet sich ungewollt beim Laden
 - [ ] Theme-Wechsel (hell/dunkel) ändert alle Farbtokens konsistent
 - [ ] Alle Icons sichtbar in Safari (SVG `<use>` + `currentColor`-Attribute auf `<g>`, nicht per CSS-Klasse)
 - [ ] Onboarding erscheint beim ersten Start, nicht mehr nach Reload/zweitem Start
-- [ ] „?"-Button im Header immer erreichbar, öffnet Glossar
+- [ ] „?"-Button im Header immer erreichbar, öffnet Glossar (automatisiert: `run_frontend_check.py::_check_help_glossary`, TASK-67 Etappe 3, lokal grün bestätigt)
 - [ ] Glossar: Suche filtert Einträge live, Accordion klappt auf/zu, „Onboarding erneut ansehen" startet die Slides neu
 - [ ] Glossar zeigt die 2 neuen Einträge (Filter-Logik, Feed/Kalender/Scout-Unterschied)
 - [ ] Alle 15 ⓘ-Stellen (5 bestehend + 10 neu) öffnen das `ElementInfo`-Overlay mit dem korrekten Text
@@ -75,9 +75,10 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 
 **Pflicht-Regression Feed:**
 - [ ] Mindestens 1 Karte sichtbar (bei min_score 0.2) (automatisiert: `test_task67_feed_regression.py`, prüft `main._filter_feed()` direkt — Karten-Rendering selbst bleibt manuell/Etappe 3)
-- [ ] Chance antippen → Detail-Sheet öffnet
+- [ ] Chance antippen → Detail-Sheet öffnet (automatisiert: `run_frontend_check.py::_check_event_detail_from_feed_card`, TASK-67 Etappe 3, lokal grün bestätigt)
 - [ ] Overlay antippen → Sheet schließt sich
 - [ ] Filter-Sheet öffnet und schließt
+- [ ] Jahreskalender-Modus lädt fehlerfrei und zeigt Termine (automatisiert: `run_frontend_check.py::_check_calendar_view`, TASK-67 Etappe 3, übernommen aus TASK-69 AK1, lokal grün bestätigt)
 - [ ] Score-Ring korrekt (visuelle Überprüfung: 75% = ring 3/4 gefüllt)
 - [ ] Karten nicht doppelt vorhanden (automatisiert: `test_task67_feed_regression.py`, prüft `main._dedup_best_per_day()`/`_filter_feed()`)
 - [ ] Routine-Events-Filter entfernt Goldene/Blaue-Stunde-Karten
@@ -104,7 +105,7 @@ Seit US-129 hat auch „Hat Beispielbild" Drei-Zustände.
 | **Eventtyp** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für Chancen-Feed, Kalender, Scout, Karte |
 | **Tageszeit** | Ja (Off → nur zeigen → ausblenden → Off) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
 | **Mindest-Wahrscheinlichkeit** | Nein (Slider 0–100%) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab**. Standardwert seit US-119: **70%** (vorher 0% = „Alle"); gilt geteilt für Feed/Kalender/Scout. Bestandsnutzer mit abweichendem gespeicherten Wert wurden einmalig auf 70% zurückgesetzt (Migrations-Flag `fotoalert_filters_v119_migrated`); ein danach selbst gewählter Wert bleibt dauerhaft erhalten |
-| **Brennweite** | Nein (Dual-Handle-Slider) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
+| **Brennweite** | Nein (Dual-Handle-Slider) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (seit TASK-47: jede Location hat eine automatisch berechnete Brennweiten-Empfehlung als eigene Eigenschaft, filtert dort aktiv mit — **Klärung Stephan, 2026-07-12**: Code ist korrekt, ältere Doku-Zeilen zu „ausgegraut" waren nach TASK-47 nicht mehr nachgezogen) |
 | **Schwierigkeit** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Kategorie** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
@@ -112,6 +113,13 @@ Seit US-129 hat auch „Hat Beispielbild" Drei-Zustände.
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
 | **Hat Beispielbild** (US-129) | Ja: Off → Nur mit Bild (Rahmen `--accent`) → Nur ohne Bild (Rahmen `--red`, Label „Ohne Bild") → Off | Gilt für Locations-Tab, Karte, Chancen-Feed, Kalender (Lookup der Location über `location_id`); **ausgegraut bei Entdecken/Scout** (Scout-Chancen haben kein `location_id`-Äquivalent); ⓘ-Erklärtext am Filter-Chip |
 | **Sichtachsen-Check** (US-09) | Ja: Off → nur diesen Status zeigen → diesen Status ausschließen → Off; Statuswerte: Frei / Teilweise verdeckt / Blockiert / Nicht geprüft | Gilt für Chancen-Feed, Kalender, Scout, Locations-Tab, Karte (Sichtachsen-Ergebnis ist Location-Eigenschaft); ⓘ-Erklärtext am Filter-Chip |
+
+**Geklärt (TASK-67 Etappe 6, Stephan 2026-07-12):** Frühere Doku-Zeilen führten Brennweite
+als „ausgegraut auf Karte + Locations-Tab" — das war seit TASK-47 nicht mehr aktuell. Der
+Code (`web/index.html` ~Zeile 3576 `dimFocalOnMap = false`, Filterlogik ~5068-5073 und
+~3046-3049) filtert Karte UND Locations-Tab bewusst aktiv nach Brennweite, weil seither
+jede Location eine automatisch berechnete Brennweiten-Empfehlung als eigene Eigenschaft
+hat. Entscheidung: Code ist korrekt, Tabellen oben wurden entsprechend korrigiert.
 
 ### Semantik der Drei-Zustände für neue Kriterien (BUG-46)
 
@@ -139,8 +147,8 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 
 | Ansicht | Ausgegraut |
 |---|---|
-| **Karte** | Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
-| **Locations-Tab** | Eventtyp, Tageszeit, Brennweite, Mindest-Wahrscheinlichkeit |
+| **Karte** | Tageszeit, Mindest-Wahrscheinlichkeit |
+| **Locations-Tab** | Eventtyp, Tageszeit, Mindest-Wahrscheinlichkeit |
 | **Chancen-Feed / Kalender** | Nichts ausgegraut |
 | **Scout (Entdecken)** | Hat Beispielbild (US-129, kein `location_id`-Äquivalent bei Scout-Chancen) |
 
@@ -151,7 +159,7 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 | Eventtyp | ✓ | ✓ | ✓ (body_name) | — (ausgegraut) | ✓ (via Feed-Daten) |
 | Tageszeit | ✓ | ✓ | ✓ (session) | — (ausgegraut) | — (ausgegraut) |
 | Wahrscheinlichkeit | ✓ | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
-| Brennweite | ✓ | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
+| Brennweite | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Schwierigkeit | ✓ | ✓ | — | ✓ | ✓ |
 | Kategorie | ✓ | ✓ | — | ✓ | ✓ |
 | Mindest-Bewertung | ✓ | ✓ | — | ✓ | ✓ |
@@ -161,19 +169,19 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 | Sichtachsen-Check (US-09) | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 **Pflicht-Regression Filter (BUG-46):**
-- [ ] Filter-Badge zeigt korrekte Anzahl aktiver Kriterien
-- [ ] Bewertungs-Chip: Off → gold „≥ N" → rot „< N" → Off (drei Tipp-Schritte)
-- [ ] Verifikation „Geprüfte": Off → gold → rot → Off (drei Tipp-Schritte)
-- [ ] Tageszeit, Brennweite, Wahrscheinlichkeit auf Karte ausgegraut
-- [ ] Eventtyp, Tageszeit, Brennweite, Wahrscheinlichkeit auf Locations-Tab ausgegraut
-- [ ] Karte zeigt nach Schwierigkeits-Filter nur passende Pins
-- [ ] Karte zeigt nach Kategorie-Filter nur passende Pins
-- [ ] Karte zeigt nach Verifikations-Filter nur passende Pins
-- [ ] Sichtachsen-Check-Chip: Off → nur diesen Status → diesen Status ausschließen → Off (drei Tipp-Schritte, US-09)
-- [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab) — nicht ausgegraut (US-09)
-- [ ] „Hat Beispielbild"-Chip: Off → gold „Hat Bild" → rot „Ohne Bild" → Off (drei Tipp-Schritte, US-129)
-- [ ] „Hat Beispielbild" wirkt auf Locations-Tab, Karte, Feed und Kalender (nur mit/nur ohne Bild korrekt gefiltert); im Feed/Kalender additiv UND-kombinierbar mit den übrigen Chancen-Filtern (US-129)
-- [ ] „Hat Beispielbild" bleibt bei Entdecken/Scout ausgegraut ohne Wirkung (US-129)
+- [ ] Filter-Badge zeigt korrekte Anzahl aktiver Kriterien (automatisiert: `run_frontend_check.py::_check_filter_badge_count`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Bewertungs-Chip: Off → gold „≥ N" → rot „< N" → Off (drei Tipp-Schritte) (automatisiert: `run_frontend_check.py::_check_rating_chip_tristate`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Verifikation „Geprüfte": Off → gold → rot → Off (drei Tipp-Schritte) (automatisiert: `run_frontend_check.py::_check_filter_tristate_and_dimming`, TASK-67 Etappe 3, Referenzmuster verifiziert, lokal grün bestätigt)
+- [ ] Tageszeit, Wahrscheinlichkeit auf Karte ausgegraut, Brennweite filtert dort aktiv mit (kein Ausgrauen mehr, s. Klärung 2026-07-12) (Teilabdeckung: Tageszeit automatisiert in `_check_filter_tristate_and_dimming` (Etappe 3, lokal grün bestätigt); Wahrscheinlichkeit automatisiert in `_check_wahrscheinlichkeit_dimming` (TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12); Brennweite-Wirkung auf der Karte noch nicht separat automatisiert getestet)
+- [ ] Eventtyp, Tageszeit, Wahrscheinlichkeit auf Locations-Tab ausgegraut, Brennweite filtert dort aktiv mit (Teilabdeckung: Tageszeit automatisiert in `_check_filter_tristate_and_dimming` (Etappe 3, lokal grün bestätigt); Wahrscheinlichkeit automatisiert in `_check_wahrscheinlichkeit_dimming` (TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12); Eventtyp weiterhin offen; Brennweite-Wirkung auf dem Orte-Tab noch nicht separat automatisiert getestet)
+- [ ] Karte zeigt nach Schwierigkeits-Filter nur passende Pins (automatisiert: `run_frontend_check.py::_check_map_pin_filtering`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Karte zeigt nach Kategorie-Filter nur passende Pins (automatisiert: `run_frontend_check.py::_check_map_pin_filtering`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Karte zeigt nach Verifikations-Filter nur passende Pins (automatisiert: `run_frontend_check.py::_check_map_pin_filtering`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Sichtachsen-Check-Chip: Off → nur diesen Status → diesen Status ausschließen → Off (drei Tipp-Schritte, US-09) (automatisiert: `run_frontend_check.py::_check_sightline_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab) — nicht ausgegraut (US-09) (Teilabdeckung automatisiert: `_check_sightline_chip_tristate_and_effect` prüft Nicht-Ausgegraut-Sein auf Feed/Karte/Locations-Tab sowie realen Filter-Effekt auf der Karte; Kalender/Scout und der volle Effekt-Nachweis auf Feed/Locations bleiben aufgrund identischer, bereits an anderer Stelle geprüfter Codepfade unautomatisiert, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] „Hat Beispielbild"-Chip: Off → gold „Hat Bild" → rot „Ohne Bild" → Off (drei Tipp-Schritte, US-129) (automatisiert: `run_frontend_check.py::_check_has_image_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] „Hat Beispielbild" wirkt auf Locations-Tab, Karte, Feed und Kalender (nur mit/nur ohne Bild korrekt gefiltert); im Feed/Kalender additiv UND-kombinierbar mit den übrigen Chancen-Filtern (US-129) (Teilabdeckung automatisiert: `_check_has_image_chip_tristate_and_effect` prüft den Effekt nur auf dem Orte-Tab gegen `Filter.applyToLocations()`; Karte/Feed/Kalender bleiben offen, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] „Hat Beispielbild" bleibt bei Entdecken/Scout ausgegraut ohne Wirkung (US-129) (Test geschrieben: `run_frontend_check.py::_check_has_image_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal ausgeführt 2026-07-12 — **schlägt aktuell fehl**, echter App-Bug gefunden und als **BUG-76** erfasst: die Ausgrauen-Bedingung `App.current === 'scout'` kann nie zutreffen, Scout ist kein eigener Reiter. Bleibt rot bis BUG-76 behoben ist.)
 
 ---
 
@@ -242,7 +250,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Karte | Leaflet, dunkle Tiles (Carto Dark). Beim allerersten Öffnen des Karten-Tabs einer Sitzung zentriert sich die Karte automatisch auf den aktuellen GPS-Standort mit einem ca. 5-km-Radius-Ausschnitt (breitengradkorrigiert, analog BUG-58-Muster); ist kein GPS möglich, aber schon ein früherer Standort bekannt, wird dieser genutzt; ist gar kein Standort bekannt, bleibt es beim Berlin-Fallback (US-117). Bei jedem weiteren Tab-Wechsel bleibt die Karte unverändert an der zuletzt gewählten Position/Zoomstufe stehen (bestehendes Guard-Verhalten). |
 | Marker | ≥10 Pins für gespeicherte Locations; SVG-Tropfen (blau, weißer Kern) im Bauhaus-Stil (US-103) |
 | Marker-Tap | Popup mit Location-Name und Kategorie |
-| Kartenfilter | Alle location-bezogenen Filterkriterien wirken auf Karten-Pins: Eventtyp (inkl. Ausschließen, BUG-23+BUG-46), Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung (GPS). Tageszeit, Brennweite und Wahrscheinlichkeit sind auf der Karte ausgegraut (BUG-46) |
+| Kartenfilter | Alle location-bezogenen Filterkriterien wirken auf Karten-Pins: Eventtyp (inkl. Ausschließen, BUG-23+BUG-46), Schwierigkeit, Kategorie, Verifikation, Bewertung, Entfernung (GPS), Brennweite (seit TASK-47 Location-Eigenschaft, filtert aktiv mit). Tageszeit und Wahrscheinlichkeit sind auf der Karte ausgegraut (BUG-46) |
 | GPS-Zentrierung | Button zentriert Karte auf aktuelle GPS-Position (US-69) |
 | Wetter-Overlay (US-112) | Umschalter „aus / Wolken / Niederschlag". Zeigt einen **weichen, fließenden Verlauf** (kein Kachelraster) aus **echten Wettermodell-Daten**: DWD ICON-D2 (~2 km, Stunde 0–48) + DWD ICON-EU (Stunde 48–72) über Deutschland/Österreich/Norditalien, plus MET Norway über Norwegen. Ein **72-Stunden-Schieber** wählt die Vorhersagestunde (Label in Berliner Zeit). Serverseitig wird je Stunde ein PNG gerendert (`backend/calculations/weather_grib.py`, Endpoints `/weather-map` + `/weather-map/png/{field}/{idx}`), im Frontend als `L.imageOverlay` gelegt (`WeatherMap`, zwischen Tiles und Markern). Pflicht-Quellenangabe „Daten: DWD · MET Norway (CC BY 4.0)" unten links. Gratis + kommerziell nutzbar; ersetzt die frühere Open-Meteo-Kacheldarstellung (US-72/BUG-55). Ist die Karte gerade im Neubau, zeigt der Endpoint ehrlich `ready:false` und die App „Wetterdaten werden geladen …" statt zu blockieren. Tippt man auf „Wolken" oder „Niederschlag", zoomt die Karte auf einen **ca. 50-km-Radius um die aktuelle Kartenmitte** bzw. um den zuletzt betrachteten Standort — **nicht** mehr auf die volle Mehrländer-Ansicht (bewusste Änderung an US-112/BUG-55, siehe BUG-58). Die Wetterfläche auf der Karte ist jetzt auch bei leichtem Wetter gut sichtbar, bleibt aber bei echtem Klarwetter bewusst unauffällig (Schwellwert-Deckkraft in `_alpha_curve`/`field_to_png`, `weather_grib.py`, BUG-59). |
 | Karten-Bedienleiste (US-112, BUG-62) | Basiskarten-Menü (Nacht/Standard/Satellit) und Wetter-Menü (aus/Wolken/Niederschlag) stehen **nebeneinander** in einer Reihe oben; Zeitachse, GPS-Taste und Zoom-Buttons sitzen am **unteren** Kartenrand → maximale Kartenfläche. Seit BUG-62 zeigen beide Gruppen **Icons statt Textbeschriftung** (Mond-Sichel/Raster/Satellit-Symbol rechts, durchgestrichener Kreis/Wolke/Wolke-mit-Tropfen links, je mit Tooltip), damit sie auch auf schmalen iPhone-Bildschirmen (ab 375px) nicht mehr ineinander laufen. |
@@ -253,7 +261,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] ≥10 Pins sichtbar
 - [ ] Pin antippen → Popup erscheint
 - [ ] Karte nicht leer nach Theme-Wechsel
-- [ ] Wetter-Overlay „Wolken"/„Niederschlag": weicher Verlauf über DE + Norwegen sichtbar (nicht leer), 72-h-Schieber zeigt Berliner Zeit und ändert die Fläche, Quellenangabe sichtbar (US-112) (Teil automatisiert: `test_us112_weather_map.py` deckt die Datenebene ab — Endpoint liefert Frames/PNG-Bytes statt leer, Attribution-String vorhanden, Cache-Verhalten; ob der Verlauf optisch „weich und gut lesbar" wirkt, bleibt Regel-2-Grenzfall, siehe Example Mapping — manuell/Etappe 3)
+- [ ] Wetter-Overlay „Wolken"/„Niederschlag": weicher Verlauf über DE + Norwegen sichtbar (nicht leer), 72-h-Schieber zeigt Berliner Zeit und ändert die Fläche, Quellenangabe sichtbar (US-112) (Teil automatisiert: `test_us112_weather_map.py` deckt die Datenebene ab — Endpoint liefert Frames/PNG-Bytes statt leer, Attribution-String vorhanden, Cache-Verhalten; Grundbedienung Ebenen-Umschalter + Zeit-Schieberegler zusätzlich automatisiert: `run_frontend_check.py::_check_weather_map_controls`, TASK-67 Etappe 3, übernommen aus TASK-69 AK5, lokal grün bestätigt (Etappe 5); ob der Verlauf optisch „weich und gut lesbar" wirkt, bleibt Regel-2-Grenzfall, siehe Example Mapping — manuell)
 
 ---
 
@@ -279,7 +287,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] Karten-Tap setzt Motiv-Marker + zeigt Linie
 - [ ] „Ohne Punkte" → Toast erscheint (kein Absturz)
 - [ ] „Mit Punkten" → Preview-Box mit Azimut, Distanz, Höhenwinkel
-- [ ] Gespeicherte Location erscheint danach im Orte-Tab
+- [ ] Gespeicherte Location erscheint danach im Orte-Tab (durchgängiger Ablauf öffnen→Koordinaten setzen→Alignments berechnen→speichern bereits automatisiert: `run_frontend_check.py::_check_location_create`, TASK-66 — übernommen aus TASK-69 AK6, keine Dopplung in TASK-67 Etappe 3 gebaut)
 - [ ] Hinweise-Text in „Optionale Angaben" eingetragen → nach dem Speichern sofort in der Hinweise-Sektion der neuen Location sichtbar (BUG-65)
 - [ ] Hinweise-Feld leer gelassen → Speichern funktioniert normal, keine automatische Notiz, keine Hinweise-Sektion sichtbar (BUG-65, Regression zu BUG-60)
 - [ ] Beispielbild in „Optionale Angaben" ausgewählt → nach dem Speichern automatisch hochgeladen, erscheint sofort im Hero-Bereich der neuen Location (US-127)
@@ -317,6 +325,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 - [ ] ≥15 Karten sichtbar (automatisiert: `test_task67_orte_regression.py`)
 - [ ] Suche „Babelsberg" filtert korrekt
 - [ ] Location-Detail-Sheet öffnet und schließt
+- [ ] Bewertungsfunktion: Anlegen/Abrufen/Löschen einer Bewertung (übernommen aus TASK-69 AK3) (automatisiert: `test_task67_ratings_regression.py`, 12 pytest-Fälle über GET/POST/DELETE `/locations/{id}/ratings` — lokal grün verifiziert, TASK-67 Etappe 3; zusätzlicher UI-Klickfluss `run_frontend_check.py::_check_rating_flow`, lokal grün bestätigt (Etappe 5))
 - [ ] Abschnitt „Ausrichtung" zeigt Sonnenaufgang/-untergang mit Azimut für heute (US-107) (Datenebene automatisiert: `test_task67_detail_regression.py`, dieselbe `precompute._serialize()`-Logik — Anzeige im Abschnitt „Ausrichtung" selbst bleibt manuell/Etappe 3)
 - [ ] Locations mit Motiv-Koordinaten zeigen Richtungsklassifizierung relativ zum Motiv (US-107)
 - [ ] Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, kein leerer Abschnitt (US-107)
@@ -350,7 +359,7 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Korrekte Platzhalter-Erkennung (US-128) | Ob eine Location eine recherchierte Bauwerkshöhe hat, wird über ein explizites Datenfeld (`subject_height_researched`) bestimmt statt über eine Heuristik am Zahlenwert. Vorher wurden Locations mit exakt 20 m Bauwerkshöhe und fehlender Bauwerksbreite fälschlich als „unbearbeiteter Platzhalter" behandelt und aus der Scout-Pipeline ausgeschlossen — unabhängig vom tatsächlichen, ggf. korrekten Wert. |
 
 **Pflicht-Regression Scout:**
-- [ ] Scout-Tab lädt ohne Fehler
+- [ ] Scout-Tab lädt ohne Fehler (Basistest automatisiert: `run_frontend_check.py::_check_scout_mode`, TASK-67 Etappe 3, übernommen aus TASK-69 AK7, lokal grün bestätigt)
 - [ ] ≥1 Scout-Karte sichtbar mit ScoreRing (links), Session-Icon + Label + Uhrzeit, Motivname, Location-Zeile „Blick vom [Richtung]", Tag-Chips
 - [ ] Location-Zeile zeigt NUR die Himmelsrichtung (kein Motivname-Duplikat): „Blick vom Nordosten"
 - [ ] Tag-Chips: Wetter-Text + Entfernung (km) + Mondbeleuchtung (nur bei Mond-Chancen)
@@ -435,6 +444,12 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 - Feed (`/opportunities`) → automatisiert (`test_feed_opportunities`, prüft Liste + Status statt Event-Anzahl).
 - Scout (`/discover`) → automatisiert (`test_scout_discover`); **Befund bei Gelegenheit dieser Etappe:** `/discover` liefert ein dict (`{"status", "opportunities", ...}`), keine flache Liste — der obige curl-Einzeiler zählt daher fälschlich `len(d)` über die Dict-Keys (immer 4), nicht über die Events; der automatisierte Test prüft stattdessen korrekt, dass `d["opportunities"]` eine Liste ist.
 - Kalender (`/calendar`) → automatisiert (`test_calendar`); gleicher Befund wie bei Scout (`/calendar` liefert ebenfalls ein dict mit `"events"`-Liste, kein flaches Array).
+
+**Fünf Zusatzfunktionen (übernommen aus TASK-69 AK8, TASK-67 Etappe 3) — jeweils mindestens ein automatisierter Basistest, lokal grün verifiziert (`test_task67_zusatzfunktionen_regression.py`):**
+- Tagesübersicht (`/opportunities/today` + `/daily-briefing`) — automatisiert: `TestTagesuebersicht`.
+- Empfehlungsplan (`/plan`, On-Demand-Alignment für beliebige Koordinaten, TASK-25) — automatisiert: `TestEmpfehlungsplan`.
+- Adress-Umkehrsuche (`/reverse-geocode`) — automatisiert: `TestAdressUmkehrsuche`; prüft nur die Antwortstruktur (Statuscode + Feld `place`), nicht den Nominatim-Inhalt selbst (externer Netzwerkzugriff, vom Endpoint bei Fehler bewusst zu `""` abgefangen statt Absturz).
+- Verarbeitungsstatus-Anzeigen (`/job-status` + `/recompute-status`) — automatisiert: `TestVerarbeitungsstatusAnzeigen`.
 
 ---
 
@@ -606,9 +621,132 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-10 | BUG-69 | Bildausschnitt-Button jetzt gut lesbar auf jedem Foto-Hintergrund |
 | 2026-07-11 | BUG-70 | Datenbank-Korruption in `location_qa_values` durch einen harten Prozess-Abbruch (OOM-Kill) repariert. Code-Härtung: `LocationStore.integrity_check()` liefert jetzt eine vollständige Fehlerliste statt nur einer einzelnen Zeile und wirft auch bei stark beschädigten Datenbanken keine ungefangene Exception mehr; Ladefehler beim Server-Start werden jetzt als ERROR statt WARNING geloggt (fällt beim Monitoring auf statt unterzugehen); zusätzlich läuft beim Start jetzt generell eine Integritätsprüfung. Für eine eventuelle erneute Reparatur steht das Skript `tools/repair_bug70_qa_values.py` bereit. |
 | 2026-07-11 | BUG-71 | Beispielbild-Upload (Location-Detail + Anlage-Formular) behält den Location-/Draft-Bezug jetzt robust über die asynchrone Fotoauswahl hinweg; fehlt der Bezug dennoch, erscheint ein Toast statt eines stillen Abbruchs. Released als v1.22.11. |
-| 2026-07-11 | BUG-75 | Live-Astro-Übersicht übernimmt beim Öffnen aus einem Ereignis (Feed/Kalender-Chance mit gespeichertem Ort UND Entdecken-Modus-Chance ohne Ort) jetzt exakt Datum + Ortszeit (Berlin) des Ereignisses statt „heute"; behebt zusätzlich einen ca. 2-Stunden-Versatz durch fälschlich als Ortszeit interpretierte UTC-Ziffern. Nachtrag: Zeit-Schieberegler startet beim Ereignis-Öffnen zentriert genau auf der Ereigniszeit und lässt sich ±12h in beide Richtungen navigieren (`_windowStart`-Fensterlogik in `AstroLive._curDate()`, additiv/abwärtskompatibel — ohne gesetztes Fenster exakt das alte Kalendertag-Verhalten). Zweiter Nachtrag: Die Zeitanzeige an der Zeitleiste zeigt jetzt zusätzlich das Datum (Format „TT.MM. · HH:MM Uhr“, `AstroLive._clockText()`), einheitlich in allen Render-Pfaden (Live-Timer, Scrub, Pin-Drag, Event-Öffnen). „Jetzt"-Live-Modus (Orts-Übersicht) unverändert außer der neuen Datumsanzeige. Status In Progress — Test/Release ausstehend. |
+| 2026-07-11 | BUG-75 | Live-Astro-Übersicht übernimmt beim Öffnen aus einem Ereignis (Feed/Kalender-Chance mit gespeichertem Ort UND Entdecken-Modus-Chance ohne Ort) jetzt exakt Datum + Ortszeit (Berlin) des Ereignisses statt „heute"; behebt zusätzlich einen ca. 2-Stunden-Versatz durch fälschlich als Ortszeit interpretierte UTC-Ziffern. Nachtrag: Zeit-Schieberegler startet beim Ereignis-Öffnen zentriert genau auf der Ereigniszeit und lässt sich ±12h in beide Richtungen navigieren (`_windowStart`-Fensterlogik in `AstroLive._curDate()`, additiv/abwärtskompatibel — ohne gesetztes Fenster exakt das alte Kalendertag-Verhalten). Zweiter Nachtrag: Die Zeitanzeige an der Zeitleiste zeigt jetzt zusätzlich das Datum (Format „TT.MM. · HH:MM Uhr“, `AstroLive._clockText()`), einheitlich in allen Render-Pfaden (Live-Timer, Scrub, Pin-Drag, Event-Öffnen). „Jetzt"-Live-Modus (Orts-Übersicht) unverändert außer der neuen Datumsanzeige. Released als v1.22.18. |
 | 2026-07-11 | TASK-64 | Backend-pytest-Suite läuft jetzt als Pflicht-Gate vor jedem Deploy (paralleler CI-Job, ~2 Min Laufzeit) |
 | 2026-07-11 | BUG-71 | Nachtrag: Service-Worker-Methodenfilter behebt 0-Byte-Bild-Upload auf iOS |
 | 2026-07-11 | TASK-66 | Bestehender Playwright-Frontend-Check im CI-Gate (TASK-64) um drei echte Bedien-Durchläufe erweitert: Location über den „+"-Tab anlegen (erscheint danach in `GET /locations` + als zusätzlicher Kartenmarker), Beispielbild gezielt über das Location-Detail-Sheet hochladen (BUG-71-Regressionsschutz, eigener isolierter Host-Login), Wahrscheinlichkeits-Filter auf einen deterministischen Extremwert setzen und zurücksetzen. Kein Cleanup nötig (jeder CI-Lauf startet mit frischer, nicht geteilter Dev-Datenbank). Reines Test-Tooling, keine sichtbare App-Änderung. |
 | 2026-07-11 | TASK-65 | Neuer generischer Feld-Rundreise-Test (`test_task_65_field_roundtrip.py`, 65 Testfälle) sichert dauerhaft ab, dass jedes Location-Feld einen Server-Neustart und einen precompute-Lauf übersteht — auch Felder, die es heute noch nicht gibt (Regressionsschutz gegen die BUG-50/61/68-Fehlerklasse). Reines Test-Tooling, keine Produktivcode-Änderung. |
 | 2026-07-11 | TASK-67 (Etappe 2) | PRODUCT.md-Pflichtliste weiter automatisiert: neue Testdateien `test_task67_feed_regression.py` (Round-Robin-Cap BUG-48, Dedup, Min-Score-Filter direkt auf `main._filter_feed()`), `test_task67_detail_regression.py` (Sonnenaufgang/-untergang-Azimut inkl. Null-Guard, US-107, end-to-end über `precompute._serialize()`) und `test_task67_orte_regression.py` (≥15 Locations). Für den überwiegenden Rest der 11 restlichen PRODUCT.md-Abschnitte (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) bestand bereits Testabdeckung an anderer Stelle (u.a. `test_us09_sightline.py`, `test_us79_moon_rise_set.py`, `test_us112_weather_map.py`, `test_bug66.py`, `test_bug67.py`, `test_us120.py`/`test_us_125.py`/`test_us_126.py`, `test_us_128.py`, `test_task45/46/47/48_*.py`, `test_task55_image_backup.py`) — diese wurde in PRODUCT.md referenziert statt dupliziert. Standort-Automatik-Abschnitt (11a) ist damit vollständig referenziert automatisiert, Backup-Abschnitt (11b) bis auf die reine Server-Ops-Restore-Funktion (kein Code-Pfad vorhanden). Zwei Grenzfälle bewusst NICHT als automatisiert markiert: (1) automatischer Sichtachsen-Trigger beim Anlegen/Ändern einer Location (Orte-Abschnitt, läuft im precompute-Subprozess, aber ungetestet), (2) Wetter-Overlay-optische Beurteilung (Karte-Abschnitt, nur Teil automatisiert). Reines Test-/Dokumentations-Tooling, keine Produktivcode-Änderung. Filter (3a) und Global UI (Abschnitt 2) bleiben in dieser Etappe komplett unautomatisiert, da alle dortigen Pflicht-Regression-Punkte echte Klick-/DOM-Interaktion oder rein optische Beurteilung voraussetzen (Etappe 3, Playwright). |
+| 2026-07-11 | TASK-67 (Etappe 4) | Abschluss-Dokumentation: kompakte „Nur manuell prüfbar"-Restliste am Ende der Datei ergänzt (Abschnitt 15) — sammelt alle Pflicht-Regressions-Punkte aus den Abschnitten 2–11c, die nach den Etappen 1–3 noch keinen Testverweis haben. Zwei bereits bekannte Lücken (Sichtachsen-Auto-Trigger beim Anlegen/Ändern einer Location, Backup-Restore-Funktion) sowie der Wetter-Overlay-Punkt sind darin explizit als Grenzfall/bekannte offene Automatisierungslücke gekennzeichnet, nicht stillschweigend einsortiert. Reine Dokumentationsarbeit, kein Code geändert. |
+
+---
+
+## 15. Nur manuell prüfbar — Restliste (Stand 2026-07-11, TASK-67)
+
+**Wozu diese Liste:** Nach den Etappen 1–6 ist ein großer Teil der Pflicht-Regression automatisiert, inzwischen auch der Filter-Bereich größtenteils (TASK-67 Etappe 6). Was hier steht, hat in seinem jeweiligen Abschnitt (oben) noch **keinen** Testverweis — das muss also weiterhin von Hand geprüft werden. Drei Gründe kommen dafür in Frage: (a) reine Optik/Layout/Animation, die kein Test bewerten kann, (b) Verhalten, das nur im echten Safari/iOS auffällt (ein Chromium-Test läuft blind daran vorbei), oder (c) Bereiche, die schlicht noch nicht drangekommen sind bzw. bewusst nur teilweise automatisiert wurden (z. B. der volle Mehr-Ansichten-Effektnachweis für Sichtachse/Hat-Beispielbild sowie der ungeklärte Brennweite-Befund, siehe Abschnitt 3a).
+
+Bei Punkten, wo die Daten dahinter schon automatisch geprüft werden, aber niemand das tatsächliche Bild auf dem Bildschirm anschaut, steht das explizit dabei („Datengrundlage ist bereits geprüft").
+
+Zwei Punkte, die schon länger als bekannte Lücke gelten, sowie ein Grenzfall sind unten **nicht** in die normale Liste gemischt, sondern eigens als „Grenzfall" bzw. „bekannte offene Automatisierungslücke" hervorgehoben.
+
+### Global-UI (Abschnitt 2)
+- Kein Tab zeigt seinen Inhalt doppelt
+- Kein Sheet öffnet sich ungewollt beim Laden der App
+- Theme-Wechsel (hell/dunkel) ändert wirklich alle Farben konsistent
+- Alle Icons sind in Safari sichtbar (bekannte WebKit-Falle: ein grüner Chrome-Test würde das nicht auffangen)
+- Onboarding erscheint nur beim allerersten Start, nicht mehr danach
+- Glossar: Suche filtert live, Accordion klappt auf/zu, „Onboarding erneut ansehen" funktioniert
+- Glossar zeigt die 2 neuen Einträge korrekt
+- Alle 15 kleinen ⓘ-Erklär-Symbole öffnen den passenden Text
+- Kartenlegende-ⓘ wirkt im Ruhezustand klein/dezent, wird bei Berühren gold
+
+### Feed (Abschnitt 3)
+- Dass mindestens eine Chance auch wirklich als Karte zu sehen ist (Datengrundlage ist bereits geprüft)
+- Overlay antippen schließt das Detail-Sheet wieder
+- Filter-Sheet öffnet und schließt sich sauber
+- Score-Ring ist optisch korrekt gefüllt (z. B. 75 % = Ring zu drei Vierteln voll) — reine Sehprüfung
+- Routine-Events-Filter blendet Goldene-/Blaue-Stunde-Karten sichtbar aus
+- Filter-Chips „Mondaufgang"/„Monduntergang" wirken sichtbar auf den Feed
+- Dass Mondaufgang-/Monduntergang-Karten wirklich als eigene Karten zu sehen sind (Datengrundlage ist bereits geprüft)
+- Dass die Sichtachsen-Pille (Auge-Symbol, Grün/Orange/Rot/Grau) auf der Karte wirklich richtig eingefärbt zu sehen ist (Datengrundlage ist bereits geprüft)
+
+### Filter (Abschnitt 3a) — nach TASK-67 Etappe 6 größtenteils automatisiert, Details siehe Abschnitt 3a
+- Brennweiten-Filterwirkung auf Karte/Orte-Tab optisch verifizieren, dass die Pins wirklich nur passend zur Brennweite angezeigt werden (funktional bestätigt korrekt, s. Klärung 2026-07-12 in Abschnitt 3a — nur der sichtbare Effekt noch nicht automatisiert)
+- Eventtyp-Sektion ist auf dem Orte-Tab sichtbar ausgegraut (kein automatisierter Test bislang, nur Tageszeit + Wahrscheinlichkeit sind abgedeckt)
+- „Sichtachsen-Check wirkt in allen Ansichten" — visueller Effekt auf Kalender/Scout sowie der volle Datenabgleich auf Feed/Locations-Tab (Teilabdeckung: Nicht-Ausgegraut-Sein + Karten-Effekt sind automatisiert, siehe Abschnitt 3a)
+- „Hat Beispielbild" wirkt sichtbar auf Karte/Feed/Kalender (Teilabdeckung: nur der Orte-Tab-Effekt ist automatisiert, siehe Abschnitt 3a)
+
+### Detail-Sheet (Abschnitt 4)
+- Sheet öffnet mit Slide-up-Animation von unten
+- Alle 12 Sektionen vorhanden, keine doppelt, beim Öffnen alle eingeklappt
+- Close-Button gut erreichbar (Safe Area, kein Overlap mit Status Bar)
+- FOV-Karte lädt sichtbar mit Verbindungslinie, Zielring-Marker und passender Legende
+- Vollbild-Symbol der FOV-Karte öffnet/schließt korrekt, Pins darin bleiben unverschiebbar
+- Sichtfeld-Kegel-Verlängerung sieht korrekt gestrichelt aus, bleibt beim Reglerwechsel sauber ohne alte Reste
+- Ohne Motivkoordinaten erscheint korrekt kein Vollbild-Symbol
+- „Zum Kalender"-Download startet wirklich sichtbar
+- Street-View-Button erscheint nur, wenn ein Azimut da ist
+- Dass Sonnenaufgang/-untergang wirklich sichtbar mit Uhrzeit + Azimut angezeigt werden (Datengrundlage ist bereits geprüft)
+- Dass die Sichtachsen-Pille wirklich sichtbar korrekt eingefärbt ist (Datengrundlage ist bereits geprüft)
+- Sichtachsen-Linie zeigt den passenden Linienstil (durchgezogen/gestrichelt/unterbrochen/gepunktet) je nach Status
+
+### Karten-Tab (Abschnitt 5)
+- Karte lädt sichtbar (kein weißer/leerer Block)
+- Mindestens 10 Pins sind sichtbar
+- Pin antippen zeigt ein Popup
+- Karte bleibt nach Theme-Wechsel sichtbar (kein leerer Block)
+
+**Grenzfall (teilautomatisiert):** Wetter-Overlay „Wolken"/„Niederschlag" — dass überhaupt ein Bild kommt (nicht leer/grau) und Zeitregler/Ebenen-Umschalter grundsätzlich bedienbar sind, ist automatisiert geprüft und lokal grün bestätigt. Ob der Wetterverlauf dabei optisch „weich und gut lesbar" wirkt, bleibt bewusst eine reine Sehprüfung von Hand.
+
+### Quick-Add (Abschnitt 6)
+- Sheet öffnet ohne Absturz
+- GPS-Button fragt sichtbar nach Standort-Erlaubnis
+- Karten-Tap setzt sichtbar den Motiv-Marker + Verbindungslinie
+- Ohne gesetzte Punkte erscheint der Hinweis-Toast
+- Mit gesetzten Punkten erscheint die Vorschau-Box mit Azimut/Distanz/Höhenwinkel
+- Eingetragener Hinweise-Text ist nach dem Speichern sofort sichtbar
+- Leer gelassenes Hinweise-Feld speichert normal, ohne automatische Notiz
+- Ausgewähltes Beispielbild erscheint nach dem Speichern automatisch im Hero-Bereich
+- Ohne Beispielbild erscheint korrekt der Platzhalter „Noch kein Beispielbild"
+- Dass ein neuer Marker/Eintrag auf Karte bzw. Orte-Liste wirklich ohne Neuladen sichtbar erscheint (Datengrundlage ist bereits geprüft)
+
+### Orte-Tab (Abschnitt 7)
+- Suche „Babelsberg" filtert sichtbar korrekt
+- Location-Detail-Sheet öffnet und schließt sauber
+- Dass Sonnenaufgang/-untergang im Abschnitt „Ausrichtung" wirklich sichtbar angezeigt werden (Datengrundlage ist bereits geprüft)
+- Locations mit Motiv-Koordinaten zeigen die Richtungsklassifizierung sichtbar korrekt
+- Locations ohne Motiv-Koordinaten zeigen nur Uhrzeit + Azimut, keinen leeren Abschnitt
+- Dass die Sichtachsen-Pille im Location-Detail wirklich sichtbar korrekt eingefärbt ist (Datengrundlage ist bereits geprüft)
+- Menüpunkt „Sichtachsen aktualisieren" löst sichtbar eine neue Prüfung aus, Pille aktualisiert sich
+- Bearbeiten → Speichern → Änderung ist sofort in Sheet + Liste sichtbar
+- Close-Button gut erreichbar (Safe Area)
+- Bearbeiten-Karte: Vollbild-Symbol öffnet/schließt korrekt, Pins darin setzbar
+- Satellit/Straße-Umschalter auf allen Location-Karten funktioniert sichtbar, gewählte Ansicht bleibt gemerkt
+- Dass Beispielbild hochladen/ersetzen wirklich mittig im Hero-Bereich sichtbar erscheint (Datengrundlage ist bereits geprüft)
+- Dass der Löschen-Button für ein Beispielbild wirklich mit vorheriger Sicherheitsabfrage arbeitet (Datengrundlage ist bereits geprüft)
+- Dass „Ausschnitt wählen" den sichtbaren Bildausschnitt per Klick wirklich verschiebt (Datengrundlage ist bereits geprüft)
+- Location mit Hinweise-Text zeigt die eigene Sektion sichtbar nach „Ausrichtung"
+- Location ohne Hinweise-Text zeigt korrekt keine leere Sektion
+
+**Grenzfall / bekannte offene Automatisierungslücke:** Dass das Anlegen/Ändern einer Location automatisch eine Sichtachsenprüfung auslöst, läuft im Hintergrund-Prozess, ist aber bislang durch keinen Test abgedeckt — bewusst als offene Lücke vorgemerkt statt stillschweigend als erledigt markiert.
+
+### Scout-Tab / Entdecken (Abschnitt 8)
+- Scout-Karte sichtbar mit ScoreRing, Session-Symbol, Motivname, Location-Zeile, Tag-Chips
+- Location-Zeile zeigt nur die Himmelsrichtung, ohne Motivname-Dopplung
+- Tag-Chips zeigen Wetter, Entfernung, Mondbeleuchtung korrekt
+- Kein Standort-Button auf der Karte, nur der Navigation-Button
+- Navigation-Button öffnet Apple Maps, nicht die Detailansicht
+- Karte antippen öffnet die Detailansicht
+- Karte erscheint nicht doppelt
+- Klick auf Scout-Karte öffnet das Detail-Sheet vollständig und eingeklappt
+- „Als Location speichern"-Button ist sichtbar (echtes Symbol, kein Emoji)
+- Klick darauf zeigt Toast + neue Location im Orte-Tab
+- AstroLive-Sektion im Scout-Detail öffnet die Bahn-Karte fehlerfrei
+
+### Einstellungen (Abschnitt 9)
+- Slider auf 80 % → Feed zeigt sichtbar weniger Karten
+- Theme-Umschalter ändert sofort das Erscheinungsbild
+- Theme-Auswahl übersteht einen App-Reload
+- Dass nach Host-/User-Login sofort die richtige Rollen-Anzeige im Tab zu sehen ist (Server-Logik ist bereits geprüft)
+
+### Login/Auth (Abschnitt 10)
+- Dass der Login-Screen für nicht eingeloggte Nutzer wirklich zu sehen ist (Server-Logik ist bereits geprüft)
+- Dass nach Host-/User-Login wirklich die passenden Tabs/Rollen-Texte zu sehen sind, auch nach einem Reload (Server-Logik ist bereits geprüft)
+
+### CI/Deploy-Testing (Abschnitt 11c)
+- Dass ein Release-Push den Testlauf wirklich mit auslöst
+- Dass ein grüner Testlauf den Deploy normal weiterlaufen lässt
+- Dass ein roter Testlauf den Deploy wirklich stoppt
+- Dass ein neues, vergessenes Location-Feld wirklich namentlich als fehlend gemeldet wird
+
+**Grenzfall / bekannte offene Automatisierungslücke (Backup, Abschnitt 11b):** Die gemeinsame Wiederherstellung von Standort-Daten UND Standort-Fotos (Restore) ist kein automatisierbarer Code-Pfad — es gibt aktuell keine Restore-Funktion in der App, das Zurückspielen ist ein manueller Vorgang direkt auf dem Server. Bleibt bewusst dauerhaft ein manueller Ops-Vorgang, nicht Teil einer künftigen Test-Etappe.

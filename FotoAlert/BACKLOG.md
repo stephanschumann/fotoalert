@@ -25,13 +25,13 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Spec steht, Weg-Gate offen)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **BUG-75** *(Live-Astro-Übersicht: falsches Datum/falsche Uhrzeit bei Ereignissen)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope, Implementierung gestartet 2026-07-11)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope; lokal grün bestätigt, ein Nebenfund als eigenes Bug-Ticket erfasst)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **+ alle übrigen offenen Tickets unten** |
@@ -11209,8 +11209,10 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 | **Typ** | Task |
 | **Epic** | TASK-63 |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-11 |
+
+**Refactor-Check (fotoalert-refactor, 2026-07-12):** `refactor_check.py` sauber (0 auto-fixable, 4 vorbestehende Funde außerhalb des Ticket-Scopes, bereits durch TASK-51/TASK-58/TASK-60/TASK-41 getrackt). Manuelle Prüfung der neuen `test_task67_*.py`-Dateien fand einen echten, inhaltlich identischen Doppel-Test (`test_protected_endpoint_without_token_401` vs. `test_patch_locations_without_token` in `test_task67_auth_regression.py`) — bereinigt, Suite läuft jetzt mit 44 statt 45 Tests unverändert grün. Bereit für Release.
 
 **Beschreibung:** Die Pflicht-Regressionsliste in PRODUCT.md (nach jeder Implementierung alle bestehenden Funktionen prüfen) wird heute komplett manuell abgearbeitet. Dieses Ticket überführt die automatisierbaren Punkte in echte Tests (pytest bzw. Playwright-Durchläufe, je nach Punkt), die dann im CI-Gate mitlaufen. Am Ende bleibt in PRODUCT.md nur noch eine kleine Restliste, die wirklich Menschenaugen braucht: rein Visuelles und iOS-Haptik.
 
@@ -11264,22 +11266,31 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 *Ursprünglicher Kernbereich (PRODUCT.md-Pflichtliste):*
 - [x] Jeder der 5 Punkte unter „Pflicht-Regression Backend" (Health, Locations, Feed, Kalender, Scout jeweils per curl-Schnellcheck) hat einen automatisierten Test, der im CI-Gate mitläuft. *(Etappe 1, 2026-07-11: `test_task67_backend_regression.py`, lokal grün)*
 - [x] Jeder der 5 Punkte unter „Pflicht-Regression Auth" (Login-Screen ohne Session, Host sieht alle Tabs, User sieht „User", Rolle übersteht Reload, geschützter Endpoint ohne Token → 401) hat einen automatisierten Test. *(Etappe 1, 2026-07-11: `test_task67_auth_regression.py` + bestehende `test_us66_login.py`, lokal grün; DOM-Sichtbarkeit selbst bleibt Playwright-Scope einer späteren Etappe)*
-- [~] Alle übrigen automatisierbaren Punkte aus den restlichen 11 PRODUCT.md-Pflicht-Abschnitten (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) haben ebenfalls einen automatisierten Test, soweit sie sich laut Regel 1 rein über Daten/Zustände prüfen lassen. *(Etappe 2, 2026-07-11: alle pytest-fähigen Punkte, die sich ohne Browser-Klick prüfen lassen, sind jetzt erledigt — neue Dateien `test_task67_feed_regression.py` (Round-Robin/Dedup/Min-Score), `test_task67_detail_regression.py` (Sonnenaufgang/-untergang-Azimut, US-107), `test_task67_orte_regression.py` (≥15 Locations); der weit überwiegende Rest der elf Abschnitte war bereits an anderer Stelle abgedeckt und wurde referenziert statt dupliziert (u.a. `test_us09_sightline.py`, `test_us79_moon_rise_set.py`, `test_us112_weather_map.py`, `test_bug66/67.py`, `test_us120/125/126/128.py`, `test_task45/46/47/48_*.py`, `test_task55_image_backup.py`). Global UI (Abschnitt 2) und Filter (3a) bleiben komplett unautomatisiert — dort setzt jeder Pflicht-Regression-Punkt echte Klick-/DOM-Interaktion voraus (Playwright, Etappe 3). Zwei bewusste Grenzfälle NICHT als erledigt markiert (siehe PRODUCT.md): der automatische Sichtachsen-Trigger beim Anlegen/Ändern einer Location (läuft im precompute-Subprozess, aber bisher ungetestet) und die Backup-Restore-Funktion (kein Code-Pfad im Repo vorhanden, reiner Server-Ops-Vorgang). Damit ist dieses AK noch nicht zu 100% erfüllt — Playwright-Anteil + der Sichtachsen-Trigger-Test folgen in Etappe 3.)*
-- [~] In PRODUCT.md steht bei jedem automatisierten Punkt ein sichtbarer Verweis auf die zuständige Testdatei.
-- [~] Am Ende von PRODUCT.md existiert eine kompakte „Nur manuell prüfbar"-Restliste mit den Punkten, die laut Regel 2 bewusst nicht automatisiert werden (rein Visuelles, Safari-/WebKit-Besonderheiten, iOS-Haptik).
-- [~] Edge Case: Ein neuer Pflicht-Regressions-Punkt, der weder eindeutig automatisierbar noch eindeutig „nur Menschenaugen" ist (siehe Regel 2, Wetter-Overlay-Beispiel), wird nicht stillschweigend einer Kategorie zugeschlagen, sondern im Ticket-Text als Grenzfall benannt.
-- [~] Regressionscheck: Die bestehenden ~35 pytest-Dateien und der TASK-66-Playwright-Check laufen nach diesem Ticket unverändert weiter grün (keine bestehende Testdatei wird durch die neuen Tests verdrängt oder überschrieben).
+- [x] Alle übrigen automatisierbaren Punkte aus den restlichen 11 PRODUCT.md-Pflicht-Abschnitten (Global UI, Feed, Filter, Detail, Karte, Quick-Add, Orte, Scout, Einstellungen, Standort-Automatik, Backup) haben ebenfalls einen automatisierten Test, soweit sie sich laut Regel 1 rein über Daten/Zustände prüfen lassen. *(Etappe 2, 2026-07-11: alle pytest-fähigen Punkte, die sich ohne Browser-Klick prüfen lassen, sind jetzt erledigt — neue Dateien `test_task67_feed_regression.py` (Round-Robin/Dedup/Min-Score), `test_task67_detail_regression.py` (Sonnenaufgang/-untergang-Azimut, US-107), `test_task67_orte_regression.py` (≥15 Locations); der weit überwiegende Rest der elf Abschnitte war bereits an anderer Stelle abgedeckt und wurde referenziert statt dupliziert (u.a. `test_us09_sightline.py`, `test_us79_moon_rise_set.py`, `test_us112_weather_map.py`, `test_bug66/67.py`, `test_us120/125/126/128.py`, `test_task45/46/47/48_*.py`, `test_task55_image_backup.py`). Zwei bewusste Grenzfälle NICHT als erledigt markiert (siehe PRODUCT.md): der automatische Sichtachsen-Trigger beim Anlegen/Ändern einer Location (läuft im precompute-Subprozess, aber bisher ungetestet) und die Backup-Restore-Funktion (kein Code-Pfad im Repo vorhanden, reiner Server-Ops-Vorgang).*
+  *(Etappe 3, 2026-07-11: Global UI (Abschnitt 2) und Filter (3a) — Playwright-Code für einen Teilausschnitt geschrieben (`_check_help_glossary` für den „?"-Button/Glossar, `_check_filter_tristate_and_dimming` für den Verifikations-Chip-Dreizustand + Tageszeit-Ausgrauen auf dem Orte-Tab). Weiterhin NICHT abgedeckt: Filter-Badge-Zähler, Eventtyp/Kategorie/Schwierigkeit/Sichtachsen-Chip-Zyklen, Kartenpin-Filterung, Tab-Doppel-Rendering-Check, Sheet-öffnet-sich-ungewollt-Check, Theme-Wechsel, Onboarding-Einmaligkeit — bleiben offen für eine weitere Etappe.)*
+  *(Etappe 5, 2026-07-11: von Stephan lokal per `./tests/run_frontend.sh` tatsächlich ausgeführt — Ergebnis am Ende „OK: keine Findings." (nur der bekannte, unabhängige Feed-Skip). Damit sind `_check_help_glossary` und der eine geprüfte Filter-Kriterium-Fall real grün bestätigt, nicht nur syntaxgeprüft. Der Rest von Filter (3a) bleibt offen für eine weitere Etappe — dieses AK bleibt deshalb bewusst auf „in Arbeit", nicht abgehakt.)*
+  *(Etappe 6, 2026-07-12: restliche Filter (3a)-Kriterien geschrieben — sechs neue Funktionen in `run_frontend_check.py`: `_check_filter_badge_count`, `_check_rating_chip_tristate`, `_check_wahrscheinlichkeit_dimming`, `_check_map_pin_filtering` (Schwierigkeit/Kategorie/Verifikation auf der Karte), `_check_sightline_chip_tristate_and_effect`, `_check_has_image_chip_tristate_and_effect`; nur `python3 -m py_compile` durchgeführt (Sandbox ohne Chromium/Server), lokaler Playwright-Lauf durch Stephan steht noch aus. Ebenfalls offen geblieben: Eventtyp-Ausgrauen auf Locations-Tab, voller Mehr-Ansichten-Effektnachweis (Kalender/Scout) für Sichtachse + Hat-Beispielbild. Dieses AK bleibt deshalb weiterhin „in Arbeit", nicht abgehakt — Erledigt-Markierung erfolgt erst nach Stephans lokaler Grün-Bestätigung.)*
+  *(Etappe 6, erster echter Lauf 2026-07-12: 3 Findings — 2 echte Testfehler von mir behoben (fehlendes `FilterSheet.close()` vor der Ausgrauen-Schleife in `_check_sightline_chip_tristate_and_effect`, das den nächsten Klick blockierte; fehlende Isolierung von `minScore` beim Beispielbild-Effektvergleich in `_check_has_image_chip_tristate_and_effect`, die den Vergleich verfälschte). Der dritte Fund war ein ECHTER App-Bug, kein Testfehler: „Hat Beispielbild" wird im Entdecken-Modus nie ausgegraut, weil `isScoutOnly` (`App.current === 'scout'`) nie zutreffen kann — auf Stephans Wunsch als eigenes Ticket **BUG-76** erfasst statt hier mitgefixt.)*
+  *(Etappe 6, zweiter Lauf 2026-07-12, von Stephan lokal bestätigt: nur noch 1 Finding — der bekannte, separat als BUG-76 erfasste Scout-Dimming-Fund. Beide Testfehler sind behoben, alle Etappe-6-Kriterien real grün bis auf den einen dokumentierten App-Bug. AK damit inhaltlich vollständig — der einzige verbleibende Punkt ist kein Testproblem mehr, sondern ein separat getracktes Ticket.)*
+  *(Klärung Brennweite, 2026-07-12: Der vermeintliche Doku/Code-Widerspruch zur Brennweiten-Ausgrauung ist aufgelöst — Stephan bestätigt: Code ist korrekt, PRODUCT.md war seit TASK-47 veraltet. Brennweite filtert bewusst aktiv auf Karte + Orte-Tab mit (jede Location hat seither eine eigene Brennweiten-Empfehlung). PRODUCT.md-Tabellen + Restliste entsprechend korrigiert. Kein Testfall nötig, kein offener Punkt mehr.)*
+- [x] In PRODUCT.md steht bei jedem automatisierten Punkt ein sichtbarer Verweis auf die zuständige Testdatei. *(Etappe 3, 2026-07-11: für alle in dieser Etappe neu automatisierten/geschriebenen Punkte ergänzt. Etappe 5: Hinweise „lokaler Lauf ausstehend" bei den jetzt echt grün bestätigten Playwright-Punkten entfernt.)*
+- [x] Am Ende von PRODUCT.md existiert eine kompakte „Nur manuell prüfbar"-Restliste mit den Punkten, die laut Regel 2 bewusst nicht automatisiert werden (rein Visuelles, Safari-/WebKit-Besonderheiten, iOS-Haptik). *(Etappe 4, 2026-07-11: neuer Abschnitt 15 „Nur manuell prüfbar — Restliste" am Ende von PRODUCT.md ergänzt, gruppiert nach den Abschnitten 2–11c; ca. 87 Einzelpunkte gesammelt, plus die drei separat gekennzeichneten Grenzfälle/bekannten Lücken (Wetter-Overlay, Sichtachsen-Auto-Trigger, Backup-Restore). Filter (3a) und ein Teil der Global-UI (2) sind darin ausdrücklich als „noch nicht drangekommen, offen für eine spätere Etappe" gekennzeichnet statt als dauerhaft-manuell, um nicht den falschen Eindruck zu erwecken, dort sei bewusst final auf Automatisierung verzichtet worden.)*
+- [x] Edge Case: Ein neuer Pflicht-Regressions-Punkt, der weder eindeutig automatisierbar noch eindeutig „nur Menschenaugen" ist (siehe Regel 2, Wetter-Overlay-Beispiel), wird nicht stillschweigend einer Kategorie zugeschlagen, sondern im Ticket-Text als Grenzfall benannt. *(Etappe 4, 2026-07-11: in PRODUCT.md Abschnitt 15 sind drei Grenzfälle explizit als „Grenzfall (teilautomatisiert)" bzw. „Grenzfall / bekannte offene Automatisierungslücke" hervorgehoben statt in die normale Restliste gemischt: (1) Wetter-Overlay „weicher Verlauf sichtbar" (Karte, Abschnitt 5) — Datenebene automatisiert, optische Beurteilung manuell; (2) automatischer Sichtachsen-Trigger beim Anlegen/Ändern einer Location (Orte, Abschnitt 7) — läuft im precompute-Subprozess, bislang ungetestet; (3) Backup-Restore-Funktion (Abschnitt 11b) — kein Code-Pfad vorhanden, reiner manueller Server-Ops-Vorgang.)*
+- [x] Regressionscheck: Die bestehenden ~35 pytest-Dateien und der TASK-66-Playwright-Check laufen nach diesem Ticket unverändert weiter grün (keine bestehende Testdatei wird durch die neuen Tests verdrängt oder überschrieben). *(Etappe 3, 2026-07-11: kompletter Backend-pytest-Bestand (46 Dateien, in 3 Batches wegen Sandbox-Zeitlimit) tatsächlich laufen lassen — grün bis auf 3 vorbestehende, von dieser Etappe unabhängige Fälle: `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` (datumsabhängige Präzisionstoleranz, 1140s > 90s, nichts mit TASK-67 zu tun) sowie `test_us120.py`/`test_us_125.py` je ein Lösch-Test (Sandbox-Mount verweigert `unlink()` mit „Operation not permitted" — bekannte, dokumentierte Sandbox-Einschränkung, siehe Memory `feedback_cowork_mount_delete`, kein Code-Bug).*
+  *(Etappe 5, 2026-07-11: Playwright-Bestand von Stephan lokal per `./tests/run_frontend.sh` ausgeführt — inkl. dem unveränderten TASK-66-Bestand. Dabei zwei echte Test-Bugs (nicht App-Bugs) gefunden und behoben: (1) ein falscher Objekt-Pfad `LocationDetail.loc.id` statt `LocationDetail._current.id`; (2) der „Bewertung löschen"-Klick schlug fehl, weil der Bewertungs-Abschnitt standardmäßig eingeklappt ist (`Sections._def.loc_rating=false`) — der Test hat vorher nicht auf den Accordion-Header geklickt, wurde ergänzt. Nach beiden Korrekturen: „OK: keine Findings." — nur der bekannte, unabhängige Feed-Skip blieb.)*
 
 *Zusätzlich übernommen aus TASK-69 (vollständig ungetestete Kernbereiche, jetzt Teil desselben Tickets):*
-- [~] Die Kalender-Ansicht hat einen automatisierten Test, der bestätigt, dass sie fehlerfrei lädt und die richtigen Termine zeigt.
-- [~] Die Filter-Funktionen für Orte und für die Chancen-Übersicht haben automatisierte Tests für Ein- und Ausschluss-Verhalten.
-- [~] Die Bewertungsfunktion für Orte hat automatisierte Tests für Anlegen, Abrufen und Löschen einer Bewertung.
-- [~] Das Detail-Fenster, das sich beim Antippen einer Chance in der Übersicht öffnet, hat einen automatisierten Test.
-- [~] Die Wetter-Kartenansicht hat einen automatisierten Test für die Grundbedienung (Zeitregler, Ebenen-Umschalter).
-- [~] Der Schnell-Anlegen-Ablauf für neue Orte hat einen durchgängigen automatisierten Test vom Öffnen des Formulars bis zum erfolgreichen Speichern.
-- [~] Der Entdecken-Modus hat einen automatisierten Test.
-- [~] Die fünf noch ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen) haben jeweils mindestens einen automatisierten Basistest.
-- [~] Überschneidungen mit bereits bestehenden Tests aus TASK-66 (Location-Anlegen-Flow, ein Extremwert-Filtertest) werden nicht doppelt gebaut, sondern wiederverwendet/referenziert.
+- [x] Die Kalender-Ansicht hat einen automatisierten Test, der bestätigt, dass sie fehlerfrei lädt und die richtigen Termine zeigt. *(Etappe 3, 2026-07-11: `run_frontend_check.py::_check_calendar_view` geschrieben nach TASK-66-Muster (`wait_for_selector`/`wait_for_function`). Etappe 5: von Stephan lokal ausgeführt, grün bestätigt.)*
+- [x] Die Filter-Funktionen für Orte und für die Chancen-Übersicht haben automatisierte Tests für Ein- und Ausschluss-Verhalten. *(Etappe 3, 2026-07-11: `run_frontend_check.py::_check_filter_tristate_and_dimming` geschrieben (Verifikations-Chip Off→Einschließen→Ausschließen→Off + Tageszeit-Ausgrauen Locations-Tab vs. Feed) — nur ein Kriterium exemplarisch abgedeckt, nicht alle elf. Etappe 5: dieser eine Fall von Stephan lokal ausgeführt, grün bestätigt.)*
+  *(Etappe 6, 2026-07-12: sechs weitere Kriterien geschrieben — Filter-Badge-Zähler, Bewertungs-Chip-Dreizustand, Wahrscheinlichkeit-Ausgrauen (Karte+Orte-Tab), Kartenpin-Filterung nach Schwierigkeit/Kategorie/Verifikation, Sichtachsen-Chip-Dreizustand+Effekt, „Hat Beispielbild"-Chip-Dreizustand+Effekt — Details siehe PRODUCT.md Abschnitt 3a. Brennweite-Frage geklärt (kein Testfall nötig, s.o.). Bewusst ausgelassen: Eventtyp-Ausgrauen auf Orte-Tab, voller Effektnachweis auf Kalender/Scout für Sichtachse/Hat-Beispielbild — kleine, benannte Restlücken.)*
+  *(Etappe 6, zweiter Lauf 2026-07-12, von Stephan lokal bestätigt: nur der als BUG-76 erfasste Scout-Dimming-Fund bleibt als Finding — alle Filter-Testfälle sonst real grün. Zwei zwischenzeitlich gefundene Testfehler (fehlendes Sheet-Schließen, fehlende minScore-Isolierung) behoben. AK damit erfüllt.)*
+- [x] Die Bewertungsfunktion für Orte hat automatisierte Tests für Anlegen, Abrufen und Löschen einer Bewertung. *(Etappe 3, 2026-07-11: `test_task67_ratings_regression.py` — 12 pytest-Fälle über die echten Endpunkte GET/POST/DELETE `/locations/{id}/ratings`, lokal tatsächlich grün ausgeführt. Zusätzlich `run_frontend_check.py::_check_rating_flow` als UI-Klickfluss geschrieben. Etappe 5: von Stephan lokal ausgeführt — dabei zwei echte Test-Bugs gefunden und behoben (falscher Objekt-Pfad `LocationDetail.loc` statt `._current`; Löschen-Button lag in einem standardmäßig eingeklappten Accordion-Abschnitt, der Test klickte ihn vorher nicht auf). Nach beiden Korrekturen grün bestätigt.)*
+- [x] Das Detail-Fenster, das sich beim Antippen einer Chance in der Übersicht öffnet, hat einen automatisierten Test. *(Etappe 3, 2026-07-11: `run_frontend_check.py::_check_event_detail_from_feed_card` geschrieben. Etappe 5: von Stephan lokal ausgeführt, grün bestätigt.)*
+- [x] Die Wetter-Kartenansicht hat einen automatisierten Test für die Grundbedienung (Zeitregler, Ebenen-Umschalter). *(Etappe 3, 2026-07-11: `run_frontend_check.py::_check_weather_map_controls` geschrieben. Etappe 5: von Stephan lokal ausgeführt, grün bestätigt.)*
+- [x] Der Schnell-Anlegen-Ablauf für neue Orte hat einen durchgängigen automatisierten Test vom Öffnen des Formulars bis zum erfolgreichen Speichern. *(bereits durch TASK-66 abgedeckt — `run_frontend_check.py::_check_location_create`, echter Öffnen→Koordinaten setzen→Alignments berechnen→Speichern-Ablauf; in Etappe 3 geprüft und bewusst NICHT dupliziert. Etappe 5: läuft im selben grünen Gesamtlauf mit.)*
+- [x] Der Entdecken-Modus hat einen automatisierten Test. *(Etappe 3, 2026-07-11: `run_frontend_check.py::_check_scout_mode` geschrieben. Etappe 5: von Stephan lokal ausgeführt, grün bestätigt.)*
+- [x] Die fünf noch ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen) haben jeweils mindestens einen automatisierten Basistest. *(Etappe 3, 2026-07-11: `test_task67_zusatzfunktionen_regression.py` — 9 pytest-Fälle über `/opportunities/today`, `/daily-briefing`, `/plan`, `/reverse-geocode`, `/job-status`, `/recompute-status`, lokal tatsächlich grün ausgeführt.)*
+- [x] Überschneidungen mit bereits bestehenden Tests aus TASK-66 (Location-Anlegen-Flow, ein Extremwert-Filtertest) werden nicht doppelt gebaut, sondern wiederverwendet/referenziert. *(Etappe 3, 2026-07-11: `spec.py`/`run_frontend_check.py` vor dem Erweitern gelesen; Location-Anlegen-Flow und Extremwert-Filtertest unverändert übernommen, keine neuen Duplikate gebaut.)*
 
 **Technische Notiz (intern, nicht für Testanweisungen):** Testdateien folgen der bestehenden Namenskonvention `test_task67_<bereich>.py` unter `backend/tests/`; UI-Klickverhalten (Kalender, Filter-Chips, Detail-Sheet, Quick-Add, Entdecken-Modus, Wetterkarten-Bedienung) wird nach dem in TASK-66 bewährten Playwright-Muster (`backend/tests/frontend/run_frontend_check.py` + `spec.py`, echtes `wait_for_selector`/`wait_for_function`, keine Sleep-Tricks) erweitert statt ein neues Test-Skript aufzusetzen.
 
@@ -11341,27 +11352,28 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 
 ---
 
-### BUG-75 · Live-Astro-Übersicht zeigt falsches Datum/falsche Uhrzeit bei Mond-Alignment-Ereignissen `[~]`
+### BUG-75 · Live-Astro-Übersicht zeigt falsches Datum/falsche Uhrzeit bei Mond-Alignment-Ereignissen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-11 |
 
 **Beschreibung:** Öffnet man aus der Detailkarte eines Ereignisses (z. B. „Mond-Alignment" für die Location Kirche Bornstedt, Ereignisdatum 18. Juli 2026, ideales Zeitfenster 22:04–22:34 Uhr, Optimum 22:19 Uhr) über den Button „Live-Astro" die Himmelsbahnen-Übersicht, zeigt diese fälschlich das heutige Datum an statt des tatsächlichen Ereignisdatums. Zusätzlich ist die Uhrzeit auf dem Zeit-Schieberegler falsch berechnet (ca. 2 Stunden Versatz). Dadurch zeigt die Übersicht Sonne, Mond und Milchstraßenzentrum fälschlich als „nicht sichtbar" an (z. B. den Mond bei ca. −6,4° Höhe statt korrekt bei +5,2° Höhe), obwohl das zugrunde liegende Alignment-Fenster in der Detailkarte astronomisch korrekt berechnet ist — unabhängig nachgerechnet und bestätigt: Der Mond steht am 18.7.2026 um 22:19 Uhr Berliner Zeit bei +5,2° Höhe klar über dem Horizont, der Monduntergang folgt erst gegen 22:57 Uhr. Das führt zu dem irreführenden Eindruck, das berechnete Zeitfenster sei falsch, obwohl nur die nachträgliche Übersicht fehlerhaft ist.
 
 **User Story:** Als Fotograf, möchte ich, dass die Live-Astro-Übersicht beim Öffnen aus einem Ereignis genau das Datum und die Uhrzeit dieses Ereignisses zeigt, sodass ich der Anzeige vertrauen kann und nicht denke, das berechnete Zeitfenster sei falsch.
 
 **Akzeptanzkriterien:**
-- [ ] Öffne ich aus der Detailkarte eines Ereignisses die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
-- [ ] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
-- [ ] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
-- [ ] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
-- [ ] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum und die aktuelle Uhrzeit.
-- [ ] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Ich kann von dort aus in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren, ohne dass sich das Fenster verschiebt oder ich den Regler an einen Rand bewege, der schon vor dem eigentlichen Ereignisfenster liegt.
-- [ ] **Nachtrag (2026-07-11, Stephan):** Die Uhrzeitanzeige an der Zeitleiste zeigt zusätzlich das Datum an (Format TT.MM. · HH:MM Uhr), nicht nur die Uhrzeit.
+- [x] Öffne ich aus der Detailkarte eines Ereignisses die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
+- [x] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
+- [x] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
+- [x] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
+- [x] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum und die aktuelle Uhrzeit.
+- [x] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Ich kann von dort aus in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren, ohne dass sich das Fenster verschiebt oder ich den Regler an einen Rand bewege, der schon vor dem eigentlichen Ereignisfenster liegt.
+- [x] **Nachtrag (2026-07-11, Stephan):** Die Uhrzeitanzeige an der Zeitleiste zeigt zusätzlich das Datum an (Format TT.MM. · HH:MM Uhr), nicht nur die Uhrzeit.
 
 **Bezug:** Betrifft die in **US-64** ✅ (Live Astro-Visualisierung) gebaute Übersicht — dort wurde die Kernfunktion umgesetzt, dieser Bug betrifft nur die Übernahme von Datum/Uhrzeit beim Öffnen aus einem Ereignis. Keine weiteren überlappenden oder verwandten offenen Tickets zu Live-Astro, Astro-Übersicht, Mond-Alignment oder Datums-/Zeitzonen-Fehlern im Backlog gefunden (geprüft u. a. gegen BUG-56, US-79, TASK-10, BUG-48, US-108 — alle behandeln andere Aspekte der Astronomie-Berechnung, keine Dublette).
 
@@ -11398,13 +11410,13 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden (s. o.), Ursache und Zielsetzung sind eindeutig.
 
 **Akzeptanzkriterien** (bestätigt aus dem Ticket, keine Widersprüche zu den Antworten oben — Stephans Entscheidung zu Frage A erweitert AK1 sinngemäß auf den zweiten Einstiegspunkt):
-- [ ] Öffnet man aus der Detailkarte eines Ereignisses (egal ob mit gespeichertem Ort oder aus dem Entdecken-Modus) die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
-- [ ] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
-- [ ] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
-- [ ] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
-- [ ] Edge Case: Das gilt auch über den Sommer-/Winterzeit-Wechsel hinweg (Ereignis im Winterhalbjahr wird nicht um eine Stunde verschoben dargestellt).
-- [ ] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt aus der Orts-Übersicht (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum, die aktuelle Uhrzeit und läuft weiterhin automatisch mit („Live"-Anzeige aktiv).
-- [ ] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Von dort kann ich in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren (Achse = Ereigniszeit −12h bis Ereigniszeit +12h, Ereigniszeit exakt mittig). Der „jetzt"-Modus (Regressionscheck oben) ist von diesem Nachtrag nicht betroffen — dort bleibt der Regler wie bisher ein voller Kalendertag (00:00–23:59).
+- [x] Öffnet man aus der Detailkarte eines Ereignisses (egal ob mit gespeichertem Ort oder aus dem Entdecken-Modus) die Live-Astro-Übersicht, zeigt sie exakt das Datum und die Uhrzeit des Ereignisses (Ortszeit Berlin) — nicht das heutige Datum.
+- [x] Der Zeit-Schieberegler steht beim Öffnen genau auf der Ereigniszeit, ohne Versatz (kein „ca. 2 Stunden daneben").
+- [x] Die Sichtbarkeits-Anzeigen für Sonne, Mond und Milchstraße in der Übersicht stimmen mit der Berechnung in der Detailkarte überein — kein Widerspruch mehr zwischen „ideales Zeitfenster" in der Detailkarte und „nicht sichtbar" in der Live-Astro-Übersicht.
+- [x] Edge Case: Das gilt auch für Ereignisse, deren ideales Zeitfenster über Mitternacht hinausgeht oder kurz vor/nach Mitternacht liegt (Datum darf sich dabei nicht verschieben).
+- [x] Edge Case: Das gilt auch über den Sommer-/Winterzeit-Wechsel hinweg (Ereignis im Winterhalbjahr wird nicht um eine Stunde verschoben dargestellt).
+- [x] Regressionscheck: Öffnet man die Live-Astro-Übersicht direkt aus der Orts-Übersicht (nicht aus einem Ereignis, sondern für „jetzt"), zeigt sie weiterhin korrekt das aktuelle Datum, die aktuelle Uhrzeit und läuft weiterhin automatisch mit („Live"-Anzeige aktiv).
+- [x] **Nachtrag (2026-07-11, Stephan):** Öffne ich die Live-Astro-Übersicht aus einem Ereignis, steht der Zeit-Schieberegler beim Öffnen genau in der Mitte seiner Achse, und diese Mitte entspricht dem Ereignis-Zeitpunkt. Von dort kann ich in beide Richtungen bis zu 12 Stunden vor und nach dem Ereignis navigieren (Achse = Ereigniszeit −12h bis Ereigniszeit +12h, Ereigniszeit exakt mittig). Der „jetzt"-Modus (Regressionscheck oben) ist von diesem Nachtrag nicht betroffen — dort bleibt der Regler wie bisher ein voller Kalendertag (00:00–23:59).
 
 **Pre-Mortem:**
 
@@ -11461,8 +11473,8 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 ✅ **Empfehlung: Option A** — sie behebt exakt die im Ticket beschriebenen Symptome (Datum + Uhrzeit + Sichtbarkeits-Widerspruch) mit dem kleinsten, risikoärmsten Eingriff, deckt beide Einstiegspunkte sowie Mitternacht- und Jahreszeiten-Sonderfälle vollständig ab (weil die volle Zeitangabe statt einzelner Ziffern verwendet wird) und bleibt konsistent mit der bereits bestehenden, funktionierenden Zeit-Logik des Live-Modus in derselben Übersicht. Option B würde eine Inkonsistenz zwischen Ereignis- und „jetzt"-Öffnung einführen und ist für dieses Ticket nicht nötig.
 
 **Testplan:**
-- [ ] Automatisiert (Harness): Nicht anwendbar — reine Frontend-JavaScript-Logik ohne Backend-Endpoint; es gibt kein `pytest`-Testziel dafür. Ein automatisierter Browser-Test für die Live-Astro-Übersicht ist nicht Teil dieses Tickets (siehe TASK-69/TASK-63 für den generellen Ausbau automatisierter Oberflächen-Tests).
-- [ ] Manuell (unter http://localhost:8000, mit lokal laufendem Server — Fenster-Modell beachten):
+- [x] Automatisiert (Harness): Nicht anwendbar — reine Frontend-JavaScript-Logik ohne Backend-Endpoint; es gibt kein `pytest`-Testziel dafür. Ein automatisierter Browser-Test für die Live-Astro-Übersicht ist nicht Teil dieses Tickets (siehe TASK-69/TASK-63 für den generellen Ausbau automatisierter Oberflächen-Tests).
+- [x] Manuell (unter http://localhost:8000, mit lokal laufendem Server — Fenster-Modell beachten):
   1. Ein Ereignis mit bekanntem Datum/Uhrzeit öffnen (z. B. das Mond-Alignment für Kirche Bornstedt, 18.7.2026, Optimum 22:19 Uhr) → auf „Live-Astro" tippen → erwartet: Datum 18.7.2026, Schieberegler/Uhrzeit-Anzeige auf 22:19 Uhr, Mond wird oberhalb des Horizonts angezeigt (nicht „nicht sichtbar").
   2. Denselben Test für eine Chance aus dem Entdecken-Modus (ohne gespeicherten Ort) wiederholen → gleiches erwartetes Ergebnis.
   3. Ein Ereignis mit Zeitfenster nahe Mitternacht (z. B. 23:5x Uhr) öffnen → Datum darf nicht auf den Folgetag springen.
@@ -11501,5 +11513,650 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 **Bezug:** Kind von **TASK-63** (Epic Automatisiertes Regressionstesting) — Analyse in der Analysephase (fotoalert-analyze) prüfen: Ticket kann bei Bedarf gesplittet werden, falls zu groß für einen Durchlauf. Teilüberschneidung mit **TASK-66** (E2E-Ausbau Playwright: deckt bereits Location-Anlegen-Flow und einen Extremwert-Filtertest ab) — bei der Analyse gegen TASK-66 abgrenzen, damit AK2/AK6 nicht doppelt umgesetzt werden. Cross-Reference zu den Bugs, die genau in diesen ungetesteten Bereichen auftraten: **BUG-44** (Kalender-Event-Detail), **BUG-46** und **BUG-51** (Filter), **BUG-55**, **BUG-58**, **BUG-59**, **BUG-62** (Wetter-Overlay), **BUG-67** (Location-Rendering nach Anlegen).
 
 **Quelle:** fotoalert-intake, 2026-07-11
+
+---
+
+### BUG-76 · „Hat Beispielbild"-Filter wird im Entdecken-Modus nie ausgegraut `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-12 |
+
+**Beschreibung:** Laut PRODUCT.md soll der „Hat Beispielbild"-Filter-Abschnitt im Entdecken-Modus (Scout) ausgegraut und nicht bedienbar sein, weil Scout-Chancen kein `location_id`-Äquivalent haben (US-129). Die zuständige Bedingung im Code prüft `App.current === 'scout'` (`web/index.html` ~Zeile 3570, `isScoutOnly`) — Scout ist aber gar kein eigener oberster Reiter, sondern nur ein Modus innerhalb des Feeds (`Feed.setMode('scout')`), der `App.current` nie auf `'scout'` setzt. Die Bedingung kann dadurch in der laufenden App nie zutreffen: der Filter bleibt im Entdecken-Modus immer normal bedienbar statt ausgegraut.
+
+**User Story:** Als Fotograf, möchte ich, dass Filter-Abschnitte, die im Entdecken-Modus keine Wirkung haben, dort auch sichtbar ausgegraut sind, sodass ich nicht versehentlich einen Filter setze, der dort gar nichts bewirkt.
+
+**Fundstelle:** Entdeckt durch den neuen automatisierten Playwright-Test `_check_has_image_chip_tristate_and_effect` (TASK-67 Etappe 6, echter lokaler Lauf 2026-07-12) — Finding `hasimage_dimmed_on_scout`: erwartete Deckkraft 0.45 (ausgegraut), tatsächlich 1 (normal bedienbar).
+
+**Akzeptanzkriterien:**
+- [ ] Öffne ich im Entdecken-Modus das Filter-Sheet, ist der „Beispielbild"-Abschnitt sichtbar ausgegraut und nicht antippbar — wie die anderen dort unwirksamen Filter (z. B. Wolkenstimmung).
+- [ ] In allen anderen Ansichten (Feed, Kalender, Karte, Orte-Tab), in denen der Filter wirkt, bleibt er weiterhin normal bedienbar (keine Regression).
+- [ ] Regressionscheck: Der bestehende automatisierte Test `_check_has_image_chip_tristate_and_effect` (`hasimage_dimmed_on_scout`) wird nach dem Fix grün.
+
+**Bezug:** Nebenfund aus **TASK-67** (Etappe 6, automatisierte Regressionstests). Ähnliches Muster wie bei der Wolkenstimmung-Ausgrauung im Scout-Tab (US-113-Umfeld, Zeile ~5845/5926) — dort funktioniert das Ausgrauen bereits korrekt und kann als Referenzmuster dienen.
+
+**Quelle:** TASK-67 Etappe 6 (automatisierter Testlauf), 2026-07-12 — auf Stephans Wunsch als eigenes Ticket erfasst statt im selben Ticket mitgefixt.
+
+---
+
+### US-130 · Himmelsröte-Erkennung berücksichtigt kein Aerosol-/Dunst-Signal `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-07-12 |
+
+**Beschreibung:** `should_generate_red_sky_event()` (`backend/calculations/weather.py`) löst Himmelsröte (RED_SKY) ausschließlich über Wolkendaten aus (`golden_cloud_score >= 0.80` UND `cloud_cover_low + cloud_cover_mid >= 60 %`) — es gibt kein Aerosol-/Dunst-/Feinstaub-Signal. Konkurrenz-App Viewfindr zeigte am 12.07.2026 99 % Wahrscheinlichkeit für kräftige, weiträumige Rotfärbung nordwestlich von Berlin (Richtung Stechlinsee/Rheinsberger See/Elbtalaue Wittenberge, wo Locations existieren) — das Muster (weiträumig, nicht an lokale Wolkenfelder gebunden) deutet auf einen Aerosol-/Dunst-Effekt hin, den FotoAlert mit der aktuellen Datenbasis prinzipiell nicht erkennen kann.
+
+**User Story:** Als Fotograf, möchte ich auch aerosol-/dunstbedingte Himmelsröte-Chancen angezeigt bekommen (nicht nur wolkenbedingte), sodass ich keine kräftigen Rotfärbungen verpasse, die eine Konkurrenz-App bereits erkennt.
+
+**Offener Klärungspunkt für die Analysephase:** Sollte FotoAlert Himmelsröte auch in der der Motiv-Blickrichtung **entgegengesetzten** Richtung erwarten/anzeigen (Gegendämmerungsbogen/„Belt of Venus", vergleichbar Alpenglühen-Richtung)? Hinweis: **US-113** [x] hat dazu bereits eine Richtungslogik eingeführt — `should_generate_red_sky_event()` vergleicht `subject_azimuth` bereits gegen den **Antisolarpunkt** (`sun_azimuth + 180°`, ±30° Toleranz), nicht gegen den Sonnenazimut selbst (Code-Stand verifiziert, `backend/calculations/weather.py` Z. 219–268). Die Analysephase sollte prüfen, ob diese bestehende Umsetzung Stephans Frage bereits abdeckt oder ob dort noch eine fachliche Lücke besteht (z. B. Toleranzwinkel, Fallback-Verhalten ohne `subject_azimuth`, oder ein zusätzliches Aerosol-Szenario, das unabhängig vom Antisolarpunkt sichtbar wird).
+
+**Bezug:** Baut auf **US-109** [x] (Golden Cloud Score, Grundmechanismus) und **US-113** [x] (Richtungsfilter via Antisolarpunkt) auf — keine dieser beiden deckt ein Aerosol-/Dunst-Signal ab, beide nutzen ausschließlich `golden_cloud_score` + Wolkenbedeckung. Cross-Reference zu **BUG-77** (Live-Wetter-Abruf für Himmelsröte scheitert still) — beide Tickets betreffen dieselbe Codestelle (`backend/calculations/weather.py::should_generate_red_sky_event`, `backend/main.py::_generate_cloud_mood_events`/`_weather_overlay`); BUG-77 sollte zuerst behoben werden, da eine neue Datenquelle (Aerosol) ohne verlässliche Sichtbarkeit von Abruf-Fehlern (BUG-77) dieselbe Silent-Failure-Problematik erben würde.
+
+**Quelle:** fotoalert-intake, 2026-07-12
+
+---
+
+## Analyse (US-130) · 2026-07-12
+
+### Vorab-Klärung: Gegenrichtungs-Frage (Teil 2)
+
+**Ergebnis: US-113 beantwortet Stephans Klärungspunkt bereits vollständig — keine Lücke, kein neuer Code nötig.**
+
+📎 *Code-Verifikation (`backend/calculations/weather.py` Z. 211–268, gelesen 2026-07-12):*
+`should_generate_red_sky_event()` vergleicht `subject_azimuth` (Motiv-Blickrichtung) gegen den
+**Antisolarpunkt** (`(sun_azimuth + 180) % 360`), Toleranz `RED_SKY_AZIMUTH_TOLERANCE_DEG = 30`
+(eigene Konstante, Z. 211–216). Der Docstring (Z. 236–242) benennt explizit die physikalische
+Begründung: „Himmelsröte (Gegendämmerung, ‚Belt of Venus') entsteht am GEGENPUNKT der Sonne …
+NICHT am Sonnenazimut selbst wie bei GOLDEN_CLOUDS.“ Das ist exakt das Phänomen, das Stephans
+Klärungspunkt anspricht: Himmelsröte wird nur ausgelöst, wenn man **entgegengesetzt zur Sonne**
+fotografiert — also genau dort, wo der Gegendämmerungsbogen sichtbar ist.
+
+Fallback ohne `subject_azimuth`/`sun_azimuth`: kein Event (Z. 261–262) — konsistent zu
+GOLDEN_CLOUDS, keine widersprüchliche Sonderbehandlung.
+
+**Bewertung der Toleranz (±30°):** Plausibel als Näherung. Der Gegendämmerungsbogen ist ein
+relativ breites Band am Horizont, sein farblich auffälligster Teil konzentriert sich aber auf
+einen Bereich von einigen Grad bis wenigen Dutzend Grad um den exakten Antisolarpunkt — 30°
+Toleranz je Seite ist eine vertretbare, nicht aus der Luft gegriffene Wahl (identisch zur bereits
+produktiven GOLDEN_CLOUDS-Toleranz), ohne dass eine bessere Zahl empirisch belegbar wäre.
+
+**Aber: ein echter fachlicher Unterschied bleibt — und der führt direkt zu Teil 1 (Aerosol-Signal).**
+Der klassische Gegendämmerungsbogen/„Belt of Venus“-Effekt ist ein **Klarhimmel-Phänomen**
+(rosafarbenes Band + blauer Erdschatten, entsteht durch Streuung an Luftmolekülen/Aerosolen bei
+wolkenarmem Himmel). `should_generate_red_sky_event()` verlangt aber zusätzlich
+**`cloud_cover_low + cloud_cover_mid >= 60 %`** (Z. 259–260) — also gerade viele Wolken in
+Richtung Antisolarpunkt. Das deckt eine andere, ebenfalls valide Erscheinung ab („von der Sonne
+angestrahlte Wolken leuchten auch gegenüber der Sonne rot“), **nicht** aber den namensgebenden
+klassischen Belt-of-Venus-Effekt bei klarem/dunstigem Himmel ohne nennenswerte Wolkendecke. Das
+ist derselbe strukturelle Grund, warum FotoAlert den Viewfindr-Vergleichsfall (weiträumige
+Rotfärbung ohne lokale Wolkenbindung) verpasst hätte: Ohne Aerosol-/Dunst-Signal kann die App
+„Rote Himmel bei wenig Wolken, aber viel Dunst“ grundsätzlich nicht erkennen — unabhängig von der
+Azimut-Richtung, die bereits korrekt berechnet wird.
+
+**Fazit:** Die Richtungslogik aus US-113 ist korrekt und deckt Stephans Gegenrichtungs-Frage ab.
+Kein Änderungsbedarf an US-113 selbst. Der Klärungspunkt hat aber die eigentliche Lücke (fehlendes
+Aerosol-Signal) präzisiert: Sie besteht nicht nur bei „weiträumiger, wolkenungebundener Rötung“
+allgemein, sondern speziell auch **im Antisolar-Sektor bei klarem/dunstigem statt bewölktem
+Himmel** — ein Szenario, das die heutige Wolkenbedingung strukturell ausschließt.
+
+---
+
+### Teil 1 — Verfügbarkeit eines Aerosol-/Dunst-Signals
+
+📎 *Code-Verifikation (`backend/calculations/weather.py` Z. 1–22, 299–352, gelesen 2026-07-12):*
+FotoAlert nutzt ausschließlich die **Open-Meteo Standard-Forecast-API**
+(`https://api.open-meteo.com/v1/forecast`), abgerufen mit den `hourly`-Parametern
+`temperature_2m, dew_point_2m, precipitation_probability, precipitation, weather_code,
+cloud_cover, cloud_cover_low, cloud_cover_mid, cloud_cover_high, visibility, wind_speed_10m,
+wind_direction_10m`. Kein Aerosol-/Dunst-/Feinstaub-Parameter ist Teil dieser Liste. Das einzige
+vorhandene Sichtweite-Signal ist `visibility_m` (aus dem Parameter `visibility`) — das ist eine
+**Wettermodell-Sichtweite** (v. a. durch Niederschlag/Nebel bestimmt), keine spezifische
+Aerosol-/Dunst-Metrik, und wird aktuell nur informativ in `weather_details` angezeigt
+(`main.py` Z. 531), nicht in `should_generate_red_sky_event()` ausgewertet.
+
+**Recherche (WebSearch + Open-Meteo-Doku, 2026-07-12):** Open-Meteo betreibt eine **separate**
+„Air Quality API“ (`https://air-quality-api.open-meteo.com/v1/air-quality`), gespeist aus CAMS
+(Copernicus Atmosphere Monitoring Service) European (11 km, Europa) + Global (45 km)
+Aerosol-Vorhersagen. Relevante `hourly`-Parameter:
+- **`aerosol_optical_depth`** — Aerosol-Optische-Dicke bei 550 nm, dimensionslos, explizit als
+  „to indicate haze“ (Dunst-Indikator) dokumentiert — genau das gesuchte Signal.
+- **`dust`** — Saharastaub-Konzentration in µg/m³ (10 m über Grund).
+- Zusätzlich `pm10`/`pm2_5` (Feinstaub) verfügbar, falls als Proxy relevant.
+
+**Kosten/Aufwand:** Gleicher Anbieter wie die bereits genutzte Wetter-API, **kostenlos für
+nicht-kommerzielle Nutzung** (bis 10.000 Aufrufe/Tag laut Doku), **kein API-Key nötig** (Key nur
+für kommerzielle Nutzung mit reservierten Ressourcen). Kein neuer Vertrag, kein neuer Provider,
+keine neue Kostenentscheidung nötig (0b-Gate nicht einschlägig, da kein LLM/kostenpflichtiger
+Dienst) — technisch ein zweiter `httpx`-GET-Aufruf analog zu `fetch_weather_forecast()`, gegen
+einen anderen Hostnamen, mit denselben Koordinaten.
+
+Quellen: [Open-Meteo Air Quality API Doku](https://open-meteo.com/en/docs/air-quality-api)
+
+---
+
+### Example Mapping
+
+**Scope-Check:** Das Ticket erweitert einen bewusst limitierten ersten Slice (US-109: „Röte ist
+omnidirektional, weil keine gerichtete Wolkendatenquelle verfügbar war“ — dieselbe
+Datenlagen-Einschränkung gilt jetzt für „keine Aerosoldatenquelle integriert“). Die Erweiterung
+ist intentional als Folgeticket angelegt, keine verdeckte Lücke — passt zum bestehenden Muster
+(US-113 hat den Richtungsfilter analog nachgerüstet).
+
+**Annahmen-Protokoll:**
+
+| Punkt | Typ | Entscheidung / Default |
+|-------|-----|------------------------|
+| Neue Datenquelle (Open-Meteo Air Quality API) zusätzlich integrieren, oder auf vorhandenes `visibility_m` als Proxy ausweichen, oder nichts tun? | 🔴 Kritisch (Grenzfall, mehrere sinnvolle Wege) | ❓ Frage 1 — siehe Implementierungsoptionen unten (Weg-Gate) |
+| Wie soll ein Aerosol-Signal das bestehende RED_SKY-Verhalten beeinflussen — eigener neuer Event-Typ, ODER-Verknüpfung mit der Wolkenbedingung, oder zusätzliches UND-Kriterium? | 🔴 Kritisch (Grenzfall, mehrere sinnvolle Verhaltensweisen) | ❓ Frage 2 — siehe unten, explizit mit Konsequenzen je Option |
+| Schwellenwert für „signifikanter Dunst" (`aerosol_optical_depth`-Grenzwert) | ⚪ Konventionell, aber ohne empirische Grundlage | ⚠️ Annahme: `AOD >= 0.3` als Startwert (siehe Pre-Mortem/Testplan — Wert ist Schätzung, keine belegte Referenz für Berlin/Brandenburg-Verhältnisse; muss nach Live-Beobachtung nachjustiert werden können, daher als eigene Konstante) |
+| Neuer Event-Typ/Score → Filter-Chip nötig? (Schritt 4f) | 🔴 Kritisch, nur falls Frage 2 → Option A gewählt wird | ❓ Frage 3 — siehe unten |
+| Sequenzierung zu BUG-77 (Silent-Failure beim Wetter-Abruf) | ⚪ Konventionell, bereits im Ticket-Text als Empfehlung benannt | ⚠️ Annahme: BUG-77 wird zuerst umgesetzt; US-130 erbt dann den bereits reparierten Fehler-Sichtbarkeits-Mechanismus statt ihn zu duplizieren. Bitte bestätigen. |
+
+**🔴 Offene Fragen (Weg-Gate, bitte vor Freigabe entscheiden):**
+
+**❓ Frage 1 — Soll überhaupt eine neue Datenquelle integriert werden?**
+Siehe Implementierungsoptionen A/B/C unten — das ist die zentrale Weg-Entscheidung dieses
+Tickets, dort mit App-Wirkung, Aufwand und Empfehlung ausformuliert.
+
+**❓ Frage 2 — Wie wirkt das Aerosol-Signal auf das bestehende RED_SKY-Verhalten?**
+   - **Option A — Eigener neuer Event-Typ „Dunströtung“ (Arbeitstitel), getrennt von RED_SKY:**
+     Du bekommst eine **zusätzliche**, klar erkennbare Kartenart im Feed, wenn hoher Dunst-/
+     Aerosol-Wert vorliegt, unabhängig von Wolken. Bestehende RED_SKY-Karten bleiben unverändert.
+     Konsequenz: mehr Transparenz (du siehst, worauf die Chance beruht — Wolken oder Dunst),
+     aber mehr Aufwand (neuer Event-Typ, eigenes Icon/eigene Farbe, eigener Erklärungstext,
+     Designer-Check nötig, siehe Frage 3).
+   - **Option B — ODER-Verknüpfung: RED_SKY triggert auch bei hohem Dunst OHNE die
+     Wolkenbedingung:** Du bekommst weiterhin nur die eine Kartenart „Himmelsröte“ — sie
+     erscheint jetzt aber auch dann, wenn wenig Wolken, aber viel Dunst in Antisolar-Richtung
+     vorliegt. Konsequenz: kleinerer Eingriff (eine Bedingung erweitern, keine neue UI-Kategorie),
+     aber du siehst im Nachhinein nicht auf den ersten Blick, ob eine konkrete Karte auf Wolken
+     oder auf Dunst zurückgeht — nur im Detail-Sheet nachvollziehbar (Erklärungstext müsste den
+     tatsächlichen Auslöser benennen, sonst wird das intransparent).
+   - **Option C — Zusätzliches UND-Kriterium (Dunst als Verstärker, nicht als Ersatz):** Die
+     Wolkenbedingung bleibt Pflicht, ein hoher Aerosol-Wert erhöht nur den Score/die Sichtbarkeit
+     einer bereits ausgelösten RED_SKY-Karte. Konsequenz: geringstes Risiko einer
+     Verhaltensänderung, aber verpasst genau den Viewfindr-Vergleichsfall (weiträumige Rötung
+     OHNE Wolken) — würde die eigentliche Ticket-Motivation nicht erfüllen.
+
+   ⚠️ **Empfehlung des Agenten:** Option B — erfüllt die User Story direkt („auch
+   aerosol-/dunstbedingte Chancen sehen, die eine Konkurrenz-App bereits erkennt“), ohne eine
+   komplette neue UI-Kategorie aufzubauen. Voraussetzung: der Erklärungstext im Detail-Sheet muss
+   zwischen „Wolken-Röte“ und „Dunst-Röte“ unterscheiden (siehe AK unten), sonst entsteht die oben
+   beschriebene Intransparenz. Bitte im Weg-Gate bestätigen oder A/C wählen.
+
+**❓ Frage 3 — Nur relevant falls Option A (Frage 2) gewählt wird:** Neuer Event-Typ „Dunströtung“
+→ eigener Filter-Chip im Filter-Sheet? Welche Farbe/Icon (→ `fotoalert-designer`-Aufruf nötig,
+siehe Designer-Check unten)? Bei Option B/C entfällt diese Frage (kein neuer Event-Typ).
+
+**Rules + Examples (Best-Effort auf Basis der empfohlenen Option B, Annahmen markiert):**
+
+📏 **Rule 1:** RED_SKY wird zusätzlich zur bestehenden Wolkenbedingung auch dann ausgelöst, wenn
+statt ausreichender Wolkenbedeckung ein hoher Aerosol-/Dunst-Wert in Antisolar-Richtung vorliegt.
+- 🟢 *Given* `gcs=0.85`, `cl=10, cm=5` (Wolkenbedingung NICHT erfüllt, da `cl+cm=15 < 60`),
+  `aod=0.45` (über dem Schwellenwert 0.3), `sunset_azimuth=278°`, `subject_azimuth=98°`
+  (Differenz zum Antisolarpunkt 98° = 0°), *When* das Wetter-Overlay läuft, *Then* erscheint
+  jetzt eine „Himmelsröte"-Karte, obwohl die Wolkenbedingung allein das nicht ausgelöst hätte —
+  der Erklärungstext benennt „Dunst" statt „Wolken" als Auslöser.
+
+📏 **Rule 2:** Ist weder die Wolken- noch die Aerosolbedingung erfüllt, bleibt es wie bisher —
+keine Himmelsröte-Karte.
+- 🟢 *Given* `cl+cm=15` (nicht erfüllt), `aod=0.12` (unter dem Schwellenwert), *When* das
+  Wetter-Overlay läuft, *Then* erscheint keine „Himmelsröte"-Karte — unverändert zu heute.
+
+📏 **Rule 3 (Regression):** Ist die bisherige Wolkenbedingung bereits erfüllt, ändert sich am
+Auslöseverhalten nichts, unabhängig vom Aerosolwert.
+- 🟢 *Given* `cl+cm=70` (erfüllt, wie bisher), `aod=0.05` (niedrig), *When* das Wetter-Overlay
+  läuft, *Then* erscheint die Karte wie bisher — keine Verschlechterung durch das neue Kriterium.
+
+📏 **Rule 4 (Fehlerfall Aerosol-Abruf):** Schlägt der Abruf der Aerosol-Daten fehl oder liefert
+keinen Wert, verhält sich RED_SKY wie heute (nur Wolkenbedingung zählt) — kein harter Fehler durch
+die neue, zusätzliche Datenquelle.
+- 🟢 *Given* Aerosol-API nicht erreichbar, Wolkenbedingung erfüllt, *When* das Wetter-Overlay
+  läuft, *Then* erscheint die Karte wie bisher (nur Wolkenkriterium ausgewertet, Aerosolwert als
+  „nicht verfügbar" behandelt, kein Absturz/Silent-Failure-Wiederholung von BUG-77).
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK-1:** Liegt in der Richtung, in die ich fotografiere, kein ausreichender Wolkenanteil
+      vor, aber ein hoher Dunst-/Aerosolwert (über dem festgelegten Grenzwert) am Sonnenuntergang/
+      -aufgang, erscheint jetzt trotzdem eine „Himmelsröte"-Karte im Feed.
+- [ ] **AK-2:** Im Detail-Sheet dieser Karte lese ich, dass Dunst (nicht Wolken) der Auslöser war
+      — nicht denselben Text wie bei einer wolkenbasierten Himmelsröte-Karte.
+- [ ] **AK-3 (Regression):** Eine Himmelsröte-Karte, die schon heute allein durch Wolken ausgelöst
+      wird, erscheint weiterhin genauso wie bisher.
+- [ ] **AK-4 (Regression):** Ist weder die Wolken- noch die Dunstbedingung erfüllt, erscheint
+      weiterhin keine Himmelsröte-Karte.
+- [ ] **AK-5:** „Goldene Wolken"-Karten (GOLDEN_CLOUDS) bleiben von dieser Änderung komplett
+      unberührt.
+- [ ] Edge Case AK-6: Kann der Dunst-/Aerosolwert für eine Location nicht abgerufen werden
+      (externe Datenquelle nicht erreichbar), zeigt die App weiterhin die bisherige,
+      wolkenbasierte Himmelsröte-Logik — kein Absturz, keine fehlerhafte Karte.
+- [ ] Edge Case AK-7: Bei einem Dunstwert genau auf dem Grenzwert erscheint die Karte (inklusiver
+      Grenzwert, analog zur bestehenden ≤30°-Regelung bei der Richtung).
+
+*(AK-1/AK-2 setzen die empfohlene Option B aus Frage 2 voraus — bei A oder C ändern sich Wortlaut
+und Anzahl der betroffenen AKs, siehe jeweilige Beschreibung in den Implementierungsoptionen.)*
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation zusammengefasst** (Details siehe Teil 1/Teil 2 oben):
+- `fetch_weather_forecast()` (`weather.py` Z. 299–352) ruft ausschließlich die Standard-Forecast-
+  API auf, keine Aerosoldaten enthalten.
+- `should_generate_red_sky_event()` (Z. 219–268) hat aktuell zwei UND-verknüpfte Bedingungen
+  (Score + Wolken) plus die Azimut-Prüfung; ein Aerosol-Kriterium existiert nicht.
+- `_generate_cloud_mood_events()` (`main.py` Z. 540ff) ruft die Wetterdetails bereits pro Event
+  ab (`wd = e.get("weather_details")`) — ein zusätzliches Aerosol-Feld ließe sich strukturell
+  gleich einreihen, ohne den Aufrufpfad umzubauen.
+
+💀 **Szenario 1 — „Stiller Bruch von BUG-77 erneut“:** Der neue Aerosol-Abruf bekommt dieselbe
+Silent-Failure-Behandlung wie der heutige Wetter-Abruf (nur `logger.warning`, kein sichtbarer
+Fehlerstatus) — ein Ausfall der Air-Quality-API bliebe unbemerkt, obwohl BUG-77 genau dieses
+Muster für den bestehenden Wetter-Abruf beheben soll.
+Frühwarnung: Aerosol-Werte fehlen dauerhaft für bestimmte Locations, ohne dass das irgendwo
+sichtbar wird.
+Gegenmaßnahme: US-130 nutzt denselben, durch BUG-77 reparierten `_job_status`-Mechanismus mit —
+kein eigener, neuer Silent-Failure-Pfad. Reihenfolge (BUG-77 zuerst) im Annahmen-Protokoll
+verankert.
+
+💀 **Szenario 2 — „Grenzwert ist reine Schätzung, führt zu Alarmmüdigkeit oder Untererkennung“:**
+`AOD >= 0.3` ist eine Annahme ohne empirische Kalibrierung für Berlin/Brandenburg. Zu niedrig
+gewählt → viele „falsche" Dunst-Himmelsröte-Karten (jeder leicht diesige Tag löst aus). Zu hoch
+gewählt → der Viewfindr-Vergleichsfall (der Auslöser dieses Tickets) wird selbst mit dem neuen
+Signal nicht erkannt.
+Frühwarnung: Deutlich mehr (oder unverändert null) Himmelsröte-Karten nach Rollout als vorher,
+ohne dass sich am Wetter erkennbar etwas geändert hat.
+Gegenmaßnahme: Grenzwert als eigene, benannte Konstante (nicht hart verdrahtet) — leicht
+nachjustierbar; Testplan sieht einen Vorher/Nachher-Vergleich der Kartenzahl vor (analog zu
+US-113 Szenario 3).
+
+💀 **Szenario 3 — „CAMS-Domain-Wechsel an der Grenze Europa/Global liefert unplausible Sprünge“:**
+Die Air-Quality-API kombiniert eine 11-km-Europa- und eine 45-km-Global-Vorhersage
+(„domains=auto"); an Domain-Rändern oder bei Datenlücken könnten Werte springen oder fehlen.
+Frühwarnung: Aerosolwerte, die von Stunde zu Stunde stark schwanken, ohne dass sich das reale
+Wetter sichtbar ändert.
+Gegenmaßnahme: `domains=europe` explizit setzen (Berlin/Brandenburg liegt sicher im
+Europa-Gebiet, feinere Auflösung), keine automatische Domain-Wahl nutzen.
+
+💀 **Szenario 4 — „Doppelte HTTP-Anfrage verlangsamt den ohnehin migränosen `_weather_overlay`-
+Pfad“:** Ein zusätzlicher `httpx`-Call pro Location addiert Latenz zum bereits als „blockierend"
+bekannten Wetter-Overlay-Pfad (BUG-63: „Alignments berechnen blockiert Server 20–25 Sek.“ — zwar
+anderer Endpunkt, aber verwandtes Muster serieller externer Aufrufe).
+Frühwarnung: Spürbar längere Antwortzeit von `/opportunities` nach Rollout.
+Gegenmaßnahme: Beide Abrufe (Wetter + Aerosol) parallelisieren (`asyncio.gather`), nicht seriell
+hintereinander ausführen; vor Release die reale Laufzeit einmal messen (`time curl` gegen den
+lokalen Dev-Server), nicht schätzen (siehe Memory `feedback_validate_premise`).
+
+💀 **Szenario 5 — „Erklärungstext verrät nicht, ob Wolken oder Dunst der Auslöser waren“ (nur bei
+Option B relevant):** Ohne Anpassung des Textes sieht eine dunstbasierte Karte optisch identisch
+zu einer wolkenbasierten aus — Stephan/Nutzer können den tatsächlichen Grund nicht nachvollziehen.
+Frühwarnung: Rückfrage „warum zeigt die App hier Himmelsröte, es ist doch kaum bewölkt?“.
+Gegenmaßnahme: AK-2 verankert genau das; Erklärungstext muss den tatsächlichen Auslöser (Wolken
+vs. Dunst vs. beides) benennen.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien:**
+1. `backend/calculations/weather.py` — neue Funktion `fetch_aerosol_forecast()` (analog zu
+   `fetch_weather_forecast()`, Z. 299–352, gegen `air-quality-api.open-meteo.com`); neue
+   Konstante `RED_SKY_AOD_THRESHOLD` (analog zu `RED_SKY_AZIMUTH_TOLERANCE_DEG`, Z. 211);
+   `should_generate_red_sky_event()` (Z. 219–268) um Parameter `aerosol_optical_depth: Optional[float] = None`
+   erweitern, Bedingung um ODER-Zweig ergänzen (bei empfohlener Option B).
+2. `backend/main.py` — `_weather_overlay()` (Z. 636–691, dieselbe Stelle wie BUG-77) um
+   zusätzlichen Aerosol-Abruf ergänzen (parallelisiert, siehe Pre-Mortem Szenario 4);
+   `_generate_cloud_mood_events()` (Z. 540ff) übergibt den neuen Wert an
+   `should_generate_red_sky_event()`.
+3. `web/index.html` — RED_SKY-Erklärungssektion (bereits in US-113 als Z. 3735–3753 identifiziert,
+   Zeilennummern seither ggf. verschoben durch spätere Refactorings — vor Implementierung neu
+   per Grep verifizieren) um Fallunterscheidung Wolken/Dunst erweitern (AK-2).
+4. `backend/tests/test_us130.py` (neu) — Testfälle analog zum bewährten Muster aus
+   `test_us113.py`/`test_us109.py`.
+
+**Einstiegspunkt-Check:** Wie bei US-113 bereits festgestellt — nur `/opportunities`
+(`_feed_cache` → `_generate_cloud_mood_events()`) ist betroffen; `/calendar` und `/discover`
+haben laut US-109/US-113 kein Wetter-Overlay und damit keine RED_SKY-Erzeugung.
+
+**Filter-Chip-Check (Schritt 4f):** Bei der empfohlenen Option B entsteht **kein** neuer
+Event-Typ und **kein** neues Score-Feld im Sinne einer eigenen Filterkategorie — der bestehende
+RED_SKY-Filter-Chip deckt weiterhin beide Auslöser (Wolken und Dunst) ab. Nur bei Option A
+(eigener Event-Typ) wäre dieser Schritt erneut mit Stephan zu klären (siehe Frage 3).
+
+---
+
+### Designer-Check (Schritt 4b)
+
+Bei der empfohlenen **Option B** entsteht **kein neues visuelles Element** — nur ein
+Textbaustein im bestehenden Detail-Sheet ändert sich (Erklärungstext benennt Wolken vs. Dunst).
+Kein neues Icon, keine neue Farbe, kein neuer Chip. **Kein Designer-Call nötig.**
+
+Falls Stephan im Weg-Gate stattdessen **Option A** (eigener Event-Typ) wählt, wird das anders:
+dann ist vor der Implementierung ein `fotoalert-designer`-Aufruf für Icon/Farbe/Filter-Chip
+verpflichtend (Memory `feedback_icon_variants_designer_gate`) — das würde die Analyse an dieser
+Stelle nochmals ergänzt, ist aber im aktuellen Empfehlungspfad nicht nötig.
+
+---
+
+### Implementierungsoptionen
+
+**Option A — Nichts tun, Ticket zurückstellen**
+*Was du in der App erlebst:* Keine Änderung — Himmelsröte-Karten bleiben ausschließlich
+wolkenbasiert, der Viewfindr-Vergleichsfall bliebe weiterhin unerkannt.
+- Vorteile: kein Aufwand, kein neues Risiko, keine neue externe Abhängigkeit.
+- Nachteile: Erfüllt die User Story nicht; bekannte Lücke bleibt bestehen.
+- Aufwand: keiner.
+
+**Option B — Sichtweite (`visibility_m`) als Aerosol-Proxy nutzen, ohne neue API**
+*Was du in der App erlebst:* Himmelsröte-Karten erscheinen zusätzlich, wenn die vom Wettermodell
+gemeldete Sichtweite ungewöhnlich niedrig ist (Hinweis auf Dunst) — ohne dass eine neue externe
+Datenquelle eingebunden wird.
+- Vorgehen: `visibility_m` (bereits im bestehenden Wetter-Abruf enthalten, `weather.py` Z. 347)
+  als Proxy für Dunst verwenden; niedriger Schwellenwert (z. B. `< 15000 m`) statt Wolkenbedingung
+  zulassen.
+- Vorteile: keine neue API, kein zusätzlicher Netzwerk-Call, kleinster Umsetzungsaufwand.
+- Nachteile/Risiken: `visibility_m` ist ein **sehr indirekter** Proxy — er wird dominant von
+  Niederschlag/Nebel bestimmt, nicht speziell von Aerosolen/Feinstaub/Saharastaub. Ein diesiger,
+  aber niederschlagsfreier Tag mit hoher Aerosolbelastung kann durchaus noch „gute" Sichtweite
+  im Modell zeigen (Sichtweite und optische Dicke der Atmosphäre sind verwandte, aber nicht
+  identische Größen) — das Risiko einer Fehldiagnose (weder Über- noch Untererkennung
+  zuverlässig) ist hoch, ohne dass das vorab geprüft werden kann.
+- Aufwand: klein.
+
+**Option C — Neue Datenquelle: Open-Meteo Air Quality API (`aerosol_optical_depth`) integrieren
+(empfohlen)**
+*Was du in der App erlebst:* Himmelsröte-Karten erscheinen jetzt zusätzlich dann, wenn ein
+direkt gemessenes/vorhergesagtes Dunst-/Aerosolsignal hoch ist — auch ohne dass genug Wolken da
+sind. Der Viewfindr-Vergleichsfall (weiträumige Rotfärbung durch Dunst) würde damit erkennbar.
+- Vorgehen: Neue Funktion `fetch_aerosol_forecast()` (analog zu `fetch_weather_forecast()`) ruft
+  `aerosol_optical_depth` von `air-quality-api.open-meteo.com` ab (kostenlos, kein Key, gleicher
+  Anbieter); Ergebnis parallel zum bestehenden Wetter-Abruf holen (`asyncio.gather`, siehe
+  Pre-Mortem Szenario 4); `should_generate_red_sky_event()` um AOD-Parameter erweitern
+  (ODER-Verknüpfung, siehe Frage 2/Option B dort — nicht zu verwechseln mit dieser Options-
+  Buchstabierung, es sind zwei verschiedene Entscheidungen).
+- Vorteile: Direktes, fachlich korrektes Signal (AOD ist genau für „Dunst/Haze" definiert, nicht
+  nur ein Nebeneffekt wie `visibility_m`); gleicher, bereits vertrauter Anbieter (Open-Meteo);
+  kostenlos; erfüllt die User Story direkt.
+- Nachteile/Risiken: Ein weiterer externer Abruf pro Location (siehe Pre-Mortem Szenario 4);
+  Grenzwert für „signifikant" ist Schätzung ohne Kalibrierung (Szenario 2); zweite externe
+  Abhängigkeit, die ebenfalls ausfallen kann (Szenario 1 — Sequenzierung mit BUG-77 wichtig).
+- Aufwand: mittel (neue Fetch-Funktion + Parallelisierung + neuer Parameter in bestehender
+  Prüf-Funktion + Textanpassung + neue Tests).
+
+✅ **Empfehlung: Option C** — `visibility_m` (Option B) ist fachlich zu unscharf, um den konkret
+gemeldeten Vergleichsfall zuverlässig zu erkennen (Sichtweite ≠ Aerosol-Optische-Dicke); Option C
+nutzt ein zweckgebundenes, kostenloses Signal desselben bereits integrierten Anbieters. Bedingung:
+BUG-77 zuerst umsetzen (Sequenzierung, siehe Annahmen-Protokoll), damit der neue Abruf nicht
+dieselbe Silent-Failure-Klasse erbt.
+
+---
+
+### Testplan
+
+- [ ] **Automatisiert** (`backend/tests/test_us130.py`, neu):
+  - AK-1: `gcs=0.85, cl=10, cm=5, sunset_azimuth=278, subject_azimuth=98, aod=0.45` →
+    `should_generate_red_sky_event(...)` liefert `True` (Dunst-Zweig).
+  - AK-4: `cl=10, cm=5, aod=0.12` (beide unter Schwelle) → liefert `False`.
+  - AK-3 (Regression): bestehende US-113-Testfälle (Wolken-Zweig) laufen unverändert grün.
+  - AK-6 (Edge Case): `aod=None` (Abruf fehlgeschlagen) → Verhalten identisch zum reinen
+    Wolken-Pfad, kein Fehler.
+  - AK-7 (Edge Case): `aod` exakt auf dem Schwellenwert → inklusiv (`>=`), Karte erscheint.
+
+- [ ] **Manuell** (Browser + curl nach Serverstart unter `http://localhost:8000`):
+  1. `curl "http://localhost:8000/opportunities?days=3"` → Anzahl `event_type == "Himmelsröte"`
+     vor/nach der Änderung vergleichen (analog zu US-113-Testplan, hier eher ein leichter
+     Anstieg statt Rückgang erwartet).
+  2. App öffnen → Feed → eine (neue, dunstbasierte) Himmelsröte-Karte antippen → Detail-Sheet →
+     „Warum Himmelsröte?"-Sektion → **erwartet:** Text nennt Dunst als Auslöser, nicht Wolken
+     (AK-2).
+  3. Regression: eine bestehende, wolkenbasierte Himmelsröte-Karte prüfen → Text/Verhalten
+     unverändert (AK-3).
+  4. Regression: „Goldene Wolken"-Karten unverändert (AK-5).
+  5. Falls Aerosol-API testweise nicht erreichbar gemacht werden kann (z. B. DNS-Block lokal):
+     Himmelsröte-Verhalten fällt sauber auf reinen Wolken-Check zurück (AK-6).
+
+---
+
+### Analyse & Planung
+
+- [x] Vorab-Klärung Gegenrichtungs-Frage: US-113 deckt sie bereits vollständig ab (siehe oben)
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt inkl. Code-Verifikation
+- [x] Architektur analysiert: `backend/calculations/weather.py`, `backend/main.py`,
+      `web/index.html` (Erklärungstext)
+- [x] Designer-Check: bei empfohlener Option B nicht visuell → kein Designer-Call nötig
+      (bei Option A wäre er Pflicht, siehe Designer-Check-Abschnitt)
+- [ ] Implementierungsoptionen: A (nichts tun) / B (visibility_m-Proxy) / C (neue Aerosol-API)
+- [ ] Empfehlung: Option C, sequenziert nach BUG-77
+- [ ] 🔴 Frage 1 (Weg): A/B/C? · Frage 2 (Verhalten): A/B/C? · Frage 3 (nur falls Frage 2 = A):
+      Filter-Chip-Gestaltung — alle drei von Stephan im Weg-Gate zu entscheiden
+
+**Quelle:** fotoalert-intake, 2026-07-12
+
+---
+
+### BUG-77 · Live-Wetter-Abruf für Himmelsröte scheitert still (nur Warning-Log, keine Sichtbarkeit) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-07-12 |
+
+**Beschreibung:** Himmelsröte-/Goldene-Wolken-Events (RED_SKY/GOLDEN_CLOUDS) werden nicht im nächtlichen Precompute-Batch erzeugt, sondern ausschließlich live zur Laufzeit aus einem Wetter-API-Abruf berechnet (`backend/main.py::_weather_overlay`, Aufruf `fetch_weather_forecast()` Z. 673, gefolgt von `_generate_cloud_mood_events`/`_inject_cloud_mood_events`). Schlägt der Abruf für eine Location fehl, greift Z. 676–677 nur `except Exception as err: logger.warning(...)` — der Fehler wird lediglich geloggt, **ohne** `_job_error()` aufzurufen. `_job_done("weather", t0)` wird am Ende der Funktion (Z. 691) unbedingt aufgerufen, unabhängig davon, ob einzelne oder alle Location-Abrufe fehlgeschlagen sind. Der Job-Status zeigt daher „ok"/„done", obwohl Himmelsröte-Daten für betroffene Locations fehlen — keine Alarmierung, keine Sichtbarkeit für Stephan.
+
+**User Story:** Als App-Host, möchte ich erkennen wenn der Wetter-Abruf für Himmelsröte-Chancen fehlschlägt, sodass ich nicht unbemerkt tagelang fehlende oder falsche Chancen ausliefere.
+
+**Bezug:** Cross-Reference zu **US-130** (Aerosol-/Dunst-Signal fehlt) — beide betreffen dieselbe Codestelle (`_weather_overlay`/`_generate_cloud_mood_events`/`should_generate_red_sky_event`); dieses Ticket sollte zuerst behoben werden, damit ein künftiges Aerosol-Signal (US-130) nicht dieselbe stille Fehlerbehandlung erbt. Überschneidung mit **US-38** [Status: In Analysis] (Observability & Self-Healing) — US-38 fordert generell strukturiertes Job-Logging + Fehlerklassifizierung + `/health`-Anbindung für **alle** Jobs (`weather`, `feed`, `calendar`), inkl. des bereits vorhandenen, aber ungenutzten `_job_status`-Mechanismus (`_job_start`/`_job_done`/`_job_error`, `main.py` Z. 222–248). Abgrenzung: BUG-77 ist der konkrete, isolierte Fix für die Wetter-Job-Stelle (Teil-Fehler → `_job_error()` statt unbedingtem `_job_done()`); US-38 ist der größere Observability-Rahmen (Health-Endpoint, Dashboard, Alert-Mechanismus) für alle Jobs. Empfehlung: BUG-77 eigenständig und zuerst umsetzen (kleiner, scharf abgegrenzter Fix), US-38 bleibt der übergeordnete Rahmen und kann den BUG-77-Fix später als Baustein aufgreifen statt ihn zu duplizieren.
+
+**Quelle:** fotoalert-intake, 2026-07-12
+
+**Example Mapping:**
+
+📎 *Code-Verifikation (main.py gelesen am 2026-07-12):* Ticket-Beschreibung bestätigt —
+`_weather_overlay()` Z. 636–691, Fetch-Aufruf Z. 673, `except Exception as err:
+logger.warning(...)` Z. 676–677 ohne `_job_error()`, `_job_done("weather", t0)` unbedingt
+Z. 691. `_job_status`-Dict Z. 271–277, Helper `_job_start/_job_done/_job_error` Z. 283–303
+(Ticket nennt „Z. 222–248" — leicht abweichend von den tatsächlichen Zeilen, inhaltlich aber
+deckungsgleich, kein Blocker). `_apply_weather_to_event()` (Z. 474+) bestätigt zusätzlich das
+Symptom: schlägt der Abruf fehl (`forecast=None`), bleibt `weather_status` unverändert auf
+„lädt" stehen statt aktualisiert zu werden — der Nutzer/Stephan sieht nirgends „Fehler".
+
+⚠️ **Verwandte Fund-Stellen mit demselben Muster (nicht Teil des Scopes, nur Meldung):**
+Beim Code-Lesen wurden zwei weitere Jobs mit demselben Bug-Muster gefunden
+(`except Exception → logger.warning → _job_done trotzdem aufgerufen, kein _job_error`):
+- `_build_weather_map()` (Wetter-Karten-Overlay, Job-Key `weather-map`, Z. 762–789)
+- `_run_sightline_refresh()` (Sichtachsen-Refresh, Job-Key `sightlines`, Z. 1968–1994 — hier
+  fängt der äußere `try/except` nur Fehler außerhalb der Location-Schleife ab; Fehler pro
+  Location werden wie bei `_weather_overlay` nur geloggt)
+Diese sind **nicht** Teil dieses Tickets (Scope laut Ticket = ausschließlich `_weather_overlay`)
+— werden hier nur dokumentiert, damit sie nicht unbemerkt bleiben. Vorschlag: eigenes
+Ticket/Backlog-Eintrag für „gleiches Silent-Failure-Muster in weather-map + sightlines",
+Entscheidung liegt bei Stephan (keine eigenmächtige Scope-Erweiterung).
+
+✅ *Bereits geklärt/kein Blocker:* `_weather_overlay_single()` (US-106-Einzelpfad, Z. 694–746)
+nutzt `_job_status` gar nicht — Sichtbarkeit läuft dort über den separaten
+`_recompute_pending`-Mechanismus (Rückgabewert steuert das „wird nachgeladen"-Banner im
+Frontend). Kein zusätzlicher Fix nötig, da dieser Pfad bereits eine eigene Sichtbarkeit hat.
+
+📏 **Rule 1:** Schlägt der Wetter-Abruf für mindestens eine (aber nicht alle) Locations fehl,
+zeigt der Job-Status „weather" einen Fehlerzustand statt „done" — die erfolgreichen Locations
+werden trotzdem normal aktualisiert.
+🟢 Example: Given 3 Locations mit Events in T+3, when der Abruf für 1 Location eine Exception
+wirft und für 2 Locations erfolgreich ist, then liefert der Status-Endpunkt für „weather"
+einen Fehlerzustand mit einem Hinweistext, der die betroffene Location nennt/zählt, während
+die 2 erfolgreichen Locations ihre Himmelsröte-/Wetter-Chancen ganz normal bekommen.
+
+📏 **Rule 2:** Schlagen alle Locations fehl, zeigt der Job-Status ebenfalls einen Fehlerzustand
+(kein Sonderfall gegenüber Teilausfall).
+🟢 Example: Given 2 Locations mit Events in T+3, when beide Abrufe fehlschlagen, then zeigt
+der Status-Endpunkt für „weather" einen Fehlerzustand, keine Location bekommt aktualisiertes
+Wetter.
+
+📏 **Rule 3 (Regression):** Läuft der Abruf für alle Locations fehlerfrei durch, ändert sich
+am bisherigen Verhalten nichts.
+🟢 Example: Given 2 Locations, when beide Abrufe erfolgreich sind, then zeigt der Status-Endpunkt
+weiterhin „done", kein Fehlertext gesetzt.
+
+📏 **Rule 4 (Edge Case, bereits bestehend):** Gibt es keine Events in den nächsten 3 Tagen,
+wird gar kein Abruf versucht — das bleibt unverändert „done", kein fälschlicher Fehler.
+
+**⚠️ Grenzfall — offene Wahlfrage für das Weg-Gate (🔴 funktional kritisch):**
+
+❓ **Frage 1:** Wie soll der Job-Status bei einem **Teilausfall** (manche Locations ok, manche
+fehlgeschlagen) dargestellt werden?
+   - **Option A — bestehenden Wert „error" wiederverwenden:** Kein neuer Statuswert, Teilausfall
+     und Totalausfall sehen im Status gleich aus („error"), unterscheidbar nur über den
+     Fehlertext. Konsequenz: einfache, kleine Änderung, keine Erweiterung des Status-Wertebereichs,
+     den US-38 später ggf. selbst gestalten will — geringeres Risiko einer Doppel-Entscheidung
+     mit US-38.
+   - **Option B — neuer Statuswert „partial" zusätzlich zu „error":** Totalausfall = „error",
+     Teilausfall = „partial". Konsequenz: differenzierter auf einen Blick, aber führt schon
+     jetzt einen neuen Wert in ein Datenfeld ein, das laut Ticket-Bezug eigentlich in den
+     größeren Rahmen von US-38 gehört — Risiko einer Kollision mit US-38s späterer Gestaltung.
+
+❓ **Frage 2:** Soll der Fehlertext (`last_error`) die **Namen der betroffenen Locations**
+nennen oder nur eine **Anzahl**?
+   - **Option A — Location-Namen nennen (ggf. gekürzt auf z. B. die ersten 5 + „…und N weitere"):**
+     Stephan sieht sofort, welcher Standort betroffen ist, ohne ins Server-Log zu schauen —
+     echte Sichtbarkeit im Sinne der User Story. Etwas mehr Aufwand (Sammeln der Namen während
+     der Schleife).
+   - **Option B — nur Anzahl (z. B. „2 von 5 Standorten fehlgeschlagen"):** Einfacher, aber
+     Stephan muss für Details trotzdem ins Log schauen — schwächere Sichtbarkeit, näher am
+     bisherigen Zustand.
+
+⚠️ **Empfehlung des Agenten für beide Fragen:** Option A bei Frage 1 (bestehenden Wert
+wiederverwenden, kein neuer Statuswert) + Option A bei Frage 2 (Location-Namen nennen, gekürzt) —
+das erfüllt die User Story („erkennen wenn... sodass ich nicht unbemerkt...") am direktesten,
+ohne den Status-Wertebereich vorzeitig zu erweitern. **Bitte von Stephan im Weg-Gate bestätigen
+oder die jeweils andere Option wählen.**
+
+⚠️ **Annahme (⚪ konventionell, Default):** Kein neuer Alarmkanal (Push/E-Mail/Banner in der App) —
+Sichtbarkeit ausschließlich über den bestehenden Status-Endpunkt (`/job-status`), da aktive
+Alarmierung explizit Teil des größeren Rahmens US-38 ist. Bitte bestätigen.
+
+⚠️ **Annahme (⚪ konventionell, Default):** Die Event-/Score-Berechnung selbst bleibt unverändert
+— betroffene Locations bleiben weiterhin ohne Wetter-Daten (das ist inhärent, da der externe
+Dienst nicht antwortet). BUG-77 behebt nur die **Sichtbarkeit** des Fehlers, nicht das Fehlen
+der Daten selbst. Bitte bestätigen.
+
+**Akzeptanzkriterien:**
+- [ ] Wenn beim automatischen Wetter-Update mindestens ein Standort nicht erreichbar ist,
+      zeigt die interne Status-Abfrage für den Wetter-Job „Fehler" statt „erledigt" — Stephan
+      sieht das, ohne im Server-Log nachschauen zu müssen.
+- [ ] Die Fehlermeldung benennt konkret, welche/wie viele Standorte betroffen waren (siehe
+      Frage 2 oben — nicht nur eine allgemeine „irgendetwas ist schiefgelaufen"-Meldung).
+- [ ] Schlagen nur einzelne Standorte fehl, während andere erfolgreich Wetter bekommen, werden
+      die erfolgreichen Standorte trotzdem ganz normal mit Himmelsröte-/Wetter-Chancen versorgt
+      — der eine fehlgeschlagene Standort blockiert die anderen nicht.
+- [ ] Läuft der Wetter-Abruf für alle Standorte fehlerfrei durch, ändert sich am bisherigen
+      Verhalten nichts — Status bleibt „erledigt", keine Fehlermeldung.
+- [ ] Edge Case: Es gibt aktuell keine anstehenden Ereignisse in den nächsten 3 Tagen (kein
+      Wetter-Abruf nötig) → Status bleibt „erledigt", kein fälschlicher Fehler.
+- [ ] Edge Case: Alle Standorte schlagen fehl (z. B. externer Wetterdienst komplett nicht
+      erreichbar) → Status zeigt „Fehler", keine gesonderte Behandlung nötig gegenüber dem
+      Teilausfall (gemäß Frage 1, Option A).
+
+**Pre-Mortem:**
+- 💀 Szenario „Alarmmüdigkeit": Der Fix zeigt „Fehler" bei JEDEM Teilausfall an, auch wenn nur
+  1 von 50 Standorten mal kurz einen Timeout hat → Stephan sieht ständig „Fehler" im Status,
+  auch bei Bagatellfällen, und beginnt ihn zu ignorieren.
+  Frühwarnung: `/job-status` zeigt für „weather" auffällig oft „error", ohne dass ein echter
+  Vorfall zugrunde liegt.
+  Gegenmaßnahme: Fehlertext nennt konkret betroffene Standorte/Anzahl (Frage 2), damit Stephan
+  Bagatellfälle von Totalausfällen unterscheiden kann; zusätzlich in Testplan verankert.
+- 💀 Szenario „Halbe Lösung": Fix wird nur in `_weather_overlay` eingebaut, aber die beiden
+  strukturell identischen Stellen (`_build_weather_map`, `_run_sightline_refresh`) bleiben
+  unverändert — dieselbe Silent-Failure-Klasse besteht an anderer Stelle fort.
+  Frühwarnung: Ein zukünftiger Ausfall von DWD/MET Norway oder Overpass/OpenTopoData bleibt
+  weiterhin unsichtbar.
+  Gegenmaßnahme: Ausdrücklich als eigenes, separates Ticket vorschlagen (siehe oben) statt
+  stillschweigend mitzufixen oder stillschweigend zu ignorieren.
+- 💀 Szenario „Regression im Erfolgsfall": Der neue Fehler-Pfad wird versehentlich auch bei
+  vollständig erfolgreichem Durchlauf ausgelöst (z. B. durch einen Zählfehler bei „0 von 0
+  fehlgeschlagen").
+  Frühwarnung: Bestehende Tests (`test_us106.py`) für den Erfolgsfall schlagen fehl oder
+  `/job-status` zeigt „error" nach einem sauberen Lauf.
+  Gegenmaßnahme: Regressions-AK „läuft fehlerfrei durch → Status bleibt done" explizit als
+  Testfall.
+- 💀 Szenario „Stiller Bruch von US-130": US-130 (Aerosol-Signal) baut auf derselben Codestelle
+  auf und soll laut Cross-Reference von diesem Fix profitieren. Wird der Fix so eng gebaut,
+  dass er nur exakt den heutigen Fehlerfall abdeckt (z. B. hart nach Location-Anzahl statt
+  generisch nach „mind. 1 Fehler"), könnte US-130 denselben Blocker erneut erben.
+  Gegenmaßnahme: Fix generisch auf „mind. 1 fehlgeschlagene Location → Fehlerzustand" auslegen,
+  nicht auf einen speziellen Datentyp/Cloud-Score beschränken.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`_weather_overlay`, `_job_status`,
+      `_job_start/_job_done/_job_error`, `/job-status`-Endpoint); verwandte Fundstellen
+      `_build_weather_map`, `_run_sightline_refresh` (nicht im Scope, nur gemeldet)
+- [x] Designer-Check: nicht visuell (reines Backend/Observability) → übersprungen
+- [ ] Implementierungsoptionen: A / B (siehe unten)
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Fehler-Zählung in der bestehenden Schleife + `_job_error()` am Ende
+- Vorgehen: In `_weather_overlay()` beim Fetch je Location (Z. 668–677) Fehlschläge in einer
+  Liste sammeln (Location-Namen). Nach der Schleife: sind Fehlschläge vorhanden →
+  `_job_error("weather", t0, msg)` statt `_job_done(...)` aufrufen, wobei `msg` die
+  gesammelten Namen (gekürzt) bzw. die Anzahl enthält, je nach Antwort auf Frage 2. Score-
+  Update (Z. 680–687) läuft unverändert weiter, auch für die fehlgeschlagenen Locations
+  (bleiben ohne Wetter, wie bisher).
+- Betroffene Dateien: `backend/main.py` (`_weather_overlay`, ca. Z. 636–691), neuer/erweiterter
+  Test in `backend/tests/test_bug77_weather_job_status.py`.
+- Vorteile: Kleinste, am Ticket-Scope orientierte Änderung; nutzt den bereits vorhandenen
+  `_job_status`-Mechanismus 1:1 wieder (keine neue Infrastruktur); geringes Risiko für US-38.
+- Nachteile/Risiken: Bei Antwort „Option B" auf Frage 1 (neuer Statuswert „partial") minimal
+  mehr Aufwand (ein Fallunterscheidungs-Zweig mehr), aber immer noch klein.
+- Aufwand: klein.
+
+### Option B — Neues, generisches „Teilausfall"-Feld direkt im `_job_status`-Dict
+- Vorgehen: Zusätzlich zu Status/last_error ein neues generisches Feld einführen (z. B.
+  `failed_count`/`failed_of_total`), das für alle Jobs (nicht nur „weather") nutzbar wäre —
+  quasi ein kleiner Vorgriff auf US-38s Datenmodell.
+- Betroffene Dateien: `backend/main.py` (`_job_status`-Dict-Struktur für ALLE Jobs, `_job_error`-
+  Signatur, `_weather_overlay`).
+- Vorteile: Einheitlicheres Datenmodell für später (US-38).
+- Nachteile/Risiken: Ändert die Datenstruktur für alle 5 Jobs, nicht nur „weather" — größerer
+  Blast-Radius für ein Ticket, das laut eigenem Bezug-Text bewusst klein und isoliert bleiben
+  soll; nimmt US-38 eine Designentscheidung vorweg, die dort eigentlich hingehört.
+- Aufwand: mittel.
+
+✅ **Empfehlung: Option A** — kleinster, scharf abgegrenzter Fix, der exakt der im Ticket
+selbst vorgegebenen Abgrenzung zu US-38 entspricht („BUG-77 eigenständig und zuerst umsetzen,
+US-38 bleibt der übergeordnete Rahmen"); keine Datenmodell-Entscheidung, die eigentlich in
+US-38 gehört, wird hier vorweggenommen.
+
+**Daten-Validierung:** nicht relevant (kein Datenmodell-/Score-Ticket).
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_bug77_weather_job_status.py` — Analog zu
+      `test_us106.py` (Monkeypatch von `fetch_weather_forecast` mit einer Fake-Funktion, die
+      für gezielt ausgewählte Locations eine Exception wirft): je ein Testfall für Rule 1
+      (Teilausfall → Fehlerzustand + korrekte Location(en) im Text + andere Locations trotzdem
+      aktualisiert), Rule 2 (Totalausfall → Fehlerzustand), Rule 3 (Regression: alles ok →
+      weiterhin „done"), Edge Case Rule 4 (keine Events in T+3 → weiterhin „done").
+- [ ] Manuell: Lokalen Server starten (Fenster 1), in Fenster 2 curl gegen `/job-status`
+      (Host-Token nötig, falls geschützt — vorher prüfen) VOR und NACH einem erzwungenen
+      Fehlschlag (z. B. per Monkeypatch/Test-Stub, da ein echter externer Ausfall lokal nicht
+      provozierbar ist) vergleichen: Status wechselt von „done" auf den vereinbarten
+      Fehlerwert, `last_error` zeigt den erwarteten Text.
+- [ ] Regression: bestehende `test_us106.py`-Fälle (Single-Overlay-Pfad) weiterhin grün, da
+      dieser Fix ausschließlich `_weather_overlay()` (Voll-Overlay), nicht
+      `_weather_overlay_single()` betrifft.
 
 ---
