@@ -64,7 +64,20 @@ class TestRoleFromLogin:
         assert r.status_code == 200, r.text
         assert r.json()["role"] == "user"
 
-    def test_host_only_route_reachable_with_host_token(self, client, host_token):
+    def test_host_only_route_reachable_with_host_token(self, client, host_token, monkeypatch):
+        # CI-Fund (2026-07-12, Workflow-Lauf #198): /refresh-feed plant per
+        # BackgroundTasks.add_task(_run_precompute, "feed") einen ECHTEN
+        # precompute.py-Subprozess (kompletter 14-Tage-Feed, alle Locations).
+        # Starlettes TestClient führt BackgroundTasks synchron VOR der Rückgabe
+        # von client.post() aus — ohne Mock würde dieser Test also einen echten,
+        # mehrminütigen Berechnungslauf anstoßen (in CI bis zum 15-Minuten-Timeout
+        # der Backend-Test-Suite). Geprüft werden soll hier nur der Auth-Vertrag
+        # ("mit Host-Token nicht gesperrt"), nicht die Berechnung selbst — die hat
+        # test_us106.py bereits mit demselben Mock-Muster abgedeckt.
+        import main
+        async def _fake_run_precompute(mode: str = "full") -> None:
+            return None
+        monkeypatch.setattr(main, "_run_precompute", _fake_run_precompute)
         r = client.post("/refresh-feed", headers={"Authorization": f"Bearer {host_token}"})
         assert r.status_code != 403
 
