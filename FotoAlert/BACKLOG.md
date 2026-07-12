@@ -28,9 +28,9 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still — Weg-Gate entschieden 2026-07-12, zuerst umzusetzen)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Weg-Gate entschieden 2026-07-12, nach BUG-77 umzusetzen)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Weg-Gate entschieden 2026-07-12, nach BUG-77 umzusetzen)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope; lokal grün bestätigt, ein Nebenfund als eigenes Bug-Ticket erfasst)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still — Fix in `_weather_overlay()` umgesetzt, 6 neue Tests + 61 wetterbezogene Regressionstests grün, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope; lokal grün bestätigt, ein Nebenfund als eigenes Bug-Ticket erfasst)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -11216,6 +11216,12 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 
 **CI-Fund nach erstem echten Release-Push (2026-07-12, Workflow-Lauf #195):** Frontend-Check (Playwright) schlug fehl — `_check_scout_mode` (Zeile ~2614) konnte `#fmb-feed` nicht klicken, weil das Schnell-Anlegen-Sheet (`#add-sheet`) noch offen war. Ursache: `AddLocation.save()` (`web/index.html` ~Zeile 6994) schließt das Sheet nur im Erfolgspfad (`this.close()`); schlägt der `/preview-alignment`-Call fehl, bleibt es offen und blockiert alle nachfolgenden Checks bis zum nächsten, der `_close_any_open_sheet()` aufruft. Die bestehende Helper-Funktion `_close_any_open_sheet()` (Zeile 1045, „Pattern 17") kannte `AddLocation` bisher nicht. Fix: `AddLocation.close()` in `_close_any_open_sheet()` ergänzt (+ `add-sheet` in die Warteliste), damit jeder nachfolgende Check robust gegen dieses Leck ist — analog zu den bereits dokumentierten Fixes für Filter-Sheet/Rating-Accordion. Kein neues Bug-Ticket nötig (reiner Test-Infrastruktur-Fix, keine sichtbare App-Auswirkung). `py_compile` grün.
 
+**Zweiter CI-Fund (2026-07-12, Workflow-Lauf #196, nach dem Add-Sheet-Fix):** Der Blocker war behoben (`_check_scout_mode` lief durch), aber 3 neue Findings — 2 davon strukturelle CI-Datenlage-Skips, kein Code-Bug:
+- `hasimage_locations_data_precondition`: CI-Checkout hat KEINE Location mit `image_url` (Beispielbilder entstehen nur durch manuelle Uploads, nie Teil der Basis-LOCATIONS-Seed-Daten) → ohne Datenvarianz nicht aussagekräftig prüfbar. Verifiziert: `deploy.yml` startet für den Frontend-Check nur `uvicorn`, kein `precompute.py`/Daten-Setup mit Bild-Upload. In dokumentierten Skip umgewandelt (gleiches Muster wie `filter_reduces_results`, siehe TASK-66/US-21).
+- `event_detail_card_present`: Feed komplett leer in CI (kein `precompute.py`-Lauf vor dem Check, siehe `deploy.yml` „Dev-Server starten"-Schritt — kein Precompute enthalten). In dokumentierten Skip umgewandelt, gleiches Muster.
+- `hasimage_dimmed_on_scout`: bereits bekannt, siehe BUG-76 — bleibt als Finding stehen (echter App-Bug, kein Skip).
+`py_compile` grün. Beide Skip-Umwandlungen sind Test-Robustheit gegen die CI-Datenlage, keine Abschwächung einer echten Prüfung — mit echten Daten (lokal, wie in den vorherigen lokalen Läufen) testen beide Fälle weiterhin scharf.
+
 **Beschreibung:** Die Pflicht-Regressionsliste in PRODUCT.md (nach jeder Implementierung alle bestehenden Funktionen prüfen) wird heute komplett manuell abgearbeitet. Dieses Ticket überführt die automatisierbaren Punkte in echte Tests (pytest bzw. Playwright-Durchläufe, je nach Punkt), die dann im CI-Gate mitlaufen. Am Ende bleibt in PRODUCT.md nur noch eine kleine Restliste, die wirklich Menschenaugen braucht: rein Visuelles und iOS-Haptik.
 
 **Scope-Erweiterung (Stephan, 2026-07-11):** TASK-69 („Automatisierte Regressions-/Smoke-Tests für ungetestete Kernbereiche") wurde inhaltlich in dieses Ticket aufgenommen. TASK-67 deckt damit zusätzlich zu den PRODUCT.md-Pflicht-Abschnitten auch die bisher komplett ungetesteten Kernbereiche ab: Kalender-Ansicht, Filter (Orte + Chancen-Übersicht, Ein-/Ausschluss), Bewertungsfunktion für Orte (Anlegen/Abrufen/Löschen), das Detail-Fenster einer Chance, die Wetter-Kartenansicht (Zeitregler, Ebenen-Umschalter), der Schnell-Anlegen-Ablauf für neue Orte, der Entdecken-Modus sowie die fünf weiteren ungetesteten Zusatzfunktionen (Tagesübersicht, Empfehlungsplan, Adress-Umkehrsuche, Verarbeitungsstatus-Anzeigen). TASK-69 wird dadurch als Duplikat/Teilmenge geschlossen (siehe dort). Der gesamte Umfang (alle 13 PRODUCT.md-Abschnitte + die genannten TASK-69-Bereiche) wird **in einem Zug** umgesetzt, nicht abschnittsweise — siehe Entscheidung zu Frage 1 + Frage 2 unten.
@@ -11957,13 +11963,13 @@ dieselbe Silent-Failure-Klasse erbt.
 
 ---
 
-### BUG-77 · Live-Wetter-Abruf für Himmelsröte scheitert still (nur Warning-Log, keine Sichtbarkeit) `[ ]`
+### BUG-77 · Live-Wetter-Abruf für Himmelsröte scheitert still (nur Warning-Log, keine Sichtbarkeit) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-12 |
 
 **Beschreibung:** Himmelsröte-/Goldene-Wolken-Events (RED_SKY/GOLDEN_CLOUDS) werden nicht im nächtlichen Precompute-Batch erzeugt, sondern ausschließlich live zur Laufzeit aus einem Wetter-API-Abruf berechnet (`backend/main.py::_weather_overlay`, Aufruf `fetch_weather_forecast()` Z. 673, gefolgt von `_generate_cloud_mood_events`/`_inject_cloud_mood_events`). Schlägt der Abruf für eine Location fehl, greift Z. 676–677 nur `except Exception as err: logger.warning(...)` — der Fehler wird lediglich geloggt, **ohne** `_job_error()` aufzurufen. `_job_done("weather", t0)` wird am Ende der Funktion (Z. 691) unbedingt aufgerufen, unabhängig davon, ob einzelne oder alle Location-Abrufe fehlgeschlagen sind. Der Job-Status zeigt daher „ok"/„done", obwohl Himmelsröte-Daten für betroffene Locations fehlen — keine Alarmierung, keine Sichtbarkeit für Stephan.
@@ -12072,21 +12078,41 @@ der Daten selbst. Bitte bestätigen.
   bestehen, nur die Sichtbarkeit wird gefixt) gelten als ✅ von Stephan bestätigt, 2026-07-12.
 
 **Akzeptanzkriterien:**
-- [ ] Wenn beim automatischen Wetter-Update mindestens ein Standort nicht erreichbar ist,
+- [x] Wenn beim automatischen Wetter-Update mindestens ein Standort nicht erreichbar ist,
       zeigt die interne Status-Abfrage für den Wetter-Job „Fehler" statt „erledigt" — Stephan
       sieht das, ohne im Server-Log nachschauen zu müssen.
-- [ ] Die Fehlermeldung benennt konkret, welche/wie viele Standorte betroffen waren (siehe
+- [x] Die Fehlermeldung benennt konkret, welche/wie viele Standorte betroffen waren (siehe
       Frage 2 oben — nicht nur eine allgemeine „irgendetwas ist schiefgelaufen"-Meldung).
-- [ ] Schlagen nur einzelne Standorte fehl, während andere erfolgreich Wetter bekommen, werden
+- [x] Schlagen nur einzelne Standorte fehl, während andere erfolgreich Wetter bekommen, werden
       die erfolgreichen Standorte trotzdem ganz normal mit Himmelsröte-/Wetter-Chancen versorgt
       — der eine fehlgeschlagene Standort blockiert die anderen nicht.
-- [ ] Läuft der Wetter-Abruf für alle Standorte fehlerfrei durch, ändert sich am bisherigen
+- [x] Läuft der Wetter-Abruf für alle Standorte fehlerfrei durch, ändert sich am bisherigen
       Verhalten nichts — Status bleibt „erledigt", keine Fehlermeldung.
-- [ ] Edge Case: Es gibt aktuell keine anstehenden Ereignisse in den nächsten 3 Tagen (kein
+- [x] Edge Case: Es gibt aktuell keine anstehenden Ereignisse in den nächsten 3 Tagen (kein
       Wetter-Abruf nötig) → Status bleibt „erledigt", kein fälschlicher Fehler.
-- [ ] Edge Case: Alle Standorte schlagen fehl (z. B. externer Wetterdienst komplett nicht
+- [x] Edge Case: Alle Standorte schlagen fehl (z. B. externer Wetterdienst komplett nicht
       erreichbar) → Status zeigt „Fehler", keine gesonderte Behandlung nötig gegenüber dem
       Teilausfall (gemäß Frage 1, Option A).
+
+**Umsetzung (2026-07-12):**
+- `backend/main.py::_weather_overlay()` (Fetch-Schleife + Abschluss): Fehlschläge pro Location
+  werden während der Schleife als Location-Namen gesammelt (`failed_locations`). Nach der
+  Schleife: gibt es Fehlschläge → `_job_error("weather", t0, msg)` mit
+  `msg = "Wetter: Fehler — Wetterdaten fehlgeschlagen für: <Namen, ggf. erste 5 + "…und N
+  weitere">"`, statt unbedingtem `_job_done(...)`. Keine Fehlschläge → unverändert
+  `_job_done(...)`. Score-Update (Schleife über `_feed_cache`) unverändert — fehlgeschlagene
+  Standorte bleiben wie bisher ohne Wetterdaten. `_build_weather_map()` und
+  `_run_sightline_refresh()` (gleiches Bug-Muster) bewusst nicht angefasst, siehe Ticket-Hinweis.
+- Neuer Test `backend/tests/test_bug77_weather_job_status.py` (6 Tests): Teilausfall
+  (Fehlerzustand + betroffener Standortname im Text, erfolgreiche Standorte trotzdem
+  aktualisiert), Namenskürzung ab 5 Standorten, Totalausfall, Regression (alles ok → weiterhin
+  „done"), Edge Case keine Events in T+3, Edge Case leerer Feed-Cache — alle 6 grün.
+- Regression: `backend/tests/test_us106.py` (13 Tests, Single-Overlay-Pfad) weiterhin grün,
+  ebenso `test_us112_weather_map.py` + `test_us07_golden_cloud_score.py` + `test_us109.py`
+  (weitere wetter-/cloud-mood-nahe Tests, zusammen 61 Tests grün). Ein Fund in der breiteren
+  Suite (`test_ephemeris_engine.py::test_ak6_passage_coverage`) tritt nur bei Volllauf aller
+  47 Testdateien zusammen auf, nicht isoliert, und betrifft die Ephemeris-/Astronomie-Berechnung
+  — unabhängig von `_weather_overlay`, nicht Teil dieses Tickets.
 
 **Pre-Mortem:**
 - 💀 Szenario „Alarmmüdigkeit": Der Fix zeigt „Fehler" bei JEDEM Teilausfall an, auch wenn nur
@@ -12164,7 +12190,7 @@ US-38 gehört, wird hier vorweggenommen.
 **Daten-Validierung:** nicht relevant (kein Datenmodell-/Score-Ticket).
 
 **Testplan:**
-- [ ] Automatisiert (Harness): `backend/tests/test_bug77_weather_job_status.py` — Analog zu
+- [x] Automatisiert (Harness): `backend/tests/test_bug77_weather_job_status.py` — Analog zu
       `test_us106.py` (Monkeypatch von `fetch_weather_forecast` mit einer Fake-Funktion, die
       für gezielt ausgewählte Locations eine Exception wirft): je ein Testfall für Rule 1
       (Teilausfall → Fehlerzustand + korrekte Location(en) im Text + andere Locations trotzdem
@@ -12175,7 +12201,7 @@ US-38 gehört, wird hier vorweggenommen.
       Fehlschlag (z. B. per Monkeypatch/Test-Stub, da ein echter externer Ausfall lokal nicht
       provozierbar ist) vergleichen: Status wechselt von „done" auf den vereinbarten
       Fehlerwert, `last_error` zeigt den erwarteten Text.
-- [ ] Regression: bestehende `test_us106.py`-Fälle (Single-Overlay-Pfad) weiterhin grün, da
+- [x] Regression: bestehende `test_us106.py`-Fälle (Single-Overlay-Pfad) weiterhin grün, da
       dieser Fix ausschließlich `_weather_overlay()` (Voll-Overlay), nicht
       `_weather_overlay_single()` betrifft.
 
