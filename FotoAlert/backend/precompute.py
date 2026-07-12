@@ -1131,6 +1131,11 @@ async def main(args: argparse.Namespace) -> None:
     # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
     from data import backup as _backup
     _backup.snapshot_before_precompute()
+    # TASK-61 (Option B): 8-Tabellen-JSON-Export zusätzlich an den bereits
+    # regelmäßig laufenden Vorberechnungslauf koppeln — garantiert eine
+    # Obergrenze für die Sicherungslücke der 6 neu erfassten Tabellen, auch
+    # ohne zwischenzeitlichen Location-Edit.
+    _backup.backup_after_precompute()
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     today = date.today()

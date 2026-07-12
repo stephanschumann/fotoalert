@@ -428,6 +428,19 @@ class LocationStore:
             rows = conn.execute(sql, (location_id,)).fetchall()
         return [dict(row) for row in rows]
 
+    def load_all_verifications(self) -> list:
+        """TASK-61: Lädt alle Verifikationen aller Locations (für Backup-Export).
+
+        Analog zu get_verifications(location_id), aber ohne Filter auf eine
+        einzelne Location — für den vollständigen Backup-Export.
+        """
+        sql = """SELECT id, location_id, location_name, status, issue_type, comment, date
+                 FROM location_verifications
+                 ORDER BY id ASC"""
+        with self._connect() as conn:
+            rows = conn.execute(sql).fetchall()
+        return [dict(row) for row in rows]
+
     def delete_last_verification(self, location_id: str) -> bool:
         """Löscht den neuesten Eintrag für eine Location. True wenn gefunden."""
         with self._connect() as conn:
@@ -638,6 +651,18 @@ class LocationStore:
             ).fetchone()
         return dict(row) if row else None
 
+    def load_all_camera_profiles(self) -> list:
+        """TASK-61: Lädt alle Kamera-Profile aller Geräte (für Backup-Export).
+
+        Analog zu get_camera_profile(device_id), aber ohne Filter auf ein
+        einzelnes Gerät — für den vollständigen Backup-Export.
+        """
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT device_id, sensor, fl, ori, updated FROM camera_profiles"
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def integrity_check(self) -> list[str]:
         """Führt PRAGMA integrity_check aus.
 
@@ -680,6 +705,17 @@ class LocationStore:
                 (location_id,),
             ).fetchone()
         return dict(row) if row else None
+
+    def load_all_qa_state(self) -> list:
+        """TASK-61: Lädt den QA-Zustand aller Locations (für Backup-Export).
+
+        Enthält u.a. die manuellen Sperren (description_lock/azimuth_lock/
+        focal_length_lock). Analog zu get_qa_state(location_id), aber ohne
+        Filter auf eine einzelne Location — für den vollständigen Backup-Export.
+        """
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM location_qa_state").fetchall()
+        return [dict(row) for row in rows]
 
     def set_qa_lock(self, location_id: str, field: str, locked: bool) -> None:
         """Setzt Lock-Flag für ein auto-generierbares Feld (Upsert).

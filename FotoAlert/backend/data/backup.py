@@ -1,10 +1,11 @@
 """
 FotoAlert Backup — RPO≈0 + lokale Snapshots
 
-Drei öffentliche Funktionen:
+Vier öffentliche Funktionen:
 
-  backup_after_edit(loc_id)       — nach jedem User-Edit; JSON-Export + Bildordner-Sync + git commit/push
+  backup_after_edit(loc_id)       — nach jedem User-Edit; JSON-Export (8 Tabellen) + Bildordner-Sync + git commit/push
   snapshot_before_precompute()    — vor jedem Precompute-Lauf; lokale DB-Kopie (7 Versionen)
+  backup_after_precompute()       — vor jedem Precompute-Lauf; derselbe 8-Tabellen-JSON-Export + git commit/push (TASK-61)
   last_backup_age_hours()         — Stunden seit letztem Git-Commit (für Health-Signal US-38)
 
 Dev-Guard: alle Funktionen sind No-Ops wenn FOTOALERT_ENV != "prod".
@@ -17,6 +18,10 @@ TASK-55: location_images/ huckepack im selben Backup-Zyklus (Unterordner
          location_images/ im Backup-Repo, per Verzeichnis-Sync auf exakten
          Live-Stand gebracht — gelöschte/ersetzte Bilder verschwinden auch
          aus dem aktuellen Sicherungsstand, keine Altstände als Sicherheitsnetz)
+TASK-61: Export auf alle 8 Datenbank-Tabellen erweitert (vorher nur
+         custom_locations + location_overrides), pro Tabelle einzeln
+         fehlertolerant, zusätzlicher Trigger am Vorberechnungslauf
+         (backup_after_precompute) als Obergrenze für die Sicherungslücke.
 """
 
 from __future__ import annotations
@@ -61,36 +66,70 @@ def _repo_ready() -> bool:
 # JSON-Export aus SQLite
 # ---------------------------------------------------------------------------
 
+def _load_overrides_for_export(store) -> list:
+    """Overrides zurück in List-of-dict mit id als erstem Feld (Backup-Format)."""
+    overrides_raw = store.load_all_overrides()
+    overrides = []
+    for ov in overrides_raw:
+        loc_id = ov.pop("id", None)
+        if loc_id:
+            overrides.append({"id": loc_id, **ov})
+    return overrides
+
+
+# TASK-61: Alle 8 Datenbank-Tabellen, die beim Export gesichert werden.
+# (Dateiname im Backup-Repo, Loader-Funktion). Je Tabelle eine eigene JSON-
+# Datei, analog zum bisherigen Muster custom_locations.json/location_overrides.json.
+def _export_table_specs(store) -> list:
+    return [
+        ("custom_locations.json", store.load_all_custom),
+        ("location_overrides.json", lambda: _load_overrides_for_export(store)),
+        ("location_qa_values.json", store.load_all_qa_values),
+        ("location_qa_state.json", store.load_all_qa_state),
+        ("location_verifications.json", store.load_all_verifications),
+        ("location_ratings.json", store.load_all_ratings),
+        ("device_tokens.json", store.load_device_tokens),
+        ("camera_profiles.json", store.load_all_camera_profiles),
+    ]
+
+
 def _export_to_repo() -> bool:
     """
-    Exportiert custom_locations + location_overrides als JSON in das Backup-Repo.
-    Gibt True zurück bei Erfolg.
+    Exportiert alle 8 Datenbank-Tabellen als je eine JSON-Datei ins Backup-Repo
+    (TASK-61: custom_locations, location_overrides, location_qa_values,
+    location_qa_state, location_verifications, location_ratings,
+    device_tokens, camera_profiles).
+
+    Jede Tabelle wird einzeln in try/except gekapselt — schlägt eine Tabelle
+    beim Auslesen/Schreiben fehl, wird das geloggt, die übrigen sieben werden
+    trotzdem exportiert (Pre-Mortem-Risiko TASK-61: vorher lag ein
+    gemeinsames try/except um die ganze Funktion, ein einzelner Lesefehler
+    hätte den kompletten Export inkl. der bisher zuverlässigen Tabellen
+    abgebrochen).
+
+    Gibt True zurück wenn der Exportlauf grundsätzlich durchgeführt werden
+    konnte (auch wenn einzelne Tabellen dabei fehlgeschlagen sind). Gibt nur
+    False zurück bei einem grundsätzlichen Fehler außerhalb der einzelnen
+    Tabellen-Exports (z.B. LocationStore lässt sich nicht initialisieren).
     """
     try:
         # Import hier um zirkuläre Abhängigkeiten zu vermeiden
         from data.store import LocationStore
         store = LocationStore()
-
-        custom = store.load_all_custom()
-        overrides_raw = store.load_all_overrides()
-
-        # Overrides zurück in List-of-dict mit id als erstem Feld
-        overrides = []
-        for ov in overrides_raw:
-            loc_id = ov.pop("id", None)
-            if loc_id:
-                overrides.append({"id": loc_id, **ov})
-
-        (_BACKUP_REPO / "custom_locations.json").write_text(
-            json.dumps(custom, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        (_BACKUP_REPO / "location_overrides.json").write_text(
-            json.dumps(overrides, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        return True
     except Exception as exc:
-        logger.error("Backup-Export fehlgeschlagen: %s", exc)
+        logger.error("Backup-Export fehlgeschlagen (LocationStore nicht initialisierbar): %s", exc)
         return False
+
+    for filename, loader in _export_table_specs(store):
+        try:
+            data = loader()
+            (_BACKUP_REPO / filename).write_text(
+                json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        except Exception as exc:
+            logger.error("Backup-Export von %s fehlgeschlagen: %s", filename, exc)
+
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +275,40 @@ def snapshot_before_precompute() -> None:
             logger.info("Alter Snapshot gelöscht: %s", oldest.name)
     except Exception as exc:
         logger.error("Snapshot fehlgeschlagen: %s", exc)
+
+
+def backup_after_precompute() -> None:
+    """
+    TASK-61 (Option B): Zusätzlich zum lokalen Snapshot (snapshot_before_precompute,
+    nur binäre DB-Kopie, nicht git-versioniert) wird hier derselbe 8-Tabellen-
+    JSON-Export wie bei backup_after_edit() ausgeführt und ins Backup-Repo
+    committet/gepusht — gemeinsame Export-Routine (_export_to_repo), zweiter
+    Trigger-Zeitpunkt neben Location-Edits.
+
+    Garantiert eine Obergrenze für die Sicherungslücke der sechs neu erfassten
+    Tabellen (location_qa_values, location_qa_state, location_verifications,
+    location_ratings, device_tokens, camera_profiles): spätestens beim
+    nächsten Vorberechnungslauf sind sie im Backup-Repo aktuell, auch ohne
+    zwischenzeitlichen Location-Edit.
+
+    Vor jedem Precompute-Lauf aufrufen (direkt nach snapshot_before_precompute()).
+    No-Op im Dev-Modus oder wenn das Backup-Repo nicht eingerichtet ist
+    (identische Guards wie backup_after_edit()).
+    """
+    if not _is_active():
+        return
+    if not _repo_ready():
+        logger.warning(
+            "Backup-Repo nicht gefunden (%s) — Vorberechnungslauf-Backup übersprungen. "
+            "Server-Setup aus TASK-18 Spec durchführen.",
+            _BACKUP_REPO,
+        )
+        return
+
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not _export_to_repo():
+        return
+    _git_commit_and_push(f"backup: precompute {ts}")
 
 
 def last_backup_age_hours() -> float | None:
