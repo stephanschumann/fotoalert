@@ -61,7 +61,7 @@ from calculations.astronomy import (
     calculate_subject_angular_profile,
     find_precise_alignment_times,
 )
-from calculations.weather import fetch_weather_forecast, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
+from calculations.weather import fetch_weather_forecast, fetch_aerosol_forecast, RED_SKY_AOD_THRESHOLD, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
 from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
 from data.locations import (
@@ -471,7 +471,13 @@ def _trigger_discover_debounced() -> None:
 # Wetter-Overlay
 # ---------------------------------------------------------------------------
 
-def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff: datetime) -> bool:
+def _apply_weather_to_event(
+    e: dict,
+    forecast: object,
+    now_utc: datetime,
+    cutoff: datetime,
+    aerosol_forecast: object = None,
+) -> bool:
     """
     US-106: Wetter-Anwendung für GENAU EIN Feed-Event (DRY-Helfer für Voll- und
     Single-Overlay). Setzt zusätzlich e["weather_status"]:
@@ -480,6 +486,11 @@ def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff
     Bei "none" und fehlendem Forecast bleibt weather_status unverändert "lädt"
     (kein Status → Frontend zeigt "wird nachgeladen", solange Location pending ist).
     Gibt True zurück, wenn echtes Wetter ("ok") gesetzt wurde.
+
+    US-130: aerosol_forecast ist optional (Default None) — fehlt er (Aerosol-Abruf
+    nicht verfügbar/fehlgeschlagen, AK-6), bleibt weather_details["aerosol_optical_depth"]
+    None und should_generate_red_sky_event() fällt sauber auf den reinen Wolken-Check
+    zurück, ohne dass diese Funktion hier einen Fehler wirft.
     """
     shoot_dt = datetime.fromisoformat(e["shoot_time"])
     if shoot_dt > cutoff or shoot_dt < now_utc - timedelta(hours=1):
@@ -530,6 +541,14 @@ def _apply_weather_to_event(e: dict, forecast: object, now_utc: datetime, cutoff
         "wind_direction_deg":   round(w_at.wind_direction_deg),
         "visibility_m":         round(w_at.visibility_m),
     }
+    # US-130: Aerosol-Optische-Dicke (Dunst-Signal) — None wenn kein Abruf/kein Datenpunkt
+    # verfügbar (AK-6, kein Fehler dadurch).
+    aod_value = None
+    if aerosol_forecast is not None:
+        a_at = aerosol_forecast.get_at(shoot_dt)
+        if a_at is not None and a_at.aerosol_optical_depth is not None:
+            aod_value = round(a_at.aerosol_optical_depth, 3)
+    e["weather_details"]["aerosol_optical_depth"] = aod_value
     e["weather_status"] = "ok"
     return True
 
@@ -566,6 +585,7 @@ def _generate_cloud_mood_events(feed_cache):
 
         cl = wd.get("cloud_cover_low_pct", 0)
         cm = wd.get("cloud_cover_mid_pct", 0)
+        aod = wd.get("aerosol_optical_depth")  # US-130: None wenn nicht verfügbar (AK-6)
 
         # Sonnen-Azimut: Morgen → sunrise_azimuth, Abend → sunset_azimuth
         if e.get("event_type") == "Goldene Stunde Morgen":
@@ -591,18 +611,36 @@ def _generate_cloud_mood_events(feed_cache):
             # AK-10: Original-Goldene-Stunde-Karte unterdrücken
             zu_entfernende_ids.add(e["id"])
 
-        # RED_SKY prüfen (AK-4, US-113: jetzt mit Sichtachsen-Filter) — unabhängig von GOLDEN_CLOUDS
-        if should_generate_red_sky_event(gcs, cl, cm, sun_az, subject_az):
+        # RED_SKY prüfen (AK-4, US-113: Sichtachsen-Filter, US-130: ODER-Verknüpfung mit
+        # Aerosol-/Dunst-Signal) — unabhängig von GOLDEN_CLOUDS
+        if should_generate_red_sky_event(gcs, cl, cm, sun_az, subject_az, aerosol_optical_depth=aod):
             new_event = _copy.deepcopy(e)
             new_event["id"] = "rs_" + _uuid.uuid4().hex[:12]
             new_event["event_type"] = "Himmelsröte"
             new_event["title"] = "Himmelsröte"
-            new_event["description"] = (
-                "Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in "
-                "Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und "
-                "mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal "
-                "für dramatische Himmelsstimmungen direkt über dem Motiv."
+            # US-130 AK-2: Dunst nur dann als Auslöser benennen, wenn die Wolkenbedingung
+            # selbst NICHT ausgereicht hätte (sonst bleibt der bisherige Wolken-Text
+            # unverändert — Regression/Rule 3, Wolkenbedingung hat immer Vorrang im Text).
+            aerosol_war_ausloeser = (
+                aod is not None
+                and aod >= RED_SKY_AOD_THRESHOLD
+                and (cl + cm) < 60
             )
+            if aerosol_war_ausloeser:
+                new_event["description"] = (
+                    "Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in "
+                    "Motivrichtung — sorgt ein hoher Dunst-/Aerosolanteil in der Atmosphäre "
+                    "(Gegendämmerung) für eine intensive rot-orange Einfärbung — auch ohne "
+                    "ausreichende Wolkendecke. Ideal für dramatische Himmelsstimmungen direkt "
+                    "über dem Motiv."
+                )
+            else:
+                new_event["description"] = (
+                    "Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in "
+                    "Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und "
+                    "mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal "
+                    "für dramatische Himmelsstimmungen direkt über dem Motiv."
+                )
             new_event["alert_priority"] = 2
             neue_events.append(new_event)
 
@@ -665,24 +703,44 @@ async def _weather_overlay() -> None:
     # Unique Locations aus den nahen Events
     seen: set = set()
     loc_forecasts: dict = {}
-    failed_locations: list = []  # BUG-77: Namen der Locations mit fehlgeschlagenem Abruf
+    aerosol_forecasts: dict = {}  # US-130
+    failed_locations: list = []  # BUG-77: Namen der Locations mit fehlgeschlagenem Wetter-Abruf
+    failed_aerosol_locations: list = []  # US-130: Namen der Locations mit fehlgeschlagenem Aerosol-Abruf
     for e in near_events:
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
         if key not in seen:
             seen.add(key)
-            try:
-                fc = await fetch_weather_forecast(e["observer_lat"], e["observer_lon"], days=7)
-                loc_forecasts[key] = fc
-                logger.info("  Wetter für %s: OK", e["location_name"])
-            except Exception as err:
-                logger.warning("  Wetter für %s fehlgeschlagen: %s", e["location_name"], err)
+            # US-130 (Pre-Mortem Szenario 4): Wetter- und Aerosol-Abruf parallelisieren
+            # statt seriell, damit der zusätzliche Aerosol-Call nicht die Latenz des
+            # ohnehin migränosen Wetter-Overlay-Pfads verdoppelt.
+            weather_result, aerosol_result = await asyncio.gather(
+                fetch_weather_forecast(e["observer_lat"], e["observer_lon"], days=7),
+                fetch_aerosol_forecast(e["observer_lat"], e["observer_lon"], days=7),
+                return_exceptions=True,
+            )
+            if isinstance(weather_result, Exception):
+                logger.warning("  Wetter für %s fehlgeschlagen: %s", e["location_name"], weather_result)
                 failed_locations.append(e["location_name"])
+            else:
+                loc_forecasts[key] = weather_result
+                logger.info("  Wetter für %s: OK", e["location_name"])
+
+            # US-130 AK-6: Ein fehlgeschlagener Aerosol-Abruf ist NICHT fatal — RED_SKY
+            # fällt für diese Location sauber auf den reinen Wolken-Check zurück
+            # (aerosol_forecasts[key] bleibt unbesetzt → None). Trotzdem sichtbar
+            # geloggt und im Job-Status erfasst statt eines stillen Fehlers (derselbe
+            # BUG-77-Mechanismus, kein neuer Silent-Failure-Pfad, Pre-Mortem Szenario 1).
+            if isinstance(aerosol_result, Exception):
+                logger.warning("  Aerosol für %s fehlgeschlagen: %s", e["location_name"], aerosol_result)
+                failed_aerosol_locations.append(e["location_name"])
+            else:
+                aerosol_forecasts[key] = aerosol_result
 
     # Scores in _feed_cache aktualisieren
     updated = 0
     for e in _feed_cache:
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
-        if _apply_weather_to_event(e, loc_forecasts.get(key), now_utc, cutoff):
+        if _apply_weather_to_event(e, loc_forecasts.get(key), now_utc, cutoff, aerosol_forecasts.get(key)):
             updated += 1
 
     # US-109: GOLDEN_CLOUDS- und Himmelsröte-Events erzeugen
@@ -693,11 +751,22 @@ async def _weather_overlay() -> None:
 
     # BUG-77: Teil- oder Totalausfall des Wetter-Abrufs sichtbar machen, statt
     # unbedingt "done" zu melden — bestehenden Statuswert "error" wiederverwenden.
-    if failed_locations:
-        names = ", ".join(failed_locations[:5])
-        if len(failed_locations) > 5:
-            names += f" …und {len(failed_locations) - 5} weitere"
-        msg = f"Wetter: Fehler — Wetterdaten fehlgeschlagen für: {names}"
+    # US-130: Aerosol-Ausfälle laufen über denselben Sichtbarkeits-Mechanismus mit,
+    # damit ein Ausfall der Air-Quality-API nicht denselben stillen Fehler reproduziert,
+    # den BUG-77 für den Wetter-Abruf behoben hat.
+    if failed_locations or failed_aerosol_locations:
+        parts = []
+        if failed_locations:
+            names = ", ".join(failed_locations[:5])
+            if len(failed_locations) > 5:
+                names += f" …und {len(failed_locations) - 5} weitere"
+            parts.append(f"Wetterdaten fehlgeschlagen für: {names}")
+        if failed_aerosol_locations:
+            names = ", ".join(failed_aerosol_locations[:5])
+            if len(failed_aerosol_locations) > 5:
+                names += f" …und {len(failed_aerosol_locations) - 5} weitere"
+            parts.append(f"Aerosoldaten fehlgeschlagen für: {names}")
+        msg = "Wetter: Fehler — " + "; ".join(parts)
         _job_error("weather", t0, msg)
     else:
         _job_done("weather", t0)

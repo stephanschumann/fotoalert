@@ -20,6 +20,9 @@ import httpx
 
 
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
+"""US-130: Separate Open-Meteo Air Quality API (CAMS-Aerosolvorhersage), liefert
+aerosol_optical_depth (Dunst-/Aerosol-Signal) — nicht Teil der Standard-Forecast-API."""
 
 
 @dataclass
@@ -59,6 +62,30 @@ class WeatherForecast:
         s = start.replace(tzinfo=timezone.utc) if start.tzinfo is None else start
         e = end.replace(tzinfo=timezone.utc) if end.tzinfo is None else end
         return [h for h in self.hourly if s <= h.time <= e]
+
+
+@dataclass
+class HourlyAerosol:
+    """US-130: Ein Aerosol-Datenpunkt (nur das für RED_SKY relevante Signal)."""
+    time: datetime
+    aerosol_optical_depth: Optional[float]  # Aerosol-Optische-Dicke bei 550 nm, dimensionslos
+
+
+@dataclass
+class AerosolForecast:
+    """US-130: Ergebnis von fetch_aerosol_forecast(), analog zu WeatherForecast."""
+    location_lat: float
+    location_lon: float
+    fetched_at: datetime
+    hourly: list[HourlyAerosol]
+
+    def get_at(self, dt: datetime) -> Optional[HourlyAerosol]:
+        """Nächste Stunde zum gesuchten Zeitpunkt (analog zu WeatherForecast.get_at)."""
+        if not self.hourly:
+            return None
+        target = dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+        best = min(self.hourly, key=lambda h: abs((h.time - target).total_seconds()))
+        return best
 
 
 def calculate_photo_weather_score(hw: HourlyWeather) -> float:
@@ -215,6 +242,15 @@ Eigene, unabhängig änderbare Konstante (nicht an GOLDEN_CLOUDS' 30°-Wert geko
 auch wenn sie initial denselben Wert hat) — siehe Implementierungsoption A, US-113.
 """
 
+RED_SKY_AOD_THRESHOLD = 0.3
+"""
+US-130: Schwellenwert für die Aerosol-Optische-Dicke (aerosol_optical_depth, 550 nm),
+ab dem ein signifikanter Dunst-/Aerosolwert vorliegt (inklusiv, >=). Startwert ohne
+empirische Kalibrierung für Berlin/Brandenburg — bewusst als eigene, benannte Konstante
+gehalten, um sie nach Live-Beobachtung nachjustieren zu können (siehe BACKLOG.md US-130,
+Pre-Mortem Szenario 2, von Stephan im Weg-Gate am 2026-07-12 bestätigt).
+"""
+
 
 def should_generate_red_sky_event(
     gcs: float,
@@ -222,16 +258,26 @@ def should_generate_red_sky_event(
     cm: float,
     sun_azimuth: Optional[float] = None,
     subject_azimuth: Optional[float] = None,
+    aerosol_optical_depth: Optional[float] = None,
 ) -> bool:
     """
-    US-109 / US-113: Prüft ob ein RED_SKY-Event erzeugt werden soll.
+    US-109 / US-113 / US-130: Prüft ob ein RED_SKY-Event erzeugt werden soll.
 
     Bedingungen:
     - golden_cloud_score >= 0.80
-    - cloud_cover_low + cloud_cover_mid >= 60 % (dominante tiefe/mittlere Bewölkung)
-      → der Gesamthimmel rötet sich, nicht nur Cirrus-Schleier
-    - US-113: Azimut-Differenz zwischen Motivrichtung und dem GEGENPUNKT der Sonne
-      <= RED_SKY_AZIMUTH_TOLERANCE_DEG (siehe Korrektur unten)
+    - Azimut-Differenz zwischen Motivrichtung und dem GEGENPUNKT der Sonne
+      <= RED_SKY_AZIMUTH_TOLERANCE_DEG (siehe Korrektur unten, US-113)
+    - US-130 (ODER-Verknüpfung, Option B): mindestens EINE der beiden Bedingungen muss
+      zusätzlich erfüllt sein —
+        (a) cloud_cover_low + cloud_cover_mid >= 60 % (dominante tiefe/mittlere Bewölkung,
+            der Gesamthimmel rötet sich, nicht nur Cirrus-Schleier), ODER
+        (b) aerosol_optical_depth >= RED_SKY_AOD_THRESHOLD (signifikanter Dunst/Aerosol,
+            klassischer Gegendämmerungsbogen/"Belt of Venus"-Effekt auch bei wolkenarmem,
+            aber diesigem Himmel — siehe BACKLOG.md US-130)
+      Ist die Wolkenbedingung bereits erfüllt, ändert sich am Auslöseverhalten nichts
+      (Regression, unabhängig vom Aerosolwert). Fehlt aerosol_optical_depth (Abruf nicht
+      verfügbar/fehlgeschlagen), verhält sich die Funktion identisch zum reinen
+      Wolken-Check (kein Fehler, kein Absturz — AK-6).
 
     US-113-Korrektur (2026-07-02, fachlicher Analysefehler behoben):
     Himmelsröte (Gegendämmerung, "Belt of Venus") entsteht am GEGENPUNKT der Sonne
@@ -243,20 +289,21 @@ def should_generate_red_sky_event(
 
     Ohne sun_azimuth oder subject_azimuth (z. B. Location ohne definiertes Motiv) ist kein
     Richtungsvergleich möglich → kein RED_SKY-Event (analog zum GOLDEN_CLOUDS-Verhalten).
+    Diese Bedingung gilt unverändert auch für den neuen Aerosol-Zweig (US-130) — ohne
+    Richtungsvergleich kein RED_SKY-Event, unabhängig vom Auslöser.
 
     Args:
-        gcs:             Golden Cloud Score (0.0–1.0)
-        cl:              cloud_cover_low in Prozent (0–100)
-        cm:              cloud_cover_mid in Prozent (0–100)
-        sun_azimuth:      Sonnen-Azimut in Grad (0–360, 0=Nord im Uhrzeigersinn), optional
-        subject_azimuth:  Motiv-Azimut vom Standpunkt aus (0–360), optional
+        gcs:                    Golden Cloud Score (0.0–1.0)
+        cl:                     cloud_cover_low in Prozent (0–100)
+        cm:                     cloud_cover_mid in Prozent (0–100)
+        sun_azimuth:            Sonnen-Azimut in Grad (0–360, 0=Nord im Uhrzeigersinn), optional
+        subject_azimuth:        Motiv-Azimut vom Standpunkt aus (0–360), optional
+        aerosol_optical_depth:  Aerosol-Optische-Dicke (550 nm), optional (US-130)
 
     Returns:
         True wenn RED_SKY-Event erzeugt werden soll
     """
     if gcs < 0.80:
-        return False
-    if (cl + cm) < 60:
         return False
     if sun_azimuth is None or subject_azimuth is None:
         return False
@@ -265,7 +312,15 @@ def should_generate_red_sky_event(
     diff = abs(antisolar_azimuth - subject_azimuth) % 360
     if diff > 180:
         diff = 360 - diff
-    return diff <= RED_SKY_AZIMUTH_TOLERANCE_DEG
+    if diff > RED_SKY_AZIMUTH_TOLERANCE_DEG:
+        return False
+
+    cloud_condition = (cl + cm) >= 60
+    aerosol_condition = (
+        aerosol_optical_depth is not None
+        and aerosol_optical_depth >= RED_SKY_AOD_THRESHOLD
+    )
+    return cloud_condition or aerosol_condition
 
 
 def wmo_code_to_description(code: int) -> str:
@@ -360,6 +415,57 @@ async def fetch_weather_forecast(lat: float, lon: float, days: int = 7) -> Weath
         location_lon=lon,
         fetched_at=datetime.now(timezone.utc),
         hourly=weather_list,
+    )
+
+
+async def fetch_aerosol_forecast(lat: float, lon: float, days: int = 7) -> AerosolForecast:
+    """
+    US-130: Holt stündliche Aerosol-/Dunst-Vorhersage (aerosol_optical_depth) von der
+    separaten Open-Meteo Air Quality API (analog zu fetch_weather_forecast(), anderer
+    Hostname/Endpunkt). Kein API-Key nötig, kostenlos.
+
+    domains=cams_global wird explizit gesetzt. Live-Verifikation in der Testphase
+    (2026-07-12) zeigte: das feinere cams_europe-Regionalmodell liefert für
+    aerosol_optical_depth an Berlin/Brandenburg-Koordinaten durchgängig null (Rohantwort
+    der API geprüft) — das globale CAMS-Modell (~45 km Auflösung) liefert dagegen reale
+    Werte. Das passt inhaltlich auch besser zum Ticket-Anlass (Viewfindr-Vergleichsfall:
+    weiträumige, nicht an lokale Wolkenfelder gebundene Dunst-Rotfärbung). Ursprünglich war
+    cams_europe vorgesehen (siehe Pre-Mortem Szenario 3, Sorge vor Sprüngen an der
+    Domain-Grenze) — diese Annahme war unzutreffend, da cams_europe hier keine Daten liefert,
+    nicht nur eine feinere Auflösung. Gültige Werte laut Open-Meteo Air Quality API: "auto",
+    "cams_europe", "cams_global" — "europe" (ohne Präfix) ist KEIN gültiger Wert und löste
+    zuvor einen 400 Bad Request aus (erster Live-Fund der Testphase, 2026-07-12).
+    """
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "hourly": ["aerosol_optical_depth"],
+        "domains": "cams_global",
+        "forecast_days": min(days, 16),
+        "timezone": "UTC",
+    }
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(AIR_QUALITY_URL, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+    hourly = data["hourly"]
+    times = [
+        datetime.fromisoformat(t).replace(tzinfo=timezone.utc)
+        for t in hourly["time"]
+    ]
+
+    aerosol_list = []
+    for i, t in enumerate(times):
+        aod = hourly["aerosol_optical_depth"][i]
+        aerosol_list.append(HourlyAerosol(time=t, aerosol_optical_depth=aod))
+
+    return AerosolForecast(
+        location_lat=lat,
+        location_lon=lon,
+        fetched_at=datetime.now(timezone.utc),
+        hourly=aerosol_list,
     )
 
 

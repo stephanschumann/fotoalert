@@ -1555,7 +1555,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.21';
+const APP_VERSION = '1.22.22';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4507,9 +4507,19 @@ const Detail = {
           const cl = wd ? wd.cloud_cover_low_pct : null;
           const cm = wd ? wd.cloud_cover_mid_pct : null;
           const total = (cl != null && cm != null) ? cl + cm : null;
+          // US-130: Aerosol-/Dunst-Signal (ODER-Verknüpfung mit der Wolkenbedingung).
+          // Schwelle muss mit backend/calculations/weather.py RED_SKY_AOD_THRESHOLD uebereinstimmen.
+          const RED_SKY_AOD_THRESHOLD = 0.3;
+          const aod = wd ? wd.aerosol_optical_depth : null;
+          const cloudConditionMet = (total != null && total >= 60);
+          const aerosolConditionMet = (aod != null && aod >= RED_SKY_AOD_THRESHOLD);
+          // AK-2: Dunst nur dann als Auslöser nennen, wenn die Wolkenbedingung allein
+          // nicht ausgereicht hätte (sonst bleibt der bisherige Wolken-Text unverändert).
+          const isAerosolTrigger = aerosolConditionMet && !cloudConditionMet;
           const clRow = (cl != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${cl} %</span></div>` : '';
           const cmRow = (cm != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${cm} %</span></div>` : '';
-          const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:var(--red)">${total} % ≥ 60 % ✓</span></div>` : '';
+          const totRow = (total != null) ? `<div class="info-row"><span class="ir-label">Tief + Mittel</span><span class="ir-val" style="color:${cloudConditionMet ? 'var(--red)' : 'var(--muted)'}">${total} % ${cloudConditionMet ? '≥' : '<'} 60 %${cloudConditionMet ? ' ✓' : ''}</span></div>` : '';
+          const aodRow = (aod != null) ? `<div class="info-row"><span class="ir-label">Dunst (Aerosol-Dicke)</span><span class="ir-val" style="color:${aerosolConditionMet ? 'var(--red)' : 'var(--muted)'}">${aod.toFixed(2)} ${aerosolConditionMet ? '≥' : '<'} ${RED_SKY_AOD_THRESHOLD}${aerosolConditionMet ? ' ✓' : ''}</span></div>` : '';
           const rsSunAz = o.sunset_azimuth ?? o.sunrise_azimuth ?? null;
           const compassHtmlRS = (rsSunAz != null)
             ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
@@ -4531,10 +4541,17 @@ const Detail = {
             ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${rsSubAz.toFixed(1)}°</span></div>` : '';
           const rsDiffRow = (rsAzDiff != null)
             ? `<div class="info-row"><span class="ir-label">Winkelversatz zum Gegenpunkt</span><span class="ir-val" style="color:var(--red)">${rsAzDiff.toFixed(1)}° ≤ 30° ✓</span></div>` : '';
+          const rsExplainText = isAerosolTrigger
+            ? `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — sorgt ein hoher Dunst-/Aerosolanteil in der Atmosphäre (Gegendämmerung) für eine intensive rot-orange Einfärbung — auch ohne ausreichende Wolkendecke. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.`
+            : `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.`;
+          const rsAodSection = (aod != null)
+            ? `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Dunst-Prüfung (Aerosol-Optische-Dicke ≥ ${RED_SKY_AOD_THRESHOLD}):</p>` + aodRow
+            : '';
           return compassHtmlRS + mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
-            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.</p>` +
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">${rsExplainText}</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
             clRow + cmRow + totRow +
+            rsAodSection +
             `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Richtungs-Prüfung (Gegenpunkt der Sonne ↔ Motiv ≤ 30°):</p>` +
             rsDirRow + rsMotifRow + rsDiffRow
           );

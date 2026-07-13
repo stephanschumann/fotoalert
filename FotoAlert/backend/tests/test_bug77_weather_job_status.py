@@ -10,6 +10,12 @@ Monkeypatch-Ansatz analog zu test_us106.py: fetch_weather_forecast wird durch
 eine Fake-Funktion ersetzt, die für gezielt ausgewählte Locations eine
 Exception wirft. Getestet wird ausschließlich die Steuerlogik in
 _weather_overlay() (main.py) — kein echter Open-Meteo-Call.
+
+US-130-Nachtrag (2026-07-12): _weather_overlay() ruft seither zusätzlich
+fetch_aerosol_forecast() parallel zu fetch_weather_forecast() ab (asyncio.gather).
+Damit dieser Testfile weiterhin "kein echter Open-Meteo-Call" einhält (auch nicht
+gegen die separate Air-Quality-API), mocken alle Tests, die _weather_overlay()
+tatsächlich mit Locations durchlaufen lassen, jetzt beide Funktionen.
 """
 import asyncio
 from datetime import datetime, timedelta, timezone
@@ -17,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 import main
-from calculations.weather import HourlyWeather, WeatherForecast
+from calculations.weather import HourlyWeather, WeatherForecast, HourlyAerosol, AerosolForecast
 
 pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
@@ -39,6 +45,27 @@ def _forecast(ref: datetime) -> WeatherForecast:
     hours = [_hourly(ref + timedelta(hours=i)) for i in range(-2, 72)]
     return WeatherForecast(location_lat=52.5, location_lon=13.4,
                            fetched_at=datetime.now(timezone.utc), hourly=hours)
+
+
+def _aerosol_hourly(t: datetime, aod=0.05) -> HourlyAerosol:
+    return HourlyAerosol(time=t, aerosol_optical_depth=aod)
+
+
+def _aerosol_forecast(ref: datetime) -> AerosolForecast:
+    """US-130: Fake-Aerosol-Forecast (niedriger, unter der Schwelle liegender Wert
+    — beeinflusst RED_SKY/Job-Status hier nicht, dient nur dazu, den echten
+    Netzwerk-Call zu ersetzen)."""
+    hours = [_aerosol_hourly(ref + timedelta(hours=i)) for i in range(-2, 72)]
+    return AerosolForecast(location_lat=52.5, location_lon=13.4,
+                            fetched_at=datetime.now(timezone.utc), hourly=hours)
+
+
+def _mock_aerosol_ok(monkeypatch):
+    """US-130: Aerosol-Abruf erfolgreich mocken (Standardfall für Tests, die nicht
+    gezielt einen Aerosol-Fehlerfall prüfen)."""
+    async def fake_fetch_aerosol(lat, lon, days=7):
+        return _aerosol_forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_fetch_aerosol)
 
 
 def _event(loc_id: str, loc_name: str, shoot_offset_h: float, lat: float, lon: float) -> dict:
@@ -92,6 +119,7 @@ def test_partial_failure_sets_error_status_with_location_name(monkeypatch):
             raise RuntimeError("Open-Meteo down")
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # US-130: nicht Teil dieses Testfalls
 
     _run(main._weather_overlay())
 
@@ -117,6 +145,7 @@ def test_partial_failure_truncates_names_after_five(monkeypatch):
     async def failing_fetch(lat, lon, days=7):
         raise RuntimeError("Open-Meteo komplett down")
     monkeypatch.setattr(main, "fetch_weather_forecast", failing_fetch)
+    _mock_aerosol_ok(monkeypatch)  # US-130: nicht Teil dieses Testfalls
 
     _run(main._weather_overlay())
 
@@ -139,6 +168,7 @@ def test_total_failure_sets_error_status(monkeypatch):
     async def failing_fetch(lat, lon, days=7):
         raise RuntimeError("Open-Meteo down")
     monkeypatch.setattr(main, "fetch_weather_forecast", failing_fetch)
+    _mock_aerosol_ok(monkeypatch)  # US-130: nicht Teil dieses Testfalls
 
     _run(main._weather_overlay())
 
@@ -163,6 +193,7 @@ def test_all_success_keeps_done_status(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # US-130: muss ebenfalls erfolgreich sein für "done"
 
     _run(main._weather_overlay())
 

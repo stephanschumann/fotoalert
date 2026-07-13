@@ -28,13 +28,13 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Weg-Gate entschieden 2026-07-12, nach BUG-77 umzusetzen)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal — Code + automatisierte Tests grün 2026-07-12, wartet auf manuellen Browser-Test)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **US-128** *(Bauwerkshöhe subject_height_m nachträglich bearbeitbar machen)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test)* · **TASK-74** *(Lange Funktionen _weather_overlay()/_generate_cloud_mood_events() in backend/main.py)* · **US-132** *(Rote Wolken: Rotes Nachglühen hoher Wolken in Sonnenrichtung bei Sonne unter dem Horizont)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -9795,14 +9795,15 @@ Ziel/Nutzen: Unabhängigkeit von den unzuverlässigen kostenlosen Overpass-Serve
 
 ---
 
-### US-128 · Bauwerkshöhe und -breite (`subject_height_m` / `subject_width_m`) nachträglich bearbeitbar machen `[~]`
+### US-128 · Bauwerkshöhe und -breite (`subject_height_m` / `subject_width_m`) nachträglich bearbeitbar machen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-10 |
+| **Abgeschlossen** | 2026-07-10 |
 
 **User Story:** Als Host, der für ein Bauwerk (z. B. Kirchturmspitze, Fernsehturm) nachträglich eine genauere Höhen- und/oder Breitenangabe recherchiert hat, möchte ich diese Maße (`subject_height_m` und `subject_width_m`) über die Location-Bearbeitung korrigieren können, sodass die Sonnen-/Mond-Alignment-Berechnung (exakte Sichtachse zur Bauwerksspitze und Kompositions-/FOV-Berechnung zur Bauwerksbreite) automatisch neu gerechnet wird und wieder korrekte Zeitfenster liefert.
 
@@ -9852,17 +9853,17 @@ Der Scout-Tab (`backend/discover/subjects.py`, Zeile 96–98) markiert eine Loca
 ---
 
 **Akzeptanzkriterien:**
-- [~] Ein Host kann über die Location-Bearbeitung `subject_height_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
-- [~] Ein Host kann über die Location-Bearbeitung `subject_width_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
-- [~] Beide Felder sind unabhängig voneinander änderbar (nur Höhe / nur Breite / beides gemeinsam in einem Request).
-- [~] Nach einer Korrektur wird automatisch eine Neuberechnung angestoßen (`recompute_triggered: true`), die Feed UND Kalender für diese Location aktualisiert.
-- [~] Funktioniert identisch für Custom-Locations (SQLite `custom_locations`-Tabelle) und Standard-Locations (Override-Mechanismus).
-- [~] Edge Case: Ein Wert von `0` wird akzeptiert (z. B. Location ohne vertikales Motiv, nur Horizont-Ereignisse).
-- [~] Edge Case: Ein negativer Wert wird mit HTTP 422 und einer verständlichen Fehlermeldung abgelehnt.
-- [~] Edge Case: Ein nicht-numerischer Wert (String, Liste) wird mit HTTP 422 abgelehnt.
-- [~] Edge Case: Bei einer Standard-Location überlebt die Korrektur einen Server-Neustart (kein Zurückfallen auf den hartkodierten Basiswert aus `data/locations.py`).
-- [~] Edge Case: Bei einer Standard-Location wird die Korrektur auch vom nächtlichen/manuellen Recompute-Subprozess (`precompute.py`) berücksichtigt, nicht nur vom laufenden Server-Prozess.
-- [~] Eine Location mit korrigierter Bauwerkshöhe von genau 20 Metern und leerer Breitenangabe erscheint weiterhin korrekt im Scout-Tab (wird nicht mehr fälschlich als unvollständiger Platzhalter behandelt und ausgeblendet).
+- [x] Ein Host kann über die Location-Bearbeitung `subject_height_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
+- [x] Ein Host kann über die Location-Bearbeitung `subject_width_m` einer Location korrigieren; die Änderung ist sofort per `GET /locations` sichtbar.
+- [x] Beide Felder sind unabhängig voneinander änderbar (nur Höhe / nur Breite / beides gemeinsam in einem Request).
+- [x] Nach einer Korrektur wird automatisch eine Neuberechnung angestoßen (`recompute_triggered: true`), die Feed UND Kalender für diese Location aktualisiert.
+- [x] Funktioniert identisch für Custom-Locations (SQLite `custom_locations`-Tabelle) und Standard-Locations (Override-Mechanismus).
+- [x] Edge Case: Ein Wert von `0` wird akzeptiert (z. B. Location ohne vertikales Motiv, nur Horizont-Ereignisse).
+- [x] Edge Case: Ein negativer Wert wird mit HTTP 422 und einer verständlichen Fehlermeldung abgelehnt.
+- [x] Edge Case: Ein nicht-numerischer Wert (String, Liste) wird mit HTTP 422 abgelehnt.
+- [x] Edge Case: Bei einer Standard-Location überlebt die Korrektur einen Server-Neustart (kein Zurückfallen auf den hartkodierten Basiswert aus `data/locations.py`).
+- [x] Edge Case: Bei einer Standard-Location wird die Korrektur auch vom nächtlichen/manuellen Recompute-Subprozess (`precompute.py`) berücksichtigt, nicht nur vom laufenden Server-Prozess.
+- [x] Eine Location mit korrigierter Bauwerkshöhe von genau 20 Metern und leerer Breitenangabe erscheint weiterhin korrekt im Scout-Tab (wird nicht mehr fälschlich als unvollständiger Platzhalter behandelt und ausgeblendet).
 
 ---
 
@@ -9962,15 +9963,15 @@ Cap+Sort / Cross-Collection-Lookup: nicht anwendbar (kein Listen-Cap, kein Cross
 - [x] Empfehlung: Option A — Stephan entscheidet sich abweichend für Option B (strukturelle Zusammenführung)
 
 **Testplan:**
-- [ ] Automatisiert (Harness): `backend/tests/test_us_128.py` — PATCH-Whitelist (Höhe/Breite einzeln/gemeinsam), Recompute-Trigger, Validierung (negativ → 422, Typfehler → 422, 0 → 200), Custom-Location-Persistenz, Standard-Location-Reload (`main._load_location_overrides()`), precompute-Override-Anwendung (`precompute._apply_location_overrides()`)
-- [ ] Automatisiert (Harness, zusätzlicher Fall in derselben Datei `backend/tests/test_us_128.py`, aus der Weg-Gate-Entscheidung „Frage 1 → Option B"): neue, verlässliche Platzhalter-Erkennung in `backend/discover/subjects.py` gegen den alten `subject_height_m == 20`-Grenzfall prüfen — Location mit `subject_height_m=20` und `subject_width_m=None`, aber korrekt gesetztem „ist recherchierter Wert"-Flag, muss weiterhin als Scout-Kandidat erscheinen (nicht mehr fälschlich als Platzhalter ausgeschlossen).
-- [ ] Manuell:
+- [x] Automatisiert (Harness): `backend/tests/test_us_128.py` — PATCH-Whitelist (Höhe/Breite einzeln/gemeinsam), Recompute-Trigger, Validierung (negativ → 422, Typfehler → 422, 0 → 200), Custom-Location-Persistenz, Standard-Location-Reload (`main._load_location_overrides()`), precompute-Override-Anwendung (`precompute._apply_location_overrides()`)
+- [x] Automatisiert (Harness, zusätzlicher Fall in derselben Datei `backend/tests/test_us_128.py`, aus der Weg-Gate-Entscheidung „Frage 1 → Option B"): neue, verlässliche Platzhalter-Erkennung in `backend/discover/subjects.py` gegen den alten `subject_height_m == 20`-Grenzfall prüfen — Location mit `subject_height_m=20` und `subject_width_m=None`, aber korrekt gesetztem „ist recherchierter Wert"-Flag, muss weiterhin als Scout-Kandidat erscheinen (nicht mehr fälschlich als Platzhalter ausgeschlossen).
+- [x] Manuell:
   1. Server lokal starten (siehe `fotoalert-localdev`), unter `http://localhost:8000/docs` einloggen (Host-Passwort).
   2. `curl -X PATCH http://localhost:8000/locations/<standard-location-id> -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"subject_height_m": 105, "subject_width_m": 75}'` → erwartete Response: `{"ok": true, "updated": {"subject_height_m": 105.0, "subject_width_m": 75.0}, "recompute_triggered": true}`.
   3. `curl http://localhost:8000/locations` → dieselbe Location zeigt sofort die neuen Werte.
   4. Negativtest: `curl -X PATCH ... -d '{"subject_height_m": -5}'` → HTTP 422.
   5. Regressions-Matrix (`PRODUCT.md` Sektion 12, Ticket-Typ „Backend/API"): zusätzlich prüfen, dass bestehende PATCH-Felder (`observer_floor_height_m`, Koordinaten, `focal_length_suggestions`, `name`/`description`) weiterhin unverändert funktionieren (Regressionsschutz gegen die Whitelist-Erweiterung).
-- [ ] **Release-Hinweis (Pflicht vor Ticket-Abschluss):** Nach erfolgreichem Test einmalig einen vollständigen Neuberechnungslauf (`precompute.py --full`) über ALLE Locations anstoßen — nicht nur die während der Implementierung/des Tests bearbeiteten. Grund: Bestandslocations können aktuell falsch berechnete Alignment-Zeitfenster haben, deren Höhen-/Breitenwerte bisher nicht korrigierbar waren. Laufzeit ca. 8 Stunden (siehe `reference_fotoalert_server_paths`) — rechtzeitig vor dem geplanten Release-Zeitpunkt einplanen, nicht spontan kurz vor Deploy starten.
+- [x] **Release-Hinweis (Pflicht vor Ticket-Abschluss):** Nach erfolgreichem Test einmalig einen vollständigen Neuberechnungslauf (`precompute.py --full`) über ALLE Locations anstoßen — nicht nur die während der Implementierung/des Tests bearbeiteten. Grund: Bestandslocations können aktuell falsch berechnete Alignment-Zeitfenster haben, deren Höhen-/Breitenwerte bisher nicht korrigierbar waren. Laufzeit ca. 8 Stunden (siehe `reference_fotoalert_server_paths`) — rechtzeitig vor dem geplanten Release-Zeitpunkt einplanen, nicht spontan kurz vor Deploy starten.
 
 ---
 
@@ -11633,13 +11634,13 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 
 ---
 
-### US-130 · Himmelsröte-Erkennung berücksichtigt kein Aerosol-/Dunst-Signal `[ ]`
+### US-130 · Himmelsröte-Erkennung berücksichtigt kein Aerosol-/Dunst-Signal `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test (Implementierung + automatisierte Tests grün, 62/62 in test_us113/test_us109/test_us130/test_bug77_weather_job_status; Live-Test fand zwei aufeinanderfolgende Bugs in der Domain-Wahl der Aerosol-API: 1) `domains: "europe"` ungültig → 400 Bad Request, Fix auf `cams_europe`, 2) `cams_europe` liefert live durchgängig `null` für aerosol_optical_depth an Berlin/Brandenburg-Koordinaten (Rohantwort geprüft), nur `cams_global` liefert reale Werte — Pre-Mortem-Annahme zu Domain-Grenzen war unzutreffend; von Stephan bestätigt, Fix auf `cams_global` 2026-07-12, Tests danach erneut 62/62 grün; wartet auf erneuten Live-Check mit echten Werten + Stephans Bestätigung, AK-6 bereits live per Server-Log bestätigt) |
 | **Erstellt** | 2026-07-12 |
 
 **Beschreibung:** `should_generate_red_sky_event()` (`backend/calculations/weather.py`) löst Himmelsröte (RED_SKY) ausschließlich über Wolkendaten aus (`golden_cloud_score >= 0.80` UND `cloud_cover_low + cloud_cover_mid >= 60 %`) — es gibt kein Aerosol-/Dunst-/Feinstaub-Signal. Konkurrenz-App Viewfindr zeigte am 12.07.2026 99 % Wahrscheinlichkeit für kräftige, weiträumige Rotfärbung nordwestlich von Berlin (Richtung Stechlinsee/Rheinsberger See/Elbtalaue Wittenberge, wo Locations existieren) — das Muster (weiträumig, nicht an lokale Wolkenfelder gebunden) deutet auf einen Aerosol-/Dunst-Effekt hin, den FotoAlert mit der aktuellen Datenbasis prinzipiell nicht erkennen kann.
@@ -11827,22 +11828,31 @@ die neue, zusätzliche Datenquelle.
 
 ### Akzeptanzkriterien
 
-- [ ] **AK-1:** Liegt in der Richtung, in die ich fotografiere, kein ausreichender Wolkenanteil
+- [x] **AK-1:** Liegt in der Richtung, in die ich fotografiere, kein ausreichender Wolkenanteil
       vor, aber ein hoher Dunst-/Aerosolwert (über dem festgelegten Grenzwert) am Sonnenuntergang/
       -aufgang, erscheint jetzt trotzdem eine „Himmelsröte"-Karte im Feed.
-- [ ] **AK-2:** Im Detail-Sheet dieser Karte lese ich, dass Dunst (nicht Wolken) der Auslöser war
+      *(automatisiert mit Testwerten bestätigt; Live-Datenfluss real bestätigt — 498/498 Events
+      mit echtem Dunstwert nach Fix; reale Auslösung heute mangels ausreichendem Dunst nicht
+      beobachtbar, von Stephan als ausreichend akzeptiert, 2026-07-13.)*
+- [x] **AK-2:** Im Detail-Sheet dieser Karte lese ich, dass Dunst (nicht Wolken) der Auslöser war
       — nicht denselben Text wie bei einer wolkenbasierten Himmelsröte-Karte.
-- [ ] **AK-3 (Regression):** Eine Himmelsröte-Karte, die schon heute allein durch Wolken ausgelöst
-      wird, erscheint weiterhin genauso wie bisher.
-- [ ] **AK-4 (Regression):** Ist weder die Wolken- noch die Dunstbedingung erfüllt, erscheint
-      weiterhin keine Himmelsröte-Karte.
-- [ ] **AK-5:** „Goldene Wolken"-Karten (GOLDEN_CLOUDS) bleiben von dieser Änderung komplett
-      unberührt.
-- [ ] Edge Case AK-6: Kann der Dunst-/Aerosolwert für eine Location nicht abgerufen werden
+      *(Code-/Logikpfad verifiziert, JS-Syntax geprüft; visueller Sichtcheck folgt automatisch
+      sobald real eine dunstbasierte Karte auftritt, von Stephan akzeptiert, 2026-07-13.)*
+- [x] **AK-3 (Regression):** Eine Himmelsröte-Karte, die schon heute allein durch Wolken ausgelöst
+      wird, erscheint weiterhin genauso wie bisher. *(automatisiert + Live-Regressionscheck ok.)*
+- [x] **AK-4 (Regression):** Ist weder die Wolken- noch die Dunstbedingung erfüllt, erscheint
+      weiterhin keine Himmelsröte-Karte. *(automatisiert + live beobachtet, 2026-07-13.)*
+- [x] **AK-5:** „Goldene Wolken"-Karten (GOLDEN_CLOUDS) bleiben von dieser Änderung komplett
+      unberührt. *(Live bestätigt: 2 Goldene-Wolken-Karten unverändert erzeugt, 2026-07-13.)*
+- [x] Edge Case AK-6: Kann der Dunst-/Aerosolwert für eine Location nicht abgerufen werden
       (externe Datenquelle nicht erreichbar), zeigt die App weiterhin die bisherige,
       wolkenbasierte Himmelsröte-Logik — kein Absturz, keine fehlerhafte Karte.
-- [ ] Edge Case AK-7: Bei einem Dunstwert genau auf dem Grenzwert erscheint die Karte (inklusiver
+      *(Live bestätigt: „Ehrenhof-Kollonaden am Schloss Sanssouci" mit fehlgeschlagenem
+      Dunst-Abruf, sichtbar im Job-Status statt still, kein Absturz, 2026-07-13.)*
+- [x] Edge Case AK-7: Bei einem Dunstwert genau auf dem Grenzwert erscheint die Karte (inklusiver
       Grenzwert, analog zur bestehenden ≤30°-Regelung bei der Richtung).
+      *(automatisiert mit exaktem Grenzwert bestätigt; wie AK-1 live nicht separat auslösbar,
+      von Stephan akzeptiert, 2026-07-13.)*
 
 *(AK-1/AK-2 setzen die empfohlene Option B aus Frage 2 voraus — bei A oder C ändern sich Wortlaut
 und Anzahl der betroffenen AKs, siehe jeweilige Beschreibung in den Implementierungsoptionen.)*
@@ -12903,5 +12913,178 @@ Testdateien).
       **Ergebnis:** Stichprobe `test_bug77_weather_job_status.py`, `test_us105_section_order.py`,
       `test_us112_weather_map.py` einzeln mit `-v` laufen lassen — alle Tests liefen wie erwartet,
       kein versehentliches Überspringen durch die Marker-Zuordnung festgestellt.
+
+---
+
+### US-131 · Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-13 |
+
+**Beschreibung:** `should_generate_red_sky_event()` und `should_generate_golden_clouds_event()`
+(`backend/calculations/weather.py`) erhalten Wolken-/Dunstwerte, die `main.py`
+(`_weather_overlay()`, Z. 717–718) mit `fetch_weather_forecast(e["observer_lat"], e["observer_lon"])`
+bzw. `fetch_aerosol_forecast(e["observer_lat"], e["observer_lon"])` **am Standort des Fotografen**
+abruft — nicht an einem Punkt in Richtung Sonnen-Gegenpunkt (RED_SKY) bzw. Sonnenrichtung
+(GOLDEN_CLOUDS) hinter dem Motiv. Die Wetter-/Luftqualitäts-API liefert nur einen Wert pro
+abgefragter Koordinate, keine Richtungsauflösung. Fachlich korrekter wäre eine Projektion des
+Abfragepunkts entlang der Sichtachse (z. B. 20–50 km) mittels der bereits vorhandenen
+`destination_point()`-Funktion (`backend/discover/geometry.py`), die für ähnliche Zwecke bereits
+in `sun_pipeline.py`/`moon_pipeline.py` genutzt wird — bisher aber nicht in `weather.py`/
+`_weather_overlay()`. Kein akuter Fehler, sondern eine bestehende Vereinfachung seit US-109/US-113
+— von Stephan während der US-130-Testphase als Rückfrage zur Ausrichtungslogik identifiziert.
+
+**User Story:** Als Fotograf, möchte ich, dass die Wolken- und Dunstwerte für Himmelsröte-/
+Goldene-Wolken-Chancen am tatsächlich fotografierten Himmelsausschnitt (in Sichtachsen-Richtung)
+abgefragt werden statt an meinem eigenen Standort, sodass die angezeigte Wahrscheinlichkeit die
+reale Wetterlage über dem Motiv widerspiegelt statt die Wetterlage über mir.
+
+**Bezug:** Baut auf **US-109** [x] (Golden Cloud Score, Grundmechanismus), **US-113** [x]
+(Richtungsfilter via Antisolarpunkt-Azimutvergleich) und **US-130** [~] (Aerosol-/Dunst-Signal,
+aktuell in Test) auf — ersetzt keines der drei. Die Richtungs-*prüfung* (Azimutvergleich mit
+Antisolarpunkt/Sonnenrichtung) ist bereits korrekt umgesetzt und unstrittig (siehe
+US-130-Analyse, „Vorab-Klärung Gegenrichtungs-Frage", 2026-07-12: „US-113 beantwortet Stephans
+Klärungspunkt bereits vollständig — keine Lücke, kein neuer Code nötig."). Dieses Ticket betrifft
+eine andere Stelle: die **Koordinate**, an der die Wetter-/Aerosoldaten abgerufen werden
+(Fotografen-Standort statt projizierter Zielpunkt) — eine Präzisierung der Datenquelle, keine
+Änderung der Richtungslogik selbst. Sequenzierung: sinnvollerweise nach Abschluss von US-130
+angehen, da beide dieselbe Codestelle (`_weather_overlay()` inkl. `fetch_aerosol_forecast()`-Aufruf)
+betreffen und eine Projektion für Wetter- und Aerosolabfrage gemeinsam eingeführt werden sollte,
+statt zweimal ähnlichen Code anzufassen. Keine Dublette gefunden (Grep nach `observer_lat`,
+`destination_point`, „Abfragepunkt", „Projektion" im gesamten Backlog ergab keinen bereits
+bestehenden Vorschlag zu einer Sichtachsen-Projektion der Wetter-/Aerosolabfrage).
+
+---
+
+### TASK-73 · US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-13 |
+
+**Beschreibung:** Aus einer zweiten, unabhängigen Verifikation von **US-130** (Aerosol-/Dunst-Signal
+für Himmelsröte) am 2026-07-13 stammen zwei nicht-blockierende, aber echte Lücken, die Stephan als
+Folge-Ticket zur Nachverfolgung akzeptiert hat:
+
+1. **Fast-Path ohne Aerosol-Daten:** `_weather_overlay_single()` (US-106-Einzelabruf-Pfad,
+   `backend/main.py` Z. 775–827) ruft nie `fetch_aerosol_forecast()` auf — nur
+   `fetch_weather_forecast()` (Z. 814) — und übergibt `_apply_weather_to_event()` (Z. 821) ohne
+   das optionale `aerosol_forecast`-Argument (Default `None`, Signatur Z. 474–479). Wird eine
+   Location neu angelegt oder editiert, entstehen darüber erzeugte Himmelsröte-Karten übergangsweise
+   **immer** ohne Dunst-Signal — nur der reguläre 3-Stunden-Cronlauf `_weather_overlay()` (Z. 674,
+   holt dort auch `fetch_aerosol_forecast()`) holt die Aerosoldaten nach. Kein Absturz: der Fallback
+   ist im Docstring von `_apply_weather_to_event()` explizit dokumentiert (Z. 490–493) und fällt
+   sauber auf den reinen Wolken-Check zurück (AK-6 aus US-130). Aber eine funktionale Inkonsistenz
+   zwischen den beiden Wetter-Pfaden (Fast-Path vs. Cronlauf).
+2. **Fehlender Regressionstest:** Für den Fall „nur der Aerosol-Abruf schlägt fehl, das normale
+   Wetter klappt" im Job-Status-Mechanismus von `_weather_overlay()` (`_job_status` /
+   `failed_aerosol_locations`) existiert kein automatisierter Test. Verifiziert: in
+   `backend/tests/test_bug77_weather_job_status.py` mockt `_mock_aerosol_ok()` (Z. 63–68) den
+   Aerosol-Abruf in **allen** Testfällen als erfolgreich — die drei Fehlerfall-Tests (Z. 119, 146,
+   169) lassen ausschließlich `fetch_weather_forecast` scheitern (`raise RuntimeError(...)`), nie
+   `fetch_aerosol_forecast`. Auch `test_us130.py` deckt diesen Zweig nicht ab (dort wird nur
+   `aerosol_optical_depth=None` auf Datenebene getestet, nicht der Job-Status-Fehlerpfad). Der Zweig
+   selbst ist im Code korrekt behandelt (sichtbar statt still, analog BUG-77) und wurde live einmal
+   beobachtet (Location „Ehrenhof-Kollonaden am Schloss Sanssouci", 2026-07-13) — es fehlt nur die
+   automatisierte Absicherung.
+
+**User Story:** Als Entwickler, möchte ich, dass beide Wetter-Pfade (Fast-Path und Cronlauf)
+konsistent Aerosoldaten liefern und der Aerosol-Fehlerfall im Job-Status testabgesichert ist,
+sodass Himmelsröte-Karten nicht von der Zufälligkeit abhängen, über welchen Pfad sie zuerst
+entstanden sind, und eine künftige Regression im Job-Status-Mechanismus automatisch auffällt.
+
+**Priorität-Begründung:** Niedrig, da nicht blockierend und kein Nutzer-sichtbarer Fehler — der
+Fallback funktioniert sauber, und die Lücke schließt sich für jede Location spätestens nach dem
+nächsten 3-Stunden-Cronlauf von selbst. Es handelt sich um Robustheit/Testabdeckung (Typ Task),
+keine neue Funktion.
+
+**Bezug:** Direkte Nacharbeit zu **US-130** [~] (Aerosol-/Dunst-Signal, aktuell In Test) —
+beide Punkte wurden während dessen zweiter Verifikationsrunde am 2026-07-13 gefunden. Indirekter
+Bezug zu **US-106** [x] (führte den betroffenen Fast-Path `_weather_overlay_single()` ein) und
+**BUG-77** [x] (führte den `_job_status`/Sichtbarkeits-Mechanismus ein, der in Punkt 2 fehlt).
+Keine Dublette gefunden (Grep nach `_weather_overlay_single`, `fetch_aerosol_forecast`,
+`failed_aerosol_locations` im gesamten Backlog): US-131 (ebenfalls Aerosol-nah) betrifft eine
+andere Fragestellung (Abfrage-Koordinate/Sichtachsen-Projektion statt fehlendem Aufruf/Test) und
+ist keine Dublette. Sequenzierung: unkritisch, kann unabhängig von US-131 und nach Abschluss von
+US-130 angegangen werden.
+
+**Quelle:** fotoalert-intake, 2026-07-13 (aus unabhängiger US-130-Verifikation)
+
+---
+
+### US-132 · Rote Wolken: Rotes Nachglühen hoher Wolken in Sonnenrichtung bei Sonne unter dem Horizont `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-13 |
+
+**Beschreibung:** Physikalisch eigenständiges drittes Wolkenstimmungs-Phänomen neben den
+bestehenden Event-Typen GOLDEN_CLOUDS („Goldene Wolken", US-109: Sonne über Horizont, beliebige
+Wolkenhöhe, Sonnenrichtung) und RED_SKY („Himmelsröte", US-109/US-113: niedrige/mittlere Wolken,
+Antisolarpunkt-Richtung, unabhängig von Aerosol/Dunst aus US-130): Steht die Sonne bereits **unter**
+dem Horizont (negative Sonnenhöhe), können hohe Wolken (Cirrus, 6+ km, Feld `cloud_cover_high_pct`
+bereits vorhanden) noch aus der Sonnenrichtung angestrahlt werden und sich kräftig rot/purpurn
+statt golden färben — weil das Licht dann einen deutlich längeren Weg durch die Atmosphäre
+zurücklegt. Die Blickrichtung bleibt dabei ungefähr in Sonnenrichtung (nicht im Gegenpunkt wie bei
+RED_SKY). Mit vorhandenen Daten (Sonnenhöhe, `cloud_cover_high_pct`, Sonnenazimut) grundsätzlich
+berechenbar, ohne neue Datenquelle.
+
+**Namenskonvention (von Stephan festgelegt, 2026-07-13):** „**Rote Wolken**" = Wolken in
+Sonnenrichtung (dieses Ticket). „**Himmelsröte**" = Himmel gegenüber Motiv/Sonne, Antisolarpunkt
+(RED_SKY, siehe US-113). Diese Trennung gilt verbindlich für Code, App-UI und künftige
+Ticket-Beschreibungen — der vorläufige Arbeitsname „Nachglühen" für dieses Phänomen ist damit
+verworfen.
+
+**User Story:** Als Fotograf, möchte ich gezielt auf das Phänomen „Rote Wolken" (rötliches
+Nachglühen hoher Wolken in Sonnenrichtung) hingewiesen werden, wenn die Sonne bereits unter dem
+Horizont steht, sodass ich dieses von „Goldene Wolken" und „Himmelsröte" visuell und zeitlich
+verschiedene Lichtphänomen nicht verpasse.
+
+**Bezug:** Verwandt, aber keine Dublette zu **US-109** [x] (Goldene Wolken & Himmelsröte,
+Grundmechanismus — GOLDEN_CLOUDS ist an eine „Goldene-Stunde-Chance" gekoppelt, also Sonne über
+Horizont; deckt den Fall „Sonne bereits untergegangen" nicht ab), **US-113** [x]
+(Himmelsröte-Richtungsfilter Antisolarpunkt, niedrige/mittlere Wolken — andere Wolkenschicht,
+andere Richtung) und **US-130** [~] (Aerosol-/Dunst-Signal für RED_SKY am Antisolarpunkt bei
+klarem Himmel — anderer Mechanismus: Dunst statt Cirrus, Gegenrichtung statt Sonnenrichtung).
+Keines der drei Tickets deckt „Sonne unter dem Horizont + hohe Wolken + Sonnenrichtung" ab (per
+Code-Verifikation Rule 2/US-109, Zeile ~5670: hohe Cirrus-Wolken lösen bislang **kein** Ereignis
+aus, wenn keine Goldene-Stunde-Bedingung erfüllt ist). **Namenskollision beachten:** Die App
+verwendet „Himmelsröte" bereits als feststehenden Begriff für RED_SKY (US-109/US-113) — dieses
+Ticket verwendet dafür den von Stephan festgelegten Namen „Rote Wolken" (siehe Namenskonvention
+oben), um Verwechslung mit dem bestehenden RED_SKY-Event zu vermeiden. **Sequenzierung:**
+Unabhängig von **US-131** (Sichtachsen-Projektion der Wetterabfrage) umsetzbar — `cloud_cover_high_pct`
+wird bereits heute am Fotografen-Standort abgerufen, das reicht für eine erste Ausbaustufe. Eine
+spätere Umsetzung von US-131 würde die Genauigkeit aller drei Phänomene (inkl. dieses Tickets)
+gemeinsam verbessern, ist aber keine Voraussetzung.
+
+**Quelle:** fotoalert-intake, 2026-07-13
+
+---
+
+### TASK-74 · Refactoring: Lange Funktionen aufteilen (backend/main.py: _weather_overlay, _generate_cloud_mood_events) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-13 |
+
+**Beschreibung:** Zwei Funktionen in `backend/main.py` überschreiten durch die US-130-Erweiterung
+(paralleler Aerosol-Abruf + Dunst-Zweig) den 80-Zeilen-Threshold von `tools/refactor_check.py`:
+- `_generate_cloud_mood_events()` Z. 559 — 88 Zeilen (Threshold: 80)
+- `_weather_overlay()` Z. 674 — 98 Zeilen (Threshold: 80)
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (US-130, 2026-07-13)
 
 ---
