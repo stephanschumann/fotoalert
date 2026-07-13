@@ -3,8 +3,9 @@ keine Sichtbarkeit).
 
 Deckt Rule 1 (Teilausfall → Fehlerzustand + betroffene Locations im Text,
 erfolgreiche Locations trotzdem aktualisiert), Rule 2 (Totalausfall →
-Fehlerzustand), Rule 3 (Regression: alles ok → weiterhin "done") und
-Rule 4 (Edge Case: keine Events in T+3 → weiterhin "done") ab.
+Fehlerzustand), Rule 3 (Regression: alles ok → weiterhin "done"),
+Rule 4 (Edge Case: keine Events in T+3 → weiterhin "done") und
+Rule 5 (TASK-73: nur Aerosol-Abruf schlägt fehl, Wetter-Abruf klappt normal) ab.
 
 Monkeypatch-Ansatz analog zu test_us106.py: fetch_weather_forecast wird durch
 eine Fake-Funktion ersetzt, die für gezielt ausgewählte Locations eine
@@ -16,6 +17,10 @@ fetch_aerosol_forecast() parallel zu fetch_weather_forecast() ab (asyncio.gather
 Damit dieser Testfile weiterhin "kein echter Open-Meteo-Call" einhält (auch nicht
 gegen die separate Air-Quality-API), mocken alle Tests, die _weather_overlay()
 tatsächlich mit Locations durchlaufen lassen, jetzt beide Funktionen.
+
+TASK-73-Nachtrag (2026-07-13): Rule 5 schließt die bis dahin fehlende Test-Lücke
+„nur Aerosol-Abruf schlägt fehl" — die bestehenden Rule-1/2-Tests ließen bisher
+ausschließlich fetch_weather_forecast scheitern, nie fetch_aerosol_forecast.
 """
 import asyncio
 from datetime import datetime, timedelta, timezone
@@ -234,3 +239,45 @@ def test_empty_feed_cache_keeps_done_status():
     status = main._job_status["weather"]
     assert status["status"] == "done"
     assert status["last_error"] is None
+
+
+# ---------------------------------------------------------------------------
+# Rule 5 (TASK-73) — nur Aerosol-Abruf schlägt fehl, Wetter-Abruf klappt normal
+# → Fehlerzustand sichtbar (Location-Name im Fehlertext), Wetter trotzdem "ok"
+# ---------------------------------------------------------------------------
+
+def test_aerosol_only_failure_sets_error_status(monkeypatch):
+    """TASK-73: bisher fehlende Absicherung für den Fall, dass ausschließlich
+    fetch_aerosol_forecast() scheitert (fetch_weather_forecast() gelingt normal).
+    Der Job-Status muss das sichtbar machen (BUG-77-Mechanismus, non-fatal für
+    das Wetter selbst) statt still zu bleiben."""
+    ok  = _event("loc_ok", "Alexanderplatz", 12, lat=52.5, lon=13.4)
+    bad = _event("loc_bad_aerosol", "Ehrenhof-Kollonaden am Schloss Sanssouci", 12, lat=52.4, lon=13.06)
+    main._feed_cache = [ok, bad]
+
+    async def fake_fetch_weather(lat, lon, days=7):
+        # Wetter-Abruf gelingt für ALLE Locations normal.
+        return _forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch_weather)
+
+    async def fake_fetch_aerosol(lat, lon, days=7):
+        # Nur der Aerosol-Abruf schlägt für "loc_bad_aerosol" fehl.
+        if abs(lat - 52.4) < 0.001 and abs(lon - 13.06) < 0.001:
+            raise RuntimeError("Air-Quality-API down")
+        return _aerosol_forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_fetch_aerosol)
+
+    _run(main._weather_overlay())
+
+    status = main._job_status["weather"]
+    # Job-Status zeigt den Aerosol-Fehler sichtbar an, inkl. Location-Name.
+    assert status["status"] == "error"
+    assert "Ehrenhof-Kollonaden am Schloss Sanssouci" in status["last_error"]
+    assert "Aerosoldaten fehlgeschlagen für" in status["last_error"]
+    # Kein fälschliches "alles ok": Wetterdaten-Fehlertext darf NICHT auftauchen,
+    # da ausschließlich der Aerosol-Abruf betroffen ist.
+    assert "Wetterdaten fehlgeschlagen für" not in status["last_error"]
+    # Beide Locations bekommen trotzdem ihr normales Wetter (kein stiller
+    # Silent-Failure, keine unnötig blockierte Location).
+    assert ok["weather_status"] == "ok"
+    assert bad["weather_status"] == "ok"

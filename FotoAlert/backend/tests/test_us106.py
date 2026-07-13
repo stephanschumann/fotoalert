@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 import main
-from calculations.weather import HourlyWeather, WeatherForecast
+from calculations.weather import HourlyWeather, WeatherForecast, HourlyAerosol, AerosolForecast
 
 pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
@@ -35,6 +35,28 @@ def _forecast(ref: datetime) -> WeatherForecast:
     hours = [_hourly(ref + timedelta(hours=i)) for i in range(-2, 72)]
     return WeatherForecast(location_lat=52.5, location_lon=13.4,
                            fetched_at=datetime.now(timezone.utc), hourly=hours)
+
+
+def _aerosol_hourly(t: datetime, aod=0.05) -> HourlyAerosol:
+    return HourlyAerosol(time=t, aerosol_optical_depth=aod)
+
+
+def _aerosol_forecast(ref: datetime) -> AerosolForecast:
+    hours = [_aerosol_hourly(ref + timedelta(hours=i)) for i in range(-2, 72)]
+    return AerosolForecast(location_lat=52.5, location_lon=13.4,
+                            fetched_at=datetime.now(timezone.utc), hourly=hours)
+
+
+def _mock_aerosol_ok(monkeypatch):
+    """TASK-73: Aerosol-Abruf erfolgreich mocken (Standardfall für Tests, die nicht
+    gezielt einen Aerosol-Fehlerfall prüfen). Seit TASK-73 ruft auch
+    _weather_overlay_single() fetch_aerosol_forecast() parallel zu
+    fetch_weather_forecast() ab (asyncio.gather) — ohne diesen Mock würden die
+    betroffenen Tests einen echten Netzwerk-Call auslösen (Offline-Marker verletzt).
+    """
+    async def fake_fetch_aerosol(lat, lon, days=7):
+        return _aerosol_forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_fetch_aerosol)
 
 
 def _event(loc_id: str, shoot_offset_h: float, lat=52.5, lon=13.4) -> dict:
@@ -84,6 +106,7 @@ def test_single_weather_overlay_only_target_location(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: nicht Teil dieses Testfalls
 
     ready = _run(main._weather_overlay_single("loc_target"))
 
@@ -103,6 +126,7 @@ def test_single_weather_overlay_marks_far_future_as_none(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: nicht Teil dieses Testfalls
 
     ready = _run(main._weather_overlay_single("loc_a"))
 
@@ -120,6 +144,55 @@ def test_single_weather_overlay_no_events_is_ready():
 
 
 # ---------------------------------------------------------------------------
+# TASK-73 — Aerosol-Abruf im Single-Overlay (parallel zu Wetter, non-fatal)
+# ---------------------------------------------------------------------------
+
+def test_single_weather_overlay_includes_aerosol_forecast(monkeypatch):
+    """TASK-73 AK 1: fetch_aerosol_forecast() wird aufgerufen und das Ergebnis an
+    _apply_weather_to_event() durchgereicht — nach erfolgreichem Aerosol-Fetch ist
+    weather_details["aerosol_optical_depth"] befüllt (nicht None)."""
+    target = _event("loc_target", 12)   # in T+3
+    main._feed_cache = [target]
+
+    async def fake_fetch(lat, lon, days=7):
+        return _forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+
+    async def fake_fetch_aerosol(lat, lon, days=7):
+        return _aerosol_forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_fetch_aerosol)
+
+    ready = _run(main._weather_overlay_single("loc_target"))
+
+    assert ready is True
+    assert target["weather_status"] == "ok"
+    assert target["weather_details"]["aerosol_optical_depth"] is not None
+    assert target["weather_details"]["aerosol_optical_depth"] == 0.05
+
+
+def test_single_weather_overlay_aerosol_failure_is_non_fatal(monkeypatch):
+    """TASK-73 AK 2+3: fetch_aerosol_forecast() wirft eine Exception, der
+    Wetter-Fetch gelingt normal → die Funktion bleibt trotzdem erfolgreich
+    (ready=True, weather_status="ok"), keine Exception propagiert nach außen."""
+    target = _event("loc_target", 12)   # in T+3
+    main._feed_cache = [target]
+
+    async def fake_fetch(lat, lon, days=7):
+        return _forecast(datetime.now(timezone.utc))
+    monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+
+    async def failing_fetch_aerosol(lat, lon, days=7):
+        raise RuntimeError("Air Quality API down")
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", failing_fetch_aerosol)
+
+    ready = _run(main._weather_overlay_single("loc_target"))
+
+    assert ready is True
+    assert target["weather_status"] == "ok"
+    assert target["weather_details"]["aerosol_optical_depth"] is None
+
+
+# ---------------------------------------------------------------------------
 # AK (a)+(b) — Pending erst nach Wetter freigeben (lügendes Banner verhindern)
 # ---------------------------------------------------------------------------
 
@@ -131,6 +204,7 @@ def test_pending_released_only_after_weather(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: nicht Teil dieses Testfalls
 
     # Simuliert das Ende von _recompute_one: erst Wetter, dann finalize.
     ready = _run(main._weather_overlay_single("loc_x"))
@@ -148,6 +222,7 @@ def test_pending_stays_when_weather_fetch_fails(monkeypatch):
     async def failing_fetch(lat, lon, days=7):
         raise RuntimeError("Open-Meteo down")
     monkeypatch.setattr(main, "fetch_weather_forecast", failing_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: läuft parallel, nicht Teil dieses Testfalls
 
     ready = _run(main._weather_overlay_single("loc_y"))
     assert ready is False
@@ -181,6 +256,7 @@ def test_recompute_order_releases_pending_before_calendar(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: _recompute_one → _weather_overlay_single ruft es mit ab
 
     _run(main._recompute_one("loc_z"))
 
@@ -209,6 +285,7 @@ def test_recompute_calendar_failure_keeps_release(monkeypatch):
     async def fake_fetch(lat, lon, days=7):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: _recompute_one → _weather_overlay_single ruft es mit ab
 
     _run(main._recompute_one("loc_q"))
 
@@ -235,6 +312,7 @@ def test_recompute_weather_fail_keeps_pending_but_runs_calendar(monkeypatch):
     async def failing_fetch(lat, lon, days=7):
         raise RuntimeError("Open-Meteo down")
     monkeypatch.setattr(main, "fetch_weather_forecast", failing_fetch)
+    _mock_aerosol_ok(monkeypatch)  # TASK-73: läuft parallel, nicht Teil dieses Testfalls
 
     _run(main._recompute_one("loc_w"))
 

@@ -25,16 +25,16 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **US-132** *(Rote Wolken: Rotes Nachglühen hoher Wolken in Sonnenrichtung bei Sonne unter dem Horizont)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test — Refactor durch, bereit fürs Release-Gate)* |
 | **🏁 Done** | abgeschlossen + deployed | **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test)* · **TASK-74** *(Lange Funktionen _weather_overlay()/_generate_cloud_mood_events() in backend/main.py)* · **US-132** *(Rote Wolken: Rotes Nachglühen hoher Wolken in Sonnenrichtung bei Sonne unter dem Horizont)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort)* · **TASK-74** *(Lange Funktionen _weather_overlay()/_generate_cloud_mood_events() in backend/main.py)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -12961,13 +12961,13 @@ bestehenden Vorschlag zu einer Sichtachsen-Projektion der Wetter-/Aerosolabfrage
 
 ---
 
-### TASK-73 · US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test `[ ]`
+### TASK-73 · US-130-Nacharbeit: Aerosol-Signal fehlt im US-106-Einzelabruf-Pfad + fehlender Job-Status-Test `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test (Refactor-Check durch, Docstring-Ergänzung, 41/41 Tests weiterhin grün — bereit fürs Release-Gate) |
 | **Erstellt** | 2026-07-13 |
 
 **Beschreibung:** Aus einer zweiten, unabhängigen Verifikation von **US-130** (Aerosol-/Dunst-Signal
@@ -13020,13 +13020,91 @@ US-130 angegangen werden.
 
 ---
 
+**Implementation Spec**
+
+**Root Cause (verifiziert am Code, 2026-07-13):**
+📎 Code-Verifikation: `backend/main.py` (`_weather_overlay`, `_weather_overlay_single`, `_apply_weather_to_event`) sowie `backend/tests/test_bug77_weather_job_status.py` und `backend/tests/test_us130.py` gelesen.
+
+- Bestätigt (Punkt 1): `_apply_weather_to_event()` (Z. 474–493) hat die Signatur `(e, forecast, now_utc, cutoff, aerosol_forecast=None)`; der Docstring dokumentiert explizit den sauberen Fallback bei fehlendem `aerosol_forecast`.
+- Bestätigt (Punkt 1): `_weather_overlay()` (der reguläre 3-Stunden-Cronlauf, Z. 674–772) holt Wetter UND Aerosol parallel via `asyncio.gather(fetch_weather_forecast(...), fetch_aerosol_forecast(...), return_exceptions=True)` (Z. 716–720) und reicht `aerosol_forecasts.get(key)` an `_apply_weather_to_event()` durch (Z. 743). Ein fehlgeschlagener Aerosol-Abruf landet non-fatal in `failed_aerosol_locations` und fließt sichtbar in den Job-Status (Z. 733–737, 764–770).
+- Bestätigt (Punkt 1): `_weather_overlay_single()` (US-106-Fast-Path, Z. 775–827) ruft ausschließlich `await fetch_weather_forecast(...)` auf (Z. 814) und übergibt das Ergebnis an `_apply_weather_to_event(e, fc, now_utc, cutoff)` (Z. 821) — ohne fünftes Argument. `fetch_aerosol_forecast()` wird in dieser Funktion an keiner Stelle aufgerufen (Grep bestätigt: kein Treffer). Aufrufer ist `_recompute_one()` (Z. 1167–1214), der Fast-Path hinter jedem Location-Anlegen/-Editieren.
+- Bestätigt (Punkt 2): `test_bug77_weather_job_status.py` definiert `_mock_aerosol_ok()` (Z. 63–68), das `fetch_aerosol_forecast` immer erfolgreich mockt. Es wird in `test_partial_failure_sets_error_status_with_location_name` (Aufruf Z. 122, Wetter-Fehlschlag Z. 117–121), `test_partial_failure_truncates_names_after_five` (Z. 148, Wetter-Fehlschlag Z. 145–147) und `test_total_failure_sets_error_status` (Z. 171, Wetter-Fehlschlag Z. 168–170) verwendet — in allen drei Fällen scheitert ausschließlich `fetch_weather_forecast`, nie `fetch_aerosol_forecast`. `test_no_near_events_keeps_done_status` und `test_empty_feed_cache_keeps_done_status` rufen `_mock_aerosol_ok()` gar nicht auf (kein Fetch nötig).
+- Bestätigt (Punkt 2): `test_us130.py` enthält zwei Aerosol-Fallback-Tests (`test_red_sky_aerosol_abruf_nicht_verfuegbar_faellt_auf_wolken_zurueck_true/false`, Z. 87–105) sowie `test_integration_aerosol_fehlt_faellt_auf_wolken_pfad_zurueck` (Z. 284) — alle testen ausschließlich `should_generate_red_sky_event()` auf Datenebene (`aerosol_optical_depth=None` als Eingabewert), nicht den `_weather_overlay()`-Job-Status-Fehlerpfad. Kein Test in beiden Dateien ruft `_weather_overlay()` mit einem scheiternden `fetch_aerosol_forecast` bei gleichzeitig erfolgreichem `fetch_weather_forecast` auf.
+- Zusatzbefund (Scope-Abgrenzung): `_weather_overlay_single()` ist nicht an `_job_status` angebunden (kein `_job_start`/`_job_done`/`_job_error`-Aufruf in der Funktion) — der Job-Status-Mechanismus existiert nur für den vollen Cronlauf `_weather_overlay()`. Punkt 2 des Tickets bezieht sich explizit auf `_weather_overlay()`; für `_weather_overlay_single()` gibt es daher keinen analogen Job-Status-Test nachzuholen.
+- Zusatzbefund (Regressionsrisiko): `test_us106.py` ruft `_weather_overlay_single()` an 5 Stellen auf (Z. 88, 107, 118, 136, 152) und mockt dabei ausschließlich `fetch_weather_forecast` — kein Mock für `fetch_aerosol_forecast`. Wird Punkt 1 umgesetzt, müssen diese 5 Testfälle einen Aerosol-Erfolgsmock ergänzen, sonst laufen sie gegen echtes Netzwerk oder schlagen fehl (Offline-Marker verletzt).
+
+**Scope:**
+- Eingeschlossen (Punkt 1): `_weather_overlay_single()` ruft künftig zusätzlich `fetch_aerosol_forecast()` ab (parallel zu `fetch_weather_forecast()`, analog zum bestehenden Muster in `_weather_overlay()`) und reicht das Ergebnis an `_apply_weather_to_event()` durch. Ein fehlschlagender Aerosol-Abruf bleibt non-fatal (bestehender Fallback über `aerosol_forecast=None`).
+- Eingeschlossen (Punkt 2): Ein neuer automatisierter Test für `_weather_overlay()` deckt den Fall „nur Aerosol-Abruf schlägt fehl, Wetter-Abruf klappt" ab und prüft den Job-Status-Fehlerpfad (`_job_status`/`failed_aerosol_locations`).
+- Ausgeschlossen: **US-131** (Sichtachsen-Projektion für die Aerosol-Abfragekoordinate statt Fotografen-Standort) — andere Fragestellung, nicht Teil dieses Tickets.
+- Ausgeschlossen: **TASK-74** (Lange-Funktion-Refactoring von `_weather_overlay()`/`_generate_cloud_mood_events()`) — separates Ticket, wird hier nicht mitgezogen.
+- Ausgeschlossen: Kein Job-Status-Test für `_weather_overlay_single()` selbst — dieser Pfad ist laut Root-Cause-Verifikation nicht an `_job_status` angebunden; das Ticket fordert den Test explizit nur für `_weather_overlay()`.
+- Ausgeschlossen: Kein Wechsel des Aerosol-Providers/der Datenquelle (`cams_global` bleibt wie in US-130 final entschieden) — außerhalb Scope.
+- Ausgeschlossen: Bestehendes Verhalten von `_weather_overlay()` (voller Cronlauf) bleibt inhaltlich unverändert — nur die Test-Coverage-Lücke wird geschlossen, keine neue Logik dort.
+
+**Akzeptanzkriterien:**
+- [x] Lege ich eine neue Location an oder ändere ihre Koordinaten, ruft das anschließende Fast-Path-Nachladen zusätzlich zum Wetter auch das Aerosol-/Dunst-Signal für diese Location ab (nicht erst beim nächsten 3-Stunden-Cronlauf) — gelingt der Abruf, enthält die erste dafür erzeugte Himmelsröte-Karte bereits das Dunst-Signal. *(Live bestätigt 2026-07-13: neue Location custom_1783943909210, 8 von 9 T+3-Events mit echtem Aerosolwert, Rest None außerhalb T+3 — erwartetes Verhalten.)*
+- [x] Edge Case: Schlägt beim Fast-Path-Nachladen nur der Aerosol-Abruf fehl (Wetter-Abruf gelingt), bleibt der bestehende Fallback erhalten: Die Location wird trotzdem normal freigegeben (kein Absturz, kein unnötiges „pending"), Himmelsröte-Events entstehen für diese Location nur über den reinen Wolken-Check. *(Testlücke aus erster Verifikation geschlossen: `test_single_weather_overlay_aerosol_failure_is_non_fatal` + `test_single_weather_overlay_includes_aerosol_forecast` (AK 1) nachgezogen in test_us106.py, vom Orchestrator selbst gelesen und ausgeführt — grün.)*
+- [x] Der Fast-Path bleibt bei erfolgreichem Wetter- und Aerosol-Abruf genauso schnell freigegeben wie zuvor — beide Abrufe laufen parallel, nicht nacheinander, sodass sich die Wartezeit beim Anlegen/Editieren einer Location nicht spürbar verlängert. *(Live bestätigt 2026-07-13: Stephan empfand das Banner-Timing als normal/gewohnt.)*
+- [x] Regression: Schlägt weiterhin nur der Wetter-Abruf fehl (wie bisher), bleibt das bestehende Verhalten unverändert — Location bleibt pending, nächster Versuch übernimmt. *(Automatisiert grün: bestehender Test `test_pending_stays_when_weather_fetch_fails` weiterhin unverändert grün.)*
+- [x] Dev-Tooling ohne sichtbares App-Verhalten, wirkt erst beim nächsten Testlauf/Release-Gate: Ein automatisierter Test bildet für den regulären 3-Stunden-Cronlauf den Fall ab, dass ausschließlich der Aerosol-Abruf fehlschlägt (Wetter-Abruf klappt normal). Der Test bestätigt: Der Job-Status zeigt sichtbar einen Fehler an (inkl. Name der betroffenen Location im Fehlertext), während dieselbe Location trotzdem ihr normales Wetter bekommt (kein stiller Fehler, keine fälschliche „alles ok"-Meldung). *(Automatisiert grün: `test_aerosol_only_failure_sets_error_status`, Rule 5.)*
+
+**Pre-Mortem:**
+- 💀 Szenario: Der Fast-Path wird durch den zusätzlichen Aerosol-Abruf spürbar langsamer und untergräbt das US-106-Kernversprechen „Banner weg in Sekunden". → Auslöser: Aerosol-Call wird seriell NACH dem Wetter-Call gehängt statt parallel. → Frühwarnung: schon im Code sichtbar, wenn `await fetch_aerosol_forecast(...)` nach dem Wetter-`await` steht statt in einem gemeinsamen `asyncio.gather`. → Gegenmaßnahme: exakt das Muster aus `_weather_overlay()` (Z. 716–720) übernehmen (`asyncio.gather(..., return_exceptions=True)`); in AK 3 verankert.
+- 💀 Szenario: Der Aerosol-Fehlschlag im Fast-Path wird versehentlich fatal gemacht (z. B. gemeinsamer try/except um beide Calls), sodass ein reiner Aerosol-Ausfall die ganze Location unnötig pending hält. → Auslöser: naive Umsetzung ohne getrennte Fehlerbehandlung pro Call. → Frühwarnung: ein Test „Wetter ok, Aerosol failed" liefert `ready=False` statt `True`. → Gegenmaßnahme: getrennte Fehlerbehandlung pro Ergebnis (wie im Cronlauf: `return_exceptions=True` + je Ergebnis geprüft); in AK 2 verankert.
+- 💀 Szenario: Der neue Job-Status-Test kopiert das Muster der drei bestehenden Fehlertests, vertauscht aber versehentlich welche Funktion fehlschlägt, und mockt am Ende doch wieder nur `fetch_weather_forecast` statt `fetch_aerosol_forecast` (Copy-Paste-Fehler) → die Lücke bliebe unter neuem Namen bestehen. → Frühwarnung: Test müsste explizit `fetch_weather_forecast` als Erfolg mocken und NUR `fetch_aerosol_forecast` scheitern lassen — Gegenprobe beim Review. → Gegenmaßnahme: Test verifiziert explizit beide Seiten (`weather_status == "ok"` UND `status["status"] == "error"` mit aerosol-spezifischem Text „Aerosoldaten fehlgeschlagen für: …"); in AK 5 verankert.
+- 💀 Szenario: Bestehende Tests in `test_us106.py` (5 Aufrufe von `_weather_overlay_single()`) brechen nach dem Fix, weil sie `fetch_aerosol_forecast` nicht mocken (Offline-Test versucht echten Netzwerk-Call bzw. wirft eine ungemockte Exception). → Auslöser: Der Fix führt einen neuen externen Call in eine Funktion ein, die bisher in Tests nur einen Call hatte. → Frühwarnung: rote Suite direkt nach der Umsetzung. → Gegenmaßnahme: alle 5 Stellen in `test_us106.py` um einen Aerosol-Erfolgsmock ergänzen (Helfer analog `_mock_aerosol_ok`); volle Suite (`test_us106.py`, `test_bug77_weather_job_status.py`, `test_us130.py`) muss grün bleiben, bevor das Ticket als getestet gilt.
+- 💀 Szenario (CI-Datenumfeld-Checkfrage): Verhält sich der neue Job-Status-Test anders bei fast leerer Datenbasis oder mit `FOTOALERT_NO_BACKGROUND=1`? → Geprüft: Der Test baut `_feed_cache` selbst explizit auf (siehe bestehendes Muster in `test_bug77_weather_job_status.py`, `_reset_state`-Fixture) und ruft `_weather_overlay()` direkt synchron auf — unabhängig vom Scheduler/Boot-Zustand. `FOTOALERT_NO_BACKGROUND` (main.py Z. 313, 1244, 1406) gated nur den Precompute-Subprozess/Scheduler-Start, nicht direkte Testaufrufe der Funktion. Kein zusätzliches Risiko — verifiziert, keine stille Annahme.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Rule 1: Fast-Path liefert Aerosol-Signal wenn verfügbar, non-fatal bei Fehlschlag, parallel statt seriell; Rule 2: Job-Status-Mechanismus deckt auch den reinen Aerosol-Fehlschlag im Cronlauf ab).
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AKs verankert).
+- [x] Architektur analysiert: `backend/main.py` (`_weather_overlay_single` Z. 775–827, `_weather_overlay` Z. 674–772 als Referenzmuster, `_apply_weather_to_event` Z. 474–493, `_recompute_one` Z. 1167–1214 als Aufrufer), `backend/tests/test_us106.py` (5 betroffene Testfälle), `backend/tests/test_bug77_weather_job_status.py` (neuer Test ergänzt bestehende Rules 1–4), `backend/tests/test_us130.py` (nur zur Abgrenzung gelesen, keine Änderung).
+- [x] Designer-Check: nicht visuell (reine Backend-/Testlogik, kein UI-Element betroffen) → übersprungen.
+- [x] Implementierungsoptionen (Punkt 1): A / B. Punkt 2 hat nur einen sinnvollen Weg (fehlenden Test ergänzen) — keine Optionen nötig, siehe Begründung unten.
+- [ ] Empfehlung: Option A (Punkt 1) + neuer Test in `test_bug77_weather_job_status.py` (Punkt 2) — wartet auf Weg-Gate-Bestätigung.
+
+**Implementierungsoptionen (Punkt 1 — Fast-Path-Fix):**
+
+### Option A — Aerosol-Abruf parallel im Fast-Path ergänzen (empfohlen)
+- App-Wirkung: Neu angelegte oder editierte Locations bekommen ihre erste Himmelsröte-Karte inklusive Dunst-Signal sofort statt erst nach bis zu 3 Stunden — ohne dass sich die Freigabe der Location spürbar verzögert.
+- Vorgehen: In `_weather_overlay_single()` den einzelnen `await fetch_weather_forecast(...)`-Aufruf durch `asyncio.gather(fetch_weather_forecast(...), fetch_aerosol_forecast(...), return_exceptions=True)` ersetzen (exakt das Muster aus `_weather_overlay()`). Wetter-Fehlschlag bleibt wie bisher fatal für diese Funktion (Rückgabe `False`, Location bleibt pending); Aerosol-Fehlschlag bleibt non-fatal (nur geloggt, `aerosol_forecast` bleibt `None`, `_apply_weather_to_event()` läuft mit dem bestehenden Default weiter).
+- Betroffene Dateien: `backend/main.py` (`_weather_overlay_single`, ca. 10–15 Zeilen), `backend/tests/test_us106.py` (5 bestehende Tests um Aerosol-Erfolgsmock ergänzen), `backend/tests/test_us106.py` optional um 2 neue Tests (Aerosol wird abgerufen; Aerosol-Fehlschlag ist non-fatal).
+- Vorteile: Beseitigt die Inkonsistenz vollständig; wiederverwendet ein bereits produktiv bewährtes Muster; kein neues Fehlerverhalten, keine neue Fehlerklasse.
+- Nachteile / Risiken: Erfordert sorgfältige getrennte Fehlerbehandlung (Pre-Mortem Szenario 2); bestehende Tests müssen mitgezogen werden (Pre-Mortem Szenario 4).
+- Aufwand: klein.
+
+### Option B — Status quo belassen, Lücke nur dokumentieren
+- App-Wirkung: Keine Verhaltensänderung — neue/geänderte Locations bekommen weiterhin erst nach bis zu 3 Stunden ihr Dunst-Signal.
+- Vorgehen: Kein Code-Fix; nur ein ergänzender Kommentar/Docstring-Hinweis in `_weather_overlay_single()`, der die Inkonsistenz als bekannt und bewusst in Kauf genommen dokumentiert.
+- Betroffene Dateien: `backend/main.py` (Kommentar/Docstring only).
+- Vorteile: Null Risiko für den Fast-Path, kein Testaufwand.
+- Nachteile: Löst Punkt 1 des Tickets nicht — der Ticket-Auftrag ist ausdrücklich als zu behebende Inkonsistenz formuliert, nicht nur als zu dokumentierender Fakt.
+- Aufwand: minimal.
+
+✅ Empfehlung: **Option A** — behebt die im Ticket klar benannte Inkonsistenz mit demselben, bereits produktiv bewährten Muster (`asyncio.gather` + non-fatale Aerosol-Fehlerbehandlung) bei kleinem Umfang. Option B würde den im Ticket explizit formulierten Auftrag zu Punkt 1 faktisch nicht erledigen.
+
+**Vorgehen Punkt 2 (Test-Nachtrag, keine Optionen nötig):** Es gibt nur einen sinnvollen Weg — den fehlenden Testfall ergänzen. Der Test wird als neue Funktion in `backend/tests/test_bug77_weather_job_status.py` angelegt (nicht als neue Datei), weil er inhaltlich zur bestehenden „Rule 1–4"-Struktur dieses Job-Status-Testfiles gehört (Rule 5: „nur Aerosol-Abruf schlägt fehl"). Docstring/Kommentar verweist auf TASK-73.
+
+**Testplan:**
+- [ ] Automatisiert (Harness), Marker `offline, regression`:
+  - `test_us106.py`: 5 bestehende `_weather_overlay_single`-Tests um einen Aerosol-Erfolgsmock ergänzen (Helfer analog `_mock_aerosol_ok`). Neuer Test `test_single_weather_overlay_includes_aerosol_forecast` (AK 1): bestätigt, dass `fetch_aerosol_forecast` aufgerufen und das Ergebnis an `_apply_weather_to_event` durchgereicht wird. Neuer Test `test_single_weather_overlay_aerosol_failure_is_non_fatal` (AK 2 + 3): Aerosol-Fetch wirft Exception, Wetter-Fetch gelingt → `ready == True`, `weather_status == "ok"`, keine spürbare Verzögerung (kein sequentielles Warten simuliert). Bestehender Test `test_pending_stays_when_weather_fetch_fails` bleibt unverändert grün (AK 4 / Regression).
+  - `test_bug77_weather_job_status.py`: neuer Test `test_aerosol_only_failure_sets_error_status` (Rule 5, AK 5): `fetch_weather_forecast` erfolgreich mocken, `fetch_aerosol_forecast` wirft `RuntimeError` für eine Location → prüft `status["status"] == "error"`, Location-Name in `status["last_error"]`, betroffenes Event hat trotzdem `weather_status == "ok"`.
+  - Volle bestehende Suite (`test_us106.py`, `test_bug77_weather_job_status.py`, `test_us130.py`) muss weiterhin grün bleiben (Pre-Mortem Szenario 4).
+- [ ] Manuell (unter http://localhost:8000, `FOTOALERT_ENV=dev`):
+  1. Neue Location anlegen (oder Koordinaten einer bestehenden ändern) → im Server-Log prüfen, dass für diese Location sowohl ein Wetter- als auch ein Aerosol-Abruf im Fast-Path-Lauf sichtbar ist (Log-Zeile analog zum Cronlauf-Muster), und dass das Banner weiterhin in vergleichbarer Zeit wie vor dem Fix verschwindet (grobe Stoppuhr-Kontrolle).
+  2. Regression (PRODUCT.md §12, „Backend-Endpoint"): Health + Locations + Feed + Scout + Kalender weiterhin normal erreichbar nach dem Fix.
+  3. Ein gezielt simulierter Aerosol-Ausfall ist lokal nicht ohne Weiteres reproduzierbar (echter Air-Quality-API-Ausfall) — dieser Zweig wird primär über den automatisierten Test (Punkt 2) abgesichert, nicht manuell.
+
+---
+
 ### US-132 · Rote Wolken: Rotes Nachglühen hoher Wolken in Sonnenrichtung bei Sonne unter dem Horizont `[ ]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-13 |
 
 **Beschreibung:** Physikalisch eigenständiges drittes Wolkenstimmungs-Phänomen neben den
@@ -13072,13 +13150,378 @@ gemeinsam verbessern, ist aber keine Voraussetzung.
 
 ---
 
-### TASK-74 · Refactoring: Lange Funktionen aufteilen (backend/main.py: _weather_overlay, _generate_cloud_mood_events) `[ ]`
+## Analyse (US-132) · 2026-07-13
+
+### Vorab-Verifikation: Interner Event-Name — ✅ bestätigt (Stephan, 2026-07-13)
+
+📎 *Code-Verifikation:* `GOLDEN_CLOUDS`/`RED_SKY` sind in `backend/calculations/weather.py`
+selbst **keine** Enum-Werte, sondern nur Doku-/Kommentar-Bezeichner. Der tatsächliche
+`event_type`-Feldwert im Event-Dict ist immer der deutsche Anzeigetext selbst
+(`"Goldene Wolken"`, `"Himmelsröte"` — gesetzt in `backend/main.py::_generate_cloud_mood_events()`,
+ca. Z. 602/619). Die Event-IDs bekommen ein kurzes Präfix (`gc_`/`rs_`, per `uuid4().hex[:12]`).
+
+**Bestätigt (Weg-Gate, Stephan, 2026-07-13) — folgt exakt dem bestehenden Muster:**
+- Interner Doku-/Funktions-Bezeichner: **`RED_CLOUDS`** (Pendant zu `GOLDEN_CLOUDS`/`RED_SKY`,
+  wie von Stephan vorgeschlagen).
+- `event_type`-Feldwert / Anzeigetext: **`"Rote Wolken"`** (identisch zum Ticket-Titel und zur
+  Namenskonvention).
+- Event-ID-Präfix: **`rc_`** (analog `gc_`/`rs_`).
+- Neue Prüf-Funktion: **`should_generate_red_clouds_event(...)`** in `backend/calculations/weather.py`
+  (analog `should_generate_golden_clouds_event`/`should_generate_red_sky_event`).
+
+---
+
+### Example Mapping
+
+**Scope-Check (bewusster erster Slice vs. versteckte Lücke):** Das Ticket beschreibt sich selbst
+als „erste Ausbaustufe" (Standort-Wetterwert statt Sichtachsen-Projektion aus US-131). Die
+Code-Verifikation unten zeigt: das ist tatsächlich der einzig sinnvolle erste Schritt — eine
+Sichtachsen-Projektion (`destination_point()` aus `backend/discover/geometry.py`, bislang nur im
+`discover`-Scout-Pfad verwendet, nicht in der Wetter-Overlay-Pipeline verdrahtet) wäre ein
+separater, deutlich größerer Eingriff (US-131). Kein Widerspruch, bewusster Slice — bestätigt.
+
+**Annahmen-Protokoll:**
+
+| Punkt | Typ | Entscheidung / Default |
+|-------|-----|------------------------|
+| Interner Event-Name (`RED_CLOUDS`), `event_type`-Wert (`"Rote Wolken"`), ID-Präfix (`rc_`) | ⚪ Konventionell, folgt 1:1 bestehendem Muster | ✅ Bestätigt (Stephan, 2026-07-13) — `RED_CLOUDS`/`"Rote Wolken"`/`rc_`, siehe Vorab-Verifikation oben |
+| Exakter Sonnenhöhen-Schwellwert für „unter dem Horizont" (bürgerliche/nautische/astronomische Dämmerung, oder ein eigener Wert?) | 🔴 Kritisch, aber mit belastbarem Default beantwortbar | ⚠️ Annahme: bestehendes „Blaue Stunde"-Zeitfenster (Sonnenhöhe **-4° bis -6°**, `backend/calculations/astronomy.py` Z. 309–319) wiederverwenden statt neuen Grenzwert einzuführen. Physikalisch plausibel: genau in diesem Fenster können sehr hohe Cirrus-Wolken (6–12 km) noch direktes Sonnenlicht abbekommen, bevor der Erdschatten auch sie erreicht; darunter (tiefer als ca. -6° bis -8°) verliert selbst hoher Cirrus die letzte direkte Beleuchtung. Kein neuer Astronomie-Code nötig — Zeitpunkt ist über das bereits generierte „Blaue Stunde"-Event gegeben. **Wichtig (Pre-Mortem Szenario 1):** zusätzlich zur Ereignis-Zugehörigkeit einen expliziten `sun_altitude < 0`-Check einbauen, nicht nur auf den Event-Typ-Namen vertrauen (Fallback-Pfad-Risiko, siehe unten). |
+| Schwellwert für „hohe Wolken" (`cloud_cover_high_pct`, in Prozent) | ⚪ Konventionell, kein empirischer Beleg nötig für Startwert | ✅ Bestätigt als Startwert (Stephan, 2026-07-13): `cloud_cover_high_pct >= 20` **und** `cloud_cover_low_pct < 30` (identisches Muster wie der bestehende Cirrus-Bonus in `calculate_photo_weather_score()`, `weather.py` Z. 135) — der Low-Cloud-Deckel verhindert, dass die App „Rote Wolken" meldet, obwohl der Blick nach oben durch geschlossene tiefe Bewölkung verstellt ist. Eigene, benannte Konstante (`RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT`), separat nachjustierbar. |
+| Azimut-Toleranz „Sonnenrichtung" | ⚪ Konventionell | ✅ Bestätigt als Startwert (Stephan, 2026-07-13): eigene Konstante `RED_CLOUDS_AZIMUTH_TOLERANCE_DEG = 30` (Wert wie GOLDEN_CLOUDS/RED_SKY, aber unabhängig änderbar — identisches Muster wie `RED_SKY_AZIMUTH_TOLERANCE_DEG`, US-113). Vergleich läuft gegen den **Sonnenazimut direkt** (wie GOLDEN_CLOUDS), NICHT gegen den Antisolarpunkt (das wäre RED_SKY). |
+| Neuer Event-Typ oder Variante eines bestehenden? | ⚪ Aus Ticket-Text bereits klar | ⚠️ Neuer, dritter, eigenständiger Event-Typ (kein Alias von GOLDEN_CLOUDS/RED_SKY) — siehe Vorab-Verifikation. |
+| Filter-Chip nötig? (Schritt 4f) | ⚪ Aus Architektur-Analyse eindeutig beantwortbar | Ja — siehe Architektur-Analyse unten, kein Klärungsbedarf. |
+| **Morgen- vs. Abend-Variante:** „Rote Wolken" ist physikalisch symmetrisch (auch vor Sonnenaufgang möglich), aber im Feed existiert aktuell **nur** ein Abend-Event „Blaue Stunde" (`EventType.BLUE_HOUR_EVENING`, `backend/calculations/opportunity.py` Z. 39) — eine Morgen-Variante wird im Feed heute **nicht** als eigenes Event erzeugt, obwohl die Astronomie-Zeitpunkte (`blue_hour_morning_start/end`) bereits berechnet werden (`astronomy.py` Z. 335–336, aktuell nur intern für ein Zeitfenster verwendet, `opportunity.py` Z. 278). | 🔴 Kritisch — echte Scope-Entscheidung, kein reiner Implementierungsdetail | ✅ **Bestätigt (Stephan, 2026-07-13): BEIDE Richtungen** (morgens + abends) werden in diesem Ticket abgedeckt. Stephans Hinweis: Für die Morgen-Variante fehlt die Sonnenazimut-Berechnung im Blaue-Stunde-Block noch komplett (neuer Opportunity-Eintrag nötig); dieselbe Ergänzung (`celestial_azimuth`/`celestial_altitude`) fehlt laut Pre-Mortem-Code-Verifikation (Szenario 2 unten) aktuell **auch** im bestehenden Abend-Block (`opportunity.py` Z. 403–433) — beide Blöcke (Morgen neu + Abend nachrüsten) müssen also die Sonnenazimut-Berechnung erhalten, siehe Architektur-Analyse Punkt 2. |
+
+**Rules + Examples:**
+
+📏 **Rule 1:** „Rote Wolken" wird ausgelöst, wenn die Sonne unter dem Horizont steht (Blaue-Stunde-
+Fenster), hohe Wolken ausreichend vorhanden sind, tiefe Wolken die Sicht nicht komplett verstellen,
+und das Motiv ungefähr in Sonnenrichtung liegt.
+- 🟢 *Given* Sonnenhöhe -5° (innerhalb Blaue Stunde), `cloud_cover_high_pct=45`,
+  `cloud_cover_low_pct=10`, Sonnenazimut 280°, Motiv-Azimut 275° (Differenz 5° ≤ 30°),
+  *When* das Wetter-Overlay läuft, *Then* erscheint eine „Rote Wolken"-Karte.
+
+📏 **Rule 2:** Ist die Sonne noch über dem Horizont (Goldene Stunde), erscheint keine „Rote
+Wolken"-Karte, selbst bei identischen Wolkenwerten — das ist weiterhin der GOLDEN_CLOUDS-Fall.
+- 🟢 *Given* dieselben Wolkenwerte wie Rule 1, aber Sonnenhöhe +3° (Goldene Stunde), *When* das
+  Wetter-Overlay läuft, *Then* erscheint keine „Rote Wolken"-Karte (ggf. aber eine „Goldene
+  Wolken"-Karte, falls deren eigene Bedingungen erfüllt sind — unverändert zu US-109).
+
+📏 **Rule 3:** Liegt das Motiv nicht in Sonnenrichtung, sondern z. B. am Antisolarpunkt, erscheint
+keine „Rote Wolken"-Karte (das wäre ggf. „Himmelsröte"/RED_SKY, ein separates Event).
+- 🟢 *Given* Sonnenhöhe -5°, `cloud_cover_high_pct=45`, Sonnenazimut 280°, Motiv-Azimut 100°
+  (Differenz zur Sonne 180°, weit außerhalb ±30°), *When* das Wetter-Overlay läuft, *Then*
+  erscheint keine „Rote Wolken"-Karte für dieses Motiv (unabhängig davon, ob RED_SKY am
+  Antisolarpunkt separat auslöst).
+
+📏 **Rule 4 (Edge Case):** Sind hohe Wolken zwar vorhanden, aber tiefe Wolken verstellen die Sicht
+komplett, erscheint keine „Rote Wolken"-Karte (physikalisch nicht sichtbar).
+- 🟢 *Given* Sonnenhöhe -5°, `cloud_cover_high_pct=50`, `cloud_cover_low_pct=90` (dicht bewölkt),
+  *When* das Wetter-Overlay läuft, *Then* erscheint keine „Rote Wolken"-Karte.
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK-1:** Steht die Sonne bereits unter dem Horizont und stehen genug hohe Wolken in
+      Sonnenrichtung, ohne dass tiefe Wolken die Sicht verstellen, sehe ich eine neue „Rote
+      Wolken"-Karte im Feed.
+- [ ] **AK-2:** Solange die Sonne noch über dem Horizont steht, sehe ich für dieselbe Wetterlage
+      weiterhin nur „Goldene Wolken" (falls deren Bedingungen erfüllt sind) — keine „Rote
+      Wolken"-Karte zusätzlich oder stattdessen.
+- [ ] **AK-3:** Im Detail der Karte lese ich einen eigenen Erklärungstext, der „Rote Wolken" von
+      „Goldene Wolken" und „Himmelsröte" unterscheidet (Sonne unter Horizont + hohe Wolken +
+      Sonnenrichtung).
+- [ ] **AK-4:** Ich kann im Filter gezielt nach „Rote Wolken" filtern, unabhängig von „Goldene
+      Wolken" und „Himmelsröte".
+- [ ] Edge Case AK-5: Verstellen tiefe Wolken die Sicht auf die hohen Wolken komplett, erscheint
+      keine „Rote Wolken"-Karte, selbst wenn hohe Wolken rechnerisch vorhanden wären.
+- [ ] Edge Case AK-6: Liegt das Motiv nicht in Sonnenrichtung (z. B. am Antisolarpunkt), erscheint
+      dafür keine „Rote Wolken"-Karte.
+- [ ] Edge Case AK-7 (Regression): Bestehende „Goldene Wolken"- und „Himmelsröte"-Karten bleiben
+      von dieser Änderung unverändert (Auslösebedingungen, Texte, Score-Berechnung).
+- [ ] Edge Case AK-8: Kann kein Wetter für eine Location abgerufen werden, erscheint keine „Rote
+      Wolken"-Karte für sie — kein Absturz, kein falscher Alarm.
+- [ ] AK-9 *(bestätigt, Stephan 2026-07-13: beide Richtungen)*: Das Phänomen wird auch vor
+      Sonnenaufgang erkannt, symmetrisch zum Abend-Fall.
+- [ ] AK-10 *(neu, Stephan 2026-07-13)*: Beim Öffnen der Erklärung zu einem der drei
+      Wolken-Phänomene (Goldene Wolken, Rote Wolken, Himmelsröte) sehe ich eine klare,
+      verständliche Beschreibung inklusive der jeweiligen Berechnungsgrundlage (Sonnenstand
+      über/unter Horizont, Wolkenhöhe, Blickrichtung relativ zur Sonne), die eindeutig erkennen
+      lässt, wodurch sich dieses Phänomen von den anderen beiden unterscheidet.
+- [ ] Edge Case AK-11 *(neu, Stephan 2026-07-13)*: Der bestehende Himmelsröte-Erklärtext wird
+      korrigiert, falls er aktuell fälschlich das Rote-Wolken-Verhalten beschreibt (statt des
+      tatsächlichen Himmelsröte-Verhaltens: Antisolarpunkt-Richtung, niedrige/mittlere Wolken) —
+      Teil dieses Tickets, kein separates Folge-Ticket.
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation (Pflicht vor den Szenarien, durchgeführt 2026-07-13):**
+- `backend/calculations/astronomy.py` Z. 309–319: Golden-Hour-Fenster ist auf Sonnenhöhe **-4° bis
+  +6°** definiert; Blue-Hour-Fenster auf **-6° bis -4°** (`bh_evening_start = ghe_evening_end`,
+  exakt bei -4°). Negative Sonnenhöhen werden also bereits heute unterstützt und berechnet — kein
+  neuer Astronomie-Code nötig, nur Wiederverwendung.
+- `backend/calculations/opportunity.py` Z. 354–401 (Goldene Stunde Abend): berechnet und speichert
+  `celestial_azimuth`/`celestial_altitude` der Sonne (`sun_pos_gh = get_body_position(...)`).
+  Z. 403–433 (Blaue Stunde): **speichert das NICHT** — kein `get_body_position()`-Aufruf, kein
+  `celestial_azimuth`/`celestial_altitude` im Blaue-Stunde-Opportunity-Objekt. Ohne Ergänzung ist
+  für Blaue-Stunde-Events kein Sonnenazimut-Vergleich möglich.
+- `backend/main.py::_apply_weather_to_event()` Z. 512–526: `golden_cloud_score` (`gcs`) wird nur
+  berechnet, wenn `event_type in {"Goldene Stunde Morgen", "Goldene Stunde Abend"}` — „Blaue
+  Stunde" ist **nicht** in dieser Menge, `gcs` bleibt `None`.
+- `backend/main.py::_generate_cloud_mood_events()` Z. 556/573 (`_GOLDEN_HOUR_TYPES`): iteriert
+  ausschließlich über Events mit `event_type in _GOLDEN_HOUR_TYPES` — „Blaue Stunde"-Events werden
+  aktuell komplett übersprungen, unabhängig vom Wetter.
+- `backend/calculations/opportunity.py` Z. 36–49 (`EventType`-Enum) + Z. 403–433: es existiert nur
+  `BLUE_HOUR_EVENING` — **kein** Morgen-Pendant wird im Feed als eigenes Event erzeugt (die
+  Astronomie-Zeitpunkte `blue_hour_morning_start/end` existieren zwar in `SunInfo`, werden aber
+  aktuell nur als Zeitfenster-Grenze verwendet, Z. 278, nicht als eigenes Opportunity-Objekt).
+- `backend/discover/geometry.py::destination_point()`: existiert, wird aber ausschließlich im
+  `discover`-Scout-Pfad verwendet — nicht in der Wetter-Overlay-Pipeline (`_weather_overlay()`)
+  verdrahtet. Für dieses Ticket (Standort-Wetterwert, keine Sichtachsen-Projektion) **nicht
+  benötigt** — bestätigt US-131 als unabhängige Folge-Ausbaustufe, kein Widerspruch zur
+  Ticket-Sequenzierung.
+- Feed-Cap (`main.py` Z. 1612–1645, BUG-48-Fix): Round-Robin je `event_type` **vor** dem
+  500er-Cap — ein neuer, seltener Event-Typ wird dadurch nicht mehr systematisch verdrängt (anders
+  als beim ursprünglichen BUG-32). Kein Handlungsbedarf hier.
+
+💀 **Szenario 1 — „Fallback-Pfad liefert falsch-positive Karte trotz Sonne über Horizont“:**
+Findet die präzise Astronomie-Berechnung (`_find_sun_altitude_crossing`) keinen Treffer (z. B.
+Datumsrand-/Polarfälle) und greift der Fallback `sunset + timedelta(minutes=10)` (`astronomy.py`
+Z. 322–338), ist die tatsächliche Sonnenhöhe zu diesem Zeitpunkt nicht garantiert negativ.
+Frühwarnung: „Rote Wolken"-Karte erscheint an einem Tag, an dem laut Sonnenuntergangszeit die Sonne
+kaum oder noch nicht ganz unten ist.
+Gegenmaßnahme: Sonnenhöhe **nicht** nur über den Event-Typ-Namen ableiten, sondern explizit über
+`get_sun_position()`/`get_body_position()` zum `shoot_time` neu berechnen und hart auf
+`sun_altitude < 0` prüfen (zusätzliches, defensives Kriterium in der neuen Prüf-Funktion).
+
+💀 **Szenario 2 — „Fehlender Sonnenazimut macht das Feature wirkungslos“:** Ohne die in Szenario
+1/Pre-Mortem-Verifikation beschriebene Ergänzung von `celestial_azimuth` im Blaue-Stunde-Block
+(`opportunity.py` Z. 403–433) hat kein Blaue-Stunde-Event einen Sonnenazimut — die neue
+Richtungs-Prüfung liefert dann für JEDES Event `False` (kein Vergleich möglich), das Feature würde
+niemals eine Karte erzeugen, ohne dass ein Fehler sichtbar wird.
+Frühwarnung: Auch bei offensichtlich passender Wetterlage (viel Cirrus, Sonne knapp unter Horizont)
+erscheint dauerhaft keine einzige „Rote Wolken"-Karte.
+Gegenmaßnahme: `opportunity.py`-Blaue-Stunde-Block um `get_body_position(lat, lon, "sun", bh_start)`
+ergänzen und Ergebnis speichern (analog Goldene-Stunde-Block, keine Verhaltensänderung für
+bestehende Blaue-Stunde-Anzeige). Test: Integrationstest prüft explizit, dass ein synthetisches
+Blaue-Stunde-Event mit gesetztem Sonnenazimut eine Karte erzeugt (Regressions-Falle sonst
+unsichtbar, da kein Fehler geworfen wird).
+
+💀 **Szenario 3 — „golden_cloud_score fehlt für Blaue Stunde, Cirrus-Check läuft ins Leere“:** Da
+`_apply_weather_to_event()` (Z. 512–526) `gcs` für „Blaue Stunde" nicht berechnet, darf die neue
+Prüf-Funktion sich NICHT auf `golden_cloud_score` stützen (wäre immer `None`). Sie muss stattdessen
+direkt auf `weather_details["cloud_cover_high_pct"]`/`cloud_cover_low_pct` zugreifen (die
+unabhängig vom `gcs`-Pfad für JEDES Event mit `weather_status == "ok"` gesetzt werden, Z. 532–543).
+Frühwarnung: `AttributeError`/`None`-Vergleich oder generell keine Auslösung, wenn versehentlich
+`gcs` als Eingabeparameter vorausgesetzt wird.
+Gegenmaßnahme: neue Funktion nimmt `ch`/`cl` (Prozentwerte) direkt entgegen, keine Abhängigkeit von
+`golden_cloud_score`.
+
+💀 **Szenario 4 — „Rote Wolken nur abends, Stephan erwartet auch morgens“:** Siehe
+Annahmen-Protokoll — ohne expliziten Morgen-Block bleibt die Hälfte des physikalisch identischen
+Phänomens unsichtbar, ohne dass das im Feed erkennbar wäre (es gibt schlicht keine passende
+Zeit-Gelegenheit, an die sich das Event hängen könnte).
+Frühwarnung: Stephan meldet nach Release „diesen Morgen war der Himmel rot-violett, keine Karte
+kam".
+Gegenmaßnahme: Weg-Gate-Entscheidung vor Implementierungsstart einholen (siehe Annahmen-Protokoll);
+falls „nur abends" gewählt wird, das explizit im Ticket-Scope und im Erklärungstext vermerken statt
+stillschweigend nur abends umzusetzen.
+
+💀 **Szenario 5 — „TASK-74-Refactoring und diese Implementierung kollidieren“:** `TASK-74` (Status
+`[~]`, in Bearbeitung) refaktorisiert exakt die beiden Funktionen (`_generate_cloud_mood_events`,
+`_weather_overlay`), in die dieser dritte Zweig eingebaut werden soll. Wird US-132 parallel oder
+vor Abschluss von TASK-74 implementiert, entsteht entweder ein Merge-Konflikt oder der neue Zweig
+verlängert exakt die Funktionen, die TASK-74 gerade kürzen soll.
+Frühwarnung: `tools/refactor_check.py` meldet nach US-132 wieder ein `long_function`-Finding für
+dieselben Funktionen, obwohl TASK-74 das gerade beheben sollte.
+Gegenmaßnahme: Sequenzierung TASK-74 → US-132 (siehe Implementierungsoptionen unten), nicht
+umgekehrt oder parallel. **Bestätigt (Stephan, 2026-07-13):** Implementierung von US-132 beginnt
+explizit erst NACH Abschluss von TASK-74 — vor Implementierungsstart den aktuellen Status von
+TASK-74 im Backlog prüfen (zum Zeitpunkt dieser Aktualisierung: „In Progress"/`[~]`, siehe
+TASK-74-Ticket unten). Solange TASK-74 nicht auf „Done" steht, nicht mit der US-132-Implementierung
+beginnen.
+
+📎 **CI-Datenumfeld-Check (Pflichtfrage):** Bei leerem `_feed_cache` (frischer CI-Checkout) iteriert
+`_generate_cloud_mood_events()` über eine leere Liste — kein Crash, keine Karte. Die neue reine
+Prüf-Funktion (`should_generate_red_clouds_event`) ist wie `should_generate_golden_clouds_event`
+unabhängig von echten Daten/Netzwerk (`pytest.mark.offline`), Integrationstest nutzt synthetische
+Feed-Dicts (analog `test_us109.py`) statt echter Locations — `FOTOALERT_NO_BACKGROUND=1` betrifft
+nur Hintergrund-Jobs beim App-Start, nicht diese Unit-/Integrationstests.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien:**
+1. `backend/calculations/weather.py` — neue Konstanten `RED_CLOUDS_AZIMUTH_TOLERANCE_DEG` (=30),
+   `RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT` (=20, plus Low-Cloud-Deckel <30, siehe Annahmen); neue
+   Funktion `should_generate_red_clouds_event(sun_altitude, ch, cl, sun_azimuth, subject_azimuth) -> bool`
+   (analog `should_generate_golden_clouds_event`, Vergleich direkt gegen Sonnenazimut, zusätzlich
+   `sun_altitude < 0`-Check, siehe Pre-Mortem Szenario 1).
+2. `backend/calculations/opportunity.py` — Blaue-Stunde-Block (ca. Z. 403–433) um
+   `get_body_position(lat, lon, "sun", bh_start)` + Speicherung von `celestial_azimuth`/
+   `celestial_altitude` erweitern (Pre-Mortem Szenario 2). Falls Weg-Gate „beide Richtungen"
+   bestätigt: symmetrischer neuer Block für Blaue Stunde Morgen (nutzt bereits vorhandene
+   `blue_hour_morning_start/end`, neuer `EventType`-Wert nötig).
+3. `backend/main.py` — `_apply_weather_to_event()` (ca. Z. 474–553): `weather_details` (inkl.
+   `cloud_cover_high_pct`/`cloud_cover_low_pct`) wird bereits für JEDES Event mit
+   `weather_status == "ok"` gesetzt, keine Änderung dort nötig (Pre-Mortem Szenario 3 — neue
+   Funktion braucht `gcs` nicht). `_GOLDEN_HOUR_TYPES`-Iteration (ca. Z. 556/573) in
+   `_generate_cloud_mood_events()` um „Blaue Stunde" erweitern (eigener Zweig, dritter
+   `if`-Block analog GOLDEN_CLOUDS/RED_SKY, ca. Z. 559–647); `_inject_cloud_mood_events()`
+   (ca. Z. 650–671): ID-Präfix-Filter um `rc_` ergänzen, damit wiederholte Wetter-Overlay-Läufe
+   keine Duplikate erzeugen.
+4. `backend/tests/test_us_132.py` (neu) — Unit-Tests für `should_generate_red_clouds_event()` +
+   Integrationstest für `_generate_cloud_mood_events()` (Muster: `test_us109.py`/`test_us113.py`).
+5. `web/index.html`:
+   - Icon-Map (ca. Z. 1729): Eintrag für `'Rote Wolken'` ergänzen.
+   - Filter-Chip-Liste `FilterSheet._ET` (ca. Z. 3214–3229): neuer Eintrag
+     `['Rote Wolken', 'Rote Wolken']` — **ohne diesen Eintrag ist die neue Karte im Filter-Sheet
+     nicht gezielt auswählbar** (Schritt 4f, Antwort: ja, nötig).
+   - `EV_SKYPOS_EXEMPT`-Set (ca. Z. 4662): `'Rote Wolken'` ergänzen (sonst versucht das Sheet,
+     eine Himmelsposition-Zusammenfassung für ein Wolken-Event zu rendern, die dort nicht
+     hinpasst — analog zu „Goldene Wolken"/„Himmelsröte", die bereits im Set stehen).
+   - Kompass-Diagramm (US-111, ca. Z. 3831–3884): dritte Zone „Rote Wolken" ergänzen — in
+     Sonnenrichtung wie GOLDEN_CLOUDS, aber eigene Farbe zur optischen Unterscheidung (siehe
+     Designer-Check unten).
+   - Erklärungstexte (ca. Z. 7348–7349, `mkSec`-Abschnitte ca. Z. 4464–4550): eigener
+     Erklärungstext für „Rote Wolken" (AK-3). **Scope-Erweiterung (Stephan, 2026-07-13, AK-10/
+     AK-11):** im selben Zug werden alle drei Erklärungstexte (Goldene Wolken, Rote Wolken,
+     Himmelsröte) überarbeitet, sodass jeder klar die eigene Berechnungsgrundlage nennt
+     (Sonnenstand über/unter Horizont, Wolkenhöhe, Blickrichtung relativ zur Sonne) und sich
+     eindeutig von den anderen beiden abgrenzt. Dabei wird der bestehende Himmelsröte-Text
+     (ca. Z. 7349) korrigiert, der aktuell fälschlich das Rote-Wolken-Verhalten beschreibt
+     (siehe Nebenbefund oben) — nicht als separates Ticket, sondern als Teil dieser
+     Doku-Aktualisierung.
+
+**Scope-Erweiterung: Design- und Doku-Konsistenz über alle drei Wolken-Phänomene (Stephan,
+2026-07-13, von Stephan selbst angeordnet, kein eigenmächtiger Scope-Creep):** Dieses Ticket
+umfasst ausdrücklich nicht nur Icon/Farbe/Erklärungstext für „Rote Wolken" isoliert, sondern eine
+saubere, konsistente Lösung für **alle drei** Phänomene gemeinsam — Goldene Wolken (US-109), Rote
+Wolken (dieses Ticket) und Himmelsröte (US-109/US-113). Das betrifft sowohl die visuelle Seite
+(Icon-Map Z. 1729, Kompass-Diagramm-Zonen, Filter-Chip-Farben) als auch die Erklärungstexte
+(siehe Punkt 5 oben). Bestehende Darstellung von Goldene Wolken/Himmelsröte darf dabei angepasst
+werden, wenn es der Konsistenz dient (kein reines „nur den neuen Typ ergänzen").
+
+**Nebenbefund — jetzt Teil des Ticket-Scopes (Stephan, 2026-07-13, siehe AK-11):** Der bestehende
+Tooltip-Text für „Himmelsröte" (`web/index.html` ca. Z. 7349: „Hohe Wolken (Cirrus) … Sonnenrichtung
+…") beschreibt inhaltlich eher das Phänomen dieses Tickets (Rote Wolken) als das tatsächliche
+RED_SKY-Verhalten (Antisolarpunkt, niedrige/mittlere Wolken). Vermutlich ein Altlast-Text aus einer
+früheren Version, bevor US-113 die Richtung korrigiert hat. Ursprüngliche Empfehlung war ein
+separates Folge-Ticket (Scope-Creep-Regel) — Stephan hat entschieden, die Korrektur stattdessen im
+Zuge dieses Tickets mitzuerledigen, da alle drei Erklärungstexte ohnehin im selben Zug überarbeitet
+werden (siehe AK-10/AK-11 und Scope-Erweiterung „Design- und Doku-Konsistenz" unten).
+
+**Einstiegspunkt-Check:** Wie bei US-109/US-113/US-130 — nur `/opportunities`
+(`_feed_cache` → `_generate_cloud_mood_events()`) betroffen; `/calendar` und `/discover` haben kein
+Wetter-Overlay und damit keine RED_CLOUDS-Erzeugung.
+
+**Filter-Chip-Frage (Schritt 4f):** Ja — neuer Event-Typ braucht einen eigenen Filter-Chip-Eintrag
+(siehe Punkt 5 oben), sonst ist „Rote Wolken" nicht gezielt filterbar/isolierbar von „Goldene
+Wolken"/„Himmelsröte" im Filter-Sheet.
+
+---
+
+### Designer-Check (Schritt 4b)
+
+Sichtbare Auswirkung: **Ja.** Neuer Event-Typ im Feed/Kalender-relevanten Pfad braucht ein
+erkennbares Icon und/oder eine eigene Farbe im Kompass-Diagramm (US-111) und im Filter-Chip, um
+sich optisch klar von „Goldene Wolken" und „Himmelsröte" zu unterscheiden (alle drei nutzen aktuell
+dasselbe Icon `i-cloud`, Z. 1729 — für drei unterscheidbare Phänomene ohne Farbdifferenzierung zu
+wenig visuelle Trennung).
+
+**Stephan, 2026-07-13:** bestätigt, UND erweitert — die Icon-/Farbentscheidung soll nicht isoliert
+für „Rote Wolken" getroffen werden, sondern konsistent für alle drei Phänomene (Goldene Wolken,
+Rote Wolken, Himmelsröte) gemeinsam (siehe Scope-Erweiterung in der Architektur-Analyse oben).
+
+**Status: Designer-Check steht noch aus.** Es wurde bislang **keine** Design-Entscheidung
+getroffen — vor Implementierungsstart wird `fotoalert-designer` separat für die Icon-/
+Farbentscheidung über alle drei Phänomene hinweg eingeholt (Memory
+`feedback_icon_variants_designer_gate`, gilt bereits ab diesem Weg-Gate). Das Ergebnis dieses
+Checks fließt noch in diese Spec ein (Architektur-Analyse Punkt 5 und Testplan sind daher bis
+dahin mit Platzhalter „eigene Farbe zur optischen Unterscheidung" zu lesen, nicht als finale
+Farbwahl).
+
+---
+
+### Implementierungsoptionen
+
+**Option A — Dritter Zweig in der bestehenden `_generate_cloud_mood_events()` (empfohlen, aber
+sequenziert NACH TASK-74)**
+*Was du in der App erlebst:* Genau wie „Goldene Wolken"/„Himmelsröte" heute entstehen — die neue
+Karte wird beim selben 3-stündigen Wetter-Overlay-Lauf mit erzeugt, gleiche Aktualität, gleicher
+Job-Status, gleiches Fehlerverhalten bei Wetter-Ausfall.
+- Vorgehen: Neuer `if`-Block in `_generate_cloud_mood_events()` (analog GOLDEN_CLOUDS/RED_SKY,
+  ca. Z. 598–645) für Events mit `event_type == "Blaue Stunde"`; ergänzt um die in Pre-Mortem
+  Szenario 2/3 beschriebenen Voraussetzungen (Sonnenazimut in Blaue-Stunde-Events, direkter
+  Cirrus-Check ohne `gcs`).
+- Vorteile: Wiederverwendet die komplette bestehende Pipeline (T+3-Fenster, Job-Status,
+  Round-Robin-Feed-Cap, Deduplizierung) ohne Zusatzaufwand; konsistent mit dem etablierten Muster
+  (alle drei Wolkenstimmungs-Typen leben an einer Stelle, leicht im Zusammenhang zu warten).
+- Nachteile/Risiken: `_generate_cloud_mood_events()`/`_weather_overlay()` sind bereits Ziel von
+  TASK-74 (zu lang). Ein weiterer Zweig ohne vorheriges Refactoring verlängert die Funktionen
+  weiter und triggert sofort ein neues `long_function`-Finding (Pre-Mortem Szenario 5).
+- Aufwand: klein bis mittel (abhängig von Morgen/Abend-Entscheidung).
+- **Empfohlene Sequenz: TASK-74 zuerst abschließen, dann US-132 auf der bereits aufgeräumten
+  Struktur aufsetzen** (Helper-Funktionen aus TASK-74 lassen sich direkt für den dritten Zweig
+  wiederverwenden, statt ein drittes Mal dieselbe Länge zu produzieren).
+
+**Option B — Eigene separate Funktion/Pipeline (`_generate_red_clouds_events()`), unabhängig von
+`_generate_cloud_mood_events()`**
+*Was du in der App erlebst:* Identisch zu Option A aus Nutzersicht — kein Unterschied in Timing
+oder Verhalten.
+- Vorgehen: Neue eigenständige Funktion mit eigener Iteration über `_feed_cache`, eigenem
+  ID-Präfix-Handling in `_inject_cloud_mood_events()` (oder einer Kopie davon).
+- Vorteile: Kein Overlap mit TASK-74 nötig, keine Wartezeit auf dessen Abschluss; könnte parallel
+  entwickelt werden.
+- Nachteile/Risiken: Zweite Iteration über denselben `_feed_cache` (unnötiger Mehraufwand);
+  zwei Stellen mit strukturell identischer Logik (Cloud-Mood-Erkennung) zu pflegen statt einer;
+  weicht vom etablierten Muster ab, in dem GOLDEN_CLOUDS und RED_SKY bewusst in derselben Funktion
+  leben; erzeugt tendenziell mehr Gesamtcode als Option A.
+- Aufwand: mittel.
+
+✅ **Bestätigt (Stephan, 2026-07-13):** Option A, sequenziert nach TASK-74. Morgen/Abend-Entscheidung
+(beide Richtungen) und interner Name (`RED_CLOUDS`/„Rote Wolken"/`rc_`) ebenfalls bestätigt, siehe
+Annahmen-Protokoll und Vorab-Verifikation oben. **Vor Implementierungsstart erneut prüfen:** Status
+von TASK-74 im Backlog (muss „Done" sein, siehe Pre-Mortem Szenario 5).
+
+---
+
+### Testplan (Schritt 6b)
+
+**Automatisiert (`backend/tests/test_us_132.py`, Marker `offline` + `regression`):**
+- Unit-Tests für `should_generate_red_clouds_event()`: ausgelöst bei negativer Sonnenhöhe + genug
+  hohen Wolken + Sonnenrichtung (Rule 1); nicht ausgelöst bei positiver Sonnenhöhe (Rule 2); nicht
+  ausgelöst außerhalb der Azimut-Toleranz (Rule 3); nicht ausgelöst bei hoher tiefer Bewölkung
+  trotz genug hoher Wolken (Rule 4); Grenzwert-Fälle (`sun_altitude == 0`, Azimut-Differenz exakt
+  30°) analog zum bestehenden `test_us113.py`-Muster.
+- Integrationstest für `_generate_cloud_mood_events()` mit synthetischem „Blaue Stunde"-Feed-Dict
+  (inkl. gesetztem Sonnenazimut, Pre-Mortem Szenario 2): Karte wird erzeugt/nicht erzeugt je nach
+  Wetterlage; Regressionstest, dass GOLDEN_CLOUDS/RED_SKY dabei unverändert bleiben (AK-7).
+
+**Manuell (nach Implementierung, Terminal-Fenster-Modell beachten):**
+1. Health-Check bestätigen (Server läuft, korrekte Version).
+2. `curl` gegen `/opportunities` mit einer Location, für die laut aktuellem Wetter in den nächsten
+   3 Tagen Cirrus-Wolken zur Blauen Stunde vorhergesagt sind — prüfen, ob eine „Rote Wolken"-Karte
+   erscheint (real abhängig vom Live-Wetter, ggf. nicht sofort beobachtbar — analog zu US-130 AK-1).
+3. Im Frontend: Filter-Sheet öffnen, „Rote Wolken" als eigenen Chip auswählen/abwählen, Detail-Sheet
+   einer erzeugten Karte öffnen und den Erklärungstext gegenlesen (unterscheidet sich sichtbar von
+   „Goldene Wolken"/„Himmelsröte").
+4. Regressionscheck: bestehende „Goldene Wolken"/„Himmelsröte"-Karten weiterhin wie gewohnt sichtbar
+   und mit unverändertem Text.
+
+---
+
+### TASK-74 · Refactoring: Lange Funktionen aufteilen (backend/main.py: _weather_overlay, _generate_cloud_mood_events) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-13 |
 
 **Beschreibung:** Zwei Funktionen in `backend/main.py` überschreiten durch die US-130-Erweiterung
@@ -13087,5 +13530,252 @@ gemeinsam verbessern, ist aber keine Voraussetzung.
 - `_weather_overlay()` Z. 674 — 98 Zeilen (Threshold: 80)
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (US-130, 2026-07-13)
+
+**Release-Hinweis (2026-07-13):** Implementierung, Test, unabhängige Verifikation und
+Refactor-Check sind abgeschlossen und bestanden — bereit fürs Release-Gate. Auf Stephans
+Entscheidung hin wird der Release zurückgestellt: `backend/main.py` enthält parallel dazu
+bereits unfertigen TASK-73-Code (`_weather_overlay_single()`, Aerosol-Parallel-Fetch). Beide
+Tickets werden gemeinsam released, sobald TASK-73 durch Test/Verifikation/Refactor-Check ist.
+Kein weiterer Schritt für TASK-74 nötig, bis TASK-73 startklar ist.
+
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`) — keine
+„Als.../möchte ich.../sodass..."-Story anwendbar, da kein Nutzererlebnis betroffen ist.
+
+**Scope:**
+- Eingeschlossen: `_generate_cloud_mood_events()` (Z. 559–647) und `_weather_overlay()`
+  (Z. 674–772) in `backend/main.py` werden durch Extraktion von Sub-Verantwortlichkeiten
+  in eigene, kleinere Helper-Funktionen aufgeteilt — ausschließlich innerhalb von
+  `backend/main.py` (kein Modul-Umzug).
+- Ausdrücklich ausgeschlossen: `_weather_overlay_single()` (Z. 775 ff., separates
+  US-106-Ticket-Thema, nicht Teil dieses Tickets), Änderungen an
+  `should_generate_golden_clouds_event()` / `should_generate_red_sky_event()` in
+  `calculations/weather.py`, jede Verhaltensänderung (Scores, Schwellwerte,
+  Beschreibungstexte, Job-Status-Logik).
+- Kein neues sichtbares App-Verhalten: reines internes Refactoring, Ergebnis ist für
+  Stephan in der App nicht bemerkbar — der Effekt zeigt sich ausschließlich im
+  `tools/refactor_check.py`-Report (verschwindet aus den „needs_ticket"-Findings) und
+  in der grünen bestehenden Testsuite.
+
+**Akzeptanzkriterien:**
+- [~] `python3 tools/refactor_check.py --report` listet für `backend/main.py` kein
+      `long_function`-Finding mehr für `_generate_cloud_mood_events` oder
+      `_weather_overlay` (beide Funktionen ≤ 80 Zeilen laut `node.end_lineno - node.lineno`).
+- [~] Keine neu extrahierte Helper-Funktion erzeugt ihrerseits ein neues
+      `long_function`-Finding (Report bleibt insgesamt clean bzgl. dieser beiden
+      Funktionen und ihrer Helfer).
+- [~] `_generate_cloud_mood_events(feed_cache)` behält exakt Signatur und Rückgabewert
+      (Tupel `(neue_events, zu_entfernende_ids)`) bei — bestehende Direktaufrufe in
+      `backend/tests/test_us109.py`, `test_us113.py`, `test_us130.py` laufen unverändert
+      und bleiben grün.
+- [~] `_weather_overlay()` behält exakt Signatur (`async def _weather_overlay() -> None`,
+      keine Parameter) bei — `backend/tests/test_bug77_weather_job_status.py` (alle 6
+      Testfälle) läuft unverändert grün, inkl. `monkeypatch.setattr(main,
+      "fetch_weather_forecast", ...)` und `monkeypatch.setattr(main,
+      "fetch_aerosol_forecast", ...)`, die weiterhin genau diese Modul-Attribute treffen
+      müssen (kein Verschieben der Fetch-Aufrufe in ein anderes Modul).
+- [~] Verhalten unverändert: GOLDEN_CLOUDS-Event wird weiterhin nur erzeugt, wenn
+      `should_generate_golden_clouds_event(gcs, sun_az, subject_az)` `True` liefert; das
+      auslösende Goldene-Stunde-Original-Event wird weiterhin per ID in
+      `zu_entfernende_ids` unterdrückt (AK-10-Regression aus US-109).
+- [~] Verhalten unverändert: RED_SKY-Beschreibungstext wählt weiterhin genau dann die
+      „Aerosol war Auslöser"-Variante, wenn `aod is not None and aod >= RED_SKY_AOD_THRESHOLD
+      and (cl + cm) < 60` — sonst bleibt der bisherige Wolken-Beschreibungstext
+      unverändert (US-130 AK-2-Regression).
+- [~] Verhalten unverändert: `_weather_overlay()` ruft für jede unique Location
+      weiterhin `fetch_weather_forecast(...)` und `fetch_aerosol_forecast(...)` parallel
+      via `asyncio.gather(..., return_exceptions=True)` auf; ein fehlgeschlagener
+      Aerosol-Abruf bleibt weiterhin nicht-fatal (fällt auf `aerosol_forecasts[key]`
+      unbesetzt / `None` zurück).
+- [~] Edge Case: leerer `_feed_cache` → `_weather_overlay()` beendet weiterhin sofort mit
+      `_job_done` ohne jeden Fetch-Aufruf (`test_empty_feed_cache_keeps_done_status`).
+- [~] Edge Case: keine Events in T+3 → `_weather_overlay()` beendet weiterhin ohne
+      Fetch-Aufruf (`test_no_near_events_keeps_done_status`).
+- [~] Edge Case: Teil- oder Totalausfall von Wetter- und/oder Aerosol-Abruf erzeugt
+      weiterhin denselben Fehlertext-Aufbau („Wetterdaten fehlgeschlagen für: …",
+      „Aerosoldaten fehlgeschlagen für: …", Kürzung auf 5 Namen + „…und N weitere") —
+      Regressionsschutz durch bestehende `test_partial_failure_*`- und
+      `test_total_failure_*`-Fälle.
+- [~] Alle bestehenden Tests der betroffenen Testdateien (`test_us109.py`,
+      `test_us113.py`, `test_us130.py`, `test_bug77_weather_job_status.py`,
+      `test_us106.py` soweit `_weather_overlay`/`_weather_overlay_single` berührt) laufen
+      unverändert (keine Testdatei-Anpassung nötig) und grün.
+
+**Pre-Mortem:**
+- 💀 Monkeypatch bricht: Fetch-Aufrufe (`fetch_weather_forecast`,
+  `fetch_aerosol_forecast`) werden versehentlich in eine neue Datei/Klasse statt in
+  einen main.py-internen Helper verschoben → `monkeypatch.setattr(main,
+  "fetch_weather_forecast", ...)` greift nicht mehr, Tests würden echte Netzwerk-Calls
+  auslösen oder mit Attribut-Fehlern crashen.
+  → Gegenmaßnahme: Helper bleiben zwingend in `backend/main.py` (Option A unten), keine
+  Modul-Migration. In AK explizit verankert.
+- 💀 Reihenfolge-Abhängigkeit beim Fetch-Helper: die anschließende Score-Aktualisierung
+  über `_feed_cache` braucht `loc_forecasts`/`aerosol_forecasts` aus dem Fetch-Schritt —
+  wird der Helper-Aufruf falsch platziert oder `near_events` nicht explizit übergeben
+  (sondern implizit aus einem globalen Zustand gelesen), kann die Reihenfolge im
+  Refactor unbemerkt vertauscht werden.
+  → Gegenmaßnahme: Fetch-Helper bekommt `near_events` als expliziten Parameter und gibt
+  `(loc_forecasts, aerosol_forecasts, failed_locations, failed_aerosol_locations)` als
+  Tupel zurück, keine impliziten Seiteneffekte auf Modul-Globals.
+- 💀 GOLDEN_CLOUDS/RED_SKY-Unabhängigkeit geht verloren: der bestehende Code prüft pro
+  Event BEIDE Bedingungen unabhängig voneinander (Kommentar „unabhängig von
+  GOLDEN_CLOUDS" Z. 614–615). Wird bei der Extraktion versehentlich ein `elif` oder ein
+  früher `continue` eingebaut, würde RED_SKY fälschlich übersprungen, sobald für
+  dasselbe Event schon ein GOLDEN_CLOUDS-Event erzeugt wurde.
+  → Gegenmaßnahme: Hauptschleife bleibt für beide Prüfungen zuständig und ruft beide
+  Helper immer beide auf (kein `elif`); durch bestehende US-109/US-113-Tests abgedeckt,
+  die Fälle mit beiden gleichzeitig zutreffenden Bedingungen prüfen.
+- 💀 Verlorene ID-Aggregation: wird die „Original unterdrücken"-Entscheidung
+  (`zu_entfernende_ids.add(e["id"])`) in einen Helper verschoben, der sie nicht klar
+  zurückgibt, könnte sie im Refactor vergessen werden.
+  → Gegenmaßnahme: GOLDEN_CLOUDS-Helper gibt explizit `(neues_event_oder_None)` zurück,
+  die Hauptschleife bleibt einzige Stelle, die `zu_entfernende_ids` befüllt — keine
+  Aggregation innerhalb des Helpers.
+- 💀 Stille Verhaltensänderung durch „Aufräumen": bei reinen Refactoring-Tickets besteht
+  die Versuchung, während der Extraktion kleine „Verbesserungen" mitzunehmen (z.B.
+  Schwellwerte anpassen). Das wäre Scope Creep und nicht durch dieses Ticket gedeckt.
+  → Gegenmaßnahme: AK „Verhalten unverändert" oben ist bewusst granular (pro Regel)
+  formuliert, damit jede Abweichung sofort auffällt; keine Verhaltensänderung ohne
+  separates Ticket.
+
+📎 Code-Verifikation: `backend/main.py` gelesen am 2026-07-13 (Z. 460–930).
+   Bestätigt: `_generate_cloud_mood_events` Z. 559–647 (88 Zeilen inkl. Docstring/Leerzeilen
+   laut `ast`-Zählung), `_weather_overlay` Z. 674–772 (98 Zeilen), direkt gefolgt von
+   `_weather_overlay_single` Z. 775 (separate Funktion, nicht Teil des Tickets).
+   Bestätigt: `tools/refactor_check.py` zählt `node.end_lineno - node.lineno` je
+   `FunctionDef`/`AsyncFunctionDef` gegen `LONG_FN_THRESHOLD = 80` (Z. 49, 115–117);
+   `LONG_FN_ALLOWLIST` (Z. 56–60) enthält aktuell keine Ausnahme für diese beiden
+   Funktionen.
+   Bestätigt: `backend/tests/test_bug77_weather_job_status.py` patcht
+   `main.fetch_weather_forecast` und `main.fetch_aerosol_forecast` direkt (Z. 68, 121,
+   147, 170, 195, 221) und ruft `main._weather_overlay()` ohne Parameter auf (Z. 124,
+   150, 173, 198, 223, 233) — Signatur- und Modul-Stabilität sind daher harte
+   Testvoraussetzung, keine Kann-Empfehlung.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (entfällt inhaltlich — reines technisches
+      Refactoring ohne Verhaltens-/UX-Entscheidungsspielraum; Annahmen-Protokoll ergab
+      keine 🔴-kritischen offenen Fragen, siehe Scope-Abschnitt)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, siehe oben)
+- [x] Architektur analysiert: `backend/main.py` (Z. 460–930, betroffene Funktionen +
+      direkter Kontext), `tools/refactor_check.py` (Threshold-Mechanik),
+      `backend/tests/test_us109.py`, `test_us113.py`, `test_us130.py`,
+      `test_bug77_weather_job_status.py` (bestehende Regressionsabdeckung)
+- [x] Designer-Check: nicht visuell (reines Backend-Refactoring) → übersprungen
+- [ ] Implementierungsoptionen: A / B / C (siehe unten)
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Verantwortungs-basierte Funktions-Extraktion innerhalb main.py (empfohlen)
+- Vorgehen:
+  - `_generate_cloud_mood_events()`: pro Event die Eingangswerte (`gcs`, `wd`, `cl`, `cm`,
+    `aod`, `sun_az`, `subject_az`) in einen kleinen Helper `_cloud_mood_inputs(e)`
+    auslagern (gibt `None` zurück, wenn Event nicht eligible ist); Bau des
+    GOLDEN_CLOUDS-Event-Dicts in `_build_golden_clouds_event(e)`; Bau des
+    RED_SKY-Event-Dicts inkl. der US-130-Text-Verzweigung in
+    `_build_red_sky_event(e, aod, cl, cm, sun_az, subject_az)`. Die Hauptfunktion bleibt
+    für Schleife + Aggregation (`neue_events`, `zu_entfernende_ids`) zuständig.
+  - `_weather_overlay()`: den kompletten Fetch-Block (unique Locations sammeln, pro
+    Location `asyncio.gather(fetch_weather_forecast, fetch_aerosol_forecast)`,
+    Fehlerlisten führen) in `async def _fetch_weather_and_aerosol(near_events) ->
+    tuple[dict, dict, list, list]` auslagern; den Fehlertext-Aufbau („Wetterdaten
+    fehlgeschlagen für…") in `_build_weather_error_message(failed_locations,
+    failed_aerosol_locations) -> str | None` auslagern. Beide Helfer bleiben in
+    `backend/main.py`, sodass `fetch_weather_forecast`/`fetch_aerosol_forecast`
+    weiterhin als Modul-Attribute von `main` aufgerufen werden.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: löst exakt die zwei US-130-Erweiterungspunkte (paralleler Aerosol-Fetch,
+  Dunst-Textzweig), die den Threshold gerissen haben; kein Risiko für
+  Monkeypatch-basierte Tests (kein Modul-Wechsel); Helper sind einzeln testbar, falls
+  später gewünscht; kleinster, am besten nachvollziehbarer Diff.
+- Nachteile / Risiken: etwas mehr Funktionen in `main.py` (aktuell ohnehin sehr groß) —
+  löst das allgemeine „main.py ist groß"-Problem nicht strukturell.
+- Aufwand: klein.
+
+### Option B — Eigenes Helper-Modul (z. B. `backend/cloud_mood.py`, `backend/weather_overlay.py`)
+- Vorgehen: dieselbe Verantwortungs-Aufteilung wie Option A, aber die Helper-Funktionen
+  wandern in neue Module; `main.py` importiert und ruft sie auf.
+- Betroffene Dateien: neue Dateien `backend/cloud_mood.py` und/oder
+  `backend/weather_overlay.py`, Änderungen an `backend/main.py` (Imports),
+  ggf. Anpassung von `tools/refactor_check.py` `BACKEND_FILES`-Liste (neue Dateien sonst
+  nicht mitgeprüft).
+- Vorteile: reduziert `main.py`-Gesamtgröße strukturell, nicht nur pro Funktion; passt
+  zum bestehenden Muster (`calculations/`, `discover/`).
+- Nachteile / Risiken: **hohes Testbruch-Risiko** — wandern die
+  `fetch_weather_forecast`/`fetch_aerosol_forecast`-Aufrufe in ein neues Modul, treffen
+  bestehende `monkeypatch.setattr(main, "fetch_weather_forecast", ...)`-Patches nicht
+  mehr automatisch (Python löst den Funktionsnamen zur Aufrufzeit im aufrufenden Modul
+  auf); alle betroffenen Tests müssten mit umgezogen/angepasst werden — das widerspricht
+  dem Ziel „Verhalten und Tests unverändert" und ist für ein Low-Priority-Refactoring
+  unverhältnismäßig teuer.
+- Aufwand: mittel bis groß.
+
+### Option C — Nur den US-130-Zusatz als eigene Helper-Funktion auslagern (Minimal-Diff)
+- Vorgehen: ausschließlich den durch US-130 neu hinzugekommenen Code auslagern (den
+  parallelen Aerosol-Fetch-Block in `_weather_overlay()` und die
+  Aerosol-Text-Verzweigung in `_generate_cloud_mood_events()`), der Rest bleibt wie er
+  ist.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: kleinster denkbarer Diff, sehr risikoarm.
+- Nachteile / Risiken: bringt beide Funktionen nicht zuverlässig unter 80 Zeilen (der
+  GOLDEN_CLOUDS-Teil in `_generate_cloud_mood_events` und der Score-Update-/Fehlertext-Teil
+  in `_weather_overlay` sind bereits vor US-130 substanziell und tragen ebenfalls zur
+  Länge bei) — würde das AK „≤ 80 Zeilen" ggf. nicht erfüllen und eine zweite
+  Nacharbeitsrunde erfordern.
+- Aufwand: klein, aber mit Restrisiko einer zweiten Iteration.
+
+✅ **Empfehlung: Option A** — löst das Ticket vollständig (beide Funktionen sicher unter
+dem Threshold, mit Marge statt knapp bei 79), hält das Monkeypatch-Risiko aus Option B
+fern und vermeidet das Nacharbeits-Risiko aus Option C. Passt außerdem exakt zur
+Beschreibung im Ticket („Aufteilen entlang der US-130-Erweiterung als eigene
+Helper-Funktion"), geht aber einen Schritt weiter und trennt zusätzlich die bereits vor
+US-130 bestehenden Verantwortlichkeiten sauber, damit der Threshold mit Sicherheitsmarge
+unterschritten wird.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): keine neuen Testfälle erforderlich — Regressionsschutz
+      läuft vollständig über die bestehenden Tests, die gegen die unveränderte
+      öffentliche Signatur/Rückgabe testen (Marker `offline`, `regression` bereits
+      gesetzt in den jeweiligen Dateien):
+      - `backend/tests/test_us109.py` (GOLDEN_CLOUDS/RED_SKY-Basisverhalten)
+      - `backend/tests/test_us113.py` (Sichtachsen-Filter)
+      - `backend/tests/test_us130.py` (Aerosol-/Dunst-Zweig)
+      - `backend/tests/test_bug77_weather_job_status.py` (Job-Status, Monkeypatch von
+        `fetch_weather_forecast`/`fetch_aerosol_forecast`, alle 6 Fälle)
+      - `backend/tests/test_us106.py` (soweit `_weather_overlay`/`_weather_overlay_single`
+        berührt)
+      Nach der Implementierung: `pytest backend/tests/ -k "us109 or us113 or us130 or
+      bug77 or us106"` muss unverändert grün bleiben, zusätzlich vollständiger
+      Regressionslauf gemäß Memory `feedback_regression_testing`.
+      Zusätzlich `python3 tools/refactor_check.py --report` ausführen und prüfen, dass
+      `_generate_cloud_mood_events`/`_weather_overlay` nicht mehr in `needs_ticket`
+      auftauchen.
+- [ ] Manuell: kein sichtbares App-Verhalten betroffen — kein manueller Browser-Test
+      nötig; stattdessen lokalen Server einmal starten und `/health` + einen
+      Feed-Abruf prüfen, um einen Importfehler durch die Umbenennung/Extraktion
+      auszuschließen (Regressions-Matrix `PRODUCT.md` Sektion 12: Backend-Ticket ohne
+      Response-Feld-Änderung → Basis-Smoke-Check reicht).
+
+**Umsetzungsvermerk (Implementierung, Option A umgesetzt):**
+- `_cloud_mood_inputs(e)` — prüft Eligibility pro Event, gibt `(gcs, wd, cl, cm, aod,
+  sun_az, subject_az)` oder `None` zurück.
+- `_build_golden_clouds_event(e)` — baut das GOLDEN_CLOUDS-Event-Dict oder `None`.
+- `_build_red_sky_event(e, aod, cl, cm, sun_az, subject_az)` — baut das RED_SKY-Event-Dict
+  inkl. US-130-Text-Verzweigung oder `None`.
+- `_generate_cloud_mood_events(feed_cache)` — nur noch Schleife + Aggregation
+  (`neue_events`, `zu_entfernende_ids`), ruft beide Builder unabhängig auf (kein `elif`).
+- `_fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, list, list]` — kompletter
+  Fetch-Block (unique Locations, paralleles `asyncio.gather`, Fehlerlisten).
+- `_build_weather_error_message(failed_locations, failed_aerosol_locations) -> str | None`
+  — Fehlertext-Aufbau, `None` wenn kein Fehler.
+- `_weather_overlay()` — unverändertes Signatur/Verhalten, ruft beide Helper auf.
+- Ergebnis `tools/refactor_check.py --report`: `_generate_cloud_mood_events` und
+  `_weather_overlay` tauchen nicht mehr in `needs_ticket` auf; keine neue Helper-Funktion
+  über dem Threshold. Verbleibende 4 Findings (`startup`, `patch_location`,
+  `_run_single_location_flow`, `mkCloudCompassSvg`) sind unabhängig von diesem Ticket.
+- Testlauf `pytest tests/ -k "us109 or us113 or us130 or bug77 or us106"`: 75 passed,
+  1 skipped (playwright fehlt in Sandbox, unabhängig von diesem Ticket), 0 rot.
+- Betroffene Datei: `backend/main.py` (einzige geänderte Datei).
 
 ---
