@@ -529,10 +529,44 @@ def _apply_weather_to_event(
     if not w_at:
         return False
 
-    w_score = calculate_photo_weather_score(w_at)
+    w_score, gcs = _weather_score_with_golden_bonus(e.get("event_type", ""), w_at)
 
-    # US-07: Golden Cloud Score nur für Goldene Stunde berechnen
-    event_type = e.get("event_type", "")
+    e["weather_score"]     = round(w_score, 3)
+    e["overall_score"]     = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
+    e["golden_cloud_score"] = round(gcs, 3) if gcs is not None else None
+    e["weather_description"] = wmo_code_to_description(w_at.weather_code) if hasattr(w_at, "weather_code") else ""
+    e["weather_details"] = _build_weather_details_dict(w_at, aerosol_forecast, shoot_dt)
+
+    # US-131 (AK-8/9/11): entkoppelte Wolkenwerte GOLDEN_CLOUDS/RED_SKY — je eigener
+    # Forecast-Parameter, keine geteilten Zwischenvariablen (Pre-Mortem TASK-76).
+    gcs_sun_dir, cl_sun_dir, cm_sun_dir = _directional_cloud_values(sun_dir_forecast, shoot_dt)
+    gcs_antisolar_dir, cl_antisolar_dir, cm_antisolar_dir = _directional_cloud_values(antisolar_dir_forecast, shoot_dt)
+
+    e["golden_cloud_score_sun_dir"] = gcs_sun_dir
+    e["cl_sun_dir"] = cl_sun_dir
+    e["cm_sun_dir"] = cm_sun_dir
+    e["golden_cloud_score_antisolar_dir"] = gcs_antisolar_dir
+    e["cl_antisolar_dir"] = cl_antisolar_dir
+    e["cm_antisolar_dir"] = cm_antisolar_dir
+
+    e["weather_status"] = "ok"
+    return True
+
+
+def _weather_score_with_golden_bonus(event_type: str, w_at) -> tuple:
+    """
+    TASK-76 (aus _apply_weather_to_event extrahiert): Foto-Wetter-Score plus
+    optionaler Golden-Cloud-Score-Bonus für die Goldene Stunde (Fotografen-
+    Standort-Werte aus `w_at`) — unverändert von den Sonnenrichtungs-/
+    Gegenrichtungs-Werten aus _directional_cloud_values().
+
+    US-07: Bonus auf weather_score wenn gcs >= 0.7 (+5 Pp, gedeckelt bei 1.0).
+    Nur +5 (nicht +10) wegen Cirrus-Doppelbewertung mit calculate_photo_weather_score.
+    gcs bleibt None außerhalb der Goldenen Stunde.
+
+    Gibt zurück: (w_score, gcs)
+    """
+    w_score = calculate_photo_weather_score(w_at)
     golden_hour_types = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
     if event_type in golden_hour_types:
         gcs = calculate_golden_cloud_score(
@@ -540,18 +574,25 @@ def _apply_weather_to_event(
             w_at.cloud_cover_mid_pct,
             w_at.cloud_cover_high_pct,
         )
-        # Bonus auf weather_score wenn gcs >= 0.7 (+5 Pp, gedeckelt bei 1.0)
-        # Nur +5 (nicht +10) wegen Cirrus-Doppelbewertung mit calculate_photo_weather_score
         if gcs >= 0.7:
             w_score = min(1.0, w_score + 0.05)
     else:
         gcs = None
+    return w_score, gcs
 
-    e["weather_score"]     = round(w_score, 3)
-    e["overall_score"]     = round(e["astronomy_score"] * 0.65 + w_score * 0.35, 3)
-    e["golden_cloud_score"] = round(gcs, 3) if gcs is not None else None
-    e["weather_description"] = wmo_code_to_description(w_at.weather_code) if hasattr(w_at, "weather_code") else ""
-    e["weather_details"] = {
+
+def _build_weather_details_dict(w_at, aerosol_forecast: object, shoot_dt: datetime) -> dict:
+    """
+    TASK-76 (aus _apply_weather_to_event extrahiert): Baut das weather_details-Dict
+    für ein Event (Fotografen-Standort-Wetterwerte aus `w_at`) inkl.
+    aerosol_optical_depth.
+
+    US-130: Aerosol-Optische-Dicke (Dunst-Signal) — None wenn kein Abruf/kein
+    Datenpunkt verfügbar (AK-5, kein Fehler dadurch). US-131: seit Option B am
+    Gegenrichtungs-/Antisolar-projizierten Punkt abgefragt (`aerosol_forecast`),
+    nicht mehr am Fotografen-Standort.
+    """
+    details = {
         "temperature_c":        round(w_at.temperature_c, 1),
         "precipitation_prob_pct": round(w_at.precipitation_prob_pct),
         "precipitation_mm":     round(w_at.precipitation_mm, 1),
@@ -563,51 +604,36 @@ def _apply_weather_to_event(
         "wind_direction_deg":   round(w_at.wind_direction_deg),
         "visibility_m":         round(w_at.visibility_m),
     }
-    # US-130: Aerosol-Optische-Dicke (Dunst-Signal) — None wenn kein Abruf/kein Datenpunkt
-    # verfügbar (AK-5, kein Fehler dadurch). US-131: seit Option B am Gegenrichtungs-/
-    # Antisolar-projizierten Punkt abgefragt, nicht mehr am Fotografen-Standort.
     aod_value = None
     if aerosol_forecast is not None:
         a_at = aerosol_forecast.get_at(shoot_dt)
         if a_at is not None and a_at.aerosol_optical_depth is not None:
             aod_value = round(a_at.aerosol_optical_depth, 3)
-    e["weather_details"]["aerosol_optical_depth"] = aod_value
+    details["aerosol_optical_depth"] = aod_value
+    return details
 
-    # US-131 (Option B, AK-8/AK-9): entkoppelte Wolkenwerte für GOLDEN_CLOUDS
-    # (Sonnenrichtung) und RED_SKY (Gegenrichtung/Antisolarpunkt) — jeweils aus dem
-    # Wetter-Forecast am zugehörigen projizierten Punkt, unabhängig vom
-    # Fotografen-Standort-basierten golden_cloud_score oben. None, wenn der jeweilige
-    # Fetch fehlgeschlagen ist oder kein Datenpunkt zum Aufnahmezeitpunkt existiert
-    # (AK-11: kein Fallback auf den Fotografen-Standort-Wert).
-    gcs_sun_dir = cl_sun_dir = cm_sun_dir = None
-    if sun_dir_forecast is not None:
-        w_sun = sun_dir_forecast.get_at(shoot_dt)
-        if w_sun is not None:
-            gcs_sun_dir = calculate_golden_cloud_score(
-                w_sun.cloud_cover_low_pct, w_sun.cloud_cover_mid_pct, w_sun.cloud_cover_high_pct,
-            )
-            cl_sun_dir = w_sun.cloud_cover_low_pct
-            cm_sun_dir = w_sun.cloud_cover_mid_pct
 
-    gcs_antisolar_dir = cl_antisolar_dir = cm_antisolar_dir = None
-    if antisolar_dir_forecast is not None:
-        w_anti = antisolar_dir_forecast.get_at(shoot_dt)
-        if w_anti is not None:
-            gcs_antisolar_dir = calculate_golden_cloud_score(
-                w_anti.cloud_cover_low_pct, w_anti.cloud_cover_mid_pct, w_anti.cloud_cover_high_pct,
-            )
-            cl_antisolar_dir = w_anti.cloud_cover_low_pct
-            cm_antisolar_dir = w_anti.cloud_cover_mid_pct
+def _directional_cloud_values(dir_forecast: object, shoot_dt: datetime) -> tuple:
+    """
+    TASK-76 (aus _apply_weather_to_event extrahiert): Berechnet
+    (golden_cloud_score, cl, cm) für EINEN projizierten Punkt (Sonnenrichtung ODER
+    Gegenrichtung/Antisolarpunkt) — für beide Richtungen separat mit jeweils
+    eigenem `dir_forecast`-Parameter aufgerufen (US-131 AK-11: keine geteilten
+    Zwischenvariablen zwischen den beiden Aufrufen, siehe Pre-Mortem TASK-76).
 
-    e["golden_cloud_score_sun_dir"] = round(gcs_sun_dir, 3) if gcs_sun_dir is not None else None
-    e["cl_sun_dir"] = round(cl_sun_dir) if cl_sun_dir is not None else None
-    e["cm_sun_dir"] = round(cm_sun_dir) if cm_sun_dir is not None else None
-    e["golden_cloud_score_antisolar_dir"] = round(gcs_antisolar_dir, 3) if gcs_antisolar_dir is not None else None
-    e["cl_antisolar_dir"] = round(cl_antisolar_dir) if cl_antisolar_dir is not None else None
-    e["cm_antisolar_dir"] = round(cm_antisolar_dir) if cm_antisolar_dir is not None else None
-
-    e["weather_status"] = "ok"
-    return True
+    Gibt (None, None, None) zurück, wenn kein Forecast vorhanden ist oder kein
+    Datenpunkt zum Aufnahmezeitpunkt existiert — kein Fallback auf einen anderen
+    Wert.
+    """
+    if dir_forecast is None:
+        return None, None, None
+    w = dir_forecast.get_at(shoot_dt)
+    if w is None:
+        return None, None, None
+    gcs = calculate_golden_cloud_score(
+        w.cloud_cover_low_pct, w.cloud_cover_mid_pct, w.cloud_cover_high_pct,
+    )
+    return round(gcs, 3), round(w.cloud_cover_low_pct), round(w.cloud_cover_mid_pct)
 
 
 _GOLDEN_HOUR_TYPES = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
@@ -992,7 +1018,7 @@ US-131 2. Nachtrag: Zusätzlich zur Nebenläufigkeits-Begrenzung (s.
 WEATHER_API_MAX_CONCURRENT_REQUESTS) erzwingt dieser Wert einen Mindestabstand
 zwischen zwei tatsächlichen API-Calls in DEMSELBEN Semaphore-Slot: Nach jedem
 Abschluss (Erfolg ODER Fehler) von fetch_weather_forecast()/fetch_aerosol_forecast()
-wartet _run_one() diese Zeit, BEVOR die Semaphore wieder freigegeben wird — so kann
+wartet _run_one_weather_fetch() diese Zeit, BEVOR die Semaphore wieder freigegeben wird — so kann
 ein frei gewordener Slot nicht sofort wieder feuern.
 
 Konservativer Startwert (KEIN verifiziertes exaktes Open-Meteo-Rate-Limit, da ohne
@@ -1038,7 +1064,33 @@ async def _fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dic
     antisolar_dir_forecasts, failed_locations, failed_aerosol_locations,
     failed_sun_dir_locations, failed_antisolar_dir_locations)
     """
-    # (kind, key, lat, lon, location_name) je geplantem Abruf, dedupliziert pro Art+Koordinate.
+    tasks_meta = _plan_weather_fetch_tasks(near_events)
+
+    # US-131 Nachtrag: Drosselt die Anzahl GLEICHZEITIG laufender externer Requests
+    # (s. WEATHER_API_MAX_CONCURRENT_REQUESTS) — asyncio.gather() plant weiterhin
+    # ALLE Calls ein, das Semaphore lässt aber nie mehr als die konfigurierte
+    # Obergrenze tatsächlich parallel gegen die Open-Meteo-API laufen. Zusätzliches
+    # zeitliches Pacing (s. _run_one_weather_fetch()) erzwingt einen Mindestabstand
+    # zwischen zwei Calls in DEMSELBEN Slot (WEATHER_API_REQUEST_PACING_SECONDS).
+    semaphore = asyncio.Semaphore(WEATHER_API_MAX_CONCURRENT_REQUESTS)
+
+    results = await asyncio.gather(
+        *[_run_one_weather_fetch(kind, lat, lon, semaphore) for (kind, _key, lat, lon, _name) in tasks_meta],
+        return_exceptions=True,
+    )
+
+    return _collect_weather_fetch_results(tasks_meta, results)
+
+
+def _plan_weather_fetch_tasks(near_events) -> list:
+    """
+    TASK-76 (aus _fetch_weather_and_aerosol extrahiert): Plant die abzurufenden
+    Wetter-/Aerosol-/Richtungs-Tasks für `near_events`, dedupliziert pro
+    Art+Koordinate.
+
+    Gibt tasks_meta zurück: Liste aus (kind, key, lat, lon, location_name) je
+    geplantem Abruf.
+    """
     tasks_meta: list = []
     seen: dict = {"weather": set(), "aerosol": set(), "sun_dir": set(), "antisolar_dir": set()}
 
@@ -1064,40 +1116,49 @@ async def _fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dic
             seen["aerosol"].add(anti_key)
             tasks_meta.append(("aerosol", anti_key, anti_lat, anti_lon, e["location_name"]))
 
-    # US-131 Nachtrag: Drosselt die Anzahl GLEICHZEITIG laufender externer Requests
-    # (s. WEATHER_API_MAX_CONCURRENT_REQUESTS) — asyncio.gather() plant weiterhin
-    # ALLE Calls ein, das Semaphore lässt aber nie mehr als die konfigurierte
-    # Obergrenze tatsächlich parallel gegen die Open-Meteo-API laufen.
-    #
-    # US-131 2. Nachtrag: Semaphore allein reichte laut 2. Live-Messung nicht (s.
-    # WEATHER_API_REQUEST_PACING_SECONDS) — zusätzliches zeitliches Pacing erzwingt
-    # einen Mindestabstand zwischen zwei Calls in DEMSELBEN Slot, damit ein frei
-    # gewordener Slot nicht sofort wieder feuert.
-    semaphore = asyncio.Semaphore(WEATHER_API_MAX_CONCURRENT_REQUESTS)
+    return tasks_meta
 
-    async def _run_one(kind: str, lat: float, lon: float):
-        async with semaphore:
-            try:
-                if kind == "aerosol":
-                    return await fetch_aerosol_forecast(lat, lon, days=7)
-                return await fetch_weather_forecast(lat, lon, days=7)
-            finally:
-                # US-131 2. Nachtrag: Pacing gilt für Erfolg UND Fehlschlag — ein
-                # fehlgeschlagener Call zählt bei der externen API ebenfalls als
-                # Request und soll den Slot nicht sofort wieder freigeben.
-                await asyncio.sleep(WEATHER_API_REQUEST_PACING_SECONDS)
 
-    results = await asyncio.gather(
-        *[_run_one(kind, lat, lon) for (kind, _key, lat, lon, _name) in tasks_meta],
-        return_exceptions=True,
-    )
+async def _run_one_weather_fetch(kind: str, lat: float, lon: float, semaphore: "asyncio.Semaphore"):
+    """
+    TASK-76 (aus _fetch_weather_and_aerosol._run_one extrahiert): Führt EINEN
+    Wetter-/Aerosol-Fetch gedrosselt über `semaphore` aus (explizit als Parameter,
+    nicht als Closure — Pre-Mortem TASK-76: die try/finally-Pacing-Struktur bleibt
+    dabei unverändert 1:1 erhalten).
 
-    loc_forecasts: dict = {}
-    aerosol_forecasts: dict = {}  # US-130/US-131: jetzt am Gegenrichtungs-/Antisolarpunkt
+    US-131 2. Nachtrag: Der `finally`-Block pausiert IMMER um
+    WEATHER_API_REQUEST_PACING_SECONDS — bei Erfolg UND bei Fehlschlag — bevor die
+    Semaphore wieder freigegeben wird, damit ein frei gewordener Slot nicht sofort
+    wieder feuert. Ein fehlgeschlagener Call zählt bei der externen API ebenfalls
+    als Request.
+    """
+    async with semaphore:
+        try:
+            if kind == "aerosol":
+                return await fetch_aerosol_forecast(lat, lon, days=7)
+            return await fetch_weather_forecast(lat, lon, days=7)
+        finally:
+            await asyncio.sleep(WEATHER_API_REQUEST_PACING_SECONDS)
+
+
+def _collect_weather_fetch_results(tasks_meta, results) -> tuple:
+    """
+    TASK-76 (aus _fetch_weather_and_aerosol extrahiert): Ordnet die
+    asyncio.gather-Ergebnisse `results` anhand von `tasks_meta` (per zip, gleiche
+    Reihenfolge/Liste wie beim gather-Aufruf — Pre-Mortem TASK-76: sonst werden
+    Ergebnisse falschen Locations/Kinds zugeordnet) den passenden
+    Forecast-Dicts/Fehl-Listen zu.
+
+    Gibt zurück: (loc_forecasts, aerosol_forecasts, sun_dir_forecasts,
+    antisolar_dir_forecasts, failed_locations, failed_aerosol_locations,
+    failed_sun_dir_locations, failed_antisolar_dir_locations)
+    """
+    loc_forecasts: dict = {}  # Fotografen-Standort-Wetter
+    aerosol_forecasts: dict = {}  # US-130/US-131: am Gegenrichtungs-/Antisolarpunkt
     sun_dir_forecasts: dict = {}  # US-131: Wetter in Sonnenrichtung (GOLDEN_CLOUDS)
     antisolar_dir_forecasts: dict = {}  # US-131: Wetter in Gegenrichtung (RED_SKY)
-    failed_locations: list = []  # BUG-77: Namen der Locations mit fehlgeschlagenem Wetter-Abruf
-    failed_aerosol_locations: list = []  # US-130: Namen der Locations mit fehlgeschlagenem Aerosol-Abruf
+    failed_locations: list = []  # BUG-77: fehlgeschlagener Wetter-Abruf
+    failed_aerosol_locations: list = []  # US-130: fehlgeschlagener Aerosol-Abruf
     failed_sun_dir_locations: list = []  # US-131: fehlgeschlagener Wolken-Abruf Sonnenrichtung
     failed_antisolar_dir_locations: list = []  # US-131: fehlgeschlagener Wolken-Abruf Gegenrichtung
 
@@ -2967,6 +3028,16 @@ def _delete_location_image_file(filename: Optional[str]) -> None:
         logger.warning("Konnte altes Beispielbild nicht löschen (%s): %s", filename, exc)
 
 
+def _delete_location_qa_data(loc_id: str) -> None:
+    """TASK-77: Entfernt QA-Zustand/-Werte einer gelöschten Location (best effort,
+    gleiches Muster wie _delete_location_image_file — schlägt der Aufruf fehl,
+    wird nur gewarnt, der restliche Löschvorgang bleibt unberührt)."""
+    try:
+        _store.delete_qa(loc_id)
+    except Exception as exc:
+        logger.warning("Konnte QA-Daten nicht entfernen (%s): %s", loc_id, exc)
+
+
 @app.post("/locations/{loc_id}/image")
 async def upload_location_image(
     loc_id: str,
@@ -3239,6 +3310,10 @@ async def delete_location(loc_id: str, _role: str = Depends(auth.require_host)) 
     else:
         # Standard-Location: Tombstone damit der Neustart sie herausfiltert
         _store.upsert_override(loc_id, deleted=True)
+
+    # TASK-77: QA-Zustand/-Werte für beide Löscharten gemeinsam bereinigen
+    # (best effort, siehe _delete_location_qa_data — blockiert den Löschvorgang nicht)
+    _delete_location_qa_data(loc_id)
 
     # Aus In-Memory-Liste entfernen
     LOCATIONS[:] = [l for l in LOCATIONS if l.id != loc_id]

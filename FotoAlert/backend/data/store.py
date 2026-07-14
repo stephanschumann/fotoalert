@@ -293,6 +293,27 @@ class LocationStore:
                 conn.execute("ROLLBACK")
                 raise
 
+    def delete_qa(self, loc_id: str) -> None:
+        """
+        TASK-77: Löscht QA-Zustand und QA-Werte einer Location (beide Tabellen,
+        eine Transaktion). Gilt für Custom UND Standard Locations gleichermaßen.
+        Kein Fehler, wenn keine Zeilen existieren (rowcount == 0 ist ok).
+        """
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                conn.execute(
+                    "DELETE FROM location_qa_state WHERE location_id = ?", (loc_id,)
+                )
+                conn.execute(
+                    "DELETE FROM location_qa_values WHERE location_id = ?", (loc_id,)
+                )
+                conn.execute("COMMIT")
+                logger.info("QA-Daten gelöscht für %s", loc_id)
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+
     def load_all_custom(self) -> list[dict]:
         """Lädt alle Custom Locations als Liste von dicts (für Startup-Load)."""
         with self._connect() as conn:

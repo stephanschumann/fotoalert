@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-77** *(Implementierung Option B startet)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-77** *(Test von Stephan bestätigt inkl. Option B manuell verifiziert, Verifikation/Refactor läuft)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, refactor_check clean, 106/106 Tests grün — wartet auf Bestätigung)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-76** *(Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` in backend/main.py, US-131-Refactor-Check)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -10214,13 +10214,13 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 ---
 
-### TASK-76 · Refactoring: Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` aufteilen (backend/main.py) `[ ]`
+### TASK-76 · Refactoring: Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` aufteilen (backend/main.py) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-14 |
 
 **Beschreibung:** `refactor_check.py` meldet nach US-131 zwei lange Funktionen in `backend/main.py`:
@@ -10246,6 +10246,266 @@ US-131-Release stehen und ein strukturelles Aufteilen ohne separaten Testlauf
 ein unnötiges Regressionsrisiko wäre. Kein Verhaltensumbau — reine Struktur.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (US-131, 2026-07-14)
+
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`), analoges Muster zu
+**TASK-74** — keine „Als.../möchte ich.../sodass..."-Story anwendbar, da kein
+Nutzererlebnis betroffen ist.
+
+**Scope:**
+- Eingeschlossen: `_apply_weather_to_event()` (Z. 475–610, 136 Zeilen) und
+  `_fetch_weather_and_aerosol()` (Z. 1010–1135, 126 Zeilen) in `backend/main.py` werden
+  durch Extraktion von Sub-Verantwortlichkeiten in eigene, kleinere Helper-Funktionen
+  aufgeteilt — ausschließlich innerhalb von `backend/main.py` (kein Modul-Umzug), analog
+  zum bereits umgesetzten Muster aus TASK-74.
+- Ausdrücklich ausgeschlossen: `_weather_overlay()`/`_weather_overlay_single()` selbst
+  (bereits durch TASK-74 aufgeteilt, hier nur als Aufrufer betroffen),
+  `_cloud_mood_projection_points()`, `_lookup_projected_forecasts()`,
+  `_generate_cloud_mood_events()`, `_build_golden_clouds_event()`/`_build_red_sky_event()`
+  (alle bereits eigenständige, unter dem Threshold liegende Funktionen aus TASK-74/US-131
+  — nicht Teil dieses Tickets), jede Verhaltensänderung (Scores, Schwellwerte,
+  Pacing-/Semaphore-Werte, Beschreibungstexte, Fehlertext-Aufbau).
+- Kein neues sichtbares App-Verhalten: reines internes Refactoring, Ergebnis ist für
+  Stephan in der App nicht bemerkbar — der Effekt zeigt sich ausschließlich im
+  `tools/refactor_check.py`-Report (verschwindet aus den „needs_ticket"-Findings) und in
+  der grünen bestehenden Testsuite.
+
+**Akzeptanzkriterien:**
+- [x] `python3 tools/refactor_check.py --report` listet für `backend/main.py` kein
+      `long_function`-Finding mehr für `_apply_weather_to_event` oder
+      `_fetch_weather_and_aerosol` (beide ≤ 80 Zeilen laut `node.end_lineno - node.lineno`).
+- [x] Keine neu extrahierte Helper-Funktion erzeugt ihrerseits ein neues
+      `long_function`-Finding (Report bleibt insgesamt clean bzgl. dieser beiden
+      Funktionen und ihrer Helfer).
+- [x] `_apply_weather_to_event(e, forecast, now_utc, cutoff, aerosol_forecast=None,
+      sun_dir_forecast=None, antisolar_dir_forecast=None) -> bool` behält exakt Signatur
+      und Rückgabewert bei — beide bestehenden Aufrufer (`_weather_overlay()` Z. 1231,
+      `_weather_overlay_single()` Z. 1295/1321) laufen unverändert mit denselben
+      Positions-/Keyword-Argumenten.
+- [x] `_fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dict, list, list,
+      list, list]` behält exakt Signatur und den 8-Tupel-Rückgabewert (`loc_forecasts,
+      aerosol_forecasts, sun_dir_forecasts, antisolar_dir_forecasts, failed_locations,
+      failed_aerosol_locations, failed_sun_dir_locations, failed_antisolar_dir_locations`)
+      bei.
+- [x] `fetch_weather_forecast`/`fetch_aerosol_forecast` werden weiterhin als
+      `main.fetch_weather_forecast`/`main.fetch_aerosol_forecast` aufgerufen (kein
+      Modul-Wechsel) — bestehende `monkeypatch.setattr(main, "fetch_weather_forecast", ...)`
+      / `monkeypatch.setattr(main, "fetch_aerosol_forecast", ...)`-Patches in
+      `test_us130.py`, `test_us131.py` und `test_bug77_weather_job_status.py` greifen
+      unverändert.
+- [x] Verhalten unverändert: der Pacing-Sleep (`WEATHER_API_REQUEST_PACING_SECONDS`) läuft
+      weiterhin nach JEDEM Fetch-Call, egal ob erfolgreich oder fehlgeschlagen
+      (`try`/`finally`-Struktur erhalten) — Regressionsschutz durch
+      `test_nachtrag_pacing_gilt_auch_bei_fehlgeschlagenem_fetch` und
+      `test_nachtrag_pacing_gilt_auch_im_fastpath` (`test_us131.py`).
+- [x] Verhalten unverändert: das Semaphore (`WEATHER_API_MAX_CONCURRENT_REQUESTS`)
+      begrenzt weiterhin die tatsächlich gleichzeitig laufenden Requests über alle Kinds
+      (weather/aerosol/sun_dir/antisolar_dir) hinweg — Regressionsschutz durch
+      `test_nachtrag_drosselung_cronlauf_ueberschreitet_obergrenze_nie` und
+      `test_nachtrag_drosselung_fastpath_ueberschreitet_obergrenze_nie` (`test_us131.py`).
+- [x] Verhalten unverändert: `golden_cloud_score_sun_dir`/`cl_sun_dir`/`cm_sun_dir` und
+      `golden_cloud_score_antisolar_dir`/`cl_antisolar_dir`/`cm_antisolar_dir` bleiben
+      unabhängig voneinander `None`, wenn der jeweilige Fetch fehlschlägt — kein Fallback
+      auf den Fotografen-Standort-Wert (US-131 AK-11) — Regressionsschutz durch
+      `test_ak11_fehlgeschlagener_wolken_abruf_sonnenrichtung` und
+      `test_ak11_fehlgeschlagener_wolken_abruf_gegenrichtung`.
+- [x] Verhalten unverändert: `weather_details["aerosol_optical_depth"]` stammt weiterhin
+      vom Gegenrichtungs-/Antisolarpunkt (nicht vom Fotografen-Standort) —
+      Regressionsschutz durch `test_ak1_aerosol_wert_stammt_von_projiziertem_punkt`.
+- [x] Verhalten unverändert: der Fotografen-Standort-`golden_cloud_score` bleibt getrennt
+      von `golden_cloud_score_sun_dir`/`golden_cloud_score_antisolar_dir` — Regressionsschutz
+      durch `test_ak2_allgemeine_wetteranzeige_bleibt_am_fotografen_standort`,
+      `test_ak8_golden_clouds_nutzt_sonnenrichtungswert`,
+      `test_ak9_red_sky_nutzt_gegenrichtungswert_kein_vertauschen`.
+- [x] Edge Case: `shoot_dt` außerhalb des T+3-Fensters → `_apply_weather_to_event()` setzt
+      weiterhin `weather_score=0.0`, `overall_score=astronomy_score`,
+      `weather_status="none"` und gibt `False` zurück, ohne `forecast.get_at()`
+      aufzurufen.
+- [x] Edge Case: `forecast=None` (Out-of-Window-Markierung, `_weather_overlay_single()`
+      Z. 1295) → Funktion gibt weiterhin sofort `False` zurück, ohne Exception.
+- [x] Alle bestehenden Tests der betroffenen Testdateien (`test_us109.py`,
+      `test_us113.py`, `test_us130.py`, `test_us131.py`,
+      `test_bug77_weather_job_status.py`, `test_us106.py` soweit `_apply_weather_to_event`/
+      `_fetch_weather_and_aerosol` berührt) laufen unverändert (keine Testdatei-Anpassung
+      nötig) und grün.
+
+**Pre-Mortem:**
+- 💀 Monkeypatch bricht: Fetch-Aufrufe (`fetch_weather_forecast`,
+  `fetch_aerosol_forecast`) werden versehentlich in eine neue Datei/Klasse statt in
+  einen main.py-internen Helper verschoben → `monkeypatch.setattr(main,
+  "fetch_weather_forecast", ...)` greift nicht mehr, Tests würden echte Netzwerk-Calls
+  auslösen oder mit Attribut-Fehlern crashen.
+  → Gegenmaßnahme: Helper bleiben zwingend in `backend/main.py` (Option A unten), keine
+  Modul-Migration — identisch zur bereits bewährten Gegenmaßnahme aus TASK-74.
+- 💀 Pacing-`finally`-Garantie geht verloren: wird der innere Fetch-Runner (aktuell
+  `_run_one()`, Z. 1078–1088) als eigenständiger Helfer extrahiert und dabei der
+  `try`/`finally`-Block (Pacing-Sleep gilt laut US-131-2.-Nachtrag AUCH bei
+  Fehlschlag, nicht nur bei Erfolg) versehentlich verkürzt oder nur in den
+  Erfolgspfad verschoben, würde ein fehlgeschlagener Call den Semaphore-Slot sofort
+  wieder freigeben — genau das Rate-Limit-Risiko, das US-131/TASK-75 gerade
+  eindämmen wollten.
+  → Gegenmaßnahme: `try`/`finally`-Struktur unverändert in den extrahierten Helfer
+  übernehmen (Semaphore als expliziter Parameter statt Closure ist unschädlich, die
+  Kontrollstruktur selbst bleibt 1:1); AK „Pacing gilt auch bei Fehlschlag" oben
+  explizit verankert, bestehende `test_nachtrag_pacing_gilt_auch_bei_fehlgeschlagenem_*`
+  decken das ab.
+- 💀 `tasks_meta`/`results`-Zuordnung auseinandergerissen: wird die Planungs-Loop
+  (aktuell Z. 1042–1065) in eine eigene Funktion ausgelagert und die Ergebnis-Zuordnung
+  (`zip(tasks_meta, results)`, Z. 1104) in einem separaten Helfer erneut aufgerufen,
+  muss `tasks_meta` unverändert (gleiche Liste, gleiche Reihenfolge) durchgereicht
+  werden — sonst werden Fetch-Ergebnisse den falschen Locations/Kinds zugeordnet
+  (stiller Datenfehler, kein Crash, schwer zu entdecken).
+  → Gegenmaßnahme: `tasks_meta` als expliziter Parameter beider Helfer (Planung UND
+  Ergebnis-Sammlung), kein impliziter globaler/geteilter Zustand; bestehende
+  Teil-/Totalausfall-Tests aus `test_us130.py`/`test_us131.py` prüfen genau diese
+  Zuordnung (Namen in den richtigen `failed_*`-Listen).
+- 💀 Sonnenrichtung/Gegenrichtung-Unabhängigkeit geht verloren: wird bei der Extraktion
+  eines gemeinsamen Helfers für die strukturell identischen Sonnenrichtungs- (Z.
+  582–590) und Gegenrichtungs-Blöcke (Z. 592–600) in `_apply_weather_to_event()`
+  versehentlich eine Kopplung eingebaut (z. B. gemeinsamer Zwischenzustand, früher
+  `return`), könnte ein fehlgeschlagener Sonnenrichtungs-Abruf fälschlich auch den
+  Gegenrichtungs-Wert auf `None` setzen oder umgekehrt — US-131 AK-11 verlangt aber
+  unabhängige `None`-Werte pro Richtung.
+  → Gegenmaßnahme: Helfer wird für jede Richtung separat mit eigenem
+  Forecast-Parameter aufgerufen, keine geteilten Zwischenvariablen zwischen den beiden
+  Aufrufen; bestehende `test_ak11_*`-Tests decken das ab (siehe AK oben).
+- 💀 Stille Verhaltensänderung durch „Aufräumen": bei reinen Refactoring-Tickets besteht
+  die Versuchung, während der Extraktion kleine „Verbesserungen" mitzunehmen (z. B.
+  Pacing-/Semaphore-Konstanten anpassen — das ist Gegenstand von TASK-75, nicht dieses
+  Tickets).
+  → Gegenmaßnahme: AK „Verhalten unverändert" oben ist bewusst granular (pro Regel)
+  formuliert, damit jede Abweichung sofort auffällt; keine Verhaltensänderung ohne
+  separates Ticket.
+
+📎 Code-Verifikation: `backend/main.py` gelesen am 2026-07-14 (Z. 475–1136).
+   Bestätigt: `_apply_weather_to_event` Z. 475–610 (136 Zeilen), `_fetch_weather_and_aerosol`
+   Z. 1010–1135 (126 Zeilen) — beide direkt gefolgt von bereits unter dem Threshold
+   liegenden Funktionen (`_cloud_mood_projection_points` Z. 619 bzw.
+   `_build_weather_error_message` Z. 1138).
+   Bestätigt: `tools/refactor_check.py` zählt `node.end_lineno - node.lineno` je
+   `FunctionDef`/`AsyncFunctionDef` gegen `LONG_FN_THRESHOLD = 80` (Z. 51, 117, 119);
+   `LONG_FN_ALLOWLIST` (Z. 58–62) enthält aktuell keine Ausnahme für diese beiden
+   Funktionen (nur `precompute.py._serialize`, `sun_pipeline.py.run`,
+   `moon_pipeline.py.run`).
+   Bestätigt: beide Funktionen werden ausschließlich aus `_weather_overlay()` (Z. 1231
+   bzw. 1216) und `_weather_overlay_single()` (Z. 1295/1321 bzw. 1304) aufgerufen — beide
+   Aufrufer bereits durch TASK-74 selbst unter dem Threshold, hier nur als
+   Signatur-Vertragspartner relevant.
+   Bestätigt: `test_bug77_weather_job_status.py`, `test_us109.py`, `test_us113.py`,
+   `test_us130.py`, `test_us131.py` existieren im Testverzeichnis (per Glob geprüft) und
+   patchen `main.fetch_weather_forecast`/`main.fetch_aerosol_forecast` direkt bzw. rufen
+   `_weather_overlay()`/`_weather_overlay_single()` auf — keine Testdatei ruft
+   `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` direkt auf, die Abdeckung
+   läuft vollständig über die beiden Aufrufer (Integrationstest-Charakter).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (entfällt inhaltlich — reines technisches
+      Refactoring ohne Verhaltens-/UX-Entscheidungsspielraum; Annahmen-Protokoll ergab
+      keine 🔴-kritischen offenen Fragen, siehe Scope-Abschnitt)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, siehe oben)
+- [x] Architektur analysiert: `backend/main.py` (Z. 475–1136, betroffene Funktionen +
+      direkter Kontext), `tools/refactor_check.py` (Threshold-Mechanik),
+      `backend/tests/test_us109.py`, `test_us113.py`, `test_us130.py`, `test_us131.py`,
+      `test_bug77_weather_job_status.py` (bestehende Regressionsabdeckung)
+- [x] Designer-Check: nicht visuell (reines Backend-Refactoring) → übersprungen
+- [ ] Implementierungsoptionen: A / B / C (siehe unten)
+- [ ] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+### Option A — Verantwortungs-basierte Funktions-Extraktion innerhalb main.py (empfohlen)
+- Vorgehen:
+  - `_apply_weather_to_event()`: die Berechnung von Wetter-Score/Golden-Cloud-Score am
+    Fotografen-Standort in einen Helper auslagern (Eligibility-Check für Goldene Stunde +
+    Bonus-Logik); den Bau des `weather_details`-Dicts in einen eigenen Helper auslagern;
+    die Aerosol-Wert-Ermittlung am Gegenrichtungspunkt in einen eigenen Helper auslagern;
+    für die strukturell identischen Sonnenrichtungs- und Gegenrichtungs-Blöcke (Wolkenwert
+    am jeweils projizierten Punkt) einen gemeinsamen, aber unabhängig aufgerufenen Helper
+    nutzen (zweimal aufgerufen, einmal je Richtung, ohne geteilten Zwischenzustand). Die
+    Hauptfunktion bleibt für T+3-Fensterprüfung, Aufruf-Reihenfolge und die finalen
+    Feld-Zuweisungen auf `e` zuständig.
+  - `_fetch_weather_and_aerosol()`: die Planungs-Loop (unique Locations/Projektionspunkte
+    sammeln, Dedup nach Koordinate) in einen Helper auslagern, der die `tasks_meta`-Liste
+    zurückgibt; den inneren Fetch-Runner (`_run_one`) als eigenständigen Helfer mit dem
+    Semaphore als explizitem Parameter (statt Closure) auslagern, `try`/`finally`-Pacing
+    unverändert; die Ergebnis-Zuordnung (`zip(tasks_meta, results)` → vier Forecast-Dicts +
+    vier Fehler-Listen) in einen weiteren Helfer auslagern. Die Hauptfunktion bleibt für
+    Orchestrierung (Planung → `asyncio.gather` → Sammlung → Rückgabe) zuständig.
+  - Alle neuen Helfer bleiben in `backend/main.py`, sodass
+    `fetch_weather_forecast`/`fetch_aerosol_forecast` weiterhin als Modul-Attribute von
+    `main` aufgerufen werden.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: löst exakt die drei Erweiterungsrunden (US-106-Entkopplung,
+  US-130-Semaphore, US-131-Pacing + Sonnenrichtungs-/Gegenrichtungs-Trennung), die den
+  Threshold gerissen haben; kein Risiko für Monkeypatch-basierte Tests (kein
+  Modul-Wechsel); Helper sind einzeln testbar, falls später gewünscht; identisches,
+  bereits bei TASK-74 bewährtes Muster für dieselbe Datei.
+- Nachteile / Risiken: etwas mehr Funktionen in `main.py` (aktuell ohnehin sehr groß) —
+  löst das allgemeine „main.py ist groß"-Problem nicht strukturell.
+- Aufwand: klein.
+
+### Option B — Eigenes Helper-Modul (z. B. `backend/weather_fetch.py`)
+- Vorgehen: dieselbe Verantwortungs-Aufteilung wie Option A, aber die Helper-Funktionen
+  wandern in ein neues Modul; `main.py` importiert und ruft sie auf.
+- Betroffene Dateien: neue Datei `backend/weather_fetch.py`, Änderungen an
+  `backend/main.py` (Imports), ggf. Anpassung von `tools/refactor_check.py`
+  `BACKEND_FILES`-Liste (neue Datei sonst nicht mitgeprüft).
+- Vorteile: reduziert `main.py`-Gesamtgröße strukturell, nicht nur pro Funktion; passt
+  zum bestehenden Muster (`calculations/`, `discover/`).
+- Nachteile / Risiken: **hohes Testbruch-Risiko** — wandern die
+  `fetch_weather_forecast`/`fetch_aerosol_forecast`-Aufrufe in ein neues Modul, treffen
+  bestehende `monkeypatch.setattr(main, "fetch_weather_forecast", ...)`-Patches nicht
+  mehr automatisch (Python löst den Funktionsnamen zur Aufrufzeit im aufrufenden Modul
+  auf); alle betroffenen Tests müssten mit umgezogen/angepasst werden — das widerspricht
+  dem Ziel „Verhalten und Tests unverändert" und ist für ein Low-Priority-Refactoring
+  unverhältnismäßig teuer (identisches Risiko wie bei TASK-74 Option B, dort verworfen).
+- Aufwand: mittel bis groß.
+
+### Option C — Nur den US-131-Zusatz als eigene Helper-Funktion auslagern (Minimal-Diff)
+- Vorgehen: ausschließlich den durch US-131 neu hinzugekommenen Code auslagern (die
+  Sonnenrichtungs-/Gegenrichtungs-Blöcke in `_apply_weather_to_event()` und die
+  Sonnenrichtungs-/Gegenrichtungs-Planung + Pacing-Logik in
+  `_fetch_weather_and_aerosol()`), der Rest bleibt wie er ist.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: kleinster denkbarer Diff, sehr risikoarm.
+- Nachteile / Risiken: bringt beide Funktionen nicht zuverlässig unter 80 Zeilen — der
+  Fotografen-Standort-Score-/Detail-Aufbau in `_apply_weather_to_event` (bereits vor
+  US-131 substanziell, aus US-106) und die Planungs-/Ergebnis-Sammlung in
+  `_fetch_weather_and_aerosol` (teils schon US-130) tragen ebenfalls erheblich zur
+  Länge bei — würde das AK „≤ 80 Zeilen" ggf. nicht erfüllen und eine zweite
+  Nacharbeitsrunde erfordern (identisches Muster wie TASK-74 Option C).
+- Aufwand: klein, aber mit Restrisiko einer zweiten Iteration.
+
+✅ **Empfehlung: Option A** — löst das Ticket vollständig (beide Funktionen sicher unter
+dem Threshold, mit Marge statt knapp bei 79), hält das Monkeypatch-Risiko aus Option B
+fern und vermeidet das Nacharbeits-Risiko aus Option C. Gleiches Muster, das bei TASK-74
+für dieselbe Datei bereits erfolgreich umgesetzt wurde (75 passed, 0 rot).
+
+**Testplan:**
+- [ ] Automatisiert (Harness): keine neuen Testfälle erforderlich — Regressionsschutz
+      läuft vollständig über die bestehenden Tests, die gegen die unveränderte
+      öffentliche Signatur/Rückgabe testen (Marker `offline`, `regression` bereits
+      gesetzt in den jeweiligen Dateien):
+      - `backend/tests/test_us109.py` (GOLDEN_CLOUDS/RED_SKY-Basisverhalten)
+      - `backend/tests/test_us113.py` (Sichtachsen-Filter)
+      - `backend/tests/test_us130.py` (Aerosol-/Dunst-Zweig, Teil-/Totalausfall)
+      - `backend/tests/test_us131.py` (Sonnenrichtungs-/Gegenrichtungs-Entkopplung,
+        Semaphore-Drosselung, Pacing — inkl. Fehlschlag-Fälle)
+      - `backend/tests/test_bug77_weather_job_status.py` (Job-Status, Monkeypatch von
+        `fetch_weather_forecast`/`fetch_aerosol_forecast`, alle 6 Fälle)
+      - `backend/tests/test_us106.py` (soweit `_apply_weather_to_event`/
+        `_fetch_weather_and_aerosol` berührt)
+      Nach der Implementierung: `pytest backend/tests/ -k "us109 or us113 or us130 or
+      us131 or bug77 or us106"` muss unverändert grün bleiben, zusätzlich vollständiger
+      Regressionslauf gemäß Memory `feedback_regression_testing`.
+      Zusätzlich `python3 tools/refactor_check.py --report` ausführen und prüfen, dass
+      `_apply_weather_to_event`/`_fetch_weather_and_aerosol` nicht mehr in
+      `needs_ticket` auftauchen.
+- [ ] Manuell: kein sichtbares App-Verhalten betroffen — kein manueller Browser-Test
+      nötig; stattdessen lokalen Server einmal starten und `/health` + einen
+      Feed-Abruf prüfen, um einen Importfehler durch die Umbenennung/Extraktion
+      auszuschließen (Regressions-Matrix `PRODUCT.md` Sektion 12: Backend-Ticket ohne
+      Response-Feld-Änderung → Basis-Smoke-Check reicht).
 
 ---
 
@@ -14883,18 +15143,20 @@ Raise) — schlägt die QA-Bereinigung fehl, wird der restliche Löschvorgang ni
 `delete_custom()` (BEGIN/COMMIT/ROLLBACK). Kein Fehler, wenn keine Zeilen existieren.
 
 **Akzeptanzkriterien:**
-- [~] Wird eine Location gelöscht, die bereits automatisch geprüft wurde (Beschreibung/idealer
+- [x] Wird eine Location gelöscht, die bereits automatisch geprüft wurde (Beschreibung/idealer
       Blickwinkel/Brennweiten-Empfehlung wurden generiert), sind danach keine zu dieser Location
       gehörenden QA-Daten mehr in der Datenbank vorhanden.
-- [~] Edge Case: Wird eine Location gelöscht, die noch nie automatisch geprüft wurde, verläuft der
+- [x] Edge Case: Wird eine Location gelöscht, die noch nie automatisch geprüft wurde, verläuft der
       Löschvorgang unverändert — kein Fehler, keine spürbare Verzögerung.
 - [~] Edge Case: Schlägt das Entfernen der QA-Daten aus einem technischen Grund fehl, wird die
       Location trotzdem vollständig gelöscht wie bisher; nur im Server-Log erscheint eine Warnung,
-      der Löschvorgang selbst meldet weiterhin Erfolg.
-- [~] Grenzfall (entschieden: Option B): Wird eine Standard-Location per Löschen-Button entfernt
+      der Löschvorgang selbst meldet weiterhin Erfolg. **(nicht automatisiert getestet — würde ein
+      Mocken von `_store.delete_qa()` erfordern, um gezielt eine Exception zu provozieren; nicht
+      im aktuellen Testlauf abgedeckt.)**
+- [x] Grenzfall (entschieden: Option B): Wird eine Standard-Location per Löschen-Button entfernt
       (Softlöschen), werden ihre QA-Daten ebenfalls entfernt — genau wie beim endgültigen Löschen
       einer selbst angelegten Location.
-- [~] Regression: Bestehendes Verhalten von Custom-Location-Löschung (inkl. Bilddatei-Cleanup),
+- [x] Regression: Bestehendes Verhalten von Custom-Location-Löschung (inkl. Bilddatei-Cleanup),
       Feed-/Kalender-Cache-Bereinigung und Standard-Location-Tombstone bleibt nach der Änderung
       unverändert.
 
@@ -14970,15 +15232,20 @@ Scope Creep auf ein nicht existierendes Feature.
 - [x] Empfehlung: Option B — offene Rückfrage an Stephan zu Frage 1 vor Implementierungsstart
 
 **Testplan:**
-- [ ] Automatisiert (Harness): Neuer Testfall `backend/tests/test_task77_qa_cleanup_on_delete.py`
+- [x] Automatisiert (Harness): Neuer Testfall `backend/tests/test_task77_qa_cleanup_on_delete.py`
       (Konvention: eigene, selbst-anlegende Test-Location je Fall, kein Rückgriff auf fremde IDs) —
       setzt `store.set_qa_values(...)`/`store.set_qa_lock(...)` für je eine Custom- und eine
       Standard-Test-Location, ruft `DELETE /locations/{id}` auf, prüft
       `store.get_qa_state(id) is None` und `store.get_qa_values(id) is None`. Marker: `offline`,
       `regression`. Bestätigte Coverage-Lücke: bisher prüft kein Test (`test_us120.py`,
-      `test_api_regression.py`) die QA-Tabellen nach einem Löschvorgang.
-- [ ] Manuell: wird vom `fotoalert-test`-Skill nach der Implementierung anhand der obigen AKs
-      generiert (curl-Prüfung der QA-Tabellen vor/nach Löschung).
+      `test_api_regression.py`) die QA-Tabellen nach einem Löschvorgang. 3/3 grün, real
+      ausgeführt (Implementierungs-Subagent + unabhängig vom Orchestrator selbst nachgefahren).
+- [x] Manuell (2026-07-14, Stephan): curl-Prüfung QA-Tabellen vor/nach Löschung für beide
+      Löscharten durchgeführt. Custom-Location (hartes Löschen): QA-Daten vorher vorhanden,
+      nach DELETE weg. Standard-Location `berliner_dom_spree` (Softlöschen/Tombstone, Option B):
+      QA-Daten vorher vorhanden (`description_lock`/`azimuth_lock` gesetzt), nach DELETE
+      `location_qa_values`/`location_qa_state` leer — Grenzfall Option B damit auch manuell
+      bestätigt, nicht nur automatisiert.
 
 ---
 
