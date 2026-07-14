@@ -649,6 +649,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-14 | BUG-78 | Apple-Maps-Koordinatenformat im Standort-/Motiv-Feld wird jetzt akzeptiert |
 | 2026-07-14 | TASK-78 | QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird immer nachgezogen, PRAGMA busy_timeout ergänzt |
 | 2026-07-14 | TASK-77 | Beim Löschen einer Location (hart bei selbst angelegten, per Tombstone bei Standard-Locations) werden jetzt auch ihre automatisch erzeugten Prüf-Daten (Beschreibung, Blickwinkel-Empfehlung, Brennweiten-Tipp) mitentfernt — keine verwaisten Datensätze mehr nach dem Löschen. Released als v1.22.27, CI-Lauf #221 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`); Verhalten zusätzlich manuell bestätigt (hartes Löschen + Softlöschen). |
+| 2026-07-14 | TASK-76 | Reines internes Refactoring: `_apply_weather_to_event()` und `_fetch_weather_and_aerosol()` in `backend/main.py` (durch die US-131-Erweiterung über den 80-Zeilen-Threshold von `tools/refactor_check.py` gewachsen) in 6 kleinere Helper-Funktionen aufgeteilt, Signaturen/Verhalten unverändert, 106 betroffene Tests weiterhin grün. Kein sichtbares App-Verhalten geändert. Released als v1.22.28, CI-Lauf #223 (nach Re-Run) grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`). Im ersten CI-Lauf Zeitüberschreitung durch einen vorbestehenden, unabhängigen Bug entdeckt (ungemockter Ephemeriden-Download in `test_astronomy_regression.py` ohne Timeout/Skip-Logik in CI) — als Folgeticket vorgesehen. |
 
 ---
 

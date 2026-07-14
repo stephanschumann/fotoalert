@@ -29,9 +29,9 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-76** *(Testbestätigung erhalten, unabhängige Verifikation bestätigt — Refactor-Check läuft)* |
+| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
@@ -10196,13 +10196,13 @@ Wichtiger Zusatzbefund: US-128 hat den Umbau auf die zentrale Tabelle bereits um
 
 ---
 
-### TASK-60 · Refactoring: Lange Funktion `patch_location()` aufteilen (backend/main.py) `[ ]`
+### TASK-60 · Refactoring: Lange Funktion `patch_location()` aufteilen (backend/main.py) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Analysis |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-10 |
 
 **Beschreibung:** `refactor_check.py` meldet eine neue lange Funktion in `backend/main.py`:
@@ -10212,16 +10212,250 @@ Neuer Fund, ausgelöst durch US-128 (Whitelist-Erweiterung um `subject_height_m`
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (US-128, 2026-07-10)
 
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`), analoges Muster zu
+**TASK-74**/**TASK-76** — keine „Als.../möchte ich.../sodass..."-Story anwendbar, da kein
+Nutzererlebnis betroffen ist.
+
+**Scope:**
+- Eingeschlossen: `patch_location()` in `backend/main.py` wird durch Extraktion von
+  Sub-Verantwortlichkeiten in eigene, kleinere Helper-Funktionen aufgeteilt —
+  ausschließlich innerhalb von `backend/main.py` (kein Modul-Umzug), analog zum bereits
+  umgesetzten Muster aus TASK-74/TASK-76.
+- Ausdrücklich ausgeschlossen: jede Verhaltensänderung (Statuscodes, Fehlertexte,
+  Feld-Whitelist, Validierungsregeln, Response-Form, Recompute-/Backup-Trigger-Bedingungen).
+- Kein neues sichtbares App-Verhalten: reines internes Refactoring, Ergebnis ist für
+  Stephan in der App nicht bemerkbar — der Effekt zeigt sich ausschließlich im
+  `tools/refactor_check.py`-Report (verschwindet aus den „needs_ticket"-Findings) und in
+  der grünen bestehenden Testsuite.
+
+**Akzeptanzkriterien:**
+- [~] `python3 tools/refactor_check.py --report` listet für `backend/main.py` kein
+      `long_function`-Finding mehr für `patch_location` (≤ 80 Zeilen laut
+      `node.end_lineno - node.lineno`).
+- [~] Keine neu extrahierte Helper-Funktion erzeugt ihrerseits ein neues
+      `long_function`-Finding.
+- [~] `patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict`
+      behält exakt Signatur, Route (`PATCH /locations/{loc_id}`) und Auth-Abhängigkeit bei.
+- [~] Response-Form bei Erfolg bleibt exakt `{"ok": True, "updated": <dict der validierten
+      Request-Felder>, "recompute_triggered": <bool>}` — insbesondere taucht der interne
+      Seiteneffekt-Flag `subject_height_researched` (US-128) NICHT im `updated`-Feld der
+      Antwort auf, selbst wenn `subject_height_m` im Request enthalten war.
+- [~] Prüfreihenfolge bleibt exakt erhalten: kein whitelisted Feld im Body → 400, BEVOR
+      geprüft wird, ob die Location existiert; danach Feld-Validierung (Koordinaten ±90°/
+      ±180°, numerische Felder ≥ 0, Brennweiten 8–1200mm) → 422, ebenfalls BEVOR geprüft
+      wird, ob die Location existiert. Ein PATCH mit ungültigem Feldwert auf eine
+      nicht-existente `loc_id` liefert weiterhin 422, nicht 404.
+- [~] Für Custom-Locations (`loc_id` beginnt mit `custom_`) bleibt `subject_height_researched`
+      von der SQLite-UPDATE-Ausführung ausgeschlossen (kein „no such column"-Fehler); für
+      Standard-Locations wird es weiterhin über den Override-Pfad (`_save_location_override`)
+      persistiert.
+- [~] Edge Case: Custom-Location nicht in Datei/DB gefunden
+      (`_update_custom_location_file()` gibt `False` zurück) → weiterhin 404 „Custom
+      Location nicht in Datei gefunden.", an derselben Stelle im Ablauf wie vorher (vor
+      In-Memory-Update, vor Recompute-Prüfung).
+- [~] Recompute-Trigger-Verhalten unverändert: nur wenn mindestens ein Feld aus
+      `RECOMPUTE_TRIGGER_FIELDS` (Koordinaten, `observer_floor_height_m`) im Request war,
+      wird `_recompute_pending` befüllt, `_run_precompute_single` als Task gestartet und
+      `_trigger_discover_debounced()` aufgerufen — reine Name/Beschreibung/Motivfeld-Änderungen
+      (`name`, `description`, `subject_height_m`, `subject_width_m`,
+      `focal_length_suggestions`) lösen weiterhin KEINEN Recompute aus.
+- [~] Backup-Trigger (`backup.backup_after_edit`) unverändert: läuft nach jedem
+      erfolgreichen PATCH, außer im Testmodus (`_NO_BACKGROUND=True`).
+- [~] Alle bestehenden Tests, die `PATCH /locations/{loc_id}` direkt oder indirekt
+      abdecken (`test_us_128.py`, `test_task_65_field_roundtrip.py`,
+      `test_patch_cache_consistency.py`, `test_bug-61.py`, `test_api_regression.py`,
+      `test_task67_auth_regression.py`, `test_bug29_calendar_single_recompute.py`), laufen
+      unverändert grün.
+
+**Pre-Mortem:**
+- 💀 Validierungs-/404-Reihenfolge vertauscht: wird die neue Feld-Validierungs-Funktion
+  versehentlich erst NACH dem `target_loc`-Lookup aufgerufen (naheliegende „Aufräum"-Logik
+  „erst prüfen ob's die Location gibt"), kippt die Fehler-Präzedenz für Requests mit
+  ungültigen Feldern gegen eine nicht-existente `loc_id` von 422 auf 404 — stiller
+  Verhaltenswechsel, kein Crash. Keiner der bestehenden Tests kombiniert aktuell „ungültiges
+  Feld" + „nicht-existente Location" (per Grep in `backend/tests/` geprüft).
+  → Gegenmaßnahme: AK „Prüfreihenfolge" oben verankert + neuer Regressionstest genau für
+  diese Kombination (siehe Testplan).
+- 💀 Normalisierter Wert geht verloren: die Validierungs-Funktion castet numerische Felder
+  auf `float` und `focal_length_suggestions` auf `list[int]` — wird ihr Rückgabewert im
+  Hauptablauf verworfen statt `allowed = _validate_patch_fields(allowed)` zuzuweisen,
+  bleiben unkonvertierte Rohwerte in `persist_fields`/der `"updated"`-Response.
+  → Gegenmaßnahme: Rückgabewert-Zuweisung explizit im Implementierungsplan (Option A)
+  festgehalten; `test_patch_cache_consistency.py`/`test_us_128.py` prüfen konkrete
+  Response-Werte.
+- 💀 `subject_height_researched`-Flag leakt in die Response: wird der Rückgabewert des
+  Persist-Fields-Helpers (inkl. Flag) versehentlich auch für das `"updated"`-Feld der
+  Antwort verwendet statt weiterhin die Variable `allowed` (ohne Flag), zeigt die API
+  künftig ein internes, nie dokumentiertes Feld.
+  → Gegenmaßnahme: AK „Response-Form" oben verankert, Hauptfunktion gibt weiterhin
+  `allowed` zurück, nicht `persist_fields`.
+- 💀 Custom-Location-Feldausschluss geht verloren: wird die Filterung von
+  `subject_height_researched` aus den SQLite-UPDATE-Kwargs beim Verschieben in den
+  Persistierungs-Helper versehentlich auch auf den Standard-Location-Zweig angewendet
+  (oder umgekehrt weggelassen), bricht entweder das Custom-Location-UPDATE („no such
+  column") oder das Flag wird für Standard-Locations nicht mehr persistiert.
+  → Gegenmaßnahme: AK oben verankert, `test_task_65_field_roundtrip.py`
+  (`CUSTOM_PATH_EXCLUDED_FIELDS`) deckt genau diesen Fall ab.
+- 💀 Reihenfolge Persistierung vs. Recompute-Trigger vertauscht: wird der neue
+  Recompute-Trigger-Helper versehentlich VOR der Persistierung/In-Memory-Aktualisierung
+  aufgerufen, plant der Hintergrund-Task potenziell mit veraltetem `target_loc`-Zustand.
+  → Gegenmaßnahme: Aufrufreihenfolge in der Hauptfunktion 1:1 wie im Original beibehalten
+  (Whitelist → Validierung → Lookup → Persist-Fields → Persistierung → In-Memory-Update →
+  Recompute-Trigger → Backup → Return).
+
+📎 Code-Verifikation: `backend/main.py` gelesen am 2026-07-14 (Z. 3150–3450).
+   **Ticket-Zeilenangabe veraltet:** Die Beschreibung nennt Z. 2489 (Stand 2026-07-10) —
+   aktuell liegt `patch_location()` bei Z. 3188–3279 (def-Zeile bis `return`), verschoben
+   durch dazwischenliegende Änderungen (u. a. US-131/TASK-76-Erweiterungen weiter oben in
+   der Datei). Die Länge selbst ist unverändert: 3279 − 3188 = **91 Zeilen**, exakt wie im
+   Ticket beschrieben — nur die absolute Position hat sich verschoben, der Fund bleibt
+   gültig (Muster „Autogen-Ticket neu verifizieren").
+   Bestätigt: Feld-Kategorien (`COORD_FIELDS`, `TEXT_FIELDS`, `NUMERIC_FIELDS`,
+   `LIST_FIELDS`, `RECOMPUTE_TRIGGER_FIELDS`, `PATCHABLE_LOCATION_FIELDS`) werden aus
+   `data/locations.py` importiert (main.py Z. 68–72) — `text_fields`/`list_fields` (Z.
+   3194/3196) werden innerhalb der Funktion nur zugewiesen, aber nicht mehr referenziert
+   (Brennweiten-Validierung Z. 3225–3234 prüft `"focal_length_suggestions" in allowed`
+   direkt statt über `list_fields`); toter Code, kein Verhaltenseinfluss, wird bei der
+   Extraktion nicht künstlich erhalten.
+   Bestätigt: `_save_location_override()` (Z. 1900), `_update_custom_location_file()`
+   (Z. 229), `_run_precompute_single()` (Z. 1811), `_trigger_discover_debounced()`
+   (Z. 439) sind bereits eigenständige main.py-interne Helper unterhalb des Thresholds —
+   bleiben unverändert, werden nur aus den neuen Helfern heraus aufgerufen statt direkt
+   aus `patch_location()`.
+   Bestätigt (Grep über `backend/tests/`): kein Test patcht `_save_location_override`,
+   `_update_custom_location_file`, `_run_precompute_single` oder
+   `_trigger_discover_debounced` per `monkeypatch.setattr(main, ...)` — Monkeypatch-Risiko
+   bei einer main.py-internen Extraktion (Option A) ist damit deutlich geringer als bei
+   TASK-76 (dort direkt betroffen: `fetch_weather_forecast`/`fetch_aerosol_forecast`).
+   Bestätigt: `tools/refactor_check.py` zählt `node.end_lineno - node.lineno` je
+   `FunctionDef`/`AsyncFunctionDef` gegen `LONG_FN_THRESHOLD = 80` (Z. 51, 117);
+   `LONG_FN_ALLOWLIST` (Z. 58–62) enthält keine Ausnahme für `patch_location`.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (entfällt inhaltlich — reines technisches
+      Refactoring ohne Verhaltens-/UX-Entscheidungsspielraum; Annahmen-Protokoll ergab
+      keine 🔴-kritischen offenen Fragen, siehe Scope-Abschnitt)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, siehe oben)
+- [x] Architektur analysiert: `backend/main.py` (Z. 3150–3450, `patch_location()` +
+      direkter Kontext, importierte Feld-Konstanten aus `data/locations.py`),
+      `tools/refactor_check.py` (Threshold-Mechanik), `backend/tests/test_us_128.py`,
+      `test_task_65_field_roundtrip.py`, `test_patch_cache_consistency.py`,
+      `test_bug-61.py`, `test_api_regression.py`, `test_task67_auth_regression.py`,
+      `test_bug29_calendar_single_recompute.py` (bestehende Regressionsabdeckung)
+- [x] Designer-Check: nicht visuell (reines Backend-Refactoring) → übersprungen
+- [x] Implementierungsoptionen: A / B / C (siehe unten)
+- [x] Empfehlung: Option A (von Stephan freigegeben, 2026-07-14)
+
+**Implementierungsoptionen:**
+
+### Option A — Verantwortungs-basierte Funktions-Extraktion innerhalb main.py (empfohlen)
+- Vorgehen:
+  - `_validate_patch_fields(allowed: dict) -> dict`: Koordinaten-Validierung
+    (Zahl-Check, ±90°/±180°), numerische Feld-Validierung inkl. `float`-Cast, sowie die
+    `focal_length_suggestions`-Listen-Validierung inkl. `int`-Cast (8–1200mm) — bündelt
+    die drei bestehenden Validierungs-Blöcke (Z. 3204–3234). Gibt den normalisierten
+    Dict zurück, wirft `HTTPException(422)` bei ungültigen Werten. Wird in der
+    Hauptfunktion vor dem `target_loc`-Lookup aufgerufen und das Ergebnis explizit
+    reassigned (`allowed = _validate_patch_fields(allowed)`).
+  - `_compute_patch_persist_fields(allowed: dict) -> dict`: die US-128-Seiteneffekt-Logik
+    (`subject_height_researched=True` bei `subject_height_m` im Request, Z. 3241–3248).
+  - `_persist_location_patch(loc_id: str, persist_fields: dict) -> None`: die
+    Custom-/Standard-Verzweigung inkl. Feld-Ausschluss für Custom-Locations und 404 bei
+    nicht gefundener Custom-Location (Z. 3250–3261).
+  - Recompute-Ermittlung + Task-Anstoß (Z. 3267–3273) in
+    `_trigger_patch_recompute(loc_id: str, allowed: dict) -> bool` auslagern (mutiert
+    `_recompute_pending`, startet `_run_precompute_single`-Task, ruft
+    `_trigger_discover_debounced()` auf, gibt `needs_recompute` für die Response zurück).
+  - Die Hauptfunktion bleibt für Whitelist-Filterung (400), Aufruf-Reihenfolge, die
+    In-Memory-`setattr`-Schleife (Z. 3264–3265, bleibt inline — trivial) und den
+    finalen Backup-Trigger + Return zuständig.
+  - Alle neuen Helfer bleiben in `backend/main.py`.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: löst den konkreten Fund vollständig (Hauptfunktion sinkt auf geschätzt
+  ~30–35 Zeilen, deutliche Marge statt knapp unter 80); Helfer folgen exakt der im
+  Ticket vorgeschlagenen Aufteilung (Whitelist-Validierung / Recompute-Trigger /
+  Persistierung); kein Monkeypatch-Risiko (siehe Code-Verifikation); identisches,
+  bereits bei TASK-74/TASK-76 bewährtes Muster für dieselbe Datei.
+- Nachteile / Risiken: etwas mehr Funktionen in `main.py` (aktuell ohnehin sehr groß) —
+  löst das allgemeine „main.py ist groß"-Problem nicht strukturell; Reihenfolge-Risiken
+  aus dem Pre-Mortem (Validierung-vor-Lookup, Persistierung-vor-Recompute) müssen beim
+  Umbau bewusst erhalten werden.
+- Aufwand: klein.
+
+### Option B — Eigenes Helper-Modul (z. B. `backend/location_patch.py`)
+- Vorgehen: dieselbe Verantwortungs-Aufteilung wie Option A, aber die Helper-Funktionen
+  wandern in ein neues Modul; `main.py` importiert und ruft sie auf.
+- Betroffene Dateien: neue Datei `backend/location_patch.py`, Änderungen an
+  `backend/main.py` (Imports), ggf. Anpassung von `tools/refactor_check.py`
+  `BACKEND_FILES`-Liste (neue Datei sonst nicht mitgeprüft).
+- Vorteile: reduziert `main.py`-Gesamtgröße strukturell, nicht nur pro Funktion.
+- Nachteile / Risiken: die Helfer brauchen Zugriff auf viele main.py-interne
+  Modul-Globals (`LOCATIONS`, `_recompute_pending`, `_NO_BACKGROUND`, `backup`,
+  `_save_location_override`, `_update_custom_location_file`, `_run_precompute_single`,
+  `_trigger_discover_debounced`) — entweder als Parameter durchreichen (unhandlich viele
+  Argumente) oder das neue Modul importiert `main` zurück (Zirkelimport-Risiko, da
+  `main.py` das neue Modul importieren müsste). Für ein Low-Priority-Refactoring mit
+  bereits geringem Monkeypatch-Risiko in Option A unverhältnismäßig teuer.
+- Aufwand: mittel bis groß.
+
+### Option C — Nur den US-128-Zusatz auslagern (Minimal-Diff)
+- Vorgehen: ausschließlich die numerische Feld-Validierung + die
+  `subject_height_researched`-Logik (der durch US-128 neu hinzugekommene Code) in einen
+  Helfer auslagern, der Rest bleibt wie er ist.
+- Betroffene Dateien: nur `backend/main.py`.
+- Vorteile: kleinster denkbarer Diff, sehr risikoarm.
+- Nachteile / Risiken: reduziert die Funktion nur um ~13–15 Zeilen (91 → ~76–78) — knapp
+  unter dem Threshold statt mit Marge; ein künftiger kleiner Zusatz (z. B. ein weiteres
+  Feld) reißt den Threshold sofort wieder, zweite Nacharbeitsrunde wahrscheinlich
+  (identisches Muster wie TASK-76 Option C).
+- Aufwand: klein, aber mit Restrisiko einer zweiten Iteration.
+
+✅ **Empfehlung: Option A** — löst das Ticket vollständig mit deutlicher Marge unter dem
+Threshold statt knapp, folgt exakt der im Ticket vorgeschlagenen Aufteilung
+(Whitelist-Validierung/Recompute-Trigger/Persistierung), vermeidet das
+Zirkelimport-/Parameter-Risiko aus Option B und das Nacharbeits-Risiko aus Option C.
+Gleiches Muster, das bei TASK-74/TASK-76 für dieselbe Datei bereits erfolgreich
+umgesetzt wurde.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): bestehende Tests laufen unverändert (Marker `offline`/
+      `api`, teils `regression`, bereits gesetzt in den jeweiligen Dateien):
+      - `backend/tests/test_us_128.py` (numerische Validierung, `subject_height_researched`)
+      - `backend/tests/test_task_65_field_roundtrip.py` (Feld-Roundtrip inkl.
+        `CUSTOM_PATH_EXCLUDED_FIELDS`)
+      - `backend/tests/test_patch_cache_consistency.py` (Response-Form, Koordinaten-Patch)
+      - `backend/tests/test_bug-61.py` (Motivname-Whitelist)
+      - `backend/tests/test_api_regression.py`
+      - `backend/tests/test_task67_auth_regression.py`
+      - `backend/tests/test_bug29_calendar_single_recompute.py`
+      Zusätzlich **ein neuer Testfall** (in `test_task_65_field_roundtrip.py` oder einer
+      neuen `test_task-60_patch_location_refactor.py`, Marker `offline`+`regression`):
+      PATCH mit ungültigem Feldwert (z. B. `observer_lat=999`) auf eine nicht-existente
+      `loc_id` → erwartet weiterhin `422` (nicht `404`) — deckt Pre-Mortem-Szenario 1 ab,
+      da kein bestehender Test diese Kombination prüft.
+      Nach der Implementierung: `pytest backend/tests/ -k "us_128 or task_65 or
+      patch_cache or bug-61 or api_regression or task67_auth or bug29_calendar"` muss
+      unverändert grün bleiben, zusätzlich vollständiger Regressionslauf gemäß Memory
+      `feedback_regression_testing`. Zusätzlich `python3 tools/refactor_check.py --report`
+      ausführen und prüfen, dass `patch_location` nicht mehr in `needs_ticket` auftaucht.
+- [ ] Manuell: kein sichtbares App-Verhalten betroffen — kein manueller Browser-Test
+      nötig; stattdessen lokalen Server einmal starten und `/health` + ein PATCH auf eine
+      Test-Location (curl) prüfen, um einen Importfehler durch die Extraktion
+      auszuschließen (Regressions-Matrix `PRODUCT.md` Sektion 12: Backend-Ticket ohne
+      Response-Feld-Änderung → Basis-Smoke-Check reicht).
+
 ---
 
-### TASK-76 · Refactoring: Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` aufteilen (backend/main.py) `[~]`
+### TASK-76 · Refactoring: Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` aufteilen (backend/main.py) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-14 |
+| **Abgeschlossen** | 2026-07-14 |
 
 **Beschreibung:** `refactor_check.py` meldet nach US-131 zwei lange Funktionen in `backend/main.py`:
 - `_apply_weather_to_event()` Z. 475 — 135 Zeilen (Threshold: 80)
