@@ -88,6 +88,7 @@ _ALIGNMENT_FILTER_EXEMPT = {
     "Goldene Stunde Morgen",
     "Goldene Stunde Abend",
     "Blaue Stunde",
+    "Blaue Stunde Morgen",  # US-132: neuer symmetrischer Morgen-Block
     "Milchstraße",
     "Neumond",
     "Meteoritenschauer",
@@ -95,6 +96,7 @@ _ALIGNMENT_FILTER_EXEMPT = {
     # US-109: Wetter-Overlay-Events (Laufzeit, kein eigener subject_azimuth nötig)
     "Goldene Wolken",
     "Himmelsröte",
+    "Rote Wolken",  # US-132
 }
 
 

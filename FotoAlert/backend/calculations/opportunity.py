@@ -36,6 +36,7 @@ from data.locations import PhotoLocation
 class EventType(str, Enum):
     GOLDEN_HOUR_MORNING = "Goldene Stunde Morgen"
     GOLDEN_HOUR_EVENING = "Goldene Stunde Abend"
+    BLUE_HOUR_MORNING = "Blaue Stunde Morgen"
     BLUE_HOUR_EVENING = "Blaue Stunde"
     MOON_RISE = "Mondaufgang"
     MOON_SET = "Monduntergang"
@@ -408,6 +409,11 @@ async def find_opportunities(
     w_score_bh = _w_score(forecast, bh_start, use_weather)
     bh_overall = _overall(0.75, w_score_bh, use_weather)
 
+    # US-132: Sonnenazimut/-höhe zum Zeitpunkt der Blauen Stunde berechnen (Pre-Mortem
+    # Szenario 2 — ohne diese Ergänzung hat kein Blaue-Stunde-Event einen Sonnenazimut,
+    # der RED_CLOUDS-Richtungsvergleich (Sonnenrichtung ±30°) wäre sonst nie möglich).
+    sun_pos_bh_eve = get_body_position(lat, lon, "sun", bh_start)
+
     if bh_overall >= min_score:
         focal_mm_bh = _focal_for_location(location, default_mm=24)
         opportunities.append(PhotoOpportunity(
@@ -428,8 +434,51 @@ async def find_opportunities(
             location_score=1.0,
             camera_hints=_camera_hints_blue_hour(focal_mm_bh),
             subject_azimuth=round(subject_az, 1),
+            celestial_azimuth=round(sun_pos_bh_eve.azimuth, 1) if sun_pos_bh_eve else None,
+            celestial_altitude=round(sun_pos_bh_eve.altitude, 1) if sun_pos_bh_eve else None,
             astronomy_report=astro,
             alert_priority=1 if bh_overall > 0.65 else 0,
+        ))
+
+    # -----------------------------------------------------------------------
+    # 2b. BLAUE STUNDE MORGEN (US-132: symmetrisch zum Abend-Block — ermöglicht
+    # RED_CLOUDS auch vor Sonnenaufgang, siehe BACKLOG.md US-132 AK-9, von Stephan
+    # bestätigt "beide Richtungen"). Nutzt die bereits vorhandenen
+    # blue_hour_morning_start/end (astronomy.py), die bislang nur als Zeitfenster-
+    # Grenze verwendet wurden, nicht als eigenes Opportunity-Objekt.
+    # -----------------------------------------------------------------------
+    bh_morning_start = sun.blue_hour_morning_start
+    bh_morning_end = sun.blue_hour_morning_end
+    w_score_bh_morn = _w_score(forecast, bh_morning_start, use_weather)
+    bh_morning_overall = _overall(0.75, w_score_bh_morn, use_weather)
+
+    sun_pos_bh_morn = get_body_position(lat, lon, "sun", bh_morning_start)
+
+    if bh_morning_overall >= min_score:
+        focal_mm_bh_morn = _focal_for_location(location, default_mm=24)
+        opportunities.append(PhotoOpportunity(
+            id=f"{location.id}_blue_hour_morning_{target_date.isoformat()}",
+            location=location,
+            event_type=EventType.BLUE_HOUR_MORNING,
+            title=f"Blaue Stunde Morgen – {location.name}",
+            description=(
+                f"Optimales Fenster {_fmt_time(bh_morning_start)}–{_fmt_time(bh_morning_end)} UTC. "
+                "Einsetzende Morgendämmerung trifft auf Resttageslicht der Nacht – ideal für "
+                "illuminierte Gebäude."
+            ),
+            shoot_time=bh_morning_start,
+            shoot_window_start=bh_morning_start,
+            shoot_window_end=bh_morning_end,
+            overall_score=round(bh_morning_overall, 2),
+            astronomy_score=0.75,
+            weather_score=round(w_score_bh_morn, 2),
+            location_score=1.0,
+            camera_hints=_camera_hints_blue_hour(focal_mm_bh_morn),
+            subject_azimuth=round(subject_az, 1),
+            celestial_azimuth=round(sun_pos_bh_morn.azimuth, 1) if sun_pos_bh_morn else None,
+            celestial_altitude=round(sun_pos_bh_morn.altitude, 1) if sun_pos_bh_morn else None,
+            astronomy_report=astro,
+            alert_priority=1 if bh_morning_overall > 0.65 else 0,
         ))
 
     # -----------------------------------------------------------------------

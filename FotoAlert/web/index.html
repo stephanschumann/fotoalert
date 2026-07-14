@@ -1054,6 +1054,8 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
   <symbol id="i-moonsmall" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13 A8 8 0 1 1 11 5 a6 6 0 0 0 8 8 Z"/></g></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18 a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.7-1.5 A3.8 3.8 0 0 1 18 18 Z"/></g></symbol>
+  <!-- US-132: Himmelsröte-Icon (Bogen/Himmelsfläche statt Wolke — der ganze Himmel glüht, nicht einzelne Wolken) -->
+  <symbol id="i-arc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 H21"/><path d="M5 17 A7 7 0 0 1 19 17"/><path d="M8.5 17 A3.5 3.5 0 0 1 15.5 17"/></g></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13 11 13 11 21 19 11 13 11 Z"/></g></symbol>
   <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9 10.5 10.5 9 15 13.5 13.5 Z"/></g></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16 L21 21"/></g></symbol>
@@ -1113,9 +1115,10 @@
 // US-100: zentraler Icon-Helper. Erzeugt <use>-Referenz auf die Inline-Sprite.
 // WebKit-sicher: Strich/Füllung sind als <g>-Attribut im <symbol> gesetzt (nicht per CSS-Klasse).
 // currentColor → erbt Theme-Farbe (US-99-Tokens).
-function ic(id, size, cls){
+function ic(id, size, cls, color){
   const s = size || 16;
-  return `<svg class="ic ${cls||''}" style="width:${s}px;height:${s}px;vertical-align:-0.15em;flex-shrink:0" aria-hidden="true"><use href="#${id}"/></svg>`;
+  const colorStyle = color ? `;color:${color}` : '';
+  return `<svg class="ic ${cls||''}" style="width:${s}px;height:${s}px;vertical-align:-0.15em;flex-shrink:0${colorStyle}" aria-hidden="true"><use href="#${id}"/></svg>`;
 }
 </script>
 <!-- US-66: Pflicht-Login-Overlay -->
@@ -1555,7 +1558,7 @@ function ic(id, size, cls){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.23';
+const APP_VERSION = '1.22.24';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1726,11 +1729,21 @@ const ICONS = {
   'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
   'Sonnenfinsternis':      'i-eclipse',
   'Blaue Stunde Morgen':   'i-moon',     'Blaue Stunde Abend':    'i-moon',
-  'Goldene Wolken':        'i-cloud',    'Himmelsröte':           'i-cloud',
+  'Goldene Wolken':        'i-cloud',    'Himmelsröte':           'i-arc',
+  'Rote Wolken':           'i-cloud',
 };
 const ICON_FALLBACK = 'i-star';  // neutrales Fallback-Linien-Icon (kein 📷, kein leeres Kästchen)
+// US-132/AK-12: Icon-Farbe zeigt den Sonnenstand — Gold = Sonne noch über dem Horizont
+// (Goldene Wolken), Rot = Sonne bereits unter dem Horizont (Rote Wolken, Himmelsröte).
+// Gleiche Farbe bei Rote Wolken/Himmelsröte = gleicher Sonnenstand; das Icon (Wolke vs.
+// Bogen) unterscheidet, ob die Wolken selbst glühen oder der ganze Himmel.
+const EVENT_ICON_COLOR = {
+  'Goldene Wolken': 'var(--accent-2)',
+  'Rote Wolken':     'var(--red)',
+  'Himmelsröte':     'var(--red)',
+};
 // Liefert fertiges <svg>-Icon-Markup für einen Event-Typ.
-function eventIcon(type, size, cls){ return ic(ICONS[type] || ICON_FALLBACK, size, cls); }
+function eventIcon(type, size, cls){ return ic(ICONS[type] || ICON_FALLBACK, size, cls, EVENT_ICON_COLOR[type]); }
 
 function scoreColor(s) {
   return s >= .90 ? 'var(--accent-2)' : s >= .80 ? 'var(--green)' : s >= .70 ? 'var(--blue)' : 'var(--muted)';
@@ -2898,6 +2911,26 @@ function localBoundsRadius(center, radiusKm) {
   return [[lat - dLat, lng - dLng], [lat + dLat, lng + dLng]];
 }
 
+// US-131 (Nachtrag, Weg-Gate 2026-07-13): Wolkenstimmung-Wert richtungsabhängig
+// bestimmen — die bisher geteilte, am Fotografen-Standort berechnete
+// golden_cloud_score wurde im Backend in zwei projizierte Werte entkoppelt
+// (Sonnenrichtung/GOLDEN_CLOUDS vs. Gegenrichtung-Antisolar/RED_SKY, siehe
+// backend/main.py _apply_weather_to_event). "Goldene Stunde Morgen/Abend" und
+// "Goldene Wolken" schauen in Sonnenrichtung → golden_cloud_score_sun_dir.
+// "Himmelsröte" schaut in Gegenrichtung (Antisolarpunkt) → golden_cloud_score_antisolar_dir.
+// "Rote Wolken" (US-132/RED_CLOUDS) führt bewusst KEINEN dieser Werte (Backend
+// setzt golden_cloud_score für Blaue-Stunde-Events immer auf None, Pre-Mortem
+// Szenario 3) — fällt hier auf o.golden_cloud_score zurück (bleibt None, Event
+// wird wie bisher ausgeblendet/ohne Wolkenstimmungsanzeige behandelt).
+function cloudMoodScoreFor(o) {
+  const et = o.event_type;
+  if (et === 'Himmelsröte') return o.golden_cloud_score_antisolar_dir;
+  if (et === 'Goldene Stunde Morgen' || et === 'Goldene Stunde Abend' || et === 'Goldene Wolken') {
+    return o.golden_cloud_score_sun_dir;
+  }
+  return o.golden_cloud_score;
+}
+
 const Filter = {
   _KEY: 'fotoalert_filters',
   _MIGRATED_KEY: 'fotoalert_filters_v119_migrated',  // US-119: Marker für einmaligen minScore-Reset
@@ -2984,12 +3017,20 @@ const Filter = {
 
   // US-40: Tägliche Routine-Events werden im Feed standardmäßig ausgeblendet.
   // Opt-in über Eventtyp-Filter im FilterSheet.
-  _ROUTINE_TYPES: ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde'],
+  // US-132: 'Blaue Stunde Morgen' analog zur bestehenden 'Blaue Stunde' (Abend) als
+  // Routine-Event standardmäßig ausblenden — sonst inkonsistent zur Abend-Variante.
+  _ROUTINE_TYPES: ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde', 'Blaue Stunde Morgen'],
 
   apply(data, { skipCloudMood = false } = {}) {
     const s = this.state;
-    // "Goldene Stunde" matcht beide Backend-Werte; alle anderen 1:1
-    const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
+    // "Goldene Stunde"/"Blaue Stunde" matchen jeweils beide Backend-Werte; alle anderen 1:1
+    // US-132 (Korrektur 2026-07-13): 'Blaue Stunde' analog zu 'Goldene Stunde' expandiert,
+    // statt eigenen Chip 'Blaue Stunde Morgen' zu führen — Tageszeit-Filter übernimmt die
+    // Morgen/Abend-Unterscheidung.
+    const ET_EXPAND = {
+      'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'],
+      'Blaue Stunde':   ['Blaue Stunde', 'Blaue Stunde Morgen'],
+    };
     const expanded     = s.eventTypes.flatMap(t => ET_EXPAND[t] || [t]);
     const expandedExcl = s.eventTypesExcl.flatMap(t => ET_EXPAND[t] || [t]);  // US-71
     return data.filter(o => {
@@ -3076,7 +3117,10 @@ const Filter = {
       }
       // US-07: Wolkenstimmungs-Filter — nur im Feed (Kalender und skipCloudMood=true ignorieren)
       if (s.minCloudMood > 0 && !skipCloudMood) {
-        const gcs = o.golden_cloud_score;
+        // US-131 (Nachtrag): richtungsabhängiger Wert statt des unprojizierten
+        // Fotografen-Standort-Werts (Sonnenrichtung für Goldene Stunde/Goldene
+        // Wolken, Gegenrichtung für Himmelsröte, siehe cloudMoodScoreFor()).
+        const gcs = cloudMoodScoreFor(o);
         // Events ohne Score (null/undefined) = nicht goldene Stunde oder kein Wetter-Overlay → ausblenden
         if (gcs == null) return false;
         const threshold = s.minCloudMood === 4 ? 0.85 : s.minCloudMood === 3 ? 0.65 : 0.40;
@@ -3226,6 +3270,7 @@ const FilterSheet = {
     ['Sonnenfinsternis',      'Sonnenfinsternis'],
     ['Goldene Wolken',        'Goldene Wolken'],
     ['Himmelsröte',           'Himmelsröte'],
+    ['Rote Wolken',           'Rote Wolken'],
   ],
 
   open() {
@@ -3800,6 +3845,7 @@ const Sections = {
     ev_desc:false, ev_zeit:false, ev_wetter:false, ev_kamera:false,
     ev_astro:false, ev_topo:false, ev_skypos:false, ev_kompo:false, ev_fov:false, ev_coords:false,
     ev_astro_live:false, ev_golden_clouds:false, ev_red_sky:false, ev_compass_gc:true, ev_compass_rs:true,
+    ev_red_clouds:false, ev_compass_rc:true,
     loc_obs:true, loc_subj:true, loc_azimut:true, loc_notes:true, loc_links:false,
     loc_fov:false, loc_events:true, loc_rating:false, loc_verify:false
   },
@@ -3828,7 +3874,7 @@ function mkSec(id, title, content) {
 
 
 // ═══════════════════════════════════════════════════════
-// US-111 · Wolken-Kompass-Diagramm für GOLDEN_CLOUDS + RED_SKY
+// US-111/US-132 · Wolken-Kompass-Diagramm für GOLDEN_CLOUDS + RED_SKY + RED_CLOUDS
 function _haversineM(lat1, lon1, lat2, lon2) {
   const R = 6371000, r = Math.PI / 180;
   const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
@@ -3840,7 +3886,11 @@ function _haversineM(lat1, lon1, lat2, lon2) {
 // (subjLine unten) — durchgezogen (frei), gestrichelt (teilweise_verdeckt), unterbrochen
 // mit Balken (blockiert), gepunktet (nicht_geprueft/undefined). Reine Stil-Anpassung,
 // kein neues Icon-Set (siehe Design-Entscheidung BACKLOG.md US-09).
-function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM, sightlineStatus) {
+// US-132: `zoneMode` ersetzt den bisherigen Boolean `isRedSky` — 'gc' (Goldene Wolken,
+// Zone um die Sonne, Gold), 'rs' (Himmelsröte/RED_SKY, Zone um den Gegenpunkt der
+// Sonne, Rot) oder 'rc' (Rote Wolken/RED_CLOUDS, Zone um die Sonne wie 'gc', aber Rot —
+// gleicher Sonnenstand-Farbcode wie 'rs', siehe Design-Entscheidung BACKLOG.md US-132).
+function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus) {
   const SIGHTLINE_DASH = {
     frei: null,
     teilweise_verdeckt: '5 4',
@@ -3874,14 +3924,29 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM, sightlineStatu
     return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rO} ${rO} 0 ${large} 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rI} ${rI} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
   }
 
-  // Zone: GOLDEN_CLOUDS = ±30° around sunAz (Alpenglühen, Streulicht um die Sonne).
-  // RED_SKY (US-113, korrigiert 2026-07-02) = ±RED_SKY_AZ_TOLERANCE um den GEGENPUNKT der Sonne
-  // (Gegendämmerung/Belt of Venus entsteht gegenüber der Sonne, nicht bei ihr — siehe BACKLOG.md US-113).
+  // Zone: GOLDEN_CLOUDS ('gc') = ±30° around sunAz (Alpenglühen, Streulicht um die Sonne).
+  // RED_SKY ('rs', US-113, korrigiert 2026-07-02) = ±RED_SKY_AZ_TOLERANCE um den GEGENPUNKT
+  // der Sonne (Gegendämmerung/Belt of Venus entsteht gegenüber der Sonne, nicht bei ihr —
+  // siehe BACKLOG.md US-113). RED_CLOUDS ('rc', US-132) = ±30° um die Sonne wie 'gc'
+  // (Wolken glühen in Sonnenrichtung), aber in Rot statt Gold (Sonne bereits unter dem
+  // Horizont — Design-Entscheidung BACKLOG.md US-132: gleicher Farbcode wie 'rs').
+  // Nebenkorrektur US-132: hartcodierter Hex-Wert #ef4444 durch das Token --red ersetzt.
+  // Der Token-Wert wird zur Laufzeit per getComputedStyle aufgelöst und als konkreter
+  // Farbwert ins SVG geschrieben (nicht als rohes var(...) in ein SVG-Attribut) — CSS-
+  // Variablen werden in dynamisch per innerHTML eingefügten SVG-Attributen in Safari/
+  // WebKit nicht zuverlässig aufgelöst (siehe Memory reference_svg_layout_gotchas). So
+  // bleibt --red die einzige Quelle der Wahrheit (Hell/Dunkel-Theme wird respektiert),
+  // ohne den bekannten Rendering-Gotcha zu riskieren.
+  const redTokenValue = (typeof getComputedStyle === 'function')
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#c8472f')
+    : '#c8472f';
   const RED_SKY_AZ_TOLERANCE = 30; // muss mit backend/calculations/weather.py RED_SKY_AZIMUTH_TOLERANCE_DEG uebereinstimmen
   let zonePath = '';
-  if (isRedSky) {
+  if (zoneMode === 'rs') {
     const antisolarAz = (sunAz + 180) % 360;
-    zonePath = `<path d="${sectorPath(antisolarAz - RED_SKY_AZ_TOLERANCE, antisolarAz + RED_SKY_AZ_TOLERANCE, 104, 22)}" fill="#ef4444" fill-opacity="0.18" stroke="#ef4444" stroke-opacity="0.5" stroke-width="1.2"/>`;
+    zonePath = `<path d="${sectorPath(antisolarAz - RED_SKY_AZ_TOLERANCE, antisolarAz + RED_SKY_AZ_TOLERANCE, 104, 22)}" fill="${redTokenValue}" fill-opacity="0.18" stroke="${redTokenValue}" stroke-opacity="0.5" stroke-width="1.2"/>`;
+  } else if (zoneMode === 'rc') {
+    zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="${redTokenValue}" fill-opacity="0.22" stroke="${redTokenValue}" stroke-opacity="0.6" stroke-width="1.2"/>`;
   } else {
     zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="#d4860a" fill-opacity="0.22" stroke="#d4860a" stroke-opacity="0.6" stroke-width="1.2"/>`;
   }
@@ -3960,8 +4025,10 @@ function mkCloudCompassSvg(sunAz, subjectAz, isRedSky, distanceM, sightlineStatu
   // Legend (US-113-Folgefix: Y-Positionen um 12px-Sicherheitspuffer nach unten verschoben,
   // damit Pfeilspitzen der Sichtachse/Sonne bei keinem Winkel mit der Legende kollidieren.
   // Inhalt/Farben/Zeilenabstand unveraendert.)
-  const legendItems = isRedSky
-    ? `<text x="8" y="263" font-size="10" fill="#ef4444">● Günstige Zone (±30° zum Gegenpunkt)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`
+  const legendItems = zoneMode === 'rs'
+    ? `<text x="8" y="263" font-size="10" fill="${redTokenValue}">● Günstige Zone (±30° zum Gegenpunkt)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`
+    : zoneMode === 'rc'
+    ? `<text x="8" y="263" font-size="10" fill="${redTokenValue}">● Günstige Zone (±30° zur Sonne)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`
     : `<text x="8" y="263" font-size="10" fill="#d4860a">● Goldene Zone (±30°)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`;
   const subjLegend = subjectAz != null
     ? `<text x="120" y="263" font-size="10" fill="#5272c0">- - Sichtachse</text>` : '';
@@ -4447,7 +4514,9 @@ const Detail = {
         // US-07: Goldene Wolken & Himmelsröte Scoring — für Goldene Stunde und US-109-Events
         const isGoldenHour = o.event_type === 'Goldene Stunde Morgen' || o.event_type === 'Goldene Stunde Abend'
                           || o.event_type === 'Goldene Wolken' || o.event_type === 'Himmelsröte';
-        const gcs = o.golden_cloud_score;
+        // US-131 (Nachtrag): richtungsabhängiger, projizierter Wert statt des
+        // unprojizierten Fotografen-Standort-Werts (siehe cloudMoodScoreFor()).
+        const gcs = cloudMoodScoreFor(o);
         let goldenCloudRow = '';
         if (isGoldenHour && gcs != null) {
           const gcPct = Math.round(gcs * 100);
@@ -4461,10 +4530,11 @@ const Detail = {
         return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter zum Shoot-Zeitpunkt <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('weather')">i</button>`,`${fogWarn}<div class="info-row"><span class="ir-label">Bewertung</span><span class="ir-val" style="color:${wColor}">${wLabel}</span></div><div class="info-row"><span class="ir-label">Temperatur</span><span class="ir-val">${wd.temperature_c > 0 ? '+' : ''}${wd.temperature_c} °C</span></div>${goldenCloudRow}<div class="info-row"><span class="ir-label">Wolken</span><span class="ir-val" style="color:${cloudColor}">${cloudLabel} (${wd.cloud_cover_pct}%)${cirrusNote}</span></div>${cloudLowRow}${cloudMidRow}${cloudHighRow}<div class="info-row"><span class="ir-label">Regen</span><span class="ir-val" style="color:${rainColor}">${wd.precipitation_prob_pct}% Wahrsch. · ${wd.precipitation_mm} mm</span></div><div class="info-row"><span class="ir-label">Wind</span><span class="ir-val">${wd.wind_speed_kmh} km/h ${windDir} (Bft ${bft})</span></div><div class="info-row"><span class="ir-label">Sichtweite</span><span class="ir-val">${wd.visibility_m >= 10000 ? '≥ 10 km' : (wd.visibility_m/1000).toFixed(1) + ' km'}</span></div>`);
       })()}
       ${(() => {
-        // US-109: Erklärungssektion für Goldene Wolken und Himmelsröte (AK-3)
+        // US-109/US-132: Erklärungssektion für Goldene Wolken, Himmelsröte und Rote Wolken (AK-3/AK-10)
         const isGoldenClouds = o.event_type === 'Goldene Wolken';
         const isRedSky       = o.event_type === 'Himmelsröte';
-        if (!isGoldenClouds && !isRedSky) return '';
+        const isRedClouds    = o.event_type === 'Rote Wolken';
+        if (!isGoldenClouds && !isRedSky && !isRedClouds) return '';
         if (isGoldenClouds) {
           // Ermittle welcher Sonnenazimut das Event ausgelöst hat:
           // Backend prüft sunrise_azimuth für Morgen-Events und sunset_azimuth für Abend-Events.
@@ -4492,12 +4562,12 @@ const Detail = {
             : '';
           const compassHtmlGC = (sunAz != null)
             ? mkSec('ev_compass_gc',`${ic('i-compass',15)} Wolken & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
-                mkCloudCompassSvg(sunAz, subAz, false,
+                mkCloudCompassSvg(sunAz, subAz, 'gc',
                   o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null),
                   o.sightline_status))
             : '';
           return compassHtmlGC + mkSec('ev_golden_clouds',`${ic('i-cloud',15)} Warum Goldene Wolken?`,
-            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold.</p>` +
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne geht in der Richtung auf oder unter, in die du dein Motiv fotografierst — und die Wolkenmenge ist hoch genug, um das Licht warm-golden einzufärben. Das Ergebnis: Wolken direkt über oder hinter deinem Motiv leuchten in Gold. Die Sonne steht dabei noch nahe dem Horizont (Goldene Stunde) — anders als „Rote Wolken" (Sonne bereits vollständig untergegangen, Blaue Stunde, aber weiterhin in Sonnenrichtung) und „Himmelsröte" (Blick zum Himmel gegenüber der Sonne, nicht in ihre Richtung).</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
             dirRow + motifRow + diffRow
           );
@@ -4523,7 +4593,7 @@ const Detail = {
           const rsSunAz = o.sunset_azimuth ?? o.sunrise_azimuth ?? null;
           const compassHtmlRS = (rsSunAz != null)
             ? mkSec('ev_compass_rs',`${ic('i-compass',15)} Himmel & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
-                mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, true,
+                mkCloudCompassSvg(rsSunAz, o.subject_azimuth ?? null, 'rs',
                   o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null),
                   o.sightline_status))
             : '';
@@ -4541,19 +4611,65 @@ const Detail = {
             ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${rsSubAz.toFixed(1)}°</span></div>` : '';
           const rsDiffRow = (rsAzDiff != null)
             ? `<div class="info-row"><span class="ir-label">Winkelversatz zum Gegenpunkt</span><span class="ir-val" style="color:var(--red)">${rsAzDiff.toFixed(1)}° ≤ 30° ✓</span></div>` : '';
+          const rsDistinction = ` Anders als „Rote Wolken" (Blaue Stunde, Sonne bereits vollständig unter dem Horizont) tritt Himmelsröte zur Goldenen Stunde auf, wenn die Sonne noch nahe am Horizont steht — der Blick geht dabei zum Himmel gegenüber der Sonne, nicht in ihre Richtung wie bei „Goldene Wolken"/„Rote Wolken".`;
           const rsExplainText = isAerosolTrigger
-            ? `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — sorgt ein hoher Dunst-/Aerosolanteil in der Atmosphäre (Gegendämmerung) für eine intensive rot-orange Einfärbung — auch ohne ausreichende Wolkendecke. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.`
-            : `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.`;
+            ? `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — sorgt ein hoher Dunst-/Aerosolanteil in der Atmosphäre (Gegendämmerung) für eine intensive rot-orange Einfärbung — auch ohne ausreichende Wolkendecke. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.${rsDistinction}`
+            : `Die Sonne geht auf oder unter, und am Himmel gegenüber der Sonne — in Motivrichtung — trifft das gestreute Licht (Gegendämmerung) auf tiefe und mittlere Wolkenschichten, die intensiv rot-orange eingefärbt werden. Ideal für dramatische Himmelsstimmungen direkt über deinem Motiv.${rsDistinction}`;
           const rsAodSection = (aod != null)
             ? `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Dunst-Prüfung (Aerosol-Optische-Dicke ≥ ${RED_SKY_AOD_THRESHOLD}):</p>` + aodRow
             : '';
-          return compassHtmlRS + mkSec('ev_red_sky',`${ic('i-cloud',15)} Warum Himmelsröte?`,
+          return compassHtmlRS + mkSec('ev_red_sky',`${ic('i-arc',15)} Warum Himmelsröte?`,
             `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">${rsExplainText}</p>` +
             `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Wolken-Prüfung (tiefe + mittlere Schichten ≥ 60 %):</p>` +
             clRow + cmRow + totRow +
             rsAodSection +
             `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Richtungs-Prüfung (Gegenpunkt der Sonne ↔ Motiv ≤ 30°):</p>` +
             rsDirRow + rsMotifRow + rsDiffRow
+          );
+        }
+        if (isRedClouds) {
+          // US-132: sun_az/sun_alt kommen aus celestial_azimuth/celestial_altitude
+          // (Blaue-Stunde-Feld, siehe backend/main.py::_red_clouds_inputs) — NICHT aus
+          // sunrise_azimuth/sunset_azimuth (das sind Goldene-Stunde-Felder).
+          const wd = o.weather_details;
+          const ch = wd ? wd.cloud_cover_high_pct : null;
+          const cl = wd ? wd.cloud_cover_low_pct : null;
+          const sunAlt = o.celestial_altitude;
+          const rcSunAz = o.celestial_azimuth;
+          const rcSubAz = o.subject_azimuth ?? null;
+          const rcAzDiff = (rcSunAz != null && rcSubAz != null)
+            ? (() => { let d = Math.abs(rcSunAz - rcSubAz) % 360; return d > 180 ? 360 - d : d; })()
+            : null;
+          const RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT = 20; // muss mit backend/calculations/weather.py uebereinstimmen
+          const RED_CLOUDS_LOW_CLOUD_CAP_PCT = 30;        // muss mit backend/calculations/weather.py uebereinstimmen
+          const chOk = (ch != null && ch >= RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT);
+          const clOk = (cl != null && cl < RED_CLOUDS_LOW_CLOUD_CAP_PCT);
+          const altRow = (sunAlt != null)
+            ? `<div class="info-row"><span class="ir-label">Sonnenhöhe</span><span class="ir-val" style="color:var(--red)">${sunAlt.toFixed(1)}° (unter Horizont)</span></div>` : '';
+          const chRow = (ch != null)
+            ? `<div class="info-row"><span class="ir-label">Hohe Wolken</span><span class="ir-val" style="color:${chOk ? 'var(--red)' : 'var(--muted)'}">${ch} % ${chOk ? '≥' : '<'} ${RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT} %${chOk ? ' ✓' : ''}</span></div>` : '';
+          const clRow = (cl != null)
+            ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val" style="color:${clOk ? 'var(--green)' : 'var(--red)'}">${cl} % ${clOk ? '<' : '≥'} ${RED_CLOUDS_LOW_CLOUD_CAP_PCT} %${clOk ? ' ✓' : ''}</span></div>` : '';
+          const rcDirRow = (rcSunAz != null)
+            ? `<div class="info-row"><span class="ir-label">Sonnenazimut</span><span class="ir-val">${rcSunAz.toFixed(1)}°</span></div>` : '';
+          const rcMotifRow = (rcSubAz != null)
+            ? `<div class="info-row"><span class="ir-label">Motivrichtung</span><span class="ir-val">${rcSubAz.toFixed(1)}°</span></div>` : '';
+          const rcDiffRow = (rcAzDiff != null)
+            ? `<div class="info-row"><span class="ir-label">Winkelversatz</span><span class="ir-val" style="color:var(--green)">${rcAzDiff.toFixed(1)}° ≤ 30° ✓</span></div>` : '';
+          const compassHtmlRC = (rcSunAz != null)
+            ? mkSec('ev_compass_rc',`${ic('i-compass',15)} Wolken & Himmelsrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('cloudCompass')">i</button>`,
+                mkCloudCompassSvg(rcSunAz, rcSubAz, 'rc',
+                  o.distance_m ?? ((o.observer_lat && o.subject_lat) ? _haversineM(o.observer_lat, o.observer_lon, o.subject_lat, o.subject_lon) : null),
+                  o.sightline_status))
+            : '';
+          return compassHtmlRC + mkSec('ev_red_clouds',`${ic('i-cloud',15)} Warum Rote Wolken?`,
+            `<p style="font-size:14px;line-height:1.6;margin:0 0 10px">Die Sonne steht bereits vollständig unter dem Horizont (Blaue Stunde), doch hohe Wolken (Cirrus, 6+ km) in Sonnenrichtung fangen ihr Licht noch ein und glühen kräftig rot-purpurn statt golden — weil das Licht dabei einen deutlich längeren Weg durch die Atmosphäre zurücklegt. Anders als „Goldene Wolken" ist die Sonne hier bereits untergegangen; anders als „Himmelsröte" bleibt der Blick dabei in Sonnenrichtung, nicht ihr gegenüber.</p>` +
+            `<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Sonnenstand:</p>` +
+            altRow +
+            `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Wolken-Prüfung (hohe Wolken ≥ ${RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT} %, tiefe Wolken < ${RED_CLOUDS_LOW_CLOUD_CAP_PCT} %):</p>` +
+            chRow + clRow +
+            `<p style="font-size:12px;color:var(--muted);margin:10px 0 8px">Richtungs-Prüfung (Sonne ↔ Motiv ≤ 30°):</p>` +
+            rcDirRow + rcMotifRow + rcDiffRow
           );
         }
         return '';
@@ -4659,7 +4775,7 @@ const Detail = {
         // Backend es auch für Goldene/Blaue Stunde & Milchstraße setzt (Motiv-Geometrie +
         // Sonnen-/Himmelsposition vorhanden). Daher zusätzlich die Nicht-Alignment-Typen
         // ausschließen — Spiegel von precompute._ALIGNMENT_FILTER_EXEMPT.
-        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Milchstraße','Meteoritenschauer','Sonnenfinsternis','Goldene Wolken','Himmelsröte']);
+        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Blaue Stunde Morgen','Milchstraße','Meteoritenschauer','Sonnenfinsternis','Goldene Wolken','Himmelsröte','Rote Wolken']);
         const ca = o.composition_analysis;
         if (!ca || EV_SKYPOS_EXEMPT.has(o.event_type)) return '';
         const body = ca.body_name || 'Objekt';
@@ -4999,7 +5115,12 @@ const MapView = {
     // BUG-23: Feed-basierter Filter – zeige nur Locations mit tatsächlichen Events
     // im 14-Tage-Feed für den gewählten Eventtyp (sinnvoller als possible_bodies).
     // Fallback auf possible_bodies wenn Feed noch nicht geladen.
-    const ET_EXPAND = { 'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'] };
+    // US-132 (Korrektur 2026-07-13): 'Blaue Stunde' analog zu 'Goldene Stunde' expandiert,
+    // damit der generische Chip auf der Karte konsistent beide Backend-Werte matcht.
+    const ET_EXPAND = {
+      'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'],
+      'Blaue Stunde':   ['Blaue Stunde', 'Blaue Stunde Morgen'],
+    };
     const expanded     = activeTypes.flatMap(t => ET_EXPAND[t] || [t]);
     const expandedExcl = exclTypes.flatMap(t => ET_EXPAND[t] || [t]);
 
@@ -7345,8 +7466,13 @@ const ElementInfo = {
     'Milchstraße':           { title: 'Milchstraße', html: '<p>Das galaktische Zentrum ist bei ausreichend dunklem Himmel und geringer Mondstörung sichtbar — Chance für Astro-Aufnahmen.</p>' },
     'Meteoritenschauer':     { title: 'Meteoritenschauer', html: '<p>Ein bekannter Sternschnuppen-Schauer erreicht sein Aktivitätsmaximum — Chance auf sichtbare Meteore, am besten bei dunklem Himmel.</p>' },
     'Sonnenfinsternis':      { title: 'Sonnenfinsternis', html: '<p>Der Mond schiebt sich vor die Sonne — ein seltenes, zeitlich sehr präzises Ereignis.</p>' },
-    'Goldene Wolken':        { title: 'Goldene Wolken', html: '<p>Die Wolkenverteilung zur Goldenen Stunde steht günstig, um golden angeleuchtet zu werden — die Wolken stehen dabei hinter dem Motiv in Sonnenrichtung (± 30°).</p>' },
-    'Himmelsröte':           { title: 'Himmelsröte', html: '<p>Hohe Wolken (Cirrus) streuen das tief stehende Sonnenlicht warm ein — der Himmel färbt sich rot/orange, die Wolken stehen dabei in Sonnenrichtung hinter dem Motiv (± 30°).</p>' },
+    'Goldene Wolken':        { title: 'Goldene Wolken', html: '<p>Die Wolkenverteilung zur Goldenen Stunde steht günstig, um golden angeleuchtet zu werden — die Wolken stehen dabei hinter dem Motiv in Sonnenrichtung (± 30°), die Sonne selbst steht noch nahe dem Horizont. Anders als „Rote Wolken" (Sonne bereits untergegangen) und „Himmelsröte" (Blick zum Himmel gegenüber der Sonne).</p>' },
+    // US-132/AK-11: Text korrigiert — beschrieb bislang fälschlich das Rote-Wolken-Verhalten
+    // (hohe Wolken/Cirrus in Sonnenrichtung). Himmelsröte (RED_SKY) ist tiefe/mittlere
+    // Bewölkung am Gegenpunkt der Sonne (Antisolarpunkt), siehe US-113-Korrektur.
+    'Himmelsröte':           { title: 'Himmelsröte', html: '<p>Tiefe und mittlere Wolken (oder Dunst) am Himmel gegenüber der Sonne — am Antisolarpunkt, im Rücken des Motivs betrachtet — färben sich zur Goldenen Stunde intensiv rot-orange ein (Gegendämmerung). Anders als „Goldene Wolken"/„Rote Wolken" liegt der Blick hier NICHT in Sonnenrichtung, sondern ihr genau gegenüber (± 30°).</p>' },
+    // US-132: neuer dritter Wolkenstimmungs-Typ (Rote Wolken/RED_CLOUDS).
+    'Rote Wolken':           { title: 'Rote Wolken', html: '<p>Die Sonne ist bereits vollständig untergegangen (Blaue Stunde), doch hohe Wolken (Cirrus, 6+ km) in Sonnenrichtung fangen ihr Licht noch ein und glühen kräftig rot-purpurn statt golden. Anders als „Goldene Wolken" ist die Sonne hier bereits unter dem Horizont; anders als „Himmelsröte" bleibt der Blick in Sonnenrichtung, nicht ihr gegenüber.</p>' },
   },
   _eventTypeFallback: { title: 'Event-Typ', html: '<p>Diese Chance basiert auf einem astronomischen oder wetterbedingten Ereignis zum angegebenen Zeitpunkt.</p>' },
   _filterGroups: {
@@ -7358,7 +7484,8 @@ const ElementInfo = {
     tageszeit: {
       title: 'Filter: Tageszeit',
       html: `<p>Grenzt Chancen auf eine Tageszeit ein (Morgens, Tagsüber, Abends, Nacht) — bezogen auf den Shoot-Zeitpunkt der Chance.</p>
-        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus.</p>`,
+        <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur anzeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus.</p>
+        <p style="margin-top:8px">Tipp: kombiniert mit „Goldene Stunde" oder „Blaue Stunde" beim Eventtyp-Filter lässt sich gezielt nur die Morgen- oder Abend-Variante anzeigen.</p>`,
     },
     wahrscheinlichkeit: {
       title: 'Filter: Mindest-Wahrscheinlichkeit',

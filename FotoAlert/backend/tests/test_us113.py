@@ -152,7 +152,14 @@ def test_golden_clouds_unveraendert_regression():
 
 def _make_golden_event(event_type="Goldene Stunde Abend", gcs=0.82, sun_azimuth=278,
                        subject_azimuth=265, cl=40, cm=35, ch=10, weather_status="ok"):
-    """Minimaler Event-Dict mit Wetter-Daten analog zu _apply_weather_to_event output."""
+    """Minimaler Event-Dict mit Wetter-Daten analog zu _apply_weather_to_event output.
+
+    US-131-Nachtrag (2026-07-13, Option B): golden_cloud_score/cl/cm sind seither in
+    _build_golden_clouds_event()/_build_red_sky_event() entkoppelt (Sonnenrichtung vs.
+    Gegenrichtung/Antisolarpunkt) — dieser Helfer setzt beide neuen Feldpaare auf
+    dieselben Werte wie das bisherige, geteilte gcs/cl/cm (dieser Testfile prüft keine
+    Entkopplung selbst, siehe test_us131.py), damit die bestehenden Testfälle mit
+    unveränderten Werten weiterhin grün laufen."""
     return {
         "id": "test-event-1",
         "event_type": event_type,
@@ -174,6 +181,12 @@ def _make_golden_event(event_type="Goldene Stunde Abend", gcs=0.82, sun_azimuth=
         "alert_priority": 1,
         "weather_status": weather_status,
         "golden_cloud_score": gcs,
+        "golden_cloud_score_sun_dir": gcs,
+        "cl_sun_dir": cl,
+        "cm_sun_dir": cm,
+        "golden_cloud_score_antisolar_dir": gcs,
+        "cl_antisolar_dir": cl,
+        "cm_antisolar_dir": cm,
         "sunset_azimuth": sun_azimuth,
         "sunrise_azimuth": None,
         "subject_azimuth": subject_azimuth,

@@ -206,6 +206,20 @@ def calculate_golden_cloud_score(cl: float, cm: float, ch: float) -> float:
     return round(max(0.0, min(1.0, base_score)), 3)
 
 
+CLOUD_MOOD_PROJECTION_DISTANCE_M = 30_000
+"""
+US-131: Projektionsdistanz (Meter) entlang der Sichtachse, an der die Wolkenwerte fuer
+GOLDEN_CLOUDS (Sonnenrichtung) und RED_SKY (Gegenrichtung/Antisolarpunkt) sowie der
+Dunst-/Aerosolwert fuer RED_SKY (ebenfalls Gegenrichtung) abgefragt werden — statt am
+Fotografen-Standort. Feste, pauschale Konstante (keine trigonometrische Herleitung wie bei
+sun_pipeline.py/moon_pipeline.py, da die Wetter-/Aerosol-API keinen Anhaltspunkt fuer die
+tatsaechliche Entfernung des Wolken-/Dunstsignals liefert). Wert 30 km: mittlere Option aus
+dem Ticket-Vorschlag (20-50 km), von Stephan im Weg-Gate am 2026-07-13 bestaetigt (siehe
+BACKLOG.md US-131). Gemeinsame Konstante fuer alle drei Projektionen (ersetzt die
+urspruenglich fuer Option A vorgesehene RED_SKY_PROJECTION_DISTANCE_M).
+"""
+
+
 def should_generate_golden_clouds_event(
     gcs: float,
     sun_azimuth: float,
@@ -321,6 +335,88 @@ def should_generate_red_sky_event(
         and aerosol_optical_depth >= RED_SKY_AOD_THRESHOLD
     )
     return cloud_condition or aerosol_condition
+
+
+RED_CLOUDS_AZIMUTH_TOLERANCE_DEG = 30
+"""
+US-132: Toleranzwinkel für den Sonnenazimut-Sichtachsen-Filter bei RED_CLOUDS.
+Eigene, unabhängig änderbare Konstante (nicht an GOLDEN_CLOUDS'/RED_SKY's 30°-Wert
+gekoppelt, auch wenn sie initial denselben Wert hat) — siehe BACKLOG.md US-132,
+Annahmen-Protokoll.
+"""
+
+RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT = 20
+"""
+US-132: Schwellenwert für cloud_cover_high_pct (in Prozent, inklusiv >=), ab dem
+genug hohe Wolken (Cirrus) für ein RED_CLOUDS-Event vorhanden sind. Startwert ohne
+empirische Kalibrierung, bewusst als eigene, benannte Konstante gehalten (analog
+RED_SKY_AOD_THRESHOLD), um sie nach Live-Beobachtung nachjustieren zu können
+(siehe BACKLOG.md US-132, von Stephan im Weg-Gate am 2026-07-13 bestätigt).
+"""
+
+RED_CLOUDS_LOW_CLOUD_CAP_PCT = 30
+"""
+US-132: Deckel für cloud_cover_low_pct (in Prozent, exklusiv <), oberhalb dessen
+tiefe Wolken die Sicht auf die hohen Wolken als komplett verstellt gelten (Edge
+Case AK-5) — verhindert eine "Rote Wolken"-Meldung bei komplett zugezogenem
+Himmel. Identisches Muster wie der bestehende Cirrus-Bonus in
+calculate_photo_weather_score() (Sweet-Spot-Deckel cl < 30).
+"""
+
+
+def should_generate_red_clouds_event(
+    sun_altitude: float,
+    ch: float,
+    cl: float,
+    sun_azimuth: Optional[float] = None,
+    subject_azimuth: Optional[float] = None,
+) -> bool:
+    """
+    US-132: Prüft ob ein RED_CLOUDS-Event ("Rote Wolken") erzeugt werden soll.
+
+    Physikalisch eigenständiges drittes Wolkenstimmungs-Phänomen neben GOLDEN_CLOUDS
+    (Sonne über Horizont) und RED_SKY (Antisolarpunkt-Richtung): Steht die Sonne
+    bereits unter dem Horizont (Blaue-Stunde-Fenster), können hohe Wolken (Cirrus)
+    noch aus der Sonnenrichtung angestrahlt werden und sich rot/purpurn färben.
+
+    Bedingungen (siehe BACKLOG.md US-132, Rules 1-4):
+    - sun_altitude < 0 (Sonne unter dem Horizont — explizit geprüft, nicht nur über
+      den Event-Typ-Namen abgeleitet, siehe Pre-Mortem Szenario 1)
+    - ch (cloud_cover_high_pct) >= RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT
+    - cl (cloud_cover_low_pct) < RED_CLOUDS_LOW_CLOUD_CAP_PCT (Edge Case AK-5: tiefe
+      Wolken dürfen die Sicht nicht komplett verstellen)
+    - Azimut-Differenz zwischen Sonnenposition und Motivrichtung
+      <= RED_CLOUDS_AZIMUTH_TOLERANCE_DEG (Sonnenrichtung, NICHT Antisolarpunkt wie
+      bei RED_SKY, siehe Edge Case AK-6)
+
+    Ohne sun_azimuth oder subject_azimuth (z. B. Location ohne definiertes Motiv oder
+    fehlende celestial_azimuth-Berechnung) ist kein Richtungsvergleich möglich → kein
+    RED_CLOUDS-Event (analog GOLDEN_CLOUDS/RED_SKY-Verhalten).
+
+    Args:
+        sun_altitude:     Sonnenhöhe in Grad zum Aufnahmezeitpunkt (negativ = unter
+                           dem Horizont)
+        ch:               cloud_cover_high_pct in Prozent (0-100)
+        cl:               cloud_cover_low_pct in Prozent (0-100)
+        sun_azimuth:      Sonnen-Azimut in Grad (0-360, 0=Nord im Uhrzeigersinn), optional
+        subject_azimuth:  Motiv-Azimut vom Standpunkt aus (0-360), optional
+
+    Returns:
+        True wenn RED_CLOUDS-Event erzeugt werden soll
+    """
+    if sun_altitude >= 0:
+        return False
+    if ch < RED_CLOUDS_HIGH_CLOUD_THRESHOLD_PCT:
+        return False
+    if cl >= RED_CLOUDS_LOW_CLOUD_CAP_PCT:
+        return False
+    if sun_azimuth is None or subject_azimuth is None:
+        return False
+
+    diff = abs(sun_azimuth - subject_azimuth) % 360
+    if diff > 180:
+        diff = 360 - diff
+    return diff <= RED_CLOUDS_AZIMUTH_TOLERANCE_DEG
 
 
 def wmo_code_to_description(code: int) -> str:

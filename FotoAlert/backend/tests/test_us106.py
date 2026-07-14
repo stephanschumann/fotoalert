@@ -147,11 +147,36 @@ def test_single_weather_overlay_no_events_is_ready():
 # TASK-73 — Aerosol-Abruf im Single-Overlay (parallel zu Wetter, non-fatal)
 # ---------------------------------------------------------------------------
 
+def _golden_event(loc_id: str, shoot_offset_h: float, lat=52.5, lon=13.4) -> dict:
+    """US-131: wie _event(), aber mit den Feldern, die ein Event fuer die
+    Cloud-Mood-Projektion (Sonnenrichtung/Gegenrichtung) qualifizieren
+    (subject_lat/lon, subject_azimuth, sunset_azimuth, event_type Goldene Stunde).
+    Seit US-131 wird fetch_aerosol_forecast() nur noch fuer qualifizierende
+    Goldene-Stunde-Events am projizierten Gegenrichtungspunkt aufgerufen, nicht mehr
+    unbedingt fuer jedes Event am Fotografen-Standort — die bestehenden TASK-73-Tests
+    brauchen deshalb ein qualifizierendes Event, um den Aerosol-Fetch ueberhaupt
+    auszuloesen."""
+    ev = _event(loc_id, shoot_offset_h, lat=lat, lon=lon)
+    ev.update({
+        "event_type": "Goldene Stunde Abend",
+        "subject_lat": lat + 0.01,
+        "subject_lon": lon + 0.01,
+        "subject_azimuth": 98,
+        "sunset_azimuth": 278,
+        "sunrise_azimuth": None,
+    })
+    return ev
+
+
 def test_single_weather_overlay_includes_aerosol_forecast(monkeypatch):
     """TASK-73 AK 1: fetch_aerosol_forecast() wird aufgerufen und das Ergebnis an
     _apply_weather_to_event() durchgereicht — nach erfolgreichem Aerosol-Fetch ist
-    weather_details["aerosol_optical_depth"] befüllt (nicht None)."""
-    target = _event("loc_target", 12)   # in T+3
+    weather_details["aerosol_optical_depth"] befüllt (nicht None).
+
+    US-131: Aerosol wird seither am Gegenrichtungs-/Antisolarpunkt abgefragt, nicht
+    mehr am Fotografen-Standort — target ist daher ein qualifizierendes
+    Goldene-Stunde-Event (_golden_event())."""
+    target = _golden_event("loc_target", 12)   # in T+3
     main._feed_cache = [target]
 
     async def fake_fetch(lat, lon, days=7):
@@ -173,8 +198,11 @@ def test_single_weather_overlay_includes_aerosol_forecast(monkeypatch):
 def test_single_weather_overlay_aerosol_failure_is_non_fatal(monkeypatch):
     """TASK-73 AK 2+3: fetch_aerosol_forecast() wirft eine Exception, der
     Wetter-Fetch gelingt normal → die Funktion bleibt trotzdem erfolgreich
-    (ready=True, weather_status="ok"), keine Exception propagiert nach außen."""
-    target = _event("loc_target", 12)   # in T+3
+    (ready=True, weather_status="ok"), keine Exception propagiert nach außen.
+
+    US-131: target ist ein qualifizierendes Goldene-Stunde-Event (_golden_event()),
+    damit der Aerosol-Fetch am Gegenrichtungspunkt ueberhaupt versucht wird."""
+    target = _golden_event("loc_target", 12)   # in T+3
     main._feed_cache = [target]
 
     async def fake_fetch(lat, lon, days=7):

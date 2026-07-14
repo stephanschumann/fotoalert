@@ -250,9 +250,21 @@ def test_aerosol_only_failure_sets_error_status(monkeypatch):
     """TASK-73: bisher fehlende Absicherung für den Fall, dass ausschließlich
     fetch_aerosol_forecast() scheitert (fetch_weather_forecast() gelingt normal).
     Der Job-Status muss das sichtbar machen (BUG-77-Mechanismus, non-fatal für
-    das Wetter selbst) statt still zu bleiben."""
+    das Wetter selbst) statt still zu bleiben.
+
+    US-131-Nachtrag (2026-07-13): Der Aerosol-/Dunst-Abruf lädt seither nur noch für
+    qualifizierende Goldene-Stunde-Events am projizierten Gegenrichtungspunkt, nicht
+    mehr pauschal am Fotografen-Standort jeder Location — "bad" bekommt deshalb die
+    dafür nötigen Felder (event_type/subject_lat/subject_lon/subject_azimuth/
+    sunset_azimuth), "ok" bleibt bewusst ein einfaches Nicht-Goldene-Stunde-Event ohne
+    Aerosol-Aufruf (Regression: allgemeines Wetter bleibt unberührt)."""
     ok  = _event("loc_ok", "Alexanderplatz", 12, lat=52.5, lon=13.4)
     bad = _event("loc_bad_aerosol", "Ehrenhof-Kollonaden am Schloss Sanssouci", 12, lat=52.4, lon=13.06)
+    bad.update({
+        "event_type": "Goldene Stunde Abend",
+        "subject_lat": 52.41, "subject_lon": 13.07,
+        "subject_azimuth": 98, "sunset_azimuth": 278, "sunrise_azimuth": None,
+    })
     main._feed_cache = [ok, bad]
 
     async def fake_fetch_weather(lat, lon, days=7):
@@ -260,12 +272,11 @@ def test_aerosol_only_failure_sets_error_status(monkeypatch):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", fake_fetch_weather)
 
-    async def fake_fetch_aerosol(lat, lon, days=7):
-        # Nur der Aerosol-Abruf schlägt für "loc_bad_aerosol" fehl.
-        if abs(lat - 52.4) < 0.001 and abs(lon - 13.06) < 0.001:
-            raise RuntimeError("Air-Quality-API down")
-        return _aerosol_forecast(datetime.now(timezone.utc))
-    monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_fetch_aerosol)
+    async def failing_fetch_aerosol(lat, lon, days=7):
+        # US-131: einziger Aerosol-Aufruf ist der für "bad" am Gegenrichtungspunkt
+        # (nur "bad" qualifiziert für die Projektion) — schlägt fehl.
+        raise RuntimeError("Air-Quality-API down")
+    monkeypatch.setattr(main, "fetch_aerosol_forecast", failing_fetch_aerosol)
 
     _run(main._weather_overlay())
 
