@@ -567,8 +567,7 @@ def _weather_score_with_golden_bonus(event_type: str, w_at) -> tuple:
     Gibt zurück: (w_score, gcs)
     """
     w_score = calculate_photo_weather_score(w_at)
-    golden_hour_types = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
-    if event_type in golden_hour_types:
+    if event_type in _GOLDEN_HOUR_TYPES:
         gcs = calculate_golden_cloud_score(
             w_at.cloud_cover_low_pct,
             w_at.cloud_cover_mid_pct,

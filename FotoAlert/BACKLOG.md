@@ -10202,7 +10202,7 @@ Wichtiger Zusatzbefund: US-128 hat den Umbau auf die zentrale Tabelle bereits um
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-07-10 |
 
 **Beschreibung:** `refactor_check.py` meldet eine neue lange Funktion in `backend/main.py`:
