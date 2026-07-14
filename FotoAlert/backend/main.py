@@ -1521,35 +1521,53 @@ def _qa_improve_one(loc, store) -> bool:
     blockierende) Rechen-/Netzarbeit nicht im Event-Loop läuft.
 
     Stößt Azimut (TASK-45) + Brennweite (TASK-47) + Beschreibung (TASK-46) an. Alle respektieren ihre
-    eigenen Locks und werfen nie; ein gesetztes Lock = kein Schreiben, gilt aber
-    trotzdem als geprüft. Fehler eines einzelnen Dienstes werden hier isoliert,
-    sodass der Spot insgesamt als erfolgreich verarbeitet gilt (er wird nicht
-    künstlich erneut anfällig nur weil ein Dienst hakte).
+    eigenen Locks und werfen nie aus reinem "nichts zu tun"-Grund (Lock gesetzt,
+    keine Daten, bereits kuratiert) — das gilt weiterhin trotzdem als geprüft.
 
-    Rückgabe: True bei erfolgreicher Verarbeitung (Hash/Zeitstempel fortschreiben),
-    False bei einem harten Fehler (Spot bleibt ungeprüft, fällt erneut an).
+    TASK-78 (Option B): Ein einzelner Teilschritt kann trotzdem an einem echten
+    Datenbank-Fehler scheitern (Exception aus store.set_qa_values()). Damit ein
+    bereits erfolgreich geschriebener Teilwert eines anderen Schritts nie ohne
+    zugehörigen Prüf-Eintrag zurückbleibt (verwaiste location_qa_values-Zeile),
+    gilt: Der Lauf für diesen Ort gilt als "abzuschließen" (Prüf-Eintrag setzen),
+    sobald mindestens ein Teilwert tatsächlich geschrieben wurde oder gar kein
+    Teilschritt einen echten Fehler hatte. Nur wenn KEIN einziger Wert geschrieben
+    wurde UND mindestens ein Teilschritt an einer Exception gescheitert ist,
+    bleibt der Fortschritt aus — der Ort bleibt vollständig unverändert und fällt
+    beim nächsten Lauf erneut an (Regel 2 im Ticket). Die Beschreibungs-Funktion
+    fängt Exceptions bereits intern vollständig ab (gibt None zurück, wirft nie);
+    sie kann also nie selbst als "gescheitert" gezählt werden — nur Azimut und
+    Brennweite können hier eine echte Exception auslösen.
+
+    Rückgabe: True, wenn der Prüf-Eintrag für den Ort gesetzt werden soll,
+    False wenn der Ort komplett unverändert bleiben und erneut anfallen soll.
     """
-    ok = True
+    azimuth_ok = True
+    focal_ok = True
+    wrote_value = False
     try:
-        qa_azimuth.update_location_azimuth(
+        azimuth_result = qa_azimuth.update_location_azimuth(
             store, loc.id,
             getattr(loc, "observer_lat", None),
             getattr(loc, "observer_lon", None),
             getattr(loc, "subject_lat", None),
             getattr(loc, "subject_lon", None),
         )
+        if azimuth_result is not None:
+            wrote_value = True
     except Exception as exc:
         logger.warning("QA-Azimut für %s fehlgeschlagen: %s", loc.id, exc)
-        ok = False
+        azimuth_ok = False
     try:
-        qa_focal.update_location_focal(
+        focal_result = qa_focal.update_location_focal(
             store, loc.id,
             getattr(loc, "subject_height_m", None),
             getattr(loc, "distance_m", None),
         )
+        if focal_result is not None:
+            wrote_value = True
     except Exception as exc:
         logger.warning("QA-Brennweite für %s fehlgeschlagen: %s", loc.id, exc)
-        ok = False
+        focal_ok = False
     try:
         result = qa_description.update_location_description(
             store, loc.id,
@@ -1560,11 +1578,13 @@ def _qa_improve_one(loc, store) -> bool:
             getattr(loc, "observer_lon", None),
         )
         if result is not None:
+            wrote_value = True
             logger.info("QA-Beschreibung für %s erzeugt", loc.id)
     except Exception as exc:
+        # Praktisch unerreichbar (update_location_description faengt intern
+        # bereits alles ab) — als Sicherheitsnetz dennoch abgesichert.
         logger.warning("QA-Beschreibung für %s fehlgeschlagen: %s", loc.id, exc)
-        ok = False
-    return ok
+    return wrote_value or (azimuth_ok and focal_ok)
 
 
 async def _run_qa_pass() -> Optional[dict]:
@@ -1576,8 +1596,13 @@ async def _run_qa_pass() -> Optional[dict]:
     ausgelagert; zwischen den Spots eine kurze Pause (Drosselung externer
     Dienste). Single-Flight + Respekt vor laufendem Recompute.
 
-    Nach erfolgreichem Spot: qa_checked_at + geo_hash fortschreiben. Ein
-    Fehlversuch schreibt NICHT fort → der Spot fällt beim nächsten Lauf erneut an.
+    Nach einem abgeschlossenen Spot: qa_checked_at + geo_hash fortschreiben,
+    sobald _qa_improve_one() True liefert — das ist laut TASK-78 (Option B)
+    bereits der Fall, wenn mindestens ein Teilwert geschrieben wurde, auch wenn
+    ein anderer Teilschritt an einem DB-Fehler gescheitert ist (kein Wert bleibt
+    ohne Prüf-Eintrag zurück). Nur wenn gar kein Wert geschrieben wurde UND
+    mindestens ein Teilschritt echt fehlgeschlagen ist, bleibt der Fortschritt
+    aus → der Spot fällt beim nächsten Lauf erneut an.
     Ein Ausfall bei einem Spot bricht den Lauf nicht ab (try/except pro Spot).
 
     Rückgabe (TASK-48 On-Demand): eine kompakte Zusammenfassung als dict

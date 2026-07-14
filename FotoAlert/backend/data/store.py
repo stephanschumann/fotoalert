@@ -139,8 +139,16 @@ class LocationStore:
     # ------------------------------------------------------------------
 
     def _connect(self) -> sqlite3.Connection:
-        """Öffnet eine neue SQLite-Verbindung mit Row-Factory."""
+        """Öffnet eine neue SQLite-Verbindung mit Row-Factory.
+
+        TASK-78: PRAGMA busy_timeout lässt SQLite bei einem gleichzeitigen
+        Schreibzugriff bis zu 5s intern warten, statt sofort "database is
+        locked" zu werfen — reduziert die Häufigkeit kurzzeitiger Lock-Konflikte
+        (Begleitmaßnahme, ersetzt nicht die Konsistenz-Absicherung in
+        _qa_improve_one()/_run_qa_pass()).
+        """
         conn = sqlite3.connect(str(self.db_path))
+        conn.execute("PRAGMA busy_timeout = 5000")
         conn.row_factory = sqlite3.Row
         return conn
 

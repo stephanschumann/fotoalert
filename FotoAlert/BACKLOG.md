@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **TASK-77** |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-78** *(Test bestätigt, Refactor-Phase läuft)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-62** *(Klären: 60 Locations ohne QA-Werte + 15 verwaiste location_qa_values-Einträge — Rückstand oder Datenproblem?)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-76** *(Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` in backend/main.py, US-131-Refactor-Check)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-76** *(Lange Funktionen `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` in backend/main.py, US-131-Refactor-Check)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -10730,14 +10730,15 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 
 ---
 
-### TASK-62 · Klären: 60 Locations ohne QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Rückstand oder Datenproblem? `[ ]`
+### TASK-62 · Klären: 60 Locations ohne QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Rückstand oder Datenproblem? `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-11 |
+| **Abgeschlossen** | 2026-07-14 |
 
 **Beschreibung:** Auf der Produktionsdatenbank enthält die Tabelle `location_qa_state` 136 Location-Einträge, aber nur 91 Einträge existieren in `location_qa_values`. Von diesen 91 haben nur 76 eine passende Location-ID in `location_qa_state` — die übrigen 15 `location_qa_values`-Einträge referenzieren Location-IDs, die in `location_qa_state` gar nicht mehr vorkommen (vermutlich alte/entfernte Locations, deren QA-Werte nie aufgeräumt wurden). Insgesamt 60 Location-IDs aus `location_qa_state` haben aktuell keinen passenden Eintrag in `location_qa_values` und damit keine automatisch erzeugten Werte (Beschreibung, Blickwinkel-/Brennweiten-Empfehlung). Unklar ist, ob das ein normaler Rückstand des nächtlichen QA-Laufs ist (`_run_qa_pass()` verarbeitet laut TASK-48/BUG-70-Analyse nur Locations mit geändertem `geo_hash` oder ganz ohne bisherigen Check — manche Locations wurden dadurch schlicht noch nie erreicht), oder ob es sich um ein eigenständiges Datenproblem handelt (z. B. verwaiste Einträge, die beim Löschen/Tombstonen einer Location nicht mitentfernt werden, oder ein Fehler in der Change-Detection). Der Befund entstand beiläufig bei der Reparatur von **BUG-70** und ist von der dortigen Datenbank-Korruption unabhängig — die Zeilenanzahl 91 in `location_qa_values` war während der gesamten BUG-70-Reparatur unverändert, die Diskrepanz bestand also bereits vorher.
 
@@ -10746,6 +10747,92 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 **Bezug:** Beiläufiger Befund aus der Reparatur von **BUG-70** (Journal-Warnung „database disk image is malformed", QA-Values) — ausdrücklich unabhängig von dessen Korruptions-Ursache, siehe Beschreibung. Berührt denselben Mechanismus wie **TASK-48** (QA-Lauf automatisieren, Done — `_run_qa_pass()`/Change-Detection über `location_qa_state.geo_hash`, dort als „Bestätigt — Change-Detection-Basis vollständig vorhanden" dokumentiert) und **TASK-51** (Refactoring `startup()`/`backend/main.py`, in dem auch `_load_qa_values()` liegt) — beides reine Nähe über dieselben Code-Stellen, kein Merge-Kandidat, da TASK-62 eine reine Klärungs-/Diagnoseaufgabe ist, keine Implementierung. Keine Dublette zu **TASK-61** (Backup-Mechanismus auf alle 8 Tabellen erweitern) — TASK-61 behandelt fehlende Sicherung, TASK-62 einen inhaltlichen Datenbestand-Rückstand; beide ergänzen sich, kein Überschneidungsbereich.
 
 **Quelle:** fotoalert-intake, 2026-07-11
+
+#### Analyse (fotoalert-analyze, 2026-07-14)
+
+📎 **Code-Verifikation (gelesen, nicht überflogen):**
+- `backend/main.py` Z.1477–1514 (`_qa_geo_hash_for`, `_qa_select_due`), Z.1517–1567 (`_qa_improve_one`), Z.1570–1638 (`_run_qa_pass`).
+- `backend/data/store.py` Z.107–126 (Tabellendefinitionen `location_qa_state`/`location_qa_values`), Z.700–821 (`get_qa_state`, `set_qa_lock`, `update_qa_checked`, `get_qa_values`, `set_qa_values`, `load_all_qa_values`).
+- `backend/data/qa_azimuth.py` Z.391–428 (`update_location_azimuth`), `backend/data/qa_focal.py` Z.84–122 (`update_location_focal`), `backend/data/qa_description.py` Z.107–173 (`generate_location_description`, `update_location_description`).
+- `backend/main.py` Z.3191–3233 (`delete_location`, US-68) sowie Grep über den gesamten Ordner `backend/` nach `DELETE FROM location_qa_state` / `DELETE FROM location_qa_values` und nach `set_qa_lock(` außerhalb von Tests.
+- BUG-70-Diagnoseergebnis in diesem Backlog (Z.10525–10530): `PRAGMA integrity_check` vom 2026-07-10 fand die B-Tree-Korruption ausschließlich in `location_qa_values` (86 Zeilen, fehlender Auto-Index) — `location_qa_state` wurde von der Diagnose ausdrücklich als **nicht betroffen** bestätigt.
+
+**Sonderfall — die Ticket-Prämisse „60 Locations wurden vom QA-Lauf schlicht noch nie erreicht" trifft laut Code so nicht zu:**
+Ein Eintrag in `location_qa_state` entsteht in der laufenden Produktion **ausschließlich** über `_store.update_qa_checked()` (Z.1620 in `_run_qa_pass`), und das wird **nur** aufgerufen, wenn `_qa_improve_one()` `True` zurückgibt — also nachdem alle drei Teil-Schritte (Azimut, Brennweite, Beschreibung) ohne unbehandelte Exception durchgelaufen sind. Der zweite Weg, über den laut Code ebenfalls ein `location_qa_state`-Eintrag entstehen könnte (`set_qa_lock()`, Z.720–743 in `store.py`), wird in `main.py` von keinem einzigen Endpunkt aufgerufen (Grep negativ, nur in Tests referenziert) — auf Prod ist der Lock-Mechanismus also aktuell **nicht erreichbar**, alle 136 `location_qa_state`-Zeilen stammen somit von abgeschlossenen, erfolgreichen QA-Läufen. Eine Location mit `location_qa_state`-Eintrag wurde also **immer** mindestens einmal vollständig geprüft — sie kann nicht „noch nie erreicht" worden sein. Was tatsächlich passiert ist: Der QA-Lauf lief für sie durch, hat aber in keinem der drei Teilschritte etwas nach `location_qa_values` geschrieben. Das ist ein regulärer, code-bestätigter Pfad, kein Fehlerfall:
+- `update_location_azimuth()` schreibt nichts, wenn `subject_lat`/`subject_lon` oder `observer_lat`/`observer_lon` fehlen (kein Bereich ableitbar) — kein Lock nötig, rein Datenlücke.
+- `update_location_focal()` schreibt nichts, wenn `subject_height_m`/`distance_m` fehlen oder ≤ 0 sind, **oder** wenn bereits eine kuratierte `focal_length_suggestions`-Liste in `location_qa_values` steht (Re-Check-Fall).
+- `update_location_description()` schreibt nichts, wenn bereits eine Beschreibung in `location_qa_values` steht (Re-Check-Fall), **oder** wenn `generate_location_description()` `None` liefert — und das passiert laut `qa_description.py` Z.120–123 bereits dann, wenn `MISTRAL_API_KEY` in der Server-Umgebung nicht gesetzt ist (kein Crash, nur `logger.info` + `None`), zusätzlich bei jedem Netzwerk-/API-Fehler oder leerer Antwort (Z.102–104, alle Exceptions werden lokal geschluckt).
+
+Fallen bei einer Location **alle drei** Schreib-Pfade auf „nichts zu tun" (typischerweise: fehlende Geometrie-Daten UND fehlgeschlagene/deaktivierte Beschreibungsgenerierung), bleibt sie nach einem erfolgreichen, protokollierten QA-Lauf komplett ohne `location_qa_values`-Zeile zurück. Das erklärt die 60 Fälle strukturell — **ob** das tatsächlich die Ursache ist (insbesondere ob `MISTRAL_API_KEY` auf dem Server gesetzt ist), lässt sich ohne Produktionszugriff nicht abschließend bestätigen, siehe Pre-Mortem.
+
+**Zu den 15 verwaisten `location_qa_values`-Einträgen:** Löschen/Tombstonen einer Location (`delete_location()`, Z.3191–3233) entfernt sie aus `LOCATIONS`, aus `custom_locations` (bei Custom-Locations) bzw. setzt einen Tombstone-Override (bei Standard-Locations) — es gibt **keinen** einzigen `DELETE`-Befehl gegen `location_qa_state` oder `location_qa_values` im gesamten Backend (Grep negativ). Eine gelöschte Location müsste also, wenn sie vorher geprüft wurde, in **beiden** Tabellen verwaiste Zeilen mit derselben `location_id` hinterlassen (symmetrisch) — nicht nur in einer. Löschung erklärt damit nicht direkt, warum 15 `location_qa_values`-Zeilen **keine** passende `location_qa_state`-Zeile mehr haben. Der einzige im Code gefundene Mechanismus, der eine solche Asymmetrie erzeugen kann: `_qa_improve_one()` ruft Azimut-, Brennweiten- und Beschreibungs-Update **nacheinander** auf, jeweils in einem eigenen `try/except` (Z.1533–1566). `update_location_azimuth()` und `update_location_focal()` sind **nicht** intern gegen DB-Fehler abgesichert (kein eigenes try/except um `store.set_qa_values()`), im Gegensatz zu `update_location_description()`, die jede Exception intern schluckt. Schreibt z. B. der Azimut-Schritt erfolgreich in `location_qa_values` (legt die Zeile an) und wirft der nachfolgende Brennweiten- oder Beschreibungs-Schritt eine SQLite-Exception (z. B. „database is locked"/I/O-Fehler), wird `ok=False` gesetzt → `update_qa_checked()` wird für diese Location **nicht** aufgerufen. War das der allererste QA-Lauf dieser Location (noch kein vorheriger `location_qa_state`-Eintrag), bleibt exakt das beobachtete Bild zurück: eine `location_qa_values`-Zeile ohne jede `location_qa_state`-Zeile. Das ist meine **beste Einschätzung basierend auf dem Code**, keine bewiesene Tatsache — siehe Pre-Mortem.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`_run_qa_pass`, `_qa_select_due`, `_qa_improve_one`, `delete_location`), `backend/data/store.py` (`location_qa_state`/`location_qa_values`-CRUD), `backend/data/qa_azimuth.py`, `backend/data/qa_focal.py`, `backend/data/qa_description.py`
+- [x] Designer-Check: nicht visuell (reine Backend-/Datenklärung) → übersprungen
+- [x] Implementierungsoptionen: A (kein Bug, nur Verifikation) / B (verwaiste Einträge sind Bug, Cleanup-Ticket) / C (gemischt — empfohlen)
+- [x] Empfehlung: Option C
+
+**Example Mapping**
+
+📏 **Regel 1 — „Geprüft" ≠ „hat Werte".** `location_qa_state` dokumentiert, dass ein QA-Lauf für eine Location vollständig (ohne DB-Fehler) durchgelaufen ist; `location_qa_values` dokumentiert nur, was dabei tatsächlich *ableitbar* war. Beide Tabellen dürfen dauerhaft auseinanderlaufen, ohne dass das ein Fehler ist.
+🟢 Given eine Location ohne `subject_height_m`/`distance_m` und mit nicht erreichbarer Beschreibungs-API. When der nächtliche QA-Lauf sie prüft. Then bekommt sie einen `location_qa_state`-Eintrag (geprüft), aber keine Zeile in `location_qa_values` — und das bleibt so, bis sich entweder ihre Geometrie-Daten oder die Erreichbarkeit der Beschreibungs-API ändert.
+
+📏 **Regel 2 — Gelöschte Locations werden aus den QA-Tabellen nicht entfernt.** `delete_location()` bereinigt `LOCATIONS`, `custom_locations`/Override-Tombstone, Bild-Datei und Feed-/Kalender-Cache — aber nicht `location_qa_state` oder `location_qa_values`. Das ist aktuell reine Code-Lücke, keine bewusste Entscheidung (kein Kommentar/keine Erwähnung im US-68-Kontext dazu gefunden).
+🟢 Given eine Standard-Location wird per Host-Löschung tombstoned, nachdem sie zuvor erfolgreich QA-geprüft wurde. When der Server danach neu startet. Then bleiben ihre `location_qa_state`- und `location_qa_values`-Zeilen unter derselben `location_id` in der DB stehen, obwohl die Location selbst nirgends mehr referenziert wird.
+
+📏 **Regel 3 — Ein fehlgeschlagener Teilschritt darf den bereits geschriebenen Teilerfolg nicht verlieren, aber auch nicht als „geprüft" zählen.** Aktuell gilt: Ein DB-Fehler im Azimut- oder Brennweiten-Schritt verhindert `update_qa_checked()` für die ganze Location, auch wenn andere Teilschritte bereits erfolgreich in `location_qa_values` geschrieben haben.
+🟢 Given Azimut-Schritt schreibt erfolgreich, Brennweiten-Schritt wirft eine SQLite-Exception. When der Lauf diese Location abschließt. Then bleibt `location_qa_values` mit dem Azimut-Teilwert bestehen, aber `location_qa_state` bekommt keinen neuen Eintrag — die Location gilt beim nächsten Lauf wieder als fällig (Retry), was korrekt ist, aber die bereits vorhandene `location_qa_values`-Zeile bleibt bis zum nächsten erfolgreichen Durchlauf ohne zugehörigen State-Eintrag stehen (genau das im Ticket beobachtete Muster für die 15 Fälle).
+
+❓ **Frage 1 — beantwortet (2026-07-14, live am Server geprüft):** `MISTRAL_API_KEY` ist auf dem Produktionsserver **nicht gesetzt** (verifiziert per `/proc/<MainPID>/environ` des laufenden `fotoalert.service`-Prozesses, `grep -c "^MISTRAL_API_KEY="` → `0`). Das bestätigt nicht nur die Hypothese zu den 60 Fällen, sondern hat eine größere Tragweite: Da `generate_location_description()` laut `qa_description.py` Z.120–123 **ausnahmslos** `None` liefert, wenn der Key fehlt, hat die automatische Beschreibungs-Generierung (Teil von TASK-48) auf Prod **noch nie** für irgendeine Location geschrieben — nicht nur für die 60 hier untersuchten. Von den 76 zugeordneten `location_qa_values`-Zeilen stammen alle bisher geschriebenen Werte ausschließlich aus den Azimut-/Brennweiten-Pfaden (sofern deren Geometrie-Voraussetzungen erfüllt waren); der Beschreibungs-Pfad war seit Produktivstart durchgehend inaktiv.
+
+**Akzeptanzkriterien (für „geklärt" — dieses Ticket hat keinen App-sichtbaren Effekt, „getestet" bedeutet hier: Dokumentationsstand + Entscheidung, kein pytest, siehe Verifikationsplan):**
+- [x] Der Codepfad, der zu „`location_qa_state`-Eintrag ohne `location_qa_values`-Eintrag" führt, ist konkret benannt (Datei+Zeile) und nicht nur vermutet.
+- [x] Der Codepfad, der zu „`location_qa_values`-Eintrag ohne `location_qa_state`-Eintrag" führen kann, ist konkret benannt; Alternativhypothesen (Löschung, BUG-70-Korruption) sind anhand des Codes/der BUG-70-Diagnose geprüft und begründet als unwahrscheinlicher eingeordnet.
+- [x] Eine Einordnung liegt vor: „60 fehlende Werte" = strukturell erwartetes Verhalten (kein Bug) vs. „fehlende Cleanup-Routine bei Löschung" = bestätigte, aber aktuell nicht ursächliche strukturelle Lücke.
+- [x] Ein konkreter Folge-Ticket-Vorschlag liegt vor (siehe Option C).
+- [x] Offene Verifikationsfrage 1 (`MISTRAL_API_KEY` auf Prod) ist von Stephan beantwortet: **nicht gesetzt** — die 60er-Diagnose gilt damit als bestätigt (siehe Frage 1 oben).
+- [x] Stephan hat Option C freigegeben (differenziert vorgehen, 2026-07-14) — Folge-Tickets TASK-77/TASK-78 angelegt.
+
+**Pre-Mortem (Risiken dieser Diagnose):**
+- 💀 Szenario 1: Die Erklärung „60 = strukturell erwartet" wird als abschließend behandelt, obwohl sie nie gegen die echte Produktions-DB verifiziert wurde (kein DB-Zugriff in dieser Analyse-Phase). Auslöser: Code-Analyse ist in sich schlüssig, könnte aber an einem Detail vorbeigehen, das nur eine echte Datenstichprobe zeigt (z. B. ob die 60 Locations tatsächlich fehlende Geometrie-Daten haben). Gegenmaßnahme: Frage 1 + der Verifikationsplan unten bleiben offen und werden als AK explizit nicht abgehakt, bis Stephan sie beantwortet.
+- 💀 Szenario 2: Die Erklärung für die 15 verwaisten Einträge (Teil-Schreibfehler) ist plausibel, aber nicht die einzig mögliche — z. B. könnte eine der Locations zwischenzeitlich unter einer geänderten ID in `data/locations.py` neu geführt worden sein (direkte Quelltext-Bearbeitung ohne DB-Bezug), was ebenfalls einen verwaisten `location_qa_values`-Eintrag ohne Zusammenhang zu Löschung oder DB-Fehlern erzeugen würde. Dieser Pfad wurde nicht mit letzter Sicherheit ausgeschlossen (keine ID-Historie im Code nachvollziehbar). Gegenmaßnahme: Im Verifikationsplan als zusätzliche Prüfung aufgenommen (Abgleich der 15 verwaisten IDs gegen `data/locations.py`).
+- 💀 Szenario 3: Die empfohlene Cleanup-Ergänzung bei `delete_location()` (Option B/C) wird als Fix für die AKTUELL beobachteten 15 Fälle missverstanden — ist sie nicht (siehe Regel 2 vs. Regel 3: die aktuell beobachteten 15 sind vermutlich Teil-Schreibfehler, nicht Löschungen). Gegenmaßnahme: Im Folge-Ticket-Vorschlag unten explizit als Präventionsmaßnahme für künftige Fälle benannt, nicht als Fix der aktuellen 15.
+
+**Architektur-Analyse (Zusammenhang der Tabellen):**
+`location_qa_state` (Zustand: Locks + `qa_checked_at` + `geo_hash`) und `location_qa_values` (Inhalt: auto-generierte Beschreibung/Azimut/Brennweite) sind zwei unabhängige Tabellen mit `location_id` als gemeinsamem, aber nicht fremdschlüssel-gesicherten Bezug (SQLite `_INIT_SQL` definiert kein `FOREIGN KEY`/`ON DELETE CASCADE` zwischen ihnen). `_run_qa_pass()` iteriert über die aktuell im Speicher gehaltene `LOCATIONS`-Liste (Basis-Locations + Custom-Locations + Overrides, aber ohne tombstonte Locations), wählt per `_qa_select_due()` die fälligen Spots (kein State ODER geänderter `geo_hash`) aus und ruft pro Spot `_qa_improve_one()` auf, die wiederum unabhängig in `location_qa_values` schreibt (drei separate Upserts). Erst bei vollständigem Erfolg aller drei Schritte wird `location_qa_state` fortgeschrieben. Beim Löschen einer Location (`delete_location()`) wird nur `LOCATIONS`/`custom_locations`/Override-Tombstone bereinigt — beide QA-Tabellen bleiben unberührt, wodurch das System strukturell anfällig für Orphans ist, sobald eine geprüfte Location gelöscht wird (aktuell vermutlich nicht die Ursache der beobachteten 15, siehe oben, aber ein bestätigtes Risiko für die Zukunft).
+
+**Implementierungsoptionen**
+
+### Option A — Kein Bug, nur Verifikation nötig
+- Vorgehen: Diagnose als vollständig ansehen, nur Frage 1 (`MISTRAL_API_KEY`) klären, danach Ticket schließen ohne Code-Änderung.
+- Vorteile: minimaler Aufwand.
+- Nachteile/Risiken: ignoriert die bestätigte strukturelle Lücke bei `delete_location()` (Regel 2) — auch wenn sie aktuell nicht ursächlich ist, bleibt sie ein reales Risiko für künftige Löschungen.
+- Aufwand: minimal.
+
+### Option B — Verwaiste Einträge sind ein Bug, Cleanup-Fix nötig
+- Vorgehen: `delete_location()` um `DELETE FROM location_qa_state`/`location_qa_values WHERE location_id = ?` ergänzen; zusätzlich einmaliger Aufräum-Lauf auf Prod für die aktuell 15 verwaisten Zeilen.
+- Vorteile: schließt die strukturelle Lücke vollständig, auch für die Vergangenheit.
+- Nachteile/Risiken: überschätzt vermutlich die aktuelle Ursache — die 15 sind laut Code-Analyse eher Teil-Schreibfehler als Löschungs-Artefakte; ein reiner Cleanup-Fix ohne Behebung von Regel 3 (Teil-Schreibfehler) würde künftige Orphans dieser Art nicht verhindern.
+- Aufwand: klein bis mittel.
+
+### Option C — Gemischt, differenziert nach tatsächlicher Ursache (empfohlen)
+- Vorgehen: (1) „60 fehlende Werte" als strukturell erwartetes Verhalten dokumentieren, keine Code-Änderung — vorbehaltlich Frage 1. (2) Für die „15 verwaisten Einträge" kein Sofort-Fix in diesem Ticket (da Ursache vermutlich nicht Löschung ist, siehe Pre-Mortem Szenario 3), sondern zwei getrennte, niedrig priorisierte Folge-Ticket-Vorschläge: **(a)** „Cleanup bei Location-Löschung: `location_qa_state`/`location_qa_values` mitentfernen" (schließt Regel-2-Lücke präventiv für künftige Löschungen) und **(b)** „QA-Teilerfolg konsistent behandeln: `update_qa_checked()` auch bei Teil-Erfolg schreiben oder Teil-Schritte transaktional koppeln" (schließt Regel-3-Lücke, verhindert künftige Asymmetrien wie die aktuellen 15).
+- Vorteile: adressiert beide echten strukturellen Lücken (Regel 2 + Regel 3), ohne die aktuellen 15 Zeilen fälschlich als Löschungs-Bug zu behandeln; hält den Scope dieses Klärungs-Tickets sauber (keine Implementierung hier, nur Diagnose + Vorschlag, passend zum Ticket-Typ).
+- Nachteile/Risiken: erzeugt zwei neue Backlog-Einträge statt einer sofortigen Lösung — vertretbar, da beide Folgethemen niedrige Priorität haben (keine Nutzer-sichtbare Auswirkung, reine Datenhygiene).
+- Aufwand: für dieses Ticket selbst minimal (nur Dokumentation); Folge-Tickets separat zu schätzen.
+
+✅ **Empfehlung: Option C** — sie unterscheidet sauber zwischen dem tatsächlich beobachteten Muster (Teil-Schreibfehler, Regel 3) und dem tatsächlich bestätigten, aber aktuell nicht ursächlichen strukturellen Risiko (fehlendes Cleanup bei Löschung, Regel 2), statt beides unter „ist ein Bug" oder „ist kein Bug" zu vermischen. Sie vermeidet außerdem Scope Creep (keine Implementierung in einem reinen Klärungs-Ticket) und schlägt stattdessen zwei klar abgegrenzte Folge-Tickets vor, deren Anlage Stephan freigeben kann.
+
+📌 **Folge-Tickets angelegt (2026-07-14, in der Inbox, nicht freigegeben):** **TASK-77** (Vorschlag a — Cleanup bei Location-Löschung: `location_qa_state`/`location_qa_values` mitentfernen) und **TASK-78** (Vorschlag b — QA-Teilerfolg konsistent behandeln: automatisches Aktualisieren der QA-Werte transaktional absichern).
+
+**Verifikationsplan (statt klassischem Testplan — reine Diagnose, kein Code-/App-Verhalten geändert):**
+- [ ] Manuell (Stephan, am Server-Terminal): `journalctl -u fotoalert.service | grep -i "mistral"` — zeigt, ob `MISTRAL_API_KEY nicht gesetzt` oder `Mistral-API nicht erreichbar` regelmäßig auftaucht (klärt Frage 1).
+- [ ] Manuell: `printenv MISTRAL_API_KEY` auf dem Server (bzw. Prüfung der systemd-Unit-Datei/`.env`) — direkter Beleg, ob der Key überhaupt gesetzt ist.
+- [ ] Manuell (optional, für höhere Sicherheit zu Regel 3): SQL-Stichprobe auf `fotoalert.db` (Service vorher stoppen oder read-only öffnen) — `SELECT location_id, description, ideal_azimuth_min, focal_length_suggestions FROM location_qa_values WHERE location_id NOT IN (SELECT location_id FROM location_qa_state)`, um zu prüfen, ob die 15 verwaisten Zeilen tatsächlich nur Teilfelder (z. B. nur Azimut, kein Fokal-/Beschreibungswert) enthalten — das würde Regel 3 (Teil-Schreibfehler) zusätzlich stützen.
+- [ ] Manuell (optional): Die 15 verwaisten `location_id`-Werte gegen die aktuellen IDs in `backend/data/locations.py` abgleichen (Pre-Mortem Szenario 2) — falls Übereinstimmungen mit umbenannten/entfernten Basis-Locations auffallen, wäre das ein zusätzlicher Hinweis auf Quelltext-Umbenennungen statt Teil-Schreibfehler.
 
 ---
 
@@ -14716,5 +14803,293 @@ Zusammenhang mit dem externen Wetter-API-Rate-Limiting, trotz oberflächlicher �
 angehen, da dieselbe Codestelle betroffen ist.
 
 **Quelle:** fotoalert-intake, 2026-07-14
+
+---
+
+### TASK-77 · Cleanup bei Location-Löschung: `location_qa_state`/`location_qa_values` mitentfernen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-07-14 |
+
+**Beschreibung:** `delete_location()` (`backend/main.py` Z.3191–3233, US-68) bereinigt beim Löschen/Tombstonen einer Location aktuell `LOCATIONS`, `custom_locations`/Override-Tombstone, die Bilddatei sowie Feed-/Kalender-Cache — aber nicht die beiden QA-Tabellen `location_qa_state` und `location_qa_values`. Laut TASK-62-Analyse (Regel 2) existiert im gesamten Backend kein einziger `DELETE`-Befehl gegen diese beiden Tabellen (Grep negativ). Das ist eine bestätigte, aktuell reine Code-Lücke — keine bewusste Entscheidung. Sie ist vermutlich **nicht** die Ursache der 15 aktuell in TASK-62 beobachteten verwaisten `location_qa_values`-Einträge (siehe TASK-62 Pre-Mortem Szenario 3 und TASK-78 für die wahrscheinlichere Ursache), stellt aber ein reales strukturelles Risiko für künftige Löschungen dar: Eine zuvor QA-geprüfte, gelöschte Location hinterlässt sonst dauerhaft verwaiste Zeilen unter derselben `location_id`.
+
+**User Story:** Als Betreiber der App, möchte ich, dass beim Löschen einer Location auch ihre zugehörigen QA-Zustands- und QA-Werte-Zeilen entfernt werden, sodass die Datenbank keine verwaisten Einträge ansammelt.
+
+**Bezug:** Folge-Ticket aus **TASK-62** (Option C, Vorschlag a) — dort als „Präventionsmaßnahme für künftige Fälle" eingeordnet, nicht als Fix der dort aktuell beobachteten 15 Einträge. Berührt denselben Code-Bereich wie **TASK-51** (Refactoring langer Funktionen in `backend/main.py`, u. a. im Umfeld von `delete_location`) und **TASK-61** (Backup-Mechanismus auf alle 8 Tabellen erweitert, Done) — reine Nähe über dieselbe Datei/Tabellen, kein Merge-Kandidat. Keine Dublette gefunden (Grep nach „delete_location", „location_qa_state", „location_qa_values" im gesamten Backlog).
+
+**Quelle:** fotoalert-intake, 2026-07-14 (Folge-Ticket aus TASK-62-Analyse)
+
+**Example Mapping:**
+
+📎 Code-Verifikation (2026-07-14): `delete_location()` gelesen in `backend/main.py` Z.3191–3233.
+Bestätigt: Custom-Zweig löscht per `_store.delete_custom(loc_id)` (`data/store.py` Z.268–286),
+Standard-Zweig setzt Tombstone per `_store.upsert_override(loc_id, deleted=True)` (Z.3216).
+Kein `DELETE`-Befehl gegen `location_qa_state`/`location_qa_values` im gesamten Backend
+gefunden (Grep negativ — einzige `DELETE FROM`-Treffer betreffen `custom_locations`,
+`location_verifications`, `location_ratings`). Beide QA-Tabellen haben `location_id` als
+Primärschlüssel (`data/store.py` Z.107–114 und Z.116–126). `_qa_select_due()`/`_qa_improve_one()`
+(`main.py` Z.1494–1567) laufen über **alle** `LOCATIONS` (Custom + Standard gemeinsam) — QA-Zeilen
+können also für **beide** Location-Typen existieren, nicht nur für Standard-Locations. Kein
+Reaktivierungs-/Restore-Endpunkt für tombstoned Standard-Locations gefunden (Grep negativ nach
+„restore", „undelete", „reaktivier") — ein Tombstone ist aktuell nur per manuellem Datenbankeingriff
+umkehrbar, nicht über die App.
+
+📏 Rule 1 — Hartes Löschen (Custom Locations): Beim endgültigen Löschen einer Location werden
+ihre QA-Zustands- und QA-Werte-Zeilen aus der Datenbank entfernt.
+🟢 Beispiel (positiv): Eine Location wurde bereits automatisch geprüft (Beschreibung, idealer
+Blickwinkel, Brennweiten-Empfehlung wurden generiert). Sie wird gelöscht → danach sind zu dieser
+Location keine QA-Daten mehr in der Datenbank vorhanden.
+🟢 Beispiel (negativ/kein Effekt): Eine Location, die noch nie automatisch geprüft wurde, wird
+gelöscht → nichts zu entfernen, der Löschvorgang verhält sich unverändert, keine Fehlermeldung.
+
+📏 Rule 2 — Fehlerbehandlung: Schlägt das Entfernen der QA-Daten technisch fehl, wird die Location
+trotzdem vollständig gelöscht; nur der Aufräum-Schritt selbst wird im Server-Log vermerkt.
+🟢 Beispiel: Die QA-Bereinigung wirft eine Datenbank-Ausnahme (z. B. kurzzeitige Sperre) → die
+Location wird trotzdem entfernt, der Löschvorgang meldet weiterhin Erfolg, im Log erscheint eine
+Warnung.
+
+❓ Frage 1 (🔴 funktional kritisch — zentraler Grenzfall, bereits im Ticket-Text angelegt):
+Soll das Entfernen der QA-Daten auch beim **Softlöschen/Tombstonen** einer Standard-Location
+passieren, oder nur beim **harten** Löschen (Custom Locations)?
+- **Option A — Nur bei hartem Löschen bereinigen, Tombstone lässt QA-Daten unangetastet:** Eine
+  als gelöscht markierte Standard-Location behält ihre QA-Daten in der Datenbank. Falls sie jemals
+  per manuellem Dateneingriff reaktiviert würde, sind Beschreibung/Blickwinkel/Brennweiten-Empfehlung
+  sofort wieder da. Nachteil: Der häufigere Löschfall (Standard-Location-Tombstone) bleibt eine
+  Quelle für genau die verwaisten Zeilen, die dieses Ticket eigentlich verhindern soll.
+- **Option B — Auch beim Tombstonen bereinigen:** Sobald eine Location gelöscht wird — egal ob
+  hart oder als Tombstone — verschwinden ihre QA-Daten sofort. Datenbank bleibt in beiden Fällen
+  sauber. Nachteil: Käme eine tombstoned Location zurück, müssten Beschreibung/Blickwinkel/
+  Brennweite neu automatisch generiert werden statt sofort wieder verfügbar zu sein — das passiert
+  aber automatisch beim nächsten QA-Lauf (Change-Detection erkennt „noch nie geprüft"), ohne
+  manuellen Aufwand, nur mit kurzer Verzögerung. Da es aktuell **keinen** Reaktivierungsweg über
+  die App gibt (siehe Code-Verifikation), ist dieser Nachteil rein theoretisch.
+- **Option C — Bereinigen beim Tombstonen + aktives Neu-Abrufen bei Reaktivierung:** Wie B, plus
+  ein eigener Mechanismus, der die QA-Daten bei einer Reaktivierung sofort neu anstößt statt auf
+  den nächsten regulären QA-Lauf zu warten. Setzt einen Reaktivierungsweg voraus, den es aktuell
+  gar nicht gibt — Mehraufwand für einen Anwendungsfall, der in der App derzeit nicht existiert.
+
+⚠️ Annahme 2 (technisch, kein sichtbarer App-Unterschied): Der neue Löschaufruf wird in
+`delete_location()` direkt nach der bestehenden Custom/Standard-Verzweigung eingefügt (nach
+Z.3216), für beide Zweige gemeinsam, im selben „best effort"-Muster wie der bestehende
+Bild-Cleanup (`_delete_location_image_file()`, Z.2932–2942: try/except mit Logger-Warnung, kein
+Raise) — schlägt die QA-Bereinigung fehl, wird der restliche Löschvorgang nicht blockiert.
+
+⚠️ Annahme 3 (technisch): Neue Store-Methode `delete_qa(location_id)` in `data/store.py` (Klasse
+`LocationStore`) löscht in einer Transaktion aus beiden Tabellen, im Stil der bestehenden
+`delete_custom()` (BEGIN/COMMIT/ROLLBACK). Kein Fehler, wenn keine Zeilen existieren.
+
+**Akzeptanzkriterien:**
+- [ ] Wird eine Location gelöscht, die bereits automatisch geprüft wurde (Beschreibung/idealer
+      Blickwinkel/Brennweiten-Empfehlung wurden generiert), sind danach keine zu dieser Location
+      gehörenden QA-Daten mehr in der Datenbank vorhanden.
+- [ ] Edge Case: Wird eine Location gelöscht, die noch nie automatisch geprüft wurde, verläuft der
+      Löschvorgang unverändert — kein Fehler, keine spürbare Verzögerung.
+- [ ] Edge Case: Schlägt das Entfernen der QA-Daten aus einem technischen Grund fehl, wird die
+      Location trotzdem vollständig gelöscht wie bisher; nur im Server-Log erscheint eine Warnung,
+      der Löschvorgang selbst meldet weiterhin Erfolg.
+- [ ] Grenzfall (abhängig von Frage 1 / gewählter Option): Wird eine Standard-Location per
+      Löschen-Button entfernt (Softlöschen), verhalten sich ihre QA-Daten gemäß der gewählten
+      Option — bleiben erhalten (A) oder werden ebenfalls entfernt (B/C).
+- [ ] Regression: Bestehendes Verhalten von Custom-Location-Löschung (inkl. Bilddatei-Cleanup),
+      Feed-/Kalender-Cache-Bereinigung und Standard-Location-Tombstone bleibt nach der Änderung
+      unverändert.
+
+**Pre-Mortem:**
+- 💀 Neuer Löschaufruf wird nur im Custom-Zweig eingebaut, der Tombstone-Zweig für
+  Standard-Locations wird bei der Umsetzung übersehen. → Gegenmaßnahme: AK 4 deckt diesen Fall
+  separat ab; Testplan verlangt einen Testfall je Location-Typ.
+- 💀 Die neue DB-Löschoperation wird ohne eigenes try/except eingebaut; ein seltener SQLite-Lock
+  (z. B. während eines laufenden QA-Cron-Laufs) lässt die gesamte `DELETE /locations/{id}`-Anfrage
+  mit 500 fehlschlagen, obwohl Location/Bild/Caches bereits bereinigt sind — inkonsistenter
+  Zwischenzustand. → Gegenmaßnahme: gleiches try/except-Logger-Muster wie beim bestehenden
+  Bild-Cleanup (Annahme 2); AK 3 verankert das explizit.
+- 💀 Cleanup-Aufruf wird VOR der Kernlöschung (Custom-DB-Delete/Tombstone-Setzen) platziert und
+  bricht bei einer ungefangenen Exception die Funktion vorzeitig ab, bevor der eigentliche
+  Löschvorgang überhaupt stattgefunden hat. → Gegenmaßnahme: Platzierung wie in Annahme 2
+  beschrieben, symmetrisch nach der Kernlöschung, wie beim bestehenden Bild-Cleanup.
+- 💀 Kein bestehender Test deckt `delete_location()` mit vorher gesetzten QA-Werten ab — verifiziert:
+  `test_us120.py` (`test_delete_custom_location_removes_image_file`,
+  `test_delete_location_without_image_still_works`) prüft nur Bild-Cleanup, keine Testdatei
+  kombiniert `set_qa_values`/`set_qa_lock` mit einem nachfolgenden `DELETE /locations/{id}`.
+  → Gegenmaßnahme: neuer, gezielter Testfall im Testplan (siehe unten).
+- 💀 CI-Datenumfeld-Check: Der Cleanup-Aufruf löscht nur Zeilen zur eigenen `location_id` (keine
+  Filterei über Cap/Sort/Listen) — ein leeres/fast leeres CI-Datenumfeld verändert das Verhalten
+  nicht. Kein zusätzliches Risiko hier.
+
+**Architektur-Analyse:**
+- `backend/main.py`, Funktion `delete_location()` (Z.3191–3233): neuer Aufruf direkt nach Z.3216
+  (nach der if/else-Verzweigung Custom/Standard), gemeinsam für beide Zweige — vermeidet
+  Code-Duplikation.
+- `backend/data/store.py`, Klasse `LocationStore`: Tabellen-Schemas verifiziert —
+  `location_qa_state` (PK `location_id`, Z.107–114), `location_qa_values` (PK `location_id`,
+  Z.116–126). Bestehendes Lösch-Muster (`delete_custom()`, Z.268–286: BEGIN/COMMIT/ROLLBACK,
+  Rückgabe ob eine Zeile betroffen war) dient als Vorlage. Keine bestehende Methode deckt das
+  Löschen aus den QA-Tabellen ab — neue Methode `delete_qa(location_id)` muss geschaffen werden.
+- QA-Zeilen sind nicht auf Standard-Locations beschränkt (siehe Code-Verifikation oben) — der
+  Cleanup muss für Custom UND Standard gelten.
+- Kein Reaktivierungspfad für tombstoned Standard-Locations im Code — relevant für Frage 1.
+
+**Implementierungsoptionen + Empfehlung:**
+- **Option A — Cleanup nur bei hartem Löschen:** Vorgehen: `delete_qa()`-Aufruf nur im
+  `if loc_id.startswith("custom_")`-Zweig. Betroffene Dateien: `backend/main.py`,
+  `backend/data/store.py`. Vorteil: minimale, konservative Änderung. Nachteil: löst das im Ticket
+  beschriebene Grundproblem nur für Custom Locations, der häufigere Standard-Tombstone-Fall bleibt
+  eine Quelle verwaister Zeilen. Aufwand: klein.
+- **Option B — Cleanup bei hartem Löschen UND Tombstone:** Vorgehen: `delete_qa()`-Aufruf einmal,
+  gemeinsam für beide Zweige (nach Z.3216). Betroffene Dateien: gleich wie A. Vorteil: schließt
+  die Lücke vollständig, für beide Location-Typen, geringster Code-Aufwand (ein Aufruf statt zwei).
+  Nachteil: siehe Frage 1, Option B — in der Praxis vernachlässigbar, da kein Reaktivierungsweg
+  existiert. Aufwand: klein.
+- **Option C — Cleanup bei Tombstone + aktives Neu-Abrufen bei Reaktivierung:** Vorgehen: wie B,
+  zusätzlich neuer Reaktivierungs-Mechanismus. Nachteil: baut Funktionalität für einen
+  Anwendungsfall, der aktuell nicht existiert (kein Restore-Endpunkt) — Scope-Erweiterung über das
+  Ticket hinaus. Aufwand: groß.
+
+✅ **Empfehlung: Option B** — schließt die im Ticket beschriebene Lücke vollständig (beide
+Location-Typen, beide Löscharten) bei minimalem Zusatzaufwand gegenüber Option A. Das einzige
+Gegenargument (Datenverlust bei Reaktivierung einer tombstoned Location) ist aktuell rein
+theoretisch, weil kein Reaktivierungsweg über die App existiert — und selbst im theoretischen
+Fall würde der nächste automatische QA-Lauf die Daten selbstständig neu generieren. Option C wäre
+Scope Creep auf ein nicht existierendes Feature.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`delete_location()`), `backend/data/store.py`
+      (`LocationStore`)
+- [x] Designer-Check: rein Backend/Datenlogik, keine sichtbare UI-Änderung → übersprungen
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option B — offene Rückfrage an Stephan zu Frage 1 vor Implementierungsstart
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Neuer Testfall `backend/tests/test_task77_qa_cleanup_on_delete.py`
+      (Konvention: eigene, selbst-anlegende Test-Location je Fall, kein Rückgriff auf fremde IDs) —
+      setzt `store.set_qa_values(...)`/`store.set_qa_lock(...)` für je eine Custom- und eine
+      Standard-Test-Location, ruft `DELETE /locations/{id}` auf, prüft
+      `store.get_qa_state(id) is None` und `store.get_qa_values(id) is None`. Marker: `offline`,
+      `regression`. Bestätigte Coverage-Lücke: bisher prüft kein Test (`test_us120.py`,
+      `test_api_regression.py`) die QA-Tabellen nach einem Löschvorgang.
+- [ ] Manuell: wird vom `fotoalert-test`-Skill nach der Implementierung anhand der obigen AKs
+      generiert (curl-Prüfung der QA-Tabellen vor/nach Löschung).
+
+---
+
+### TASK-78 · QA-Teilerfolg konsistent behandeln: automatisches Aktualisieren der QA-Werte transaktional absichern `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-14 |
+
+**Beschreibung:** `_qa_improve_one()` (`backend/main.py` Z.1517–1567) ruft beim automatischen Aktualisieren der QA-Werte pro Location die drei Teilschritte Azimut (`update_location_azimuth()`, `backend/data/qa_azimuth.py` Z.391–428), Brennweite (`update_location_focal()`, `backend/data/qa_focal.py` Z.84–122) und Beschreibung (`update_location_description()`, `backend/data/qa_description.py` Z.107–173) nacheinander auf, jeweils in einem eigenen try/except (Z.1533–1566 in `main.py`). Nur `update_location_description()` schluckt DB-Fehler intern; Azimut- und Brennweiten-Update sind **nicht** gegen DB-Fehler abgesichert (kein eigenes try/except um `store.set_qa_values()`). Schreibt z. B. der Azimut-Schritt erfolgreich in `location_qa_values`, wirft aber ein nachfolgender Schritt eine SQLite-Exception (z. B. „database is locked"), wird `update_qa_checked()` (`main.py` Z.1620, in `_run_qa_pass`) für diese Location nicht aufgerufen — laut TASK-62-Analyse (Regel 3) die plausibelste Ursache für die dort beobachteten 15 `location_qa_values`-Einträge ohne passenden `location_qa_state`-Eintrag.
+
+**User Story:** Als Betreiber der App, möchte ich, dass ein fehlgeschlagener Teilschritt beim automatischen Aktualisieren der QA-Werte den Lauf nicht in einem inkonsistenten Zwischenzustand zurücklässt, sodass keine `location_qa_values`-Zeilen ohne zugehörigen `location_qa_state`-Eintrag mehr entstehen können.
+
+**Bezug:** Folge-Ticket aus **TASK-62** (Option C, Vorschlag b) — dort als beste Einschätzung für die Ursache der aktuell 15 beobachteten verwaisten Einträge dokumentiert (Regel 3, TASK-62 Pre-Mortem Szenario 2 als nicht restlos ausgeschlossene Alternativhypothese). Berührt denselben Mechanismus wie **TASK-48** (QA-Lauf automatisieren, Done — `_run_qa_pass()`/Change-Detection) und **TASK-51** (Refactoring `backend/main.py`) — reine Nähe über dieselben Code-Stellen, kein Merge-Kandidat. Keine Dublette gefunden (Grep nach „_qa_improve_one", „update_qa_checked", „transaktional" im gesamten Backlog).
+
+**Quelle:** fotoalert-intake, 2026-07-14 (Folge-Ticket aus TASK-62-Analyse)
+
+#### Analyse (fotoalert-analyze, 2026-07-14)
+
+📎 **Code-Verifikation (gelesen, nicht überflogen — Zeilenangaben gegen aktuellen Stand geprüft):**
+- `backend/main.py` Z.1517–1567 (`_qa_improve_one`) — Ticket-Zeilenangabe bestätigt. Drei try/except-Blöcke: Azimut Z.1533–1543, Brennweite Z.1544–1552, Beschreibung Z.1553–1566.
+- `backend/data/qa_azimuth.py` Z.391–428 (`update_location_azimuth`) — Ticket-Zeilenangabe bestätigt. Schreibt via `store.set_qa_values()` in Z.423–427, **kein** eigenes try/except um diesen Aufruf.
+- `backend/data/qa_focal.py` Z.84–122 (`update_location_focal`) — Ticket-Zeilenangabe bestätigt. Schreibt via `store.set_qa_values()` in Z.121, **kein** eigenes try/except.
+- `backend/data/qa_description.py` — **Korrektur zur Ticket-Angabe:** Die im Ticket genannte Zeilenspanne Z.107–173 umfasst zwei Funktionen; `update_location_description()` selbst beginnt erst bei **Z.132** und endet bei **Z.173** (Z.107–129 ist `generate_location_description()`, eine separate vorgelagerte Funktion). Der inhaltliche Befund des Tickets bleibt richtig: `update_location_description()` hat ein eigenes, alles abfangendes try/except (Z.151–173, `except Exception` → `return None`), das auch den `store.set_qa_values()`-Aufruf in Z.167 abdeckt — sie wirft nie an den Aufrufer durch.
+- `backend/data/store.py` Z.700–821: `get_qa_state()` (Z.700–707), `update_qa_checked()` (Z.745–763), `set_qa_values()` (Z.779–809). Jeder dieser Aufrufe öffnet **seine eigene** Verbindung/Transaktion (`with self._connect() as conn: conn.execute("BEGIN") … COMMIT / ROLLBACK`) — die drei QA-Werte-Schreibvorgänge und der Prüf-Zeitstempel sind vier **unabhängige** Transaktionen, keine gemeinsame. Jeder einzelne Schreibvorgang ist für sich bereits korrekt atomar (Rollback bei Fehler innerhalb *seiner* eigenen Transaktion) — das Problem liegt ausschließlich zwischen den vier Transaktionen, nicht innerhalb einer einzelnen.
+- `backend/data/store.py` Z.141–145 (`_connect()`): Öffnet die Verbindung ohne `PRAGMA busy_timeout` — SQLite wirft bei einem gleichzeitigen Schreibzugriff standardmäßig **sofort** `database is locked` (kein internes Warten). Grep über `backend/` nach `sqlite3.connect` bestätigt: `_connect()` ist die **einzige** Verbindungsstelle in Produktionscode (weitere Treffer nur in Testdateien) — eine `busy_timeout`-Ergänzung dort würde zentral für alle Schreibvorgänge wirken.
+- `backend/main.py` Z.1616–1625 (`_run_qa_pass`, Aufruf-Stelle): `ok = await asyncio.to_thread(_qa_improve_one, loc, _store)`; nur bei `ok == True` wird `_store.update_qa_checked(loc.id, current_hash)` (Z.1620) aufgerufen. `ok` wird in `_qa_improve_one` gemeinsam für alle drei Teilschritte geführt (eine gemeinsame Variable) — **jeder** der drei Schritte kann `ok` auf `False` setzen, nicht nur Azimut/Brennweite; scheitert z. B. Brennweite, nachdem Azimut bereits erfolgreich geschrieben hat, bleibt der Azimut-Teilwert dauerhaft committet, aber der Prüf-Zeitstempel wird für den gesamten Ort nicht gesetzt.
+- Grep nach weiteren Aufrufstellen von `update_location_azimuth`/`update_location_focal`/`update_location_description`: **ausschließlich** in `_qa_improve_one()` sowie in den jeweils eigenen Testdateien (`test_task45_azimuth.py`, `test_task46_descriptions.py`, `test_task47_focal.py`) referenziert — keine weiteren Aufrufer im Backend, die bei einem Umbau der drei Funktionen berücksichtigt werden müssten.
+- `backend/main.py` Z.2671–2686 (`POST /run-qa-pass`, TASK-48 On-Demand): bestehender, Host-geschützter Endpunkt, der `_run_qa_pass()` manuell sofort anstößt — relevant als bestehender Workaround-Pfad für Pre-Mortem-Szenario 1 unten.
+
+**Sonderfall Produktionsdaten (Kontext, keine Ticket-Ursache):** `MISTRAL_API_KEY` ist auf Prod laut TASK-62 nicht gesetzt → der Beschreibungs-Schritt schreibt aktuell nie etwas (liefert immer `None`, ohne Exception). Das bedeutet: die aktuell beobachteten 15 verwaisten Zeilen stammen ausschließlich aus dem Azimut-/Brennweiten-Pfad. Die hier vorgeschlagene Lösung darf sich darauf aber **nicht verlassen** (der Key könnte künftig gesetzt werden) — der Beschreibungs-Schritt bleibt strukturell Teil des Problems, auch wenn er auf Prod aktuell inaktiv ist.
+
+**Example Mapping**
+
+📏 **Regel 1 — Ein geschriebener Teilwert braucht immer einen zugehörigen Prüf-Eintrag.** Sobald für einen Ort in diesem Lauf mindestens ein automatisch ermittelter Wert (Blickrichtung, Brennweiten-Empfehlung oder Beschreibung) tatsächlich gespeichert wurde, muss am Ende des Laufs für diesen Ort auch ein Prüf-Eintrag (Zeitstempel + Geo-Fingerabdruck) existieren — unabhängig davon, ob ein anderer Teilschritt an einem Datenbank-Fehler gescheitert ist.
+🟢 Given der Blickrichtungs-Schritt schreibt erfolgreich, der Brennweiten-Schritt scheitert an einem simulierten Datenbank-Fehler. When der Lauf für diesen Ort abgeschlossen ist. Then existiert sowohl der geschriebene Blickrichtungs-Wert als auch ein neuer Prüf-Eintrag für diesen Ort — kein Zustand „Wert ohne Prüf-Eintrag" mehr.
+
+📏 **Regel 2 — Ein komplett fehlgeschlagener Lauf verändert nichts und bleibt fällig.** Scheitern alle drei Teilschritte an einem Datenbank-Fehler (kein einziger Wert geschrieben), verhält sich der Ort wie bisher: kein neuer Prüf-Eintrag, er fällt beim nächsten Lauf erneut an.
+🟢 Given alle drei Teilschritte scheitern an einem simulierten Datenbank-Fehler. When der Lauf für diesen Ort abgeschlossen ist. Then bleibt der bisherige Zustand (kein Wert, kein neuer Prüf-Eintrag) unverändert, der Ort gilt weiterhin als fällig.
+
+📏 **Regel 3 — Ein fehlerfreier Lauf verhält sich exakt wie heute.** Läuft der komplette automatische Check für einen Ort ohne jeden Datenbank-Fehler durch, ändert sich am Ergebnis nichts gegenüber dem heutigen Verhalten.
+🟢 Given kein Teilschritt scheitert. When der Lauf für diesen Ort abgeschlossen ist. Then sind Werte und Prüf-Eintrag identisch zum heutigen Verhalten — keine sichtbare Verhaltensänderung im Normalfall.
+
+⚠️ **Annahme (⚪ konventionell, Default sinnvoll):** „Datenbank-Fehler" wird hier generisch behandelt (SQLite-Lock, I/O-Fehler, jede Exception aus `store.set_qa_values()`), nicht nur der im Ticket als Beispiel genannte „database is locked"-Fall. Die Lösung unterscheidet nicht nach Fehlerart — bitte bestätigen, falls eine Differenzierung gewünscht ist.
+
+⚠️ **Annahme (⚪ konventionell, Default sinnvoll):** Die Reihenfolge der drei Teilschritte (Azimut → Brennweite → Beschreibung) bleibt unverändert; das Ticket verlangt keine Änderung der Reihenfolge, nur der Fehlerbehandlung danach.
+
+❓ **Grenzfall mit zwei sinnvollen Verhaltensweisen — gehört ins Weg-Gate unten (Schritt „Implementierungsoptionen"):** Wie soll mit einem Ort umgegangen werden, bei dem ein Teilschritt an einem **echten, wiederkehrenden** Fehler scheitert (nicht nur ein einmaliger, transienter Datenbank-Lock)?
+- **Option A — echte Transaktion mit Rollback:** Bei jedem Fehler wird der gesamte Ort so behandelt, als wäre der Lauf für ihn nie passiert (auch bereits erfolgreich berechnete Teilwerte werden verworfen); er bleibt fällig und wird bei jedem weiteren Lauf automatisch erneut komplett versucht.
+- **Option B — Prüf-Eintrag immer nachziehen:** Bereits erfolgreich geschriebene Teilwerte bleiben stehen, der Ort gilt aber ab sofort als „geprüft" (Prüf-Eintrag wird gesetzt). Ein Ort mit einem echten, wiederkehrenden Fehler wird dadurch **nicht mehr automatisch** erneut versucht, solange sich seine Geo-Daten nicht ändern — er müsste manuell über den bestehenden Admin-Anstoß (`POST /run-qa-pass`) oder durch Löschen seines Prüf-Eintrags erneut angestoßen werden.
+
+Siehe Implementierungsoptionen unten — diese Frage ist deckungsgleich mit der Wahl zwischen Option A/B und wird dort gemeinsam mit der technischen Umsetzung vorgelegt.
+
+**Akzeptanzkriterien:**
+- [~] Scheitert beim automatischen Aktualisieren eines Ortes ein Teilschritt an einem Datenbank-Fehler, nachdem ein anderer Teilschritt bereits erfolgreich einen Wert gespeichert hat, bleibt am Ende kein gespeicherter Wert ohne zugehörigen Prüf-Eintrag zurück.
+- [~] Scheitern bei einem Ort alle drei Teilschritte an einem Datenbank-Fehler, bleibt der Ort unverändert und gilt weiterhin als noch nicht geprüft (Retry beim nächsten Lauf).
+- [~] Läuft der automatische Check für einen Ort ohne jeden Fehler durch, sind Ergebnis und Prüf-Eintrag identisch zum bisherigen Verhalten (keine Regression im Normalfall).
+- [~] Ein Ort, dessen Werte manuell gesperrt sind, wird weiterhin unverändert übersprungen — die Absicherung ändert nichts am bestehenden Sperr-Verhalten.
+- [~] Edge Case: Es handelt sich um den allerersten automatischen Check eines Ortes (noch kein vorheriger Prüf-Eintrag vorhanden) — auch hier darf nach einem Teilfehler kein Wert ohne Prüf-Eintrag entstehen.
+- [~] Der bestehende manuelle Admin-Anstoß (sofortiger Check ohne auf die Nacht zu warten) liefert weiterhin dieselbe Rückmeldung (Anzahl geprüft/verbessert/fehlgeschlagen) wie bisher — keine Formatänderung.
+
+**Pre-Mortem:**
+- 💀 Szenario 1: Bei Wahl von Option B wird ein Ort mit einem echten, wiederkehrenden Fehler (nicht nur transientem Lock) fälschlich als „geprüft" markiert und dadurch nie wieder automatisch neu versucht, solange sich seine Geo-Daten nicht ändern. Auslöser: Der „Prüf-Eintrag immer nachziehen"-Ansatz unterscheidet nicht zwischen einmaligem und dauerhaftem Fehler. Frühwarnung: bestehende `logger.warning`-Meldung pro fehlgeschlagenem Teilschritt bleibt erhalten und ist im Log sichtbar. Gegenmaßnahme: In den Testplan aufnehmen, dass die Warn-Logs unverändert bestehen bleiben; im Ticket den bestehenden `POST /run-qa-pass`-Endpunkt als bekannten manuellen Workaround dokumentieren.
+- 💀 Szenario 2: Bei Wahl von Option A (echte Transaktion) wird die Berechnung des Beschreibungs-Schritts (inkl. externem Mistral-API-Netzwerk-Aufruf) versehentlich **innerhalb** der gemeinsamen Datenbank-Transaktion ausgeführt statt davor — SQLite serialisiert Schreibzugriffe, das würde alle anderen gleichzeitigen Schreibanfragen der App (z. B. eine Location-Bearbeitung oder Bewertung eines Nutzers) für die Dauer des Netzwerk-Aufrufs blockieren. Auslöser: Naive Umsetzung, die Compute- und Schreib-Phase nicht sauber trennt. Frühwarnung: spürbar langsamere Antwortzeiten anderer Endpunkte während eines laufenden QA-Laufs. Gegenmaßnahme: Falls Option A gewählt wird, im Plan explizit verankern, dass jede Berechnung (inkl. Netzwerk-Aufruf) **vor** Beginn der gemeinsamen Transaktion abgeschlossen sein muss; als eigenes Akzeptanzkriterium/Testfall aufnehmen.
+- 💀 Szenario 3: Ein Test simuliert den Datenbank-Fehler nicht an der richtigen Stelle (z. B. nur generisch gegen `store.set_qa_values()` gemockt, aber nicht über den tatsächlichen Aufrufpfad aus `qa_azimuth`/`qa_focal`) und bestätigt dadurch fälschlich „Fix funktioniert", obwohl der reale Fehlerpfad in `_qa_improve_one()` anders verläuft. Gegenmaßnahme: Testfälle lösen die Exception exakt im Aufruf von `qa_azimuth.update_location_azimuth()` bzw. `qa_focal.update_location_focal()` aus (z. B. per Monkeypatch auf `store.set_qa_values`), nicht nur isoliert auf Store-Ebene.
+- 💀 Szenario 4: Die zusätzliche `busy_timeout`-Einstellung (Begleitmaßnahme, s. u.) wird als vollständige Lösung missverstanden — sie reduziert nur die Häufigkeit des Auslösers (kurzzeitige Lock-Konflikte werden intern abgewartet statt sofort zu scheitern), verhindert aber nicht strukturell, dass bei einem tatsächlichen Fehler (z. B. Timeout überschritten, I/O-Fehler) weiterhin ein Teilerfolg ohne Prüf-Eintrag entstehen kann. Gegenmaßnahme: `busy_timeout` im Plan klar als Ergänzung, nicht als Ersatz für die eigentliche Konsistenz-Absicherung kennzeichnen (siehe Optionen unten).
+
+**Architektur-Analyse:**
+`location_qa_state` (Prüf-Zeitstempel + Geo-Fingerabdruck + manuelle Sperren) und `location_qa_values` (die drei automatisch ermittelten Inhalte) sind zwei unabhängige SQLite-Tabellen ohne Fremdschlüssel-Bindung. Jeder der vier Schreibvorgänge pro Ort — Azimut-Wert, Brennweiten-Wert, Beschreibungs-Wert, Prüf-Eintrag — läuft heute in einer eigenen, für sich atomaren Transaktion über `store.py`. Die Lücke liegt ausschließlich **zwischen** diesen vier Transaktionen: Es gibt keine Klammer, die alle vier gemeinsam absichert. `_qa_improve_one()` fasst den Erfolg aller drei Werte-Schritte in einer einzigen gemeinsamen `ok`-Variable zusammen; `_run_qa_pass()` schreibt den Prüf-Eintrag nur, wenn `ok` am Ende `True` ist — unabhängig davon, welcher der drei Teilschritte tatsächlich fehlgeschlagen ist und ob andere Teilschritte bereits erfolgreich geschrieben haben. Die drei Werte-Update-Funktionen (`qa_azimuth`, `qa_focal`, `qa_description`) sind ausschließlich von `_qa_improve_one()` aus erreichbar (plus ihre eigenen Testdateien) — ein Umbau ihres internen Verhaltens hat keine weiteren Aufrufer im Backend zu berücksichtigen.
+
+**Designer-Check:** nicht visuell (reine Backend-/Datenkonsistenz, kein sichtbares App-Element) → übersprungen.
+
+**Implementierungsoptionen**
+
+### Option A — Echte Transaktion mit Rollback
+- Vorgehen: `_qa_improve_one()` umbauen, sodass zunächst nur die reinen Berechnungen (inkl. bestehender Sperr-/Vorhandene-Werte-Prüfung) ausgeführt werden — inklusive des externen Netzwerk-Aufrufs für die Beschreibung — und die Ergebnisse gesammelt werden, **bevor** irgendetwas geschrieben wird. Anschließend schreibt eine neue, gemeinsame Store-Methode alle ermittelten Werte **und** den Prüf-Eintrag in einer einzigen Transaktion. Schlägt dieser gemeinsame Schreibvorgang fehl, wird vollständig zurückgerollt — der Ort bleibt komplett unverändert und fällt beim nächsten Lauf erneut an.
+- Betroffene Dateien: `backend/main.py` (`_qa_improve_one` neu strukturiert), `backend/data/store.py` (neue atomare Sammel-Schreibmethode), ggf. `backend/data/qa_azimuth.py`/`qa_focal.py`/`qa_description.py` (Trennung von Berechnung und Schreiben, ohne die bestehenden öffentlichen Funktionen/Tests zu brechen).
+- Vorteile: stärkste Garantie — ein Teilerfolg wird nie sichtbar, bevor der gesamte Ort fertig ist; entspricht wörtlich dem Ticket-Titel „transaktional absichern"; retryt automatisch auch bei dauerhaften Fehlern (kein manueller Eingriff nötig).
+- Nachteile/Risiken: größerer Umbau über vier Dateien; Gefahr der Netzwerk-Aufruf-in-Transaktion-Falle (Pre-Mortem Szenario 2), muss im Plan aktiv vermieden werden; Risiko, dass die Trennung von Berechnung/Schreiben die bestehende Sperr-/Vorhandene-Werte-Logik dupliziert, wenn sie nicht sauber aus den bestehenden Funktionen herausgezogen werden kann.
+- Aufwand: mittel bis groß.
+
+### Option B — Prüf-Eintrag immer nachziehen (empfohlen)
+- Vorgehen: Die drei Teilschritte bleiben wie heute unabhängig (jeder für sich bereits korrekt atomar). `_run_qa_pass()`/`_qa_improve_one()` werden so geändert, dass der Prüf-Eintrag (`update_qa_checked()`) für einen Ort immer geschrieben wird, sobald der Lauf für ihn abgeschlossen ist — unabhängig davon, ob ein einzelner Teilschritt eine Exception geworfen hat. Der bestehende `failed`-Zähler/die Logs bleiben als Monitoring-Signal erhalten, beeinflussen aber nicht mehr, ob der Prüf-Eintrag gesetzt wird. Ergänzend (Begleitmaßnahme, adressiert Pre-Mortem-Auslöser direkt): `PRAGMA busy_timeout` (z. B. 5000 ms) in `store.py` `_connect()` ergänzen, damit kurzzeitige gleichzeitige Schreibzugriffe intern abgewartet statt sofort als Fehler geworfen werden.
+- Betroffene Dateien: `backend/main.py` (`_qa_improve_one`/`_run_qa_pass`, wenige Zeilen), `backend/data/store.py` (`_connect()`, eine Zeile für `busy_timeout`).
+- Vorteile: kleiner, gut nachvollziehbarer Eingriff; keine Änderung an den drei bestehenden, bereits getesteten QA-Update-Funktionen nötig (`test_task45_azimuth.py`/`test_task46_descriptions.py`/`test_task47_focal.py` bleiben unverändert gültig); vermeidet die Netzwerk-in-Transaktion-Falle vollständig, weil gar keine neue gemeinsame Transaktion eingeführt wird; proportional zum Aufwand für ein „Niedrig"-priorisiertes Ticket.
+- Nachteile/Risiken: siehe Pre-Mortem Szenario 1 — ein Ort mit einem echten, wiederkehrenden Fehler wird nicht mehr automatisch retryt, sondern bräuchte einen manuellen Anstoß. Bei den bisher beobachteten Fällen (transiente Datenbank-Locks) ist das unkritisch, bei einem strukturellen Dauerfehler eines einzelnen Ortes wäre es eine reale, aber seltene Restlücke.
+- Aufwand: klein.
+
+✅ **Empfehlung: Option B** — schließt exakt die im Ticket beschriebene Lücke (kein Wert mehr ohne zugehörigen Prüf-Eintrag), ohne die Netzwerk-Aufruf-Blockierungsgefahr von Option A einzugehen und ohne die drei bestehenden, bereits getesteten QA-Update-Funktionen anzufassen. Der Kompromiss (Szenario 1: kein automatischer Retry bei einem seltenen, dauerhaften Fehler eines einzelnen Ortes) ist bei „Niedrig"-Priorität und einem bestehenden manuellen Workaround (`POST /run-qa-pass`) vertretbar. Die ergänzende `busy_timeout`-Einstellung reduziert zusätzlich die Häufigkeit des ursprünglichen Auslösers.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/main.py` (`_qa_improve_one`, `_run_qa_pass`, `/run-qa-pass`), `backend/data/store.py` (`get_qa_state`, `set_qa_values`, `update_qa_checked`, `_connect`), `backend/data/qa_azimuth.py`, `backend/data/qa_focal.py`, `backend/data/qa_description.py`
+- [x] Designer-Check: nicht visuell → übersprungen
+- [x] Implementierungsoptionen: A (echte Transaktion mit Rollback) / B (Prüf-Eintrag immer nachziehen, empfohlen) — Weg-Gate bestanden: Stephan hat Option B am 2026-07-14 als gewählten Umsetzungsweg freigegeben.
+- [x] Empfehlung: Option B (siehe oben) — von Stephan bestätigt (2026-07-14)
+
+**Testplan:**
+- [ ] Automatisiert (Harness): neue Datei `backend/tests/test_task78_qa_transactional.py`, Ticket-ID im Docstring, Marker `offline, regression`.
+  - Test 1: Azimut-Schritt schreibt erfolgreich, Brennweiten-Schritt wirft simulierte Exception (Monkeypatch auf `store.set_qa_values` im Brennweiten-Aufrufpfad) → nach Lauf existiert Prüf-Eintrag für den Ort UND der geschriebene Azimut-Wert bleibt erhalten (AK 1).
+  - Test 2: Alle drei Teilschritte werfen simulierte Exceptions → kein Prüf-Eintrag entsteht, Ort bleibt „fällig" (AK 2).
+  - Test 3: Kein Fehler in keinem Teilschritt → Ergebnis identisch zum bisherigen Verhalten, Regressionstest gegen bestehende `test_task48`-artige Fälle (AK 3).
+  - Test 4: Ort mit gesetztem Lock (z. B. `azimuth_lock`) → weiterhin übersprungen wie bisher (AK 4).
+  - Test 5: Ort ohne jeden vorherigen Prüf-Eintrag (erster Lauf), Teilfehler in einem Schritt → kein Wert ohne Prüf-Eintrag (AK 5, Edge Case).
+- [ ] Manuell: `POST /run-qa-pass` (Host-Token) gegen lokalen Dev-Server auslösen, Rückmeldungsformat (`checked`/`improved`/`failed`) mit bisherigem Verhalten vergleichen (AK 6); anschließend `location_qa_state`/`location_qa_values` per curl/SQLite-Abfrage auf Konsistenz prüfen (keine Zeile in `location_qa_values` ohne passende `location_qa_state`-Zeile für die im Test verarbeiteten Orte).
+
+**Testergebnis (Stephan, lokal, 2026-07-14, Python 3.9.6 bestätigt):**
+- `pytest tests/test_task78_qa_transactional.py -v` → 5 passed, 0 failed
+- `pytest tests/test_task48_qa_cron.py -v` → 13 passed, 0 failed
+- Offen (nicht durch obige Läufe abgedeckt): Testplan-Punkt „Manuell: POST /run-qa-pass" (AK 6). Beide Testdateien rufen ausschließlich `main._run_qa_pass()` direkt auf (interne Funktion) — Grep nach „run-qa-pass"/„client.post"/„TestClient" in beiden Dateien ergibt keinen Treffer, es gibt keinen HTTP-Request über den Endpunkt. Der manuelle Check gegen den lokalen Dev-Server steht weiterhin aus.
+
+**Abweichungs-Notiz (Verifikation, 2026-07-14):** Die tatsächliche Implementierung von AK2 („Scheitern bei einem Ort alle drei Teilschritte, bleibt der Ort unverändert/fällig") ist etwas breiter gefasst als der AK-Wortlaut: Der Prüf-Eintrag wird bereits dann nicht gesetzt, wenn kein Wert geschrieben wurde UND mindestens ein Schritt (Azimut/Brennweite) eine echte Exception geworfen hat — nicht erst wenn alle drei Schritte scheitern. Das ist konservativer/sicherer als der AK-Wortlaut, technisch aber eine Verallgemeinerung davon. Bewusste, verifizierte Abweichung — keine Korrektur nötig.
 
 ---

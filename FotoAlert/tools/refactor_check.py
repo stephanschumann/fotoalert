@@ -12,6 +12,8 @@ Usage:
 Exit codes: 0 = clean, 1 = findings (auto-fixable or needs-ticket), 2 = error
 """
 
+from __future__ import annotations
+
 import ast
 import json
 import re
