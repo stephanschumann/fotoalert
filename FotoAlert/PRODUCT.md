@@ -648,6 +648,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-14 | US-132 | Neuer Event-Typ „Rote Wolken" (RED_CLOUDS): hohe Wolken (Cirrus) glühen in Sonnenrichtung rot/purpurn, wenn die Sonne bereits unter dem Horizont steht (Blaue Stunde); dafür wurde auch ein neuer, zur bestehenden „Blaue Stunde" (Abend) symmetrischer „Blaue Stunde Morgen"-Event-Typ eingeführt. Released als v1.22.24, CI-Lauf #213 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`), gemeinsam mit US-131. |
 | 2026-07-14 | BUG-78 | Apple-Maps-Koordinatenformat im Standort-/Motiv-Feld wird jetzt akzeptiert |
 | 2026-07-14 | TASK-78 | QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird immer nachgezogen, PRAGMA busy_timeout ergänzt |
+| 2026-07-14 | TASK-77 | Beim Löschen einer Location (hart bei selbst angelegten, per Tombstone bei Standard-Locations) werden jetzt auch ihre automatisch erzeugten Prüf-Daten (Beschreibung, Blickwinkel-Empfehlung, Brennweiten-Tipp) mitentfernt — keine verwaisten Datensätze mehr nach dem Löschen. Released als v1.22.27, CI-Lauf #221 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`); Verhalten zusätzlich manuell bestätigt (hartes Löschen + Softlöschen). |
 
 ---
 
