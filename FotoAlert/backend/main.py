@@ -3184,24 +3184,15 @@ async def update_location_image_focus(
     return {"ok": True, "image_focus_x": x, "image_focus_y": y}
 
 
-@app.patch("/locations/{loc_id}")
-async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
-    """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
-    # US-128: Die drei vormals redundant gepflegten Feld-Listen (hier + main.py
-    # _load_location_overrides + precompute.py _OVERRIDE_FIELDS) sind jetzt aus
-    # data/locations.py:LOCATION_FIELD_RULES abgeleitet (eine gemeinsame Quelle).
-    coord_fields    = COORD_FIELDS
-    text_fields     = TEXT_FIELDS  # BUG-61: Motivname whitelisten
-    numeric_fields  = NUMERIC_FIELDS       # US-62 + US-128 (subject_height_m/subject_width_m)
-    list_fields     = LIST_FIELDS       # BUG-22: list[int], beeinflusst camera_hints
-    recompute_fields = RECOMPUTE_TRIGGER_FIELDS
-    all_allowed_fields = PATCHABLE_LOCATION_FIELDS
-    allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
-    if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, subject_height_m, subject_width_m, focal_length_suggestions).")
-
+def _validate_patch_fields(allowed: dict) -> dict:
+    """TASK-60 (aus patch_location extrahiert): Validiert + normalisiert die PATCH-Feldwerte
+    (Koordinaten ±90°/±180°, numerische Felder inkl. float-Cast, focal_length_suggestions
+    inkl. int-Cast 8–1200mm). Wirft HTTPException(422) bei ungültigen Werten. Gibt den
+    normalisierten Dict zurück — MUSS vor dem target_loc-Lookup in patch_location() aufgerufen
+    werden, sonst kippt die Fehler-Präzedenz für ungültige Felder gegen eine nicht-existente
+    loc_id von 422 auf 404."""
     # Koordinaten validieren
-    for f in coord_fields & allowed.keys():
+    for f in COORD_FIELDS & allowed.keys():
         val = allowed[f]
         if not isinstance(val, (int, float)):
             raise HTTPException(status_code=422, detail=f"{f} muss eine Zahl sein.")
@@ -3213,7 +3204,7 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     # Numerische Felder validieren: observer_floor_height_m (US-62), subject_height_m/
     # subject_width_m (US-128) — Zahl, ≥ 0, 0 ist ein gültiger Bestandswert (z.B.
     # geltow_havelblick ohne vertikales Motiv).
-    for f in numeric_fields & allowed.keys():
+    for f in NUMERIC_FIELDS & allowed.keys():
         val = allowed[f]
         if not isinstance(val, (int, float)):
             raise HTTPException(status_code=422, detail=f"{f} muss eine Zahl sein.")
@@ -3233,20 +3224,24 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
             parsed.append(int(v))
         allowed["focal_length_suggestions"] = parsed
 
-    # In-Memory-Location suchen
-    target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
-    if not target_loc:
-        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+    return allowed
 
-    # US-128 (Frage 1, Option B): Eine bewusste Korrektur von subject_height_m markiert den
-    # Wert als recherchiert, nicht mehr als unbearbeiteten Locationscout-Import-Platzhalter
-    # (discover/subjects.py:_is_placeholder()). Bewusst getrennt von `allowed` gehalten, damit
-    # dieser interne Seiteneffekt-Flag nicht in der API-Response ("updated") auftaucht.
+
+def _compute_patch_persist_fields(allowed: dict) -> dict:
+    """TASK-60 (aus patch_location extrahiert): US-128 (Frage 1, Option B) — eine bewusste
+    Korrektur von subject_height_m markiert den Wert als recherchiert, nicht mehr als
+    unbearbeiteten Locationscout-Import-Platzhalter (discover/subjects.py:_is_placeholder()).
+    Bewusst getrennt von `allowed` gehalten, damit dieser interne Seiteneffekt-Flag nicht in
+    der API-Response ("updated") auftaucht."""
     if "subject_height_m" in allowed:
-        persist_fields = dict(allowed, subject_height_researched=True)
-    else:
-        persist_fields = allowed
+        return dict(allowed, subject_height_researched=True)
+    return allowed
 
+
+def _persist_location_patch(loc_id: str, persist_fields: dict) -> None:
+    """TASK-60 (aus patch_location extrahiert): Custom-/Standard-Location-Verzweigung für die
+    Persistierung eines PATCH. Wirft HTTPException(404) wenn eine Custom-Location nicht in der
+    Datei/DB gefunden wird."""
     if loc_id.startswith("custom_"):
         # subject_height_researched ist keine Spalte in custom_locations (Custom-Locations
         # werden nie mit False angelegt, Default bleibt beim Neu-Laden ohnehin True) — nicht an
@@ -3260,17 +3255,48 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
         # Felder generisch als JSON-Blob, kein Schema-Problem für subject_height_researched).
         _save_location_override(loc_id, **persist_fields)
 
-    # In-Memory-Liste aktualisieren (inkl. Seiteneffekt-Flag, falls gesetzt)
-    for k, v in persist_fields.items():
-        setattr(target_loc, k, v)
 
-    # TASK-12: Koordinaten oder observer_floor_height_m geändert → Single-Location Recompute
-    needs_recompute = bool(recompute_fields & allowed.keys())
+def _trigger_patch_recompute(loc_id: str, allowed: dict) -> bool:
+    """TASK-60 (aus patch_location extrahiert): TASK-12 — Koordinaten oder
+    observer_floor_height_m geändert → Single-Location Recompute anstoßen. Gibt
+    needs_recompute für die Response zurück."""
+    needs_recompute = bool(RECOMPUTE_TRIGGER_FIELDS & allowed.keys())
     if needs_recompute:
         logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
         _recompute_pending.add(loc_id)  # US-106: sofort pending, damit Banner ehrlich bleibt
         asyncio.create_task(_run_precompute_single(loc_id))
         _trigger_discover_debounced()  # US-106 Teil 2: Entdecken zieht zeitnah nach
+    return needs_recompute
+
+
+@app.patch("/locations/{loc_id}")
+async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
+    """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
+    # US-128: Die drei vormals redundant gepflegten Feld-Listen (hier + main.py
+    # _load_location_overrides + precompute.py _OVERRIDE_FIELDS) sind jetzt aus
+    # data/locations.py:LOCATION_FIELD_RULES abgeleitet (eine gemeinsame Quelle).
+    all_allowed_fields = PATCHABLE_LOCATION_FIELDS
+    allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
+    if not allowed:
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, subject_height_m, subject_width_m, focal_length_suggestions).")
+
+    # TASK-60: Validierung MUSS vor dem target_loc-Lookup laufen — sonst kippt die
+    # Fehlerantwort für ungültige Felder bei einer nicht-existenten loc_id von 422 auf 404.
+    allowed = _validate_patch_fields(allowed)
+
+    # In-Memory-Location suchen
+    target_loc = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if not target_loc:
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+
+    persist_fields = _compute_patch_persist_fields(allowed)
+    _persist_location_patch(loc_id, persist_fields)
+
+    # In-Memory-Liste aktualisieren (inkl. Seiteneffekt-Flag, falls gesetzt)
+    for k, v in persist_fields.items():
+        setattr(target_loc, k, v)
+
+    needs_recompute = _trigger_patch_recompute(loc_id, allowed)
 
     # TASK-18: Backup nach jedem erfolgreichen Edit (im Test-Modus aus – keine Git-Operationen)
     if not _NO_BACKGROUND:
