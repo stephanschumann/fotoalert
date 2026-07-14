@@ -101,5 +101,12 @@ Verifikations-Subagent (§ Verifikation).
 - Kanban nach **jeder** Status-Änderung mitziehen (`tools/sync_kanban.py` → `update_artifact`).
 - PRODUCT.md nach jedem Ticket pflegen (Basis für Regression).
 - Server läuft **Python 3.9** — keine 3.10+-Syntax (`str|None`).
+- **Kein Tool-Call vor einer reinen Text-/Codeblock-Antwort** (Handoff-Schritt, Erklärung,
+  Terminal-Befehl zum Kopieren) — kein `bash echo`/`true`, kein sachfremder Werkzeug-Griff nur
+  um "etwas zu tun". Selbst-Check vor JEDEM Call: „Braucht die Antwort dieses Ergebnis?" Wenn nein
+  → direkt antworten. Gilt besonders in Ketten aus mehreren Handoff-Antworten hintereinander
+  (Release/Test-Dialoge) — dort ist der Fehlreflex am stärksten. 11-fach rückfällig trotz
+  globaler Memory `feedback_no_tool_call_before_text_answer` — deshalb hier zusätzlich verankert,
+  weil diese Datei bei jedem Chat-Start geladen wird (globale Memory offenbar nicht ausreichend).
 
 Vollständige Details und Warum: siehe Memory-Dateien und `FotoAlert/PIPELINE.md` §3.5/§3.6.
