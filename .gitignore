@@ -42,3 +42,18 @@ FotoAlert/backend/de421.bsp
 # Logs
 *.log
 logs/
+
+# QA-Report (generiert bei jedem Testlauf, kein Versionsstand)
+FotoAlert/backend/findings.json
+
+# Veralteter Kanban-Snapshot im Repo-Root — Board läuft über das Cowork-Artifact,
+# wird von gen_kanban.py/sync_kanban.py seit BUG-67 nicht mehr hierher geschrieben
+/fotoalert-kanban.html
+
+# QA-Screenshots aus Testläufen (Playwright etc.)
+FotoAlert/docs/qa-screenshots/
+
+# Fremde/unabhängige Artefakte außerhalb des Ticket-Scopes
+FotoAlert/docs/skill-ergaenzung-testabdeckung-vollregression.md
+/fotoalert-release-edit.skill
+/fotoalert_cowork_workflow.html
