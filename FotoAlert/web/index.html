@@ -1558,7 +1558,7 @@ function ic(id, size, cls, color){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.24';
+const APP_VERSION = '1.22.25';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -6943,9 +6943,31 @@ const AddLocation = {
     if (lon < -180 || lon > 180) return 'Längengrad muss zwischen −180° und +180° liegen';
     return null;
   },
+  // BUG-78: normalisiert Apple-Maps-Format (deutsch/englisch, mit/ohne Leerzeichen
+  // vor °, Komma- oder Punkt-Dezimaltrennzeichen) zu "lat, lon" Dezimalgrad, bevor
+  // die bestehende Dezimal-/DMS-Erkennung in _parseCoords() läuft. Kein Treffer ->
+  // Text unverändert durchreichen (bestehende Zweige greifen wie bisher).
+  _normalizeCoordInput(text) {
+    if (!text) return text;
+    const t = text.trim();
+    const m = t.match(
+      /^(-?\d{1,3}(?:[.,]\d+)?)\s*°?\s*([NSEWOnsewo])?\s*[,;]\s*(-?\d{1,3}(?:[.,]\d+)?)\s*°?\s*([NSEWOnsewo])?$/
+    );
+    if (!m) return text; // kein Treffer (z.B. DMS, Unsinn) -> unverändert durchreichen
+
+    let lat = parseFloat(m[1].replace(',', '.'));
+    let lon = parseFloat(m[3].replace(',', '.'));
+    const latCard = (m[2] || '').toUpperCase();
+    const lonCard = (m[4] || '').toUpperCase();
+    if (latCard === 'S') lat = -Math.abs(lat);
+    if (lonCard === 'W') lon = -Math.abs(lon);
+    // N, E, O (Ost) => positiv, Vorzeichen bleibt wie geparst
+
+    return `${lat}, ${lon}`;
+  },
   _parseCoords(text) {
     if (!text) return null;
-    text = text.trim();
+    text = this._normalizeCoordInput(text.trim());
     // Dezimalgrad: "52.51234, 13.40123" oder mit Tab/Leerzeichen
     const dec = text.match(/(-?\d{1,3}\.?\d*)[,\s;]+(-?\d{1,3}\.?\d*)/);
     if (dec) {

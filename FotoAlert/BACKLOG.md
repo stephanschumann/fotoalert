@@ -29,7 +29,7 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | BUG-78 |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
@@ -2036,6 +2036,142 @@ Icon: `i-doc` (bereits im SVG-Symbol-Set vorhanden, geometrisches Blatt-Icon, pa
 **User Story:** Als App-Nutzer möchte ich, dass die Berechnung von Alignments in der Anlage-Maske andere Nutzer und meine eigenen weiteren Aktionen nicht für mehrere Sekunden blockiert, sodass die App für alle durchgängig reaktionsfähig bleibt, auch während jemand eine neue Location anlegt.
 
 **Bezug:** Entstand als dokumentierter Nebenbefund im BUG-60-Ticket (siehe dort, Abschnitt „Nachgeholter UI-Klick-Test", 2026-07-04: „separat per Intake ins Backlog aufgenommen"). Keine Dublette gefunden — kein anderes Ticket behandelt diese konkrete Blockade von `/preview-alignment` bzw. `find_precise_alignment_times`. Verwandtes Lösungsmuster bereits an anderer Stelle etabliert: **TASK-48** (Szenario 4, Empfehlung) und die QA-Beschreibungs-Pipeline lagern vergleichbare rechenintensive/synchrone Aufrufe explizit per `asyncio.to_thread` aus dem Event-Loop aus — als Präzedenzfall für die Analyse-Phase relevant, aber kein Überschneidungs- oder Merge-Kandidat, da dort andere Endpunkte betroffen sind. Abgrenzung zu BUG-60: BUG-60 behandelt das automatisch vorbelegte Hinweise-Feld (bereits in Test), dieses Ticket behandelt ausschließlich die Blockade-Performance desselben Endpunkts.
+
+---
+
+### BUG-78 · Koordinaten-Eingabefeld „Mein Standort (Fotograf)" akzeptiert kein Apple-Maps-Format (deutsche Lokalisierung) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-14 |
+
+**Beschreibung:** Im „Neue Location"-Sheet lehnt das Feld „MEIN STANDORT (FOTOGRAF)" Koordinaten ab, die aus Apple Maps kopiert wurden, sobald das Gerät auf Deutsch lokalisiert ist — beobachtetes Format z. B. „46,64770° N, 11,71666° O" (Komma statt Punkt als Dezimaltrennzeichen, Gradzeichen direkt an der Zahl, ausgeschriebene Himmelsrichtung N/S/O/W nachgestellt). Die Fehlermeldung des Felds verlangt „Dezimal (52.4, 13.1) oder DMS" — beide unterstützten Formate akzeptieren dieses Apple-Maps-Format nicht. Erwartet: Aus Apple Maps kopierte Koordinaten lassen sich unverändert einfügen, ohne dass Komma, Gradzeichen und Himmelsrichtung vorher manuell entfernt/umgeschrieben werden müssen.
+
+**User Story:** Als Host, möchte ich beim Anlegen einer Location eine aus Apple Maps kopierte Koordinate direkt ins Standort-Feld einfügen können, sodass ich sie nicht erst manuell umformatieren muss (Punkt statt Komma, ° und Himmelsrichtung entfernen).
+
+**Bezug:** Feld wurde ursprünglich in **US-56** [x] (Done, Koordinaten-Eingabe: Dezimal + DMS-Unterstützung) geschaffen und in **US-60** [x] (Done, einheitliches Koordinatenfeld für alle Locations) vereinheitlicht — dieses Ticket ist eine Format-Erweiterung der dort gebauten Parsing-Logik, keine Dublette (beide Tickets sind bereits Done und behandelten Dezimal/DMS, nicht das lokalisierte Apple-Maps-Format). Keine inhaltliche Überschneidung mit **BUG-21** [ ] (Brennweiten-Eingabe: fehlende Komma-Taste auf iOS) — anderes Feld, anderes Symptom, nur oberflächlich verwandtes Lokalisierungs-/Zahlenformat-Thema.
+
+#### 🔬 Analyse & Spec (BUG-78) · 2026-07-14
+
+⚠️ **Hinweis zum Pipeline-Gate:** BUG-78 stand zum Zeitpunkt dieser Analyse noch in der Lane **📥 Inbox**, nicht in **🚦 Ready for Analysis** — die Analyse wurde auf ausdrückliche, namentliche Anforderung durchgeführt (nicht durch automatischen Pipeline-Lauf). Board unten wurde im Zuge dieser Analyse aktualisiert (Inbox → In Analysis); falls das nicht gewollt war, bitte zurückverschieben.
+
+##### 📎 Code-Verifikation (durchgeführt 2026-07-14)
+
+- `web/index.html` Zeile 6946–6965, Funktion `AddLocation._parseCoords(text)`: die **einzige** Parse-Funktion für **beide** Koordinatenfelder im „Neue Location"-Sheet. Wird aufgerufen von `_onObsInput()` (Zeile 6985–6999, Feld `#obs-coords` = „Mein Standort (Fotograf)", Zeile 1357–1360) UND `_onSubjInput()` (Zeile 7000–7015, Feld `#subj-coords` = „Motiv (Gebäude / Landmark)", Zeile 1368–1371) sowie vom Einfügen-Button `_pasteCoords()` (Zeile 6966–6984, Clipboard-Read). STANDORT und MOTIV sind also bereits heute keine getrennten Implementierungen, sondern dieselbe Funktion.
+- Zeile 6950: Dezimal-Regex `/(-?\d{1,3}\.?\d*)[,\s;]+(-?\d{1,3}\.?\d*)/` — erkennt **nur** Punkt als Dezimaltrennzeichen, kein Komma, kein `°`, keine Himmelsrichtungs-Buchstaben.
+- Zeile 6956: DMS-Regex — erkennt Grad/Minute/Sekunde mit `°`/`'`/`″` und Himmelsrichtung **N/S/E/W**, aber **nicht** das deutsche „O" für Ost. Strukturell auf Grad+Minute+Sekunde ausgelegt — das Apple-Maps-Format („46,64770° N") ist reines **Dezimalgrad mit Himmelsrichtung**, kein DMS, passt also auch inhaltlich nicht in diesen Zweig.
+- Fehlermeldungstext „Ungültige Koordinaten – Dezimal (52.4, 13.1) oder DMS" steht an zwei Stellen dupliziert: Zeile 6990 (`_onObsInput`) und Zeile 7005 (`_onSubjInput`).
+- Bestätigt: Es gibt **keine** dritte, bereits vorhandene Teil-Unterstützung für das Apple-Maps-Format — es wird aktuell vollständig abgelehnt.
+- **Zweite, unabhängige Code-Kopie gefunden:** `LocationDetail._parseEditCoords(val)` (Zeile 6456–6473) ist eine strukturell identische, aber **separat gepflegte** Parse-Funktion für das Bearbeiten-Sheet (Felder `#edit-obs-coords`/`#edit-subj-coords`). Sie ist **nicht** Teil dieses Tickets (Ticket-Scope ist explizit „Neue Location"-Sheet) und bliebe von einer Änderung an `_parseCoords()` unberührt — siehe Pre-Mortem Szenario 3.
+- Wertebereichsprüfung `_validateLatLon()` (Zeile 6940–6945) ist dem Parsing nachgelagert und bleibt unverändert relevant (±90°/±180°).
+
+##### Example Mapping
+
+**Scope-Check:** Ticket-Text beschränkt sich explizit auf das „Neue Location"-Sheet und nennt nur das STANDORT-Feld. Da STANDORT und MOTIV in diesem Sheet aber dieselbe Funktion nutzen (siehe Code-Verifikation), ist die Beschränkung auf „nur STANDORT" im Ticket vermutlich beiläufig (Ticket beschreibt nur den beobachteten Anwendungsfall), nicht technisch erzwingbar ohne Zusatzaufwand — siehe ❓ Frage 2.
+
+**📏 Rule 1:** Das STANDORT-Feld im „Neue Location"-Sheet akzeptiert Koordinaten im deutschen Apple-Maps-Format (Komma als Dezimaltrennzeichen, `°` direkt am Zahlenwert, ausgeschriebene Himmelsrichtung N/S/O/W nachgestellt, Komma+Leerzeichen zwischen den beiden Koordinaten) und wandelt sie korrekt in Dezimalgrad um, inkl. korrektem Vorzeichen bei S/W.
+
+🟢 Beispiel: Stephan fügt „46,64770° N, 11,71666° O" ins Feld „Mein Standort (Fotograf)" ein → keine Fehlermeldung, auf der Karte erscheint sofort ein Marker bei lat=46.64770, lon=11.71666.
+
+🟢 Beispiel: Stephan fügt „46,64770° S, 11,71666° W" ein → wird akzeptiert, lat=−46.64770, lon=−11.71666 (Vorzeichen-Konvention identisch zur bestehenden DMS-Logik, Zeile 6959/6961).
+
+**📏 Rule 2 (Regression):** Die bereits unterstützten Formate (Dezimal mit Punkt, DMS mit Gradzeichen/Anführungszeichen) funktionieren nach der Änderung unverändert weiter.
+
+🟢 Beispiel: Stephan fügt weiterhin „52.40747, 13.09279" ein → wird wie bisher akzeptiert.
+🟢 Beispiel: Stephan fügt weiterhin `52°24'26"N 13°05'33"E` ein → wird wie bisher akzeptiert.
+
+**📏 Rule 3 (Ungültige Eingabe, Regression):** Eingaben, die keinem der unterstützten Formate entsprechen oder außerhalb der Wertebereiche liegen, zeigen weiterhin eine verständliche Fehlermeldung.
+
+🟢 Beispiel: Stephan tippt „abc" ein → Fehlermeldung „Ungültige Koordinaten – Dezimal (52.4, 13.1) oder DMS" (ggf. Hilfetext um „oder Apple Maps" ergänzt, siehe AK-6) erscheint weiterhin, kein stiller Absturz, keine Fehlkoordinate.
+
+❓ **Frage 1 (🔴 funktional kritisch — Grenzfall mit mehreren sinnvollen Optionen):** Soll NUR das exakte, im Ticket beschriebene Format unterstützt werden, oder eine Bandbreite ähnlicher Varianten?
+&nbsp;&nbsp;**Option A — Eng:** Nur das deutsche Apple-Maps-Format exakt wie im Ticket-Beispiel (Komma-Dezimal + `°` + Leerzeichen + N/S/O/W). *Konsequenz:* kleinstmöglicher, gezielter Fix; englische Lokalisierung („…° N, …° E"), Eingaben ohne Leerzeichen vor `°`, oder Semikolon als Trenner würden weiterhin abgelehnt — ein Nutzer mit englischem Gerät oder anderer Copy-Paste-Quelle bräuchte erneut manuelles Nacharbeiten bzw. ein Folge-Ticket.
+&nbsp;&nbsp;**Option B — Breit:** Tolerante Normalisierung: Komma ODER Punkt als Dezimaltrennzeichen, `°` optional mit/ohne Leerzeichen, Himmelsrichtung N/S/O/W (deutsch) UND N/S/E/W (englisch), Trenner zwischen den beiden Koordinaten per Komma, Semikolon oder mehreren Leerzeichen. *Konsequenz:* robuster gegenüber Varianten aus Google Maps/GPS-Geräten/anderen Sprachen, geringfügig höherer Implementierungs- und Testaufwand, aber deutlich geringeres Risiko für einen erneuten Format-Bug in naher Zukunft.
+
+❓ **Frage 2 (🔴 funktional kritisch — Scope-Grenze, siehe Code-Fund):** Soll das MOTIV-Feld dieselbe Erweiterung bekommen wie das STANDORT-Feld?
+&nbsp;&nbsp;**Option A — Ja, MOTIV automatisch mit:** Da beide Felder bereits heute dieselbe Funktion `_parseCoords()` nutzen, ist das der Weg des geringsten Aufwands — keine Sonderbehandlung nötig, konsistentes Verhalten in beiden Feldern desselben Sheets.
+&nbsp;&nbsp;**Option B — Nein, nur STANDORT:** Erfordert eine bewusste Feld-Unterscheidung (z. B. ein Parameter an `_parseCoords()`, der das neue Format nur für STANDORT aktiviert) — zusätzlicher Aufwand für eine Einschränkung, die im aktuellen Code nicht existiert und im Ticket nicht ausdrücklich begründet ist.
+&nbsp;&nbsp;⚠️ Default-Tendenz (nicht final, bis Stephan bestätigt): Option A, weil sie dem bestehenden Code entspricht und das Ticket keinen erkennbaren fachlichen Grund nennt, MOTIV auszuschließen.
+
+⚠️ **Annahme (Vorzeichen S/W):** Für die neue Dezimal+°+Buchstabe-Erkennung gilt dieselbe Vorzeichen-Konvention wie im bestehenden DMS-Zweig: N und O/E → positiv, S und W → negativ (siehe Zeile 6959/6961). Keine eigene Rückfrage nötig, da bereits im Code als Präzedenzfall vorhanden.
+
+⚠️ **Annahme (Edit-Sheet außerhalb Scope):** `LocationDetail._parseEditCoords()` (Bearbeiten-Sheet) wird durch dieses Ticket NICHT mit angepasst — Ticket-Text nennt ausdrücklich nur das „Neue Location"-Sheet. Als Folge-Ticket-Kandidat vormerken, falls die entstehende Inkonsistenz (Neuanlage akzeptiert Apple-Maps-Format, Bearbeiten nicht) stört.
+
+##### Akzeptanzkriterien
+
+- [~] AK-1: Stephan öffnet „Neue Location" und fügt „46,64770° N, 11,71666° O" ins Feld „Mein Standort (Fotograf)" ein → keine Fehlermeldung, auf der Karte erscheint sofort ein Marker an der Position 46,6477° N / 11,71666° O.
+- [~] AK-2: Dieselbe Eingabe mit südlicher/westlicher Richtung („…° S, …° W") → Marker erscheint an der entsprechend gespiegelten Position (negatives Vorzeichen korrekt angewendet).
+- [~] AK-3 (abhängig von Frage 2): Falls „MOTIV auch" bestätigt: Stephan kann dieselbe Apple-Maps-Koordinate auch ins Feld „Motiv (Gebäude / Landmark)" einfügen, mit identischem Ergebnis. Falls „nur STANDORT" bestätigt: Motiv-Feld verhält sich weiterhin wie bisher (Apple-Maps-Format wird dort abgelehnt).
+- [~] AK-4 (Regression): Bisher unterstützte Formate („52.40747, 13.09279" und DMS mit Anführungszeichen) funktionieren in beiden Feldern unverändert weiter.
+- [~] AK-5 (Edge Case, Regression): Eine erkennbar ungültige Eingabe (z. B. nur Buchstaben, oder Werte außerhalb ±90°/±180°) zeigt weiterhin eine verständliche Fehlermeldung statt einer stillen Fehlkoordinate.
+- [~] AK-6 (Einfügen-Button): Der „Einfügen"-Button (Clipboard-Paste) übernimmt das neue Format identisch zur manuellen Texteingabe (nutzt dieselbe Parse-Funktion).
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Naiver globaler String-Replace zerstört den bestehenden Dezimal-Trenner.**
+Auslöser: Ein einfacher `text.replace(',', '.')` VOR dem Parsing würde nicht nur das Dezimalkomma in „46,64770" umwandeln, sondern auch das Trenn-Komma zwischen den beiden Koordinaten (z. B. bei „52.4, 13.1" verschmelzen beide Zahlen zu einer).
+Frühwarnung: Der bestehende Regressionstest mit Punkt-Dezimal liefert nach einem blinden Replace plötzlich falsche oder gar keine Werte.
+Gegenmaßnahme: Komma nur als Dezimaltrennzeichen interpretieren, wenn er direkt zwischen zwei Ziffern steht (z. B. Regex-Muster `\d,\d`), nicht per globalem String-Replace. AK-4 deckt das als Regressionstest ab.
+
+💀 **Szenario 2: Erweiterung landet nur bei STANDORT, MOTIV bekommt eine unbeabsichtigte Kopie statt derselben erweiterten Funktion.**
+Auslöser: Da `_parseCoords()` geteilt ist, wäre die Erweiterung „kostenlos" für beide Felder — ein unbeabsichtigtes Duplizieren (z. B. „STANDORT bekommt neue Logik, MOTIV bleibt bei einer alten Kopie") würde stillschweigend Inkonsistenz erzeugen und unnötigen Zusatzaufwand verursachen.
+Frühwarnung: AK-3-Test für MOTIV schlägt fehl, obwohl AK-1/AK-2 für STANDORT grün sind.
+Gegenmaßnahme: Frage 2 vor Implementierung klären; bei „ja" sicherstellen, dass die eine gemeinsame Funktion erweitert wird, nicht dupliziert.
+
+💀 **Szenario 3: Bearbeiten-Sheet bleibt inkonsistent zum Neuanlage-Sheet.**
+Auslöser: `LocationDetail._parseEditCoords()` ist eine separate Code-Kopie (Zeile 6456), vom Ticket-Scope nicht erfasst.
+Frühwarnung: Stephan testet den Fix erfolgreich bei „Neue Location", versucht dieselbe Apple-Maps-Koordinate beim nachträglichen Bearbeiten einer bestehenden Location einzufügen und bekommt erneut die alte Fehlermeldung — wirkt wie ein unvollständiger Fix.
+Gegenmaßnahme: Scope-Grenze im Testplan (manuell) explizit gegenprüfen und im Ticket dokumentieren, damit die Inkonsistenz nicht überrascht; als Folge-Ticket vormerken.
+
+💀 **Szenario 4 (nur relevant bei Frage-1-Option B, breite Bandbreite): Zu tolerantes Parsing verschluckt Tippfehler als „gültige" Koordinate.**
+Auslöser: Eine sehr freizügige Trenner-/Format-Erkennung könnte zwei zufällige Zahlen in eingefügtem Fremdtext fälschlich als Koordinate interpretieren.
+Frühwarnung: Ungewöhnliche Koordinaten (z. B. mitten im Ozean) tauchen ohne Fehlermeldung als Location auf.
+Gegenmaßnahme: Wertebereichsprüfung `_validateLatLon()` bleibt Pflicht-Gate nach dem Parsing (AK-5); bei Option B nur die tatsächlich in Frage 1 bestätigten Varianten zulassen, keine unbegrenzte Toleranz.
+
+##### Implementierungsoptionen
+
+**Option A — Eingabe vor der bestehenden Prüfung normalisieren**
+Alltagssprache: Bevor die App die eingefügte Koordinate genauer anschaut, wird der Text zuerst in ein Format gebracht, das sie schon kennt (Komma wird zu Punkt, `°` und Himmelsrichtung werden in ein Vorzeichen umgewandelt) — die eigentliche Prüfung dahinter bleibt wie sie ist.
+- Vorgehen: Neuer Normalisierungsschritt am Anfang von `_parseCoords()`, der Apple-Maps-typischen Text in das bereits unterstützte Dezimalformat umwandelt (z. B. „46,64770° N, 11,71666° O" → „46.64770, 11.71666"), bevor die bestehenden Regex-Blöcke laufen.
+- Betroffene Dateien: `web/index.html`, nur im Umfeld von `_parseCoords()` (Zeile ~6946).
+- Vorteile: Bestehende, bereits bewährte Kernlogik (Wertebereichsprüfung, DMS-Zweig) bleibt unangetastet → geringes Regressionsrisiko; weitere künftige Formate lassen sich leicht ergänzen.
+- Nachteile/Risiken: Die Normalisierung selbst muss sorgfältig sein (Pre-Mortem Szenario 1 — Komma-Trenner darf nicht zerstört werden).
+- Aufwand: klein.
+
+**Option B — Parser um einen dritten, eigenständigen Format-Zweig erweitern**
+Alltagssprache: Die App bekommt eine dritte, komplett eigene Erkennungsregel extra für das Apple-Maps-Format, gleichrangig neben den zwei bestehenden (Dezimal, DMS).
+- Vorgehen: Neuer dritter Prüfblock in `_parseCoords()`, der explizit auf „Zahl mit Komma + ° + Buchstabe" matcht, unabhängig von den bestehenden zwei Blöcken.
+- Betroffene Dateien: `web/index.html`, `_parseCoords()`.
+- Vorteile: Bestehende Regex-Blöcke werden gar nicht verändert → Regression durch einen gemeinsamen Normalisierungsschritt ist strukturell ausgeschlossen.
+- Nachteile/Risiken: Drei parallele, leicht unterschiedliche Regex-Blöcke sind langfristig schwerer zu pflegen; bei breiter Formatbandbreite (Frage 1, Option B) müsste dieser dritte Block selbst mehrere Varianten abdecken → wird schnell unübersichtlich.
+- Aufwand: klein bis mittel (abhängig von Frage-1-Antwort).
+
+✅ **Empfehlung: Option A.** Sie trennt sauber „Text in ein bekanntes Format bringen" von „bekanntes Format auswerten" — die bestehende, bereits getestete Prüflogik bleibt unverändert und risikofrei, und die Normalisierung lässt sich gezielt gegen das konkrete Pre-Mortem-Risiko (Komma-Trenner) absichern. Bei einer breiteren Formatbandbreite (Frage 1, Option B) skaliert eine Normalisierung außerdem leichter als ein wachsender dritter Regex-Block.
+
+##### Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation)
+- [x] Architektur analysiert: `web/index.html` (`AddLocation._parseCoords()`, Zeile 6946–6965; gemeinsame Funktion für STANDORT + MOTIV); `LocationDetail._parseEditCoords()` (Zeile 6456–6473) bewusst außerhalb Scope
+- [x] Designer-Check: visuell? → nein, reine Eingabe-Parsing-Logik ohne neues/verändertes UI-Element → übersprungen
+- [ ] Implementierungsoptionen: A (Normalisierung) / B (dritter Regex-Zweig)
+- [ ] Empfehlung: Option A — wartet auf Weg-Gate-Bestätigung + Antworten auf Frage 1 und Frage 2
+
+##### Testplan
+
+- [ ] Automatisiert (Harness): **Kein Backend-Test möglich** — das Parsing ist rein clientseitig in `web/index.html` (`AddLocation._parseCoords()`); die vorhandene Backend-Test-Infrastruktur hat keinen Ausführungspfad für isolierte JS-Funktionsaufrufe (die existierenden `frontend`-Marker-Tests in `backend/tests/frontend/` prüfen echte Browser-Klickpfade per Playwright, nicht einzelne JS-Funktionen). `backend/tests/test_bug-78.py` wurde trotzdem angelegt (Ticket-ID im Docstring, Marker `frontend`), enthält aber bewusst nur einen dokumentierten, übersprungenen Platzhalter statt eines Tests, der ohne echte JS-Ausführung nichts prüfen würde.
+- [ ] Manuell (unter http://localhost:8000, „Neue Location"-Sheet, Feld „Mein Standort (Fotograf)"):
+  1. „46,64770° N, 11,71666° O" einfügen → keine Fehlermeldung, Marker erscheint (AK-1).
+  2. „46,64770° S, 11,71666° W" einfügen → Marker erscheint gespiegelt (AK-2).
+  3. Je nach Frage-2-Antwort: gleiche Eingabe im Feld „Motiv" testen (AK-3).
+  4. „52.40747, 13.09279" (bestehendes Dezimalformat) erneut testen (AK-4).
+  5. `52°24'26"N 13°05'33"E` (bestehendes DMS-Format) erneut testen (AK-4).
+  6. „abc" eingeben → Fehlermeldung erscheint weiterhin (AK-5).
+  7. Apple-Maps-Koordinate über den „Einfügen"-Button (Zwischenablage) statt Tippen testen (AK-6).
+  8. Zur Kenntnis: dieselbe Koordinate im **Bearbeiten**-Sheet einer bestehenden Location einfügen — wird laut Scope weiterhin abgelehnt (Pre-Mortem Szenario 3, kein Fehler, sondern bewusste Scope-Grenze).
 
 ---
 
