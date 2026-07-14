@@ -470,6 +470,7 @@ curl -s http://localhost:8000/calendar | python3 -c "import sys,json; d=json.loa
 | Standortbeschreibung automatisch | Für Standorte ohne (oder mit leerer) Beschreibung wird automatisch ein kurzer deutscher Text aus den vorhandenen Fakten (Name, Motiv, Kategorie, Koordinaten) erzeugt und hinterlegt. |
 | Manuelle Werte bleiben geschützt | Hat jemand eine Blickrichtung, Brennweite oder Beschreibung selbst gesetzt oder gesperrt, rührt die Automatik diese Werte nicht an. |
 | Sofort-Auslöser | Ein geschützter Auslöser (nur für den Host) startet diesen Qualitätslauf bei Bedarf sofort, ohne auf die Nacht zu warten. |
+| QA-Teilerfolg konsistent behandelt (TASK-78) | Scheitert beim automatischen Lauf ein einzelner Teilschritt (Blickrichtung/Brennweite/Beschreibung) an einem Datenbank-Fehler, nachdem ein anderer Teilschritt für denselben Standort bereits erfolgreich geschrieben hat, wird der Prüf-Eintrag trotzdem nachgezogen — es bleiben keine Werte ohne zugehörigen Prüf-Eintrag zurück. Nur wenn für einen Standort gar kein Wert geschrieben wurde, bleibt er wie bisher fällig und wird beim nächsten Lauf erneut versucht. Zusätzlich reduziert ein `PRAGMA busy_timeout` beim Datenbankzugriff die Häufigkeit kurzzeitiger Sperr-Konflikte als Auslöser. |
 
 **Pflicht-Regression Standort-Automatik:**
 - [ ] Neuer Standort ohne Blickrichtung erhält nach dem Lauf eine automatische Blickrichtung (automatisiert: `test_task45_azimuth.py`, `test_unlocked_is_written`)
@@ -646,6 +647,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-14 | US-131 | Himmelsröte- und Goldene-Wolken-Karten fragen ihren Dunst-/Wolkenwert jetzt an einem 30 km entlang der Sichtachse projizierten Punkt statt am Fotografen-Standort ab (getrennte Projektionen für beide Kartentypen, kein Fallback bei Fehlschlag); zusätzlich wurde die externe Wetter-API-Anbindung gedrosselt (Semaphore max. 5 gleichzeitige Requests + 0,15 s Pacing), nachdem Live-Messungen signifikantes Rate-Limiting zeigten. Released als v1.22.24, CI-Lauf #213 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`), gemeinsam mit US-132. |
 | 2026-07-14 | US-132 | Neuer Event-Typ „Rote Wolken" (RED_CLOUDS): hohe Wolken (Cirrus) glühen in Sonnenrichtung rot/purpurn, wenn die Sonne bereits unter dem Horizont steht (Blaue Stunde); dafür wurde auch ein neuer, zur bestehenden „Blaue Stunde" (Abend) symmetrischer „Blaue Stunde Morgen"-Event-Typ eingeführt. Released als v1.22.24, CI-Lauf #213 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 161`), gemeinsam mit US-131. |
 | 2026-07-14 | BUG-78 | Apple-Maps-Koordinatenformat im Standort-/Motiv-Feld wird jetzt akzeptiert |
+| 2026-07-14 | TASK-78 | QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird immer nachgezogen, PRAGMA busy_timeout ergänzt |
 
 ---
 
