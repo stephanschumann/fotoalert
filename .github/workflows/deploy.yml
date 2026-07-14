@@ -113,6 +113,35 @@ jobs:
         working-directory: FotoAlert/backend
         run: pip install -r requirements.txt
 
+      # BUG-79: de421.bsp (~17 MB Ephemeride) wird von calculations/astronomy.py::_get_eph()
+      # bei jedem ersten Aufruf pro Testprozess ungemockt via skyfield.api.load() geladen —
+      # nicht nur von den 3 @pytest.mark.online-Tests, sondern transitiv von ≥9 Funktionen.
+      # Fester Cache-Key (NICHT an requirements.txt/Commit-Hash gekoppelt, siehe Pre-Mortem
+      # Szenario 4 in BACKLOG.md BUG-79) — die Ephemeridendatei ändert sich nicht mit Code.
+      - name: Ephemeride (de421.bsp) aus CI-Cache wiederherstellen
+        id: cache-ephemeris
+        uses: actions/cache@v4
+        with:
+          path: FotoAlert/backend/de421.bsp
+          key: de421-bsp-v1
+
+      # Cache-Miss-Fallback: eigener, timeout-abgesicherter Download VOR pytest, damit der
+      # eigentliche Testschritt selbst nie einen unbegrenzten Live-Download auslösen kann.
+      # curl --max-time (90s) + Step-Timeout (2 Min) als zweite Absicherung, falls curl selbst
+      # aus irgendeinem Grund nicht rechtzeitig abbricht (AK2/AK6: klarer Fehlschlag < 2 Min,
+      # statt in den globalen 15-Minuten-Job-Timeout zu laufen, siehe Zeile ~101).
+      - name: de421.bsp herunterladen (nur bei Cache-Miss, mit Timeout-Absicherung)
+        if: steps.cache-ephemeris.outputs.cache-hit != 'true'
+        timeout-minutes: 2
+        working-directory: FotoAlert/backend
+        run: |
+          echo "Cache-Miss: lade de421.bsp (~17 MB) mit begrenztem Timeout, damit ein"
+          echo "hängender/langsamer Drittserver nicht das 15-Minuten-Job-Limit reißt."
+          curl -fSL --max-time 90 \
+            -o de421.bsp \
+            https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
+            || { echo "❌ de421.bsp-Download fehlgeschlagen oder Timeout (90s) überschritten"; exit 1; }
+
       - name: Backend-Testsuite ausführen
         working-directory: FotoAlert/backend
         run: python3 -m pytest tests/ -v

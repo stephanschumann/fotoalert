@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-51 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-79 · TASK-41 |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21, TASK-41 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **TASK-51** *(Lange Funktion startup() in backend/main.py)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-60** *(Lange Funktion patch_location() in backend/main.py)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **BUG-79** *(CI-Testsuite lädt bei jedem Lauf real 17-MB-Ephemeridendatei — Skip-Kommentar für @pytest.mark.online wirkungslos, Fund aus TASK-76-CI-Lauf)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -7925,13 +7925,13 @@ Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den
 
 ---
 
-### TASK-51 · Refactoring: Lange Funktion `startup()` aufteilen (backend/main.py) `[ ]`
+### TASK-51 · Refactoring: Lange Funktion `startup()` aufteilen (backend/main.py) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-02 |
 
 **Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `backend/main.py`:
@@ -7940,6 +7940,240 @@ Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den
 Aufteilen in kleinere Hilfsfunktionen (z.B. Scheduler-Setup, QA-Values-Laden, Location-Overrides separieren). Kein inhaltlicher Umbau.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (US-113, 2026-07-02)
+
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`), analoges Muster zu
+**TASK-41**/**TASK-60**/**TASK-76** — keine „Als.../möchte ich.../sodass..."-Story
+anwendbar, da kein Nutzererlebnis betroffen ist.
+
+---
+
+#### 🔬 Analyse-Spec (TASK-51) · 2026-07-14
+
+### Kernbefund: Zeilenangabe veraltet — Funktion ist deutlich gewachsen, nicht geschrumpft
+
+📎 **Code-Verifikation:** `backend/main.py` gelesen am 2026-07-14, zusätzlich
+`python3 tools/refactor_check.py --report` gegen den aktuellen Stand ausgeführt (reine
+Python-AST-Zählung `node.end_lineno - node.lineno`, vertrauenswürdig). Live-Report:
+
+```
+"file": "backend/main.py", "line": 1952, "name": "startup",
+"lines": 100, "message": "Funktion `startup()` ist 100 Zeilen lang (Threshold: 80)"
+```
+
+Ticket nennt Z. 1237 / 84 Zeilen (Stand 2026-07-02). Aktuell steht die Funktion bei
+**Z. 1951–2052 (Decorator `@app.on_event("startup")` + `async def startup()`), 100
+Zeilen** laut Tool-Messung — die Funktion ist seit Ticket-Anlage um 16 Zeilen
+**gewachsen**, nicht geschrumpft (u.a. durch BUG-70-Datenbank-Integritätscheck,
+US-112-Wetterkarten-Overlay, TASK-25/US-81-Erweiterungen). Der Befund ist weiterhin
+gültig und hat sich verschärft. Beide im Ticket vorgeschlagenen Beispiel-Kandidaten
+(QA-Values-Laden, Location-Overrides-Laden) sind bereits eigene Funktionen
+(`_load_qa_values()` Z. 1905, `_load_location_overrides()` vor Z. 1899) — dort besteht
+kein weiterer Handlungsbedarf. Der tatsächliche Rest-Umfang von `startup()` gliedert sich
+in folgende Teilschritte (nummeriert wie im Code kommentiert):
+
+1. Log „Backend startet" + BUG-70-Datenbank-Integritätscheck (try/except, ~11 Zeilen,
+   eigener Block, noch nicht ausgelagert)
+2. Vier Lade-Aufrufe (Custom Locations, QA-Values, Location-Overrides,
+   Geländehöhen-Cache) — **bereits eigene Funktionen**, nur die Aufruf-Reihenfolge liegt
+   in `startup()`
+3. JSON-Caches laden (`_load_caches()`, bereits eigene Funktion) → Ergebnis `cache_ok`
+4. **Test-/Sandbox-Kurzschluss:** `if _NO_BACKGROUND: ... return` — bricht `startup()`
+   hier komplett ab, alles Folgende läuft nur im Normalbetrieb
+5. Wetter-Overlay- und Wetterkarten-Hintergrundtasks anstoßen (`asyncio.create_task(...)`)
+6. Scout-Cache laden + Schema-Check (`body_name`-Feld, US-81) + ggf. Neuberechnung
+   anstoßen — **inline-Logik, noch nicht ausgelagert**
+7. On-Demand-Modus ermitteln (`FOTOALERT_ONDEMAND`) → `_precompute_mode`
+8. Falls kein Cache vorhanden: Erstberechnung im Hintergrund anstoßen
+9. Falls On-Demand: verschachtelte Closure `_prewarm_calendar()` definieren + als Task
+   anstoßen — **inline, noch nicht ausgelagert**
+10. Scheduler-Konfiguration (5 `add_job`-Aufrufe inkl. `functools.partial`-Bindung für
+    den Precompute-Job) + `scheduler.start()` — **inline, noch nicht ausgelagert**,
+    genau das im Ticket namentlich genannte Beispiel „Scheduler-Setup"
+11. Abschluss-Log mit Cache-Zählern
+
+**Scope:** Nur Struktur-Umbau der noch nicht ausgelagerten Blöcke (1, 6, 9, 10). Die
+Aufruf-Reihenfolge und alle Werte/Bedingungen (insbesondere der Kurzschluss bei Schritt 4
+und die Merge-Reihenfolge in Schritt 2) bleiben exakt erhalten. Kein Verhalten ändert
+sich, keine neuen Log-Texte, keine geänderten Scheduler-Zeiten.
+
+---
+
+### Example Mapping
+
+Entfällt inhaltlich — reines technisches Refactoring ohne Verhaltens-/UX-Entscheidungs-
+spielraum (analog TASK-41/TASK-60/TASK-76). Annahmen-Protokoll ergab keine
+🔴-kritischen offenen Fragen.
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] AK-1: Der Server startet weiterhin ohne Fehlermeldung, genauso wie vorher.
+- [ ] AK-2: Direkt nach dem Start sind Kalender, Feed, Scout-Tab und alle
+      Location-Daten (inklusive manuell korrigierter Koordinaten/Sichtachsen) sofort
+      nutzbar, mit exakt denselben Werten wie vor der Änderung.
+- [ ] AK-3: Der automatische nächtliche Rechenlauf sowie die übrigen geplanten
+      Hintergrundläufe (Wetter-Overlay, Scout-Aktualisierung, QA-Lauf) starten weiterhin
+      zu den gleichen Uhrzeiten wie vorher.
+- [ ] AK-4: Im Test-/Sandbox-Modus (ohne Hintergrundprozesse) verhält sich der Start
+      weiterhin genauso sparsam: kein Scheduler, kein Netzwerkzugriff, keine
+      Hintergrundberechnung.
+- [ ] AK-5: Ist die Datenbank beschädigt, erscheint beim Start weiterhin dieselbe
+      deutliche Fehlermeldung im Log wie vorher (Datenbank-Integritätscheck).
+- [ ] Edge Case: Läuft der Server im „Alles selbst nachrechnen bei Bedarf"-Modus
+      (On-Demand), wird der aktuelle Kalendermonat weiterhin automatisch im Hintergrund
+      vorbereitet, damit er beim ersten Öffnen sofort da ist.
+- [ ] AK-6 *(Dev-Tooling, kein App-Erlebnis — zeigt sich erst beim nächsten
+      Qualitäts-Check, nicht beim Benutzen der App)*: Der automatisierte
+      Code-Qualitätscheck meldet für diese Funktion keinen „zu lang"-Befund mehr, und
+      keine der neu entstandenen Hilfsfunktionen erzeugt ihrerseits einen neuen Befund.
+
+---
+
+### Pre-Mortem
+
+💀 **Szenario 1 — Test-/Sandbox-Kurzschluss bricht**
+Auslöser: Der Block `if _NO_BACKGROUND: ...; return` wird versehentlich in eine
+Hilfsfunktion verschoben. Ein `return` darin beendet nur die Hilfsfunktion, nicht
+`startup()` selbst — der Server würde im Test-/Sandbox-Modus (`FOTOALERT_NO_BACKGROUND=1`)
+plötzlich doch Scheduler, Precompute und Netzwerkzugriffe starten, obwohl das bisher
+zuverlässig unterdrückt wurde.
+Frühwarnung: Ein lokaler Testlauf mit `FOTOALERT_NO_BACKGROUND=1` zeigt im Log
+Scheduler-Start-Meldungen, obwohl das nicht erwartet ist.
+Gegenmaßnahme: Der Kurzschluss-Block bleibt wortwörtlich in `startup()` selbst stehen;
+nur die Blöcke davor und danach werden ausgelagert (siehe AK-4).
+
+💀 **Szenario 2 — Lade-Reihenfolge vertauscht**
+Auslöser: Ein Code-Kommentar dokumentiert explizit die Merge-Reihenfolge
+„Code-Defaults < qa_values < location_overrides". Werden die vier Lade-Aufrufe beim
+Aufteilen versehentlich umsortiert (z.B. weil mehrere in eine gemeinsame „Lade alles"-
+Hilfsfunktion gebündelt werden und die interne Reihenfolge dabei nicht exakt erhalten
+bleibt), überschreiben QA-Werte plötzlich manuell gesetzte Location-Korrekturen — eine
+stille Datenabweichung ohne Absturz.
+Gegenmaßnahme: Die vier Aufrufe bleiben in exakt derselben Reihenfolge; werden sie
+gebündelt, dann 1:1 in der bestehenden Reihenfolge.
+
+💀 **Szenario 3 — Zwischenwerte gehen bei der Extraktion verloren**
+Auslöser: `cache_ok` (Ergebnis des Cache-Ladens) und der Precompute-Modus
+(voll/nur-Feed, aus einer Umgebungsvariable abgeleitet) werden aktuell als lokale Werte
+zwischen mehreren Schritten weitergereicht (Erstberechnung-Trigger, Scheduler-Jobs).
+Werden sie beim Aufteilen nicht sauber übergeben, sondern z.B. aus einer globalen
+Variable „erraten", kann die Erstberechnung fälschlich immer/nie anlaufen oder der
+nächtliche Job im falschen Modus laufen.
+Gegenmaßnahme: Beide Werte werden explizit an die betroffenen Hilfsfunktionen
+übergeben, nicht global zwischengespeichert; manueller Test prüft beide Modi
+(mit und ohne On-Demand-Umgebungsvariable).
+
+💀 **Szenario 4 — Kalender-Vorwärm-Fehlerbehandlung geht verloren**
+Auslöser: Das Vorwärmen des aktuellen Kalendermonats im On-Demand-Modus ist aktuell ein
+verschachtelter Codeblock mit eigener Fehlerbehandlung (ein Fehler wird geloggt, ohne den
+restlichen Start zu gefährden). Wird dieser Block zu einer eigenständigen Funktion
+gemacht, muss die Fehlerbehandlung unverändert mitwandern — sonst würde ein Fehler beim
+Vorwärmen (z.B. ein Netzwerkproblem) nicht mehr sauber geloggt, sondern nur noch als
+unbeachtete Hintergrund-Fehlermeldung sichtbar.
+Gegenmaßnahme: Die bestehende Fehlerbehandlung wird 1:1 in die neue Funktion
+übernommen.
+
+💀 **Szenario 5 — Nächtlicher Job läuft mit falscher Bindung**
+Auslöser: Ein Code-Kommentar erklärt bewusst, warum für den nächtlichen
+Erstberechnungs-Job eine bestimmte Bindungstechnik (statt einer einfacheren Alternative)
+verwendet wird, damit der Scheduler die Funktion korrekt als asynchron erkennt. Wird beim
+Auslagern des Scheduler-Setups versehentlich eine andere, einfachere Bindung verwendet,
+könnte der nächtliche Recompute-Job beim Feuern (05:30 Uhr) stillschweigend fehlschlagen —
+ein Fehler, der erst beim nächsten nächtlichen Lauf auffiele, nicht beim Server-Start.
+Gegenmaßnahme: Die bestehende Bindungstechnik wird unverändert in die neue
+Scheduler-Hilfsfunktion übernommen, inklusive erklärendem Kommentar.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Datei:** `backend/main.py`, ausschließlich der Bereich um `startup()`
+(Z. 1899–2052) sowie ggf. neue Hilfsfunktionen direkt oberhalb der Route-Definitionen.
+Keine anderen Dateien betroffen (kein Bezug zu `precompute.py`/TASK-41,
+`index.html`/TASK-58, `patch_location()`/TASK-60 — reine Namens-Nähe, siehe
+Ticket-Kontext).
+
+Alle innerhalb von `startup()` verwendeten Namen (`_store`, `scheduler`, `_feed_cache`,
+`_calendar_cache`, `_discover_cache`, `_NO_BACKGROUND`, `logger`, `LOCATIONS`) sind
+Modul-globale Variablen (verifiziert per Grep, Definitionszeilen 90/124/239–241/307/314).
+Innerhalb von `startup()` selbst wird keiner dieser Globals neu zugewiesen (nur
+gelesen bzw. über bereits bestehende Helferfunktionen mutiert) — neue Hilfsfunktionen
+können diese Globals daher ohne `global`-Deklaration lesend nutzen, es entstehen keine
+Closure-Probleme. Die einzige echte Closure im aktuellen Code (`_prewarm_calendar`) hat
+keine eingefangenen lokalen Variablen (nur `date.today()` und Modul-globale Aufrufe) und
+kann daher gefahrlos zu einer eigenständigen Modulfunktion werden.
+
+---
+
+### Implementierungsoptionen
+
+**Optionen in Alltagssprache:** Alle drei Optionen ändern nichts am Erlebnis in der App —
+der Unterschied liegt ausschließlich darin, wie „aufgeräumt" der Start-Code für künftige
+Änderungen ist und wie sicher die 80-Zeilen-Grenze künftig eingehalten wird.
+
+### Option A — Minimal (2 neue Hilfsfunktionen)
+- Vorgehen: Nur den Datenbank-Integritätscheck (Schritt 1) und das Scheduler-Setup
+  (Schritt 10) auslagern — die beiden am klarsten abgrenzbaren Blöcke.
+- Betroffene Dateien: `backend/main.py`
+- Vorteile: kleinster Diff, geringstes Umsetzungsrisiko
+- Nachteile/Risiken: reduziert `startup()` nur um ca. 24 Zeilen auf ca. 76 Zeilen —
+  knapp unter dem Threshold. Der nächste kleine Zusatz (neue Logzeile, neuer Kommentar)
+  lässt den Befund vermutlich sehr bald wieder aufleben.
+- Aufwand: klein
+
+### Option B — Moderat (4 neue Hilfsfunktionen)
+- Vorgehen: Zusätzlich zu Option A auch die Scout-Cache-Schema-Prüfung (Schritt 6) und
+  die On-Demand-Kalender-Vorwärmung (Schritt 9, aus verschachtelter Closure zu
+  eigenständiger Funktion) auslagern.
+- Betroffene Dateien: `backend/main.py`
+- Vorteile: `startup()` sinkt auf geschätzt 45–55 Zeilen — deutliche Sicherheitsmarge
+  unter dem Threshold. Deckt genau die im Ticket genannten Beispiele ab
+  (Scheduler-Setup) und zusätzlich die beiden weiteren inline verbliebenen Blöcke.
+  Jede neue Funktion hat eine klare, einzelne Verantwortung.
+- Nachteile/Risiken: etwas größerer Diff als Option A; Pre-Mortem-Szenarien 1–5 gelten
+  hier vollständig (v.a. Kurzschluss-Regel und Reihenfolge beachten).
+- Aufwand: mittel
+
+### Option C — Maximal (6–7 neue Hilfsfunktionen, jeder nummerierte Schritt separat)
+- Vorgehen: Auch die bereits kurzen Blöcke (Wetter-Task-Anstoß, Precompute-Trigger)
+  jeweils in eigene Funktionen packen, sodass `startup()` nur noch eine Aufrufliste ist.
+- Betroffene Dateien: `backend/main.py`
+- Vorteile: maximale Lesbarkeit, jede Funktion einzeln testbar
+- Nachteile/Risiken: höchstes Umsetzungsrisiko — insbesondere der Test-/Sandbox-
+  Kurzschluss (Pre-Mortem Szenario 1) lässt sich nicht sauber in eine „Schritt-für-
+  Schritt"-Symmetrie pressen, ohne Sonderbehandlung. Aufwand steht in keinem Verhältnis
+  zum Nutzen bei einem Threshold-Überschreiten von nur 20 Zeilen.
+- Aufwand: groß
+
+✅ **Empfehlung: Option B.** Beste Balance aus Sicherheitsmarge unter dem Threshold,
+Umsetzungsrisiko und Aufwand. Deckt das im Ticket genannte Beispiel (Scheduler-Setup)
+sowie die beiden zusätzlich identifizierten inline-Blöcke ab; die beiden im Ticket
+ebenfalls genannten Beispiele (QA-Values, Location-Overrides) sind bereits als eigene
+Funktionen umgesetzt und brauchen keine weitere Änderung.
+
+---
+
+### Analyse & Planung
+
+- [x] Example Mapping durchgeführt (entfällt inhaltlich, siehe oben)
+- [x] Pre-Mortem durchgeführt (5 Szenarien)
+- [x] Architektur analysiert: `backend/main.py` (Z. 1899–2052), Globals-Check
+      durchgeführt, keine Closure-Risiken außer `_prewarm_calendar` (unkritisch)
+- [x] Designer-Check: nicht visuell (reines Backend-Refactoring) → übersprungen
+- [ ] Implementierungsoptionen: A (minimal) / B (moderat) / C (maximal)
+- [ ] Empfehlung: Option B
+
+**Testplan:**
+- [ ] Automatisiert (Harness): bestehende `pytest`-Suite vollständig grün, insbesondere
+      alle Tests mit `FOTOALERT_NO_BACKGROUND=1` (prüft Kurzschluss-Regel, Pre-Mortem
+      Szenario 1); `python3 tools/refactor_check.py --report` läuft danach ohne
+      `long_function`-Fund für `backend/main.py`.
+- [ ] Manuell: lokalen Server starten (`FOTOALERT_ENV=dev`), Log-Reihenfolge mit dem
+      Stand vor der Änderung vergleichen; einmal mit und einmal ohne
+      `FOTOALERT_ONDEMAND=1` starten und beide Male auf identisches Verhalten prüfen
+      (Scheduler-Jobs, Kalender-Vorwärmung).
 
 ---
 
@@ -7962,13 +8196,13 @@ Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklapp
 
 ---
 
-### TASK-41 · Refactoring: Lange Funktionen aufteilen (backend/precompute.py) `[ ]`
+### TASK-41 · Refactoring: Lange Funktionen aufteilen (backend/precompute.py) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-06-25 |
 
 **Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold:
@@ -7977,6 +8211,226 @@ Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklapp
 - `_run_standard_flow()` Z. 838 — 84 Zeilen
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-39, 2026-06-25)
+
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`), analoges Muster zu
+**TASK-60**/**TASK-76** — keine „Als.../möchte ich.../sodass..."-Story anwendbar, da kein
+Nutzererlebnis betroffen ist.
+
+---
+
+#### 🔬 Analyse-Spec (TASK-41) · 2026-07-14
+
+### Kernbefund: Zeilenangaben veraltet — von 3 gemeldeten Funktionen ist nur noch 1 über dem Threshold
+
+📎 **Code-Verifikation:** `backend/precompute.py` gelesen am 2026-07-14, zusätzlich
+`python3 tools/refactor_check.py --report` gegen den aktuellen Stand ausgeführt (reine
+Python-AST-Zählung `node.end_lineno - node.lineno`, kein Regex-Heuristik-Problem wie bei
+TASK-42/JS — der Fund ist grundsätzlich vertrauenswürdig, nur die Zeilenangaben im
+Ticket-Text sind veraltet, Stand 2026-06-25).
+
+Live-Report (`needs_ticket`) für `backend/precompute.py` enthält aktuell nur **einen**
+Fund:
+```
+"file": "backend/precompute.py", "line": 965, "name": "_run_single_location_flow",
+"lines": 81, "message": "Funktion `_run_single_location_flow()` ist 81 Zeilen lang (Threshold: 80)"
+```
+
+Abgleich mit den drei ursprünglich genannten Funktionen:
+- **`compute_calendar_incremental()`** — Ticket nennt Z. 590 / 146 Zeilen. Aktuell: Z.
+  868–907, **40 Zeilen**. Bereits unter dem Threshold — im Code bereits in drei Helfer
+  aufgeteilt (`_load_calendar_cache` Z. 705, `_init_calendar_pass` Z. 735,
+  `_compute_calendar_for_location` Z. 798), deren Docstring selbst schon auf diese
+  Aufteilung verweist ("Details: _init_calendar_pass, _compute_calendar_for_location").
+  Erscheint nicht mehr im Report — **Befund überholt, kein Handlungsbedarf mehr**.
+- **`_run_standard_flow()`** — Ticket nennt Z. 838 / 84 Zeilen. Aktuell: Z. 1049–1110,
+  **62 Zeilen**. Ebenfalls unter dem Threshold, keine Fundmeldung mehr — **Befund
+  überholt, kein Handlungsbedarf mehr**.
+- **`_run_single_location_flow()`** — Ticket nennt Z. 743 / 92 Zeilen. Aktuell: Z.
+  965–1046, vom Tool mit **81 Zeilen** gemessen (1 Zeile über Threshold 80). **Einziger
+  noch aktiver, gültiger Fund.**
+
+Bestätigt (Grep über `backend/tests/`): kein bestehender Test ruft
+`_run_single_location_flow()`, `_run_standard_flow()` oder `main()` mit `--location-id`
+direkt auf oder monkeypatcht sie — nur `compute_calendar_incremental()` wird direkt
+getestet (`test_bug29_calendar_single_recompute.py`). Monkeypatch-Bruchrisiko bei der
+Extraktion ist damit gering, aber es fehlt auch jede automatisierte
+Regressionsabsicherung für den Single-Location-Gesamtfluss (siehe Pre-Mortem 4).
+
+**Scope:** Nur noch `_run_single_location_flow()` wird aufgeteilt.
+✅ Von Stephan bestätigt (2026-07-14): Scope-Reduktion auf diese eine Funktion
+akzeptiert, die anderen beiden gelten als bereits erledigt (kein separates Ticket nötig,
+analog TASK-42-Musters „veralteter Autogen-Fund").
+
+---
+
+### Example Mapping
+
+Entfällt inhaltlich — reines technisches Refactoring ohne Verhaltens-/UX-Entscheidungs-
+spielraum (analog TASK-60/TASK-76). Annahmen-Protokoll ergab keine 🔴-kritischen offenen
+Fragen außer der oben markierten Scope-Annahme (⚪, mit sinnvollem Default).
+
+---
+
+### Akzeptanzkriterien
+
+- [~] AK-1: Das beobachtbare Verhalten der App ändert sich nicht — der 14-Tage-Feed, der
+      365-Tage-Kalender und der Single-Location-Recompute (ausgelöst nach einer
+      Koordinaten-Korrektur einer Location) liefern exakt dieselben Daten wie vorher.
+- [~] AK-2: Alle bestehenden Backend-Tests bleiben grün (vollständiger `pytest`-Lauf).
+- [~] AK-3: `python3 tools/refactor_check.py --report` meldet für `backend/precompute.py`
+      keinen `long_function`-Fund mehr.
+- [~] AK-4: Keine der neu entstandenen Helferfunktionen erzeugt ihrerseits einen neuen
+      `long_function`-Fund.
+- [~] Edge Case: Ein Single-Location-Recompute nach einer Koordinaten-Änderung
+      aktualisiert weiterhin Geländehöhe, Sichtachsen-Status, Feed- und
+      Kalender-Einträge für genau diese eine Location — alle anderen Locations bleiben
+      im Cache unverändert.
+
+---
+
+### Pre-Mortem
+
+💀 **Szenario 1 — Geländehöhe wird nicht mehr rechtzeitig auf die Location gepatcht**
+Auslöser: Die neu abgerufene Geländehöhe (`elevation_difference_m`) muss VOR dem
+Sichtachsen-Check und der Feed-/Kalenderberechnung auf das `loc`-Objekt geschrieben
+sein, weil sie direkt in `_composition_analysis()` (Z. 392–394) in die
+Alignment-Berechnung einfließt. Arbeitet der neue Elevation-Helfer versehentlich mit
+einer Kopie statt dem Original-`loc`-Objekt, rechnen Feed und Kalender weiter mit der
+alten Höhe — kein Crash, nur eine stille Datenabweichung.
+Gegenmaßnahme: Helfer erhält und mutiert exakt dasselbe `loc`-Objekt; Aufrufreihenfolge
+bleibt exakt wie bisher (Elevation → Sichtachse → Feed → Kalender).
+
+💀 **Szenario 2 — Fehlerbehandlungs-Granularität ändert sich**
+Auslöser: Aktuell hat jeder der vier Blöcke (Elevation, Sichtachse, Feed, Kalender) sein
+eigenes lokales try/except, das den Fehler loggt und weitermacht — ein Feed-Fehler
+verhindert z.B. nicht die Kalenderberechnung. Wird bei der Extraktion ein gemeinsames
+äußeres try/except über mehrere Helferaufrufe gelegt, bricht künftig ein Fehler in einem
+frühen Schritt (z.B. Sichtachsen-Check) auch die nachfolgenden Schritte ab, obwohl das
+vorher nicht der Fall war.
+Gegenmaßnahme: Jede extrahierte Helferfunktion behält ihr eigenes lokales
+Exception-Handling, kein gemeinsamer äußerer try/except in der Hauptfunktion.
+
+💀 **Szenario 3 — Parameter-Verwechslung bei mehreren durchgereichten Pfaden/Zeitwerten**
+Auslöser: Die Funktion reicht `feed_path`, `elev_path`, `today`, `computed_at`,
+`location_id` durch mehrere Ebenen. Bei mehreren neuen Helferfunktionen mit
+überlappenden Parameterlisten ist eine Vertauschung möglich (z.B. `elev_path` an der
+Position von `feed_path`), die zu keinem Fehler führt, sondern die falsche Datei mit dem
+falschen Inhalt beschreibt.
+Gegenmaßnahme: Helferfunktionen ausschließlich mit Keyword-Argumenten aufrufen — eine
+Vertauschung fällt dann sofort als `TypeError` auf statt still falsche Daten zu
+schreiben.
+
+💀 **Szenario 4 — Kein automatisierter Test deckt den Single-Location-Gesamtfluss ab**
+Wie oben per Grep verifiziert: kein bestehender Test ruft `_run_single_location_flow()`
+direkt auf. Ein Fehler aus Szenario 1–3 würde ohne zusätzlichen Test nur bei manuellem
+Test auffallen.
+Gegenmaßnahme: neuer, einfacher Regressionstest (siehe Testplan) + manueller Testschritt.
+
+---
+
+### Architektur-Analyse
+
+`precompute.py` läuft als eigener Subprozess (kein Teil des FastAPI-Servers), täglich
+per Cron sowie einmalig nach jedem `PATCH /locations/{id}` mit Koordinaten-Änderung
+(`--location-id`-Flag). `main()` verzweigt danach in zwei sich gegenseitig
+ausschließende Flows:
+- `_run_standard_flow()` (kein `--location-id`): alle Locations — Elevation → 14-Tage-
+  Feed → 365-Tage-Kalender (inkrementell über `compute_calendar_incremental()`).
+- `_run_single_location_flow()` (`--location-id` gesetzt): nur die eine geänderte
+  Location — Elevation neu abrufen, Sichtachsen-Check, Feed neu berechnen + mergen,
+  Kalender für genau diese Location neu berechnen + mergen (Rest des Kalenders bleibt
+  unangetastet, BUG-29-Muster).
+
+Beide Flows rufen sich nicht gegenseitig auf, teilen sich aber
+`compute_calendar_incremental()` (mit/ohne `location_id`) sowie mehrere Schreibhelfer
+(`_write_calendar_cache`, `_merge_and_write_feed`, `_write_feed_cache`).
+`compute_calendar_incremental()` ist – wie oben gezeigt – bereits in drei Helfer
+aufgeteilt und liegt bei 40 Zeilen. Nur `_run_single_location_flow()` bündelt noch vier
+klar trennbare, sequenzielle Verantwortlichkeiten in einer Funktion: Elevation-Refresh,
+Sichtachsen-Check, Feed-Refresh, Kalender-Refresh.
+
+---
+
+### Implementierungsoptionen
+
+#### Option A — Verantwortungs-basierte Extraktion in vier Helferfunktionen (empfohlen)
+Vorgehen: `_run_single_location_flow()` wird auf eine dünne Orchestrierung reduziert,
+die vier neue, private Helferfunktionen nacheinander aufruft:
+- `_refresh_single_location_elevation(loc, location_id, computed_at, elev_path) -> None`
+  (Elevation-Fetch + Cache schreiben + Patch auf `loc`)
+- `_check_single_location_sightline(loc) -> None` (Sichtachsen-Raycast, eigenes
+  try/except wie bisher)
+- `_refresh_single_location_feed(loc, location_id, today, computed_at, feed_path) -> None`
+  (Feed berechnen + mergen + schreiben)
+- `_refresh_single_location_calendar(location_id, today, computed_at) -> None`
+  (Kalender berechnen + schreiben)
+Betroffene Dateien: nur `backend/precompute.py`.
+Vorteile: Hauptfunktion sinkt auf geschätzt ~20–25 Zeilen (deutliche Marge statt der
+bisherigen 1-Zeilen-Überschreitung); folgt exakt demselben, bereits bewährten Muster wie
+`_compute_calendar_for_location()` in derselben Datei sowie TASK-60/TASK-76 in
+`main.py`; jeder Helfer behält sein eigenes Exception-Handling
+(Pre-Mortem-Szenario 2 direkt entschärft).
+Nachteile/Risiken: 4 neue Funktionssignaturen mit mehreren durchgereichten Parametern
+(Pre-Mortem-Szenario 3) — durch Keyword-Argumente entschärfbar.
+Aufwand: klein.
+
+#### Option B — Minimal-Extraktion (nur den größten Block auslagern)
+Vorgehen: Nur der Feed-Berechnungsblock (ca. Z. 1010–1026, ~17 Zeilen) wird in
+`_refresh_single_location_feed()` ausgelagert, der Rest bleibt inline.
+Betroffene Dateien: nur `backend/precompute.py`.
+Vorteile: kleinster Diff, sehr risikoarm.
+Nachteile/Risiken: reduziert die Funktion nur um ca. 15–17 Zeilen (81 → ~64–66) — zwar
+unter dem Threshold, aber ohne saubere Verantwortungstrennung für die übrigen drei
+Blöcke; ein künftiger kleiner Zusatz kann die Funktion erneut über 80 Zeilen heben,
+zweite Nacharbeitsrunde wahrscheinlich (identisches Muster wie bei TASK-60/TASK-76
+Option C, dort jeweils verworfen).
+Aufwand: minimal.
+
+✅ **Empfehlung: Option A** — die Funktion hat bereits heute vier sauber abgrenzbare,
+sequenzielle Verantwortlichkeiten, die exakt dem Extraktionsmuster entsprechen, das in
+derselben Datei (`_compute_calendar_for_location`) und in TASK-60/TASK-76 bereits
+erfolgreich angewendet wurde. Option A schafft echte Marge unter dem Threshold statt
+einer knappen Überschreitungsvermeidung wie bei Option B.
+
+---
+
+### Testplan
+
+- [ ] Automatisiert (Harness): voller Regressionslauf `pytest backend/tests/` (Marker
+      `offline`) muss unverändert grün bleiben (kein bestehender Test ruft
+      `_run_single_location_flow`/`_run_standard_flow` direkt auf, siehe
+      Code-Verifikation). Zusätzlich neuer Test (Marker `offline`+`regression`) in
+      `backend/tests/test_task-41_precompute_refactor.py`: ruft `main()` mit
+      `--location-id=<test-location>` gegen eine Test-Fixture auf und prüft, dass
+      Elevation-Patch, Feed-Merge und Kalender-Merge wie vorher alle ausgeführt werden
+      (deckt Pre-Mortem-Szenario 4). Nach der Implementierung zusätzlich
+      `python3 tools/refactor_check.py --report` ausführen — `_run_single_location_flow`
+      darf nicht mehr in `needs_ticket` erscheinen, keiner der 4 neuen Helfer darf neu
+      auftauchen.
+- [ ] Manuell: kein sichtbares App-Verhalten betroffen. Stephan kann zur Sicherheit
+      lokal einen Single-Location-Recompute anstoßen (`python3 precompute.py
+      --location-id <id>`) und in Logs + geschriebenen Cache-Dateien (`elevations.json`,
+      `opportunities.json`, `calendar.json`) prüfen, dass sich für diese eine Location
+      alles wie gewohnt aktualisiert und die übrigen Locations unverändert bleiben
+      (Regressions-Matrix `PRODUCT.md` Sektion 12: Backend-Ticket ohne
+      Response-Feld-Änderung → Cache-Konsistenz-Check reicht).
+
+---
+
+### Analyse & Planung
+- [x] Example Mapping durchgeführt (entfällt inhaltlich — reines technisches
+      Refactoring, siehe oben)
+- [x] Pre-Mortem durchgeführt (4 Szenarien, siehe oben)
+- [x] Architektur analysiert: `backend/precompute.py` (Z. 868–1110, betroffene
+      Funktionen + Kontext), `tools/refactor_check.py` (Threshold-Mechanik/Live-Report),
+      Grep über `backend/tests/` (keine direkten Aufrufer von
+      `_run_single_location_flow`/`_run_standard_flow`)
+- [x] Designer-Check: nicht visuell (reines Backend-Refactoring) → übersprungen
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A — von Stephan freigegeben (2026-07-14)
+
+---
 
 ---
 
@@ -10196,14 +10650,15 @@ Wichtiger Zusatzbefund: US-128 hat den Umbau auf die zentrale Tabelle bereits um
 
 ---
 
-### TASK-60 · Refactoring: Lange Funktion `patch_location()` aufteilen (backend/main.py) `[~]`
+### TASK-60 · Refactoring: Lange Funktion `patch_location()` aufteilen (backend/main.py) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-10 |
+| **Abgeschlossen** | 2026-07-14 |
 
 **Beschreibung:** `refactor_check.py` meldet eine neue lange Funktion in `backend/main.py`:
 - `patch_location()` Z. 2489 — 91 Zeilen (Threshold: 80)
@@ -15601,14 +16056,16 @@ Siehe Implementierungsoptionen unten — diese Frage ist deckungsgleich mit der 
 
 ---
 
-### BUG-79 · CI-Testsuite lädt bei jedem Lauf real eine 17-MB-Ephemeridendatei — Skip-Kommentar für `@pytest.mark.online` ist wirkungslos `[ ]`
+### BUG-79 · CI-Testsuite lädt bei jedem Lauf real eine 17-MB-Ephemeridendatei — Skip-Kommentar für `@pytest.mark.online` ist wirkungslos `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-14 |
+| **Gewählte Option** | Option B — Ephemeride in CI cachen (GitHub Actions Cache) + Timeout-Absicherung, freigegeben von Stephan am Weg-Gate 2026-07-14 |
+| **Implementierung** | Cache-Step (`actions/cache@v4`, Key `de421-bsp-v1`) + Vorab-Download-Fallback (`curl --max-time 90`, `timeout-minutes: 2`) in `.github/workflows/deploy.yml`; Kommentar-Fix + Marker-Korrektur (`test_moon_earth_distance_in_physical_range` → `online`) in `test_astronomy_regression.py`; neuer Test `test_bug79_ci_ephemeris_skip.py`. Lokal isoliert 15/15 grün (inkl. 3 online-Tests). Volle Suite: 573 passed, 2 skipped, 3 failed — alle 3 Fehlschläge vorbestehend/unabhängig verifiziert (TASK-68-Flakiness, Sandbox-Datei-Löschrechte), nicht durch diese Änderung verursacht. |
 
 **Beschreibung:** `backend/tests/test_astronomy_regression.py` markiert drei Tests (`test_sunrise_berlin_within_tolerance`, `test_sunset_berlin_within_tolerance`, `test_babelsberg_pfingstberg_azimuth_plausible`) mit `@pytest.mark.online` und behauptet in einem Kommentar (Z. 110–112): „Dieser Test ist mit @pytest.mark.online markiert und wird in CI übersprungen wenn kein Netz verfügbar ist (de421.bsp-Download ~17 MB)." Das stimmt nicht: Es existiert keine Skip-Logik dafür — weder in `conftest.py` (kein `pytest_collection_modifyitems`/Marker-Hook), noch in `pytest.ini` (`addopts = -ra -q`, kein `-m`-Filter), noch im CI-Aufruf selbst (`.github/workflows/deploy.yml` Zeile 118: `pytest tests/ -v`, ohne `-m`-Filter). Jeder CI-Lauf löst dadurch real `skyfield.api.load("de421.bsp")` aus — einen ungemockten ~17-MB-Download ohne Timeout-Absicherung, unabhängig davon ob Netz „verfügbar" ist oder nicht. Beobachtet (Fund aus TASK-76, 2026-07-14): Der erste CI-Lauf nach dem TASK-76-Push (v1.22.28, GitHub-Actions-Run #223) wurde nach 15 Minuten wegen Zeitüberschreitung abgebrochen (`The job has exceeded the maximum execution time of 15m0s`, `deploy.yml` Zeile 101: `timeout-minutes: 15`), der Deploy lief dadurch nicht. Ein unabhängiger Code-Audit hat TASK-76s eigenen Code als Ursache ausgeschlossen. Ein Re-Run direkt danach war in 2m28s grün. Das stützt (zeitliche Koinzidenz, nicht per Netzwerk-Trace bestätigt) die Theorie, dass der ungemockte, timeout-lose externe Download die Ursache war. Erwartet: Der Kommentar beschreibt reales Verhalten, und ein hängender/langsamer externer Server kann nicht unbemerkt das 15-Minuten-CI-Zeitlimit reißen und damit den Deploy blockieren.
 
@@ -15621,5 +16078,204 @@ Siehe Implementierungsoptionen unten — diese Frage ist deckungsgleich mit der 
 - Keine Dublette gefunden: Grep nach `@pytest.mark.online`, „online"-Marker, Skip-Logik in `conftest.py`/`pytest.ini` im gesamten Backlog ergab nur das bereits abgeschlossene TASK-72; kein weiteres offenes Ticket zu dieser Kombination.
 
 **Quelle:** fotoalert-intake, 2026-07-14 (Fund des Orchestrators aus TASK-76-CI-Lauf, GitHub-Actions-Run #223)
+
+**⚠️ Kritischer Analyse-Fund (Scope-Korrektur, vor Weg-Gate zu bestätigen):** Die Ticket-Prämisse
+„nur die 3 `@pytest.mark.online`-Tests lösen den Download aus" stimmt nicht vollständig mit dem
+Code überein. `backend/calculations/astronomy.py::_get_eph()` (Z.33–37) lädt `load("de421.bsp")`
+bei jedem ersten Aufruf pro Testprozess (Modul-globaler Cache, kein Test-Mock). Diese Funktion wird
+von mindestens 9 Stellen aufgerufen — u. a. `get_moon_earth_distance_km()` (Z.200), die vom
+`@pytest.mark.offline`-markierten Test `test_moon_earth_distance_in_physical_range` (gleiche Datei,
+Z.26–31) genutzt wird. Das heißt: **mindestens ein vierter, als „offline" deklarierter Test** löst
+denselben ungemockten Download aus — eine reine Marker-Filter-Lösung für die 3 genannten Tests
+(Option A) würde das in der User Story formulierte Ziel nicht vollständig erreichen. Siehe
+Pre-Mortem-Szenario 2 und Empfehlung unten.
+
+**Example Mapping (2026-07-14):**
+
+Regel 1 — CI-Testlauf darf nicht von einem externen Datei-Server abhängen: Der reguläre
+CI-Backend-Testlauf (`deploy.yml` Z.118, `pytest tests/ -v`, 15-Minuten-Timeout Z.101) darf nicht
+mehr durch einen hängenden/langsamen Download von `de421.bsp` (~17 MB) blockiert werden können.
+- Beispiel: Given ein CI-Lauf mit fehlerfreiem Code, When der externe Ephemeriden-Server 20 Minuten
+  nicht antwortet, Then reißt dieser Download NICHT das 15-Minuten-CI-Zeitlimit — entweder weil kein
+  Live-Download nötig ist (Cache-Hit) oder weil ein eigener kurzer Timeout den Download vorher
+  kontrolliert mit klarer Fehlermeldung abbricht.
+
+Regel 2 — Der Code-Kommentar muss der Realität entsprechen: Der irreführende Kommentar in
+`test_astronomy_regression.py` Z.110–112 (behauptet eine nicht existierende Skip-Logik) wird durch
+eine Beschreibung des tatsächlichen Verhaltens ersetzt.
+- Beispiel: Given die Umsetzung ist abgeschlossen, When jemand den Kommentar über den 3
+  `online`-Tests liest, Then beschreibt er exakt das neue, tatsächliche CI-Verhalten.
+
+Regel 3 — Die reale Abhängigkeit ist größer als die 3 markierten Tests: Jeder Test, der transitiv
+`_get_eph()` aufruft, zählt als „hat Live-Download-Risiko" — unabhängig vom aktuellen Marker.
+- Beispiel (Grenzfall, verifiziert): Given `test_moon_earth_distance_in_physical_range` ist
+  `@pytest.mark.offline` markiert, When der Test läuft, Then ruft er über
+  `A.get_moon_earth_distance_km()` → `_get_eph()` → `load("de421.bsp")` denselben ungemockten
+  Download auf wie die 3 `online`-Tests — der Marker ist irreführend.
+
+Regel 4 — Lokales Entwicklungsverhalten bleibt erhalten: Der bestehende Komfort „läuft beim ersten
+Aufruf mit Download, danach offline aus dem lokalen Cache (`backend/de421.bsp`, per `.gitignore`
+nicht committed)" darf durch die CI-Lösung nicht verändert werden.
+- Beispiel: Given Stephan arbeitet lokal weiter mit `pytest tests/`, When er die Suite nach diesem
+  Fix ausführt, Then bleibt der lokale Workflow unverändert (einmaliger Download, danach
+  Datei-Cache).
+
+❓ Frage 1 (🔴 kritisch, Scope-Wahl — siehe Kasten oben): Soll der Fix nur die 3 explizit im Ticket
+genannten Tests behandeln (Option A, eng) oder die gemeinsame Ursache strukturell für den ganzen
+Testbestand beheben (Option B, siehe unten)? → Empfehlung: Option B (siehe Implementierungsoptionen).
+Grund: Option A lässt `test_moon_earth_distance_in_physical_range` unverändert als Live-Download-
+Risiko zurück und erreicht das in der User Story formulierte Ziel damit nicht vollständig.
+
+**Akzeptanzkriterien:**
+- [~] AK1: Der `test-backend`-Job in `deploy.yml` lädt `de421.bsp` bei einem Cache-Hit NICHT mehr
+      real vom externen Server (verifizierbar am CI-Log: „Cache restored" statt einer
+      Skyfield-Download-Zeile).
+- [~] AK2: Der erste CI-Lauf nach dem Fix (Cache-Miss) hat einen expliziten Timeout auf den
+      `de421.bsp`-Download, der bei Überschreitung den Testschritt kontrolliert mit einer klaren
+      Fehlermeldung abbricht statt in den globalen 15-Minuten-Job-Timeout zu laufen.
+- [~] AK3: Der Kommentar in `test_astronomy_regression.py` Z.110–112 beschreibt nach der Umsetzung
+      das tatsächliche Verhalten — kein Verweis mehr auf eine nicht existierende Skip-Logik.
+- [~] AK4 (Scope-Korrektur): Der Widerspruch „Marker sagt `offline`, Code lädt real Netzwerk" bei
+      `test_moon_earth_distance_in_physical_range` existiert nach Abschluss nicht mehr — entweder
+      durch Marker-Korrektur oder durch dieselbe strukturelle Absicherung wie bei den 3
+      `online`-Tests.
+- [~] AK5: Die 3 `online`-markierten Tests laufen nach der Umsetzung weiterhin real in CI (keine
+      stille Dauer-Skip-Regression) — verifizierbar am CI-Log (`3 passed` für diese Testnamen).
+- [~] AK6 (Edge Case): Ein CI-Lauf, bei dem der externe Ephemeriden-Server testweise nicht
+      erreichbar ist, endet mit einem klaren, schnellen Fehlschlag (< 2 Minuten), nicht mit dem
+      15-Minuten-Timeout-Abbruch.
+- [~] AK7 (Regression): Die volle Suite (`python3 -m pytest tests/ -v`) hat nach der Änderung
+      dieselbe Anzahl PASSED/SKIPPED wie vorher — keine neuen Fails durch die Cache-/Timeout-Logik.
+
+**Pre-Mortem:**
+- 💀 Szenario 1 „Online-Tests werden dauerhaft übersprungen": Wird Option A ohne Ersatzmechanismus
+  gewählt (`-m "not online"` in `deploy.yml` Z.118, kein separater Job für `online`), laufen die 3
+  Sonnenauf-/-untergang-Referenztests (TASK-34/BUG-56) nie mehr in CI. Frühwarnung:
+  `deploy.yml` enthält `-m "not online"` und kein Job führt `-m online` aus. Gegenmaßnahme: AK5
+  verlangt reales Weiterlaufen dieser Tests in CI.
+- 💀 Szenario 2 „Ticket-Prämisse unvollständig" (verifiziert, siehe Kasten oben):
+  `test_moon_earth_distance_in_physical_range` (offline-markiert) löst denselben Download aus wie
+  die 3 online-Tests. Eine Lösung, die nur die 3 genannten Tests behandelt, lässt das eigentliche
+  Problem über diesen Test unverändert bestehen. Gegenmaßnahme: AK4 + Empfehlung Option B (deckt
+  strukturell ab, ohne jeden einzelnen betroffenen Test identifizieren zu müssen).
+- 💀 Szenario 3 „Cache verschleiert künftigen echten Serverausfall": Ein GH-Actions-Cache (Option
+  B) sorgt dafür, dass kein CI-Lauf mehr den echten Download-Pfad testet, solange der Cache
+  besteht. Ein künftiger echter Serverausfall fiele erst auf, wenn GitHub den Cache räumt
+  (Standard: nach 7 Tagen Nichtnutzung). Gegenmaßnahme: Timeout-Absicherung (AK2) bleibt bestehen
+  — der Cache-Miss-Fall testet weiterhin real, mit Timeout statt unbegrenztem Hängen.
+- 💀 Szenario 4 „Cache-Key zu volatil gewählt": Ein Cache-Key, der z. B. an `requirements.txt`
+  gekoppelt ist, würde bei jeder Dependency-Änderung unnötig neu laden. Gegenmaßnahme: fester,
+  von Requirements unabhängiger Cache-Key (die Ephemeridendatei ändert sich nicht mit Code-Changes).
+- 💀 Szenario 5 „CI-Datenumfeld-Check": Verhält sich der Fix anders bei einem frischen Checkout
+  ohne bisherigen Cache-Eintrag (z. B. erster Lauf nach Einführung des Cache-Steps)? Ja — das ist
+  exakt der Cache-Miss-Fall, der weiterhin real lädt (mit Timeout-Absicherung, AK2/AK6).
+  `FOTOALERT_NO_BACKGROUND=1` wird für den `test-backend`-Job nicht explizit in `deploy.yml`
+  gesetzt (nur im `test-frontend`-Job, Z.31), ist aber über `conftest.py` Z.17
+  (`os.environ.setdefault(...)`) trotzdem aktiv — für dieses Ticket nicht ursächlich, da kein
+  datengetriebener Feed-/Filtertest betroffen ist.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Regeln, 1 kritische Scope-Frage mit Empfehlung)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, gegen real gelesenen Code verifiziert)
+- [x] Architektur analysiert: `backend/tests/test_astronomy_regression.py`,
+      `backend/conftest.py` (liegt unter `backend/`, nicht `backend/tests/`),
+      `backend/pytest.ini`, `.github/workflows/deploy.yml`, zusätzlich
+      `backend/calculations/astronomy.py` (`_get_eph()`, Scope-Korrektur), `.gitignore`,
+      `backend/requirements.txt`
+- [x] Designer-Check: nicht nötig (reines CI-/Test-Tooling, keine visuelle Auswirkung)
+- [x] Implementierungsoptionen: A / B / C (siehe unten)
+- [x] Empfehlung: Option B
+
+**📎 Code-Verifikation (2026-07-14):**
+- `test_astronomy_regression.py` (208 Zeilen) gelesen: Kommentar Z.110–112 behauptet Skip-Logik;
+  keine solche Logik im gelesenen Code — bestätigt Ticket-Beschreibung.
+- `backend/conftest.py` (158 Zeilen; liegt unter `backend/`, NICHT unter `backend/tests/` — Pfad
+  im Ticket-Titel leicht ungenau) gelesen: keine `pytest_collection_modifyitems`-Hook, keine
+  Marker-basierte Skip-Logik vorhanden.
+- `backend/pytest.ini` gelesen: `addopts = -ra -q`, kein `-m`-Filter; `online` als 8. Marker
+  registriert (Z.12, aus TASK-72) — nur Registrierung, keine Filterwirkung.
+- `.github/workflows/deploy.yml` gelesen: `test-backend`-Job (Z.98–118), `timeout-minutes: 15`
+  (Z.101), Testaufruf Z.118 `python3 -m pytest tests/ -v` — kein `-m`-Filter. Bestätigt
+  Ticket-Angabe exakt.
+- `backend/calculations/astronomy.py` gelesen: `_get_eph()` (Z.33–37) lädt `load("de421.bsp")`
+  beim ersten Aufruf pro Prozess (Modul-Cache `_eph`, Z.30). Aufgerufen von ≥9 Funktionen
+  (Z.200, 270, 346, 365, 441, 466, 767, 847, 889) — u. a. `get_moon_earth_distance_km()` (Z.200),
+  genutzt vom `offline`-markierten Test (Z.26–31). **Widerlegt** die Ticket-Prämisse „nur 3 Tests
+  betroffen".
+- `.gitignore` bestätigt: `FotoAlert/backend/de421.bsp` ist ignoriert (nicht committed) — jeder
+  frische CI-Checkout hat keinen lokalen Dateicache.
+- `backend/requirements.txt` bestätigt: `skyfield` ist Pflicht-Dependency — die
+  `skipif(not _SKYFIELD_AVAILABLE)`-Guards der 3 online-Tests greifen in CI nie, die Tests laufen
+  dort also immer real.
+
+**Implementierungsoptionen:**
+
+### Option A — Nur Marker-Filter in CI (`-m "not online"`)
+- Vorgehen: `deploy.yml` Z.118 wird zu `pytest tests/ -v -m "not online"`. Die 3 online-Tests
+  laufen nie mehr in CI (auch nicht in einem separaten Job).
+- Betroffene Dateien: `.github/workflows/deploy.yml` (Z.118)
+- Vorteile: Minimaler Diff, entspricht dem im Ticket zuerst skizzierten Ansatz.
+- Nachteile/Risiken: Löst das Problem NICHT vollständig — `test_moon_earth_distance_in_physical_range`
+  bleibt unverändert ein Live-Download-Risiko (Szenario 2). Zusätzlich: die 3 online-Tests laufen
+  nie mehr automatisiert — Regressionen wie BUG-56 (Zeitzonen-Fehler) würden künftig nur noch bei
+  manuellem lokalem `pytest -m online` entdeckt (Szenario 1).
+- Aufwand: klein.
+
+### Option B — Strukturelle Lösung: Ephemeride in CI cachen (GitHub Actions Cache) + Timeout
+- Vorgehen: `actions/cache@v4`-Schritt vor dem Testschritt im `test-backend`-Job einfügen, der
+  `FotoAlert/backend/de421.bsp` unter festem Cache-Key (z. B. `de421-bsp-v1`, unabhängig von
+  `requirements.txt`) ablegt/wiederherstellt. Bei Cache-Hit entfällt der Live-Download für ALLE
+  Tests, die `_get_eph()` transitiv aufrufen — nicht nur die 3 markierten. Zusätzlich Timeout um
+  den Download für den (seltenen) Cache-Miss-Fall.
+- Betroffene Dateien: `.github/workflows/deploy.yml` (neuer Cache-Step im `test-backend`-Job),
+  optional `backend/conftest.py` (Timeout-Wrapper) oder `backend/calculations/astronomy.py`
+  (`_get_eph()` mit Timeout-Parameter, sofern produktionsseitig vertretbar).
+- Vorteile: Löst das Ziel strukturell und vollständig, deckt auch den Szenario-2-Fund ab, ohne
+  jeden betroffenen Test einzeln identifizieren zu müssen. Die 3 online-Tests laufen weiterhin
+  real (kein Regressionsverlust wie bei Option A).
+- Nachteile/Risiken: Höherer Umsetzungsaufwand als A/C; Cache kann künftigen Serverausfall
+  verschleiern (Szenario 3, durch Timeout-Absicherung bei Cache-Miss abgefedert).
+- Aufwand: mittel.
+
+### Option C — Nur Timeout/Retry um den Download, Download bleibt real
+- Vorgehen: `_get_eph()` bzw. ein Test-Wrapper bekommt einen expliziten Timeout + Retry, ohne den
+  Live-Download an sich zu vermeiden.
+- Betroffene Dateien: `backend/calculations/astronomy.py` (`_get_eph`), ggf. `backend/conftest.py`.
+- Vorteile: Kleinerer Diff als B, verhindert unbegrenztes Hängen.
+- Nachteile/Risiken: Löst das strukturelle Problem nicht — der Download bleibt bei JEDEM CI-Lauf
+  real (17 MB Traffic pro Lauf, Abhängigkeit vom Drittserver bleibt CI-Gate-Voraussetzung). Deckt
+  nur die Hälfte der User Story ab („hängend" ja, „durchgehend langsam aber nicht hängend" nein —
+  ein Retry auf einen langsamen, aber nicht komplett hängenden Server verzögert weiterhin).
+- Aufwand: klein-mittel.
+
+✅ **Empfehlung: Option B** — einzige Option, die (a) das strukturelle Problem für den gesamten
+Testbestand löst (nicht nur die 3 genannten Tests, siehe verifizierter Fund zu
+`test_moon_earth_distance_in_physical_range`, Szenario 2), (b) die 3 online-Tests weiterhin real
+ausführt (keine stille Regressionslücke wie bei Option A), und (c) das in der User Story
+formulierte Ziel „nicht durch einen langsamen ODER hängenden Drittserver verzögert oder verhindert"
+vollständig statt nur zur Hälfte abdeckt (Option C). Der irreführende Kommentar (Regel 2, AK3) und
+die Marker-Korrektur bei `test_moon_earth_distance_in_physical_range` (AK4) werden unabhängig von
+der gewählten Options-Mechanik in jedem Fall umgesetzt.
+
+**Testplan:**
+- Automatisiert (Harness): Neuer Test `backend/tests/test_bug79_ci_ephemeris_skip.py`
+  (Marker: `offline`, `regression`):
+  - AK3: prüft per Textsuche, dass die alte irreführende Formulierung („wird in CI übersprungen
+    wenn kein Netz verfügbar ist") nicht mehr im Kommentar von `test_astronomy_regression.py`
+    vorkommt.
+  - AK4/Szenario 2: prüft, dass kein `@pytest.mark.offline`-markierter Test in
+    `test_astronomy_regression.py` mehr unkommentiert einen bekannten `_get_eph`-Aufrufpfad nutzt
+    (leichtgewichtiger Text-/AST-Check, kein echter Netzwerktest).
+  - AK1/AK2/AK6 (Cache-/Timeout-Wirkung) sind an echtes GitHub-Actions-Verhalten gebunden und
+    lokal nicht sinnvoll simulierbar — werden manuell bestätigt (siehe unten).
+- Manuell:
+  1. Nach Implementierung: Push auslösen, ersten CI-Lauf (Cache-Miss erwartet) im Actions-Log
+     beobachten — Download-Zeile UND Cache-Save-Schritt müssen sichtbar sein; Laufzeit notieren.
+  2. Zweiten Lauf (z. B. leerer Commit oder Re-Run) beobachten — Cache-Restore-Schritt sichtbar
+     („Cache restored from key…"), keine Download-Zeile mehr, spürbar kürzere Laufzeit.
+  3. `backend/tests/test_astronomy_regression.py` Z.110ff. gegenlesen — Kommentar muss der
+     finalen Umsetzung entsprechen (AK3).
+  4. Lokal `python3 -m pytest backend/tests/ -v -m online` ausführen — die 3 Tests müssen
+     weiterhin PASSED liefern (AK5, keine Regressionslücke).
 
 ---

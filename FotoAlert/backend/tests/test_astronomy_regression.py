@@ -23,7 +23,10 @@ pytestmark = [pytest.mark.regression]
 
 # --- BUG-18: Mond-Erde-Distanz muss physikalisch plausibel sein -------------------
 # AK: Anzeige zeigt ~384.400 km, nicht ~370 km. Perigäum ~356.500, Apogäum ~406.700 km.
-@pytest.mark.offline
+# BUG-79 (AK4): war zuvor fälschlich @pytest.mark.offline markiert — ruft über
+# A.get_moon_earth_distance_km() transitiv _get_eph() auf und braucht damit denselben
+# ungemockten de421.bsp-Zugriff (Download oder Datei-Cache) wie die 3 online-Tests unten.
+@pytest.mark.online
 @pytest.mark.parametrize("month", [1, 4, 7, 10])
 def test_moon_earth_distance_in_physical_range(month):
     dt = datetime(2026, month, 15, 20, 0, tzinfo=timezone.utc)
@@ -107,9 +110,16 @@ def test_subject_angular_width_realistic():
 #   (BUG-56: vormals 01:43/20:25 UTC — Zeitzonen-Offset-Fehler im Testwert, per
 #   Skyfield + astral doppelt gegenverifiziert, siehe BACKLOG.md BUG-56)
 #
-# Dieser Test ist mit @pytest.mark.online markiert und wird in CI übersprungen
-# wenn kein Netz verfügbar ist (de421.bsp-Download ~17 MB). Lokal: läuft beim
-# ersten Aufruf mit Download, danach offline aus dem Cache.
+# Dieser Test ist mit @pytest.mark.online markiert. Es gibt KEINE Skip-Logik, die ihn
+# in CI übersprüngt (BUG-79) — er läuft dort immer real. Den ungemockten
+# de421.bsp-Download (~17 MB) vermeidet stattdessen typischerweise ein
+# GitHub-Actions-Cache (Key `de421-bsp-v1`, `.github/workflows/deploy.yml`,
+# test-backend-Job): bei Cache-Hit liegt die Datei schon vor dem pytest-Lauf in
+# `backend/de421.bsp`. Bei Cache-Miss lädt ein eigener CI-Schritt sie mit
+# Timeout-Absicherung (curl --max-time 90s, Step-Timeout 2 Minuten) herunter, bevor
+# pytest startet — ein hängender/langsamer Drittserver kann so nicht mehr das globale
+# 15-Minuten-Job-Zeitlimit reißen. Lokal: läuft beim ersten Aufruf weiterhin mit
+# echtem Download, danach offline aus dem lokalen Dateicache (`backend/de421.bsp`).
 try:
     from skyfield.api import load, wgs84
     from skyfield import almanac
