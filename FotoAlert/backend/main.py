@@ -1948,14 +1948,14 @@ def _load_qa_values() -> None:
         )
 
 
-@app.on_event("startup")
-async def startup() -> None:
-    logger.info("FotoAlert Backend v2 startet (Cache-First)...")
+def _startup_integrity_check() -> None:
+    """TASK-51: aus startup() ausgelagert (Schritt 1), Verhalten unverändert.
 
-    # BUG-70: genereller Integritätscheck der SQLite-Datenbank beim Start —
-    # unabhängig von einem konkreten Ladefehler (z.B. QA-Values). Eine "malformed"-
-    # Datenbank soll beim routinemäßigen Log-Blick auffallen, nicht erst bei einer
-    # Ad-hoc-Diagnose wie beim ursprünglichen Vorfall.
+    BUG-70: genereller Integritätscheck der SQLite-Datenbank beim Start —
+    unabhängig von einem konkreten Ladefehler (z.B. QA-Values). Eine "malformed"-
+    Datenbank soll beim routinemäßigen Log-Blick auffallen, nicht erst bei einer
+    Ad-hoc-Diagnose wie beim ursprünglichen Vorfall.
+    """
     try:
         _startup_check = _store.integrity_check()
         if _startup_check != ["ok"]:
@@ -1967,6 +1967,61 @@ async def startup() -> None:
             )
     except Exception as _exc:
         logger.error("Startup-Integritätscheck konnte nicht ausgeführt werden: %s", _exc)
+
+
+def _startup_check_discover_schema() -> None:
+    """TASK-51: aus startup() ausgelagert (Schritt 6), Verhalten unverändert.
+
+    Scout-Cache laden (falls vorhanden) und ggf. neu berechnen.
+    Schema-Check: US-81 migrierte moon_* → body_*. Alter Cache hat kein body_name-Feld
+    → erzwingt Neuberechnung damit das Frontend nicht undefined° anzeigt.
+    """
+    _load_discover_cache()
+    _first_opp = (_discover_cache.get("opportunities") or [{}])[0]
+    if not _discover_cache or "body_name" not in _first_opp:
+        if _discover_cache:
+            logger.info("Scout-Cache hat altes Schema (moon_*) — starte Neuberechnung (US-81).")
+        asyncio.create_task(_refresh_discover())
+
+
+async def _prewarm_calendar() -> None:
+    """TASK-51: aus startup() ausgelagert (Schritt 9, vormals verschachtelte Closure).
+
+    On-Demand: aktuellen Monat (alle Locations) im Hintergrund vorwärmen, damit
+    die Kalender-Monatsübersicht beim ersten Aufruf sofort da ist (statt ~30 s).
+    """
+    d = date.today()
+    try:
+        await _compute_month_all_locations(d.year, d.month)
+        logger.info("On-Demand-Kalender vorgewärmt: %d-%02d", d.year, d.month)
+    except Exception as e:
+        logger.error("Kalender-Pre-Warm fehlgeschlagen: %s", e)
+
+
+def _startup_setup_scheduler(_precompute_mode: str) -> None:
+    """TASK-51: aus startup() ausgelagert (Schritt 10), Verhalten unverändert.
+
+    Scheduler — functools.partial bleibt eine Coroutine-Funktion (APScheduler
+    awaitet sie korrekt; ein lambda täte das nicht).
+    """
+    import functools as _functools
+    # TASK-48: Nächtlicher QA-Lauf um 05:15 — bewusst 15 Min VOR dem Recompute
+    # (05:30), damit frisch verbesserte Auto-Werte beim Recompute schon vorliegen
+    # und über _apply_qa_values() in Feed/Kalender einfließen.
+    scheduler.add_job(_run_qa_pass, "cron", hour=1, minute=0)   # täglich 01:00 (großer Puffer vor Recompute 05:30)
+    scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
+                      "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
+    scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
+    scheduler.add_job(_build_weather_map, "cron", minute=20, hour="*/3") # US-112: Karten-Overlay alle 3h
+    scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
+    scheduler.start()
+
+
+@app.on_event("startup")
+async def startup() -> None:
+    logger.info("FotoAlert Backend v2 startet (Cache-First)...")
+
+    _startup_integrity_check()
 
     # 0. Custom Locations laden (persistent gespeicherte User-Spots)
     _load_custom_locations()
@@ -1999,14 +2054,7 @@ async def startup() -> None:
     asyncio.create_task(_build_weather_map())
 
     # 2b. Scout-Cache laden (falls vorhanden) und ggf. neu berechnen
-    _load_discover_cache()
-    # Schema-Check: US-81 migrierte moon_* → body_*. Alter Cache hat kein body_name-Feld
-    # → erzwingt Neuberechnung damit das Frontend nicht undefined° anzeigt.
-    _first_opp = (_discover_cache.get("opportunities") or [{}])[0]
-    if not _discover_cache or "body_name" not in _first_opp:
-        if _discover_cache:
-            logger.info("Scout-Cache hat altes Schema (moon_*) — starte Neuberechnung (US-81).")
-        asyncio.create_task(_refresh_discover())
+    _startup_check_discover_schema()
 
     # TASK-25 / AK5 (Option A): Im On-Demand-Modus wird der schwere 365-Tage-
     # Kalender NICHT mehr vorberechnet (kommt live über /calendar). Es bleibt nur
@@ -2025,28 +2073,9 @@ async def startup() -> None:
     # On-Demand: aktuellen Monat (alle Locations) im Hintergrund vorwärmen, damit
     # die Kalender-Monatsübersicht beim ersten Aufruf sofort da ist (statt ~30 s).
     if _ondemand:
-        async def _prewarm_calendar() -> None:
-            d = date.today()
-            try:
-                await _compute_month_all_locations(d.year, d.month)
-                logger.info("On-Demand-Kalender vorgewärmt: %d-%02d", d.year, d.month)
-            except Exception as e:
-                logger.error("Kalender-Pre-Warm fehlgeschlagen: %s", e)
         asyncio.create_task(_prewarm_calendar())
 
-    # Scheduler — functools.partial bleibt eine Coroutine-Funktion (APScheduler
-    # awaitet sie korrekt; ein lambda täte das nicht).
-    import functools as _functools
-    # TASK-48: Nächtlicher QA-Lauf um 05:15 — bewusst 15 Min VOR dem Recompute
-    # (05:30), damit frisch verbesserte Auto-Werte beim Recompute schon vorliegen
-    # und über _apply_qa_values() in Feed/Kalender einfließen.
-    scheduler.add_job(_run_qa_pass, "cron", hour=1, minute=0)   # täglich 01:00 (großer Puffer vor Recompute 05:30)
-    scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
-                      "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
-    scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
-    scheduler.add_job(_build_weather_map, "cron", minute=20, hour="*/3") # US-112: Karten-Overlay alle 3h
-    scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
-    scheduler.start()
+    _startup_setup_scheduler(_precompute_mode)
     logger.info("Bereit. Cache: %d Feed-Events, %d Kalender-Events, Scout: %d Chancen",
                 len(_feed_cache), len(_calendar_cache),
                 _discover_cache.get("count", 0))
