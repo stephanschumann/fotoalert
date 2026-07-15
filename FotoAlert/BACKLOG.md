@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-51 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | BUG-79 · TASK-41 |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-41 |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-79** *(Test-Doku README.md veraltet nach BUG-79)* · **TASK-80** *(Forgejo/Codeberg-Spiegel-Workflow fehlt BUG-79-Fix)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -7925,14 +7925,15 @@ Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den
 
 ---
 
-### TASK-51 · Refactoring: Lange Funktion `startup()` aufteilen (backend/main.py) `[~]`
+### TASK-51 · Refactoring: Lange Funktion `startup()` aufteilen (backend/main.py) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-02 |
+| **Abgeschlossen** | 2026-07-15 |
 
 **Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `backend/main.py`:
 - `startup()` Z. 1237 — 84 Zeilen (Threshold: 80)
@@ -8009,22 +8010,22 @@ spielraum (analog TASK-41/TASK-60/TASK-76). Annahmen-Protokoll ergab keine
 
 ### Akzeptanzkriterien
 
-- [ ] AK-1: Der Server startet weiterhin ohne Fehlermeldung, genauso wie vorher.
-- [ ] AK-2: Direkt nach dem Start sind Kalender, Feed, Scout-Tab und alle
+- [~] AK-1: Der Server startet weiterhin ohne Fehlermeldung, genauso wie vorher.
+- [~] AK-2: Direkt nach dem Start sind Kalender, Feed, Scout-Tab und alle
       Location-Daten (inklusive manuell korrigierter Koordinaten/Sichtachsen) sofort
       nutzbar, mit exakt denselben Werten wie vor der Änderung.
-- [ ] AK-3: Der automatische nächtliche Rechenlauf sowie die übrigen geplanten
+- [~] AK-3: Der automatische nächtliche Rechenlauf sowie die übrigen geplanten
       Hintergrundläufe (Wetter-Overlay, Scout-Aktualisierung, QA-Lauf) starten weiterhin
       zu den gleichen Uhrzeiten wie vorher.
-- [ ] AK-4: Im Test-/Sandbox-Modus (ohne Hintergrundprozesse) verhält sich der Start
+- [~] AK-4: Im Test-/Sandbox-Modus (ohne Hintergrundprozesse) verhält sich der Start
       weiterhin genauso sparsam: kein Scheduler, kein Netzwerkzugriff, keine
       Hintergrundberechnung.
-- [ ] AK-5: Ist die Datenbank beschädigt, erscheint beim Start weiterhin dieselbe
+- [~] AK-5: Ist die Datenbank beschädigt, erscheint beim Start weiterhin dieselbe
       deutliche Fehlermeldung im Log wie vorher (Datenbank-Integritätscheck).
-- [ ] Edge Case: Läuft der Server im „Alles selbst nachrechnen bei Bedarf"-Modus
+- [~] Edge Case: Läuft der Server im „Alles selbst nachrechnen bei Bedarf"-Modus
       (On-Demand), wird der aktuelle Kalendermonat weiterhin automatisch im Hintergrund
       vorbereitet, damit er beim ersten Öffnen sofort da ist.
-- [ ] AK-6 *(Dev-Tooling, kein App-Erlebnis — zeigt sich erst beim nächsten
+- [~] AK-6 *(Dev-Tooling, kein App-Erlebnis — zeigt sich erst beim nächsten
       Qualitäts-Check, nicht beim Benutzen der App)*: Der automatisierte
       Code-Qualitätscheck meldet für diese Funktion keinen „zu lang"-Befund mehr, und
       keine der neu entstandenen Hilfsfunktionen erzeugt ihrerseits einen neuen Befund.
@@ -8274,15 +8275,15 @@ Fragen außer der oben markierten Scope-Annahme (⚪, mit sinnvollem Default).
 
 ### Akzeptanzkriterien
 
-- [~] AK-1: Das beobachtbare Verhalten der App ändert sich nicht — der 14-Tage-Feed, der
+- [x] AK-1: Das beobachtbare Verhalten der App ändert sich nicht — der 14-Tage-Feed, der
       365-Tage-Kalender und der Single-Location-Recompute (ausgelöst nach einer
       Koordinaten-Korrektur einer Location) liefern exakt dieselben Daten wie vorher.
-- [~] AK-2: Alle bestehenden Backend-Tests bleiben grün (vollständiger `pytest`-Lauf).
-- [~] AK-3: `python3 tools/refactor_check.py --report` meldet für `backend/precompute.py`
+- [x] AK-2: Alle bestehenden Backend-Tests bleiben grün (vollständiger `pytest`-Lauf).
+- [x] AK-3: `python3 tools/refactor_check.py --report` meldet für `backend/precompute.py`
       keinen `long_function`-Fund mehr.
-- [~] AK-4: Keine der neu entstandenen Helferfunktionen erzeugt ihrerseits einen neuen
+- [x] AK-4: Keine der neu entstandenen Helferfunktionen erzeugt ihrerseits einen neuen
       `long_function`-Fund.
-- [~] Edge Case: Ein Single-Location-Recompute nach einer Koordinaten-Änderung
+- [x] Edge Case: Ein Single-Location-Recompute nach einer Koordinaten-Änderung
       aktualisiert weiterhin Geländehöhe, Sichtachsen-Status, Feed- und
       Kalender-Einträge für genau diese eine Location — alle anderen Locations bleiben
       im Cache unverändert.
@@ -8397,7 +8398,7 @@ einer knappen Überschreitungsvermeidung wie bei Option B.
 
 ### Testplan
 
-- [ ] Automatisiert (Harness): voller Regressionslauf `pytest backend/tests/` (Marker
+- [x] Automatisiert (Harness): voller Regressionslauf `pytest backend/tests/` (Marker
       `offline`) muss unverändert grün bleiben (kein bestehender Test ruft
       `_run_single_location_flow`/`_run_standard_flow` direkt auf, siehe
       Code-Verifikation). Zusätzlich neuer Test (Marker `offline`+`regression`) in
@@ -8415,6 +8416,66 @@ einer knappen Überschreitungsvermeidung wie bei Option B.
       alles wie gewohnt aktualisiert und die übrigen Locations unverändert bleiben
       (Regressions-Matrix `PRODUCT.md` Sektion 12: Backend-Ticket ohne
       Response-Feld-Änderung → Cache-Konsistenz-Check reicht).
+
+---
+
+#### 🔍 Unabhängige Verifikation (2026-07-14) — Urteil: ROT, Nachbesserung nötig
+
+Separater Prüf-Subagent (nicht der Implementierer) hat Code + Tests eigenständig
+gegengeprüft, nicht nur den Implementierungs-Bericht übernommen.
+
+**Bestätigt:** Elevation-Patch auf demselben `loc`-Objekt vor Sichtachse/Feed/Kalender
+(Pre-Mortem-Szenario 1 entschärft); Aufrufreihenfolge exakt erhalten; alle 4
+Helferaufrufe ausschließlich mit Keyword-Argumenten; kein Scope Creep (nur
+`precompute.py` + neuer Testfile geändert); `refactor_check.py --report` bestätigt
+unabhängig: `precompute.py` erscheint nicht mehr im Report; neuer Test 2/2 grün und
+inhaltlich sinnvoll.
+
+**Widerlegt — Pre-Mortem-Szenario 2 nicht vollständig umgesetzt:** Nur
+`_check_single_location_sightline` und `_refresh_single_location_feed` haben ein
+eigenes lokales try/except wie gefordert. `_refresh_single_location_elevation` und
+`_refresh_single_location_calendar` haben **keins** — ein Fehler dort würde
+ungefangen propagieren und die nachfolgenden Schritte abbrechen, was vor dem
+Refactoring nicht der Fall war (jeder der vier Original-Blöcke hatte eigenes
+Error-Handling). Der neue Test deckt diese Lücke nur für Sightline ab, nicht für
+Elevation/Kalender.
+
+**Ungeklärte Diskrepanz:** Eigener `pytest -m offline -q`-Lauf des Prüfers ergab 335
+passed / 1 skipped / 0 failed — der Implementierer hatte 402 passed gemeldet. 0 failed
+stimmt überein, die Gesamtzahl nicht; vermutlich unterschiedlicher Testauswahl-Scope
+zwischen beiden Läufen, vor Abschluss zu klären.
+
+**Nächster Schritt:** Try/except für die beiden fehlenden Helfer ergänzen (jeweils
+lokal, wie bei den anderen beiden Helfern und wie im Original), Testabdeckung dafür im
+neuen Testfile ergänzen, Diskrepanz bei der Testanzahl aufklären, danach erneute
+Verifikation.
+
+---
+
+#### 🔍 Re-Verifikation nach Nachbesserung (2026-07-14) — Urteil: GRÜN
+
+Nachbesserung: `_refresh_single_location_elevation` und `_refresh_single_location_calendar`
+haben jetzt jeweils ein eigenes lokales try/except (analog zu den beiden bereits vorher
+korrekten Helfern) — loggt den Fehler, bricht nur den eigenen Schritt ab, der Aufrufer
+läuft mit dem nächsten Schritt weiter. 2 neue Testfälle decken genau diese beiden
+Fehlerpfade ab (insgesamt 4 Tests im neuen Testfile, alle grün).
+
+**Wieder von einem separaten Prüfer (dritter Subagent im Verlauf) eigenständig
+gegengeprüft**, nicht nur der Bericht des Fix-Agenten übernommen: Code direkt gelesen,
+Elevation-Patch auf demselben `loc`-Objekt weiterhin bestätigt (Pre-Mortem-Szenario 1
+nicht durch den Fix gebrochen), kein gemeinsames äußeres try/except, Aufrufreihenfolge
+unverändert. Eigener Testlauf: Testfile isoliert 4/4 grün, Gesamtlauf
+`pytest -m offline -q` 337 passed / 1 skipped (playwright fehlt, erwartungsgemäß) /
+0 failed — deckt sich exakt mit der Meldung des Fix-Agenten (338 Gesamt). Eigener
+`refactor_check.py --report`-Lauf: `precompute.py` erscheint nicht mehr, einziger Fund
+ist der bereits bekannte, TASK-41-fremde `mkCloudCompassSvg` in `web/index.html`.
+Testzahl-Diskrepanz (335 vs. 402 in der ersten Runde) erklärt sich durch
+`pytest.ini testpaths = tests` — abhängig vom Arbeitsverzeichnis beim Aufruf wurde ggf.
+zusätzlich `backend/calculations/tests/` mit eingesammelt; für die Freigabe irrelevant,
+da 0 failed in allen Läufen durchgängig bestätigt ist.
+
+Alle 5 Akzeptanzkriterien (AK-1 bis AK-4 + Edge Case) einzeln gegen den finalen Code-
+und Teststand abgeglichen — alle bestätigt.
 
 ---
 
@@ -16056,16 +16117,20 @@ Siehe Implementierungsoptionen unten — diese Frage ist deckungsgleich mit der 
 
 ---
 
-### BUG-79 · CI-Testsuite lädt bei jedem Lauf real eine 17-MB-Ephemeridendatei — Skip-Kommentar für `@pytest.mark.online` ist wirkungslos `[~]`
+### BUG-79 · CI-Testsuite lädt bei jedem Lauf real eine 17-MB-Ephemeridendatei — Skip-Kommentar für `@pytest.mark.online` ist wirkungslos `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-07-14 |
 | **Erstellt** | 2026-07-14 |
 | **Gewählte Option** | Option B — Ephemeride in CI cachen (GitHub Actions Cache) + Timeout-Absicherung, freigegeben von Stephan am Weg-Gate 2026-07-14 |
 | **Implementierung** | Cache-Step (`actions/cache@v4`, Key `de421-bsp-v1`) + Vorab-Download-Fallback (`curl --max-time 90`, `timeout-minutes: 2`) in `.github/workflows/deploy.yml`; Kommentar-Fix + Marker-Korrektur (`test_moon_earth_distance_in_physical_range` → `online`) in `test_astronomy_regression.py`; neuer Test `test_bug79_ci_ephemeris_skip.py`. Lokal isoliert 15/15 grün (inkl. 3 online-Tests). Volle Suite: 573 passed, 2 skipped, 3 failed — alle 3 Fehlschläge vorbestehend/unabhängig verifiziert (TASK-68-Flakiness, Sandbox-Datei-Löschrechte), nicht durch diese Änderung verursacht. |
+| **Release** | Commit `d699644` gepusht (kein Frontend-Release nötig, kein Versionsbump). CI-Run #227: Backend-Tests grün (2m42s), Cache-Miss + Download real beobachtet. Re-Run (gleicher Commit): „Cache hit for: de421-bsp-v1" / „Cache restored successfully", Download-Schritt korrekt übersprungen (0s). Alle 3 CI-Jobs beim Re-Run grün (Frontend-Check war beim ersten Lauf rot mit Playwright-Timeout — unabhängiger Flake, beim Re-Run grün). Live-Health-Check bestätigt: `{"status":"ok","version":"2.0.0","locations_count":161}` (unverändert, erwartungsgemäß). |
+
+**Verifikations-Notiz (2026-07-14, separater Subagent):** AK1–AK4 vollständig durch Code + CI-Log belegt. AK5–AK7 nur teilweise formal belegt (kein wörtliches „3 passed"-Log-Zitat für die online-Tests, kein realer Server-Ausfall-Testlauf, kein expliziter Vorher/Nachher-Zahlenvergleich) — inhaltlich plausibel über den grünen CI-Gesamtstatus, aber nicht einzeln nachgewiesen. Zwei dokumentierte Restrisiken, kein Blocker: (1) der neue Guard-Test `test_no_offline_marked_test_uses_known_get_eph_path` erkennt nur direkte (1-Hop) `_get_eph()`-Aufrufe — `get_body_position()` ruft `_get_eph()` nur transitiv über `_get_body_position_direct()` auf und würde von einem künftigen, fälschlich `offline`-markierten Test darüber nicht erkannt; (2) Timeout-Mechanismus (AK2/AK6) ist strukturell vorhanden, aber nie durch einen echten Server-Ausfall real ausgelöst worden. Gesamturteil: verifiziert, Nacharbeit optional (Guard-Test-Erweiterung), kein Release-Blocker.
 
 **Beschreibung:** `backend/tests/test_astronomy_regression.py` markiert drei Tests (`test_sunrise_berlin_within_tolerance`, `test_sunset_berlin_within_tolerance`, `test_babelsberg_pfingstberg_azimuth_plausible`) mit `@pytest.mark.online` und behauptet in einem Kommentar (Z. 110–112): „Dieser Test ist mit @pytest.mark.online markiert und wird in CI übersprungen wenn kein Netz verfügbar ist (de421.bsp-Download ~17 MB)." Das stimmt nicht: Es existiert keine Skip-Logik dafür — weder in `conftest.py` (kein `pytest_collection_modifyitems`/Marker-Hook), noch in `pytest.ini` (`addopts = -ra -q`, kein `-m`-Filter), noch im CI-Aufruf selbst (`.github/workflows/deploy.yml` Zeile 118: `pytest tests/ -v`, ohne `-m`-Filter). Jeder CI-Lauf löst dadurch real `skyfield.api.load("de421.bsp")` aus — einen ungemockten ~17-MB-Download ohne Timeout-Absicherung, unabhängig davon ob Netz „verfügbar" ist oder nicht. Beobachtet (Fund aus TASK-76, 2026-07-14): Der erste CI-Lauf nach dem TASK-76-Push (v1.22.28, GitHub-Actions-Run #223) wurde nach 15 Minuten wegen Zeitüberschreitung abgebrochen (`The job has exceeded the maximum execution time of 15m0s`, `deploy.yml` Zeile 101: `timeout-minutes: 15`), der Deploy lief dadurch nicht. Ein unabhängiger Code-Audit hat TASK-76s eigenen Code als Ursache ausgeschlossen. Ein Re-Run direkt danach war in 2m28s grün. Das stützt (zeitliche Koinzidenz, nicht per Netzwerk-Trace bestätigt) die Theorie, dass der ungemockte, timeout-lose externe Download die Ursache war. Erwartet: Der Kommentar beschreibt reales Verhalten, und ein hängender/langsamer externer Server kann nicht unbemerkt das 15-Minuten-CI-Zeitlimit reißen und damit den Deploy blockieren.
 
@@ -16127,24 +16192,24 @@ Grund: Option A lässt `test_moon_earth_distance_in_physical_range` unverändert
 Risiko zurück und erreicht das in der User Story formulierte Ziel damit nicht vollständig.
 
 **Akzeptanzkriterien:**
-- [~] AK1: Der `test-backend`-Job in `deploy.yml` lädt `de421.bsp` bei einem Cache-Hit NICHT mehr
+- [x] AK1: Der `test-backend`-Job in `deploy.yml` lädt `de421.bsp` bei einem Cache-Hit NICHT mehr
       real vom externen Server (verifizierbar am CI-Log: „Cache restored" statt einer
       Skyfield-Download-Zeile).
-- [~] AK2: Der erste CI-Lauf nach dem Fix (Cache-Miss) hat einen expliziten Timeout auf den
+- [x] AK2: Der erste CI-Lauf nach dem Fix (Cache-Miss) hat einen expliziten Timeout auf den
       `de421.bsp`-Download, der bei Überschreitung den Testschritt kontrolliert mit einer klaren
       Fehlermeldung abbricht statt in den globalen 15-Minuten-Job-Timeout zu laufen.
-- [~] AK3: Der Kommentar in `test_astronomy_regression.py` Z.110–112 beschreibt nach der Umsetzung
+- [x] AK3: Der Kommentar in `test_astronomy_regression.py` Z.110–112 beschreibt nach der Umsetzung
       das tatsächliche Verhalten — kein Verweis mehr auf eine nicht existierende Skip-Logik.
-- [~] AK4 (Scope-Korrektur): Der Widerspruch „Marker sagt `offline`, Code lädt real Netzwerk" bei
+- [x] AK4 (Scope-Korrektur): Der Widerspruch „Marker sagt `offline`, Code lädt real Netzwerk" bei
       `test_moon_earth_distance_in_physical_range` existiert nach Abschluss nicht mehr — entweder
       durch Marker-Korrektur oder durch dieselbe strukturelle Absicherung wie bei den 3
       `online`-Tests.
-- [~] AK5: Die 3 `online`-markierten Tests laufen nach der Umsetzung weiterhin real in CI (keine
+- [x] AK5: Die 3 `online`-markierten Tests laufen nach der Umsetzung weiterhin real in CI (keine
       stille Dauer-Skip-Regression) — verifizierbar am CI-Log (`3 passed` für diese Testnamen).
-- [~] AK6 (Edge Case): Ein CI-Lauf, bei dem der externe Ephemeriden-Server testweise nicht
+- [x] AK6 (Edge Case): Ein CI-Lauf, bei dem der externe Ephemeriden-Server testweise nicht
       erreichbar ist, endet mit einem klaren, schnellen Fehlschlag (< 2 Minuten), nicht mit dem
       15-Minuten-Timeout-Abbruch.
-- [~] AK7 (Regression): Die volle Suite (`python3 -m pytest tests/ -v`) hat nach der Änderung
+- [x] AK7 (Regression): Die volle Suite (`python3 -m pytest tests/ -v`) hat nach der Änderung
       dieselbe Anzahl PASSED/SKIPPED wie vorher — keine neuen Fails durch die Cache-/Timeout-Logik.
 
 **Pre-Mortem:**
@@ -16277,5 +16342,47 @@ der gewählten Options-Mechanik in jedem Fall umgesetzt.
      finalen Umsetzung entsprechen (AK3).
   4. Lokal `python3 -m pytest backend/tests/ -v -m online` ausführen — die 3 Tests müssen
      weiterhin PASSED liefern (AK5, keine Regressionslücke).
+
+---
+
+### TASK-79 · Test-Doku `backend/tests/README.md` veraltet nach BUG-79 (Marker-Tabelle + Testbeschreibung) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-14 |
+
+**Beschreibung:** `backend/tests/README.md` ist seit der BUG-79-Umsetzung veraltet. Die Marker-Tabelle (Z. 20–23) listet nur `test_astronomy_regression.py` und `test_api_smoke.py` und führt den neuen Test `test_bug79_ci_ephemeris_skip.py` nicht auf. Zusätzlich behauptet die Tabellenzeile zu `test_astronomy_regression.py` weiterhin die Marker „`offline`, `regression`" — real enthält die Datei seit BUG-79 vier `@pytest.mark.online`-Tests (die 3 ursprünglichen Sonnenauf-/-untergangs-/Azimut-Tests sowie den durch BUG-79 korrigierten, vorher fälschlich `offline` markierten Test `test_moon_earth_distance_in_physical_range`). Kein CI-Risiko, aber Verwirrungspotenzial für künftige Sessions, die sich an der Tabelle orientieren (vgl. bereits in TASK-72 dokumentiertes, bis heute nicht behobenes Drift-Risiko).
+
+**User Story:** Als Entwickler(in), der/die sich anhand von `backend/tests/README.md` über die Testabdeckung und Marker-Konventionen orientiert, möchte ich, dass die Marker-Tabelle den tatsächlichen Testbestand korrekt beschreibt, sodass ich mich bei künftigen Änderungen nicht auf veraltete Angaben verlasse.
+
+**Bezug:**
+- **BUG-79** (In Test): Quelle/Fund dieses Tickets — führte `test_bug79_ci_ephemeris_skip.py` ein und korrigierte den Marker von `test_moon_earth_distance_in_physical_range` (offline → online), ohne die README-Tabelle nachzuziehen.
+- **TASK-72** (Done): hatte bereits vor BUG-79 dieselbe strukturelle Schwäche dokumentiert (README-Marker-Tabelle listet nur 2 von damals 48 Testdateien, Pre-Mortem-Szenario 5) und bewusst nicht behoben („Umsetzung entscheidet den Umfang der README-Aktualisierung"). Keine Dublette — TASK-72 ist abgeschlossen und behandelte den allgemeinen Rückstand, dieses Ticket behandelt konkret die durch BUG-79 neu hinzugekommene Falschangabe.
+- Kein weiteres offenes Ticket zu README.md-Testdokumentation gefunden (Grep über gesamtes Backlog).
+
+---
+
+### TASK-80 · `.forgejo/workflows/deploy.yml` (Codeberg-Spiegel) fehlt BUG-79-Fix — divergiert von `.github/workflows/deploy.yml` `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-14 |
+
+**Beschreibung:** Neben dem primären `.github/workflows/deploy.yml` existiert ein zweiter Workflow `.forgejo/workflows/deploy.yml` (Codeberg/Forgejo-Spiegel, laut Kopfkommentar „Automatisches Deployment via Forgejo Actions (Codeberg)"). Der BUG-79-Fix (GitHub-Actions-Cache-Step für `de421.bsp` unter Key `de421-bsp-v1` + timeout-abgesicherter Fallback-Download im `test-backend`-Job) wurde nur in `.github/workflows/deploy.yml` umgesetzt. Verifiziert: Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` (Zeilen 98–118) enthält weiterhin nur `pip install -r requirements.txt` + `pytest tests/ -v`, keinen Cache-Step, keine Timeout-Absicherung um den `de421.bsp`-Download. Falls diese Forgejo/Codeberg-Pipeline aktiv genutzt wird, besteht dort weiterhin das ursprüngliche BUG-79-Problem: ein ungemockter, timeout-loser ~17-MB-Download, der einen CI-Lauf unbemerkt bis zum 15-Minuten-Job-Timeout blockieren kann.
+
+**Offene Frage (für die Analyse-Phase, nicht hier geklärt):** Wird `.forgejo/workflows/` überhaupt aktiv von einer Forgejo/Codeberg-Instanz ausgeführt, oder ist es totes/unbenutztes Konfigurationsmaterial (z. B. Altlast aus einem früheren Spiegel-Setup)? Das entscheidet, ob dieses Ticket ein reales Betriebsrisiko oder reine Aufräumarbeit ist.
+
+**User Story:** Als Betreiber der App, möchte ich, dass alle aktiv genutzten CI-Pipelines denselben Schutz vor einem hängenden/langsamen `de421.bsp`-Download haben wie die GitHub-Pipeline, sodass kein Deploy-Pfad durch den in BUG-79 bereits identifizierten und dort behobenen Fehler weiterhin blockiert werden kann.
+
+**Bezug:**
+- **BUG-79** (In Test): Quelle/Fund dieses Tickets — der dort umgesetzte Fix (Cache + Timeout) wurde nur in `.github/workflows/deploy.yml` eingepflegt, `.forgejo/workflows/deploy.yml` wurde nicht angefasst.
+- Kein bestehendes Ticket zu `.forgejo`/Forgejo/Codeberg gefunden (Grep über gesamtes Backlog: keine Treffer außer diesem neuen Ticket).
+- Vermutlich höhere Priorität als **TASK-79** (reine Doku-Divergenz) einzuordnen, da hier — sofern die Pipeline aktiv ist — ein reales CI-/Deploy-Blockierungsrisiko analog zur BUG-79-Ausgangslage besteht; endgültige Priorisierung obliegt Stephan.
 
 ---
