@@ -962,6 +962,109 @@ def _write_feed_cache(feed_path, feed: list, computed_at: str) -> None:
 # Hauptfunktion
 # ─────────────────────────────────────────────────────────────────────────────
 
+async def _refresh_single_location_elevation(
+    loc,
+    location_id: str,
+    computed_at: str,
+    elev_path,
+) -> None:
+    """Elevation für diese Location neu abrufen (Koordinaten geändert), cachen
+    und auf DASSELBE `loc`-Objekt patchen (Pre-Mortem-Szenario 1, TASK-41:
+    fließt direkt in _composition_analysis() ein — Aufrufreihenfolge Elevation
+    → Sichtachse → Feed → Kalender bleibt exakt erhalten).
+    Eigenes lokales try/except (Pre-Mortem-Szenario 2, TASK-41): ein Fehler
+    hier darf Sichtachse-/Feed-/Kalenderberechnung nicht verhindern."""
+    logger.info("  Elevation neu abrufen …")
+    try:
+        elevations = await fetch_elevations(force_refetch_ids={location_id})
+        elev_path.write_text(
+            json.dumps({"computed_at": computed_at, "elevations": elevations},
+                       ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        if location_id in elevations:
+            elev_val = elevations[location_id]["elevation_difference_m"]
+            try:
+                object.__setattr__(loc, "elevation_difference_m", elev_val)
+            except Exception:
+                setattr(loc, "elevation_difference_m", elev_val)
+            logger.info("  ✅ Elevation: Δ%+.1f m", elev_val)
+    except Exception as e:
+        logger.warning("  Elevation-Refresh fehlgeschlagen für %s: %s", loc.name, e)
+
+
+async def _check_single_location_sightline(loc) -> None:
+    """US-09: Sichtachsen-Check (Raycast) — einmalig bei Anlegen/Ändern der Location
+    (Regel 3 der Spec), NICHT bei jedem täglichen Standard-Precompute-Lauf.
+    Eigenes lokales try/except (Pre-Mortem-Szenario 2, TASK-41): ein Fehler hier
+    darf Feed-/Kalenderberechnung nicht verhindern."""
+    logger.info("  Sichtachsen-Check …")
+    try:
+        from calculations.sightline import update_location_sightline
+        from data.elevation import provider as _elev_provider
+        sl_result = await update_location_sightline(LocationStore(), loc, _elev_provider)
+        logger.info("  ✅ Sichtachse: %s", sl_result.get("status"))
+    except Exception as e:
+        logger.warning("  Sichtachsen-Check fehlgeschlagen für %s: %s", loc.name, e)
+
+
+async def _refresh_single_location_feed(
+    loc,
+    location_id: str,
+    today: date,
+    computed_at: str,
+    feed_path,
+) -> None:
+    """14-Tage Feed für diese Location neu berechnen, in opportunities.json mergen
+    (bestehende Events anderer Locations bleiben unangetastet) und schreiben."""
+    logger.info("  14-Tage Feed für %s …", loc.name)
+    t1 = time.time()
+    try:
+        opps = await find_opportunities_multi_day(
+            loc, today, days=14, forecast=None, min_score=0.30, astronomy_only=True,
+        )
+        new_events = [_serialize(o) for o in opps]
+    except Exception as e:
+        logger.error("  Fehler: %s", e)
+        new_events = []
+    # Merge: bestehende Events für andere Locations behalten, diese ersetzen
+    merged_count = _merge_and_write_feed(feed_path, location_id, new_events, computed_at)
+    logger.info(
+        "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
+        len(new_events), loc.name, merged_count, time.time() - t1,
+    )
+
+
+async def _refresh_single_location_calendar(
+    location_id: str,
+    today: date,
+    computed_at: str,
+) -> None:
+    """BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
+    Vorher schrieb der --feed-only-Single-Flow ausschließlich opportunities.json und
+    returnte vor jeder Kalenderberechnung → Chancendetails aus dem Kalender zeigten
+    alte Koordinaten/Astronomie. compute_calendar_incremental(location_id=…) merged
+    nur die Events DIESER Location und lässt alle übrigen unverändert.
+    Eigenes lokales try/except (Pre-Mortem-Szenario 2, TASK-41): ein Fehler hier
+    darf die zuvor bereits abgeschlossenen Schritte (Elevation, Sichtachse, Feed)
+    nicht rückwirkend ungültig machen — der Fehler wird geloggt, die Funktion
+    endet, `_run_single_location_flow()` läuft danach normal weiter/aus."""
+    logger.info("  365-Tage Kalender für %s …", location_id)
+    t2 = time.time()
+    try:
+        calendar, computed_meta = await compute_calendar_incremental(
+            today, location_id=location_id,
+        )
+        cal_path = CACHE_DIR / "calendar.json"
+        _write_calendar_cache(cal_path, calendar, computed_meta, computed_at)
+        logger.info(
+            "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
+            len(calendar), time.time() - t2,
+        )
+    except Exception as e:
+        logger.error("  Kalenderberechnung fehlgeschlagen für %s: %s", location_id, e)
+
+
 async def _run_single_location_flow(
     location_id: str,
     today: date,
@@ -972,7 +1075,12 @@ async def _run_single_location_flow(
     elev_path,
     t0: float,
 ) -> None:
-    """Single-Location Recompute (nach Koordinaten-Änderung via PATCH)."""
+    """Single-Location Recompute (nach Koordinaten-Änderung via PATCH).
+
+    Dünne Orchestrierung (TASK-41): ruft die vier Helfer nacheinander in exakt
+    derselben Reihenfolge wie zuvor auf — Elevation → Sichtachse → Feed →
+    Kalender. Jeder Helfer behält sein eigenes Fehlerhandling; hier bewusst
+    KEIN gemeinsames äußeres try/except (Pre-Mortem-Szenario 2)."""
     single_loc_list = [l for l in LOCATIONS if l.id == location_id]
     if not single_loc_list:
         logger.error("Location '%s' nicht gefunden – Abbruch", location_id)
@@ -980,67 +1088,20 @@ async def _run_single_location_flow(
     loc = single_loc_list[0]
     logger.info("── Single-Location Recompute: %s ──", loc.name)
 
-    # Elevation für diese Location neu abrufen (Koordinaten geändert)
-    logger.info("  Elevation neu abrufen …")
-    elevations = await fetch_elevations(force_refetch_ids={location_id})
-    elev_path.write_text(
-        json.dumps({"computed_at": computed_at, "elevations": elevations},
-                   ensure_ascii=False, indent=2),
-        encoding="utf-8",
+    await _refresh_single_location_elevation(
+        loc=loc, location_id=location_id, computed_at=computed_at, elev_path=elev_path,
     )
-    if location_id in elevations:
-        elev_val = elevations[location_id]["elevation_difference_m"]
-        try:
-            object.__setattr__(loc, "elevation_difference_m", elev_val)
-        except Exception:
-            setattr(loc, "elevation_difference_m", elev_val)
-        logger.info("  ✅ Elevation: Δ%+.1f m", elev_val)
-
-    # US-09: Sichtachsen-Check (Raycast) — einmalig bei Anlegen/Ändern der Location
-    # (Regel 3 der Spec), NICHT bei jedem täglichen Standard-Precompute-Lauf.
-    logger.info("  Sichtachsen-Check …")
-    try:
-        from calculations.sightline import update_location_sightline
-        from data.elevation import provider as _elev_provider
-        sl_result = await update_location_sightline(LocationStore(), loc, _elev_provider)
-        logger.info("  ✅ Sichtachse: %s", sl_result.get("status"))
-    except Exception as e:
-        logger.warning("  Sichtachsen-Check fehlgeschlagen für %s: %s", loc.name, e)
+    await _check_single_location_sightline(loc=loc)
 
     if run_feed:
-        logger.info("  14-Tage Feed für %s …", loc.name)
-        t1 = time.time()
-        try:
-            opps = await find_opportunities_multi_day(
-                loc, today, days=14, forecast=None, min_score=0.30, astronomy_only=True,
-            )
-            new_events = [_serialize(o) for o in opps]
-        except Exception as e:
-            logger.error("  Fehler: %s", e)
-            new_events = []
-        # Merge: bestehende Events für andere Locations behalten, diese ersetzen
-        merged_count = _merge_and_write_feed(feed_path, location_id, new_events, computed_at)
-        logger.info(
-            "  ✅ Feed: %d neue Events für %s, %d gesamt (%.1fs)",
-            len(new_events), loc.name, merged_count, time.time() - t1,
+        await _refresh_single_location_feed(
+            loc=loc, location_id=location_id, today=today, computed_at=computed_at,
+            feed_path=feed_path,
         )
 
-    # BUG-29: Kalender-Cache (calendar.json) für genau diese Location regenerieren.
-    # Vorher schrieb der --feed-only-Single-Flow ausschließlich opportunities.json und
-    # returnte vor jeder Kalenderberechnung → Chancendetails aus dem Kalender zeigten
-    # alte Koordinaten/Astronomie. compute_calendar_incremental(location_id=…) merged
-    # nur die Events DIESER Location und lässt alle übrigen unverändert.
     if run_calendar:
-        logger.info("  365-Tage Kalender für %s …", loc.name)
-        t2 = time.time()
-        calendar, computed_meta = await compute_calendar_incremental(
-            today, location_id=location_id,
-        )
-        cal_path = CACHE_DIR / "calendar.json"
-        _write_calendar_cache(cal_path, calendar, computed_meta, computed_at)
-        logger.info(
-            "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
-            len(calendar), time.time() - t2,
+        await _refresh_single_location_calendar(
+            location_id=location_id, today=today, computed_at=computed_at,
         )
 
     logger.info("=== Single-Location Recompute abgeschlossen in %.1fs ===", time.time() - t0)
