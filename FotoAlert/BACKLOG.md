@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-80 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-41 |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-79** *(Test-Doku README.md veraltet nach BUG-79)* · **TASK-80** *(Forgejo/Codeberg-Spiegel-Workflow fehlt BUG-79-Fix)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-79** *(Test-Doku README.md veraltet nach BUG-79)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -8197,14 +8197,15 @@ Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklapp
 
 ---
 
-### TASK-41 · Refactoring: Lange Funktionen aufteilen (backend/precompute.py) `[~]`
+### TASK-41 · Refactoring: Lange Funktionen aufteilen (backend/precompute.py) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | In Test |
+| **Status** | Done (released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15) |
 | **Erstellt** | 2026-06-25 |
+| **Abgeschlossen** | 2026-07-15 |
 
 **Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold:
 - `compute_calendar_incremental()` Z. 590 — 146 Zeilen
@@ -16371,8 +16372,9 @@ der gewählten Options-Mechanik in jedem Fall umgesetzt.
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-07-14 |
+| **Freigegeben** | 2026-07-15 |
 
 **Beschreibung:** Neben dem primären `.github/workflows/deploy.yml` existiert ein zweiter Workflow `.forgejo/workflows/deploy.yml` (Codeberg/Forgejo-Spiegel, laut Kopfkommentar „Automatisches Deployment via Forgejo Actions (Codeberg)"). Der BUG-79-Fix (GitHub-Actions-Cache-Step für `de421.bsp` unter Key `de421-bsp-v1` + timeout-abgesicherter Fallback-Download im `test-backend`-Job) wurde nur in `.github/workflows/deploy.yml` umgesetzt. Verifiziert: Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` (Zeilen 98–118) enthält weiterhin nur `pip install -r requirements.txt` + `pytest tests/ -v`, keinen Cache-Step, keine Timeout-Absicherung um den `de421.bsp`-Download. Falls diese Forgejo/Codeberg-Pipeline aktiv genutzt wird, besteht dort weiterhin das ursprüngliche BUG-79-Problem: ein ungemockter, timeout-loser ~17-MB-Download, der einen CI-Lauf unbemerkt bis zum 15-Minuten-Job-Timeout blockieren kann.
 
@@ -16384,5 +16386,166 @@ der gewählten Options-Mechanik in jedem Fall umgesetzt.
 - **BUG-79** (In Test): Quelle/Fund dieses Tickets — der dort umgesetzte Fix (Cache + Timeout) wurde nur in `.github/workflows/deploy.yml` eingepflegt, `.forgejo/workflows/deploy.yml` wurde nicht angefasst.
 - Kein bestehendes Ticket zu `.forgejo`/Forgejo/Codeberg gefunden (Grep über gesamtes Backlog: keine Treffer außer diesem neuen Ticket).
 - Vermutlich höhere Priorität als **TASK-79** (reine Doku-Divergenz) einzuordnen, da hier — sofern die Pipeline aktiv ist — ein reales CI-/Deploy-Blockierungsrisiko analog zur BUG-79-Ausgangslage besteht; endgültige Priorisierung obliegt Stephan.
+
+---
+
+## Analyse (TASK-80)
+
+### ❓ Zentrale offene Frage — vor Priorisierung/Freigabe zu klären
+
+**Frage 1:** Wird `.forgejo/workflows/deploy.yml` aktuell von einer aktiven Codeberg/Forgejo-Instanz ausgeführt?
+
+Diese Frage konnte im Rahmen der Analyse **nicht abschließend beantwortet werden** — Git-Remote-Prüfungen und Live-Checks gegen Codeberg sind aus der Sandbox nicht erlaubt (keine Git-Befehle, keine Live-Requests aus dem Subagenten; Regeln `feedback_sandbox_git_lockfile` / `feedback_subagent_sandbox_network_tests`). Es wurde jedoch ein starker **Textbeleg im Repo selbst** gefunden, der gegen eine aktive Nutzung spricht:
+
+> `.gitignore`, Zeilen 22–23:
+> ```
+> # Codeberg-spezifisch (nicht mehr verwendet, GitHub Actions wird genutzt)
+> .forgejo/
+> ```
+
+Zusätzlich: `FotoAlert/deploy/DEPLOYMENT-GUIDE.md` Zeilen 231–240 und `FotoAlert/deploy/setup_server.sh` Zeilen 19–22 + 68–73 verwenden zwar noch die Variable `CODEBERG_USER`, klonen aber explizit von `github.com` (`git clone "https://github.com/$CODEBERG_USER/$REPO_NAME.git"`), mit dem expliziten Kommentar „Hinweis: Der Parameter heißt noch `CODEBERG_USER` im Script, funktioniert aber für GitHub genauso". Das ist ein zweiter, unabhängiger Hinweis auf denselben Befund: Codeberg war früher der Deploy-Weg, wurde aber auf GitHub umgestellt.
+
+**Aber:** Ein `.gitignore`-Eintrag wirkt nicht rückwirkend — falls `.forgejo/workflows/deploy.yml` bereits **vor** diesem Eintrag von Git getrackt wurde, würde die Datei trotz `.gitignore` weiterhin bei jedem Push mitgeführt und könnte, sofern ein Codeberg-Remote weiterhin existiert, dort nach wie vor eine echte Pipeline auslösen. Das kann ich aus der Sandbox nicht klären (bräuchte `git ls-files` / `git remote -v`, beides nicht sandbox-zulässig).
+
+**Konsequenz für die Priorisierung:**
+- Falls aktiv genutzt → reales Betriebsrisiko (identisches BUG-79-Problem: hängender ~17-MB-Download kann den Job bis zum 15-Minuten-Timeout blockieren) → Fix sollte zeitnah portiert werden.
+- Falls nicht mehr genutzt → reine Aufräumarbeit, keine Dringlichkeit; ggf. sogar sinnvoller, die Datei als veraltet zu kennzeichnen statt Aufwand in eine Portierung zu stecken.
+
+**Bitte an Stephan zu klären (im Mac-Terminal, nicht in der Sandbox):**
+```
+git remote -v
+```
+und ob unter Codeberg.org ein aktives Repository/Actions-Log für dieses Projekt existiert.
+
+---
+
+### Example Mapping
+
+**⚠️ Annahme:** Scope ist strikt auf die Portierung des BUG-79-Mechanismus (Cache-Step + timeout-abgesicherter Fallback-Download) begrenzt. Andere gefundene Divergenzen zwischen den beiden Workflow-Dateien werden **nicht** mitgezogen (Kein-Scope-Creep-Regel):
+- `.github`: `uses: actions/checkout@v4.2.2` (exakt gepinnt) vs. `.forgejo`: `uses: actions/checkout@v4` (ungepinnt) — an 3 Stellen (Zeilen 38, 105, 127 in `.github`; entsprechend in `.forgejo`). Nicht Teil von BUG-79, bleibt unangetastet, kann als eigenes Ticket vorgeschlagen werden falls gewünscht.
+- Kleinere Kommentar-/Formatierungsabweichungen im Kopfblock (z. B. Leerzeichen-Ausrichtung bei `SERVER_USER`). Kosmetisch, kein Scope.
+
+📏 **Regel 1:** Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` bekommt denselben Ephemeriden-Cache-Mechanismus wie `.github/workflows/deploy.yml` (Cache-Key `de421-bsp-v1`, `path: FotoAlert/backend/de421.bsp`).
+🟢 Beispiel: Gegeben ein zweiter CI-Lauf auf Codeberg nach einem ersten erfolgreichen Lauf — wenn der `test-backend`-Job startet, dann wird `de421.bsp` aus dem Cache wiederhergestellt statt erneut heruntergeladen.
+
+📏 **Regel 2:** Bei Cache-Miss (erster Lauf oder Cache abgelaufen/geleert) bricht ein hängender/langsamer Download kontrolliert ab, statt den Job bis zum globalen 15-Minuten-Timeout zu blockieren.
+🟢 Beispiel: Gegeben ein Cache-Miss und ein Drittserver, der nicht antwortet — wenn der Download-Schritt 90 Sekunden überschreitet (`curl --max-time 90`) oder der Step insgesamt 2 Minuten überschreitet (`timeout-minutes: 2`), dann bricht der Schritt mit einer klaren Fehlermeldung ab, nicht erst nach 15 Minuten.
+
+📏 **Regel 3 (bedingt, abhängig von Frage 1):** Falls Stephan bestätigt, dass `.forgejo/` nicht mehr aktiv genutzt wird, wird der Fix **nicht** portiert; stattdessen wird der irreführende Kopfkommentar korrigiert, der aktuell weiterhin „Automatisches Deployment via Forgejo Actions (Codeberg)" behauptet.
+🟢 Beispiel: Gegeben Stephans Bestätigung „Codeberg wird nicht mehr genutzt" — wenn die Datei danach geöffnet wird, dann macht der Kopfkommentar sofort erkennbar, dass diese Pipeline nicht aktiv ist (statt einer stillschweigend falschen Selbstbeschreibung).
+
+Keine offenen Questions mehr außer Frage 1 (s. o.), die die Wahl zwischen Regel 1+2 (Option A) und Regel 3 (Option B) im Weg-Gate entscheidet.
+
+---
+
+### Akzeptanzkriterien
+
+*(Hinweis: Dies ist reine CI-Konfiguration ohne sichtbares App-Verhalten. Der Effekt zeigt sich nicht beim Benutzen der App, sondern beim nächsten Push auf `main`, wenn die jeweilige Pipeline — GitHub und/oder Codeberg — automatisch anläuft.)*
+
+**Falls Frage 1 mit „aktiv genutzt" beantwortet wird (Option A):**
+- [ ] Beim nächsten Codeberg-CI-Lauf nach einem vorherigen erfolgreichen Lauf wird die Ephemeriden-Datei aus dem Cache geladen, nicht erneut heruntergeladen (im Actions-Log erkennbar am Cache-Hit-Schritt).
+- [ ] Bei einem Cache-Miss bricht ein hängender Download spätestens nach 2 Minuten kontrolliert mit Fehlermeldung ab — der Job hängt nicht bis zum 15-Minuten-Limit.
+- [ ] Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` ist inhaltlich identisch zum entsprechenden Abschnitt in `.github/workflows/deploy.yml` (gleicher Cache-Key, gleiche Timeout-Werte, gleiche Fehlermeldungstexte) — abgesehen von der bewusst ausgeschlossenen `checkout`-Versionspinnung.
+- [ ] Edge Case: Die YAML-Datei bleibt nach der Änderung syntaktisch gültig (kein Parse-Fehler beim nächsten Workflow-Trigger).
+
+**Falls Frage 1 mit „nicht mehr genutzt" beantwortet wird (Option B):**
+- [ ] Der Kopfkommentar von `.forgejo/workflows/deploy.yml` macht unmissverständlich klar, dass diese Pipeline nicht aktiv ist und GitHub Actions die einzige aktive Pipeline ist.
+- [ ] Der eigentliche BUG-79-Fix wird **nicht** portiert (kein unnötiger Aufwand in totes Konfigurationsmaterial).
+- [ ] Edge Case: Eine mögliche Löschung der Datei ist ausdrücklich **kein** automatischer Teil dieses Tickets — sie würde eine separate, explizite Freigabe von Stephan brauchen (Regel „Keine Löschung ohne Genehmigung").
+
+---
+
+### Pre-Mortem
+
+📎 **Code-Verifikation:** `.github/workflows/deploy.yml` und `.forgejo/workflows/deploy.yml` vollständig gelesen (2026-07-15).
+Bestätigt: Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` (Zeilen 98–118) enthält tatsächlich nur `pip install -r requirements.txt` (Zeile 114) + `python3 -m pytest tests/ -v` (Zeile 118) — kein Cache-Step, kein Timeout-Fallback. Der BUG-79-Fix in `.github/workflows/deploy.yml` (Zeilen 116–143: Kommentarblock + `actions/cache@v4`-Step mit Key `de421-bsp-v1` + bedingter `curl --max-time 90`-Fallback mit `timeout-minutes: 2`) ist exakt so vorhanden wie im Ticket beschrieben.
+Zusätzlich gefunden (nicht im Ticket erwähnt): `.gitignore` Zeilen 22–23 sowie `DEPLOYMENT-GUIDE.md`/`setup_server.sh` deuten übereinstimmend darauf hin, dass Codeberg als Deploy-Weg bereits durch GitHub ersetzt wurde (s. Frage 1 oben).
+
+💀 **Szenario 1:** Der Fix wird 1:1 nach `.forgejo/workflows/deploy.yml` kopiert, aber Forgejo/Codebergs Actions-Runner verarbeitet die GitHub-Marketplace-Action `actions/cache@v4` nicht identisch (z. B. weil kein kompatibler Actions-Cache-Backend auf der Codeberg-Instanz konfiguriert ist).
+   Auslöser: Stille Annahme „GitHub-Actions-Syntax funktioniert 1:1 auf Forgejo".
+   Frühwarnung: Cache-Step schlägt im Codeberg-Actions-Log fehl oder greift nie (permanenter Cache-Miss).
+   Gegenmaßnahme: Nach der Portierung muss ein echter Testlauf auf Codeberg (durch Stephan, nicht aus der Sandbox) den Cache-Hit im zweiten Lauf bestätigen — nicht nur die Syntaxgültigkeit prüfen.
+
+💀 **Szenario 2:** `.forgejo/` ist tatsächlich totes Konfigurationsmaterial; der Fix wird trotzdem portiert, weil Frage 1 übersprungen/geraten statt geklärt wurde → verschwendeter Aufwand plus der irreführende Eindruck einer zweiten aktiv gepflegten Pipeline bleibt bestehen.
+   Auslöser: Frage 1 wird nicht vor der Implementierung verbindlich beantwortet.
+   Frühwarnung: Kein Codeberg-Remote unter `git remote -v`, keine sichtbaren Action-Runs in den letzten Monaten.
+   Gegenmaßnahme: Frage 1 ist Weg-Gate-Voraussetzung, nicht optional.
+
+💀 **Szenario 3:** `.gitignore` verhindert nur *neue* Tracking-Vorgänge — falls die Datei vor dem Ignore-Eintrag bereits getrackt war, wird sie trotzdem weiter mit gepusht. Die `.gitignore`-Notiz „nicht mehr verwendet" könnte damit über den tatsächlichen Live-Zustand hinwegtäuschen.
+   Auslöser: `.gitignore`-Kommentar wird als alleiniger Beweis gewertet statt als Indiz.
+   Frühwarnung: Datei taucht trotz `.gitignore`-Eintrag in `git ls-files` auf (durch Stephan zu prüfen, nicht in der Sandbox).
+   Gegenmaßnahme: In der Spec ausdrücklich als Indiz, nicht als Beweis behandelt (s. Frage 1); keine Priorisierungsentscheidung allein darauf stützen.
+
+💀 **Szenario 4:** Bei Wahl von Option B wird die Datei vorschnell gelöscht statt nur gekennzeichnet.
+   Auslöser: „Aufräumen" wird mit „Löschen" verwechselt.
+   Frühwarnung: Löschung taucht in einem Implementierungs-Diff auf, ohne dass Stephan vorher explizit „Ja, löschen" gesagt hat.
+   Gegenmaßnahme: AK für Option B verankert explizit, dass Löschung kein automatischer Ticket-Bestandteil ist (Regel `feedback_no_delete_without_approval`).
+
+Neue Erkenntnis fürs Memory (Vorschlag für `retrospective`): Bei Repo-weiten Konfigurations-Divergenzen (mehrere CI-Dateien für denselben Zweck) lohnt sich vor der Fix-Portierung ein kurzer Grep nach Cross-Referenzen (`.gitignore`, Deployment-Docs, Setup-Skripte) — hier lieferte das einen starken Hinweis auf den De-facto-Status, ohne dass ein einziger Git-Befehl nötig war.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien:**
+- `.forgejo/workflows/deploy.yml` — Zieldatei für den Fix (Option A) bzw. für den Deprecation-Hinweis (Option B); `test-backend`-Job Zeilen 98–118.
+- `.github/workflows/deploy.yml` — Referenzimplementierung; BUG-79-Fix in Zeilen 116–143.
+- `.gitignore` (Zeilen 19–23) — enthält den Hinweis „Codeberg-spezifisch (nicht mehr verwendet, GitHub Actions wird genutzt)" für `.forgejo/`.
+- `FotoAlert/deploy/DEPLOYMENT-GUIDE.md` (Zeilen 231–240) — Hinweis, dass `CODEBERG_USER` nur noch historisch benannt, faktisch GitHub ist.
+- `FotoAlert/deploy/setup_server.sh` (Zeilen 19–22, 68–73) — klont explizit von `github.com`.
+
+**Diff-artige Gegenüberstellung `test-backend`-Job:**
+
+| | `.github/workflows/deploy.yml` | `.forgejo/workflows/deploy.yml` |
+|---|---|---|
+| `checkout`-Version | `actions/checkout@v4.2.2` (Z. 105) | `actions/checkout@v4` (Z. 105) — außerhalb Scope |
+| Cache-Step | Z. 121–126: `actions/cache@v4`, Key `de421-bsp-v1` | **fehlt vollständig** |
+| Fallback-Download mit Timeout | Z. 133–143: `if: cache-hit != 'true'`, `timeout-minutes: 2`, `curl --max-time 90` | **fehlt vollständig** |
+| Testsuite-Ausführung | Z. 145–147 | Z. 116–118 — unverändert identisch (`pip install` + `pytest tests/ -v`) |
+
+Designer-Check: nicht relevant (kein sichtbares UI-Element, reine CI-Konfiguration).
+Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronisation).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation beider Workflow-Dateien)
+- [x] Architektur analysiert: `.forgejo/workflows/deploy.yml`, `.github/workflows/deploy.yml`, `.gitignore`, `DEPLOYMENT-GUIDE.md`, `setup_server.sh`
+- [x] Designer-Check: visuell? → nein, übersprungen
+- [ ] Implementierungsoptionen: A (Fix portieren) / B (als inaktiv kennzeichnen) — Wahl hängt von Frage 1 ab
+- [ ] Empfehlung: siehe unten
+
+---
+
+### Implementierungsoptionen
+
+**Diese Wahl ist an Frage 1 gekoppelt — beide Optionen werden hier vollständig vorbereitet, damit nach Stephans Antwort sofort losgelegt werden kann, ohne erneute Analyse-Runde.**
+
+#### Option A — BUG-79-Fix 1:1 nach `.forgejo/workflows/deploy.yml` portieren
+- Vorgehen: Den Kommentarblock + Cache-Step + Fallback-Download-Step aus `.github/workflows/deploy.yml` Zeilen 116–143 unverändert zwischen „Abhängigkeiten installieren" (Zeile 114) und „Backend-Testsuite ausführen" (Zeile 118 alt) in `.forgejo/workflows/deploy.yml` einfügen.
+- Betroffene Dateien: nur `.forgejo/workflows/deploy.yml`.
+- Vorteile: Beide Pipelines wieder synchron; falls Codeberg aktiv ist, ist das reale Blockierungsrisiko dort behoben.
+- Nachteile/Risiken: Falls die Pipeline inaktiv ist, verschenkter (aber harmloser) Aufwand; `actions/cache@v4` muss auf dem Forgejo-Runner live verifiziert werden (Szenario 1 im Pre-Mortem) — das kann nur Stephan über einen echten Codeberg-Lauf bestätigen, nicht die Sandbox.
+- Aufwand: klein (Copy-Paste von ca. 28 Zeilen, keine Logikänderung).
+
+#### Option B — Datei als inaktiv kennzeichnen statt Fix zu portieren
+- Vorgehen: Kopfkommentar (Zeile 1) um einen expliziten Hinweis ergänzen, z. B. „⚠️ Nicht aktiv genutzt — GitHub Actions (`.github/workflows/deploy.yml`) ist die einzige aktive Pipeline, siehe `.gitignore`-Hinweis". Fix wird nicht portiert. Löschung der Datei ist explizit **kein** Bestandteil dieses Tickets — nur als separater, gesondert freizugebender Folgeschritt denkbar.
+- Betroffene Dateien: nur `.forgejo/workflows/deploy.yml` (Kommentar-Ergänzung).
+- Vorteile: Kein verschwendeter Portierungsaufwand; korrigiert die aktuell irreführende Selbstbeschreibung im Kopfkommentar.
+- Nachteile/Risiken: Falls sich später doch eine aktive Nutzung herausstellt, bleibt das BUG-79-Risiko dort bestehen, bis aktiv nachgeholt.
+- Aufwand: klein (eine Kommentarzeile).
+
+✅ **Empfehlung:** Zuerst **Frage 1 klären** (Weg-Gate-Voraussetzung). Falls die Klärung nicht kurzfristig möglich ist oder das Ergebnis unsicher bleibt: **Option A als sicherer Default**, weil das Risiko asymmetrisch ist — ein unnötig portierter Fix richtet keinen Schaden an, ein unterlassener Fix bei tatsächlich aktiver Pipeline lässt ein reales Betriebsrisiko (hängender CI-Job bis 15-Minuten-Timeout) bestehen. Bei eindeutiger Bestätigung „Codeberg wird nicht mehr genutzt" ist Option B die sauberere Wahl (kein Aufwand in totes Material, aber ehrliche Selbstbeschreibung im Repo).
+
+---
+
+### Testplan
+
+**Automatisiert (Harness):** Reine CI-Konfigurationsdatei ohne Backend-Code-Pfad — kein `pytest`-Fall ableitbar. Stattdessen: YAML-Syntaxprüfung nach der Änderung (z. B. lokal mit einem YAML-Parser, dass die Datei gültig bleibt).
+
+**Manuell:**
+- [ ] `.forgejo/workflows/deploy.yml` und `.github/workflows/deploy.yml` nebeneinander lesen: Cache-Step + Fallback-Step inhaltlich identisch (Cache-Key `de421-bsp-v1`, `--max-time 90`, `timeout-minutes: 2`)?
+- [ ] Falls Option A gewählt und ein Codeberg-Remote existiert: Stephan löst über sein Terminal/den Codeberg-Browser einen Push/Trigger aus und prüft im Actions-Log, ob der Cache-Step beim zweiten Lauf einen Cache-Hit zeigt (kann nicht aus der Sandbox getestet werden — Live-Request-Regel).
+- [ ] Falls Option B gewählt: Kopfkommentar in `.forgejo/workflows/deploy.yml` öffnen und lesbar/eindeutig prüfen.
+- [ ] Regressionscheck: `.github/workflows/deploy.yml` bleibt komplett unverändert (Diff nur in `.forgejo/`).
 
 ---
