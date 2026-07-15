@@ -26,15 +26,15 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-80 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | *(leer)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15)* · **BUG-80** *(Option A gewählt, Freigabe 2026-07-15)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | TASK-79 *(Option B – 59 Testdateien dokumentiert, 3/3 Tests grün, wartet auf Verifikation)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-59** *(Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-79** *(Test-Doku README.md veraltet nach BUG-79)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -44,6 +44,142 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-80 · Header springt beim Filtern: Infozeile ändert Höhe, Kopfzeile verschiebt sich sichtbar hinter dem Filter-Sheet `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-15 |
+| **Freigegeben** | 2026-07-15 |
+
+**Beschreibung:** Beim Öffnen/Bedienen des Filter-Sheets verschiebt sich die im Hintergrund liegende Kopfzeile (Logo + Infozeile) sichtbar. Ursache (per Scope-Check am Code bestätigt): Der Infotext in `#header-subtitle` (`web/index.html`, Zeile 1155/2106f.) wechselt je nach Filterergebnis zwischen dem kurzen Standardtext „Capture moments that matter." und einem längeren, dynamischen Text wie „Heute: 4 Chancen · Bester Score X%" — die unterschiedliche Zeilenanzahl/Länge ändert die Höhe von `#header`, wodurch der ganze Kopfbereich optisch springt, auch während das Filter-Sheet als Overlay davorliegt. Reproduzierbar durch jedes Umschalten eines Filterkriteriums, das die Trefferzahl ändert (z. B. Himmelsröte aktiv ↔ ausgeschlossen).
+
+**User Story:** Als Nutzer/in der FotoAlert-App, möchte ich, dass die Kopfzeile beim Filtern ruhig stehen bleibt, sodass ich mich beim Bedienen des Filter-Sheets nicht durch einen springenden Hintergrund ablenken lasse.
+
+**Scope-Check (durchgeführt):** Im gesamten `web/index.html` gibt es nur eine einzige Stelle mit dynamischer Header-Höhe durch wechselnden Text — das Element `#header-subtitle` im App-Header. Andere „-header"-Elemente (`add-header`, `add-map-fs-header`, `edit-map-fs-header`, `fov-map-fs-header`, `filter-header`, `scout-day-header`) sind strukturell/statisch oder liegen bereits innerhalb ihres eigenen Overlays (z. B. der Live-Zähler „↳ … sichtbar" im Filter-Sheet selbst, Zeile ~3401) und verursachen kein Springen eines dahinterliegenden Elements. Scope daher bewusst eng auf `#header-subtitle` begrenzt — keine weiteren betroffenen Stellen gefunden.
+
+**Bezug:** Keine verwandten/überschneidenden Tickets im Backlog gefunden (Grep nach „Header", „Kopfzeile", „Infozeile", „Layout-Shift", „Filter-Sheet" ergab keine Treffer zu diesem Höhen-/Sprung-Phänomen). Eigenständiges Ticket.
+
+---
+
+**Example Mapping**
+
+📏 Regel 1: Die Kopfzeile (`#header`) darf ihre Höhe nicht ändern, unabhängig davon, welcher der beiden Infozeilen-Texte gerade angezeigt wird.
+🟢 Example: Gegeben der Feed zeigt „Capture moments that matter." — wenn ein Filterkriterium umgeschaltet wird, das den Text auf „Heute: 4 Chancen · Bester Score 87%" ändert — dann bleibt die Höhe von `#header` (Logo + Titel + Infozeile) exakt gleich, keine sichtbare Verschiebung.
+
+📏 Regel 2: Der Sprung ist unabhängig vom Filter-Sheet-Zustand sichtbar, weil das Filter-Sheet nur den unteren Bildschirmbereich abdeckt (`position:fixed; bottom:0`) und die Kopfzeile darüber liegt.
+🟢 Example: Gegeben das Filter-Sheet ist geöffnet und der Nutzer schaltet „Himmelsröte" aus — wenn sich dadurch die Trefferzahl ändert — dann ist der Kopfzeilen-Sprung trotz geöffnetem Sheet sichtbar, weil der Header nicht vom Sheet verdeckt wird.
+
+⚠️ Annahme: Der Fix betrifft ausschließlich `web/index.html` (Frontend/CSS), keine Backend-/API-Änderung — bereits durch Code-Lektüre bestätigt (einzige Stelle, die `#header-subtitle` per `textContent` setzt: `Feed.render()`, Zeile 2106f.).
+
+❓ Frage 1 (Grenzfall mit zwei sinnvollen Verhaltensweisen — siehe Weg-Gate unten): Soll der lange Infotext bei Platzmangel gekürzt werden (Ellipsis, Header bleibt garantiert 1-zeilig) oder soll dauerhaft Platz für 2 Zeilen reserviert werden (Text nie gekürzt, aber im Normalzustand permanent kleiner Leerraum unter dem Standardtext)? Siehe Implementierungsoptionen A/B.
+
+**Weg-Gate-Entscheidung (2026-07-15):** Stephan hat Option A gewählt — Infozeile bleibt immer einzeilig, langer Text wird bei Platzmangel mit „…" gekürzt.
+
+**Akzeptanzkriterien:**
+- [~] AK1: Wird im Feed-Tab ein Filterkriterium umgeschaltet, das die Zahl der heutigen Chancen ändert (z. B. „Himmelsröte" aktivieren/deaktivieren), bleibt die Kopfzeile (Logo, App-Name, Infozeile) optisch exakt an derselben Stelle — keine sichtbare Verschiebung, egal ob der Infotext kurz oder lang ist. Messbar: Höhe von `#header` ändert sich um ≤ 1px zwischen den beiden Textzuständen.
+- [~] AK2: Dasselbe gilt auf einem schmalen Bildschirm (z. B. 375px Breite, iPhone-SE/Mini-Klasse), auf dem der lange Text eher umbrechen würde als auf einem breiten Bildschirm.
+- [~] Edge Case AK3: Sind heute 0 Chancen vorhanden, bleibt wie bisher der Standardtext „Capture moments that matter." stehen — auch dieser Zustand darf keine andere Header-Höhe erzeugen als der Zustand mit Chancen.
+- [~] Edge Case AK4 (Option A gewählt): Ein sehr langer Infotext (z. B. „Heute: 24 Chancen · Bester Score 100%") wird bei Platzmangel sichtbar mit „…" gekürzt, Header-Höhe bleibt trotzdem konstant.
+- [~] AK5 (Regression, PRODUCT.md §12 „CSS/Theme"): Die Kopfzeile sieht auf allen 5 Tabs (Feed/Kalender/Scout/Karte/Locations) weiterhin unauffällig aus, kein abgeschnittenes Logo/Icon, in Hell- und Dunkel-Theme (`data-theme`, US-97/US-99).
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-07-15.
+- Bestätigt: `#header-subtitle` wird im gesamten Frontend nur an zwei Stellen berührt — Zeile 1155 (initialer HTML-Text „Capture moments that matter.") und Zeile 2106f. in `Feed.render()` (`textContent = best ? 'Heute: ... Chancen · Bester Score ...' : 'Capture moments that matter.'`). Keine weitere Stelle setzt diesen Text.
+- Bestätigt: `#header` (Zeile 107-112) hat keine feste Höhe — `display:flex; flex-shrink:0`, Höhe ist rein inhaltsgetrieben. `.subtitle` (Zeile 114) hat weder `white-space`, `min-height` noch `max-width` gesetzt.
+- Bestätigt: `#filter-sheet` (Zeile 626) ist `position:fixed; bottom:0` — deckt nur den unteren Bildschirmbereich ab, der Header bleibt bei geöffnetem Sheet sichtbar (erklärt, warum der Sprung trotz Overlay wahrnehmbar ist).
+- Bestätigt: `Filter._applyLive()` (Zeile 3358ff., Kommentar „Sofortiges Re-Render des aktuellen Views ohne Sheet zu schließen") ruft bei `Feed.mode === 'feed'` bei jedem Chip-Toggle `Feed.render()` auf, ohne das Sheet zu schließen → jeder Filter-Toggle im offenen Sheet kann den Header-Sprung auslösen.
+- Bestätigt: Bei 0 Chancen heute bleibt `best` `null` → Standardtext bleibt stehen (`Feed.render()`, Zeile 2106f.). Relevant für Testdaten (siehe CI-Hinweis unten).
+- Widerlegt: Kein anderes „-header"-Element im Code hat dasselbe Höhen-/Sprung-Problem (deckt sich mit dem bereits im Intake durchgeführten Scope-Check).
+
+💀 Szenario 1 — Reservierte/erzwungene Höhe passt nicht zur längsten echten Textvariante.
+Auslöser: Es wird ungeprüft angenommen, „1 Zeile" oder „2 Zeilen" reichten immer, ohne den längsten realistischen String (zweistellige Chancen-Zahl + Score 100%) auf dem schmalsten unterstützten Bildschirm tatsächlich zu prüfen.
+Frühwarnung: Kein Test mit einem extremen Datensatz auf schmalem Viewport.
+Gegenmaßnahme: AK2 verlangt Test auf schmalem Bildschirm; Umsetzung soll mit dem längsten in der Praxis vorkommenden String geprüft werden, nicht nur mit einem kurzen Beispiel.
+
+💀 Szenario 2 — Kürzung verschluckt die wichtigste Information (nur relevant bei Option A).
+Auslöser: Eine Kürzung mit Auslassungspunkten entfernt Text vom Zeilenende her; „Bester Score X%" steht aber am Ende des Strings und wäre der zuerst wegfallende Teil.
+Frühwarnung: Sichtprüfung mit einem sehr langen Beispieltext zeigt, dass genau der Score-Wert verschwindet.
+Gegenmaßnahme: Als explizite Wahloption im Weg-Gate vorgelegt (Frage 1) statt still zu entscheiden; bei Wahl von Option A wird ein Testschritt mit einem extrem langen Text in den Testplan aufgenommen (AK4).
+
+💀 Szenario 3 — Header ist auf allen Tabs sichtbar, Fix wird nur im Feed-Tab getestet.
+Auslöser: `#header` liegt außerhalb des Tab-Contents und ist auf allen 5 Tabs identisch sichtbar; die Infozeile wird aber nur beim Feed-Rendering neu gesetzt.
+Frühwarnung: Manueller Test findet nur im Feed-Tab statt.
+Gegenmaßnahme: AK5 (Regression über alle 5 Tabs, Hell/Dunkel) gemäß PRODUCT.md §12 „CSS/Theme".
+
+💀 Szenario 4 — Eine künftige dritte Textvariante bringt den Sprung in neuer Form zurück.
+Auslöser: Der Fix wird hart auf die zwei aktuell bekannten Strings zugeschnitten (z. B. exakte Pixelwerte nur für diese zwei Fälle), statt generisch zu wirken.
+Frühwarnung: Ein späteres Ticket führt einen dritten Infozeilen-Zustand ein (z. B. „Kein Netz") mit wieder anderer Länge.
+Gegenmaßnahme: Lösung so wählen, dass sie unabhängig vom konkreten Textinhalt funktioniert (Kürzung oder großzügige generische Reserve), nicht nur für die zwei bekannten Strings kalibriert.
+
+💀 CI-Datenumfeld-Check (Pflicht-Checkfrage, Antwort verifiziert): Verhält sich ein automatisierter Test anders, wenn im (frischen) CI-Environment für „Heute" 0 Chancen vorhanden sind? Ja — bei 0 Chancen bleibt `best` `null`, der Standardtext bleibt stehen, der eigentliche Sprung-Fall (langer Text) wird gar nicht ausgelöst. Ein automatisierter Test für dieses Ticket braucht deshalb mindestens 1 Opportunity für „Heute" in den Testdaten, sonst prüft er nur den ohnehin unveränderten Normalzustand. Kein funktionales Risiko für den Fix selbst, aber Voraussetzung für sinnvolle Testabdeckung (siehe Testplan).
+
+**Architektur-Analyse:**
+- Betroffene Datei: ausschließlich `web/index.html` (Single-File-App). Kein Backend-/API-Bezug, keine `precompute.py`/`main.py`-Berührung.
+- CSS-Regel `#header .subtitle` (Zeile 114): aktuell ohne Breiten- oder Höhenbegrenzung.
+- Text-Zuweisung ausschließlich in `Feed.render()` (Zeile 2106f.) — einzige Stelle im gesamten Frontend, die `#header-subtitle` verändert (per Grep verifiziert, 2 Treffer gesamt: Ausgangs-HTML Zeile 1155 + Zuweisung Zeile 2106).
+- `#header` (Zeile 107-112): `display:flex`, `flex-shrink:0`, keine feste Höhe — Höhe folgt rein dem Inhalt.
+- `#filter-sheet` (Zeile 626): `position:fixed; bottom:0`, deckt nur unteren Bildschirmbereich ab → Header bleibt bei offenem Sheet sichtbar, Sprung ist deshalb wahrnehmbar.
+- `Filter._applyLive()` (Zeile 3358ff.): löst bei jedem Chip-Toggle im offenen Sheet ein sofortiges `Feed.render()` aus (ohne Sheet zu schließen) — das ist der Auslösepfad für den Sprung.
+- Render-Pfad-Check (Pflicht bei visuellen Elementen, durchgeführt): Element wird rein client-seitig per CSS/JS gerendert, kein Server-Asset/PNG beteiligt — bestätigt durch Code-Lektüre.
+
+**Designer-Check:**
+Merkmale aus Schritt 4b geprüft (nach Code-Lektüre, nicht vorher): kein neues DOM-Element, keine Farb-/Radius-/Icon-Änderung, keine neue Karten-Visualisierung. Der einzige wahrnehmbare Nebeneffekt ist je nach gewählter Option entweder (a) eine Textkürzung mit „…" oder (b) ein kleiner dauerhafter Leerraum unter dem Standardtext — beides sind geometrische Stabilitätsfolgen einer Bug-Behebung, keine gestalterische Entscheidung (keine neue Farbe/Form/Icon-Wahl). Einschätzung: `fotoalert-designer` für diesen Fix nicht zwingend nötig; die Auswahl zwischen den beiden Nebeneffekten (Kürzung vs. Leerraum) wird stattdessen direkt Stephan im Weg-Gate vorgelegt (Frage 1).
+
+**Implementierungsoptionen:**
+
+### Option A — Infozeile bleibt immer einzeilig, langer Text wird bei Platzmangel mit „…" gekürzt (empfohlen)
+- Vorgehen: CSS-Ergänzung an `#header-subtitle`: einzeilig erzwingen, Überlauf ausblenden und mit Auslassungspunkten kürzen; dazu eine Breitenbegrenzung am umgebenden Element, damit die Kürzung einen Rahmen hat. Keine JS-Änderung nötig.
+- Betroffene Dateien: nur `web/index.html` (CSS-Block um Zeile 107-114, ggf. kleine Anpassung am umschließenden Element um Zeile 1153).
+- Vorteile: Kopfzeilenhöhe auf jedem Gerät garantiert konstant, kein dauerhafter Leerraum im Normalzustand, rein CSS ohne Verhaltensrisiko im JS.
+- Nachteile/Risiken: Bei sehr langen Texten könnte „Bester Score X%" am Zeilenende abgeschnitten werden (Szenario 2); die Breitenbegrenzung muss im bestehenden verschachtelten Flex-Layout sorgfältig gesetzt werden (kleine, aber überschaubare CSS-Arbeit).
+- Aufwand: klein.
+
+### Option B — Für die Infozeile wird dauerhaft Platz für 2 Zeilen reserviert
+- Vorgehen: `#header-subtitle` bekommt eine feste Mindesthöhe, die der maximal möglichen Zeilenzahl entspricht, unabhängig vom aktuellen Text. Text wird nie gekürzt.
+- Betroffene Dateien: nur `web/index.html` (CSS-Ergänzung an `#header .subtitle`).
+- Vorteile: kein Textverlust unabhängig vom Score-Wert; sehr einfache, robuste CSS-Regel.
+- Nachteile/Risiken: im Normalzustand bleibt dauerhaft ein kleiner, immer sichtbarer Leerraum unter dem Standardtext stehen — Kopfzeile wird permanent etwas höher als heute, auch ohne aktive Filter; die genaue Höhe muss mit dem längsten realistischen Text nachgemessen werden (Szenario 1).
+- Aufwand: klein.
+
+### Option C — Höhe dynamisch per JavaScript messen statt pauschal reservieren
+- Vorgehen: Beim Rendern beide Textvarianten unsichtbar messen und die größere tatsächlich benötigte Höhe exakt als Mindesthöhe setzen; passt sich automatisch an jede Bildschirmbreite und jede künftige dritte Textvariante an.
+- Betroffene Dateien: `web/index.html` (kleine JS-Ergänzung zusätzlich zur CSS-Basis).
+- Vorteile: kein geratener Höhenwert nötig, adressiert Szenario 4 am robustesten, kein größerer Leerraum als tatsächlich nötig.
+- Nachteile/Risiken: deutlich mehr Aufwand für einen rein kosmetischen Bug; zusätzliche Mess-Logik im DOM (Risiko für Layout-Thrashing bei ungünstiger Umsetzung); Overkill für aktuell nur 2 bekannte Textvarianten.
+- Aufwand: mittel.
+
+✅ **Empfehlung: Option A.** Sie ist reines CSS, macht die Kopfzeilenhöhe unabhängig von Bildschirmbreite und Textlänge (das eigentliche Ziel des Tickets), fügt im Normalzustand keinen permanenten Leerraum hinzu und ist am wenigsten aufwändig. Das Restrisiko (mögliche Kürzung von „Bester Score") ist bewusst als offene Grenzfall-Frage vorgelegt (siehe unten) statt still entschieden zu werden.
+
+**⚠️ Offene Grenzfall-Frage für das Weg-Gate (Frage 1):**
+Wie wichtig ist es, dass „Bester Score X%" niemals abgeschnitten wird?
+- **Option A (empfohlen)** — Text darf bei Platzmangel gekürzt werden: Header bleibt garantiert stabil, in seltenen Extremfällen (viele Chancen + hoher Score auf sehr schmalem Bildschirm) könnte der Score-Wert hinter „…" verschwinden.
+- **Option B** — Text wird nie gekürzt, Header reserviert dauerhaft etwas mehr Platz: Score immer sichtbar, aber Kopfzeile ist ab sofort permanent ca. 14-16px höher als heute, auch ohne aktive Filter.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation am 2026-07-15)
+- [x] Architektur analysiert: `web/index.html` (`#header`, `.subtitle`, `Feed.render()`, `Filter._applyLive()`, `#filter-sheet`)
+- [x] Designer-Check: visuell? → geprüft, aber keine gestalterische Entscheidung (Farbe/Form/Icon) betroffen — `fotoalert-designer` nicht aufgerufen, Grenzfall-Wahl stattdessen im Weg-Gate an Stephan
+- [ ] Implementierungsoptionen: A (empfohlen) / B / C
+- [ ] Empfehlung: Option A — wartet auf Freigabe (Weg-Gate)
+
+**Testplan:**
+- Automatisiert (Harness):
+  - [x] `backend/tests/test_bug-80.py` (bereits angelegt, self-contained Playwright-Test — bewusst NICHT in `run_frontend_check.py` eingehängt, das wäre bereits Implementierung statt Analyse): `test_bug80_header_height_stable_after_filter_change` misst die `#header`-Bounding-Box-Höhe vor/nach einem deterministischen Filterwechsel (`Filter.save({minScore:v})` + `FilterSheet._applyLive()`, derselbe Codepfad wie der reale Score-Slider bzw. `_check_filter_feed` aus TASK-66) auf schmalem Viewport (375px, AK2) und erwartet ≤ 1px Differenz (AK1); Reset-Höhe wird zusätzlich gegen die Baseline geprüft. Marker `frontend`, `regression` (kein `smoke`, kein Kernpfad).
+  - [x] Test enthält eingebauten, dokumentierten Skip (kein falsch-grüner Pass) für das CI-Datenumfeld: ändert der Filterwechsel den Infozeilen-Text nicht (z. B. 0 „Heute"-Chancen oder kein ausschließbarer `overall_score`, vgl. TASK-66-Edge-Case), wird der Test übersprungen statt fälschlich zu bestehen (siehe Pre-Mortem CI-Datenumfeld-Check).
+  - [ ] Läuft erst grün nach Umsetzung von Option A (aktuell erwartungsgemäß rot/fail, sofern Testdaten mit „Heute"-Chancen vorhanden sind — Test-First).
+- Manuell:
+  - [ ] Lokalen Dev-Server starten, im Browser (Safari) auf http://localhost:8000 den Feed-Tab öffnen.
+  - [ ] Filter-Sheet öffnen, „Himmelsröte" mehrfach aktivieren/deaktivieren — Kopfzeile (Logo + Infozeile) darf sich dabei nicht sichtbar verschieben.
+  - [ ] Denselben Test mit schmalem Browserfenster (≈375px, iPhone-SE-Breite) wiederholen.
+  - [ ] Regression nach PRODUCT.md §12 „CSS/Theme": Kopfzeile auf allen 5 Tabs (Feed/Kalender/Scout/Karte/Locations) weiterhin unauffällig, in Hell- und Dunkel-Theme.
+
+---
 
 ### BUG-55 · Wetterkarte: Overlay erscheint als senkrechte Linie statt 10×10-Gitter (Zoom zu nah) `[x]`
 
@@ -10423,13 +10559,13 @@ Diese Änderung hat **sichtbare** Auswirkungen (Kompass-Diagramm-Zone ändert si
 
 ---
 
-### TASK-59 · Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors `[ ]`
+### TASK-59 · Eigener Overpass-API-Server statt unzuverlässiger öffentlicher Mirrors `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Progress |
 | **Erstellt** | 2026-07-09 |
 
 **User Story:** Als Betreiber der FotoAlert-App, möchte ich einen eigenen, selbst gehosteten Overpass-API-Server betreiben, sodass der Sichtachsen-Check (US-09) zuverlässig Gebäudedaten bekommt und nicht mehr von instabilen kostenlosen öffentlichen Overpass-Mirrors abhängt.
@@ -10445,6 +10581,119 @@ Ziel/Nutzen: Unabhängigkeit von den unzuverlässigen kostenlosen Overpass-Serve
 **Bezug:** **US-09** [x] (Done, released v1.22.0) — führte den Overpass-basierten Sichtachsen-Check ein und dokumentiert in seiner Analyse/Retro die aktuellen Mirror-Probleme (Kumi-Timeouts, overpass-api.de HTTP-406-Block). TASK-59 ist keine Dublette, sondern die Infrastruktur-Konsequenz daraus: US-09 behandelt die fachliche Logik des Sichtachsen-Checks, TASK-59 behandelt die Zuverlässigkeit der externen Datenquelle, von der diese Logik abhängt. Keine Überschneidung mit TASK-45 (Azimut via Overpass, Done) — nutzt dieselbe Datenquelle, aber eigenständiges Ticket zur Infrastruktur, kein Code-Umbau an TASK-45 vorgesehen.
 
 **Quelle:** fotoalert-intake (Recherche mit Stephan, 2026-07-09)
+
+---
+
+**Example Mapping:**
+
+⚠️ Annahmen (Default, blockiert nicht):
+- ⚠️ Annahme: Die Umstellung betrifft ausschließlich die Gebäude-Verfeinerung des Sichtachsen-Checks aus US-09. Am übrigen App-Verhalten ändert sich nichts.
+- ⚠️ Annahme: Ein Regionalauszug Berlin/Brandenburg (Geofabrik) deckt alle aktuell erfassten Locations ab — FotoAlert ist erkennbar auf diesen Raum ausgelegt.
+- ⚠️ Annahme: "Tägliche Diff-Updates" heißt ein automatisierter, wiederkehrender Job ohne manuelles Zutun — keine wöchentliche Handarbeit durch Stephan.
+
+❓ Fragen (🔴 kritisch — vor der Umsetzung zu klären):
+
+1. **Serverwahl:** Separater kleiner Server oder Mitlaufen auf dem bestehenden Hetzner-Server?
+   Bekannt ist nur die Server-Grundausstattung (aus `deploy/DEPLOYMENT-GUIDE.md`): Hetzner CX22, 2 vCPUs, 4 GB RAM, Frankfurt/Nürnberg, ~4,49 €/Monat. Die **aktuelle freie Auslastung** (wie viel RAM/Speicherplatz gerade frei sind) ist nirgends im Repo dokumentiert — das ist eine echte Wissenslücke, keine Vermutung. Diese Frage entscheidet direkt zwischen Option A und B unten. Bitte auf dem Server einmal `free -h` und `df -h` prüfen (lassen) und das Ergebnis melden.
+
+2. **Ausfallverhalten — Grenzfall mit zwei sinnvollen Varianten:**
+   - **Option A — öffentliche Server bleiben als letzte Rückfallebene:** Fällt der eigene Server aus, versucht die App zusätzlich noch die beiden bekannten öffentlichen Server (die aktuellen Problemfälle), bevor sie auf die reine Peilungs-Basis zurückfällt. Vorteil: eine zusätzliche Sicherheitsebene für den seltenen Fall, dass einer der beiden doch gerade antwortet. Nachteil: bringt in der Praxis meist nichts (beide sind bekanntermaßen unzuverlässig), macht aber auch nichts kaputt.
+   - **Option B — nur noch der eigene Server wird angefragt:** Einfacher, ein klarer Verantwortungsbereich. Fällt der eigene Server aus, springt der Sichtachsen-Check sofort auf die reine Peilungs-Basis (kein Absturz, aber auch kein Notnagel mehr).
+   → Bitte eine der beiden Varianten wählen.
+
+3. **Monitoring:** Wie soll Stephan erfahren, wenn der eigene Server ausfällt oder ein tägliches Update fehlschlägt? Aktuell gibt es keine Benachrichtigung dafür — jeder Fehler führt geräuschlos zum Rückfall auf die Peilungs-Basis (siehe Rule 3). Reicht das, oder soll ein einfacher Alert eingerichtet werden?
+
+📏 Rules (vorbehaltlich der Antworten auf Fragen 1–3):
+
+- **Rule 1:** Der Sichtachsen-Check fragt zuerst den eigenen Server nach Gebäudedaten.
+  🟢 Beispiel: Eine Location mit klarer Gebäude-Sichtlinie wird geprüft → die App fragt den eigenen Server ab, bekommt eine Antwort und berechnet "Teilweise verdeckt" oder "Blockiert" statt "Nicht geprüft".
+
+- **Rule 2:** Die Gebäudedatenbank des eigenen Servers hält sich automatisch aktuell, ohne dass Stephan manuell eingreifen muss.
+  🟢 Beispiel: Ein neues Gebäude wird in OpenStreetMap eingetragen → spätestens am übernächsten Tag berücksichtigt der Sichtachsen-Check dieses Gebäude von selbst.
+
+- **Rule 3:** Jeder Fehler oder Ausfall des eigenen Servers führt zum stillen Rückfall auf die reine Peilungs-Basis — kein Absturz, kein sichtbarer Fehler in der App. Dieses Verhalten existiert heute schon (bei Mirror-Fehlern) und bleibt unverändert.
+  🟢 Beispiel: Der eigene Server ist wegen eines Neustarts kurz nicht erreichbar → die betroffene Location bekommt trotzdem einen berechneten Idealbereich, nur ohne Gebäude-Verfeinerung — der Nutzer merkt in der App nichts.
+
+- **Rule 4:** Die Umstellung selbst verändert an der App sichtbar nichts außer der Zuverlässigkeit des Sichtachsen-Checks.
+  🟢 Beispiel: Eine Location, die vorher zuverlässig "Frei" zurückbekam, liefert nach der Umstellung dasselbe Ergebnis — nur Locations, die bisher an Mirror-Fehlern gescheitert sind, ändern sich.
+
+**Akzeptanzkriterien:**
+- [~] Bei einer Stichprobe von mindestens 10 Locations mit Gebäude in Sichtlinie, die vorher wegen Mirror-Fehlern auf "Nicht geprüft" standen, liefert der Sichtachsen-Check nach der Umstellung ein echtes Ergebnis ("Frei", "Teilweise verdeckt" oder "Blockiert").
+- [~] Eine Testanfrage an den eigenen Server antwortet deutlich innerhalb der heutigen Zeitgrenzen (aktuell 8–10 Sekunden je nach Anfrageart) — realer Messwert wird nach dem Aufbau hier nachgetragen, nicht vorab geschätzt.
+- [~] Der Zeitpunkt des letzten erfolgreich durchgelaufenen täglichen Updates ist jederzeit nachprüfbar; bleibt er älter als 48 Stunden, ist das erkennbar (nicht stillschweigend).
+- [~] Edge Case: Fällt der eigene Server komplett aus, versucht die App zusätzlich noch die beiden bekannten öffentlichen Server, bevor sie auf die reine Peilungs-Basis zurückfällt (Ausfallverhalten Variante „öffentliche Server bleiben Rückfallebene", von Stephan am 2026-07-15 bestätigt).
+- [~] Edge Case: Der tatsächliche Speicherbedarf der aufgebauten Datenbank wird nach dem ersten Aufbau gemessen und dokumentiert (realer GB-Wert statt der bisherigen 4-5x-Schätzung).
+- [~] Fällt der eigene Server aus oder schlägt ein tägliches Update fehl, wird Stephan aktiv benachrichtigt (kein rein stiller Rückfall mehr) — von Stephan am 2026-07-15 als Anforderung bestätigt, konkreter Benachrichtigungsweg (z. B. E-Mail, Log-Alert) wird in der Implementierung festgelegt.
+
+**Pre-Mortem:**
+- 💀 Szenario: Der eigene Server läuft auf dem bestehenden Hetzner-Server mit; dessen 4 GB RAM reichen zusammen mit der laufenden App nicht für den Overpass-Dienst (der beim Datenimport/Update typischerweise mehrere GB RAM braucht) → App wird während Updates langsam/instabil, oder der Overpass-Dienst crasht wiederholt.
+  Auslöser: Mitlaufen auf dem bestehenden Server ohne vorherige Kapazitätsprüfung.
+  Frühwarnung: `free -h`/`df -h` auf dem Server zeigen schon vorher wenig Puffer.
+  Gegenmaßnahme: Kapazitätscheck als Vorbedingung für Option B (Frage 1); ohne ausreichenden Puffer nur Option A (separater Server).
+- 💀 Szenario: Die täglichen Diff-Updates schlagen mehrere Tage/Wochen still fehl (Netzwerkfehler, Formatänderung bei Geofabrik), die Datenbank veraltet zunehmend — der Server antwortet weiterhin, liefert aber immer öfter falsche Gebäudedaten (neue Bauwerke fehlen, abgerissene sind noch da), ohne dass jemand es bemerkt.
+  Auslöser: kein Monitoring für Update-Fehlschläge eingerichtet (siehe Frage 3).
+  Frühwarnung: Zeitstempel des letzten erfolgreichen Updates wird nie geprüft.
+  Gegenmaßnahme: AK 3 oben (Update-Alter muss erkennbar sein) fest einplanen.
+- 💀 Szenario: Der eigene Server fällt komplett aus (Absturz, hängender Neustart, Docker-Container tot) und niemand merkt es tagelang, weil der Code geräuschlos auf die Peilungs-Basis zurückfällt — genau das "still degradierend"-Prinzip, das ursprünglich für einzelne Netzfehler gedacht war, verschleiert hier einen kompletten Dauerausfall. Stephan denkt der Sichtachsen-Check liefert verlässlich Gebäudedaten, tatsächlich läuft er seit Tagen nur noch auf reiner Peilung.
+  Auslöser: keine aktive Ausfall-Meldung vorgesehen (Frage 3 unbeantwortet).
+  Frühwarnung: Log-Häufung von Mirror-/Server-Fehlschlägen wird nie ausgewertet.
+  Gegenmaßnahme: einfaches Health-Check-/Alert-Verfahren einplanen, nicht nur auf den stillen Fallback vertrauen.
+- 💀 Szenario: Der laufende Wartungsaufwand wird unterschätzt — Docker-Image-Updates, Pflege des Update-Jobs, langsames Wachstum der Datenbank über Monate — was als "einmal aufsetzen" gedacht war, wird zu wiederkehrender Handarbeit, die nirgends eingeplant ist.
+  Auslöser: Ticket beschreibt nur den einmaligen Aufbau, keinen Wartungsrhythmus.
+  Gegenmaßnahme: festen Prüfrhythmus (z.B. monatlich) als laufenden Aufwand explizit im Ticket festhalten, nicht nur als Einmal-Aufgabe.
+
+📎 Code-Verifikation: `backend/data/qa_azimuth.py` gelesen am 2026-07-15.
+  Bestätigt: Die Umstellung ist tatsächlich rein konfigurativ — `_fetch_from_mirrors()` (Zeile 92–117) iteriert ausschließlich über die Modulkonstante `OVERPASS_MIRRORS` (Zeile 45–48). Beide Aufrufer (`_fetch_overpass_footprint`, Zeile 197; `fetch_buildings_along_line`, Zeile 276) nehmen zwar einen `overpass_url`-Parameter entgegen, geben ihn aber nie an `_fetch_from_mirrors()` weiter — er ist faktisch wirkungslos. Es genügt, `OVERPASS_MIRRORS` (und der Konsistenz halber `OVERPASS_URL`, Zeile 42) auf die eigene Server-Adresse umzustellen; die restliche Anfrage-/Rückfall-/Rate-Limit-Logik bleibt unverändert.
+  Bestätigt: Jeder Fehler (Timeout, HTTP-Fehler, leere Antwort) führt in `compute_ideal_azimuth_range()` (Zeile 336–388) und darüber in `update_location_azimuth()` (Zeile 391–428) zu stillem Rückfall auf die Bearing-Basis — kein Crash, keine Exception nach außen (bestätigt Rule 3).
+  Bestätigt: Bestehende Tests (`backend/tests/test_task45_azimuth.py`, `backend/tests/test_us09_sightline.py`) sind mit `pytest.mark.offline` markiert und mocken `_fetch_overpass_footprint` direkt (`monkeypatch`) — sie hängen nicht von den echten `OVERPASS_MIRRORS`-Werten ab und bleiben von der Umstellung unberührt grün.
+  Offen (nicht im Repo dokumentiert, nicht geraten): freie RAM-/Speicherkapazität des bestehenden Hetzner-Servers — siehe Frage 1.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/data/qa_azimuth.py` (Zeilen 42–117, 197–244, 276–333, 336–388)
+- [x] Designer-Check: visuell? → nein, reine Infrastruktur-/Backend-Entscheidung ohne sichtbare App-Änderung — übersprungen
+- [x] Implementierungsoptionen: A / B / C / D (siehe unten)
+- [x] Empfehlung: vorläufig Option A, siehe Begründung — endgültig abhängig von Antwort auf Frage 1
+
+**Implementierungsoptionen:**
+
+*Option A — Separater kleiner Server nur für den eigenen Overpass-Dienst*
+- Vorgehen: Neuer kleiner Server (Hetzner oder vergleichbarer Anbieter) ausschließlich für den Overpass-Dienst; Docker-Image `wiktorn/overpass-api`; Berlin/Brandenburg-Auszug laden; tägliche Diff-Updates einrichten; danach die Ziel-Adresse in `qa_azimuth.py` (Zeile 42–48) auf den eigenen Server umstellen.
+- Vorteile: Kein Risiko für die bestehende App — sauber getrennte Ressourcen; leicht abschaltbar/austauschbar ohne die Haupt-App anzufassen.
+- Nachteile/Risiken: Zusätzliche laufende Kosten (grob im Bereich der bestehenden Serverkosten, je nach Anbieter/Größe); ein weiterer Server zum Patchen/Überwachen.
+- Aufwand: mittel.
+
+*Option B — Mitlaufen auf dem bestehenden Hetzner-Server*
+- Vorgehen: Overpass-Docker-Container zusätzlich auf dem bestehenden CX22-Server installieren; gemeinsame Nutzung von CPU/RAM/Speicher mit der laufenden FotoAlert-App.
+- Vorteile: keine zusätzlichen Serverkosten; nur ein Ort zum Warten statt zwei.
+- Nachteile/Risiken: 4 GB RAM insgesamt sind knapp, wenn die App bereits mitläuft — siehe Pre-Mortem-Szenario 1. Ohne verifizierte freie Kapazität (Frage 1) ist das Risiko für die Produktions-App real, nicht nur theoretisch.
+- Aufwand: klein bis mittel (kein neuer Server, aber Kapazitätsprüfung + ggf. Ressourcenbegrenzung nötig).
+
+*Option C — Gemanagter Overpass-Dienst eines Drittanbieters*
+- Vorgehen: Prüfen, ob ein bezahlter, gemanagter Overpass-Dienst existiert, der Serverbetrieb und Updates abnimmt.
+- Vorteile: kein eigener Serverbetrieb, keine eigene Update-Pflege.
+- Nachteile/Risiken: Kein bekannter, etablierter Anbieter dieser Art konnte hier bestätigt werden — das ist unrecherchiert, keine belastbare Option ohne weitere Recherche.
+- Aufwand: unklar, abhängig vom Rechercheergebnis.
+- Diese Option bleibt vorerst unklar und wird nicht empfohlen, bis eine Recherche sie bestätigt.
+
+*Option D — Status quo behalten, nur Rückfallverhalten verbessern (kein eigener Server)*
+- Vorgehen: Kein eigener Server; stattdessen z.B. weitere öffentliche Mirrors ergänzen, Wiederholversuche mit Wartezeit statt nur einem Versuch pro Server, evtl. bereits abgefragte Gebäudedaten zwischenspeichern, um Wiederholanfragen zu vermeiden.
+- Vorteile: keine zusätzlichen Kosten, kein zusätzlicher Server, kein zusätzlicher Wartungsaufwand.
+- Nachteile/Risiken: Löst das Kernproblem nicht — overpass-api.de blockiert Stephans IP dauerhaft unabhängig von Wiederholversuchen, Kumis Timeouts bleiben bestehen. Der Sichtachsen-Check bleibt strukturell unzuverlässig.
+- Aufwand: klein.
+
+✅ **Vorläufige Empfehlung: Option A** (separater kleiner Server) — solange die freie Kapazität des bestehenden Hetzner-Servers nicht verifiziert ist (Frage 1), ist das Risiko aus Pre-Mortem-Szenario 1 (Ressourcen-Konkurrenz mit der Produktions-App) real. Liefert Stephan verifizierte Kapazitätsdaten mit deutlichem Puffer (z.B. durchgängig >1,5–2 GB freies RAM, >10 GB freier Speicher auch während eines Update-Laufs), ist Option B die günstigere und wartungsärmere Wahl und würde die Empfehlung wechseln. Option D wird nicht empfohlen, da sie das eigentliche Zuverlässigkeitsproblem nicht behebt. Option C bleibt mangels Recherche keine belastbare Alternative.
+
+**Weg-Gate-Entscheidung (Stephan, 2026-07-15):**
+- Frage 1 (Serverwahl): Live-Kapazitätscheck auf dem bestehenden Hetzner-Server ergab `free -h` → 2,0 GB verfügbares RAM (von 3,7 GB gesamt, 1,7 GB bereits durch die App belegt, keine Reserve) und `df -h /` → 30 GB frei von 38 GB. Damit an der unteren Kante der Puffer-Schätzung ohne Sicherheitsreserve → **Option A gewählt** (separater kleiner Server, ca. 4 €/Monat bei Hetzner CX22-Größe, Stand Preisanpassung 15.06.2026).
+- Frage 2 (Ausfallverhalten): **Variante „öffentliche Server bleiben Rückfallebene"** — fällt der eigene Server aus, versucht die App zusätzlich die beiden bekannten öffentlichen Mirrors, bevor sie auf reine Peilungs-Basis zurückfällt.
+- Frage 3 (Monitoring): **Aktive Benachrichtigung gewünscht** — kein rein stiller Rückfall mehr bei Serverausfall oder fehlgeschlagenem täglichem Update; konkreter Benachrichtigungsweg wird in der Implementierung festgelegt.
+- Freigabe zur Implementierung erteilt.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Kein neuer pytest-Fall nötig — die Umstellung ändert nur die Ziel-Adresse, keine Logik. Bestehende Tests (`test_task45_azimuth.py`, `test_us09_sightline.py`, beide `offline`+gemockt) bleiben unverändert grün und dienen als Regressionsschutz, dass der Rückfall-Mechanismus (Rule 3) durch die Umstellung nicht verändert wird.
+- [ ] Manuell: Nach Aufbau des eigenen Servers — Testanfrage direkt an den eigenen Server (curl gegen die Overpass-Query aus AK 1) und Antwortzeit messen; danach `OVERPASS_MIRRORS`/`OVERPASS_URL` umstellen und für die AK-1-Stichprobe (≥10 Locations) den Sichtachsen-Check erneut laufen lassen und die Ergebnisse mit dem vorherigen Stand ("Nicht geprüft") vergleichen.
 
 ---
 
@@ -16346,14 +16595,15 @@ der gewählten Options-Mechanik in jedem Fall umgesetzt.
 
 ---
 
-### TASK-79 · Test-Doku `backend/tests/README.md` veraltet nach BUG-79 (Marker-Tabelle + Testbeschreibung) `[ ]`
+### TASK-79 · Test-Doku `backend/tests/README.md` veraltet nach BUG-79 (Marker-Tabelle + Testbeschreibung) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-14 |
+| **Freigegeben** | 2026-07-15 |
 
 **Beschreibung:** `backend/tests/README.md` ist seit der BUG-79-Umsetzung veraltet. Die Marker-Tabelle (Z. 20–23) listet nur `test_astronomy_regression.py` und `test_api_smoke.py` und führt den neuen Test `test_bug79_ci_ephemeris_skip.py` nicht auf. Zusätzlich behauptet die Tabellenzeile zu `test_astronomy_regression.py` weiterhin die Marker „`offline`, `regression`" — real enthält die Datei seit BUG-79 vier `@pytest.mark.online`-Tests (die 3 ursprünglichen Sonnenauf-/-untergangs-/Azimut-Tests sowie den durch BUG-79 korrigierten, vorher fälschlich `offline` markierten Test `test_moon_earth_distance_in_physical_range`). Kein CI-Risiko, aber Verwirrungspotenzial für künftige Sessions, die sich an der Tabelle orientieren (vgl. bereits in TASK-72 dokumentiertes, bis heute nicht behobenes Drift-Risiko).
 
@@ -16366,15 +16616,193 @@ der gewählten Options-Mechanik in jedem Fall umgesetzt.
 
 ---
 
-### TASK-80 · `.forgejo/workflows/deploy.yml` (Codeberg-Spiegel) fehlt BUG-79-Fix — divergiert von `.github/workflows/deploy.yml` `[ ]`
+## Analyse (TASK-79)
+
+**Scope:**
+🔀 Weg-Gate-Entscheidung (Stephan, 2026-07-15): gegen die Empfehlung (Option A) — gewählter Weg
+ist Option B, die vollständige Tabellen-Erneuerung. Der folgende Scope-Text ist entsprechend
+angepasst (Stand nach der Entscheidung, nicht mehr der ursprüngliche Analyse-Vorschlag).
+
+Eingeschlossen: Korrektur der beiden README-Zeilen, die durch BUG-79 unrichtig geworden sind —
+(1) die Marker-Zeile zu `test_astronomy_regression.py` (behauptet weiterhin ausschließlich
+`offline`, real seit BUG-79 gemischt: 5× `offline` + 4× `online`) sowie (2) eine fehlende neue
+Zeile für `test_bug79_ci_ephemeris_skip.py`. Zusätzlich die „Läuft im Sandbox"-Spalte der
+Astronomie-Zeile, da sie mit den neuen `online`-Tests nicht mehr stimmt (nur die `offline`-Tests
+laufen im Standardlauf `pytest -m offline`; `online` braucht `--all` + Netzwerk-/Dateicache-Zugriff).
+Zusätzlich, gemäß Option B: die Marker-Tabelle wird auf ALLE aktuell ~57 Testdateien in
+`backend/tests/` erweitert (nicht nur die zwei BUG-79-betroffenen Zeilen) — jede Testdatei
+bekommt eine eigene, korrekte Tabellenzeile (Marker, Kurzbeschreibung, „Läuft im
+Sandbox"-Angabe). Das schließt auch die Korrektur der vorbestehenden, nicht durch BUG-79
+verursachten Ungenauigkeit bei `test_api_smoke.py` ein (Tabelle nennt aktuell „network", real
+trägt die Datei laut Code-Verifikation unten nur `pytest.mark.api` (modulweit) +
+`pytest.mark.smoke` (auf `test_health_ok`) — kein `network`-Marker im Quelltext) — diese Zeile
+wird im Zuge der Vollerneuerung ohnehin neu geschrieben, eine gesonderte Ausklammerung wäre
+inkonsistent.
+
+Explizit ausgeschlossen:
+- Kein Code-/App-Verhalten betroffen — reine Entwickler-Dokumentation, kein Designer-Check
+  nötig (nicht visuell in der App, Schritt 4b übersprungen).
+
+**Akzeptanzkriterien:**
+- [x] Die Marker-Zeile zu `test_astronomy_regression.py` nennt beide Markergruppen mit Anzahl
+      (5× `offline`, 4× `online`, alle zusätzlich `regression`) statt nur „offline, regression".
+- [x] Dieselbe Zeile beschreibt die „Läuft im Sandbox"-Spalte korrekt differenziert:
+      `offline`-Tests laufen immer im Standardlauf; `online`-Tests nur mit `--all` und laufendem
+      Netzwerk-/Dateicache-Zugriff auf `de421.bsp`.
+- [x] Eine neue Tabellenzeile für `test_bug79_ci_ephemeris_skip.py` existiert mit Marker
+      `offline`, `regression`, Status „✅ immer" und einer Kurzbeschreibung, die die zwei
+      statischen Prüfungen benennt (Kommentar-Wortlaut-Check + AST-Marker-Konsistenz-Check
+      gegen `_get_eph()`-Aufrufpfade).
+- [x] Jede Testdatei in `backend/tests/` (aktuell ~57 `*.py`-Dateien) hat eine eigene, inhaltlich
+      korrekte Tabellenzeile in `backend/tests/README.md` (Marker, Kurzbeschreibung, „Läuft im
+      Sandbox"-Angabe) — inklusive Korrektur der vorbestehenden `test_api_smoke.py`-„network"-
+      Ungenauigkeit (real: `api` + `smoke`, siehe Code-Verifikation unten). Erledigt: alle
+      tatsächlich vorhandenen 59 Testdateien (Stand 2026-07-15, geringfügig mehr als die zu
+      Ticket-Erstellung geschätzten ~57) haben je eine eigene Zeile, Marker gegen die
+      tatsächlichen `@pytest.mark.*`-Dekoratoren jeder Datei geprüft.
+- [x] Edge Case: Ein automatisierter Regressionstest liest `backend/tests/README.md` als Text
+      und schlägt fehl, wenn entweder `test_bug79_ci_ephemeris_skip.py` nicht erwähnt wird oder
+      die Tabellenzeile zu `test_astronomy_regression.py` kein „online" enthält.
+- [x] Neu (Option B): Ein automatisierter Test findet per Glob alle `*.py`-Dateien in
+      `backend/tests/` und prüft für jede, ob ihr Dateiname als Zeile in der README-Tabelle
+      vorkommt (reiner Existenz-Check). Die inhaltliche Richtigkeit der Marker-Angabe je Zeile
+      wird dabei NICHT automatisiert geprüft — das wäre unverhältnismäßig aufwendig zu
+      automatisieren und bleibt manuelle Sorgfaltspflicht bei der Umsetzung. Umgesetzt als
+      `test_all_test_files_listed_in_readme_table()` in `test_task79_readme_marker_sync.py`.
+
+**Pre-Mortem:**
+- 💀 Zu grobe Formulierung („online" statt Aufschlüsselung) lässt künftige Sessions denken, die
+  ganze Datei sei jetzt online-only und schließt sie fälschlich aus Sandbox-Läufen aus →
+  Gegenmaßnahme: AK1 verlangt konkrete Zahlen (5× offline, 4× online).
+- 💀 „Läuft im Sandbox"-Spalte bleibt bei „✅ immer" stehen, obwohl `online`-Tests im
+  Standardlauf (`pytest -m offline`) übersprungen werden → künftige Session verlässt sich auf
+  eine falsche Vollständigkeitsangabe → Gegenmaßnahme: AK2 verlangt explizite Korrektur.
+- 💀 Die neue Zeile zu `test_bug79_ci_ephemeris_skip.py` bekommt nur einen vagen Bereichstext
+  („BUG-79-Test") und hilft künftigen Sessions nicht zu verstehen, dass es zwei rein statische
+  AST-/Text-Checks ohne echten Netzwerkzugriff sind → Gegenmaßnahme: AK3 verlangt eine konkrete
+  Kurzbeschreibung.
+- 💀 Risiken der Option B (Stephans gewählter Weg, siehe Scope-Abschnitt): Bei ~57 Testdateien
+  ist die Fehlerquote beim manuellen Übertragen der Marker in die Tabelle hoch (Tippfehler,
+  vergessene Zeilen, veraltete Marker beim nächsten Testdatei-Update) → Gegenmaßnahme: der neue
+  Existenz-Check-Test (siehe Testplan) stellt zumindest sicher, dass keine Datei in der Tabelle
+  fehlt; die inhaltliche Korrektheit jeder einzelnen Zeile bleibt aber manuelle
+  Sorgfaltspflicht bei der Umsetzung und wird NICHT automatisiert geprüft.
+- 💀 Ohne systematische Verifikation jeder einzelnen Datei könnte die Tabelle selbst wieder
+  falsch werden (neue, größere Drift-Quelle als vorher) → Gegenmaßnahme: Umsetzung sollte jede
+  Zeile gegen die tatsächlichen `@pytest.mark.*`-Dekoratoren der jeweiligen Datei gegenprüfen,
+  nicht aus dem Gedächtnis oder von Vermutungen übertragen.
+- 💀 Der Aufwand für die Vollerneuerung (~57 Zeilen statt 2) könnte für die „Niedrig"-Priorität
+  dieses Tickets unangemessen groß werden → das wurde Stephan bereits am Weg-Gate mitgeteilt
+  (Option B war explizit als „Aufwand: groß" markiert); hier nochmals festgehalten, damit es in
+  der Umsetzungsphase nicht in Vergessenheit gerät.
+- CI-Datenumfeld-Checkfrage (Pflicht-Punkt): nicht einschlägig — reine Markdown-Doku-Änderung
+  ohne Code-/Filter-/Endpunkt-Bezug, kein CI-Verhalten wird geändert.
+
+📎 Code-Verifikation (2026-07-15): `backend/tests/test_astronomy_regression.py` vollständig
+gelesen — bestätigt: modulweites `pytestmark = [pytest.mark.regression]`;
+`test_moon_earth_distance_in_physical_range` (`@pytest.mark.online`, parametrisiert über 4
+Monate) + 3 weitere `@pytest.mark.online`-Tests (`test_sunrise_berlin_within_tolerance`,
+`test_sunset_berlin_within_tolerance`, `test_babelsberg_pfingstberg_azimuth_plausible`) = exakt
+4 online-Tests, wie im Ticket behauptet. 5 Tests bleiben `@pytest.mark.offline` (Haversine,
+2× Brennweite, 2× Winkelprofil). `backend/tests/test_bug79_ci_ephemeris_skip.py` gelesen —
+modulweit `[pytest.mark.offline, pytest.mark.regression]`, 2 reine AST-/Text-Checks, kein
+Netzwerkzugriff. `backend/tests/test_api_smoke.py` gelesen — trägt aktuell nur
+`pytest.mark.api` (modulweit) + `pytest.mark.smoke` (auf `test_health_ok`), **kein**
+`network`-Marker im Quelltext — bestätigt die vorbestehende (nicht BUG-79-bedingte)
+README-Ungenauigkeit, die laut Scope NICHT Teil dieses Tickets ist. `backend/tests/run_tests.sh`
+gelesen — Standardlauf ist `pytest -m offline`, `online`-Tests laufen nur mit `--all` (bestätigt
+AK2). `backend/pytest.ini` gelesen — Marker `online` bereits registriert (aus TASK-72), keine
+Änderung an `pytest.ini` nötig.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (0 offene 🔴-Fragen — Scope war im Ticket-Text bereits
+      eindeutig auf die BUG-79-Falschangabe begrenzt; Tabellenformat als ⚠️ Annahme behandelt)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: betroffen ist ausschließlich `backend/tests/README.md`
+      (Marker-Tabelle); neu: `backend/tests/test_task79_readme_marker_sync.py`
+- [x] Designer-Check: visuell? → nein, übersprungen (reine Dev-Doku, kein App-Effekt)
+- [x] Implementierungsoptionen: A / B (siehe unten)
+- [x] Empfehlung: Option A — Gewählter Weg (Stephans Entscheidung am Weg-Gate, gegen die
+      Empfehlung): Option B, 2026-07-15
+
+⚠️ Annahme: Tabellenformat bleibt „eine Zeile pro Testdatei" (bestehende Konvention), gemischte
+Marker werden als Zahlen-Aufschlüsselung in derselben Zelle beschrieben statt die Zeile in zwei
+Zeilen aufzuspalten — bitte bestätigen, falls eine andere Darstellung gewünscht ist.
+
+**Implementierungsoptionen:**
+
+### Option A — Gezielte Korrektur (empfohlen)
+- Vorgehen: Nur die 2 betroffenen Tabellenzeilen anfassen — Astronomie-Zeile korrigieren
+  (Marker-Aufschlüsselung + Sandbox-Spalte), neue Zeile für `test_bug79_ci_ephemeris_skip.py`
+  ergänzen. Neuer Absicherungstest verhindert künftiges erneutes Drift.
+- Betroffene Dateien: `backend/tests/README.md` (Tabelle),
+  `backend/tests/test_task79_readme_marker_sync.py` (neu, bereits angelegt).
+- Vorteile: Passt genau zum Ticket-Scope (BUG-79-Falschangabe), minimaler Diff, schnell
+  überprüfbar, kein Risiko für Scope-Kriechen.
+- Nachteile/Risiken: Die generelle Tabellen-Lücke (TASK-72-Altlast) bleibt bestehen — aber das
+  ist laut Ticket explizit gewollt.
+- Aufwand: klein.
+
+### Option B — Vollständige Tabellen-Erneuerung (alle Testdateien)
+- Vorgehen: Marker-Tabelle auf alle aktuell ~57 Testdateien im Verzeichnis erweitern (TASK-72s
+  offen gelassene Aufgabe gleich mit erledigen).
+- Betroffene Dateien: `backend/tests/README.md` (große Tabellen-Neufassung).
+- Vorteile: Löst das strukturelle Problem einmal vollständig, keine weiteren TASK-79-artigen
+  Folgetickets nötig.
+- Nachteile/Risiken: Sprengt den „Niedrig"-Prioritäts-Rahmen dieses Tickets deutlich; TASK-72
+  hatte diese Erweiterung bewusst ausgeklammert; höheres Fehlerrisiko bei einer so großen
+  Tabelle (neue Drift-Quelle); explizit nicht Ticket-Scope laut Bezug-Abschnitt.
+- Aufwand: groß.
+
+✅ Empfehlung: Option A — passt exakt zum im Ticket-Text bereits festgelegten engen Scope
+(konkrete BUG-79-Falschangabe), hält den Diff klein und nachvollziehbar. Die generelle
+Tabellen-Vervollständigung (Option B) wäre ein eigenständiges, separat zu priorisierendes
+Folge-Ticket — hier nicht automatisch mitgezogen (kein Scope Creep).
+
+🔀 Weg-Gate-Entscheidung (Stephan, 2026-07-15): gegen diese Empfehlung — gewählter Weg ist
+Option B (vollständige Tabellen-Erneuerung auf alle ~57 Testdateien). Scope, Akzeptanzkriterien,
+Pre-Mortem und Testplan oben wurden entsprechend angepasst.
+
+**Testplan:**
+- [x] Automatisiert (Harness): `backend/tests/test_task79_readme_marker_sync.py` — 3 Tests,
+      Marker `offline`, `regression`:
+      - `test_readme_lists_bug79_ephemeris_skip_test` (AK3)
+      - `test_readme_astronomy_regression_row_mentions_online` (AK1)
+      - `test_all_test_files_listed_in_readme_table` (Option B, letztes AK — neu ergänzt)
+      Ursprünglich Test-First angelegt (Schritt 6b, 2 Tests, ERWARTET ROT); Option-B-Test in
+      der Implementierungsphase ergänzt.
+- [x] Neu (Option B): `test_all_test_files_listed_in_readme_table` — findet per Glob alle
+      `*.py`-Dateien in `backend/tests/` (59 Stand 2026-07-15, `__init__.py`/`conftest.py`
+      als Nicht-Testdateien ausgeschlossen — beide kommen in `backend/tests/` direkt aktuell
+      nicht vor) und prüft für jede, ob ihr Dateiname als Zeile in der README-Tabelle vorkommt
+      (reiner Existenz-Check je Datei). Deckt NICHT die inhaltliche Korrektheit der
+      Marker-Angabe pro Zeile ab — das bleibt manuelle Sorgfaltspflicht bei der Umsetzung.
+- [x] Lokaler Testlauf bestätigt (Sandbox, 2026-07-15): `pytest backend/tests/test_task79_readme_marker_sync.py -v`
+      → 3 von 3 Tests grün (`3 passed`). Lief mit System-Python 3.10 + separat installiertem
+      `pytest` (das mitgelieferte `backend/venv` hat unter der Sandbox einen kaputten Symlink
+      auf einen Mac-Pfad, bekanntes Sandbox-Problem, kein Befund über den Code — siehe TASK-64
+      Pre-Mortem Szenario 2 und Memory `reference_sandbox_venv`). Kein Einfluss auf `data_dev`,
+      da diese Tests nur `backend/tests/README.md` als Text lesen.
+- [x] Manuell: `backend/tests/README.md` in einem Editor geöffnet, Marker-Tabelle gelesen, alle
+      59 Zeilen wurden bei der Erstellung einzeln gegen die tatsächlichen `@pytest.mark.*`-
+      Dekoratoren der jeweiligen Datei geprüft (nicht nur stichprobenartig — per Grep über alle
+      Dateien plus gezieltem Lesen der gemischt-markierten Dateien `test_astronomy_regression.py`,
+      `test_bug47.py`, `test_us66_login.py`, `test_us112_weather_map.py`). Kein Server-/App-Test
+      nötig (reine Textdatei, kein Endpunkt/UI betroffen). PRODUCT.md §12 Regressionsmatrix
+      nicht einschlägig — kein App-Bereich verändert.
+
+---
+
+### TASK-80 · `.forgejo/workflows/deploy.yml` (Codeberg-Spiegel) fehlt BUG-79-Fix — divergiert von `.github/workflows/deploy.yml` `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Analysis |
+| **Status** | Done |
 | **Erstellt** | 2026-07-14 |
 | **Freigegeben** | 2026-07-15 |
+| **Abgeschlossen** | 2026-07-15 |
 
 **Beschreibung:** Neben dem primären `.github/workflows/deploy.yml` existiert ein zweiter Workflow `.forgejo/workflows/deploy.yml` (Codeberg/Forgejo-Spiegel, laut Kopfkommentar „Automatisches Deployment via Forgejo Actions (Codeberg)"). Der BUG-79-Fix (GitHub-Actions-Cache-Step für `de421.bsp` unter Key `de421-bsp-v1` + timeout-abgesicherter Fallback-Download im `test-backend`-Job) wurde nur in `.github/workflows/deploy.yml` umgesetzt. Verifiziert: Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` (Zeilen 98–118) enthält weiterhin nur `pip install -r requirements.txt` + `pytest tests/ -v`, keinen Cache-Step, keine Timeout-Absicherung um den `de421.bsp`-Download. Falls diese Forgejo/Codeberg-Pipeline aktiv genutzt wird, besteht dort weiterhin das ursprüngliche BUG-79-Problem: ein ungemockter, timeout-loser ~17-MB-Download, der einen CI-Lauf unbemerkt bis zum 15-Minuten-Job-Timeout blockieren kann.
 
@@ -16449,9 +16877,11 @@ Keine offenen Questions mehr außer Frage 1 (s. o.), die die Wahl zwischen Regel
 - [ ] Edge Case: Die YAML-Datei bleibt nach der Änderung syntaktisch gültig (kein Parse-Fehler beim nächsten Workflow-Trigger).
 
 **Falls Frage 1 mit „nicht mehr genutzt" beantwortet wird (Option B):**
-- [ ] Der Kopfkommentar von `.forgejo/workflows/deploy.yml` macht unmissverständlich klar, dass diese Pipeline nicht aktiv ist und GitHub Actions die einzige aktive Pipeline ist.
-- [ ] Der eigentliche BUG-79-Fix wird **nicht** portiert (kein unnötiger Aufwand in totes Konfigurationsmaterial).
-- [ ] Edge Case: Eine mögliche Löschung der Datei ist ausdrücklich **kein** automatischer Teil dieses Tickets — sie würde eine separate, explizite Freigabe von Stephan brauchen (Regel „Keine Löschung ohne Genehmigung").
+- [x] Der Kopfkommentar von `.forgejo/workflows/deploy.yml` macht unmissverständlich klar, dass diese Pipeline nicht aktiv ist und GitHub Actions die einzige aktive Pipeline ist.
+- [x] Der eigentliche BUG-79-Fix wird **nicht** portiert (kein unnötiger Aufwand in totes Konfigurationsmaterial).
+- [x] Edge Case: Eine mögliche Löschung der Datei ist ausdrücklich **kein** automatischer Teil dieses Tickets — sie würde eine separate, explizite Freigabe von Stephan brauchen (Regel „Keine Löschung ohne Genehmigung").
+
+**Entscheidung Weg-Gate (2026-07-15):** Stephan bestätigt Frage 1 mit „nicht mehr genutzt" → **Option B** gewählt (nur Kennzeichnung, kein Fix-Portieren).
 
 ---
 
