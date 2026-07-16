@@ -16,7 +16,7 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 - Backend: FastAPI + Python (`backend/main.py`)
 - Datenbank: SQLite (WAL, `backend/data/`)
 - Hosting: Hetzner-Server, Deploy via `release.sh` + GitHub Actions
-- Auth: JWT-basiert, zwei Rollen: `host` und `user`
+- Auth: signiertes Sitzungs-Token, zwei Rollen: `host` und `user`; TASK-83: Transport per HttpOnly/Secure/SameSite=Lax-Cookie (`fa_session`), nicht mehr per Browser-Speicher/Authorization-Header (siehe Abschnitt 10)
 
 ---
 
@@ -383,10 +383,10 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 |----------|-----------|
 | Mindest-Score Slider | 0–100%; nach Änderung → Feed zeigt weniger/mehr Chancen |
 | Erscheinungsbild | System / Hell / Dunkel (US-97); Auswahl persistiert in localStorage |
-| Backend-URL | Änderbar; wird in localStorage gespeichert |
+| Backend-URL | TASK-83: feste Auswahl (Prod / `http://localhost:8000`) statt Freitextfeld; Auswahl persistiert in localStorage, Wert außerhalb der Liste wird verworfen |
 | „Jetzt aktualisieren" | POST `/refresh`; Toast „✅ Daten aktualisiert" nach ~3s |
 | Impressum | Öffnet Impressum-Sheet |
-| Rollen-Anzeige | Zeigt „Host" oder „User" — Rolle wird aus dem Token-Präfix abgeleitet (`CFG.role` als Getter aus `fa_token`), nicht aus `fa_role` in localStorage; robust gegen Safari ITP / Storage-Bereinigung (BUG-47) |
+| Rollen-Anzeige | Zeigt „Host" oder „User" — TASK-83: Rolle wird aus `fa_role` in localStorage gelesen (unkritischer UI-Hinweis, reine Anzeige); die eigentliche Autorisierung läuft serverseitig über das Sitzungscookie, nicht mehr über ein JS-lesbares Token-Präfix (löst BUG-47-Mechanismus ab) |
 
 **Pflicht-Regression Einstellungen:**
 - [ ] Slider auf 80% → Feed-Reload → weniger Karten
@@ -404,15 +404,20 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 | Login-Screen | Erscheint wenn nicht eingeloggt |
 | Host-Login | Volladmin: Locations anlegen/editieren, Refresh starten |
 | User-Login | Lesen + eigene Custom-Locations |
-| Session | JWT-Token; überlebt App-Reload |
-| Logout | Manuell in Einstellungen |
-| Rollen-Ableitung | `CFG.role` wird als Getter aus dem Token-Präfix (`fa_token`) gelesen — kein Fallback auf `fa_role` localStorage-Key; nach Login `App.init()` + `App.nav('feed')` sorgen für korrektes Re-Render des Settings-Tabs (BUG-47) |
+| Session | TASK-83: HttpOnly/Secure/SameSite=Lax-Sitzungscookie (`fa_session`, 30 Tage Max-Age), gesetzt von `POST /login`; kein JS-lesbares Token mehr (Body enthält nur `role`) |
+| Logout | Settings-Sheet ruft `POST /logout` — löscht das Cookie serverseitig (Max-Age=0); JS kann ein HttpOnly-Cookie nicht selbst entfernen |
+| Endpunktschutz | `require_auth`/`require_host` lesen ausschließlich das Cookie (`fastapi.Cookie`), kein Authorization-Header-Fallback — ein Deploy dieses Tickets erzwingt Zwangs-Logout aller vorher ausgestellten Bearer-Token |
+| CORS | Explizite Origin-Liste (`https://fotoalert.stephanschumann.com`, `http://localhost:8000`) + `allow_credentials=True` statt Wildcard — Voraussetzung für Cookie-Auth (Wildcard+Credentials ist per Fetch-Spec verboten) |
+| Backend-Adresse (Settings) | Feste Auswahl (Prod / `http://localhost:8000`) statt Freitextfeld — verhindert Umbiegen der API-Zieladresse per Skript; ein Wert außerhalb der Liste wird beim nächsten Start verworfen (`CFG.setApi`) |
+| Rollen-Ableitung | `CFG.role` liest `fa_role` aus localStorage (unkritischer UI-Hinweis, reine Anzeige) — die eigentliche Autorisierung läuft serverseitig ausschließlich über das Cookie; `Auth.isLoggedIn()` = `!!CFG.role` (optimistischer Boot-Check, echte Prüfung passiert beim ersten geschützten Request via 401→Logout) |
 
 **Pflicht-Regression Auth:**
-- [ ] Nicht-eingeloggter Zugriff → Login-Screen erscheint (automatisiert: `test_task67_auth_regression.py`, serverseitiger Vertrag geprüft — DOM-Sichtbarkeit selbst bleibt manuell, s. Datei-Docstring)
-- [ ] Login als Host → alle Tabs erreichbar, Einstellungen zeigen sofort „Host" (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`, Rollenvergabe + Endpunktschutz geprüft — sichtbarer Tab/Text bleibt manuell)
+- [ ] Nicht-eingeloggter Zugriff → Login-Screen erscheint (automatisiert: `test_task67_auth_regression.py`, `test_task-83.py`, serverseitiger Vertrag geprüft — DOM-Sichtbarkeit selbst bleibt manuell, s. Datei-Docstring)
+- [ ] Login als Host → alle Tabs erreichbar, Einstellungen zeigen sofort „Host" (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py` + `test_task-83.py`, Rollenvergabe + Endpunktschutz + Cookie-Attribute geprüft — sichtbarer Tab/Text bleibt manuell)
 - [ ] Login als User → Einstellungen zeigen „User" (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`, Rollenvergabe geprüft — sichtbarer Text bleibt manuell)
-- [ ] App-Reload nach Host-Login → Einstellungen zeigen weiterhin „Host" (Token-Präfix-Auswertung) (automatisiert: `test_task67_auth_regression.py`, Token-Decodierstabilität über wiederholte "Reloads" geprüft — sichtbarer Text bleibt manuell)
+- [ ] App-Reload nach Host-Login → Einstellungen zeigen weiterhin „Host" (`fa_role` aus localStorage) (automatisiert: `test_task67_auth_regression.py`, sichtbarer Text bleibt manuell)
+- [ ] Logout beendet die Sitzung serverseitig — direkt danach zeigt ein geschützter Vorgang wieder den Login-Bildschirm (automatisiert: `test_task-83.py::TestLogoutInvalidatesCookie`)
+- [ ] CORS: erlaubte Origin bekommt `Access-Control-Allow-Credentials: true` + exakte (nicht Wildcard-)Origin, fremde Origin bekommt keinen Credential-Header (automatisiert: `test_task-83.py::TestCorsAllowsCredentialsOnlyForKnownOrigins`)
 - [ ] Geschützte Endpoints ohne Token → HTTP 401 (automatisiert: `test_task67_auth_regression.py` + `test_us66_login.py`)
 
 ---
@@ -544,13 +549,13 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 
 | Ticket | Beschreibung |
 |--------|-------------|
-| US-133 | Kartenausschnitt schwenkt bei Koordinaten-Eingabe (Anlegen + Bearbeiten) automatisch zur eingetippten Position, erst beim Verlassen des Feldes (Blur), Zoomstufe bleibt erhalten (Implemented, lokales Test-Gate + Refactor + Release ausstehend) |
 | US-106 | Geänderte/neue Location sofort komplett nutzbar — Wetter + Entdecken + Nachholen (Implemented, lokales Test-Gate + Refactor + Release ausstehend) |
 | US-83 | Scout-Detail + „Als Location speichern" (In Progress) |
 | US-95 | Chancendetails: Buttons kleiner, Karte größer |
 | US-98 | Bauhaus-Redesign Epic (übergeordnet) |
 | BUG-21 | Brennweiten-Eingabe: kein Komma auf iOS |
 | US-79 offen | Location-Detail Astronomie-Block: Mondaufgang/-untergang für Heute (live berechnet) — noch nicht entschieden ob eigenes Ticket; der restliche Scope (Feed, Filter, Event-Detail) ist fertig |
+| TASK-83 | HttpOnly-Cookie-Auth implementiert + Backend-Testsuite grün (In Test); manuelle Browser-Verifikation (Chrome + Safari, Cookie-Attribute + Secure-über-`http://localhost`, `fa_api`-Allow-Liste) noch ausstehend |
 
 ---
 
@@ -660,6 +665,9 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-07-15 | TASK-79 | Marker-Tabelle in `backend/tests/README.md` auf alle 59 Testdateien erweitert (Option B, gegen Empfehlung gewählt); korrigiert zudem die durch BUG-79 veraltete Marker-Zeile zu `test_astronomy_regression.py` (jetzt 5× `offline` + 4× `online` statt nur „offline") sowie die vorbestehende `test_api_smoke.py`-Ungenauigkeit (real `api` + `smoke`, nicht „network"). Neuer Regressionstest `test_task79_readme_marker_sync.py` (3 Fälle) prüft künftig automatisiert, dass jede Testdatei in der README-Tabelle vorkommt und die BUG-79-relevanten Angaben stimmen. Reines Test-Tooling, kein Produktivcode geändert. Released Commit `09d4ff4`, CI-Lauf #232 grün, Health-Check bestätigt (`version 2.0.0`, `locations_count 164`). |
 | 2026-07-16 | BUG-63 | Alignments-Berechnung entblockt (Fenster-Engine + parallele Geländehöhenabfrage), Race-Fix für gleichzeitige Requests |
 | 2026-07-16 | BUG-80 | Kopfzeile springt beim Filtern nicht mehr: Infozeile (`#header .subtitle`) bleibt immer einzeilig und wird bei Platzmangel mit „…" gekürzt statt die Header-Höhe zu verändern (Option A). Reines CSS, kein Backend-/API-Bezug. Alle 5 Akzeptanzkriterien manuell auf Mac und iPhone (Ursprungsgerät des gemeldeten Bugs) bestätigt. |
+| 2026-07-16 | US-133 | Kartenschwenk bei Koordinaten-Eingabe (Anlegen + Bearbeiten, alle 4 Felder): sobald ein Koordinatenfeld nach vollständiger, gültiger Eingabe verlassen wird (Blur), schwenkt die kleine Formular-/Bearbeiten-Karte automatisch zur neuen Position — aktuelle Zoomstufe bleibt erhalten (reines `panTo`, keine feste Zoomstufe). Weg-Gate-Entscheidung gegen ursprüngliche Empfehlung (Blur statt live, Zoom-Erhalt statt fester Zoomstufe 14). Reines Frontend, kein Backend-/API-Bezug. Released als v1.22.34, CI-Lauf #237 grün (Frontend-Check/Playwright, Backend-Tests/pytest, Deploy), Commit `13151d3`, Health-Check bestätigt (`version 2.0.0`, `locations_count 172`). Alle 9 Akzeptanzkriterien manuell bestätigt. |
+| 2026-07-16 | TASK-83 | Sitzungs-Ticket vom JS-lesbaren `localStorage`/Bearer-Header auf HttpOnly/Secure/SameSite=Lax-Cookie (`fa_session`, 30 Tage) umgestellt — ein XSS-Skript kann das Ticket dadurch nicht mehr auslesen. `/login`-Antwort enthält kein `token`-Feld mehr (nur `role`); neuer `POST /logout` verfällt das Cookie serverseitig; `require_auth`/`require_host` lesen ausschließlich das Cookie, kein Header-Fallback (Zwangs-Logout aller alten Bearer-Token). CORS von `allow_origins=["*"]` auf explizite Origin-Liste (Prod-Domain + `http://localhost:8000`) + `allow_credentials=True` umgestellt (Voraussetzung für Cookie-Auth). Settings-Sheet: `fa_api`-Freitextfeld durch feste Auswahl ersetzt. Rollen-Anzeige liest jetzt `fa_role` aus localStorage statt Token-Präfix (löst BUG-47-Mechanismus ab, weiterhin nur UI-Anzeige, keine Autorisierung). Automatisiert: `test_task-83.py` (10/10 grün) + volle Regressionssuite migriert (Cookie-Isolation in `conftest.py`, Header-basierte Legacy-Tests auf Cookie-Login umgestellt: `test_us66_login.py`, `test_task67_auth_regression.py`, `test_bug47.py`, `test_bug63.py`, `test_us120.py`, `test_us_125.py`, `test_us_126.py`, `test_task77_qa_cleanup_on_delete.py`). Status In Test — manuelle Browser-Verifikation (Chrome + Safari, Cookie-Attribute/Secure-über-localhost) noch ausstehend. |
+| 2026-07-16 | TASK-82 | Sechs Schutz-Header live über Caddy ausgeliefert: die vier vorher schon im Programm-Ordner vorhandenen (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS, Server-Software-Hinweis entfernt) kamen zuvor nie auf dem Server an — der normale Release-Weg (`deploy/deploy.sh`) rührte die Webserver-Konfiguration nie an, nur die einmalige Ersteinrichtung tat das. Neu: Content-Security-Policy (eigene Seite, die zwei Bibliotheks-CDNs, die drei Kartenkachel-Anbieter, eingebetteter Code bewusst erlaubt) und Permissions-Policy (alles gesperrt außer Standortabfrage + Zwischenablage). Option B umgesetzt: `deploy/deploy.sh` gleicht die Konfigurationsdatei jetzt bei jedem Release automatisch mit dem Server ab (inkl. Prüfmodus vor dem Neuladen, damit ein Tippfehler den Webserver nicht lahmlegt). Im Live-Browser-Test zwei Nachbesserungsrunden nötig: `connect-src` fehlte zunächst komplett (der Service Worker lädt Fremd-Inhalte per eigenem `fetch()` nach, das läuft über `connect-src`, nicht über `script-src`/`img-src`) — nach Ergänzung liefen Karte, Sternenberechnung, GPS-Knopf, Kopieren-Knopf und Login/Service-Worker unverändert. Zusätzlich ein vorbestehender, unabhängiger Fund behoben: die Server-eigene Log-Datei hatte beim ersten echten Einsatz falsche Besitzrechte (root statt Webserver-Nutzer), einmalig korrigiert. Released als v1.22.35 + 2 Nachbesserungscommits, Health-Check bestätigt (`version 2.0.0`, `locations_count 172`). Alle 8 Akzeptanzkriterien manuell in Safari bestätigt. |
 
 ---
 

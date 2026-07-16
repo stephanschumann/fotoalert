@@ -28,10 +28,13 @@ pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 @pytest.fixture
 def host_headers(client):
+    """TASK-83: /login setzt ein Cookie auf dem geteilten `client` statt einen
+    Header-Token zurückzugeben — Folge-Requests auf demselben `client` sind dadurch
+    automatisch authentifiziert. Der leere Header-Dict bleibt aus Kompatibilität zu
+    bestehenden `headers=host_headers`-Aufrufen bestehen (kein-op, harmlos)."""
     r = client.post("/login", json={"password": "test-host-pw"})
     assert r.status_code == 200, r.text
-    token = r.json()["token"]
-    return {"Authorization": f"Bearer {token}"}
+    return {}
 
 
 def _make_photo_location(loc_id: str):

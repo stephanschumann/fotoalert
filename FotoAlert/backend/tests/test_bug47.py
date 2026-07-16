@@ -99,10 +99,16 @@ class TestLoginRoleResponse:
         )
 
     def test_host_login_token_encodes_host_role(self, client):
-        """Host-Login: Token-Prefix ist 'host' — Frontend kann Rolle daraus ableiten."""
+        """Host-Login: Token-Prefix ist 'host' — Rolle lässt sich aus dem Token ableiten.
+
+        TASK-83: Das Token steckt nicht mehr im JS-lesbaren Body, sondern im
+        HttpOnly-Sitzungscookie (Set-Cookie). Der Cookie-Wert hat weiterhin exakt das
+        alte "<rolle>.<hmac>"-Format (auth.issue_token) — nur der Transportweg hat sich
+        geändert, BUG-47s Kernaussage (Prefix kodiert die Rolle) bleibt gültig.
+        """
         r = client.post("/login", json={"password": "test-host-pw"})
         assert r.status_code == 200, r.text
-        token = r.json()["token"]
+        token = r.cookies["fa_session"]
         prefix = token.partition(".")[0]
         assert prefix == "host", (
             f"Token-Prefix sollte 'host' sein, ist {prefix!r}. "
@@ -110,11 +116,12 @@ class TestLoginRoleResponse:
         )
 
     def test_host_login_role_matches_token_prefix(self, client):
-        """Host-Login: role im Response stimmt mit Token-Prefix überein (Konsistenz)."""
+        """Host-Login: role im Response stimmt mit dem Token-Prefix im Sitzungscookie
+        überein (Konsistenz) — TASK-83: Token liegt im Cookie, nicht mehr im Body."""
         r = client.post("/login", json={"password": "test-host-pw"})
         assert r.status_code == 200, r.text
         data = r.json()
-        token_prefix = data["token"].partition(".")[0]
+        token_prefix = r.cookies["fa_session"].partition(".")[0]
         assert data["role"] == token_prefix, (
             f"role={data['role']!r} stimmt nicht mit Token-Prefix {token_prefix!r} überein."
         )
@@ -126,10 +133,10 @@ class TestLoginRoleResponse:
         assert r.json()["role"] == "user"
 
     def test_user_login_token_encodes_user_role(self, client):
-        """User-Login: Token-Prefix ist 'user'."""
+        """User-Login: Token-Prefix ist 'user' (TASK-83: Token im Sitzungscookie)."""
         r = client.post("/login", json={"password": "test-user-pw"})
         assert r.status_code == 200, r.text
-        token = r.json()["token"]
+        token = r.cookies["fa_session"]
         prefix = token.partition(".")[0]
         assert prefix == "user", (
             f"Token-Prefix sollte 'user' sein, ist {prefix!r}."

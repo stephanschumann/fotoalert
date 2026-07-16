@@ -36,30 +36,61 @@ def client():
     from fastapi.testclient import TestClient
     try:
         import main  # Import erst hier, damit importorskip vorher greift
-        with TestClient(main.app) as c:
+        # TASK-83: base_url MUSS https sein, sonst verwirft httpx' Cookie-Jar das
+        # Secure-Sitzungscookie stillschweigend bei jedem Folge-Request (Secure-Cookies
+        # werden nur über https mitgeschickt; TestClient nutzt ohne explizites base_url
+        # "http://testserver"). Ohne diesen Fix wären ALLE cookie-basierten Auth-Tests
+        # (auch über user_token/host_token) unabhängig vom Server-Code rot.
+        with TestClient(main.app, base_url="https://testserver") as c:
             yield c
     except Exception as exc:  # pragma: no cover - umgebungsabhängig
         pytest.skip(f"App-Startup im Sandbox nicht möglich: {exc}")
 
 
+@pytest.fixture(autouse=True)
+def _isolate_client_cookies(client):
+    """TASK-83 Pflicht-Vorlauf (Pre-Mortem-Risiko 5): `client` ist session-scoped und
+    teilt seine Cookie-Jar über ALLE Testdateien hinweg. Seit /login ein HttpOnly-Cookie
+    setzt, würde ein Login in Test A das Cookie in Test B (der "ohne Auth -> 401" prüft)
+    faelschlich am Leben halten. Autouse + function-scoped: läuft vor UND nach jedem
+    einzelnen Test, unabhängig davon ob der Test `client` explizit anfordert oder nur
+    über eine andere Fixture (z.B. user_token) transitiv nutzt — pytest instanziiert
+    autouse-Fixtures vor explizit angeforderten Fixtures gleichen Scopes, d.h. der Login
+    in user_token/host_token läuft garantiert NACH diesem Reset."""
+    client.cookies.clear()
+    yield
+    client.cookies.clear()
+
+
 @pytest.fixture
 def user_token(client):
-    """US-66: gültiges User-Token für geschützte Endpoints."""
+    """US-66/TASK-83: loggt als User auf dem geteilten `client` ein (setzt das neue
+    Sitzungs-Cookie dort für alle Folge-Requests dieses Tests) und liefert zusätzlich
+    einen gültig signierten "alten" Bearer-Token direkt aus auth.issue_token — die
+    /login-JSON-Antwort enthält seit TASK-83 kein token-Feld mehr, manche Tests (z.B.
+    TASK-83s eigener Zwangs-Logout-Test) brauchen aber weiterhin einen validen
+    Token-String, um zu belegen, dass der alte Header-Pfad nicht mehr funktioniert."""
     r = client.post("/login", json={"password": "test-user-pw"})
     assert r.status_code == 200, r.text
-    return r.json()["token"]
+    import auth
+    return auth.issue_token("user")
 
 
 @pytest.fixture
 def host_token(client):
-    """US-66: gültiges Host-Token (Admin-Routen)."""
+    """US-66/TASK-83: analog zu user_token, aber Host-Rolle."""
     r = client.post("/login", json={"password": "test-host-pw"})
     assert r.status_code == 200, r.text
-    return r.json()["token"]
+    import auth
+    return auth.issue_token("host")
 
 
 @pytest.fixture
 def auth_headers(user_token):
+    """TASK-83: Der Authorization-Header wird serverseitig nicht mehr ausgewertet —
+    die eigentliche Authentifizierung läuft über das Cookie, das user_token bereits auf
+    dem geteilten `client` gesetzt hat. Der Header bleibt aus Kompatibilität zu
+    bestehenden Testaufrufen bestehen (harmlos, wird ignoriert)."""
     return {"Authorization": f"Bearer {user_token}"}
 
 

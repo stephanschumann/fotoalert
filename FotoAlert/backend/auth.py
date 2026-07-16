@@ -20,9 +20,12 @@ import hashlib
 import hmac
 import os
 
-from fastapi import Depends, Header, HTTPException
+from fastapi import Cookie, Depends, HTTPException
 
 VALID_ROLES = ("host", "user")
+
+# TASK-83: Name des HttpOnly-Sitzungscookies (loest den Authorization-Header ab).
+SESSION_COOKIE_NAME = "fa_session"
 
 
 def _secret() -> str:
@@ -64,10 +67,16 @@ def role_for_token(token: str) -> str | None:
 
 # --- FastAPI-Dependencies --------------------------------------------------------
 
-def require_auth(authorization: str = Header(default="")) -> str:
-    """Verlangt ein gültiges Bearer-Token; gibt die Rolle zurück oder 401."""
-    token = authorization[7:].strip() if authorization[:7].lower() == "bearer " else authorization.strip()
-    role = role_for_token(token)
+def require_auth(fa_session: str = Cookie(default="")) -> str:
+    """TASK-83: Verlangt ein gültiges Sitzungs-Cookie; gibt die Rolle zurück oder 401.
+
+    Kein Authorization-Header-Fallback mehr (Weg-Gate-Entscheidung 3) — ein alter,
+    vor der Migration ausgestellter Bearer-Token authentifiziert dadurch bewusst nicht
+    mehr (Zwangs-Logout aller bestehenden Sessions, Weg-Gate-Entscheidung 1). Der
+    Parametername `fa_session` muss exakt dem Cookie-Namen (SESSION_COOKIE_NAME)
+    entsprechen, da FastAPI den Cookie standardmäßig über den Parameternamen liest.
+    """
+    role = role_for_token(fa_session)
     if not role:
         raise HTTPException(status_code=401, detail="Nicht eingeloggt oder ungültiges Token.")
     return role

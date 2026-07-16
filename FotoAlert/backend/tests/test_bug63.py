@@ -40,7 +40,6 @@ import asyncio
 
 import pytest
 
-import auth
 import calculations.astronomy as astro
 
 pytestmark = [pytest.mark.offline, pytest.mark.regression]
@@ -54,10 +53,14 @@ _SUBJECT_LAT, _SUBJECT_LON = 52.4158, 13.0688
 _ELEVATION_DIFF_M = 50.0
 
 
-def _host_headers():
-    """BUG-63-Testplan: Token direkt via auth.issue_token('host') erzeugen,
-    kein /login-Roundtrip (siehe Memory reference_fotoalert_local_auth)."""
-    return {"Authorization": f"Bearer {auth.issue_token('host')}"}
+def _login_as_host(client):
+    """TASK-83: /preview-alignment liest nur noch das Sitzungscookie (kein
+    Authorization-Header-Fallback mehr) — ein direkt via auth.issue_token('host')
+    gebauter Bearer-Header (der bisherige BUG-63-Testplan-Ansatz, kein /login-
+    Roundtrip) authentifiziert seit dem Umbau nicht mehr. Ein echter /login-Aufruf
+    setzt das Cookie auf dem geteilten `client` für alle Folge-Requests dieses Tests."""
+    r = client.post("/login", json={"password": "test-host-pw"})
+    assert r.status_code == 200, r.text
 
 
 def _preview_payload(**overrides):
@@ -128,8 +131,9 @@ class TestReferenceEndpointUnaffectedByPreviewAlignmentWindowState:
 
         before = _reference_plan_result(client)
 
+        _login_as_host(client)
         payload = _preview_payload()
-        r = client.post("/preview-alignment", json=payload, headers=_host_headers())
+        r = client.post("/preview-alignment", json=payload)
         assert r.status_code == 200, r.text
 
         # Kernaussage BUG-63: clear_active_window() wurde im finally aufgerufen -
@@ -158,9 +162,10 @@ class TestReferenceEndpointUnaffectedByPreviewAlignmentWindowState:
 
         monkeypatch.setattr(asyncio, "to_thread", _boom)
 
+        _login_as_host(client)
         payload = _preview_payload()
         with pytest.raises(RuntimeError):
-            client.post("/preview-alignment", json=payload, headers=_host_headers())
+            client.post("/preview-alignment", json=payload)
 
         assert astro._active_window.get() is None, (
             "Nach einer Exception in der Alignment-Berechnung blieb "
@@ -196,12 +201,13 @@ class TestAlignmentsOnePerDayAndBodyPassage:
 
         monkeypatch.setattr(provider, "elevation_difference", _fake_elevation_difference)
 
+        _login_as_host(client)
         payload = _preview_payload(
             subject_lat=52.39674661285668, subject_lon=13.096798178332305,
             subject_height_m=44.0, subject_width_m=20.0,
             days=10,
         )
-        r = client.post("/preview-alignment", json=payload, headers=_host_headers())
+        r = client.post("/preview-alignment", json=payload)
         assert r.status_code == 200, r.text
 
         alignments = r.json()["alignments"]

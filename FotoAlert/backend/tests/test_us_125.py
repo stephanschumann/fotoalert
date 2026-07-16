@@ -35,10 +35,13 @@ def _make_jpeg_bytes(width: int, height: int, color=(200, 60, 60)) -> bytes:
 
 @pytest.fixture
 def host_headers(client):
+    """TASK-83: /login setzt ein Cookie auf dem geteilten `client` statt einen
+    Header-Token zurückzugeben — Folge-Requests auf demselben `client` sind dadurch
+    automatisch authentifiziert. Der leere Header-Dict bleibt aus Kompatibilität zu
+    bestehenden `headers=host_headers`-Aufrufen bestehen (kein-op, harmlos)."""
     r = client.post("/login", json={"password": "test-host-pw"})
     assert r.status_code == 200, r.text
-    token = r.json()["token"]
-    return {"Authorization": f"Bearer {token}"}
+    return {}
 
 
 @pytest.fixture
@@ -107,7 +110,7 @@ class TestDeleteImageSuccess:
 class TestDeleteImageAuthOnlyHost:
     """AK 6: Nur ein Host darf löschen; normale Nutzer/nicht eingeloggte Clients nicht."""
 
-    def test_delete_rejected_for_non_host(self, client, auth_headers, host_headers, test_location_id):
+    def test_delete_rejected_for_non_host(self, client, host_headers, test_location_id):
         upload = client.post(
             f"/locations/{test_location_id}/image",
             files={"file": ("beispiel.jpg", _make_jpeg_bytes(800, 600), "image/jpeg")},
@@ -115,7 +118,13 @@ class TestDeleteImageAuthOnlyHost:
         )
         assert upload.status_code == 200, f"Vorbereitender Upload fehlgeschlagen: {upload.text}"
 
-        r = client.delete(f"/locations/{test_location_id}/image", headers=auth_headers)
+        # TASK-83: Cookie-Auth ist ambient auf `client` — der Host-Cookie aus dem
+        # vorbereitenden Upload muss für den Nicht-Host-Check explizit auf 'user'
+        # umgeschaltet werden (ein reiner Authorization-Header wie zuvor würde den
+        # noch gültigen Host-Cookie nicht überstimmen).
+        login = client.post("/login", json={"password": "test-user-pw"})
+        assert login.status_code == 200, login.text
+        r = client.delete(f"/locations/{test_location_id}/image")
         assert r.status_code == 403, f"Erwartet 403 für Nicht-Host, bekam {r.status_code}: {r.text}"
 
     def test_delete_rejected_without_token(self, client, host_headers, test_location_id):
@@ -126,6 +135,9 @@ class TestDeleteImageAuthOnlyHost:
         )
         assert upload.status_code == 200, f"Vorbereitender Upload fehlgeschlagen: {upload.text}"
 
+        # TASK-83: Der Host-Cookie aus dem vorbereitenden Upload lebt sonst auf
+        # `client` weiter — für den "ohne Auth"-Check muss er explizit entfernt werden.
+        client.cookies.clear()
         r = client.delete(f"/locations/{test_location_id}/image")
         assert r.status_code == 401
 

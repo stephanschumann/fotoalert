@@ -29,7 +29,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.min.css">
 
   <style>
     /* ── Design Tokens ────────────────────────────────────────────── */
@@ -1553,9 +1553,9 @@ function ic(id, size, cls, color){
 <div id="toast"></div>
 
 <!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="/vendor/leaflet/leaflet.min.js"></script>
 <!-- US-64: Astronomy Engine (clientseitige Himmelsmechanik, MIT) -->
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script src="/vendor/astronomy-engine/astronomy.browser.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 // VERSION  (Major.Feature.Fix)
@@ -1563,22 +1563,43 @@ function ic(id, size, cls, color){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.35';
+const APP_VERSION = '1.22.36';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
+// TASK-83: Backend-Adresse ist keine Freitexteingabe mehr, sondern eine feste
+// Auswahl (Prod-Domain / lokaler Dev-Server) — verhindert, dass ein Skript die
+// Adresse (und damit den Zielort künftiger Requests samt Cookie) auf einen
+// fremden Server umbiegt. '' steht für "Prod, same-origin" (unverändertes
+// Verhalten wie zuvor der leere Default), 'http://localhost:8000' für lokal.
+const API_ALLOWLIST = ['', 'http://localhost:8000'];
+
 const CFG = {
-  api: localStorage.getItem('fa_api') ?? (location.hostname === 'localhost' ? 'http://localhost:8000' : ''),
+  api: (() => {
+    const def = location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+    const stored = localStorage.getItem('fa_api');
+    if (stored !== null && API_ALLOWLIST.includes(stored)) return stored;
+    // AK Edge Case: ein außerhalb der Allow-Liste liegender Wert (z.B. per Konsole
+    // gesetzt) wird beim nächsten App-Start ignoriert und auf den Default zurückgesetzt.
+    localStorage.setItem('fa_api', def);
+    return def;
+  })(),
   minScore: 0.35,  // Backend-Minimum; wird nicht mehr per Settings-Slider geändert
   notifyHigh: localStorage.getItem('fa_notify_high') !== 'false',
   notifyGolden: localStorage.getItem('fa_notify_golden') !== 'false',
   notifyMilky: localStorage.getItem('fa_notify_milky') === 'true',
-  token: localStorage.getItem('fa_token') || null,  // US-66: Session-Token
-  get role() {                                       // BUG-47: immer aus Token-Präfix lesen
-    const tok = localStorage.getItem('fa_token');
-    if (!tok) return null;
-    const prefix = tok.split('.')[0];
-    return (prefix === 'host' || prefix === 'user') ? prefix : null;
+  // TASK-83: Das Sitzungs-Ticket liegt nicht mehr im JS-lesbaren localStorage
+  // (HttpOnly-Cookie stattdessen, siehe Auth/API weiter unten). fa_role bleibt als
+  // unkritischer UI-Hinweis bestehen (reine Anzeige "Host"/"User") — die eigentliche
+  // Autorisierung läuft serverseitig ausschließlich über das Cookie.
+  get role() {
+    const r = localStorage.getItem('fa_role');
+    return (r === 'host' || r === 'user') ? r : null;
+  },
+  setApi(v) {
+    if (!API_ALLOWLIST.includes(v)) return;
+    this.api = v;
+    localStorage.setItem('fa_api', v);
   },
 };
 
@@ -1626,11 +1647,10 @@ const Theme = {
 // API CLIENT
 // ═══════════════════════════════════════════════════════
 const API = {
-  // US-66: hängt das Session-Token an jede Anfrage; 401 → automatischer Logout (Re-Login).
+  // TASK-83: kein Authorization-Header mehr — die Session läuft über das
+  // HttpOnly-Sitzungscookie, das der Browser automatisch mitschickt.
   _headers(extra) {
-    const h = Object.assign({}, extra || {});
-    if (CFG.token) h['Authorization'] = 'Bearer ' + CFG.token;
-    return h;
+    return Object.assign({}, extra || {});
   },
   async _check(r) {
     if (r.status === 401) { Auth.logout(true); throw new Error('HTTP 401'); }
@@ -1638,23 +1658,23 @@ const API = {
     return r.json();
   },
   async get(path) {
-    return this._check(await fetch(CFG.api + path, { headers: this._headers() }));
+    return this._check(await fetch(CFG.api + path, { headers: this._headers(), credentials: 'same-origin' }));
   },
   async post(path, body) {
     return this._check(await fetch(CFG.api + path, {
       method: 'POST', headers: this._headers({'Content-Type':'application/json'}),
-      body: JSON.stringify(body)
+      credentials: 'same-origin', body: JSON.stringify(body)
     }));
   },
   async patch(path, body) {
     return this._check(await fetch(CFG.api + path, {
       method: 'PATCH', headers: this._headers({'Content-Type':'application/json'}),
-      body: JSON.stringify(body)
+      credentials: 'same-origin', body: JSON.stringify(body)
     }));
   },
   async delete(path) {
     return this._check(await fetch(CFG.api + path, {
-      method: 'DELETE', headers: this._headers()
+      method: 'DELETE', headers: this._headers(), credentials: 'same-origin'
     }));
   },
   // US-120: Datei-Upload (FormData, kein JSON) — kein 'Content-Type' setzen,
@@ -1663,36 +1683,44 @@ const API = {
     const fd = new FormData();
     fd.append('file', file);
     return this._check(await fetch(CFG.api + path, {
-      method: 'POST', headers: this._headers(), body: fd
+      method: 'POST', headers: this._headers(), credentials: 'same-origin', body: fd
     }));
   }
 };
 
 // ═══════════════════════════════════════════════════════
-// AUTH (US-66 — Pflicht-Login, Rollen-Erkennung, Option B)
+// AUTH (US-66 — Pflicht-Login, Rollen-Erkennung; TASK-83 — HttpOnly-Cookie statt
+// Browser-Speicher)
 // ═══════════════════════════════════════════════════════
 const Auth = {
-  isLoggedIn() { return !!CFG.token; },
+  // TASK-83: Das Sitzungscookie ist HttpOnly und damit für JS unsichtbar —
+  // isLoggedIn() kann es nicht direkt prüfen. fa_role ist ein unkritischer
+  // UI-Hinweis: ist er gesetzt, startet die App optimistisch; fehlt das Cookie
+  // tatsächlich (gelöscht/abgelaufen), liefert der erste geschützte Request 401 →
+  // API._check() ruft Auth.logout(true) → Login-Bildschirm (AK Edge Case: "beim
+  // nächsten Laden ODER bei der nächsten geschützten Aktion").
+  isLoggedIn() { return !!CFG.role; },
   isHost() { return CFG.role === 'host'; },
   async login(password) {
-    // Raw fetch (nicht API.post): /login braucht kein Token und darf 401 nicht als Logout werten.
+    // Raw fetch (nicht API.post): /login braucht kein Cookie und darf 401 nicht als Logout werten.
     const r = await fetch(CFG.api + '/login', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ password })
+      credentials: 'same-origin', body: JSON.stringify({ password })
     });
     if (r.status === 401) return false;
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    CFG.token = d.token;                           // BUG-47: role wird via getter aus Token gelesen
-    localStorage.setItem('fa_token', d.token);
-    // fa_role wird nicht mehr als maßgebliche Quelle verwendet (BUG-47),
-    // bleibt aber gesetzt für eventuelle externe Kompatibilität.
+    // TASK-83: kein token-Feld mehr im Body — der Server setzt das Sitzungscookie
+    // per Set-Cookie (HttpOnly/Secure/SameSite=Lax), das JS nicht lesen kann.
     if (d.role) localStorage.setItem('fa_role', d.role);
     return true;
   },
   logout(silent) {
-    CFG.token = null;                              // BUG-47: CFG.role ist getter, kein Setter
-    localStorage.removeItem('fa_token'); localStorage.removeItem('fa_role');
+    // TASK-83: JS kann ein HttpOnly-Cookie nicht selbst löschen — /logout lässt es
+    // serverseitig verfallen. Fire-and-forget (nicht awaited), damit der
+    // Login-Bildschirm sofort erscheint statt auf den Roundtrip zu warten.
+    fetch(CFG.api + '/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+    localStorage.removeItem('fa_role');
     LoginScreen.show();
   }
 };
@@ -4155,8 +4183,9 @@ const CameraFOV = {
         // Migration: localStorage → Server (einmalig)
         this._profile = Object.assign({}, _default, local);
         try {
-          const token = localStorage.getItem('fa_token');
-          if (token) {
+          // TASK-83: Es gibt kein JS-lesbares Token mehr — Auth.isLoggedIn() (liest
+          // CFG.role/fa_role) ersetzt den bisherigen fa_token-Vorhandensein-Check.
+          if (Auth.isLoggedIn()) {
             await API.post('/camera-profile', {
               device_id: deviceId, ...this._profile
             });
@@ -7330,8 +7359,12 @@ const Settings = {
         <div class="settings-group">
           <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:6px">
             <span style="font-size:13px;font-weight:600">Server URL</span>
-            <input class="server-input" type="url" value="${CFG.api}"
-              onchange="CFG.api=this.value;localStorage.setItem('fa_api',this.value)">
+            <!-- TASK-83: kein Freitextfeld mehr (verhindert Umbiegen der Backend-Adresse
+                 per Skript) — feste Auswahl, serverseitig per CFG.setApi() validiert. -->
+            <select class="server-input" onchange="CFG.setApi(this.value)">
+              <option value="" ${CFG.api===''?'selected':''}>Prod (fotoalert.stephanschumann.com)</option>
+              <option value="http://localhost:8000" ${CFG.api==='http://localhost:8000'?'selected':''}>Lokal (http://localhost:8000)</option>
+            </select>
           </div>
           <div class="settings-row">
             <div class="sr-label"><span>Astronomie neu berechnen</span><small>Dauert 2–5 Minuten</small></div>

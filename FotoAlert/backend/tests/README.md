@@ -47,6 +47,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_task-41_precompute_refactor.py` | TASK-41: Refactoring `_run_single_location_flow()` in 4 Helferfunktionen | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task-60_patch_location_refactor.py` | TASK-60: Aufrufreihenfolge nach `patch_location()`-Refactoring | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task-66.py` | TASK-66: Playwright-Wrapper für 3 neue Klick-Durchläufe (echter Dev-Server nötig) | ⏭️ übersprungen ohne Playwright + laufenden Dev-Server | `frontend`, `regression` |
+| `test_task-83.py` | TASK-83: Login-Ticket als HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher (Login, Endpunktschutz, Zwangs-Logout, `/logout`, CORS-Credentials) | ⏳ nur mit `--all` (FastAPI-Stack + App-Startup) | `api`, `regression` (+1× `smoke`) |
 | `test_task43_qa_model.py` | TASK-43: QA-Datenmodell (Lock-Flags, QA-Tabellen, Geo-Hash) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task45_azimuth.py` | TASK-45: idealer Azimut automatisch aus Sichtlinie | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task46_descriptions.py` | TASK-46: automatische Standortbeschreibung via LLM (Mistral gemockt) | ✅ immer (offline, deterministisch) | `offline`, `regression` |

@@ -38,7 +38,7 @@ from typing import Optional
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends, UploadFile, File
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -95,9 +95,18 @@ app = FastAPI(
     version="2.0.0",
 )
 
+# TASK-83: explizite Origin-Liste statt Wildcard — Voraussetzung für allow_credentials=True
+# (Wildcard + Credentials ist per Fetch-Spec verboten, der Browser würde jede Cookie-Antwort
+# verwerfen). Prod-Domain + lokaler Dev-Server, siehe deploy/setup_server.sh (DOMAIN).
+_ALLOWED_ORIGINS = [
+    "https://fotoalert.stephanschumann.com",
+    "http://localhost:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -2585,17 +2594,61 @@ async def get_discover(
     }
 
 
+# TASK-83 ⚠️ Annahme (von Stephan im Weg-Gate bestätigt): 30 Tage Cookie-Lebensdauer,
+# erhält die bisherige, praktisch unbegrenzte localStorage-Persistenz näherungsweise.
+_SESSION_MAX_AGE_S = 60 * 60 * 24 * 30  # 30 Tage
+
+# TASK-83 Nachtrag (Safari-Fund, Stephans manueller Test 2026-07-16): Die Pre-Mortem-
+# Annahme im Ticket (MDN: Secure-Cookies funktionieren auch über http://localhost) galt
+# NICHT für jeden Browser — Chrome macht für localhost stillschweigend eine Ausnahme,
+# Safari nicht: das Cookie erscheint dort einfach nicht im Speicher-Tab, ohne
+# Konsolen-Fehler. Produktion ist nicht betroffen (echtes HTTPS via Caddy). Secure daher
+# nur in Prod hart erzwingen (nicht verhandelbar), im Dev-Modus weglassen — siehe
+# TASK-19-Muster (`FOTOALERT_ENV`, data/store.py) für dieselbe dev/prod-Unterscheidung.
+_COOKIE_SECURE = _os.getenv("FOTOALERT_ENV", "prod") == "prod"
+
+
 @app.post("/login")
-async def login(body: dict = Body(...)) -> dict:
-    """US-66: Pflicht-Login. Passwort → Rolle (host/user) + stateless Token.
+async def login(response: Response, body: dict = Body(...)) -> dict:
+    """US-66/TASK-83: Pflicht-Login. Passwort → Rolle (host/user) + HttpOnly-Sitzungscookie.
 
     Kein Username, kein Rollen-Auswahlfeld — die Rolle ergibt sich aus dem Passwort.
+    TASK-83: Das Sitzungs-Ticket wandert vom JS-lesbaren Response-Body (bisher `token`)
+    in ein HttpOnly/Secure/SameSite=Lax-Cookie — ein XSS-Skript kann es dadurch nicht
+    mehr direkt auslesen. Kein Authorization-Header-Fallback (Weg-Gate-Entscheidung 3).
     """
     password = (body or {}).get("password", "")
     role = auth.role_for_password(password)
     if not role:
         raise HTTPException(status_code=401, detail="Falsches Passwort.")
-    return {"role": role, "token": auth.issue_token(role)}
+    response.set_cookie(
+        key=auth.SESSION_COOKIE_NAME,
+        value=auth.issue_token(role),
+        max_age=_SESSION_MAX_AGE_S,
+        path="/",
+        httponly=True,
+        secure=_COOKIE_SECURE,
+        samesite="lax",
+    )
+    return {"role": role}
+
+
+@app.post("/logout")
+async def logout(response: Response) -> dict:
+    """TASK-83: Neuer Endpoint — lässt das Sitzungscookie serverseitig verfallen.
+
+    JS kann ein HttpOnly-Cookie nicht selbst löschen; bislang räumte Auth.logout() im
+    Frontend nur localStorage auf (Cookie hätte weitergelebt). Max-Age=0 verfällt das
+    Cookie sofort beim Client.
+    """
+    response.delete_cookie(
+        key=auth.SESSION_COOKIE_NAME,
+        path="/",
+        httponly=True,
+        secure=_COOKIE_SECURE,
+        samesite="lax",
+    )
+    return {"status": "ok"}
 
 
 @app.post("/refresh-discover")

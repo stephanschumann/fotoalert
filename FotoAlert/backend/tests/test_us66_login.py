@@ -46,7 +46,10 @@ class TestLoginEndpoint:
         r = client.post("/login", json={"password": "test-host-pw"})
         assert r.status_code == 200, r.text
         assert r.json()["role"] == "host"
-        assert r.json()["token"]
+        # TASK-83: kein token-Feld mehr im JS-lesbaren Body — das Sitzungs-Ticket
+        # steckt im HttpOnly-Cookie (Set-Cookie), nicht mehr im Response-Body.
+        assert "token" not in r.json()
+        assert r.cookies["fa_session"]
 
     @pytest.mark.smoke
     def test_user_login(self, client):
