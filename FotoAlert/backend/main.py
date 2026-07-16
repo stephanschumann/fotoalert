@@ -2910,22 +2910,40 @@ async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(a
 
     today = date.today()
     days = min(req.days, 14)
-    all_alignments = []
 
-    for body in ("sun", "moon"):
-        for day_offset in range(days):
-            target_date = today + timedelta(days=day_offset)
-            try:
-                aligns = find_precise_alignment_times(
-                    observer_lat=req.observer_lat, observer_lon=req.observer_lon,
-                    subject_lat=req.subject_lat, subject_lon=req.subject_lon,
-                    subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
-                    target_date=target_date, body=body,
-                    az_tolerance_deg=4.0, min_quality=0.15,
-                )
-                all_alignments.extend(aligns)
-            except Exception as e:
-                logger.debug("Alignment-Fehler %s %s: %s", body, target_date, e)
+    def _compute_alignments() -> list:
+        # BUG-63 Option A (TASK-48-Muster): reine Rechenschleife, wird unten per
+        # asyncio.to_thread aus dem Event-Loop ausgelagert — zusätzliche
+        # Absicherung, falls sie unter Last doch spürbar blockiert.
+        result = []
+        for body in ("sun", "moon"):
+            for day_offset in range(days):
+                target_date = today + timedelta(days=day_offset)
+                try:
+                    aligns = find_precise_alignment_times(
+                        observer_lat=req.observer_lat, observer_lon=req.observer_lon,
+                        subject_lat=req.subject_lat, subject_lon=req.subject_lon,
+                        subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
+                        target_date=target_date, body=body,
+                        az_tolerance_deg=4.0, min_quality=0.15,
+                    )
+                    result.extend(aligns)
+                except Exception as e:
+                    logger.debug("Alignment-Fehler %s %s: %s", body, target_date, e)
+        return result
+
+    # BUG-63 Option B: Fenster-Engine aktivieren (Muster wie main.py ~2381/~2468),
+    # damit find_precise_alignment_times() den schnellen, bereits vorhandenen
+    # WindowEphemeris-Pfad statt des langsameren Alt-Pfads nutzt. try/finally
+    # garantiert, dass der globale Fenster-State auch bei einer Exception
+    # zurückgesetzt wird (Pre-Mortem-Szenario 4).
+    from calculations.window_engine import WindowEphemeris
+    import calculations.astronomy as _astro
+    _astro.set_active_window(WindowEphemeris(req.observer_lat, req.observer_lon, today, days))
+    try:
+        all_alignments = await asyncio.to_thread(_compute_alignments)
+    finally:
+        _astro.clear_active_window()
 
     all_alignments.sort(key=lambda a: a.time)
 

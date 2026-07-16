@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15)* · **BUG-80** *(Option A gewählt, Freigabe 2026-07-15)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15)* · **BUG-80** *(Option A gewählt, Freigabe 2026-07-15)* · **US-133** *(Weg-Gate entschieden 2026-07-16: Frage 1 = Option B/Zoom-Erhalt, Frage 2 = Option B/Blur, gegen Empfehlung Option A)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-63** *(Option C umgesetzt: Fenster-Engine aktiviert + Geländehöhen-Abfrage parallelisiert + `asyncio.to_thread`-Absicherung, temporäre Timing-Logs entfernt, 2026-07-15)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-63** *(„Alignments berechnen" blockiert Server ca. 20–25 Sek.)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2158,13 +2158,13 @@ Icon: `i-doc` (bereits im SVG-Symbol-Set vorhanden, geometrisches Blatt-Icon, pa
 
 ---
 
-### BUG-63 · „Alignments berechnen" blockiert den Server für alle Nutzer ca. 20–25 Sekunden `[ ]`
+### BUG-63 · „Alignments berechnen" blockiert den Server für alle Nutzer ca. 20–25 Sekunden `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** Beim Klick auf „Alignments berechnen" in der Anlage-Maske (Quick Location Capture, `POST /preview-alignment`) wirkt der Server für ca. 20–25 Sekunden blockiert — auch andere Requests (z. B. einfaches Laden der Startseite `GET /`) hängen währenddessen. Beobachtet in zwei Testdurchläufen während der BUG-60-Tests am 2026-07-04, Ursache nicht verifiziert. Erwartet: Andere Nutzer/Requests werden von einer laufenden Alignment-Berechnung nicht spürbar ausgebremst.
@@ -2172,6 +2172,154 @@ Icon: `i-doc` (bereits im SVG-Symbol-Set vorhanden, geometrisches Blatt-Icon, pa
 **User Story:** Als App-Nutzer möchte ich, dass die Berechnung von Alignments in der Anlage-Maske andere Nutzer und meine eigenen weiteren Aktionen nicht für mehrere Sekunden blockiert, sodass die App für alle durchgängig reaktionsfähig bleibt, auch während jemand eine neue Location anlegt.
 
 **Bezug:** Entstand als dokumentierter Nebenbefund im BUG-60-Ticket (siehe dort, Abschnitt „Nachgeholter UI-Klick-Test", 2026-07-04: „separat per Intake ins Backlog aufgenommen"). Keine Dublette gefunden — kein anderes Ticket behandelt diese konkrete Blockade von `/preview-alignment` bzw. `find_precise_alignment_times`. Verwandtes Lösungsmuster bereits an anderer Stelle etabliert: **TASK-48** (Szenario 4, Empfehlung) und die QA-Beschreibungs-Pipeline lagern vergleichbare rechenintensive/synchrone Aufrufe explizit per `asyncio.to_thread` aus dem Event-Loop aus — als Präzedenzfall für die Analyse-Phase relevant, aber kein Überschneidungs- oder Merge-Kandidat, da dort andere Endpunkte betroffen sind. Abgrenzung zu BUG-60: BUG-60 behandelt das automatisch vorbelegte Hinweise-Feld (bereits in Test), dieses Ticket behandelt ausschließlich die Blockade-Performance desselben Endpunkts.
+
+#### 🔬 Analyse & Spec (BUG-63) · 2026-07-15
+
+##### 📎 Code-Verifikation (durchgeführt 2026-07-15)
+
+- `backend/main.py` Zeile 2879–2932, Funktion `preview_alignment()` (Endpunkt `POST /preview-alignment`): `async def`, drei Arbeitsschritte nacheinander im selben Request: (1) Zeile 2889–2890 `await _elevation_provider.elevation_difference(...)`, (2) Zeile 2915–2929 eine verschachtelte Schleife über `("sun","moon") × bis zu 14 Tage` (max. 28 Durchläufe), die synchron `find_precise_alignment_times()` aufruft — **ohne** `await` innerhalb der Schleife, **ohne** `asyncio.to_thread`, (3) Zeile 2932 `await _save_alignment_as_location(...)`.
+- `backend/main.py` Zeile 2381 und Zeile 2468: Zwei **andere** Endpunkte (`/preview-plan` bzw. der On-Demand-Monatskalender) aktivieren vor derselben Art Berechnung explizit `_astro.set_active_window(WindowEphemeris(...))` (TASK-25, schneller Pfad) und räumen ihn im `finally` wieder ab. **`preview_alignment()` tut das nicht** — der Endpunkt fällt dadurch bei jedem Aufruf auf den langsameren Alt-Pfad zurück.
+- `backend/calculations/astronomy.py` Zeile 753–759, `find_precise_alignment_times()`: Wenn kein aktives `WindowEphemeris`-Fenster die Koordinaten/das Datum abdeckt (`_win_for()`, Zeile 61–65, liefert `None`), fällt die Funktion auf Zeile 761–812 zurück — pro Aufruf ein **eigener** Skyfield-Call (`.at(times).observe(sky_body).apparent().altaz()`) über 1020 (Sonne) bzw. 1440 (Mond) Zeitstempel, **nicht** über mehrere Tage hinweg vektorisiert.
+- `backend/calculations/window_engine.py` Zeile 250–302, `WindowEphemeris.alignments()`: identische Aufrufsignatur, bereits von `find_precise_alignment_times()` selbst genutzt, sobald ein Fenster aktiv ist (Zeile 754–759) — **keine Änderung an `astronomy.py` nötig**, um den schnellen Pfad zu nutzen. Laut Docstring (Zeile 11, TASK-25, deren Messung damals selbst durchgeführt wurde): „14 Tage, eine Location … Plan < 500 ms".
+- `backend/data/elevation.py`: `elevation_difference()` (Zeile 131–144) ruft `get_elevation()` für Fotograf- und Motiv-Punkt **sequenziell** ab (Zeile 140–141, zwei `await`s hintereinander, nicht parallel). Bei jedem der beiden Punkte (Zeile 99–118, `_fetch_elevation`) wird eine Dataset-Kette (`eudem25m → srtm30m → mapzen`, Zeile 37) probiert, **vor jedem echten Netzaufruf** erzwingt ein **modulweiter** (prozessweiter, nicht pro Request) `asyncio.Lock` (Zeile 51, `_respect_rate_limit()`, Zeile 55–70) eine Mindestpause von `RATE_LIMIT_PAUSE_S = 1.1` Sekunden seit dem letzten echten Netzaufruf — ausdrücklich „auch über mehrere Punkte hinweg" (Kommentar Zeile 46–50). Pro Netzaufruf gilt ein `httpx`-Timeout von 30 Sekunden (Zeile 103). Für eine **neu angelegte** Location (genau der Anwendungsfall dieser Anlage-Maske) ist ein Cache-Treffer im persistenten Tile-Cache so gut wie ausgeschlossen — jeder Klick auf „Alignments berechnen" für einen neuen Standort löst also mit hoher Wahrscheinlichkeit echte Netzaufrufe aus.
+- `backend/main.py` Zeile 1410–1411 und Zeile 1701: bestätigt vorhandenes, etabliertes Muster `await asyncio.to_thread(...)` für rechenintensive synchrone Aufrufe (Wetter-PNG-Rendering, QA-Einzelverbesserung) — der im Ticket erwähnte TASK-48-Präzedenzfall ist real und übertragbar.
+- `backend/main.py` Zeile 1811–1844, `_run_precompute_single()`: der Recompute nach dem Speichern (`asyncio.create_task`, Zeile 2871) läuft über `_run_precompute_single_subproc()` (Zeile 1726) als **eigener Subprozess** (`precompute.py`), nicht im selben Event-Loop-Prozess — als Blockade-Quelle für andere Requests ausgeschlossen.
+
+##### ⚠️ Wichtigster Befund: Die angenommene Ursache (synchrone Alignment-Schleife) ist durch Messung widerlegt
+
+Das Ticket übernimmt (aus dem BUG-60-Nebenbefund) die Vermutung „rechenintensive, synchrone Schleife (14 Tage × Sonne/Mond) blockiert den Server" — mit ausdrücklichem Verweis auf das TASK-48-Muster (`asyncio.to_thread`). Per Skill-Pflicht („Performance-Prämisse messen, nicht übernehmen") wurde das **real gemessen**, nicht angenommen:
+
+```
+Testaufbau: gleiche Koordinaten wie im Docstring von calculate_subject_angular_profile()
+(Babelsberg → Pfingstberg), gleiche Parameter wie im Endpunkt (az_tolerance_deg=4.0,
+min_quality=0.15), 14 Tage, 2 Himmelskörper = 28 Durchläufe, echte Skyfield-Ephemeride
+(de421.bsp), Python 3.10 (Sandbox), identischer Code aus astronomy.py.
+
+Ergebnis: 0,86 Sekunden Gesamtlaufzeit für alle 28 Durchläufe (inkl. einmaligem
+Kaltstart-Ladevorgang der Ephemeride-Datei).
+```
+
+Das widerspricht der Ticket-Prämisse deutlich: Die reine Rechenschleife ist **nicht** die Quelle einer 20–25-Sekunden-Blockade — sie ist selbst im ungünstigeren, nicht-optimierten Alt-Pfad (ohne `WindowEphemeris`) bereits unter 1 Sekunde fertig.
+
+**Deutlich besser zur beobachteten Größenordnung passt der Geländehöhen-Abruf** (`elevation_difference()`, siehe Code-Verifikation oben): sequenzielle Zwei-Punkt-Abfrage, pro Punkt bis zu 3 Dataset-Versuche, vor **jedem** echten Netzaufruf eine erzwungene 1,1-Sekunden-Pause (prozessweit, nicht pro Request), pro Versuch bis zu 30 Sekunden Timeout. Im ungünstigen Fall (z. B. ein Dataset antwortet träge, bevor auf das nächste in der Kette gewechselt wird) summiert sich das plausibel auf 15–25 Sekunden — passend zur beobachteten Größenordnung. Diese Netzaufrufe sind zwar technisch korrekt per `await`/`httpx.AsyncClient` **nicht-blockierend** programmiert (sollten also andere Requests im Event-Loop eigentlich nicht aufhalten) — ob das in der Praxis wirklich so ist, oder ob durch die Kette aus Lock + Timeout + sequenziellen Abrufen doch ein spürbarer Block entsteht, konnte in dieser Analyse **nicht live verifiziert werden** (kein Netzwerktest aus der Analyse-Sandbox erlaubt, siehe Memory `feedback_subagent_sandbox_network_tests`).
+
+**Konsequenz:** Bevor eine Implementierungsoption endgültig gewählt wird, braucht es **einen echten, einmaligen Messlauf** durch Stephan (siehe Pre-Mortem-Gegenmaßnahme unten) — nicht, um die Analyse zu verzögern, sondern weil sie sonst exakt in die Falle liefe, die dieser Skill verhindern soll (vgl. BUG-29/TASK-25-Präzedenzfälle: falsche Prämisse → falscher Fix → Iterationsschleife).
+
+##### Example Mapping
+
+**Scope-Check:** Das Ticket beschreibt „Blockade durch Alignment-Berechnung" als gegeben. Die Messung zeigt: Es gibt wahrscheinlich **zwei unabhängige Verbesserungspotenziale** — (1) eine ungenutzte, bereits vorhandene schnelle Berechnungs-Architektur (TASK-25/`WindowEphemeris`) und (2) eine wahrscheinlichere, aber noch nicht live bestätigte Netzwerk-Engpassquelle (Geländehöhen-Abruf). Das ist kein Scope-Erweiterungswunsch, sondern eine Korrektur der Ursachenannahme — beide Punkte gehören inhaltlich weiterhin exakt zum Ticket-Titel „Alignments berechnen blockiert den Server".
+
+**Annahmen-Protokoll:**
+- 🔴 **Funktional kritisch (Frage 1):** Ist die reale Blockade-Ursache tatsächlich der Geländehöhen-Abruf (Netzwerk/Rate-Limit), oder blockiert doch etwas anderes, das in dieser Analyse nicht gefunden wurde? → Muss vor der finalen Wahl der Implementierungsoption per echtem Messlauf geklärt werden (siehe unten). Blockiert die Empfehlung in Schritt „Implementierungsoptionen" (dort als offene Frage erneut sichtbar).
+- ⚪ **Konventionell:** Die Aktivierung des Fenster-Engines (`WindowEphemeris`) folgt exakt dem Muster der zwei bestehenden Aufrufer (`main.py` Zeile 2381, 2468) — `set_active_window(...)` vor der Schleife, `clear_active_window()` in `finally`. ⚠️ Annahme: kein Sonderfall für `preview_alignment()`, der das verhindern würde (nicht gefunden).
+- 🔴 **Funktional kritisch (Frage 2 — Grenzfall mit mehreren sinnvollen Verhaltensweisen):** Die `WindowEphemeris`-Engine liefert laut eigenem Kommentar (`window_engine.py` Zeile 12–15, von Stephan am 2026-06-22 für AK6 freigegeben) „EIN Event pro echter Passage am Qualitätsmaximum", während der aktuell von `preview_alignment()` genutzte Alt-Pfad potenziell mehrere Treffer im 1-Minuten-Raster pro Passage liefern kann. Das ändert die Anzahl/Zusammensetzung der in der Vorschau angezeigten Alignment-Treffer.
+  &nbsp;&nbsp;**Option A — Fenster-Engine aktivieren, neues (reduziertes) Ergebnisformat akzeptieren:** Die Vorschau zeigt künftig pro Tag/Himmelskörper-Passage nur noch den einen besten Treffer statt mehrerer eng beieinanderliegender Minuten-Treffer. *Konsequenz:* übersichtlichere, wahrscheinlich sogar bessere Vorschau (weniger Redundanz), aber ein sichtbares Verhaltensänderung gegenüber dem bisherigen Vorschau-Ergebnis.
+  &nbsp;&nbsp;**Option B — Fenster-Engine NICHT für die Vorschau nutzen, nur den Speicherpfad/andere Absicherung wählen:** Die Vorschau bleibt exakt wie bisher (gleiche Anzahl/Granularität an Treffern), Performance-Fix erfolgt ausschließlich über einen anderen Mechanismus (z. B. `asyncio.to_thread`, parallele Geländehöhen-Abfrage). *Konsequenz:* kein Verhaltensrisiko für die Vorschau, aber die schnellste verfügbare Architektur bleibt ungenutzt.
+
+##### Akzeptanzkriterien
+
+- [~] AK-1: Ein Nutzer klickt in der Anlage-Maske auf „Alignments berechnen" für einen neu eingegebenen Standort. Während die Berechnung läuft, lädt ein zweiter, gleichzeitig geöffneter Browser-Tab die Startseite der App → die Startseite reagiert spürbar sofort, nicht erst nach dem Ende der Alignment-Berechnung.
+- [~] AK-2: Der Klick auf „Alignments berechnen" selbst liefert das Ergebnis spürbar schneller als bisher (Zielwert wird erst nach dem Mess-Gate unten mit einer echten Zahl belegt, siehe Pre-Mortem-Gegenmaßnahme — vorläufige Grobrichtung: deutlich unter 10 Sekunden statt 20–25 Sekunden).
+- [~] AK-3 (Edge Case): Zwei Nutzer klicken nahezu gleichzeitig auf „Alignments berechnen" für zwei unterschiedliche Standorte → keiner der beiden muss auf den anderen warten, beide Vorschauen laufen praktisch parallel. *(Die Gleichzeitigkeits-Korrektheit ist inzwischen zusätzlich durch zwei dedizierte Tests mit echter Nebenläufigkeit abgedeckt — nicht nur durch die ursprünglichen sequenziellen Tests, siehe „Race-Fix-Nachbesserung (2026-07-16)" unten.)*
+- [~] AK-4 (Regression): Die bereits bestehenden Endpunkte, die die schnelle Fenster-Berechnung nutzen (Kalender, On-Demand-Monatsübersicht), zeigen unverändert korrekte Ergebnisse — die Änderung an `preview_alignment()` darf die geteilte Infrastruktur (`WindowEphemeris`, Geländehöhen-Cache) nicht für andere Aufrufer verändern.
+- [~] AK-5 (abhängig von Frage 2): Falls Option A gewählt wird: Die Vorschau zeigt pro Tag/Himmelskörper-Passage genau einen Treffer am Qualitätsmaximum. Falls Option B gewählt wird: Die Vorschau zeigt unverändert dieselbe Anzahl/Granularität an Treffern wie vor diesem Fix.
+- [~] AK-6 Edge Case: Ein Standort, für den die Geländehöhen-API keine Daten liefert (außerhalb der Kartenabdeckung), zeigt weiterhin ein Ergebnis mit `elevation_incomplete=true` statt eines Absturzes oder einer Endlos-Wartezeit — unverändertes bestehendes Fallback-Verhalten (siehe BUG-66).
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Ein Fix wird auf Basis der (falschen) Ticket-Prämisse gebaut (`asyncio.to_thread` um die Alignment-Schleife), die reale Ursache (Geländehöhen-Netzwerkkette) bleibt unangetastet.**
+Auslöser: Die TASK-48-Analogie aus dem Ticket wird ungeprüft übernommen, ohne die hier durchgeführte Messung zu berücksichtigen.
+Frühwarnung: Nach Implementierung bleibt die Blockade beim manuellen Test unverändert bei ~20–25 Sekunden.
+Gegenmaßnahme: **Vor der finalen Options-Wahl** führt Stephan (nicht die Analyse-Sandbox, siehe Memory `feedback_subagent_sandbox_network_tests`) einen einmaligen, einfachen Messlauf gegen den lokalen Dev-Server durch: temporäres Logging/Timing um die drei Phasen in `preview_alignment()` (Geländehöhen-Abruf / Alignment-Schleife / Speichern+Geocoding) sowie einen parallelen `GET /`-Aufruf aus einem zweiten Terminal-Fenster während des Requests. Erst danach wird die Implementierungsoption final freigegeben.
+
+💀 **Szenario 2: Die Aktivierung von `WindowEphemeris` verändert die Vorschau-Ergebnisse unbemerkt (Frage 2), Stephan bemerkt das erst nach Release.**
+Auslöser: Frage 2 (Grenzfall, mehrere sinnvolle Optionen) wird nicht vor der Umsetzung explizit entschieden, sondern eine der beiden Optionen wird stillschweigend gewählt.
+Frühwarnung: Ein Regressionstest, der die Anzahl der zurückgegebenen Treffer für eine bekannte Test-Location vergleicht, schlägt fehl oder wird gar nicht erst geschrieben.
+Gegenmaßnahme: Frage 2 gehört ins selbe Weg-Gate wie die Implementierungsoptionen (siehe unten); AK-5 deckt beide möglichen Antworten ab.
+
+💀 **Szenario 3: Die sequenzielle Zwei-Punkt-Geländehöhen-Abfrage wird parallelisiert (`asyncio.gather`), verletzt dabei aber die für OpenTopoData geltende 1-Anfrage/Sekunde-Grenze (Kommentar `elevation.py` Zeile 38–41).**
+Auslöser: `asyncio.gather(get_elevation(observer), get_elevation(subject))` ruft ggf. gleichzeitig zwei echte Netzaufrufe auf, wenn der modulweite Rate-Limit-Lock das nicht sauber seriealisiert.
+Frühwarnung: Häufigere `429`-Fehler/leere Höhenwerte (`incomplete=True`) in den Logs nach dem Fix, insbesondere bei mehreren gleichzeitigen Standort-Anlagen.
+Gegenmaßnahme: Falls Parallelisierung gewählt wird, muss der bestehende `_rate_limit_lock`/`_respect_rate_limit()`-Mechanismus (Zeile 51–70) weiterhin JEDEN echten Netzaufruf einzeln takten — nicht durch die Parallelisierung umgehen. Eigener Regressionstest: Rate-Limit-Pause bleibt bei parallelen Abfragen unverändert wirksam.
+
+💀 **Szenario 4: Seiteneffekt auf bestehende Fenster-Engine-Nutzer (Kalender, On-Demand-Monatsübersicht), falls `set_active_window`/`clear_active_window` in `preview_alignment()` fehlerhaft verschachtelt wird (z. B. `finally` fehlt, Exception vor dem Clear).**
+Auslöser: Copy-Paste-Fehler beim Übernehmen des Musters aus Zeile 2381/2468.
+Frühwarnung: Nach einem `preview_alignment()`-Aufruf liefern nachfolgende Kalender-Anfragen plötzlich falsche/fenster-verschmutzte Ergebnisse (globaler `_active_window`-State, siehe `astronomy.py` Zeile 48).
+Gegenmaßnahme: `try/finally` zwingend wie im bestehenden Muster; Regressionstest, der nach einem `preview_alignment()`-Aufruf einen Kalender-Request auf demselben Prozess prüft.
+
+##### Architektur-Analyse
+
+**Betroffene Dateien:**
+- `backend/main.py` — Endpunkt `preview_alignment()` (Zeile 2879–2932): Fenster-Aktivierung ergänzen und/oder Rechenschleife per `asyncio.to_thread` auslagern (je nach Options-Wahl).
+- `backend/data/elevation.py` — `elevation_difference()` (Zeile 131–144): Kandidat für Parallelisierung der zwei Punkt-Abfragen, falls der Messlauf das als dominanten Faktor bestätigt.
+- `backend/calculations/astronomy.py` / `window_engine.py` — **keine Änderung nötig**, Delegation an den schnellen Pfad ist bereits vorhanden und funktionsfähig (Zeile 753–759 bzw. 250–302).
+
+**Nicht betroffen:** `_run_precompute_single()`/`precompute.py` (eigener Subprozess, siehe Code-Verifikation) — kein Änderungsbedarf.
+
+##### Implementierungsoptionen (vorläufig — finale Wahl hängt vom Mess-Gate ab)
+
+**Was bedeutet das für die App:**
+
+- Option A behebt in erster Linie, dass **andere Nutzer** während einer laufenden Alignment-Berechnung nicht mehr warten müssen — der klickende Nutzer selbst wartet ggf. weiterhin ähnlich lang wie bisher.
+- Option B macht die Berechnung für **alle** spürbar schneller (auch für den klickenden Nutzer selbst), sofern der Geländehöhen-Abruf tatsächlich die Hauptursache ist — das bestätigt sich erst nach dem Messlauf.
+- Option C kombiniert beides als „auf Nummer sicher"-Ansatz.
+
+### Option A — Nur `asyncio.to_thread` um die vorhandene Rechenschleife (TASK-48-Muster, unabhängig vom Messergebnis)
+- **Vorgehen:** Den Block Zeile 2911–2930 (Tages-/Himmelskörper-Schleife) in eine synchrone Hilfsfunktion auslagern, per `await asyncio.to_thread(...)` aufrufen. Keine Änderung an `astronomy.py`.
+- **Betroffene Dateien:** `backend/main.py` (~10 Zeilen).
+- **Vorteile:** Kleinster Diff, kein Risiko einer Ergebnisänderung (bit-identisch zum bisherigen Verhalten), folgt 1:1 dem bereits etablierten Muster (Zeile 1410/1701).
+- **Nachteile/Risiken:** Löst laut Messung **wahrscheinlich nicht das eigentliche Problem** — die Schleife war in der Messung bereits unter 1 Sekunde schnell. Der Geländehöhen-Abruf (die plausiblere Ursache) bleibt unangetastet.
+- **Aufwand:** klein.
+
+### Option B — Geländehöhen-Abruf entschärfen (Root-Cause-Kandidat) + Fenster-Engine aktivieren
+- **Vorgehen:** (1) `_astro.set_active_window(WindowEphemeris(...))` vor der Schleife aktivieren, `finally: clear_active_window()` (Muster Zeile 2381/2468) — behebt die Architektur-Inkonsistenz unabhängig vom Messergebnis. (2) Die zwei sequenziellen `get_elevation()`-Aufrufe in `elevation_difference()` per `asyncio.gather()` parallelisieren, **ohne** den bestehenden Rate-Limit-Lock zu umgehen (Szenario 3 beachten).
+- **Betroffene Dateien:** `backend/main.py` (~10 Zeilen), `backend/data/elevation.py` (~10 Zeilen).
+- **Vorteile:** Adressiert die nach Messung wahrscheinlichere Ursache; nutzt die bereits vorhandene, von Stephan freigegebene schnelle Architektur (TASK-25) konsistent mit den Schwester-Endpunkten.
+- **Nachteile/Risiken:** Verhaltensänderung bei den Vorschau-Treffern (Frage 2, siehe oben) muss vor Umsetzung entschieden werden; Parallelisierungs-Risiko (Szenario 3) muss sauber abgesichert werden.
+- **Aufwand:** mittel.
+
+### Option C (Vorschlag als Sicherheitsnetz) — Kombination A + B
+- **Vorgehen:** Beide Änderungen aus A und B umsetzen — Root-Cause-Fix (B) UND zusätzliches `asyncio.to_thread` um den verbleibenden synchronen Rechenanteil (A), damit selbst wenn der Messlauf eine dritte, bisher nicht gefundene Ursache zutage fördert oder die Fenster-Engine-Aktivierung in einem Grenzfall doch länger braucht als die dokumentierten <500 ms, andere Nutzer trotzdem nie blockiert werden (Pre-Mortem-Meta-Regel: dasselbe Risiko erneut gegen die empfohlene Option geprüft).
+- **Aufwand:** mittel (kaum mehr als B allein).
+
+✅ **Vorläufige Empfehlung: Option C** — *aber nicht final freigebbar ohne den Messlauf aus Pre-Mortem-Szenario 1.* Der Messlauf entscheidet, ob der Elevation-Anteil aus Option B tatsächlich nötig ist oder ob sich eine ganz andere Stelle als Hauptursache zeigt; die `to_thread`-Absicherung aus Option A ist in jedem Fall risikoarm und güntig genug, um unabhängig vom Messergebnis mitzunehmen.
+
+##### ⛔ Offene Punkte vor dem Weg-Gate (blockierend)
+
+1. **Messlauf durch Stephan** (Pre-Mortem-Szenario 1): reale Zeitaufteilung der drei Phasen + Parallel-Request-Test — bestimmt, ob Option B/C den Elevation-Teil überhaupt braucht.
+2. **Frage 2** (Grenzfall Vorschau-Ergebnisformat): Option A oder B im Example Mapping — von Stephan zu entscheiden, bevor `WindowEphemeris` aktiviert wird.
+
+##### ✅ Weg-Gate-Entscheidung (2026-07-15)
+
+- **Messlauf durchgeführt** (echte, garantiert neue Koordinaten, kein Cache-Treffer möglich): Gesamtzeit **2,56 Sekunden** (Geländehöhe 1,73 s + Berechnungsschleife 0,83 s + Speichern 0,00 s), keine spürbare Blockade paralleler Anfragen (`GET /` durchgehend 3–6 ms während der Berechnung).
+- Damit sind **beide** geprüften Ursachen-Theorien (synchrone Berechnungsschleife, Geländehöhen-Netzwerkabruf) unter normalen Testbedingungen widerlegt — die ursprünglich beobachteten 20–25 Sekunden (2026-07-04) konnten mit aktuellem Code nicht reproduziert werden. Mögliche Erklärung (nicht belegt, nur Vermutung): einmalige Netzwerkverzögerung oder gleichzeitige Hintergrundlast beim ursprünglichen Test.
+- **Stephans Entscheidung:** Trotz fehlender bestätigter Root Cause wird **Option C** (Kombination A+B) als günstige, risikoarme Absicherung umgesetzt — falls die Blockade unter realer Last/Netzwerk-Bedingungen doch auftritt, ist sie dadurch bereits entschärft. **Frage 2** (Vorschau-Verhalten) wurde mit **„Option A — Fenster-Engine aktivieren, reduziertes Ergebnisformat akzeptieren"** beantwortet (nur noch ein Top-Treffer pro Tag/Himmelskörper-Passage statt mehrerer).
+- Die permanenten Timing-Log-Zeilen (`[BUG-63-TIMING]`, aktuell testweise in `backend/main.py` mit Kommentar „TEMP BUG-63 TIMING - vor Merge entfernen") werden vor dem finalen Commit wieder entfernt.
+
+##### Testplan
+
+- [ ] Automatisiert (Harness), nach Klärung der offenen Punkte: `backend/tests/test_bug63.py` — Regressionstest „Kalender-Request nach `preview_alignment()`-Aufruf liefert unveränderte Ergebnisse" (Szenario 4), Marker `offline`/`regression`. Tests für die gewählte Fix-Variante folgen erst nach Messlauf (kein Test für eine noch nicht gewählte Implementierung, siehe Memory `feedback_test_first` — Basis sind die AKs, die erst nach dem Mess-Gate final feststehen).
+- [ ] Manuell: siehe Pre-Mortem-Szenario 1 (Timing-Log + Parallel-`GET /`-Test) als **Voraussetzung**, nicht als Nachtest.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation, Performance-Prämisse gemessen statt übernommen)
+- [x] Architektur analysiert: `backend/main.py`, `backend/data/elevation.py`, `backend/calculations/astronomy.py`, `backend/calculations/window_engine.py`
+- [x] Designer-Check: nicht einschlägig (rein Backend/Performance, keine sichtbaren UI-Änderungen)
+- [x] Implementierungsoptionen: A / B / C erarbeitet
+- [x] Empfehlung final: Option C umgesetzt (Messlauf durchgeführt, Ursache nicht reproduzierbar, Absicherung trotzdem beschlossen); Frage 2 beantwortet mit Option A
+
+**Implementierung abgeschlossen (2026-07-15):** Option C umgesetzt in `backend/main.py` (Fenster-Engine + to_thread-Absicherung) und `backend/data/elevation.py` (parallelisierte Geländehöhen-Abfrage).
+
+##### 🛠️ Race-Fix-Nachbesserung (2026-07-16)
+
+Bei der unabhängigen Verifikation der Option-C-Umsetzung wurde ein bislang unentdecktes Nebenläufigkeits-Risiko gefunden: Das aktive Zeitfenster für die schnelle Berechnung (`_active_window` in `backend/calculations/astronomy.py`) war als einzige, für den ganzen Serverprozess gemeinsame Variable abgelegt (ein sogenanntes „Modul-Global" — ein Wert, den sich alle gleichzeitig laufenden Anfragen teilen, statt dass jede Anfrage ihre eigene Kopie bekommt). Bei echter Gleichzeitigkeit — also wenn zwei Nutzer wirklich im selben Moment „Alignments berechnen" für zwei unterschiedliche Standorte anstoßen (genau der in AK-3 beschriebene Fall) — konnte Anfrage B das Fenster von Anfrage A überschreiben, während As Hintergrundberechnung noch lief. Das führte zu keinem Absturz und zu keiner falschen/korrupten Antwort, sondern zu einem stillen Teil-Rückfall: Anfrage A rutschte unbemerkt auf den langsameren Alt-Pfad zurück, den Option C eigentlich vermeiden sollte — also ein reines Performance-Risiko, keine Korrektheitsverletzung der Ergebnisse.
+
+Stephans Entscheidung: sauber beheben statt nur dokumentieren. Umgesetzt in `backend/calculations/astronomy.py`: `_active_window` wurde vom einfachen Modul-Global auf ein `contextvars.ContextVar` umgestellt (ein Python-Bordmittel, das jeder Anfrage automatisch ihren eigenen, isolierten Wert zuweist, statt dass sich alle Anfragen einen gemeinsamen Wert teilen) — das isoliert jede Anfrage korrekt, auch über die Thread-Auslagerung per `asyncio.to_thread()` hinweg, die für Option A/C bereits genutzt wird.
+
+Zur Absicherung wurden zwei neue Tests in `backend/tests/test_bug63.py` ergänzt (Klasse `TestActiveWindowConcurrencyIsolation`), die echte Nebenläufigkeit erzwingen (über `asyncio.gather()` in Kombination mit `asyncio.Event`, statt nur nacheinander ablaufende Aufrufe zu simulieren) und die korrekte Isolation der beiden gleichzeitigen Anfragen bestätigen. Beide Tests sind grün; zusätzlich wurden sie gegen eine bewusst kaputte Reimplementierung gegengetestet, bei der sie korrekt fehlschlagen — ein Beleg dafür, dass die Tests die Isolation tatsächlich prüfen und nicht nur zufällig grün sind.
+
+**Bekannter, unabhängiger Nebenbefund (nicht Teil dieses Tickets):** Während der Race-Fix-Session fiel auf, dass `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` fehlschlägt, wenn er in derselben Testsitzung NACH `test_bug63.py`/`test_task67_*` läuft (Testreihenfolge-Verunreinigung — vermutlich ein zwischen Tests nicht sauber zurückgesetzter globaler Zustand). Isoliert für sich alleine ausgeführt ist der Test zu 100 % grün und reproduzierbar, auch mit unverändertem Original-Code vor diesem Fix — der Befund ist also nachweislich unabhängig von BUG-63 und nicht Teil dieses Tickets. Vermerk als Hinweis für ein mögliches Folge-Ticket; nicht selbst angelegt.
 
 ---
 
@@ -8058,6 +8206,167 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den TASK-49-Fix der Längen-Messung (echte Klammer-Zählung statt Distanz-Heuristik, siehe Retro-Eintrag Z. 2858–2860). Vorher wurde die Länge durch die verschachtelte `sectorPath`-Closure verdeckt/falsch zugeordnet. Aufteilen in kleinere Hilfsfunktionen (z.B. SVG-Grundgerüst, Zonen-Pfad-Berechnung, Label-Platzierung separieren). Kein inhaltlicher/visueller Umbau — von `fotoalert-designer` bereits abgenommene Optik (US-111) darf sich nicht ändern.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-62-Release-Check, 2026-07-05)
+
+---
+
+### US-133 · Kartenausschnitt springt bei Koordinaten-Eingabe zur eingegebenen Position `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Beim Anlegen einer neuen Location oder Bearbeiten einer bestehenden Location (Fotografen- oder Motiv-Koordinaten) aktualisiert die Formular-Karte zwar den Pin, sobald Koordinaten eingegeben werden, verschiebt aber den sichtbaren Kartenausschnitt nicht mit. Die Karte bleibt auf ihrem bisherigen Zentrum (aktuell: eigener Standort) stehen, sodass der neu gesetzte Pin bei entfernten Koordinaten außerhalb des sichtbaren Bereichs liegt und manuell gesucht werden muss.
+
+**User Story:** Als Host, der eine neue Location anlegt oder eine bestehende Location bearbeitet, möchte ich, dass die Kartenansicht automatisch zur eingegebenen Koordinate springt/zentriert, sodass ich die Position sofort sehe, ohne manuell auf der Karte danach suchen zu müssen.
+
+**Bezug:** Verwandt, aber keine Dublette: **US-124** [x] (Vollbild-Modus Anlege-Karte) und **US-87** [x] (Vollbild-Overlay Bearbeiten-Karte) nutzen dieselben Koordinatenfelder/Karten, decken aber nur Pin-Setzen per Antippen/Ziehen ab, nicht das automatische Zentrieren bei Texteingabe. **BUG-78** [x] (Koordinaten-Format-Parsing) betrifft dieselben Eingabefelder, aber die Format-Erkennung, nicht die Kartenansicht. **BUG-67** [x] (neue Location erscheint nicht direkt in Karte/Liste) betrifft den Haupt-Karten-Tab nach dem Speichern, nicht die kleine Formular-Karte während der Eingabe. Kein bestehendes Ticket deckt das automatische Nachführen des Kartenausschnitts bei Koordinaten-Eingabe ab.
+
+**⚠️ Hinweis zur User Story (zu bestätigen):** Die obige User Story ist die im Ticket bereits hinterlegte Formulierung ("Als Host..."). Der Intake-Übergabetext für diese Analyse enthielt eine leicht abweichende Formulierung ("Als App-Nutzer (Stephan)..."). Inhaltlich identisch (automatisches Zentrieren bei Koordinaten-Eingabe), aber die genaue Formulierung ist mit Stephan noch nicht live abgestimmt — daher ausdrücklich als zu bestätigen markiert, nicht stillschweigend übernommen.
+
+---
+
+**Example Mapping**
+
+**Scope-Check (durchgeführt):** Die Einschränkung auf die kleinen Formular-Karten (Anlegen: `add-map`, Bearbeiten: `edit-mini-map`) ist intentional, keine zufällige erste Teilscheibe — sie ergibt sich direkt aus der Ticketbeschreibung ("Formular-Karte") und der Abgrenzung zu US-124/US-87 (siehe Bezug oben). Die Vollbild-Kartenoverlays (`add-map-fs`, `edit-map-fs`) sind explizit NICHT Teil dieses Tickets: ihre Pins werden zwar über `_syncFsMarkers()`/`_reloadEditMapFsFromFields()` aus den Koordinatenfeldern nachgezogen, ihre eigene Kartenansicht (Center/Zoom) bleibt aber unverändert — das ist bestehendes, unverändertes Verhalten und bewusst außerhalb des Scopes.
+
+📏 Regel 1: Beim Anlegen einer neuen Location zentriert sich die kleine Formular-Karte automatisch auf eine vollständig eingetippte, gültige Koordinate — sowohl für den Fotografen-Standort als auch für das Motiv.
+🟢 Example: Gegeben das Anlege-Formular ist offen, die Karte zeigt noch den Standard-/GPS-Ausschnitt — wenn ich im Feld "Mein Standort" eine gültige, weit entfernte Koordinate fertig eintippe — dann springt die Karte automatisch dorthin, der Pin ist sichtbar.
+
+📏 Regel 2: Beim Bearbeiten einer bestehenden Location zentriert sich die kleine Bearbeiten-Karte automatisch auf eine vollständig eingetippte, gültige Koordinate — sowohl für den Fotografen-Standort als auch für das Motiv.
+🟢 Example: Gegeben ich öffne eine bestehende Location zum Bearbeiten, die Karte zeigt den bisherigen Standort — wenn ich im Feld "Fotograf-Standort" eine neue, weit entfernte Koordinate eintippe — dann springt die kleine Bearbeiten-Karte automatisch auf diese neue Position.
+
+📏 Regel 3: Eine unvollständige oder ungültige Koordinateneingabe löst keinen Kartensprung aus — das bestehende Validierungsverhalten (Fehlermeldung, kein Pin) bleibt unverändert die Voraussetzung.
+🟢 Example: Gegeben ich tippe nur "48," ins Koordinatenfeld — wenn die Eingabe unvollständig/ungültig ist — dann bleibt die Karte an ihrer aktuellen Position stehen, wie bisher erscheint die bestehende Fehlermeldung.
+
+⚠️ Annahme: Der Fix betrifft ausschließlich `web/index.html` (Frontend/Leaflet), keine Backend-/API-Änderung — es gibt keinen Endpoint-Bezug, die Kartenzentrierung ist reines Client-Verhalten (bereits durch Code-Lektüre bestätigt, siehe Architektur-Analyse).
+
+⚠️ Annahme: Springt die Karte auf die Motiv-Koordinate, muss der Fotografen-Pin (und umgekehrt) dabei nicht zwingend im sichtbaren Ausschnitt bleiben — kein `fitBounds` über beide Punkte. Das entspricht der User Story wörtlich ("zur eingegebenen Position springen"), nicht "beide Punkte im Blick behalten". Falls das nicht gewünscht ist, bitte explizit korrigieren.
+
+❓ Frage 1 (Grenzfall mit zwei sinnvollen Verhaltensweisen — siehe Weg-Gate unten): Auf welche Zoomstufe soll die Karte springen — feste, nahe Zoomstufe (wie beim bestehenden GPS-/Einfügen-Button) oder aktuellen Zoom beibehalten und nur schwenken? Siehe Implementierungsoptionen A/B unten.
+
+❓ Frage 2 (Grenzfall mit zwei sinnvollen Verhaltensweisen — siehe Weg-Gate unten): Soll die Karte live bei jedem gültigen Tastenanschlag springen oder erst, wenn das Feld verlassen wird (Blur)? Siehe Implementierungsoptionen A/B unten.
+
+---
+
+**Akzeptanzkriterien:**
+
+**🚦 Weg-Gate-Entscheidung (Stephan, 2026-07-16):** Frage 1 (Zoomstufe) = **Option B** (aktueller Zoom bleibt erhalten, nur Schwenk/`panTo`). Frage 2 (Zeitpunkt) = **Option B** (erst beim Verlassen des Feldes/Blur, nicht live beim Tippen). Beide Entscheidungen gehen gegen die ursprüngliche Empfehlung (Option A/A = live + feste Zoomstufe 14). Die folgenden AKs sind entsprechend auf die B/B-Kombination korrigiert (nicht nur ergänzt) — siehe auch Korrektur bei Szenario 3 und der Empfehlungszeile unten.
+
+- [~] AK1: Beim Anlegen einer neuen Location schwenkt die kleine Formular-Karte automatisch zur eingetippten Koordinate, sobald ich das Feld "Mein Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — die aktuelle Zoomstufe bleibt dabei unverändert.
+- [~] AK2: Beim Anlegen schwenkt die Karte ebenso automatisch zur eingetippten Koordinate, sobald ich das Feld "Motiv" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
+- [~] AK3: Beim Bearbeiten einer bestehenden Location schwenkt die kleine Bearbeiten-Karte automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Fotograf-Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
+- [~] AK4: Beim Bearbeiten schwenkt die Karte ebenso automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Motiv (Koordinaten)" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
+- [~] Edge Case AK5: Tippe ich eine unvollständige oder ungültige Koordinate ein und verlasse das Feld, schwenkt die Karte nicht — sie bleibt an ihrer aktuellen Position, die bestehende Fehlermeldung erscheint wie bisher.
+- [~] Edge Case AK6: Lösche ich den Inhalt eines Koordinatenfelds komplett und verlasse das Feld, bleibt die Karte an ihrer zuletzt zentrierten Position stehen — kein Rücksprung zu einem Standardausschnitt.
+- [~] Edge Case AK7 (Weg-Gate entschieden, Frage 1 = Option B): Beim Schwenken bleibt die aktuell eingestellte Zoomstufe der Karte unverändert — es findet ausschließlich eine Positionsänderung (`panTo`) statt, kein Zoomwechsel auf eine feste Stufe.
+- [~] Edge Case AK8 (Regression): Öffne und schließe ich das Bearbeiten-Vollbild-Kartenoverlay, ohne vorher in ein Koordinatenfeld getippt zu haben, verhält sich das Schließen weiterhin wie bisher — kein zusätzlicher, durch diesen Fix neu ausgelöster Kartensprung.
+- [~] AK9 (Regression, PRODUCT.md §12 "Location-Edit"/"Sheet-Open/Close"): Alle bestehenden Interaktionswege der Formular-Karten (Antippen zum Setzen, Ziehen des Pins, GPS-Button, Einfügen aus Zwischenablage, Satellit/Straße-Umschalter, Vollbild öffnen/schließen) funktionieren nach dem Fix unverändert weiter.
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-07-16.
+- Bestätigt: `AddLocation._onObsInput()` (Z. 7012-7026) und `_onSubjInput()` (Z. 7027-7042) parsen die Koordinate, setzen `this.obs`/`this.subj`, erneuern den Marker und rufen `drawLine()` + `_syncFsMarkers()` auf — **kein** `setView`/`panTo`/`flyTo`-Aufruf.
+- Bestätigt: `LocationDetail._onEditObsInput()` (Z. 6480-6486) und `_onEditSubjInput()` (Z. 6488-6504) setzen nur `setLatLng()` auf dem bestehenden Marker + `_drawEditLine()` — ebenfalls **kein** Zentrieren.
+- **Wichtiger Fund — bereits vorhandenes Wiederverwendungsmuster (historisch, für die gewählte Option B nicht direkt nutzbar):** `AddLocation.setObserver(lat, lng, flyTo=false)` (Z. 6920-6931) und `setSubject(lat, lng, flyTo=false)` (Z. 6932-6944) enthalten bereits genau die Zeile `if (flyTo && this.map) this.map.setView([lat, lng], 14);`. Dieses Muster wird heute von `useMyLocation()` (Z. 6912-6919, ruft mit `flyTo=true` auf) und `_pasteCoords()` (Z. 6993-7011, ebenfalls `flyTo=true`) genutzt. **Nach der Weg-Gate-Entscheidung (Option B statt A) wird dieses `flyTo`/Zoom-14-Muster für den Blur-Fix NICHT wiederverwendet**, da es eine feste Zoomstufe erzwingt — das widerspräche der gewählten Option B (Zoom bleibt erhalten, nur `panTo`). Für den GPS-/Einfügen-Button ändert sich nichts, das bestehende `flyTo`-Muster bleibt dort unverändert; der neue Blur-Fix bekommt eine eigene, separate Handler-Logik.
+- Bestätigt: Für LocationDetail/Edit existiert **kein** äquivalentes `flyTo`-Muster — muss neu ergänzt werden. Vorhandene Zentrierung nur beim initialen Öffnen: `_initEditMap()` (Z. 6327-6355) zentriert einmalig auf `[loc.observer_lat, loc.observer_lon]` bei Zoom 14 (Z. 6330); `_initEditMapFs()` (Z. 6391-6410) zentriert die Vollbild-Karte einmalig bei Zoom 15 (Z. 6405-6406).
+- **Risiko-Fund:** `LocationDetail.closeMapFullscreen()` (Z. 6383-6389) ruft `this._onEditObsInput(); this._onEditSubjInput();` **direkt und programmatisch** auf, um die kleine Karte beim Schließen des Vollbild-Overlays aus den Koordinatenfeldern nachzuziehen. Würde man `setView` naiv direkt in `_onEditObsInput`/`_onEditSubjInput` einbauen, würde JEDES Schließen des Bearbeiten-Vollbilds zusätzlich einen Kartensprung auslösen — auch wenn der Nutzer gar nicht getippt hat, sondern nur im Vollbild den Pin gezogen hat. Das wäre eine ungewollte Nebenwirkung außerhalb des beschriebenen Auslösers "Koordinaten-Eingabe".
+- Bestätigt (Render-Pfad, Schritt 4g): Die Karte ist vollständig client-seitig per Leaflet gerendert (`L.map(...)`, Tile-Layer via `LocMapMode.addTileLayer`, Marker via `L.marker`/`MapMarkers`). Kein Server-Asset/PNG beteiligt — Zentrieren ist ein reiner Leaflet-API-Aufruf (`map.setView([lat,lng], zoom)`).
+- Bestätigt: Beide Eingabefelder-Paare sind ausschließlich über `oninput` gebunden (Z. 1365, 1376, 6244, 6250) — kein bestehender `onblur`-Handler vorhanden, müsste bei Wahl der Blur-Option (Frage 2, Option B) neu ergänzt werden.
+
+💀 Szenario 1 — Ungewollter Doppel-Sprung beim Schließen des Bearbeiten-Vollbild-Overlays.
+Auslöser: `closeMapFullscreen()` (Z. 6387-6388) ruft `_onEditObsInput`/`_onEditSubjInput` direkt auf; eine naive Umsetzung würde bei jedem Schließen zusätzlich zentrieren, unabhängig von einer Tipp-Eingabe.
+Frühwarnung: Manueller Test „Vollbild öffnen → Pin ziehen → schließen, ohne vorher getippt zu haben" zeigt einen unerwarteten Kartensprung der kleinen Karte.
+Gegenmaßnahme: Zentrierung nicht ungeprüft in den bestehenden Funktionskörper einbauen, sondern nur im Tipp-Eingabepfad auslösen (z. B. optionaler Parameter analog zum bereits bestehenden `flyTo`-Muster). Verankert in AK8.
+
+💀 Szenario 2 — Jitter/Sprung-Kaskade während des Tippens.
+Auslöser: `oninput` feuert bei jedem Zeichen; sobald der Wert erstmals vollständig valide ist, bleiben weitere Tastenanschläge (z. B. zusätzliche Nachkommastellen) ebenfalls valide → wiederholtes, sichtbares Nachspringen der Karte während des Tippens.
+Frühwarnung: Manueller Test mit schnellem, mehrfachem Nachtippen von Ziffern zeigt sichtbares „Zittern" der Karte.
+Gegenmaßnahme: Als explizite Grenzfall-Frage im Weg-Gate vorgelegt (Frage 2, live vs. Blur) statt still entschieden. **Aufgelöst (2026-07-16):** Stephan hat Option B (Blur) gewählt — das Schwenken hängt nicht mehr an `oninput`, sondern an einem separaten `onblur`-Handler pro Feld. Dieses Szenario entfällt damit strukturell: es gibt während des Tippens keinen Trigger mehr, der mehrfach nachspringen könnte.
+
+💀 Szenario 3 — Code-Duplikation zwischen `_onObsInput`/`_onSubjInput` und `setObserver`/`setSubject` driftet auseinander.
+Auslöser: `_onObsInput`/`_onSubjInput` (Z. 7012-7042) fahren aktuell eine eigene, zum vorhandenen `flyTo`-Muster in `setObserver`/`setSubject` (Z. 6920-6944) leicht abweichende Marker-Logik. Wird der Fix nur an einer der beiden Stellen sauber nachgezogen, bleiben zwei parallele, künftig auseinanderdriftende Codepfade bestehen.
+Frühwarnung: Ein späterer Fix an `setObserver`/`setSubject` (z. B. anderer Zoom) wird in `_onObsInput`/`_onSubjInput` vergessen.
+Gegenmaßnahme: **Korrigiert nach Weg-Gate-Entscheidung (2026-07-16, Option B statt der ursprünglich empfohlenen Option A):** Der bestehende `flyTo`/`setView(...,14)`-Pfad in `setObserver`/`setSubject` wird **nicht** wiederverwendet, weil er eine feste Zoomstufe erzwingt — das widerspricht der gewählten Option B (Zoom bleibt erhalten). Stattdessen wird eine neue, einzige gemeinsame Blur-Handler-Hilfsfunktion (`panTo` ohne Zoom-Parameter) eingeführt und von allen vier Koordinatenfeldern (Anlegen + Bearbeiten, je Fotograf + Motiv) aufgerufen — das verhindert die hier beschriebene Duplikation auf einem anderen Weg als ursprünglich geplant (eine gemeinsame neue Quelle der Wahrheit statt Wiederverwendung der alten `flyTo`-Quelle).
+
+💀 Szenario 4 — Motiv weit entfernt vom Fotografen-Standort: nach Zentrieren auf den einen Punkt verschwindet der andere Pin/die Verbindungslinie aus dem sichtbaren Ausschnitt.
+Auslöser: `setView` zentriert exakt auf den neuen Punkt, kein `fitBounds` über beide Punkte gemeinsam.
+Frühwarnung: keine — dies ist das laut User Story gewünschte Verhalten ("zur eingegebenen Position springen"), kein technischer Fehler.
+Gegenmaßnahme: Bewusst als Annahme im Example Mapping dokumentiert (nicht als offene Frage), keine Scope-Erweiterung auf `fitBounds`.
+
+💀 Szenario 5 — Karteninstanz noch nicht initialisiert (`this.map`/`this._editMap` ist `null`) beim Aufruf.
+Auslöser: theoretisch könnte `oninput` feuern, bevor `initMap()`/`_initEditMap()` gelaufen ist.
+Frühwarnung: JS-Fehler „Cannot read properties of null" beim sehr schnellen Tippen direkt nach Sheet-Öffnen.
+Gegenmaßnahme: Bestehendes defensives Muster fortführen — `setObserver`/`setSubject` prüfen bereits `if (flyTo && this.map)` (Z. 6928, 6941); dieselbe Guard-Bedingung im Fix für Edit übernehmen (`if (this._editMap) ...`). Kein neues Risiko, bestehendes Muster wird nur konsequent weitergeführt.
+
+**Architektur-Analyse:**
+- Betroffene Datei: ausschließlich `web/index.html` (Single-File-App). Kein Backend-/API-Bezug, keine Berührung von `main.py`/`precompute.py`.
+- `AddLocation._onObsInput()` (Z. 7012-7026), `_onSubjInput()` (Z. 7027-7042) — Zentrierung fehlt hier.
+- `AddLocation.setObserver(lat,lng,flyTo=false)` (Z. 6920-6931), `setSubject(lat,lng,flyTo=false)` (Z. 6932-6944) — enthalten bereits das wiederverwendbare `flyTo`-Muster (`this.map.setView([lat,lng], 14)`), genutzt von `useMyLocation()` (Z. 6912-6919) und `_pasteCoords()` (Z. 6993-7011).
+- `LocationDetail._onEditObsInput()` (Z. 6480-6486), `_onEditSubjInput()` (Z. 6488-6504) — kein Zentrieren, kein vorhandenes `flyTo`-Äquivalent.
+- `LocationDetail._initEditMap()` (Z. 6327-6355) — Karteninstanz `this._editMap`, initiale Zentrierung Zoom 14 (Z. 6330).
+- `LocationDetail.closeMapFullscreen()` (Z. 6383-6389) — ruft `_onEditObsInput`/`_onEditSubjInput` programmatisch auf (Pre-Mortem Szenario 1).
+- Fullscreen-Karten `add-map-fs` (Z. 7106) und `edit-map-fs` (Z. 6405-6406) bleiben laut Scope-Check unverändert — ihre Pins werden über `_syncFsMarkers()`/`_reloadEditMapFsFromFields()` nachgezogen, ihre Kartenansicht (Center/Zoom) wird von diesem Fix nicht angefasst.
+- Render-Pfad-Check (Schritt 4g, durchgeführt): Karte ist vollständig client-seitig per Leaflet gerendert, kein Server-Asset/PNG beteiligt.
+
+**Designer-Check:**
+Merkmale aus Schritt 4b geprüft (nach Code-Lektüre): kein neues DOM-Element, keine Farb-/Radius-/Icon-Änderung, keine neue Karten-Visualisierung, keine geänderte Größe/Position eines UI-Elements im Ruhezustand. Die einzige Veränderung ist eine dynamische, temporäre Kartenbewegung (Center-/Zoom-Wechsel) als Reaktion auf Texteingabe — kein neues visuelles Element, kein Screenshot-Unterschied im Ruhezustand. Einschätzung: `fotoalert-designer` für dieses Ticket nicht nötig, wird übersprungen. Die verbleibenden gestaltungsnahen Entscheidungen (Zoomstufe, Timing) sind reine Verhaltens-/UX-Fragen ohne Farb-/Form-/Icon-Bezug und werden stattdessen direkt Stephan im Weg-Gate vorgelegt (Fragen 1+2).
+
+**Implementierungsoptionen:**
+
+### Option A — Festes, bewährtes `flyTo`-Zoom-14-Muster live bei jeder gültigen Eingabe wiederverwenden (empfohlen)
+- App-Wirkung: Sobald eine vollständige, gültige Koordinate eingetippt ist (Anlegen oder Bearbeiten, Fotograf oder Motiv), springt die jeweilige Formular-Karte sofort auf eine feste, nahe Zoomstufe — genau wie es GPS-Button und Einfügen-Button heute schon tun.
+- Vorgehen: Bei `AddLocation._onObsInput`/`_onSubjInput` den bereits vorhandenen `flyTo`-Zweig aus `setObserver`/`setSubject` (Z. 6928/6941) wiederverwenden statt der eigenen Marker-Logik (behebt zugleich Pre-Mortem Szenario 3). Bei `LocationDetail._onEditObsInput`/`_onEditSubjInput` neu `this._editMap.setView([coords.lat, coords.lon], 14)` ergänzen, aber über einen Parameter (z. B. `center=true`, Default `true` bei `oninput`, explizit `false` beim internen Resync-Aufruf in `closeMapFullscreen()`) von der programmatischen Aufrufstelle (Z. 6387-6388) trennen — behebt Pre-Mortem Szenario 1.
+- Betroffene Dateien: nur `web/index.html` (~10-15 Zeilen in 4 Funktionen + Anpassung der 2 Aufrufstellen in `closeMapFullscreen()`).
+- Vorteile: nutzt bestehendes, bereits bewährtes Muster (Konsistenz mit GPS-/Einfügen-Verhalten), kleinster Eingriff, kein neues UI, kein Backend, behebt nebenbei die Code-Duplikation aus Szenario 3.
+- Nachteile/Risiken: Parameter-Erweiterung an `_onEditObsInput`/`_onEditSubjInput` nötig, um Szenario 1 sauber zu vermeiden — kleine, aber sorgfältige Änderung; potenzielles Jitter bei mehrfacher Nachkorrektur (Szenario 2, siehe Frage 2).
+- Aufwand: klein.
+
+### Option B — Zentrierung erst beim Verlassen des Feldes (Blur), aktueller Zoom bleibt erhalten
+- App-Wirkung: Die Karte bleibt während des Tippens komplett ruhig; erst wenn das Feld verlassen wird (z. B. Tab zum nächsten Feld oder Wegklicken), schwenkt die Karte zur neuen Position — ohne die aktuell eingestellte Zoomstufe zu verändern.
+- Vorgehen: Neue `onblur`-Handler an den 4 Koordinatenfeldern (Z. 1365, 1376, 6244, 6250) ergänzen, die bei vorhandenem validem Wert `map.panTo([lat,lng])` (ohne Zoom-Änderung) auslösen; `oninput` bleibt weiterhin nur für das Marker-Update zuständig.
+- Betroffene Dateien: `web/index.html` (4 neue Event-Bindings + 4 kleine Handler-Ergänzungen).
+- Vorteile: kein Jitter/Sprung-Kaskade während des Tippens (Szenario 2 entfällt strukturell), respektiert einen vom Nutzer bewusst gewählten Zoom.
+- Nachteile/Risiken: fühlt sich weniger „sofort" an als die User Story beschreibt ("automatisch springt... sodass ich die Position sofort sehe"); neue Event-Bindings statt Wiederverwendung des bestehenden Musters; bei sehr weit heraus- oder hineingezoomter Karte kann der neue Pin trotz Zentrierung kaum auffallen bzw. abgeschnitten wirken (kein Zoom-Ausgleich).
+- Aufwand: klein-mittel.
+
+✅ **Empfehlung: Option A** (ursprünglich ausgesprochen). Sie nutzt das bereits bestehende, bewährte `flyTo`-Muster (GPS-Button und Einfügen-Button verwenden es schon erfolgreich), erfüllt die User-Story-Formulierung wörtlich ("automatisch springt... sofort sehe") und ist der kleinste, sauberste Eingriff — inklusive Behebung der bestehenden Code-Duplikation (Szenario 3). Das Jitter-Restrisiko (Szenario 2) und die Zoom-Frage (Grenzfall 1) werden nicht in der Architektur versteckt entschieden, sondern Stephan explizit im Weg-Gate vorgelegt.
+
+**⚠️ Override durch Stephan (2026-07-16):** Beide Weg-Gate-Fragen wurden gegen die hier ausgesprochene Empfehlung entschieden. Umgesetzt wird die **B/B-Kombination** (Blur-Zeitpunkt + Zoom-Erhalt/`panTo`), nicht die hier empfohlene A/A-Kombination (Live + feste Zoomstufe 14). Die Konsequenzen aus Option A (Konsistenz mit GPS-/Einfügen-Button, Wiederverwendung des `flyTo`-Musters) gelten damit für die tatsächliche Implementierung **nicht** — siehe korrigierte Gegenmaßnahme bei Pre-Mortem Szenario 3.
+
+**⚠️ Offene Grenzfall-Fragen für das Weg-Gate — Ergebnis:**
+
+Frage 1 (Zoomstufe): Auf welche Zoomstufe soll die Karte springen, wenn sie sich auf die neu eingegebene Koordinate zentriert?
+- Option A (empfohlen, **nicht gewählt**) — Feste, nahe Zoomstufe (Zoom 14, wie bereits beim GPS-Button und beim Einfügen-Button etabliert): Konsequenz: Die Karte springt immer auf denselben nahen, konsistenten Ausschnitt — ein vorher bewusst eingestellter, weiterer Zoom (z. B. Stadtübersicht) geht dabei verloren.
+- **Option B — ✅ von Stephan gewählt (2026-07-16)** — Aktuellen Zoom beibehalten, nur der Kartenmittelpunkt wandert (reines Schwenken ohne Zoom-Änderung): Konsequenz: Ein bewusst gewählter Zoom bleibt erhalten, aber bei sehr weit herausgezoomter Karte wirkt der neue Standort kaum auffällig zentriert, bei sehr weit hineingezoomtem Zustand ggf. zu nah/abgeschnitten.
+
+Frage 2 (Zeitpunkt): Wann genau soll die Karte springen?
+- Option A (empfohlen, **nicht gewählt**) — Live, sofort bei jeder vollständigen, gültigen Eingabe (aktuelles `oninput`-Verhalten, kein neues Event nötig): Konsequenz: Die Karte reagiert „sofort", wie in der User Story gewünscht; bei mehrfachem Nachjustieren der letzten Nachkommastellen kann die Karte mehrfach leicht nachspringen.
+- **Option B — ✅ von Stephan gewählt (2026-07-16)** — Erst beim Verlassen des Feldes (Fokus-Wechsel/Blur): Konsequenz: ruhigeres Erlebnis ohne Zwischensprünge während des Tippens, aber die Karte reagiert nicht mehr „sofort" während der Eingabe, sondern erst danach.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (3 Regeln, je ≥1 Example, 2 Annahmen, 2 Grenzfall-Fragen)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, inkl. Pflicht-Code-Verifikation am 2026-07-16, Fundstellen zitiert)
+- [x] Architektur analysiert: `web/index.html` — `AddLocation._onObsInput/_onSubjInput/setObserver/setSubject`, `LocationDetail._onEditObsInput/_onEditSubjInput/_initEditMap/closeMapFullscreen`
+- [x] Designer-Check: visuell? → geprüft, keine gestalterische Entscheidung (Farbe/Form/Icon) betroffen — `fotoalert-designer` nicht aufgerufen
+- [x] Implementierungsoptionen: A (empfohlen) / B (von Stephan gewählt, siehe Weg-Gate-Ergebnis)
+- [x] Empfehlung: Option A ausgesprochen, von Stephan überstimmt — Weg-Gate entschieden 2026-07-16: Frage 1 = Option B, Frage 2 = Option B (Blur + Zoom-Erhalt)
+
+**Testplan:**
+- Automatisiert (Harness):
+  - [ ] Kein Backend-/API-Bezug vorhanden (reines Frontend-/Leaflet-Verhalten, keine Berührung von `main.py`/`precompute.py`/DB) — ein klassischer `backend/tests/test_us-133.py`-pytest-Fall ist hier nicht sinnvoll anwendbar, ehrlich dokumentiert statt erzwungen.
+  - [ ] Ein Playwright-basierter Frontend-Test (analog zum bereits etablierten Muster `backend/tests/test_bug-80.py`, das per `page.evaluate()` clientseitigen Kartenzustand prüft) wäre technisch möglich, um z. B. `AddLocation.map.getCenter()`/`LocationDetail._editMap.getCenter()` vor/nach simuliertem Blur-Event zu vergleichen (Assertion jetzt eindeutig: Center ändert sich, `getZoom()` bleibt exakt gleich). Weg-Gate-Entscheidung liegt jetzt vor (Frage 1 = B, Frage 2 = B) — dieser Test ist noch NICHT angelegt worden (offener Punkt aus dieser Implementierungsrunde, siehe Rückmeldung des Implementierungs-Subagenten vom 2026-07-16), sollte vor Release nachgezogen werden.
+- Manuell (http://localhost:8000, lokaler Dev-Server, Safari):
+  - [ ] Anlegen-Formular öffnen ("+"-Button) → im Feld "Mein Standort" eine weit entfernte, gültige Koordinate eintippen (z. B. „48.8566, 2.3522" für Paris) → erwartet: die kleine Karte springt/zentriert sich automatisch auf Paris, Pin sichtbar.
+  - [ ] Gleiches im Feld "Motiv" mit einer anderen weit entfernten Koordinate wiederholen → erwartet: Karte zentriert sich auf die Motiv-Koordinate.
+  - [ ] Bestehende Location öffnen → Bearbeiten → im Feld "Fotograf-Standort" eine weit entfernte Koordinate eintippen → erwartet: die kleine Bearbeiten-Karte springt auf diese Position.
+  - [ ] Gleiches im Feld "Motiv (Koordinaten)" beim Bearbeiten wiederholen.
+  - [ ] Edge Case (AK5): unvollständige/ungültige Koordinate eintippen (z. B. nur „48,") → erwartet: keine Kartenbewegung, bestehende Fehlermeldung erscheint wie gehabt.
+  - [ ] Edge Case (AK6): Feldinhalt komplett löschen → erwartet: Karte bleibt an der zuletzt zentrierten Position stehen.
+  - [ ] Regression (AK8): Beim Bearbeiten das Vollbild-Kartenoverlay öffnen, per Antippen/Ziehen einen Pin setzen, wieder schließen — OHNE vorher etwas in ein Koordinatenfeld getippt zu haben → erwartet: kein unerwarteter zusätzlicher Kartensprung der kleinen Karte beim Schließen.
+  - [ ] Regression (AK9, PRODUCT.md §12 „Location-Edit"/„Sheet-Open/Close"): GPS-Button, Einfügen-Button, Satellit/Straße-Umschalter, Antippen/Ziehen des Pins funktionieren in beiden Formularen weiterhin wie gewohnt.
 
 ---
 
@@ -16995,3 +17304,19 @@ Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronis
 - [ ] Regressionscheck: `.github/workflows/deploy.yml` bleibt komplett unverändert (Diff nur in `.forgejo/`).
 
 ---
+
+### [TASK-81] · Refactoring: Lange Funktion `preview_alignment()` aufteilen (backend/main.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** `refactor_check.py` meldet nach BUG-63 eine lange Funktion in `backend/main.py`:
+- `preview_alignment()` Z. 2880 — 96 Zeilen (Threshold: 80)
+
+Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in derselben Datei, ist Done und unabhängig von diesem Fund). Aufteilen in kleinere Hilfsfunktionen (z. B. Fenster-Aktivierung/Elevation-Abruf, Alignment-Berechnung, Response-Aufbau separieren). Kein inhaltlicher Umbau — insbesondere die BUG-63-Fixes (`try/finally` um `set_active_window`/`clear_active_window`, `ContextVar`-Isolation, `asyncio.to_thread`) müssen unverändert erhalten bleiben.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-63, 2026-07-16)

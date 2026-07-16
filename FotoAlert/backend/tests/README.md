@@ -35,6 +35,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_bug29_calendar_single_recompute.py` | BUG-29: Kalender-Snapshot nach Koordinaten-PATCH | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug43_partial_composition.py` | BUG-43: Kompositions-Analyse liefert Teilergebnis ohne Motivhöhe | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug47.py` | BUG-47: Rollen-Kodierung im Token + `/login`-Antwort | teils ✅ immer (offline-Klasse), teils nur mit `--all` (api-Klasse) | `offline`, `api`, `regression` |
+| `test_bug63.py` | BUG-63: `preview_alignment()` setzt `WindowEphemeris`-Fenster-State per `try/finally` zurück (Pre-Mortem-Szenario 4, Referenz-Endpoint `GET /plan`); AK-5 Dedup pro Tag/Himmelskörper-Passage | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug66.py` | BUG-66: „Höhenwinkel Spitze" in `POST /preview-alignment` | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_bug67.py` | BUG-67: neue Location erscheint nicht direkt in Karte/Liste | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_bug77_weather_job_status.py` | BUG-77: Live-Wetterabruf-Fehlerzustand sichtbar statt stillem Log | ✅ immer (offline, deterministisch) | `offline`, `regression` |

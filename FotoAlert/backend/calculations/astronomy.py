@@ -12,6 +12,7 @@ Berechnet:
 
 from __future__ import annotations
 
+import contextvars
 import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -44,22 +45,29 @@ def _get_eph():
 # berechnungen kommen dann aus den vorberechneten Fenster-Arrays statt aus je
 # einem Skyfield-Call pro Tag. Kein Import von window_engine hier (duck-typed) →
 # kein Zirkelimport.
+#
+# BUG-63-Nachbesserung (Race-Fix): früher ein einfacher Modul-Global — bei
+# echter Nebenläufigkeit (zwei gleichzeitige Requests, z. B. preview_alignment()
+# via asyncio.to_thread() während der Event-Loop weiterläuft) konnte Request B
+# das Fenster von Request A überschreiben. contextvars.ContextVar ist pro
+# asyncio.Task isoliert (jeder Request läuft in Starlette als eigener Task mit
+# eigener Kontext-Kopie) und asyncio.to_thread() kopiert den Kontext explizit
+# in den Thread (contextvars.copy_context() + ctx.run(), Python 3.9+) — die
+# Isolation bleibt also auch über to_thread() hinweg erhalten.
 # ---------------------------------------------------------------------------
-_active_window = None
+_active_window: "contextvars.ContextVar" = contextvars.ContextVar("_active_window", default=None)
 
 
 def set_active_window(w) -> None:
-    global _active_window
-    _active_window = w
+    _active_window.set(w)
 
 
 def clear_active_window() -> None:
-    global _active_window
-    _active_window = None
+    _active_window.set(None)
 
 
 def _win_for(lat: float, lon: float, d):
-    w = _active_window
+    w = _active_window.get()
     if w is not None and w.covers(lat, lon, d):
         return w
     return None

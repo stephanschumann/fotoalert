@@ -136,9 +136,18 @@ class ElevationProvider:
         Höhenunterschied Motiv-Basis − Fotograf-Standort (m) + Flag `incomplete`.
         Semantik wie precompute.fetch_elevations: difference = subject − observer.
         Fehlt eine Höhe → (0.0, True): Berechnung läuft weiter, transparent markiert.
+
+        BUG-63: Fotograf- und Motiv-Punkt werden parallel abgefragt
+        (asyncio.gather), um die Wartezeit beider Aufrufe zu überlappen. Der
+        modulweite Rate-Limit-Lock (_respect_rate_limit, s.o.) wird davon nicht
+        umgangen — er sitzt weiterhin vor jedem echten Netzaufruf innerhalb von
+        _fetch_elevation() und takted diese unverändert einzeln. Nur die
+        Wartezeit AUF den Lock läuft jetzt für beide Punkte parallel.
         """
-        obs = await self.get_elevation(observer_lat, observer_lon)
-        sub = await self.get_elevation(subject_lat, subject_lon)
+        obs, sub = await asyncio.gather(
+            self.get_elevation(observer_lat, observer_lon),
+            self.get_elevation(subject_lat, subject_lon),
+        )
         if obs is None or sub is None:
             return 0.0, True
         return round(sub - obs, 1), False
