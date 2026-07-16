@@ -29,12 +29,12 @@
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15)* · **US-133** *(Weg-Gate entschieden 2026-07-16: Frage 1 = Option B/Zoom-Erhalt, Frage 2 = Option B/Blur, gegen Empfehlung Option A)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-82** *(Schutz-Header + CSP, deploy/Caddyfile + deploy/deploy.sh geändert, wartet auf Deploy+Live-Test)* · **TASK-83** *(Cookie-Umstellung implementiert, automatisierte Tests grün, wartet auf manuelle Browser-Verifikation)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **BUG-81** *(Gespeicherte Schadskripte über ungefilterte Texte unterbinden (XSS) — Security-Audit, 2/7)* · **TASK-84** *(Externe Skripte mit Echtheitsprüfung (SRI) laden — Security-Audit, 4/7)* · **TASK-85** *(App bei fehlendem Auth-Geheimnis hart abbrechen — Security-Audit, 5/7)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) — Security-Audit, 6/7)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -44,6 +44,23 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-81 · Gespeicherte Schadskripte über ungefilterte Texte unterbinden (XSS) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** **Beobachtet:** Location-Namen, -Beschreibungen, -Notizen, Kategorien sowie Verifizierungs-Kommentare und Suchbegriffe werden roh als HTML ins DOM geschrieben (`innerHTML`) — ein vorhandener Escape-Helfer wird nur an einer einzigen Stelle genutzt. **Erwartet:** Jeder dynamische Wert wird escapt bzw. per `textContent` gesetzt. **Auswirkung:** Ein einmal eingetragener Schadtext läuft im Browser jedes anderen Nutzers und kann dessen Login-Ticket stehlen (Verifizierungs-Kommentare brauchen dafür nicht mal Admin-Rechte). Zusätzlich: URL-Felder (`locationscout_url`, `attribution_url`) vor Zuweisung an `href` auf erlaubtes Schema prüfen.
+
+**User Story:** Als Nutzer, möchte ich, dass von anderen eingetragene Texte niemals als Programmcode in meinem Browser ausgeführt werden, sodass niemand über eine Location oder einen Prüfkommentar meine Sitzung übernehmen kann.
+
+**Bezug:** TASK-82 (Content-Security-Policy dämpft die hier behandelte XSS-Gefahr als zweite Verteidigungslinie — behebt die Ursache aber nicht, beide Tickets bleiben nötig). TASK-83 (HttpOnly-Cookie entzieht einem erfolgreichen XSS-Angriff das lohnendste Ziel). Quelle: Security-Audit 2026-07-16.
+
+---
 
 ### BUG-80 · Header springt beim Filtern: Infozeile ändert Höhe, Kopfzeile verschiebt sich sichtbar hinter dem Filter-Sheet `[x]`
 
@@ -8215,14 +8232,15 @@ Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den
 
 ---
 
-### US-133 · Kartenausschnitt springt bei Koordinaten-Eingabe zur eingegebenen Position `[~]`
+### US-133 · Kartenausschnitt springt bei Koordinaten-Eingabe zur eingegebenen Position `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Progress |
+| **Status** | Done |
 | **Erstellt** | 2026-07-16 |
+| **Abgeschlossen** | 2026-07-16 |
 
 **Beschreibung:** Beim Anlegen einer neuen Location oder Bearbeiten einer bestehenden Location (Fotografen- oder Motiv-Koordinaten) aktualisiert die Formular-Karte zwar den Pin, sobald Koordinaten eingegeben werden, verschiebt aber den sichtbaren Kartenausschnitt nicht mit. Die Karte bleibt auf ihrem bisherigen Zentrum (aktuell: eigener Standort) stehen, sodass der neu gesetzte Pin bei entfernten Koordinaten außerhalb des sichtbaren Bereichs liegt und manuell gesucht werden muss.
 
@@ -8261,15 +8279,15 @@ Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den
 
 **🚦 Weg-Gate-Entscheidung (Stephan, 2026-07-16):** Frage 1 (Zoomstufe) = **Option B** (aktueller Zoom bleibt erhalten, nur Schwenk/`panTo`). Frage 2 (Zeitpunkt) = **Option B** (erst beim Verlassen des Feldes/Blur, nicht live beim Tippen). Beide Entscheidungen gehen gegen die ursprüngliche Empfehlung (Option A/A = live + feste Zoomstufe 14). Die folgenden AKs sind entsprechend auf die B/B-Kombination korrigiert (nicht nur ergänzt) — siehe auch Korrektur bei Szenario 3 und der Empfehlungszeile unten.
 
-- [~] AK1: Beim Anlegen einer neuen Location schwenkt die kleine Formular-Karte automatisch zur eingetippten Koordinate, sobald ich das Feld "Mein Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — die aktuelle Zoomstufe bleibt dabei unverändert.
-- [~] AK2: Beim Anlegen schwenkt die Karte ebenso automatisch zur eingetippten Koordinate, sobald ich das Feld "Motiv" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
-- [~] AK3: Beim Bearbeiten einer bestehenden Location schwenkt die kleine Bearbeiten-Karte automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Fotograf-Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
-- [~] AK4: Beim Bearbeiten schwenkt die Karte ebenso automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Motiv (Koordinaten)" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert.
-- [~] Edge Case AK5: Tippe ich eine unvollständige oder ungültige Koordinate ein und verlasse das Feld, schwenkt die Karte nicht — sie bleibt an ihrer aktuellen Position, die bestehende Fehlermeldung erscheint wie bisher.
-- [~] Edge Case AK6: Lösche ich den Inhalt eines Koordinatenfelds komplett und verlasse das Feld, bleibt die Karte an ihrer zuletzt zentrierten Position stehen — kein Rücksprung zu einem Standardausschnitt.
-- [~] Edge Case AK7 (Weg-Gate entschieden, Frage 1 = Option B): Beim Schwenken bleibt die aktuell eingestellte Zoomstufe der Karte unverändert — es findet ausschließlich eine Positionsänderung (`panTo`) statt, kein Zoomwechsel auf eine feste Stufe.
-- [~] Edge Case AK8 (Regression): Öffne und schließe ich das Bearbeiten-Vollbild-Kartenoverlay, ohne vorher in ein Koordinatenfeld getippt zu haben, verhält sich das Schließen weiterhin wie bisher — kein zusätzlicher, durch diesen Fix neu ausgelöster Kartensprung.
-- [~] AK9 (Regression, PRODUCT.md §12 "Location-Edit"/"Sheet-Open/Close"): Alle bestehenden Interaktionswege der Formular-Karten (Antippen zum Setzen, Ziehen des Pins, GPS-Button, Einfügen aus Zwischenablage, Satellit/Straße-Umschalter, Vollbild öffnen/schließen) funktionieren nach dem Fix unverändert weiter.
+- [x] AK1: Beim Anlegen einer neuen Location schwenkt die kleine Formular-Karte automatisch zur eingetippten Koordinate, sobald ich das Feld "Mein Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — die aktuelle Zoomstufe bleibt dabei unverändert. *(manuell getestet 2026-07-16, positiv)*
+- [x] AK2: Beim Anlegen schwenkt die Karte ebenso automatisch zur eingetippten Koordinate, sobald ich das Feld "Motiv" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert. *(manuell getestet 2026-07-16, positiv)*
+- [x] AK3: Beim Bearbeiten einer bestehenden Location schwenkt die kleine Bearbeiten-Karte automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Fotograf-Standort" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert. *(manuell getestet 2026-07-16, positiv)*
+- [x] AK4: Beim Bearbeiten schwenkt die Karte ebenso automatisch zur neu eingetippten Koordinate, sobald ich das Feld "Motiv (Koordinaten)" nach einer vollständigen, gültigen Eingabe verlasse (Blur) — Zoomstufe bleibt unverändert. *(manuell getestet 2026-07-16, positiv)*
+- [x] Edge Case AK5: Tippe ich eine unvollständige oder ungültige Koordinate ein und verlasse das Feld, schwenkt die Karte nicht — sie bleibt an ihrer aktuellen Position, die bestehende Fehlermeldung erscheint wie bisher. *(manuell getestet 2026-07-16, positiv)*
+- [x] Edge Case AK6: Lösche ich den Inhalt eines Koordinatenfelds komplett und verlasse das Feld, bleibt die Karte an ihrer zuletzt zentrierten Position stehen — kein Rücksprung zu einem Standardausschnitt. *(manuell getestet 2026-07-16, positiv)*
+- [x] Edge Case AK7 (Weg-Gate entschieden, Frage 1 = Option B): Beim Schwenken bleibt die aktuell eingestellte Zoomstufe der Karte unverändert — es findet ausschließlich eine Positionsänderung (`panTo`) statt, kein Zoomwechsel auf eine feste Stufe. *(manuell getestet 2026-07-16, positiv)*
+- [x] Edge Case AK8 (Regression): Öffne und schließe ich das Bearbeiten-Vollbild-Kartenoverlay, ohne vorher in ein Koordinatenfeld getippt zu haben, verhält sich das Schließen weiterhin wie bisher — kein zusätzlicher, durch diesen Fix neu ausgelöster Kartensprung. *(manuell getestet 2026-07-16, positiv)*
+- [x] AK9 (Regression, PRODUCT.md §12 "Location-Edit"/"Sheet-Open/Close"): Alle bestehenden Interaktionswege der Formular-Karten (Antippen zum Setzen, Ziehen des Pins, GPS-Button, Einfügen aus Zwischenablage, Satellit/Straße-Umschalter, Vollbild öffnen/schließen) funktionieren nach dem Fix unverändert weiter. *(manuell getestet 2026-07-16, positiv)*
 
 **Pre-Mortem:**
 
@@ -17343,3 +17361,291 @@ Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronis
 Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in derselben Datei, ist Done und unabhängig von diesem Fund). Aufteilen in kleinere Hilfsfunktionen (z. B. Fenster-Aktivierung/Elevation-Abruf, Alignment-Berechnung, Response-Aufbau separieren). Kein inhaltlicher Umbau — insbesondere die BUG-63-Fixes (`try/finally` um `set_active_window`/`clear_active_window`, `ContextVar`-Isolation, `asyncio.to_thread`) müssen unverändert erhalten bleiben.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-63, 2026-07-16)
+
+---
+
+### TASK-82 · Schutz-Header + Content-Security-Policy live ausliefern (Caddy) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-16 |
+
+**Weg-Gate-Entscheidung (von Stephan bestätigt, 2026-07-16):** Option B (Header + dauerhafter automatischer Abgleich in `deploy/deploy.sh`). Beide offenen Wahlfragen bestätigt: (1) eingebetteter Code bleibt von der Inhalts-Sicherheitsregel ausgenommen, (2) Testfeld für fremde Server-Adresse wird auf „nur eigene Adresse" eingeschränkt.
+
+**Beschreibung:** Die live laufende Caddy-Konfig auf dem Server ist minimal (nur `fotoalert.stephanschumann.com { reverse_proxy localhost:8000 }`) — kein einziger Schutz-Header kommt an (live per curl bestätigt: `server: uvicorn` leakt durch, weder HSTS noch X-Frame-Options/X-Content-Type-Options/Referrer-Policy). Der Header-Block in `deploy/Caddyfile` wurde nie auf den Server ausgeliefert. Zu ergänzen: die vier vorhandenen Header plus neu `Content-Security-Policy` und `Permissions-Policy`; außerdem sicherstellen, dass die Repo-Datei die tatsächlich deployte Quelle ist.
+
+**User Story:** Als App-Nutzer, möchte ich, dass die App nicht in fremde Seiten eingebettet und nicht durch eingeschleuste Skripte manipuliert werden kann, sodass meine Sitzung und meine Aktionen geschützt bleiben.
+
+**Bezug:** BUG-81 (CSP dämpft die dort behandelte XSS-Gefahr; die Reihenfolge CSP → Escaping ist bewusst so gewählt, weil die CSP sofort wirkt, ohne dass alle Frontend-Stellen angefasst sind). TASK-84 (eine strikte CSP kann CDN-Skripte blocken — SRI/Self-Hosting muss dazu passen). Quelle: Security-Audit 2026-07-16.
+
+---
+
+**Implementation Spec**
+
+**Code-Verifikation (gelesen am 2026-07-16):**
+📎 `deploy/Caddyfile` gelesen: enthält bereits einen Header-Block mit den vier Basis-Headern (`X-Content-Type-Options nosniff`, `X-Frame-Options DENY`, `Referrer-Policy strict-origin-when-cross-origin`, `Strict-Transport-Security`) sowie `-Server` (entfernt den Software-Hinweis). Content-Security-Policy und Permissions-Policy fehlen darin noch.
+- Bestätigt: `deploy/setup_server.sh` (Z. ~124–129) kopiert `deploy/Caddyfile` einmalig nach `/etc/caddy/Caddyfile` und lädt den Webserver neu — läuft aber nur bei der **Ersteinrichtung** eines neuen Servers.
+- Bestätigt: `deploy/deploy.sh` (läuft bei **jedem** Release über GitHub Actions/SSH) enthält git-pull, Service-Worker-Cache-Update, Dependency-Install, Neustart von App-Service und Precompute-Timer sowie einen Health-Check — **keinerlei Schritt, der die Webserver-Konfiguration anfasst oder neu lädt**. `deploy/rollback.sh` und `deploy/restore.sh` ebenfalls nicht. Damit ist bestätigt: eine Änderung an `deploy/Caddyfile` erreicht den Server über den normalen Release-Weg nicht von selbst — genau das im Ticket vermutete Problem.
+- Bestätigt: `web/index.html` lädt Fremd-Inhalte von genau fünf Adressen: zwei Bibliotheks-Anbieter für Programmcode/Formatierung (`cdnjs.cloudflare.com` für Leaflet, `cdn.jsdelivr.net` für die Sternenberechnung) sowie drei Kartenbild-Anbieter für die Kartenkacheln (`tile.openstreetmap.org`, `server.arcgisonline.com`, `basemaps.cartocdn.com`, jeweils mit wechselnden Unterdomains).
+- Bestätigt: Die komplette App-Logik steckt in eingebettetem Programmcode direkt in `index.html` (kein separates Skript), dazu mindestens ein eingebetteter Klick-Handler und rund 460 eingebettete Formatierungs-Angaben. Es gibt keinen Mechanismus, der „vertrauenswürdigen" von „fremdem" eingebetteten Code unterscheidet — eine Regel, die eingebetteten Code kategorisch verbietet, würde die App komplett lahmlegen (weißer Bildschirm).
+- Bestätigt: Die App nutzt aktiv die Standortabfrage des Browsers (GPS-Knopf, mehrere Stellen) und das Lesen der Zwischenablage (Kopieren-Funktion) — eine pauschal sperrende Berechtigungsregel würde beide Funktionen zerstören.
+- Bestätigt: Alle Server-Anfragen der App laufen über eine Adresse, die standardmäßig „die eigene Seite" ist und nur über ein manuelles Einstellungsfeld auf eine fremde Adresse umgestellt werden kann (Bezug TASK-83). Eine Beschränkung auf „nur die eigene Adresse" schränkt nur diesen selten genutzten Testmodus ein und passt zum Sicherheitsziel von TASK-83.
+
+**Example Mapping:**
+- 📏 Regel 1: Jede Server-Antwort trägt weiterhin die vier bestehenden Schutz-Header, und der Hinweis auf die verwendete Server-Software taucht nicht mehr auf.
+  - 🟢 Beispiel: Ruft man die Startseite auf, enthält die Antwort „kein Einbetten in fremde Seiten erlaubt", „Verweis-Infos eingeschränkt", „immer HTTPS merken" — aber keinen Hinweis mehr darauf, welche Server-Software läuft.
+- 📏 Regel 2: Zusätzlich liefert der Server eine Inhalts-Sicherheitsregel (CSP) aus, die nur die tatsächlich benötigten Quellen erlaubt (eigene Seite, die zwei Bibliotheks-Anbieter, die drei Kartenbild-Anbieter, eingebetteter Code) und alles andere blockiert.
+  - 🟢 Beispiel: Karte, Sternenberechnung und Kartenkacheln laden weiterhin normal; eine fremd eingeschleuste Adresse würde blockiert.
+- 📏 Regel 3: Eine Berechtigungsregel (Permissions-Policy) schränkt ungenutzte Browser-Funktionen (z. B. Kamera/Mikrofon) ein, lässt Standortabfrage und Zwischenablage-Lesen für die eigene Seite aber ausdrücklich weiter zu.
+  - 🟢 Beispiel: Der GPS-Knopf und der Kopieren-Knopf funktionieren nach der Änderung unverändert.
+- 📏 Regel 4: Die Datei im Programm-Ordner ist die einzige Quelle der Wahrheit für die Serverkonfiguration — eine künftige Änderung daran kommt zuverlässig auch tatsächlich auf dem Server an.
+  - 🟢 Beispiel: Nach dem nächsten normalen Release zeigt eine Prüfung der Serverantwort, dass die Änderung wirklich live ist (nicht nur im Programm-Ordner sichtbar).
+- ❓ Frage 1 (⚪ Annahme, kein Blocker): Da die App komplett aus eingebettetem Code besteht, kann die Inhalts-Sicherheitsregel eingebetteten Code nicht verbieten, ohne die App unbenutzbar zu machen. ⚠️ Annahme: Die Regel erlaubt eingebetteten Code weiterhin — sie schützt damit gezielt gegen fremde Adressen/Einbettung, ist aber kein vollständiger Schutz gegen bereits im Code vorhandene Lücken (das ist Aufgabe von BUG-81/TASK-84, nicht dieses Tickets). Bitte bestätigen.
+- ❓ Frage 2 (⚪ Annahme, kein Blocker): Das manuelle Einstellungsfeld für eine fremde Server-Adresse (Testmodus, Bezug TASK-83) wird durch „nur eigene Adresse erlaubt" eingeschränkt. ⚠️ Annahme: Das ist gewünscht, da es das Sicherheitsziel aus TASK-83 unterstützt. Bitte bestätigen.
+
+**Scope:**
+- Eingeschlossen: Ergänzung der Inhalts-Sicherheitsregel (CSP) und der Berechtigungsregel (Permissions-Policy) im Header-Block von `deploy/Caddyfile`, passend zu den tatsächlich verwendeten Fremd-Adressen. Sicherstellen, dass diese Datei die tatsächlich live ausgelieferte Konfiguration ist (siehe Optionen).
+- Ausgeschlossen: Entfernen des eingebetteten Codes/Formatierung aus `index.html` (eigenes, deutlich größeres Vorhaben). Der in BUG-81/TASK-83/TASK-84 behandelte Escaping-/Cookie-/SRI-Umbau ist nicht Teil dieses Tickets.
+
+**Akzeptanzkriterien:**
+- [ ] Ruft man die App-Adresse auf, enthält die Serverantwort alle sechs Schutz-Header: Kein-Einbetten-in-fremde-Seiten, Verstecken der Server-Software, eingeschränkte Verweis-Informationen, „immer HTTPS merken" (HSTS), die neue Inhalts-Sicherheitsregel (CSP) und die neue Berechtigungsregel (Permissions-Policy).
+- [ ] Der Hinweis auf die verwendete Server-Software (bisher sichtbar als „uvicorn") taucht in der Antwort nicht mehr auf.
+- [ ] Karte in allen drei Ansichten (Standard, Satellit, Nacht-Modus), Sternen-/Mondberechnung und alle bestehenden Sheets/Overlays funktionieren nach der Änderung unverändert — kein hängendes Laden, keine Fehlermeldung wegen blockierter Inhalte.
+- [ ] Der GPS-Knopf (Standort ermitteln) funktioniert weiterhin.
+- [ ] Der „In Zwischenablage kopieren"-Knopf funktioniert weiterhin.
+- [ ] Edge Case: Nutzt man die App normal und öffnet dabei die Entwickler-Konsole des Browsers, erscheint keine Blockierungsmeldung für einen der App-eigenen Inhalte.
+- [ ] Edge Case: Ändert jemand künftig den Header-Block in der Programm-Ordner-Datei und stößt einen normalen Release an, kommt die Änderung nachweislich auch auf dem Server an (per Prüfung der Serverantwort nach dem Release, nicht nur durch Ansehen der Datei im Programm-Ordner).
+- [ ] Edge Case: Nach dem Einspielen lässt sich der Webserver ohne Fehlermeldung neu laden (kein Syntaxfehler in der Konfigurationsdatei).
+
+**Pre-Mortem:**
+- 💀 Szenario 1: Die Inhalts-Sicherheitsregel ist zu streng gefasst (z. B. nur „eigene Adresse" ohne die zwei Bibliotheks-Anbieter) → Karte und Sternenberechnung laden nicht mehr, App wirkt komplett kaputt. Frühwarnung: Browser-Konsole zeigt beim Testen sofort Blockierungsmeldungen. Gegenmaßnahme: Die Regel wird gezielt gegen die tatsächlich im Code gefundenen fünf Fremd-Adressen gebaut und vor dem Release im Browser durchgeklickt (AK 3).
+- 💀 Szenario 2: Die Regel verbietet den eingebetteten Programmcode/die eingebetteten Formatierungen kategorisch → die App (die praktisch komplett aus eingebettetem Code besteht) lädt gar nicht mehr. Gegenmaßnahme: Eingebetteter Code bleibt bewusst erlaubt (siehe Annahme im Example Mapping); das wird offen so kommuniziert, keine falsche Sicherheit vorgetäuscht.
+- 💀 Szenario 3: Die Berechtigungsregel blockiert Standortabfrage oder Zwischenablage-Zugriff → GPS-Knopf oder Kopieren-Knopf funktionieren plötzlich nicht mehr, ohne offensichtlichen Zusammenhang zur Änderung. Gegenmaßnahme: Standort und Zwischenablage werden explizit für die eigene Seite erlaubt, nicht pauschal verboten; beide Knöpfe werden einzeln im manuellen Test geprüft (AK 4+5).
+- 💀 Szenario 4: Die neue Konfigurationsdatei enthält einen Tippfehler → der Webserver kann nicht neu laden, die gesamte Seite ist nicht mehr erreichbar (nicht nur „Header fehlen", sondern „App tot"). Frühwarnung: Der Neustart-Befehl meldet einen Fehler statt Erfolg. Gegenmaßnahme: Konfiguration vor dem produktiven Einspielen mit dem eingebauten Prüfmodus des Webservers testen; erst danach live neu laden. Alte Konfigurationsdatei bleibt als Rückfalloption erhalten.
+- 💀 Szenario 5 (Kernrisiko des Tickets): Die Datei im Programm-Ordner wird geändert, aber wie offenbar schon einmal geschehen nie automatisch auf den Server übertragen → der Fix wirkt „erledigt", ist live aber wirkungslos, bis es erneut zufällig auffällt. Auslöser (verifiziert): Der normale Release-Weg (`deploy/deploy.sh`) rührt die Webserver-Konfiguration nicht an — nur das einmalige Ersteinrichtungs-Skript tut das. Gegenmaßnahme: Kernfrage der beiden Implementierungsoptionen unten — entweder eine dokumentierte Pflicht-Handanweisung für diesen einen Fix (Option A) oder ein dauerhafter automatischer Abgleich (Option B).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (4 Regeln, 2 Annahmen dokumentiert, keine blockierenden Fragen)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, Gegenmaßnahmen in AKs verankert, inkl. Code-Verifikation der Deploy-Skripte)
+- [x] Architektur analysiert: `deploy/Caddyfile`, `deploy/setup_server.sh`, `deploy/deploy.sh`, `deploy/rollback.sh`, `deploy/restore.sh`, `web/index.html` (Fremd-Quellen, eingebetteter Code, Geolocation/Clipboard-Nutzung)
+- [x] Designer-Check: rein serverseitige Konfiguration, keine sichtbare UI-Änderung → übersprungen
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option B
+
+**Implementierungsoptionen:**
+
+### Option A — Header-Block ergänzen, einmalig manuell auf den Server bringen
+- App-Wirkung: Ab dem nächsten Einspielen sind alle sechs Schutz-Header aktiv; für Nutzer bleibt die App optisch/funktional unverändert.
+- Vorgehen: `deploy/Caddyfile` um die beiden neuen Regeln ergänzen (Inhalts-Sicherheitsregel mit den fünf bekannten erlaubten Fremd-Adressen + Erlaubnis für eingebetteten Code; Berechtigungsregel, die alles außer Standort und Zwischenablage sperrt). Danach die Datei einmalig manuell auf den Server kopieren und den Webserver neu laden — Stephan bekommt dafür eine konkrete Schritt-für-Schritt-Anleitung fürs Terminal.
+- Betroffene Dateien: `deploy/Caddyfile`.
+- Vorteile: Kleinster Eingriff, sofort wirksam, kein Risiko für den bestehenden Release-Ablauf.
+- Nachteile/Risiken: Löst das Drift-Problem nur für diesen einen Fix — bei der nächsten Änderung an `deploy/Caddyfile` muss wieder manuell daran gedacht werden, sie auf den Server zu kopieren. Das eigentliche Root-Problem aus Szenario 5 bleibt bestehen.
+- Aufwand: klein.
+
+### Option B — wie A, zusätzlich dauerhafter Abgleich im normalen Release-Ablauf
+- App-Wirkung: identisch zu Option A für den Nutzer; zusätzlich verlässlich für die Zukunft — jede künftige Änderung an der Konfigurationsdatei kommt beim nächsten normalen Release automatisch auf dem Server an, ohne dass sich jemand daran erinnern muss.
+- Vorgehen: Wie A, zusätzlich wird `deploy/deploy.sh` um einen Schritt erweitert, der die Konfigurationsdatei bei jedem Release auf den Server kopiert/abgleicht und den Webserver bei Bedarf neu lädt — inklusive Prüfmodus vor dem Neuladen, damit ein Tippfehler den Server nicht lahmlegt (Gegenmaßnahme zu Szenario 4).
+- Betroffene Dateien: `deploy/Caddyfile`, `deploy/deploy.sh`.
+- Vorteile: Löst das strukturelle Problem dauerhaft — genau das, was das Ticket als zweites Ziel benennt („sicherstellen, dass die Repo-Datei die tatsächlich deployte Quelle ist").
+- Nachteile/Risiken: Größerer Eingriff in ein zentrales, produktiv genutztes Skript; ein Fehler dort könnte künftige Releases der ganzen App gefährden, nicht nur die Header — braucht sorgfältigeres Testen (Prüfmodus + Rückfallmöglichkeit, siehe AK „Edge Case: Webserver lässt sich ohne Fehler neu laden").
+- Aufwand: mittel.
+
+✅ Empfehlung: **Option B** — das Ticket benennt das Drift-Problem ausdrücklich als eigenen Punkt, und genau dieses Muster (Fix nur im Programm-Ordner, nie ausgeliefert) ist laut Code-Verifikation bereits genau so aufgetreten (die Header stehen seit Langem im Repo, kamen aber nie auf dem Server an). Ein einmaliger manueller Fix (Option A) behebt nur das akute Symptom, nicht die Ursache — bei der nächsten Konfigurationsänderung (z. B. TASK-84/TASK-86) würde sich das Muster wiederholen. Der Mehraufwand von A zu B ist überschaubar (ein zusätzlicher, gut testbarer Schritt in einem bestehenden Skript).
+
+**Offene Wahlfragen fürs Weg-Gate (siehe Example Mapping):**
+1. Eingebetteter Code bleibt von der neuen Regel ausgenommen (sonst startet die App gar nicht) — einverstanden?
+2. Das manuelle Testfeld für eine fremde Server-Adresse wird durch die neue Regel auf „nur eigene Adresse" eingeschränkt — einverstanden?
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Diese Änderung betrifft ausschließlich die Webserver-Konfiguration (keine Python-/API-Logik) — kein `pytest`-Fall in `backend/tests/` möglich oder sinnvoll. Testabdeckung erfolgt vollständig manuell gegen den Live-Server.
+- [ ] Manuell (nach dem Einspielen, gegen `https://fotoalert.stephanschumann.com`):
+  1. `curl -sI` gegen die App-Adresse im Terminal → erwartet: alle sechs Schutz-Header vorhanden, kein Hinweis mehr auf die Server-Software (AK 1+2).
+  2. In Safari (Stephans Browser) die App komplett durchklicken: Karte (Standard/Satellit/Nacht), Sternen-/Mond-Chancen öffnen, GPS-Knopf, Kopieren-Knopf, alle Sheets/Overlays — Entwicklerkonsole parallel offen halten, keine Blockierungsmeldungen (AK 3–6).
+  3. Regression (PRODUCT.md §12, Bereich Server-/Header-Änderung): Login/Auth weiterhin möglich, Service Worker registriert sich weiterhin.
+  4. Bei Option B zusätzlich: bewussten Tippfehler in einer Test-Kopie der Konfiguration einbauen und prüfen, dass der Prüfmodus das VOR dem Neuladen erkennt (AK „Webserver lässt sich ohne Fehler neu laden").
+
+**Implementierung (2026-07-16):**
+- `deploy/Caddyfile`: Header-Block um `Content-Security-Policy` und `Permissions-Policy` ergänzt.
+  - CSP: `default-src 'self'`; `script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net`; `style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com`; `img-src 'self' https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com`. Quellen 1:1 aus dem per Grep verifizierten Fundstellen-Set in `web/index.html` (Z. 32/1556/1558/4079/4081/5029–5031/5700) übernommen; Unterdomain-Wildcard (`*.`) nur bei `tile.openstreetmap.org` und `basemaps.cartocdn.com` ergänzt, da dort `{s}.` als Leaflet-Subdomain-Platzhalter verwendet wird — `server.arcgisonline.com` wird im Code immer ohne `{s}`-Präfix aufgerufen, daher kein Wildcard dafür. `'unsafe-inline'` bewusst für `script-src`/`style-src` gesetzt (kein Nonce/Hash-Mechanismus vorhanden, App besteht komplett aus eingebettetem Code). Kein `'unsafe-eval'` ergänzt (kein `eval()`/`new Function()` im eigenen Code gefunden) — ob Leaflet/astronomy-engine intern eval nutzen, ließ sich nicht laufzeitseitig verifizieren (kein Live-/Browser-Zugriff in dieser Phase); das deckt der bestehende manuelle Testplan (Browser-Konsole, AK 3+6) ab. Kein `data:` in `img-src` ergänzt, da kein `data:image`-Vorkommen in `index.html` gefunden wurde.
+  - Permissions-Policy: alle gängigen Policy-kontrollierten Features (`accelerometer`, `camera`, `microphone`, `usb` usw.) auf `()` gesetzt, nur `geolocation=(self)`, `clipboard-read=(self)` und `clipboard-write=(self)` erlaubt. Hinweis: Code-Verifikation zeigt, dass die App aktuell nur `navigator.clipboard.readText()` nutzt (`_pasteCoords`, Z. 7015), keine `writeText()`-Stelle gefunden — `clipboard-write` trotzdem mit erlaubt, da so im Ticket-Auftrag explizit vorgegeben (Vorratsfreigabe für den Fall künftiger Nutzung).
+- `deploy/deploy.sh`: neuer Schritt 7 „Caddy-Konfiguration abgleichen" nach dem App-Health-Check. Ersetzt den `YOUR_DOMAIN`-Platzhalter in einer temporären Kandidaten-Datei (gleiche Substitution wie in `setup_server.sh`), validiert sie mit `caddy validate --config ... --adapter caddyfile`. Nur bei bestandener Validierung UND inhaltlicher Abweichung (`cmp`) wird die Datei nach `/etc/caddy/Caddyfile` kopiert und `systemctl reload caddy` ausgeführt. Schlägt die Validierung fehl, bleibt die alte, funktionierende Konfiguration unverändert aktiv (kein erzwungener Reload, Pre-Mortem Szenario 4) — das Deploy-Skript beendet sich danach trotzdem mit Exit-Code 1, damit der Fehlschlag in der GitHub-Actions-Ansicht sichtbar wird, ohne den bereits erfolgreich deployten App-Code zurückzurollen.
+- `deploy/setup_server.sh`, `deploy/rollback.sh`, `deploy/restore.sh`: nur lesend geprüft, kein Caddy-Bezug in den beiden letztgenannten gefunden — keine Änderung nötig, Annahme aus der Spec bestätigt.
+- Syntaxcheck: `bash -n deploy/deploy.sh` erfolgreich (fehlerfrei). Kein Git-Befehl, kein Live-/Server-Zugriff, kein curl gegen die Live-Domain verwendet.
+
+---
+
+### TASK-83 · Login-Ticket vor Skript-Zugriff schützen (HttpOnly-Cookie statt Browser-Speicher) `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Test |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Das Sitzungs-Ticket liegt im `localStorage` und ist damit für jedes Skript lesbar — jede XSS-Lücke wird dadurch direkt zum Ticket-Diebstahl. Zusätzlich lässt sich die Backend-Adresse (`fa_api`) per Eingabe/Skript auf einen fremden Server umbiegen, wodurch künftige Anfragen samt Ticket dorthin gingen. Umstellen auf HttpOnly/Secure/SameSite-Cookie; `fa_api` auf eine Allow-Liste begrenzen.
+
+**User Story:** Als Nutzer, möchte ich, dass mein Login-Ticket nicht von Skripten auslesbar ist, sodass mein Zugang selbst bei einer Lücke nicht gestohlen werden kann.
+
+**Bezug:** BUG-81 (dieses Ticket entzieht einem XSS-Angriff das lohnendste Ziel, ersetzt den Fix dort aber nicht). Baut auf US-66 [x] (Login mit Rollen-Erkennung, Token-Mechanismus) auf — der dort etablierte Token-Transport wird hier umgestellt. Grenzt an US-84 (Passwort-Änderung durch den Host, Inbox): berührt denselben Auth-Bereich, aber anderer Scope — Abgrenzung bei Analyse prüfen. Quelle: Security-Audit 2026-07-16.
+
+**Weg-Gate-Teilentscheidungen (von Stephan bestätigt, 2026-07-16):**
+1. Migration bestehender Sessions: Zwangs-Logout — jeder alte `fa_token` wird nach Deploy wertlos, kein Übergangsmechanismus.
+2. `fa_api`-Backend-Adresse: Freitextfeld entfällt, feste Auswahl (Prod-Domain + `http://localhost:8000`).
+3. Gesamt-Option: reines HttpOnly/Secure/SameSite-Cookie, kein Authorization-Header-Fallback (iOS sendet ohnehin keinen Auth-Header, `main.py:2610`).
+
+**Scope:**
+Eingeschlossen: Umstellung des Session-Tickets von `localStorage`/Bearer-Header auf ein HttpOnly-Cookie (Login, Logout, Endpunktschutz), Umbau der CORS-Konfiguration auf `allow_credentials=True` mit expliziter Origin-Liste (dafür zwingend erforderlich), Ablösung des `fa_api`-Freitextfelds durch eine feste Auswahl.
+Ausgeschlossen: die native iOS-App (sendet laut Code-Verifikation keinen Auth-Header, `main.py:2610` — kein Fallback-Transport nötig), inhaltliche Änderungen an Passwort-Prüfung/Rollenvergabe (`auth.role_for_password`/`role_for_token` bleiben unverändert), das in TASK-86 behandelte Login-Rate-Limiting.
+
+**Akzeptanzkriterien:**
+- [ ] Nach erfolgreichem Login verschwindet der Login-Bildschirm; in den Browser-Entwicklertools unter „Application → Cookies" erscheint ein Sitzungscookie mit den Attributen HttpOnly, Secure und SameSite=Lax — unter „Application → Local Storage" steht kein Sitzungs-Ticket mehr.
+- [ ] Die Antwort von `POST /login` enthält im sichtbaren (per JS lesbaren) Antworttext nur noch die Rolle (`role`), kein Ticket/Token-Feld mehr.
+- [ ] Ein Klick auf „Abmelden" (Settings-Sheet) beendet die Sitzung serverseitig: ein direkt danach erneut versuchter geschützter Vorgang (z. B. Location bearbeiten) zeigt wieder den Login-Bildschirm.
+- [ ] Edge Case: Fehlt das Sitzungscookie (gelöscht, abgelaufen, oder nie gesetzt), zeigt die App beim nächsten Laden/bei der nächsten geschützten Aktion den Login-Bildschirm — unabhängig vom Zustand des Local Storage.
+- [ ] Edge Case: Ein vor dem Deploy ausgestelltes altes Sitzungs-Ticket (früherer `Authorization`-Header-Mechanismus) wird nach dem Umbau nicht mehr akzeptiert — Zwangs-Logout wirkt tatsächlich.
+- [ ] Im Settings-Sheet gibt es kein Freitextfeld für die Backend-Adresse mehr, sondern eine feste Auswahl (Prod-Domain / lokaler Dev-Server `http://localhost:8000`).
+- [ ] Edge Case: Ein außerhalb dieser festen Auswahl liegender Wert (z. B. per Konsole gesetzt) wird beim nächsten App-Start ignoriert bzw. auf den Default zurückgesetzt.
+- [ ] Edge Case: Lokale Entwicklung über `http://localhost:8000` funktioniert unverändert — das Secure-Cookie wird trotz unverschlüsseltem `http://localhost` gesetzt und bei Folge-Requests mitgeschickt (siehe Pre-Mortem 2 zur Quellenlage; **manueller Verifikationspunkt in Chrome UND Safari**, da MDN nur die Spezifikation, nicht jede Browser-Version belegt).
+- [ ] Nach dem Login zeigt das Settings-Sheet weiterhin korrekt „Host" bzw. „User" an (Rollen-Anzeige bleibt funktionsfähig, obwohl das Ticket selbst nicht mehr JS-lesbar ist).
+
+**⚠️ Annahme (nicht blockierend, bitte bestätigen):** Cookie-Lebensdauer per `Max-Age` auf 30 Tage gesetzt (kein `Expires`-loses Session-Cookie) — das erhält die bisherige, praktisch unbegrenzte `localStorage`-Persistenz näherungsweise, statt bei jedem Browser-Neustart einen erneuten Login zu erzwingen. Falls Stephan eine kürzere Lebensdauer (z. B. echtes Session-Cookie) bevorzugt, vor Implementierungsstart kurz bestätigen.
+
+**Pre-Mortem:**
+- 💀 CORS-Fehlkonfiguration sperrt alle Nutzer aus → Auslöser: `allow_origins=["*"]` bleibt bestehen, während `allow_credentials=True` gesetzt wird — diese Kombination ist laut Fetch-Spec verboten, der Browser verwirft dann JEDE Cookie-Antwort. Frühwarnung: Browser-Konsole zeigt sofort beim ersten Login nach Deploy „Access-Control-Allow-Origin cannot be '*' when credentials flag is true". Gegenmaßnahme: explizite Origin-Liste (AK verankert in Scope + Testplan, CORS-Header-Test per curl vor Release).
+- 💀 Secure-Cookie wird für lokale Entwicklung fälschlich für unmöglich gehalten → Auslöser: Annahme, Secure-Cookies würden über `http://localhost` generell verworfen. Frühwarnung: Login lokal schlägt fehl / Cookie erscheint nie in DevTools. Gegenmaßnahme: MDN (Set-Cookie-Referenz, Abschnitt „Secure", Stand 2026-06-15) dokumentiert explizit: „Insecure sites (http:) cannot set cookies with the Secure attribute. The https: requirements are ignored when the Secure attribute is set by localhost." — trotzdem als manueller Prüfpunkt in Chrome UND Safari verankert (AK 8), da die Spezifikation keine Garantie für jede konkrete Browser-Version ist.
+- 💀 `fa_api`-Allow-Liste zu eng gefasst blockiert lokale Entwicklung → Auslöser: nur Prod-Domain zugelassen, `http://localhost:8000` fehlt. Frühwarnung: erster lokaler Testlauf nach dem Umbau schlägt bei jedem API-Call fehl. Gegenmaßnahme: Allow-Liste deckt beide Werte ab (Scope explizit benannt).
+- 💀 Cookie-Path/Domain falsch gesetzt → Cookie wird nie mitgeschickt → Auslöser: `Set-Cookie` ohne `Path=/` oder mit falschem `Domain`-Attribut; Server läuft same-origin hinter Caddy (`main.py:3607` mountet `web/` unter `/`), ein zu enger Pfad würde das Cookie bei API-Calls unter anderen Pfaden nicht mitschicken. Frühwarnung: Login meldet Erfolg, jeder Folge-Request liefert dennoch 401. Gegenmaßnahme: `Path=/` explizit setzen, kein `Domain`-Attribut (Host-only-Cookie reicht same-origin); Testfall prüft PATCH direkt nach Login im selben Client ohne Authorization-Header.
+- 💀 Geteilte Test-Session kontaminiert bestehende Auth-Regressionstests → Auslöser: `backend/conftest.py`s `client`-Fixture ist `session`-scoped (geteilte Cookie-Jar über alle Testdateien hinweg). Sobald `/login` ein Cookie setzt, bleibt es für den Rest des Testlaufs in dieser Client-Instanz gesetzt — Tests, die bisher „ohne Header → 401" prüfen (z. B. `test_us66_login.py::test_protected_endpoint_without_token`, `test_task67_auth_regression.py::TestProtectedEndpointRejectsMissingToken`), laufen nach einem vorherigen Login in derselben Session unbemerkt fälschlich grün durch das mitgeschickte Cookie. Frühwarnung: bestehende Regressionstests werden grün, obwohl der eigentliche „ohne Auth"-Fall nicht mehr geprüft wird. Gegenmaßnahme: `backend/conftest.py` braucht eine Cookie-Isolation (z. B. `client.cookies.clear()` in einer autouse-Fixture zwischen Tests, oder ein dedizierter `fresh_client`), zusätzlich zur Migration der bestehenden Header-basierten Tests auf das Cookie-Muster — beides als Pflicht-Vorlauf vor der eigentlichen Implementierung im Aufwand einplanen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (Weg-Gate-Teilentscheidungen oben)
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `backend/auth.py` (`require_auth`/`require_host`, Z. 67–80), `backend/main.py` (CORS-Block Z. 98–103, `/login` Z. 2588–2598, neuer `/logout`-Endpoint, `/register-device` Z. 2608–2619 bewusst unverändert), `web/index.html` (`CFG`/`API`/`Auth`-Objekte Z. 1568–1698, Settings-Sheet-Feld Z. 7332–7334), `backend/conftest.py` (Cookie-Isolation für Tests, siehe Pre-Mortem)
+- [x] Designer-Check: visuell? → teilweise (Settings-Feld wechselt von Freitext zu fester Auswahl) — als minimale, nicht bauhaus-relevante Steuerelement-Änderung eingestuft; ⚠️ Annahme: Designer-Check vor Implementierungsstart optional nachholen, falls Stephan eine sichtbare Auswahl-UI (Dropdown vs. Segmented Control) wünscht.
+- [x] Implementierungsoptionen: A (reines HttpOnly-Cookie) / B (Cookie + Header-Fallback)
+- [x] Empfehlung: Option A
+
+**Implementierungsoptionen:**
+
+*Option A — Reines HttpOnly-Cookie (empfohlen):*
+- Vorgehen: `POST /login` setzt `Set-Cookie: fa_session=<token>; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000` (30 Tage, siehe ⚠️ Annahme oben); JSON-Body liefert nur noch `{"role": ...}`. `require_auth`/`require_host` lesen ausschließlich das Cookie (`fastapi.Cookie`), kein Header-Fallback. Neuer `POST /logout`-Endpoint setzt das Cookie mit `Max-Age=0` ab (JS kann ein HttpOnly-Cookie nicht selbst löschen — `Auth.logout()` in `web/index.html:1693` tut bisher nur `localStorage.removeItem`). CORS: `allow_origins` auf explizite Liste (Prod-Domain + `http://localhost:8000`) + `allow_credentials=True`. Frontend: `API._headers()` verliert den `Authorization`-Zusatz, `fetch`-Calls brauchen `credentials:'same-origin'` (Default reicht, da same-origin laut Architektur-Notiz oben) statt manuellem Header. `CFG.role`-Getter liest künftig aus dem bereits vorhandenen `fa_role`-localStorage-Eintrag (`web/index.html:1690`, bislang nur „für eventuelle externe Kompatibilität" gesetzt) statt aus dem Token-Präfix — das ist kein Geheimnis (reine UI-Anzeige), die tatsächliche Autorisierung bleibt serverseitig über das Cookie. `fa_api`-Feld wird von Freitext auf feste Auswahl umgestellt.
+- Betroffene Dateien: `backend/auth.py`, `backend/main.py`, `web/index.html`, `backend/conftest.py` (Testinfrastruktur).
+- Vorteile: kein XSS-lesbares Ticket mehr, ein einziger Auth-Pfad (keine Dual-Mechanismus-Komplexität), deckt sich mit der bestätigten Entscheidung, iOS unberührt.
+- Nachteile/Risiken: bricht bestehende Header-basierte Auth-Tests strukturell (Migrationsaufwand außerhalb dieses Testfiles, siehe Pre-Mortem 5), CORS-Fehlkonfiguration sperrt bei Fehler sofort alle Logins (Pre-Mortem 1).
+- Aufwand: mittel.
+
+*Option B — Cookie + Authorization-Header-Fallback (verworfen):*
+- Vorgehen: Cookie primär, `require_auth` akzeptiert zusätzlich weiterhin einen Bearer-Header.
+- Vorteile: bestehende Header-basierte Tests blieben ohne Anpassung grün.
+- Nachteile: der Header-Pfad — exakt die von diesem Ticket zu schließende Lücke — bliebe offen; kein aktueller Client braucht ihn (iOS sendet nachweislich keinen Auth-Header, `main.py:2610`). Verfehlt das Ticketziel.
+- Aufwand: klein, aber sinnlos.
+
+✅ Empfehlung: Option A — von Stephan im Weg-Gate-Teilentscheid 3 bereits bestätigt.
+
+**Daten-Validierung:** nicht relevant — der Zwangs-Logout ersetzt jede Migration, keine Bestandsdaten zu überführen.
+
+**Testplan:**
+- [ ] Automatisiert (Harness, `backend/tests/test_task-83.py`, Marker `api`+`regression`): Login setzt HttpOnly/Secure/SameSite=Lax-Cookie; Login-Response ohne `token`-Feld; geschützter Endpunkt ohne Cookie → 401 (isolierter frischer Client); geschützter Endpunkt mit Cookie nach Login → 200 ohne Authorization-Header; `/logout` verfällt das Cookie, danach wieder 401; alter Bearer-Header wird nicht mehr akzeptiert (Zwangs-Logout-Vertrag); CORS-Response für erlaubte Origin enthält `Access-Control-Allow-Credentials: true` + exakte (nicht Wildcard-)Origin, für fremde Origin fehlt der Allow-Header.
+- [ ] Nicht automatisierbar (Backend-Harness) — `fa_api`-Allow-Liste ist reines Frontend-Verhalten ohne Server-Gegenpart: manuell im Browser prüfen (siehe unten), analog zum bestehenden Muster in `test_bug47.py`.
+- [ ] Manuell (`http://localhost:8000`, Chrome UND Safari getrennt): 1) Login durchführen, DevTools → Application → Cookies prüfen (HttpOnly/Secure/SameSite=Lax sichtbar, `fa_token` in Local Storage NICHT mehr vorhanden). 2) Abmelden, Cookie verschwindet, erneuter geschützter Vorgang zeigt Login-Bildschirm. 3) Settings-Sheet öffnen: Freitextfeld für Backend-Adresse ist weg, feste Auswahl vorhanden; per Konsole `localStorage.setItem('fa_api','https://evil.example')` setzen und App neu laden → Wert wird ignoriert/zurückgesetzt. 4) `curl -i -X POST http://localhost:8000/login -d '{"password":"..."}' -H 'Content-Type: application/json'` → `Set-Cookie`-Header mit den drei Attributen sichtbar, Body ohne `token`-Feld. 5) Regressions-Matrix (`PRODUCT.md` Abschnitt 12) für Auth-Änderungen konsultieren — zusätzlich alle bestehenden Login/Logout/Rollen-Anzeige-Pfade (Feed, Locations-Edit, Settings) erneut durchklicken.
+
+---
+
+### TASK-84 · Externe Skripte mit Echtheitsprüfung (SRI) laden `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Leaflet und astronomy-engine werden von fremden CDNs (cdnjs, jsdelivr) ohne `integrity`-Attribut geladen. Ein manipuliertes oder übernommenes CDN könnte beliebigen Code in der App ausführen. `integrity`-Hash + `crossorigin` ergänzen oder die Bibliotheken selbst hosten.
+
+**User Story:** Als Nutzer, möchte ich, dass die App nur unveränderte, echte Fremd-Bibliotheken lädt, sodass ein manipuliertes CDN keinen Schadcode in meine App bringen kann.
+
+**Bezug:** TASK-82 (die dort eingeführte CSP muss die CDN-Herkünfte erlauben — oder Self-Hosting macht beide Tickets einfacher; bei Analyse gemeinsam betrachten). Quelle: Security-Audit 2026-07-16.
+
+---
+
+### TASK-85 · App bei fehlendem Auth-Geheimnis hart abbrechen (Notwert entfernen) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Fehlt die Umgebungsvariable `FOTOALERT_AUTH_SECRET`, fällt die App still auf einen im Code hinterlegten, öffentlich bekannten Notwert zurück — damit ließe sich ein Admin-Ticket ohne Passwort berechnen. Aktuell **nicht** ausnutzbar (Live-Prüfung am 2026-07-16: das Geheimnis ist in `/opt/fotoalert/app/FotoAlert/backend/.env` gesetzt), aber ein latentes Risiko bei jedem künftigen Deploy ohne `.env`. Notwert entfernen, Start hart abbrechen wenn das Geheimnis fehlt.
+
+**User Story:** Als Nutzer, möchte ich, dass die App bei fehlender Sicherheits-Konfiguration gar nicht erst startet, sodass eine Fehlkonfiguration nie zu einem fälschbaren Admin-Zugang führt.
+
+**Bezug:** Baut auf US-66 [x] (Auth-Mechanismus) auf. Eigenständig, kein Überlapp mit TASK-83 (dort geht es um die Ablage des Tickets im Browser, hier um die serverseitige Signaturbasis). Quelle: Security-Audit 2026-07-16.
+
+---
+
+### TASK-86 · Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Mehrere öffentlich erreichbare Endpunkte sind ungebremst: der Planungs-Endpunkt nimmt einen ungedeckelten Zeitraum entgegen (beliebig teure Berechnung), der Kalender-Cache lässt sich durch minimal variierte Werte umgehen und wächst unbegrenzt, Login-Fehlversuche werden nicht gedrosselt (Passwort-Durchprobieren), CORS steht auf „alle Herkünfte erlaubt", und die Geräte-Registrierung nimmt ungeprüft unbegrenzt Einträge an. Deckeln, drosseln, eingrenzen, validieren.
+
+**User Story:** Als Nutzer, möchte ich, dass die App auch unter Missbrauchsversuchen erreichbar und schnell bleibt, sodass Einzelne den Dienst nicht lahmlegen oder Passwörter durchprobieren können.
+
+**Bezug:** Überschneidung mit BUG-63 [x] („Alignments berechnen" blockierte den Server 20–25 s) — dort wurde die *Laufzeit* desselben Planungs-Endpunkts entschärft (`asyncio.to_thread`), hier fehlt weiterhin die *Eingabe-Deckelung* des Zeitraums; kein Dublett, aber die dortige Lösung vor der Analyse lesen. Berührt dieselbe Funktion `preview_alignment()` wie TASK-81 (Refactoring, Inbox) — Konflikt-/Reihenfolgerisiko, bei Freigabe abstimmen. Abgrenzung zu TASK-75 (Wetter-API-Drosselung): dort *ausgehende* Anfragen an fremde Dienste, hier *eingehende* Anfragen an FotoAlert. Quelle: Security-Audit 2026-07-16.
+
+---
+
+### TASK-87 · Kleinere Sicherheits-Härtungen (Sammelticket) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Bündel niedrig-schwerer Audit-Funde, in der Analyse ggf. splitten:
+- (a) Status-Endpunkte geben interne Fehlertexte öffentlich preis.
+- (b) Bearbeiten kuratierter Locations verlangt nur ein Nutzer-Ticket, obwohl Löschen/Bild Admin verlangt.
+- (c) Upload prüft die Größe erst nach vollständigem Einlesen in den Speicher.
+- (d) systemd-Härtung fehlt weitgehend (Precompute-Unit ganz ohne).
+- (e) Deploy-SSH akzeptiert jeden Server-Schlüssel (`StrictHostKeyChecking=no`) und `main` hat keinen Branch-Schutz trotz Push=Deploy.
+- (f) Zwei eingeloggte Debug-HTML-Dateien liegen im Git.
+- (g) locationscout-Sitzungscookie (gültig bis ~Aug 2026, enthält E-Mail) liegt im Klartext lokal — durch Ausloggen entwerten.
+- (h) Alte Paketversionen (python-multipart 0.0.9, Pillow 10.3.0) mit `pip-audit` gegenprüfen.
+
+**User Story:** Als Nutzer und Betreiber, möchte ich, dass auch die kleineren Schwachstellen geschlossen werden, sodass die Angriffsfläche insgesamt klein bleibt.
+
+**Bezug:** Punkt (c) berührt den Upload-Pfad aus US-120 [x] (Beispielbild-Upload, Größenlimit) — dort wurde das Limit fachlich eingeführt, hier geht es um den Zeitpunkt der Prüfung; kein Dublett. Punkt (e) berührt dieselbe Deploy-Pipeline wie TASK-80 [x] (Forgejo-/GitHub-Workflows), aber anderer Scope. Punkt (h) überschneidet sich thematisch mit US-74 (Regelmäßige Open-Source-Lizenzprüfung, offen) — dort Lizenzen, hier Sicherheitslücken; ggf. gemeinsamer Dependency-Check-Lauf, Entscheidung bei Analyse. Quelle: Security-Audit 2026-07-16.
+
+---
+
+### TASK-88 · Release-Skript: Merge-Konflikt darf keinen Ad-hoc-Commit ohne Standard-Message/Tag hinterlassen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Beim Release von US-133 (v1.22.34) trat ein Merge-Konflikt in `FotoAlert/PRODUCT.md` auf (`U FotoAlert/PRODUCT.md`, `error: Committing is not possible because you have unmerged files`, `fatal: Exiting because of an unresolved conflict`). Trotz dieses Abbruchs blieb ein lokaler, unpushter Commit mit einer Ad-hoc-Message ("merge: PRODUCT.md Konflikt nach stash pop aufgelöst", Autor Stephan) zurück — vermutlich Ergebnis eines Auto-Recovery-Schritts außerhalb des eigentlichen Release-Skripts. Dieser Commit folgte NICHT dem Standard-Muster `release: vX.Y.Z – <Beschreibung>` und erzeugte KEINEN Git-Tag (verifiziert: `git tag -l "v1.22.34"` war zu diesem Zeitpunkt leer, obwohl der Commit den korrekten Versionsbump in `web/index.html`/`sw.js` bereits enthielt). Nachbesserung war nur manuell möglich (`git commit --amend`, dann `git tag`, dann Push) und nur, weil der Commit noch nicht gepusht war.
+
+Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pushen", Zeilen 71–81) enthält selbst **keinerlei** Stash- oder Merge-Konflikt-Behandlung — es ist eine reine lineare Sequenz `git add` → `git commit -m "release: vX.Y.Z – …"` → `git push origin main` → `git tag` → `git push origin <tag>` ohne Fehlerbehandlung über `set -euo pipefail` hinaus. Der Ad-hoc-Commit muss also aus einer Ebene oberhalb von `release.sh` stammen (z. B. dem `fotoalert-release`-Skill oder einer Heartbeat-Routine, die laut bestehender Notiz vor/nach dem Aufruf von `release.sh` `git stash push`/`git stash pop` ausführt — Details dazu liegen außerhalb dieses Repos und müssen in der Analyse lokalisiert werden).
+
+**Ziel:** Der Konflikt-Fall soll entweder (a) gar nicht selbst aufgelöst werden, sondern zu einem sauberen, klar kommunizierten Abbruch führen, bevor irgendein Commit entsteht, oder (b) falls Auto-Recovery gewünscht ist, dabei konsistent die Standard-Commit-Message (`release: vX.Y.Z – <Beschreibung>`) und den korrekten Tag setzen. In der Analyse zuerst die tatsächliche Quelle des Auto-Recovery-Mechanismus identifizieren (nicht in `release.sh` selbst gefunden).
+
+**User Story:** Als Stephan, möchte ich, dass ein Merge-Konflikt beim Release entweder sauber abbricht oder korrekt mit Standard-Message und Tag committet wird, sodass ich nie wieder einen unpushten Ad-hoc-Commit manuell nachbessern muss und kein Release-Tag fehlt.
+
+**Bezug:** Ausgelöst durch Retrospektive zu US-133 (Release v1.22.34, 2026-07-16).

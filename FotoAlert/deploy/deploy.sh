@@ -113,8 +113,49 @@ if [ "$HTTP_STATUS" != "200" ]; then
     exit 1
 fi
 
+# ── 7. Caddy-Konfiguration abgleichen (TASK-82) ─────────────────────────────
+# deploy/Caddyfile ist die Quelle der Wahrheit. Ohne diesen Schritt kommt eine
+# Änderung an der Datei nie automatisch auf dem Server an (nur setup_server.sh
+# kopiert sie – aber nur einmalig bei der Ersteinrichtung eines neuen Servers).
+echo ""
+echo ">>> Caddy-Konfiguration abgleichen..."
+CADDY_DOMAIN="fotoalert.stephanschumann.com"
+CADDY_SRC="$DEPLOY_DIR/Caddyfile"
+CADDY_LIVE="/etc/caddy/Caddyfile"
+CADDY_CANDIDATE="/tmp/fotoalert_caddyfile_candidate.$$"
+CADDY_OK=1
+
+# YOUR_DOMAIN-Platzhalter genauso ersetzen wie setup_server.sh es einmalig tut,
+# sonst würde ein reiner Abgleich die schon live gesetzte Domain wieder überschreiben.
+sed "s|YOUR_DOMAIN|$CADDY_DOMAIN|g" "$CADDY_SRC" > "$CADDY_CANDIDATE"
+
+if ! sudo caddy validate --config "$CADDY_CANDIDATE" --adapter caddyfile; then
+    echo "❌ Caddyfile-Validierung fehlgeschlagen (Syntaxfehler) – Konfiguration wird NICHT übernommen."
+    echo "   Alte Konfiguration bleibt aktiv, Webserver läuft unverändert weiter."
+    echo "   Bitte $CADDY_SRC prüfen und Fehler beheben."
+    CADDY_OK=0
+elif ! sudo cmp -s "$CADDY_CANDIDATE" "$CADDY_LIVE" 2>/dev/null; then
+    echo ">>> Caddyfile geändert – wird übernommen, Webserver wird neu geladen..."
+    sudo cp "$CADDY_CANDIDATE" "$CADDY_LIVE"
+    if sudo systemctl reload caddy; then
+        echo ">>> Caddy erfolgreich neu geladen."
+    else
+        echo "❌ Caddy-Reload fehlgeschlagen trotz gültiger Konfiguration – manueller Eingriff nötig (journalctl -u caddy -n 50)."
+        CADDY_OK=0
+    fi
+else
+    echo ">>> Caddyfile unverändert – kein Reload nötig."
+fi
+rm -f "$CADDY_CANDIDATE"
+
 echo ""
 echo "✅ Deploy erfolgreich!"
 echo "   Commit: $NEW_COMMIT"
 echo "   SW-Cache: fotoalert-$DEPLOY_TS"
 echo "   Zeit: $(date '+%Y-%m-%d %H:%M:%S')"
+
+if [ "$CADDY_OK" != "1" ]; then
+    echo ""
+    echo "⚠️  App-Code erfolgreich deployt, aber Caddy-Konfiguration konnte NICHT übernommen werden (siehe oben)."
+    exit 1
+fi
