@@ -26,11 +26,16 @@ YOUR_DOMAIN {
         # Unterdomains) sind erlaubt. Eingebetteter Code (Script/Style) bleibt
         # bewusst über 'unsafe-inline' zugelassen, da die komplette App aus
         # eingebettetem Code besteht (siehe Ticket-Annahme, keine Nachlässigkeit).
-        # connect-src (Nachtrag nach Live-Test): Der Service Worker fängt die
-        # CDN-Skripte ab und lädt sie per eigenem fetch() nach – das läuft über
-        # connect-src, nicht über script-src. Ohne diesen Eintrag blockierte die
-        # Regel Leaflet und astronomy-engine komplett (im Browser-Test entdeckt).
-        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com; connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net"
+        # connect-src (Nachtrag nach Live-Test): Der Service Worker fängt JEDE
+        # Netzwerk-Anfrage ab und lädt sie per eigenem fetch() nach – das läuft
+        # immer über connect-src, unabhängig davon ob es sich um ein Skript
+        # (script-src), ein Stylesheet (style-src) oder ein Bild (img-src)
+        # handelt. Deshalb muss connect-src dieselben Fremd-Adressen wie die
+        # anderen Direktiven enthalten (im Browser-Test in zwei Runden entdeckt:
+        # zuerst bei den beiden Bibliotheks-CDNs, dann bei den drei
+        # Kartenkachel-Anbietern). img-src bekommt zusätzlich "data:" für
+        # Leaflets eingebautes 1x1-Pixel-Platzhalterbild.
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com; connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com"
         # Permissions-Policy (TASK-82): alles sperren außer Standortabfrage (GPS-Knopf)
         # und Zwischenablage-Zugriff (Koordinaten aus Zwischenablage einfügen).
         Permissions-Policy "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(), gamepad=(), geolocation=(self), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(self), clipboard-write=(self)"
