@@ -122,7 +122,7 @@ echo ">>> Caddy-Konfiguration abgleichen..."
 CADDY_DOMAIN="fotoalert.stephanschumann.com"
 CADDY_SRC="$DEPLOY_DIR/Caddyfile"
 CADDY_LIVE="/etc/caddy/Caddyfile"
-CADDY_CANDIDATE="/tmp/fotoalert_caddyfile_candidate.$$"
+CADDY_CANDIDATE="/tmp/fotoalert_caddyfile_candidate"
 CADDY_OK=1
 
 # YOUR_DOMAIN-Platzhalter genauso ersetzen wie setup_server.sh es einmalig tut,
