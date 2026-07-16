@@ -86,6 +86,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_us_126.py` | US-126: Bildausschnitt (Crop-Fokuspunkt) selbst wählen | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us_128.py` | US-128: Bauwerkshöhe/-breite nachträglich per PATCH bearbeitbar | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us_132.py` | US-132: „Rote Wolken" (RED_CLOUDS) in Sonnenrichtung, Blaue-Stunde-Fenster | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_us-133.py` | US-133: Kartenschwenk bei Koordinaten-Eingabe (Anlegen + Bearbeiten, rein clientseitig) | ⏭️ immer übersprungen (Platzhalter, AKs manuell getestet) | `frontend`, `regression` |
 
 **Marker `smoke` (TASK-70, erweitert in TASK-71):** kleine, handverlesene Auswahl der
 wichtigsten/schnellsten Tests (Health/Locations/Feed/Auth, ein Kernpfad pro Hauptfunktion) für
