@@ -67,6 +67,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_task77_qa_cleanup_on_delete.py` | TASK-77: QA-Zeilen werden bei Location-Löschung mitentfernt | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task78_qa_transactional.py` | TASK-78: QA-Teilerfolg konsistent behandeln (Option B) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task79_readme_marker_sync.py` | TASK-79: diese README-Tabelle gegen die BUG-79-Testrealität + Vollständigkeit gegen alle Testdateien absichern | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task84.py` | TASK-84 (Nacharbeit): Vendor-Umstellung (Leaflet/astronomy-engine self-hosted unter `web/vendor/`) + CSP-Verschlankung (`deploy/Caddyfile`) statisch abgesichert | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task_65_field_roundtrip.py` | TASK-65: generischer Feld-Rundreise-Test (Whitelist-Vollständigkeit aller Location-Felder) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us-129.py` | US-129: Datenvertrag `image_url` für Filter „Hat Beispielbild" | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us07.py` | US-07: Goldene Wolken & Himmelsröte Scoring (AKs) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
