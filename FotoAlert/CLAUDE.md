@@ -101,6 +101,12 @@ Verifikations-Subagent (§ Verifikation).
 - Kanban nach **jeder** Status-Änderung mitziehen (`tools/sync_kanban.py` → `update_artifact`).
 - PRODUCT.md nach jedem Ticket pflegen (Basis für Regression).
 - Server läuft **Python 3.9** — keine 3.10+-Syntax (`str|None`).
+- **Subagenten-Erfolgsmeldung zu Schreiboperationen nie ungeprüft übernehmen** ("Datei X
+  geändert/ergänzt" o.ä.): sofort nach dem Edit/Write per Grep/Read gegen die genannte
+  Zielstelle verifizieren, Rohausgabe zitieren — nicht nur die Prosa-Zusammenfassung des
+  Subagenten glauben. Zweifach aufgetreten (TASK-64, TASK-84) — reines Memory reichte beim
+  ersten Mal nicht aus, deshalb hier zusätzlich verankert (Memory
+  `feedback_subagent_false_positive_claims`, `fotoalert-impl` Pattern 21).
 - **Kein Tool-Call vor einer reinen Text-/Codeblock-Antwort** (Handoff-Schritt, Erklärung,
   Terminal-Befehl zum Kopieren) — kein `bash echo`/`true`, kein sachfremder Werkzeug-Griff nur
   um "etwas zu tun". Selbst-Check vor JEDEM Call: „Braucht die Antwort dieses Ergebnis?" Wenn nein

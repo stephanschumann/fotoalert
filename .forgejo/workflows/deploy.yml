@@ -1,6 +1,9 @@
 # FotoAlert – Automatisches Deployment via Forgejo Actions (Codeberg)
 # Trigger: Push auf den main-Branch
 #
+# ⚠️ NICHT MEHR AKTIV (TASK-80): Diese Codeberg/Forgejo-Pipeline wird nicht mehr genutzt.
+# GitHub Actions (.github/workflows/deploy.yml) ist die einzige aktive Deploy-Pipeline.
+#
 # Voraussetzung (einmalig in Codeberg unter Settings → Secrets einrichten):
 #   DEPLOY_SSH_KEY           – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
 #   SERVER_IP                – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
