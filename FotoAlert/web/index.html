@@ -1125,6 +1125,37 @@ function ic(id, size, cls, color){
   const colorStyle = color ? `;color:${color}` : '';
   return `<svg class="ic ${cls||''}" style="width:${s}px;height:${s}px;vertical-align:-0.15em;flex-shrink:0${colorStyle}" aria-hidden="true"><use href="#${id}"/></svg>`;
 }
+
+// BUG-81: zentraler HTML-Escape-Helfer (global, ersetzt die vorherige lokale Kopie in
+// der Himmelsposition-Zusammenfassung sowie mehrere unvollständige Teil-Escapes an
+// anderen Stellen). Escaped bewusst NUR & < > " (keine Nicht-ASCII-Zeichen/Umlaute/
+// Akzente) — sicher fuer Text- UND einfache Attribut-Kontexte (z.B. value="...").
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+// BUG-81: Schema-Allowlist fuer dynamische URL-Felder (z.B. locationscout_url) vor
+// Zuweisung an href — nur http:/https:, case-insensitiv. javascript:/data:/vbscript:
+// u.ae. werden geblockt.
+function isSafeUrl(u) {
+  return typeof u === 'string' && /^https?:\/\//i.test(u.trim());
+}
+
+// BUG-81: sichere Einbettung von dynamischem Text in onclick='...'-Attribute, die
+// intern einen doppelt gequoteten JS-String-Aufruf enthalten (onclick='fn("...")').
+// Zwei verschachtelte Escaping-Schichten muessen in dieser Reihenfolge behandelt werden:
+// 1) der innere JS-String-Kontext (Backslash und doppeltes Anfuehrungszeichen, da der
+//    Aufruf innerhalb von onclick='...' mit "..." gebaut wird), danach
+// 2) der aeussere HTML-Attribut-Kontext (einfaches Anfuehrungszeichen escapen, da
+//    onclick mit '...' delimitiert ist; & zusaetzlich, damit die HTML-Entity-Dekodierung
+//    vor dem JS-Parsing nichts Unbeabsichtigtes erzeugt).
+// Ersetzt die bisherigen unvollstaendigen Teil-Escapes (nur das JS-Anfuehrungszeichen
+// wurde per Backslash behandelt, das umschliessende HTML-Attribut nicht) — die gaben
+// ein falsches Sicherheitsgefuehl.
+function escJsAttr(s) {
+  const j = String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r/g, '').replace(/\n/g, '\\n');
+  return j.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+}
 </script>
 <!-- US-66: Pflicht-Login-Overlay -->
 <style>
@@ -1563,7 +1594,7 @@ function ic(id, size, cls, color){
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.37';
+const APP_VERSION = '1.22.38';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1928,8 +1959,8 @@ function oppCard(o) {
           <span class="opp-type">${o.event_type}</span>
           <span class="opp-time">${formatTime(o.shoot_time)}</span>
         </div>
-        <div class="opp-title">${o.title}</div>
-        <div class="opp-location">${ic('i-pin',13)} ${Locations.nameFor(o.location_id, o.location_name)}</div>
+        <div class="opp-title">${esc(o.title)}</div>
+        <div class="opp-location">${ic('i-pin',13)} ${esc(Locations.nameFor(o.location_id, o.location_name))}</div>
         <div class="opp-tags">${prio}${fl}${weatherTag}${stativ}${verified}${sightline}${rated}</div>
       </div>
     </div>
@@ -1961,7 +1992,7 @@ function scoutCard(o) {
           <span class="opp-type">${sesLabel}</span>
           <span class="opp-time">${time}</span>
         </div>
-        <div class="opp-title">${o.subject_name || '–'}</div>
+        <div class="opp-title">${esc(o.subject_name || '–')}</div>
         <div class="opp-location">${ic('i-pin',13)} Blick vom ${bearing}</div>
         <div class="opp-tags">${weatherTag}${distTag}${illumTag}</div>
       </div>
@@ -2107,7 +2138,7 @@ const Feed = {
         `<div class="alert-chip" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           <div class="chip-icon">${eventIcon(o.event_type, 20)}</div>
           <div class="chip-day">${formatDate(o.shoot_time)}</div>
-          <div class="chip-name">${Locations.nameFor(o.location_id, o.location_name)}</div>
+          <div class="chip-name">${esc(Locations.nameFor(o.location_id, o.location_name))}</div>
         </div>`).join('');
       html += `<div id="alert-banner">
         <h3 style="display:flex;align-items:center;gap:6px">${ic('i-star',16)} Besondere Ereignisse (${high.length})</h3>
@@ -2483,8 +2514,8 @@ const CalendarView = {
           html += `<div class="cal-event" onclick="CalendarView.openDetail(${JSON.stringify(e).replace(/"/g,'&quot;')})">
             <div class="cal-event-icon">${icon}</div>
             <div class="cal-event-body">
-              <div class="cal-event-title">${e.title}${prio}</div>
-              <div class="cal-event-sub">${Locations.nameFor(e.location_id, e.location_name)} · ${hh}:${mm} Uhr${moonTxt}</div>
+              <div class="cal-event-title">${esc(e.title)}${prio}</div>
+              <div class="cal-event-sub">${esc(Locations.nameFor(e.location_id, e.location_name))} · ${hh}:${mm} Uhr${moonTxt}</div>
             </div>
             <div class="cal-event-score">${Math.round(e.overall_score * 100)}%</div>
           </div>`;
@@ -2592,11 +2623,11 @@ const Verify = {
     const v = this.getLast(locationId);
     if (!v) return '';
     if (v.status === 'issue') {
-      const type = v.issue_type ? ` · ${v.issue_type}` : '';
-      const cmt  = v.comment ? ` – „${v.comment}"` : '';
+      const type = v.issue_type ? ` · ${esc(v.issue_type)}` : '';
+      const cmt  = v.comment ? ` – „${esc(v.comment)}"` : '';
       return `<div class='verified-badge-issue' style='display:flex;align-items:center;gap:5px'>${ic('i-warn',14)} Problem gemeldet am ${this.formatDate(v.date)}${type}${cmt} <button class="el-info-btn" onclick="ElementInfo.show('verification')">i</button></div>`;
     }
-    const cmt = v.comment ? ` · „${v.comment}"` : '';
+    const cmt = v.comment ? ` · „${esc(v.comment)}"` : '';
     return `<div class='verified-badge' style='display:flex;align-items:center;gap:5px'>${ic('i-check',14)} Vor Ort geprüft am ${this.formatDate(v.date)}${cmt} <button class="el-info-btn" onclick="ElementInfo.show('verification')">i</button></div>`;
   },
 
@@ -2630,8 +2661,8 @@ const Verify = {
       const isIssue = v.status === 'issue';
       const icon  = ic(isIssue ? 'i-warn' : 'i-check', 14);
       const color = isIssue ? 'var(--red)' : 'var(--green)';
-      const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${v.issue_type}</span>` : '';
-      const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${v.comment}"</span>` : '';
+      const type  = isIssue && v.issue_type ? `<span style="color:var(--red);font-size:11px">${esc(v.issue_type)}</span>` : '';
+      const cmt   = v.comment ? `<span style="color:var(--muted);font-size:11px">„${esc(v.comment)}"</span>` : '';
       return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--hairline)">
         <span style="color:${color};flex-shrink:0;width:16px">${icon}</span>
         <span style="font-size:12px;color:var(--muted);flex-shrink:0;width:72px">${this.formatDate(v.date)}</span>
@@ -2655,7 +2686,7 @@ const Verify = {
       <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis (z.B. Zugang, Besonderheiten):</div>
       <textarea id='verify-comment-${formId}' placeholder='z.B. Zugang ab Oktober gesperrt…'></textarea>
       <div class='verify-form-actions'>
-        <button class='btn-verify' onclick='Verify.confirm("${locationId}","${locationName.replace(/'/g,"\\'")}","${formId}")'>${ic('i-check',14)} Bestätigen</button>
+        <button class='btn-verify' onclick='Verify.confirm("${locationId}","${escJsAttr(locationName)}","${formId}")'>${ic('i-check',14)} Bestätigen</button>
         <button class='btn-verify-cancel' onclick='document.getElementById("${formId}").remove()'>Abbrechen</button>
       </div>`;
     btn.insertAdjacentElement('afterend', form);
@@ -2672,7 +2703,7 @@ const Verify = {
 
   // ── Verifikations-UI für Location-Detail-Sheet ──────────────────
   verifySection(locationId, locationName) {
-    const safeName = locationName.replace(/'/g, "\\'");
+    const safeName = escJsAttr(locationName);
     const sid = 'loc-verify-section-' + locationId.replace(/[^a-z0-9]/gi,'_');
     const fid = 'loc-verify-form-' + locationId.replace(/[^a-z0-9]/gi,'_');
     const hasEntries = this.getList(locationId).length > 0;
@@ -2698,7 +2729,7 @@ const Verify = {
         <div style='font-size:13px;color:var(--muted)'>Optionaler Hinweis:</div>
         <textarea id='${fid}-txt' placeholder='z.B. Zugang über Nordeingang…'></textarea>
         <div class='verify-form-actions'>
-          <button class='btn-verify' onclick='Verify.saveLocOk("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>${ic('i-check',14)} Bestätigen</button>
+          <button class='btn-verify' onclick='Verify.saveLocOk("${locationId}","${escJsAttr(locationName)}","${fid}")'>${ic('i-check',14)} Bestätigen</button>
           <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
         </div>
       </div>`;
@@ -2715,7 +2746,7 @@ const Verify = {
         <div class='issue-chips'>${chips}</div>
         <textarea id='${fid}-txt' placeholder='Weitere Details (optional)…' style='background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;resize:vertical;min-height:56px;font-family:inherit'></textarea>
         <div class='verify-form-actions'>
-          <button class='btn-issue' onclick='Verify.saveLocIssue("${locationId}","${locationName.replace(/'/g,"\\'")}","${fid}")'>${ic('i-warn',14)} Problem speichern</button>
+          <button class='btn-issue' onclick='Verify.saveLocIssue("${locationId}","${escJsAttr(locationName)}","${fid}")'>${ic('i-warn',14)} Problem speichern</button>
           <button class='btn-verify-cancel' onclick='document.getElementById("${fid}").innerHTML=""'>Abbrechen</button>
         </div>
       </div>`;
@@ -4512,8 +4543,8 @@ const Detail = {
     document.getElementById('detail-content').innerHTML = `
       <div class="sheet-hero">
         <div class="sheet-hero-type" style="display:flex;align-items:center;gap:6px">${icon} ${o.event_type} <button class="el-info-btn" onclick="ElementInfo.show('eventType','${o.event_type.replace(/'/g, "\\'")}')">i</button></div>
-        <div class="sheet-hero-title">${o.title}</div>
-        ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${Locations.nameFor(o.location_id, o.location_name)} →</button></div>` : ''}
+        <div class="sheet-hero-title">${esc(o.title)}</div>
+        ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${esc(Locations.nameFor(o.location_id, o.location_name))} →</button></div>` : ''}
         ${o.location_id ? `<div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>` : ''}
         ${SIGHTLINE_RELEVANT_TYPES.has(o.event_type) ? `<div style="margin-top:6px">${sightlineTagHtml(o.sightline_status, true)}</div>` : ''}
       </div>
@@ -4528,7 +4559,7 @@ const Detail = {
           <div id="score-info-body"></div>
         </div>
       </div>
-      ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${o.description}</p>`)}
+      ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${esc(o.description)}</p>`)}
       ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('idealWindow')">i</button>`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
       ${(() => {
         const wd = o.weather_details;
@@ -4813,7 +4844,7 @@ const Detail = {
         const ca = o.composition_analysis;
         if (!ca || EV_SKYPOS_EXEMPT.has(o.event_type)) return '';
         const body = ca.body_name || 'Objekt';
-        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        // BUG-81: lokale Kopie entfernt, nutzt jetzt die globale esc()-Funktion.
         const bodyHtml = esc(body);
         // Meter-Formatierung NUR aus gecachten Cache-Werten (keine Neuberechnung).
         const fmtM = v => Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(2).replace('.', ',') + ' km' : Math.abs(v).toFixed(0) + ' m';
@@ -4903,7 +4934,7 @@ const Detail = {
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
-        <button id="verify-btn-${(o.location_id||'x').replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${Locations.nameFor(o.location_id, o.location_name).replace(/'/g,"\'")}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
+        <button id="verify-btn-${(o.location_id||'x').replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${escJsAttr(Locations.nameFor(o.location_id, o.location_name))}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
         </button>`
         }
@@ -5128,8 +5159,8 @@ const MapView = {
       });
       const m = L.marker([loc.observer_lat, loc.observer_lon], {icon}).addTo(this.map);
       m.bindPopup(`<div class="map-popup">
-        <h4>${loc.name}</h4>
-        <p>${loc.category}<br><small>${loc.description.slice(0,80)}…</small></p>
+        <h4>${esc(loc.name)}</h4>
+        <p>${esc(loc.category)}<br><small>${esc(loc.description.slice(0,80))}…</small></p>
         <span class="popup-btn" onclick="LocationDetail.open('${loc.id}')">Details →</span>
       </div>`);
       this.markers.push({ marker: m, loc });
@@ -5573,8 +5604,10 @@ const WeatherMap = {
     if (!el) return;
     if (this.mode === 'off') { el.classList.remove('open'); return; }
     const txt = (this.data && this.data.attribution) || 'Daten: DWD · MET Norway (CC BY 4.0)';
-    const url = (this.data && this.data.attribution_url) || 'https://www.met.no/en/free-meteorological-data';
-    el.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener">' + txt + '</a>';
+    const defaultUrl = 'https://www.met.no/en/free-meteorological-data';
+    const rawUrl = (this.data && this.data.attribution_url) || defaultUrl;
+    const url = isSafeUrl(rawUrl) ? rawUrl : defaultUrl; // BUG-81: Schema-Pruefung, Fallback auf feste Adresse statt Link weglassen (Pflicht-Attribution)
+    el.innerHTML = '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(txt) + '</a>';
     el.classList.add('open');
   },
 
@@ -5986,19 +6019,19 @@ const Locations = {
         <div class="loc-card">
           <div class="loc-icon" style="background:var(--surface)">${ic(catIcon[l.category]||'i-pin',22)}</div>
           <div class="loc-body">
-            <h4>${l.name}</h4>
-            <p>${l.category}</p>
+            <h4>${esc(l.name)}</h4>
+            <p>${esc(l.category)}</p>
           </div>
           <span class="loc-diff ${diffCls[l.difficulty]||'diff-2'}">${diffLabel[l.difficulty]||'Mittel'}</span>
         </div>
-        <p style="font-size:12px;color:var(--muted);margin:8px 0;line-height:1.5">${l.description.slice(0,100)}…</p>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0;line-height:1.5">${esc(l.description.slice(0,100))}…</p>
         <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
           ${fls}
           <span id="loc-rating-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Rating.displayHtml(l.id)}</span>
           <span id="loc-card-tag-${l.id.replace(/[^a-z0-9]/gi,'_')}">${Verify.cardTagHtml(l.id)}</span>
         </div>
-        ${l.solar_alignment_note ? `<p style="font-size:11px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${l.solar_alignment_note}</p>` : ''}
-        ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${l.access_note}</p>` : ''}
+        ${l.solar_alignment_note ? `<p style="font-size:11px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${esc(l.solar_alignment_note)}</p>` : ''}
+        ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${esc(l.access_note)}</p>` : ''}
       </div>`;
     }).join('');
     document.getElementById('locations-content').innerHTML = html || `<div class="empty"><p>Keine Locations gefunden.</p></div>`;
@@ -6059,7 +6092,7 @@ const LocationDetail = {
       const fy = (loc.image_focus_y != null ? loc.image_focus_y : 50);
       return `
         <div class="loc-image-area" id="loc-image-area">
-          <img src="${CFG.api}${loc.image_url}" alt="Beispielbild ${loc.name.replace(/"/g,'&quot;')}" style="object-position:${fx}% ${fy}%">
+          <img src="${CFG.api}${loc.image_url}" alt="Beispielbild ${esc(loc.name)}" style="object-position:${fx}% ${fy}%">
           ${Auth.isHost() ? `<button class="loc-image-delete-btn" onclick="LocationDetail.deleteImage('${loc.id}')" title="Beispielbild löschen">${ic('i-trash',14)}</button>` : ''}
           ${Auth.isHost() ? `<button class="loc-image-edit-btn" onclick="LocationDetail.triggerImageUpload()">${ic('i-camera',14)} Ersetzen</button>` : ''}
           ${Auth.isHost() ? `<button class="loc-image-focus-btn" onclick="LocationDetail.openFocusPicker('${loc.id}')" title="Ausschnitt wählen">${ic('i-target',14)} Ausschnitt wählen</button>` : ''}
@@ -6243,11 +6276,11 @@ const LocationDetail = {
       </div>
       <div class="edit-form">
         <label>Name</label>
-        <input class="input-field" id="edit-name" type="text" value="${loc.name.replace(/"/g,'&quot;')}">
+        <input class="input-field" id="edit-name" type="text" value="${esc(loc.name)}">
 
         <label>Motivname</label>
         <input class="input-field" id="edit-subject-name" type="text"
-          value="${(loc.subject_name||'').replace(/"/g,'&quot;')}"
+          value="${esc(loc.subject_name||'')}"
           placeholder="z.B. Berliner Dom">
 
         <label>Kategorie</label>
@@ -6262,7 +6295,7 @@ const LocationDetail = {
 
         <label>Beschreibung</label>
         <div class="geocode-row">
-          <textarea class="input-field" id="edit-desc" rows="3">${loc.description||''}</textarea>
+          <textarea class="input-field" id="edit-desc" rows="3">${esc(loc.description||'')}</textarea>
           <button class="geocode-btn" onclick="LocationDetail._geocodeDesc()" title="Beschreibung via Standort-Erkennung füllen">⊕</button>
         </div>
         <p id="edit-geocode-hint" style="font-size:11px;color:var(--muted);margin:-8px 0 12px">⊕ erkennt den Ortsnamen deines Standorts und generiert eine neue Beschreibung.</p>
@@ -6321,7 +6354,7 @@ const LocationDetail = {
 
         <label>Hinweise (Zugang, beste Jahreszeit etc.)</label>
         <textarea class="input-field" id="edit-special-notes" rows="2"
-          placeholder="z.B. Parkgebühren, beste Zeit: April–August">${loc.special_notes||''}</textarea>
+          placeholder="z.B. Parkgebühren, beste Zeit: April–August">${esc(loc.special_notes||'')}</textarea>
 
         <div class="edit-actions" style="margin-top:8px">
           <button class="btn-secondary" style="flex:1" onclick="LocationDetail.open('${loc.id}')">Abbrechen</button>
@@ -6709,31 +6742,31 @@ const LocationDetail = {
       ${LocationDetail._imageAreaHtml(loc)}
       <div class="sheet-hero" style="padding-bottom:12px">
         <div class="sheet-hero-type">
-          ${ic(catIcon[loc.category]||'i-pin',16)} <span>${loc.category}</span>
+          ${ic(catIcon[loc.category]||'i-pin',16)} <span>${esc(loc.category)}</span>
           <span class="loc-diff ${diffCls[loc.difficulty]||'diff-2'}" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px">${diffLabel[loc.difficulty]||'Mittel'} <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('difficulty')">i</button></span>
           <button onclick="LocationDetail.openEdit()" style="margin-left:8px;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 4px" title="Bearbeiten">${ic('i-edit',16)}</button>
           ${Auth.isHost() ? `<button onclick="LocationDetail.deleteLocation('${loc.id}')" style="background:none;border:none;color:var(--red);font-size:15px;cursor:pointer;padding:2px 4px" title="Location löschen">${ic('i-trash',16)}</button>` : ''}
         </div>
-        <div class="sheet-hero-title">${loc.name}</div>
+        <div class="sheet-hero-title">${esc(loc.name)}</div>
         <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button>
-        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${loc.description}</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${esc(loc.description)}</p>
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}${sightlineTagHtml(loc.sightline_status, true)}</div>
       </div>
 
       ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
 
-      ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${loc.subject_name} <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
+      ${mkSec('loc_subj',`${ic('i-target',15)} Motiv – ${esc(loc.subject_name)} <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`${subjLat ? `<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${subjLat}°N, ${subjLon}°E</span></div><div style="display:flex;gap:8px;margin-top:8px"><a class="loc-maps-btn" href="${subjAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${subjGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a></div>` : '<p style="font-size:12px;color:var(--muted)">Keine Motivkoordinaten vorhanden.</p>'}<div class="info-row" style="margin-top:8px"><span class="ir-label">Entfernung</span><span class="ir-val">${distTxt}</span></div>${loc.subject_height_m ? `<div class="info-row"><span class="ir-label">Bauwerkshöhe</span><span class="ir-val">${heightTxt}</span></div>` : ''}${Math.abs(loc.elevation_difference_m || 0) > 2 ? `<div class="info-row"><span class="ir-label">Niveaudiff.</span><span class="ir-val">${(loc.elevation_difference_m > 0 ? '+' : '')}${Math.round(loc.elevation_difference_m)} m ${loc.elevation_difference_m > 0 ? '↑ Motiv höher' : '↓ Standort höher'}</span></div>` : ''}`)}
 
-      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${loc.solar_alignment_note}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${loc.lunar_alignment_note}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${loc.access_note}</p>` : ''}<div id="loc-sun-today"></div>`)}
+      ${mkSec('loc_azimut',`${ic('i-viewpoint',15)} Ausrichtung <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Idealer Azimut</span><span class="ir-val">${azTxt}</span></div><div class="info-row" style="align-items:flex-start"><span class="ir-label" style="padding-top:4px">Alignments</span><span class="ir-val">${bodyChipsHtml || '<span style="color:var(--muted);font-size:12px">–</span>'}</span></div>${bodyWarn}${sunOk && loc.solar_alignment_note ? `<p style="font-size:12px;color:var(--gold);margin-top:6px;display:flex;align-items:center;gap:5px">${ic('i-sun',13)} ${esc(loc.solar_alignment_note)}</p>` : ''}${moonOk && loc.lunar_alignment_note ? `<p style="font-size:12px;color:var(--text);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-moon',13)} ${esc(loc.lunar_alignment_note)}</p>` : ''}${loc.access_note ? `<p style="font-size:12px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${esc(loc.access_note)}</p>` : ''}<div id="loc-sun-today"></div>`)}
 
-      ${(loc.special_notes||'').trim() ? mkSec('loc_notes', ic('i-doc',15)+' Hinweise', `<p style="font-size:15px;color:var(--text);line-height:1.5">${loc.special_notes}</p>`) : ''}
+      ${(loc.special_notes||'').trim() ? mkSec('loc_notes', ic('i-doc',15)+' Hinweise', `<p style="font-size:15px;color:var(--text);line-height:1.5">${esc(loc.special_notes)}</p>`) : ''}
 
       ${(() => {
         CameraFOV._data['loc'] = { obsLat:loc.observer_lat, obsLon:loc.observer_lon, subjLat:loc.subject_lat||null, subjLon:loc.subject_lon||null, distM:loc.distance_m||0 };
         return mkSec('loc_fov',`${ic('i-fov',15)} Karte & Blickwinkel <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('fov')">i</button>`, CameraFOV.panelHtml('loc'));
       })()}
 
-      ${loc.locationscout_url ? mkSec('loc_links',`${ic('i-link',15)} Links`,`<a class="loc-maps-btn" href="${loc.locationscout_url}" target="_blank" style="margin-top:4px">${ic('i-camera',13)} Locationscout</a>`) : ''}
+      ${loc.locationscout_url && isSafeUrl(loc.locationscout_url) ? mkSec('loc_links',`${ic('i-link',15)} Links`,`<a class="loc-maps-btn" href="${esc(loc.locationscout_url)}" target="_blank" style="margin-top:4px">${ic('i-camera',13)} Locationscout</a>`) : ''}
 
       ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locEvents')">i</button>`,`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
 
@@ -6805,7 +6838,7 @@ const LocationDetail = {
         <div class="loc-next-event-row" onclick="LocationDetail.close();setTimeout(()=>Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')}),300)">
           <div class="loc-next-event-icon">${ic(eventIcon(e),18)}</div>
           <div class="loc-next-event-body">
-            <div class="loc-next-event-title">${e.title}</div>
+            <div class="loc-next-event-title">${esc(e.title)}</div>
             <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
           </div>
           <div class="loc-next-event-score">${Math.round((e.overall_score||0)*100)}%</div>
@@ -7879,7 +7912,7 @@ const Glossary = {
     const entries = this._entries().filter(e => !q || e.q.toLowerCase().includes(q));
     const list = document.getElementById('glossary-list');
     if (!entries.length) {
-      list.innerHTML = `<div class="glossary-empty">Kein Eintrag gefunden für „${q}".</div>`;
+      list.innerHTML = `<div class="glossary-empty">Kein Eintrag gefunden für „${esc(q)}".</div>`;
       return;
     }
     let html = '';
