@@ -26,12 +26,12 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-85 |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · TASK-85 · TASK-88 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-81** *(Escaping umgesetzt, wartet auf Testbestätigung)* |
-| **🏁 Done** | abgeschlossen + deployed | **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🏁 Done** | abgeschlossen + deployed | **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
 | **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) — Security-Audit, 6/7)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-89** *(Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern, Fund aus TASK-82-Testphase)* · **TASK-90** *(Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln, Fund aus TASK-82-Testphase)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **+ alle übrigen offenen Tickets unten** |
@@ -45,13 +45,14 @@
 
 ## 🐛 BugFixes
 
-### BUG-82 · Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht `[ ]`
+### BUG-82 · Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-17 |
 
 **Beschreibung:** **Beobachtet:** Im Karten-Tab hat die Suchleiste keine Wirkung — egal welcher Suchbegriff eingegeben wird, reagiert die Kartenansicht nicht darauf, es werden weiterhin alle Marker angezeigt. **Erwartet:** Ein eingegebener Suchbegriff filtert die Kartenmarker analog zu Feed (BUG-02) und Locations-Tab (BUG-06). **Ursache (Code-Analyse):** `Search._triggerRender()` hat keinen Zweig für `App.current === 'map'`; `MapView.applyFilter()` prüft `Search.query` an keiner Stelle. Wirkt wie eine von Anfang an fehlende Verdrahtung — kein Zusammenhang mit BUG-81 oder der jüngsten XSS-Reparatur. Entdeckt von Stephan indirekt beim Testen von BUG-81, gemeldet am 2026-07-17.
@@ -60,16 +61,117 @@
 
 **Bezug:** Kein offenes Duplikat gefunden. Historischer Präzedenzfall (beide Done, gleiche Funktion): **BUG-02** (Suche filtert Jahreskalender nicht — `Search._triggerRender()` um Kalender-Zweig erweitert) und **BUG-06** (Header-Suche filtert Locations-Tab nicht — `Search._triggerRender()` um Locations-Zweig erweitert); dieses Ticket ergänzt denselben Mechanismus um den fehlenden Karten-Zweig. **BUG-23** (Archiv, Done) behob einen anderen, aber thematisch verwandten Kartenfilter-Sync-Bug (Eventtyp-Filter wirkte nicht in Kartenansicht) — andere Ursache/Mechanismus, kein Duplikat. **BUG-46** (Done) etablierte `Filter.applyToLocations()`/`MapView.applyFilter()` als zentrale Filterquelle für Chips, betrifft aber nicht die Textsuche. **BUG-49** (Done, doppeltes Suchfeld) und **BUG-51** (Done, Entfernungsfilter) sind eigenständig, keine Überschneidung.
 
+**Scope-Erweiterung (Stephan, 2026-07-18, beim Testen des Karten-Fixes entdeckt):** Zwei weitere, vom Karten-Fix unabhängige Lücken derselben Fehlerklasse gefunden und auf Stephans Entscheidung in dieses Ticket mit aufgenommen (statt als eigene Tickets):
+- **Locations-Tab-Wechsel:** `App.nav('locations')` (Zeile ~8007) rendert beim Tab-Wechsel über `Filter.applyToLocations(Locations.all)` direkt und ignoriert dabei `Search.query` komplett — eine im Feed aktive Suche bleibt im Suchfeld sichtbar, wirkt sich aber nicht auf die beim Wechsel angezeigte Locations-Liste aus. Erst erneutes Eintippen im Locations-Tab selbst triggert `Locations.filter()`, das die Suche korrekt anwendet. Rule 4 (automatische Anwendung beim Tab-Wechsel) war für die Karte in der ursprünglichen Spec bereits gefordert, für Locations aber nie wirklich verdrahtet.
+- **Scout:** `Filter.applyToScout()` (Zeile ~3271) hat gar keinen Textsuche-Check, und `Search._triggerRender()` routet im Scout-Untermodus (`Feed.mode === 'scout'`) auf das unsichtbare `Feed.render()` statt auf `Scout.render()` — die Suche wirkt in Scout weder beim direkten Tippen dort noch beim Tab-Wechsel mit bereits aktiver Suche.
+
+**Example Mapping:**
+
+- 📏 Rule 1 — Eintippen eines Suchbegriffs im Karten-Tab reduziert die sichtbaren Marker auf Treffer.
+  - 🟢 Given ich bin im Karten-Tab und alle Marker sind sichtbar, When ich "Alexanderplatz" in die Suchleiste eintippe, Then zeigt die Karte nur noch Marker deren Name/Beschreibung/Kategorie den Begriff enthält.
+  - 🟢 Given ich bin im Karten-Tab, When ich einen Begriff eintippe der zu keiner Location passt, Then verschwinden alle Marker.
+- 📏 Rule 2 — Leeren der Suche zeigt wieder alle (durch andere Filter erlaubten) Marker.
+  - 🟢 Given eine aktive Suche mit Treffern, When ich die Suchleiste leere oder schließe (×), Then sind wieder alle Marker sichtbar, die die übrigen aktiven Filter erlauben.
+- 📏 Rule 3 — Die Textsuche kombiniert sich per UND mit aktiven Chip-Filtern (Eventtyp/Schwierigkeit/etc., BUG-23/BUG-46).
+  - 🟢 Given ein aktiver Eventtyp-Chip UND ein Suchbegriff, When beide gleichzeitig aktiv sind, Then ist ein Marker nur sichtbar wenn er BEIDE Bedingungen erfüllt.
+- 📏 Rule 4 — Eine während der Kartenansicht aktive Suche bleibt beim Tab-Wechsel erhalten und wird beim Zurückkehren zur Karte automatisch neu angewendet.
+  - 🟢 Given ich suche im Feed nach "Fernsehturm" und wechsle in den Karten-Tab, Then zeigt die Karte sofort nur Marker die zu "Fernsehturm" passen (kein erneutes Eintippen nötig).
+- 📏 Rule 5 (Scope-Erweiterung 2026-07-18) — Dieselbe automatische Anwendung beim Tab-Wechsel gilt auch für den Locations-Tab.
+  - 🟢 Given ich suche im Feed nach "Fernsehturm" und wechsle in den Locations-Tab, Then zeigt die Liste sofort nur Locations die zu "Fernsehturm" passen (kein erneutes Eintippen nötig).
+- 📏 Rule 6 (Scope-Erweiterung 2026-07-18) — Die Textsuche wirkt auch im Scout-Tab, sowohl beim direkten Tippen dort als auch beim Tab-Wechsel mit bereits aktiver Suche.
+  - 🟢 Given ich bin im Scout-Tab und alle Scout-Chancen sind sichtbar, When ich einen Motiv- oder Session-Begriff eintippe, Then zeigt Scout nur noch passende Chancen.
+  - 🟢 Given ich suche im Feed nach einem Begriff und wechsle in den Scout-Tab, Then ist Scout sofort gefiltert (kein erneutes Eintippen nötig).
+
+⚠️ Annahme: Die Textsuche auf der Karte durchsucht dieselben Location-Felder wie im Locations-Tab (Name, Beschreibung, Kategorie) — nicht Feed-Felder wie Titel/Event-Typ, weil Kartenmarker Locations sind, keine Feed-Chancen. Begründung: `MapView.markers` enthält vollständige `loc`-Objekte (Name, Beschreibung, Kategorie stehen dort bereits für das Popup zur Verfügung), analog zu `Locations.filter()`. Bitte bestätigen.
+
+⚠️ Annahme (Scope-Erweiterung 2026-07-18): Scout-Einträge haben keine `location_id`-Bindung an gespeicherte Locations (siehe `Scout.openDetail()`, `location_id` wird dort explizit auf `null` gesetzt) — die Textsuche durchsucht deshalb `subject_name` (Motiv-Name) und die übersetzte Session-Bezeichnung (`SESSION_LABELS[o.session]`), nicht Location-Felder. Bitte bestätigen.
+
+⚠️ Annahme: Groß-/Kleinschreibung spielt keine Rolle (Suche ist case-insensitiv), analog zu Feed und Locations-Tab — `Search.onInput()` normalisiert bereits per `.toLowerCase()`.
+
+**Akzeptanzkriterien:**
+- [x] Wenn ich im Karten-Tab in die Suchleiste einen Ortsnamen eintippe, zeigt die Karte nur noch Marker, deren Name, Beschreibung oder Kategorie den Suchbegriff enthält.
+- [x] Wenn der Suchbegriff zu keiner Location passt, zeigt die Karte keinen einzigen Marker mehr.
+- [x] Wenn ich die Suche leere oder über das × schließe, sind wieder alle Marker sichtbar, die von den übrigen aktiven Filtern erlaubt werden.
+- [x] Groß-/Kleinschreibung spielt keine Rolle ("berlin" findet auch "Berlin").
+- [x] Ist zusätzlich ein Eventtyp- oder anderer Filter-Chip aktiv, werden nur Marker gezeigt, die sowohl zum Suchbegriff als auch zum Chip-Filter passen.
+- [x] Wenn ich mit aktiver Suche vom Feed/Locations-Tab in den Karten-Tab wechsle, ist die Karte sofort gefiltert, ohne dass ich den Suchbegriff erneut eingeben muss.
+- [x] Edge Case: Sonderzeichen im Suchbegriff (z.B. "?", "%", Emoji) führen nicht zu einem Fehler oder einer leeren/abstürzenden Karte — sie werden einfach als normaler Text behandelt und finden ggf. keine Treffer.
+- [x] (Scope-Erweiterung) Wenn ich mit aktiver Suche vom Feed/Karten-Tab in den Locations-Tab wechsle, ist die Liste sofort gefiltert, ohne dass ich den Suchbegriff erneut eingeben muss.
+- [x] (Scope-Erweiterung) Wenn ich im Scout-Tab in die Suchleiste einen Begriff eintippe, zeigt Scout nur noch Chancen, deren Motiv-Name oder Session-Bezeichnung den Suchbegriff enthält.
+- [x] (Scope-Erweiterung) Wenn ich mit aktiver Suche in den Scout-Tab wechsle, ist Scout sofort gefiltert, ohne dass ich den Suchbegriff erneut eingeben muss.
+
+**Pre-Mortem:**
+- 💀 Szenario: Suche leert sich, aber ein zuvor ausgeblendeter Marker bleibt unsichtbar. Auslöser: Der Sichtbarkeits-Reset müsste bei jedem Aufruf neu von `visible = true` starten. Frühwarnung: Nach Leeren der Suche fehlen einzelne Marker die vorher da waren. Gegenmaßnahme: `MapView.applyFilter()` setzt `visible` bereits pro Marker-Durchlauf neu auf `true` (Zeile 5217) — der neue Suchbegriff-Check muss diese bestehende Struktur nur ergänzen, nicht ersetzen. Als AK/Test abgedeckt (Leeren-Kriterium).
+- 💀 Szenario: Suchtreffer und Chip-Filter widersprechen sich in der Kombinationslogik (ODER statt UND). Auslöser: Neuer Check wird versehentlich vor die bestehenden `if (visible && …)`-Ketten gesetzt und überschreibt deren Ergebnis. Frühwarnung: Ein Marker erscheint trotz aktivem Ausschluss-Chip. Gegenmaßnahme: Neuer Suchbegriff-Check folgt demselben `if (visible && …) visible = false`-Muster wie alle bestehenden Filter in `applyFilter()` — rein additiv, keine bestehende Zeile verändert.
+- 💀 Szenario: Performance-Einbruch bei vielen Markern durch Suche bei jedem Tastendruck. Auslöser: `Search.onInput()` ruft `_triggerRender()` ungedrosselt bei jedem Zeichen auf. Frühwarnung: Bemerkbares Ruckeln beim Tippen. Gegenmaßnahme: Kein neues Risiko — Feed und Locations-Tab nutzen bereits denselben ungedrosselten Mechanismus produktiv; Location-Anzahl liegt im niedrigen Hundert-Bereich, `.includes()`-Vergleich pro Marker ist trivial billig. Kein Debounce nötig, konsistent mit bestehendem Verhalten.
+- 💀 Szenario: Tab-Wechsel mit aktiver Suche zeigt kurz ungefilterte Marker, bevor die Suche greift (Race Condition). Auslöser: `App.nav('map')` ruft `MapView.init()` auf, das Marker neu aufbaut und danach `applyFilter()` aufruft (Zeile 5168) — Reihenfolge ist synchron, kein Await/Race zu erwarten. Frühwarnung: Kurzes Aufblitzen aller Marker beim Tab-Wechsel. Gegenmaßnahme: Code-Verifikation bestätigt, dass `applyFilter()` synchron am Ende von `init()` läuft, keine Race Condition zu erwarten — trotzdem als manueller Testschritt aufnehmen.
+- 💀 Szenario: Suchfeld-Wert wird case-sensitiv verglichen, weil das Popup/`loc`-Objekt Groß-/Kleinschreibung anders behandelt als angenommen. Auslöser: `Search.query` ist bereits lowercased (`Search.onInput` Zeile 7967), aber `loc.name`/`loc.description`/`loc.category` müssen im neuen Check ebenfalls `.toLowerCase()` erhalten, sonst matcht "berlin" nicht gegen "Berlin". Gegenmaßnahme: Exakt das gleiche Muster wie `Locations.filter()` (Zeile 5979-5983) übernehmen, das bereits beide Seiten lowercased.
+- 💀 Szenario (Scope-Erweiterung): Locations-Tab-Wechsel zeigt kurz ungefilterte Liste, weil `Locations.load()` (nur beim allerersten Tab-Besuch, `Locations.all` noch leer) einmal ohne Suche rendert, bevor die Suche nachträglich angewendet wird. Frühwarnung: Kurzes Aufblitzen der vollen Liste beim allerersten Locations-Besuch mit aktiver Suche. Gegenmaßnahme: Doppel-Render (erst `Locations.load()`, dann sofort `Locations.filter(Search.query)`) ist bewusst in Kauf genommen — dieser Pfad wird in der Praxis nur beim allerersten App-Start durchlaufen, da `Locations.all` durch `App.init()` i.d.R. bereits vorab geladen ist (BUG-30).
+- 💀 Szenario (Scope-Erweiterung): Scout-Suche liefert `TypeError`, wenn `Search.query` gesetzt ist, aber `Scout.data` noch `null` (nicht geladen) ist. Frühwarnung: JS-Fehler in der Konsole beim Tab-Wechsel zu Scout mit aktiver Suche, bevor die Daten geladen sind. Gegenmaßnahme: `Scout.render()` prüft bereits `if (!this.data || this.data.length === 0)` vor jedem `Filter.applyToScout()`-Aufruf (Zeile 2221) — der neue Suchbegriff-Check liegt innerhalb von `applyToScout()`, wird also nie mit `data: null` aufgerufen.
+- 💀 Szenario (Scope-Erweiterung): Scout-Suchtreffer widersprechen den bestehenden Chip-Filtern (ODER statt UND). Auslöser: Neuer Suchbegriff-Check wird versehentlich vor die bestehenden `if (...) return false;`-Zeilen in `applyToScout()` gesetzt. Gegenmaßnahme: Suchbegriff-Check folgt demselben `if (...) return false;`-Muster ganz am Ende der Filterkette, rein additiv, keine bestehende Zeile verändert — analog zum bereits verifizierten Muster in `Filter.apply()` (Zeile 3193-3202, Feed-Textsuche).
+
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-07-17.
+- Bestätigt: `Search._triggerRender()` (Zeile 7971-7975) hat nur Zweige für `'locations'` und `Feed.mode === 'calendar'`, sonst `else Feed.render()` — im Karten-Tab läuft dieser else-Zweig (wirkungslos, kein Bezug zur Karte).
+- Bestätigt: `MapView.applyFilter()` (Zeile 5174 ff.) prüft `Filter.state` (Eventtyp, Schwierigkeit, Kategorie, Bewertung, Verifikation, Sichtachse, Bild, Brennweite, Entfernung) pro Marker, aber an keiner Stelle `Search.query`.
+- Bestätigt: `Locations.filter(q)` (Zeile 5974-5986) ist das bestehende Referenzmuster für Text-Suche gegen Location-Felder (`name`, `description`, `category`, alle `.toLowerCase()`-verglichen) — direkt übertragbar auf `MapView.applyFilter()`, da beide auf Location-Objekten arbeiten.
+- Bestätigt: `MapView.init()` (Marker-Aufbau) ruft am Ende `this.applyFilter()` auf (Zeile 5168) — ein Tab-Wechsel zur Karte mit bereits aktiver Suche wendet die Suche automatisch mit an, sobald `applyFilter()` `Search.query` berücksichtigt.
+
+📎 Code-Verifikation (Scope-Erweiterung, 2026-07-18): `web/index.html` erneut gelesen.
+- Bestätigt: `App.nav('locations')` (Zeile ~8007-8016) ruft bei bereits befülltem `Locations.all` `Filter.requestGps().then(() => Locations.render(Filter.applyToLocations(Locations.all)))` auf — `Search.query` wird an keiner Stelle geprüft.
+- Bestätigt: `Locations.filter(q)` (Zeile 5993-5999, nach dem BUG-82-Karten-Fix) ruft bereits `Filter._matchesSearch()` auf — der Locations-Tab-Wechsel-Fix kann diese bestehende, bereits korrekte Funktion direkt wiederverwenden statt neue Suchlogik zu schreiben.
+- Bestätigt: `Filter.applyToScout(data)` (Zeile 3271-3306) hat keinen `Search.query`-Check — die Filterkette endet mit dem Entfernungsfilter, direkt vor `return true;`.
+- Bestätigt: `Search._triggerRender()` hat keinen Zweig für `Feed.mode === 'scout'` — läuft in den generischen `else Feed.render()`-Zweig, der bei aktivem Scout-Untermodus wirkungslos ist (Scout hat einen eigenen Container, `feed-content` ist per `display:none` ausgeblendet).
+- Bestätigt: `SESSION_LABELS` (verwendet in `Scout.openDetail()`, Zeile ~2231) ist eine modulweite `const` im selben Script-Scope wie `Filter` — direkt in `applyToScout()` verwendbar ohne zusätzlichen Import/Parameter.
+- Bestätigt: Scout-Einträge haben laut `Scout.openDetail()` (Zeile ~2296) `location_id: null` fest gesetzt — keine Bindung an gespeicherte Locations, Textsuche muss auf `o.subject_name` (Motiv) und Session-Label arbeiten, nicht auf Location-Felder.
+
+**Implementierungsoptionen:**
+
+### Option A — Minimal-Fix nach BUG-02/BUG-06-Muster
+- Vorgehen: `Search._triggerRender()` (Zeile 7971) um einen Zweig `else if (App.current === 'map') MapView.applyFilter();` erweitern (vor dem generischen `else Feed.render()`, gleiche Struktur wie der bestehende `'locations'`-Zweig). `MapView.applyFilter()` (Zeile 5174 ff.) um einen zusätzlichen `if (visible && Search.query) { ... }`-Block erweitern, der Name/Beschreibung/Kategorie des `loc`-Objekts gegen `Search.query` prüft — exakt das Muster aus `Locations.filter()`.
+- Betroffene Dateien: `web/index.html` (zwei kleine, additive Änderungen, ca. 10-15 Zeilen).
+- Vorteile: Kleinstmögliche, risikoarme Änderung; folgt exakt dem bereits zweimal bewährten Muster (BUG-02, BUG-06); keine Änderung an Filter.state/Datenstruktur; keine Regressionsgefahr für Chip-Filter, da rein additiv in bestehende `if (visible && …)`-Kette eingefügt.
+- Nachteile/Risiken: Duplikation der Such-Logik (Name/Beschreibung/Kategorie-Matching existiert dann zweimal — in `Locations.filter()` und in `MapView.applyFilter()`). Bei künftigen Änderungen an den durchsuchten Feldern müsste an zwei Stellen synchron nachgezogen werden.
+- Aufwand: klein.
+
+### Option B — Zentralisierte Textsuche über Filter.applyToLocations()
+- Vorgehen: Such-Matching als gemeinsame Hilfsfunktion (z.B. `Filter._matchesSearch(loc, query)`) extrahieren und sowohl in `Locations.filter()` als auch in `MapView.applyFilter()` verwenden — analog zur BUG-46-Zentralisierung von `Filter.applyToLocations()` für Chip-Filter. Optional: Suchbegriff direkt als Teil von `Filter.applyToLocations()` behandeln, sodass Karte und Locations-Tab exakt eine Filterquelle haben.
+- Betroffene Dateien: `web/index.html` (Filter-Objekt, `Locations.filter()`, `MapView.applyFilter()`).
+- Vorteile: Keine Logik-Duplikation mehr; ein Ort für künftige Änderungen an den durchsuchten Feldern; konsistent mit der in BUG-46 etablierten Zentralisierungsrichtung.
+- Nachteile/Risiken: Größerer Eingriff in eine bereits produktiv laufende, in mehreren Bugfixes (BUG-23, BUG-46, BUG-51) gehärtete Filterkette — höheres Regressionsrisiko für Feed/Kalender/Scout/Locations, obwohl das Ticket nur die Karte betrifft. Aufwand steht in keinem Verhältnis zur Priorität "Mittel" dieses Tickets.
+- Aufwand: mittel bis groß.
+
+✅ Empfehlung: **Option A**. Das Ticket beschreibt exakt dieselbe Fehlerklasse wie BUG-02/BUG-06 (fehlender Zweig in `_triggerRender()`), die dort jeweils mit einer kleinen additiven Erweiterung behoben wurde — ohne Regressionen. Die Zentralisierung aus Option B ist ein sinnvoller Gedanke, aber ein eigenständiges Refactoring-Ticket wert (nicht im Scope eines Mittel-priorisierten Bugfixes mit erhöhtem Regressionsrisiko für die BUG-46-Filterkette).
+
+**Entscheidung (Stephan, 2026-07-17):** Option B gewählt — bewusst abweichend von der Empfehlung. Umsetzung: zentralisierte Textsuche über eine gemeinsame Hilfsfunktion (z.B. `Filter._matchesSearch(loc, query)`), verwendet sowohl in `Locations.filter()` als auch in `MapView.applyFilter()`, analog zur BUG-46-Zentralisierung.
+
+**Entscheidung (Stephan, 2026-07-18, Scope-Erweiterung):** Beim Testen des Karten-Fixes zwei weitere, vom eigentlichen BUG-82-Scope unabhängige Lücken gefunden (Locations-Tab-Wechsel ignoriert Suche; Scout hat gar keine Suche). Statt als eigene Tickets zu erfassen (wie es sonst bei vorbestehenden, beim Testen entdeckten Lücken üblich ist, siehe BUG-82 selbst aus BUG-81), auf Wunsch von Stephan direkt in dieses Ticket mit aufgenommen. Umsetzung: Locations-Tab-Wechsel nutzt die bereits bestehende, korrekte `Locations.filter(Search.query)` statt `Filter.applyToLocations()` direkt aufzurufen; Scout bekommt einen Suchbegriff-Check in `Filter.applyToScout()` (Motiv-Name + Session-Label) sowie einen neuen Zweig in `Search._triggerRender()`.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt
+- [x] Architektur analysiert: `web/index.html` (`Search._triggerRender()` Z. 7971, `MapView.applyFilter()` Z. 5174, `Locations.filter()` Z. 5974, `App.nav()`/`MapView.init()` Z. 5168+7989)
+- [x] Designer-Check: nicht visuell (keine neue UI, kein Chip, keine Farbe/Layout-Änderung — reine Filterlogik-Verdrahtung) → übersprungen
+- [x] Implementierungsoptionen: A / B
+- [x] Empfehlung: Option A (umgesetzt: Option B, siehe Entscheidung Stephan)
+
+**Testplan:**
+- [x] Automatisiert (Harness): Backend-seitig nicht betroffen (reine Frontend-Filterlogik in `web/index.html`) — kein `pytest`-Fall in `backend/tests/` sinnvoll; manuelle Browser-Tests sind hier der primäre Testweg.
+- [x] Manuell: Im Karten-Tab (http://localhost:8000) einen bekannten Ortsnamen in die Suchleiste eintippen → nur passende Marker sichtbar. Suche leeren → alle Marker (unter Berücksichtigung aktiver Chips) wieder sichtbar. Suche + aktiven Eventtyp-Chip kombinieren → UND-Verknüpfung prüfen. Im Feed nach einem Ort suchen, dann in den Karten-Tab wechseln → Karte sofort gefiltert ohne Neueingabe. Suchbegriff mit Sonderzeichen ("?", "%", Emoji) eintippen → keine Fehlermeldung, Karte bleibt bedienbar. Von Stephan bestätigt: alle positiv (2026-07-18).
+- [x] Manuell (Scope-Erweiterung): Im Feed nach einem Ort suchen, dann in den Locations-Tab wechseln → Liste sofort gefiltert ohne Neueingabe. Im Scout-Tab direkt einen Motiv- oder Session-Begriff eintippen → nur passende Scout-Chancen sichtbar. Im Feed nach einem Begriff suchen, dann in den Scout-Tab wechseln → Scout sofort gefiltert ohne Neueingabe. Von Stephan bestätigt: alle positiv (2026-07-18).
+- [x] Regression: Locations-Tab-Suche (direktes Eintippen, ohne Tab-Wechsel) und Feed-Suche weiterhin unverändert korrekt, da beide jetzt dieselbe zentrale Funktion nutzen. Von Stephan bestätigt: alle positiv (2026-07-18).
+
 ---
 
-### BUG-81 · Gespeicherte Schadskripte über ungefilterte Texte unterbinden (XSS) `[~]`
+### BUG-81 · Gespeicherte Schadskripte über ungefilterte Texte unterbinden (XSS) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
+| **Epic** | TASK-92 |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-16 |
+| **Abgeschlossen** | 2026-07-17 |
 
 **Beschreibung:** **Beobachtet:** Location-Namen, -Beschreibungen, -Notizen, Kategorien sowie Verifizierungs-Kommentare und Suchbegriffe werden roh als HTML ins DOM geschrieben (`innerHTML`) — ein vorhandener Escape-Helfer wird nur an einer einzigen Stelle genutzt. **Erwartet:** Jeder dynamische Wert wird escapt bzw. per `textContent` gesetzt. **Auswirkung:** Ein einmal eingetragener Schadtext läuft im Browser jedes anderen Nutzers und kann dessen Login-Ticket stehlen (Verifizierungs-Kommentare brauchen dafür nicht mal Admin-Rechte). Zusätzlich: URL-Felder (`locationscout_url`, `attribution_url`) vor Zuweisung an `href` auf erlaubtes Schema prüfen.
 
@@ -17473,11 +17575,43 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 
 ---
 
+### TASK-92 · Security-Audit 2026-07-16 (Epic) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Epic) |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Dach-Ticket für die Funde aus dem Sicherheits-Audit vom 2026-07-16 (Angriffsflächen, unzureichend geschützte Daten und Schutzmaßnahmen über Backend, Infrastruktur/Caddy und Frontend/PWA). Bündelt die aus dem Audit abgeleiteten Kern-Tickets sowie die während ihrer Umsetzung entstandenen Folge-Tickets. Kein eigener Code — reines Tracking.
+
+**User Story:** Als Nutzer und Betreiber möchte ich, dass die im Audit gefundenen Schwachstellen nachvollziehbar gebündelt und geschlossen werden, sodass die App und meine Daten wirksam geschützt sind und kein Fund verloren geht.
+
+**Kind-Tickets — Kern (aus dem Audit):**
+- TASK-82 · Schutz-Header + CSP live (Caddy) — 🏁 Done (v1.22.35)
+- BUG-81 · XSS über ungefilterte Texte — 🏁 Done (v1.22.38)
+- TASK-83 · Login-Ticket als HttpOnly-Cookie — 🏁 Done (v1.22.36)
+- TASK-84 · Externe Skripte self-hosted + CSP verschlankt — 🏁 Done (v1.22.37)
+- TASK-85 · Auth-Geheimnis: hart abbrechen statt Notwert — 🔬 In Analysis
+- TASK-86 · Offene Endpunkte härten (Last, Login-Bremse, CORS) — 📥 Inbox
+- TASK-87 · Kleinere Härtungen (Sammelticket) — 📥 Inbox
+
+**Kind-Tickets — Folge (während der Umsetzung entstanden):**
+- TASK-89 · Caddy-Logdatei-Berechtigung absichern — 📥 Inbox (aus TASK-82-Testphase)
+- TASK-90 · Mehrfachen /opportunities-Abruf bündeln — 📥 Inbox (aus TASK-82-Testphase)
+- TASK-91 · Feed-Dedup-Test auf gepinntes Datum — 📥 Inbox (aus TASK-83-Release)
+- BUG-82 · Textsuche wirkt nicht in Kartenansicht — 📥 Inbox (aus BUG-81-Testphase)
+- TASK-88 · Release-Skript: kein Ad-hoc-Commit bei Merge-Konflikt — 🔬 In Analysis (aus den Security-Releases)
+
+---
+
 ### TASK-82 · Schutz-Header + Content-Security-Policy live ausliefern (Caddy) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
@@ -17598,6 +17732,7 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
@@ -17679,6 +17814,7 @@ Ausgeschlossen: die native iOS-App (sendet laut Code-Verifikation keinen Auth-He
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
@@ -17779,6 +17915,7 @@ Ausgeschlossen: die native iOS-App (sendet laut Code-Verifikation keinen Auth-He
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | In Analysis |
 | **Erstellt** | 2026-07-16 |
@@ -17842,6 +17979,7 @@ def _secret() -> str:
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -17859,6 +17997,7 @@ def _secret() -> str:
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -17884,8 +18023,9 @@ def _secret() -> str:
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** Beim Release von US-133 (v1.22.34) trat ein Merge-Konflikt in `FotoAlert/PRODUCT.md` auf (`U FotoAlert/PRODUCT.md`, `error: Committing is not possible because you have unmerged files`, `fatal: Exiting because of an unresolved conflict`). Trotz dieses Abbruchs blieb ein lokaler, unpushter Commit mit einer Ad-hoc-Message ("merge: PRODUCT.md Konflikt nach stash pop aufgelöst", Autor Stephan) zurück — vermutlich Ergebnis eines Auto-Recovery-Schritts außerhalb des eigentlichen Release-Skripts. Dieser Commit folgte NICHT dem Standard-Muster `release: vX.Y.Z – <Beschreibung>` und erzeugte KEINEN Git-Tag (verifiziert: `git tag -l "v1.22.34"` war zu diesem Zeitpunkt leer, obwohl der Commit den korrekten Versionsbump in `web/index.html`/`sw.js` bereits enthielt). Nachbesserung war nur manuell möglich (`git commit --amend`, dann `git tag`, dann Push) und nur, weil der Commit noch nicht gepusht war.
@@ -17898,6 +18038,28 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 
 **Bezug:** Ausgelöst durch Retrospektive zu US-133 (Release v1.22.34, 2026-07-16).
 
+**Pre-Mortem (was könnte schiefgehen):**
+- Man behebt nur den beobachteten Einzelfall (Konflikt genau in `PRODUCT.md`) und übersieht, dass derselbe Ad-hoc-Mechanismus auch bei Konflikten in anderen Dateien zuschlagen kann.
+- Man rätselt weiter an der Ursache, statt sie sauber einzugrenzen, und baut am Ende eine Lösung für ein Problem, das man gar nicht genau kennt.
+- Ein reiner „bricht sauber ab"-Fix lässt Stephan im Ernstfall ohne klare Handlungsanweisung stehen, wodurch er wieder manuell nachbessern muss.
+- Es entsteht Scope-Creep hin zu einer großen, generischen Recovery-Automatik, obwohl das Ticket nur einen kleinen, konkreten Fehlerfall abdecken soll.
+
+**Akzeptanzkriterien (in Alltagssprache):**
+- Wenn beim Release ein Konflikt auftritt, wird kein einziger Commit erzeugt, bevor der Konflikt gelöst ist — egal welche Datei betroffen ist.
+- Ist der Konflikt gelöst und der Release läuft weiter, sieht der entstehende Commit genauso aus wie ein ganz normaler Release-Commit — mit der üblichen Beschreibung und dem passenden Versions-Etikett (Tag).
+- Ein normaler Release ohne Konflikt läuft weiterhin genauso schnell und unauffällig wie bisher — es gibt keine spürbare Verzögerung oder zusätzliche Rückfrage.
+- Tritt der Konfliktfall ein, bekommt Stephan eine klare, verständliche Anleitung, was er als Nächstes tun muss — er muss nicht raten oder selbst recherchieren.
+
+**Architektur-Befund (verifiziert durch direktes Lesen der Dateien, keine Sandbox-Git-Befehle nötig):**
+`release.sh` enthält im Git-Abschnitt ausschließlich eine lineare Befehlsfolge (Hinzufügen → Commit mit Standard-Beschreibung → Hochladen → Etikett setzen → Etikett hochladen) — keinerlei Zwischenspeicher- oder Konflikt-Behandlung. Auch das `fotoalert-release`-Skill, die Datei `sync-pull.sh` und die Arbeitsregeln (`CLAUDE.md`) enthalten keinen Hinweis auf einen solchen Mechanismus (Volltextsuche nach dem Begriff ergab keinen Treffer). **Damit ist gesichert, dass die Quelle des beobachteten Ad-hoc-Commits nicht in einer dieser vier Dateien liegt.** Wo genau er stattdessen herkam (z. B. ein manueller Eingriff von Stephan selbst am Terminal, oder ein Mechanismus außerhalb dieses Projektordners), lässt sich ohne Einsicht in die Commit-Historie nicht abschließend klären — das wurde bewusst nicht per Sandbox-Git geprüft (harte Regel, Blockier-Risiko für Stephans Terminal). Das ist damit als offene Frage markiert, nicht als Vermutung ausgegeben.
+
+**Implementierungsoptionen:**
+- **Option A — sauberer Abbruch vor jedem Commit (empfohlen):** `release.sh` prüft vor dem `git add`/`git commit`-Schritt aktiv, ob unaufgelöste Konflikte vorliegen, und bricht in diesem Fall mit einer klaren, für Stephan verständlichen Meldung ab (was ist passiert, was ist als Nächstes zu tun) — es wird dabei nichts committet oder getaggt. Vorteil: geringes Risiko, einfach zu bauen und zu testen, verhindert das eigentliche Kernproblem (unsauberer Commit ohne Standard-Format/Tag) zuverlässig.
+- **Option B — konsistentes Auto-Recovery:** Der Konflikt wird automatisch aufgelöst und anschließend trotzdem mit der Standard-Beschreibung und korrektem Etikett committet. Vorteil: kein manueller Eingriff nötig. Nachteil: deutlich komplexer, und die eigentliche Quelle des heutigen Auto-Recovery-Mechanismus ist nicht sicher lokalisiert — eine Lösung „on top" einer unbekannten Automatik zu bauen ist riskanter.
+- **Empfehlung:** Option A. Solange nicht sicher geklärt ist, woher der bisherige Auto-Recovery-Schritt kommt, ist ein sauberer, gut kommunizierter Abbruch die risikoärmere Lösung — sie behebt zuverlässig das eigentliche Problem (fehlendes Standard-Format/Tag) ohne an einer unbekannten Stelle anzusetzen.
+
+**Nicht sicher geklärt (offen, kein Fakt):** Wer/was den beobachteten Ad-hoc-Commit tatsächlich erzeugt hat (Mensch am Terminal vs. ein Mechanismus außerhalb des Projektordners).
+
 ---
 
 ### TASK-89 · Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern `[ ]`
@@ -17905,6 +18067,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -17922,6 +18085,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -17939,6 +18103,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-17 |

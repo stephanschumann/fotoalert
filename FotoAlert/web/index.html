@@ -1594,7 +1594,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.38';
+const APP_VERSION = '1.22.39';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3250,6 +3250,21 @@ const Filter = {
     });
   },
 
+  // BUG-82: Gemeinsames Text-Such-Matching (Name/Beschreibung/Kategorie), verwendet von
+  // Locations.filter() und MapView.applyFilter() — identisches Matching wie das bisherige
+  // Locations.filter()-Inline-Muster (OR über die drei Felder, jeweils lowercased).
+  // query kann bereits lowercased sein (Search.onInput) — .toLowerCase() hier ist idempotent
+  // und macht die Funktion auch bei direktem Aufruf mit Rohwerten sicher.
+  _matchesSearch(loc, query) {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return (
+      (loc.name || '').toLowerCase().includes(q) ||
+      (loc.description || '').toLowerCase().includes(q) ||
+      (loc.category || '').toLowerCase().includes(q)
+    );
+  },
+
   // Filtert Scout-Chancen (US-80/US-81)
   // Anwendbare Dimensionen: Körpertyp (body_name), Tageszeit, Score, Brennweite, Entfernung
   // Nicht anwendbar: difficulty, minRating, verification (kein Äquivalent in Scout-Daten)
@@ -3289,6 +3304,15 @@ const Filter = {
       if (s.maxDistKm > 0 && this._gps) {
         const d = haversineKm(this._gps.lat, this._gps.lon, o.standpoint_lat, o.standpoint_lon);
         if (d > s.maxDistKm) return false;
+      }
+      // BUG-82 (Scope-Erweiterung): Textsuche — sucht in Motiv-Name (subject_name) und
+      // Session-Label (SESSION_LABELS), da Scout-Einträge keine location_id-Bindung an
+      // gespeicherte Locations haben (openDetail() setzt location_id explizit auf null).
+      if (Search.query) {
+        const q = Search.query;
+        const sesLabel = SESSION_LABELS[o.session] || o.session || '';
+        const hay = [(o.subject_name || ''), sesLabel].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
       }
       return true;
     });
@@ -5285,6 +5309,10 @@ const MapView = {
         if (d > s.maxDistKm) visible = false;
       }
 
+      // BUG-82: Textsuche (Name/Beschreibung/Kategorie) — UND mit allen anderen Filtern,
+      // identisches Matching wie Locations.filter() via Filter._matchesSearch().
+      if (visible && Search.query && !Filter._matchesSearch(loc, Search.query)) visible = false;
+
       if (visible) {
         if (!this.map.hasLayer(marker)) this.map.addLayer(marker);
       } else {
@@ -5976,11 +6004,7 @@ const Locations = {
     await Filter.requestGps();  // US-118: siehe load() — für Entfernungssortierung immer anfragen
     let f = Filter.applyToLocations(this.all);
     if (q) {
-      f = f.filter(l =>
-        l.name.toLowerCase().includes(q.toLowerCase()) ||
-        l.description.toLowerCase().includes(q.toLowerCase()) ||
-        l.category.toLowerCase().includes(q.toLowerCase())
-      );
+      f = f.filter(l => Filter._matchesSearch(l, q));
     }
     this.render(f);
   },
@@ -7970,7 +7994,11 @@ const Search = {
 
   _triggerRender() {
     if (App.current === 'locations') Locations.filter(this._query);
+    else if (App.current === 'map') MapView.applyFilter();
     else if (Feed.mode === 'calendar') CalendarView.render();
+    // BUG-82 (Scope-Erweiterung): eigener Zweig für Scout, sonst lief die Suche im
+    // wirkungslosen else-Zweig (Feed.render() statt Scout.render()).
+    else if (Feed.mode === 'scout') Scout.render();
     else Feed.render();
   },
 };
@@ -7993,10 +8021,13 @@ const App = {
       // Feed/Karten-Besuch), lief hier bisher render() direkt ohne Filter.requestGps()
       // zu awaiten → Filter._gps blieb null, sortByDistance() sortierte nie.
       // Fix: denselben GPS-Request-Pfad wie Locations.load()/filter() awaiten.
+      // BUG-82 (Scope-Erweiterung): Locations.filter(Search.query) statt Filter.applyToLocations()
+      // direkt, damit eine beim Tab-Wechsel bereits aktive Suche automatisch mit angewendet wird
+      // (analog zum Karten-Fix) — vorher wurde Search.query beim Tab-Wechsel ignoriert.
       if (Locations.all.length) {
-        Filter.requestGps().then(() => Locations.render(Filter.applyToLocations(Locations.all)));
+        Locations.filter(Search.query);
       } else {
-        Locations.load();
+        Locations.load().then(() => Locations.filter(Search.query));
       }
     }
   },
