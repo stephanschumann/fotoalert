@@ -60,6 +60,37 @@ if [[ "$CONFIRM" != "j" && "$CONFIRM" != "J" ]]; then
     exit 0
 fi
 
+# ── Git: Repo-Root wechseln ───────────────────────────────────────────────────
+cd "$SCRIPT_DIR/.."  # Repo-Root
+
+# ── Merge-Konflikte prüfen (Pflicht vor jeder Datei-Änderung, TASK-88) ───────
+# Läuft bewusst VOR den sed-Edits an index.html/sw.js weiter unten: würde die
+# Prüfung erst nach dem Versions-Bump laufen, bliebe bei einem Abbruch der
+# Bump bereits (uncommitted) im Arbeitsverzeichnis stehen — ein zweiter Versuch
+# würde CURRENT_VERSION dann fälschlich schon als hochgezählt einlesen und
+# nochmal draufzählen (Doppel-Bump). Deshalb: erst prüfen, dann ändern.
+#
+# git status --porcelain ist die git-native Quelle für den Konfliktstatus
+# (Status-Codes UU/AA/DD/AU/UA/UD/DU) und damit robuster als eine reine
+# Textsuche nach Konfliktmarkern: kein False-Positive durch Marker-Text in
+# legitimen Dateiinhalten, kein False-Negative bei binären Dateien.
+CONFLICT_FILES=$(git status --porcelain | grep -E '^(UU|AA|DD|AU|UA|UD|DU) ' | awk '{print $2}' || true)
+if [ -n "$CONFLICT_FILES" ]; then
+    echo ""
+    echo "❌ Release abgebrochen: Es liegen ungelöste Merge-Konflikte vor."
+    echo "   Betroffene Datei(en):"
+    echo "$CONFLICT_FILES" | sed 's/^/     - /'
+    echo ""
+    echo "   Nächste Schritte:"
+    echo "     1. Konflikt(e) in den genannten Datei(en) manuell lösen"
+    echo "        (Konfliktmarker <<<<<<< / ======= / >>>>>>> entfernen)"
+    echo "     2. git add <datei> && git commit"
+    echo "     3. Danach das Release erneut starten:"
+    echo "        ./release.sh ${BUMP_TYPE} \"${COMMIT_MSG}\""
+    echo ""
+    exit 1
+fi
+
 # ── index.html: APP_VERSION aktualisieren ────────────────────────────────────
 sed -i '' "s/APP_VERSION = '$CURRENT_VERSION'/APP_VERSION = '$NEW_VERSION'/" "$INDEX_HTML"
 echo "✓ APP_VERSION in index.html auf $NEW_VERSION gesetzt"
@@ -69,8 +100,6 @@ sed -i '' "s/const CACHE_NAME = 'fotoalert-v[^']*'/const CACHE_NAME = 'fotoalert
 echo "✓ CACHE_NAME in sw.js auf fotoalert-v${NEW_VERSION} gesetzt"
 
 # ── Git: committen und pushen ─────────────────────────────────────────────────
-cd "$SCRIPT_DIR/.."  # Repo-Root
-
 git add \
     "FotoAlert/web/index.html" \
     "FotoAlert/web/sw.js"
