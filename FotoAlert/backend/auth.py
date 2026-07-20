@@ -28,8 +28,36 @@ VALID_ROLES = ("host", "user")
 SESSION_COOKIE_NAME = "fa_session"
 
 
+def _load_secret() -> str:
+    """TASK-85: Kein Notwert-Fallback mehr. Fehlt `FOTOALERT_AUTH_SECRET` (nicht
+    gesetzt oder leer), bricht der Import dieses Moduls sofort mit einer klaren
+    Fehlermeldung ab — und damit auch der Import von main.py (das auth.py ganz
+    am Anfang importiert), noch bevor die App startet oder ein Endpunkt bindet.
+
+    Bewusste Inkonsistenz (Pre-Mortem TASK-85): Fehlende Rollen-Passwörter
+    (`_passwords()` unten) werden weiterhin weich behandelt — die betroffene
+    Rolle ist dann einfach deaktiviert, kein Abbruch. Das Auth-Secret ist die
+    kryptographische Signaturbasis für ALLE Sitzungs-Tickets; ein Notwert-Fallback
+    dort ermöglicht ein frei berechenbares Admin-Ticket ganz ohne Passwort. Diese
+    Asymmetrie ist Absicht, kein Bug: einzelne Rollen dürfen fehlen, das Secret nicht.
+    """
+    value = os.environ.get("FOTOALERT_AUTH_SECRET", "")
+    if not value:
+        raise RuntimeError(
+            "FOTOALERT_AUTH_SECRET ist nicht gesetzt (oder leer). "
+            "Diese Umgebungsvariable muss vor dem Start des Servers gesetzt "
+            "werden — es gibt keinen Notwert-Fallback mehr."
+        )
+    return value
+
+
+# Wird einmal beim Modul-Laden ausgewertet (siehe _load_secret-Docstring),
+# nicht erst beim ersten Token-Aufruf.
+_SECRET = _load_secret()
+
+
 def _secret() -> str:
-    return os.getenv("FOTOALERT_AUTH_SECRET", "fotoalert-dev-secret-change-me")
+    return _SECRET
 
 
 def _passwords() -> dict[str, str]:
