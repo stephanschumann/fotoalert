@@ -987,7 +987,7 @@ def _inject_cloud_mood_events() -> None:
         )
 
 
-WEATHER_API_MAX_CONCURRENT_REQUESTS = 5
+WEATHER_API_MAX_CONCURRENT_REQUESTS = 4
 """
 US-131 Nachtrag (Weg-Gate 2026-07-13, gemessener Befund): Ein einzelner
 /weather-refresh-Lauf auf dem lokalen Dev-Server erzeugte 339 parallele Requests an
@@ -1017,10 +1017,31 @@ VIELE Requests gleichzeitig laufen, nicht WIE SCHNELL ein frei gewordener Slot s
 wieder einen neuen Request abfeuert — bei einem kurzen Zeitfenster-Limit (z. B. pro
 Sekunde) reicht reine Nebenläufigkeits-Begrenzung ohne Pacing nicht. Siehe
 WEATHER_API_REQUEST_PACING_SECONDS für das ergänzte zeitliche Pacing.
+
+BUG-83-Nachtrag (2026-07-21, Weg-Gate Option A, NICHT live nachgetestet — kein
+Internetzugriff aus der Sandbox): TASK-75s dritte Live-Messung mit der bisherigen
+Kombination (5 Slots / 0.15s Pacing) zeigte zwar eine niedrige AGGREGIERTE
+429-Quote (~4,8%), aber BUG-83 deckte auf, dass diese aggregierte Zahl einen
+extremen Unterschied zwischen den Abruf-Arten überdeckt: Der "Wetter"-Anteil (nur
+1x pro Location, häuft sich am Anfang des Laufs) kommt fast immer durch, während
+"Sonnenrichtung"/"Gegenrichtung" (bis zu 6x pro Location, über die GESAMTE Laufzeit
+verteilt) zu >95% fehlschlagen — ein Hinweis darauf, dass Open-Meteo mit
+anhaltender Last zunehmend härter drosselt, nicht nur mit einer konstanten
+Fehlerquote pro Request. Deshalb hier bewusst eine Stufe konservativer als die
+bisherige, schon gemessene (5/0.15s)-Kombination: 5 → 4 Slots, siehe
+WEATHER_API_REQUEST_PACING_SECONDS für die zugehörige Pacing-Anpassung. Beide
+Werte zusammen senken den gedeckelten Maximaldurchsatz spürbar (s. dort) und sollen
+gerade den über die GESAMTE Laufzeit verteilten Sonnenrichtung/Gegenrichtung-Anteil
+entlasten. Zusätzlich abgesichert durch einen Retry-mit-Backoff bei HTTP 429 (s.
+WEATHER_API_MAX_RETRIES_ON_429/WEATHER_API_RETRY_BACKOFF_BASE_SECONDS unten,
+_run_one_weather_fetch()) — beide Maßnahmen zusammen, nicht als Alternative
+zueinander (Pattern 18/Pre-Mortem Szenario 3). Muss nach dem nächsten echten
+Live-Lauf (Stephan) anhand der dann nach Abruf-Art aufgeschlüsselten Fehlerquote
+ggf. weiter nachjustiert werden.
 """
 
 
-WEATHER_API_REQUEST_PACING_SECONDS = 0.15
+WEATHER_API_REQUEST_PACING_SECONDS = 0.25
 """
 US-131 2. Nachtrag: Zusätzlich zur Nebenläufigkeits-Begrenzung (s.
 WEATHER_API_MAX_CONCURRENT_REQUESTS) erzwingt dieser Wert einen Mindestabstand
@@ -1038,6 +1059,68 @@ Größenordnung, die zur 21%-Fehlerquote im 2. Live-Lauf geführt hat, verlangsa
 Wetter-Overlay-Lauf (2869 Events im letzten Lauf) aber nicht übermäßig, da die Pacing-
 Wartezeit parallel über alle 5 Slots anfällt statt seriell über alle Requests. Muss
 ggf. nach dem 3. Live-Smoke-Test (Stephan, gegen die echte API) noch angepasst werden.
+
+BUG-83-Nachtrag (2026-07-21, Weg-Gate Option A, NICHT live nachgetestet): Zusammen
+mit der Reduktion von WEATHER_API_MAX_CONCURRENT_REQUESTS auf 4 (s. dort) auf 0.25s
+angehoben (von 0.15s) — auf Basis der historischen Messwerte (31%/21%/4,8%
+Fehlerquote bei 0/5-ohne-Pacing/5-mit-0,15s-Pacing), OHNE neuen Live-Smoke-Test
+(aus der Sandbox nicht möglich, kein Internetzugriff). Neuer gedeckelter
+Maximaldurchsatz: 4 Slots × (1 Request / 0.25s) = 16 Requests/Sekunde (vorher:
+33,3 Requests/Sekunde, ca. -52%). Für einen Vollauf mit ~1186 Requests (TASK-75-
+Referenzmessung) ergibt das rechnerisch statt ~35,6s ca. ~74s reine
+Pacing-Untergrenze — spürbar mehr in absoluten Sekunden, aber immer noch weit
+unter dem 3-Stunden-Cronzyklus und für den manuellen Button noch im Bereich
+"kurz warten", nicht "eingefroren". Ziel: den über die GESAMTE Laufzeit
+verteilten Sonnenrichtung/Gegenrichtung-Anteil (der laut BUG-83-Analyse
+überproportional von einer mit anhaltender Last härter werdenden Drosselung
+getroffen wird) durch einen niedrigeren Dauerdurchsatz zu entlasten. Muss nach
+dem nächsten Live-Lauf (Stephan) ggf. weiter nachjustiert werden — insbesondere,
+falls die dann nach Abruf-Art aufgeschlüsselte Fehlerquote zeigt, dass diese
+Kalibrierung allein noch nicht ausreicht (siehe Retry-Mechanismus als zweite,
+unabhängige Absicherung).
+"""
+
+
+WEATHER_API_MAX_RETRIES_ON_429 = 2
+"""
+BUG-83 (Option B, Weg-Gate 2026-07-21): Maximale Anzahl zusätzlicher Versuche in
+_run_one_weather_fetch(), wenn Open-Meteo mit HTTP 429 (Too Many Requests)
+antwortet — gilt einheitlich für ALLE Abruf-Arten (weather/aerosol/sun_dir/
+antisolar_dir), da alle denselben Helfer nutzen (Pre-Mortem Szenario 3: keine
+zwei unterschiedlich robusten Pfade in derselben Funktion). Andere Fehler (Timeout,
+Verbindungsfehler, sonstige HTTP-Status) werden NICHT wiederholt — dafür bleibt das
+bestehende BUG-77-Sichtbarkeits-Verhalten (sofortiger, sichtbarer Fehlschlag)
+unverändert erhalten.
+"""
+
+
+WEATHER_API_RETRY_BACKOFF_BASE_SECONDS = 1.0
+"""
+BUG-83 (Option B): Steigende Wartezeit vor jedem Retry-Versuch, in ganzen
+Vielfachen dieses Basiswerts (1. Retry nach 1,0s, 2. Retry nach 2,0s) — bewusst
+grob gewählt (kein exaktes Rate-Limit-Zeitfenster bekannt), soll dem externen
+Dienst spürbar Zeit geben, sich von der auslösenden Lastspitze zu erholen, bevor
+derselbe Slot erneut anfragt. Läuft NACH dem Fehlschlag und VOR dem nächsten
+Versuch, zusätzlich zum unveränderten WEATHER_API_REQUEST_PACING_SECONDS-Pacing
+im finally-Block (das weiterhin bei jedem Abschluss — Erfolg, endgültiger
+Fehlschlag oder letzter Retry — läuft, s. _run_one_weather_fetch()).
+
+Worst-Case-Laufzeit-Abschätzung (für Stephan, zur Einordnung beim Live-Test):
+Falls ALLE Sonnenrichtung/Gegenrichtung-Requests eines Laufs (BUG-83-Beispiel:
+~165+168=333 von ~172 Locations) jeweils beide Retries ausschöpfen (1,0s+2,0s=3,0s
+zusätzliche Wartezeit pro Request, während dieser Slot blockiert bleibt), addiert
+das im ungünstigsten Fall 333 × 3,0s = 999s Slot-Wartezeit, verteilt auf
+WEATHER_API_MAX_CONCURRENT_REQUESTS=4 parallele Slots ≈ 999s / 4 ≈ 250s (~4,2 Min)
+zusätzliche Wall-Clock-Zeit. Zusammen mit der Option-A-Anpassung (~74s statt
+~35,6s reine Pacing-Untergrenze) ergäbe das im absoluten Worst Case einen Vollauf
+von ca. 74s + 250s ≈ 324s (~5,4 Min) statt ~35,6s — das WÄRE "spürbar länger"
+und widerspräche dem Laufzeit-Akzeptanzkriterium. Wichtig: Dieser Worst Case tritt
+nur ein, wenn die Option-A-Kalibrierung NICHT greift und weiterhin praktisch jeder
+Sonnenrichtung/Gegenrichtung-Request einen 429 samt beider Retries produziert —
+genau das Szenario, das die Kalibrierung verhindern soll. Trifft der Live-Test
+diesen Worst Case an, ist das ein Signal, dass Option A allein nicht ausreicht und
+weiter nachjustiert werden muss (z. B. noch geringere Parallelität/noch mehr
+Pacing) — nicht, dass der Retry-Mechanismus selbst das Problem ist.
 """
 
 
@@ -1139,12 +1222,37 @@ async def _run_one_weather_fetch(kind: str, lat: float, lon: float, semaphore: "
     Semaphore wieder freigegeben wird, damit ein frei gewordener Slot nicht sofort
     wieder feuert. Ein fehlgeschlagener Call zählt bei der externen API ebenfalls
     als Request.
+
+    BUG-83 (Option B, Weg-Gate 2026-07-21): Bei HTTP 429 (Too Many Requests) wird
+    derselbe Fetch bis zu WEATHER_API_MAX_RETRIES_ON_429-mal automatisch mit
+    steigender Wartezeit (WEATHER_API_RETRY_BACKOFF_BASE_SECONDS × Versuchsnummer)
+    wiederholt, BEVOR der Task endgültig als fehlgeschlagen gilt — einheitlich für
+    ALLE Abruf-Arten (weather/aerosol/sun_dir/antisolar_dir), da alle diesen einen
+    Helfer nutzen (Pre-Mortem Szenario 3). Andere Fehler (Timeout, Verbindungsfehler,
+    sonstige HTTP-Status) werden weiterhin NICHT wiederholt — das bestehende
+    BUG-77-Sichtbarkeits-Verhalten (sofortiger, sichtbarer Fehlschlag im UI) bleibt
+    für diese Fälle unverändert erhalten (Regressions-Schutz, s. Akzeptanzkriterium).
     """
     async with semaphore:
+        attempt = 0
         try:
-            if kind == "aerosol":
-                return await fetch_aerosol_forecast(lat, lon, days=7)
-            return await fetch_weather_forecast(lat, lon, days=7)
+            while True:
+                try:
+                    if kind == "aerosol":
+                        return await fetch_aerosol_forecast(lat, lon, days=7)
+                    return await fetch_weather_forecast(lat, lon, days=7)
+                except httpx.HTTPStatusError as exc:
+                    status_code = exc.response.status_code if exc.response is not None else None
+                    if status_code == 429 and attempt < WEATHER_API_MAX_RETRIES_ON_429:
+                        attempt += 1
+                        backoff = WEATHER_API_RETRY_BACKOFF_BASE_SECONDS * attempt
+                        logger.warning(
+                            "  %s: HTTP 429 (Too Many Requests), Retry %d/%d nach %.1fs",
+                            kind, attempt, WEATHER_API_MAX_RETRIES_ON_429, backoff,
+                        )
+                        await asyncio.sleep(backoff)
+                        continue
+                    raise
         finally:
             await asyncio.sleep(WEATHER_API_REQUEST_PACING_SECONDS)
 

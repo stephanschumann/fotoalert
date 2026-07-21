@@ -632,8 +632,12 @@ def test_nachtrag_himmelsroete_und_rote_wolken_ueber_opportunities_ungekuerzt():
 def test_nachtrag_max_concurrent_requests_konstante_ist_konservativ_gesetzt():
     """Konservativer, benannter Grenzwert (analog CLOUD_MOOD_PROJECTION_DISTANCE_M-
     Muster) -- kein exaktes Open-Meteo-Limit recherchiert (nicht verifizierbar ohne
-    Internetzugriff), sondern bewusst niedrig gewählter, leicht änderbarer Wert."""
-    assert main.WEATHER_API_MAX_CONCURRENT_REQUESTS == 5
+    Internetzugriff), sondern bewusst niedrig gewählter, leicht änderbarer Wert.
+    BUG-83-Nachjustierung (2026-07-21): von 5 auf 4 gesenkt, weil die Sonnenrichtung-/
+    Gegenrichtung-Abrufe (bis zu 6x pro Location, US-131) trotz der ursprünglich nur
+    ~4,8% aggregierten 429-Quote fast vollständig fehlschlugen -- siehe BUG-83 in
+    BACKLOG.md für die vollständige Herleitung."""
+    assert main.WEATHER_API_MAX_CONCURRENT_REQUESTS == 4
 
 
 def test_nachtrag_drosselung_cronlauf_ueberschreitet_obergrenze_nie(monkeypatch):
@@ -757,9 +761,10 @@ def test_nachtrag_pacing_konstante_ist_konservativ_gesetzt():
     """Benannter, konservativer Startwert -- kein exaktes Open-Meteo-Zeitfenster-
     Limit recherchiert (nicht verifizierbar ohne Internetzugriff), bewusst klein
     und leicht änderbar (analog WEATHER_API_MAX_CONCURRENT_REQUESTS-Muster).
-    Überschlagsrechnung (s. Docstring in main.py): 5 parallele Slots x
-    (1 Request / 0.15s) = ca. 33 Requests/Sekunde Pacing-Obergrenze."""
-    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.15)
+    BUG-83-Nachjustierung (2026-07-21): von 0.15s auf 0.25s erhöht (siehe BUG-83 in
+    BACKLOG.md). Überschlagsrechnung (s. Docstring in main.py): 4 parallele Slots x
+    (1 Request / 0.25s) = ca. 16 Requests/Sekunde Pacing-Obergrenze."""
+    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.25)
 
 
 def test_nachtrag_pacing_sleep_folgt_auf_jeden_erfolgreichen_fetch_call(monkeypatch):
