@@ -46,11 +46,26 @@ pytestmark = [pytest.mark.offline, pytest.mark.regression]
 # mit anderen Testdateien wie test_us131.py, auch wenn die Muster ähnlich sind)
 # ---------------------------------------------------------------------------
 
-def _run(coro):
+def _run(coro_builder):
+    """coro_builder: aufrufbar (i.d.R. eine Lambda), die bei Aufruf die eigentliche
+    Coroutine liefert -- WICHTIG: der Aufruf von coro_builder() erfolgt HIER, erst
+    NACHDEM der neue Event-Loop als aktueller Loop gesetzt wurde.
+
+    Hintergrund (CI-Nachtrag 2026-07-22, BUG-83-Release-Fehlschlag): asyncio.Semaphore()
+    bindet sich in Python 3.9 (CI-Runner-Version) beim Konstruieren EAGER an den
+    aktuellen Event-Loop (RuntimeError "There is no current event loop", falls keiner
+    gesetzt ist) -- ab Python 3.10 entfaellt das (Bindung rein lazy beim ersten await),
+    weshalb es lokal mit neuerem Python unauffaellig durchlief, in der echten CI
+    (Python 3.9.25) aber fehlschlug. Wird ein Semaphore also VOR diesem Aufruf
+    konstruiert, wie urspruenglich in diesem Modul, schlaegt es in CI fehl. Die Loesung:
+    asyncio.Semaphore(1) wird nun erst INNERHALB der Lambda konstruiert, also nachdem
+    set_event_loop() bereits gelaufen ist."""
     loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        return loop.run_until_complete(coro)
+        return loop.run_until_complete(coro_builder())
     finally:
+        asyncio.set_event_loop(None)
         loop.close()
 
 
@@ -168,8 +183,7 @@ def test_retry_bei_429_erfolgreich_nach_einem_versuch(monkeypatch):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", flaky)
 
-    sem = asyncio.Semaphore(1)
-    result = _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+    result = _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 2, "Erster Versuch 429, zweiter Versuch (Retry) erfolgreich -- genau 2 Calls erwartet"
     assert isinstance(result, WeatherForecast)
@@ -185,8 +199,7 @@ def test_retry_bei_429_erfolgreich_erst_nach_beiden_versuchen(monkeypatch):
         return _forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_weather_forecast", flaky)
 
-    sem = asyncio.Semaphore(1)
-    result = _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+    result = _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 3, "Initialer Call + 2 Retries = 3 Calls, dritter erfolgreich"
     assert isinstance(result, WeatherForecast)
@@ -200,9 +213,8 @@ def test_retry_gibt_nach_ausgeschoepften_versuchen_endgueltig_auf(monkeypatch):
         raise _http_error(429)
     monkeypatch.setattr(main, "fetch_weather_forecast", always_429)
 
-    sem = asyncio.Semaphore(1)
     with pytest.raises(httpx.HTTPStatusError):
-        _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+        _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 1 + main.WEATHER_API_MAX_RETRIES_ON_429, (
         "Bei dauerhaftem 429 muessen genau initial+2 Retries versucht werden, "
@@ -221,9 +233,8 @@ def test_kein_retry_bei_generischer_exception_bug77_regression(monkeypatch):
         raise RuntimeError("Timeout o.ae. (kein 429)")
     monkeypatch.setattr(main, "fetch_weather_forecast", failing)
 
-    sem = asyncio.Semaphore(1)
     with pytest.raises(RuntimeError):
-        _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+        _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 1, "Kein Retry bei generischer Exception -- genau 1 Call"
 
@@ -238,9 +249,8 @@ def test_kein_retry_bei_anderem_http_status(monkeypatch):
         raise _http_error(500)
     monkeypatch.setattr(main, "fetch_weather_forecast", failing)
 
-    sem = asyncio.Semaphore(1)
     with pytest.raises(httpx.HTTPStatusError):
-        _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+        _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 1, "Kein Retry bei HTTP 500 -- genau 1 Call"
 
@@ -258,8 +268,7 @@ def test_retry_gilt_auch_fuer_aerosol_kind(monkeypatch):
         return _aerosol_forecast(datetime.now(timezone.utc))
     monkeypatch.setattr(main, "fetch_aerosol_forecast", flaky_aerosol)
 
-    sem = asyncio.Semaphore(1)
-    result = _run(main._run_one_weather_fetch("aerosol", 52.5, 13.4, sem))
+    result = _run(lambda: main._run_one_weather_fetch("aerosol", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert calls["n"] == 2
     assert isinstance(result, AerosolForecast)
@@ -286,8 +295,7 @@ def test_backoff_wartezeit_steigt_und_pacing_folgt_am_ende(monkeypatch):
         sleep_calls.append(seconds)
     monkeypatch.setattr(main.asyncio, "sleep", fake_sleep)
 
-    sem = asyncio.Semaphore(1)
-    _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+    _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert sleep_calls == [
         main.WEATHER_API_RETRY_BACKOFF_BASE_SECONDS * 1,
@@ -309,9 +317,8 @@ def test_pacing_laeuft_auch_wenn_retries_endgueltig_scheitern(monkeypatch):
         sleep_calls.append(seconds)
     monkeypatch.setattr(main.asyncio, "sleep", fake_sleep)
 
-    sem = asyncio.Semaphore(1)
     with pytest.raises(httpx.HTTPStatusError):
-        _run(main._run_one_weather_fetch("weather", 52.5, 13.4, sem))
+        _run(lambda: main._run_one_weather_fetch("weather", 52.5, 13.4, asyncio.Semaphore(1)))
 
     assert sleep_calls[-1] == main.WEATHER_API_REQUEST_PACING_SECONDS, (
         "Pacing-Sleep muss auch nach endgueltig ausgeschoepften Retries als "
@@ -349,7 +356,7 @@ def test_sonnenrichtung_und_gegenrichtung_erholen_sich_von_transientem_429(monke
         return _aerosol_forecast(datetime.now(timezone.utc), aod=0.05)
     monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_aerosol)
 
-    _run(main._weather_overlay())
+    _run(lambda: main._weather_overlay())
 
     assert failed_once["sun"] is True and failed_once["anti"] is True, "Testaufbau ungueltig: 429 wurde nie ausgeloest"
     assert ev["golden_cloud_score_sun_dir"] is not None, "Sonnenrichtung sollte sich dank Retry erholen"
@@ -375,7 +382,7 @@ def test_dauerhafter_429_bleibt_sichtbarer_fehler_bug77_regression(monkeypatch):
         return _aerosol_forecast(datetime.now(timezone.utc), aod=0.05)
     monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_aerosol)
 
-    _run(main._weather_overlay())  # darf nicht crashen
+    _run(lambda: main._weather_overlay())  # darf nicht crashen
 
     assert ev["golden_cloud_score_sun_dir"] is None
     status = main._job_status["weather"]
@@ -402,7 +409,7 @@ def test_allgemeine_wetteranzeige_am_fotografen_standort_unveraendert(monkeypatc
         return _aerosol_forecast(datetime.now(timezone.utc), aod=0.05)
     monkeypatch.setattr(main, "fetch_aerosol_forecast", fake_aerosol)
 
-    _run(main._weather_overlay())
+    _run(lambda: main._weather_overlay())
 
     wd = ev["weather_details"]
     assert wd["cloud_cover_low_pct"] == 5
