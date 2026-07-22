@@ -42,7 +42,7 @@ def _load_secret() -> str:
     Asymmetrie ist Absicht, kein Bug: einzelne Rollen dürfen fehlen, das Secret nicht.
     """
     value = os.environ.get("FOTOALERT_AUTH_SECRET", "")
-    if not value:
+    if not value.strip():
         raise RuntimeError(
             "FOTOALERT_AUTH_SECRET ist nicht gesetzt (oder leer). "
             "Diese Umgebungsvariable muss vor dem Start des Servers gesetzt "

@@ -82,6 +82,7 @@ class TestAuthSecretHardAbort:
         source = (BACKEND_DIR / "auth.py").read_text(encoding="utf-8")
         assert "fotoalert-dev-secret-change-me" not in source
 
+    @pytest.mark.api
     def test_set_secret_login_flow_still_works(self, client):
         """API-Ebene: mit gesetztem Test-Secret (conftest.py) funktioniert Login wie zuvor.
 
