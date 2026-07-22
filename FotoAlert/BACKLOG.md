@@ -18046,6 +18046,8 @@ def _secret() -> str:
 
 **Empfehlung: Option A** — erfüllt „hart abbrechen beim Start" am direktesten und frühesten, ist die kleinste Änderung genau an der Stelle, wo der Notwert heute steht, und die Testsuite ist nachweislich unbetroffen.
 
+**Nachtrag (2026-07-22, v1.22.43):** Zwei kleine Nachbesserungen aus der Refactor-Phase ergänzt: `_load_secret()` behandelt jetzt auch einen reinen Leerzeichen-Wert als „fehlt" (`if not value.strip():` statt `if not value:`), und der Login-Flow-Test in `test_task-85.py` trägt zusätzlich den `api`-Marker (Testkonvention). Kein neuer Funktionsumfang. Volle Backend-Regressionssuite weiterhin grün (662 passed / 5 failed — alle 5 Fehlschläge nachweislich TASK-86-Regressionen bzw. bekannte Altlasten, keiner in `test_task-85.py`). Released als v1.22.43, CI grün (Frontend-Check Playwright, Backend-Tests pytest, Deploy FotoAlert), Health-Check bestätigt (`version 2.0.0`, `locations_count 172`) auf https://fotoalert.stephanschumann.com.
+
 ---
 
 ### TASK-86 · Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) `[ ]`
