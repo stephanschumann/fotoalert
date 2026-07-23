@@ -130,7 +130,7 @@ class TestTask24DeviceTokens:
     """
 
     import uuid as _uuid
-    TOKEN = f"tok-task24-{_uuid.uuid4().hex[:8]}"
+    TOKEN = f"tok-task24-{_uuid.uuid4().hex[:12]}"
 
     def test_register_new_token(self, client):
         """TASK-24 AK: neuer Token → 200, registered."""

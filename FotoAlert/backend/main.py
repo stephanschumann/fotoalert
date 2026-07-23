@@ -3074,11 +3074,16 @@ async def _save_alignment_as_location(
 
 
 @app.post("/preview-alignment")
-async def preview_alignment(req: PreviewAlignmentRequest, request: Request, _role: str = Depends(auth.require_auth)) -> dict:
+async def preview_alignment(req: PreviewAlignmentRequest, request: Request = None, _role: str = Depends(auth.require_auth)) -> dict:
     # TASK-86 (AK-1): Häufigkeits-Bremse pro Absenderadresse (20 Aufrufe/60s) — die
     # bestehende Zeitraum-Deckelung (`days = min(req.days, 14)`, BUG-63) bleibt unten
-    # unverändert bestehen (AK-8, Regression).
-    rate_limit.enforce_rate_limit(_preview_alignment_limiter, request)
+    # unverändert bestehen (AK-8, Regression). `request` hat einen Default von None,
+    # damit Direktaufrufe der Funktion ohne HTTP-Layer (siehe test_bug63.py,
+    # Nebenläufigkeits-Regressionstest) weiterhin funktionieren; FastAPI liefert bei
+    # echten HTTP-Requests immer ein echtes Request-Objekt, daher greift die Bremse
+    # im echten Betrieb unverändert.
+    if request is not None:
+        rate_limit.enforce_rate_limit(_preview_alignment_limiter, request)
     if not (-90 <= req.observer_lat <= 90 and -180 <= req.observer_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Fotograf-Koordinaten.")
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
