@@ -18050,13 +18050,13 @@ def _secret() -> str:
 
 ---
 
-### TASK-86 · Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) `[ ]`
+### TASK-86 · Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** Mehrere öffentlich erreichbare Endpunkte sind ungebremst: der Planungs-Endpunkt nimmt einen ungedeckelten Zeitraum entgegen (beliebig teure Berechnung), der Kalender-Cache lässt sich durch minimal variierte Werte umgehen und wächst unbegrenzt, Login-Fehlversuche werden nicht gedrosselt (Passwort-Durchprobieren), CORS steht auf „alle Herkünfte erlaubt", und die Geräte-Registrierung nimmt ungeprüft unbegrenzt Einträge an. Deckeln, drosseln, eingrenzen, validieren.
@@ -18064,6 +18064,123 @@ def _secret() -> str:
 **User Story:** Als Nutzer, möchte ich, dass die App auch unter Missbrauchsversuchen erreichbar und schnell bleibt, sodass Einzelne den Dienst nicht lahmlegen oder Passwörter durchprobieren können.
 
 **Bezug:** Überschneidung mit BUG-63 [x] („Alignments berechnen" blockierte den Server 20–25 s) — dort wurde die *Laufzeit* desselben Planungs-Endpunkts entschärft (`asyncio.to_thread`), hier fehlt weiterhin die *Eingabe-Deckelung* des Zeitraums; kein Dublett, aber die dortige Lösung vor der Analyse lesen. Berührt dieselbe Funktion `preview_alignment()` wie TASK-81 (Refactoring, Inbox) — Konflikt-/Reihenfolgerisiko, bei Freigabe abstimmen. Abgrenzung zu TASK-75 (Wetter-API-Drosselung): dort *ausgehende* Anfragen an fremde Dienste, hier *eingehende* Anfragen an FotoAlert. Quelle: Security-Audit 2026-07-16.
+
+#### 🔬 Analyse & Spec (TASK-86) · 2026-07-22
+
+##### 📎 Code-Verifikation (frisch durchgeführt 2026-07-22, gegen aktuellen Stand)
+
+- `backend/main.py` Zeile 3073, `preview_alignment()`: `days = min(req.days, 14)` — Zeitraum weiterhin hart auf 14 Tage gedeckelt. **Diese Ticket-Prämisse ist bereits gelöst** (Nebenprodukt von BUG-63). Übrig bleibt die Anfragehäufigkeit, nicht die Anfragegröße.
+- `backend/main.py` Zeile 101–110: CORS weiterhin auf explizite Origin-Liste beschränkt (`_ALLOWED_ORIGINS`, seit TASK-83). **Auch diese Prämisse ist bereits gelöst.** Native iOS-App ist von CORS ohnehin nicht betroffen.
+- `backend/main.py` Zeile 2570/2593–2609, `_compute_month_all_locations()`: Cache-Schlüssel enthält den ungerundeten `min_score`-Float direkt; `_ondemand_month_cache` hat weiterhin keine TTL, keine Größenbegrenzung, kein Eviction. **Bestätigt real und ungelöst.**
+- `backend/main.py` Zeile 2720–2739, `/login`: weiterhin keine Rate-Begrenzung, kein Lockout — jeder falsche Versuch liefert sofort `401`, beliebig oft wiederholbar. **Bestätigt real und ungelöst.**
+- `backend/main.py` Zeile 2770–2779, `/register-device`: weiterhin bewusst ohne Auth (native App noch nicht login-fähig), keine Token-Format-/Längenprüfung, keine Rate-Begrenzung. **Bestätigt real und ungelöst.**
+- `deploy/fotoalert.service` Zeile 11: weiterhin `--workers 1` — ein einfacher, prozessweiter In-Memory-Zähler bleibt die richtige Größenordnung.
+- `backend/requirements.txt`: weiterhin keine Rate-Limiting-Bibliothek installiert.
+- `backend/data/elevation.py` Zeile 51/55/62: bestehendes Muster für genau diese Art Drosselung (`asyncio.Lock`-gestützter Rate-Limit-Gate) bereits im Projekt vorhanden und als Vorbild nutzbar.
+
+##### ⚠️ Wichtigster Befund: Zwei der fünf Teilprobleme sind bereits gelöst
+
+Von den fünf im Ticket beschriebenen Punkten sind **Zeitraum-Deckelung** und **CORS** bereits erledigt. Der real offene Scope reduziert sich auf vier Punkte: (1) Anfragehäufigkeit des Planungs-Endpunkts begrenzen, (2) Kalender-Cache-Schlüssel normalisieren + Größe begrenzen, (3) Login-Drosselung, (4) Geräte-Registrierung validieren + drosseln.
+
+##### Example Mapping
+
+📏 **Regel 1 — Planungs-Endpunkt-Häufigkeit:** Ruft dieselbe Absenderadresse den Planungs-Endpunkt sehr häufig hintereinander auf, wird sie ab einer Schwelle vorübergehend gebremst statt jede Anfrage sofort voll zu berechnen.
+🟢 Beispiel: Eine Adresse ruft den Endpunkt 40-mal innerhalb einer Minute auf → ab der konfigurierten Schwelle bekommen weitere Anfragen in diesem Zeitfenster eine klare „zu viele Anfragen, bitte in X Sekunden erneut versuchen"-Antwort statt eine volle Berechnung.
+
+📏 **Regel 2 — Kalender-Cache-Normalisierung:** Minimal unterschiedliche, aber inhaltlich gleichwertige Anfragewerte (z. B. Score-Schwelle 0.40 vs. 0.4000001) landen im selben Cache-Eintrag statt in unbegrenzt vielen neuen.
+🟢 Beispiel: Zwei Anfragen für denselben Monat mit Score-Schwelle 0.40 und 0.40000001 liefern das gleiche, aus demselben Cache-Eintrag stammende Ergebnis.
+🟢 Beispiel: Der Cache wächst insgesamt nicht unbegrenzt weiter — ab einer Obergrenze verdrängen neue Einträge die ältesten.
+
+📏 **Regel 3 — Login-Drosselung:** Nach mehreren falschen Passwort-Versuchen von derselben Absenderadresse in kurzer Zeit wird weiteres Durchprobieren für eine Weile gebremst.
+🟢 Beispiel: Eine Adresse gibt 5-mal hintereinander ein falsches Passwort ein → der 6. Versuch innerhalb desselben Zeitfensters wird mit einer klaren „zu viele Anfragen"-Meldung abgewiesen, ohne das Passwort überhaupt zu prüfen.
+🟢 Beispiel: Nach Ablauf des Zeitfensters (bzw. nach einem korrekten Login) kann es normal weitergehen.
+
+📏 **Regel 4 — Geräte-Registrierung:** Ein Registrierungs-Versuch mit offensichtlich unplausiblem Token (leer, zu lang, unerwartete Zeichen) wird abgelehnt; auch bei gültigen Token wird die Registrierungs-Häufigkeit pro Absenderadresse begrenzt.
+🟢 Beispiel: Ein 5000 Zeichen langer Zufallsstring als Token → Registrierung wird mit einer klaren Fehlermeldung abgelehnt, kein Eintrag in der Datenbank.
+🟢 Beispiel: Eine Adresse registriert 200 unterschiedliche Token innerhalb einer Minute → ab einer Schwelle werden weitere Registrierungen für diese Adresse mit derselben „zu viele Anfragen"-Meldung vorübergehend abgewiesen.
+
+**Weg-Gate-Entscheidungen (bestätigt von Stephan, 2026-07-22):**
+- ✅ **Drossel-Antwort:** Option A — klare Fehlermeldung mit Wartezeit (Standard-„zu viele Anfragen"-Antwort, die dem Nutzer ehrlich sagt, dass und wie lange er warten soll). Gilt einheitlich für alle vier Bremsen.
+- ✅ Login-Schwelle: 5 Fehlversuche pro 15 Minuten pro Absenderadresse, Zähler setzt sich bei erfolgreichem Login zurück — bestätigt.
+- ✅ Score-Schwelle für den Cache-Schlüssel wird auf 2 Nachkommastellen gerundet (0.4000001 → 0.40); die tatsächliche Ergebnisfilterung bleibt exakt, nur der Cache-Schlüssel wird normalisiert — bestätigt.
+- ✅ Geräte-Token-Längenlimit großzügig (20–256 Zeichen, druckbare ASCII/Hex-Zeichen) — bestätigt.
+
+##### Pre-Mortem
+
+💀 **Szenario 1: Legitime Nutzer hinter einer gemeinsamen IP-Adresse (Firmennetz, mobiles Carrier-NAT) werden durch die Login-Drosselung ausgesperrt, weil mehrere Personen zufällig kurz hintereinander Passwörter falsch eingeben.**
+Gegenmaßnahme: Schwelle bewusst großzügig (5/15 Min.), Zähler setzt sich bei jedem erfolgreichen Login zurück (AK-5).
+
+💀 **Szenario 2: TASK-81 (Refactoring von `preview_alignment()`, noch in Inbox, nicht freigegeben) wird später umgesetzt und entfernt beim Umbau unbemerkt die hier ergänzte Häufigkeits-Bremse.**
+Gegenmaßnahme: Im TASK-81-Ticket als Abhängigkeit vermerken; Regressionstest gegen die Häufigkeits-Bremse bleibt Teil der Dauer-Testsuite (AK-8/AK-9 als Vorlage für dieses Muster).
+
+💀 **Szenario 3: CORS wird versehentlich aus vermeintlicher iOS-Kompatibilität gelockert, obwohl das unnötig ist (CORS betrifft native Clients nicht).**
+Gegenmaßnahme: Ausdrücklich als „kein Änderungsbedarf" festgehalten, AK-9 sichert das als Regression ab.
+
+💀 **Szenario 4: Rundung der Score-Schwelle auf 2 Nachkommastellen könnte zwei tatsächlich unterschiedlich gemeinte Werte auf denselben Cache-Eintrag mappen.**
+Gegenmaßnahme: Frontend nutzt nur wenige feste Filter-Stufen, keine frei eingebbaren Nachkommawerte — in der Implementierung kurz die tatsächlich von `web/index.html` gesendete Genauigkeit prüfen, bevor die Rundungsstufe final verbaut wird.
+
+💀 **Szenario 5: Die Häufigkeits-Bremse für den Planungs-Endpunkt blockiert legitime Nutzung während echter Hochlastphasen (z. B. nach einer Empfehlung/einem Blogpost).**
+Gegenmaßnahme: Schwelle realistisch oberhalb normaler Einzelnutzung wählen (z. B. 20–30 Aufrufe/Minute pro Adresse), nach Release die 429-Rate im Log beobachten.
+
+##### Architektur-Analyse
+
+**Betroffene Dateien/Endpunkte (Zeilen Stand 2026-07-22):**
+- `backend/main.py` — `preview_alignment()` (Zeile 3041 ff., `POST /preview-alignment`): Häufigkeits-Bremse ergänzen; Zeitraum-Deckelung (Zeile 3073) bleibt unverändert.
+- `backend/main.py` — `_compute_month_all_locations()`/`get_calendar()` (Zeile 2593–2614, `GET /calendar`): Cache-Schlüssel-Rundung + Größenbegrenzung von `_ondemand_month_cache` (Zeile 2570).
+- `backend/main.py` — `login()` (Zeile 2720–2739, `POST /login`): Häufigkeits-Bremse pro Absenderadresse vor der Passwortprüfung.
+- `backend/main.py` — `register_device()` (Zeile 2770–2779, `POST /register-device`) + `backend/data/store.py` `register_device_token()`: Token-Validierung + Häufigkeits-Bremse.
+- `backend/main.py` Zeile 101–110 (CORS-Middleware): **keine Änderung nötig**, bereits gelöst (TASK-83).
+- Neu: ein kleines, wiederverwendbares Rate-Limit-Hilfsmodul (z. B. `backend/rate_limit.py`), von allen vier Stellen genutzt statt vier separater Implementierungen — Muster analog zum bestehenden `asyncio.Lock`-Gate in `backend/data/elevation.py`.
+
+##### Implementierungsoptionen
+
+✅ **Empfehlung: Option B (eigene kleine In-Memory-Lösung)** für alle vier Bremsen + Rundung/Höchstgröße für den Kalender-Cache. Begründung: einziger Serverprozess (`--workers 1`) macht eine geteilte/externe Lösung unnötig, das Projekt hat bereits ein etabliertes Muster für genau diese Art handgebauter Drosselung (`backend/data/elevation.py`), Umfang klein genug ohne zusätzliche Abhängigkeit.
+
+Verworfene Alternative: etablierte Rate-Limiting-Bibliothek (z. B. `slowapi`) — mehr Standard-„out of the box", aber neue Abhängigkeit ohne echten Zusatznutzen bei nur einem Serverprozess.
+
+##### Akzeptanzkriterien
+
+- [x] AK-1: Wer den Planungs-Endpunkt („Alignments berechnen") von derselben Absenderadresse deutlich häufiger aufruft als eine normale Nutzung es erfordert, bekommt ab einer Schwelle eine klare „zu viele Anfragen, bitte in X Sekunden erneut versuchen"-Antwort statt eine vollständige Berechnung — normale, gelegentliche Nutzung ist davon nicht spürbar betroffen.
+- [x] AK-2: Zwei Kalenderanfragen für denselben Monat mit praktisch identischer Score-Schwelle (Unterschied kleiner als 0.01) liefern erkennbar dasselbe, aus einem gemeinsamen Zwischenspeicher stammende Ergebnis — der Zwischenspeicher wächst dadurch nicht mit jeder minimalen Wertänderung weiter an.
+- [x] AK-3 Edge Case: Wird der Kalender-Zwischenspeicher über einen konfigurierten Höchststand hinaus gefüllt, verdrängen neue Einträge automatisch die ältesten — der Server läuft dadurch nicht in einen unbegrenzten Speicherverbrauch.
+- [x] AK-4: Nach 5 falschen Passwort-Eingaben von derselben Absenderadresse innerhalb von 15 Minuten wird ein weiterer Versuch mit einer klaren „zu viele Anfragen"-Meldung abgewiesen, ohne dass das eingegebene Passwort überhaupt geprüft wird; ein korrektes Passwort wird weiterhin sofort akzeptiert, solange die Schwelle noch nicht erreicht ist.
+- [x] AK-5 Edge Case: Nach einem erfolgreichen Login von derselben Adresse wird der Fehlversuchs-Zähler zurückgesetzt; nach Ablauf des Zeitfensters ohne Sperre kann es ebenfalls normal weitergehen.
+- [x] AK-6: Eine Geräte-Registrierung mit einem offensichtlich unplausiblen Token (leer, extrem lang, unerwartete Zeichen) wird mit einer klaren Fehlermeldung abgelehnt und erzeugt keinen Datenbank-Eintrag.
+- [x] AK-7 Edge Case: Registriert dieselbe Absenderadresse innerhalb kurzer Zeit sehr viele unterschiedliche Geräte-Token, werden weitere Registrierungen ab einer Schwelle mit derselben „zu viele Anfragen"-Meldung vorübergehend abgewiesen; eine einzelne, normale Geräte-Registrierung (z. B. beim App-Start) bleibt davon unberührt.
+- [x] AK-8 (Regression): Der Planungs-Endpunkt liefert für ein und denselben, nicht gedrosselten Aufruf weiterhin exakt dasselbe Ergebnis wie vor diesem Ticket (Zeitraum-Deckelung auf 14 Tage bleibt unverändert bestehen, wird durch dieses Ticket nicht angetastet).
+- [x] AK-9 (Regression): CORS-Verhalten bleibt unverändert (Origin-Allowlist aus TASK-83) — dieses Ticket ändert daran nichts, da bereits gelöst.
+
+##### Testplan
+
+- [ ] Automatisiert (Harness): `backend/tests/test_task86.py` — je ein Test pro AK (Marker `offline`/`regression`): Häufigkeits-Bremse Planungs-Endpunkt (AK-1), Cache-Normalisierung + Höchstgröße (AK-2/AK-3), Login-Drosselung + Reset (AK-4/AK-5), Geräte-Token-Validierung + Drosselung (AK-6/AK-7), Regressionstests Zeitraum-Deckelung/CORS unverändert (AK-8/AK-9).
+- [ ] Manuell: `POST /login` mit 6 falschen Passwörtern hintereinander gegen den lokalen Dev-Server (`http://localhost:8000`) → 6. Versuch liefert die Drossel-Antwort, nicht `401`; danach ein korrektes Passwort → sofort akzeptiert.
+
+
+**Gate-Status:**
+| Gate | Status | Nachweis / Begründung |
+|------|--------|-----------------------|
+| Spec | ✅ | Example Mapping, Pre-Mortem, Architektur, Optionen+Empfehlung, AKs, Weg-Gate 2026-07-22 |
+| Tests definiert | ✅ | backend/tests/test_task86.py, ein Test je AK |
+| Implementierung | ✅ | backend/rate_limit.py + 4 Integrationsstellen in backend/main.py |
+| Test bestanden | ✅ 2026-07-22 | 30/30 automatisierte Tests grün (14.90s), inkl. 2 neuer Spoofing-Resistance-Tests + manueller Login-Drossel-Check (5×401→429) auf Stephans Mac bestätigt |
+| Refactor-Check | ⬜ | — |
+| PRODUCT.md | ✅ 2026-07-22 | PRODUCT.md-Changelog ergänzt (TASK-86-Eintrag + Login-Sperre-Zeile in Abschnitt 10) |
+| Release | ⬜ | — |
+
+**Verifikation:** ✅ 2026-07-22 — alle 9 AKs unabhängig bestätigt: AK-2/AK-3/AK-5/AK-6/AK-8/AK-9 waren bereits im ersten Durchgang sauber; die im ersten Durchgang gefundene X-Forwarded-For-Spoofing-Lücke (client_identity() vertraute dem client-fälschbaren ERSTEN Header-Eintrag statt dem von Caddy garantiert selbst angehängten LETZTEN, wodurch AK-1/AK-4/AK-7 durch rotierende gefälschte Absenderadressen umgehbar gewesen wären) ist geschlossen: `backend/rate_limit.py::client_identity()` liest jetzt nachweislich `xff.split(",")[-1]`, die Ein-Hop-Topologie (Caddy einziger Hop vor `--host 127.0.0.1`, kein weiterer Proxy/CDN davor) wurde erneut gegen `deploy/Caddyfile`/`deploy/fotoalert.service` geprüft und bestätigt, und der neue Test `TestClientIdentitySpoofingResistance::test_ak4_login_lockout_still_triggers_despite_changing_spoofed_first_entry` ist ein echter End-to-End-Beweis (5 Fehlversuche mit je unterschiedlichem gefälschtem ersten Eintrag aber gleichem echten letzten Eintrag lösen die Sperre trotzdem aus, 6./7. Versuch → 429) statt nur eines internen Verhaltens-Tests. Keine offenen Risiken gefunden.
+
+**Refactor-Check:** ✅ 2026-07-22 — refactor_check.py: 2 Befunde, beide bereits in TASK-81/TASK-58 erfasst, kein neues Ticket nötig; README-Marker-Tabelle um test_task86.py ergänzt (fehlte, hätte test_task79_readme_marker_sync.py brechen lassen); ein nicht-blockierender Hinweis (unbegrenztes Dict-Wachstum in rate_limit.py über Prozesslaufzeit, geringes Risiko) an Stephan gemeldet statt selbst behoben.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation — zwei der fünf Teilprobleme bereits gelöst)
+- [x] Architektur analysiert: `backend/main.py`, `backend/data/store.py`, `deploy/fotoalert.service`, `backend/requirements.txt`
+- [x] Designer-Check: nicht einschlägig (rein Backend/Sicherheit, keine sichtbaren UI-Änderungen)
+- [x] Implementierungsoptionen: A / B abgewogen
+- [x] Empfehlung: Option B (eigene In-Memory-Lösung) + Cache-Rundung/Höchstgröße
+- [x] Weg-Gate: von Stephan am 2026-07-22 entschieden (Option A Drossel-Antwort, alle drei Annahmen bestätigt) — Implementierung freigegeben
+
+**Hinweis für TASK-81:** Falls TASK-81 (Refactoring `preview_alignment()`) später freigegeben wird, muss dessen Umsetzung die hier ergänzte Häufigkeits-Bremse erhalten (Pre-Mortem-Szenario 2).
 
 ---
 

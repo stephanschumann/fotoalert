@@ -32,13 +32,14 @@ import math
 import subprocess
 import sys
 import uuid as _uuid
+from collections import OrderedDict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends, Response, UploadFile, File
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Body, Depends, Response, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -56,6 +57,7 @@ except Exception:
     pass
 
 import auth  # US-66: Login/Token/Rollen (Option B)
+import rate_limit  # TASK-86: Haeufigkeits-Bremse + Login-Lockout + Token-Validierung
 
 from calculations.astronomy import (
     calculate_subject_angular_profile,
@@ -110,6 +112,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# TASK-86: Haeufigkeits-Bremsen + Login-Lockout (In-Memory, ein Serverprozess,
+# siehe backend/rate_limit.py). Schwellen bewusst konservativ ueber normaler
+# Einzelnutzung gewaehlt (Weg-Gate-Entscheidungen im Ticket bestaetigt).
+_preview_alignment_limiter = rate_limit.SlidingWindowRateLimiter(max_calls=20, window_seconds=60)
+_login_lockout = rate_limit.LoginLockout(max_failures=5, window_seconds=15 * 60)
+_register_device_limiter = rate_limit.SlidingWindowRateLimiter(max_calls=10, window_seconds=60)
 
 # ---------------------------------------------------------------------------
 # Cache-Pfade
@@ -2567,7 +2576,13 @@ async def daily_briefing(target_date: Optional[str] = None) -> DailyBriefingOut:
 # TASK-25 / AK5: In-Memory-Cache für die On-Demand-Monatsübersicht (alle Locations).
 # Ersetzt den 365×N-Batch: ein Monat wird bei Bedarf einmal gerechnet (Window-Engine)
 # und gecacht; Pre-Warm beim Start hält die gängigen Monate sofort verfügbar.
-_ondemand_month_cache: dict[str, list] = {}
+# TASK-86 (AK-2/AK-3): OrderedDict statt dict — hält eine feste Höchstgröße ein und
+# verdrängt bei Überschreitung den ältesten Eintrag (FIFO), damit der Cache nicht mehr
+# unbegrenzt wächst. Der Cache-Schlüssel rundet `min_score` zusätzlich auf 2 Nachkomma-
+# stellen (siehe _compute_month_all_locations), damit praktisch identische Score-Werte
+# (Unterschied < 0.01) denselben Eintrag treffen statt unbegrenzt viele neue anzulegen.
+_ONDEMAND_MONTH_CACHE_MAX_SIZE = 200
+_ondemand_month_cache: "OrderedDict[str, list]" = OrderedDict()
 
 
 async def _compute_location_month(loc, year: int, month: int, min_score: float) -> list:
@@ -2595,8 +2610,13 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
     365-Tage-Batch durch eine bedarfsgesteuerte, schnelle Monatsberechnung."""
     import asyncio as _asyncio
     from data.locations import LOCATIONS as _LOCS
-    key = f"{year}-{month:02d}-{min_score}"
+    # TASK-86 (AK-2): Cache-Schlüssel rundet min_score auf 2 Nachkommastellen — die
+    # tatsächliche Ergebnisfilterung (weiter unten/in get_calendar) bleibt exakt, nur
+    # der Cache-Schlüssel wird normalisiert (bestätigte Annahme, Weg-Gate TASK-86).
+    rounded_min_score = round(min_score, 2)
+    key = f"{year}-{month:02d}-{rounded_min_score}"
     if key in _ondemand_month_cache:
+        _ondemand_month_cache.move_to_end(key)
         return _ondemand_month_cache[key]
     events: list = []
     for i, loc in enumerate(_LOCS):
@@ -2607,6 +2627,9 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
         if i % 8 == 0:
             await _asyncio.sleep(0)   # Event-Loop nicht blockieren
     _ondemand_month_cache[key] = events
+    # TASK-86 (AK-3): Höchstgröße einhalten — ältesten Eintrag verdrängen (FIFO).
+    while len(_ondemand_month_cache) > _ONDEMAND_MONTH_CACHE_MAX_SIZE:
+        _ondemand_month_cache.popitem(last=False)
     return events
 
 
@@ -2717,18 +2740,26 @@ _COOKIE_SECURE = _os.getenv("FOTOALERT_ENV", "prod") == "prod"
 
 
 @app.post("/login")
-async def login(response: Response, body: dict = Body(...)) -> dict:
+async def login(request: Request, response: Response, body: dict = Body(...)) -> dict:
     """US-66/TASK-83: Pflicht-Login. Passwort → Rolle (host/user) + HttpOnly-Sitzungscookie.
 
     Kein Username, kein Rollen-Auswahlfeld — die Rolle ergibt sich aus dem Passwort.
     TASK-83: Das Sitzungs-Ticket wandert vom JS-lesbaren Response-Body (bisher `token`)
     in ein HttpOnly/Secure/SameSite=Lax-Cookie — ein XSS-Skript kann es dadurch nicht
     mehr direkt auslesen. Kein Authorization-Header-Fallback (Weg-Gate-Entscheidung 3).
+
+    TASK-86 (AK-4/AK-5): Vor der Passwortprüfung wird geprüft, ob die Absenderadresse
+    aktuell wegen zu vieler Fehlversuche gesperrt ist (5 Fehlversuche / 15 Min.) — ein
+    gesperrter Versuch bekommt sofort 429, ohne dass das Passwort geprüft wird. Ein
+    erfolgreicher Login setzt den Fehlversuchs-Zähler dieser Adresse zurück.
     """
+    client_key = rate_limit.enforce_login_lockout(_login_lockout, request)
     password = (body or {}).get("password", "")
     role = auth.role_for_password(password)
     if not role:
+        _login_lockout.record_failure(client_key)
         raise HTTPException(status_code=401, detail="Falsches Passwort.")
+    _login_lockout.record_success(client_key)
     response.set_cookie(
         key=auth.SESSION_COOKIE_NAME,
         value=auth.issue_token(role),
@@ -2767,13 +2798,18 @@ async def trigger_discover_refresh(background_tasks: BackgroundTasks, _role: str
 
 
 @app.post("/register-device")
-async def register_device(token: str, platform: str = "ios") -> dict:
+async def register_device(request: Request, token: str, platform: str = "ios") -> dict:
     # US-66: bewusst NICHT geschützt — die native iOS-App ist noch nicht login-fähig.
     # TASK-24: Token wird jetzt in SQLite persistiert (nicht mehr im RAM).
     # Auth-Schutz nachziehen, sobald die iOS-App ein Token sendet (Folge-Ticket).
-    if not token:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=422, detail="token ist erforderlich.")
+    # TASK-86 (AK-6/AK-7): Token-Formatvalidierung zuerst (kein DB-Eintrag bei ungültigem
+    # Token), danach Häufigkeits-Bremse pro Absenderadresse (10 Registrierungen/60s).
+    if not rate_limit.is_valid_device_token(token):
+        raise HTTPException(
+            status_code=422,
+            detail="token ist ungültig (erwartet: 20–256 druckbare ASCII-Zeichen).",
+        )
+    rate_limit.enforce_rate_limit(_register_device_limiter, request)
     is_new = _store.register_device_token(token=token, platform=platform)
     if not is_new:
         return {"status": "already_registered"}
@@ -3038,7 +3074,11 @@ async def _save_alignment_as_location(
 
 
 @app.post("/preview-alignment")
-async def preview_alignment(req: PreviewAlignmentRequest, _role: str = Depends(auth.require_auth)) -> dict:
+async def preview_alignment(req: PreviewAlignmentRequest, request: Request, _role: str = Depends(auth.require_auth)) -> dict:
+    # TASK-86 (AK-1): Häufigkeits-Bremse pro Absenderadresse (20 Aufrufe/60s) — die
+    # bestehende Zeitraum-Deckelung (`days = min(req.days, 14)`, BUG-63) bleibt unten
+    # unverändert bestehen (AK-8, Regression).
+    rate_limit.enforce_rate_limit(_preview_alignment_limiter, request)
     if not (-90 <= req.observer_lat <= 90 and -180 <= req.observer_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Fotograf-Koordinaten.")
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
