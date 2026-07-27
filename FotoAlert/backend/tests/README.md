@@ -58,6 +58,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_task48_qa_ondemand.py` | TASK-48: Endpoint `POST /run-qa-pass` (On-Demand-Trigger, Verbesserung gemockt) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task53_dev_sync.py` | TASK-53: Live-Nutzerdaten periodisch nach Dev spiegeln (subprocess gemockt) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task55_image_backup.py` | TASK-55: `location_images/` im Server-Backup mitsichern | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task59_own_overpass.py` | TASK-59: Optionaler eigener Overpass-Server (Code-Vorbereitung in `data/qa_azimuth.py`, komplett gemockt — der eigene Server existiert noch nicht) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task61_backup_coverage.py` | TASK-61: Backup auf alle 8 DB-Tabellen erweitert | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task67_auth_regression.py` | TASK-67 Etappe 1: PRODUCT.md „Pflicht-Regression Auth" | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task67_backend_regression.py` | TASK-67 Etappe 1: PRODUCT.md „Pflicht-Regression Backend" (Health/Locations/Feed/Kalender/Scout); 2 Tests zusätzlich `smoke` | ⏳ nur mit `--all` | `api`, `regression` (+2× `smoke`) |
@@ -72,6 +73,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_task84.py` | TASK-84 (Nacharbeit): Vendor-Umstellung (Leaflet/astronomy-engine self-hosted unter `web/vendor/`) + CSP-Verschlankung (`deploy/Caddyfile`) statisch abgesichert | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task-85.py` | TASK-85: Harter Serverstart-Abbruch bei fehlendem/leerem `FOTOALERT_AUTH_SECRET`, kein Notwert-Fallback mehr | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task86.py` | TASK-86: Häufigkeits-Bremse `/preview-alignment` (AK-1), Kalender-Cache-Normalisierung + Höchstgröße (AK-2/AK-3), Login-Lockout (AK-4/AK-5), Geräte-Token-Validierung + Bremse `/register-device` (AK-6/AK-7), Regression Zeitraum-Deckelung/CORS (AK-8/AK-9) | teils ✅ immer (offline-Klassen: `rate_limit.py`-Unit-Tests + Cache-Normalisierung), teils nur mit `--all` (api-Klassen: `/login`, `/preview-alignment`, `/register-device`) | `offline`, `api`, `regression` |
+| `test_task89_caddy_log_permissions.py` | TASK-89: Caddy-Logdatei-Berechtigung bei Server-Neuaufbau (Text-/Grep-Check gegen `deploy/setup_server.sh`, kein echter Server-Neuaufbau) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task_65_field_roundtrip.py` | TASK-65: generischer Feld-Rundreise-Test (Whitelist-Vollständigkeit aller Location-Felder) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us-129.py` | US-129: Datenvertrag `image_url` für Filter „Hat Beispielbild" | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us07.py` | US-07: Goldene Wolken & Himmelsröte Scoring (AKs) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
