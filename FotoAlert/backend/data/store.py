@@ -31,6 +31,17 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
+
+def _num_or_default(val, default):
+    """BUG-84-Folgefehler: `dict.get(key, default)` liefert den Default NUR, wenn
+    der Key komplett fehlt -- ist der Key vorhanden, aber sein Wert explizit None
+    (z.B. subject_height_m/subject_width_m/distance_m einer frisch angelegten
+    Custom-Location, die diese optionalen PhotoLocation-Felder nicht setzt), gibt
+    .get() weiterhin None zurück und ein nachfolgendes float(None)/int(None) crasht
+    mit TypeError. Diese Hilfsfunktion prüft explizit auf None statt sich auf den
+    .get()-Default zu verlassen."""
+    return default if val is None else val
+
 # TASK-19: FOTOALERT_ENV steuert den Datenpfad (prod → data/, dev → data_dev/)
 _ENV = os.getenv("FOTOALERT_ENV", "prod")
 _DEFAULT_DB = (
@@ -222,13 +233,13 @@ class LocationStore:
             loc_dict["subject_lat"],
             loc_dict["subject_lon"],
             loc_dict.get("subject_name", ""),
-            float(loc_dict.get("subject_height_m", 0)),
-            float(loc_dict.get("subject_width_m", 0)),
-            int(loc_dict.get("distance_m", 0)),
+            float(_num_or_default(loc_dict.get("subject_height_m"), 0)),
+            float(_num_or_default(loc_dict.get("subject_width_m"), 0)),
+            int(_num_or_default(loc_dict.get("distance_m"), 0)),
             json.dumps(loc_dict.get("focal_length_suggestions", [])),
             loc_dict.get("special_notes", ""),
-            int(loc_dict.get("difficulty", 1)),
-            float(loc_dict.get("observer_floor_height_m", 0.0)),
+            int(_num_or_default(loc_dict.get("difficulty"), 1)),
+            float(_num_or_default(loc_dict.get("observer_floor_height_m"), 0.0)),
         )
         with self._connect() as conn:
             conn.execute("BEGIN")
@@ -401,13 +412,13 @@ class LocationStore:
             loc_dict["subject_lat"],
             loc_dict["subject_lon"],
             loc_dict.get("subject_name", ""),
-            float(loc_dict.get("subject_height_m", 0)),
-            float(loc_dict.get("subject_width_m", 0)),
-            int(loc_dict.get("distance_m", 0)),
+            float(_num_or_default(loc_dict.get("subject_height_m"), 0)),
+            float(_num_or_default(loc_dict.get("subject_width_m"), 0)),
+            int(_num_or_default(loc_dict.get("distance_m"), 0)),
             json.dumps(loc_dict.get("focal_length_suggestions", [])),
             loc_dict.get("special_notes", ""),
-            int(loc_dict.get("difficulty", 1)),
-            float(loc_dict.get("observer_floor_height_m", 0.0)),
+            int(_num_or_default(loc_dict.get("difficulty"), 1)),
+            float(_num_or_default(loc_dict.get("observer_floor_height_m"), 0.0)),
         )
         with self._connect() as conn:
             cur = conn.execute(sql, params)
