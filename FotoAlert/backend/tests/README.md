@@ -32,6 +32,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_bug-61.py` | BUG-61: `subject_name` fehlte im PATCH-Text-Feld-Whitelist | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_bug-78.py` | BUG-78: Koordinaten-Parsing Apple-Maps-Format (rein clientseitig) | ⏭️ immer übersprungen (Platzhalter, AKs manuell getestet) | `frontend`, `regression` |
 | `test_bug-80.py` | BUG-80: Kopfzeilen-Höhe bleibt beim Infotext-Wechsel stabil | ⏭️ übersprungen ohne Playwright + laufenden Dev-Server | `frontend`, `regression` |
+| `test_bug-84.py` | BUG-84: Kategorie/Schwierigkeitsgrad im Bearbeiten-Formular falsch vorbelegt bzw. beim Speichern wirkungslos (category_key + PATCH-Whitelist) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_bug29_calendar_single_recompute.py` | BUG-29: Kalender-Snapshot nach Koordinaten-PATCH | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug43_partial_composition.py` | BUG-43: Kompositions-Analyse liefert Teilergebnis ohne Motivhöhe | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug47.py` | BUG-47: Rollen-Kodierung im Token + `/login`-Antwort | teils ✅ immer (offline-Klasse), teils nur mit `--all` (api-Klasse) | `offline`, `api`, `regression` |

@@ -30,11 +30,11 @@
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | · **BUG-83** *(Wolkenwert-Abruf Sonnenrichtung/Gegenrichtung, Option A+B implementiert + automatisiert getestet, wartet auf Live-Test)*
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-75** *(Wetter-API-Drosselung Semaphore/Pacing empirisch kalibrieren, US-131-Nacharbeit)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-89** *(Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern, Fund aus TASK-82-Testphase)* · **TASK-90** *(Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln, Fund aus TASK-82-Testphase)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-89** *(Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern, Fund aus TASK-82-Testphase)* · **TASK-90** *(Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln, Fund aus TASK-82-Testphase)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **TASK-93** *(Backlog-Datenqualität: rund 147 alte Tickets ohne Status-Feld nachpflegen, Fund aus WS-018)* · **BUG-84** *(Kategorie UND Schwierigkeitsgrad im Bearbeiten-Formular falsch vorbelegt bzw. beim Speichern wirkungslos, Fund aus Qualitäts-Audit 2026-07-27, Scope 2026-07-27 um Schwierigkeitsgrad erweitert)* · **BUG-85** *(Englischer Platzhaltertext ersetzt deutsche Statuszeile bei aktivem Filter + leerer Tagesmenge, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-86** *(Mondphasen-Bezeichnung passt nicht zum Beleuchtungsgrad, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidiert zwischen Verifikation und Sichtachsen-Status, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse ohne Eskalation bei „Nicht geprüft", Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-89** *(Wetter-Score/Wolkenstimmung wirken auf Karte widersprüchlich ohne Inline-Erklärung, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-90** *(Kompositions-Analyse fehlt bei Mondaufgang/-untergang, Fund aus Qualitäts-Audit 2026-07-27)* · **TASK-94** *(main.py::_load_custom_locations() nutzt nicht coerce_category_value() und ist nicht pro Eintrag abgesichert, Fund aus BUG-84-Verifikation)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -43,16 +43,455 @@
 
 ---
 
+### TASK-93 · Backlog-Datenqualität: rund 147 alte Tickets ohne durchgängiges Status-Feld nachpflegen
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-23 |
+
+**Beschreibung:** Bei der Untersuchung von WS-018 (Workspace-Sync, siehe Workspace-Backlog.md) wurde festgestellt, dass ein großer Teil der FotoAlert-Tickets älter ist als die heutige Typ/Priorität/Status-Feldtabellen-Konvention und stattdessen nur eine alte Kurz-Markierung im Titel trägt (`[ ]`/`[x]`/`[~]`). Diese Tickets werden vom projektübergreifenden Workspace-Abgleich komplett übersprungen, weil ihnen die Pflichtfelder fehlen — sie tauchen dadurch im Workspace-Kanban nicht auf, auch wenn sie inhaltlich offen oder erledigt sind. 27 konkret betroffene Tickets wurden im Zuge von WS-018 bereits mit einer Feldtabelle nachgerüstet (Typ nach der im Backlog etablierten ID-Präfix-Konvention, Priorität Mittel, Status ToDo bzw. bei US-07 Done); die verbleibenden rund 147 nicht.
+
+**Bezug:** WS-018 (`Claude Cowork/Workspace-Backlog.md`), Nebenbefund bei der Prüfung der Status-Feld-Abdeckung, 2026-07-23.
+
+**User Story:** Als Projektverantwortlicher möchte ich, dass jedes FotoAlert-Ticket im projektübergreifenden Workspace-Kanban korrekt sichtbar ist, damit ich mich auf einen einzigen, vollständigen Überblick verlassen kann statt Tickets zusätzlich im FotoAlert-Backlog selbst nachschlagen zu müssen.
+
+---
+
 ## 🐛 BugFixes
 
-### BUG-83 · Wolkenwert-Abruf (Sonnenrichtung/Gegenrichtung) schlägt beim manuellen Wetter-Update für ~160 Locations fehl `[~]`
+### BUG-84 · Kategorie UND Schwierigkeitsgrad im Bearbeiten-Formular: falsche Vorbelegung und wirkungsloses Speichern `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
 | **Status** | In Test |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Das Bearbeiten-Formular für Locations liest im Kategorie-Dropdown ein Feld (`category_key`), das die API gar nicht liefert, und fällt deshalb immer auf einen festen Default zurück. Beim Speichern wird dadurch die tatsächliche Kategorie der Location unbemerkt überschrieben — ein echter Datenverlust, kein reiner Anzeigefehler. Beobachtet: Öffnet man eine Location mit gesetzter Kategorie im Bearbeiten-Sheet, zeigt das Dropdown immer denselben Default statt der tatsächlichen Kategorie; speichert man ohne die Kategorie manuell zu korrigieren, wird die Location stillschweigend umkategorisiert. Erwartet: Das Dropdown zeigt die tatsächlich gespeicherte Kategorie vorbelegt und ändert sie nur, wenn der Nutzer sie aktiv ändert. Ursache: `web/index.html`, `LocationDetail.openEdit()`, Zeile 6316 — Dropdown liest `category_key`, das im gelieferten Objekt nicht existiert. Fix: Dropdown auf tatsächlich geliefertes Feld umstellen bzw. Backend liefert zusätzlich einen Kategorie-Schlüssel. Systemisch: Test ergänzen, dass jedes Bearbeiten-Formular korrekt mit echten API-Werten vorbelegt wird (Regressionsschutz gegen ähnliche Feld-Mismatches).
+
+**User Story:** Als Host, möchte ich, dass das Bearbeiten-Formular einer Location sowohl die tatsächlich gespeicherte Kategorie als auch den tatsächlich gespeicherten Schwierigkeitsgrad korrekt anzeigt UND dass eine bewusste Änderung dieser beiden Felder beim Speichern auch wirklich übernommen wird, sodass ich mich nicht auf falsch vorbelegte oder wirkungslos verpuffende Angaben zu meiner Location verlasse.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27 (`docs/2026-07-27-qualitaets-audit-live-app.md`), verifizierte Ursache in `docs/2026-07-27-fix-vorschlaege-audit-befunde.md`. Dubletten-Check per Grep auf „category_key"/„Kategorie-Dropdown"/„umkategorisiert" ohne Treffer — kein bestehendes Ticket zu diesem Feld-Mismatch gefunden.
+
+**⚠️ Code-Verifikation — Korrektur der Ticket-Prämisse (2026-07-27):**
+Der beschriebene Root-Cause ist bestätigt: `web/index.html`, `LocationDetail.openEdit()`, Zeile 6316
+liest `loc.category_key`, ein Feld, das `LocationOut` (`backend/models/schemas.py` Zeile 20-54)
+nicht liefert — das Dropdown fällt deshalb immer auf `SKYLINE` zurück. **Die im Ticket behauptete
+Konsequenz „echter Datenverlust beim Speichern" ist jedoch widerlegt:** `category` ist im
+generischen PATCH-Endpoint aktuell gar nicht patchbar. `backend/data/locations.py` Zeile 131-162
+(`LOCATION_FIELD_RULES`) enthält keinen Eintrag für `category` (auch keinen für `difficulty`);
+`PATCHABLE_LOCATION_FIELDS` wird daraus abgeleitet (Zeile 176-178). In `patch_location()`
+(`backend/main.py` Zeile 3525-3558) filtert `allowed = {k:v for k,v in body.items() if k in
+all_allowed_fields}` (Zeile 3532) das vom Frontend gesendete `category`-Feld deshalb still heraus,
+bevor irgendetwas persistiert oder auf `target_loc` gesetzt wird (`setattr`-Schleife Zeile
+3549-3550 erreicht `category` nie). Ergebnis: Die tatsächlich gespeicherte Kategorie wird durch
+das Speichern **nicht** überschrieben — stattdessen ist die Kategorie über dieses Formular
+aktuell komplett wirkungslos änderbar, während die App fälschlich „✓ Location aktualisiert"
+meldet. Dasselbe stille Verwerfen betrifft `difficulty` (Schwierigkeit) im selben Formular (siehe
+„Systemisch" unten). Diese Korrektur ändert, was „beheben" für dieses Ticket bedeuten kann — siehe
+❓ Frage 1 und die Implementierungsoptionen.
+
+**Example Mapping:**
+
+📏 Regel 1 — Vorbelegung: Beim Öffnen des Bearbeiten-Formulars zeigt das Kategorie-Feld die
+tatsächlich gespeicherte Kategorie der Location vorausgewählt.
+- 🟢 Positiv: Given eine Location mit gespeicherter Kategorie „Wasser & Spiegelung", When der Host
+  das Bearbeiten-Formular öffnet, Then zeigt das Kategorie-Feld „Wasser & Spiegelung" — nicht
+  „Skyline & Architektur".
+- 🟢 Negativ/Regressionsschutz: Given eine Location mit Kategorie „Skyline & Architektur" (zufällig
+  identisch mit dem bisherigen Fallback), When der Host das Formular öffnet, Then zeigt es
+  „Skyline & Architektur" — ein Test dafür MUSS zusätzlich mit einer Nicht-Skyline-Kategorie
+  laufen, sonst bleibt der ursprüngliche Bug unentdeckt (er sah bei Skyline-Locations „zufällig
+  richtig" aus).
+- 🟢 Edge Case: Given ein vom Server gelieferter, nicht zuordenbarer Kategorie-Wert, When das
+  Formular öffnet, Then fällt das Feld auf einen sinnvollen Standardwert zurück, statt das
+  Formular unbenutzbar zu machen.
+
+📏 Regel 2 — Speichern wirkt tatsächlich: Ändert der Host die Kategorie und speichert, wird die
+neue Kategorie übernommen und ist danach überall in der App sichtbar.
+- 🟢 Positiv: Given eine Location mit Kategorie „Skyline & Architektur", When der Host im Formular
+  auf „Wasser & Spiegelung" umstellt und speichert, Then zeigt die Location direkt danach überall
+  in der App „Wasser & Spiegelung" — auch nach einem Neuladen der App.
+- 🟢 Negativ: Given der Host ändert nur ein anderes Feld (z.B. Beschreibung) und lässt die korrekt
+  vorbelegte Kategorie unangetastet, When er speichert, Then bleibt die Kategorie exakt
+  unverändert.
+- 🟢 Edge Case: Given das Speichern schlägt fehl (z.B. Netzwerkfehler), When der Host es erneut
+  versucht, Then bleibt seine getroffene Auswahl im Formular erhalten und es erscheint eine
+  ehrliche Fehlermeldung statt eines fälschlich positiven Hinweises.
+
+❓ **Frage 1 (🔴 kritisch — Scope-Wahl, siehe Implementierungsoptionen):** Soll BUG-84 nur die
+fehlerhafte Anzeige beheben (Kategorie wird korrekt vorbelegt, „Ändern + Speichern" bleibt wie
+heute serverseitig wirkungslos — Option A/C), oder soll das Ticket zusätzlich die dahinterliegende
+Ursache mitbeheben, dass Kategorieänderungen über dieses Formular aktuell nie gespeichert werden
+(Option B, vollständiger Fix)?
+- Option A/C — Nur Anzeige: Der Host sieht ab sofort immer die korrekte Kategorie. Ändert er sie
+  testweise und speichert, bleibt die Location bei der alten Kategorie — ohne Fehlermeldung.
+- Option B — Vollständig: Der Host sieht die korrekte Kategorie UND kann sie tatsächlich ändern;
+  „Speichern" tut, was das Formular verspricht.
+- → Empfehlung: Option B (Begründung unten) — offen für Stephans Weg-Gate-Entscheidung.
+
+✅ **Weg-Gate-Entscheidung (Stephan, 2026-07-27):** Option B — vollständiger Fix. Anzeige UND
+Speichern werden repariert: Das Dropdown zeigt die korrekte Kategorie vorbelegt, UND eine bewusste
+Änderung wird beim Speichern tatsächlich in der Datenbank übernommen — nicht nur Weg A/reine
+Anzeige-Korrektur. Zusätzlich hat Stephan entschieden, das bei der Code-Verifikation gefundene,
+verwandte Schwierigkeitsgrad-Problem (identische Fehlerklasse: korrekt angezeigt, aber beim
+Speichern von der Backend-Feld-Whitelist verworfen) NICHT als eigenes Ticket zu führen, sondern
+direkt mit demselben Fix-Ansatz in BUG-84 mitzubeheben (siehe „Systemisch", Pre-Mortem Szenario 3
+und Implementierungsoptionen Option B unten — jetzt erweitert um `difficulty`). Der Scope von
+BUG-84 umfasst damit ab sofort beide Felder — Kategorie UND Schwierigkeitsgrad —, jeweils mit
+korrekter Vorbelegung UND tatsächlicher Persistenz bei Änderung.
+
+**Akzeptanzkriterien:**
+- [~] AK1 (Vorbelegung): Öffnet man das Bearbeiten-Formular einer Location, zeigen sowohl das
+      Kategorie-Feld als auch das Schwierigkeitsgrad-Feld die tatsächlich für diese Location
+      gespeicherten Werte an — nicht mehr für alle Locations denselben Standardwert.
+- [~] AK2 (Regressionsschutz): Das ist mit mindestens einer Location geprüft, deren Kategorie UND
+      deren Schwierigkeitsgrad NICHT dem bisherigen Standardwert entsprechen.
+- [~] AK3 (Speichern wirkt tatsächlich): Ändert man im Formular die Kategorie und/oder den
+      Schwierigkeitsgrad und speichert, wird die neue Auswahl tatsächlich übernommen — sichtbar in
+      der Location-Liste, im Location-Detail und beim erneuten Öffnen des Bearbeiten-Formulars,
+      auch nach einem Neuladen der App.
+- [~] AK4 (Unverändert bleibt unverändert): Speichert man das Formular, ohne die (korrekt
+      angezeigte) Kategorie oder den Schwierigkeitsgrad zu ändern, bleiben beide Werte exakt
+      unverändert.
+- [~] AK5 (Fehlerfall): Schlägt das Speichern fehl, bleibt die im Formular getroffene Auswahl bei
+      Kategorie UND Schwierigkeitsgrad für einen erneuten Versuch erhalten, und es erscheint eine
+      ehrliche Fehlermeldung statt einer fälschlichen Erfolgsmeldung.
+- [~] AK6 (Edge Case): Liefert der Server für Kategorie oder Schwierigkeitsgrad einen nicht
+      zuordenbaren Wert, zeigt das jeweilige Feld einen sinnvollen Standardwert, statt dass das
+      Formular unbenutzbar wird.
+
+**Pre-Mortem:**
+- 💀 Szenario 1 „Enum-Cast-Absturz" (nur relevant bei Option B): Wird `category` naiv wie ein
+  normales Textfeld (`kind: "text"`) in `LOCATION_FIELD_RULES` ergänzt, landet beim Speichern ein
+  roher String (der Dropdown-Key, z.B. „WASSER") direkt in `target_loc.category`
+  (`setattr`-Schleife, `main.py` Zeile 3549-3550) statt eines `LocationCategory`-Enum-Objekts. Der
+  nächste `GET /locations`-Aufruf ruft `loc.category.value` auf (`_loc_to_out()`, Zeile 2289) — ein
+  einfacher String hat kein `.value` → 500-Fehler für ALLE Locations, nicht nur die geänderte.
+  Frühwarnung: direkt nach der Änderung `GET /locations` gegen eine testweise geänderte Location
+  aufrufen. Gegenmaßnahme: gezielte Konvertierung `LocationCategory[value]` vor dem Setzen, analog
+  zum bestehenden Muster in `_load_custom_locations()` (`main.py` Zeile 191) — kein generisches
+  „text"-Feld.
+- 💀 Szenario 2 „Custom- vs. Standard-Location-Persistenz divergiert" (nur Option B):
+  Custom-Locations persistieren über `_update_custom_location_file()`/SQLite
+  (`_save_custom_location()` schreibt bereits `loc.category.name`, Zeile 213), Standard-Locations
+  über `_save_location_override()`. Beide Pfade müssen `category` konsistent als Enum-Namen
+  serialisieren, sonst driften Custom- und Standard-Locations auseinander. Gegenmaßnahme: beide
+  Persistenzpfade mit je einem Testfall (eine Custom-, eine Standard-Location) absichern.
+- 💀 Szenario 3 „Difficulty bleibt als unsichtbare Altlast liegen" (Status: 2026-07-27 durch
+  Stephans Weg-Gate-Entscheidung aufgelöst): `difficulty` hat exakt dasselbe Symptom wie `category`
+  (korrekt vorbelegt, aber beim Speichern von der PATCH-Whitelist stillschweigend verworfen) — war
+  ursprünglich NICHT Teil dieses Tickets, wurde aber von Stephan bewusst mit in BUG-84
+  aufgenommen (siehe Weg-Gate-Entscheidung oben), damit kein isolierter Category-Fix den falschen
+  Eindruck einer vollständigen Formular-Reparatur erweckt, während „Schwierigkeit ändern"
+  weiterhin lautlos wirkungslos bliebe. Gegenmaßnahme: beide Felder gemeinsam mit demselben
+  Fix-Ansatz beheben (siehe „Systemisch" und Implementierungsoptionen).
+- 💀 Szenario 4 „Frontend-Reverse-Mapping bricht bei künftig neuer Kategorie" (nur relevant bei
+  Option A, reines Label→Key-Mapping ohne `category_key`): Ein rein clientseitiges Zurück-Mapping
+  von Label auf Key funktioniert nur, solange Frontend-Liste (`web/index.html` Zeile 6313-6315) und
+  Backend-Enum (`data/locations.py` Zeile 21-28) exakt synchron gehalten werden (aktuell verifiziert
+  identisch). Gegenmaßnahme: `category_key` serverseitig als kanonische Quelle liefern (Option
+  B/C), statt sich auf zwei getrennt gepflegte Listen zu verlassen.
+- 💀 Szenario 5 „Silently-ignored-Pattern wiederholt sich": Ursache des Bugs ist eine
+  Formular/API-Whitelist-Divergenz ohne jede Fehlermeldung — genau dieses Muster betraf bereits
+  `difficulty` und könnte bei künftigen neuen Bearbeiten-Feldern erneut auftreten. Gegenmaßnahme
+  (systemisch, siehe unten): ein Test, der für jedes im Formular vorhandene Feld sowohl Vorbelegung
+  als auch tatsächliche Persistenz nach PATCH prüft.
+
+**Systemisch (verifiziert, nicht nur übernommen):**
+- Fundstellen-Sweep: `category_key` kommt im gesamten Repo nur an der einen bekannten Stelle vor
+  (Grep, 1 Treffer). Es gibt in der gesamten App genau EIN `.edit-form`-Bearbeiten-Formular
+  (`LocationDetail.openEdit()`); kein weiteres „Bearbeiten"-Formular existiert. Der im Ticket
+  vermutete Fall „ähnliche Feld-Mismatches in anderen Bearbeiten-Formularen" trifft damit **nicht**
+  zu — es gibt keine weiteren Formulare zu prüfen.
+- Stattdessen gefunden: Innerhalb DIESES EINEN Formulars gibt es ein verwandtes Problem derselben
+  Fehlerklasse — `difficulty` wird korrekt vorbelegt, aber genau wie `category` beim Speichern von
+  der PATCH-Whitelist (`PATCHABLE_LOCATION_FIELDS`, `backend/data/locations.py` Zeile 131-162)
+  stillschweigend verworfen. Ursprüngliche Empfehlung war ein eigenes Ticket dafür
+  (Scope-Disziplin) — Stephan hat sich stattdessen entschieden (Weg-Gate-Entscheidung
+  2026-07-27, siehe oben), `difficulty` direkt in BUG-84 mitzubeheben, da es exakt derselbe
+  Fix-Ansatz ist: Backend-Feld-Whitelist um beide Felder erweitern, plus im Frontend sicherstellen,
+  dass beide Felder korrekt vorbelegt werden.
+- Sinnvoller Regressionstest (systemisch): ein pytest-Fall, der für jedes vom Bearbeiten-Formular
+  gesendete Feld (`name`, `description`, `subject_name`, `category`, `special_notes`, `difficulty`,
+  `focal_length_suggestions`, Koordinaten, Höhen) prüft, dass ein PATCH mit diesem Feld tatsächlich
+  im nächsten GET sichtbar ist — das hätte sowohl die `category`- als auch die
+  `difficulty`-Lücke von Anfang an aufgedeckt.
+
+**Implementierungsoptionen:**
+
+### Option A — Nur Frontend, Label-Rückwärts-Mapping (kein Backend-Touch)
+- Vorgehen: In `openEdit()` (`web/index.html`, Zeile 6316) die bestehende `[key,label]`-Liste
+  nutzen, um per `label === loc.category` den passenden Key zu ermitteln, statt des nicht
+  existierenden `category_key`. „Speichern" bleibt wie heute serverseitig wirkungslos für die
+  Kategorie.
+- Betroffene Dateien: `web/index.html` (nur `openEdit()`).
+- Vorteile: kleinster Diff, kein Backend-Risiko, behebt die im Ticket beschriebene Fehlanzeige
+  vollständig.
+- Nachteile/Risiken: löst das in der Code-Verifikation gefundene Folgeproblem nicht — ändert der
+  Host testweise die Kategorie und speichert, bleibt sie unverändert, ohne Hinweis (Pre-Mortem
+  Szenario 4 zusätzliches Fragilitätsrisiko).
+- Aufwand: klein.
+
+### Option B — Vollständiger Fix: category_key + Whitelist-Erweiterung für category UND difficulty + tatsächliche Persistenz (empfohlen — von Stephan freigegeben 2026-07-27)
+- Vorgehen:
+  1. `backend/models/schemas.py`: `LocationOut` um `category_key: str` erweitern.
+  2. `backend/main.py`, `_loc_to_out()`: `category_key=loc.category.name` ergänzen.
+  3. `backend/data/locations.py`: `category` UND `difficulty` in `LOCATION_FIELD_RULES` aufnehmen
+     — `category` mit gezielter Sonderbehandlung im PATCH-Handler (`LocationCategory[value]`-
+     Konvertierung vor dem Setzen, siehe Pre-Mortem Szenario 1), kein generisches „text"-Feld;
+     `difficulty` analog mit dem für dieses Feld passenden Werte-/Typ-Check.
+  4. `web/index.html`, `openEdit()`: Preselect auf `loc.category_key||'SKYLINE'` umstellen UND die
+     bestehende Vorbelegung von `difficulty` verifizieren (laut Ausgangsbefund bereits korrekt
+     angezeigt) bzw. korrigieren, falls sie nicht das tatsächlich gelieferte Feld nutzt.
+  5. Beide Persistenzpfade (Custom-Location via SQLite, Standard-Location via Override) je mit
+     einem Testfall für BEIDE Felder absichern (Pre-Mortem Szenario 2).
+- Betroffene Dateien: `backend/models/schemas.py`, `backend/main.py`, `backend/data/locations.py`,
+  `web/index.html`.
+- Vorteile: löst Anzeige UND das zugrunde liegende „Speichern wirkt nicht"-Problem für beide
+  betroffenen Felder vollständig; erfüllt die User Story wörtlich; `category_key` als kanonische
+  Quelle macht ein künftiges Auseinanderdriften von Frontend-Liste und Backend-Enum (Pre-Mortem
+  Szenario 4) strukturell unmöglich; vermeidet ein separates Difficulty-Ticket mit identischem
+  Fix-Ansatz (Weg-Gate-Entscheidung).
+- Nachteile/Risiken: größter Diff der drei Optionen; Enum-Cast-Risiko (Szenario 1) muss sauber
+  getestet werden; berührt eine bislang nie geänderte PATCH-Whitelist-Datei; jetzt zwei Felder
+  statt einem, entsprechend mehr Testfälle.
+- Aufwand: mittel (leicht erhöht gegenüber der ursprünglichen category-only-Schätzung durch die
+  Mitaufnahme von `difficulty`).
+
+### Option C — Nur category_key ergänzen, Kategorie bewusst weiterhin nicht änderbar
+- Vorgehen: wie Option B Schritte 1+2+4, aber ohne Schritt 3 (kein PATCH-Whitelist-Eintrag).
+  Zusätzlich das Kategorie-Feld im Formular auf „nur lesbar" umstellen (z.B. disabled + Hinweis
+  „Kategorie kann aktuell nicht geändert werden"), damit das Formular nichts verspricht, was es
+  nicht hält.
+- Betroffene Dateien: `backend/models/schemas.py`, `backend/main.py`, `web/index.html`.
+- Vorteile: behebt die Fehlanzeige korrekt und ehrlich, ohne das Enum-Cast-Risiko aus Option B.
+- Nachteile: Der Host kann die Kategorie über die App weiterhin nicht ändern — eine
+  Funktionseinschränkung gegenüber dem, was das Formular heute optisch anbietet.
+- Aufwand: klein-mittel.
+
+✅ **Empfehlung: Option B.** Begründung: Die User Story fordert wörtlich, dass beim Speichern
+nichts „unbemerkt verloren" geht — das schließt ein, dass eine bewusste Änderung tatsächlich
+ankommt. Die Pre-Mortem-Risiken (Enum-Cast, Persistenzpfad-Divergenz) sind konkret benannt und mit
+gezielten Tests beherrschbar. Option A/C würden das echte, neu gefundene Problem (Formular
+verspricht Funktionalität, die es nicht hat) unbehoben lassen bzw. durch eine sichtbare
+Einschränkung ersetzen. Ist der Aufwand aktuell nicht gewünscht, ist Option A eine vertretbare
+Zwischenlösung — dann aber bitte explizit als bewusste Reduktion (nicht als vollständiger Fix)
+bestätigen.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (2 Regeln, 1 kritische Scope-Frage A vs. B)
+- [x] Fundstellen-Sweep: `category_key` repoweit gesucht — 1 Treffer (nur bekannte Stelle);
+      `.edit-form`/`openEdit` gesucht — nur EIN Bearbeiten-Formular in der gesamten App, kein
+      weiteres zu prüfen.
+- [x] Zustands-Check: Wartezustand — bestehender „Speichert…"-Button-Text während PATCH
+      (unverändert). Leerzustand — nicht relevant (Formular zeigt immer eine geladene Location).
+      Fehlerfall — bestehender catch-Block zeigt Fehlertoast; AK5 sichert zusätzlich ab, dass die
+      getroffene Auswahl dabei erhalten bleibt.
+- [x] Pre-Mortem durchgeführt (5 Szenarien, gegen real gelesenen Code verifiziert)
+- [x] Architektur analysiert: `web/index.html` (`LocationDetail.openEdit()`, `saveEdit()`),
+      `backend/models/schemas.py` (`LocationOut`), `backend/main.py` (`_loc_to_out()`,
+      `patch_location()`, `_compute_patch_persist_fields()`, `_persist_location_patch()`,
+      `_load_custom_locations()`, `_save_custom_location()`), `backend/data/locations.py`
+      (`LocationCategory`, `LOCATION_FIELD_RULES`, `PATCHABLE_LOCATION_FIELDS`)
+- [x] Designer-Check: nicht nötig — keine neue Optik, nur korrektes Vorbelegen/Speichern eines
+      bestehenden Dropdowns.
+- [x] Implementierungsoptionen: A / B / C (siehe oben) — Weg-Gate entschieden: Option B
+      (Stephan, 2026-07-27)
+- [x] Empfehlung: Option B — von Stephan freigegeben (2026-07-27), Scope zusätzlich um
+      `difficulty` erweitert (statt eigenem Ticket)
+
+**Testplan:**
+- [ ] Automatisiert (Harness), `backend/tests/test_bug-84.py`, Marker `offline`+`regression`:
+      PATCH `/locations/{id}` mit `category="WASSER"` → GET prüft `category=="Wasser &
+      Spiegelung"` und `category_key=="WASSER"`. Zusätzlich PATCH mit geändertem `difficulty` →
+      GET prüft, dass der neue Wert übernommen wurde. Beide Felder zusätzlich für eine
+      Custom-Location-ID geprüft (Pre-Mortem Szenario 2). Regressionstest: `GET /locations`
+      liefert nach der Änderung für ALLE bestehenden Locations weiterhin gültige `category`- und
+      `difficulty`-Felder (kein 500 durch Enum-Cast-Fehler, Szenario 1).
+- [ ] Manuell unter http://localhost:8000: Location mit Kategorie „Wasser & Spiegelung" und
+      abweichendem Schwierigkeitsgrad öffnen → Bearbeiten → beide Felder zeigen die tatsächlich
+      gespeicherten Werte (AK1/AK2). Kategorie auf „Milchstraße & Astro" UND Schwierigkeitsgrad
+      ändern → Speichern → Location-Liste und Location-Detail zeigen sofort beide neuen Werte,
+      auch nach Reload (AK3) → Formular erneut öffnen → beide korrekt vorbelegt.
+- [ ] Regressions-Matrix (`PRODUCT.md` §12) konsultiert: Bearbeiten-Formular-Ticket → zusätzlich
+      Location-Liste- und Location-Detail-Kategorie-Icons prüfen, da beide von `category`
+      abhängen.
+
+
+**Umsetzung (2026-07-27, Option B umgesetzt):**
+- `backend/data/locations.py`: `coerce_category_value()` ergänzt (Enum-Konvertierung mit
+  Fallback auf SKYLINE bei nicht zuordenbarem Wert, AK6). `category` (kind `category`) und
+  `difficulty` (kind `difficulty`) neu in `LOCATION_FIELD_RULES` — beide dadurch automatisch
+  Teil von `PATCHABLE_LOCATION_FIELDS`. Neue abgeleitete Sichten `CATEGORY_FIELDS`/
+  `DIFFICULTY_FIELDS`.
+- `backend/main.py`: `_loc_to_out()` liefert jetzt `category_key` (kanonische Quelle fürs
+  Frontend-Dropdown) und liest `category` defensiv über `coerce_category_value()` (Pre-Mortem
+  Szenario 1 — verhindert 500 für ALLE Locations bei einem einzelnen kaputten Wert).
+  `_validate_patch_fields()` validiert `category` (nur bekannte Enum-Member-Namen, sonst 422)
+  und `difficulty` (nur 1/2/3, sonst 422) getrennt von der generischen `numeric`-Regel. Der
+  finale `setattr`-Schritt in `patch_location()` sowie der generische Reload-Loop in
+  `_load_location_overrides()` konvertieren `category` gezielt zurück in eine
+  `LocationCategory`-Instanz vor dem Setzen (Enum-Cast-Absturz-Vermeidung, Pre-Mortem
+  Szenario 1).
+- `backend/precompute.py`: `_apply_location_overrides()` spiegelt dieselbe
+  Enum-Konvertierung (Pre-Mortem Szenario 1 gilt auch für den precompute-Subprozess).
+- `backend/models/schemas.py`: `LocationOut.category_key: str` neu.
+- `web/index.html`: `LocationDetail.openEdit()` — Kategorie-Dropdown liest jetzt
+  `loc.category_key` mit Fallback auf `SKYLINE` bei unbekanntem Wert (AK6); Schwierigkeitsgrad-
+  Radios ergänzt um denselben Fallback (auf `2`) für einen außerhalb 1–3 liegenden Wert.
+  `saveEdit()` sendete `category`/`difficulty` bereits korrekt im PATCH-Body — unverändert.
+- Tests: `backend/tests/test_bug-84.py` neu (12 Tests, AK1–AK6 abgedeckt für Custom- UND
+  Standard-Location-Persistenzpfad, siehe Datei-Docstring für nicht automatisierbare Restfälle).
+  `backend/tests/test_task_65_field_roundtrip.py` erweitert (`category`/`difficulty` aus
+  `FIELD_EXCEPTIONS` entfernt, jetzt Teil der generischen Rundreise-Parametrisierung — deckt
+  Server-Neustart- und precompute-Reload für beide Felder zusätzlich ab). `backend/tests/
+  README.md` um `test_bug-84.py`-Zeile ergänzt (TASK-79-Konvention).
+- Regressionslauf (Sandbox-Kopie, siehe Bericht): 665 passed, 0 der 7 failed/3 error auf diese
+  Änderung zurückführbar (alle wegen nicht mitkopierter `web/vendor/`- bzw. `deploy/`-Dateien in
+  der isolierten Testkopie, oder — 2 Fälle — bereits vor diesem Ticket bestehende README-Lücken
+  bei `test_task59_own_overpass.py`/`test_task89_caddy_log_permissions.py`, nicht durch BUG-84
+  verursacht).
+
+---
+
+### BUG-85 · Englischer Platzhaltertext ersetzt deutsche Statuszeile im Kopfbereich bei aktivem Filter + leerer Tagesmenge `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Ist ein Event-Typ-Filter aktiv und wird dadurch die gefilterte Tagesmenge leer, zeigt die Statuszeile im Kopfbereich den englischen Platzhaltertext „Capture moments that matter." statt eines deutschen, kontextsensitiven Hinweises. Beobachtet: Feed-Filter auf einen Event-Typ setzen, für den heute keine Chance vorliegt → Kopfzeile zeigt englischen Text. Erwartet: ein deutscher Text, der den leeren, gefilterten Zustand erklärt. Ursache: `web/index.html`, `Feed.render()`, Zeile 2168–2171 — vergessener Fallback-Text, offenbar Copy-Paste aus dem initialen Lade-Platzhalter. Fix: deutschen kontextsensitiven Text für den Fall „Filter aktiv, Tagesmenge leer" einsetzen. Systemisch: Check auf englische Reststrings in der UI ergänzen; Testfall „Statuszeile bei aktivem Filter + leerer Tagesmenge" hinzufügen.
+
+**User Story:** Als Nutzer, möchte ich auch bei einem Filter ohne Treffer eine verständliche deutsche Statusmeldung sehen, sodass ich nicht denke, die App sei fehlerhaft oder ungewollt auf Englisch umgesprungen.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Verwandt: BUG-80 `[x]` (Done — Header springt beim Filtern: Infozeile ändert Höhe) berührt dieselbe Kopfzeilen-Logik (`Feed.render()`/`#header-subtitle`) und referenziert im eigenen Ticket-Text bereits denselben „Capture moments that matter."-Platzhalter als Testbeispiel für Höhenstabilität — behandelt aber die Layout-Höhe, nicht den Sprach-/Inhaltsfehler. Eigenständig, grenzt an BUG-80 ab (kein Merge, da BUG-80 bereits Done ist und einen anderen Aspekt derselben Codestelle behoben hat).
+
+---
+
+### BUG-86 · Mondphasen-Bezeichnung passt nicht zum Beleuchtungsgrad (z.B. „Halbmond" bei 96–99% Beleuchtung) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Die angezeigte Mondphasen-Bezeichnung stimmt bei bestimmten Beleuchtungsgraden nicht mit der tatsächlichen Beleuchtung überein — beobachtet wurde z.B. „Halbmond" bei 96–99% Beleuchtung statt der für „Halbmond" erwarteten ca. 50%. Ursache: `backend/calculations/astronomy.py`, `_moon_phase_name()`, Zeilen 250-266 — falsch gezogene Bucket-Grenzen bei der Zuordnung von Beleuchtungsgrad zu Phasennamen. Fix: Bucket-Grenzen korrigieren (Details siehe `docs/2026-07-27-fix-vorschlaege-audit-befunde.md`). Systemisch: Unit-Test ergänzen, der den Phasennamen gegen den Beleuchtungsgrad plausibilisiert — nach Vorbild der bestehenden Distanz-Assertion in derselben Datei (Zeile 214).
+
+**User Story:** Als Fotograf, möchte ich, dass die angezeigte Mondphase tatsächlich zum angegebenen Beleuchtungsgrad passt, sodass ich mich bei der Foto-Planung auf die Phasenangabe verlassen kann, statt sie selbst gegenzuprüfen.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Dubletten-Check per Grep auf „Halbmond"/„Mondphase"/„_moon_phase_name"/„Beleuchtungsgrad" ohne Treffer zu diesem konkreten Bucket-Fehler — kein bestehendes Ticket gefunden.
+
+---
+
+### BUG-87 · Badge-Wortlaut „Geprüft"/„Nicht geprüft" wird für zwei unabhängige Status-Konzepte wiederverwendet (Verifikation vs. Sichtachsen-Datenverfügbarkeit) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Zwei fachlich unabhängige Status-Konzepte — die Vor-Ort-Verifikation einer Location durch den Host und die Verfügbarkeit von Sichtachsen-Daten — teilen sich denselben Badge-Wortlaut „Geprüft"/„Nicht geprüft". Das wirkt wie ein Widerspruch, wenn beide Badges gleichzeitig sichtbar sind (z.B. Location als „Geprüft" markiert, aber Sichtachse zeigt „Nicht geprüft"). Ursache: `web/index.html`, `SIGHTLINE_LABELS` Zeile 1902-1907 kollidiert begrifflich mit dem Verify-Badge Zeile 1947-1948. Fix: Sichtachsen-Label umbenennen (z.B. „Daten fehlen" statt „Nicht geprüft"), interner Status/Datenmodell bleibt unverändert. Systemisch: Mini-Glossar für Badge-Texte anlegen, das verhindert, dass neue Status-Badges versehentlich denselben Wortlaut wie bestehende, fachlich andere Badges verwenden.
+
+**User Story:** Als Nutzer, möchte ich zwei unterschiedliche Status-Konzepte (Verifikation vs. Sichtachsen-Datenverfügbarkeit) an unterschiedlichem Wortlaut erkennen, sodass ich nicht denke, die App widerspreche sich selbst.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Eng verwandt mit BUG-88 (dieselbe Codestelle `SIGHTLINE_LABELS`/`sightlineTagHtml()`/`SIGHTLINE_COLORS`, Zeile 1902-1927) — siehe Beziehungsanalyse in BUG-88. Dubletten-Check per Grep auf „SIGHTLINE_LABELS"/„Sichtachse Geprüft"/„sightlineTagHtml"/„SIGHTLINE_COLORS" ohne Treffer zu diesem konkreten Wortlaut-Konflikt; die umfangreichen bestehenden Tickets zum Sichtachsen-Status (u.a. US-09, Done) behandeln die Einführung des vierstufigen Status (Frei/Teilweise verdeckt/Blockiert/Nicht geprüft), nicht den hier gefundenen Namenskonflikt mit dem Verify-Badge — kein Duplikat.
+
+---
+
+### BUG-88 · Sichtachsen-Alignment-Ereignisse zeigen „Nicht geprüft"-Status ohne Eskalation, obwohl die Sichtachse hier die Kernaussage ist `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Bei Sichtachsen-Alignment-Ereignissen — bei denen die Sichtachse die Kernaussage des Events ist — wird ein „nicht geprüft"-Status genauso unauffällig angezeigt wie bei Events, für die die Sichtachse nur ein Nebenaspekt ist. Es fehlt eine Eskalationslogik nach Zentralität: Gerade wenn die Sichtachse die zentrale Aussage ist, sollte ein fehlender Datenstatus deutlicher hervorgehoben werden, damit der Nutzer nicht auf eine ungeprüfte Kernaussage vertraut. Ursache: `web/index.html`, `sightlineTagHtml()`/`SIGHTLINE_COLORS` Zeile 1908-1927 — keine Eskalationslogik nach Zentralität vorhanden. Fix: Eskalationslogik ergänzen, die den „Nicht geprüft"-Status bei Sichtachsen-zentralen Events (z.B. via Warnfarbe/Icon/zusätzlichem Hinweistext) deutlicher hervorhebt als bei Events mit Sichtachse als Nebenaspekt. Systemisch: Prüfen, ob weitere Status-Badges eine ähnliche Zentralitäts-Eskalation brauchen.
+
+**User Story:** Als Fotograf, möchte ich bei einem Sichtachsen-Alignment-Event deutlich erkennen, wenn der Sichtachsen-Status ungeprüft ist, sodass ich nicht unwissentlich zu einem Standort fahre, an dem die entscheidende Sichtachse tatsächlich blockiert sein könnte.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Hängt technisch mit BUG-87 zusammen (gleiche Codestelle `SIGHTLINE_LABELS`/`sightlineTagHtml()`/`SIGHTLINE_COLORS`, Zeile 1902-1927).
+
+🔗 **Beziehungsanalyse BUG-87 ↔ BUG-88**
+- **Verwandt:** BUG-87 — Abhängigkeit/Überschneidung (dieselbe Codestelle: `SIGHTLINE_LABELS`/`sightlineTagHtml()`/`SIGHTLINE_COLORS`, `web/index.html` Zeile 1902-1927), aber fachlich zwei unterschiedliche Defekte: BUG-87 ist ein reiner Wortlaut-/Begriffskonflikt (Badge-Text kollidiert mit einem anderen Status-Konzept), BUG-88 ist eine fehlende Eskalationslogik (kein visueller Unterschied je nach Zentralität des Sichtachsen-Status für das jeweilige Event).
+- **Empfehlung:** Zwei eigenständige, aber explizit verknüpfte Tickets (Split, kein Merge).
+- **Begründung:** Beide Fixes sind unabhängig voneinander sinnvoll und priorisierbar — BUG-87 (Wortlaut) kann ohne Eskalationslogik gefixt werden und umgekehrt; ein Merge würde riskieren, dass Stephan sie nicht getrennt priorisieren/gaten kann (BUG-88 hat spürbar höhere Zentralität fürs Kernversprechen als BUG-87, daher höhere Priorität). Da beide dieselbe Codestelle berühren, bei Umsetzung nacheinander statt parallel in zwei Branches bearbeiten, um Merge-Konflikte zu vermeiden.
+
+---
+
+### BUG-89 · Wetter-Score und „Wolkenstimmung" wirken auf derselben Karte widersprüchlich (keine Karten-interne Erklärung) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Wetter-Score und „Wolkenstimmung" stehen auf derselben Event-Karte als zwei unabhängige Kennzahlen nebeneinander, ohne dass eine Karten-interne Erklärung verdeutlicht, warum beide unterschiedlich ausfallen können (z.B. guter Wetter-Score trotz mäßiger Wolkenstimmung). Die Erklärung existiert bislang nur im separaten Glossar-Popup, das der Nutzer aktiv aufrufen muss. Ursache: `web/index.html` Zeile 4555-4619. Fix: Inline-Hinweis direkt auf der Karte ergänzen, der kurz erklärt, dass beide Kennzahlen unabhängige Aspekte messen. Systemisch: Inline-Hinweis-Pflicht einführen, sobald zwei unabhängige Scores auf einer Karte nebeneinanderstehen (Designrichtlinie).
+
+**User Story:** Als Nutzer, möchte ich direkt auf der Event-Karte verstehen, warum Wetter-Score und Wolkenstimmung unterschiedlich ausfallen können, sodass ich die beiden Werte nicht als Widerspruch oder Fehler der App interpretiere.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Dubletten-Check: US-07 (Golden Cloud Score)/US-55 (⓵-Button-Erklärung für Scores, Zeile 6303) und US-109 (Goldene Wolken & Himmelsröte) haben die Wolkenstimmungs-Anzeige und das separate Glossar-Popup ursprünglich eingeführt, decken aber nicht den hier beschriebenen fehlenden Inline-Hinweis auf der Karte selbst ab — kein Duplikat.
+
+---
+
+### BUG-90 · Kompositions-Analyse fehlt bei Mondaufgang-/Monduntergang-Ereignissen (fehlende Geometriedaten celestial_altitude) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** Die Kompositions-Analyse (Rahmung/Versatz) fehlt bei Mondaufgang- und Monduntergang-Ereignissen, weil für diese Events die dafür nötigen Geometriedaten (`celestial_altitude`) gar nicht berechnet werden — anders als bei 3D-Alignment-Ereignissen, für die `celestial_altitude` vorliegt. Zusätzliche Anforderung von Stephan: Sobald die Geometriedaten ergänzt sind, soll die Versatzangabe künftig automatisch auch in Metern erscheinen (nicht nur in Grad) — diese Darstellung existiert im Frontend bereits und muss nicht neu gebaut werden, nur mit Daten versorgt werden. Ursache: `backend/calculations/opportunity.py`, Block „5b. MONDAUFGANG UND MONDUNTERGANG", Zeilen 748-796 — `celestial_altitude` wird dort nicht gesetzt. Fix: `celestial_altitude` im Mondaufgang-/Monduntergang-Block analog zu den 3D-Alignment-Ereignissen berechnen und setzen. **Offener Punkt (noch zu prüfen, nicht als erledigt behandeln):** Ob `backend/precompute.py` die Kompositions-Analyse für diese Event-Typen zusätzlich aktiv filtert/ausschließt, konnte im Rahmen der Ursachenanalyse nicht abschließend geklärt werden — diese Datei war bei der Analyse nicht einsehbar. Muss vor/während der Implementierung geprüft werden, da die `celestial_altitude`-Ergänzung allein sonst nicht ausreichen könnte.
+
+**User Story:** Als Fotograf, möchte ich auch bei Mondaufgang- und Monduntergang-Ereignissen eine Kompositions-Analyse mit Versatzangabe in Grad und Metern sehen, sodass ich meinen Bildausschnitt genauso planen kann wie bei anderen Alignment-Ereignissen.
+
+**Bezug:** Quelle: Qualitäts-Audit 2026-07-27. Verwandt: US-37 `[x]` (Kompositions-Analyse im Event-Detail, Grundfunktion bereits umgesetzt, Done) — dieses Ticket erweitert deren Datengrundlage auf einen bislang nicht abgedeckten Event-Typ, kein Duplikat. BUG-44 `[x]` (Kalender-Event-Detail: Wetter/Kamera-Empfehlung/Kompositions-Analyse fehlen, Done) behandelte einen anderen, bereits behobenen Ursachenbereich (fehlendes `weather_details` im Kalender-Cache, nicht fehlende `celestial_altitude` bei Mondaufgang/-untergang) — keine Überschneidung. Kein bestehendes Ticket zu diesem konkreten Datenlücken-Fund gefunden.
+
+---
+
+### TASK-94 · `_load_custom_locations()` in main.py: kein `coerce_category_value()`-Fallback, keine Pro-Eintrag-Absicherung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-07-27 |
+
+**Beschreibung:** In `backend/main.py::_load_custom_locations()` wird die Kategorie eines Custom-Location-Eintrags beim Server-Start weiterhin über direkten Enum-Zugriff (`LocationCategory[...]`) geladen statt über die von BUG-84 eingeführte robuste `coerce_category_value()`-Fallback-Funktion. Zusätzlich ist dieser Ladepfad in main.py nicht pro Eintrag try/except-abgesichert — ein einzelner beschädigter Kategoriewert in der Datenbank würde das Laden ALLER Custom-Locations beim Serverstart abbrechen. `backend/precompute.py` hat für denselben Ladepfad bereits eine Pro-Eintrag-Absicherung (Referenzimplementierung vorhanden, main.py zieht sie nicht nach). Betrifft nur vorbestehende, bereits beschädigte Kategoriewerte — durch BUG-84s neue Patch-Validierung kann ein solcher Wert ab jetzt nicht mehr neu entstehen. Kein akutes Problem, aber ein Konsistenz-/Robustheitsrisiko am sensiblen Server-Start-Pfad.
+
+**User Story:** Als App-Betreiber, möchte ich, dass ein einzelner beschädigter Kategoriewert in der Datenbank nicht das Laden aller Custom-Locations beim Serverstart verhindert, sodass ein Server-Neustart auch bei vorbestehenden Datenfehlern robust bleibt.
+
+**Bezug:** Fund aus BUG-84-Verifikation (2026-07-27, ✅ Done). Direkt verwandt zu BUG-84, das `coerce_category_value()` eingeführt und in `_loc_to_out()` sowie `backend/precompute.py::_apply_location_overrides()` verankert hat, dabei aber `_load_custom_locations()` in main.py ausgelassen hat. Keine Dublette: Grep auf `coerce_category_value`, `_load_custom_locations`, `LocationCategory` und `precompute.py` in BACKLOG.md ergab keine bestehende Ticket-Beschreibung dieses konkreten Lücken-Fundes — die übrigen Treffer (Umfeld TASK-48/US-128/TASK-65) betreffen die strukturell ähnliche, aber inhaltlich andere Fehlerklasse „Feld fehlt in einer main.py-/precompute.py-Whitelist" (BUG-29/50/61/68-Muster) bei anderen Feldern (subject_height_m/width_m, QA-Werte), nicht die Enum-Robustheit der Kategorie beim Custom-Location-Laden.
+
+---
+
+### BUG-83 · Wolkenwert-Abruf (Sonnenrichtung/Gegenrichtung) schlägt beim manuellen Wetter-Update für ~160 Locations fehl `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Done |
 | **Erstellt** | 2026-07-21 |
+| **Abgeschlossen** | 2026-07-22 |
 
 **Beschreibung:** **Beobachtet:** Beim manuellen Auslösen von „Wetter aktualisieren" meldet die App zwei Fehlermeldungen im UI: der Wolkenwert-Abruf für die Sonnenrichtung schlägt für ca. 165 Locations fehl, der für die Gegenrichtung für ca. 168 Locations — beide gleichzeitig, für einen großen, weitgehend überlappenden Teil des gesamten Location-Bestands (laut PRODUCT.md/Health-Check zuletzt ca. 172 Locations insgesamt). Andere Teile desselben Wetter-Updates (14-Tage-Feed, allgemeine Wetterwerte am Fotografen-Standort, Sonnenrichtungs-Alignment-Chancen im Feed) laufen laut Screenshot unauffällig durch — betroffen ist ausschließlich der projizierte Wolkenwert-Abruf (Grundlage für `golden_cloud_score`/Himmelsröte- und Goldene-Wolken-Chancen, eingeführt in US-131: zwei getrennte Abfragepunkte in Sonnenrichtung und Gegenrichtung entlang der Sichtachse statt am Fotografen-Standort). Die Größenordnung (fast der gesamte Bestand, beide Richtungen gleichzeitig) spricht für eine systematische Ursache (z. B. Rate-Limit/429 bei der externen Wetter-API, Timeout, fehlerhafter Endpoint/API-Key, Netzwerkproblem) statt für vereinzelte Datenprobleme einzelner Locations — muss in der Analyse-Phase am Live-Log verifiziert werden. **Erwartet:** Der Wolkenwert-Abruf gelingt für praktisch alle Locations; vereinzelte Fehlschläge sind Einzelfälle, nicht der Großteil des Bestands gleichzeitig.
 
@@ -276,10 +715,15 @@ Das ergibt einen in sich stimmigen, code-gestützten Mechanismus: Reagiert Open-
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
+| **Epic** | TASK-92 |
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
 | **Abgeschlossen** | 2026-07-17 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** **Beobachtet:** Location-Namen, -Beschreibungen, -Notizen, Kategorien sowie Verifizierungs-Kommentare und Suchbegriffe werden roh als HTML ins DOM geschrieben (`innerHTML`) — ein vorhandener Escape-Helfer wird nur an einer einzigen Stelle genutzt. **Erwartet:** Jeder dynamische Wert wird escapt bzw. per `textContent` gesetzt. **Auswirkung:** Ein einmal eingetragener Schadtext läuft im Browser jedes anderen Nutzers und kann dessen Login-Ticket stehlen (Verifizierungs-Kommentare brauchen dafür nicht mal Admin-Rechte). Zusätzlich: URL-Felder (`locationscout_url`, `attribution_url`) vor Zuweisung an `href` auf erlaubtes Schema prüfen.
 
@@ -531,6 +975,10 @@ Wie wichtig ist es, dass „Bester Score X%" niemals abgeschnitten wird?
 | **Erstellt** | 2026-06-30 |
 | **Abgeschlossen** | 2026-06-30 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Beim Einschalten des Wetter-Overlays (US-72) zeigt die Karte statt des erwarteten 10×10-Mosaiks nur eine schmale senkrechte Linie. Beobachtet: Alle 100 Grid-Rechtecke sind im DOM, aber nur 2 davon haben sichtbare Größe. Ursache (bereits verifiziert, kein Render-/Daten-/Safari-Fehler): Das Wetter-Gitter spannt ganz Deutschland auf — eine Zelle ist 1,0° breit und damit bei der Start-Zoomstufe (Karte startet auf Berlin, Zoom 10) breiter als das gesamte Kartenfenster; 98 von 100 Zellen liegen außerhalb des Sichtbereichs und werden von Leaflet weggeschnitten. Es ist ein Maßstabs-Problem, kein Bug an den Daten. Erwartet: Beim Aktivieren des Overlays wird das vollständige Deutschland-Gitter als zusammenhängendes Mosaik sichtbar.
 
 **Lösungsansatz (nur Vorschlag, nicht Teil dieses Intake):** Beim Einschalten des Wetter-Overlays die Karte automatisch so weit herauszoomen (z. B. via `fitBounds` auf die Gitter-/Deutschland-Bounding-Box 47.3°N–55.0°N, 6.0°E–15.0°E), dass das gesamte Gitter sichtbar ist; beim Ausschalten zur vorherigen Ansicht (Center + Zoom) zurückkehren.
@@ -648,6 +1096,10 @@ Der Zoom-Fix (Option B) ist bereits getestet ✅. Zusätzlich gewünscht: feiner
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Nachdem neue Locations angelegt wurden, erscheinen die Location-Namen im 14-Tage-Feed mit einem vorangestellten 📍-Emoji direkt im Namen (z. B. „Mondaufgang – 📍 Alter Hafen Potsdam"). Das Emoji soll nicht Teil des gespeicherten Location-Namens sein — es wird im UI separat ergänzt. Vermutlich wird beim Speichern neuer Locations das 📍 fälschlicherweise in den `name`-Wert geschrieben und persistiert. Erwartetes Verhalten: Der Location-Name enthält kein Emoji; das UI rendert ggf. ein Emoji dekorativ, aber nicht dauerhaft gespeichert im Namen.
 
 **Bezug:** Kein direktes Vorgänger-Ticket. Möglicherweise Zusammenhang mit US-106 (neue Locations anlegen), falls das Add-Formular oder der Preview-Alignment-Endpoint das Emoji in den Namen übernimmt.
@@ -715,6 +1167,10 @@ Das Formular (falls vorhanden) oder der API-Caller sendet kein Emoji. Greift abe
 | **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Abgeschlossen** | 2026-06-28 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Wenn ich die Position einer Location verschiebe oder eine neue Location hinzufüge, möchte ich diese Location innerhalb kurzer Zeit überall in der App vollständig und korrekt sehen — nicht erst am nächsten Morgen oder nach Stunden. Heute erscheinen die kommenden Foto-Chancen für diese Location zwar schon zügig, aber an drei Stellen hinkt die App noch hinterher: das Wetter zur Chance, die Empfehlungen im Entdecken-Bereich und Fälle, in denen gerade eine große Hintergrund-Aktualisierung läuft. Ziel: nach einer Standort-Änderung ist die Location ohne weiteres Zutun überall sofort richtig.
 
@@ -1200,6 +1656,10 @@ Begründung: Minimal-invasiv (nur `web/index.html`, 4 Stellen), WebKit-sicher na
 | **Erstellt** | 2026-07-02 |
 | **Abgeschlossen** | 2026-07-03 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `tests/test_astronomy_regression.py::test_sunrise_berlin_within_tolerance` und `test_sunset_berlin_within_tolerance` schlagen fehl — die berechnete Sonnenauf-/-untergangszeit für Berlin liegt außerhalb der im Test erwarteten Toleranz. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113 (Himmelsröte-Chance). Root Cause noch nicht analysiert — offen ob Ephemeriden-Bibliothek, Zeitzonen-Handling oder Toleranzwert des Tests veraltet ist.
 
 **Bezug:** Unabhängig von BUG-57 (Weather-Map-Tests) — andere Root Cause (Astronomie-Berechnung vs. veraltete US-72-Testdatei), daher als eigenes Ticket geführt statt zusammengelegt. Berührt inhaltlich US-107 (Sonnen-Alignment-Planung, done 2026-06-29): Beide nutzen dieselbe Sonnenauf-/-untergangs-Berechnung im Backend. Da diese Berechnung sich als korrekt erwiesen hat (siehe Root Cause unten), besteht **kein** Korrekturbedarf an US-107 — die dort ausgelieferten Zeiten sind nicht betroffen.
@@ -1301,6 +1761,10 @@ Vor der Korrektur per Live-Testlauf (`pytest backend/tests/test_astronomy_regres
 | **Erstellt** | 2026-07-02 |
 | **Abgeschlossen** | 2026-07-05 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `tests/test_us72_weather_map.py` schlägt mit `ImportError`/`AttributeError` fehl, da `backend/main.py` keine Funktion `fetch_weather_multigrid` (mehr) besitzt. Beim Testlauf für US-113 entdeckt, ohne inhaltlichen Bezug zu US-113. Vermutliche Ursache laut US-112-Analyse-Spec (Zeile 1268 f.): Die Testdatei wurde test-first für das nie gebaute US-72-Backend geschrieben (`fetch_weather_grid`, `fetch_weather_multigrid`, `WEATHER_REGIONS`, `_weather_map_cache` kamen laut damaligem Befund ausschließlich in dieser untracked Testdatei vor, nie im Backend implementiert). US-112 hat den `/weather-map`-Endpoint dann tatsächlich gebaut, aber mit anderer Architektur (DWD ICON-D2 + MET Norway statt Open-Meteo-Multigrid) — die alte Testdatei wurde dabei nicht auf die neue Implementierung migriert oder entfernt. Zu klären: Testdatei an die tatsächliche US-112-Implementierung anpassen, oder als obsolet entfernen (US-72 „geht in US-112 auf", siehe US-112-Bezug).
 
 **Bezug:** Direkte Verbindung zu **US-72** (Wetterkarte, Board-Status „Done", aber Backend laut US-112-Analyse nie eigenständig existent) und **US-112** (Wetter-Overlay DWD/MET, Board-Status „Done", released 2026-07-01, hat US-72 laut eigenem Bezugstext „aufgehen lassen"). Kein neuer Bug in der Wetter-Funktionalität selbst — US-112 wurde live verifiziert und funktioniert; betrifft ausschließlich eine veraltete/verwaiste Testdatei aus der US-72-Phase. Unabhängig von BUG-56 (Astronomie) — andere Root Cause, daher getrennt geführt.
@@ -1394,6 +1858,10 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 | **Erstellt** | 2026-07-03 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Tippt man im Karten-Tab auf den „Wolken"- oder „Niederschlag"-Umschalter, zentriert und zoomt die Karte auf eine Mehrländer-Ansicht (Frankreich bis Nord-Norwegen). Gewünscht: Die Karte soll stattdessen auf einen Kartenausschnitt von ca. 50 km Radius um die aktuelle Kartenmitte bzw. um den zuletzt betrachteten Standort zoomen.
 
 **Testergebnis (2026-07-03):** Von Stephan im Browser getestet. Kern-AK bestätigt: „Die Funktionalität hat geklappt" — der Umschalter zoomt jetzt auf den ca. 50-km-Ausschnitt statt auf die Europa-Ansicht. Übrige Testschritte (Breitengrad-Vergleich Nord/Berlin, mehrfaches Umschalten, frischer Seitenaufruf, 5-Tabs-Regressionscheck) wurden nicht explizit kommentiert — Annahme: unauffällig, da nicht negativ erwähnt. Zwei unabhängige Zusatzbeobachtungen ausgelagert in eigene Tickets (kein BUG-58-Scope, technisch anderer Codepfad, siehe Bezug): **BUG-59** (Wolken-/Regen-Overlay beim Zeitregler nicht sichtbar) und **TASK-52** (Legende Wolken/Regen von Mitte-links nach unten-links über den Zeitregler verschieben).
@@ -1464,6 +1932,10 @@ Kontext: Kein Bug in der Wetterkarte selbst; US-112 ist released und live verifi
 | **Status** | Done |
 | **Erstellt** | 2026-07-03 |
 | **Abgeschlossen** | 2026-07-04 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Beim Bedienen des Zeitreglers im Karten-Tab (mit dem man durch die Zeitpunkte der Wolken-/Niederschlag-Wettervorhersage blättert) hat Stephan kein Wolken- oder Regen-Overlay auf der Karte gesehen — die erwartete Wetterfläche erscheint visuell nicht.
 
@@ -1666,6 +2138,12 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 ---
 
 ### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
 > **Entscheidung: Option B – Tag-Chips**
@@ -1699,6 +2177,10 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 | **Status** | Done |
 | **Erstellt** | 2026-07-05 |
 | **Abgeschlossen** | 2026-07-05 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Host möchte ich in der Location-Detailansicht ein bereits hochgeladenes Beispielbild eigenständig löschen können, ohne dafür gleich die ganze Location löschen oder zwingend ein Ersatzbild hochladen zu müssen.
 
@@ -1839,6 +2321,10 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 | **Status** | Done |
 | **Erstellt** | 2026-07-05 |
 | **Abgeschlossen** | 2026-07-05 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Host möchte ich den sichtbaren Ausschnitt eines Beispielbilds selbst festlegen können. Aktuell (seit US-120) wird bei Quer- oder Hochformatbildern immer automatisch die Bildmitte als Ausschnitt gewählt (Rule 2 in US-120: „der sichtbare Bildausschnitt wird immer mittig aus dem Originalbild genommen"). Das kann dazu führen, dass bei Bildern, deren Motiv nicht zentriert ist, genau der Teil abgeschnitten wird, der das eigentliche Motiv zeigt.
 
@@ -1983,6 +2469,10 @@ Damit sind alle vier vormals blockierenden Fragen geklärt und die Implementieru
 | **Status** | Done |
 | **Erstellt** | 2026-07-09 |
 | **Abgeschlossen** | 2026-07-09 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Host möchte ich beim Anlegen einer neuen Location direkt ein Beispielbild mit hochladen können, statt die Location erst ohne Bild zu speichern und das Bild danach über den separaten Bearbeiten-Modus nachzupflegen.
 
@@ -2337,6 +2827,10 @@ Ergebnis: Werkzeug verhält sich exakt wie in den AKs gefordert. Kein weiterer N
 | **Status** | Done |
 | **Erstellt** | 2026-07-06 |
 | **Abgeschlossen** | 2026-07-07 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Das Feld „Hinweise (Zugang, beste Jahreszeit etc.)" ist aktuell nur im Bearbeiten-Modus einer Location sichtbar. Stephan möchte es zusätzlich in der Detailansicht (read-only) und in der Neuanlage-Maske sehen, damit bereits vorhandene bzw. eingetragene Hinweise nicht nur über den Umweg „Bearbeiten öffnen" einsehbar sind.
 
@@ -2811,6 +3305,10 @@ Alltagssprache: Die App bekommt eine dritte, komplett eigene Erkennungsregel ext
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Beim Anlegen einer Location über Quick Location Capture erscheint automatisch der Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Beobachtet: Das Feld ist von Anfang an vorbelegt, obwohl der Nutzer nichts eingetragen hat. Erwartet: Das Feld bleibt bei Neuanlage leer und wird nur befüllt, wenn der Nutzer selbst explizit einen Hinweis einträgt.
 
 **User Story:** Als Nutzer, der über Quick Location Capture eine neue Location anlegt, möchte ich, dass das Hinweise-Feld leer bleibt, sodass ich nicht fälschlich denke, ich hätte schon etwas eingetragen, und das Feld nur zeigt, was ich selbst geschrieben habe.
@@ -3011,6 +3509,10 @@ Test-Locations „bornstedt test" (`custom_1783243478`, `custom_1783243546` — 
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Im Location-Detail-Sheet zeigt die Sektionsüberschrift „MOTIV – &lt;Name&gt;" nach Umbenennung des Motivs weiterhin den alten Namen (Beispiel: Umbenennung zu „Havelblick von der Wublitzbrücke", angezeigt bleibt „Havelböick von der Wublitzbrücke"). Beobachtet: veraltete, falsche Anzeige trotz erfolgter Umbenennung. Erwartet: Die Sektionsüberschrift zeigt jederzeit den aktuell gespeicherten Motivnamen. Zu prüfen: Ob auch der Beschreibungstext unterhalb dieser Sektion denselben veralteten Namen referenziert.
 
 **Scope-Hinweis (Code-Recherche PM-Intake):** `web/index.html` Zeile 5717 rendert die Sektion als `Motiv – ${loc.subject_name}` direkt aus dem Location-Objekt (`LocationDetail._render`), eine zentrale Datenquelle für diese eine Sektion. `LocationDetail.saveEdit()` (ca. Zeile 5626–5631) lädt nach dem Speichern bereits `Locations.all` neu vom Server und ruft `LocationDetail.open(locId)` erneut auf (Muster aus BUG-30, dort für den Location-Namen gefixt) — trotzdem scheint der Motivname stale zu bleiben, das ist im Kern dieses Bugs zu klären (evtl. anderer Bearbeitungsweg als das Formular, z. B. direkter API-Edit, oder ein separater Cache-Effekt). Zusätzlich verwendet der Chancen-/Feed-/Scout-/Kalender-Datensatz ein **eigenes** `o.subject_name`-Feld (Zeilen 1589, 1877, 1895, 1942), das aus dem Opportunities-Cache (`opportunities.json`/`discover.json`) stammt und unabhängig vom Location-Objekt ist — dort könnte derselbe veraltete Motivname ebenfalls auftauchen, wenn der Cache nach einer Umbenennung nicht neu berechnet wird. Ob das tatsächlich betroffen ist, ist Analysephase-Arbeit, nicht hier entschieden.
@@ -3110,6 +3612,10 @@ Regression behoben durch ensure_seed_location-Fixture (conftest.py), 2x grün ve
 | **Status** | Done |
 | **Erstellt** | 2026-07-09 |
 | **Abgeschlossen** | 2026-07-09 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Beim Anlegen einer neuen Location zeigt die Vorschau („Alignments berechnen") das Feld „Höhenwinkel Spitze" (`profile.angular_altitude_top_deg`). Dieser Wert ist bei Stephan immer 0,0°. Ursache: Der Endpoint `POST /preview-alignment` (`backend/main.py`, Funktion `preview_alignment`) ruft `calculate_subject_angular_profile` (`backend/calculations/astronomy.py`) nur mit `subject_lat/lon`, `observer_lat/lon`, `subject_height_m` und `subject_width_m` auf — der Parameter `elevation_difference_m` (Geländeunterschied Motiv-Basis vs. Fotograf-Standort) wird in dieser Vorschau nie übergeben und bleibt beim Funktionsdefault 0.0. Zusätzlich wird `observer_height_m` fix mit 1.6 m (Augenhöhe) angenommen. Trägt Stephan im Anlage-Formular keine Motivhöhe ein (Feld bleibt leer → Frontend-Fallback `|| 0` in `web/index.html`, Zeile ~6839), ergibt `effective_height = max(0, 0 + 0 - 1.6) = 0` → Winkel = 0,0°. Erwartet: Der Winkel berücksichtigt die tatsächliche Motivhöhe und den Geländeunterschied — aktuell fehlt im Anlage-Formular komplett die Möglichkeit, einen Geländeunterschied einzugeben, und dieser fließt serverseitig auch nicht ein.
 
@@ -3290,6 +3796,12 @@ Ausgeschlossen: iOS-App (kein entsprechender Code in dieser Analyse betrachtet, 
 
 
 ### US-33 · Developer Tool: Locationscout Import-Management
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als App-Host** möchte ich neue Locations aus Locationscout-Listen komfortabel importieren und bereits abgelehnte Spots dauerhaft ausschließen können.
 >
 > **Akzeptanzkriterien:**
@@ -3306,6 +3818,7 @@ Ausgeschlossen: iOS-App (kein entsprechender Code in dieser Analyse betrachtet, 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
+| **Priorität** | Mittel |
 | **Status** | In Analysis |
 
 > **Als App-Host** möchte ich die problemlose Funktionsweise der App überwachen und Fehler sofort identifizieren, damit ich die User Experience jederzeit sicherstellen kann.
@@ -3561,6 +4074,12 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 - **Wartet am Weg-Gate:** Freigabe durch Stephan vor Implementierung
 
 ### US-04 · Kalender-Integration für geplante Fotowalks
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich mit einem Tap einen Kalender-Eintrag für ein geplantes Foto-Event erstellen.
 >
 > **Akzeptanzkriterien:**
@@ -3570,6 +4089,12 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 > - Erinnerung 30/60/120 Min. vorher
 
 ### US-06 · Gespeicherte Locations verwalten
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich meine selbst erfassten Locations bearbeiten, mit Notizen versehen und löschen können.
 >
 > **Akzeptanzkriterien:**
@@ -3579,6 +4104,12 @@ Nur wenn `FOTOALERT_ALERT_EMAIL` gesetzt; sonst nur `logger.critical(...)`.
 > - Export als JSON
 
 ### US-64 · Live Astro-Visualisierung (PhotoPills-like) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich in Echtzeit sehen, wo sich Sonne und Mond am Himmel befinden, und diese Position relativ zu meinem Fotostandort und Motiv visualisiert bekommen.
 >
 > **Hintergrund:** FotoAlert hat Skyfield-Engine und Location-Paare. Diese Story ergänzt einen Live-Modus der die aktuelle Himmelsposition anzeigt und mit Locationdaten überlagert.
@@ -3677,6 +4208,10 @@ Ausgeschlossen: Backend-Endpoint (`/astro/live` gestrichen), iOS-App, AR/Exif, P
 | **Status** | Done |
 | **Erstellt** | 2026-06-19 |
 | **Abgeschlossen** | 2026-07-01 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Fotograf möchte ich eine Wetterkarte für Berlin/Potsdam/Umland sehen, um Wolkendecke und Niederschlag für meine geplanten Shooting-Fenster visuell einschätzen zu können.
 
@@ -3782,6 +4317,10 @@ Kontext: Der Slider triggert sonst pro Tick einen API-Call → Open-Meteo-Rate-L
 | **Status** | Done |
 | **Erstellt** | 2026-06-30 |
 | **Abgeschlossen** | 2026-07-01 (released, live verifiziert) |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **✅ Abschluss (2026-07-01):** Live auf der Produktion verifiziert — weicher Wolken-/Niederschlags-Verlauf über DE/AT/Norditalien (DWD ICON-D2 0–48 h + ICON-EU 48–72 h) plus Norwegen (MET), 72-h-Schieber mit Berliner Zeit, Attribution, kein Speicher-Abbruch. Vier Live-Fehler behoben (DWD-Dateinamen, Speicherüberlauf → Blockgröße, zu langsames Rendern → Stützpunkt-Ausdünnung, ICON-EU 6-h-Hauptläufe) + Zeit-Label-Fix (`+00:00`→Invalid Date) + Layout-Feinschliff (Menüs nebeneinander, Zeitachse/GPS unten, Quellenangabe links). **Nicht-Bug gelernt:** Overlay „fehlte" nur, weil der Browser gegen den lokalen Server (`fa_api`/localhost) ohne DWD-Daten lief bzw. ein alter Service Worker die Seite cachte — Produktion war korrekt.
 
@@ -4010,6 +4549,10 @@ TASK-44 ──▶ TASK-45 (Azimut)    ┐
 | **Status** | Done |
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Regelmäßiger (idealerweise automatischer) Mechanismus, der die durch Nutzung stetig wachsenden Live-Daten in die Dev-Umgebung überträgt und dortige Testdaten überschreibt. Ziel: realistischere Testdaten in Dev, um Auswirkungen auf Performance, Datenspeicherung und Nutzerverträglichkeit (z. B. längere Ladezeiten oder Berechnungen) sichtbar zu machen, die mit synthetischen Testdaten nicht auffallen würden.
 
@@ -4336,6 +4879,10 @@ Manuelle Durchsicht von `_sync_image_dir_to_repo()` im Vergleich zu den Nachbarf
 | **In Progress seit** | 2026-07-05 |
 | **Abgeschlossen** | 2026-07-05 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Vor jedem Precompute-Lauf legt `snapshot_before_precompute()` (`backend/data/backup.py`) automatisch eine DB-Kopie unter `backend/data/snapshots/` an (max. 7, ältere räumt das Skript selbst weg). Der Ordner fehlte in `.gitignore`, dadurch wurden bei früheren Commits (`10ce891`, `4225991`) einzelne Snapshots versehentlich mitgecheckt. Räumt das Skript sie später lokal auf, zeigt Git sie als „deleted"; neue, noch ungecheckte Snapshots als „untracked" — das sorgte bei Releases für Verwirrung. Kein Datenverlust, reines Ignore-/Tracking-Problem, ~0,8 MB Historie betroffen.
 
 **Umsetzung:** `.gitignore` um `backend/data/snapshots/` ergänzt. Die 7 bereits getrackten (aber lokal schon wieder gelöschten) Snapshot-Einträge müssen noch per `git rm --cached` aus der Versionsverfolgung genommen und committet werden — dieser Schritt läuft über Stephans eigenes Terminal, nicht in der Sandbox.
@@ -4351,6 +4898,10 @@ Manuelle Durchsicht von `_sync_image_dir_to_repo()` im Vergleich zu den Nachbarf
 | **Status** | Done |
 | **Erstellt** | 2026-07-05 |
 | **Abgeschlossen** | 2026-07-05 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Aus der Retrospektive zu US-117: Der „lange JS-Funktion"-Check in `tools/refactor_check.py` maß die Länge einer Funktion bisher als Abstand bis zur *nächsten erkannten* Funktion, nicht bis zur tatsächlichen schließenden `}` (TASK-32-Limitation). Das erzeugte bei verschachtelten Closures/IIFEs regelmäßig Falsch-Positive (100–1400 „Zeilen" für tatsächlich 1–12-zeilige Funktionen), die bisher einzeln per Namens-Ignorelist unterdrückt werden mussten (zuletzt bei US-117 für `localBoundsRadius`, davor TASK-42/TASK-49/TASK-43). Diese Wurzelursache wurde jetzt behoben statt erneut nur die Ignorelist zu erweitern.
 
@@ -4371,6 +4922,10 @@ Manuelle Durchsicht von `_sync_image_dir_to_repo()` im Vergleich zu den Nachbarf
 | **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Für Locations ohne kuratierten Idealbereich soll das System aus frei verfügbaren Kartendaten ableiten, aus welcher Himmelsrichtung Sonne oder Mond hinter dem Motiv stehen müssten, damit die App auch bei neuen oder per Backend angelegten Spots automatisch einen sinnvollen „idealer Azimut"-Bereich anzeigt — ohne dass jemand ihn von Hand eintragen muss.
 
@@ -4560,6 +5115,10 @@ test_build_prompt_contains_facts
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Für Spots ohne kuratierte Brennweiten-Empfehlung soll das System aus Motivgröße und Entfernung automatisch eine passende Brennweite vorschlagen, damit die App auch bei neuen Spots eine brauchbare Objektiv-Empfehlung zeigt.
 
 ---
@@ -4649,6 +5208,10 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 | **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Epic** | US-75 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Das System soll regelmäßig und automatisch prüfen, welche Spots sich geändert haben oder noch nie geprüft wurden, und für genau diese die Auto-Verbesserungen anstoßen — ohne unveränderte Spots unnötig neu zu berechnen und ohne externe Dienste zu überlasten. Dies ist der Schlussstein von Epic US-75: er verbindet die fertigen Bausteine (Azimut TASK-45, Brennweite TASK-47) mit einem geplanten Lauf und stellt zugleich sicher, dass die ermittelten Werte auch in den täglich vorberechneten Chancen (Feed/Kalender) ankommen — nicht nur in der Live-Detailansicht.
 
@@ -4864,6 +5427,10 @@ Wenn ein Spot keine von Hand gepflegte Objektiv-Empfehlung hat, aber Motivgröß
 | **Erstellt** | 2026-06-28 |
 | **Abgeschlossen** | 2026-06-29 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Als Fotograf möchte ich für eine Location sehen, wann und in welcher Richtung die Sonne auf- oder untergeht — ob sie dabei nah, hinter oder über dem Motiv steht, oder ob ein Untergang gegenüber der Location für Gegenlicht-Motive interessant ist — damit ich Shootings präzise planen kann.
 
 **Bezug:** US-64 (Live Astro-Visualisierung, zeigt Sonnenbahn live auf der Karte — US-107 ergänzt das um Planungs-/Zeitperspektive und Richtungsklassifizierung relativ zum Motiv), US-82 (Sun-Score v2 — berechnet Rötlichkeits-Score, kein Planungs-UI), TASK-45 (Azimut-Ableitung aus Geo-Daten — Infrastruktur, die US-107 nutzen kann), US-79 (Mondaufgang/-untergang im Detail — analoges Konzept für Mond, US-107 ist das Pendant für Sonne mit Planungsaspekt). Abgrenzung: US-64 zeigt Echtzeit-Position; US-107 zeigt geplante Auf-/Untergangszeiten + Richtungsklassifizierung (nah/hinter/über/gegenüber Motiv) für konkrete Tage.
@@ -5061,6 +5628,10 @@ Was du in der App erlebst: Im Event-Detail (Feed, Kalender) siehst du den Azimut
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Beim Anlegen eines neuen Standorts (AddLocation-Formular) lässt sich die Karte bislang nur in der kleinen Formular-Vorschau bedienen. Ein eigener Vollbild-Modus mit Zoom sowie Satellit-/Standard-Kartenwahl soll die präzise Positionierung des Standort-Pins erleichtern.
 
 **User Story:** Als Fotograf/in, möchte ich beim Anlegen eines neuen Standorts in den Vollbildmodus wechseln können, in dem sowohl Zoom als auch Satellit- und Standard-Kartenansicht verfügbar sind, sodass ich den Standort-Pin präziser positionieren kann.
@@ -5205,6 +5776,10 @@ Ausgeschlossen: Draggable Pins im Vollbild (bleibt Antippen wie bisher). Keine �
 | **Status** | Done |
 | **Erstellt** | 2026-06-20 |
 | **Abgeschlossen** | 2026-07-08 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 ✅ **Testbestätigung (Stephan, 2026-07-08):** Alle Testschritte im lokalen Browsertest positiv.
 
@@ -5660,6 +6235,10 @@ Was du in der App erlebst: Optisch identisches Ergebnis zu Option A — Legende 
 | **Erstellt** | 2026-06-20 |
 | **Abgeschlossen** | 2026-07-03 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Die Karte in den Locationdetails ist zu klein für komfortables Navigieren und Setzen der Location-Pins. Sie soll deutlich größer werden — idealerweise in einem bildschirmfüllenden Overlay, das sich per Klick auf ein Symbol wieder schließen lässt.
 
 **Bezug:** Verbessert die Edit-Karte des Location-Details (US-60). Grenzt an US-58[x] (Blickwinkel-Karte) und US-69[x] (GPS-Zentrierung). Eigenständig. **Ergänzung von Stephan (2026-07-03):** Das neue Vollbild-Overlay darf nicht denselben Fehler wie BUG-34[x] zeigen (iPhone Safari: Bearbeitungs-Overlay löste ungewollten Seiten-Zoom aus und ragte rechts aus dem Bildschirm) — das Overlay muss auf dem iPhone vollständig im sichtbaren Bereich bleiben, ohne dass die Seite beim Öffnen/Bedienen automatisch zoomt.
@@ -6077,6 +6656,12 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 ---
 
 ### US-17 · Lieblingslocations (Favorites)
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich Locations als Favoriten markieren können, **damit ich** meinen persönlichen Kern-Spotpool schnell filtern kann.
 >
 > **Akzeptanzkriterien:**
@@ -6088,6 +6673,12 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 > ⚠️ **Persistenz-Designhinweis (TASK-23, 2026-06-24):** Das AK „localStorage/PWA" reicht nicht — iOS löscht PWA-Storage nach 7 Tagen Inaktivität (vgl. BUG-26). Bei Implementierung Favoriten direkt serverseitig persistieren (analog US-89/US-90), nicht rein lokal.
 
 ### US-26 · Sprachumschaltung DE / EN
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich die App zwischen Deutsch und Englisch umschalten können, **damit ich** sie auch mit internationalen Fotografie-Gästen nutzen kann.
 >
 > **Akzeptanzkriterien:**
@@ -6105,6 +6696,10 @@ Die neuen Felder (`moonrise_utc`, `moonset_utc`, `moonrise_azimuth`, `moonset_az
 | **Status** | Done |
 | **Erstellt** | ursprünglich vor 2026-07-04, erweitert 2026-07-05 |
 | **Abgeschlossen** | 2026-07-06 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Weg-Gate-Entscheidung (2026-07-05):**
 - Implementierungsweg: **Option C** — Onboarding + zentrales Glossar bleiben erhalten, zusätzlich bekommt jedes bedeutungstragende Element (Schwierigkeitsgrad, Event-Typ, Verifikations-Status, Filter-Chips, Kartensymbole) ein eigenes ⓘ nach dem bewährten US-55-Muster (Score-Erklärungen via ⓘ-Overlay).
@@ -6292,6 +6887,14 @@ Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlau
 ---
 
 ### US-07 · Goldene Wolken & Himmelsröte Scoring `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Abgeschlossen** | 2026-06-30 |
+
 > **Status:** Done
 > **Abgeschlossen:** 2026-06-30
 > **Als Fotograf** möchte ich für Goldene-Stunde-Events eine Einschätzung der Wolkenstimmungsqualität sehen – ob Bedingungen für dramatische goldene Wolken oder leuchtende Himmelsröte vorliegen – damit ich Go/No-Go-Entscheidungen noch gezielter treffen kann.
@@ -6356,6 +6959,10 @@ Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlau
 >
 > *Folge-Tickets: US-109 (Richtungsbasiertes Wolken-Scoring), US-110 (Neue Event-Typen Goldene Wolken & Himmelsröte)*
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 ---
 
 ### US-109 · Goldene Wolken & Himmelsröte als eigene Chancen: Richtungsbewusstes Scoring und Feed-Events `[x]`
@@ -6367,6 +6974,10 @@ Kein Status-Wechsel — Ticket bleibt „In Test" bis zum nächsten Testdurchlau
 | **Status** | Done |
 | **Erstellt** | 2026-06-30 |
 | **Abgeschlossen** | 2026-06-30 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Der aktuelle `golden_cloud_score` (US-07) berechnet nur die Gesamtmenge der Wolken pro Höhenstufe — er weiß nicht, in welcher Himmelsrichtung die Wolken stehen. Für goldene Wolken und Himmelsröte ist entscheidend, dass die Wolken **hinter dem Motiv in Sonnenrichtung** stehen (beim Abendrot im Westen, beim Morgenrot im Osten).
 
@@ -6789,6 +7400,12 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 ---
 
 ### US-08 · GPX-Export (Apple Maps / Google Maps)
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Status:** Maps-Links für Fotograf-Standort und Motiv sind bereits in der Event-Detailansicht implementiert.
 >
 > **Offen:** „Alle Locations exportieren" als `.gpx`-Datei
@@ -6803,6 +7420,10 @@ Was du in der App erlebst: Gleiche Anzeige wie Option A — aber die App-Logik s
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Erstellt** | 2026-07-05 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Aktuell wird die Sichtachse Fotograf→Motiv nur als reine Richtungslinie (Bearing) behandelt — ob dazwischen tatsächlich Gebäude oder Gelände/Topographie die Sicht blockieren, wird nicht geprüft. Ein Raycast-Algorithmus (Höhendaten via OpenTopoData + Gebäudedaten via OSM Buildings) soll Hindernisse entlang der Sichtachse erkennen, damit Stephan nicht zu Standorten geleitet wird, an denen das Motiv tatsächlich verdeckt ist.
 
@@ -7055,9 +7676,21 @@ Released als v1.22.0 (2026-07-06), GitHub Actions grün, Live-Health-Check best�
 **⚠️ Weiterhin offen (auch nach Done, kein Release-Blocker):** Die Live-Verifikation der Zustände „Blockiert" und „Teilweise verdeckt" mit echten Gebäudedaten steht weiterhin aus (s. Testergebnis oben) — bisher zeigen alle Locations nur „Nicht geprüft", da die öffentlichen Overpass-Server während der Testphase nicht zuverlässig erreichbar waren. Empfehlung: bei Gelegenheit (ruhigerer Zeitpunkt) den „Sichtachsen aktualisieren"-Lauf erneut anstoßen und prüfen, ob echte „Blockiert"/„Teilweise verdeckt"-Zustände zustande kommen — ggf. als kleines Nachfolge-Ticket (Verifikation, kein neuer Funktionsumfang) erfassen, damit der Punkt nicht in Vergessenheit gerät.
 
 ### US-10 · Polarlichter / Aurora-Warnung
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > NOAA SWPC Kp-Index, Push bei Kp ≥ 5. *(Offen)*
 
 ### US-11 · Bauarbeiten & Sperrungen
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Manuelles Crowdsourcing + Berlin Open Data API. *(Offen)*
 
 ---
@@ -7169,6 +7802,10 @@ Released als v1.22.0 (2026-07-06), GitHub Actions grün, Live-Health-Check best�
 | **Status** | Done |
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-05 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Fotograf möchte ich, dass der Karten-Tab beim Öffnen immer meinen aktuellen Standort mit 5 km Radius zeigt, damit ich sofort die relevanten Locations in meiner direkten Umgebung sehe.
 
@@ -7440,6 +8077,10 @@ Gegenmaßnahme: Sortierung als eigener, nachgelagerter Schritt nach dem Filtern 
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Als Fotograf möchte ich im Feed standardmäßig nur Chancen mit Wahrscheinlichkeit ≥70% sehen, damit ich nicht von unwahrscheinlichen Chancen überflutet werde; reduziere ich den Wahrscheinlichkeits-Filter manuell, sollen auch niedrigere Wahrscheinlichkeiten wieder sichtbar werden.
 
 **Bezug:** Der „Mindest-Wahrscheinlichkeit"-Filter (Slider, Teil des Filter-Systems aus **US-32** [x]/US-18-20/27, siehe auch **BUG-08** [x] Done) existiert bereits, aktueller Standardwert laut Code-Referenzen im Backlog ist **0,35** (35%), nicht 70%. Dieses Ticket ändert vermutlich nur den Default-Wert des bestehenden Sliders (bzw. bestätigt/dokumentiert das Reduzier-Verhalten), kein neuer Mechanismus. Kein Duplikat — reine Wertänderung eines bestehenden Features. Abgrenzung zu prüfen: ob 70% als Feed-Default separat vom Locations-/Karten-Filter-Default gilt.
@@ -7574,6 +8215,10 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 | **Status** | Done |
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Host möchte ich pro Location ein Beispielbild hochladen können, das andere Nutzer in Hoch- oder Querformat passend zur Geräteausrichtung sehen (Bild dreht beim Drehen des Handys mit, Hochkant-Bilder vollflächig im Hochkant-Modus), damit Interessierte sofort einen visuellen Eindruck vom Spot bekommen. Bildgröße max. 1 MB, idealerweise serverseitige Kompression auf ca. 500 KB beim Upload, um Performance und Datenvolumen zu schonen.
 
@@ -7772,6 +8417,10 @@ In Alltagssprache: Der Host lädt zwei Fotos hoch, eines eigens fürs Hochkant-H
 | **Abgeschlossen** | 2026-07-04 |
 | **Ergebnis** | Als Dublette geschlossen — kein Code geändert. Automatische Neuberechnung bei Standort-Änderung existiert bereits vollständig (TASK-12 + US-106), siehe Spec unten. |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Als Fotograf möchte ich, dass alle Foto-Chancen automatisch neu berechnet werden, wenn der Standort des Motivs oder Fotografen einer bestehenden Location geändert wird, damit die Chancen nie auf veralteten Koordinaten basieren.
 
 **Bezug:** Starke Überschneidung mit **TASK-12** [x] (Done, v1.4.2 — führte bereits automatische Neuberechnung von Feed + Jahreskalender nach Koordinaten-Änderung ein: asynchroner `_run_precompute(location_ids=[id])` direkt nach PATCH `/locations/{id}`) und **US-106** [x] (Done, v1.19.5, baut auf TASK-12 auf und schließt drei weitere Lücken: Wetter sofort, Entdecken-Bereich zeitnah, kein Verlust bei laufendem Großlauf). Nach Aktenlage im Backlog **scheint automatische Neuberechnung bereits zu existieren** — abschließend nur durch Stephan/Live-Test zu bestätigen.
@@ -7830,6 +8479,10 @@ Die Code-Recherche zeigt eindeutig: **Die automatische Neuberechnung bei Standor
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 | **Ergebnis** | Als Dublette geschlossen — kein Code geändert. Sonnen-Alignment existiert bereits vollständig (Backend, Feed, Kalender, Scout, Filter-UI), siehe Spec unten. |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Als Fotograf möchte ich Sonnen-Alignment als eigenständige Chance im 14-Tage-Feed, im Kalender und bei den Scouts sehen — nach derselben Logik wie das bestehende Mond-Alignment, nur zur goldenen Stunde (blaue Stunde entfällt, da die Sonne dann nicht sichtbar ist) — mit Filterkriterien analog zu den bestehenden Mond-Filtern (Drei-Zustand: aktivieren/ausschließen/neutral).
 
@@ -7966,6 +8619,10 @@ In Alltagssprache: Stephan schaut sich im laufenden Betrieb aktiv im Feed/Kalend
 | **Erstellt** | 2026-07-04 |
 | **Abgeschlossen** | 2026-07-04 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Als Host möchte ich bei Neuanlage/Bearbeiten einer Location neben der Satellitenansicht auch eine Standardansicht (Straßenkarte) wählen können, mit Umschaltmöglichkeit zwischen beiden, damit ich je nach Situation die besser lesbare Kartendarstellung nutzen kann.
 
 **Bezug:** Die Bearbeiten-Karte nutzt laut Backlog-Referenzen aktuell fix einen Satelliten-Layer (`CameraFOV.initMap()` verwendet `arcgisonline` fix). Der allgemeine Karten-Tab hat laut PRODUCT.md-Regressionshinweis (Zeile „Layer-Umschaltung Nacht/Standard/Satellit") bereits eine Layer-Umschaltung — diese Umschaltmöglichkeit scheint aber nicht für die Location-Anlage-/Bearbeiten-Karte selbst zu gelten, nur für den normalen Karten-Tab. Keine Dublette gefunden; Abgrenzung zu klären: ob die bestehende Karten-Tab-Layer-Umschaltung einfach auf die Bearbeiten-Karte übertragen werden kann (dann kleiner Aufwand) oder ob dort eine eigene Lösung nötig ist.
@@ -8084,6 +8741,12 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 ## 🟡 Mittel – Daten & Integration
 
 ### US-50 · Nutzungsanalyse (Analytics) via Matomo `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als App-Host** möchte ich das häufigste Nutzungsverhalten meiner User verstehen, damit ich wertvolle Features priorisieren und wenig genutzte Funktionen verbessern oder entfernen kann.
 >
 > **Werkzeug:** Matomo (Open Source, selbst-gehostet, DSGVO-konform, kostenlos)
@@ -8098,6 +8761,12 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 > *Kein Overlap mit bestehendem Backlog.*
 
 ### US-51 · Navigation & Fahrtzeit zum Fotostandort `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als App-User** möchte ich eine Wegplanung von meiner aktuellen Position zum Fotograf-Standort starten können und vorab sehen wie lange ich aktuell dorthin bräuchte, damit ich rechtzeitig vor Ort bin.
 >
 > **Verfügbar:** In Locationdetails + Chancendetails
@@ -8112,6 +8781,12 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 > *Differenziert von US-08 (Maps-Link = Einzel-Tap, bereits implementiert) – diese Story ergänzt In-App Fahrtzeit + expliziten Route-CTA.*
 
 ### US-52 · Smarte Abfahrts-Erinnerung (distanzbasiert) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich eine Push-Notification erhalten, die auf meiner aktuellen Entfernung zum Fotostandort basiert, sodass ich pünktlich zum Shoot-Zeitpunkt vor Ort bin – ohne selbst berechnen zu müssen wann ich losmuss.
 >
 > **Akzeptanzkriterien:**
@@ -8125,15 +8800,39 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 > *Differenziert von US-44 (manuelle Vorlaufzeit 15/30/60/120 Min.) – diese Story ist automatisch und distanzbasiert.*
 
 ### TASK-01 · Kometen-Integration `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > NASA JPL Horizons API anbinden für aktuelle Kometen-Positionen und -Sichtbarkeit.
 
 ### TASK-02 · Sonnenfinsternisse berechnen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Skyfield-Berechnung der Kontakte (C1–C4) für Berlin/BB-Region.
 
 ### TASK-03 · Feuerwerk-Events `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Manuelle Events für wiederkehrende Feuerwerke: Silvester, Pyronale, Havel in Flammen.
 
 ### TASK-05 · Design-Spec dokumentieren `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > `DESIGN.md` mit allen CSS-Tokens, Abständen, Komponenten-Regeln anlegen. *(Design ist eingefroren, Dokumentation fehlt noch)*
 
 ---
@@ -8141,21 +8840,57 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 ## 🟢 Niedrig – App-Verbesserungen
 
 ### US-43 · Apple Watch Komplikation `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich die nächste Foto-Chance direkt auf meiner Apple Watch sehen, ohne die App zu öffnen.
 
 ### US-44 · Push-Notification Vorlaufzeit konfigurieren `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich selbst festlegen, wie früh ich vor einem Event benachrichtigt werde (15 / 30 / 60 / 120 Min.).
 
 ### US-45 · Wochenvorschau-Widget `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich die Top-3 Chancen der Woche als iOS-Homescreen-Widget sehen.
 
 ### TASK-06 · AR-Overlay: Sonnenbahn über Kamera-Live-Preview `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Sonnenbahn als AR-Overlay über dem Kamera-Bild einblenden.
 
 ### TASK-07 · Export als PhotoPills-Bookmark `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Location-Daten im PhotoPills-kompatiblen Format exportieren.
 
 ### TASK-09 · Bortle-Karte `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Lichtverschmutzungs-Overlay für Milchstraßen-Locations (Bortle-Skala).
 
 ---
@@ -8163,15 +8898,39 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 ## 💡 Ideen / Langfristig
 
 ### US-47 · KI-Kompositions-Vorschläge `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich automatisch generierte Bildausschnitt-Empfehlungen basierend auf Azimut und Gebäudeform erhalten.
 
 ### US-48 · Community-Locations `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich eigene Spots einreichen, die nach Prüfung durch den Host in die App aufgenommen werden.
 
 ### US-49 · Historische Alignments `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > **Als Fotograf** möchte ich sehen, welche Alignments an einem Spot in den letzten 5 Jahren stattgefunden haben.
 
 ### TASK-10 · Astronomisches Twilight für Milchstraße `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
 > Nautische vs. astronomische Dämmerung in der Berechnung unterscheiden (relevant für Milchstraßen-Sichtbarkeit).
 
 ---
@@ -8243,6 +9002,10 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 | **Status** | Done |
 | **Erstellt** | 2026-06-28 |
 | **Abgeschlossen** | 2026-06-28 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Nach der Anmeldung mit dem Host-Passwort zeigt die Einstellungsseite „User" statt „Host" an. Die Rolle wird also nach erfolgreichem Login falsch dargestellt — obwohl der Login selbst funktioniert und host-spezifische Rechte greife, stimmt die angezeigte Rollenbezeichnung nicht mit dem tatsächlichen Token überein.
 
@@ -8407,6 +9170,10 @@ Logout → als User anmelden → Einstellungen → "User"
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-06-23 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Öffnet man auf dem iPhone (Safari) das Bearbeiten-Overlay einer Location, vergrößert die Seite (Zoom) und der rechte Teil des Overlays ragt außerhalb des sichtbaren Bereichs. Erwartet: Das Overlay passt sich vollständig in den Viewport ein, kein ungewollter Zoom.
 
@@ -8739,6 +9506,10 @@ Frage 2 (Zeitpunkt): Wann genau soll die Karte springen?
 | **Erstellt** | 2026-07-02 |
 | **Abgeschlossen** | 2026-07-15 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `backend/main.py`:
 - `startup()` Z. 1237 — 84 Zeilen (Threshold: 80)
 
@@ -8991,6 +9762,10 @@ Funktionen umgesetzt und brauchen keine weitere Änderung.
 | **Status** | Done |
 | **Erstellt** | 2026-06-30 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `refactor_check.py` (category: `section_missing_default`) meldet, dass zwei Event-Sections gerendert werden, aber keinen Eintrag in `Sections._def` haben:
 - `ev_golden_clouds`
 - `ev_red_sky`
@@ -9010,6 +9785,10 @@ Fehlt ein `_def`-Eintrag, bleibt die Section beim ersten Render stumm eingeklapp
 | **Status** | Done (released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15) |
 | **Erstellt** | 2026-06-25 |
 | **Abgeschlossen** | 2026-07-15 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Drei Funktionen in `backend/precompute.py` überschreiten den 80-Zeilen-Threshold:
 - `compute_calendar_incremental()` Z. 590 — 146 Zeilen
@@ -9310,6 +10089,10 @@ und Teststand abgeglichen — alle bestätigt.
 | **Erstellt** | 2026-06-25 |
 | **Abgeschlossen** | 2026-07-03 — kein Handlungsbedarf, Falsch-Positiv (siehe Analyse-Spec unten) |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Zwei JS-Funktionen in `web/index.html` überschreiten den Threshold erheblich:
 - `local()` Z. 2674 — ~265 Zeilen
 - `row()` Z. 3531 — ~1034 Zeilen
@@ -9421,6 +10204,10 @@ Aufwand: klein, aber ohne Gegenwert.
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Erstellt** | 2026-06-28 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Der Filter verhält sich in zwei Punkten inkonsistent:
 
@@ -10022,6 +10809,10 @@ Beim Tippen auf ein Kalender-Event wird ein separater API-Request an `/opportuni
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Die `/opportunities`-API gibt 500 Events zurück, aber ausschließlich Mond-Events (Mondaufgang, Monduntergang, Milchstraße, Mond-Alignment). Goldene Stunde und Blaue Stunde erscheinen mit 0 Treffern — obwohl `opportunities.json` im Cache 910× Goldene Stunde Abend und 910× Blaue Stunde enthält.
 
 **Root-Cause-Hypothese:** Die BUG-32-Sortierung priorisiert Nicht-Routine-Events (Mond, Milchstraße) vor Goldene/Blaue Stunde. Mit ~2298 Nicht-Routine-Events im 14-Tage-Cache füllen diese den `:500`-Cap vollständig — Routine-Events fallen heraus.
@@ -10145,6 +10936,10 @@ Begründung: Option B löst das Problem für den aktuellen Cache, bricht aber be
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Im Locations-Panel existieren zwei Sucheingaben gleichzeitig: ein statisch sichtbares „Suchen"-Feld und ein weiteres, das sich über das Suchlogo im Menü öffnet. Das ist redundant und verwirrend — es sollte nur einen einzigen konsistenten Sucheinstieg geben.
 
 **Bezug:** Keine Dubletten gefunden.
@@ -10259,6 +11054,10 @@ Begründung: Option B löst das Problem für den aktuellen Cache, bricht aber be
 | **Status** | Done |
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Bei Locations, die per Quick Location Capture angelegt wurden, speichert die App den Text „Automatisch erfasst via Quick Location Capture." im HINWEISE-Feld. Löscht der Nutzer diesen Text, schreibt sich der Wert beim nächsten Speichern/Öffnen erneut hinein — der Hinweis lässt sich nicht dauerhaft entfernen (reproduzierbar z. B. bei Ehrenhof-Kollonaden am Schloss Sanssouci).
 
@@ -10394,6 +11193,10 @@ Option B: Gleiches Ergebnis, aber über einen separaten Endpoint. In der App ide
 | **Status** | Done |
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Der Entfernungsfilter (Radius-Slider oder Entfernungs-Chips) hat keine sichtbare Wirkung auf die angezeigte Locations- oder Feed-Liste — Locations außerhalb des gewählten Radius werden trotzdem angezeigt. Erwartetes Verhalten: nur Locations innerhalb des gesetzten Radius sind sichtbar.
 
@@ -10534,6 +11337,10 @@ Gegenmaßnahme: Fix isoliert in `applyToLocations` — berührt Map-Code (Zeile 
 | **Status** | Done |
 | **Erstellt** | 2026-06-29 |
 | **Abgeschlossen** | 2026-06-29 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Die App fordert die Geolocation-Berechtigung wiederholt innerhalb einer Session an — auch wenn der Nutzer sie bereits erteilt hat. Erwartetes Verhalten: Nach einmaliger Zustimmung bleibt die Freigabe für die laufende Session aktiv und wird nicht erneut abgefragt.
 
@@ -10689,6 +11496,10 @@ Beim ersten `requestGps()`-Aufruf das laufende Promise in `Filter._gpsPromise` s
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Abgeschlossen** | 2026-06-30 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:**
 Sonnenauf-/-untergang und Mondauf-/-untergang werden aktuell für jede Location angezeigt, unabhängig davon, ob der Auf-/Untergang zur Sichtachse auf das Motiv passt. Das führt zu irrelevanten Chancen-Einträgen (z. B. Sonnenuntergang seitlich, obwohl er weder im Bild liegt noch das Motiv beleuchtet).
@@ -11023,6 +11834,10 @@ Gegenmaßnahme: `width="100%" height="200"` + `viewBox="0 0 200 200"` → respon
 | **Status** | Done |
 | **Erstellt** | 2026-07-01 |
 | **Abgeschlossen** | 2026-07-02 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Die „Himmelsröte"-Chance (RED_SKY, Sonnenauf-/-untergang-Himmelsfarbe/„goldene Stunde") soll nur ausgelöst werden, wenn sich die Wolkenzone mit der Sichtachse vom Standort zum Motiv überschneidet. Liegen die Wolken zwar vor, aber außerhalb der Blickrichtung, soll keine Chance generiert werden — aktuell wird Himmelsröte bewusst omnidirektional (ohne Richtungsfilter) ausgelöst.
 
@@ -11571,6 +12386,10 @@ Cap+Sort / Cross-Collection-Lookup: nicht anwendbar (kein Listen-Cap, kein Cross
 | **Erstellt** | 2026-07-10 |
 | **Abgeschlossen** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Bei der US-128-Code-Verifikation fiel auf, dass `special_notes` (Hinweise) und `subject_name` (Motivname) zwar über `PATCH /locations/{id}` korrekt editierbar sind (BUG-50, BUG-61 — Done), aber vermutlich in zwei weiteren Whitelists fehlen, die für Standard-Locations denselben Korrekturwert dauerhaft sichtbar halten müssen: `main.py:_load_location_overrides()` (Reload-Tupel, Zeile ~1218–1221) und `precompute.py:_OVERRIDE_FIELDS` (Zeile ~140–143). Falls das zutrifft, würde eine Korrektur für Standard-Locations einen Server-Neustart nicht überleben und vom precompute-Subprozess (Einzel- wie Vollrecompute) nicht gesehen — noch nicht selbst geprüft, ob das tatsächlich zutrifft.
 
 **User Story:** Als Host, der das Hinweise-Feld oder den Motivnamen einer Standard-Location nachträglich korrigiert, möchte ich, dass meine Korrektur auch einen Server-Neustart und den nächtlichen/manuellen Neuberechnungslauf übersteht, sodass mein editierter Text nicht unbemerkt wieder auf den alten Wert zurückfällt.
@@ -11654,6 +12473,10 @@ Wichtiger Zusatzbefund: US-128 hat den Umbau auf die zentrale Tabelle bereits um
 | **Status** | Done |
 | **Erstellt** | 2026-07-10 |
 | **Abgeschlossen** | 2026-07-14 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** `refactor_check.py` meldet eine neue lange Funktion in `backend/main.py`:
 - `patch_location()` Z. 2489 — 91 Zeilen (Threshold: 80)
@@ -11906,6 +12729,10 @@ umgesetzt wurde.
 | **Status** | Done |
 | **Erstellt** | 2026-07-14 |
 | **Abgeschlossen** | 2026-07-14 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** `refactor_check.py` meldet nach US-131 zwei lange Funktionen in `backend/main.py`:
 - `_apply_weather_to_event()` Z. 475 — 135 Zeilen (Threshold: 80)
@@ -12258,6 +13085,10 @@ für dieselbe Datei bereits erfolgreich umgesetzt wurde (75 passed, 0 rot).
 | **Erstellt** | 2026-07-10 |
 | **Abgeschlossen** | 2026-07-10 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Im Locations-Tab bzw. in der Filterleiste soll ein neuer Filter-Chip „Hat Bild" hinzukommen, mit dem Locations danach gefiltert werden können, ob sie ein Beispielbild (`image_url`) haben oder nicht — als dreistufiger Toggle nach demselben Muster wie der bestehende Verifikationsfilter (Aus → Nur mit Bild → Nur ohne Bild → Aus, ein Klick pro Stufe).
 
 **Scope-Erweiterung (2026-07-10, während Test-Phase, Done-Gate pausiert auf Wunsch von Stephan):** Der Kern (Locations-Tab + Karte) ist implementiert und von Stephan live bestätigt (Drei-Zustand-Chip funktioniert korrekt). Stephan wortwörtlich: „Passt, aber eigentlich will ich den Filter auch bei den Chancen im Feed/Kalender." Scope wird um Feed + Kalender erweitert; Entdecken (Scout) bleibt außen vor (Begründung siehe Scope unten). Analyse-Update ab hier; bestehende, bereits getestete AKs zu Locations-Tab/Karte bleiben unverändert.
@@ -12431,6 +13262,10 @@ Beide Optionen führen zum selben sichtbaren Ziel (Chip in Feed/Kalender aktiv n
 | **Erstellt** | 2026-07-10 |
 | **Abgeschlossen** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Beim Start von `fotoalert.service` auf dem Produktionsserver (2026-07-10, 20:45:47 UTC) erschien im systemd-Journal die Warnung „Fehler beim Laden der QA-Values: database disk image is malformed". Das deutet auf eine beschädigte SQLite-Datenbankdatei hin (vermutlich `backend/data/fotoalert.db`, Bereich QA-Values). Der Neustart selbst war regulär/sauber, kein Crash — der Fund entstand beiläufig bei einer Ad-hoc-Diagnose und ist unabhängig vom Neustart-Anlass. Priorität Hoch, da eine korrupte Produktionsdatenbank potenziell Datenverlust bedeutet und die Ursache noch ungeklärt ist.
 
 **User Story:** Als Host, möchte ich dass die Produktionsdatenbank verlässlich intakt bleibt und Ladefehler beim Start nicht stillschweigend auftreten, sodass ich mich auf korrekte QA-Werte verlassen kann und keine Daten verliere.
@@ -12588,6 +13423,10 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 | **Erstellt** | 2026-07-10 |
 | **Abgeschlossen** | 2026-07-12 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Der bestehende Backup-Mechanismus (`backend/data/backup.py::_export_to_repo()`) sichert per Git-Commit ausschließlich zwei der acht Tabellen der Produktionsdatenbank (`custom_locations`, `location_overrides`) als JSON. Die übrigen sechs Tabellen — `location_qa_values`, `location_qa_state` (inkl. manueller Sperren/gesperrter Werte), `location_verifications`, `location_ratings`, `device_tokens`, `camera_profiles` — haben aktuell keine JSON-Sicherung außerhalb der Live-Datenbank. Bei einer Beschädigung oder einem Verlust der Live-DB wären Bewertungen, Vor-Ort-Verifikationen, Geräte-Tokens und Kamera-Profile unwiederbringlich verloren. Der Befund entstand bei der Diagnose von BUG-70 (Journal-Warnung „database disk image is malformed" durch eine beschädigte `location_qa_values`-Tabelle) — dort war laut Diagnose zwar nur diese eine, grundsätzlich automatisch neu erzeugbare Tabelle betroffen, die Lücke selbst betrifft aber strukturell alle sechs ungesicherten Tabellen und besteht unabhängig vom konkreten Vorfall weiter.
 
 **User Story:** Als Betreiber der App, möchte ich, dass alle Datenbestände gesichert werden, sodass bei einem Ausfall oder einer Datenbank-Beschädigung keine Daten unwiederbringlich verloren gehen.
@@ -12683,6 +13522,10 @@ Keine andere Tabelle taucht im Ergebnis auf — `custom_locations`, `location_ov
 | **Status** | Done |
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-14 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Auf der Produktionsdatenbank enthält die Tabelle `location_qa_state` 136 Location-Einträge, aber nur 91 Einträge existieren in `location_qa_values`. Von diesen 91 haben nur 76 eine passende Location-ID in `location_qa_state` — die übrigen 15 `location_qa_values`-Einträge referenzieren Location-IDs, die in `location_qa_state` gar nicht mehr vorkommen (vermutlich alte/entfernte Locations, deren QA-Werte nie aufgeräumt wurden). Insgesamt 60 Location-IDs aus `location_qa_state` haben aktuell keinen passenden Eintrag in `location_qa_values` und damit keine automatisch erzeugten Werte (Beschreibung, Blickwinkel-/Brennweiten-Empfehlung). Unklar ist, ob das ein normaler Rückstand des nächtlichen QA-Laufs ist (`_run_qa_pass()` verarbeitet laut TASK-48/BUG-70-Analyse nur Locations mit geändertem `geo_hash` oder ganz ohne bisherigen Check — manche Locations wurden dadurch schlicht noch nie erreicht), oder ob es sich um ein eigenständiges Datenproblem handelt (z. B. verwaiste Einträge, die beim Löschen/Tombstonen einer Location nicht mitentfernt werden, oder ein Fehler in der Change-Detection). Der Befund entstand beiläufig bei der Reparatur von **BUG-70** und ist von der dortigen Datenbank-Korruption unabhängig — die Zeilenanzahl 91 in `location_qa_values` war während der gesamten BUG-70-Reparatur unverändert, die Diskrepanz bestand also bereits vorher.
 
@@ -12885,6 +13728,10 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-13 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Dach-Ticket für den Umbau des Testens von „Stephan probiert alles von Hand aus" zu „die App testet sich selbst". Befund der Metaanalyse: Es existieren rund 30 pytest-Testdateien, die aber nur manuell im Terminal gestartet werden; der automatische Ablauf bei jeder Veröffentlichung (GitHub Actions, `deploy.yml`) führt nur einen Playwright-Frontend-Oberflächen-Kurzcheck aus, nicht die Backend-Testsuite; `release.sh` hat kein Testgate; die Pflicht-Regressionsliste in PRODUCT.md wird rein manuell abgearbeitet; die Fehlerklasse „Feld fehlt in Whitelist → Änderung wird still verworfen" trat dreimal auf (BUG-50, BUG-61, BUG-68); 24 von 29 Bugs fand Stephan selbst durch manuelles Ausprobieren. Ziel des Epics: Tests laufen selbständig — ohne Copy&Paste ins Terminal — und eine fehlerhafte Version geht gar nicht erst live.
 
 **User Story:** Als Betreiber der App, möchte ich, dass sich die App nach jeder Änderung automatisch selbst durchtestet, sodass Fehler vor der Veröffentlichung auffallen statt erst bei meinen Nutzern oder beim manuellen Ausprobieren.
@@ -12917,6 +13764,10 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `backend/tests/test_us66_login.py::TestEndpointProtection::test_protected_endpoint_with_user_token` schlägt aktuell fehl: `PATCH /locations/custom_1781560330` mit gültigem User-Token liefert **404 „Location nicht gefunden"** statt der erwarteten **200**. Die beiden Nachbartests derselben Klasse (`test_protected_endpoint_without_token` → 401, `test_host_only_endpoint_blocks_user` → 403) sind laut TASK-64-CI-Lauf nicht als fehlgeschlagen gemeldet — der Fehler betrifft offenbar konkret das Vorhandensein der Test-Location `custom_1781560330`, nicht die Auth-Logik selbst.
 
 **Vermuteter Zusammenhang (nicht verifiziert):** Dieselbe Location-ID `custom_1781560330` (TASK-19-Seed) wird auch von den zeitgleich fehlschlagenden Tests in BUG-22, BUG-29, BUG-30 und BUG-61 verwendet. Möglicherweise fehlt diese Seed-Location aktuell in der `data_dev`-Datenbank/dem Fixture-Setup (z. B. weil ein Reset ohne erneuten Seed-Lauf stattfand), statt dass vier unabhängige Code-Regressionen gleichzeitig aufgetreten sind. Diese Hypothese ist in der Analysephase zuerst zu prüfen (z. B. `GET /locations` gegen `data_dev` auf Vorhandensein von `custom_1781560330` prüfen), bevor an der PATCH-Endpoint-Logik selbst gesucht wird.
@@ -12940,6 +13791,10 @@ Beide Rückfragen von Stephan bestätigt: ⚠️-Annahme zum Fehlertext übernom
 | **Status** | Done |
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
@@ -12981,6 +13836,10 @@ Reproduziert: `AssertionError` in `test_us120.py:331` — die Bilddatei existier
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
 **Beschreibung:** `backend/tests/test_us_125.py::TestDeleteImageSuccess::test_delete_removes_image_url_and_file` schlägt aktuell fehl. Der Test lädt ein Bild hoch, löscht es über `DELETE /locations/{id}/image` und erwartet, dass sowohl `image_url` am Location-Objekt verschwindet als auch die Datei über ihre alte Adresse danach 404 liefert (physisches Löschen).
@@ -13020,6 +13879,10 @@ Reproduziert: `AssertionError` in `test_us_125.py:102` — die Datei ist über i
 | **Status** | Done |
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Vermerk:** Verifiziert im echten CI-Lauf (v1.22.12, GitHub Actions #Backend-Tests), Hypothese Sandbox-Fehlalarm bestätigt.
 
@@ -13067,6 +13930,10 @@ Empfehlung: Option A — Beleglage (4/4 grün, kein Netzwerk-/Zeitabhängigkeit 
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
 | **Blockiert durch** | BUG-22, BUG-29, BUG-30, BUG-61 (Regressionen bestehender Done-Tickets, siehe Vermerke dort — BUG-22/29/30 in BACKLOG-ARCHIVE.md), BUG-72, BUG-73, BUG-74, TASK-68 (neu, Inbox) |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Verifiziert:** Echter GitHub-Actions-Lauf (v1.22.12) — Job „Backend-Tests (pytest)" grün in 2m 11s, Deploy erfolgreich, Health-Check ok. Damit sind auch BUG-73, BUG-74 und TASK-68 verifiziert — sie liefen im selben Lauf grün mit (Sandbox-Fehlalarm-Hypothese bestätigt, kein Codefix nötig).
 
@@ -13337,6 +14204,10 @@ Gegenmaßnahme: Unit-Test-Muster (Monkeypatch gegen `main._load_location_overrid
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Der bestehende Playwright-Frontend-Check im CI prüft heute nur oberflächlich, ob die App lädt (Smoke-Check). Er wird um echte Bedien-Durchläufe erweitert, wie ein Nutzer sie macht: Location anlegen → erscheint auf der Karte; Bild hochladen → ist danach wieder abrufbar; Filter setzen → der Feed reagiert entsprechend. Die Durchläufe laufen im CI-Gate mit — schlägt einer fehl, wird nicht deployt.
 
 **User Story:** Als Betreiber der App, möchte ich, dass die wichtigsten Bedien-Abläufe vor jeder Veröffentlichung automatisch durchgeklickt werden, sodass Fehler, die nur beim echten Benutzen sichtbar werden (und die ich bisher selbst finden musste), schon vor dem Live-Gang auffallen.
@@ -13500,6 +14371,10 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 | **Status** | Done (released Workflow-Lauf #199, Commit 8c86fa6, Health bestätigt version 2.0.0 / locations_count 161, 2026-07-12) |
 | **Erstellt** | 2026-07-11 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Refactor-Check (fotoalert-refactor, 2026-07-12):** `refactor_check.py` sauber (0 auto-fixable, 4 vorbestehende Funde außerhalb des Ticket-Scopes, bereits durch TASK-51/TASK-58/TASK-60/TASK-41 getrackt). Manuelle Prüfung der neuen `test_task67_*.py`-Dateien fand einen echten, inhaltlich identischen Doppel-Test (`test_protected_endpoint_without_token_401` vs. `test_patch_locations_without_token` in `test_task67_auth_regression.py`) — bereinigt, Suite läuft jetzt mit 44 statt 45 Tests unverändert grün. Bereit für Release.
 
 **CI-Fund nach erstem echten Release-Push (2026-07-12, Workflow-Lauf #195):** Frontend-Check (Playwright) schlug fehl — `_check_scout_mode` (Zeile ~2614) konnte `#fmb-feed` nicht klicken, weil das Schnell-Anlegen-Sheet (`#add-sheet`) noch offen war. Ursache: `AddLocation.save()` (`web/index.html` ~Zeile 6994) schließt das Sheet nur im Erfolgspfad (`this.close()`); schlägt der `/preview-alignment`-Call fehl, bleibt es offen und blockiert alle nachfolgenden Checks bis zum nächsten, der `_close_any_open_sheet()` aufruft. Die bestehende Helper-Funktion `_close_any_open_sheet()` (Zeile 1045, „Pattern 17") kannte `AddLocation` bisher nicht. Fix: `AddLocation.close()` in `_close_any_open_sheet()` ergänzt (+ `add-sheet` in die Warteliste), damit jeder nachfolgende Check robust gegen dieses Leck ist — analog zu den bereits dokumentierten Fixes für Filter-Sheet/Rating-Accordion. Kein neues Bug-Ticket nötig (reiner Test-Infrastruktur-Fix, keine sichtbare App-Auswirkung). `py_compile` grün.
@@ -13661,6 +14536,10 @@ Syntaxprüfung (`python3 -m py_compile backend/tests/frontend/run_frontend_check
 | **Status** | Done |
 | **Erstellt** | 2026-07-11 |
 | **Abgeschlossen** | 2026-07-11 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Öffnet man aus der Detailkarte eines Ereignisses (z. B. „Mond-Alignment" für die Location Kirche Bornstedt, Ereignisdatum 18. Juli 2026, ideales Zeitfenster 22:04–22:34 Uhr, Optimum 22:19 Uhr) über den Button „Live-Astro" die Himmelsbahnen-Übersicht, zeigt diese fälschlich das heutige Datum an statt des tatsächlichen Ereignisdatums. Zusätzlich ist die Uhrzeit auf dem Zeit-Schieberegler falsch berechnet (ca. 2 Stunden Versatz). Dadurch zeigt die Übersicht Sonne, Mond und Milchstraßenzentrum fälschlich als „nicht sichtbar" an (z. B. den Mond bei ca. −6,4° Höhe statt korrekt bei +5,2° Höhe), obwohl das zugrunde liegende Alignment-Fenster in der Detailkarte astronomisch korrekt berechnet ist — unabhängig nachgerechnet und bestätigt: Der Mond steht am 18.7.2026 um 22:19 Uhr Berliner Zeit bei +5,2° Höhe klar über dem Horizont, der Monduntergang folgt erst gegen 22:57 Uhr. Das führt zu dem irreführenden Eindruck, das berechnete Zeitfenster sei falsch, obwohl nur die nachträgliche Übersicht fehlerhaft ist.
 
@@ -13825,6 +14704,10 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 | **Status** | Done (auf Stephans Wunsch direkt im Zuge von TASK-67 gefixt statt separat eingeplant, released Workflow-Lauf #199, Commit 8c86fa6, 2026-07-12) |
 | **Erstellt** | 2026-07-12 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Fix (2026-07-12):** `isScoutOnly` (`web/index.html` ~Zeile 3570) von `App.current === 'scout'` (kann strukturell nie zutreffen) auf `App.current === 'feed' && Feed.mode === 'scout'` geändert — Scout ist ein Unter-Modus des Feed-Tabs (`Feed.setMode('scout')`), nicht ein eigener `App.nav()`-Tab. `FilterSheet.open()` ruft `_render()` bei jedem Öffnen frisch auf, die Korrektur greift also sofort beim nächsten Öffnen des Filter-Sheets im Entdecken-Modus. Verifiziert: Der bestehende automatisierte Test `_check_has_image_chip_tristate_and_effect` (`hasimage_dimmed_on_scout`) im echten CI-Lauf #199 grün — Fix bestätigt.
 
 **Beschreibung:** Laut PRODUCT.md soll der „Hat Beispielbild"-Filter-Abschnitt im Entdecken-Modus (Scout) ausgegraut und nicht bedienbar sein, weil Scout-Chancen kein `location_id`-Äquivalent haben (US-129). Die zuständige Bedingung im Code prüft `App.current === 'scout'` (`web/index.html` ~Zeile 3570, `isScoutOnly`) — Scout ist aber gar kein eigener oberster Reiter, sondern nur ein Modus innerhalb des Feeds (`Feed.setMode('scout')`), der `App.current` nie auf `'scout'` setzt. Die Bedingung kann dadurch in der laufenden App nie zutreffen: der Filter bleibt im Entdecken-Modus immer normal bedienbar statt ausgegraut.
@@ -13853,6 +14736,10 @@ Keine offenen Fragen mehr — beide Klärungsfragen sind mit Stephan entschieden
 | **Status** | Done (Commit 8fb5417, Release v1.22.22, CI-Lauf #209 grün, Health-Check bestätigt: version 2.0.0, locations_count 161, 2026-07-13. Zwei Live-Bugs während der Testphase gefunden und gefixt: ungültiger `domains`-Wert „europe" → 400 Bad Request, sowie `cams_europe` liefert keine Aerosoldaten an Berlin/Brandenburg-Koordinaten → auf `cams_global` korrigiert. Unabhängige Verifikation durchlaufen, 62/62 Tests grün. Zwei nicht-kritische Folgepunkte als TASK-73 ausgelagert.) |
 | **Erstellt** | 2026-07-12 |
 | **Abgeschlossen** | 2026-07-13 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** `should_generate_red_sky_event()` (`backend/calculations/weather.py`) löst Himmelsröte (RED_SKY) ausschließlich über Wolkendaten aus (`golden_cloud_score >= 0.80` UND `cloud_cover_low + cloud_cover_mid >= 60 %`) — es gibt kein Aerosol-/Dunst-/Feinstaub-Signal. Konkurrenz-App Viewfindr zeigte am 12.07.2026 99 % Wahrscheinlichkeit für kräftige, weiträumige Rotfärbung nordwestlich von Berlin (Richtung Stechlinsee/Rheinsberger See/Elbtalaue Wittenberge, wo Locations existieren) — das Muster (weiträumig, nicht an lokale Wolkenfelder gebunden) deutet auf einen Aerosol-/Dunst-Effekt hin, den FotoAlert mit der aktuellen Datenbasis prinzipiell nicht erkennen kann.
 
@@ -14277,6 +15164,10 @@ dieselbe Silent-Failure-Klasse erbt.
 | **Erstellt** | 2026-07-12 |
 | **Abgeschlossen** | 2026-07-12 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Himmelsröte-/Goldene-Wolken-Events (RED_SKY/GOLDEN_CLOUDS) werden nicht im nächtlichen Precompute-Batch erzeugt, sondern ausschließlich live zur Laufzeit aus einem Wetter-API-Abruf berechnet (`backend/main.py::_weather_overlay`, Aufruf `fetch_weather_forecast()` Z. 673, gefolgt von `_generate_cloud_mood_events`/`_inject_cloud_mood_events`). Schlägt der Abruf für eine Location fehl, greift Z. 676–677 nur `except Exception as err: logger.warning(...)` — der Fehler wird lediglich geloggt, **ohne** `_job_error()` aufzurufen. `_job_done("weather", t0)` wird am Ende der Funktion (Z. 691) unbedingt aufgerufen, unabhängig davon, ob einzelne oder alle Location-Abrufe fehlgeschlagen sind. Der Job-Status zeigt daher „ok"/„done", obwohl Himmelsröte-Daten für betroffene Locations fehlen — keine Alarmierung, keine Sichtbarkeit für Stephan.
 
 **User Story:** Als App-Host, möchte ich erkennen wenn der Wetter-Abruf für Himmelsröte-Chancen fehlschlägt, sodass ich nicht unbemerkt tagelang fehlende oder falsche Chancen ausliefere.
@@ -14521,6 +15412,10 @@ US-38 gehört, wird hier vorweggenommen.
 | **Priorität** | Niedrig |
 | **Status** | Done (reine Test-Infrastruktur, kein Deploy nötig, 2026-07-12 — **Nachtrag 2026-07-12**: der `@pytest.mark.smoke`-Decorator auf `test_health_ok` war trotz Done-Status nie committet, kein Commit-Bezug hier dokumentiert; erst mit TASK-72-Release Commit `6cf7d79` tatsächlich released, CI-Lauf #205 grün) |
 | **Erstellt** | 2026-07-12 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Das bestehende pytest-Marker-System (`backend/pytest.ini`: `offline`, `network`,
 `api`, `regression`, `frontend`, `slow`) hat keinen Marker für eine kleine, handverlesene Auswahl
@@ -14811,6 +15706,10 @@ Mechanismus. **Bitte im Weg-Gate bestätigen oder Option B/C wählen.**
 | **Status** | Done (reine Test-Infrastruktur, kein Versions-Bump nötig — Commit 6cf7d79, CI-Lauf #205 grün, Health-Check bestätigt version 2.0.0/locations_count 161, 2026-07-12. Enthält zusätzlich den nachgeholten TASK-70-Rest: smoke-Marker auf test_health_ok) |
 | **Erstellt** | 2026-07-12 |
 | **Abgeschlossen** | 2026-07-12 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Seit **TASK-70** gilt die Pflicht, neue Tests mit passenden Markern
 (`offline`/`network`/`api`/`regression`/`slow`/`smoke`) zu taggen — das gilt aber nur für
@@ -15136,6 +16035,10 @@ Testdateien).
 | **Status** | Done |
 | **Abgeschlossen** | 2026-07-14 |
 | **Erstellt** | 2026-07-13 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Release-Hinweis (2026-07-14):** Released v1.22.24, CI-Lauf #213 grün, Health-Check bestätigt
 (version 2.0.0, locations_count 161, 2026-07-14) — gemeinsam mit **US-132** released.
@@ -15843,6 +16746,10 @@ spürbar weiter senken.
 | **Abgeschlossen** | 2026-07-13 |
 | **Erstellt** | 2026-07-13 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Release-Hinweis (2026-07-13):** Released v1.22.23, CI-Lauf #211 grün, Health-Check bestätigt
 (version 2.0.0, locations_count 161, 2026-07-13) — gemeinsam mit **TASK-74** released.
 
@@ -15983,6 +16890,10 @@ US-130 angegangen werden.
 | **Status** | Done |
 | **Abgeschlossen** | 2026-07-14 |
 | **Erstellt** | 2026-07-13 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Release-Hinweis (2026-07-14):** Released v1.22.24, CI-Lauf #213 grün, Health-Check bestätigt
 (version 2.0.0, locations_count 161, 2026-07-14) — gemeinsam mit **US-131** released.
@@ -16451,6 +17362,10 @@ von TASK-74 im Backlog (muss „Done" sein, siehe Pre-Mortem Szenario 5).
 | **Abgeschlossen** | 2026-07-13 |
 | **Erstellt** | 2026-07-13 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Zwei Funktionen in `backend/main.py` überschreiten durch die US-130-Erweiterung
 (paralleler Aerosol-Abruf + Dunst-Zweig) den 80-Zeilen-Threshold von `tools/refactor_check.py`:
 - `_generate_cloud_mood_events()` Z. 559 — 88 Zeilen (Threshold: 80)
@@ -16703,14 +17618,15 @@ unterschritten wird.
 
 ---
 
-### TASK-75 · Wetter-API-Drosselung (Semaphore/Pacing) empirisch kalibrieren `[ ]`
+### TASK-75 · Wetter-API-Drosselung (Semaphore/Pacing) empirisch kalibrieren `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-14 |
+| **Abgeschlossen** | 2026-07-22 |
 
 **Beschreibung:** Im Rahmen von **US-131** wurde zur Vermeidung von Rate-Limiting (`429 Too Many
 Requests`) durch die externe Open-Meteo-API eine Drosselung in `backend/main.py`
@@ -16748,6 +17664,19 @@ angehen, da dieselbe Codestelle betroffen ist.
 
 **Quelle:** fotoalert-intake, 2026-07-14
 
+**Geschlossen (Nachtrag 2026-07-22, im Zuge von BUG-83, Stephans Entscheidung):** BUG-83 hat
+dieselbe Codestelle (`WEATHER_API_MAX_CONCURRENT_REQUESTS`/`WEATHER_API_REQUEST_PACING_SECONDS`
+in `backend/main.py`) anhand echter Daten weiter nachjustiert (5→4 / 0.15→0.25) UND zusätzlich
+einen automatischen Retry bei HTTP 429 eingeführt (bis zu 2 Versuche mit steigender Wartezeit,
+`WEATHER_API_MAX_RETRIES_ON_429`/`WEATHER_API_RETRY_BACKOFF_BASE_SECONDS`). Der Retry entschärft
+das eigentliche Kernanliegen dieses Tickets strukturell: einzelne 429-Treffer fangen sich jetzt
+innerhalb desselben Laufs selbst ab, statt als sichtbarer Fehler aufzutauchen oder auf den
+nächsten 3h-Cronlauf zu warten. Live-Test (BUG-83) bestätigte 0 Fehler / 100 % Erfolg bei den
+aktuellen Werten. Eine darüber hinausgehende, systematische empirische Messreihe (mehrere
+Semaphore/Pacing-Kombinationen gezielt live durchmessen für einen mathematisch optimalen Punkt)
+fand nicht statt und bleibt ein theoretischer Rest — bei bereits „Priorität Niedrig" und durch
+den Retry entschärftem Schmerzpunkt aber kein ausreichender Grund, das Ticket offen zu halten.
+
 ---
 
 ### TASK-77 · Cleanup bei Location-Löschung: `location_qa_state`/`location_qa_values` mitentfernen `[x]`
@@ -16759,6 +17688,10 @@ angehen, da dieselbe Codestelle betroffen ist.
 | **Status** | Done |
 | **Erstellt** | 2026-07-14 |
 | **Abgeschlossen** | 2026-07-14 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** `delete_location()` (`backend/main.py` Z.3191–3233, US-68) bereinigt beim Löschen/Tombstonen einer Location aktuell `LOCATIONS`, `custom_locations`/Override-Tombstone, die Bilddatei sowie Feed-/Kalender-Cache — aber nicht die beiden QA-Tabellen `location_qa_state` und `location_qa_values`. Laut TASK-62-Analyse (Regel 2) existiert im gesamten Backend kein einziger `DELETE`-Befehl gegen diese beiden Tabellen (Grep negativ). Das ist eine bestätigte, aktuell reine Code-Lücke — keine bewusste Entscheidung. Sie ist vermutlich **nicht** die Ursache der 15 aktuell in TASK-62 beobachteten verwaisten `location_qa_values`-Einträge (siehe TASK-62 Pre-Mortem Szenario 3 und TASK-78 für die wahrscheinlichere Ursache), stellt aber ein reales strukturelles Risiko für künftige Löschungen dar: Eine zuvor QA-geprüfte, gelöschte Location hinterlässt sonst dauerhaft verwaiste Zeilen unter derselben `location_id`.
 
@@ -16944,6 +17877,10 @@ Scope Creep auf ein nicht existierendes Feature.
 | **Erstellt** | 2026-07-14 |
 | **Abgeschlossen** | 2026-07-14 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** `_qa_improve_one()` (`backend/main.py` Z.1517–1567) ruft beim automatischen Aktualisieren der QA-Werte pro Location die drei Teilschritte Azimut (`update_location_azimuth()`, `backend/data/qa_azimuth.py` Z.391–428), Brennweite (`update_location_focal()`, `backend/data/qa_focal.py` Z.84–122) und Beschreibung (`update_location_description()`, `backend/data/qa_description.py` Z.107–173) nacheinander auf, jeweils in einem eigenen try/except (Z.1533–1566 in `main.py`). Nur `update_location_description()` schluckt DB-Fehler intern; Azimut- und Brennweiten-Update sind **nicht** gegen DB-Fehler abgesichert (kein eigenes try/except um `store.set_qa_values()`). Schreibt z. B. der Azimut-Schritt erfolgreich in `location_qa_values`, wirft aber ein nachfolgender Schritt eine SQLite-Exception (z. B. „database is locked"), wird `update_qa_checked()` (`main.py` Z.1620, in `_run_qa_pass`) für diese Location nicht aufgerufen — laut TASK-62-Analyse (Regel 3) die plausibelste Ursache für die dort beobachteten 15 `location_qa_values`-Einträge ohne passenden `location_qa_state`-Eintrag.
 
 **User Story:** Als Betreiber der App, möchte ich, dass ein fehlgeschlagener Teilschritt beim automatischen Aktualisieren der QA-Werte den Lauf nicht in einem inkonsistenten Zwischenzustand zurücklässt, sodass keine `location_qa_values`-Zeilen ohne zugehörigen `location_qa_state`-Eintrag mehr entstehen können.
@@ -17063,6 +18000,10 @@ Siehe Implementierungsoptionen unten — diese Frage ist deckungsgleich mit der 
 | **Gewählte Option** | Option B — Ephemeride in CI cachen (GitHub Actions Cache) + Timeout-Absicherung, freigegeben von Stephan am Weg-Gate 2026-07-14 |
 | **Implementierung** | Cache-Step (`actions/cache@v4`, Key `de421-bsp-v1`) + Vorab-Download-Fallback (`curl --max-time 90`, `timeout-minutes: 2`) in `.github/workflows/deploy.yml`; Kommentar-Fix + Marker-Korrektur (`test_moon_earth_distance_in_physical_range` → `online`) in `test_astronomy_regression.py`; neuer Test `test_bug79_ci_ephemeris_skip.py`. Lokal isoliert 15/15 grün (inkl. 3 online-Tests). Volle Suite: 573 passed, 2 skipped, 3 failed — alle 3 Fehlschläge vorbestehend/unabhängig verifiziert (TASK-68-Flakiness, Sandbox-Datei-Löschrechte), nicht durch diese Änderung verursacht. |
 | **Release** | Commit `d699644` gepusht (kein Frontend-Release nötig, kein Versionsbump). CI-Run #227: Backend-Tests grün (2m42s), Cache-Miss + Download real beobachtet. Re-Run (gleicher Commit): „Cache hit for: de421-bsp-v1" / „Cache restored successfully", Download-Schritt korrekt übersprungen (0s). Alle 3 CI-Jobs beim Re-Run grün (Frontend-Check war beim ersten Lauf rot mit Playwright-Timeout — unabhängiger Flake, beim Re-Run grün). Live-Health-Check bestätigt: `{"status":"ok","version":"2.0.0","locations_count":161}` (unverändert, erwartungsgemäß). |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Verifikations-Notiz (2026-07-14, separater Subagent):** AK1–AK4 vollständig durch Code + CI-Log belegt. AK5–AK7 nur teilweise formal belegt (kein wörtliches „3 passed"-Log-Zitat für die online-Tests, kein realer Server-Ausfall-Testlauf, kein expliziter Vorher/Nachher-Zahlenvergleich) — inhaltlich plausibel über den grünen CI-Gesamtstatus, aber nicht einzeln nachgewiesen. Zwei dokumentierte Restrisiken, kein Blocker: (1) der neue Guard-Test `test_no_offline_marked_test_uses_known_get_eph_path` erkennt nur direkte (1-Hop) `_get_eph()`-Aufrufe — `get_body_position()` ruft `_get_eph()` nur transitiv über `_get_body_position_direct()` auf und würde von einem künftigen, fälschlich `offline`-markierten Test darüber nicht erkannt; (2) Timeout-Mechanismus (AK2/AK6) ist strukturell vorhanden, aber nie durch einen echten Server-Ausfall real ausgelöst worden. Gesamturteil: verifiziert, Nacharbeit optional (Guard-Test-Erweiterung), kein Release-Blocker.
 
@@ -17489,6 +18430,10 @@ Pre-Mortem und Testplan oben wurden entsprechend angepasst.
 | **Freigegeben** | 2026-07-15 |
 | **Abgeschlossen** | 2026-07-15 |
 
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+
 **Beschreibung:** Neben dem primären `.github/workflows/deploy.yml` existiert ein zweiter Workflow `.forgejo/workflows/deploy.yml` (Codeberg/Forgejo-Spiegel, laut Kopfkommentar „Automatisches Deployment via Forgejo Actions (Codeberg)"). Der BUG-79-Fix (GitHub-Actions-Cache-Step für `de421.bsp` unter Key `de421-bsp-v1` + timeout-abgesicherter Fallback-Download im `test-backend`-Job) wurde nur in `.github/workflows/deploy.yml` umgesetzt. Verifiziert: Der `test-backend`-Job in `.forgejo/workflows/deploy.yml` (Zeilen 98–118) enthält weiterhin nur `pip install -r requirements.txt` + `pytest tests/ -v`, keinen Cache-Step, keine Timeout-Absicherung um den `de421.bsp`-Download. Falls diese Forgejo/Codeberg-Pipeline aktiv genutzt wird, besteht dort weiterhin das ursprüngliche BUG-79-Problem: ein ungemockter, timeout-loser ~17-MB-Download, der einen CI-Lauf unbemerkt bis zum 15-Minuten-Job-Timeout blockieren kann.
 
 **Offene Frage (für die Analyse-Phase, nicht hier geklärt):** Wird `.forgejo/workflows/` überhaupt aktiv von einer Forgejo/Codeberg-Instanz ausgeführt, oder ist es totes/unbenutztes Konfigurationsmaterial (z. B. Altlast aus einem früheren Spiegel-Setup)? Das entscheidet, ob dieses Ticket ein reales Betriebsrisiko oder reine Aufräumarbeit ist.
@@ -17683,15 +18628,53 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 
 ---
 
+### TASK-92 · Security-Audit 2026-07-16 (Epic) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task (Epic) |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-07-16 |
+
+**Beschreibung:** Dach-Ticket für die Funde aus dem Sicherheits-Audit vom 2026-07-16 (Angriffsflächen, unzureichend geschützte Daten und Schutzmaßnahmen über Backend, Infrastruktur/Caddy und Frontend/PWA). Bündelt die Kern-Tickets aus dem Audit sowie die während der Umsetzung entstandenen Folge-Tickets. Kein eigener Code — reines Tracking.
+
+**User Story:** Als Nutzer und Betreiber, möchte ich, dass die im Audit gefundenen Schwachstellen nachvollziehbar gebündelt und geschlossen werden, sodass die App und meine Daten wirksam geschützt sind und kein Fund verloren geht.
+
+**Kind-Tickets — Kern (aus dem Audit):**
+1. **TASK-82** — Schutz-Header + Content-Security-Policy live ausliefern (Caddy) · ✅ **Done**
+2. **BUG-81** — Gespeicherte Schadskripte über ungefilterte Texte unterbinden (XSS) · ✅ **Done**
+3. **TASK-83** — Login-Ticket vor Skript-Zugriff schützen (HttpOnly-Cookie statt Browser-Speicher) · ✅ **Done**
+4. **TASK-84** — Externe Skripte mit Echtheitsprüfung (SRI) laden · ✅ **Done**
+5. **TASK-85** — App bei fehlendem Auth-Geheimnis hart abbrechen (Notwert entfernen) · ✅ **Done**
+6. **TASK-86** — Offene Endpunkte gegen Missbrauch härten (Last, Login-Bremse, CORS) · ✅ **Done**
+7. **TASK-87** — Kleinere Sicherheits-Härtungen (Sammelticket) · ⬜ **ToDo**
+
+**Kind-Tickets — Folge (während der Umsetzung entstanden):**
+1. **TASK-89** — Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern · ⬜ **ToDo** · Herkunft: Fund während TASK-82-Testphase
+2. **TASK-90** — Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln · ⬜ **ToDo** · Herkunft: Beobachtung während TASK-82-Testphase
+3. **TASK-91** — Test `test_dedup_best_per_day_keeps_only_highest_score` auf gepinntes Datum umstellen · ⬜ **ToDo** · Herkunft: Fund im TASK-83-Release-CI-Lauf
+4. **BUG-82** — Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht · ✅ **Done** · Herkunft: entdeckt beim Testen von BUG-81
+5. **TASK-88** — Release-Skript: Merge-Konflikt darf keinen Ad-hoc-Commit ohne Standard-Message/Tag hinterlassen · ⬜ **ToDo** · Herkunft: Retrospektive zu US-133 (Release v1.22.34)
+
+**Quelle:** Security-Audit 2026-07-16 · Dach-Ticket wiederhergestellt 2026-07-23 (nach Verlust durch Pipeline-Lauf)
+
+---
+
 ### TASK-82 · Schutz-Header + Content-Security-Policy live ausliefern (Caddy) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Hoch |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
 | **Abgeschlossen** | 2026-07-16 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Weg-Gate-Entscheidung (von Stephan bestätigt, 2026-07-16):** Option B (Header + dauerhafter automatischer Abgleich in `deploy/deploy.sh`). Beide offenen Wahlfragen bestätigt: (1) eingebetteter Code bleibt von der Inhalts-Sicherheitsregel ausgenommen, (2) Testfeld für fremde Server-Adresse wird auf „nur eigene Adresse" eingeschränkt.
 
@@ -17808,10 +18791,15 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
 | **Abgeschlossen** | 2026-07-17 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 **Beschreibung:** Das Sitzungs-Ticket liegt im `localStorage` und ist damit für jedes Skript lesbar — jede XSS-Lücke wird dadurch direkt zum Ticket-Diebstahl. Zusätzlich lässt sich die Backend-Adresse (`fa_api`) per Eingabe/Skript auf einen fremden Server umbiegen, wodurch künftige Anfragen samt Ticket dorthin gingen. Umstellen auf HttpOnly/Secure/SameSite-Cookie; `fa_api` auf eine Allow-Liste begrenzen.
 
@@ -17889,10 +18877,15 @@ Ausgeschlossen: die native iOS-App (sendet laut Code-Verifikation keinen Auth-He
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
 | **Abgeschlossen** | 2026-07-17 |
+
+**Retro:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Refactor-Check:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
+**Verifikation:** ⤼ Stephan 2026-07-02: Altbestand vor Gate-Erweiterung, kein Backfill
 
 ✅ **Weg-Gate-Freigabe (Stephan, 2026-07-16):** Option B (Bibliotheken selbst hosten, inkl. Leaflet-CSS) gewählt.
 
@@ -17989,10 +18982,11 @@ Ausgeschlossen: die native iOS-App (sendet laut Code-Verifikation keinen Auth-He
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
-| **Erstellt** | 2026-07-16 |
 | **Abgeschlossen** | 2026-07-22 |
+| **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** Fehlt die Umgebungsvariable `FOTOALERT_AUTH_SECRET`, fällt die App still auf einen im Code hinterlegten, öffentlich bekannten Notwert zurück — damit ließe sich ein Admin-Ticket ohne Passwort berechnen. Aktuell **nicht** ausnutzbar (Live-Prüfung am 2026-07-16: das Geheimnis ist in `/opt/fotoalert/app/FotoAlert/backend/.env` gesetzt), aber ein latentes Risiko bei jedem künftigen Deploy ohne `.env`. Notwert entfernen, Start hart abbrechen wenn das Geheimnis fehlt.
 
@@ -18046,7 +19040,7 @@ def _secret() -> str:
 
 **Empfehlung: Option A** — erfüllt „hart abbrechen beim Start" am direktesten und frühesten, ist die kleinste Änderung genau an der Stelle, wo der Notwert heute steht, und die Testsuite ist nachweislich unbetroffen.
 
-**Nachtrag (2026-07-22, v1.22.43):** Zwei kleine Nachbesserungen aus der Refactor-Phase ergänzt: `_load_secret()` behandelt jetzt auch einen reinen Leerzeichen-Wert als „fehlt" (`if not value.strip():` statt `if not value:`), und der Login-Flow-Test in `test_task-85.py` trägt zusätzlich den `api`-Marker (Testkonvention). Kein neuer Funktionsumfang. Volle Backend-Regressionssuite weiterhin grün (662 passed / 5 failed — alle 5 Fehlschläge nachweislich TASK-86-Regressionen bzw. bekannte Altlasten, keiner in `test_task-85.py`). Released als v1.22.43, CI grün (Frontend-Check Playwright, Backend-Tests pytest, Deploy FotoAlert), Health-Check bestätigt (`version 2.0.0`, `locations_count 172`) auf https://fotoalert.stephanschumann.com.
+**Nachtrag (2026-07-22, v1.22.43):** Zwei kleine Nachbesserungen aus der Refactor-Phase ergänzt: `_load_secret()` behandelt jetzt auch einen reinen Leerzeichen-Wert als „fehlt“ (`if not value.strip():` statt `if not value:`), und der Login-Flow-Test in `test_task-85.py` trägt zusätzlich den `api`-Marker (Testkonvention). Kein neuer Funktionsumfang. Volle Backend-Regressionssuite weiterhin grün (662 passed / 5 failed — alle 5 Fehlschläge nachweislich TASK-86-Regressionen bzw. bekannte Altlasten, keiner in `test_task-85.py`). Released als v1.22.43, CI grün (Frontend-Check Playwright, Backend-Tests pytest, Deploy FotoAlert), Health-Check bestätigt (`version 2.0.0`, `locations_count 172`) auf https://fotoalert.stephanschumann.com.
 
 ---
 
@@ -18055,6 +19049,7 @@ def _secret() -> str:
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Mittel |
 | **Status** | Done |
 | **Erstellt** | 2026-07-16 |
@@ -18190,6 +19185,7 @@ Verworfene Alternative: etablierte Rate-Limiting-Bibliothek (z. B. `slowapi`) �
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -18215,6 +19211,7 @@ Verworfene Alternative: etablierte Rate-Limiting-Bibliothek (z. B. `slowapi`) �
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -18236,6 +19233,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -18253,6 +19251,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-16 |
@@ -18270,6 +19269,7 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
+| **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
 | **Status** | ToDo |
 | **Erstellt** | 2026-07-17 |

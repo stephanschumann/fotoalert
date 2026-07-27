@@ -104,7 +104,12 @@ def main():
     tickets = parse_backlog(text)
     template = open(TEMPLATE, encoding="utf-8").read()
     stamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    html = template.replace("__TICKETS_JSON__", json.dumps(tickets, ensure_ascii=False)).replace("__STAMP__", stamp)
+    tickets_json = json.dumps(tickets, ensure_ascii=False)
+    # Sicherheitsnetz: Tickets duerfen Text wie "<script>...</script>" enthalten (z.B. XSS-Testfaelle).
+    # Ohne Escaping beendet der HTML-Parser das umschliessende <script>-Tag an dieser Stelle vorzeitig
+    # und der Rest der Seite wird als Rohtext dargestellt statt als Kanban-Board zu rendern.
+    tickets_json = tickets_json.replace("</", "<\\/")
+    html = template.replace("__TICKETS_JSON__", tickets_json).replace("__STAMP__", stamp)
     out_path = os.path.join(out_dir, "fotoalert-kanban.html")
     open(out_path, "w", encoding="utf-8").write(html)
     from collections import Counter

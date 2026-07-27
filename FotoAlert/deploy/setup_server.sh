@@ -121,6 +121,18 @@ systemctl enable --now fotoalert-precompute.timer
 
 echo ">>> Services gestartet."
 
+# ── Caddy-Log-Verzeichnis mit korrekten Rechten vorbereiten (TASK-89) ────────
+# Das Caddyfile enthält eine log{}-Direktive auf /var/log/caddy/fotoalert.log.
+# `caddy validate` (z.B. in deploy.sh vor jedem Reload) läuft als root und
+# würde die Zieldatei beim allerersten Anlegen mit root-Besitzrechten
+# erstellen, bevor der unprivilegierte "caddy"-Dienstuser sie öffnen kann →
+# Reload scheitert mit "permission denied" (live aufgetreten bei TASK-82).
+# Verzeichnis/Datei deshalb hier vorsorglich mit dem "caddy"-User anlegen,
+# BEVOR ein `caddy validate`/reload-Lauf sie anfassen kann.
+mkdir -p /var/log/caddy
+touch /var/log/caddy/fotoalert.log
+chown -R caddy:caddy /var/log/caddy
+
 # ── Caddy konfigurieren ──────────────────────────────────────────────────────
 echo ">>> Caddy konfigurieren..."
 cp "$DEPLOY_DIR/Caddyfile" /etc/caddy/Caddyfile

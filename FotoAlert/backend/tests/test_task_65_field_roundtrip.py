@@ -32,7 +32,7 @@ import dataclasses
 
 import pytest
 
-from data.locations import PhotoLocation, LOCATION_FIELD_RULES
+from data.locations import PhotoLocation, LOCATION_FIELD_RULES, LocationCategory
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -45,7 +45,6 @@ pytestmark = [pytest.mark.api, pytest.mark.regression]
 # ---------------------------------------------------------------------------
 FIELD_EXCEPTIONS: dict[str, str] = {
     "id": "Primärschlüssel, strukturell, nie über den generischen PATCH-Endpoint änderbar.",
-    "category": "Enum, wird nur bei Anlage gesetzt; kein PATCH-Pfad in main.py:patch_location.",
     "elevation_difference_m": "Wird serverseitig aus DEM-Höhendaten berechnet (main.py:_elevation_provider), kein Host-Eingabefeld.",
     "distance_m": "Rein informativer, berechneter Wert; kein PATCH-Pfad in main.py:patch_location vorgesehen.",
     "best_times": "Liste, kein PATCH-Pfad in main.py:patch_location vorgesehen (nur Code-Pflege/Locationscout-Import).",
@@ -54,7 +53,6 @@ FIELD_EXCEPTIONS: dict[str, str] = {
     "lunar_alignment_note": "Freitext, aber kein PATCH-Pfad in main.py:patch_location vorgesehen (nur Code-Pflege in data/locations.py).",
     "access_note": "Freitext, aber kein PATCH-Pfad in main.py:patch_location vorgesehen (nur Code-Pflege in data/locations.py).",
     "locationscout_url": "Freitext, aber kein PATCH-Pfad in main.py:patch_location vorgesehen (nur Code-Pflege in data/locations.py).",
-    "difficulty": "Nur bei Anlage/Custom-Location-Erstellung gesetzt; kein PATCH-Pfad in main.py:patch_location vorgesehen.",
     "sightline_status": "Wird ausschließlich vom Sichtachsen-Check gesetzt (US-09, /sightline-refresh), kein Host-PATCH-Pfad.",
     "sightline_angle_deg": "Wird ausschließlich vom Sichtachsen-Check gesetzt (US-09, /sightline-refresh), kein Host-PATCH-Pfad.",
 }
@@ -131,7 +129,27 @@ def _test_values(kind: str, field_name: str):
         return 20.0, 77.0  # image_focus_x/y: Prozentwerte 0-100
     if kind == "flag":
         return False, True
+    # BUG-84: category wird ueberall (SQLite/Override-JSON/PATCH-Body) als
+    # LocationCategory-Enum-Member-NAME (String, z.B. "WASSER") gehalten -- die
+    # Roundtrip-Funktionen konvertieren das beim setattr in eine echte
+    # LocationCategory-Instanz (siehe coerce_category_value), siehe _comparable()
+    # unten fuer den kind-uebergreifenden Werte-Vergleich danach.
+    if kind == "category":
+        return "SKYLINE", "WASSER"
+    # BUG-84: difficulty ist ein int in {1,2,3} (1=einfach, 3=schwer).
+    if kind == "difficulty":
+        return 1, 3
     raise ValueError(f"Unbekannter Feld-'kind': {kind!r} (Feld: {field_name})")
+
+
+def _comparable(value):
+    """BUG-84: Normalisiert eine LocationCategory-Enum-Instanz auf ihren Member-Namen,
+    damit die generischen (kind-unabhängigen) Rundreise-Assertions unten weiterhin per
+    einfachem `==` gegen den rohen, ueberall persistierten Namens-String (z.B. "WASSER")
+    vergleichen koennen. Fuer alle anderen Feld-"kind"s ist dies die Identitätsfunktion."""
+    if isinstance(value, LocationCategory):
+        return value.name
+    return value
 
 
 _ALL_FIELDS = sorted(LOCATION_FIELD_RULES.items())
@@ -164,13 +182,13 @@ class TestStandardLocationOverrideReloadRoundtrip:
         M._load_location_overrides()
 
         if rule["override_reload"]:
-            assert getattr(loc, field_name) == new_val, (
+            assert _comparable(getattr(loc, field_name)) == new_val, (
                 f"Feld '{field_name}' hat override_reload=True in LOCATION_FIELD_RULES, "
                 "überlebt aber keinen simulierten Server-Neustart "
                 "(main._load_location_overrides) -- Regressionsschutz für BUG-68."
             )
         else:
-            assert getattr(loc, field_name) == old_val, (
+            assert _comparable(getattr(loc, field_name)) == old_val, (
                 f"Feld '{field_name}' hat override_reload=False -- der alte Wert muss "
                 "unverändert bleiben (bewusste Ausnahme, z.B. image_filename)."
             )
@@ -201,13 +219,13 @@ class TestStandardLocationPrecomputeReloadRoundtrip:
 
         assert applied == 1
         if rule["precompute_reload"]:
-            assert getattr(loc, field_name) == new_val, (
+            assert _comparable(getattr(loc, field_name)) == new_val, (
                 f"Feld '{field_name}' hat precompute_reload=True in LOCATION_FIELD_RULES, "
                 "der precompute-Subprozess rechnet aber weiter mit dem alten Wert "
                 "(precompute._apply_location_overrides) -- BUG-29/BUG-68-Muster."
             )
         else:
-            assert getattr(loc, field_name) == old_val, (
+            assert _comparable(getattr(loc, field_name)) == old_val, (
                 f"Feld '{field_name}' hat precompute_reload=False -- das ist eine bewusste, "
                 "dokumentierte Ausnahme (z.B. image_filename), der alte Wert muss bestehen "
                 "bleiben. Kein Fehlalarm laut AK 5/Pre-Mortem Szenario 2."
@@ -277,7 +295,7 @@ class TestCustomLocationOverrideReloadRoundtrip:
 
         loc = next((l for l in M.LOCATIONS if l.id == entry["id"]), None)
         assert loc is not None, "Custom-Location wurde nicht aus dem Fake-Store geladen."
-        assert getattr(loc, field_name) == new_val, (
+        assert _comparable(getattr(loc, field_name)) == new_val, (
             f"Feld '{field_name}' einer Custom-Location überlebt keinen simulierten "
             "Server-Neustart (main._load_custom_locations) -- Custom-Locations nutzen "
             "einen eigenen Speicherweg (Rule 4), unabhängig von der Override-Tabelle."
@@ -318,13 +336,13 @@ class TestCustomLocationPrecomputeReloadRoundtrip:
         # den neuen Wert" das korrekte, dokumentierte Verhalten (kein Fehlalarm).
         if rule["precompute_reload"] and rule["kind"] != "image":
             assert added == 1
-            assert getattr(loc, field_name) == new_val, (
+            assert _comparable(getattr(loc, field_name)) == new_val, (
                 f"Feld '{field_name}' einer Custom-Location wird vom precompute-Subprozess "
                 "nicht mit dem neuen Wert gesehen (precompute._load_custom_locations) -- "
                 "BUG-33-Muster-Wiederholung."
             )
         else:
-            actual = getattr(loc, field_name, None)
+            actual = _comparable(getattr(loc, field_name, None))
             assert actual != new_val, (
                 f"Feld '{field_name}' hat precompute_reload=False (oder ist ein Bild-Feld) "
                 "-- precompute darf den neuen Wert nicht sehen. Wenn dieser Assert fehlschlägt, "

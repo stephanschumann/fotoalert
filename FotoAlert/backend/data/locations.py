@@ -28,6 +28,25 @@ class LocationCategory(str, Enum):
     MILCHSTRASSE = "Milchstraße & Astro"
 
 
+def coerce_category_value(value) -> "LocationCategory":
+    """BUG-84: Wandelt einen rohen Kategorie-Wert (Enum-Member-Name als String, z.B.
+    aus einem PATCH-Body oder einem persistierten Override/einer Custom-Location) in
+    eine LocationCategory-Enum-Instanz um. Ist der Wert bereits eine Instanz, wird er
+    unverändert zurückgegeben (idempotent).
+
+    Faellt bei einem nicht zuordenbaren Wert auf SKYLINE zurueck (AK6 Edge Case)
+    statt eine Exception zu werfen -- ein einzelner ungueltiger/veralteter
+    Kategorie-Wert (z.B. aus einer alten Override-Zeile) darf weder das
+    Bearbeiten-Formular unbenutzbar machen noch GET /locations fuer ALLE Locations
+    mit einem 500 abstuerzen lassen (Pre-Mortem Szenario 1, BACKLOG.md BUG-84)."""
+    if isinstance(value, LocationCategory):
+        return value
+    try:
+        return LocationCategory[value]
+    except (KeyError, TypeError):
+        return LocationCategory.SKYLINE
+
+
 class BestTime(str, Enum):
     GOLDEN_MORNING = "Goldene Stunde Morgen"
     GOLDEN_EVENING = "Goldene Stunde Abend"
@@ -162,6 +181,22 @@ LOCATION_FIELD_RULES: dict[str, dict] = {
     # precompute.py braucht dieses Feld nicht (build_subjects()/_is_placeholder() laufen
     # ausschließlich im main.py-Serverprozess, nie im precompute-Subprozess).
     "subject_height_researched": {"kind": "flag", "recompute": False, "override_reload": True, "precompute_reload": False},
+
+    # BUG-84: category/difficulty waren zuvor NICHT patchbar -- das Bearbeiten-Formular
+    # zeigte sie zwar an, ein PATCH wurde aber von PATCHABLE_LOCATION_FIELDS (unten)
+    # stillschweigend verworfen (kein Eintrag hier). "category" braucht eine gezielte
+    # Enum-Konvertierung an jeder Stelle, die den Wert per setattr auf eine
+    # PhotoLocation schreibt (main.py:patch_location/_load_location_overrides,
+    # precompute.py:_apply_location_overrides) -- siehe coerce_category_value() oben
+    # und Pre-Mortem Szenario 1 (BACKLOG.md BUG-84): ein roher String ohne Konvertierung
+    # in loc.category würde beim nächsten GET /locations mit `loc.category.value`
+    # crashen (Strings haben kein .value), fuer ALLE Locations, nicht nur die editierte.
+    "category": {"kind": "category", "recompute": False, "override_reload": True, "precompute_reload": True},
+    # difficulty (1=einfach .. 3=schwer) braucht keine Typ-Konvertierung wie category,
+    # aber eine eigene Validierung (nur 1/2/3 gueltig) statt der generischen
+    # "numeric"-Regel (die würde auf float casten -- schemas.py:LocationOut.difficulty
+    # ist int).
+    "difficulty": {"kind": "difficulty", "recompute": False, "override_reload": True, "precompute_reload": True},
 }
 
 # Abgeleitete Sichten (jeweils zur Laufzeit aus LOCATION_FIELD_RULES berechnet,
@@ -170,6 +205,11 @@ COORD_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"]
 TEXT_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "text")
 NUMERIC_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "numeric")
 LIST_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "list")
+# BUG-84: eigene "kind"-Sichten fuer category/difficulty (siehe LOCATION_FIELD_RULES-
+# Kommentar oben) -- category braucht Enum-Konvertierung, difficulty eine 1/2/3-Regel;
+# beide passen nicht zu den bestehenden "text"/"numeric"-Validierungen.
+CATEGORY_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "category")
+DIFFICULTY_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "difficulty")
 # Über den generischen PATCH-Endpoint akzeptierte Felder (main.py:patch_location) —
 # "image"- und "flag"-Felder bewusst ausgeschlossen (eigener Endpoint bzw. reiner
 # Seiteneffekt, kein direkt vom Host patchbarer Wert; unverändertes Verhalten für image).

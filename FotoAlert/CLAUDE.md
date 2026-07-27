@@ -114,5 +114,16 @@ Verifikations-Subagent (§ Verifikation).
   (Release/Test-Dialoge) — dort ist der Fehlreflex am stärksten. 11-fach rückfällig trotz
   globaler Memory `feedback_no_tool_call_before_text_answer` — deshalb hier zusätzlich verankert,
   weil diese Datei bei jedem Chat-Start geladen wird (globale Memory offenbar nicht ausreichend).
+- **Nach Retro (Pflicht, siehe §2/§3):** Zeile `**Retro:** ✅ <Datum> — <Notiz>` ins Ticket
+  schreiben — das ist der maschinenlesbare Nachweis, den `tools/gate_check.py` prüft (siehe
+  `docs/gate-status-konvention.md`).
+- **Nach `refactor_check.py` (Pflicht vor Release):** Ergebnis als
+  `**Refactor-Check:** ✅/⤼ <Datum> — <Zusammenfassung der Befunde>` ins Ticket schreiben.
+- **Verifikations-Dispatch (Pflicht vor dem Release-Gate):** ein **frischer** Subagent (nicht der
+  Impl-Kontext — vermeidet den Bias, dass derselbe Kontext, der den Code geschrieben hat, ihn auch
+  „grün" prüft) bekommt Diff + Akzeptanzkriterien des Tickets, liefert pass/fail je AK + gefundene
+  Risiken zurück und schreibt `**Verifikation:** ✅/⬜ <Datum> — <Urteil>` ins Ticket. Ein Urteil
+  „fail" ist kein automatisch nachholbarer Fall, sondern ein echter Befund → Stephan-Entscheidung
+  (Halt + Frage).
 
 Vollständige Details und Warum: siehe Memory-Dateien und `FotoAlert/PIPELINE.md` §3.5/§3.6.

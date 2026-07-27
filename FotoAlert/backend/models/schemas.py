@@ -23,6 +23,10 @@ class LocationOut(BaseModel):
     name: str
     description: str
     category: str
+    # BUG-84: kanonische Quelle fuers Bearbeiten-Formular-Dropdown -- vorher fehlte dieses
+    # Feld komplett in der Response, das Frontend las `category_key`, das nie geliefert
+    # wurde, und fiel deshalb immer auf einen festen Default zurück (Ursache des Bugs).
+    category_key: str
     observer_lat: float
     observer_lon: float
     subject_lat: Optional[float]

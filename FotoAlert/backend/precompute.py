@@ -48,7 +48,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from calculations.opportunity import find_opportunities, find_opportunities_multi_day
 from calculations.astronomy import get_moon_earth_distance_km, MOON_DIAMETER_KM, get_body_position
 from data.locations import (
-    LOCATIONS, PhotoLocation, LocationCategory, PRECOMPUTE_OVERRIDE_FIELDS,
+    LOCATIONS, PhotoLocation, LocationCategory, coerce_category_value, PRECOMPUTE_OVERRIDE_FIELDS,
 )
 from data.store import LocationStore
 
@@ -173,12 +173,20 @@ def _apply_location_overrides() -> int:
         loc = loc_map.get(ov.get("id"))
         if not loc:
             continue
+        # BUG-84: "category" wird als Enum-Member-Name (String) im Override gespeichert --
+        # vor dem setattr gezielt zurück in eine LocationCategory-Instanz konvertieren
+        # (spiegelt main.py:_load_location_overrides, siehe Docstring oben).
         for field in _OVERRIDE_FIELDS:
-            if field in ov:
-                try:
-                    object.__setattr__(loc, field, ov[field])
-                except Exception:
-                    setattr(loc, field, ov[field])
+            if field not in ov:
+                continue
+            value = ov[field]
+            if field == "category":
+                value = coerce_category_value(value)
+            # Refactor (BUG-84): dupliziertes try/except object.__setattr__-Muster durch
+            # den bereits vorhandenen _set_loc_attr-Helfer ersetzt (unten definiert, gleiche
+            # Semantik -- funktioniert auch bei frozen/slots-Dataclasses). Kein Verhaltens-
+            # unterschied, nur eine gemeinsame Quelle statt zweier identischer Implementierungen.
+            _set_loc_attr(loc, field, value)
         applied += 1
     if applied:
         logger.info("Location-Overrides angewendet: %d (Koordinaten-/Name-Korrekturen)", applied)

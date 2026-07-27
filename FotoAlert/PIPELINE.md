@@ -169,6 +169,29 @@ So bedeutet „Karte nach Ready for Analysis schieben" künftig konkret: der Ana
 beginnt sofort mit Pre-Mortem + Spec. Die **Implementierung** startet aber erst hinter deinem
 Weg-Gate (`Ready for Dev`) — das Gate-Schieben löst nie direkt Code-Änderungen aus.
 
+**Heartbeat-Sweep (Aufgabe C) — geplant, noch kein realer Scheduled Task (Stand 2026-07-22):**
+Ein wiederkehrender `fotoalert-pipeline-heartbeat`-Lauf wird an mehreren Stellen dieses Dokuments
+und in `docs/2026-07-02-pipeline-gate-reliability-design.md` erwähnt, existiert aber — geprüft
+per `list_triggers` — aktuell **nicht** als echter Scheduled Task in diesem Account. Diese Lücke
+gehört zum selben, in jenem Design-Dokument (§0) belegten Muster: mehrere Prozess-Mechanismen
+sind hier dokumentiert, aber nie eingerichtet worden. Sollte Stephan sich künftig für die
+Einrichtung eines solchen Scheduled Tasks entscheiden, soll er zusätzlich zu den bestehenden
+Aufgaben A (Kanban-Sync) und B (Auto-Start) diese **Aufgabe C** übernehmen:
+
+1. Die `🏁 Done`-Lane aus dem bereits gelesenen Gate-Board verwenden.
+2. Pro Ticket: `gate_check.py <ID> --phase retro` **und** `gate_check.py <ID> --phase refactor`
+   laufen lassen (Verifikation läuft primär als Release-Blocker, siehe `CLAUDE.md` §3b/§5 — der
+   Sweep prüft sie hier nur als Sicherheitsnetz für den unwahrscheinlichen Fall, dass ein Ticket
+   trotzdem ohne sie `Done` erreicht hat).
+3. Jedes rote Gate → frischer, scharf umrissener Subagent (genau dieses Ticket + dieses Gate,
+   isolierter Kontext) holt es nach, meldet kompakt zurück.
+4. Den Marker als ✅ eintragen, eine Zeile in der Lauf-Zusammenfassung ergänzen.
+5. Nichts rot → unverändert die knappe „Board synchron"-Zeile.
+
+**Ob und mit welcher Frequenz dieser Scheduled Task eingerichtet wird, ist Stephans
+Entscheidung** — hier nur die Beschreibung, was Aufgabe C tun soll, falls/wenn er einmal
+eingerichtet wird.
+
 ### 3.6 Agenten-Orchestrierung & Kontext-Strategie
 
 Damit das Hauptkontextfenster klein und relevant bleibt, läuft **keine** Phase inline im
@@ -253,7 +276,7 @@ für externe URLs in der Sandbox** (stattdessen `web_fetch`), **keine Löschung 
 | 3 | **Sandbox-Test-Harness + pytest-aus-AKs** | Vollsystem-Regression, größter Hebel | ✅ Offline-Regression (10) + API-Regression (BUG-22 u. a.) grün im Sandbox; App-Startup via `FOTOALERT_NO_BACKGROUND` test-sicher (kein Scheduler/Precompute/Netzwerk/Backup) — 16 Tests in `backend/tests/` |
 | 4 | **Pre-Mortem-Schritt + Mehr-Optionen in `analyze`** | risikoinformierte Pläne & Tests | 🟡 gebaut — aktualisiertes `fotoalert-analyze.skill` zur Installation |
 | 5 | **Orchestrator + Subagent-Architektur** | Manuell startbar, dünner Orchestrator mit isolierten Phasen-Subagenten (§3.5/§3.6), respektiert alle Gates | ✅ installiert (Test-Phase nutzt jetzt das Harness aus Schritt 3) |
-| 6 | **Lern-Loop + Retro-Lane koppeln** | Auto-Retro hinter Done; Memory/Tests auto, Skill-/Agent-Änderungen vorbereitet zur Freigabe (§3.4) | offen |
+| 6 | **Lern-Loop + Retro-Lane koppeln** | Auto-Retro hinter Done; Memory/Tests auto, Skill-/Agent-Änderungen vorbereitet zur Freigabe (§3.4) | offen — Gate-Marker (Retro/Refactor-Check/Verifikation) seit 2026-07-22 in `gate_check.py` prüfbar; der auto-sweepende `fotoalert-pipeline-heartbeat`-Scheduled-Task selbst (Aufgabe C, §3.5) ist weiterhin **nicht eingerichtet** (kein Auto-Nachholen der Done-Lane) |
 
 > Schritt 1 ist der kleinste Hebel mit sofortiger Wirkung. Schritt 3 ist der größte
 > Enabler Richtung Vollautomatik — ohne ihn bleibt Testing der Engpass.

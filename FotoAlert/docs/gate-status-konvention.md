@@ -25,6 +25,29 @@ Skill abhakt, bevor es ein Gate auf ✅ setzt.
 | Release | ⬜ | — |
 ```
 
+**Status (seit 2026-07-22, siehe `docs/2026-07-02-pipeline-gate-reliability-design.md`):** diese
+Tabellenform ist weiterhin ein gültiges, von `gate_check.py` erkanntes Format — aber **faktisch
+ungenutzt**. Reale Tickets tracken Fortschritt über Prosa, nicht über diese Tabelle. Für die drei
+Gates **Retro / Lernen**, **Refactor-Check** und **Verifikation** gilt stattdessen das
+freistehende Marker-Format direkt im Ticket-Fließtext (nächster Abschnitt) — das ist der Weg, wie
+diese drei Gates tatsächlich befüllt werden.
+
+## Freistehendes Marker-Format (Retro, Refactor-Check, Verifikation)
+
+Statt einer Tabellenzeile schreibt der zuständige Skill/Subagent eine einzelne Zeile direkt ins
+Ticket, im Stil, wie Tickets tatsächlich geschrieben werden:
+
+```markdown
+**Retro:** ✅ 2026-07-02 — Memory `reference_x` ergänzt; test_us113_edge.py hinzugefügt
+**Refactor-Check:** ✅ 2026-07-02 — keine offenen Befunde
+**Verifikation:** ✅ 2026-07-02 — alle 13 AKs bestanden, keine Risiken gefunden
+```
+
+`gate_check.py` erkennt diese Zeilen zusätzlich zur Tabellenform und trägt das Ergebnis in
+denselben Gate-Status ein (einfache Dict-Vereinigung, kein separates Format). Erlaubte Symbole:
+✅ / ⬜ / ⤼ — mit denselben drei Zuständen wie unten beschrieben (⤼ nur gültig mit
+`Stephan JJJJ-MM-TT: <Grund>`-Zuschreibung). Auch der Label „Retro / Lernen" wird erkannt.
+
 ## Drei Zustände je Gate
 
 - **✅ erledigt** — der Nachweis liegt am Ticket vor (z. B. Spec-Abschnitt, pytest-Datei, Testreport).
@@ -40,9 +63,16 @@ Skill abhakt, bevor es ein Gate auf ✅ setzt.
   `backend/tests/test_<ticket-id>.py`. Gilt vor der Implementierung (Test-First).
 - **Implementierung:** Notiz „geänderte Dateien" + Status mindestens `In Progress`.
 - **Test bestanden:** Testreport pass je AK inkl. Regression (nicht nur die geänderte Funktion).
-- **Refactor-Check:** `tools/refactor_check.py` gelaufen, ohne offene Befunde.
+- **Refactor-Check:** `tools/refactor_check.py` gelaufen, ohne offene Befunde — Nachweis als
+  Marker-Zeile `**Refactor-Check:** ✅/⤼ <Datum> — <Zusammenfassung der Befunde>` (siehe oben).
 - **PRODUCT.md:** Ticket in `PRODUCT.md` nachgezogen.
+- **Verifikation:** separater, frisch gestarteter Subagent (nicht der Impl-Kontext) prüft Diff +
+  Akzeptanzkriterien, liefert pass/fail je AK, schreibt
+  `**Verifikation:** ✅/⬜ <Datum> — <Urteil>` (siehe oben). Ein Urteil „fail" ist **kein**
+  automatisch nachholbarer Fall — das ist ein echter Befund, der eine Stephan-Entscheidung braucht.
 - **Release:** deployt + Health-Check grün — ODER ⤼ mit Begründung „kein Deploy nötig".
+- **Retro / Lernen:** `retrospective`-Subagent gelaufen, Marker-Zeile
+  `**Retro:** ✅ <Datum> — <Notiz>` (siehe oben).
 
 ## Reihenfolge / welche Vorstufen ein Schritt verlangt
 
@@ -51,8 +81,10 @@ Skill abhakt, bevor es ein Gate auf ✅ setzt.
 | Implementierung | Spec · Tests definiert |
 | Test ausführen | Spec · Tests · Implementierung |
 | Refactor-Check | Spec · Tests · Impl · Test bestanden |
-| Release | Spec · Tests · Impl · Test bestanden · Refactor · PRODUCT.md |
+| Verifikation | Spec · Tests · Impl · Test bestanden · Refactor · PRODUCT.md |
+| Release | Spec · Tests · Impl · Test bestanden · Refactor · PRODUCT.md · Verifikation |
 | Done | alle oben + Release |
+| Retro | alle oben + Release |
 
 ## Verhalten bei Rot (Stephans Wahl 2026-06-28)
 

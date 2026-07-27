@@ -25,6 +25,7 @@ Python-3.9-kompatibel.
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 from typing import List, Optional, Tuple
@@ -49,6 +50,18 @@ OVERPASS_MIRRORS: List[str] = [
 OVERPASS_TIMEOUT_S: float = 8.0
 # Suchradius um die Motiv-Koordinate für den Gebäude-Footprint (Meter).
 OVERPASS_SEARCH_RADIUS_M: int = 40
+
+# TASK-59: Optionale eigene Overpass-Server-Adresse (künftiger, selbst
+# gehosteter Server für zuverlässigere Gebäudedaten). Der Server existiert
+# noch NICHT — Stephan baut ihn erst in einem separaten Schritt auf. Solange
+# die Umgebungsvariable leer/nicht gesetzt ist (heutiger Zustand), bleibt das
+# Verhalten exakt wie vor TASK-59: nur OVERPASS_MIRRORS wird angefragt. Ist
+# sie gesetzt, versucht _fetch_from_mirrors() zuerst diesen eigenen Server und
+# fällt bei dessen Fehlschlag automatisch auf OVERPASS_MIRRORS zurück
+# (von Stephan am 2026-07-15 bestätigte Ausfallverhalten-Variante "öffentliche
+# Server bleiben Rückfallebene", TASK-59 Frage 2 / AK "Edge Case: Fällt der
+# eigene Server komplett aus...").
+OWN_OVERPASS_URL: Optional[str] = os.environ.get("OWN_OVERPASS_URL") or None
 
 # Live-Bug (US-09): Der kostenlose Overpass-Server lehnt bei zu schneller
 # Anfragefolge Verbindungen ab ([Errno 61] Connection refused), wodurch der
@@ -90,17 +103,41 @@ def _respect_overpass_rate_limit() -> None:
 
 
 def _fetch_from_mirrors(query: str, timeout_s: float, log_context: str) -> Optional[dict]:
-    """Versucht die gegebene Overpass-Query nacheinander gegen jeden Eintrag in
-    OVERPASS_MIRRORS (je EIN Versuch pro Mirror, kein Retry auf demselben
-    Mirror). Vor JEDEM Versuch wird _respect_overpass_rate_limit() aufgerufen —
-    beide Mirrors sind kostenlose Community-Server und werden gleich behandelt.
+    """Versucht die gegebene Overpass-Query zuerst (optional) gegen den eigenen
+    Server (TASK-59, `OWN_OVERPASS_URL`) und danach nacheinander gegen jeden
+    Eintrag in OVERPASS_MIRRORS (je EIN Versuch pro Server, kein Retry auf
+    demselben Server). Vor JEDEM Versuch wird _respect_overpass_rate_limit()
+    aufgerufen — alle Server (eigener + Mirrors) werden gleich behandelt.
 
-    Gibt das geparste JSON-Payload des ersten erfolgreichen Mirrors zurück,
-    oder None, wenn alle Mirrors fehlschlagen (der Aufrufer loggt dann und
-    fällt still auf die Bearing-Basis zurück)."""
+    Ist OWN_OVERPASS_URL nicht gesetzt (heutiger Zustand, Standard), verhält
+    sich diese Funktion exakt wie vor TASK-59: nur OVERPASS_MIRRORS wird
+    angefragt, gleiche Reihenfolge, gleiche Timeouts.
+
+    Gibt das geparste JSON-Payload des ersten erfolgreichen Servers zurück,
+    oder None, wenn alle fehlschlagen (der Aufrufer loggt dann und fällt still
+    auf die Bearing-Basis zurück)."""
     import httpx  # lokaler Import: QA ohne Overpass braucht httpx nie
 
     last_error: Optional[Exception] = None
+
+    if OWN_OVERPASS_URL:
+        _respect_overpass_rate_limit()
+        try:
+            with httpx.Client(timeout=timeout_s) as client:
+                resp = client.post(OWN_OVERPASS_URL, data={"data": query})
+                resp.raise_for_status()
+                return resp.json()
+        except Exception as e:
+            last_error = e
+            # TASK-59: unterscheidbare Log-Meldung speziell für den EIGENEN
+            # Server (nicht einen der öffentlichen Mirrors) — Grundlage für
+            # eine spätere aktive Benachrichtigung. Kein Alert-Versand hier,
+            # das folgt erst wenn der Server existiert (siehe Ticket).
+            logger.warning(
+                "Eigener Overpass-Server %s für %s fehlgeschlagen (%s) — "
+                "Rückfall auf öffentliche Mirrors", OWN_OVERPASS_URL, log_context, e,
+            )
+
     for mirror_url in OVERPASS_MIRRORS:
         _respect_overpass_rate_limit()
         try:

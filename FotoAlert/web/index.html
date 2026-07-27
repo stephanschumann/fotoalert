@@ -1594,7 +1594,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.45';
+const APP_VERSION = '1.22.46';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -6309,12 +6309,19 @@ const LocationDetail = {
 
         <label>Kategorie</label>
         <select class="input-field" id="edit-category" style="appearance:auto">
-          ${[['SCHLOSS','Schloss & Historisch'],['SKYLINE','Skyline & Architektur'],
+          ${(() => {
+            // BUG-84: category_key liefert jetzt echte Server-Werte (vorher nie geliefert,
+            // Formular zeigte deshalb immer den Default). AK6 Edge Case: ein nicht
+            // zuordenbarer/unbekannter Wert fällt auf SKYLINE zurück statt das Dropdown
+            // ohne Auswahl (und damit faktisch unbenutzbar) zu lassen.
+            const cats = [['SCHLOSS','Schloss & Historisch'],['SKYLINE','Skyline & Architektur'],
              ['NATUR','Natur & Landschaft'],['WASSER','Wasser & Spiegelung'],
              ['AUSSICHT','Aussichtspunkt'],['INDUSTRIE','Industrie & Urban'],
-             ['MILCHSTRASSE','Milchstraße & Astro']]
-            .map(([k,v]) => `<option value="${k}" ${(loc.category_key||'SKYLINE')===k?'selected':''}>${v}</option>`)
-            .join('')}
+             ['MILCHSTRASSE','Milchstraße & Astro']];
+            const validKeys = cats.map(([k]) => k);
+            const catKey = validKeys.includes(loc.category_key) ? loc.category_key : 'SKYLINE';
+            return cats.map(([k,v]) => `<option value="${k}" ${catKey===k?'selected':''}>${v}</option>`).join('');
+          })()}
         </select>
 
         <label>Beschreibung</label>
@@ -6361,19 +6368,25 @@ const LocationDetail = {
 
         <label>Schwierigkeit</label>
         <div style="display:flex;gap:8px;margin-bottom:14px">
-          ${[['1','Einfach'],['2','Mittel'],['3','Anspruchsvoll']].map(([val,label]) => `
+          ${(() => {
+            // BUG-84 AK6 (Edge Case): ein nicht zuordenbarer/außerhalb 1-3 liegender Server-
+            // Wert fällt auf "2" (Mittel) zurück statt dass keine der drei Optionen markiert
+            // ist (das würde das Formular optisch ohne Auswahl und damit unklar wirken lassen).
+            const diffVal = ['1','2','3'].includes(String(loc.difficulty)) ? String(loc.difficulty) : '2';
+            return [['1','Einfach'],['2','Mittel'],['3','Anspruchsvoll']].map(([val,label]) => `
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;
-              padding:8px;border-radius:8px;border:1px solid ${String(loc.difficulty||2)===val?'var(--gold)':'var(--border)'};
-              background:${String(loc.difficulty||2)===val?'var(--gold-dim)':'transparent'};
+              padding:8px;border-radius:8px;border:1px solid ${diffVal===val?'var(--gold)':'var(--border)'};
+              background:${diffVal===val?'var(--gold-dim)':'transparent'};
               font-size:12px;font-weight:600;text-transform:none;letter-spacing:0;margin-bottom:0">
               <input type="radio" name="edit-difficulty" value="${val}"
-                ${String(loc.difficulty||2)===val?'checked':''}
+                ${diffVal===val?'checked':''}
                 onchange="this.closest('.edit-form').querySelectorAll('[name=edit-difficulty]').forEach(r=>{
                   r.closest('label').style.borderColor=r.checked?'var(--gold)':'var(--border)';
                   r.closest('label').style.background=r.checked?'var(--gold-dim)':'transparent';
                 })">
               ${label}
-            </label>`).join('')}
+            </label>`).join('');
+          })()}
         </div>
 
         <label>Hinweise (Zugang, beste Jahreszeit etc.)</label>

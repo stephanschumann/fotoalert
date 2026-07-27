@@ -68,8 +68,8 @@ from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weich
 from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
 from discover.geometry import destination_point  # US-131: Projektion Wolken-/Dunstabfrage entlang Sichtachse
 from data.locations import (
-    LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory,
-    COORD_FIELDS, TEXT_FIELDS, NUMERIC_FIELDS, LIST_FIELDS,
+    LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory, coerce_category_value,
+    COORD_FIELDS, TEXT_FIELDS, NUMERIC_FIELDS, LIST_FIELDS, CATEGORY_FIELDS, DIFFICULTY_FIELDS,
     PATCHABLE_LOCATION_FIELDS, RECOMPUTE_TRIGGER_FIELDS, OVERRIDE_RELOAD_FIELDS,
 )
 from data.store import LocationStore, compute_geo_hash
@@ -2013,9 +2013,16 @@ def _load_location_overrides() -> None:
             if loc:
                 # US-128: Feld-Tupel jetzt aus data/locations.py:LOCATION_FIELD_RULES
                 # abgeleitet (OVERRIDE_RELOAD_FIELDS) statt hier hartkodiert dupliziert.
+                # BUG-84: "category" wird als Enum-Member-Name (String) im Override
+                # gespeichert -- vor dem setattr gezielt zurück in eine LocationCategory-
+                # Instanz konvertieren (gleiche Begründung wie in patch_location).
                 for field in OVERRIDE_RELOAD_FIELDS:
-                    if field in ov:
-                        setattr(loc, field, ov[field])
+                    if field not in ov:
+                        continue
+                    value = ov[field]
+                    if field == "category":
+                        value = coerce_category_value(value)
+                    setattr(loc, field, value)
                 applied += 1
         if applied:
             logger.info("Location Overrides geladen: %d Einträge aus SQLite", applied)
@@ -2282,11 +2289,20 @@ def _compute_possible_bodies(observer_lat: float, ideal_azimuth_range: list | No
 
 def _loc_to_out(loc) -> LocationOut:
     az_range = list(loc.ideal_azimuth_range) if getattr(loc, 'ideal_azimuth_range', None) else None
+    # BUG-84: defensiv ueber coerce_category_value() lesen statt loc.category.value direkt --
+    # falls loc.category durch einen bislang uebersehenen Code-Pfad doch mal ein roher String
+    # statt einer LocationCategory-Instanz ist, waere `.value` sonst ein AttributeError fuer
+    # DIESE eine Location und würde GET /locations fuer ALLE Locations mit 500 abbrechen
+    # (Pre-Mortem Szenario 1). category_key liefert den Enum-Member-Namen als kanonische
+    # Quelle fuer das Bearbeiten-Formular (ersetzt das nicht existente `category_key`-Feld,
+    # das vorher nie geliefert wurde -- Ursache des Ausgangsbugs).
+    _cat = coerce_category_value(loc.category)
     return LocationOut(
         id=loc.id,
         name=loc.name,
         description=loc.description,
-        category=loc.category.value,
+        category=_cat.value,
+        category_key=_cat.name,
         observer_lat=loc.observer_lat,
         observer_lon=loc.observer_lon,
         subject_lat=getattr(loc, 'subject_lat', None),
@@ -3465,6 +3481,30 @@ def _validate_patch_fields(allowed: dict) -> dict:
             raise HTTPException(status_code=422, detail=f"{f} muss ≥ 0 sein.")
         allowed[f] = float(val)
 
+    # BUG-84: category validieren -- nur bekannte Enum-Member-Namen (die Keys, die das
+    # Frontend-Dropdown auch als <option value> sendet, z.B. "WASSER"), sonst 422. Bewusst
+    # KEIN stiller Fallback auf SKYLINE hier (anders als coerce_category_value): eine
+    # bewusste, aber fehlerhafte PATCH-Eingabe soll AK5 (ehrliche Fehlermeldung) auslösen,
+    # nicht lautlos umgebogen werden.
+    for f in CATEGORY_FIELDS & allowed.keys():
+        val = allowed[f]
+        if not isinstance(val, str) or val not in LocationCategory.__members__:
+            raise HTTPException(status_code=422, detail=f"{f} enthält einen unbekannten Kategorie-Wert.")
+
+    # BUG-84: difficulty validieren -- nur 1/2/3 gültig (siehe data/locations.py
+    # PhotoLocation.difficulty-Kommentar "1=einfach, 3=schwer"). Eigene Regel statt der
+    # generischen "numeric"-Validierung oben, die auf float casten würde
+    # (schemas.py:LocationOut.difficulty ist int).
+    for f in DIFFICULTY_FIELDS & allowed.keys():
+        val = allowed[f]
+        try:
+            ival = int(val)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=422, detail=f"{f} muss eine ganze Zahl sein.")
+        if ival not in (1, 2, 3):
+            raise HTTPException(status_code=422, detail=f"{f} muss 1, 2 oder 3 sein.")
+        allowed[f] = ival
+
     # focal_length_suggestions validieren (BUG-22)
     if "focal_length_suggestions" in allowed:
         val = allowed["focal_length_suggestions"]
@@ -3531,7 +3571,7 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     all_allowed_fields = PATCHABLE_LOCATION_FIELDS
     allowed = {k: v for k, v in body.items() if k in all_allowed_fields}
     if not allowed:
-        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, subject_height_m, subject_width_m, focal_length_suggestions).")
+        raise HTTPException(status_code=400, detail="Keine gültigen Felder (name, description, special_notes, subject_name, observer_lat/lon, subject_lat/lon, observer_floor_height_m, subject_height_m, subject_width_m, focal_length_suggestions, category, difficulty).")
 
     # TASK-60: Validierung MUSS vor dem target_loc-Lookup laufen — sonst kippt die
     # Fehlerantwort für ungültige Felder bei einer nicht-existenten loc_id von 422 auf 404.
@@ -3546,7 +3586,13 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     _persist_location_patch(loc_id, persist_fields)
 
     # In-Memory-Liste aktualisieren (inkl. Seiteneffekt-Flag, falls gesetzt)
+    # BUG-84: "category" wird persistiert (SQLite/Override-JSON) als Enum-Member-NAME
+    # (String, z.B. "WASSER") -- fuers In-Memory-Objekt aber gezielt in eine echte
+    # LocationCategory-Instanz konvertiert (Pre-Mortem Szenario 1: ein roher String in
+    # target_loc.category würde beim nächsten GET /locations mit `.value` crashen).
     for k, v in persist_fields.items():
+        if k == "category":
+            v = coerce_category_value(v)
         setattr(target_loc, k, v)
 
     needs_recompute = _trigger_patch_recompute(loc_id, allowed)
