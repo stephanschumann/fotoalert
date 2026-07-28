@@ -43,6 +43,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_bug79_ci_ephemeris_skip.py` | BUG-79: statische Checks (Kommentar-Wortlaut + AST-Marker-Konsistenz gegen `_get_eph()`-Aufrufpfade) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug83.py` | BUG-83: Wetter-API-Drosselung neu kalibriert (`WEATHER_API_MAX_CONCURRENT_REQUESTS`/`WEATHER_API_REQUEST_PACING_SECONDS`) + Retry mit steigender Wartezeit bei HTTP 429 in `_run_one_weather_fetch()`, einheitlich für weather/aerosol/sun_dir/antisolar_dir | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug_68.py` | BUG-68: `special_notes`/`subject_name` übersteht Neustart + precompute | ⏳ nur mit `--all` | `api`, `regression` |
+| `test_bug_85.py` | BUG-85: Kopfzeile (`#header-subtitle`) aktualisiert sich nicht, wenn der komplette 14-Tage-Feed durch aktive Filter auf 0 Treffer reduziert wird | ⏭️ übersprungen ohne Playwright + laufenden Dev-Server | `frontend`, `regression` |
 | `test_ephemeris_engine.py` | TASK-25: On-Demand-Ephemeriden-Engine (de421, deterministisch) | ✅ immer (offline); 1 `slow`-Test optional per `-m "not slow"` ausschließbar | `offline`, `regression` (+1× `slow`) |
 | `test_moon_phase_events.py` | US-91/92/93: Vollmond-/Neumond-/Supermond-Override-Logik | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_patch_cache_consistency.py` | TASK-34: Cache-Konsistenz nach `PATCH /locations/{id}` | ⏳ nur mit `--all` | `api`, `regression` |
