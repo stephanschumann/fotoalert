@@ -1594,7 +1594,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.47';
+const APP_VERSION = '1.22.48';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2097,6 +2097,9 @@ const Feed = {
     if (!data.length) {
       // BUG-32: Soft-Fallback — wenn kein expliziter Filter aktiv und Non-Routine = 0,
       // Routine-Events (Goldene/Blaue Stunde) als Tägliche-Chancen-Sektion anzeigen.
+      // BUG-85: dieser Zweig bleibt bewusst unangetastet (kein Kopfzeilen-Update hier) —
+      // er zeigt tatsächlich Karten (Routine-Events), ist also kein "0 Treffer"-Zustand
+      // im Sinne des Tickets (siehe BACKLOG.md BUG-85, Scope-Ausschluss).
       if (!Search.query && Filter.activeCount() === 0 && n > 0) {
         const routineData = this.data.filter(o => Filter._ROUTINE_TYPES.includes(o.event_type));
         if (routineData.length > 0) {
@@ -2126,6 +2129,16 @@ const Feed = {
             ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
             : `Keine besonderen Chancen in den nächsten 14 Tagen.`
           : `Keine Chancen gefunden. Mindest-Score: ${pct(CFG.minScore)}`;
+      // BUG-85: dieser Zweig kehrt per `return` zurück, bevor die reguläre
+      // Kopfzeilen-Aktualisierung weiter unten in render() erreicht wird — ohne
+      // dieses Update bleibt #header-subtitle sonst auf einem veralteten Stand
+      // stehen. Eigener, bewusst kurzer Kopfzeilentext statt Wiederverwendung von
+      // `msg` (der je nach Filter-/Suchzustand deutlich länger wird und damit das
+      // BUG-80-Höhensprung-Risiko reproduzieren würde, siehe test_bug-80.py).
+      document.getElementById('header-subtitle').textContent =
+        (Filter.activeCount() > 0 || Search.query)
+          ? 'Filter: keine Treffer.'
+          : 'Keine Chancen in den nächsten 14 Tagen.';
       el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><p>${msg}</p></div>`;
       return;
     }
