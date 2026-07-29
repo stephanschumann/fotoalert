@@ -83,7 +83,10 @@ HEALTH_CAL_MIN       = 10  # Kalender: kritischer Schwellwert (ERROR)
 REGRESSION_CAL_MIN   = 30  # Kalender: Regression-Schwellwert (WARNING)
 
 # Eventtypen, die KEINEN Alignment-Filter erhalten
-# (kein Celestial-Tracking auf Motivpunkt → composition_analysis ist None)
+# (kein Celestial-Tracking auf Motivpunkt → composition_analysis ist None,
+#  ODER eine bereits etablierte, bewusst weichere Richtungs-/Zeitprüfung gilt
+#  statt der harten ±2°-Präzisionsausrichtung — z.B. Mondaufgang/Monduntergang,
+#  deren Zeitpunkt physikalisch fix ist statt gezielt gesucht, BUG-90)
 _ALIGNMENT_FILTER_EXEMPT = {
     "Goldene Stunde Morgen",
     "Goldene Stunde Abend",
@@ -97,6 +100,8 @@ _ALIGNMENT_FILTER_EXEMPT = {
     "Goldene Wolken",
     "Himmelsröte",
     "Rote Wolken",  # US-132
+    "Mondaufgang",  # BUG-90: physikalisch fixer Zeitpunkt, ±35°-FRONT-Zone (US-108) bereits Qualitätsschwelle
+    "Monduntergang",  # BUG-90
 }
 
 

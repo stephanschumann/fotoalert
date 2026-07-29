@@ -791,6 +791,7 @@ async def find_opportunities(
                 camera_hints=_camera_hints_moon(200),
                 subject_azimuth=round(subject_az, 1),
                 celestial_azimuth=moon_az_mr,
+                celestial_altitude=round(moon_pos_mr.altitude, 1) if moon_pos_mr else None,
                 astronomy_report=astro,
                 alert_priority=1 if overall_mr > 0.65 else 0,
             ))
