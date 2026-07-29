@@ -1594,7 +1594,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.49';
+const APP_VERSION = '1.22.50';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -3098,6 +3098,34 @@ const Filter = {
   // Routine-Event standardmäßig ausblenden — sonst inkonsistent zur Abend-Variante.
   _ROUTINE_TYPES: ['Goldene Stunde Morgen', 'Goldene Stunde Abend', 'Blaue Stunde', 'Blaue Stunde Morgen'],
 
+  // BUG-91: Muss synchron bleiben mit backend/precompute.py ALIGNMENT_TOLERANCE_DEG (BUG-90).
+  // Weg-Gate-Entscheidung Stephan (2026-07-29): Option A, bestehende großzügige ±2°-Toleranz
+  // wiederverwenden, keine neue engere Frontend-Schwelle einführen.
+  MOON_ALIGNMENT_TOLERANCE_DEG: 2.0,
+
+  // BUG-91: Vollmond/Supermond-Ereignisse mit präzisem Alignment zum Motiv sollen zusätzlich
+  // unter dem "Mond-Alignment"-Filter auffindbar sein, ohne dass sich ihr angezeigter
+  // event_type ändert (reine Filter-Matching-Erweiterung, kein Daten-/Typwechsel).
+  // Rule 3 / Pre-Mortem Szenario 3: fehlt composition_analysis (null) oder fehlt eines der
+  // beiden Delta-Felder (z.B. BUG-43-Teilanalyse ohne Motivhöhe), gilt das Event als NICHT
+  // qualifiziert — bleibt dann ausschließlich unter "Vollmond"/"Supermond" auffindbar.
+  _hasGoodMoonAlignment(o) {
+    if (o.event_type !== 'Vollmond' && o.event_type !== 'Supermond') return false;
+    const ca = o.composition_analysis;
+    if (!ca) return false;
+    const az = ca.azimuth_delta_deg, alt = ca.altitude_delta_deg;
+    if (typeof az !== 'number' || typeof alt !== 'number') return false;
+    return Math.abs(az) <= this.MOON_ALIGNMENT_TOLERANCE_DEG && Math.abs(alt) <= this.MOON_ALIGNMENT_TOLERANCE_DEG;
+  },
+
+  // BUG-91: Prüft ob Event o zum (bereits ET_EXPAND-expandierten) Filtertyp `type` passt —
+  // entweder exakter event_type-Match (bestehendes Verhalten) oder, nur für den Typ
+  // "Mond-Alignment", ein Vollmond/Supermond-Event mit gutem Alignment (s. _hasGoodMoonAlignment).
+  _matchesExpandedType(o, type) {
+    if (type === 'Mond-Alignment' && this._hasGoodMoonAlignment(o)) return true;
+    return o.event_type === type;
+  },
+
   apply(data, { skipCloudMood = false } = {}) {
     const s = this.state;
     // "Goldene Stunde"/"Blaue Stunde" matchen jeweils beide Backend-Werte; alle anderen 1:1
@@ -3112,7 +3140,8 @@ const Filter = {
     const expandedExcl = s.eventTypesExcl.flatMap(t => ET_EXPAND[t] || [t]);  // US-71
     return data.filter(o => {
       if (s.eventTypes.length) {
-        if (!expanded.includes(o.event_type)) return false;
+        // BUG-91: statt reinem includes()-Vergleich — s. _matchesExpandedType oben
+        if (!expanded.some(t => this._matchesExpandedType(o, t))) return false;
       } else {
         // Default: Routine-Events (täglich) ausblenden; opt-in via Eventtyp-Filter.
         // US-71: Default bleibt an "Include leer" gekoppelt; Exclude ändert ihn nicht.
@@ -5227,11 +5256,14 @@ const MapView = {
     const expandedExcl = exclTypes.flatMap(t => ET_EXPAND[t] || [t]);
 
     // Baue Set der Location-IDs mit passenden Feed-Events (für O(1)-Lookup)
+    // BUG-91: eigene Kopie derselben Matching-Logik wie Filter.apply() — statt reinem
+    // includes()-Vergleich auch hier Filter._matchesExpandedType() nutzen, damit ein
+    // Vollmond/Supermond-Treffer mit gutem Alignment auch auf der Karte sichtbar bleibt.
     let locIdsWithMatch = null;
     if (activeTypes.length > 0 && Feed.data && Feed.data.length > 0) {
       locIdsWithMatch = new Set(
         Feed.data
-          .filter(e => expanded.includes(e.event_type))
+          .filter(e => expanded.some(t => Filter._matchesExpandedType(e, t)))
           .map(e => e.location_id)
       );
     }
