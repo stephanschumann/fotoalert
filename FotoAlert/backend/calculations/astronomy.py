@@ -255,11 +255,11 @@ def _moon_phase_name(fraction: float) -> str:
     elif fraction < 0.28:
         return "Erstes Viertel"
     elif fraction < 0.47:
-        return "Zunehmender Halbmond"
+        return "Zunehmender Dreiviertelmond"
     elif fraction < 0.53:
         return "Vollmond"
     elif fraction < 0.72:
-        return "Abnehmender Halbmond"
+        return "Abnehmender Dreiviertelmond"
     elif fraction < 0.78:
         return "Letztes Viertel"
     else:
