@@ -442,14 +442,15 @@ Option B — Zentraler Fix direkt nach der Filter.apply()-Berechnung (strukturel
 ✅ Empfehlung: Option A — trifft exakt den von Stephan bestätigten Sonderfall, geringstes Risiko, lässt den nicht bestätigten BUG-32-Fall unangetastet (bei Bedarf als eigenes Folge-Ticket) — kombiniert mit dem eigenen, dedizierten kurzen Kopfzeilentext aus der Frage-1-Entscheidung (siehe oben). Frage 1 ist beantwortet; die eigentliche Implementierung startet dennoch erst nach Stephans expliziter Freigabe (Status bleibt bis dahin „In Analysis").
 ---
 
-### BUG-86 · Mondphasen-Bezeichnung passt nicht zum Beleuchtungsgrad (z.B. „Halbmond" bei 96–99% Beleuchtung) `[~]`
+### BUG-86 · Mondphasen-Bezeichnung passt nicht zum Beleuchtungsgrad (z.B. „Halbmond" bei 96–99% Beleuchtung) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-07-27 |
+| **Abgeschlossen** | 2026-07-30 |
 
 **Beschreibung:** Die angezeigte Mondphasen-Bezeichnung stimmt bei bestimmten Beleuchtungsgraden nicht mit der tatsächlichen Beleuchtung überein — beobachtet wurde z.B. „Halbmond" bei 96–99% Beleuchtung statt der für „Halbmond" erwarteten ca. 50%. Ursache: `backend/calculations/astronomy.py`, `_moon_phase_name()`, Zeilen 250-266 — falsch gezogene Bucket-Grenzen bei der Zuordnung von Beleuchtungsgrad zu Phasennamen. Fix: Bucket-Grenzen korrigieren (Details siehe `docs/2026-07-27-fix-vorschlaege-audit-befunde.md`). Systemisch: Unit-Test ergänzen, der den Phasennamen gegen den Beleuchtungsgrad plausibilisiert — nach Vorbild der bestehenden Distanz-Assertion in derselben Datei (Zeile 214).
 
@@ -513,7 +514,7 @@ Erwogene Alternative — kontinuierliche Phasenbeschreibung statt Bucket-Tabelle
 
 **Testplan:**
 - [x] Automatisiert (Harness): `backend/tests/test_bug-86.py`, Marker `offline`+`regression`. Deckt ab: konkrete Ticket-Reproduktion (97%/90% Beleuchtung darf nicht „Halbmond" heißen), Regressionsschutz für bereits korrekte Buckets (Erstes/Letztes Viertel, Vollmond, Neumond), sowie einen systemischen Sweep-Test über 1000 Stützstellen im gesamten `fraction`-Bereich, der jeden Phasennamen gegen eine Beleuchtungs-Plausibilitätsspanne prüft (Vorbild: Distanz-Assertion Zeile ~214). **Rot-Nachweis:** 3 von 7 Tests schlagen gegen den aktuellen, unreparierten Code erwartungsgemäß fehl — `test_97_prozent_beleuchtung_ist_kein_halbmond` (liefert „Zunehmender Halbmond" bei 97.6%), `test_90_prozent_beleuchtung_abnehmend_ist_kein_halbmond` (liefert „Abnehmender Halbmond" bei 90.5%), sowie der Sweep-Test (380 von 1000 Stützstellen unplausibel). Die 4 Regressionsschutz-Tests (Erstes/Letztes Viertel, Vollmond, Neumond) sind bereits grün.
-- [ ] Manuell: Lokalen Server starten, eine Location an einem Datum mit ~97%/~90% Mondbeleuchtung aufrufen (z.B. wenige Tage vor/nach Vollmond) und im Feed/Kalender/Location-Detail prüfen, dass die Mondphasen-Bezeichnung neben der Prozentangabe stimmig wirkt (z.B. „Zunehmender Dreiviertelmond (97%)" statt „Zunehmender Halbmond (97%)"). curl-Beispiel: `curl -s http://localhost:8000/locations/<id> | jq '.moon_phase, .moon_illumination_pct'` (bzw. entsprechendes Feld im `/opportunities`- oder `/calendar`-Response).
+- [x] Manuell: Lokalen Server starten, eine Location an einem Datum mit ~97%/~90% Mondbeleuchtung aufrufen (z.B. wenige Tage vor/nach Vollmond) und im Feed/Kalender/Location-Detail prüfen, dass die Mondphasen-Bezeichnung neben der Prozentangabe stimmig wirkt (z.B. „Zunehmender Dreiviertelmond (97%)" statt „Zunehmender Halbmond (97%)"). curl-Beispiel: `curl -s http://localhost:8000/locations/<id> | jq '.moon_phase, .moon_illumination_pct'` (bzw. entsprechendes Feld im `/opportunities`- oder `/calendar`-Response). **Live-Nachtrag (2026-07-30):** Statt lokalem Server direkt auf Produktion geprueft (staerkerer Nachweis) - vor Precompute-Neustart 206 Events mit 85-98% Beleuchtung zeigten faelschlich Halbmond (u.a. Referenz-Event Herrmannstiege bei 96,6%), danach 0x Halbmond und 288x korrekt Dreiviertelmond im selben Bereich, Herrmannstiege zeigt jetzt Abnehmender Dreiviertelmond.
 - Regressions-Matrix (PRODUCT.md §12, Zeile „Backend-Endpoint"): zusätzlich Health + Locations + Feed + Scout + Kalender kurz gegenprüfen, da `moon_phase` in Feed-Karten (`web/index.html:2526`), Event-Detail (`:4580`) und Kalender (`main.py:2569`) angezeigt wird.
 ---
 
