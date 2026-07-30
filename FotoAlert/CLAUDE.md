@@ -120,6 +120,19 @@ Verifikations-Subagent (§ Verifikation).
   technischer Durchsetzungsversuch (PreToolUse-Hook) wurde geprüft und verworfen — Cowork führt
   Plugin-Hooks nicht aus. Diese Textverankerung ist damit die höchste verfügbare Eskalationsstufe
   in dieser Umgebung, kein Beweis für Wirksamkeit.
+- **Vierter dokumentierter Vorfall trotz bestehender Regel (BUG-86-Retro, 2026-07-30):** Das
+  Muster trat erneut auf — der vierte belegte Fall in dieser Datei allein, obwohl die Regel oben
+  bereits mehrfach verschärft wurde. Konkreter Beispiel-Katalog typischer Auslöse-Situationen
+  (nicht abschließend, aber die drei häufigsten Muster):
+  - **unmittelbar bevor eine reine Text-/Fehlermeldung folgt** — der Call bringt keinen neuen
+    Zustand, nur die folgende Antwort besteht ohnehin aus Text/Codeblock.
+  - **als vermeintliche Zwischenmeldung** ("kurz Status geben", "nur zur Sicherheit nochmal
+    schauen") ohne dass ein Tool für die eigentliche Antwort gebraucht wird.
+  - **als Test/Sondierung ohne neuen Informationsgewinn** — ein Aufruf, dessen Ergebnis bereits
+    bekannt ist oder inhaltlich identisch zu einem unmittelbar vorherigen Aufruf.
+  Vor jedem Tool-Call, der einer dieser drei Situationen ähnelt, **zwingend zuerst** die
+  Selbst-Check-Frage aus dem Absatz oben laut/explizit beantworten — nicht erst im Nachhinein
+  erkennen und ankündigen, das ändert nichts am bereits abgesetzten Call.
 - **Nach Retro (Pflicht, siehe §2/§3):** Zeile `**Retro:** ✅ <Datum> — <Notiz>` ins Ticket
   schreiben — das ist der maschinenlesbare Nachweis, den `tools/gate_check.py` prüft (siehe
   `docs/gate-status-konvention.md`).
