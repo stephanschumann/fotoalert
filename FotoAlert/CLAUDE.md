@@ -109,11 +109,17 @@ Verifikations-Subagent (§ Verifikation).
   `feedback_subagent_false_positive_claims`, `fotoalert-impl` Pattern 21).
 - **Kein Tool-Call vor einer reinen Text-/Codeblock-Antwort** (Handoff-Schritt, Erklärung,
   Terminal-Befehl zum Kopieren) — kein `bash echo`/`true`, kein sachfremder Werkzeug-Griff nur
-  um "etwas zu tun". Selbst-Check vor JEDEM Call: „Braucht die Antwort dieses Ergebnis?" Wenn nein
-  → direkt antworten. Gilt besonders in Ketten aus mehreren Handoff-Antworten hintereinander
-  (Release/Test-Dialoge) — dort ist der Fehlreflex am stärksten. 11-fach rückfällig trotz
-  globaler Memory `feedback_no_tool_call_before_text_answer` — deshalb hier zusätzlich verankert,
-  weil diese Datei bei jedem Chat-Start geladen wird (globale Memory offenbar nicht ausreichend).
+  um "etwas zu tun", UND kein identisches Wiederholen eines bereits erfolgreich ausgeführten
+  Tool-Calls ohne neue Information (neue Variante, BUG-90, 2026-07-30: `update_artifact` 3x
+  hintereinander ohne Zustandsänderung). Selbst-Check vor JEDEM Call: „Braucht die Antwort dieses
+  Ergebnis, und habe ich es nicht schon?" Wenn nein → direkt antworten bzw. vorhandenes Ergebnis
+  nutzen. Gilt besonders in Ketten aus mehreren Handoff-Antworten hintereinander
+  (Release/Test-Dialoge) — dort ist der Fehlreflex am stärksten. 20x+ rückfällig trotz globaler
+  Memory `feedback_no_tool_call_before_text_answer` — deshalb hier zusätzlich verankert, weil
+  diese Datei bei jedem Chat-Start geladen wird. **Ehrlicher Stand (seit 2026-07-19):** ein
+  technischer Durchsetzungsversuch (PreToolUse-Hook) wurde geprüft und verworfen — Cowork führt
+  Plugin-Hooks nicht aus. Diese Textverankerung ist damit die höchste verfügbare Eskalationsstufe
+  in dieser Umgebung, kein Beweis für Wirksamkeit.
 - **Nach Retro (Pflicht, siehe §2/§3):** Zeile `**Retro:** ✅ <Datum> — <Notiz>` ins Ticket
   schreiben — das ist der maschinenlesbare Nachweis, den `tools/gate_check.py` prüft (siehe
   `docs/gate-status-konvention.md`).
