@@ -770,6 +770,36 @@ def _cloud_mood_inputs(e):
     return gcs, wd, cl, cm, aod, sun_az, subject_az
 
 
+def _build_opportunity_title(event_type_label: str, location_id) -> str:
+    """
+    BUG-94: Zentraler, für ALLE Chancenarten-Builder verbindlicher Baustein zur
+    Titel-Bildung -- ersetzt das früher pro Builder hartcodierte Titel-Literal
+    (Ursache von BUG-94: drei Wolkenstimmungs-Builder duplizierten denselben Fehler,
+    kein Motiv-/Ortsbezug im Titel). Ein Chancenart-Builder liefert ab jetzt nur noch
+    Event-Typ-Label + location_id, NICHT mehr den fertigen Titel-String -- diese
+    Funktion baut daraus den Titel nach dem etablierten Muster "{Event-Typ} über
+    {Motiv}" (analog zum Mond-Alignment-Muster, calculations/opportunity.py Z. 519).
+
+    Architektur-Pflicht (BUG-94, Weg-Gate 2026-07-31): JEDER Builder für eine neue
+    oder bestehende Chancenart MUSS new_event["title"] über diese Funktion setzen,
+    niemals über einen eigenen Literal-String. Der Konsistenz-Wächter-Test
+    (backend/tests/test_bug-94.py) durchsucht main.py automatisch nach allen
+    Funktionen im Namensmuster `_build_*_event`, die new_event["title"] setzen, und
+    lässt die Suite rot laufen, falls ein (auch künftig neu hinzugefügter) Builder
+    diese Funktion nicht verwendet bzw. weiterhin einen Literal-String zuweist --
+    ohne dass dafür manuell ein neuer Einzeltest ergänzt werden muss.
+
+    Fallback (Pre-Mortem/AK Edge Case): kein Location-Treffer für location_id oder
+    Location ohne subject_name -> bisheriger reiner Event-Typ-Titel statt
+    "... über None"/"... über undefined".
+    """
+    location = get_location_by_id(location_id) if location_id else None
+    subject_name = getattr(location, "subject_name", None) if location else None
+    if not subject_name:
+        return event_type_label
+    return f"{event_type_label} über {subject_name}"
+
+
 def _build_golden_clouds_event(e):
     """
     TASK-74 (aus _generate_cloud_mood_events extrahiert): Baut das GOLDEN_CLOUDS-
@@ -795,7 +825,7 @@ def _build_golden_clouds_event(e):
     new_event = _copy.deepcopy(e)
     new_event["id"] = "gc_" + _uuid.uuid4().hex[:12]
     new_event["event_type"] = "Goldene Wolken"
-    new_event["title"] = "Goldene Wolken"
+    new_event["title"] = _build_opportunity_title(new_event["event_type"], e.get("location_id"))
     new_event["description"] = (
         "Die Sonne geht in Motivrichtung auf oder unter und trifft auf "
         "Wolkenschichten, die das Licht warm-golden einfärben. "
@@ -827,7 +857,7 @@ def _build_red_sky_event(e, aod, cl, cm, sun_az, subject_az):
     new_event = _copy.deepcopy(e)
     new_event["id"] = "rs_" + _uuid.uuid4().hex[:12]
     new_event["event_type"] = "Himmelsröte"
-    new_event["title"] = "Himmelsröte"
+    new_event["title"] = _build_opportunity_title(new_event["event_type"], e.get("location_id"))
     # US-130 AK-2: Dunst nur dann als Auslöser benennen, wenn die Wolkenbedingung
     # selbst NICHT ausgereicht hätte (sonst bleibt der bisherige Wolken-Text
     # unverändert — Regression/Rule 3, Wolkenbedingung hat immer Vorrang im Text).
@@ -908,7 +938,7 @@ def _build_red_clouds_event(e, ch, cl, sun_alt, sun_az, subject_az):
     new_event = _copy.deepcopy(e)
     new_event["id"] = "rc_" + _uuid.uuid4().hex[:12]
     new_event["event_type"] = "Rote Wolken"
-    new_event["title"] = "Rote Wolken"
+    new_event["title"] = _build_opportunity_title(new_event["event_type"], e.get("location_id"))
     new_event["description"] = (
         "Die Sonne steht bereits unter dem Horizont, doch hohe Wolken (Cirrus) in "
         "Motivrichtung werden noch direkt angestrahlt und färben sich kräftig "

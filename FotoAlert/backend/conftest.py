@@ -98,7 +98,7 @@ def auth_headers(user_token):
 # Feste Test-Location custom_1781560330 (TASK-19-Seed-Ersatz)
 # ---------------------------------------------------------------------------
 
-_SEED_LOCATION_ID = "custom_1781560330"
+_SEED_LOCATION_ID = "test_bug94_seed_9f3a1c"
 
 
 def _seed_location_dict() -> dict:
