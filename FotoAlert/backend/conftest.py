@@ -95,22 +95,30 @@ def auth_headers(user_token):
 
 
 # ---------------------------------------------------------------------------
-# Feste Test-Location custom_1781560330 (TASK-19-Seed-Ersatz)
+# Feste Test-Locations (TASK-19-Seed-Ersatz + BUG-94-Nachbesserung 2026-07-31)
 # ---------------------------------------------------------------------------
 
 _SEED_LOCATION_ID = "test_bug94_seed_9f3a1c"
 
+# BUG-94-Nachbesserung (2026-07-31, CI-Regression nach dem BUG-94-Kollisions-
+# fix): fünf ältere Testdateien (test_api_regression.py, test_bug-61.py,
+# test_patch_cache_consistency.py, test_task-83.py, test_us66_login.py)
+# referenzieren weiterhin hart die alte ID `custom_1781560330` als eigene
+# Modulkonstante `LOC` — diese Dateien selbst werden bewusst NICHT verändert
+# (siehe Docstring von ensure_seed_location unten für die Root-Cause-Analyse).
+_LEGACY_SEED_LOCATION_ID = "custom_1781560330"
+
 
 def _seed_location_dict() -> dict:
-    """Default-Felder für die feste Test-Location.
+    """Default-Felder für die BUG-94-eigene, kollisionsfreie Test-Location.
 
-    Werte sind Platzhalter (Raum Berlin/Potsdam); die vier Testdateien patchen
-    bzw. prüfen ohnehin ihre eigenen Felder, reale fotografische Genauigkeit
-    ist für den Testzweck irrelevant.
+    Werte sind Platzhalter (Raum Berlin/Potsdam); test_bug-94.py patcht bzw.
+    prüft ohnehin seine eigenen Felder, reale fotografische Genauigkeit ist
+    für den Testzweck irrelevant.
     """
     return {
         "id": _SEED_LOCATION_ID,
-        "name": "Test-Harness-Location (custom_1781560330)",
+        "name": "Test-Harness-Location (BUG-94 Seed)",
         "description": "",
         "category": "SKYLINE",
         "observer_lat": 52.3906,
@@ -128,16 +136,41 @@ def _seed_location_dict() -> dict:
     }
 
 
-@pytest.fixture
-def ensure_seed_location(client):
-    """Stellt sicher, dass die feste Test-Location custom_1781560330 existiert.
+def _legacy_seed_location_dict() -> dict:
+    """Default-Felder für die historische feste Test-Location custom_1781560330.
 
-    Historisch (TASK-19) wurde diese Location einmalig manuell in data_dev/
-    geseedet; der Seed ging später verloren, wodurch test_bug-61.py,
-    test_api_regression.py, test_patch_cache_consistency.py und
-    test_us66_login.py (alle referenzieren sie als Modulkonstante `LOC`) mit
-    404 fehlschlugen. Diese Fixture ersetzt den verlorenen manuellen
-    Seed-Schritt idempotent, ohne main.py/data/store.py zu verändern.
+    Eigener, generischer Platzhalter (Raum Berlin/Potsdam) — bewusst NICHT
+    identisch mit dem echten, gitignorten Produktiv-/Dev-Eintrag gleicher ID
+    aus backend/data/custom_locations.json ("Belvedere Test"). Diese Test-
+    Location lebt ausschließlich in der Test-DB (data_dev/, FOTOALERT_ENV=dev)
+    und berührt data/custom_locations.json nie. Die fünf abhängigen Testdateien
+    patchen bzw. prüfen ohnehin ihre eigenen Felder, reale fotografische
+    Genauigkeit ist für den Testzweck irrelevant.
+    """
+    return {
+        "id": _LEGACY_SEED_LOCATION_ID,
+        "name": "Test-Harness-Location (Legacy-Seed custom_1781560330)",
+        "description": "",
+        "category": "SKYLINE",
+        "observer_lat": 52.3906,
+        "observer_lon": 13.0645,
+        "subject_lat": 52.3920,
+        "subject_lon": 13.0700,
+        "subject_name": "Test-Motiv",
+        "subject_height_m": 20.0,
+        "subject_width_m": 10.0,
+        "distance_m": 500,
+        "focal_length_suggestions": [50],
+        "special_notes": "",
+        "difficulty": 1,
+        "observer_floor_height_m": 0.0,
+    }
+
+
+def _ensure_location(loc_dict: dict) -> None:
+    """Generische, wiederverwendbare Ensure-Logik für eine feste Test-Location
+    (BUG-94-Nachbesserung 2026-07-31 — vormals hart auf eine einzige ID
+    zugeschnitten, jetzt für beliebig viele feste Test-Location-IDs nutzbar).
 
     Zwei Ebenen müssen die Location beide kennen, weil main.py sie getrennt hält:
     - `main._store` (SQLite in data_dev/fotoalert.db) — Persistenzschicht,
@@ -148,7 +181,7 @@ def ensure_seed_location(client):
       session-scoped und startet die App vor dem ersten Testlauf einmal — ein
       reiner DB-Insert wäre für GET/PATCH in der laufenden TestClient-Session
       unsichtbar, weil LOCATIONS bereits geladen ist. Deshalb hängt diese
-      Fixture die Location bei Bedarf zusätzlich direkt an `main.LOCATIONS`
+      Funktion die Location bei Bedarf zusätzlich direkt an `main.LOCATIONS`
       an — exakt das gleiche Konstruktionsmuster wie
       `main._load_custom_locations` für einen einzelnen Eintrag.
 
@@ -160,18 +193,18 @@ def ensure_seed_location(client):
     import main as _main
     from data.locations import PhotoLocation, LocationCategory
 
-    loc_dict = _seed_location_dict()
+    location_id = loc_dict["id"]
 
     # 1) DB-Ebene: nur inserten, wenn noch nicht vorhanden.
     existing_ids = {e["id"] for e in _main._store.load_all_custom()}
-    if _SEED_LOCATION_ID not in existing_ids:
+    if location_id not in existing_ids:
         try:
             _main._store.create_custom(loc_dict)
         except Exception:
             pass  # Race: paralleler Testlauf hat sie inzwischen angelegt.
 
     # 2) In-Memory-Ebene: nur anhängen, wenn noch nicht in LOCATIONS.
-    if not any(l.id == _SEED_LOCATION_ID for l in _main.LOCATIONS):
+    if not any(l.id == location_id for l in _main.LOCATIONS):
         loc = PhotoLocation(
             id=loc_dict["id"], name=loc_dict["name"], description=loc_dict["description"],
             category=LocationCategory[loc_dict["category"]],
@@ -185,4 +218,42 @@ def ensure_seed_location(client):
         )
         _main.LOCATIONS.append(loc)
 
+
+@pytest.fixture
+def ensure_seed_location(client):
+    """Stellt sicher, dass BEIDE festen Test-Locations existieren: die BUG-94-
+    eigene, kollisionsfreie `test_bug94_seed_9f3a1c` (test_bug-94.py) UND die
+    historische `custom_1781560330` (fünf ältere Testdateien, siehe unten).
+
+    Root Cause (verifiziert per echtem Pytest-Lauf gegen eine frische
+    data_dev/, ohne das gitignorte backend/data/custom_locations.json —
+    2026-07-31): `custom_1781560330` existiert NICHT als committeter Seed.
+    Bis zur vorherigen BUG-94-Kollisionsfix-Runde zeigte `_SEED_LOCATION_ID`
+    selbst auf `custom_1781560330`, wodurch diese (damals einzige) Fixture in
+    CI als Nebeneffekt genau die ID anlegte, die test_api_regression.py,
+    test_bug-61.py, test_patch_cache_consistency.py, test_task-83.py und
+    test_us66_login.py seit ihrer eigenen Entstehung hart als Modulkonstante
+    `LOC` referenzieren. Die Kollisionsfix-Runde änderte `_SEED_LOCATION_ID`
+    auf eine neue ID (`test_bug94_seed_9f3a1c`), um nicht mehr denselben
+    Bezeichner wie der echte, gitignorte Dev-Eintrag "Belvedere Test"
+    (backend/data/custom_locations.json, NICHT Teil des Git-Repos) zu
+    verwenden — das war für sich genommen richtig, hat aber den ungewollten
+    Nebeneffekt gekappt, auf den die fünf o.g. Dateien sich verlassen hatten.
+    Lokal blieb das unbemerkt, weil `backend/data/custom_locations.json` auf
+    Entwicklungsrechnern echt vorhanden ist und `main._load_custom_locations()`
+    daraus automatisch nach data_dev/ migriert (Fallback bei leerer DB) — in
+    einem frischen CI-Checkout fehlt diese Datei jedoch komplett (.gitignore),
+    weshalb der Fallback dort nie greift und `custom_1781560330` seit der
+    Kollisionsfix-Runde in CI mit 404 fehlschlug.
+
+    Lösung: `_LEGACY_SEED_LOCATION_ID` (`custom_1781560330`) wird zusätzlich
+    zur neuen BUG-94-ID über dieselbe generische `_ensure_location()`-Logik in
+    der Test-DB (data_dev/, komplett getrennt von data/custom_locations.json
+    und dem echten Dev-Eintrag) sichergestellt — die BUG-94-Kollisionslösung
+    selbst bleibt unverändert bestehen (test_bug-94.py nutzt weiterhin
+    ausschließlich die neue, kollisionsfreie ID). Die fünf abhängigen Test-
+    dateien wurden inhaltlich NICHT verändert, nur diese Fixture repariert.
+    """
+    _ensure_location(_seed_location_dict())
+    _ensure_location(_legacy_seed_location_dict())
     return _SEED_LOCATION_ID
