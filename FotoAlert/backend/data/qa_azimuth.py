@@ -24,10 +24,12 @@ Python-3.9-kompatibel.
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import threading
 import time
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 from discover.geometry import bearing_between
@@ -40,12 +42,16 @@ DEFAULT_TOLERANCE_DEG: float = 15.0
 
 # Overpass: öffentlicher Endpoint + kurzes Timeout, damit ein langsamer/down
 # Server den QA-Lauf nicht hängen lässt (Pre-Mortem-Gegenmaßnahme).
-OVERPASS_URL: str = "https://overpass.kumi.systems/api/interpreter"
-# Mirror-Liste für Fallback bei Serverblockade/-ausfall: Kumi zuerst (aktuell
-# bestätigt funktionierend), overpass-api.de als Fallback falls Kumi down ist.
+OVERPASS_URL: str = "https://overpass-api.de/api/interpreter"
+# Mirror-Liste für Fallback bei Serverblockade/-ausfall: overpass-api.de
+# zuerst (TASK-59, live verifiziert 2026-08-02 mit gesetztem User-Agent/
+# Referer-Header: liefert echte Daten, keine Sperre mehr), kumi.systems als
+# zweiter Versuch (liefert im selben Live-Test weiterhin einen Timeout-Fehler
+# "server too busy" — Grundproblem ist echte Serverauslastung, nicht der
+# fehlende Header, bleibt daher unzuverlässig).
 OVERPASS_MIRRORS: List[str] = [
-    "https://overpass.kumi.systems/api/interpreter",
     "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
 ]
 OVERPASS_TIMEOUT_S: float = 8.0
 # Suchradius um die Motiv-Koordinate für den Gebäude-Footprint (Meter).
@@ -62,6 +68,22 @@ OVERPASS_SEARCH_RADIUS_M: int = 40
 # Server bleiben Rückfallebene", TASK-59 Frage 2 / AK "Edge Case: Fällt der
 # eigene Server komplett aus...").
 OWN_OVERPASS_URL: Optional[str] = os.environ.get("OWN_OVERPASS_URL") or None
+
+# TASK-59 Option E (2026-08-02): Aus der Recherche zur Zuverlässigkeit der
+# öffentlichen Mirrors — beide (Kumi/Private.coffee, overpass-api.de/FOSSGIS)
+# verlangen laut OSM-Wiki einen gesetzten User-Agent/Referer-Header; ein
+# bisher nicht gesetzter Header ist ein möglicher (bisher nicht geprüfter)
+# Mitgrund für die bisherigen Sperren/Timeouts. Kostet nichts, gilt für JEDE
+# Anfrage an einen Overpass-Server (eigenen wie öffentlichen).
+OVERPASS_USER_AGENT: str = (
+    "FotoAlert/1.0 (+https://fotoalert.stephanschumann.com; "
+    "contact: stephanschumann@me.com)"
+)
+OVERPASS_REFERER: str = "https://fotoalert.stephanschumann.com"
+OVERPASS_REQUEST_HEADERS: dict = {
+    "User-Agent": OVERPASS_USER_AGENT,
+    "Referer": OVERPASS_REFERER,
+}
 
 # Live-Bug (US-09): Der kostenlose Overpass-Server lehnt bei zu schneller
 # Anfragefolge Verbindungen ab ([Errno 61] Connection refused), wodurch der
@@ -83,6 +105,136 @@ MAX_TOLERANCE_DEG: float = 179.999
 # sicher (synchrones Pendant zu _rate_limit_lock in elevation.py).
 _overpass_rate_limit_lock = threading.Lock()
 _last_overpass_request_ts: Optional[float] = None
+
+# ---------------------------------------------------------------------------
+# TASK-59 Option E (2026-08-02): lokale Batch-Cache-Datei statt Live-Anfrage
+# ---------------------------------------------------------------------------
+# Kein eigener Server mehr (siehe Weg-Gate-Entscheidung 2026-08-02, ersetzt die
+# Server-Entscheidung vom 2026-07-15). Stattdessen extrahiert ein geplanter
+# GitHub-Actions-Workflow (siehe .github/workflows/update-building-data.yml)
+# regelmäßig Gebäude-Footprints aus einem lokalen Geofabrik-Auszug für die
+# ~60 bekannten Basis-Locations (backend/data/locations.py) und committet das
+# Ergebnis als backend/data/cache/building_footprints.json ins Repo. Beide
+# Funktionen unten (_fetch_overpass_footprint, fetch_buildings_along_line)
+# schauen zuerst hier nach, BEVOR sie einen Live-Mirror kontaktieren.
+#
+# Bewusste Scope-Grenze: Nur die Basis-Locations aus data/locations.py sind
+# Teil des Batch-Exports, da nur sie im Git-Repo stehen — Custom-Locations
+# (vom Host über die App angelegt) leben ausschließlich in der Server-DB und
+# sind dem GitHub-Actions-Workflow nicht zugänglich. Für sie (und für neu
+# angelegte/koordinaten-korrigierte Basis-Locations, die noch nicht im
+# letzten Batch-Lauf enthalten sind) bleibt der bestehende Live-Mirror-Pfad
+# unverändert die einzige Datenquelle — automatisch, ohne Sonderfall-Code:
+# ein Koordinaten-Abgleich, der keinen Treffer findet, fällt einfach durch.
+BUILDING_CACHE_PATH: Path = Path(__file__).resolve().parent / "cache" / "building_footprints.json"
+
+# Toleranz für den Koordinaten-Abgleich zwischen einer Live-Anfrage und einem
+# Cache-Eintrag (Grad, ~1m bei diesem Wert). Beide Werte stammen aus derselben
+# Python-Fließkommazahl über JSON-Round-Trip — 1e-5 ist großzügig genug für
+# Rundungsrauschen, aber eng genug, dass eine tatsächlich manuell korrigierte
+# Koordinate (Meter- bis Zehnermeter-Bereich) zuverlässig NICHT mehr matcht
+# und automatisch auf den Live-Pfad zurückfällt.
+BUILDING_CACHE_COORD_TOLERANCE_DEG: float = 1e-5
+
+_building_cache_lock = threading.Lock()
+# None = noch nicht geladen; danach immer eine Liste (ggf. leer bei fehlender
+# oder fehlerhafter Datei — kein Unterschied zum "Cache-Miss"-Verhalten).
+_building_cache_entries: Optional[List[dict]] = None
+
+
+def _load_building_cache() -> List[dict]:
+    """Lädt (einmalig, thread-sicher, gecached für die Prozesslaufzeit) die
+    lokale Gebäude-Cache-Datei (TASK-59 Option E). Fehlt die Datei (z.B. weil
+    der GitHub-Actions-Job noch nie erfolgreich gelaufen ist) oder ist sie
+    fehlerhaft/leer, wird das geräuschlos wie eine leere Liste behandelt —
+    jede Lookup-Anfrage fällt dann automatisch auf den Live-Mirror-Pfad
+    zurück (kein Crash, keine Exception nach außen, kein Unterschied zum
+    Verhalten vor Option E)."""
+    global _building_cache_entries
+    if _building_cache_entries is not None:
+        return _building_cache_entries
+    with _building_cache_lock:
+        if _building_cache_entries is not None:
+            return _building_cache_entries
+        try:
+            raw = json.loads(BUILDING_CACHE_PATH.read_text(encoding="utf-8"))
+            entries = raw.get("locations") or []
+        except FileNotFoundError:
+            logger.info(
+                "Lokale Gebäude-Cache-Datei %s existiert noch nicht — "
+                "Live-Mirror-Pfad wird für alle Locations genutzt "
+                "(GitHub-Actions-Job aus TASK-59 Option E noch nicht gelaufen?)",
+                BUILDING_CACHE_PATH,
+            )
+            entries = []
+        except (OSError, ValueError, AttributeError) as e:
+            logger.warning(
+                "Lokale Gebäude-Cache-Datei %s nicht lesbar (%s) — "
+                "Live-Mirror-Pfad wird für alle Locations genutzt",
+                BUILDING_CACHE_PATH, e,
+            )
+            entries = []
+        _building_cache_entries = entries
+        return _building_cache_entries
+
+
+def _coords_match(a: Optional[float], b: Optional[float]) -> bool:
+    """True, wenn beide Koordinaten gesetzt und innerhalb der Cache-Toleranz
+    gleich sind."""
+    if a is None or b is None:
+        return False
+    return abs(a - b) < BUILDING_CACHE_COORD_TOLERANCE_DEG
+
+
+def _find_local_cache_entry(
+    subject_lat: float,
+    subject_lon: float,
+    observer_lat: Optional[float] = None,
+    observer_lon: Optional[float] = None,
+) -> Optional[dict]:
+    """Sucht in der lokalen Gebäude-Cache-Datei einen Eintrag, dessen Motiv-
+    Koordinate (und, falls angegeben, auch dessen Standort-Koordinate) mit den
+    übergebenen Werten übereinstimmt. Kein Treffer -> None; der Aufrufer fällt
+    dann auf den bisherigen Live-Mirror-Pfad zurück (z.B. neu angelegte
+    Location, seit dem letzten Batch-Lauf koordinaten-korrigierte Location,
+    oder eine Custom-Location außerhalb des Batch-Exports)."""
+    for entry in _load_building_cache():
+        if not _coords_match(entry.get("subject_lat"), subject_lat):
+            continue
+        if not _coords_match(entry.get("subject_lon"), subject_lon):
+            continue
+        if observer_lat is not None and not _coords_match(entry.get("observer_lat"), observer_lat):
+            continue
+        if observer_lon is not None and not _coords_match(entry.get("observer_lon"), observer_lon):
+            continue
+        return entry
+    return None
+
+
+def _nearest_building_nodes(
+    subject_lat: float,
+    subject_lon: float,
+    buildings: List[dict],
+) -> Optional[List[Tuple[float, float]]]:
+    """Wählt aus einer Liste gecachter Gebäude (je {"nodes": [[lat,lon],...],
+    "height_m": float}) das mit dem Schwerpunkt am dichtesten an der Motiv-
+    Koordinate — dieselbe Auswahlregel wie im Live-Pfad in
+    _fetch_overpass_footprint(). Gibt None zurück, wenn `buildings` leer ist
+    oder kein Eintrag mindestens 3 Knoten hat (kein valides Polygon)."""
+    best_nodes: Optional[List[Tuple[float, float]]] = None
+    best_dist = float("inf")
+    for b in buildings:
+        raw_nodes = b.get("nodes") or []
+        nodes = [(float(n[0]), float(n[1])) for n in raw_nodes if len(n) == 2]
+        if len(nodes) < 3:
+            continue
+        c_lat = sum(n[0] for n in nodes) / len(nodes)
+        c_lon = sum(n[1] for n in nodes) / len(nodes)
+        d = (c_lat - subject_lat) ** 2 + (c_lon - subject_lon) ** 2
+        if d < best_dist:
+            best_dist = d
+            best_nodes = nodes
+    return best_nodes
 
 
 def _respect_overpass_rate_limit() -> None:
@@ -123,7 +275,7 @@ def _fetch_from_mirrors(query: str, timeout_s: float, log_context: str) -> Optio
     if OWN_OVERPASS_URL:
         _respect_overpass_rate_limit()
         try:
-            with httpx.Client(timeout=timeout_s) as client:
+            with httpx.Client(timeout=timeout_s, headers=OVERPASS_REQUEST_HEADERS) as client:
                 resp = client.post(OWN_OVERPASS_URL, data={"data": query})
                 resp.raise_for_status()
                 return resp.json()
@@ -141,7 +293,7 @@ def _fetch_from_mirrors(query: str, timeout_s: float, log_context: str) -> Optio
     for mirror_url in OVERPASS_MIRRORS:
         _respect_overpass_rate_limit()
         try:
-            with httpx.Client(timeout=timeout_s) as client:
+            with httpx.Client(timeout=timeout_s, headers=OVERPASS_REQUEST_HEADERS) as client:
                 resp = client.post(mirror_url, data={"data": query})
                 resp.raise_for_status()
                 return resp.json()
@@ -241,7 +393,18 @@ def _fetch_overpass_footprint(
 
     Gibt eine Liste von (lat, lon) zurück oder None bei jedem Fehler/Timeout/
     fehlenden Daten — der Aufrufer fällt dann still auf die Bearing-Basis zurück.
+
+    TASK-59 Option E: Schaut zuerst in der lokalen Batch-Cache-Datei nach
+    (_find_local_cache_entry). Ein Treffer dort — auch mit leerer Gebäudeliste,
+    was "im letzten Batch-Lauf bestätigt kein Gebäude in der Nähe" bedeutet —
+    beendet die Funktion ohne Live-Netzanfrage. Nur bei einem Cache-Miss (z.B.
+    neu angelegte oder seither koordinaten-korrigierte Location) läuft der
+    bisherige Live-Mirror-Pfad unverändert weiter.
     """
+    local_entry = _find_local_cache_entry(subject_lat, subject_lon)
+    if local_entry is not None:
+        return _nearest_building_nodes(subject_lat, subject_lon, local_entry.get("buildings") or [])
+
     query = (
         "[out:json][timeout:{t}];"
         "("
@@ -329,7 +492,25 @@ def fetch_buildings_along_line(
     (_fetch_overpass_footprint), aber mit Bounding-Box statt Radius-um-Punkt,
     da hier die gesamte Sichtlinie abgedeckt werden muss, nicht nur ein
     40m-Umkreis um das Motiv.
+
+    TASK-59 Option E: Schaut zuerst in der lokalen Batch-Cache-Datei nach
+    (_find_local_cache_entry, Abgleich über Standort- UND Motiv-Koordinate).
+    Ein Treffer dort — auch mit leerer Gebäudeliste, was "im letzten
+    Batch-Lauf bestätigt keine Gebäude in der Umgebung" bedeutet und laut
+    evaluate_sightline() korrekt als "geprüft, frei" gilt (im Unterschied zu
+    None = "nicht geprüft") — beendet die Funktion ohne Live-Netzanfrage. Nur
+    bei einem Cache-Miss läuft der bisherige Live-Mirror-Pfad unverändert weiter.
     """
+    local_entry = _find_local_cache_entry(subject_lat, subject_lon, observer_lat, observer_lon)
+    if local_entry is not None:
+        return [
+            {
+                "nodes": [(float(n[0]), float(n[1])) for n in (b.get("nodes") or [])],
+                "height_m": b.get("height_m", DEFAULT_BUILDING_HEIGHT_M),
+            }
+            for b in (local_entry.get("buildings") or [])
+        ]
+
     lat_min = min(observer_lat, subject_lat) - 0.001   # ~110m Rand
     lat_max = max(observer_lat, subject_lat) + 0.001
     lon_min = min(observer_lon, subject_lon) - 0.001

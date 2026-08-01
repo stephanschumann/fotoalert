@@ -155,6 +155,66 @@ def test_own_overpass_fehlschlag_erzeugt_unterscheidbare_log_meldung(monkeypatch
     assert len(mirror_logs) == len(qa_azimuth.OVERPASS_MIRRORS)
 
 
+class _HeaderCapturingClient:
+    """Fake httpx.Client: merkt sich die Konstruktor-Kwargs (insbesondere
+    `headers`) UND die angefragten URLs, schlägt beim eigentlichen Request
+    immer fehl -> Reihenfolge/Header sind unabhängig vom Anfrageerfolg prüfbar."""
+
+    calls: list = []
+    init_kwargs: list = []
+
+    def __init__(self, *args, **kwargs):
+        _HeaderCapturingClient.init_kwargs.append(kwargs)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+    def post(self, url, data=None):
+        _HeaderCapturingClient.calls.append(url)
+        raise httpx.ConnectError("simulierter Verbindungsfehler")
+
+
+def test_user_agent_und_referer_header_bei_mirror_anfragen_gesetzt(monkeypatch):
+    """TASK-59 Option E (User-Agent/Referer-Fix): Jede Anfrage an einen
+    OVERPASS_MIRRORS-Eintrag muss den FotoAlert-User-Agent + Referer-Header
+    tragen (laut OSM-Wiki von Kumi/Private.coffee UND overpass-api.de/FOSSGIS
+    verlangt — bisher fehlend, möglicher Mitgrund für die Sperren/Timeouts)."""
+    monkeypatch.setattr(qa_azimuth, "OWN_OVERPASS_URL", None)
+    _HeaderCapturingClient.calls = []
+    _HeaderCapturingClient.init_kwargs = []
+    monkeypatch.setattr(httpx, "Client", _HeaderCapturingClient)
+
+    qa_azimuth._fetch_from_mirrors("fake-query", 5.0, "test-context")
+
+    assert len(_HeaderCapturingClient.init_kwargs) == len(qa_azimuth.OVERPASS_MIRRORS)
+    for kwargs in _HeaderCapturingClient.init_kwargs:
+        headers = kwargs.get("headers")
+        assert headers is not None
+        assert headers["User-Agent"] == qa_azimuth.OVERPASS_USER_AGENT
+        assert headers["Referer"] == qa_azimuth.OVERPASS_REFERER
+
+
+def test_user_agent_und_referer_header_bei_eigenem_server_gesetzt(monkeypatch):
+    """Derselbe Header-Fix muss auch für den (dormanten, TASK-59
+    Code-Vorbereitung) OWN_OVERPASS_URL-Pfad gelten — beide HTTP-Anfragestellen
+    in _fetch_from_mirrors() sind betroffen."""
+    monkeypatch.setattr(qa_azimuth, "OWN_OVERPASS_URL", _OWN_URL)
+    _HeaderCapturingClient.calls = []
+    _HeaderCapturingClient.init_kwargs = []
+    monkeypatch.setattr(httpx, "Client", _HeaderCapturingClient)
+
+    qa_azimuth._fetch_from_mirrors("fake-query", 5.0, "test-context")
+
+    # Erster Aufruf ist der eigene Server (siehe Reihenfolge-Test oben).
+    assert _HeaderCapturingClient.calls[0] == _OWN_URL
+    own_server_kwargs = _HeaderCapturingClient.init_kwargs[0]
+    assert own_server_kwargs["headers"]["User-Agent"] == qa_azimuth.OVERPASS_USER_AGENT
+    assert own_server_kwargs["headers"]["Referer"] == qa_azimuth.OVERPASS_REFERER
+
+
 def test_own_overpass_url_leer_string_wird_wie_nicht_gesetzt_behandelt(monkeypatch):
     """Edge Case: ein leerer String (z.B. gesetzte, aber leere Env-Var) muss
     denselben Effekt wie None haben — kein versehentlicher Versuch gegen eine

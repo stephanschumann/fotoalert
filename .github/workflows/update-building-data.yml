@@ -1,0 +1,80 @@
+# TASK-59 Option E: Wöchentlicher Batch-Export von OSM-Gebäude-Footprints für
+# die bekannten FotoAlert-Locations (Ersatz für unzuverlässige Live-Overpass-
+# Anfragen im Sichtachsen-Check, siehe backend/data/qa_azimuth.py).
+#
+# WICHTIG — kein Deploy-Trigger: Dieser Workflow committet ausschließlich
+# backend/data/cache/building_footprints.json. deploy.yml (Produktions-
+# Deploy) triggert auf jeden Push nach main, hat dafür aber `paths-ignore`
+# genau für diese Datei bekommen — ein Commit hier allein löst also KEINEN
+# Deploy aus. Würde ein Commit hier zusätzlich andere Dateien ändern, GRIFFE
+# der paths-ignore-Schutz nicht mehr — dieser Workflow darf deshalb niemals
+# mehr als die eine Datendatei anfassen/committen.
+#
+# Stephan muss nach dem ersten Push einmalig selbst verifizieren:
+#   (a) dass dieser Workflow tatsächlich erfolgreich gegen den echten
+#       Geofabrik-Brandenburg-Auszug läuft (Sandbox hatte keinen
+#       Netzwerkzugriff, konnte den echten Download/osmium-Lauf nicht testen),
+#   (b) dass building_footprints.json danach plausible echte Gebäudedaten
+#       enthält (nicht nur eine leere/fehlerhafte Datei).
+
+name: Update Building Footprint Data (TASK-59)
+
+on:
+  schedule:
+    # Jeden Montag 03:00 UTC — Locations sind überwiegend statisch, ein
+    # wöchentlicher Lauf reicht (siehe TASK-59 Option E Beschreibung).
+    - cron: '0 3 * * 1'
+  # Manueller Trigger für den ersten Verifikationslauf durch Stephan.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-building-data:
+    name: Gebäudedaten aus Geofabrik-Auszug extrahieren
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4.2.2
+
+      - name: Python 3.9 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Extraktions-Abhängigkeiten installieren
+        working-directory: FotoAlert/backend
+        run: pip install -r tools/requirements-extract.txt
+
+      # Real ca. 281 MB (Stand TASK-59-Recherche 2026-08-02) — deutlich kleiner
+      # als der komplette Planet-Datensatz, siehe BACKLOG.md TASK-59 Option E.
+      - name: Geofabrik Brandenburg-Auszug (inkl. Berlin) herunterladen
+        timeout-minutes: 10
+        run: |
+          curl -fSL --max-time 480 \
+            -o /tmp/brandenburg-latest.osm.pbf \
+            https://download.geofabrik.de/europe/germany/brandenburg-latest.osm.pbf \
+            || { echo "❌ Geofabrik-Download fehlgeschlagen oder Timeout überschritten"; exit 1; }
+
+      - name: Gebäudedaten extrahieren
+        working-directory: FotoAlert/backend
+        run: |
+          python3 tools/extract_building_data.py \
+            --pbf /tmp/brandenburg-latest.osm.pbf \
+            --output data/cache/building_footprints.json \
+            --radius 200
+
+      - name: Änderung committen (nur falls sich die Datei geändert hat)
+        run: |
+          if git diff --quiet -- FotoAlert/backend/data/cache/building_footprints.json; then
+            echo "Keine inhaltliche Änderung an building_footprints.json — kein Commit nötig."
+            exit 0
+          fi
+          git config user.name "fotoalert-bot"
+          git config user.email "actions@github.com"
+          git add FotoAlert/backend/data/cache/building_footprints.json
+          git commit -m "chore(TASK-59): Gebäudedaten aus Geofabrik-Brandenburg-Auszug aktualisiert"
+          git push

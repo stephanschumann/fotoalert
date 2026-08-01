@@ -15,6 +15,13 @@ on:
   push:
     branches:
       - main
+    # TASK-59 Option E: Der geplante update-building-data.yml-Workflow
+    # committet ausschließlich diese eine Datendatei. Sie soll für sich allein
+    # KEINEN Produktions-Deploy auslösen (Gebäudedaten-Update ≠ App-Release).
+    # Ändert ein Commit ZUSÄTZLICH andere Dateien, greift dieser Ausschluss
+    # nicht mehr und der Deploy läuft wie gewohnt.
+    paths-ignore:
+      - 'FotoAlert/backend/data/cache/building_footprints.json'
   # Manueller Trigger: in GitHub unter Actions → Run workflow
   workflow_dispatch:
 

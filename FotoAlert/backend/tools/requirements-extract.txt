@@ -1,0 +1,12 @@
+# TASK-59 Option E: Zusätzliche Abhängigkeit NUR für den geplanten
+# GitHub-Actions-Workflow update-building-data.yml (tools/extract_building_data.py).
+# Bewusst NICHT in backend/requirements.txt, damit der Produktions-Server und
+# die normale CI-Testsuite (test-backend in deploy.yml) dieses vergleichsweise
+# schwere C-Erweiterungspaket nicht mitinstallieren müssen — es wird zur
+# Laufzeit der App nie gebraucht (Live-Overpass-Pfad in qa_azimuth.py nutzt
+# weiterhin nur httpx).
+#
+# ⚠️ Nicht in dieser Sandbox gegen PyPI verifiziert (kein Netzwerkzugriff) —
+# Stephan muss die Versionsspanne beim ersten echten Workflow-Lauf prüfen
+# (siehe BACKLOG.md TASK-59, Punkt "Stephan muss noch verifizieren").
+osmium>=3.6,<4
