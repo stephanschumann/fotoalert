@@ -2651,7 +2651,7 @@ async def _compute_location_month(loc, year: int, month: int, min_score: float) 
     return [e for e in (_serialize(o) for o in opps) if _passes_alignment_filter(e)]
 
 
-async def _compute_month_all_locations(year: int, month: int, min_score: float = 0.40) -> list:
+async def _compute_month_all_locations(year: int, month: int, min_score: float = 0.35) -> list:
     """Monatsübersicht über ALLE Locations (On-Demand, gecacht). Ersetzt den
     365-Tage-Batch durch eine bedarfsgesteuerte, schnelle Monatsberechnung."""
     import asyncio as _asyncio
@@ -2684,7 +2684,7 @@ async def get_calendar(
     location_id: Optional[str] = None,
     month: Optional[int] = None,
     year: Optional[int] = None,
-    min_score: float = 0.40,
+    min_score: float = 0.35,
 ) -> dict:
     """
     Jahreskalender: astronomy-only Events für alle Locations, 365 Tage.
@@ -2723,7 +2723,7 @@ async def get_calendar(
         events = [e for e in events if int(e["shoot_time"][5:7]) == month]
     if year:
         events = [e for e in events if int(e["shoot_time"][:4]) == year]
-    if min_score != 0.40:
+    if min_score != 0.35:
         events = [e for e in events if e["overall_score"] >= min_score]
 
     return {

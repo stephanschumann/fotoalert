@@ -859,7 +859,7 @@ async def _compute_calendar_for_location(
         d = date.fromisoformat(d_str)
         try:
             opps = await find_opportunities(
-                loc, d, forecast=None, min_score=0.40, astronomy_only=True,
+                loc, d, forecast=None, min_score=0.35, astronomy_only=True,
             )
             new_events_for_loc.extend(
                 e for e in (_serialize(o) for o in opps)
