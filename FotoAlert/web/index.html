@@ -597,6 +597,13 @@
     .coords-btns { display: flex; gap: 6px; }
     .coords-maps-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
     .coords-sv-btn { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--gold); cursor: pointer; }
+    /* TASK-07: PhotoPills-Text-/Kopier-Fallback in .sheet-actions, Stil wie bestehende Aktions-Buttons */
+    .pp-fallback { background: var(--card); border: 1px solid var(--gold); border-radius: 10px; padding: 12px 14px; margin-top: 2px; }
+    .pp-fallback-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+    .pp-fallback-sub { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+    .pp-fallback-text { font-family: monospace; font-size: 12px; line-height: 1.7; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word; user-select: all; }
+    .pp-copy-btn { margin-top: 10px; background: var(--gold); color: var(--on-accent); border: none; border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; }
+    .pp-copy-btn.copied { background: var(--green); }
     .verified-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--green); background: rgba(76,175,80,.12); border: 1px solid rgba(76,175,80,.3); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .verified-badge-issue { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--red); background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.35); border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
     .tag-verified { background: rgba(76,175,80,.15); color: var(--green); }
@@ -1103,6 +1110,9 @@
   <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7 H19 M9 7 V5 h6 V7 M7 7 l1 13 h8 l1 -13"/></g></symbol>
   <symbol id="i-walk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="M13 7 11 12 8 21 M11 12 16 14 18 20 M11 12 7 14 5 18"/></g></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9 M10 6 12 4 a3 3 0 0 1 4 4 l-2 2 M14 18 12 20 a3 3 0 0 1 -4 -4 l2 -2"/></g></symbol>
+  <!-- TASK-07: PhotoPills-Export – gleicher Linienstil (1.7 Stroke, round caps, geometrisch) wie übrige Icons -->
+  <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 20 4 13 20 11 13 4 12 Z"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="12" height="14" rx="2"/><path d="M9 4 V3 a1 1 0 0 1 1 -1 h9 a1 1 0 0 1 1 1 v14 a1 1 0 0 1 -1 1 h-1"/></g></symbol>
   <symbol id="i-sliders" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 H20 M4 16 H20"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="16" r="2"/></g></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 V4 M4 20 H20"/><path d="M8 16 V13 M12 16 V9 M16 16 V11"/></g></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 h6 l2 2 h8 v11 H4 Z"/></g></symbol>
@@ -1594,7 +1604,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.53';
+const APP_VERSION = '1.22.54';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4996,14 +5006,20 @@ const Detail = {
           ? `<button class="btn-primary" onclick="Scout._saveFromDetail()" style="background:var(--accent);color:var(--on-accent,#000);border:none">${ic('i-pin',15)} Als Location speichern</button>`
           : `<button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           ${ic('i-calplus',15)} Zum Kalender hinzufügen
+        </button>`
+        }
+        ${(o.observer_lat != null && o.observer_lon != null) ? `
+        <button id="pp-btn" class="btn-primary" onclick="Detail.sendToPhotoPills(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
+          ${ic('i-send',15)} An PhotoPills senden
         </button>
+        <div id="pp-result"></div>` : ''}
+        ${!o._isScout ? `
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
         <button id="verify-btn-${(o.location_id||'x').replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${escJsAttr(Locations.nameFor(o.location_id, o.location_name))}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
-        </button>`
-        }
+        </button>` : ''}
       </div>
     `;
     Detail._currentScout = o._isScout ? o._scoutRaw : null;
@@ -5067,6 +5083,105 @@ const Detail = {
     const h = Math.round(heading || 0);
     const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}&heading=${h}&pitch=0&fov=75`;
     window.open(url, '_blank');
+  },
+  // ── TASK-07: Export als PhotoPills-Bookmark (Option C – Hybrid) ──────────
+  // Best-Effort-Deep-Link + IMMER sichtbarer Text-/Kopier-Fallback, da sich der Erfolg
+  // eines photopills://-Deep-Links im Browser nicht zuverlässig feststellen lässt
+  // (kein Rückkanal, kein "onerror" für Custom-URL-Schemes) – siehe Pre-Mortem Szenario 1.
+  sendToPhotoPills(o) {
+    if (typeof o === 'string') o = JSON.parse(o);
+    // AK Edge Case: fehlende Koordinaten → Button wird bereits nicht gerendert (siehe open()),
+    // hier zusätzliche Absicherung falls die Funktion doch mit unvollständigen Daten aufgerufen wird.
+    if (o.observer_lat == null || o.observer_lon == null) { toast('Keine Koordinaten für PhotoPills-Export vorhanden'); return; }
+    // ⚠️ Ungetestet: PhotoPills' photopills://-URL-Schema ist nicht öffentlich dokumentiert.
+    // Ob/welche Parameter außer Koordinaten (Datum, Uhrzeit) akzeptiert werden, ist offen
+    // (TASK-07 Analyse-Spec, Frage 2) – der empirische Test auf einem echten iPhone mit
+    // installierter PhotoPills-App macht Stephan selbst. Bis dahin: Koordinaten sind der
+    // sichere Kern, alles Weitere best effort und ohne Garantie auf Wirkung.
+    const ppUrl = `photopills://?lat=${o.observer_lat}&lng=${o.observer_lon}`;
+    try { window.open(ppUrl, '_blank'); } catch (e) { /* Scheme evtl. nicht unterstützt – Fallback unten greift ohnehin immer */ }
+    Detail._showPhotoPillsFallback(o);
+  },
+  _buildPhotoPillsText(o) {
+    // Bug-Fix (AK7): Scout-Kandidaten haben weder location_id noch location_name
+    // (siehe Scout.openDetail() – beide werden dort explizit auf null gesetzt).
+    // Locations.nameFor() liefert dann null zurück ("null" landet sonst zweimal im
+    // Text). o.title trägt bei Scout-Objekten bereits den echten Motiv-Namen
+    // (Scout.openDetail(): title = o.subject_name || '–') – dieselbe Quelle, die
+    // auch der Sheet-Titel (sheet-hero-title, Detail.open()) korrekt anzeigt.
+    const locName = Locations.nameFor(o.location_id, o.location_name) || o.title || o.subject_name || 'Unbekannter Ort';
+    const lines = [];
+    lines.push(`${locName} – ${o.event_type}`);
+    lines.push(`Datum: ${new Date(o.shoot_time).toLocaleDateString('de-DE', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Berlin'})}`);
+    const windowStr = (o.shoot_window_start && o.shoot_window_end)
+      ? ` (Zeitfenster ${formatTime(o.shoot_window_start).replace(' Uhr','')}–${formatTime(o.shoot_window_end)})`
+      : '';
+    lines.push(`Uhrzeit: ${formatTime(o.shoot_time)}${windowStr}`);
+    if (o.subject_lat != null && o.subject_lon != null) {
+      lines.push(`Standort (Fotograf): ${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}`);
+      lines.push(`Motiv: ${locName}, ${o.subject_lat.toFixed(5)}, ${o.subject_lon.toFixed(5)}`);
+    } else {
+      lines.push(`Standort: ${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}`);
+    }
+    if (o.celestial_altitude != null) lines.push(`Höhe Himmelsobjekt: ${o.celestial_altitude.toFixed(1)}° über dem Horizont`);
+    // AK: Motivhöhe wird bei fehlendem Wert komplett weggelassen (nicht "null"/leer).
+    // Nutzt elevation_difference_m (kanonisches, garantiert vorhandenes Feld aus
+    // precompute._serialize() – siehe Code-Verifikation), nicht das optionale, nur in
+    // composition_analysis verschachtelte subject_height_m. Gleiche Terminologie wie
+    // die bestehende "Niveaudifferenz"-Sektion (Pattern 10: bestehenden Wortlaut wiederverwenden).
+    if (o.elevation_difference_m != null) {
+      const elev = o.elevation_difference_m;
+      const dirWord = elev > 0 ? 'Motiv höher' : (elev < 0 ? 'Standort höher' : 'gleiche Höhe');
+      lines.push(`Motivhöhe (Niveaudifferenz): ${elev > 0 ? '+' : ''}${Math.round(elev)} m (${dirWord})`);
+    }
+    if (o.description) lines.push(`Ereignis: ${o.description}`);
+    return lines.join('\n');
+  },
+  // Bug-Fix (AK3/AK8): "An PhotoPills senden" ist eine Sende-Aktion, kein reiner
+  // Auf-/Zuklapp-Schalter – AK3 verlangt bei JEDEM Tap sofort die vollständige
+  // Textübersicht, solange sich der Erfolg des photopills://-Deep-Links nicht
+  // feststellen lässt (kein Rückkanal). Die vorherige Implementierung schaltete
+  // _ppExpanded bei jedem Tap um (true→false→true→…), wodurch ein zweiter Tap den
+  // Block fälschlich wieder versteckte statt ihn (erneut) zu zeigen – erst der
+  // dritte Tap zeigte ihn wieder. Root Cause war also nicht ein Race/Zustands-Leck,
+  // sondern dass Toggle-Semantik für eine Sende-Aktion grundsätzlich falsch ist.
+  // Fix: immer sichtbar setzen (idempotent) statt umzuschalten – erfüllt auch AK8
+  // (mehrfaches Antippen löst kein doppeltes Öffnen/keinen Absturz aus).
+  _showPhotoPillsFallback(o) {
+    const resultEl = document.getElementById('pp-result');
+    if (!resultEl) return;
+    resultEl.innerHTML = `
+      <div class="pp-fallback">
+        <div class="pp-fallback-title">${ic('i-warn',14)} Falls PhotoPills nicht automatisch geöffnet wurde</div>
+        <div class="pp-fallback-sub">Kopiere die Daten stattdessen manuell in PhotoPills:</div>
+        <div class="pp-fallback-text" id="pp-fallback-text"></div>
+        <button class="pp-copy-btn" id="pp-copy-btn" onclick="Detail.copyPhotoPillsText()">${ic('i-copy',14)} Kopieren</button>
+      </div>`;
+    // textContent statt innerHTML: kein manuelles HTML-Escaping nötig, Zeilenumbrüche
+    // bleiben durch .pp-fallback-text { white-space: pre-wrap } erhalten.
+    const textEl = document.getElementById('pp-fallback-text');
+    Detail._ppLastText = Detail._buildPhotoPillsText(o);
+    if (textEl) textEl.textContent = Detail._ppLastText;
+  },
+  copyPhotoPillsText() {
+    const text = Detail._ppLastText || document.getElementById('pp-fallback-text')?.textContent || '';
+    const done = () => {
+      const b = document.getElementById('pp-copy-btn');
+      if (b) {
+        b.classList.add('copied');
+        b.innerHTML = `${ic('i-check',14)} Kopiert`;
+        setTimeout(() => {
+          const b2 = document.getElementById('pp-copy-btn');
+          if (b2) { b2.classList.remove('copied'); b2.innerHTML = `${ic('i-copy',14)} Kopieren`; }
+        }, 1800);
+      }
+      toast('✓ In die Zwischenablage kopiert');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(done);
+    } else {
+      done();
+    }
   }
 };
 
