@@ -75,6 +75,16 @@ struct PhotoOpportunity: Codable, Identifiable {
     let moon_illumination_pct: Double?
     let sunrise_utc: Date?
     let sunset_utc: Date?
+    // TASK-07: PhotoPills-Export. Felder stecken laut backend/precompute.py:_serialize()
+    // bereits in jeder Chance-API-Antwort, waren hier bisher nur ungenutzt (Codable
+    // verwirft unbekannte JSON-Keys stillschweigend – ohne diese Deklaration kämen sie
+    // nie im Struct an). Optional, weil manche Chancen (reine Himmelsereignisse ohne
+    // festes Motiv) kein subject_lat/lon bzw. keine Niveaudifferenz haben.
+    let observer_lat: Double?
+    let observer_lon: Double?
+    let subject_lat: Double?
+    let subject_lon: Double?
+    let elevation_difference_m: Double?
 
     // MARK: Computed
 

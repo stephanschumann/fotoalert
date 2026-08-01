@@ -285,14 +285,37 @@ struct OpportunityDetailView: View {
 
     // MARK: Helpers
 
+    // TASK-07: Erweiterung der bestehenden Teilen-Funktion um Koordinaten & Höhendaten,
+    // statt eines separaten zweiten Wegs (AK 5) – auf iOS läuft die PhotoPills-Aktion
+    // ausschließlich über diesen bereits vorhandenen ShareLink (Toolbar oben), es gibt
+    // keinen eigenständigen zweiten Button/Weg mehr.
     var shareText: String {
-        """
-        📸 FotoAlert: \(opportunity.title)
-        📍 \(opportunity.location_name)
-        🕐 \(opportunity.formattedDate), \(opportunity.formattedShootTime)
-        📊 Score: \(opportunity.scorePercent)%
-        🎯 \(opportunity.description)
-        """
+        var lines = [
+            "📸 FotoAlert: \(opportunity.title)",
+            "📍 \(opportunity.location_name)",
+            "🕐 \(opportunity.formattedDate), \(opportunity.formattedShootTime)",
+            "📊 Score: \(opportunity.scorePercent)%",
+            "🎯 \(opportunity.description)",
+        ]
+        if let obsLat = opportunity.observer_lat, let obsLon = opportunity.observer_lon {
+            if let subLat = opportunity.subject_lat, let subLon = opportunity.subject_lon {
+                lines.append("🧭 Standort (Fotograf): \(String(format: "%.5f", obsLat)), \(String(format: "%.5f", obsLon))")
+                lines.append("📌 Motiv: \(opportunity.location_name), \(String(format: "%.5f", subLat)), \(String(format: "%.5f", subLon))")
+            } else {
+                lines.append("🧭 Standort: \(String(format: "%.5f", obsLat)), \(String(format: "%.5f", obsLon))")
+            }
+        }
+        if let alt = opportunity.celestial_altitude {
+            lines.append("📐 Höhe Himmelsobjekt: \(String(format: "%.1f", alt))° über dem Horizont")
+        }
+        // AK: Motivhöhe wird bei fehlendem Wert komplett weggelassen (nicht "null"/leer).
+        // Nutzt elevation_difference_m (kanonisches, garantiert vorhandenes Feld aus
+        // precompute._serialize()), gleiche Terminologie wie die "Niveaudifferenz" im Web-Detail.
+        if let elev = opportunity.elevation_difference_m {
+            let dirWord = elev > 0 ? "Motiv höher" : (elev < 0 ? "Standort höher" : "gleiche Höhe")
+            lines.append("⛰️ Motivhöhe (Niveaudifferenz): \(elev > 0 ? "+" : "")\(Int(elev.rounded())) m (\(dirWord))")
+        }
+        return lines.joined(separator: "\n")
     }
 
     func openInMaps() {
