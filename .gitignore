@@ -11,7 +11,15 @@ FotoAlert/backend/venv/
 
 # Persistente Daten – werden NICHT überschrieben beim Deployment
 # Diese Dateien leben auf dem Server und werden nie per git verwaltet
-FotoAlert/backend/data/cache/
+# (TASK-59 Option E, 2026-08-02: Ausnahme für building_footprints.json — die
+# lebt NICHT nur auf dem Server, sondern wird bewusst per Git-Commit aus dem
+# wöchentlichen GitHub-Actions-Batch-Job verteilt, siehe update-building-data.yml.
+# "cache/*" statt "cache/" ist hier zwingend: ein Verzeichnis-Ausschluss mit "/"
+# verhindert, dass Git überhaupt in den Ordner schaut, wodurch die Ausnahme-Zeile
+# darunter wirkungslos wäre — mit "cache/*" bleibt der Ordner selbst durchsuchbar,
+# nur seine Dateien werden einzeln ausgeschlossen, außer der negierten.)
+FotoAlert/backend/data/cache/*
+!FotoAlert/backend/data/cache/building_footprints.json
 FotoAlert/backend/data/custom_locations.json
 FotoAlert/backend/data/location_overrides.json
 FotoAlert/backend/data/elevations.json

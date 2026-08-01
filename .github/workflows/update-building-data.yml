@@ -68,13 +68,19 @@ jobs:
             --radius 200
 
       - name: Änderung committen (nur falls sich die Datei geändert hat)
+        # BUG-Fix (2026-08-02, erster Verifikationslauf): "git diff --quiet" vor dem
+        # "git add" erkennt eine neue/geänderte Datei NICHT, wenn sie (wie hier) in
+        # einem grundsätzlich gitignorten Ordner liegt bzw. noch nie getrackt wurde —
+        # der ursprüngliche Lauf war deshalb fälschlich grün, ohne je zu committen.
+        # Reihenfolge jetzt: IMMER zuerst "git add" (staged die Datei so oder so dank
+        # der .gitignore-Ausnahme), danach den GESTAGTEN Diff gegen HEAD prüfen.
         run: |
-          if git diff --quiet -- FotoAlert/backend/data/cache/building_footprints.json; then
-            echo "Keine inhaltliche Änderung an building_footprints.json — kein Commit nötig."
-            exit 0
-          fi
           git config user.name "fotoalert-bot"
           git config user.email "actions@github.com"
           git add FotoAlert/backend/data/cache/building_footprints.json
+          if git diff --cached --quiet; then
+            echo "Keine inhaltliche Änderung an building_footprints.json — kein Commit nötig."
+            exit 0
+          fi
           git commit -m "chore(TASK-59): Gebäudedaten aus Geofabrik-Brandenburg-Auszug aktualisiert"
           git push
