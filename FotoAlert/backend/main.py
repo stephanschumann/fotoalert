@@ -2271,7 +2271,22 @@ def _compute_possible_bodies(observer_lat: float, ideal_azimuth_range: list | No
     if not ideal_azimuth_range or len(ideal_azimuth_range) < 2:
         return ["sun", "moon", "milkyway"]
 
-    az_lo, az_hi = float(ideal_azimuth_range[0]), float(ideal_azimuth_range[1])
+    # Defensiv (BUG-96, 2026-08-03): ideal_azimuth_range kommt aus der QA-Werte-
+    # Tabelle und kann durch eine fehlerhafte Schreiboperation nicht-numerische
+    # Werte enthalten (real beobachtet: 'NATUR', ein Kategorie-Wert statt eines
+    # Winkels). Bisher riss das JEDE /locations-Antwort komplett ab (500 für
+    # ALLE Locations statt nur der betroffenen) — konsistent mit dem "still
+    # degradierend, nie crashen"-Prinzip der übrigen QA-Pipeline (siehe
+    # qa_azimuth.py) hier ebenfalls: ungültiger Bereich wird wie "kein Bereich"
+    # behandelt statt die ganze Anfrage zu Fall zu bringen.
+    try:
+        az_lo, az_hi = float(ideal_azimuth_range[0]), float(ideal_azimuth_range[1])
+    except (TypeError, ValueError):
+        logger.warning(
+            "Ungültiger ideal_azimuth_range %r (nicht numerisch) — "
+            "wie 'kein Bereich' behandelt", ideal_azimuth_range,
+        )
+        return ["sun", "moon", "milkyway"]
     cos_lat = math.cos(math.radians(observer_lat))
     if cos_lat < 1e-9:
         return ["sun", "moon", "milkyway"]  # Pol – Sonderfälle ignorieren
