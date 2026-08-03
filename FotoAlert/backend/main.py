@@ -2334,6 +2334,36 @@ def _compute_possible_bodies(observer_lat: float, ideal_azimuth_range: list | No
 
 def _loc_to_out(loc) -> LocationOut:
     az_range = list(loc.ideal_azimuth_range) if getattr(loc, 'ideal_azimuth_range', None) else None
+    # BUG-96-Nachbesserung (2026-08-03): Der ursprüngliche BUG-96-Fix in
+    # _compute_possible_bodies() griff NICHT — Pydantic validiert az_range
+    # bereits als LocationOut-Feld bei der Objekt-Konstruktion unten, BEVOR
+    # possible_bodies überhaupt berechnet wird. Ein pydantic.ValidationError
+    # (real beobachtet: 'NATUR' statt Zahl in ideal_azimuth_range) reißt
+    # GET /locations weiterhin für ALLE Locations ab, nicht nur die betroffene.
+    # Hier direkt vor der LocationOut-Konstruktion bereinigen, analog zum
+    # bereits etablierten BUG-84-Schutzmuster direkt darunter (ein defekter
+    # Datensatz darf nie alle anderen mit runterreißen).
+    if az_range is not None:
+        try:
+            az_range = [float(az_range[0]), float(az_range[1])]
+        except (TypeError, ValueError, IndexError):
+            logger.warning(
+                "Location %s: ungültiger ideal_azimuth_range %r (nicht numerisch) "
+                "— wie 'kein Bereich' behandelt", getattr(loc, "id", "?"), az_range,
+            )
+            az_range = None
+
+    focal_lengths = loc.focal_length_suggestions
+    if focal_lengths is not None and not isinstance(focal_lengths, list):
+        # Real beobachtet (2026-08-03, selber CI-Vorfall wie oben): ein einzelner
+        # float (52.417828) statt einer Liste — vermutlich dieselbe fehlerhafte
+        # QA-Werte-Schreiboperation wie beim ideal_azimuth_range-Fund.
+        logger.warning(
+            "Location %s: ungültige focal_length_suggestions %r (keine Liste) "
+            "— auf leere Liste zurückgesetzt", getattr(loc, "id", "?"), focal_lengths,
+        )
+        focal_lengths = []
+
     # BUG-84: defensiv ueber coerce_category_value() lesen statt loc.category.value direkt --
     # falls loc.category durch einen bislang uebersehenen Code-Pfad doch mal ein roher String
     # statt einer LocationCategory-Instanz ist, waere `.value` sonst ein AttributeError fuer
@@ -2359,7 +2389,7 @@ def _loc_to_out(loc) -> LocationOut:
         elevation_difference_m=getattr(loc, 'elevation_difference_m', 0.0),
         observer_floor_height_m=getattr(loc, 'observer_floor_height_m', 0.0),
         distance_m=loc.distance_m,
-        focal_length_suggestions=loc.focal_length_suggestions,
+        focal_length_suggestions=focal_lengths,
         special_notes=loc.special_notes,
         solar_alignment_note=loc.solar_alignment_note,
         lunar_alignment_note=loc.lunar_alignment_note,
