@@ -755,8 +755,12 @@ def _init_calendar_pass(
 ) -> tuple:
     """Version-Check, Cache-Reset, Event-Pruning und Location-Selektion.
 
-    Returns: (valid_events, locations_to_process, new_meta, target_range)
+    Returns: (valid_events, locations_to_process, new_meta, target_range, existing_meta)
              locations_to_process ist None wenn location_id nicht gefunden → Aufrufer returnt früh.
+             existing_meta wird zusätzlich zurückgegeben, weil sie bei Versions-Mismatch
+             (kein location_id) intern auf {} zurückgesetzt wird (BUG-93: dieser Reset muss
+             an den Aufrufer propagiert werden, sonst arbeitet compute_calendar_incremental()
+             mit seiner eigenen, nie aktualisierten Kopie weiter).
     """
     # Version-Check + ggf. Vollneu-Reset
     if (force_full or cache_version != ALGORITHM_VERSION) and not location_id:
@@ -792,7 +796,7 @@ def _init_calendar_pass(
         locations_to_process = [l for l in LOCATIONS if l.id == location_id]
         if not locations_to_process:
             logger.error("  Kalender Single-Recompute: Location '%s' nicht gefunden", location_id)
-            return valid_events, None, existing_meta, target_range
+            return valid_events, None, existing_meta, target_range, existing_meta
         new_meta = {
             lid: {
                 "coordinates_hash": m.get("coordinates_hash"),
@@ -805,7 +809,7 @@ def _init_calendar_pass(
         locations_to_process = list(LOCATIONS)
         new_meta = {}
 
-    return valid_events, locations_to_process, new_meta, target_range
+    return valid_events, locations_to_process, new_meta, target_range, existing_meta
 
 
 async def _compute_calendar_for_location(
@@ -888,9 +892,13 @@ async def compute_calendar_incremental(today: date, force_full: bool = False, lo
     cal_path = CACHE_DIR / "calendar.json"
     existing_events, existing_meta, cache_version = _load_calendar_cache(cal_path, force_full, location_id)
 
-    valid_events, locations_to_process, new_meta, target_range = _init_calendar_pass(
+    valid_events, locations_to_process, new_meta, target_range, existing_meta = _init_calendar_pass(
         existing_events, existing_meta, cache_version, today, force_full, location_id,
     )
+    # BUG-93: existing_meta wird hier bewusst mit dem von _init_calendar_pass()
+    # zurückgegebenen Wert überschrieben (statt der eigenen, oben geladenen Kopie) —
+    # nur so kommt ein Versions-Mismatch-Reset ({}) tatsächlich bei der folgenden
+    # Location-Schleife an, statt lokal in _init_calendar_pass() zu verpuffen.
     if locations_to_process is None:
         # BUG-29: Location nicht gefunden → bestehenden Kalender unverändert zurückgeben
         return valid_events, existing_meta
