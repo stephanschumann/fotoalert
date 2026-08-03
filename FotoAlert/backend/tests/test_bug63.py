@@ -204,9 +204,9 @@ class TestAlignmentsOnePerDayAndBodyPassage:
             "in Produktion) nicht am Deploy-Gate zu blockieren. Ob echte "
             "Zeitabhängigkeit oder ein Regressions-Bug in der Alignment-"
             "Berechnung vorliegt, ist in BUG-97 noch zu klären — nicht vorschnell "
-            "als reines Timing-Problem abtun.",
-            strict=False,
-        )
+            "als reines Timing-Problem abtun."
+        ),
+        strict=False,
     )
     def test_no_duplicate_day_body_pairs_in_alignments(self, client, monkeypatch):
         from data.elevation import provider
