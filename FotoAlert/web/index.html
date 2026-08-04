@@ -1604,7 +1604,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.55';
+const APP_VERSION = '1.22.56';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -5093,12 +5093,28 @@ const Detail = {
     // AK Edge Case: fehlende Koordinaten → Button wird bereits nicht gerendert (siehe open()),
     // hier zusätzliche Absicherung falls die Funktion doch mit unvollständigen Daten aufgerufen wird.
     if (o.observer_lat == null || o.observer_lon == null) { toast('Keine Koordinaten für PhotoPills-Export vorhanden'); return; }
-    // ⚠️ Ungetestet: PhotoPills' photopills://-URL-Schema ist nicht öffentlich dokumentiert.
-    // Ob/welche Parameter außer Koordinaten (Datum, Uhrzeit) akzeptiert werden, ist offen
-    // (TASK-07 Analyse-Spec, Frage 2) – der empirische Test auf einem echten iPhone mit
-    // installierter PhotoPills-App macht Stephan selbst. Bis dahin: Koordinaten sind der
-    // sichere Kern, alles Weitere best effort und ohne Garantie auf Wirkung.
-    const ppUrl = `photopills://?lat=${o.observer_lat}&lng=${o.observer_lon}`;
+    // TASK-07 Korrektur (2026-08-04): das vorherige Schema `photopills://?lat=X&lng=Y` öffnete
+    // nachweislich nur das PhotoPills-Hauptmenü ohne Daten. Das jetzige `planner?...`-Schema
+    // basiert auf drei von PhotoPills selbst erzeugten Kalender-Rücksprung-Links (Stephan,
+    // 2026-08-04, Belege im Ticket). o (Beobachter) / l (Motiv) stammen direkt aus den
+    // validierten FotoAlert-Koordinaten, mc/ms (Karten-Mittelpunkt/-Ausdehnung) sind daraus
+    // abgeleitet, d aus o.shoot_time (bereits UTC-ISO ohne Millisekunden, backend dt_utc =
+    // strftime("%Y-%m-%dT%H:%M:%SZ") – exakt das Format der drei Beleg-Links, daher keine
+    // Date()-Konvertierung nötig). a/b sind laut Bearing-Gegenprobe an allen drei Beispielen
+    // NICHT von den Pin-Koordinaten/dem Datum abhängig (enge a-Werte 31-35 trotz stark
+    // unterschiedlicher Geometrien) – vermutlich Geräte-/App-Einstellung, für uns unkritisch,
+    // daher feste Defaults. Noch NICHT auf echtem Gerät mit einem von FotoAlert selbst
+    // erzeugten Link verifiziert (nächster Schritt, siehe Ticket).
+    const hasSubject = o.subject_lat != null && o.subject_lon != null;
+    const subjLat = hasSubject ? o.subject_lat : o.observer_lat;
+    const subjLon = hasSubject ? o.subject_lon : o.observer_lon;
+    const mcLat = (o.observer_lat + subjLat) / 2;
+    const mcLon = (o.observer_lon + subjLon) / 2;
+    const ms = '0.0054,0.0056';
+    const a = 0;
+    const b = 0;
+    const d = o.shoot_time || new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const ppUrl = `photopills://planner?mc=${mcLat},${mcLon}&ms=${ms}&l=${subjLat},${subjLon}&a=${a}&d=${d}&o=${o.observer_lat},${o.observer_lon}&b=${b}`;
     try { window.open(ppUrl, '_blank'); } catch (e) { /* Scheme evtl. nicht unterstützt – Fallback unten greift ohnehin immer */ }
     Detail._showPhotoPillsFallback(o);
   },
