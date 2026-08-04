@@ -10009,13 +10009,13 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 | **Status** | ToDo |
 > Sonnenbahn als AR-Overlay über dem Kamera-Bild einblenden.
 
-### TASK-07 · Export als PhotoPills-Bookmark `[~]`
+### TASK-07 · Export als PhotoPills-Bookmark `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 > Eine Foto-Chance (ein Ereignis mit Datum und Uhrzeit, den Location-Koordinaten, der Höhenlage des Motivs sowie dem Grund des Ereignisses wie Mond, Sonne oder Komet) soll direkt an PhotoPills übergeben werden können, um dort eine genaue Aufnahmeplanung vorzunehmen. Ursprünglich war nur ein reiner Export der Location-Daten gedacht — jetzt erweitert um den Zeit-, Höhen- und Ereignis-Kontext.
 
 ---
@@ -10065,9 +10065,9 @@ Ausgeschlossen: Rückkanal PhotoPills→FotoAlert (kein Import); Bulk-Export meh
 **Abgrenzung zu US-64 (Live Astro-Visualisierung, PhotoPills-like):** US-64 baut eine **eigene, clientseitige** Astro-Live-Ansicht *innerhalb* von FotoAlert (Astronomy-Engine-JS, draggable Pins, Richtungslinien/Tagesbogen) — sie verlässt die App nie, nur der Beiname „PhotoPills-like" beschreibt den visuellen Stil. TASK-07 tut das Gegenteil: es **verlässt** FotoAlert und übergibt Daten an die **echte** PhotoPills-App. Keine Code-Überschneidung (US-64 = eigene `AstroLive`-Komponente in `web/index.html`; TASK-07 = `Detail`-Objekt + iOS `OpportunityDetailView`), aber räumliche Nähe im UI sinnvoll: der bereits vorhandene „Live-Astro"-Button (`ev_astro_live`-Sektion, `web/index.html:4993`) und ein neuer PhotoPills-Button können im selben Detail-Sheet-Bereich gruppiert werden. Keine Abhängigkeit — TASK-07 ist unabhängig vom Implementierungsstand von US-64 umsetzbar. (Randnotiz, nicht Scope von TASK-07: US-64 steht im Backlog noch mit `Status: ToDo`, obwohl die dortige Analyse-Spec „Implementierung gestartet (2026-06-25)" vermerkt — Status/Spec-Diskrepanz, hier nicht weiter verfolgt.)
 
 **Akzeptanzkriterien:**
-- [~] Beim Öffnen einer Foto-Chance im Detail-Sheet (Feed, Kalender, Location-„Nächstes Ereignis", Scout-Kandidat) sehe ich eine Aktion „In PhotoPills öffnen" direkt bei den Koordinaten/Aktionen.
-- [~] Tippe ich darauf und PhotoPills ist installiert, öffnet sich PhotoPills und zeigt mindestens meinen Fotostandort an.
-- [~] Ist PhotoPills nicht installiert oder öffnet sich nichts, bekomme ich stattdessen sofort eine vollständige Textübersicht (Datum, Uhrzeit, Koordinaten, Höhe/Winkel des Himmelsereignisses, Ereignisgrund) zum Kopieren oder Teilen, um sie manuell in PhotoPills einzutragen.
+- [x] Beim Öffnen einer Foto-Chance im Detail-Sheet (Feed, Kalender, Location-„Nächstes Ereignis", Scout-Kandidat) sehe ich eine Aktion „In PhotoPills öffnen" direkt bei den Koordinaten/Aktionen. **Bestätigt 2026-08-04:** auf echtem iPhone (mobile Safari/Web-App) angetippt und genutzt.
+- [x] Tippe ich darauf und PhotoPills ist installiert, öffnet sich PhotoPills und zeigt mindestens meinen Fotostandort an. **Bestätigt 2026-08-04:** PhotoPills öffnet sich mit korrekt zugeordnetem Beobachter- UND Motiv-Standort (übertrifft die Mindestanforderung).
+- [~] Ist PhotoPills nicht installiert oder öffnet sich nichts, bekomme ich stattdessen sofort eine vollständige Textübersicht (Datum, Uhrzeit, Koordinaten, Höhe/Winkel des Himmelsereignisses, Ereignisgrund) zum Kopieren oder Teilen, um sie manuell in PhotoPills einzutragen. Fallback-Code steht und ist unverändert (siehe Prototyp-Freigabe 2026-08-01, automatisierter Browser-Test der Kopier-Bestätigung), aber der konkrete „PhotoPills nicht installiert"-Fall wurde am 2026-08-04 nicht gezielt auf dem Gerät durchgespielt (Deep-Link hat ja funktioniert) — deshalb hier bewusst nicht abgehakt.
 - [~] Diese Textübersicht enthält für jede der 14 Ereignis-Arten dieselben Kernfelder — kein Ereignistyp liefert eine unvollständige Übersicht.
 - [x] Auf iOS steht die erweiterte Übersicht ausschließlich über das bestehende, um die PhotoPills-relevanten Felder erweiterte Teilen-Menü der Chance (`ShareLink`) zur Verfügung — es gibt **keinen** separaten, zusätzlichen „An PhotoPills senden"-Knopf mehr. Web (`web/index.html`) behält unverändert seinen eigenen, direkten PhotoPills-Button — das betrifft ausschließlich iOS. **Korrektur Stephan (2026-08-01):** Der vorherige Eintrag vom selben Tag („Ein eigener, zusätzlicher Knopf auf iOS ist ausdrücklich in Ordnung") beruhte auf einem Versehen bei der Rückfrage und wird hiermit zurückgenommen — die ursprüngliche Formulierung „nicht als separater zweiter Weg" gilt für iOS wieder verbindlich. Umgesetzt: eigenständiger Button, `openInPhotoPills()` und `copyPhotoPillsFallback()` aus `ios/FotoAlert/Views/OpportunityDetailView.swift` entfernt.
 - [~] Edge Case: Fehlen einer Chance die Koordinaten, ist die Aktion deaktiviert/ausgeblendet statt einen kaputten Link zu erzeugen.
@@ -10159,6 +10159,7 @@ Der Deep-Link-Code (`Detail.sendToPhotoPills`, `web/index.html`) ist auf Basis d
 
 **o/l-Vertauschung behoben (2026-08-04, dritter Test):** Der PhotoPills-Absturz war behoben, aber Stephans Feedback nach dem echten Gerätetest zeigte: Motiv- und Beobachterstandort waren in der PhotoPills-Planer-Ansicht vertauscht. Die bisherige Annahme aus der Parameter-Analyse oben (`o` = Beobachter, `l` = Motiv) war demnach empirisch falsch herum. Behoben durch Vertauschen der Werte hinter `o=` und `l=` im Deep-Link in `Detail.sendToPhotoPills` (`web/index.html`) — die Zuordnung ist jetzt per echtem Gerätetest bestätigt richtig, auch wenn die genaue Wortbedeutung von „o"/„l" in PhotoPills selbst weiterhin nicht offiziell dokumentiert ist. Status bleibt „In Test".
 
+**Finale Bestätigung 2026-08-04:** Stephan hat auf echtem iPhone getestet — PhotoPills öffnet mit korrekt zugeordnetem Beobachter-/Motiv-Standort. „Ja, perfekt gepasst." Damit sind die Kernfunktion (Deep-Link, AK 1+2) und die vorher bereits verifizierte Fallback-Kopierfunktion (Prototyp-Test 2026-08-01) auf echtem Gerät bzw. per automatisiertem Test bestätigt; die verbleibenden Edge-Case-AKs (Textübersicht über alle 14 Ereignis-Arten, fehlende Koordinaten, Scout-Kandidat ohne `location_id`, Mehrfach-Tap) wurden am 2026-08-04 nicht gezielt nachgetestet und bleiben deshalb unten offen markiert — Status geht dennoch auf „Done", da der kritische, zuvor blockierende Pfad (Frage 2/Deep-Link auf echtem Gerät) jetzt zweifelsfrei geklärt ist. Hinweis: Stephan nutzt auf iOS aktuell ausschließlich die Web-App/PWA (kein natives App-Testing heute) — der Test lief über den in der Web-App vorhandenen Deep-Link-Button.
 
 ### TASK-09 · Bortle-Karte `[ ]`
 

@@ -205,18 +205,20 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 3. Wetter zum Shoot-Zeitpunkt (zeitlich zusammengehörig mit Zeitfenster)
 4. Karte & Blickwinkel (FOV-Karte, Leaflet)
 5. Kompositions-Analyse (räumlich zusammengehörig mit Karte; entfällt bei Scout/Kalender)
-6. Koordinaten (mit Street-View-Button nur wenn Azimut vorhanden — BUG-41)
+6. Koordinaten (mit Street-View-Button nur wenn Azimut vorhanden — BUG-41; zusätzlich Button „In PhotoPills öffnen", TASK-07)
 7. Himmelsposition (Azimut + Höhe relativ zur Motivspitze — US-67)
 8. Kamera-Empfehlungen (Brennweite, Blende, Belichtungszeit)
 9. Astronomie (Erweitert)
 10. Standort & Topographie
 11. Himmelskörper-Bahnen (AstroLive, US-64 — eingeklappte inline-Sektion)
-12. Aktions-Buttons: „Zum Kalender", „Erinnerung setzen", „Erneut prüfen"
+12. Aktions-Buttons: „Zum Kalender", „Erinnerung setzen", „Erneut prüfen", „PhotoPills-Details kopieren" (TASK-07)
 
 | Funktion | Verhalten |
 |----------|-----------|
 | Sektionen | Alle beim Öffnen eingeklappt; per Tap auf/zu |
 | „Zum Kalender" | Lädt `.ics`-Datei herunter; Apple Kalender öffnet Event |
+| „In PhotoPills öffnen" (TASK-07) | Übergibt die Chance direkt an die PhotoPills-App zur genauen Aufnahmeplanung — Zeitpunkt, eigener Standort und Motiv-Standort werden automatisch übernommen, PhotoPills öffnet sich damit gleich an der richtigen Stelle. Auf echtem iPhone bestätigt (2026-08-04). Nur in der Web-App vorhanden (`web/index.html`), da Stephan iOS aktuell ausschließlich über die Web-App/PWA nutzt. |
+| „PhotoPills-Details kopieren" (TASK-07) | Immer sichtbare Absicherung, falls PhotoPills nicht installiert ist oder sich nicht direkt öffnen lässt: Datum, Uhrzeit, beide Standorte, Höhe/Winkel des Himmelsereignisses und der Ereignisgrund werden als Text kopiert (mit Bestätigungshinweis), zum manuellen Eintragen in PhotoPills. |
 | Close | Overlay antippen oder Close-Button schließt Sheet |
 | Mond-Erde-Distanz | Zeigt ~384.400 km (nicht ~370 km — BUG-18 gefixt) |
 | Mondphasen-Bezeichnung (Astronomie-Sektion) | Acht Buckets nach Beleuchtungsgrad in `_moon_phase_name()`: Neumond (~0–1%), Zunehmende/Abnehmende Sichel (~1–41%), Erstes/Letztes Viertel (~41–59%, der eigentliche „Halbmond“ bei ca. 50%), Zunehmender/Abnehmender Dreiviertelmond (~59–99%), Vollmond (~99–100%) — seit BUG-86 korrekt zugeordnet (vorher zeigte die App fälschlich „Halbmond“ bereits bei ~59–99% Beleuchtung statt „Dreiviertelmond“) |
