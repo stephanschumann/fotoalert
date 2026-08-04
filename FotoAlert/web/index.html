@@ -5105,6 +5105,16 @@ const Detail = {
     // unterschiedlicher Geometrien) – vermutlich Geräte-/App-Einstellung, für uns unkritisch,
     // daher feste Defaults. Noch NICHT auf echtem Gerät mit einem von FotoAlert selbst
     // erzeugten Link verifiziert (nächster Schritt, siehe Ticket).
+    // TASK-07 Absturzfix (2026-08-04, zweiter Test): Der Kommentar oben ist an dieser Stelle
+    // FALSCH – shoot_time kommt vom Backend NICHT als "UTC-ISO ohne Millisekunden" an. Beleg:
+    // backend/precompute.py serialisiert mit `"shoot_time": o.shoot_time.isoformat()`, und ein
+    // echter Cache-Eintrag zeigt Werte wie "2026-08-04T19:58:47.231908+00:00" (Mikrosekunden +
+    // "+00:00"-Offset statt "Z"). Beim ersten Gerätetest mit genau diesem Event ("Goldene Wolken
+    // über Toskana Blick auf St. Magdalena Kirche", Stephan, 2026-08-04) ist PhotoPills
+    // abgestürzt – Verdacht: das unkodierte "+" im Offset wird von PhotoPills' Datums-Parser als
+    // Leerzeichen fehlinterpretiert (x-www-form-urlencoded-Verhalten), was zum Absturz statt zu
+    // stillem Ignorieren führt. Fix: d läuft jetzt IMMER durch new Date(...).toISOString() +
+    // Millisekunden-Entfernung, unabhängig vom Rohformat der Quelle (shoot_time oder Fallback).
     const hasSubject = o.subject_lat != null && o.subject_lon != null;
     const subjLat = hasSubject ? o.subject_lat : o.observer_lat;
     const subjLon = hasSubject ? o.subject_lon : o.observer_lon;
@@ -5113,7 +5123,8 @@ const Detail = {
     const ms = '0.0054,0.0056';
     const a = 0;
     const b = 0;
-    const d = o.shoot_time || new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const rawShootTime = o.shoot_time ? new Date(o.shoot_time) : new Date();
+    const d = rawShootTime.toISOString().replace(/\.\d{3}Z$/, 'Z');
     const ppUrl = `photopills://planner?mc=${mcLat},${mcLon}&ms=${ms}&l=${subjLat},${subjLon}&a=${a}&d=${d}&o=${o.observer_lat},${o.observer_lon}&b=${b}`;
     try { window.open(ppUrl, '_blank'); } catch (e) { /* Scheme evtl. nicht unterstützt – Fallback unten greift ohnehin immer */ }
     Detail._showPhotoPillsFallback(o);
