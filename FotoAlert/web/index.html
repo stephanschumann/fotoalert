@@ -5123,9 +5123,17 @@ const Detail = {
     const ms = '0.0054,0.0056';
     const a = 0;
     const b = 0;
+    // TASK-07 o/l-Vertauschung behoben (2026-08-04, dritter Test): Der Kommentar oben geht
+    // davon aus, dass o=Beobachter und l=Motiv PhotoPills' eigene Bedeutung dieser Parameter
+    // trifft – das war laut Stephans drittem Gerätetest FALSCH HERUM: Der Deep-Link stürzte
+    // zwar nicht mehr ab, aber Motiv- und Beobachterstandort waren in der PhotoPills-
+    // Planer-Ansicht vertauscht. Fix: die Werte hinter o= und l= sind unten vertauscht
+    // (l= bekommt jetzt die Beobachter-Koordinaten, o= bekommt jetzt die Motiv-Koordinaten).
+    // Diese Zuordnung ist EMPIRISCH per echtem Gerätetest bestätigt richtig – die genaue
+    // Wortbedeutung von "o"/"l" in PhotoPills selbst ist weiterhin nicht offiziell dokumentiert.
     const rawShootTime = o.shoot_time ? new Date(o.shoot_time) : new Date();
     const d = rawShootTime.toISOString().replace(/\.\d{3}Z$/, 'Z');
-    const ppUrl = `photopills://planner?mc=${mcLat},${mcLon}&ms=${ms}&l=${subjLat},${subjLon}&a=${a}&d=${d}&o=${o.observer_lat},${o.observer_lon}&b=${b}`;
+    const ppUrl = `photopills://planner?mc=${mcLat},${mcLon}&ms=${ms}&l=${o.observer_lat},${o.observer_lon}&a=${a}&d=${d}&o=${subjLat},${subjLon}&b=${b}`;
     try { window.open(ppUrl, '_blank'); } catch (e) { /* Scheme evtl. nicht unterstützt – Fallback unten greift ohnehin immer */ }
     Detail._showPhotoPillsFallback(o);
   },

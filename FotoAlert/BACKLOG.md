@@ -10157,6 +10157,8 @@ Der Deep-Link-Code (`Detail.sendToPhotoPills`, `web/index.html`) ist auf Basis d
 
 **Absturzfix shoot_time-Format (2026-08-04, zweiter Test):** PhotoPills stürzte beim ersten Gerätetest mit dem oben beschriebenen `planner`-Schema ab (Event „Goldene Wolken über Toskana Blick auf St. Magdalena Kirche"). Ursache identifiziert: `shoot_time` kommt vom Backend nicht im erwarteten `YYYY-MM-DDTHH:MM:SSZ`-Format der drei Beleg-Links an, sondern im Rohformat mit Mikrosekunden und `+00:00`-Offset (z. B. `2026-08-04T19:58:47.231908+00:00`, Beleg `backend/precompute.py`: `"shoot_time": o.shoot_time.isoformat()`) — vermuteter Absturzauslöser ist das darin enthaltene unkodierte `+`-Zeichen. Behoben in `Detail.sendToPhotoPills` (`web/index.html`) durch konsequente `toISOString()`-Normalisierung von `d` (läuft jetzt für jeden Quellwert, ob `shoot_time` oder Fallback `new Date()`, durch denselben Pfad). Nächster Gerätetest steht aus.
 
+**o/l-Vertauschung behoben (2026-08-04, dritter Test):** Der PhotoPills-Absturz war behoben, aber Stephans Feedback nach dem echten Gerätetest zeigte: Motiv- und Beobachterstandort waren in der PhotoPills-Planer-Ansicht vertauscht. Die bisherige Annahme aus der Parameter-Analyse oben (`o` = Beobachter, `l` = Motiv) war demnach empirisch falsch herum. Behoben durch Vertauschen der Werte hinter `o=` und `l=` im Deep-Link in `Detail.sendToPhotoPills` (`web/index.html`) — die Zuordnung ist jetzt per echtem Gerätetest bestätigt richtig, auch wenn die genaue Wortbedeutung von „o"/„l" in PhotoPills selbst weiterhin nicht offiziell dokumentiert ist. Status bleibt „In Test".
+
 
 ### TASK-09 · Bortle-Karte `[ ]`
 
