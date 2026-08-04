@@ -762,9 +762,13 @@ def test_nachtrag_pacing_konstante_ist_konservativ_gesetzt():
     Limit recherchiert (nicht verifizierbar ohne Internetzugriff), bewusst klein
     und leicht änderbar (analog WEATHER_API_MAX_CONCURRENT_REQUESTS-Muster).
     BUG-83-Nachjustierung (2026-07-21): von 0.15s auf 0.25s erhöht (siehe BUG-83 in
-    BACKLOG.md). Überschlagsrechnung (s. Docstring in main.py): 4 parallele Slots x
-    (1 Request / 0.25s) = ca. 16 Requests/Sekunde Pacing-Obergrenze."""
-    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.25)
+    BACKLOG.md). BUG-99-Nachjustierung (2026-08-04, Weg-Gate Stephan — empfohlener
+    Weg): von 0.25s auf 0.35s weiter erhöht, entlang des dokumentierten Trends
+    31%/21%/4,8% 429-Fehlerquote bei zunehmender Drosselung. Überschlagsrechnung
+    (s. Docstring in main.py): 4 parallele Slots x (1 Request / 0.35s) = ca. 11,4
+    Requests/Sekunde Pacing-Obergrenze. Dieser Test ist ein Regressionsanker auf
+    den JEWEILS aktuellen Wert, kein Test auf einen für alle Zeit fixen Wert."""
+    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.35)
 
 
 def test_nachtrag_pacing_sleep_folgt_auf_jeden_erfolgreichen_fetch_call(monkeypatch):

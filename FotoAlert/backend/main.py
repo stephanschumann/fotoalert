@@ -1080,7 +1080,7 @@ ggf. weiter nachjustiert werden.
 """
 
 
-WEATHER_API_REQUEST_PACING_SECONDS = 0.25
+WEATHER_API_REQUEST_PACING_SECONDS = 0.35
 """
 US-131 2. Nachtrag: Zusätzlich zur Nebenläufigkeits-Begrenzung (s.
 WEATHER_API_MAX_CONCURRENT_REQUESTS) erzwingt dieser Wert einen Mindestabstand
@@ -1117,6 +1117,74 @@ dem nächsten Live-Lauf (Stephan) ggf. weiter nachjustiert werden — insbesonde
 falls die dann nach Abruf-Art aufgeschlüsselte Fehlerquote zeigt, dass diese
 Kalibrierung allein noch nicht ausreicht (siehe Retry-Mechanismus als zweite,
 unabhängige Absicherung).
+
+BUG-99-Nachtrag (2026-08-04, Weg-Gate Stephan — empfohlener Weg): Von 0.25s auf
+0.35s angehoben — ⚠️ Annahme, konservativ moderat gewählt (kein neuer
+Live-Smoke-Test, aus der Sandbox weiterhin nicht möglich), als eine weitere
+Stufe entlang des bereits dokumentierten Trends 31% → 21% → 4,8% 429-Fehlerquote
+bei zunehmender Drosselung (s. oben) — mehr Pacing-Abstand senkt tendenziell die
+429-Quote weiter, auf Kosten etwas längerer Gesamtlaufzeit. Neuer gedeckelter
+Maximaldurchsatz: 4 Slots × (1 Request / 0.35s) ≈ 11,4 Requests/Sekunde (vorher:
+16 Requests/Sekunde, ca. -29%). Bewusst NICHT verdoppelt/drastisch erhöht, um die
+Gesamtlaufzeit im Normalfall nicht unnötig zu verlängern — das eigentliche
+Hänger-Risiko (unbegrenzte Gesamtdauer bei durchgehend nicht antwortenden
+Locations) wird primär über WEATHER_OVERLAY_MAX_TOTAL_SECONDS (s. u.) als
+Sicherheitsnetz behoben, nicht allein über das Pacing. Muss nach dem nächsten
+Live-Lauf (Stephan) ggf. weiter nachjustiert werden.
+"""
+
+
+WEATHER_OVERLAY_MAX_TOTAL_SECONDS = 180.0
+"""
+BUG-99 (2026-08-04, Weg-Gate Stephan — empfohlener Weg + Sicherheitsnetz):
+Gesamtzeit-Obergrenze für EINEN Lauf von _fetch_weather_and_aerosol(). Semaphore
+(WEATHER_API_MAX_CONCURRENT_REQUESTS) und Retry-Cap (WEATHER_API_MAX_RETRIES_ON_429)
+begrenzen nur Nebenläufigkeit bzw. Wiederholungen — bei durchgehend nicht (rechtzeitig)
+antwortenden Locations (Timeout statt HTTP 429, wird NICHT wiederholt) wuchs die
+Gesamtdauer bisher unbegrenzt mit der Anzahl betroffener Locations, ohne Kurzschluss.
+Dieser Wert ist die Notbremse dagegen (Spike-Nachweis vor der Implementierung:
+siehe BACKLOG.md BUG-99-Ticket „Spike bereits durchgeführt und bestätigt" —
+Baseline wuchs mit der Anzahl stummer Orte, mit dieser Obergrenze blieb die
+Laufzeit konstant).
+
+⚠️ Korrektur (2026-08-04, Verifikationsfund nach Implementierung): Der ursprüngliche
+Startwert 60s war zu niedrig — bei der ECHTEN Location-Zahl (~315-319, aus
+`data_dev/fotoalert.db`: 60 statische Locations + 259 `custom_locations`, NICHT die
+eingefrorenen 9 aus der alten Prod-Kopie) hätte bereits ein völlig FEHLERFREIER Lauf
+rechnerisch ≈104s benötigt und wäre an der alten 60s-Grenze fälschlich abgebrochen
+worden (s. Regressionstest in `backend/tests/test_bug-99.py`). Neuer, von Stephan
+bestätigter Wert: 180s (3 Min) = ≈104s fehlerfreie Grundzeit + ≈30s Retry-Puffer
+(HTTP-429-Retries, s. WEATHER_API_MAX_RETRIES_ON_429/WEATHER_API_RETRY_BACKOFF_BASE_SECONDS)
++ ≈25% Sicherheitsmarge, gerundet auf 180s. Deutlich über der für einen normalen,
+nicht überlasteten Wetterdienst UND der aktuellen realen Location-Zahl erwarteten
+Laufzeit, aber weiterhin klar unter dem 3-Stunden-Cronzyklus und weit unter einem
+echten Server-„Hänger" im Sinne des Tickets. Muss nach dem nächsten realen Lauf
+(Stephan, insbesondere bei einer echten Open-Meteo-Drosselung oder einem deutlichen
+Anstieg der Location-Zahl) ggf. nachjustiert werden.
+
+Bei Erreichen der Obergrenze (Weg-Gate-Entscheidung Stephan, BUG-99): Teilergebnis
+wird verwendet — bereits erfolgreich abgeschlossene Fetches behalten ihr Ergebnis,
+nur die zum Abbruchzeitpunkt noch offenen Fetches werden abgebrochen und laufen in
+denselben BUG-77-failed_*-Sammelpfad wie ein regulärer Fehlschlag (kein separater
+Fehlerpfad, kein stiller Datenverlust bereits erfolgreicher Ergebnisse — s.
+_fetch_weather_and_aerosol()).
+
+Zusammenspiel-Check (BUG-99, Pflicht vor Implementierung): _fetch_weather_and_aerosol()
+wird identisch von DREI Aufrufern genutzt — dem periodischen 3h-Cron
+(_weather_overlay(), main.py Z. ~2177), dem Abschluss der täglichen/vollen
+Feed-Vorberechnung (_run_precompute(mode="full"/"feed") → _weather_overlay(),
+main.py Z. ~1644-1645) UND dem Fast-Path für eine einzelne Location
+(_weather_overlay_single(), US-106). Verifiziert: Alle drei filtern ihre
+near_events identisch auf denselben T+3-Tage-Ausschnitt des _feed_cache
+(_weather_overlay()) bzw. auf die Events GENAU EINER Location
+(_weather_overlay_single(), strukturell immer klein) — es gibt aktuell KEINEN
+Aufrufer, der strukturell absehbar mehr Locations auf einmal verarbeitet als ein
+anderer. Ein einzelner gemeinsamer Default ist damit für alle drei heutigen
+Aufrufer korrekt; trotzdem ist die Obergrenze als Funktionsparameter (s.
+max_total_seconds in _fetch_weather_and_aerosol()) parametrisierbar gehalten,
+nicht hart auf diese Konstante verdrahtet, damit ein künftiger Aufrufer mit
+einer strukturell anderen Location-Menge einen eigenen Wert übergeben kann, ohne
+diese gemeinsam genutzte Funktion zu verzweigen.
 """
 
 
@@ -1163,7 +1231,9 @@ Pacing) — nicht, dass der Retry-Mechanismus selbst das Problem ist.
 """
 
 
-async def _fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dict, list, list, list, list]:
+async def _fetch_weather_and_aerosol(
+    near_events, max_total_seconds: float | None = None
+) -> tuple[dict, dict, dict, dict, list, list, list, list]:
     """
     TASK-74 (aus _weather_overlay extrahiert): Holt für jede unique Location aus
     near_events Wetter- und Aerosol-Forecast parallel via asyncio.gather.
@@ -1193,6 +1263,36 @@ async def _fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dic
     Gibt zurück: (loc_forecasts, aerosol_forecasts, sun_dir_forecasts,
     antisolar_dir_forecasts, failed_locations, failed_aerosol_locations,
     failed_sun_dir_locations, failed_antisolar_dir_locations)
+
+    BUG-99 (2026-08-04, Weg-Gate Stephan — empfohlener Weg + Sicherheitsnetz): Zusätzlich
+    zur bestehenden Nebenläufigkeits-/Retry-Härtung (US-131/BUG-83) begrenzt diese Funktion
+    jetzt auch die GESAMTdauer eines Laufs — vorher konnte ein Lauf bei durchgehend nicht
+    (rechtzeitig) antwortenden Locations (Timeout statt HTTP 429, wird NICHT wiederholt)
+    unbegrenzt lange sequenziell durch alle Semaphore-Runden warten. `max_total_seconds`
+    ist bewusst PARAMETRISIERBAR (Default None → liest WEATHER_OVERLAY_MAX_TOTAL_SECONDS
+    zur Aufrufzeit, nicht als gebundener Default-Parameterwert — damit ein Monkeypatch der
+    Modulkonstante in Tests wirkt): Diese eine Funktion wird identisch von mehreren
+    Aufrufern genutzt (3h-Cron, täglicher Feed-/Voll-Precompute-Abschluss,
+    Einzel-Location-Fast-Path _weather_overlay_single()) — siehe Zusammenspiel-Check im
+    Docstring von WEATHER_OVERLAY_MAX_TOTAL_SECONDS für die Begründung, warum ein
+    gemeinsamer Default für alle heutigen Aufrufer korrekt ist, der Parameter aber trotzdem
+    existiert.
+
+    Bei Erreichen der Obergrenze (Weg-Gate-Entscheidung Stephan, BUG-99): Teilergebnis wird
+    verwendet — bereits erfolgreich abgeschlossene Fetches behalten ihr Ergebnis, nur die
+    zum Abbruchzeitpunkt noch offenen Fetches werden abgebrochen (Task.cancel()) und laufen
+    über denselben BaseException-Zweig in _collect_weather_fetch_results() in denselben
+    BUG-77-failed_*-Sammelpfad wie ein regulärer Fehlschlag (kein separater Fehlerpfad, kein
+    stiller Datenverlust bereits erfolgreicher Ergebnisse — Pre-Mortem Szenario 3/4 im
+    BUG-99-Ticket). Bewusst NICHT `asyncio.wait_for()` direkt um `asyncio.gather()` OHNE
+    Nachbearbeitung: Ein durch `wait_for` bei Zeitüberschreitung abgebrochenes `gather()`
+    cancelt zwar automatisch alle noch offenen Kind-Tasks, bereits fertige Tasks bleiben
+    dabei aber mit ihrem Ergebnis erhalten — genau dieses Verhalten wird unten per erneutem
+    `asyncio.gather(*tasks, return_exceptions=True)` nach dem Cancel explizit eingesammelt,
+    damit die bereits fertigen Ergebnisse tatsächlich zurückgegeben werden (nicht nur
+    theoretisch erhalten bleiben, sondern auch abgefragt werden — vermeidet zusätzlich
+    "Task exception was never retrieved"-Warnungen). Dieses Muster wurde vorab isoliert
+    per Spike bestätigt (Ticket-Historie BUG-99).
     """
     tasks_meta = _plan_weather_fetch_tasks(near_events)
 
@@ -1204,10 +1304,36 @@ async def _fetch_weather_and_aerosol(near_events) -> tuple[dict, dict, dict, dic
     # zwischen zwei Calls in DEMSELBEN Slot (WEATHER_API_REQUEST_PACING_SECONDS).
     semaphore = asyncio.Semaphore(WEATHER_API_MAX_CONCURRENT_REQUESTS)
 
-    results = await asyncio.gather(
-        *[_run_one_weather_fetch(kind, lat, lon, semaphore) for (kind, _key, lat, lon, _name) in tasks_meta],
-        return_exceptions=True,
+    # BUG-99: effektive Obergrenze zur AUFRUFZEIT auflösen (nicht als gebundener
+    # Default-Parameterwert), damit ein Monkeypatch von WEATHER_OVERLAY_MAX_TOTAL_SECONDS
+    # (z. B. in Tests) tatsächlich greift, auch wenn kein max_total_seconds übergeben wird.
+    effective_ceiling = (
+        WEATHER_OVERLAY_MAX_TOTAL_SECONDS if max_total_seconds is None else max_total_seconds
     )
+
+    tasks = [
+        asyncio.ensure_future(_run_one_weather_fetch(kind, lat, lon, semaphore))
+        for (kind, _key, lat, lon, _name) in tasks_meta
+    ]
+    try:
+        results = await asyncio.wait_for(
+            asyncio.gather(*tasks, return_exceptions=True), timeout=effective_ceiling
+        )
+    except asyncio.TimeoutError:
+        still_open = sum(1 for t in tasks if not t.done())
+        logger.warning(
+            "BUG-99: Wetter-Overlay-Gesamtzeit-Obergrenze (%.1fs) erreicht — %d von %d "
+            "Abrufen noch offen, werden abgebrochen. Bereits erfolgreiche Ergebnisse "
+            "bleiben erhalten.",
+            effective_ceiling, still_open, len(tasks),
+        )
+        for t in tasks:
+            if not t.done():
+                t.cancel()
+        # Bereits fertige Tasks behalten ihr Ergebnis; abgebrochene Tasks liefern
+        # asyncio.CancelledError als "Ergebnis" (return_exceptions=True) — s.
+        # _collect_weather_fetch_results() (BaseException-Zweig, nicht nur Exception).
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
     return _collect_weather_fetch_results(tasks_meta, results)
 
@@ -1318,7 +1444,14 @@ def _collect_weather_fetch_results(tasks_meta, results) -> tuple:
     failed_antisolar_dir_locations: list = []  # US-131: fehlgeschlagener Wolken-Abruf Gegenrichtung
 
     for (kind, key, _lat, _lon, name), result in zip(tasks_meta, results):
-        if isinstance(result, Exception):
+        # BUG-99: BaseException statt Exception — asyncio.CancelledError (das ein per
+        # Task.cancel() abgebrochener Fetch bei Erreichen der Gesamtzeit-Obergrenze als
+        # "Ergebnis" liefert, s. _fetch_weather_and_aerosol()) erbt in Python 3.8+ von
+        # BaseException, NICHT von Exception — mit dem alten isinstance(..., Exception)-
+        # Check wäre ein abgebrochener Fetch hier durchgerutscht und das CancelledError-
+        # Objekt selbst als "Forecast-Ergebnis" in loc_forecasts/... gelandet, statt in
+        # denselben BUG-77-failed_*-Sammelpfad wie ein regulärer Fehlschlag zu laufen.
+        if isinstance(result, BaseException):
             logger.warning("  %s für %s fehlgeschlagen: %s", kind, name, result)
             if kind == "weather":
                 failed_locations.append(name)
