@@ -1604,7 +1604,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.57';
+const APP_VERSION = '1.22.58';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4663,7 +4663,7 @@ const Detail = {
           const gcPct = Math.round(gcs * 100);
           const gcShort = gcs >= 0.85 ? 'Exzellent' : gcs >= 0.65 ? 'Gut' : gcs >= 0.40 ? 'Mäßig' : 'Gering';
           const gcColor = gcs >= 0.85 ? 'var(--gold)' : gcs >= 0.65 ? 'var(--yellow,#e8b820)' : 'var(--muted)';
-          goldenCloudRow = `<div class="info-row"><span class="ir-label">Wolkenstimmung <button class="sc-info-btn" onclick="ScoreInfo.show('wolkenstimmung')">i</button></span><span class="ir-val" style="color:${gcColor}">${gcPct} % · ${gcShort}</span></div>`;
+          goldenCloudRow = `<div class="info-row"><span class="ir-label">Wolkenstimmung <button class="sc-info-btn" onclick="ScoreInfo.show('wolkenstimmung')">i</button></span><span class="ir-val" style="color:${gcColor}">${gcPct} % · ${gcShort}</span></div><div style="font-size:12px;color:var(--muted);line-height:1.5;padding:2px 0 4px">Wetter-Score und Wolkenstimmung sind unabhängige Werte — der eine bewertet die allgemeine Wetterlage, der andere das Potenzial für goldene Wolken. Beide können deshalb unterschiedlich ausfallen.</div>`;
         }
         const cloudLowRow = (wd.cloud_cover_low_pct != null) ? `<div class="info-row"><span class="ir-label">Tiefe Wolken</span><span class="ir-val">${wd.cloud_cover_low_pct} %</span></div>` : '';
         const cloudMidRow = (wd.cloud_cover_mid_pct != null) ? `<div class="info-row"><span class="ir-label">Mittlere Wolken</span><span class="ir-val">${wd.cloud_cover_mid_pct} %</span></div>` : '';
