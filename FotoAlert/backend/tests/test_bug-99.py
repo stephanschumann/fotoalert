@@ -253,6 +253,15 @@ def test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling
         return _bug99_forecast()
 
     monkeypatch.setattr(main, "fetch_weather_forecast", _fast_success_fetch)
+    # WEATHER_API_REQUEST_PACING_SECONDS ebenfalls mit SCALE stauchen: main._run_one_weather_fetch()
+    # wartet nach JEDEM Fetch real diese Pause ab (finally-Block, unabhängig von Erfolg/Fehler,
+    # nicht durch das obige Fetch-Mock abgedeckt). Ungestaucht wäre das bei 80 Semaphore-Runden
+    # (ceil(319/4)) ein fixer, nicht mit SCALE schrumpfender Anteil von 80 * 0.35s ≈ 28s realer
+    # Wartezeit, der jeden Lauf weit über die gestauchte 3.6s-Obergrenze treibt und praktisch
+    # jede Location an der Zeit-Obergrenze abbrechen lässt — unabhängig von Maschine/CI-Auslastung
+    # (asyncio.sleep ist wall-clock-basiert). Root-Cause-Fund 2026-08-07 nach rotem CI-Lauf
+    # trotz lokal grünem Testlauf, siehe Ticket-Historie BUG-89/BUG-99.
+    monkeypatch.setattr(main, "WEATHER_API_REQUEST_PACING_SECONDS", main.WEATHER_API_REQUEST_PACING_SECONDS * SCALE)
     # WEATHER_OVERLAY_MAX_TOTAL_SECONDS bewusst NICHT monkeypatched — dieser Test prüft den
     # echten Produktionswert (s. Assertion oben), übergibt aber max_total_seconds explizit
     # gestaucht (main._fetch_weather_and_aerosol() erlaubt das per Parameter, s. Docstring
