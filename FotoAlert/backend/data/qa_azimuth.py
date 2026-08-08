@@ -27,10 +27,12 @@ from __future__ import annotations
 import json
 import logging
 import os
+import math
 import threading
 import time
 from pathlib import Path
 from typing import List, Optional, Tuple
+from datetime import datetime, timezone
 
 from discover.geometry import bearing_between
 
@@ -644,3 +646,409 @@ def update_location_azimuth(
         ideal_azimuth_max=rng[1],
     )
     return rng
+
+
+# ---------------------------------------------------------------------------
+# US-135: Scout-Zugänglichkeits-/Sichtfreiheits-Live-Prüfung (kombinierte
+# Overpass-Anfrage + eigener Tage-Cache, Implementierungsoption A)
+# ---------------------------------------------------------------------------
+# Anders als der Gebäude-Batch-Cache oben (BUILDING_CACHE_PATH) gibt es hier
+# KEINEN GitHub-Actions-Commit-Schritt: Scout-Kandidatenkoordinaten sind
+# tagesaktuell berechnete Standpunkte, kein fester Bestand aus
+# data/locations.py, und stehen daher nicht im Repo. Der Cache unten ist
+# reine lokale Laufzeit-Persistenz (JSON-Datei neben BUILDING_CACHE_PATH),
+# mehrere Tage gültig (SCOUT_ACCESS_CACHE_TTL_DAYS).
+
+# Suchradius (Meter) um den Scout-Standpunkt für die KOMBINIERTE
+# Zugänglichkeits-Live-Anfrage (Wald/Wasser/Bahn/Weg). Größer als
+# SCOUT_ACCESS_PATH_RADIUS_M gewählt, damit Wege bis zum vollen AK-Radius
+# überhaupt mit abgefragt werden — der fachliche 50m-Schwellwert selbst wird
+# danach in Software exakt geprüft (discover/accessibility.py); der
+# Netz-Radius hier ist bewusst eine großzügigere Obermenge.
+SCOUT_ACCESS_QUERY_RADIUS_M: int = 150
+
+# Fachlicher AK-Schwellwert (US-135, von Stephan bestätigt 2026-08-07): ein
+# öffentlich begehbarer Weg innerhalb dieses Radius um den Standpunkt gilt
+# als "Weg in der Nähe" (Regel 2). NICHT identisch mit dem Cluster-Rastermaß
+# in discover/accessibility.py (rein technische Lastreduktion, andere
+# Konstante, andere Bedeutung).
+SCOUT_ACCESS_PATH_RADIUS_M: float = 50.0
+
+# Eigene, dokumentierte technische Näherungswerte (kein AK-Wortlaut) für
+# "im Wasser"/"direkt neben Bahngleisen" bei linienförmigen OSM-Objekten
+# (Fluss-/Gleismittellinie haben selbst keine Breite in den Rohdaten) —
+# kleine Pufferzone um die Mittellinie.
+SCOUT_ACCESS_WATER_LINE_BUFFER_M: float = 15.0
+SCOUT_ACCESS_RAIL_BUFFER_M: float = 15.0
+
+# US-135 Live-Bug (2026-08-08, Stephans Server-Log server_log_us135.txt.txt):
+# 405 von 938 (43%) im Live-Volllauf ausgeblendeten Kandidaten waren NICHT
+# wirklich unzugaenglich, sondern nur "nicht pruefbar", weil die kombinierte
+# Anfrage (Gebaeude+Wald+Wasser+Bahn+Weg in EINER Query, deutlich mehr Daten
+# als die reine Gebaeude-Query mit LINE_OVERPASS_TIMEOUT_S=10.0) bei 10s
+# Timeout regelmaessig auf BEIDEN Mirrors mit echtem Read-Timeout gescheitert
+# ist (Log-Muster: erster Mirror 504/429, zweiter Mirror "The read operation
+# timed out"). Beleg fuer die Datenmenge: Stichprobe aus dem bereits gefuellten
+# SCOUT_ACCESS_CACHE_PATH (247 echte Live-Antworten) zeigt Median ~28KB, aber
+# p90 ~736KB und Maximum ~1,7MB pro Antwort (grosse Waldflaechen wie
+# Grunewald/Tegeler Forst liefern sehr knotenreiche Polygone) -- 10s reichen
+# dafuer auf einem ausgelasteten oeffentlichen Mirror oft nicht. 25s ist mehr
+# als das Doppelte des bisherigen Werts (grosszuegiger Puffer fuer die groesste
+# beobachtete Antwortgroesse), aber bewusst nicht beliebig hoch, damit ein
+# einzelner haengender Mirror-Versuch den Cluster-Lauf nicht unnoetig blockiert
+# (mit fetch_scout_accessibility_data() jetzt zusaetzlich per asyncio.to_thread
+# aus dem Event-Loop ausgelagert, siehe discover/pipeline.py).
+SCOUT_ACCESS_TIMEOUT_S: float = 25.0
+
+# Aktive Bahn-/Wegtypen (OSM-Tag-Werte). Bewusst NUR aktiv genutzte Gleise
+# (US-135-Annahme, von Stephan bestätigt): reguläre railway=rail/tram/
+# light_rail/subway/narrow_gauge/monorail/funicular OHNE disused=yes-Tag.
+# Stillgelegte Strecken mit dem OSM-Lifecycle-Präfix disused:railway=*
+# tragen gar keinen railway=*-Tag (sondern disused:railway=*) und matchen
+# den ["railway"~...]-Filter unten deshalb bereits von selbst nicht — kein
+# zusätzlicher Negativfilter dafür nötig, nur das separate disused=yes-
+# Sekundär-Tag wird zusätzlich explizit ausgeschlossen.
+_SCOUT_ACCESS_RAIL_VALUES: str = "rail|tram|light_rail|subway|narrow_gauge|monorail|funicular"
+_SCOUT_ACCESS_PATH_VALUES: str = "footway|path|track|pedestrian|steps|bridleway|cycleway|living_street"
+
+SCOUT_ACCESS_CACHE_PATH: Path = Path(__file__).resolve().parent / "cache" / "scout_accessibility_cache.json"
+
+# Gröbere Koordinatentoleranz als BUILDING_CACHE_COORD_TOLERANCE_DEG
+# (1e-5°, ~1m) — passend zum Cluster-Raster aus discover/accessibility.py
+# (ACCESSIBILITY_CLUSTER_SIZE_M = 80m): 5e-4° ≈ 55m an der Berlin-Breite,
+# deckt damit denselben oder einen direkt benachbarten Cluster ab.
+SCOUT_ACCESS_CACHE_COORD_TOLERANCE_DEG: float = 5e-4
+
+# Kein bestehender Cache-TTL-Präzedenzfall im Code gefunden (BUILDING_CACHE
+# hat keine TTL, nur wöchentliche GitHub-Actions-Neuerzeugung). Eigener,
+# explizit benannter Wert: an TASK-59s wöchentlichem Batch-Rhythmus
+# orientiert, damit Standpunkte, die über mehrere Tage wiederkehren
+# (US-135-Pre-Mortem: _trigger_discover_debounced() bei jeder
+# Location-Bearbeitung), den Live-Call nicht jedes Mal neu auslösen.
+SCOUT_ACCESS_CACHE_TTL_DAYS: float = 7.0
+
+_scout_access_cache_lock = threading.Lock()
+_scout_access_cache_entries: Optional[List[dict]] = None
+
+
+def _load_scout_access_cache() -> List[dict]:
+    """Lädt (einmalig, thread-sicher, gecached für die Prozesslaufzeit) den
+    lokalen US-135-Zugänglichkeits-Cache. Fehlt/ist fehlerhaft die Datei,
+    verhält sich das wie ein leerer Cache (kein Crash, jede Anfrage fällt
+    auf den Live-Pfad zurück)."""
+    global _scout_access_cache_entries
+    if _scout_access_cache_entries is not None:
+        return _scout_access_cache_entries
+    with _scout_access_cache_lock:
+        if _scout_access_cache_entries is not None:
+            return _scout_access_cache_entries
+        try:
+            raw = json.loads(SCOUT_ACCESS_CACHE_PATH.read_text(encoding="utf-8"))
+            entries = raw.get("entries") or []
+        except FileNotFoundError:
+            entries = []
+        except (OSError, ValueError, AttributeError) as e:
+            logger.warning(
+                "US-135 Zugänglichkeits-Cache %s nicht lesbar (%s) — "
+                "startet mit leerem Cache", SCOUT_ACCESS_CACHE_PATH, e,
+            )
+            entries = []
+        _scout_access_cache_entries = entries
+        return _scout_access_cache_entries
+
+
+def _save_scout_access_cache() -> None:
+    """Schreibt den aktuellen In-Memory-Cache auf Disk. Anders als
+    BUILDING_CACHE_PATH KEIN GitHub-Actions-Commit-Schritt — Scout-
+    Kandidaten stehen nicht im Repo, dies ist reine lokale
+    Laufzeit-Persistenz. Schreibfehler werden geloggt, aber nie nach außen
+    geworfen (Cache ist eine Optimierung, kein Korrektheits-Erfordernis)."""
+    try:
+        SCOUT_ACCESS_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"entries": _scout_access_cache_entries or []}
+        SCOUT_ACCESS_CACHE_PATH.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8",
+        )
+    except OSError as e:
+        logger.warning("US-135 Zugänglichkeits-Cache %s nicht schreibbar (%s)",
+                        SCOUT_ACCESS_CACHE_PATH, e)
+
+
+def _find_scout_access_cache_entry(
+    observer_lat: float, observer_lon: float,
+    subject_lat: float, subject_lon: float,
+) -> Optional[dict]:
+    """Sucht einen noch gültigen (TTL, SCOUT_ACCESS_CACHE_TTL_DAYS) Treffer
+    innerhalb der groben Cluster-Koordinatentoleranz. Kein Treffer -> None,
+    der Aufrufer holt die Daten dann live."""
+    tol = SCOUT_ACCESS_CACHE_COORD_TOLERANCE_DEG
+    now = datetime.now(timezone.utc)
+    for entry in _load_scout_access_cache():
+        if abs((entry.get("observer_lat") or 0.0) - observer_lat) >= tol:
+            continue
+        if abs((entry.get("observer_lon") or 0.0) - observer_lon) >= tol:
+            continue
+        if abs((entry.get("subject_lat") or 0.0) - subject_lat) >= tol:
+            continue
+        if abs((entry.get("subject_lon") or 0.0) - subject_lon) >= tol:
+            continue
+        try:
+            cached_at = datetime.fromisoformat(entry.get("cached_at"))
+        except (TypeError, ValueError):
+            continue
+        if cached_at.tzinfo is None:
+            cached_at = cached_at.replace(tzinfo=timezone.utc)
+        if (now - cached_at).total_seconds() > SCOUT_ACCESS_CACHE_TTL_DAYS * 86400.0:
+            continue
+        return entry
+    return None
+
+
+def fetch_scout_accessibility_data(
+    observer_lat: float,
+    observer_lon: float,
+    subject_lat: float,
+    subject_lon: float,
+    radius_m: float = SCOUT_ACCESS_QUERY_RADIUS_M,
+    timeout_s: float = SCOUT_ACCESS_TIMEOUT_S,
+) -> Optional[dict]:
+    """US-135: EINE kombinierte Live-Overpass-Anfrage für Gebäude (Sichtlinie,
+    Bounding-Box Standpunkt<->Motiv, analog fetch_buildings_along_line) UND
+    Wald/Wasser/Bahn/Weg (Umkreis um den Standpunkt) — Implementierungs-
+    option A statt zwei getrennter Anfragen. Nutzt _fetch_from_mirrors und
+    damit denselben geteilten Rate-Limit-Tracker/Mirror-Fallback wie alle
+    bestehenden QA-Overpass-Abfragen in diesem Modul.
+
+    Gibt None zurück, wenn ALLE Mirrors fehlschlagen — der Aufrufer
+    (discover/accessibility.py, über get_scout_accessibility_data)
+    behandelt das als "Prüfung nicht durchführbar" (US-135 Regel 3: im
+    Zweifel ausblenden, nie als "frei"/"zugänglich" werten)."""
+    lat_min = min(observer_lat, subject_lat) - 0.001
+    lat_max = max(observer_lat, subject_lat) + 0.001
+    lon_min = min(observer_lon, subject_lon) - 0.001
+    lon_max = max(observer_lon, subject_lon) + 0.001
+
+    query = (
+        "[out:json][timeout:{t}];"
+        "("
+        'way["building"]({s},{w},{n},{e});'
+        'way["landuse"="forest"](around:{r},{olat},{olon});'
+        'way["natural"="wood"](around:{r},{olat},{olon});'
+        # US-135 Nachbesserung (2026-08-08, realer Fall "Einsteinturm"):
+        # grosse Waldflaechen sind in OSM haeufig als Multipolygon-RELATION
+        # gemappt, nicht als einzelner way (Beleg: relation 12981504,
+        # landuse=forest, Telegrafenberg-Forst bei Potsdam). Die vorherige
+        # way-only-Abfrage fand solche Flaechen nie -- ein Scout-Standpunkt
+        # mitten in genau diesem Wald blieb faelschlich als "zugaenglich"
+        # im Feed sichtbar (AK3-Verletzung). Ergaenzt um die passenden
+        # relation[...]-Klauseln, Parsing der Member-Geometrie unten.
+        'relation["landuse"="forest"](around:{r},{olat},{olon});'
+        'relation["natural"="wood"](around:{r},{olat},{olon});'
+        'way["natural"="water"](around:{r},{olat},{olon});'
+        'way["waterway"](around:{r},{olat},{olon});'
+        # US-135 Nachbesserung (2026-08-08, realer Fall "Schloss Pfaueninsel
+        # - Rundtuerme"): Grosse Seen sind in OSM ebenfalls haeufig als
+        # Multipolygon-RELATION gemappt (Beleg: relation 173239, "Havel",
+        # natural=water, EIN outer-Ring + ZWEI inner-Ringe fuer die Inseln
+        # inkl. Pfaueninsel selbst). Die separate way["natural"="water"]-
+        # Antwort oben deckt nur ein kleineres Teilstueck ab, nicht den
+        # tatsaechlichen relevanten See-Umriss -- ein per Dreiecksberechnung
+        # erzeugter Standpunkt lag dadurch nachweislich INNERHALB des realen
+        # Havel-Umrisses (per Punkt-in-Polygon-Test gegen die Relation
+        # bestaetigt), blieb aber faelschlich als "zugaenglich" sichtbar
+        # (AK4-Verletzung).
+        'relation["natural"="water"](around:{r},{olat},{olon});'
+        'relation["waterway"](around:{r},{olat},{olon});'
+        'way["railway"~"^({rail})$"]["disused"!~"yes"](around:{r},{olat},{olon});'
+        'way["highway"~"^({path})$"](around:{r},{olat},{olon});'
+        ");out geom;"
+    ).format(
+        t=int(timeout_s),
+        s=lat_min, w=lon_min, n=lat_max, e=lon_max,
+        r=int(radius_m), olat=observer_lat, olon=observer_lon,
+        rail=_SCOUT_ACCESS_RAIL_VALUES, path=_SCOUT_ACCESS_PATH_VALUES,
+    )
+    payload = _fetch_from_mirrors(
+        query, timeout_s,
+        log_context="US-135 Scout-Zugänglichkeit ({},{})".format(observer_lat, observer_lon),
+    )
+    if payload is None:
+        return None
+
+    buildings: List[dict] = []
+    forest_ways: List[dict] = []
+    water_ways: List[dict] = []
+    rail_ways: List[dict] = []
+    path_ways: List[dict] = []
+
+    for el in payload.get("elements") or []:
+        tags = el.get("tags") or {}
+
+        # US-135 Nachbesserung (2026-08-08): Multipolygon-Relationen (grosse
+        # Waelder UND grosse Seen, siehe Kommentare an den relation[...]-
+        # Query-Klauseln oben) haben KEINE eigene "geometry" auf oberster
+        # Ebene (anders als ways) -- die Geometrie steckt pro Member-Way in
+        # "members"[i]["geometry"]. Jeder Member-Way mit eigener Geometrie
+        # wird wie ein eigenstaendiger forest_way/water_way behandelt; fuer
+        # den hier verwendeten simplen Punkt-in-Polygon-/Kanten-Distanz-Test
+        # reicht das aus. Auch role="inner" wird bewusst mitgezaehlt (z.B.
+        # Waldlichtungen oder -- Havel-Fall -- Insel-Umrisse INNERHALB eines
+        # Sees): das macht den Filter im Zweifel konservativer (schliesst im
+        # Grenzfall eher eine Lichtung/Insel mit aus), nie unsicherer --
+        # passend zum bestehenden "im Zweifel ausblenden"-Prinzip (Regel 3).
+        # Ein Member-Way wird nur als "closed" markiert, wenn sein eigener
+        # erster und letzter Knoten uebereinstimmen (ein aus mehreren
+        # Member-Ways zusammengesetzter Ring kann das einzeln nicht
+        # garantieren) -- die Kanten-Distanz-Pruefung greift trotzdem, auch
+        # wenn "closed" False bleibt.
+        if el.get("type") == "relation":
+            is_forest_rel = tags.get("landuse") == "forest" or tags.get("natural") == "wood"
+            is_water_rel = tags.get("natural") == "water" or "waterway" in tags
+            if is_forest_rel or is_water_rel:
+                for member in el.get("members") or []:
+                    m_geom = member.get("geometry")
+                    if not m_geom:
+                        continue
+                    m_nodes = [(g["lat"], g["lon"]) for g in m_geom if "lat" in g and "lon" in g]
+                    if len(m_nodes) < 2:
+                        continue
+                    if is_forest_rel and len(m_nodes) >= 3:
+                        forest_ways.append({"nodes": m_nodes})
+                    if is_water_rel:
+                        water_ways.append({
+                            "nodes": m_nodes,
+                            "closed": len(m_nodes) >= 3 and m_nodes[0] == m_nodes[-1],
+                        })
+            continue
+
+        geom = el.get("geometry")
+        if not geom:
+            continue
+        nodes = [(g["lat"], g["lon"]) for g in geom if "lat" in g and "lon" in g]
+        if len(nodes) < 2:
+            continue
+
+        if "building" in tags:
+            if len(nodes) >= 3:
+                buildings.append({"nodes": nodes, "height_m": _building_height(tags)})
+            continue
+        if tags.get("landuse") == "forest" or tags.get("natural") == "wood":
+            if len(nodes) >= 3:
+                forest_ways.append({"nodes": nodes})
+            continue
+        if tags.get("natural") == "water" or "waterway" in tags:
+            water_ways.append({
+                "nodes": nodes,
+                "closed": len(nodes) >= 3 and nodes[0] == nodes[-1],
+            })
+            continue
+        if tags.get("railway"):
+            rail_ways.append({"nodes": nodes})
+            continue
+        if tags.get("highway"):
+            path_ways.append({"nodes": nodes})
+            continue
+
+    return {
+        "buildings": buildings,
+        "forest_ways": forest_ways,
+        "water_ways": water_ways,
+        "rail_ways": rail_ways,
+        "path_ways": path_ways,
+    }
+
+
+def get_scout_accessibility_data(
+    observer_lat: float,
+    observer_lon: float,
+    subject_lat: float,
+    subject_lon: float,
+) -> Optional[dict]:
+    """US-135: Öffentliche Cache+Live-Funktion für einen Scout-Standpunkt.
+
+    Schaut zuerst im lokalen Tage-Cache nach (SCOUT_ACCESS_CACHE_TTL_DAYS
+    gültig, grobe Cluster-Toleranz), sonst genau EINE kombinierte
+    Live-Overpass-Anfrage (fetch_scout_accessibility_data) über den
+    geteilten Rate-Limit-Tracker. Ergebnis wird bei Erfolg im Cache
+    gespeichert; ein Fehlschlag (None) wird NICHT gecacht, damit ein
+    späterer Aufruf mit wieder erreichbarem Overpass nicht dauerhaft
+    blockiert bleibt.
+
+    Rückgabe: dict mit buildings/forest_ways/water_ways/rail_ways/
+    path_ways, oder None wenn die Prüfung nicht durchführbar war
+    (Timeout/Fehler) — der Aufrufer behandelt das als "nicht bestätigt"
+    (US-135 Regel 3)."""
+    cached = _find_scout_access_cache_entry(observer_lat, observer_lon, subject_lat, subject_lon)
+    if cached is not None:
+        return cached.get("data")
+
+    data = fetch_scout_accessibility_data(observer_lat, observer_lon, subject_lat, subject_lon)
+    if data is None:
+        return None
+
+    entry = {
+        "observer_lat": observer_lat,
+        "observer_lon": observer_lon,
+        "subject_lat": subject_lat,
+        "subject_lon": subject_lon,
+        "cached_at": datetime.now(timezone.utc).isoformat(),
+        "data": data,
+    }
+    global _scout_access_cache_entries
+    with _scout_access_cache_lock:
+        if _scout_access_cache_entries is None:
+            _scout_access_cache_entries = []
+        _scout_access_cache_entries.append(entry)
+        _save_scout_access_cache()
+    return data
+
+
+def is_sightline_blocked_by_buildings(
+    observer_lat: float,
+    observer_lon: float,
+    subject_lat: float,
+    subject_lon: float,
+    buildings: List[dict],
+) -> bool:
+    """US-135 Regel 1: grobe 2D-Sichtlinien-Blockprüfung ohne Geländehöhen-
+    profil — bewusst einfacher als der vollständige Sichtachsen-Check aus
+    US-09 (calculations/sightline.py), passend zum in der US-135-Analyse
+    festgelegten "groben Ausschlussfilter, keine vollständige geometrische
+    Sichtachsenberechnung". True, wenn mindestens ein Gebäude zwischen
+    Standpunkt und Motiv liegt UND sein horizontaler Winkelbereich (vom
+    Standpunkt aus gesehen, wiederverwendet _footprint_angular_span) die
+    Peilung zum Motiv vollständig überdeckt."""
+    subject_bearing = _norm(bearing_between(observer_lat, observer_lon, subject_lat, subject_lon))
+    subject_dist = _scout_access_haversine_m(observer_lat, observer_lon, subject_lat, subject_lon)
+
+    for b in buildings:
+        nodes = b.get("nodes") or []
+        if len(nodes) < 3:
+            continue
+        c_lat = sum(n[0] for n in nodes) / len(nodes)
+        c_lon = sum(n[1] for n in nodes) / len(nodes)
+        dist_to_building = _scout_access_haversine_m(observer_lat, observer_lon, c_lat, c_lon)
+        if dist_to_building <= 0 or dist_to_building >= subject_dist:
+            continue  # nicht zwischen Standpunkt und Motiv
+        span = _footprint_angular_span(observer_lat, observer_lon, nodes)
+        if not span:
+            continue
+        span_min, span_max = span
+        width = (span_max - span_min) % 360.0
+        offset = (subject_bearing - span_min) % 360.0
+        if offset <= width:
+            return True
+    return False
+
+
+def _scout_access_haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Lokale Haversine-Distanz (Meter) — eigene kleine Kopie statt Import
+    aus discover/pipeline_base.py, um das bestehende Modul-Layering zu
+    wahren (data/ importiert bereits discover.geometry für Bearings, aber
+    keine Pipeline-Bausteine)."""
+    R = 6_371_000.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = (math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2)
+    return 2 * R * math.asin(math.sqrt(a))

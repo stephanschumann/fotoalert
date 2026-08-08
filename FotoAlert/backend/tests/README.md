@@ -97,6 +97,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_us120.py` | US-120: Beispielbild-Upload (Host, Kompression, EXIF-Ausrichtung) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us130.py` | US-130: Himmelsröte mit Aerosol-/Dunst-Signal (ODER-Verknüpfung) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us131.py` | US-131: Wolken-/Dunstabfrage entlang der Sichtachse statt Fotografen-Standort | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_us135.py` | US-135: Scout — nur zugängliche Standorte mit freier Sicht vorschlagen (Sichtachsen-Blockade durch Gebäude, Wald-/Wasser-/Bahn-Ausschluss inkl. Weg-Nähe-Ausnahme, Overpass-Cache, geteilter Rate-Limit-Tracker, Threadpool-Entkopplung) | ✅ immer (offline, deterministisch, Overpass-HTTP-Client gemockt) | `offline`, `regression` |
 | `test_us66_login.py` | US-66: Pflicht-Login mit Rollen-Erkennung (Token, `/login`, Endpunktschutz); 1 Test zusätzlich `smoke` | teils ✅ immer (offline-Klasse), teils nur mit `--all` (api-Klassen) | `offline`, `api`, `regression` (+1× `smoke`) |
 | `test_us67_composition.py` | US-67: Datengrundlage Himmelsposition (`composition_analysis`) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us79_moon_rise_set.py` | US-79: Mondaufgang/-untergang als eigene Event-Typen | ✅ immer (offline, deterministisch) | `offline`, `regression`, `frontend` |

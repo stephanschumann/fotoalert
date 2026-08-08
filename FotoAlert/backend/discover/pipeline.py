@@ -20,6 +20,7 @@ from pathlib import Path
 
 from discover import moon_pipeline, sun_pipeline
 from discover.pipeline_base import ScoutOpportunity, clear_weather_cache
+from discover.accessibility import filter_accessible_candidates
 
 log = logging.getLogger(__name__)
 
@@ -54,6 +55,20 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
     else:
         all_opportunities.extend(sun_result)
 
+    # US-135 Live-Bug (2026-08-08): filter_accessible_candidates() ist eine
+    # rein synchrone Funktion, die pro Cluster eine blockierende httpx-
+    # Overpass-Anfrage ausfuehrt (Live-Volllauf: ~938 Cluster, ca. 52 Minuten
+    # Gesamtlaufzeit laut Server-Log). Direkt aufgerufen wuerde das den
+    # gesamten asyncio-Event-Loop fuer die komplette Laufzeit blockieren --
+    # nachweislich im Log (auch /health antwortete nicht, andere geplante
+    # Jobs wie der 3-stuendliche Wetter-Overlay-Job wurden nachweislich
+    # verpasst: "Run time of job ... was missed"). Ausgelagert per
+    # asyncio.to_thread, exakt das bestehende Muster fuer andere lang
+    # laufende, netzlastige synchrone Arbeit in diesem Projekt (siehe
+    # main.py::_run_qa_pass -> asyncio.to_thread(_qa_improve_one, ...) und
+    # main.py::_compute_alignments) -- kein neues Muster, keine neue
+    # Architekturentscheidung.
+    all_opportunities = await asyncio.to_thread(filter_accessible_candidates, all_opportunities)
     all_opportunities.sort(key=lambda o: o.score, reverse=True)
 
     moon_count = len(moon_result) if not isinstance(moon_result, Exception) else "ERR"
