@@ -83,6 +83,19 @@ jobs:
             --screenshot-root /tmp/qa-screenshots \
             --findings-json /tmp/findings.json
 
+      # BUG-100: test_bug_85.py/test_bug-80.py/test_task-66.py beginnen mit
+      # pytest.importorskip("playwright") + einem zusätzlichen /health-Erreichbarkeits-
+      # Skip gegen BASE_URL — im test-backend-Job (kein Playwright, kein Dev-Server)
+      # wurden sie deshalb bislang lautlos SKIPPED statt real ausgeführt. Dieser Job
+      # hat Playwright bereits installiert und den Dev-Server bereits laufen (siehe
+      # oben) — gezielt nur diese drei Dateien, NICHT der breitere -m frontend-Marker
+      # (der würde 5 weitere, bereits unabhängig funktionierende Dateien zusätzlich
+      # treffen).
+      - name: Backend-Playwright-Tests ausführen
+        working-directory: FotoAlert/backend
+        run: |
+          python3 -m pytest tests/test_bug_85.py "tests/test_bug-80.py" "tests/test_task-66.py" -v
+
       - name: Findings + Screenshots als CI-Artefakt hochladen
         if: always()
         uses: actions/upload-artifact@v4
