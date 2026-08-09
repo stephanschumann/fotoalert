@@ -25,16 +25,17 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **TASK-88** *(Release-Skript: Merge-Konflikt darf keinen Ad-hoc-Commit ohne Standard-Message/Tag hinterlassen)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
+| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* · **TASK-02** *(Sonnenfinsternisse berechnen (4 Typen), Freigabe 2026-08-09 — Umsetzung startet, keine Verzeichniskopie: berührte Dateien überschneiden sich nicht mit TASK-59s Release-Sperre)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **US-135** *(Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen — Filter implementiert (accessibility.py + qa_azimuth.py US-135-Erweiterung + pipeline.py-Filterschritt), 18 eigene Tests gruen, wartet auf fotoalert-test, 2026-08-08)* · **BUG-89** *(Wetter-Score/Wolkenstimmung: Inline-Hinweis implementiert, wartet auf Test, 2026-08-05)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* |
+| **🏁 Done** | abgeschlossen + deployed | **US-134** *(Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern, zweiter Auslöseweg zusätzlich zum bestehenden Blur-Schwenk aus US-133; Test: 10/11 AK sofort gruen, AK7-Doppelaufruf-Bug gefunden und per onmousedown="event.preventDefault()" behoben, danach alle 11 AK bestaetigt; separate Verifikation: Bestaetigt; Refactor abgeschlossen; released v1.22.61, Deploy verifiziert (Health-Check ok, Live-Verifikation im Browser: Bestaetigen-Button + Kartenschwenk nach Cache-Bereinigung eines aktiven Service Workers bestaetigt), 2026-08-09)* · **TASK-101** *(Skill-Qualitäts-Audit — AK-Qualitäts-Check-Ergänzungen für fotoalert-analyze/fotoalert-orchestrator ausgeliefert und von Stephan installiert, 2026-08-09)* · **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **US-134** *(Bestätigen-Button neben Koordinatenfeldern, zweiter Auslöseweg für Kartenschwenk aus US-133)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-89** *(Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern, Fund aus TASK-82-Testphase)* · **TASK-90** *(Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln, Fund aus TASK-82-Testphase)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **TASK-93** *(Backlog-Datenqualität: rund 147 alte Tickets ohne Status-Feld nachpflegen, Fund aus WS-018)* · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidiert zwischen Verifikation und Sichtachsen-Status, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse ohne Eskalation bei „Nicht geprüft", Fund aus Qualitäts-Audit 2026-07-27)* · **TASK-94** *(main.py::_load_custom_locations() nutzt nicht coerce_category_value() und ist nicht pro Eintrag abgesichert, Fund aus BUG-84-Verifikation)* · **TASK-96** *(Testsuite: undokumentierte Gesamtrepo-Abhängigkeit einiger „offline"-Tests + README-Marker-Lücke test_bug-94.py, Fund aus Nachverifikation des BUG-94-Testlaufs)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94)* · **TASK-97** *(Unerklärter roter CI-Lauf bei Frontend-Check/Playwright nach reinem Backend-Zahlen-Diff ohne Auth-Bezug — Login-Precondition-Fehler, Re-Run grün, Ursache nie geklärt, Fund aus BUG-92-Retro)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **TASK-98** *(release.sh härten: Pathspec-Fix + Versions-Verifikation, Fund aus TASK-07-Retrospektive 2026-08-04)* · **TASK-99** *(Administrative Berlin/Brandenburg-Beschränkung entfernen)* · **TASK-100** *(Lange Funktion _fetch_weather_and_aerosol() in backend/main.py, Fund durch fotoalert-refactor nach US-135)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **TASK-93** *(Backlog-Datenqualität: rund 147 alte Tickets ohne Status-Feld nachpflegen, Fund aus WS-018)* · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidiert zwischen Verifikation und Sichtachsen-Status, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse ohne Eskalation bei „Nicht geprüft", Fund aus Qualitäts-Audit 2026-07-27)* · **TASK-94** *(main.py::_load_custom_locations() nutzt nicht coerce_category_value() und ist nicht pro Eintrag abgesichert, Fund aus BUG-84-Verifikation)* · **TASK-96** *(Testsuite: undokumentierte Gesamtrepo-Abhängigkeit einiger „offline"-Tests + README-Marker-Lücke test_bug-94.py, Fund aus Nachverifikation des BUG-94-Testlaufs)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94)* · **TASK-97** *(Unerklärter roter CI-Lauf bei Frontend-Check/Playwright nach reinem Backend-Zahlen-Diff ohne Auth-Bezug — Login-Precondition-Fehler, Re-Run grün, Ursache nie geklärt, Fund aus BUG-92-Retro)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **TASK-98** *(release.sh härten: Pathspec-Fix + Versions-Verifikation, Fund aus TASK-07-Retrospektive 2026-08-04)* · **TASK-99** *(Administrative Berlin/Brandenburg-Beschränkung entfernen)* · **TASK-100** *(Lange Funktion _fetch_weather_and_aerosol() in backend/main.py, Fund durch fotoalert-refactor nach US-135)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -61,6 +62,53 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-101 · Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse zum Motiv `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-08-09 |
+
+**Beschreibung:** Die Scout-Zugänglichkeitsprüfung (`backend/discover/accessibility.py`, `filter_accessible_candidates()`, Z. 191ff.) prüft die Sichtlinie vom vorgeschlagenen Fotografenstandpunkt zum Motiv ausschließlich per `qa_azimuth.is_sightline_blocked_by_buildings()` (Aufruf Z. 268) — also nur gegen Gebäude-Grundflächen. Bäume/Wald werden bei dieser Sichtachsen-Prüfung nicht berücksichtigt, obwohl `filter_accessible_candidates()` an anderer Stelle (`_is_excluded()`) bereits Waldflächen als Ausschlusskategorie kennt — dort aber nur zur Zugänglichkeits-/Wegprüfung (US-135 Regel 2, „nicht mitten im Wald ohne Weg"), nicht zur Sichtfreiheit. Konkret beobachtet: Ein von Scout vorgeschlagener Standpunkt für Schloss Pfaueninsel lag an Land (nicht mehr im Wasser — separater, bereits gefixter Bug aus der US-135-Nachbesserung 2026-08-08), aber mitten in einem lichten Waldstück ohne freie Sicht zum Motiv. Stephan bewertete den Standort als klare Verbesserung („viel besser, er liegt an Land"), merkte aber an, dass trotz lichtem Baumbestand kein freier Blick aufs Motiv besteht.
+
+**User Story:** Als Nutzer möchte ich, dass vorgeschlagene Fotografenstandpunkte auch dann eine wirklich freie Sicht zum Motiv haben, wenn Bäume/Wald dazwischen liegen — nicht nur wenn Gebäude die Sicht versperren.
+
+**Bezug:** Hängt fachlich mit **US-135** *(In Test — Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen)* zusammen: gleiche Funktion (`filter_accessible_candidates()`), gleiche Fallgruppe (Sichtachsen-/Zugänglichkeitsprüfung für Scout-Kandidaten), auch derselbe reale Fundort (Schloss Pfaueninsel, US-135-Nachbesserung 2026-08-08). Bewusst **nicht** Teil von dessen Scope — Stephans ausdrückliche Entscheidung, dies als eigenes Ticket zu führen, nicht rückwirkend in US-135 nachzuziehen.
+
+🔗 **Beziehungsanalyse BUG-101 ↔ US-135**
+- **Verwandt:** US-135 (In Test) — Abhängigkeit/Überschneidung (dieselbe Codestelle `filter_accessible_candidates()`/`accessibility.py`, gleicher Fundort Schloss Pfaueninsel), aber fachlich zwei unterschiedliche Lücken: US-135 Regel 1 prüft Sichtfreiheit ausschließlich gegen Gebäude, US-135 Regel 2 prüft Wald nur auf Wegnähe/Zugänglichkeit (nicht auf Sichtfreiheit) — die Kombination „lichter Wald mit Weg in der Nähe, aber ohne freie Sicht zum Motiv" fällt durch beide bestehenden Prüfungen und wird von keiner AK von US-135 abgedeckt.
+- **Empfehlung:** Eigenständiges, aber explizit verknüpftes Ticket (kein Merge in US-135, kein Split nötig — US-135 steht bereits in Test und ist von Stephan bewusst nicht erweitert worden).
+- **Begründung:** US-135 ist bereits implementiert und in Test; eine nachträgliche Scope-Erweiterung würde das laufende Release-Gate von US-135 verzögern und widerspricht Stephans expliziter Entscheidung, den Wald-Sichtachsen-Fall getrennt zu behandeln. Die Fixes sind technisch unabhängig priorisierbar (Baum-Sichtachsen-Prüfung kann unabhängig von US-135s Gebäude-/Wegprüfung ergänzt werden, vermutlich als weitere Prüfkategorie in `filter_accessible_candidates()`, analog zur bestehenden Gebäude-Prüfung).
+- Grep-Gegencheck (Suchbegriffe „Wald", „Baum", „Bäume", „Sichtachse", „filter_accessible_candidates", „accessibility.py") ergab keine weitere offene oder abgeschlossene Dublette zu dieser konkreten Lücke.
+
+---
+
+### BUG-102 · Motiv-Koordinaten (SUBJECTS) frieren beim Serverstart ein — Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen bis zum Neustart `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-08-09 |
+
+**Beschreibung:** In `backend/discover/subjects.py`, Z. 232, werden `SUBJECTS` und `EXCLUSION_ZONES` einmalig beim ersten Modul-Import berechnet (`SUBJECTS, EXCLUSION_ZONES = build_subjects()`, Kommentar „Gecachte Instanzen (einmal pro Prozess aufgebaut)") und danach nie neu berechnet — auch nicht bei einem manuellen Refresh über `/refresh-discover`. Sowohl `moon_pipeline.py` (Z. 31: `from discover.subjects import SUBJECTS, ...`) als auch `sun_pipeline.py` (Z. 30, gleicher Import) importieren `SUBJECTS` aus diesem eingefrorenen Modul-Level-Konstrukt. Folge: Wenn die Koordinaten eines Motivs (z. B. Einsteinturm) nach dem Serverstart korrigiert werden, zeigen Scout-Chancen weiterhin auf die alte, veraltete Koordinate — bis der Server komplett neu gestartet wird. Die normale Location-Detailseite ist davon nicht betroffen, sie zeigt immer die aktuelle Koordinate: `PATCH /locations/{id}` (`backend/main.py`, `patch_location()`, Z. 3774ff.) findet die Location per `next((l for l in LOCATIONS if l.id == loc_id), None)` (Z. 3789) und mutiert dieses Objekt direkt in `LOCATIONS` — verifiziert, dieser Pfad ist vom SUBJECTS-Freeze nicht betroffen. Ursprünglich entdeckt, als Stephan bei einer Scout-Chance für Einsteinturm feststellte, dass die Motiv-Koordinate der Chance nicht mit der Koordinate der gespeicherten Location übereinstimmt („Karte & Blickwinkel" zeigte für Chance und Location zwei unterschiedliche Motivstandorte).
+
+**User Story:** Als Nutzer möchte ich, dass Scout-Chancen immer die aktuelle Motiv-Koordinate verwenden, auch wenn ich die Koordinate erst nach dem letzten Serverstart korrigiert habe — ohne dass ich dafür den Server neu starten muss.
+
+**Bezug:** Unabhängiger Architektur-Bug, kein fachlicher Bezug zu US-135 außer dem Fundort (beide im Scout-/`backend/discover/`-Bereich, aber unterschiedliche Fehlerklassen — US-135 betrifft die Plausibilitätsprüfung von Scout-*Standpunkten*, dieser Bug betrifft veraltete *Motiv*-Koordinaten). Berührt außerdem denselben Trigger-Mechanismus, den **US-106** *(Done — Geänderte oder neue Location sofort komplett nutzbar)* für den Scout-Teil eingeführt hat (`_trigger_discover_debounced()`/`/refresh-discover`, debounced Volllauf nach Location-Änderung): US-106 sorgt zuverlässig dafür, dass nach einer Standort-Änderung zeitnah ein neuer Scout-Lauf angestoßen wird, aber dieser Lauf verwendet wegen des SUBJECTS-Freezes trotzdem weiterhin die alte Koordinate — der Debounce-Trigger allein behebt das hier gemeldete Problem also nicht.
+
+🔗 **Beziehungsanalyse BUG-102 ↔ US-106 / US-135**
+- **Verwandt:** US-106 (Done) — kein Merge, keine Dublette: US-106 stellt sicher, *dass* nach einer Location-Änderung zeitnah ein neuer Scout-Lauf läuft (Trigger-Timing), behandelt aber nicht, *welche* Motiv-Daten dieser Lauf verwendet. Der hier gemeldete Freeze unterläuft den Nutzen von US-106 speziell für den Fall einer nachträglichen Koordinatenkorrektur bei einem bestehenden Motiv.
+- **Nicht verwandt (geprüft, keine Überschneidung):** US-135 — reiner Fundort-Zufall (beide in `backend/discover/`), keine gemeinsame Codestelle, kein gemeinsamer Fehlermechanismus.
+- **Empfehlung:** Eigenständiges Ticket, kein Merge.
+- **Begründung:** Architektonisch unabhängiger Fix (Modul-Level-Konstante durch Funktionsaufruf/Cache-Invalidierung ersetzen), unabhängig von US-135 und unabhängig priorisierbar von US-106 planbar; ein Merge in US-106 wäre nachträglich (US-106 ist bereits Done) und würde eine unabhängig behebbare Ursache künstlich an ein abgeschlossenes Ticket binden.
+- Grep-Gegencheck (Suchbegriffe „SUBJECTS", „build_subjects", „subjects.py", „EXCLUSION_ZONES", „refresh-discover", „Einsteinturm") ergab keine bestehende offene oder abgeschlossene Dublette zu diesem konkreten Freeze-Mechanismus.
+
+---
 
 ### BUG-100 · CI-Job „test-backend" installiert kein Playwright — drei pytest-Testdateien werden still als SKIPPED statt real ausgeführt, CI bleibt trotzdem grün `[x]`
 
@@ -1203,13 +1251,15 @@ Eingeschlossen: Ein kurzer, immer sichtbarer Inline-Hinweistext in der Detail-Sh
 Explizit ausgeschlossen: Die bestehenden ⓘ-Glossar-Popups („Wetter", „Wolkenstimmung") werden nicht verändert. Die generelle „Inline-Hinweis-Pflicht bei zwei nebeneinanderstehenden Scores" als Designrichtlinie wird NICHT in diesem Ticket entschieden (siehe „Systemischer Hinweis" unten — Beobachtung, kein AK). Keine Änderung an der Berechnung von Wetter-Score oder Wolkenstimmung selbst.
 
 **Akzeptanzkriterien:**
-- [~] Öffnet ein Nutzer die Detailansicht einer Foto-Chance vom Typ „Goldene Stunde Morgen/Abend", „Goldene Wolken" oder „Himmelsröte" mit vorhandenen Wetterdaten und klappt die Sektion „Wetter zum Shoot-Zeitpunkt" auf, sieht er bei der Wolkenstimmung-Zeile einen kurzen erklärenden Satz, der ohne weiteren Klick verständlich macht, dass Wetter-Score und Wolkenstimmung zwei unabhängige Werte sind.
+- [x] Öffnet ein Nutzer die Detailansicht einer Foto-Chance vom Typ „Goldene Stunde Morgen/Abend", „Goldene Wolken" oder „Himmelsröte" mit vorhandenen Wetterdaten und klappt die Sektion „Wetter zum Shoot-Zeitpunkt" auf, sieht er bei der Wolkenstimmung-Zeile einen kurzen erklärenden Satz, der ohne weiteren Klick verständlich macht, dass Wetter-Score und Wolkenstimmung zwei unabhängige Werte sind.
 - [x] Bei Chancen-Typen ohne Wolkenstimmungs-Anzeige (z. B. Mond-Alignment, 3D-Alignment, Milchstraße, Blaue Stunde) bleibt die Wetter-Sektion wie bisher — kein neuer Hinweistext.
 - [x] Die bestehenden ⓘ-Info-Buttons neben „Wetter" und „Wolkenstimmung" öffnen weiterhin unverändert die bekannten Glossar-Popups.
 - [x] Edge Case: Bei einer Chance ohne verfügbare Wetterdaten (mehr als 3 Tage in der Zukunft) bleibt die Sektion wie bisher auf „Verfügbar ab T-3 Tage" beschränkt — kein neuer Hinweistext ohne zugrundeliegende Werte.
 - [x] Edge Case: Der Hinweistext ist optisch klar als ergänzende Zusatzinfo erkennbar (kleine, gedämpfte Schrift, keine neue Farbe, kein Warn-/Fehler-Stil) und nicht als eigenständiger, klickbarer Bedienbereich.
-- [~] Der Hinweis erscheint unabhängig davon, über welchen Einstiegspunkt (Feed-Karte, Kalender, Scout, LocationDetail-Nächstes-Event) das Detail-Sheet geöffnet wurde (gemeinsame Komponente, stichprobenartig an mind. 2 Einstiegspunkten verifiziert).
+- [x] Der Hinweis erscheint unabhängig davon, über welchen Einstiegspunkt (Feed-Karte, Kalender, Scout, LocationDetail-Nächstes-Event) das Detail-Sheet geöffnet wurde (gemeinsame Komponente, stichprobenartig an mind. 2 Einstiegspunkten verifiziert).
 - [x] *(abhängig von Weg-Gate-Entscheidung Frage 1):* Erscheint der Hinweis gemäß Option A immer (Default-Empfehlung) oder gemäß Option B nur bei einer noch zu definierenden Mindestabweichung — das gewählte Verhalten ist reproduzierbar nachvollziehbar.
+
+**Test-Gate (SPEC-W5 Baustein D, gate-auditor Modus A, 08.08.2026):** Automatischer Chrome-Browser-Testlauf gegen alle sieben AKs durchgeführt (AK1/AK6 vorher offen, jetzt per echter Browser-Beobachtung an zwei Chancen bzw. zwei Einstiegspunkten bestätigt). Unabhängige gate-auditor-Prüfung (frischer Kontext, echter Code-Stand + Testprotokoll, kein Vertrauen auf Selbstauskunft): **Urteil Bestätigt** — alle AKs im Code nachgewiesen, Pre-Mortem-Szenarien 2+4 vermieden, Scope sauber (ein Commit `b589e0b`, nur der Hinweistext + Standard-Versionsbump). **Hinweis:** `b589e0b`/v1.22.58 war zu diesem Zeitpunkt bereits released (2026-08-05) — der Test-Gate-Lauf fand also nachträglich statt, nicht vor dem Release wie im Regelfall. Kein AK-Verstoß, aber eine Reihenfolge-Abweichung vom Normalablauf, die Stephan bei Gelegenheit einordnen sollte.
 
 **Pre-Mortem:**
 - 💀 *Szenario 1 — Sichtbarkeit der Sektion:* Die Sektion „Wetter zum Shoot-Zeitpunkt" ist standardmäßig eingeklappt (`Sections._def.ev_wetter = false`, Zeile 3984) — Auslöser: bestehendes App-Verhalten, nicht neu durch dieses Ticket. Frühwarnung: Code-Verifikation des Sections-Default. Gegenmaßnahme: Keine Verschlechterung, da die Wolkenstimmung selbst genauso „versteckt" ist — der neue Hinweis hat exakt dieselbe Sichtbarkeit wie der Wert, den er erklärt (er erscheint immer gemeinsam mit ihm). Kein zusätzlicher AK nötig, aber als bekannte Einschränkung dokumentiert.
@@ -1871,6 +1921,132 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 
 ---
 
+### TASK-101 · Akzeptanzkriterien-Qualität: Analyse-Skills und Orchestratoren gegen Meta-Framework prüfen `[x]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | Done |
+| **Erstellt** | 2026-08-08 |
+
+**Entscheidung von Stephan (2026-08-09 07:12):** Orchestratoren sollen zusätzlich selbst prüfen, ob eine Analyse den neuen AK-Qualitäts-Check durchgeführt hat — nicht nur die Analyse-Skills selbst. Gate 1 damit aufgelöst, Umsetzung beginnt.
+
+**Umsetzung abgeschlossen (2026-08-09 07:36):** Skill-Ergänzungsdateien für `fotoalert-analyze` (neuer Schritt 6c „AK-Qualitäts-Check", sechs Dimensionen + Negativ-/Randfall-Checkliste + Optimierungsleck-Cross-Check) und `fotoalert-orchestrator` (neue AK-Qualitäts-Check-Verifikation vor dem Weg-Gate, inline im Hauptthread über `gate-auditor` Modus B — kein eigener Subagent, da nur ein einzelnes, bereits fertiges Dokument geprüft wird, kein Diff/Test/Live-Abgleich) wurden erstellt und Stephan per Datei-Übergabe zugestellt (2026-08-09 07:36). Installierte Skills können in dieser Session nicht live editiert werden — Stephan muss die gelieferten Dateien selbst über „Skill speichern" installieren; eine Bestätigung, dass das geschehen ist, liegt noch nicht vor. Dieses Ticket liefert keinen App-Code, daher ist kein automatisierter Test-/Release-Zyklus anwendbar — als nächstliegende Ersatzprüfung wird Stephans eigene Bestätigung benötigt, dass die Dateien installiert und inhaltlich richtig sind, bevor das Ticket auf Done gesetzt wird.
+
+**Stephan bestätigt (2026-08-09 08:22):** Skills gespeichert/installiert. Verifiziert (nicht nur behauptet): Installationsstand von `fotoalert-analyze` und `fotoalert-orchestrator` per Zeitstempel- und Byte-für-Byte-Vergleich gegen die ausgelieferten `.skill`-Dateien geprüft — identisch. Damit sind alle Akzeptanzkriterien erfüllt; Status auf Done gesetzt. Kein Test-/Release-Gate anwendbar (kein App-Code).
+
+**Beschreibung:** Stephan hat eine Grundlagenanalyse geliefert (gespeichert unter `/Users/stephan/Claude/Projects/Claude Cowork/specs/AkzeptanzkriterienQualitaetsanalyse20260808.md`), die untersucht, warum Akzeptanzkriterien in stark automatisierten Entwicklungsketten (Analyse-Agent → Test-Agent → Implementierungs-Agent) eine andere, kritischere Rolle spielen als in klassischer Entwicklung — lückenhafte Kriterien erzeugen keinen sichtbaren Fehlschlag, sondern falsche Sicherheit (Tests werden grün, weil sie exakt die Lücke abdecken). Das Dokument liefert: ein Prüfraster mit sechs Dimensionen (Granularität, Polarität, Messbarkeit, Abdeckung über vier AK-Kategorien [funktional/nicht-funktional/Architektur/Sonstige], Testbarkeit ohne Rückfrage, Herkunftsnachvollziehbarkeit), eine Checkliste häufig vergessener Negativ-/Randfall-Kategorien, sowie am FotoAlert-Fallbeispiel „Pfaueninsel"-Bug eine generalisierbare Planungsfrage samt Akzeptanzkriterien- und Testfall-Vorlage für eine bestimmte Bug-Klasse („Optimierungsleck durch falsche Äquivalenzannahme" — z. B. bei Gruppierung/Stichprobenprüfung/Caching/Deduplizierung, die aus Performancegründen eingeführt wird).
+
+**Aufgabe dieses Tickets:** Prüfen, ob und wie dieses Prüfraster, die Checkliste und die Planungsfrage/Vorlagen bereits in `fotoalert-analyze`, `flow-game-analyze` und den jeweiligen Orchestratoren (`fotoalert-orchestrator`, `flow-game-orchestrator`) abgedeckt sind — und wo konkrete Ergänzungen sinnvoll wären (z. B. ein fester Pre-Mortem-Prüfschritt vor Freigabe einer Spec, der genau diese Fragen systematisch stellt). Die konkreten Maßnahmen sind explizit noch nicht Teil der Analyse selbst, sondern Ergebnis dieses Tickets. Betrifft potenziell auch das Flow-Game-Projekt (eigenes Backlog) — dort sollte ein entsprechendes Pendant-Ticket ergänzt werden, sobald der genaue Pfad zum Flow-Game-Backlog vorliegt.
+
+**User Story:** Als Stephan, der sich auf automatisiert generierte Tests als Freigabe-Signal verlässt, möchte ich, dass die Analyse-Skills und Orchestratoren systematisch auf Lücken in der Akzeptanzkriterien-Qualität prüfen, sodass lückenhafte Kriterien nicht unbemerkt als grüne Tests durchgehen und falsche Sicherheit erzeugen.
+
+**Bezug:** Keine Dublette gefunden (Grep nach „Akzeptanzkriterien-Qualität", „Prüfraster", „Meta-Framework", „Pfaueninsel", „Optimierungsleck", „Äquivalenzannahme" im gesamten Backlog ohne Treffer auf ein bestehendes Ticket zu diesem Thema). Inhaltlich angrenzend, aber keine Überschneidung: **TASK-63** *(Done, Epic Automatisiertes Regressionstesting)* — dort ging es um die Testinfrastruktur/CI-Pflicht-Gates selbst, nicht um die inhaltliche Qualität der Akzeptanzkriterien, aus denen Tests abgeleitet werden. **TASK-97** *(Inbox, unerklärter roter CI-Lauf)* und **BUG-97** *(Inbox, Alignment-Regressionstest liefert leere Liste trotz Docstring-Zusage)* sind konkrete Einzelfälle mit Testabdeckungs-Bezug, aber keine Dubletten — dieses Ticket ist strukturell/prozessual (Skill-Ebene), nicht ein einzelner Testfund.
+
+**Analyse abgeschlossen (2026-08-08).** Dieses Ticket ist ein Skill-Qualitäts-Audit, kein App-Feature — entsprechend ersetzt der folgende Abschnitt das übliche Example Mapping durch einen systematischen Abgleich der Grundlagenanalyse gegen die vier genannten Skill-Dateien.
+
+**Pre-Mortem zur Analyse selbst (was könnte an dieser Prüfung schiefgehen?):**
+- 💀 Szenario: Ein Konzept aus der Grundlagenanalyse wird als „abgedeckt" gewertet, weil ein ähnliches Wort im Skill vorkommt (z. B. „Edge Case" ≈ „Polarität"), obwohl die tatsächliche Prüftiefe eine andere ist. Auslöser: oberflächlicher Stichwortabgleich statt inhaltlicher Prüfung. Gegenmaßnahme: Für jede Dimension wird unten die konkrete Skill-Stelle zitiert und explizit bewertet, ob sie dieselbe Frage stellt oder nur benachbart ist (siehe Spalte „Deckungsgrad").
+- 💀 Szenario: Ad-hoc-/situative Checks (z. B. „Cap+Sort → Typ-Verdrängung", nur bei erkennbarem `:N`-Limit ausgelöst) werden mit einer systematischen, für jedes Ticket verbindlichen Prüfung verwechselt. Auslöser: Ein einzelner Trefferfund lässt vorschnell auf vollständige Abdeckung schließen. Gegenmaßnahme: Unten wird für jeden Fund unterschieden, ob er *situativ getriggert* (nur bei bestimmten Ticket-Merkmalen) oder *für jedes Ticket verbindlich* ist.
+- 💀 Szenario: Die Orchestratoren werden übersprungen, weil AK-Qualität auf den ersten Blick reine Analyse-Skill-Sache wirkt. Gegenmaßnahme: Beide Orchestratoren wurden vollständig gelesen und auf Berührungspunkte geprüft (Ampel-Prüfung, Weg-Gate, gate-auditor-Kopplung) — Ergebnis unten.
+- 💀 Szenario: Die vorgeschlagenen Ergänzungen werden als sofort umsetzbare Live-Edits an installierten Skills dargestellt, obwohl das technisch in dieser Sitzung nicht möglich ist (Skills mit blanker ID sind nicht direkt überschreibbar). Gegenmaßnahme: Alle Optionen unten benennen explizit die Lieferform (Ergänzungstext zur manuellen Übernahme durch Stephan, nicht Live-Edit).
+- 💀 Szenario: Das FotoAlert-Fallbeispiel „Pfaueninsel" aus der Grundlagenanalyse wird mit dem realen, andersartigen Pfaueninsel-Bugticket in diesem Backlog (Bild-Upload-Problem, nicht Geo-Filter-Rasterzellen) verwechselt. Klarstellung: Das in der Grundlagenanalyse beschriebene Geo-Filter-Szenario ist illustrativ/generalisiert, kein Zitat eines realen BACKLOG.md-Tickets — im Backlog gibt es keinen Treffer für „Optimierungsleck" oder „Äquivalenzannahme" (siehe Bezug-Feld oben).
+
+**Systematischer Abgleich — sechs Dimensionen des Meta-Framework (Abschnitt 3 der Grundlagenanalyse):**
+
+1. **Granularität** (jedes Kriterium einzeln/unabhängig prüfbar, kein Sammelkriterium):
+   - `fotoalert-analyze` Schritt 2: „Jedes Kriterium **spezifisch**" + „Edge Cases als eigene Kriterien." — berührt das Thema, fragt aber nicht explizit „verstecken sich mehrere Verhalten hinter einem Kriterium?".
+   - `flow-game-analyze` Schritt 3: „beschreibt beobachtbares Verhalten" + „ist testbar" — dieselbe Lücke.
+   - **Deckungsgrad: Teilweise.** Die Stoßrichtung (spezifisch statt vage) ist da, die explizite Sammelkriterium-Frage fehlt in beiden Analyse-Skills. In den Orchestratoren nicht vorgesehen (dort keine AK-Inhaltsprüfung).
+
+2. **Polarität** (zu jedem positiven Kriterium mind. ein negatives/Grenzfall-Gegenstück):
+   - `fotoalert-analyze` Schritt 1b „Zustands-Check" (Warte-/Leer-/Fehlerfall je Kernschritt) und Schritt 1 Vorgehen Punkt 4 „1–2 Examples pro Rule" — deckt Randzustände ab, verlangt aber nicht explizit ein negatives Beispiel *pro Regel*.
+   - `flow-game-analyze` 2d „Zustands-Check" — identischer Wortlaut, gleiche Lücke.
+   - **Deckungsgrad: Teilweise.** Der Zustands-Check ist eine Pflichtfrage, aber pro Kernschritt, nicht pro einzelner Rule/AK — eine Regel ohne Negativ-Beispiel fällt dadurch nicht zuverlässig auf.
+
+3. **Messbarkeit** (beobachtbares Verhalten statt Implementierungsannahme):
+   - `fotoalert-analyze` Schritt 2 „Aus Nutzersicht formulieren (Pflicht)": „AKs beschreiben erlebbares App-Verhalten … nicht technisches pass/fail am Code (keine Funktions-/Variablennamen …)".
+   - `flow-game-analyze` Schritt 3: „Es beschreibt beobachtbares Verhalten, keine Implementierung … Keine Funktions-, Klassen- oder Dateinamen in den Akzeptanzkriterien."
+   - **Deckungsgrad: Vollständig.** Wortgleiche Pflichtregel in beiden Skills, mit Beispielpaar (schlecht/gut).
+
+4. **Abdeckung über die vier AK-Kategorien** (funktional / nicht-funktional / Architektur / Sonstige):
+   - `fotoalert-analyze` Annahmen-Protokoll (Schritt 1) unterscheidet „Funktionale Lücken, Ästhetische/UX-Entscheidungen, Scope-Grenzen, Technische Weggabelungen" — eine andere Vierteilung, keine Entsprechung zu nicht-funktional/Architektur/Sonstige. Situative Einzelchecks decken Ausschnitte ab (Timeout messen bei Backend-Call, CSP→Service-Worker-Querprüfung), aber nur wenn der Ticket-Text den jeweiligen Trigger enthält.
+   - `flow-game-analyze` hat keine entsprechende Kategorienliste; „Architektur" taucht nur als Abschnittsüberschrift „Betroffene Architektur" (Schritt 5) auf, ohne AK-Bezug.
+   - **Deckungsgrad: Größte Lücke.** Kein Skill prüft systematisch (für jedes Ticket) explizit, ob nicht-funktionale, architektonische oder „sonstige" (Compliance/Datenschutz/Logging/Betriebsübergabe) Anforderungen relevant sind. Vorhandene Treffer sind situativ, nicht als feste Vier-Kategorien-Checkliste verankert.
+
+5. **Testbarkeit ohne Rückfrage** (Test ableitbar ohne zusätzliche Annahme):
+   - `fotoalert-analyze` Schritt 2 „Anschluss ans Test-Harness": „schon hier so formulieren, dass sich ein Test direkt ableiten lässt — also mit konkreten Eingaben und erwarteten Werten/Statuscodes, nicht nur Prosa." Zusätzlich Schritt 6b verlangt, dass der Test tatsächlich **vor** der Freigabe geschrieben und rot nachgewiesen wird — strenger als die reine Meta-Framework-Frage.
+   - `flow-game-analyze`: AK-Testbarkeit ist Vorstufe für `flow-game-bdd`, das die Tests ebenfalls vor Freigabe schreibt.
+   - **Deckungsgrad: Vollständig, stellenweise stärker als die Grundlagenanalyse fordert** — die Pflicht, echte Tests bereits in der Analysephase zu schreiben, deckt „ohne Rückfrage testbar" praktisch zwangsläufig ab, weil ein nicht eindeutiges Kriterium gar nicht in Code gegossen werden könnte.
+
+6. **Herkunftsnachvollziehbarkeit** (erkennbar, warum ein Kriterium existiert):
+   - Keine der vier Skill-Dateien verlangt, dass ein einzelnes AK mit seinem Ursprung (welche Frage/welches Risiko/welche Stephan-Entscheidung hat es erzeugt) verknüpft bleibt. Das Ticket-Feld „Bezug" verankert Herkunft nur auf Ticket-Ebene, nicht pro AK. Pre-Mortem-Gegenmaßnahmen werden zwar in AKs überführt (Schritt 3, Fotoalert: „Jede Gegenmaßnahme … in die Akzeptanzkriterien … übernehmen"), aber ohne Rückverweis-Pflicht in der anderen Richtung (AK → warum).
+   - **Deckungsgrad: Fehlt vollständig** in allen vier Dateien.
+
+**Abgleich — Checkliste vergessener Negativ-/Randfall-Kategorien (Abschnitt 4 der Grundlagenanalyse):**
+
+| Kategorie | fotoalert-analyze | flow-game-analyze |
+|---|---|---|
+| Grenzwerte (kleinste/größte Werte) | nur situativ (Cap+Sort-Typ-Verdrängung, Schritt 4b) | nicht erwähnt |
+| Ungültige/fehlende Eingaben | nicht als feste Checkliste, nur implizit über Zustands-Check „Fehlerfall" | dito |
+| Nebenläufigkeit/gleichzeitige Zugriffe | nicht erwähnt | **explizit als Pflicht-Fokus** (Schritt 4 „Race Conditions", Schritt 4a „Zusammenspiel bestehender Bausteine … über mehrere Spielende hinweg") |
+| Verhalten unter Lastgrenzen | nicht erwähnt | nicht erwähnt |
+| Leerer/übervoller Zustand | **ja**, Zustands-Check „Leerzustand" (Schritt 1b) | **ja**, Zustands-Check „Leerzustand" (2d) |
+| Berechtigungen/Zugriffsschutz | nicht als feste Checkliste (einzelne Tickets wie TASK-86 behandeln es punktuell) | teilweise über „serverautoritative Regeln" in Schritt 4 |
+| Abwärtskompatibilität | nicht erwähnt | nicht erwähnt |
+| Rollback-/Wiederanlauffähigkeit | **teilweise** — Ampel-Prüfung Frage 3 „Ist die Änderung ohne Datenverlust rückgängig zu machen?" (Weg-Gate-Ebene, nicht AK-Ebene) | nicht erwähnt |
+| Beobachtbarkeit im Fehlerfall | nicht als Checkliste (US-38 behandelt Observability als eigenes Produkt-Ticket, nicht als AK-Pflichtfrage) | nicht erwähnt |
+
+**Deckungsgrad: Punktuell, nicht systematisch.** 2 von 9 Kategorien sind in mindestens einem Skill als feste Pflichtfrage verankert (Leerzustand beidseitig, Nebenläufigkeit bei flow-game-analyze), der Rest ist entweder situativ getriggert oder komplett offen. Auffällig: `flow-game-analyze` deckt Nebenläufigkeit strukturell besser ab als `fotoalert-analyze` (folgerichtig, da FotoAlert bislang kein Mehrbenutzer-System mit gleichzeitigen Schreibzugriffen ist) — aber Grenzwerte, ungültige Eingaben, Lastgrenzen, Abwärtskompatibilität und Beobachtbarkeit im Fehlerfall sind in **keinem** der beiden Analyse-Skills als für jedes Ticket verbindliche Frage verankert.
+
+**Abgleich — Planungsfrage/AK-/Testfall-Vorlage „Optimierungsleck durch falsche Äquivalenzannahme" (Abschnitt 7 der Grundlagenanalyse):**
+- `fotoalert-analyze` Schritt 4b enthält mit „Cap+Sort → Typ-Verdrängung prüfen" (Pflicht wenn `:N`-Limit vorhanden) einen **strukturell verwandten, aber engeren** Fall: dort geht es um Verdrängung durch Sortierung+Kappung, nicht um die allgemeinere Frage „gruppiert/cached/dedupliziert die Umsetzung Kandidaten und nimmt sie seien austauschbar?". Die generalisierte Planungsfrage aus der Grundlagenanalyse (Gruppierung/Stichprobe/Cache/Dedup → ein Ergebnis wird stellvertretend auf mehrere Kandidaten übertragen) existiert in keinem der vier Skills.
+- `flow-game-analyze` hat keine Entsprechung.
+- Weder AK-Vorlage noch Testfall-Vorlage aus Abschnitt 7 sind in einem der vier Skills vorhanden.
+- **Deckungsgrad: Fehlt vollständig** als generalisierte, skill-weite Regel — nur ein einziger, eng gefasster Vorläufer-Fall existiert in `fotoalert-analyze`.
+
+**Abgleich — Orchestratoren (`fotoalert-orchestrator`, `flow-game-orchestrator`):**
+- Beide Orchestratoren definieren keine eigene AK-Inhaltsprüfung — sie verlassen sich vollständig auf das Ergebnis der jeweiligen `*-analyze`-Skills und prüfen nur, *ob* eine Spec/Ampel vorliegt, nicht *wie gut* die AKs selbst sind.
+- Berührungspunkt 1: Die Ampel-Prüfung (`fotoalert-analyze` Schritt 5b, `flow-game-analyze` 8a) fragt u. a. „Hat das Pre-Mortem kein hohes Risiko gefunden?" — das ist ein Ergebnis-Gate, keine Qualitätsprüfung der AKs selbst; ein lückenhaftes AK-Set, das kein Risiko *erkennen ließ*, würde die Ampel trotzdem grün zeigen.
+- Berührungspunkt 2: `gate-auditor` (referenziert in beiden Orchestratoren vor Test-Gate/Done-Gate) prüft Implementierung gegen AK-Text und Diff — das deckt „stimmt der Code mit den AKs überein" ab, nicht „sind die AKs selbst vollständig/granular/polar genug".
+- **Deckungsgrad: Keine direkte Abdeckung.** Die Orchestratoren sind der einzige Ort, an dem ein *fester, für jedes Ticket verbindlicher* Prüfschritt strukturell verankert werden könnte, ohne den jeweiligen Analyse-Skill selbst aufzublähen (siehe Optionen unten).
+
+**Ergänzungsvorschläge (mehrere Optionen, wo mehrdeutig — mit Empfehlung):**
+
+*Vorbemerkung zur Lieferform:* `fotoalert-analyze`, `flow-game-analyze`, `fotoalert-orchestrator` und `flow-game-orchestrator` sind Skills mit blanker ID und in dieser Sitzung nicht direkt live überschreibbar. Jede der folgenden Optionen wird deshalb nicht als Live-Edit umgesetzt, sondern als Ergänzungstext (bzw. vollständige aktualisierte SKILL.md, je nach Umfang) per `SendUserFile` geliefert — Stephan übernimmt sie über den üblichen „Save skill"-Weg, wie es der bestehende Retro-Kreislauf in beiden Orchestratoren („Fortlaufende Weiterentwicklung der Skills über die Retro" / „Verhältnis zu book-of-work") ohnehin vorsieht.
+
+1. **Wo verankern — direkt in den Analyse-Skills (Schritt 1/2) vs. als neuer, fester Vorprüfschritt kurz vor Spec-Freigabe:**
+   - Option A — Ergänzung direkt in bestehende Schritte einweben (z. B. Granularität/Polarität in Schritt 2 „Akzeptanzkriterien ableiten", die Vier-Kategorien-Abdeckung als neuer Punkt im Annahmen-Protokoll Schritt 1): passt organisch in den bestehenden Ablauf, aber die Skills sind bereits sehr lang (700+ Zeilen) — weitere verstreute Ergänzungen erhöhen das Risiko, dass ein einzelner Punkt beim Lesen übersehen wird.
+   - Option B — **Empfohlen:** Ein neuer, kompakter, fester Prüfschritt „AK-Qualitäts-Check" unmittelbar vor der Spec-Freigabe (nach Schritt 6b/vor Schritt 7 bei `fotoalert-analyze`, analog nach Schritt 9 bei `flow-game-analyze`), der die sechs Dimensionen + die Checkliste + die Planungsfrage als kompakte Prüfliste noch einmal explizit gegen die bereits formulierten AKs durchgeht — genau der von Stephans Grundlagenanalyse selbst vorgeschlagene Ansatzpunkt („ein fester Pre-Mortem-Prüfschritt vor Freigabe einer Spec"). Vorteil: ein einziger, klar benannter Block statt verstreuter Einzelergänzungen; leichter zu pflegen und leichter für Stephan zu prüfen, ob er greift.
+   - Begründung der Empfehlung: Ein einzelner, klar abgegrenzter Block ist konsistent mit dem bestehenden Muster (Schritt 5b „Ampel-Prüfung" ist bereits genau so ein nachgelagerter, kompakter Prüfblock) und senkt das Risiko, dass eine der sechs Dimensionen beim Schreiben unter Zeitdruck implizit übersprungen wird.
+
+2. **Vier-Kategorien-Abdeckung (funktional/nicht-funktional/Architektur/Sonstige) — Ergänzung:** Als expliziter Pflichtpunkt im neuen AK-Qualitäts-Check (Option B oben): „Wurde für dieses Ticket bewusst geprüft, ob neben dem funktionalen Verhalten auch Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit (nicht-funktional), Konsistenz mit bestehenden Mustern/Rückwärtskompatibilität (Architektur) und Compliance/Logging/Betriebsübergabe (Sonstige) relevant sind — mit einem Satz Begründung auch wenn die Antwort 'nicht relevant' lautet?" — Verhältnismäßigkeitsklausel wie beim bestehenden Fundstellen-Sweep/Zustands-Check (ein Satz reicht bei trivialen Tickets, muss aber dastehen).
+
+3. **Negativ-/Randfall-Checkliste — Ergänzung:** Die 9 Kategorien aus Abschnitt 4 als feste Prüfliste im selben neuen Block ergänzen, mit Verweis auf die bereits vorhandenen Teilabdeckungen (Zustands-Check deckt Leerzustand ab, `flow-game-analyze` deckt Nebenläufigkeit bereits ab) statt sie zu duplizieren — nur die fehlenden Kategorien (Grenzwerte, ungültige Eingaben, Lastgrenzen, Berechtigungen, Abwärtskompatibilität, Beobachtbarkeit im Fehlerfall) müssten inhaltlich neu ergänzt werden.
+
+4. **Planungsfrage „Optimierungsleck durch falsche Äquivalenzannahme" — Ergänzung:** Wörtlich (oder minimal angepasst) als Pflichtfrage in Schritt 3 (Pre-Mortem) beider Analyse-Skills aufnehmen, ausgelöst immer dann, wenn ein Ticket eine Prüfung/Filterung/Bewertung über eine Menge von Kandidaten beschreibt (Locations, Scout-Kandidaten, Spielzüge, o. ä.) — mit der AK-Vorlage aus Abschnitt 7 als Formulierungsvorlage. Bei `fotoalert-analyze` naheliegend als Erweiterung des bestehenden „Cap+Sort"-Checks in Schritt 4b, nicht als komplett neuer Abschnitt.
+
+5. **Orchestrator-Rolle — zwei gleichwertige Optionen, echte Wahlfrage:**
+   - Option A — Orchestratoren bleiben unverändert; der AK-Qualitäts-Check lebt ausschließlich in den `*-analyze`-Skills (die die Spec ohnehin erzeugen). Einfacher, keine Doppelprüfung.
+   - Option B — Orchestratoren bekommen zusätzlich einen leichten Verweis „vor dem Weg-Gate prüfen, ob der AK-Qualitäts-Check im Analyse-Ergebnis explizit als durchgeführt zurückgemeldet wurde (analog zur bestehenden Status-Empfehlung/Ampel-Ergebnis-Zeile)" — schafft eine zweite, unabhängige Absicherung nach demselben Muster wie `gate-auditor` bei Test-/Done-Gate, verhindert dass ein Analyse-Subagent den neuen Check in Eile weglässt, ohne dass es auffällt.
+   - Keine Empfehlung an dieser Stelle: Beide Optionen sind gleichwertig sinnvoll — Option A ist schlanker, Option B konsistenter mit dem bereits etablierten Prinzip „unabhängige Zweitprüfung vor jedem Gate" (`gate-auditor`). Das ist eine echte Stephan-Entscheidung (Aufwand/Redundanz vs. zusätzliche Absicherung), kein technisches Detail.
+
+**Akzeptanzkriterien (Alltagssprache — was müsste beobachtbar anders sein):**
+- [x] Wenn Stephan sich künftig die Analyse-Spec eines neuen Tickets ansieht, findet er dort einen eigenen, klar erkennbaren Abschnitt, der zeigt, dass die Akzeptanzkriterien noch einmal gezielt auf Lücken geprüft wurden — nicht nur die übliche Liste der Kriterien selbst.
+- [x] Bei einem Ticket, das eine Prüfung/Filterung über mehrere ähnliche Kandidaten beschreibt (z. B. mehrere Orte, mehrere Einträge), taucht in der Analyse erkennbar die Frage auf, ob eine Gruppierung/ein Cache/eine Stichprobe fälschlich annehmen könnte, ähnliche Kandidaten seien austauschbar — so wie es beim Scout-Feature bereits hätte auffallen können.
+- [x] Wenn eine Spec fertig ist, kann Stephan an einer Stelle nachlesen, ob neben dem eigentlichen Verhalten auch Themen wie Geschwindigkeit, Sicherheit, Zusammenspiel mit bestehenden Funktionen oder Nachvollziehbarkeit im Fehlerfall bewusst bedacht wurden — auch wenn die Antwort am Ende „nicht relevant" lautet.
+- [x] Die Ergänzungen liegen Stephan als fertige, prüfbare Datei(en) vor, die er wie gewohnt über „Save skill" übernehmen kann — es wird nicht behauptet, ein Skill sei bereits live geändert worden, obwohl das in dieser Sitzung technisch nicht möglich war.
+- [x] Stephan hat für die eine offene Wahlfrage (Rolle der Orchestratoren, Vorschlag 5) eine bewusste Entscheidung getroffen, bevor die Ergänzung tatsächlich übernommen wird — sie wurde ihm nicht stillschweigend vorweggenommen.
+
+**Testplan:**
+- Automatisiert: entfällt — dieses Ticket verändert keinen App-Code, sondern Skill-Texte; kein `pytest`-Fall ableitbar.
+- Manuell: Stephan liest die gelieferte(n) Ergänzungsdatei(en), entscheidet über die offene Wahlfrage (Vorschlag 5) und übernimmt die gewünschten Ergänzungen selbst über „Save skill". Ein Nachweis, dass der neue AK-Qualitäts-Check tatsächlich greift, ergibt sich erst beim nächsten regulär durchlaufenden Ticket (keine Simulation hier).
+
+**🚦 Ampel-Ergebnis:**
+🔴 Rot — braucht Stephans Entscheidung: Die Empfehlung liegt bei mehreren Teilfragen nicht klar auf einer einzigen Option — insbesondere Vorschlag 5 (Orchestrator-Rolle: Option A vs. Option B) ist laut eigener Einschätzung oben bewusst gleichauf, keine Empfehlung. Zusätzlich ist die Umsetzungsform selbst mehrdeutig (Live-Skills sind nicht direkt überschreibbar — Stephan muss die gelieferten Dateien aktiv über „Save skill" übernehmen, das ist kein automatisch durchlaufbarer Implementierungsschritt wie bei einem App-Feature). Damit ist Ampel-Kriterium 1 („klarer Abstand zur Alternative") an mindestens einer Stelle nicht erfüllt — eine automatische Weiterleitung in eine „Implementierungsphase" ergibt für dieses Ticket ohnehin keinen Sinn, weil das Ergebnis selbst schon die Lieferung ist.
+
+---
 
 ### US-135 · Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen `[~]`
 
@@ -10632,14 +10808,248 @@ In Alltagssprache: Der bereits vorhandene Umschalter aus dem normalen Karten-Tab
 | **Status** | ToDo |
 > NASA JPL Horizons API anbinden für aktuelle Kometen-Positionen und -Sichtbarkeit.
 
-### TASK-02 · Sonnenfinsternisse berechnen `[ ]`
+### TASK-02 · Sonnenfinsternisse berechnen `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Progress |
 > Skyfield-Berechnung der Kontakte (C1–C4) für Berlin/BB-Region.
+> **Erweiterung (Stephan, 2026-08-09):** Zusätzlich zur (partiellen) Sonnenfinsternis auch Mondfinsternis und partielle Mondfinsternis berechnen. In die bestehende Filterlogik einbauen wie Mond-Alignment bzw. Sonnen-Alignment (vgl. US-107 Sonnen-Alignment, BUG-91 Mond-Alignment-Filtererweiterung).
+
+---
+
+#### 📋 Analyse-Spec (2026-08-09, fotoalert-analyze)
+
+**Ticket & User Story:** Kanonischer Tickettext (oben) übernommen. Ursprünglich nur „Sonnenfinsternisse berechnen" (Skyfield-Kontakte C1–C4 für Berlin/BB), von Stephan am 09.08.2026 explizit auf vier Ereignistypen erweitert: (1) Sonnenfinsternis (total), (2) partielle Sonnenfinsternis, (3) Mondfinsternis (total), (4) partielle Mondfinsternis — jeweils integriert in die bestehende Filterlogik analog zu US-107 (Sonnen-Alignment) und BUG-91 (Mond-Alignment-Filtererweiterung).
+
+**Scope-Check:** Die Erweiterung auf vier Typen ist explizit von Stephan selbst vorgenommen worden (kein impliziter erster Slice) — keine Rückfrage nötig.
+
+**📎 Code-Verifikation (gelesen am 2026-08-09):**
+- `backend/calculations/opportunity.py` `EventType`-Enum (Z.36–50): `ECLIPSE = "Sonnenfinsternis"` existiert bereits — aber **nirgends im Code erzeugt** (Grep nach `EventType.ECLIPSE` ergibt außerhalb der Enum-Definition keinen Treffer). Das Ticket beschreibt exakt diese Lücke.
+- Frontend hat für den bestehenden `Sonnenfinsternis`-Typ bereits vollständiges Pre-Wiring: Icon `i-eclipse` (`web/index.html:1102`, gemappt in `ICONS` Z.1843), Filter-Chip in `FilterSheet._ET` (Z.3449), Ausschluss aus der „Himmelsposition"-Detailsektion via `EV_SKYPOS_EXEMPT` (Z.4958), Zuordnung zu `SUN_TYPES` im Karten-Fallback (Z.5485), Erklärtext im Filter-Sheet (Z.7880), sowie Ausnahme vom ±2°-Alignment-Qualitätsfilter via `_ALIGNMENT_FILTER_EXEMPT` (`backend/precompute.py:98`).
+- **Dead-Code-Fund:** `web/index.html:5484` (`MapView`-Fallback für „Feed noch nicht geladen"): das `MOON_TYPES`-Array enthält bereits die Strings `'Mondfinsternis'` und `'Blutmond'` — beide werden aktuell nie erzeugt (kein passender `EventType`), reine Altlast aus einem früheren, nie fertiggestellten Anlauf. Wird durch dieses Ticket teilweise „lebendig" (`Mondfinsternis`), `Blutmond` bleibt bewusst ungenutzt (s. Annahme unten).
+- `backend/calculations/astronomy.py`: Skyfield 1.49 (`backend/requirements.txt:5`), Ephemeris `de421.bsp` bereits einmalig geladen (`_get_eph()`, Z.28–34). `skyfield.eclipselib.lunar_eclipses(start_time, end_time, eph)` ist im installierten Paket vorhanden und **fertig nutzbar** — liefert Zeitpunkt des Maximums + Typ-Code (Penumbral/Partial/Total) + Magnitude-Details je Mondfinsternis, aber **keine** eigenen Kontakt-Zeitpunkte (nur Maximum, kein P1–P4/U1–U4). Für Sonnenfinsternisse existiert **keine** eingebaute Skyfield-Funktion — Sichtbarkeit/Kontaktzeiten sind beobachterabhängig und müssen über die scheinbare Winkeltrennung Sonne–Mond von einem Berlin-Referenzpunkt aus neu gesucht werden (kein bestehendes Muster im Repo dafür).
+- Architektur-Präzedenzfall `METEOR_SHOWERS`/`active_meteor_showers` (`astronomy.py:151,163`, verwendet in `opportunity.py` Z.797ff): Kalender-/Zeitfenster-Ereignisse ohne Location-Abhängigkeit werden **einmal pro Aufruf von `calculate_full_report(lat, lon, date)`** ermittelt und dann pro Location in der bestehenden Opportunity-Schleife emittiert — genau das architektonische Muster, das auch für Finsternisse greift (Kontaktzeiten unterscheiden sich innerhalb Berlin/BB nur um Sekunden, nicht fotografisch relevant).
+- Scout-Pipeline (`backend/discover/moon_pipeline.py`, `sun_pipeline.py`, `Filter.applyToScout` in `web/index.html:3362`) arbeitet ausschließlich über `body_name` (`"moon"`/`"sun"`) und ist laut BUG-91-Analyse bereits als eigenständig, unabhängig von `event_type`-Logik dokumentiert — Finsternisse passen konzeptionell nicht in dieses Modell (kein generischer Alignment-Suchlauf, sondern seltene Kalenderereignisse).
+
+**🌗 Live-Verifikation (2026-08-09, Skyfield 1.49 + de421.bsp, identische Ephemeris-Basis wie das Backend, real ausgeführt in dieser Analyse — kein Erinnerungswert):**
+Minimale Winkeltrennung Sonne–Mond von Berlin (52,52°N/13,405°E) am 12.08.2026: **0,0748°** um 18:08 UTC (20:08 MESZ), Sonnenhöhe zu diesem Zeitpunkt nur **3,37°** (kurz vor Sonnenuntergang). Summe der scheinbaren Radien (~0,5255°) > gemessene Trennung > Differenz der Radien (~0,0075°) → **reale, für Berlin sichtbare PARTIELLE Sonnenfinsternis, keine Totalität** — bestätigt unabhängig, dass die Totalitätsbahn (laut allgemeinem astronomischem Kenntnisstand über Grönland/Island/Spanien) Berlin nicht erreicht. Dieses Ereignis liegt nur 3 Tage in der Zukunft (heute: 09.08.2026) und damit sicher innerhalb des bestehenden Feed-/Kalenderfensters (14/30 Tage, vgl. US-107) — ein unmittelbar verfügbarer, realer Testfall für die Implementierungsphase, kein hypothetisches Beispiel.
+
+**Annahmen-Protokoll:**
+
+| Typ | Punkt |
+|---|---|
+| ✅ Klar | Vier Typen, Berlin/BB-Region, Integration in Feed/Kalender/Karte-Filterlogik wie US-107/BUG-91 — von Stephan explizit vorgegeben. |
+| ⚠️ Annahme: Kontaktzeiten-Berechnung erfolgt **einmal pro Precompute-Zeitfenster** mit einem festen Berlin-Referenzpunkt (nicht pro Location), analog zum `METEOR_SHOWERS`-Muster — Kontaktzeiten unterscheiden sich innerhalb Berlin/BB um Sekunden, fotografisch irrelevant. Bitte bestätigen. |
+| ⚠️ Annahme: Für Mondfinsternisse wird nur die von Skyfield gelieferte **Maximum-Zeit + Magnitude** genutzt (kein eigener P1–P4-Kontaktsuchlauf wie bei der Sonne) — die C1–C4-Präzisionsforderung des Tickets bezog sich im Originaltext explizit auf die Sonnenfinsternis-Berechnung, nicht auf die nachträglich ergänzte Mondfinsternis. Für die Fotoplanung reicht ein grobes Zeitfenster um das Maximum (ähnlich „Goldene Stunde"-Präzision), keine sekundengenauen Kontakte. Bitte bestätigen oder engere Präzision fordern. |
+| ⚠️ Annahme: **Penumbrale** Mondfinsternisse (mit bloßem Auge kaum wahrnehmbar) werden NICHT als eigener Typ geführt — nur Partial/Total aus Skyfields Klassifizierung fließen in „Mondfinsternis"/„Partielle Mondfinsternis" ein. Bitte bestätigen. |
+| ⚠️ Annahme: Der dormante Frontend-String `'Blutmond'` (`web/index.html:5484`) wird NICHT als eigener fünfter Typ eingeführt — „Mondfinsternis" (total) deckt das ab, wie im Ticket wörtlich benannt. `'Blutmond'` bleibt als bereits vorhandener, harmloser Zusatzstring im Fallback-Array stehen (matcht einfach nie), wird nicht aktiv entfernt (außerhalb Ticket-Scope). Bitte bestätigen. |
+| ✅ Klar | Scout-Modus bleibt unberührt (eigene, `body_name`-basierte Pipeline, s. Code-Verifikation) — analog zu BUG-91s eigener Scope-Abgrenzung. |
+
+**Fundstellen-Sweep** (Suchbegriffe: `ECLIPSE`, `Sonnenfinsternis`, `eclipse`, `Mondfinsternis`, `Blutmond`, `partiell`; alle sechs Ansichten-Klassen einzeln geprüft):
+- **Liste/Feed:** betroffen — `Filter.apply()`/`ET_EXPAND` (`web/index.html:3101ff`).
+- **Kalender:** betroffen — ruft identische `Filter.apply()`-Funktion (bestätigt bereits in BUG-91-Analyse), kein separater Mechanismus.
+- **Karte:** betroffen — eigene Kopie der Filterprüfung in `MapView.applyFilter()` (Z.5218ff) **plus** der schmale Fallback-Zweig „Feed noch nicht geladen" mit `SUN_TYPES`/`MOON_TYPES`-Arrays (Z.5484–5485) — letzterer enthält bereits die (bislang toten) Strings `Mondfinsternis`/`Blutmond`.
+- **Scout:** NICHT betroffen — eigene `body_name`-Pipeline (s. o.).
+- **Chancen-Übersicht:** keine separate Ansicht, identisch zu Feed.
+- **Event-Detail:** betroffen nur passiv — `EV_SKYPOS_EXEMPT` (Z.4958) muss um die 3 neuen Typen erweitert werden, sonst würde die „Himmelsposition"-Sektion versuchen, eine für Finsternisse nicht existente `composition_analysis` (Motiv-Ausrichtungsgüte) darzustellen.
+
+**Zustands-Check:**
+- Wartezustand: Berechnung läuft im täglichen Precompute-Batch (asynchron, wie alle anderen Event-Typen) — kein neuer Wartezustand im UI.
+- Leerzustand: Fällt keine Finsternis in den angezeigten Zeitraum (Regelfall — Finsternisse sind selten), bleibt der Filter-Chip wählbar, liefert aber ein leeres gefiltertes Ergebnis — wie bei jedem anderen seltenen Typ (z. B. Supermond).
+- Fehlerfall: Schlägt die neue Berechnung für ein einzelnes Datum fehl (z. B. numerischer Randfall in der neuen Kontaktzeit-Suche), darf das NICHT den gesamten Precompute-Lauf abbrechen — nur das betroffene Ereignis fehlt (bestehendes Fehlerbehandlungsmuster in `precompute.py`, pro Event/Location, nicht global).
+
+**🎨 Designer-Check (fotoalert-designer, 2026-08-09):** Visuell sichtbar (neue Filter-Chips, neue Kartentitel) → Designer-Skill aufgerufen. Empfehlung: Alle vier Finsternis-Typen nutzen dasselbe bestehende Icon `i-eclipse` (keine neuen Sprites — physikalisch dieselbe Grundform: ein Himmelskörper verdeckt einen anderen), **ohne** eigene `EVENT_ICON_COLOR`-Zuordnung (konsistent mit dem heutigen, bereits produktiven `Sonnenfinsternis`-Verhalten) — Unterscheidung ausschließlich über Titel/Label-Text, analog zu `Vollmond`/`Mond-Alignment`, die sich ebenfalls nur über Icon+Text, nicht über Farbe unterscheiden. Eine Seltenheits-Farbcodierung (Gold für totale Sonnenfinsternis, Rot für Mondfinsternis) wurde als Option B verworfen, da sie rückwirkend das bereits produktive `Sonnenfinsternis`-Verhalten ändern würde — außerhalb des Ticket-Scopes, ggf. eigenes Folge-Ticket.
+
+---
+
+##### 🔀 Implementierungsoptionen
+
+**Option A — Echte Skyfield-Kontaktsuche für Sonne + Skyfield-Fertigfunktion für Mond, einmal pro Zeitfenster (empfohlen)**
+- Vorgehen: Neue Funktion `find_solar_eclipses(lat, lon, start_date, end_date)` in `astronomy.py`: sucht um jeden Neumond-Zeitpunkt die scheinbare Winkeltrennung Sonne–Mond vom Berlin-Referenzpunkt; unterschreitet sie die Summe der scheinbaren Radien → Ereignis (C1/C4 als erste/letzte Unterschreitung), unterschreitet sie zusätzlich die Radien-Differenz → total (`EventType.ECLIPSE`), sonst partiell (`PARTIAL_SOLAR_ECLIPSE`). Neue Funktion `find_lunar_eclipses(start_date, end_date)` nutzt `skyfield.eclipselib.lunar_eclipses()` direkt, filtert per Sichtbarkeits-Guard (`get_body_position` → Mond-Höhe > 0° in Berlin während des Maximums), mapped Partial/Total auf `PARTIAL_LUNAR_ECLIPSE`/`LUNAR_ECLIPSE` (Penumbral ausgeschlossen). Beide Funktionen werden **einmal pro Precompute-Zeitfenster** aufgerufen (analog `active_meteor_showers`), das Ergebnis dann pro Location in der bestehenden Opportunity-Schleife emittiert.
+- Betroffene Dateien: `backend/calculations/astronomy.py` (neue Funktionen + Dataclasses), `backend/calculations/opportunity.py` (`EventType` um 3 neue Werte erweitern, neuer Emissions-Block analog Meteoritenschauer Z.797ff), `backend/precompute.py` (`_ALIGNMENT_FILTER_EXEMPT` um 3 Strings erweitern), `web/index.html` (`ICONS`, `FilterSheet._ET`, `EV_SKYPOS_EXEMPT`, `SUN_TYPES`/`MOON_TYPES`-Fallback, Filter-Erklärtexte — je 3 neue Einträge), `ios/FotoAlert/Models/Models.swift` (`eventIcon`-Switch um 3 neue Fälle erweitern — Fund aus Schritt 6c AK-Qualitäts-Check, s. u.).
+- Vorteile: astronomisch korrekt, erfüllt die explizite Ticket-Anforderung „Skyfield-Berechnung", nutzt bereits geladene Ephemeris-Infrastruktur, Mondfinsternis-Teil sehr günstig dank Fertigfunktion, Performance-sicher durch Einmal-pro-Fenster-Muster.
+- Nachteile/Risiken: Sonnenfinsternis-Kontaktsuche ist komplett neue, ungetestete Astronomie-Mathematik ohne bestehendes Muster im Repo — höheres Bug-Risiko als bei anderen Tickets, Korrektheit nur gegen externe Referenzdaten prüfbar (s. Testplan).
+- Aufwand: groß (Sonnenfinsternis-Teil), klein–mittel (Mondfinsternis-Teil).
+
+**Option B — Nur Mondfinsternisse jetzt, Sonnenfinsternis-Kontaktsuche zurückstellen**
+- Vorgehen: Nur `find_lunar_eclipses()` umsetzen; Sonnenfinsternis-Teil (der eigentliche Ticket-Titel) bleibt offen für ein Folge-Ticket.
+- Vorteile: geringeres Risiko, schneller lieferbar, deckt 2 von 4 Typen ab.
+- Nachteile/Risiken: Der ursprüngliche Ticket-Kern (Titel: „Sonnenfinsternisse berechnen") bliebe unerledigt.
+- Aufwand: klein. **Nicht empfohlen** — liefert nicht den eigentlichen Auftrag.
+
+**Option C — Statische Terminliste statt Eigenberechnung (analog `METEOR_SHOWERS`)**
+- Vorgehen: Bekannte Finsternistermine + extern recherchierte Kontaktzeiten für Berlin als hartcodierte Liste hinterlegen (z. B. aus NASA-GSFC/timeanddate.com übernommen), statt live mit Skyfield zu rechnen.
+- Vorteile: kein Risiko fehlerhafter Eigenberechnung, sehr einfach.
+- Nachteile/Risiken: widerspricht der expliziten Ticket-Anforderung „Skyfield-Berechnung"; Daten veralten, manuelle Pflege nötig, keine generische Lösung für beliebige zukünftige Jahre.
+- Aufwand: klein. **Nicht empfohlen** — widerspricht Stephans expliziter Vorgabe.
+
+✅ **Empfehlung: Option A.** Erfüllt die explizite Ticket-Anforderung vollständig, nutzt für den Mondfinsternis-Teil eine bereits fertige, risikoarme Skyfield-Funktion und begrenzt das Risiko des neuen Sonnenfinsternis-Codes durch das etablierte Einmal-pro-Fenster-Muster (Performance) sowie eine Datenvalidierung gegen das bereits live verifizierte Referenzereignis vom 12.08.2026.
+
+---
+
+##### 🚦 Ampel-Ergebnis:
+🔴 Rot — braucht Stephans Entscheidung: **Hohes Risiko laut Pre-Mortem**, da die Sonnenfinsternis-Kontaktzeit-Suche komplett neue, im Repo unerprobte Astronomie-Mathematik ist (kein bestehendes Muster wie bei anderen Skyfield-Aufrufen), deren Korrektheit nur gegen externe Referenzdaten verifizierbar ist — kein automatischer Test kann einen subtilen Geometriefehler (z. B. Winkeleinheiten-Verwechslung) zuverlässig selbst aufdecken, ohne gegen ein bekanntes reales Ereignis geprüft zu werden.
+
+---
+
+##### ⚠️ Pre-Mortem
+
+💀 **Szenario 1 — Naive Performance-Falle:** Wird die neue Kontaktzeit-Suche naiv pro Location statt einmal pro Zeitfenster aufgerufen (wie z. B. `subject_azimuth`, das tatsächlich pro Location variiert), läuft sie bei ~200 Locations praktisch 200× für dasselbe Ergebnis.
+→ Frühwarnung: Precompute-Laufzeit steigt nach der Änderung spürbar (Vorher/Nachher-Messung, wie BUG-83 Pre-Mortem Szenario 2).
+→ Gegenmaßnahme: Einmal-pro-Fenster-Muster analog `active_meteor_showers` (s. Option A), AK-12.
+
+💀 **Szenario 2 — Plausibel aussehende, aber falsche Kontaktzeiten:** Die Sonnenfinsternis-Suche ist neue Mathematik ohne Repo-Vorbild — ein Vorzeichen- oder Einheitenfehler (Grad/Radiant) liefert plausible, aber falsche Zeiten, ohne dass ein synthetischer Test das zwangsläufig bemerkt.
+→ Frühwarnung: Ergebnis weicht von einem bekannten, extern verifizierbaren Referenzdatum ab.
+→ Gegenmaßnahme: Daten-Validierung gegen das live verifizierte Ereignis vom 12.08.2026 (s. o.), AK-13.
+
+💀 **Szenario 3 — Totale Sonnenfinsternis kommt für Berlin praktisch nie vor:** Eine Totalitätsbahn ist nur wenige hundert Kilometer breit und trifft eine feste Region im Mittel nur alle paar hundert Jahre — für den praktisch relevanten Planungshorizont (nächste 10–20 Jahre) ist für Berlin/BB mit sehr hoher Wahrscheinlichkeit ausschließlich mit PARTIELLEN Sonnenfinsternissen zu rechnen (live bestätigt für 12.08.2026, s. o.). Der Code-Pfad „totale Sonnenfinsternis" könnte in Produktion faktisch nie durchlaufen werden.
+→ Frühwarnung: Datenvalidierung findet für den Prüfzeitraum keine einzige totale Sonnenfinsternis für Berlin.
+→ Gegenmaßnahme: kein Bug, sondern zu dokumentierender Zustand — die Total/Partiell-Klassifizierungslogik selbst wird gegen ein Ereignis geprüft, das anderswo real total ist (nicht zwingend Berlin), um den Code-Pfad zu verifizieren, auch wenn er für Berlin aktuell nicht real durchlaufen wird.
+
+💀 **Szenario 4 — Mondfinsternis erzeugt, obwohl Mond unter dem Horizont steht:** `lunar_eclipses()` liefert alle weltweiten Mondfinsternisse unabhängig von Berlins Sichtbarkeit — ohne Sichtbarkeits-Guard würden auch für Berlin unsichtbare Ereignisse (Mond tagsüber unter dem Horizont) als Foto-Chance vorgeschlagen.
+→ Frühwarnung: Testfall mit bekannt unsichtbarer Mondfinsternis erzeugt fälschlich eine Opportunity.
+→ Gegenmaßnahme: Sichtbarkeits-Guard via `get_body_position(lat, lon, "moon", max_time)` → nur wenn Höhe > 0°, analoges Muster wie US-107 Pre-Mortem Szenario 4 (Guard bei `sunrise=None`), AK-5.
+
+💀 **Szenario 5 — Inkonsistente Umsetzung über mehrere Fundstellen (BUG-91-Muster):** Die drei neuen Typ-Strings müssen an mindestens 6 Stellen in Frontend+Backend konsistent ergänzt werden (`ICONS`, `FilterSheet._ET`, `EV_SKYPOS_EXEMPT`, `SUN_TYPES`/`MOON_TYPES`-Fallback, `_ALIGNMENT_FILTER_EXEMPT`, Info-Texte) — wird eine Stelle vergessen, entsteht dasselbe Muster, das bei BUG-91 real den Karten-Fallback-Zweig fast übersehen hätte.
+→ Frühwarnung: Ein View (z. B. Feed) zeigt das Ereignis korrekt, ein anderer (z. B. Karten-Fallback) nicht.
+→ Gegenmaßnahme: Fundstellen-Checkliste (s. o.) explizit im Implementierungsplan abhaken, Testplan deckt Feed/Kalender/Karte einzeln ab (AK-7).
+
+---
+
+**Scope:**
+- Eingeschlossen: Berechnung + Filterintegration aller vier Typen (Sonnenfinsternis, partielle Sonnenfinsternis, Mondfinsternis, partielle Mondfinsternis) für Berlin/BB-Region in Feed, Kalender, Karte, Event-Detail.
+- Ausgeschlossen: Scout-Modus (eigene `body_name`-Pipeline, analog BUG-91-Scope-Abgrenzung); penumbrale Mondfinsternisse als eigener Typ; sekundengenaue P1–P4-Kontaktzeiten für Mondfinsternisse (nur Skyfield-Maximum+Magnitude); Farbcodierung nach Seltenheit (Designer-Empfehlung Option B); rückwirkende Änderung des bereits produktiven `Sonnenfinsternis`-Verhaltens.
+
+**Akzeptanzkriterien:**
+- [~] AK-1: Fällt eine totale Sonnenfinsternis in den Feed-/Kalenderzeitraum, erscheint dafür eine Foto-Chance mit dem Typ „Sonnenfinsternis" (bestehender Filter-Chip).
+- [~] AK-2: Fällt eine partielle Sonnenfinsternis in den Zeitraum, erscheint dafür eine Foto-Chance mit dem neuen Typ „Partielle Sonnenfinsternis" — unterscheidbar von einer totalen.
+- [~] AK-3: Fällt eine totale Mondfinsternis in den Zeitraum UND ist der Mond zum Zeitpunkt des Maximums von Berlin/Brandenburg aus über dem Horizont sichtbar, erscheint dafür eine Foto-Chance mit dem neuen Typ „Mondfinsternis".
+- [~] AK-4: Fällt eine partielle Mondfinsternis in den Zeitraum UND ist der Mond sichtbar, erscheint dafür eine Foto-Chance mit dem neuen Typ „Partielle Mondfinsternis".
+- [~] Edge Case AK-5 (Pre-Mortem Szenario 4): Findet das Maximum einer Mondfinsternis zu einem Zeitpunkt statt, an dem der Mond in Berlin/Brandenburg unter dem Horizont steht, erscheint dafür KEINE Foto-Chance.
+- [~] AK-6: Alle drei neuen Typen lassen sich im Filter-Sheet genauso als eigener Chip auswählen wie der bestehende „Sonnenfinsternis"-Chip.
+- [~] AK-7 (Pre-Mortem Szenario 5, BUG-91-Präzedenz): Aktiviere ich einen der neuen Filter-Chips, werden ausschließlich Ereignisse dieses Typs angezeigt — konsistent in Feed, Kalender UND Kartenansicht.
+- [~] AK-8: Öffne ich das Event-Detail einer Finsternis-Chance, erscheint kein leerer oder fehlerhaft wirkender „Himmelsposition"-Bereich (Finsternisse haben keine Motiv-Ausrichtungsgüte) — analog zum bestehenden Verhalten bei „Sonnenfinsternis".
+- [~] AK-9 (Designer-Entscheidung): Alle vier Finsternis-Typen zeigen dasselbe Icon wie die heutige „Sonnenfinsternis" — Unterscheidung nur über Titel/Text.
+- [~] AK-10: Der Scout-Modus bleibt von den neuen Typen unberührt.
+- [~] Edge Case AK-11: Liegt im aktuellen Feed-/Kalenderzeitraum keine Finsternis (Regelfall), zeigt der Filter-Chip weiterhin normal an, liefert aber ein leeres Ergebnis — kein Fehler.
+- [~] AK-12 (Performance, Pre-Mortem Szenario 1): Ein vollständiger täglicher Precompute-Lauf dauert durch die neue Berechnung nicht spürbar länger als vorher (Vorher/Nachher-Messung in Sekunden) — Kontaktzeiten-Suche läuft einmal pro Zeitfenster, nicht pro Location.
+- [~] AK-13 (Datenqualität, Pre-Mortem Szenario 2+3): Die berechneten Kontaktdaten stimmen für das live verifizierte Referenzereignis vom 12.08.2026 (minimale Winkeltrennung Berlin ≈0,075° um 18:08 UTC, partiell, keine Totalität) mit einer öffentlich zugänglichen Referenzquelle überein.
+- [~] AK-14 (Regression): Die bestehenden Filter „Mond-Alignment" (BUG-91), „Sonnen-Alignment" (US-107) sowie der bereits produktive „Sonnenfinsternis"-Filter funktionieren nach der Änderung unverändert.
+- [~] AK-15 (Beobachtbarkeit im Fehlerfall): Schlägt die Berechnung für ein einzelnes Datum unerwartet fehl, bricht der gesamte tägliche Precompute-Lauf NICHT ab — nur das betroffene Ereignis fehlt, alle anderen Foto-Chancen bleiben verfügbar; der Fehler wird geloggt (Datum + Fehlerart).
+- [~] Edge Case AK-16 (Herkunft: Schritt 6c AK-Qualitäts-Check, Polarität-Dimension — analog Pre-Mortem Szenario 4): Findet das C1–C4-Kontaktfenster einer Sonnenfinsternis zu einem Zeitpunkt statt, an dem die Sonne in Berlin/Brandenburg unter dem Horizont steht (Sonnenhöhe ≤ 0°), erscheint dafür KEINE Foto-Chance — analog zum bereits bestehenden Sichtbarkeits-Guard für Mondfinsternisse (AK-5).
+- [~] Edge Case AK-17 (Herkunft: Schritt 6c AK-Qualitäts-Check, Fundstellen-Sweep-Nachtrag): In der iOS-App wird für alle vier Finsternis-Typen (inkl. der drei neuen) dasselbe Finsternis-Symbol angezeigt wie für den bereits bestehenden Typ „Sonnenfinsternis“ — nicht ein generisches Kamera-Symbol als Fallback (technischer Hinweis: `ios/FotoAlert/Models/Models.swift`, `eventIcon`-Switch, aktuell nur der Fall `"Sonnenfinsternis"` gemappt, alle anderen Typen fallen auf `camera.fill` zurück).
+
+**Pre-Mortem (Zusammenfassung):** s. oben, 5 Szenarien — Kernrisiko: neue, unerprobte Sonnenfinsternis-Astronomie-Mathematik ohne Repo-Vorbild (Szenario 2), abgesichert durch ein bereits live verifiziertes Referenzdatum (12.08.2026).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: Suchbegriffe `ECLIPSE`/`Sonnenfinsternis`/`Mondfinsternis`/`Blutmond`/`partiell`; alle sechs Ansichten-Klassen einzeln geprüft (Feed/Kalender/Karte: betroffen; Scout: nicht betroffen, eigene Pipeline; Chancen-Übersicht: = Feed; Event-Detail: passiv betroffen über `EV_SKYPOS_EXEMPT`)
+- [x] Zustands-Check: kein neuer Wartezustand (Precompute-Batch), Leerzustand wie bei anderen seltenen Typen, Fehlerfall isoliert pro Event (nicht Gesamtlauf)
+- [x] Pre-Mortem durchgeführt (inkl. live verifiziertem Referenzereignis 12.08.2026)
+- [x] Architektur analysiert: `backend/calculations/astronomy.py`, `backend/calculations/opportunity.py`, `backend/precompute.py`, `web/index.html`
+- [x] Designer-Check: visuell? → ja, `fotoalert-designer` aufgerufen — Empfehlung: bestehendes `i-eclipse`-Icon für alle vier Typen, keine neue Farbcodierung
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c, nachträglich vollständig nachgeholt am 2026-08-09 — s. eigene Unterabschnitte unten): 2 weitere AKs ergänzt — AK-16 (Sichtbarkeits-Guard für Sonnenfinsternisse, Polarität-Lücke: für Mondfinsternisse existierte mit AK-5 bereits ein Guard, für Sonnenfinsternisse fehlte das spiegelbildliche Pendant) und AK-17 (iOS-Icon-Mapping in `Models.swift` fällt für die 3 neuen Typen auf den generischen Fallback zurück — der ursprüngliche Fundstellen-Sweep hatte nur die 6 Web-Ansichten-Klassen geprüft, nicht den separaten iOS-Codebestand); zusätzlich eine Testplan-Lücke bei AK-15 (Log-Inhalt nicht explizit getestet) geschlossen; Performance (AK-12) und Datenqualität (AK-13) als eigene Vier-Kategorien-Abdeckung bereits vorhanden; Testbarkeit/Rot-Nachweis in dieser Analyse-Phase weiterhin bewusst zurückgestellt (Hauptthread-Vorgabe: keine Implementierung in der Analyse-Phase); restliche Negativ-Kategorien (Nebenläufigkeit, Berechtigungen, Lastgrenzen jenseits AK-12) nicht relevant, da keine neue Schreib-/Auth-Ebene entsteht und kein Cap+Sort-Mechanismus eingeführt wird.
+
+**Granularität (Schritt 6c):**
+Alle Akzeptanzkriterien (AK-1 bis AK-15, plus die in diesem Check neu ergänzten AK-16/AK-17) einzeln geprüft, ob sich hinter einem AK mehr als ein eigenständig prüfbares Verhalten verbirgt:
+- AK-1/AK-2/AK-3/AK-4: je genau ein Verhalten (ein Finsternis-Typ → eine Foto-Chance mit einem Typ-Label). Kein Aufteilen nötig.
+- AK-5 (Edge Case): ein Verhalten (Sichtbarkeits-Guard Mond). Kein Aufteilen nötig.
+- AK-6: bündelt „alle drei neuen Typen sind als Filter-Chip wählbar" in einer Zeile — dieselbe Mechanik (Chip-Registrierung) für 3 Typen. Bewusst nicht aufgeteilt: identisches Verhalten pro Typ, Testplan-Schritt 1 deckt alle drei im selben Test ab (analog zur bereits akzeptierten Bündelung in US-134 AK10). Kein Aufteilen nötig.
+- AK-7: bündelt „Feed, Kalender UND Karte" — explizit als Drei-Ansichten-Konsistenzprüfung nach BUG-91-Präzedenz im Ticket-Text selbst so benannt, Testplan-Schritt 2 deckt alle drei im selben Test ab. Kein Aufteilen nötig.
+- AK-8: ein Verhalten (kein leerer/fehlerhafter „Himmelsposition"-Bereich). Kein Aufteilen nötig.
+- AK-9: bündelt „alle vier Finsternis-Typen" — identische Designer-Entscheidung (ein Icon) für alle vier, keine typspezifische Abweichung zu prüfen. Kein Aufteilen nötig.
+- AK-10/AK-11: je ein Verhalten. Kein Aufteilen nötig.
+- AK-12/AK-13: je ein Verhalten (Performance-Schwelle bzw. Datenkorrektheit gegen eine Referenz). Kein Aufteilen nötig.
+- AK-14: bündelt drei bestehende Filter (Mond-Alignment, Sonnen-Alignment, Sonnenfinsternis) in einer Regressions-Zeile — analog zur akzeptierten Regressions-Bündelung in US-134 AK10, jeder Filter wird im Testplan als eigener Teilschritt (Schritt 4) abgehakt. Kein Aufteilen nötig.
+- AK-15: bündelt zwei unterscheidbare, einzeln fehlschlagbare Verhalten — (a) der Gesamtlauf bricht nicht ab, (b) der Fehler wird mit Datum+Fehlerart geloggt. Echter Granularitäts-Grenzfall: der bisherige Testplan-Eintrag deckte nur (a) explizit ab, nicht (b). Statt AK-15 aufzuteilen (beide Teilverhalten lassen sich im selben einen Testszenario prüfen, kein zusätzlicher Testaufwand durch Trennung) wurde der Testplan-Eintrag unten um den Log-Inhalt-Check ergänzt — AK bleibt ungeteilt, nur die Testplan-Lücke wurde geschlossen.
+- AK-16/AK-17 (neu, s. u.): je ein Verhalten. Kein Aufteilen nötig.
+Ergebnis: keine Aufteilung eines bestehenden AK erforderlich; eine Testplan-Lücke bei AK-15 identifiziert und geschlossen (s. Testplan).
+
+**Polarität (Schritt 6c):**
+Für jede im Ticket beschriebene Regel/jedes Verhalten geprüft, ob sowohl ein positives als auch ein negatives/Grenzfall-Pendant unter den ACs existiert:
+- Regel „Sonnenfinsternis-Typen erzeugen Foto-Chancen" (Ticket-Wortlaut, Typenliste): positiv über AK-1 (total)/AK-2 (partiell) abgedeckt — **aber ohne Negativ-/Grenzfall-Pendant.** Für Mondfinsternisse existiert mit AK-5 ein expliziter Sichtbarkeits-Guard (Mond unter Horizont → keine Chance); für Sonnenfinsternisse fehlte das spiegelbildliche Pendant vollständig, weder als AK noch als Pre-Mortem-Szenario. Echte, konkrete Lücke: Die in Option A beschriebene Suche „vom Berlin-Referenzpunkt" prüft die scheinbare Winkeltrennung Sonne–Mond rein geometrisch, unabhängig davon, ob die Sonne zum Maximum-Zeitpunkt in Berlin überhaupt über dem Horizont steht — ein Kontaktfenster könnte rechnerisch gefunden werden, obwohl in Berlin zu diesem Zeitpunkt bereits Nacht ist (Sonne unter dem Horizont, Ereignis von Berlin aus unsichtbar). → als **Edge Case AK-16** ergänzt (s. Akzeptanzkriterien-Liste), symmetrisch zu AK-5.
+- Regel „Mondfinsternis-Typen erzeugen Foto-Chancen, gated durch Sichtbarkeit": positiv über AK-3/AK-4, negativ über AK-5 — vollständig gepaart.
+- Regel „Filterintegration (Chip wählbar, filtert korrekt über alle Views)": positiv über AK-6/AK-7, negativ/Grenzfall über AK-11 (leerer Zeitraum → Chip normal wählbar, leeres Ergebnis, kein Fehler) — vollständig gepaart.
+- Regel „Event-Detail zeigt keinen defekten Himmelsposition-Bereich": AK-8 ist selbst bereits die Negativ-/Schutzformulierung, referenziert explizit das bestehende Positiv-Verhalten bei „Sonnenfinsternis" — kein separates Positiv-AK nötig.
+- Regel „Scout-Modus bleibt unberührt": AK-10 ist selbst eine Grenzformulierung (Abwesenheit von Änderung) — kein Positiv-Pendant sinnvoll.
+- Regel „Performance bleibt im Rahmen" / „Daten sind korrekt": AK-12/AK-13 sind Schwellenwert- bzw. Korrektheitsprüfungen ohne sinnvolles Negativ-Pendant.
+- Regel „Bestehende Filter funktionieren weiter" (Regression): AK-14 ist bereits selbst die Negativ-Absicherung.
+- Regel „Fehler bei Einzeldatum werden isoliert und beobachtbar behandelt": AK-15 positiv (Rest funktioniert, Fehler wird geloggt) — ein Negativ-Pendant („im Erfolgsfall wird KEIN Fehler geloggt") gilt als impliziter Standardfall, konsistent mit Projektkonvention, kein neues AK nötig.
+Ergebnis: 1 echte Polaritäts-Lücke gefunden und geschlossen (AK-16, Sonnenfinsternis-Sichtbarkeits-Guard).
+
+**Messbarkeit (Schritt 6c):**
+Alle AKs (AK-1 bis AK-17) auf eingeschlichenen technischen Code (Funktions-/Variablennamen) geprüft — konkret gegengeprüft gegen `find_solar_eclipses`, `find_lunar_eclipses`, `get_body_position`, `EventType.ECLIPSE`, `_ALIGNMENT_FILTER_EXEMPT`, `EV_SKYPOS_EXEMPT`, `SUN_TYPES`/`MOON_TYPES`: keiner dieser Bezeichner taucht in den AC-Formulierungen selbst auf, sie sind korrekt auf Code-Verifikation/Pre-Mortem/Implementierungsoptionen beschränkt. AK-8 nennt „Himmelsposition"-Bereich — das ist der sichtbare App-Sektionsname, kein Codebezeichner. AK-15 nennt „geloggt (Datum + Fehlerart)" — beschreibt einen für Stephan beobachtbaren Effekt (ein Log-Eintrag existiert), keinen internen Funktions-/Variablennamen. AK-16 (neu) nennt „Sonnenhöhe ≤ 0°" — eine nachvollziehbare physikalische Bedingung, kein Codebezeichner. AK-17 (neu) ist die einzige bewusste Ausnahme: der Kernsatz ist user-facing formuliert („dasselbe Finsternis-Symbol ... nicht ein generisches Kamera-Symbol"), der technische Hinweis auf `Models.swift`/`eventIcon`/`camera.fill` steht explizit gekennzeichnet als Klammerzusatz für die Umsetzung, weil ohne Nennung der Fundstelle die neu entdeckte Cross-Platform-Lücke nicht lokalisierbar bliebe — vergleichbar mit den bereits im Ticket vorhandenen Datei-/Zeilenverweisen in Pre-Mortem-Gegenmaßnahmen, hier bewusst zusätzlich im AK selbst, da sonst die Lücke bei der Implementierung leicht wieder übersehen würde.
+Ergebnis: keine Messbarkeits-Verstöße in den ursprünglichen 15 AKs; AK-17 enthält einen bewusst begründeten technischen Klammerzusatz (Ausnahme, kein Muster-Verstoß).
+
+**Herkunftsnachvollziehbarkeit (Schritt 6c):**
+
+| AK | Herkunft |
+|---|---|
+| AK-1 | Ticket-Wortlaut (Stephans explizite Typenliste, 09.08.2026) |
+| AK-2 | Ticket-Wortlaut (Typenliste) |
+| AK-3 | Ticket-Wortlaut (Typenliste) + Pre-Mortem Szenario 4 (Sichtbarkeitsbedingung in die Formulierung integriert) |
+| AK-4 | Ticket-Wortlaut (Typenliste) + Pre-Mortem Szenario 4 |
+| AK-5 | Pre-Mortem Szenario 4 |
+| AK-6 | Ticket-Wortlaut („in die bestehende Filterlogik einbauen") |
+| AK-7 | Pre-Mortem Szenario 5 (BUG-91-Präzedenz) |
+| AK-8 | Code-Verifikation (Fundstelle `EV_SKYPOS_EXEMPT`) |
+| AK-9 | Designer-Entscheidung (fotoalert-designer, 2026-08-09) |
+| AK-10 | Annahmen-Protokoll (Scope-Abgrenzung Scout) |
+| AK-11 | Zustands-Check (Leerzustand) |
+| AK-12 | Pre-Mortem Szenario 1 |
+| AK-13 | Pre-Mortem Szenario 2+3 / Live-Verifikation |
+| AK-14 | Regressions-Konvention (PRODUCT.md §12) |
+| AK-15 | Negativ-/Randfall-Checkliste, ursprünglicher Schritt-6c-Durchlauf |
+| AK-16 (neu) | Schritt 6c AK-Qualitäts-Check, Polarität-Dimension (dieser Durchlauf) |
+| AK-17 (neu) | Schritt 6c AK-Qualitäts-Check, Abwärtskompatibilität/Fundstellen-Sweep-Nachtrag (dieser Durchlauf) |
+
+**Negativ-/Randfall-Checkliste (Schritt 6c, alle 9 Kategorien einzeln geprüft):**
+
+| Kategorie | Befund |
+|---|---|
+| Grenzwerte (kleinste/größte Werte) | Relevant. Zwei Funde: (1) Sichtbarkeits-Grenzwert für Sonnenfinsternisse (Sonnenhöhe = 0°) fehlte als Guard — geschlossen durch AK-16. (2) Klassifizierungs-Grenzwert total/partiell (Radien-Differenz) deckt bewusst KEINE ringförmigen (annularen) Sonnenfinsternisse als eigenen Typ ab — keine Lücke, sondern deckungsgleich mit Stephans expliziter Vier-Typen-Aufzählung vom 09.08.2026, die „ringförmig" nicht enthält; bewusst nicht ergänzt. (3) Ephemeris-Gültigkeitsbereich von `de421.bsp` (ca. 1900–2053) ist für den aktuellen Planungshorizont nicht grenzwertig — aktuell nicht relevant, vor 2053 erneut zu prüfen. |
+| Ungültige/fehlende Eingaben | Kaum relevant — kein direkter Nutzereingabepfad (interne Precompute-Berechnung mit festem Berlin-Referenzpunkt, kein Formularfeld). Verbleibendes Risiko (z. B. degenerierter Datumsbereich) wird von der bestehenden, pro Event isolierten Fehlerbehandlung abgefangen (AK-15). |
+| Nebenläufigkeit/gleichzeitige Zugriffe | Nicht relevant — kein neuer Mehrnutzer-Schreibzugriff, reine Lesepfad-Erweiterung im täglichen Batch-Precompute. |
+| Verhalten unter Lastgrenzen | Relevant, abgedeckt durch AK-12 (Precompute-Laufzeit). Zusätzlich geprüft: kein neuer `:N`-Cap/Sortier-Mechanismus wird eingeführt (Schritt-4b-Check „Cap+Sort → Typ-Verdrängung" damit nicht einschlägig) — Finsternis-Ereignisse werden eigenständig einmal pro Zeitfenster berechnet und emittiert, konkurrieren nicht um einen gekappten Listenplatz. Auch der seltene Fall einer Sonnen- und Mondfinsternis in derselben Eclipse-Season (~14 Tage Abstand) innerhalb desselben 14/30-Tage-Feed-Fensters ist unproblematisch, da beide unabhängig emittiert werden. |
+| Leerer/übervoller Zustand | Bereits durch Zustands-Check (Leerzustand) + AK-11 abgedeckt — nicht dupliziert. |
+| Berechtigungen/Zugriffsschutz | Nicht relevant — keine neue Berechtigungsebene, Finsternis-Chancen sind wie alle anderen Foto-Chancen für alle Nutzer gleichermaßen sichtbar. |
+| Abwärtskompatibilität | Relevant — echter Fund: `EventType.ECLIPSE` wird bereits heute live ausgeliefert und von der iOS-App konsumiert (`ios/FotoAlert/Models/Models.swift:110`, `eventIcon`-Switch). Der ursprüngliche Fundstellen-Sweep (Schritt 1b) prüfte nur die 6 Web-Ansichten-Klassen, nicht den separaten iOS-Codebestand (verifiziert per Grep in `ios/`: nur ein einziger Treffer für „Sonnenfinsternis", kein Treffer für die 3 neuen Typ-Strings). Die 3 neuen Typ-Strings treffen dort auf keinen passenden `case` und fallen auf das generische `camera.fill`-Icon zurück — funktional kein Crash (Fallback vorhanden), aber inkonsistent mit der Designer-Entscheidung (AK-9) und dem produktiven Web-Verhalten. → als **Edge Case AK-17** ergänzt; Option A um die betroffene iOS-Datei ergänzt (s. Implementierungsoptionen oben). |
+| Rollback-/Wiederanlauffähigkeit | Eigenständig geprüft (das Ampel-Ergebnis dieses Tickets ist Rot und beantwortet Ampel-Frage 3 daher nicht explizit einzeln): Die Änderung ist rein additiv (neue Funktionen, 3 neue `EventType`-Werte, keine Schema-/DB-Migration, keine entfernten Felder) — bei Bedarf ohne Datenverlust vollständig revertierbar, da Foto-Chancen ohnehin täglich neu berechnet und nicht migrationspflichtig persistiert werden. |
+| Beobachtbarkeit im Fehlerfall | Bereits abgedeckt durch AK-15 — bei der Granularitäts-Prüfung oben zusätzlich eine Testplan-Lücke gefunden (bestehender Testplan-Eintrag zu AK-15 prüfte nur „bricht nicht ab", nicht den Log-Inhalt) und im Testplan unten nachgetragen. |
+
+Ergebnis: 2 der 9 Kategorien liefern echte, bislang unadressierte Funde (Grenzwerte → AK-16, Abwärtskompatibilität → AK-17); 1 Kategorie liefert eine Testplan-Lücke ohne neuen AK-Bedarf (Beobachtbarkeit im Fehlerfall); die übrigen 6 Kategorien sind entweder bereits abgedeckt oder nachvollziehbar nicht relevant.
+
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — 2 echte Lücken gefunden und geschlossen: AK-16 (fehlender Sichtbarkeits-Guard für Sonnenfinsternisse, Polarität-Asymmetrie zu AK-5) und AK-17 (iOS-App-Icon-Mapping in Models.swift nie geprüft, ursprünglicher Fundstellen-Sweep hatte nur die 6 Web-Ansichten abgedeckt, nicht den iOS-Codebestand); zusätzlich eine Testplan-Lücke bei AK-15 (Log-Inhalt nicht explizit getestet) geschlossen; restliche Dimensionen/Kategorien bestätigt oder begründet nicht relevant.
+
+**Daten-Validierung:**
+- [x] Live-verifiziert (2026-08-09, Skyfield 1.49 + de421.bsp): Sonne–Mond-Trennung Berlin am 12.08.2026 = 0,0748° um 18:08 UTC (Sonnenhöhe 3,37°) → reale partielle Sonnenfinsternis, keine Totalität — direkt als AK-13-Testfall nutzbar.
+- [ ] Offen für Implementierungsphase: ein reales, extern dokumentiertes Mondfinsternis-Datum (Total oder Partial) als zweiter Referenzpunkt für `find_lunar_eclipses()` verifizieren (in dieser Analyse nicht recherchiert, um keine unverifizierte Zahl zu erfinden).
+
+**Testplan:**
+- [ ] Automatisiert (Harness, `backend/tests/test_task02_eclipses.py` — **wird in der Implementierungsphase von `fotoalert-impl` angelegt und dem Rot-Nachweis unterzogen, hier bewusst nicht vorab geschrieben, da diese Analyse-Phase explizit keine Implementierung umfasst**):
+  - AK-1/AK-2: Klassifizierung total vs. partiell (Sonne) anhand des live verifizierten 12.08.2026-Datenpunkts
+  - AK-3/AK-4: Klassifizierung total vs. partiell (Mond) anhand Skyfield `lunar_eclipses()`-Codes
+  - AK-5: Sichtbarkeits-Guard — Mondfinsternis mit Mond unter Horizont in Berlin → keine Opportunity
+  - AK-16 (neu, Schritt 6c): Sichtbarkeits-Guard — Sonnenfinsternis-Kontaktfenster mit Sonne unter Horizont in Berlin → keine Opportunity (symmetrischer Test zu AK-5)
+  - AK-11: leeres Zeitfenster ohne Finsternis → kein Crash, kein Phantom-Event
+  - AK-12: Precompute-Laufzeit vor/nach Änderung messen
+  - AK-14: bestehende `_ALIGNMENT_FILTER_EXEMPT`-Strings + neue 3 Strings vorhanden
+  - AK-15: simulierter Berechnungsfehler für ein Datum → Gesamtlauf bricht nicht ab **und** Log-Eintrag enthält Datum + Fehlerart (Schritt-6c-Nachtrag zur Granularitäts-Prüfung — ursprünglicher Testplan-Eintrag prüfte nur den Nicht-Abbruch)
+- [ ] Manuell (`http://localhost:8000`):
+  1. Feed/Kalender/Karte auf den Zeitraum 09.–14.08.2026 stellen, „Partielle Sonnenfinsternis"-Filter aktivieren → Ereignis am 12.08. abends sichtbar (live verifiziertes Referenzereignis).
+  2. Denselben Filter im Kalender und auf der Karte aktivieren (AK-7, Drei-Ansichten-Konsistenz wie BUG-91-Testplan).
+  3. Event-Detail öffnen → kein leerer „Himmelsposition"-Bereich (AK-8).
+  4. Regressionscheck: bestehende „Mond-Alignment"/„Sonnen-Alignment"/„Sonnenfinsternis"-Filter weiterhin funktionsfähig (AK-14).
+  5. Scout-Modus als Regressionscheck (AK-10, kein neues Verhalten erwartet).
+  6. (neu, Schritt 6c) iOS-App (Simulator oder Gerät) mit einer Finsternis-Foto-Chance eines der drei neuen Typen öffnen → Finsternis-Icon erscheint, nicht das generische Kamera-Icon (AK-17, nach Umsetzung von `Models.swift`).
+
+---
 
 ### TASK-03 · Feuerwerk-Events `[ ]`
 
@@ -11272,7 +11682,7 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `web/index.html`:
@@ -11446,20 +11856,261 @@ Frage 2 (Zeitpunkt): Wann genau soll die Karte springen?
 
 ---
 
-### US-134 · Bestätigen-Button neben Koordinaten-Eingabefeldern (zweiter Auslöseweg für Kartenschwenk aus US-133) `[ ]`
+### US-134 · Bestätigen-Button neben Koordinaten-Eingabefeldern (zweiter Auslöseweg für Kartenschwenk aus US-133) `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-16 |
+| **Abgeschlossen** | 2026-08-09 |
 
 **Beschreibung:** Das Koordinaten-Eingabefeld (rechte Seite, alle 4 Vorkommen aus US-133) soll etwas verkürzt werden, damit daneben ein kleiner, formhoher „OK"-Button Platz hat. Der Button löst denselben Kartenschwenk aus wie das bestehende Verlassen des Feldes (Blur) aus US-133 — beide Wege sollen gleichwertig funktionieren. Ziel: für den Nutzer klarer erkennbar machen, dass die Eingabe eine Kartenreaktion auslöst, plus eine explizite Bestätigungsmöglichkeit per Klick.
 
 **User Story:** Als Host, der eine Location anlegt oder bearbeitet, möchte ich neben jedem Koordinatenfeld einen kompakten „OK"-Button haben, der die Karte zur eingegebenen Position schwenkt, sodass für mich sichtbar wird, dass meine Eingabe etwas auslöst, und ich das auch gezielt per Klick bestätigen kann — nicht nur durch zufälliges Verlassen des Feldes.
 
 **Bezug:** Baut direkt auf **US-133** *(In Progress, lokal getestet, noch nicht released)* auf — keine Dublette, sondern Abhängigkeit/unmittelbare UX-Erweiterung. US-133 führt den Kartenschwenk (`panTo`, Zoom bleibt erhalten) bei Verlassen der 4 Koordinatenfelder ein: `#obs-coords`/`#subj-coords` im Anlegen-Formular (`AddLocation`), `#edit-obs-coords`/`#edit-subj-coords` im Bearbeiten-Formular (`LocationDetail`). Dieses Ticket verändert das Schwenk-Verhalten selbst nicht, sondern ergänzt (a) eine Button-UI neben dem verkürzten Feld und (b) einen zweiten, gleichwertigen Auslöseweg (Klick) zusätzlich zum bestehenden Blur-Weg — für alle 4 Felder gleichermaßen. Grep nach verwandten Begriffen („Bestätig", „OK-Button", „Okay-Button", „GPS-Button", „Einfügen-Button") ergab keine weiteren, bislang unbekannten Tickets zu Formular-Button-Layout im selben Bereich.
+
+**Example Mapping**
+
+**Scope-Check (durchgeführt):** Die Einschränkung auf exakt die 4 aus US-133 bekannten Koordinatenfelder (`#obs-coords`/`#subj-coords` im Anlegen-Formular, `#edit-obs-coords`/`#edit-subj-coords` im Bearbeiten-Formular) ist intentional — das Ticket benennt sie explizit im Bezug-Absatz als vollständigen Scope, kein Teil-Slice. Die Vollbild-Kartenoverlays (`add-map-fs`/`edit-map-fs`) sind wie schon in US-133 nicht betroffen: sie werden weiterhin nur über `_syncFsMarkers()`/`_reloadEditMapFsFromFields()` synchronisiert, keine eigene Zentrierung/kein eigener Button.
+
+📏 Regel 1: Neben jedem der 4 Koordinaten-Eingabefelder erscheint ein kompakter Bestätigen-Button in derselben Zeile; das Eingabefeld wird dafür entsprechend schmaler.
+🟢 Example: Gegeben das Anlege-Formular ist offen — wenn ich auf das Feld "Mein Standort" schaue — dann sehe ich rechts daneben einen kleinen Button in Feldhöhe, das Eingabefeld ist entsprechend schmaler als vorher.
+
+📏 Regel 2: Ein Klick auf den Bestätigen-Button löst exakt denselben Kartenschwenk aus wie das bestehende Verlassen des Feldes (Blur) aus US-133 — inklusive aller dort etablierten Edge Cases (ungültig/leer → kein Schwenk, Zoomstufe bleibt unverändert).
+🟢 Example: Gegeben ich tippe eine vollständige, gültige Koordinate ins Feld "Motiv" ein, ohne das Feld zu verlassen — wenn ich auf den Bestätigen-Button klicke — dann schwenkt die Karte zur eingegebenen Position, die Zoomstufe bleibt unverändert.
+🟢 Example: Gegeben das Feld "Fotograf-Standort" beim Bearbeiten ist leer — wenn ich auf den Bestätigen-Button klicke — dann passiert nichts (kein Schwenk, keine neue Fehlermeldung), identisch zum bestehenden Blur-Verhalten bei leerem Feld (US-133 AK6).
+
+📏 Regel 3: Der Button ist rein clientseitig und wiederverwendet die bestehende Blur-Handler-Logik direkt (keine neue, parallele Parsing-/Validierungslogik) — vermeidet die in US-133 (Pre-Mortem Szenario 3) bereits erkannte Code-Duplikations-Gefahr.
+🟢 Example: Gegeben eine künftige Änderung an der Koordinaten-Validierung (`_parseCoords`/`_parseEditCoords`) — wenn sie im Blur-Handler nachgezogen wird — dann gilt sie automatisch auch für den Button-Weg, ohne zweite Fundstelle pflegen zu müssen.
+
+**Annahmen-Protokoll:**
+- ⚪ Annahme (ästhetisch, Default — bitte bestätigen): Der Button zeigt das bereits im Bauhaus-Icon-Set vorhandene Haken-Icon `i-check` (Z. 1080, bereits für "Bestätigen" an anderer Stelle genutzt, Z. 2712/2755 `.btn-verify`) statt eines Text-Labels „OK". Konsequenz bei Ablehnung: minimaler Austausch (Icon-Markup gegen Textknoten „OK"), kein struktureller Unterschied.
+- ✅ Klar aus Kontext ableitbar: Der Button verhält sich bei leerem/ungültigem Feld identisch zum bestehenden Blur-Weg (kein neues Fehler-Feedback) — direkt aus dem Ticket-Wortlaut abgeleitet ("beide Wege sollen gleichwertig funktionieren"), siehe Bezug-Absatz. Keine Rückfrage nötig.
+- ✅ Klar aus Kontext ableitbar: Die Vollbild-Kartenoverlays bleiben unverändert (siehe Scope-Check oben).
+
+Keine offenen 🔴-Fragen — Mapping ist vollständig (3 Regeln, je ≥1 Example, 1 ⚪-Annahme mit Default, 2 direkt aus dem Ticket-Wortlaut ableitbare Punkte).
+
+**Fundstellen-Sweep (durchgeführt):** Grep nach `obs-coords`/`subj-coords` in `web/index.html` ergibt exakt 4 Treffer auf `id="..."`-Ebene (Z. 1404, 1415, 6530, 6536) — deckt sich mit der im Ticket genannten Zahl "alle 4 Vorkommen". Keine weitere, bislang unerwähnte Fundstelle. Zusätzlich geprüft: kein `<form>`-Element in `web/index.html` vorhanden (0 Treffer für `<form`) — Button-Submit-Risiko entfällt strukturell (siehe Pre-Mortem Szenario 3).
+
+**Zustands-Check (durchgeführt):**
+- Wartezustand: keiner — der Kartenschwenk ist eine synchrone Leaflet-API-Operation (`panTo`), kein Netzwerk-Call, kein Spinner nötig.
+- Leerzustand: Klick auf leerem Feld → kein Schwenk, kein neues Fehler-Feedback (siehe Regel 2, Example 2) — bewusst identisch zum bestehenden Blur-Verhalten, kein eigenes AK-Ziel für "leer sichtbar machen".
+- Fehlerfall: ungültige Koordinate → bestehende Fehlermeldung (`obs-error`/`subj-error`/`edit-obs-error`/`edit-subj-error`) bleibt unverändert bestehen, wird durch diesen Fix nicht berührt (Regression, siehe AK9).
+
+---
+
+**Scope:**
+Eingeschlossen: Neuer, kompakter Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern (Anlegen: `#obs-coords`/`#subj-coords`; Bearbeiten: `#edit-obs-coords`/`#edit-subj-coords`), Klick löst denselben Kartenschwenk aus wie das bestehende Blur-Verhalten aus US-133 (Wiederverwendung der 4 bestehenden Handler `AddLocation._onObsBlur/_onSubjBlur`, `LocationDetail._onEditObsBlur/_onEditSubjBlur`), Eingabefeld wird entsprechend schmaler.
+Ausgeschlossen: Jede Änderung am Schwenk-Verhalten selbst (Zoomstufe, Zeitpunkt) — das bleibt exakt wie in US-133 entschieden (Blur + Zoom-Erhalt); die Vollbild-Kartenoverlays (`add-map-fs`/`edit-map-fs`); neue Fehler-Feedback-Logik für den Button-Weg bei leerem/ungültigem Feld (bewusst Parität mit Blur, siehe Annahmen-Protokoll).
+
+**Akzeptanzkriterien:**
+- [x] AK1: Im Anlege-Formular ist neben dem (dafür leicht verkürzten) Eingabefeld "Mein Standort (Fotograf)" ein kompakter Bestätigen-Button in Feldhöhe sichtbar.
+- [x] AK2: Tippe ich eine vollständige, gültige Koordinate ins Feld "Mein Standort" und klicke auf den Bestätigen-Button (ohne das Feld vorher zu verlassen), schwenkt die kleine Anlege-Karte zur eingegebenen Position — die aktuelle Zoomstufe bleibt dabei unverändert (identisch zum Blur-Verhalten aus US-133 AK1).
+- [x] AK3: Dasselbe gilt spiegelbildlich für das Feld "Motiv" im Anlege-Formular (Bestätigen-Button + Klick lösen den Schwenk aus, Zoomstufe bleibt erhalten) — analog US-133 AK2.
+- [x] AK4: Im Bearbeiten-Formular ist neben dem Eingabefeld "Fotograf-Standort (Koordinaten)" derselbe kompakte Bestätigen-Button sichtbar; ein Klick nach vollständiger, gültiger Eingabe schwenkt die kleine Bearbeiten-Karte zur neuen Position, Zoomstufe bleibt erhalten — analog US-133 AK3.
+- [x] AK5: Dasselbe gilt für das Feld "Motiv (Koordinaten)" im Bearbeiten-Formular — analog US-133 AK4.
+- [x] Edge Case AK6 (Herkunft: Ticket-Wortlaut "gleichwertig" + Pre-Mortem Szenario 5): Klicke ich den Bestätigen-Button bei leerem oder unvollständigem/ungültigem Koordinatenfeld, schwenkt die Karte nicht — es erscheint keine neue, vom bisherigen Blur-Weg abweichende Fehlermeldung (identisches Verhalten zu US-133 AK5/AK6).
+- [x] Edge Case AK7 (Herkunft: Pre-Mortem Szenario 1): Tippe ich eine Koordinate ein und klicke direkt (ohne zwischenzeitlichen Fokuswechsel) auf den Bestätigen-Button, schwenkt die Karte genau einmal sichtbar zur neuen Position — kein doppeltes Springen/Zucken durch die Blur+Click-Ereignisfolge.
+- [x] Edge Case AK8 (Herkunft: Pre-Mortem Szenario 2): Auf einem schmalen Bildschirm (375px Breite) bleiben Platzhaltertext des Eingabefelds und Bestätigen-Button beide vollständig sichtbar, nicht überlappend und nicht abgeschnitten.
+- [x] AK9 (Regression, Herkunft: Pre-Mortem Szenario 4 + PRODUCT.md §12 "Location-Edit"/"CSS/Theme"): Die bestehende Fehlermeldung bei ungültiger Eingabe (US-133 AK5) erscheint nach dieser Änderung weiterhin korrekt unterhalb des jeweiligen Eingabefelds, sowohl in Hell- als auch in Dunkel-Modus.
+- [x] AK10 (Regression, analog US-133 AK9): Alle bestehenden Interaktionswege der Formular-Karten (Antippen zum Setzen, Ziehen des Pins, GPS-Button, Einfügen-Button, Satellit/Straße-Umschalter, Vollbild öffnen/schließen, Blur-Schwenk aus US-133) funktionieren nach dieser Änderung unverändert weiter.
+- [x] AK11 (Zugänglichkeit, Herkunft: Vier-Kategorien-Check Schritt 6c): Der Bestätigen-Button hat ein `aria-label`/`title` ("Position bestätigen" o.ä.), da er nur ein Icon ohne sichtbaren Text enthält — für Screenreader-Nutzer erkennbar.
+
+**Pre-Mortem:**
+📎 Code-Verifikation: `web/index.html` gelesen am 2026-08-09.
+- Bestätigt: Die 4 Koordinatenfelder sind an exakt den vom Ticket genannten Stellen (Z. 1404, 1415, 6530, 6536), mit bestehenden `oninput`+`onblur`-Bindings (`AddLocation._onObsInput/_onObsBlur`, `_onSubjInput/_onSubjBlur`, `LocationDetail._onEditObsInput/_onEditObsBlur`, `_onEditSubjInput/_onEditSubjBlur`).
+- Bestätigt: `_onObsBlur()`/`_onSubjBlur()` (Z. 7361-7373) und `_onEditObsBlur()`/`_onEditSubjBlur()` (Z. 6808-6816) lesen den aktuellen Feldwert direkt per `document.getElementById(...).value` — sie hängen NICHT vom tatsächlichen `blur`-Event selbst ab, sondern nur vom aktuellen DOM-Wert. Direkter Aufruf aus einem Button-`onclick` funktioniert daher identisch, ohne Anpassung der Funktionen selbst.
+- Bestätigt: Kein `<form>`-Element in `web/index.html` vorhanden (Grep `<form` → 0 Treffer) — kein Submit-Risiko bei neuem `<button>`.
+- Bestätigt: Alle Fehlermeldungs-Elemente (`obs-error`, `subj-error`, `edit-obs-error`, `edit-subj-error`) werden ausschließlich über `document.getElementById(...)` angesprochen (kein `.closest()`/`.nextElementSibling`) — ein neues Wrapper-`<div>` um Input+Button ist DOM-strukturell sicher.
+- Bestätigt: Bestehendes Bauhaus-Icon `i-check` (Z. 1080, Kreis+Haken) ist bereits im `<symbol>`-Defs-Block vorhanden und wird an anderer Stelle exakt für "Bestätigen" genutzt (`.btn-verify`, Z. 2712/2755) — kein neues Icon nötig.
+- Bestätigt: `.geocode-btn`/`.paste-btn` (Z. 826-838) liefern ein bereits etabliertes CSS-Muster für einen kompakten, in Feldhöhe stehenden Button neben einem Eingabefeld (`flex-shrink:0`, Radius 10px, Rand-Farbe mit Gold-Hover).
+
+💀 Szenario 1 — Doppelter Funktionsaufruf durch Blur-dann-Click-Ereignisfolge.
+Auslöser: Beim Klick auf den Button verliert das zuvor fokussierte Feld zuerst per nativer Browser-Reihenfolge den Fokus (`blur` feuert, Handler läuft, schwenkt die Karte), danach feuert `click` auf dem Button (ruft dieselbe Funktion nochmal auf).
+Frühwarnung: sichtbares doppeltes "Zucken" der Karte bei schnellem Klick.
+Gegenmaßnahme: Verifiziert unschädlich — `map.panTo()` auf ein bereits erreichtes Ziel verändert die Kartenposition nicht weiter (kein zweiter sichtbarer Sprung). Kein zusätzlicher Guard nötig, in AK7 als Testfall verankert.
+
+💀 Szenario 2 — Verkürztes Eingabefeld schneidet Platzhaltertext auf schmalen Displays ab.
+Auslöser: Fester Button-Platzbedarf reduziert die verfügbare Breite des ohnehin langen Platzhaltertexts (z.B. „z.B. 52.40747, 13.09279 oder 52°24'26"N...").
+Frühwarnung: Manueller Test bei 375px-Breite zeigt abgeschnittenen/überlappenden Platzhalter.
+Gegenmaßnahme: `min-width:0` auf dem Input innerhalb des neuen Flex-Wrappers setzen (verhindert Flex-Overflow), 375px-Test explizit in den Testplan aufgenommen (AK8).
+
+💀 Szenario 3 — Neuer Button löst versehentlich ein Formular-Submit/Seiten-Reload aus.
+Auslöser: Standard-Verhalten eines `<button>` ohne explizites `type`-Attribut innerhalb eines `<form>`-Kontexts.
+Frühwarnung: Sheet schließt sich/Seite lädt neu beim Klick.
+Gegenmaßnahme: Code-Verifikation bestätigt: kein `<form>`-Element in der gesamten Datei vorhanden — Risiko entfällt strukturell. `type="button"` wird trotzdem explizit gesetzt (Best Practice, konsistent mit Z. 4238/4239).
+
+💀 Szenario 4 — Neues Wrapper-`<div>` bricht bestehende Fehlermeldungs-Anzeige (US-133 AK5/AK6).
+Auslöser: Umstrukturierung der DOM-Hierarchie um Input+Button könnte relative Geschwister-Referenzen brechen.
+Frühwarnung: Fehlermeldung erscheint nach der Änderung nicht mehr oder an falscher Stelle.
+Gegenmaßnahme: Code-Verifikation bestätigt: alle 4 Fehler-Elemente werden ausschließlich per `getElementById` angesprochen, keine relative DOM-Traversal — strukturell sicher. Als Regression AK9 verankert, inkl. Hell-/Dunkel-Modus (PRODUCT.md §12 "CSS/Theme").
+
+💀 Szenario 5 — Klick auf leeres/ungültiges Feld wirkt wie ein nicht reagierender, "kaputter" Button.
+Auslöser: Bestehende Blur-Handler brechen bei leerem/ungültigem Wert früh ab, ohne Fehlermeldung — der Button erbt dieses Verhalten 1:1 durch Wiederverwendung.
+Frühwarnung: Nutzer klickt OK auf leerem Feld, nichts sichtbares passiert.
+Gegenmaßnahme: Bewusst akzeptiert statt als Bug behandelt — direkt aus dem Ticket-Wortlaut abgeleitet ("beide Wege sollen gleichwertig funktionieren"). Neues Fehler-Feedback nur für den Button-Weg würde eine Inkonsistenz zwischen den beiden als "gleichwertig" beschriebenen Wegen schaffen und ist bewusst außerhalb des Scopes (siehe Scope-Abschnitt).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (3 Regeln, je ≥1 Example, 1 ⚪-Annahme mit Default, keine offenen 🔴-Fragen)
+- [x] Fundstellen-Sweep: `obs-coords`/`subj-coords` in `web/index.html` gesucht → exakt 4 Treffer (Z. 1404, 1415, 6530, 6536), deckt sich mit Ticket-Angabe; zusätzlich `<form` gesucht → 0 Treffer
+- [x] Zustands-Check: kein Wartezustand (synchron), Leerzustand = bewusste Parität mit Blur (kein neues Feedback), Fehlerfall = bestehende Fehlermeldung unverändert (Regression AK9)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, inkl. Code-Verifikation am 2026-08-09, Fundstellen zitiert)
+- [x] Architektur analysiert: `web/index.html` — 4× HTML-Wrapper um bestehende Koordinatenfelder, 1× neue CSS-Klasse `.coord-confirm-btn`/`.coord-confirm-row`, kein neuer JS-Code (Wiederverwendung von `AddLocation._onObsBlur/_onSubjBlur`, `LocationDetail._onEditObsBlur/_onEditSubjBlur`)
+- [x] Designer-Check: visuell? → ja (neuer Button im DOM) → `fotoalert-designer` aufgerufen: Radius 10px (Input-Ebene, analog `.geocode-btn`), Icon `i-check` (bestehendes Bauhaus-Icon, bereits für "Bestätigen" genutzt), Farben aus Token-Set (var(--card)/var(--border)/var(--muted), Hover var(--gold), analog `.paste-btn`), Touch-Breite min. 44px, Dark-Mode automatisch über bestehende Tokens abgedeckt — kein neues Token nötig.
+- [x] Implementierungsoptionen: A (empfohlen, Wiederverwendung) / B (neue duplizierte Handler, nicht empfohlen)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 6 Dimensionen + 9-Kategorien-Checkliste geprüft, 1 AK (Zugänglichkeit) aus Vier-Kategorien-Abdeckung ergänzt (AK11), restliche Kategorien nicht relevant (Begründung je Zeile im Ticket) — siehe Abschnitte unten.
+
+**Granularität (Schritt 6c):**
+- Alle 11 AKs (AK1-AK11) einzeln geprüft: kein AK verbirgt mehr als ein eigenständig prüfbares Verhalten. AK2-AK5 koppeln zwar "Schwenk ausgelöst" und "Zoomstufe bleibt unverändert" in einem Satz — das ist aber exakt dieselbe Kopplung wie bereits in den korrespondierenden US-133-AKs (AK1-AK4) etabliert, beides wird durch denselben einen Klick-Testschritt sichtbar geprüft, kein Aufteilen nötig.
+- AK10 (Regression) listet mehrere Interaktionswege (GPS-Button, Einfügen-Button, Satellit/Straße-Umschalter, Pin-Ziehen, Vollbild, Blur-Schwenk) in einer Zeile — bewusst als ein zusammenfassendes Regressions-AK analog zu US-133 AK9 gehalten, nicht mehrere versteckte Einzelverhalten; jeder Weg wird im Testplan als eigener Teilpunkt derselben Regressions-Zeile abgehakt. Kein Aufteilen nötig.
+- Ergebnis: keine Aufteilung erforderlich, alle 11 AKs bleiben wie formuliert.
+
+**Polarität (Schritt 6c):**
+- Regel 1 (Button erscheint neben jedem der 4 Felder): positiv über AK1/AK4 abgedeckt; Negativ-/Grenzfall-Gegenstück ist AK8 (375px-Breite: Platzhaltertext und Button bleiben trotz beengtem Platz beide sichtbar, nicht überlappend) — prüft den Grenzfall der Regel-1-Zusage unter Platzdruck.
+- Regel 2 (Klick löst denselben Schwenk aus wie Blur, inkl. Edge Cases): positiv über AK2/AK3 abgedeckt; Negativ-Gegenstück ist AK6 (leeres/ungültiges Feld → kein Schwenk, keine neue Fehlermeldung).
+- Regel 3 (Button ruft die bestehende Blur-Handler-Logik direkt auf, keine neue Parsing-Logik): positiv über die Implementierungsoptionen-Entscheidung (Option A) abgedeckt; Grenzfall-Gegenstück ist AK7 (Blur-dann-Click-Ereignisfolge löst die wiederverwendete Funktion zweimal aus → genau ein sichtbarer Schwenk, kein Doppel-Sprung) — prüft direkt die Konsequenz der Direkt-Wiederverwendung aus Regel 3.
+
+**Messbarkeit (Schritt 6c):**
+- Gegengeprüft, ob sich in einem der 11 AKs technischer Code (Funktions-/Variablennamen wie `_onObsBlur`, `_onSubjBlur`, `_onEditObsBlur`, `_onEditSubjBlur`, `panTo`, die im Pre-Mortem und in den Implementierungsoptionen mehrfach vorkommen) eingeschlichen hat: nein. Stichprobe: AK2-AK5 sprechen von "Bestätigen-Button klicken"/"Karte schwenkt zur eingegebenen Position", nicht von der intern aufgerufenen Funktion. AK11 nennt zwar `aria-label`/`title` — das sind Nutzer-/DOM-Attributnamen (Screenreader-Vertrag), keine internen Funktions-/Variablennamen, zählt daher nicht als Verstoß.
+
+**Testbarkeit ohne Rückfrage (Schritt 6c):**
+- Bestätigt: Jedes der 11 AKs (AK1-AK11) taucht bereits im bestehenden Testplan-Abschnitt (Manuell, 11 Punkte) mit explizitem `(AKx)`-Verweis als eigener, eindeutiger Testschritt auf — keine Rückfrage zur Übersetzung eines AKs in einen Testschritt nötig, siehe Testplan-Abschnitt unten.
+
+**Vier-Kategorien-Abdeckung (Schritt 6c):**
+- Nicht-funktional (Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit): Performance/Sicherheit/Skalierbarkeit nicht relevant (reine Client-DOM-/CSS-Ergänzung, kein neuer Netzwerk-/Datenpfad); Zugänglichkeit relevant → AK11 (aria-label/title) ergänzt.
+- Architektur (Konsistenz/Rückwärtskompatibilität): Konsistent mit bestehendem `.geocode-btn`/`.paste-btn`-Muster und dem `i-check`-Icon-Einsatz; keine Änderung an IDs, Event-Namen oder Datenformaten — keine Rückwärtskompatibilitäts-Auswirkung.
+- Sonstige (Compliance/Logging/Betriebsübergabe): nicht relevant — reine UI-Ergänzung ohne neue Datenverarbeitung, kein Logging-Bedarf.
+
+**Negativ-/Randfall-Checkliste (Schritt 6c):**
+- Grenzwerte: nicht relevant, kein numerischer Zähler/Limit betroffen.
+- Ungültige/fehlende Eingaben: abgedeckt durch AK6.
+- Nebenläufigkeit: nicht relevant (Einzelnutzer-Formular, kein gleichzeitiger Schreibzugriff).
+- Verhalten unter Lastgrenzen: nicht relevant, keine Server-/Backend-Beteiligung.
+- Leerer/übervoller Zustand: abgedeckt durch Zustands-Check (Leerzustand) + AK6.
+- Berechtigungen/Zugriffsschutz: nicht relevant, Button ist Teil des bereits zugriffsgeschützten Anlegen-/Bearbeiten-Formulars (kein neuer Berechtigungspfad).
+- Abwärtskompatibilität: abgedeckt oben (Architektur-Zeile) — keine ID-/Datenformat-Änderung.
+- Rollback-/Wiederanlauffähigkeit: bestätigt über Ampel-Frage 3 (reiner UI-Zusatz, ohne Datenmigration trivial revertierbar).
+- Beobachtbarkeit im Fehlerfall: kein neuer Fehlerpfad — identisch zur bestehenden, unveränderten Blur-Fehlerbehandlung (AK9).
+
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — 4 Dimensionen nachträglich ergänzt (Granularität, Polarität, Messbarkeit,
+   Testbarkeit ohne Rückfrage), Vier-Kategorien-Abdeckung und Herkunftsnachvollziehbarkeit
+   bereits vorhanden, keine neuen AKs nötig.
+
+**Implementierungsoptionen:**
+
+### Option A — Bestehende Blur-Handler direkt wiederverwenden + Bauhaus-Icon `i-check` (empfohlen)
+- App-Wirkung: Neben jedem der 4 (entsprechend schmaleren) Koordinatenfelder erscheint ein kompakter Button mit Haken-Icon. Ein Klick darauf schwenkt die Karte exakt so, wie es das Verlassen des Feldes heute schon tut — als zweiter, gleichwertiger Weg.
+- Vorgehen: Jedes der 4 Eingabefelder in einen neuen Flex-Wrapper (`.coord-confirm-row`) einbetten, der Input + neuen `<button type="button" class="coord-confirm-btn">` enthält. Der Button ruft im `onclick` direkt dieselbe Funktion auf, die bereits am `onblur` hängt (`AddLocation._onObsBlur()`, `_onSubjBlur()`, `LocationDetail._onEditObsBlur()`, `_onEditSubjBlur()`) — keine neue Parsing-/Validierungslogik. Neue CSS-Klasse `.coord-confirm-btn` (Radius 10px, Rand-/Muted-Farbe mit Gold-Hover analog `.paste-btn`, min. 44px Breite, enthält das bestehende `i-check`-Symbol als `<use>`).
+- Betroffene Dateien: nur `web/index.html` — 4× HTML-Wrapper-Änderung (Z. 1403-1409, 1414-1420, 6529-6533, 6535-6539), 1× neue CSS-Regel, kein neuer JS-Code.
+- Vorteile: kleinster Eingriff, exakte Verhaltensparität mit Blur (erfüllt Ticket-Wortlaut "gleichwertig"), keine Code-Duplikation, nutzt bereits etabliertes Bauhaus-Icon-/Button-Muster (`i-check`, `.paste-btn`), kein neues JS-Risiko.
+- Nachteile/Risiken: doppelter Funktionsaufruf bei Blur+Click-Reihenfolge (Pre-Mortem Szenario 1) — verifiziert unschädlich.
+- Aufwand: klein.
+
+### Option B — Neue, eigenständige Handler-Funktionen (nicht empfohlen)
+- App-Wirkung: identisch aus Nutzersicht — der Unterschied liegt rein im Code.
+- Vorgehen: 4 neue Methoden (z.B. `_onObsConfirm()` etc.) mit eigener, zur Blur-Logik parallelen Parsing-/Validierungs-/Schwenk-Logik schreiben.
+- Betroffene Dateien: `web/index.html`, zusätzlich ~20-30 Zeilen neuer, duplizierter JS-Code.
+- Vorteile: keine.
+- Nachteile/Risiken: genau die Code-Duplikations-Gefahr, die US-133 (Pre-Mortem Szenario 3) bereits bewusst vermieden hat — zwei Stellen, die künftig auseinanderdriften können, sobald sich Parsing/Validierung ändert.
+- Aufwand: klein-mittel (mehr Code für denselben Effekt).
+
+✅ **Empfehlung: Option A** — Wiederverwendung bestehender Komponenten ist laut Vorgabe (Schritt 5) der Standardweg, deckt sich mit dem Ticket-Wortlaut ("gleichwertig") und vermeidet ein bereits bekanntes Risiko (US-133 Szenario 3). Die verbleibende Detailfrage (Icon `i-check` statt Text „OK") ist als ⚪-Annahme mit Default markiert, nicht Teil der Kern-Entscheidung zwischen den Optionen.
+
+**🚦 Ampel-Prüfung:**
+1. Klarer Abstand zur Alternative? Ja — Option A vermeidet Code-Duplikation, Option B hat keinen Vorteil.
+2. Innerhalb des Tickets, keine Architektur-/Datenmodell-Änderung? Ja — reines Frontend, Wiederverwendung bestehender Funktionen, kein Backend/keine DB.
+3. Ohne Datenverlust rückgängig zu machen? Ja — reiner UI-Zusatz, trivial revertierbar.
+4. Kein hohes Risiko laut Pre-Mortem? Ja — alle 5 Szenarien verifiziert und mit Gegenmaßnahme abgeschlossen.
+5. Keine reine Geschmacks-/Optikfrage? Ja — die tragende Entscheidung (Wiederverwendung vs. Duplikation) ist technisch; die Icon-vs-Text-Detailfrage ist nicht blockierend (⚪-Annahme mit reversiblem Default).
+
+🚦 Ampel-Ergebnis:
+🟢 Grün — autonome Umsetzung möglich
+
+**Testplan:**
+- Automatisiert (Harness):
+  - [x] `backend/tests/test_us-134.py` angelegt, analog `test_us-133.py` — geskippter Platzhalter-Test (Marker `frontend`+`regression`), da das Verhalten rein clientseitig ist und keine Playwright-Infrastruktur für isolierte JS-Funktionsaufrufe existiert (identische Begründung wie US-133); dokumentiert alle 11 AKs samt manueller Testschritte im Docstring. README-Marker-Tabelle (`backend/tests/README.md`) entsprechend ergänzt.
+- Manuell (http://localhost:8000, lokaler Dev-Server):
+  - [x] Anlegen-Formular öffnen ("+"-Button) → neben "Mein Standort" ist ein kompakter Bestätigen-Button (Haken-Icon) sichtbar, Feld ist entsprechend schmaler (AK1).
+  - [x] Gültige, weit entfernte Koordinate ins Feld "Mein Standort" tippen, OHNE das Feld zu verlassen, direkt auf den Bestätigen-Button klicken → erwartet: Karte schwenkt zur Position, Zoomstufe unverändert (AK2).
+  - [x] Dasselbe im Feld "Motiv" wiederholen (AK3).
+  - [x] Bestehende Location öffnen → Bearbeiten → gültige Koordinate ins Feld "Fotograf-Standort" tippen, Bestätigen-Button klicken → erwartet: Bearbeiten-Karte schwenkt (AK4).
+  - [x] Dasselbe im Feld "Motiv (Koordinaten)" beim Bearbeiten wiederholen (AK5).
+  - [x] Leeres bzw. unvollständiges Feld (z.B. "48,") → Bestätigen-Button klicken → erwartet: keine Kartenbewegung, keine neue Fehlermeldung (AK6).
+  - [x] Koordinate eintippen, direkt auf Bestätigen-Button klicken (ohne vorherigen Fokuswechsel) → erwartet: genau ein sichtbarer Schwenk, kein Doppel-Sprung (AK7).
+  - [x] Browser-Fenster/Simulator auf 375px Breite verkleinern → Platzhaltertext und Button beide vollständig sichtbar, nicht überlappend (AK8).
+  - [x] Ungültige Koordinate eintippen, Feld verlassen (Blur) → bestehende Fehlermeldung erscheint korrekt, in Hell- UND Dunkel-Modus prüfen (AK9, PRODUCT.md §12 "CSS/Theme").
+  - [x] Regression: GPS-Button, Einfügen-Button, Satellit/Straße-Umschalter, Antippen/Ziehen des Pins, Vollbild öffnen/schließen, bestehender Blur-Schwenk — alle unverändert testen (AK10, PRODUCT.md §12 "Location-Edit").
+  - [x] Screenreader/Inspector: Bestätigen-Button hat `aria-label`/`title` (AK11).
+
+**Release-Vorbereitung (vorbereitet, nicht ausgeführt):**
+
+Vorbereitet am 2026-08-09 (dateibasierte Analyse, kein Git-Zugriff aus der Sandbox — siehe
+`fotoalert-release`/`device-access-conventions`). Der folgende Befehl ist ausschließlich für
+Stephans eigenes Mac-Terminal bestimmt und wurde in dieser Sitzung nicht ausgeführt.
+
+*Einbezogene Datei:* `web/index.html` (4 neue Bestätigen-Buttons + CSS + `onmousedown`-Fix
+gegen Doppelaufruf + erklärender Kommentar) — eindeutig zum Ticket gehörend, wird von
+`release.sh` ohnehin automatisch mitcommittet (siehe Skript-Header). `web/sw.js` wird vom
+Skript ebenfalls automatisch angefasst (reiner `CACHE_NAME`-Versionsbump), enthält aber laut
+Dateizeitstempel (8.8. statt 9.8.) keine inhaltliche US-134-Änderung.
+
+*Bewusst NICHT in diesen Release-Commit aufgenommen:*
+- `BACKLOG.md` (dieser Ticket-Text inkl. dieses Abschnitts) — laut Projektkonvention (siehe
+  `fotoalert-release`, Abschnitt „Ticket-Abschluss-Reihenfolge") wird `BACKLOG.md` nicht im
+  selben Commit wie der Code releast, sondern eigenständig als Teil des späteren
+  Ticket-Abschluss-Commits (zusammen mit `PRODUCT.md`-Changelog, `Status: Done`,
+  `Abgeschlossen`-Datum) behandelt, nachdem Release + Deploy-Verifikation abgeschlossen sind.
+  Kein Beifang im Sinne einer ticketfremden Datei, sondern planmäßig separat terminiert.
+- `backend/tests/test_us-134.py` + `backend/tests/README.md` — bereits vor dieser
+  Release-Vorbereitung angelegt (Analyse-Phase, geskippter Platzhalter-Test samt
+  README-Marker-Eintrag, Zeile 109) und keine neue Änderung in diesem Schritt — daher kein
+  zusätzlicher `git add` nötig.
+- Kein weiterer Beifang gefunden: `_worktrees/` ist leer, keine offene Kopie-Ordner-Rücksync-
+  Frage für dieses Ticket.
+
+*Versionsermittlung:* `release.sh` liest `APP_VERSION` selbst aus `web/index.html` und zählt
+je nach Bump-Typ hoch (siehe Skript). Aktueller Stand dort: `1.22.60`. Letzter in `PRODUCT.md`
+(Abschnitt 14, Changelog) dokumentierter Release ist v1.22.59 (BUG-100, 2026-08-08) — die Lücke
+zwischen dokumentiertem v1.22.59 und dem tatsächlich in `web/index.html` stehenden `1.22.60`
+ließ sich ohne Git-Zugriff nicht zweifelsfrei aufklären (möglich: ein bereits gelaufener,
+im Changelog noch nicht nachgetragener Release eines anderen Tickets); für die reine
+Versionsberechnung ist das unerheblich, da `release.sh` ohnehin vom tatsächlich in der Datei
+stehenden Wert ausgeht. Bump-Typ `patch`, passend zum durchgängigen Projektmuster (alle
+bisherigen Einträge in Abschnitt 14 nutzen ausschließlich Patch-Bumps, auch für
+UI-Erweiterungen wie US-133). **Nächste Version: `1.22.61`.**
+
+*Vorbereiteter Befehl (im Mac-Terminal auszuführen, NICHT in dieser Sitzung):*
+
+```bash
+# 1) Index-Lock-Check (Pflicht vor jedem git add)
+ls ~/Claude/Projects/FotoAlert/.git/index.lock
+```
+Erwartet: „No such file or directory". Falls die Datei existiert: `rm ~/Claude/Projects/FotoAlert/.git/index.lock`, dann erst weiter.
+
+```bash
+# 2) Pflicht-Diff-Check: web/index.html und web/sw.js wirklich nur US-134-Inhalt, kein fremder
+#    unfertiger Code aus einem parallel laufenden Ticket (US-135/BUG-89/TASK-89 sind aktuell
+#    ebenfalls "In Test")
+cd ~/Claude/Projects/FotoAlert && git --no-pager diff -- FotoAlert/web/index.html FotoAlert/web/sw.js
+```
+Ergebnis vor dem nächsten Schritt gegenprüfen: nur die 4 Buttons/CSS/Kommentar/`onmousedown`-Fix,
+kein unzusammenhängender Inhalt.
+
+```bash
+# 3) Release durchführen (patch-Bump)
+cd ~/Claude/Projects/FotoAlert
+cd FotoAlert && ./release.sh patch "US-134: Bestätigen-Button neben Koordinaten-Eingabefeldern"
+```
+Erwartet nach Bestätigung mit „j": `✅ v1.22.61 gepusht. GitHub Actions deployt jetzt automatisch.`
+
+**Ausdrücklich nicht Teil dieser Vorbereitung:** Befehl ausführen, GitHub Actions überwachen,
+Server/Health-Check verifizieren, `Status`-Feld dieses Tickets ändern — das bleibt Stephans
+eigenem Terminal bzw. dem Orchestrator vorbehalten.
 
 ---
 
@@ -21232,7 +21883,7 @@ Verworfene Alternative: etablierte Rate-Limiting-Bibliothek (z. B. `slowapi`) �
 | **Typ** | Task |
 | **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** Beim Release von US-133 (v1.22.34) trat ein Merge-Konflikt in `FotoAlert/PRODUCT.md` auf (`U FotoAlert/PRODUCT.md`, `error: Committing is not possible because you have unmerged files`, `fatal: Exiting because of an unresolved conflict`). Trotz dieses Abbruchs blieb ein lokaler, unpushter Commit mit einer Ad-hoc-Message ("merge: PRODUCT.md Konflikt nach stash pop aufgelöst", Autor Stephan) zurück — vermutlich Ergebnis eines Auto-Recovery-Schritts außerhalb des eigentlichen Release-Skripts. Dieser Commit folgte NICHT dem Standard-Muster `release: vX.Y.Z – <Beschreibung>` und erzeugte KEINEN Git-Tag (verifiziert: `git tag -l "v1.22.34"` war zu diesem Zeitpunkt leer, obwohl der Commit den korrekten Versionsbump in `web/index.html`/`sw.js` bereits enthielt). Nachbesserung war nur manuell möglich (`git commit --amend`, dann `git tag`, dann Push) und nur, weil der Commit noch nicht gepusht war.
@@ -21247,14 +21898,14 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 
 ---
 
-### TASK-89 · Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern `[ ]`
+### TASK-89 · Caddy-Logdatei-Berechtigung bei Server-Neuaufbau prüfen/absichern `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** `deploy/Caddyfile` enthält seit längerem eine Log-Regel (`log { output file /var/log/caddy/fotoalert.log ... } }`), die aber nie live auf dem Server aktiv war. Beim ersten echten Deploy dieser Konfiguration (im Zuge von TASK-82) legte der als root laufende Validierungsschritt (`sudo caddy validate`) die Logdatei mit root-Besitzrechten an, bevor der eigentliche Caddy-Dienst (eigener, unprivilegierter User `caddy`) sie öffnen konnte → Reload schlug mit „permission denied" fehl. Wurde einmalig per `chown caddy:caddy` auf dem Server behoben (nicht im Repo, da Server-Zustand). Dieses Ticket soll dokumentieren: (a) den Fund, (b) prüfen ob `deploy/setup_server.sh` (das bei einem künftigen Server-Neuaufbau läuft) das Log-Verzeichnis/die Datei vorsorglich mit den richtigen Besitzrechten anlegen sollte, damit das Problem nicht bei einem Server-Umzug/Wiederaufbau erneut auftritt.
@@ -21263,23 +21914,275 @@ Fundstelle geprüft: `FotoAlert/release.sh` (Abschnitt „Git: committen und pus
 
 **Bezug:** TASK-82 [x] (Fund entstand während dessen Testphase, dort bereits einmalig live gefixt, siehe Ticket-Vermerk „Eigenes Ticket für die Doku dieses Fundes: siehe Backlog-Inbox").
 
+**Example Mapping:**
+
+📏 Regel 1 — Bei einem Server-Neuaufbau legt `deploy/setup_server.sh` das Verzeichnis `/var/log/caddy` inkl. der Datei `fotoalert.log` mit dem Besitzer `caddy:caddy` an, bevor die Caddy-Konfiguration übernommen und ein Reload ausgelöst wird.
+🟢 Example: Given ein frischer Server (Ubuntu 22.04, Caddy noch nicht konfiguriert), When `setup_server.sh` vollständig durchläuft, Then existiert `/var/log/caddy/fotoalert.log` mit Besitzer `caddy:caddy` UND `systemctl reload caddy` läuft im Skript ohne „permission denied" durch.
+
+📏 Regel 2 — Der schützende Block (mkdir/touch/chown) steht im Skript textuell nach der Caddy-Paketinstallation (der System-User `caddy` muss existieren) und vor dem Caddy-Konfigurations-/Reload-Block.
+🟢 Example: Given den Skripttext, When man die Positionen der drei Marker (`apt-get install -y -qq caddy`, `chown -R caddy:caddy /var/log/caddy`, `systemctl reload caddy`) vergleicht, Then gilt install-Position < chown-Position < reload-Position.
+
+📏 Regel 3 — Fund und Absicherung sind im Ticket nachvollziehbar dokumentiert (Root Cause, Fix-Ort, Test-Nachweis).
+🟢 Example: Given dieses Ticket, When man die Analyse-Sektion liest, Then sind Root Cause, Fix-Ort (`deploy/setup_server.sh` Z. 124–134) und Test-Datei (`backend/tests/test_task89_caddy_log_permissions.py`) benannt.
+
+❓ Questions: keine offenen 🔴-kritischen Fragen.
+
+⚠️ Annahme: Caddys System-User heißt `caddy` (Standard des offiziellen Debian/Ubuntu-Caddy-Pakets, das `setup_server.sh` installiert) — bereits durch den live aufgetretenen Vorfall selbst bestätigt (der manuelle `chown caddy:caddy`-Fix behob das Problem). Keine Rückfrage nötig.
+
+⚠️ Annahme: Scope bleibt exakt auf `deploy/setup_server.sh` beschränkt, wörtlich so im Ticket verlangt („prüfen ob deploy/setup_server.sh … sollte"); `deploy/deploy.sh`, `deploy/restore.sh`, `deploy/rollback.sh` werden nur zur Einordnung gelesen, nicht verändert.
+
+Scope-Check: Kein Hinweis auf „Slice"/„Phase 1" im Ticket — die Beschränkung auf `setup_server.sh` ist laut Ticket-Wortlaut bewusst, keine Rückfrage nötig.
+
+**Wichtiger Befund vor der Architektur-Analyse:** Beim Lesen des Codes (Pflicht-Code-Verifikation, siehe unten) hat sich gezeigt, dass sowohl der Fix in `deploy/setup_server.sh` als auch die zugehörige Testdatei `backend/tests/test_task89_caddy_log_permissions.py` bereits vollständig im Repo vorhanden sind — inkl. Kommentaren/Docstrings, die wörtlich auf „TASK-89" bzw. eine „TASK-89-Analyse" verweisen (Skriptkommentar: „Caddy-Log-Verzeichnis mit korrekten Rechten vorbereiten (TASK-89)"; Test-Docstring verweist auf „Pre-Mortem-Szenario 1 aus der TASK-89-Analyse"). Es sieht so aus, als sei zu diesem Ticket bereits ein früherer Analyse-/Implementierungsdurchlauf gelaufen, dessen Ergebnis im Code liegt, aber bislang nicht in diesem BACKLOG.md-Ticket dokumentiert wurde. Diese Spec dokumentiert den verifizierten Ist-Zustand nachträglich vollständig, statt ihn zu wiederholen.
+
+**Fundstellen-Sweep:** Suchbegriffe `/var/log/caddy` und `caddy validate` reposweit gesucht (ohne `_to_delete/`). Treffer: `deploy/Caddyfile:48` (Log-Direktive, Ursprung, unverändert), `deploy/setup_server.sh:125–134` (bereits vorhandener Fix, Kern dieses Tickets), `deploy/deploy.sh:132` (`sudo caddy validate`, TASK-82 Schritt 7, läuft bei jedem Deploy — siehe Pre-Mortem/Code-Verifikation unten). Keine Treffer in `deploy/restore.sh`, `deploy/rollback.sh`, `deploy/DEPLOYMENT-GUIDE.md` → außerhalb des Scopes, keine Änderung. Sechs Ansichten-Klassen (Liste/Karte/Kalender/Scout/Chancen-Übersicht/Event-Detail): nicht anwendbar, reines Server-Setup-Skript ohne Frontend-Bezug.
+
+**Zustands-Check:** Wartezustand nicht zutreffend (Setup läuft synchron in einer Shell-Sitzung). Leerzustand = Ausgangszustand eines frischen Servers ohne `/var/log/caddy` — dafür sorgt `mkdir -p` fehlerfrei. Fehlerfall: Schlägt `chown` oder `reload` fehl, bricht das Skript wegen `set -euo pipefail` sichtbar im Terminal ab (kein stiller Fehler); der bestehende Fallback `systemctl reload caddy || systemctl restart caddy` fängt nur einen fehlgeschlagenen Reload ab, nicht einen fehlgeschlagenen `chown`.
+
+**Akzeptanzkriterien:**
+- [x] AK1: Bei einem Server-Neuaufbau (`setup_server.sh` vollständig durchgelaufen) existiert `/var/log/caddy/fotoalert.log` mit Besitzer `caddy:caddy`, sodass der anschließende Caddy-Reload ohne „permission denied" durchläuft. *(Herkunft: Ticket-Kernanforderung Punkt (b))* — bereits erfüllt; Test: `test_creates_caddy_log_dir_with_correct_owner`.
+- [x] AK2: Der mkdir/chown-Block steht im Skript vor dem Caddy-Konfigurations-/Reload-Block. *(Herkunft: Pre-Mortem Szenario 1 — Reihenfolge ist der eigentliche Fix-Kern)* — Test: `test_log_dir_fix_runs_before_caddy_reload`.
+- [x] AK3 (Edge Case): Der mkdir/chown-Block steht nach der Caddy-Paketinstallation, da der System-User `caddy` erst durch das apt-Paket entsteht. *(Herkunft: Pre-Mortem Szenario 2 — Ausführungsreihenfolge)* — Test: `test_log_dir_fix_runs_after_caddy_package_install`.
+- [x] AK4 (Edge Case, Idempotenz): Ein wiederholter Lauf von `setup_server.sh` auf einem bereits eingerichteten Server verändert den Besitzer nicht negativ (`mkdir -p`/`chown -R` sind idempotent, kein Fehler bei bereits existierendem Pfad). *(Herkunft: Negativ-Checkliste „Abwärtskompatibilität")* — durch Code-Inspektion bestätigt (Shell-Semantik von `-p`/`-R`), kein separater Test nötig.
+- [x] AK5 (Scope-Abgrenzung, dokumentiert statt getestet): `deploy/deploy.sh`, `deploy/restore.sh`, `deploy/rollback.sh` bleiben unverändert; ihr Caddy-Bezug (bzw. dessen Fehlen) ist im Fundstellen-Sweep dokumentiert. *(Herkunft: Ticket-Scope + Fundstellen-Sweep)*
+
+**Pre-Mortem:**
+
+💀 Szenario 1 — Reihenfolgen-Regression: Jemand fügt künftig einen neuen Schritt zwischen Service-Installation und Caddy-Konfiguration ein und verschiebt dabei versehentlich den chown-Block hinter den Reload.
+Auslöser: Keine automatisierte Reihenfolge-Prüfung außer Skriptkommentaren.
+Frühwarnung: „permission denied" beim nächsten echten Server-Neuaufbau.
+Gegenmaßnahme: `test_log_dir_fix_runs_before_caddy_reload` (bereits vorhanden) schlägt fehl, sobald die Reihenfolge bricht → AK2.
+
+💀 Szenario 2 — User-Existenz-Regression: Der chown-Block würde vor die Caddy-Installation rutschen; der User `caddy` existiert dann noch nicht, `chown` schlägt fehl, das Skript bricht wegen `set -e` sofort ab, noch bevor die App überhaupt läuft.
+Auslöser: Umsortierung des Skripts.
+Frühwarnung: Skriptabbruch direkt beim `chown`-Aufruf, sichtbar im Terminal.
+Gegenmaßnahme: `test_log_dir_fix_runs_after_caddy_package_install` (bereits vorhanden) → AK3.
+
+💀 Szenario 3 — Externe Abhängigkeit ändert sich: Ein künftiges Caddy-Debian-Paket verwendet einen anderen System-User als `caddy`.
+Auslöser: Liegt außerhalb unserer Kontrolle (Paket-Maintainer-Entscheidung).
+Frühwarnung: `systemctl status caddy` zeigt den tatsächlichen Prozess-User.
+Gegenmaßnahme: Außerhalb des Ticket-Scopes, keine Code-Änderung, nur als Betriebshinweis vermerkt (kein AK, da nicht im Einflussbereich dieses Tickets).
+
+💀 Szenario 4 — Alternativer Wiederherstellungspfad: Ein künftiger Server-Umzug läuft über `deploy/restore.sh` (Snapshot-Wiederherstellung) statt über `setup_server.sh`; `restore.sh` hat laut Fundstellen-Sweep keinerlei Caddy-Bezug und würde den Log-Ordner-Zustand unverändert aus dem Backup übernehmen, statt ihn aktiv zu reparieren.
+Auslöser: Zwei unterschiedliche Wiederherstellungswege mit unterschiedlicher Abdeckung.
+Frühwarnung: Reload-Fehler nach einem Restore-Lauf.
+Gegenmaßnahme: Explizit als Scope-Grenze dokumentiert (AK5); kein Fix in diesem Ticket, da der Ticket-Wortlaut sich nur auf `setup_server.sh` bezieht — bei Bedarf eigenes Folgeticket.
+
+📎 Code-Verifikation: `deploy/setup_server.sh` und `deploy/Caddyfile` am 09.08.2026 vollständig gelesen (per `device_bash`, kein Git-Zugriff verwendet). Bestätigt: Fix-Block existiert bereits (Z. 124–134), mit explizitem Kommentar-Verweis auf „(TASK-89)"; Reihenfolge korrekt (Caddy-Install → App-User/SSH/Repo/venv/Skyfield → systemd-Services → chown-Fix → Caddy-Konfiguration/Reload). Zusätzlich bestätigt: `backend/tests/test_task89_caddy_log_permissions.py` existiert bereits mit drei Tests (Marker `offline`+`regression`), die exakt AK1–AK3 prüfen. Da im Sandbox-VM kein `pytest` installierbar ist (keine Netzwerkverbindung für `pip install`), wurden alle drei Assertions stattdessen Zeile für Zeile manuell gegen den tatsächlichen Skripttext nachvollzogen — alle drei treffen zu (siehe Testplan). `deploy/deploy.sh` gelesen: Schritt 7 (TASK-82) führt `sudo caddy validate` bei jedem Deploy aus, aber gegen eine temporäre Kandidatendatei in `/tmp`, nicht gegen die Live-Konfiguration; da Verzeichnis/Datei zu diesem Zeitpunkt (nach dem initialen `setup_server.sh`-Lauf) bereits mit korrektem Besitzer existieren, entsteht dabei kein root-Besitz erneut (kein `O_CREAT` auf eine bereits bestehende Datei ändert deren Besitzer). `deploy/restore.sh`/`deploy/rollback.sh` gelesen bzw. gegrept: kein Caddy-Bezug.
+
+**Architektur-Analyse:**
+- `deploy/setup_server.sh` — enthält bereits den Fix-Block (mkdir/touch/chown, Z. 124–134), korrekt positioniert zwischen Caddy-Paketinstallation und Caddy-Konfiguration/Reload.
+- `deploy/Caddyfile` — Ursprung der `log{}`-Direktive (Z. 45–50), unverändert, kein Fix-Bedarf hier.
+- `deploy/deploy.sh` — Schritt 7 (TASK-82, Z. 116–142): `sudo caddy validate` bei jedem Deploy gegen eine `/tmp`-Kandidatendatei; abhängig davon, dass Verzeichnis/Datei bereits mit korrektem Besitzer existieren (das stellt `setup_server.sh` sicher) — reine Lesebeziehung, kein Änderungsbedarf.
+- `deploy/restore.sh`, `deploy/rollback.sh`, `deploy/DEPLOYMENT-GUIDE.md` — kein Caddy-Log-Bezug (Grep negativ), außerhalb des Scopes.
+- `backend/tests/test_task89_caddy_log_permissions.py` — bereits vorhandene, reine Text-/Grep-Prüfung gegen `setup_server.sh` (kein Live-Server-Test, das Docstring benennt diese Einschränkung selbst explizit).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (3 Regeln, je ≥1 Example, 2 ⚪-Annahmen mit Default, keine offenen 🔴-Fragen)
+- [x] Fundstellen-Sweep: `/var/log/caddy` + `caddy validate` reposweit gesucht (ohne `_to_delete/`) → 3 relevante Treffer (Caddyfile, setup_server.sh, deploy.sh), 3 Dateien ohne Bezug (restore.sh, rollback.sh, DEPLOYMENT-GUIDE.md)
+- [x] Zustands-Check: Warte-/Leer-/Fehlerfall geprüft, kein zusätzliches AK über die bereits gelisteten hinaus nötig
+- [x] Pre-Mortem durchgeführt (4 Szenarien, 2 mit bereits vorhandenem Testschutz, 2 als dokumentierte Scope-Grenze), inkl. Pflicht-Code-Verifikation (Datum + Fundstellen oben)
+- [x] Architektur analysiert: `deploy/setup_server.sh`, `deploy/Caddyfile`, `deploy/deploy.sh`, `deploy/restore.sh`, `deploy/rollback.sh`, `backend/tests/test_task89_caddy_log_permissions.py`
+- [x] Designer-Check: visuell? → nein (reines Server-/Ops-Skript ohne UI-Bezug), übersprungen
+- [x] Implementierungsoptionen: A (Ist-Zustand bestätigen/dokumentieren) / B (zusätzlicher Regressionstest — bereits vorhanden)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 6 Dimensionen + 9-Kategorien-Checkliste geprüft, keine neuen AKs nötig, alle Kriterien durch bereits vorhandenen Code+Test erfüllt — siehe Abschnitte unten.
+
+**Granularität (Schritt 6c):** Alle 5 AKs geprüft: kein AK verbirgt mehr als ein eigenständig prüfbares Verhalten (Existenz+Besitzer / Reihenfolge-vor-Reload / Reihenfolge-nach-Install / Idempotenz / Scope-Dokumentation sind fünf getrennte Aussagen mit je eigenem Test bzw. eigener Begründung). Keine Aufteilung nötig.
+
+**Polarität (Schritt 6c):** Regel 1 (Datei entsteht mit korrektem Besitzer): positiv über AK1 abgedeckt, Negativ-/Grenzfall-Gegenstück ist AK2 (falsche Reihenfolge → würde erneut root-Besitz erzeugen). Regel 2 (Block-Position nach Caddy-Install): positiv/negativ-Paar ist AK3 (würde vor Caddy-Install stehen → Skriptabbruch). Regel 3 (Dokumentation): AK5 als Gegenstück zu AK1–AK4, deckt die bewusst ausgeschlossenen Dateien ab.
+
+**Messbarkeit (Schritt 6c):** Gegengeprüft, ob sich technischer Code (Funktions-/Variablennamen) in den AKs eingeschlichen hat, die über die reinen Shell-Befehle/Dateipfade hinausgehen: nein — die genannten Befehle (`mkdir`, `chown`, `systemctl reload`) sind der beobachtbare Skript-Effekt selbst, keine internen App-Funktionsnamen; das entspricht der vorgesehenen Dev-Tooling-Ausnahme (Schritt 2), da dieses Ticket kein sichtbares App-Erlebnis hat, sondern ein Ops-Skript ist.
+
+**Testbarkeit ohne Rückfrage (Schritt 6c):** Bestätigt — AK1–AK3 sind bereits als pytest-Tests umgesetzt (`test_task89_caddy_log_permissions.py`) und wurden Zeile für Zeile gegen den echten Skripttext nachvollzogen (siehe Code-Verifikation); AK4 ist durch Shell-Semantik garantiert testbar, aber trivial genug, dass kein separater Test nötig ist; AK5 ist reine Dokumentation ohne Testanspruch.
+
+**Vier-Kategorien-Abdeckung (Schritt 6c):**
+- Funktional: AK1 (Datei entsteht mit korrektem Besitzer, Reload gelingt).
+- Nicht-funktional (Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit): Sicherheit ist der Kern des Tickets (Zugriffsschutz/Besitzrechte, AK1–AK3); Performance/Skalierbarkeit/Zugänglichkeit nicht relevant, da einmaliges Setup-Skript ohne Laufzeitpfad in der App.
+- Architektur (Konsistenz/Rückwärtskompatibilität): AK4 (idempotenter Wiederholungslauf, keine Regression bei erneuter Ausführung).
+- Sonstige (Compliance/Logging/Betriebsübergabe): AK5 (Scope-Dokumentation, Betriebsübergabe — ein künftiger Admin kann sich auf das Ticket verlassen, ohne selbst suchen zu müssen, welche Dateien betroffen sind).
+
+**Negativ-/Randfall-Checkliste (Schritt 6c):**
+- Grenzwerte: nicht relevant, kein numerischer Wertebereich betroffen.
+- Ungültige/fehlende Eingaben: nicht relevant, das Skript hat an dieser Stelle keine Nutzereingabe; bestehendes `set -euo pipefail` deckt Fehlerfälle ab.
+- Nebenläufigkeit: nicht relevant, Setup läuft einmalig sequenziell ohne gleichzeitigen Mehrbenutzer-Schreibzugriff.
+- Verhalten unter Lastgrenzen: nicht relevant, kein Traffic-/Laufzeitbezug.
+- Leerer/übervoller Zustand: bereits im Zustands-Check behandelt (Leerzustand = frischer Server ohne `/var/log/caddy`), kein Duplikat.
+- Berechtigungen/Zugriffsschutz: Kern des Tickets, explizit durch AK1–AK3 abgedeckt.
+- Abwärtskompatibilität: AK4 (idempotenter Wiederholungslauf).
+- Rollback-/Wiederanlauffähigkeit: bereits durch Ampel-Frage 3 unten abgedeckt (rein additive, risikolos rückgängig zu machende Dokumentation).
+- Beobachtbarkeit im Fehlerfall: Ein fehlschlagender `chown`/`reload` bricht das Skript wegen `set -euo pipefail` sichtbar im Terminal ab, kein stiller Fehler.
+
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — alle 5 AKs strukturell vollständig geprüft (6 Dimensionen + 9-Kategorien-
+   Checkliste), keine Lücke gefunden; Kernbefund: Fix UND automatisierte Tests (3 pytest-Fälle)
+   waren bereits vollständig im Repo vorhanden, diese Spec dokumentiert den verifizierten
+   Ist-Zustand nachträglich, kein weiterer Code nötig.
+
+**Implementierungsoptionen:**
+
+### Option A — Ist-Zustand bestätigen und dokumentieren (empfohlen)
+- App-Wirkung: keine sichtbare App-Wirkung (reines Ops-/Deploy-Thema) — der Effekt zeigt sich ausschließlich bei einem künftigen Server-Neuaufbau, dann als Abwesenheit des „permission denied"-Fehlers.
+- Vorgehen: Diese Analyse-Sektion dokumentiert nachträglich den bereits vorhandenen Fix (`deploy/setup_server.sh` Z. 124–134) und die bereits vorhandene Testabsicherung (`backend/tests/test_task89_caddy_log_permissions.py`); keine weitere Code-Änderung.
+- Betroffene Dateien: nur `BACKLOG.md` (dieser Abschnitt).
+- Vorteile: kein Risiko, keine Redundanz, spiegelt exakt wider, was bereits verifiziert im Repo liegt.
+- Nachteile/Risiken: keine.
+- Aufwand: minimal (nur Dokumentation).
+
+### Option B — Zusätzlicher Regressionstest gegen Reihenfolge-Regression
+- App-Wirkung: identisch zu Option A, keine sichtbare App-Wirkung.
+- Vorgehen: Ein pytest-Test, der die textuelle Reihenfolge Caddy-Install → chown-Fix → Reload in `setup_server.sh` prüft.
+- Betroffene Dateien: `backend/tests/test_task89_caddy_log_permissions.py`.
+- Vorteile: automatisierte Absicherung gegen künftige versehentliche Umsortierung des Skripts.
+- Nachteile/Risiken: keine, sehr geringer Aufwand.
+- Aufwand: klein.
+- **Status: bereits umgesetzt** — die Datei existiert bereits mit exakt dieser Prüfung (3 Tests: Existenz+Besitzer, Reihenfolge-vor-Reload, Reihenfolge-nach-Caddy-Install).
+
+✅ **Empfehlung: Option A** — der unter Option B beschriebene Schutz ist bereits vollständig vorhanden; es ist keine weitere Implementierung nötig. Das Ticket kann nach Freigabe direkt auf „Done" wechseln, sobald die Spec-Dokumentation im Ticket steht (Status-Feld bleibt vorerst „In Analysis", das übernimmt der Hauptthread/Orchestrator).
+
+**🚦 Ampel-Prüfung:**
+1. Klarer Abstand zur Alternative? Ja — Option B ist bereits vollständig Teil des Ist-Zustands, es gibt also faktisch keine offene Alternative mehr zu Option A.
+2. Innerhalb des Tickets, keine Architektur-/Datenmodell-Änderung? Ja — reine Dokumentation, keine Code-Änderung nötig.
+3. Ohne Datenverlust rückgängig zu machen? Ja — reine Doku-Ergänzung in BACKLOG.md.
+4. Kein hohes Risiko laut Pre-Mortem? Ja — alle 4 Szenarien entweder bereits testabgesichert (1, 2) oder explizit als dokumentierte Scope-Grenze außerhalb der Kontrolle dieses Tickets (3, 4).
+5. Keine reine Geschmacks-/Optikfrage? Ja — sicherheitsrelevantes Ops-Thema, keine Optikfrage.
+
+🚦 Ampel-Ergebnis:
+🟢 Grün — autonome Umsetzung möglich
+
+**Testplan:**
+- Automatisiert (Harness): `backend/tests/test_task89_caddy_log_permissions.py` (bereits vorhanden, 3 Tests, Marker `offline`+`regression`) deckt AK1–AK3 ab:
+  - `test_creates_caddy_log_dir_with_correct_owner` (AK1)
+  - `test_log_dir_fix_runs_before_caddy_reload` (AK2)
+  - `test_log_dir_fix_runs_after_caddy_package_install` (AK3)
+  Konnte im Analyse-Sandbox nicht per echtem `pytest`-Lauf ausgeführt werden (keine Netzwerkverbindung für `pip install pytest` in der Geräte-Brücken-VM); stattdessen wurden alle drei Assertions Zeile für Zeile manuell gegen `deploy/setup_server.sh` nachvollzogen (siehe Code-Verifikation oben) — alle drei treffen zu. Ein echter `pytest`-Lauf sollte bei nächster Gelegenheit (lokale Entwicklungsumgebung/CI) nachgeholt werden, ist aber kein Blocker, da rein bestätigend.
+- Manuell: Bei nächstem echten Server-Neuaufbau (Hetzner) nach vollständigem `setup_server.sh`-Lauf: `stat -c '%U:%G' /var/log/caddy/fotoalert.log` → erwartet `caddy:caddy`; `systemctl status caddy` → erwartet `active (running)` ohne Fehlermeldung im Output von `setup_server.sh` (AK1, AK4).
+
+**Test-Gate (2026-08-09, echter Terminal-Lauf durch Stephan):** `pytest tests/test_task89_caddy_log_permissions.py -v` → **3 passed, 4 warnings in 18.47s** (Warnungen sind vorbestehende, unabhängige FastAPI-`on_event`-Deprecation-Hinweise, kein Bezug zu diesem Ticket). Alle drei Tests (AK1/AK2/AK3) damit real bestätigt, nicht nur per Code-Nachvollzug wie in der Analyse. Offen: Commit-/Release-Stand des bereits vorhandenen Fixes noch ungeklärt (git-Zugriff aus der Sandbox nicht erlaubt) — Stephan prüft das separat per `git status`.
+
 ---
 
-### TASK-90 · Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln `[ ]`
+### TASK-90 · Mehrfacher gleichzeitiger /opportunities-Abruf beim App-Start bündeln `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Done |
 | **Erstellt** | 2026-07-16 |
+
 
 **Beschreibung:** Beim App-Start ruft `web/index.html` den Endpunkt `/opportunities` aus mindestens drei verschiedenen Codestellen nahezu gleichzeitig auf (Aufrufer laut Konsolen-Stacktrace um die Zeilen 1982/7974/7977 — bitte im Zuge der Analyse-Phase per Grep/Read exakt verifizieren, nicht diese Zeilennummern ungeprüft übernehmen, Code kann sich seither verschoben haben). In Kombination mit dem Service Worker (der jede Anfrage selbst per `fetch()` abfängt, siehe `web/sw.js`) führt das zu mehreren parallelen ~1,16-MB-Antworten, spürbar langsamerem Laden und irreführenden (aber letztlich harmlosen) Konsolenfehlern in Safari bei den überzähligen doppelten Anfragen — beobachtet während der TASK-82-Testphase. Funktional lädt die App am Ende korrekt (eine der Anfragen kommt durch), es geht hier um Redundanz-Vermeidung/Ladezeit, nicht um einen kaputten Zustand.
 
 **User Story:** Als Nutzer, möchte ich, dass die App beim Start nicht mehrfach dieselben großen Daten lädt, sodass sie schneller startet.
 
 **Bezug:** Kein bestehendes Ticket zu diesem Punkt gefunden (Grep nach „opportunities" + „init(" in BACKLOG.md ohne Treffer außerhalb des auslösenden TASK-82-Vermerks). Beobachtung entstand während der TASK-82-Testphase (siehe dortiger Ticket-Vermerk „Eigenes Ticket für die Backlog-Inbox").
+
+
+**Scope:**
+Eingeschlossen: clientseitiger Schutz gegen mehrfache gleichzeitige identische GET-Anfragen an `/opportunities` (und generisch an `API.get()`), damit beim App-Start nicht mehrfach dieselbe ~1,16-MB-Antwort parallel geladen wird. Ausgeschlossen: Änderungen am Backend-Endpoint `/opportunities` selbst, Änderungen an der Antwortgröße/-struktur, die separate (deutlich größere) Redundanz bei `/locations` (9 Aufrufstellen im Code, siehe Fundstellen-Sweep) — wird nur als Nebeneffekt mitgeschützt, ist aber kein eigener Ticket-Scope und braucht keine eigene AK-Abdeckung hier.
+
+**⚠️ Offene Frage zur Ticket-Prämisse (Pflicht-Klärung, siehe Pre-Mortem/Code-Verifikation):**
+Die im Ticket beschriebenen „mindestens drei gleichzeitigen Codestellen" ließen sich im aktuellen Code (Stand 2026-08-09) NICHT nachweisen — siehe Code-Verifikation unten. Es existiert nur eine aktive Aufrufstelle für `/opportunities` beim Boot. Zwei mögliche Lesarten, Stephan muss vor Umsetzung wählen:
+- **Option 1 — Trotzdem umsetzen (empfohlen):** Ein genereller, risikoarmer In-Flight-Dedup-Schutz wird unabhängig von der genauen Aufrufstellenzahl gebaut. Er schützt sowohl vor dem historisch beobachteten Verhalten (evtl. durch inzwischen geänderten Code oder eine Safari-spezifische Service-Worker-Race entstanden, die sich per Grep nicht sehen lässt) als auch vor künftigen Regressionen. Aufwand ist gering, Risiko ist gering (siehe Pre-Mortem).
+- **Option 2 — Zurückstellen:** Ticket bleibt in „In Analysis" bzw. wird zurück in die Inbox verschoben, bis das Verhalten unter den ursprünglichen TASK-82-Testbedingungen (Safari, frischer Service-Worker-Install) erneut reproduziert und mit aktuellen Zeilennummern/Stacktrace belegt ist.
+Diese Spec ist für Option 1 ausgearbeitet; die Implementierungsphase sollte vor dem Start kurz bestätigen lassen, dass Option 1 gilt.
+
+**Stephans Entscheidung (2026-08-09):** Option 1 — trotzdem umsetzen (Option A, genereller In-Flight-Dedup in `API.get()`), obwohl die ursprüngliche 3-Aufrufstellen-Beobachtung im aktuellen Code nicht reproduzierbar war.
+
+**Akzeptanzkriterien:**
+- [x] AK1 (funktional, Kern): Fordern zwei Codestellen zur gleichen Zeit dieselbe Kombination aus Endpoint-Pfad und Parametern an (z. B. zweimal `/opportunities?min_score=0.7&days=14`), löst das höchstens eine tatsächliche Netzwerkanfrage aus — beide Aufrufer bekommen dieselbe Antwort, statt dass die zweite Anfrage einen eigenen Request startet.
+- [x] AK2 (funktional, Negativabgrenzung): Zwei gleichzeitige Aufrufe mit unterschiedlichen Parametern (z. B. Feed-Aufruf `/opportunities?min_score=0.7&days=14` und Location-Detail-Aufruf `/opportunities?location_id=42&days=30&min_score=0.3`) werden weiterhin unabhängig voneinander korrekt beantwortet — keiner bekommt die Antwort des jeweils anderen.
+- [x] AK3 (funktional, Zeitfenster): Der bestehende, bewusst verzögerte zweite `Feed.load()`-Aufruf 12 Sekunden nach App-Start (Wetter-Overlay-Refresh) läuft weiterhin als echter, neuer Netzwerk-Request und wird nicht fälschlich als Duplikat unterdrückt.
+- [x] AK4 (Edge Case, Fehlerfall): Schlägt die eine gebündelte Anfrage fehl (z. B. Netzwerkfehler, Server 500), bekommen alle wartenden Aufrufer denselben Fehler zurückgemeldet statt eines hängenden Promises; die bestehende Auto-Retry-Logik in `Feed.load()` (Wiederholung nach 2 s bei Fehlschlag) funktioniert danach unverändert.
+- [x] AK5 (Edge Case, Cleanup): Nach Abschluss einer Anfrage (Erfolg oder Fehler) wird der In-Flight-Merker sofort entfernt — ein weiterer Aufruf kurz danach (z. B. manueller Refresh) löst wieder eine frische Netzwerkanfrage aus und bekommt keine veraltete Antwort.
+- [x] AK6 (nicht-funktional/Performance): Bei gleichzeitigen identischen Aufrufen sinkt die Zahl paralleler Netzwerk-Requests im Browser-Network-Panel für dieselbe URL auf maximal 1, statt für jeden Aufrufer einen eigenen ~1,16-MB-Download zu starten.
+- [x] AK7 (Architektur/Rückwärtskompatibilität): Alle bestehenden Aufrufer von `API.get(...)` (u. a. `/locations`, `/calendar`, `/discover`, `/verifications`, `/ratings`, `/camera-profile`, `/job-status`) funktionieren nach der Änderung unverändert weiter — keine Signaturänderung an `API.get()`, kein Verhaltensunterschied bei nicht-parallelen (sequenziellen) Aufrufen.
+
+**Pre-Mortem:**
+
+📎 Code-Verifikation (gelesen am 2026-08-09, `web/index.html` [8441 Zeilen] und `web/sw.js` [43 Zeilen]):
+- Widerlegt: Die Ticket-Prämisse „mindestens drei verschiedene Codestellen rufen `/opportunities` beim App-Start nahezu gleichzeitig auf" ließ sich nicht bestätigen. Literalsuche nach `/opportunities` in `web/index.html` findet genau **zwei** Fetch-Aufrufstellen im gesamten File: Zeile 2060 (`Feed.load()`, Parameter `min_score`/`days=14`) und Zeile 7041 (Location-Detail-Aufruf, Parameter `location_id`/`days=30`/`min_score=0.3`). Nur Zeile 2060 gehört zum Boot-Pfad.
+- Bestätigt: Beim App-Start (`App.init()`, Zeile ~8296–8313) wird `Feed.load()` genau **einmal synchron** (Zeile 8307) und danach **einmal verzögert** über `setTimeout(..., 12000)` (Zeile 8310) aufgerufen — diese beiden Aufrufe liegen 12 Sekunden auseinander und sind damit nicht gleichzeitig. `CalendarView` (Zeile 2412) lädt über den separaten Endpoint `/calendar` (Zeile 2441), `Scout` (Zeile 2213 ff.) über `/discover` (Zeile 2244) — beide sind zusätzlich lazy (erst bei Tab-Wechsel), nicht Teil des Boot-Pfads.
+- Bestätigt: `API.get()` (Zeile 1708–1720) hat aktuell **keinerlei** In-Flight-Dedup oder Response-Cache — jeder Aufruf löst unbedingt einen neuen `fetch()` aus. Das ist die zentrale, wiederverwendbare Stelle für einen generischen Fix.
+- Bestätigt: `web/sw.js` fängt GET-Requests an `/api/`, `/opportunities`, `/locations`, `/daily-briefing` per `fetch(e.request)` ab (network-first, Zeile 18–20) — die Anfrage wird dabei nicht selbst vervielfacht, aber jede vom Client abgesetzte Anfrage läuft zusätzlich durch diesen Interception-Layer, was insbesondere in Safari während einer Service-Worker-Install/Activate-Race zu den in der Konsole beobachteten, aber harmlosen Doppel-Log-Einträgen führen kann (aus Code allein nicht abschließend nachweisbar, siehe „Offene Frage zur Ticket-Prämisse" oben).
+- Fundstellen-Sweep (Pflicht, Schritt 1b): Suchbegriff `opportunities` in `web/index.html` → 3 Treffer gesamt (2× Fetch-URL, 1× `res.opportunities` als Datenzugriff in `Scout.load()`, unabhängiger `/discover`-Endpoint). Sechs Ansichten-Klassen einzeln geprüft: **Liste/Feed** (Zeile 2060, betroffen/Kern des Tickets) · **Karte** (`MapView` nutzt `/locations` + `/weather-map`, kein `/opportunities`) · **Kalender** (`/calendar`, separater Endpoint, nicht betroffen) · **Scout** (`/discover`, separater Endpoint, nicht betroffen) · **Chancen-Übersicht** (= Feed, s. o.) · **Event-Detail** (Location-Detail, Zeile 7041, eigener Parametersatz, nicht Teil des Boot-Pfads, aber derselbe Endpoint — von AK2 explizit mit abgedeckt). Zusätzlicher Fund außerhalb des Ticket-Scopes: `/locations` wird an 9 Stellen im Code aufgerufen (Zeilen 5382, 6204, 6298, 6395, 6412, 6493, 6877, 6929, 8302) — deutlich größere Redundanz als bei `/opportunities`, aber nicht Teil dieses Tickets (siehe Scope).
+- Zustands-Check (Pflicht, Schritt 1b): Wartezustand — `Feed.load()` zeigt beim Boot keine eigene Ladeanzeige (bestehendes Verhalten, durch diesen Fix nicht verändert). Leerzustand — unverändert, Backend-Antwortformat/-inhalt wird durch den Dedup nicht beeinflusst. Fehlerfall — bestehender Auto-Retry nach 2 s (Zeile ~2072–2078) muss mit dem Dedup-Mechanismus zusammenspielen, siehe AK4.
+
+- 💀 Szenario: Der In-Flight-Cache-Key basiert nur auf dem Pfad `/opportunities` statt der vollständigen URL inkl. Query-String → der Feed-Aufruf (`min_score`/`days=14`) und der Location-Detail-Aufruf (`location_id`/`days=30`/`min_score=0.3`) würden sich gegenseitig die falsche Antwort liefern.
+  Auslöser: Zu grober Cache-Key.
+  Frühwarnung: Ein Test mit zwei gleichzeitigen, unterschiedlich parametrisierten `/opportunities`-Aufrufen zeigt identische (falsche) Antworten.
+  Gegenmaßnahme: Cache-Key = vollständige Request-URL (Pfad + Query-String) — verankert in AK1/AK2 + Testfall.
+- 💀 Szenario: Der geplante 12-Sekunden-Re-Fetch (Wetter-Overlay-Refresh) wird fälschlich als Duplikat erkannt und unterdrückt, wodurch aktualisiertes Wetter nie ankommt.
+  Auslöser: In-Flight-Map wird nicht sofort nach Abschluss des ersten Requests geleert, sondern bleibt darüber hinaus als Cache bestehen.
+  Frühwarnung: Nach 12 s taucht im Network-Panel kein neuer Request auf.
+  Gegenmaßnahme: Dedup gilt ausschließlich, solange das ursprüngliche Promise noch unbeantwortet ist; sofortiges Löschen des Map-Eintrags bei Erfolg/Fehler — verankert in AK3/AK5 + Testfall.
+- 💀 Szenario: Zwei Aufrufer teilen sich dieselbe Response-Objekt-Referenz; einer mutiert sie in-place (z. B. `sort()`), wodurch der andere unerwartet veränderte Daten sieht.
+  Auslöser: Beide Promises lösen mit derselben Objekt-Referenz auf, nicht mit einer Kopie.
+  Frühwarnung: Code-Review der beiden `/opportunities`-Aufrufer.
+  Gegenmaßnahme: Verifiziert — weder `Feed.load()` (`this.data = await API.get(url)`) noch der Location-Detail-Aufruf (`const data = await API.get(...)`) mutieren das Ergebnis in-place; als Randbedingung im Implementierungsplan festgehalten (keine in-place Mutation an geteilten Response-Objekten einführen).
+- 💀 Szenario: Die ursprünglich beobachteten „3 gleichzeitigen Aufrufe" bestehen unter echten Safari/iOS-Bedingungen (frischer Service-Worker-Install) weiterhin fort, weil sie durch eine Laufzeit-Race entstehen, die sich per statischer Codeanalyse nicht sehen lässt — der Fix würde dann am eigentlichen Problem vorbeigehen.
+  Auslöser: Statische Analyse kann SW-Install-Races nicht abbilden.
+  Frühwarnung: Nach dem Fix zeigt ein erneuter Safari-Test unter TASK-82-ähnlichen Bedingungen weiterhin doppelte Requests im Network-Panel.
+  Gegenmaßnahme: Implementierungsphase MUSS die Wirksamkeit gezielt im Browser (Network-Panel, nicht nur Backend-pytest) verifizieren — siehe Testplan.
+- 💀 Szenario: Der generische Dedup in `API.get()` wirkt sich unbeabsichtigt auf bereits zeitkritischen Code rund um `/locations` aus (z. B. die in BUG-27/BUG-28/BUG-30-Kommentaren dokumentierten Lade-Reihenfolge-Annahmen) und verändert dort unbemerkt Timing-Verhalten.
+  Auslöser: Generische Lösung wirkt breiter als der eigentliche Ticket-Scope (nur `/opportunities`).
+  Frühwarnung: Vollsystem-Regression nach der Implementierung.
+  Gegenmaßnahme: Pflicht-Vollsystem-Regressionstest vor Done (verankert in AK7 + Testplan); Dedup-Mechanismus wirkt nur auf tatsächlich zeitgleiche identische Requests, verändert sequenzielle Aufrufe nicht.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: Suchbegriff `opportunities` in web/index.html, 3 Treffer (2× Fetch-URL Zeile 2060/7041, 1× Datenzugriff `res.opportunities` in Scout.load()); 6 Ansichten-Klassen einzeln geprüft, nur Feed + Location-Detail betroffen (siehe Code-Verifikation oben)
+- [x] Zustands-Check: Warte-/Leer-/Fehlerfall je Kernschritt geprüft (siehe Code-Verifikation oben), Fehlerfall-Zusammenspiel mit Auto-Retry als eigenes AK4 verankert
+- [x] Pre-Mortem durchgeführt — inkl. Pflicht-Code-Verifikation, die die Ticket-Prämisse (3 gleichzeitige Aufrufstellen) nicht bestätigen konnte (siehe „Offene Frage zur Ticket-Prämisse" im Scope-Abschnitt)
+- [x] Architektur analysiert: web/index.html (API-Objekt Zeile 1708–1720, Feed-Objekt Zeile 2035 ff.), web/sw.js (Fetch-Interception Zeile 17–21)
+- [x] Designer-Check: visuell? → nein (rein interne Netzwerklogik, kein sichtbares Element) — übersprungen
+- [x] Implementierungsoptionen: A / B / C (siehe unten)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): alle 6 Dimensionen geprüft, keine Lücke offen; 9-Kategorien-Checkliste durchgegangen (Nebenläufigkeit = Kernscope, restliche mit Begründung nicht relevant/bereits abgedeckt); 1 optionale ⚠️ Annahme (kein Zusatz-Logging beim Dedup-Treffer) zur Bestätigung markiert
+
+**Architektur-Analyse:**
+Betroffen ist ausschließlich `web/index.html` (Frontend-JS, kein Backend-Python-Code, keine Datenbank). Zentrale Stelle: das `API`-Objekt (Zeile 1708–1745) mit der Methode `get(path)`, die aktuell direkt und ungeschützt `fetch(...)` aufruft — dies ist die einzige gemeinsame Stelle, durch die alle 18 verschiedenen `API.get(...)`-Aufrufstellen im Code laufen (siehe Grep-Liste: `/opportunities`, `/locations` [9×], `/calendar`, `/discover`, `/verifications`, `/ratings`, `/camera-profile`, `/weather-map`, `/reverse-geocode`, `/job-status`, `/recompute-status`), und damit der natürliche Ort für einen generischen In-Flight-Dedup. `web/sw.js` (43 Zeilen) fängt GET-Requests an `/opportunities` u. a. per network-first `fetch(e.request)` ab, dupliziert dabei aber selbst keine Anfrage — es ist ein zusätzlicher Interception-Layer, kein Multiplikator. Eine Bündelung direkt im Service Worker (Option C) wäre möglich, aber deutlich aufwändiger und riskanter zu testen als ein Fix im bereits einfachen, synchron nachvollziehbaren Frontend-Code.
+
+**Implementierungsoptionen:**
+
+### Option A — Genereller In-Flight-Dedup in `API.get()` (empfohlen)
+- Vorgehen: In `API.get()` eine `Map` von URL → laufendem Promise führen; ist für dieselbe vollständige URL (Pfad + Query-String) bereits ein Request unterwegs, wird dessen Promise zurückgegeben statt ein neuer `fetch()` gestartet; Eintrag wird bei Erfolg und bei Fehler sofort entfernt (kein dauerhafter Cache).
+- Betroffene Dateien: `web/index.html` (API-Objekt).
+- Vorteile: Schützt `/opportunities` UND alle anderen 17 `API.get()`-Aufrufstellen (inkl. der deutlich größeren `/locations`-Redundanz mit 9 Stellen) vor derselben Fehlerklasse, ohne dass jede Stelle einzeln angepasst werden muss; kleine, isolierte, gut testbare Änderung; kein Service-Worker-Versionsbump nötig.
+- Nachteile/Risiken: Wirkt breiter als der ursprüngliche Ticket-Scope — Risiko eines unbeabsichtigten Nebeneffekts auf bestehende, zeitkritische `/locations`-Ladepfade (siehe Pre-Mortem-Szenario 5); durch Pflicht-Vollsystem-Regression abgefedert.
+- Aufwand: klein.
+
+### Option B — Scoped Fix nur in `Feed.load()`
+- Vorgehen: Ein eigener In-Flight-Merker `Feed._loadPromise`, ausschließlich innerhalb der `Feed`-Komponente.
+- Betroffene Dateien: `web/index.html` (Feed-Objekt).
+- Vorteile: Minimalster Eingriff, kein Risiko für andere Endpoints.
+- Nachteile: Deckt weder den Location-Detail-Aufruf (Zeile 7041) noch künftige ähnliche Fälle ab; jeder neue Endpoint mit demselben Problem bräuchte eine eigene, duplizierte Lösung; löst die deutlich größere `/locations`-Redundanz nicht mit.
+- Aufwand: sehr klein.
+
+### Option C — Bündelung im Service Worker (`web/sw.js`)
+- Vorgehen: Im `fetch`-Event-Handler eine In-Flight-Map führen, die eine zweite gleichzeitige Anfrage an dieselbe URL auf die bereits laufende `fetch()`-Antwort umlenkt.
+- Betroffene Dateien: `web/sw.js`.
+- Vorteile: Würde auch nicht-JS-verursachte Duplikate abfangen (z. B. durch Browser-Prefetch); zentraler am tatsächlichen Netzwerkrand, den das Ticket selbst als Mitverursacher nennt.
+- Nachteile/Risiken: Service Worker sind fehleranfälliger zu ändern/debuggen (erfordert `CACHE_NAME`-Versionsbump zum sauberen Ausrollen); Verwaltung mehrerer wartender `fetch`-Events pro URL ist deutlich komplexer als ein Promise-Map im Hauptthread; deutlich höherer Aufwand für denselben Nutzen, ohne dass die Code-Verifikation echte JS-seitige Gleichzeitigkeit nachweisen konnte.
+- Aufwand: mittel.
+
+✅ Empfehlung: Option A — kleinster Aufwand bei größtem Nutzen (deckt zusätzlich die deutlich größere `/locations`-Redundanz ab), bleibt vollständig im bereits einfachen Frontend-Code, kein Service-Worker-Versionsbump nötig; das Restrisiko (Nebeneffekt auf `/locations`) wird durch die ohnehin verpflichtende Vollsystem-Regression abgefedert.
+
+**Testplan:**
+- [ ] Automatisiert (Harness): Reine Frontend-JS-Änderung ohne Backend-Endpoint-Berührung — kein neuer `pytest`-Fall in `backend/tests/` nötig. Empfehlung: Erweiterung von `backend/tests/frontend/run_frontend_check.py` um einen Playwright-Check, der beim App-Boot die Netzwerk-Requests mitschneidet und AK1/AK3/AK6 (max. 1 gleichzeitiger `/opportunities`-Request, echter Request nach 12 s) automatisiert prüft — lokal durch Stephan auszuführen (Sandbox hat laut PRODUCT.md kein Playwright/Chromium).
+- [ ] Manuell: `http://localhost:8000` öffnen, Chrome/Safari DevTools → Network-Panel, Filter auf „opportunities" setzen, Seite neu laden (harter Reload) → erwartet: genau 1 Request beim Boot, ein weiterer nach ca. 12 s (AK1/AK3/AK6). Danach in der Konsole `Promise.all([API.get("/opportunities?min_score=0.7&days=14"), API.get("/opportunities?min_score=0.7&days=14")])` ausführen → erwartet: nur 1 Netzwerk-Request im Panel, beide Promises lösen mit identischem Ergebnis auf (AK1). Anschließend `Promise.all([API.get("/opportunities?min_score=0.7&days=14"), API.get("/opportunities?location_id=1&days=30&min_score=0.3")])` → erwartet: 2 unabhängige Requests mit unterschiedlichen Antworten (AK2). Regressions-Matrix (PRODUCT.md Abschnitt 12) konsultieren: Backend-Change-Typ „Frontend/API-Layer" → zusätzlich Feed-Tab, Location-Detail, Orte-Tab (9× `/locations`) und Kalender-Tab manuell gegenprüfen, da diese ebenfalls über `API.get()` laufen.
+
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — Granularität/Polarität/Messbarkeit ok (7 AKs, je Rule mind. 1 Positiv- + 1 Negativ-/Grenzfall-Beleg); Vier-Kategorien-Abdeckung vollständig (funktional AK1/2/4/5, nicht-funktional/Performance AK6, Architektur/Rückwärtskompatibilität AK7, Sonstige/Compliance: nicht relevant — rein clientseitige Performance-Optimierung ohne Server-/Datenänderung); Testbarkeit ohne Rückfrage gegeben (konkrete URLs/Parameter/Zeitwerte); Herkunft jedes AK auf Pre-Mortem-Szenario zurückgeführt. Negativ-/Randfall-Checkliste: Nebenläufigkeit = Kernscope (AK1/2/5), Ungültige Eingaben/Fehlerfall = AK4, Grenzwerte/Lastgrenzen/Berechtigungen/Rollback = nicht relevant für diesen rein clientseitigen Read-Dedup (Begründung im Ticket), Abwärtskompatibilität = AK7, Beobachtbarkeit im Fehlerfall = bestehende console.warn-Pfade bleiben erhalten (⚠️ Annahme: kein zusätzliches Logging beim Dedup-Treffer — bitte bestätigen). Größter offener Punkt bleibt die widerlegte Ticket-Prämisse (siehe „Offene Frage zur Ticket-Prämisse" im Scope-Abschnitt) — kein AK-Qualitätsproblem, sondern eine Entscheidung, die vor der Implementierung an Stephan zurückgespielt wird.
+
+🚦 Ampel-Ergebnis:
+🔴 Rot — braucht Stephans Entscheidung: Prämisse/Scope (Ampel-Kriterium 1/5-Vorfrage), da die im Ticket beschriebene Kernursache („mindestens drei gleichzeitige Aufrufstellen beim Boot") sich im aktuellen Code nicht verifizieren ließ (nur 1 aktive Aufrufstelle beim Boot gefunden, siehe Pre-Mortem-Code-Verifikation) — Stephan muss vor der Implementierung zwischen Option 1 (defensiven Dedup trotzdem bauen) und Option 2 (zurückstellen/neu reproduzieren) wählen, bevor autonom weitergemacht wird. Die technische Umsetzung selbst (Option A) wäre für sich genommen risikoarm genug für 🟢, aber die Sonderfall-Regel „Ticket-Prämisse stimmt nicht mit Code überein" verlangt hier zwingend Stephans Entscheidung vor dem Start.
+
+**Test-Gate (2026-08-09):** Live-Browser-Verifikation gegen laufenden lokalen Server (http://localhost:8000) durch gate-auditor (Modus A) unabhaengig selbst reproduziert — AK1/AK2/AK4/AK5/AK6 sowie AK3 (echter 12s-Wartetest) live bestaetigt. Urteil: **Bestaetigt**, mit zwei benannten Einschraenkungen (AK7 nur an 1 von 23 API.get()-Aufrufstellen visuell geprueft; AK4-Retry-Pfad nicht am echten Fehlschlag isoliert getriggert) — strukturelles Restrisiko gering, siehe Diff (Rueckgabe-/Fehlervertrag unveraendert). Refactor-Phase abgeschlossen: IIFE-Pattern durch `.then()`-Chain ersetzt (Konsistenz mit bestehendem `CalendarView._monthCache`-Stil), refactor_check.py zeigt keinen neuen Befund. Aus der Verzeichniskopie zurueckgesynct: dabei eine zwischenzeitliche, unabhaengige Aenderung an denselben Datei (4x `onmousedown="event.preventDefault()"`-Entfernung an coord-confirm-btn, vermutlich US-134) im Original entdeckt und beim Zurueckschreiben bewusst erhalten (Patch neu gegen aktuellen Original-Stand angewendet statt Kopie stumpf zurueckzuschreiben).
+
+**Release-Gate (2026-08-09):** Code wurde beim Zurücksynchronisieren aus der Ticket-Verzeichniskopie unbeabsichtigt vom zeitgleichen US-134-Release mitgenommen (`release.sh` committet den kompletten Dateistand von `web/index.html`, nicht nur ticket-bezogene Hunks) — bestätigt per Inhaltsvergleich (`_inflightGet` bereits in HEAD-Commit `2754cd3` / v1.22.61 vorhanden, identische Dateigröße Arbeitskopie vs. HEAD). GitHub-Actions-Lauf „Deploy to Hetzner #304“ grün. Live auf https://fotoalert.stephanschumann.com verifiziert: `API._inflightGet` vorhanden und aktiv, `/health` → `status: ok`, `locations_count: 172`. Kein separater Release-Schritt mehr nötig.
 
 ---
 
