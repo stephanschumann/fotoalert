@@ -320,7 +320,6 @@ def analyze_frontend() -> dict:
         "ic",               # globale Top-Level Icon-Helper-Function — tatsächlich 4 Zeilen (TASK-49)
         "handler",          # Closure in ThemeManager.init() — tatsächlich 1 Zeile, komplett einzeilig (TASK-49)
         "verState",         # Closure in FilterSheet._render() — tatsächlich 5 Zeilen (TASK-49)
-        "sectorPath",       # Closure in IIFE mkCloudCompassSvg() — tatsächlich 11 Zeilen (TASK-49)
         "azDiffFn",         # Closure in Location-Detail-IIFE — tatsächlich 1 Zeile, komplett einzeilig (TASK-49)
         "sunAlignmentLabel",  # globale Top-Level-Function — tatsächlich 9 Zeilen (TASK-49)
         "localBoundsRadius",  # reine Berechnungsfunktion neben haversineKm — tatsächlich 10 Zeilen (US-117)

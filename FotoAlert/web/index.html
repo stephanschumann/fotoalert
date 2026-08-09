@@ -1626,7 +1626,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.61';
+const APP_VERSION = '1.22.62';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1841,6 +1841,11 @@ const ICONS = {
   'Sonnen-Alignment':      'i-sun',
   'Milchstraße':           'i-milkyway', 'Meteoritenschauer':     'i-meteor',
   'Sonnenfinsternis':      'i-eclipse',
+  // TASK-02: drei weitere Finsternis-Typen, dasselbe Icon wie 'Sonnenfinsternis'
+  // (AK-9, Designer-Entscheidung — Unterscheidung nur über den Titel/Label-Text).
+  'Partielle Sonnenfinsternis': 'i-eclipse',
+  'Mondfinsternis':             'i-eclipse',
+  'Partielle Mondfinsternis':   'i-eclipse',
   'Blaue Stunde Morgen':   'i-moon',     'Blaue Stunde Abend':    'i-moon',
   'Goldene Wolken':        'i-cloud',    'Himmelsröte':           'i-arc',
   'Rote Wolken':           'i-cloud',
@@ -3447,6 +3452,9 @@ const FilterSheet = {
     ['Milchstraße',           'Milchstraße'],
     ['Meteoritenschauer',     'Meteoritenschauer'],
     ['Sonnenfinsternis',      'Sonnenfinsternis'],
+    ['Partielle Sonnenfinsternis', 'Partielle Sonnenfinsternis'],
+    ['Mondfinsternis',             'Mondfinsternis'],
+    ['Partielle Mondfinsternis',   'Partielle Mondfinsternis'],
     ['Goldene Wolken',        'Goldene Wolken'],
     ['Himmelsröte',           'Himmelsröte'],
     ['Rote Wolken',           'Rote Wolken'],
@@ -4061,115 +4069,56 @@ function _haversineM(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// US-09: sightlineStatus (optional, 5. Parameter) steuert den Linienstil der Sichtachse
-// (subjLine unten) — durchgezogen (frei), gestrichelt (teilweise_verdeckt), unterbrochen
-// mit Balken (blockiert), gepunktet (nicht_geprueft/undefined). Reine Stil-Anpassung,
-// kein neues Icon-Set (siehe Design-Entscheidung BACKLOG.md US-09).
-// US-132: `zoneMode` ersetzt den bisherigen Boolean `isRedSky` — 'gc' (Goldene Wolken,
-// Zone um die Sonne, Gold), 'rs' (Himmelsröte/RED_SKY, Zone um den Gegenpunkt der
-// Sonne, Rot) oder 'rc' (Rote Wolken/RED_CLOUDS, Zone um die Sonne wie 'gc', aber Rot —
-// gleicher Sonnenstand-Farbcode wie 'rs', siehe Design-Entscheidung BACKLOG.md US-132).
-function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus) {
-  const SIGHTLINE_DASH = {
-    frei: null,
-    teilweise_verdeckt: '5 4',
-    blockiert: '9 3 2 3',
-    nicht_geprueft: '1.5 4',
-  };
-  const axisDash = SIGHTLINE_DASH[sightlineStatus] !== undefined
-    ? SIGHTLINE_DASH[sightlineStatus] : SIGHTLINE_DASH.nicht_geprueft;
-  // H erweitert (US-113-Folgefix): Sicherheitsabstand zw. Kreisrand (inkl. Cardinal-Labels bei S,
-  // äußerster Punkt = cy+R+18+4.5 = 250.5) und Legende, damit Pfeilspitzen (max. r=107) die Legende
-  // bei keinem Winkel erreichen. Puffer 12px = etabliertes Bauhaus-Spacing-Muster im File
-  // (vgl. margin-top:12px an anderen UI-Blöcken). Kreis (R) und cx unveraendert.
-  const W = 240, H = 284, cx = 120, cy = 120, R = 108;
-  // Convert azimuth (0=N, clockwise) to SVG angle (0=up, clockwise)
-  const azToRad = az => (az - 90) * Math.PI / 180;
-  const pt = (az, r) => {
-    const a = azToRad(az);
-    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
-  };
+// TASK-58: mkCloudCompassSvg()-Hilfsfunktionen (Top-Level-Helper-Extraktion, Option A).
+// cx/cy/R sind bewusst KEINE Modul-globalen Konstanten (analog _haversineM() oben) —
+// sie bleiben lokale const in mkCloudCompassSvg() und werden an jeden Helfer, der sie
+// braucht, explizit als Parameter durchgereicht.
 
-  // Sector path: arc from startAz to endAz, outer radius rO, inner rI
-  function sectorPath(startAz, endAz, rO, rI) {
-    // Normalize span
-    let span = ((endAz - startAz) + 360) % 360;
-    if (span === 0) span = 360;
-    const large = span > 180 ? 1 : 0;
-    const [x1o, y1o] = pt(startAz, rO);
-    const [x2o, y2o] = pt(endAz,   rO);
-    const [x1i, y1i] = pt(startAz, rI);
-    const [x2i, y2i] = pt(endAz,   rI);
-    return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rO} ${rO} 0 ${large} 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rI} ${rI} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
-  }
+// Convert azimuth (0=N, clockwise) to SVG angle (0=up, clockwise)
+function _ccAzToRad(az) {
+  return (az - 90) * Math.PI / 180;
+}
+function _ccPt(az, r, cx, cy) {
+  const a = _ccAzToRad(az);
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
 
-  // Zone: GOLDEN_CLOUDS ('gc') = ±30° around sunAz (Alpenglühen, Streulicht um die Sonne).
-  // RED_SKY ('rs', US-113, korrigiert 2026-07-02) = ±RED_SKY_AZ_TOLERANCE um den GEGENPUNKT
-  // der Sonne (Gegendämmerung/Belt of Venus entsteht gegenüber der Sonne, nicht bei ihr —
-  // siehe BACKLOG.md US-113). RED_CLOUDS ('rc', US-132) = ±30° um die Sonne wie 'gc'
-  // (Wolken glühen in Sonnenrichtung), aber in Rot statt Gold (Sonne bereits unter dem
-  // Horizont — Design-Entscheidung BACKLOG.md US-132: gleicher Farbcode wie 'rs').
-  // Nebenkorrektur US-132: hartcodierter Hex-Wert #ef4444 durch das Token --red ersetzt.
-  // Der Token-Wert wird zur Laufzeit per getComputedStyle aufgelöst und als konkreter
-  // Farbwert ins SVG geschrieben (nicht als rohes var(...) in ein SVG-Attribut) — CSS-
-  // Variablen werden in dynamisch per innerHTML eingefügten SVG-Attributen in Safari/
-  // WebKit nicht zuverlässig aufgelöst (siehe Memory reference_svg_layout_gotchas). So
-  // bleibt --red die einzige Quelle der Wahrheit (Hell/Dunkel-Theme wird respektiert),
-  // ohne den bekannten Rendering-Gotcha zu riskieren.
-  const redTokenValue = (typeof getComputedStyle === 'function')
-    ? (getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#c8472f')
-    : '#c8472f';
+// Sector path: arc from startAz to endAz, outer radius rO, inner rI
+function _ccSectorPath(startAz, endAz, rO, rI, cx, cy) {
+  // Normalize span
+  let span = ((endAz - startAz) + 360) % 360;
+  if (span === 0) span = 360;
+  const large = span > 180 ? 1 : 0;
+  const [x1o, y1o] = _ccPt(startAz, rO, cx, cy);
+  const [x2o, y2o] = _ccPt(endAz,   rO, cx, cy);
+  const [x1i, y1i] = _ccPt(startAz, rI, cx, cy);
+  const [x2i, y2i] = _ccPt(endAz,   rI, cx, cy);
+  return `M ${x1o.toFixed(2)} ${y1o.toFixed(2)} A ${rO} ${rO} 0 ${large} 1 ${x2o.toFixed(2)} ${y2o.toFixed(2)} L ${x2i.toFixed(2)} ${y2i.toFixed(2)} A ${rI} ${rI} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)} Z`;
+}
+
+// Zone: GOLDEN_CLOUDS ('gc') = ±30° around sunAz (Alpenglühen, Streulicht um die Sonne).
+// RED_SKY ('rs', US-113, korrigiert 2026-07-02) = ±RED_SKY_AZ_TOLERANCE um den GEGENPUNKT
+// der Sonne (Gegendämmerung/Belt of Venus entsteht gegenüber der Sonne, nicht bei ihr —
+// siehe BACKLOG.md US-113). RED_CLOUDS ('rc', US-132) = ±30° um die Sonne wie 'gc'
+// (Wolken glühen in Sonnenrichtung), aber in Rot statt Gold (Sonne bereits unter dem
+// Horizont — Design-Entscheidung BACKLOG.md US-132: gleicher Farbcode wie 'rs').
+// Nebenkorrektur US-132: hartcodierter Hex-Wert #ef4444 durch das Token --red ersetzt.
+// redTokenValue wird von mkCloudCompassSvg() genau einmal per getComputedStyle aufgelöst
+// und hierher durchgereicht (kein erneuter DOM-Style-Read pro Helfer, siehe Pre-Mortem
+// Szenario 5).
+function _ccZonePath(zoneMode, sunAz, redTokenValue, cx, cy) {
   const RED_SKY_AZ_TOLERANCE = 30; // muss mit backend/calculations/weather.py RED_SKY_AZIMUTH_TOLERANCE_DEG uebereinstimmen
-  let zonePath = '';
   if (zoneMode === 'rs') {
     const antisolarAz = (sunAz + 180) % 360;
-    zonePath = `<path d="${sectorPath(antisolarAz - RED_SKY_AZ_TOLERANCE, antisolarAz + RED_SKY_AZ_TOLERANCE, 104, 22)}" fill="${redTokenValue}" fill-opacity="0.18" stroke="${redTokenValue}" stroke-opacity="0.5" stroke-width="1.2"/>`;
+    return `<path d="${_ccSectorPath(antisolarAz - RED_SKY_AZ_TOLERANCE, antisolarAz + RED_SKY_AZ_TOLERANCE, 104, 22, cx, cy)}" fill="${redTokenValue}" fill-opacity="0.18" stroke="${redTokenValue}" stroke-opacity="0.5" stroke-width="1.2"/>`;
   } else if (zoneMode === 'rc') {
-    zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="${redTokenValue}" fill-opacity="0.22" stroke="${redTokenValue}" stroke-opacity="0.6" stroke-width="1.2"/>`;
-  } else {
-    zonePath = `<path d="${sectorPath(sunAz - 30, sunAz + 30, 104, 22)}" fill="#d4860a" fill-opacity="0.22" stroke="#d4860a" stroke-opacity="0.6" stroke-width="1.2"/>`;
+    return `<path d="${_ccSectorPath(sunAz - 30, sunAz + 30, 104, 22, cx, cy)}" fill="${redTokenValue}" fill-opacity="0.22" stroke="${redTokenValue}" stroke-opacity="0.6" stroke-width="1.2"/>`;
   }
+  return `<path d="${_ccSectorPath(sunAz - 30, sunAz + 30, 104, 22, cx, cy)}" fill="#d4860a" fill-opacity="0.22" stroke="#d4860a" stroke-opacity="0.6" stroke-width="1.2"/>`;
+}
 
-  // Sun arrow (from center to r=95, arrowhead, sun circle)
-  const [sax, say] = pt(sunAz, 95);
-  const [sax2, say2] = pt(sunAz, 107);
-  const sunColor = '#d4860a';
-  // Arrowhead points
-  const arrowAngle = azToRad(sunAz);
-  const perpA = arrowAngle + Math.PI / 2;
-  const tipX = sax.toFixed(2), tipY = say.toFixed(2);
-  const ah1x = (sax - 10 * Math.cos(arrowAngle) + 5 * Math.cos(perpA)).toFixed(2);
-  const ah1y = (say - 10 * Math.sin(arrowAngle) + 5 * Math.sin(perpA)).toFixed(2);
-  const ah2x = (sax - 10 * Math.cos(arrowAngle) - 5 * Math.cos(perpA)).toFixed(2);
-  const ah2y = (say - 10 * Math.sin(arrowAngle) - 5 * Math.sin(perpA)).toFixed(2);
-
-  const sunArrow = `
-    <line x1="${cx}" y1="${cy}" x2="${(sax - 8 * Math.cos(arrowAngle)).toFixed(2)}" y2="${(say - 8 * Math.sin(arrowAngle)).toFixed(2)}"
-      stroke="${sunColor}" stroke-width="2.2" stroke-linecap="round"/>
-    <polygon points="${tipX},${tipY} ${ah1x},${ah1y} ${ah2x},${ah2y}" fill="${sunColor}"/>
-    <circle cx="${sax2.toFixed(2)}" cy="${say2.toFixed(2)}" r="5" fill="${sunColor}" fill-opacity="0.9"/>`;
-
-  // Subject azimuth dashed line with arrowhead toward subject
-  let subjLine = '';
-  if (subjectAz != null) {
-    const [s1x, s1y] = pt(subjectAz, 95);       // Motiv-Seite (Pfeilspitze)
-    const [s2x, s2y] = pt(subjectAz + 180, 95); // Rückseite (Standort-Seite)
-    const sAng = azToRad(subjectAz);
-    const sPerpA = sAng + Math.PI / 2;
-    // Pfeilspitze an Motiv-Seite
-    const sAh1x = (s1x - 9 * Math.cos(sAng) + 4.5 * Math.cos(sPerpA)).toFixed(2);
-    const sAh1y = (s1y - 9 * Math.sin(sAng) + 4.5 * Math.sin(sPerpA)).toFixed(2);
-    const sAh2x = (s1x - 9 * Math.cos(sAng) - 4.5 * Math.cos(sPerpA)).toFixed(2);
-    const sAh2y = (s1y - 9 * Math.sin(sAng) - 4.5 * Math.sin(sPerpA)).toFixed(2);
-    // US-09: dasharray je Sichtachsen-Status statt fest "5 4" (siehe axisDash oben).
-    const axisDashAttr = axisDash ? ` stroke-dasharray="${axisDash}"` : '';
-    subjLine = `
-      <line x1="${s2x.toFixed(2)}" y1="${s2y.toFixed(2)}" x2="${(s1x - 7 * Math.cos(sAng)).toFixed(2)}" y2="${(s1y - 7 * Math.sin(sAng)).toFixed(2)}"
-        stroke="#5272c0" stroke-width="1.8"${axisDashAttr} stroke-linecap="round" opacity="0.85"/>
-      <polygon points="${s1x.toFixed(2)},${s1y.toFixed(2)} ${sAh1x},${sAh1y} ${sAh2x},${sAh2y}" fill="#5272c0" opacity="0.85"/>`;
-    // (Entfernung wird als HTML unterhalb des SVG angezeigt, nicht im SVG)
-  }
-
+// SVG-Grundgerüst: Ringe + Haupt-/Nebenhimmelsrichtungs-Ticks + Labels + Mittelpunkt.
+function _ccBase(cx, cy, R) {
   // Compass rings
   const rings = `
     <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#888" stroke-opacity="0.35" stroke-width="1.2"/>
@@ -4185,25 +4134,72 @@ function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatu
   ];
   let ticks = '', labels = '';
   for (const c of cardinals) {
-    const [tx1, ty1] = pt(c.az, R - 4);
-    const [tx2, ty2] = pt(c.az, R + 6);
+    const [tx1, ty1] = _ccPt(c.az, R - 4, cx, cy);
+    const [tx2, ty2] = _ccPt(c.az, R + 6, cx, cy);
     ticks += `<line x1="${tx1.toFixed(2)}" y1="${ty1.toFixed(2)}" x2="${tx2.toFixed(2)}" y2="${ty2.toFixed(2)}" stroke="${c.color}" stroke-width="${c.bold ? 2 : 1.2}"/>`;
-    const [lx, ly] = pt(c.az, R + 18);
+    const [lx, ly] = _ccPt(c.az, R + 18, cx, cy);
     labels += `<text x="${lx.toFixed(2)}" y="${(ly + 4.5).toFixed(2)}" text-anchor="middle" font-size="11" font-weight="${c.bold ? '700' : '400'}" fill="${c.color}">${c.lbl}</text>`;
   }
   // Intercardinal ticks (NE, SE, SW, NW)
   for (const az of [45, 135, 225, 315]) {
-    const [tx1, ty1] = pt(az, R - 3);
-    const [tx2, ty2] = pt(az, R + 4);
+    const [tx1, ty1] = _ccPt(az, R - 3, cx, cy);
+    const [tx2, ty2] = _ccPt(az, R + 4, cx, cy);
     ticks += `<line x1="${tx1.toFixed(2)}" y1="${ty1.toFixed(2)}" x2="${tx2.toFixed(2)}" y2="${ty2.toFixed(2)}" stroke="#888" stroke-opacity="0.4" stroke-width="0.9"/>`;
   }
 
   // Center dot
   const centerDot = `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#555"/>`;
 
-  // Legend (US-113-Folgefix: Y-Positionen um 12px-Sicherheitspuffer nach unten verschoben,
-  // damit Pfeilspitzen der Sichtachse/Sonne bei keinem Winkel mit der Legende kollidieren.
-  // Inhalt/Farben/Zeilenabstand unveraendert.)
+  return { rings, ticks, labels, centerDot };
+}
+
+// Sun arrow (from center to r=95, arrowhead, sun circle)
+function _ccSunArrow(sunAz, cx, cy) {
+  const [sax, say] = _ccPt(sunAz, 95, cx, cy);
+  const [sax2, say2] = _ccPt(sunAz, 107, cx, cy);
+  const sunColor = '#d4860a';
+  // Arrowhead points
+  const arrowAngle = _ccAzToRad(sunAz);
+  const perpA = arrowAngle + Math.PI / 2;
+  const tipX = sax.toFixed(2), tipY = say.toFixed(2);
+  const ah1x = (sax - 10 * Math.cos(arrowAngle) + 5 * Math.cos(perpA)).toFixed(2);
+  const ah1y = (say - 10 * Math.sin(arrowAngle) + 5 * Math.sin(perpA)).toFixed(2);
+  const ah2x = (sax - 10 * Math.cos(arrowAngle) - 5 * Math.cos(perpA)).toFixed(2);
+  const ah2y = (say - 10 * Math.sin(arrowAngle) - 5 * Math.sin(perpA)).toFixed(2);
+
+  return `
+    <line x1="${cx}" y1="${cy}" x2="${(sax - 8 * Math.cos(arrowAngle)).toFixed(2)}" y2="${(say - 8 * Math.sin(arrowAngle)).toFixed(2)}"
+      stroke="${sunColor}" stroke-width="2.2" stroke-linecap="round"/>
+    <polygon points="${tipX},${tipY} ${ah1x},${ah1y} ${ah2x},${ah2y}" fill="${sunColor}"/>
+    <circle cx="${sax2.toFixed(2)}" cy="${say2.toFixed(2)}" r="5" fill="${sunColor}" fill-opacity="0.9"/>`;
+}
+
+// Subject azimuth dashed line with arrowhead toward subject
+function _ccSubjectLine(subjectAz, axisDash, cx, cy) {
+  if (subjectAz == null) return '';
+  const [s1x, s1y] = _ccPt(subjectAz, 95, cx, cy);       // Motiv-Seite (Pfeilspitze)
+  const [s2x, s2y] = _ccPt(subjectAz + 180, 95, cx, cy); // Rückseite (Standort-Seite)
+  const sAng = _ccAzToRad(subjectAz);
+  const sPerpA = sAng + Math.PI / 2;
+  // Pfeilspitze an Motiv-Seite
+  const sAh1x = (s1x - 9 * Math.cos(sAng) + 4.5 * Math.cos(sPerpA)).toFixed(2);
+  const sAh1y = (s1y - 9 * Math.sin(sAng) + 4.5 * Math.sin(sPerpA)).toFixed(2);
+  const sAh2x = (s1x - 9 * Math.cos(sAng) - 4.5 * Math.cos(sPerpA)).toFixed(2);
+  const sAh2y = (s1y - 9 * Math.sin(sAng) - 4.5 * Math.sin(sPerpA)).toFixed(2);
+  // US-09: dasharray je Sichtachsen-Status statt fest "5 4" (siehe axisDash, von
+  // mkCloudCompassSvg() unveraendert per !== undefined-Pruefung durchgereicht).
+  const axisDashAttr = axisDash ? ` stroke-dasharray="${axisDash}"` : '';
+  // (Entfernung wird als HTML unterhalb des SVG angezeigt, nicht im SVG)
+  return `
+      <line x1="${s2x.toFixed(2)}" y1="${s2y.toFixed(2)}" x2="${(s1x - 7 * Math.cos(sAng)).toFixed(2)}" y2="${(s1y - 7 * Math.sin(sAng)).toFixed(2)}"
+        stroke="#5272c0" stroke-width="1.8"${axisDashAttr} stroke-linecap="round" opacity="0.85"/>
+      <polygon points="${s1x.toFixed(2)},${s1y.toFixed(2)} ${sAh1x},${sAh1y} ${sAh2x},${sAh2y}" fill="#5272c0" opacity="0.85"/>`;
+}
+
+// Legend (US-113-Folgefix: Y-Positionen um 12px-Sicherheitspuffer nach unten verschoben,
+// damit Pfeilspitzen der Sichtachse/Sonne bei keinem Winkel mit der Legende kollidieren.
+// Inhalt/Farben/Zeilenabstand unveraendert.)
+function _ccLegend(zoneMode, subjectAz, redTokenValue) {
   const legendItems = zoneMode === 'rs'
     ? `<text x="8" y="263" font-size="10" fill="${redTokenValue}">● Günstige Zone (±30° zum Gegenpunkt)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`
     : zoneMode === 'rc'
@@ -4211,8 +4207,11 @@ function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatu
     : `<text x="8" y="263" font-size="10" fill="#d4860a">● Goldene Zone (±30°)</text><text x="8" y="275" font-size="10" fill="#d4860a">→ Sonne</text>`;
   const subjLegend = subjectAz != null
     ? `<text x="120" y="263" font-size="10" fill="#5272c0">- - Sichtachse</text>` : '';
+  return { legendItems, subjLegend };
+}
 
-  // Entfernungszeile + ggf. Hinweis bei sehr kurzem Motiv-Abstand
+// Entfernungszeile + ggf. Hinweis bei sehr kurzem Motiv-Abstand
+function _ccDistanceHtml(subjectAz, distanceM) {
   let distHtml = '';
   if (subjectAz != null) {
     const distTxt = (distanceM != null && distanceM > 0)
@@ -4225,6 +4224,51 @@ function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatu
       distHtml += `<p style="font-size:11px;color:#b07a12;margin:6px 0 0;padding:6px 10px;background:rgba(176,122,18,.1);border-radius:6px;border:1px solid rgba(176,122,18,.25);line-height:1.5">⚠ Motiv sehr nah — Wolken wirken als eigenständiges Motiv, nicht als direkter Hintergrund.</p>`;
     }
   }
+  return distHtml;
+}
+
+// US-09: sightlineStatus (optional, 5. Parameter) steuert den Linienstil der Sichtachse
+// (subjLine unten) — durchgezogen (frei), gestrichelt (teilweise_verdeckt), unterbrochen
+// mit Balken (blockiert), gepunktet (nicht_geprueft/undefined). Reine Stil-Anpassung,
+// kein neues Icon-Set (siehe Design-Entscheidung BACKLOG.md US-09).
+// US-132: `zoneMode` ersetzt den bisherigen Boolean `isRedSky` — 'gc' (Goldene Wolken,
+// Zone um die Sonne, Gold), 'rs' (Himmelsröte/RED_SKY, Zone um den Gegenpunkt der
+// Sonne, Rot) oder 'rc' (Rote Wolken/RED_CLOUDS, Zone um die Sonne wie 'gc', aber Rot —
+// gleicher Sonnenstand-Farbcode wie 'rs', siehe Design-Entscheidung BACKLOG.md US-132).
+// TASK-58: Rumpf auf 8 Top-Level-Helfer (_cc*, direkt oberhalb) aufgeteilt — Signatur,
+// Aufrufreihenfolge der Fragmente (AK6) und Rückgabewert-Form unveraendert.
+function mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus) {
+  const SIGHTLINE_DASH = {
+    frei: null,
+    teilweise_verdeckt: '5 4',
+    blockiert: '9 3 2 3',
+    nicht_geprueft: '1.5 4',
+  };
+  const axisDash = SIGHTLINE_DASH[sightlineStatus] !== undefined
+    ? SIGHTLINE_DASH[sightlineStatus] : SIGHTLINE_DASH.nicht_geprueft;
+  // H erweitert (US-113-Folgefix): Sicherheitsabstand zw. Kreisrand (inkl. Cardinal-Labels bei S,
+  // äußerster Punkt = cy+R+18+4.5 = 250.5) und Legende, damit Pfeilspitzen (max. r=107) die Legende
+  // bei keinem Winkel erreichen. Puffer 12px = etabliertes Bauhaus-Spacing-Muster im File
+  // (vgl. margin-top:12px an anderen UI-Blöcken). Kreis (R) und cx unveraendert.
+  const W = 240, H = 284, cx = 120, cy = 120, R = 108;
+
+  // redTokenValue wird zur Laufzeit per getComputedStyle aufgelöst und als konkreter
+  // Farbwert ins SVG geschrieben (nicht als rohes var(...) in ein SVG-Attribut) — CSS-
+  // Variablen werden in dynamisch per innerHTML eingefügten SVG-Attributen in Safari/
+  // WebKit nicht zuverlässig aufgelöst (siehe Memory reference_svg_layout_gotchas). So
+  // bleibt --red die einzige Quelle der Wahrheit (Hell/Dunkel-Theme wird respektiert),
+  // ohne den bekannten Rendering-Gotcha zu riskieren. Genau einmal berechnet und an die
+  // Helfer durchgereicht (Pre-Mortem Szenario 5), nicht in jedem Helfer neu ermittelt.
+  const redTokenValue = (typeof getComputedStyle === 'function')
+    ? (getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#c8472f')
+    : '#c8472f';
+
+  const zonePath = _ccZonePath(zoneMode, sunAz, redTokenValue, cx, cy);
+  const { rings, ticks, labels, centerDot } = _ccBase(cx, cy, R);
+  const subjLine = _ccSubjectLine(subjectAz, axisDash, cx, cy);
+  const sunArrow = _ccSunArrow(sunAz, cx, cy);
+  const { legendItems, subjLegend } = _ccLegend(zoneMode, subjectAz, redTokenValue);
+  const distHtml = _ccDistanceHtml(subjectAz, distanceM);
 
   // Anzeigehöhe an neues viewBox-Seitenverhältnis (240:284) angepasst, sonst Stauchung/Verzerrung
   // des Kreises trotz unveränderter viewBox-Breite (US-113-Folgefix).
@@ -4955,7 +4999,7 @@ const Detail = {
         // Backend es auch für Goldene/Blaue Stunde & Milchstraße setzt (Motiv-Geometrie +
         // Sonnen-/Himmelsposition vorhanden). Daher zusätzlich die Nicht-Alignment-Typen
         // ausschließen — Spiegel von precompute._ALIGNMENT_FILTER_EXEMPT.
-        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Blaue Stunde Morgen','Milchstraße','Meteoritenschauer','Sonnenfinsternis','Goldene Wolken','Himmelsröte','Rote Wolken']);
+        const EV_SKYPOS_EXEMPT = new Set(['Goldene Stunde Morgen','Goldene Stunde Abend','Blaue Stunde','Blaue Stunde Morgen','Milchstraße','Meteoritenschauer','Sonnenfinsternis','Partielle Sonnenfinsternis','Mondfinsternis','Partielle Mondfinsternis','Goldene Wolken','Himmelsröte','Rote Wolken']);
         const ca = o.composition_analysis;
         if (!ca || EV_SKYPOS_EXEMPT.has(o.event_type)) return '';
         const body = ca.body_name || 'Objekt';
@@ -5481,8 +5525,8 @@ const MapView = {
         } else {
           // Fallback: possible_bodies (Feed noch nicht geladen)
           const pb = Array.isArray(loc.possible_bodies) ? loc.possible_bodies : [];
-          const MOON_TYPES = ['Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Vollmond', 'Neumond', 'Supermond', 'Blutmond', 'Mondfinsternis'];
-          const SUN_TYPES  = ['Sonnen-Alignment', 'Sonnenaufgang', 'Sonnenuntergang', 'Sonnenfinsternis'];
+          const MOON_TYPES = ['Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Vollmond', 'Neumond', 'Supermond', 'Blutmond', 'Mondfinsternis', 'Partielle Mondfinsternis'];
+          const SUN_TYPES  = ['Sonnen-Alignment', 'Sonnenaufgang', 'Sonnenuntergang', 'Sonnenfinsternis', 'Partielle Sonnenfinsternis'];
           const needsMoon = activeTypes.some(t => MOON_TYPES.includes(t));
           const needsSun  = activeTypes.some(t => SUN_TYPES.includes(t));
           const hasBodylessType = activeTypes.some(t => !MOON_TYPES.includes(t) && !SUN_TYPES.includes(t));
@@ -7877,7 +7921,11 @@ const ElementInfo = {
     'Sonnen-Alignment':      { title: 'Sonnen-Alignment', html: '<p>Die Sonne erscheint exakt in der Sichtachse zwischen Fotograf-Standort und Motiv — z. B. beim Auf- oder Untergang genau hinter einem Wahrzeichen.</p>' },
     'Milchstraße':           { title: 'Milchstraße', html: '<p>Das galaktische Zentrum ist bei ausreichend dunklem Himmel und geringer Mondstörung sichtbar — Chance für Astro-Aufnahmen.</p>' },
     'Meteoritenschauer':     { title: 'Meteoritenschauer', html: '<p>Ein bekannter Sternschnuppen-Schauer erreicht sein Aktivitätsmaximum — Chance auf sichtbare Meteore, am besten bei dunklem Himmel.</p>' },
-    'Sonnenfinsternis':      { title: 'Sonnenfinsternis', html: '<p>Der Mond schiebt sich vor die Sonne — ein seltenes, zeitlich sehr präzises Ereignis.</p>' },
+    'Sonnenfinsternis':      { title: 'Sonnenfinsternis', html: '<p>Der Mond schiebt sich vollständig vor die Sonne — ein seltenes, zeitlich sehr präzises Ereignis.</p>' },
+    // TASK-02: drei weitere Finsternis-Typen, analog zur bestehenden "Sonnenfinsternis"-Erklärung.
+    'Partielle Sonnenfinsternis': { title: 'Partielle Sonnenfinsternis', html: '<p>Der Mond schiebt sich nur teilweise vor die Sonne — die Totalität wird von diesem Standort aus nicht erreicht, aber ND-Filter sind trotzdem zwingend nötig.</p>' },
+    'Mondfinsternis':             { title: 'Mondfinsternis', html: '<p>Der Mond taucht vollständig in den Erdschatten ein ("Blutmond") — ein seltenes, zeitlich sehr präzises Ereignis, ohne ND-Filter fotografierbar.</p>' },
+    'Partielle Mondfinsternis':   { title: 'Partielle Mondfinsternis', html: '<p>Der Mond taucht nur teilweise in den Erdschatten ein — ein Teil der Mondoberfläche bleibt hell.</p>' },
     'Goldene Wolken':        { title: 'Goldene Wolken', html: '<p>Die Wolkenverteilung zur Goldenen Stunde steht günstig, um golden angeleuchtet zu werden — die Wolken stehen dabei hinter dem Motiv in Sonnenrichtung (± 30°), die Sonne selbst steht noch nahe dem Horizont. Anders als „Rote Wolken" (Sonne bereits untergegangen) und „Himmelsröte" (Blick zum Himmel gegenüber der Sonne).</p>' },
     // US-132/AK-11: Text korrigiert — beschrieb bislang fälschlich das Rote-Wolken-Verhalten
     // (hohe Wolken/Cirrus in Sonnenrichtung). Himmelsröte (RED_SKY) ist tiefe/mittlere

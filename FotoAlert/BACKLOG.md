@@ -25,18 +25,19 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **TASK-58** *(Lange Funktion mkCloudCompassSvg() in web/index.html)* · **TASK-88** *(Release-Skript: Merge-Konflikt darf keinen Ad-hoc-Commit ohne Standard-Message/Tag hinterlassen)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **TASK-88** *(Release-Skript: Merge-Konflikt darf keinen Ad-hoc-Commit ohne Standard-Message/Tag hinterlassen)* · **TASK-93** *(Backlog-Datenqualität: rund 147 alte Tickets ohne Status-Feld nachpflegen, Fund aus WS-018)* · **TASK-94** *(main.py::_load_custom_locations() nutzt nicht coerce_category_value() und ist nicht pro Eintrag abgesichert, Fund aus BUG-84-Verifikation)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | US-38 · **TASK-95** · **TASK-96** · **TASK-97** · **TASK-98** · **TASK-99** · **TASK-100** |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | *(leer)* |
+| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **BUG-104** *(Wolkenstimmung-Berechnung golden_cloud_score_sun_dir/_antisolar_dir liefert für alle Chancen null — Spec/Optionen A/B/C stehen, Ampel 🔴: Root-Cause code-verifiziert plausibilisiert aber nicht live bestätigt, alle Optionen berühren dieselben Wetter-Drosselungsparameter wie BUG-99 (siehe Ticket-Volltext für den vollen Bezug), 2026-08-09)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | *(leer)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
 | **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-02** *(Sonnenfinsternisse berechnen, erweitert auf 4 Typen (Sonnenfinsternis total/partiell, Mondfinsternis total/partiell) — Implementierung inkl. AK-16/AK-17-Nachbesserung abgeschlossen, 17 neue Tests unabhängig gegengeprüft grün (inkl. Live-Referenzereignis 12.08.2026 Berlin), Implementierungs-Diffs in opportunity.py/precompute.py/web/index.html/Models.swift unabhängig verifiziert, wartet auf fotoalert-test, 2026-08-09)* · **US-135** *(Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen — Filter implementiert (accessibility.py + qa_azimuth.py US-135-Erweiterung + pipeline.py-Filterschritt), 18 eigene Tests gruen, wartet auf fotoalert-test, 2026-08-08)* · **BUG-89** *(Wetter-Score/Wolkenstimmung: Inline-Hinweis implementiert, wartet auf Test, 2026-08-05)* |
+| **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | **TASK-58** *(Refactoring mkCloudCompassSvg() abgeschlossen, Test-Gate per Gate-Auditor bestätigt, Refactor sauber, Release-Befehl folgt)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-89** *(Caddy-Log-Verzeichnis-Berechtigung bei Server-Neuaufbau: Schutz-Block in deploy/setup_server.sh war bereits vorhanden (Commit fb35944/v1.22.46), Release-/Commit-Stand nachtraeglich ueber die oeffentliche GitHub-Weboberflaeche verifiziert (kein offener Diff, Fix bestaetigt live auf main), kein Code-Deploy noetig, 2026-08-09)* · **US-134** *(Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern, zweiter Auslöseweg zusätzlich zum bestehenden Blur-Schwenk aus US-133; Test: 10/11 AK sofort gruen, AK7-Doppelaufruf-Bug gefunden und per onmousedown="event.preventDefault()" behoben, danach alle 11 AK bestaetigt; separate Verifikation: Bestaetigt; Refactor abgeschlossen; released v1.22.61, Deploy verifiziert (Health-Check ok, Live-Verifikation im Browser: Bestaetigen-Button + Kartenschwenk nach Cache-Bereinigung eines aktiven Service Workers bestaetigt), 2026-08-09)* · **TASK-101** *(Skill-Qualitäts-Audit — AK-Qualitäts-Check-Ergänzungen für fotoalert-analyze/fotoalert-orchestrator ausgeliefert und von Stephan installiert, 2026-08-09)* · **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* · **TASK-90** *(Genereller In-Flight-Dedup in `API.get()` gegen mehrfache gleichzeitige /opportunities-Abrufe beim App-Start (Option A), Live-Browser-Verifikation durch gate-auditor bestätigt (AK1/AK2/AK4/AK5/AK6 sowie AK3 real reproduziert), im Zuge des zeitgleichen US-134-Release (v1.22.61) mitgenommen, Live bestätigt (`API._inflightGet` aktiv, Health-Check ok, locations_count 172), 2026-08-09)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-87** *(Kleinere Sicherheits-Härtungen, Sammelticket — Security-Audit, 7/7)* · **TASK-91** *(Feed-Dedup-Test auf gepinntes Datum umstellen, Mitternachts-Flake im TASK-83-Release entdeckt)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **TASK-93** *(Backlog-Datenqualität: rund 147 alte Tickets ohne Status-Feld nachpflegen, Fund aus WS-018)* · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidiert zwischen Verifikation und Sichtachsen-Status, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse ohne Eskalation bei „Nicht geprüft", Fund aus Qualitäts-Audit 2026-07-27)* · **TASK-94** *(main.py::_load_custom_locations() nutzt nicht coerce_category_value() und ist nicht pro Eintrag abgesichert, Fund aus BUG-84-Verifikation)* · **TASK-96** *(Testsuite: undokumentierte Gesamtrepo-Abhängigkeit einiger „offline"-Tests + README-Marker-Lücke test_bug-94.py, Fund aus Nachverifikation des BUG-94-Testlaufs)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94)* · **TASK-97** *(Unerklärter roter CI-Lauf bei Frontend-Check/Playwright nach reinem Backend-Zahlen-Diff ohne Auth-Bezug — Login-Precondition-Fehler, Re-Run grün, Ursache nie geklärt, Fund aus BUG-92-Retro)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **TASK-98** *(release.sh härten: Pathspec-Fix + Versions-Verifikation, Fund aus TASK-07-Retrospektive 2026-08-04)* · **TASK-99** *(Administrative Berlin/Brandenburg-Beschränkung entfernen)* · **TASK-100** *(Lange Funktion _fetch_weather_and_aerosol() in backend/main.py, Fund durch fotoalert-refactor nach US-135)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm)* · **BUG-103** *(Scout-Zugänglichkeits-Cache prüft beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen, Fund aus US-135-Test, Pfaueninsel)* · **+ alle übrigen offenen Tickets unten** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84, BUG-21 · US-94 · **BUG-43** · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **BUG-56** *(Astronomie-Regression Sonnenauf-/-untergang Berlin)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-54** *(Prüfen: dauerhafter Festplatten-Cache für Wetterkarten-PNGs)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **BUG-62** *(Kartenansicht: Wetter-Filter und Kartenmodus-Umschalter überlappen auf schmalen Bildschirmen)* · **BUG-64** *(Prod-Locations mit Platzhaltertext im Hinweise-Feld — vermutlich ausstehender BUG-60-Cleanup-Lauf)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt nicht in Kartenansicht, indirekt entdeckt beim Testen von BUG-81)* · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidiert zwischen Verifikation und Sichtachsen-Status, Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse ohne Eskalation bei „Nicht geprüft", Fund aus Qualitäts-Audit 2026-07-27)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm)* · **BUG-103** *(Scout-Zugänglichkeits-Cache prüft beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen, Fund aus US-135-Test, Pfaueninsel)* · **+ alle übrigen offenen Tickets unten** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -51,7 +52,7 @@
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-23 |
 
 **Beschreibung:** Bei der Untersuchung von WS-018 (Workspace-Sync, siehe Workspace-Backlog.md) wurde festgestellt, dass ein großer Teil der FotoAlert-Tickets älter ist als die heutige Typ/Priorität/Status-Feldtabellen-Konvention und stattdessen nur eine alte Kurz-Markierung im Titel trägt (`[ ]`/`[x]`/`[~]`). Diese Tickets werden vom projektübergreifenden Workspace-Abgleich komplett übersprungen, weil ihnen die Pflichtfelder fehlen — sie tauchen dadurch im Workspace-Kanban nicht auf, auch wenn sie inhaltlich offen oder erledigt sind. 27 konkret betroffene Tickets wurden im Zuge von WS-018 bereits mit einer Feldtabelle nachgerüstet (Typ nach der im Backlog etablierten ID-Präfix-Konvention, Priorität Mittel, Status ToDo bzw. bei US-07 Done); die verbleibenden rund 147 nicht.
@@ -63,6 +64,133 @@
 ---
 
 ## 🐛 BugFixes
+
+### BUG-104 · Wolkenstimmung-Berechnung (golden_cloud_score_sun_dir/_antisolar_dir) liefert aktuell für alle Chancen null `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Wartet auf Entscheidung |
+| **Erstellt** | 2026-08-09 |
+
+**Beschreibung:** Bei der Live-Verifikation von BUG-89 ("Wetter-Score und Wolkenstimmung wirken auf derselben Karte widersprüchlich") wurde geprüft, ob der neue Inline-Hinweistext auf der echten Produktionsseite sichtbar wird. Dabei wurde festgestellt: Für die vier Event-Typen, die überhaupt eine Wolkenstimmung zeigen können ("Goldene Stunde Morgen", "Goldene Stunde Abend", "Goldene Wolken", "Himmelsröte") verwendet die Frontend-Funktion `cloudMoodScoreFor(o)` in `web/index.html` NICHT den allgemeinen Wetterwert `o.golden_cloud_score`, sondern einen richtungsspezifischen, projizierten Wert: `o.golden_cloud_score_sun_dir` für die ersten drei Typen, `o.golden_cloud_score_antisolar_dir` für "Himmelsröte" (im Code als "US-131" markiert: "richtungsabhängiger projizierter Wert statt des unprojizierten Fotografen-Standort-Werts"). Direkter Live-Check über die `/opportunities`-API (min_score=0.35, days=14, Stand 2026-08-09): von allen 500 aktuell im 14-Tage-Fenster gelisteten Chancen hat KEIN einziger Eintrag einen gesetzten Wert für `golden_cloud_score_sun_dir` ODER `golden_cloud_score_antisolar_dir` — beide Felder sind überall null. Das gilt auch für die beiden einzigen Chancen mit bereits vollständig geladenen allgemeinen Wetterdaten (weather_score=1): "muggelturm_golden_eve_2026-08-10" (golden_cloud_score 0.358, aber golden_cloud_score_sun_dir null) und "schloss_babelsberg_pfingstberg_golden_eve_2026-08-11" (golden_cloud_score 0.2, golden_cloud_score_sun_dir null) — live im Browser bestätigt: Wetter-Sektion zeigt volle Daten, aber keine Wolkenstimmung-Zeile. Im Backend (`backend/main.py`) ist die Berechnung dieser richtungsspezifischen Werte tatsächlich implementiert (u. a. Funktionen/Variablen `calculate_golden_cloud_score`, `gcs_sun_dir`, `gcs_antisolar_dir`, `CLOUD_MOOD_PROJECTION_DISTANCE_M`) — es ist also kein fehlendes Feature, sondern eine Berechnung, die im Moment für die gesamte aktuelle Datenlage None zurückliefert. Vermutete Ursache (nicht verifiziert, gehört in die Analyse-Phase): Die Berechnung braucht Wetter-/Wolkendaten an einem zweiten, projizierten Punkt (nicht am Fotografen-Standort) — dieser zusätzliche Fetch/diese zusätzliche Berechnung läuft aktuell offenbar nirgends erfolgreich durch. **Auswirkung:** Der BUG-89-Hinweistext (und generell die ganze Wolkenstimmung-Zeile für diese vier Event-Typen) kann dadurch aktuell live nirgends erscheinen — unabhängig davon, ob das allgemeine Wetter schon geladen ist. Blockiert BUG-89's vollständige Live-Verifikation (Schritt 4 des Release-Skills), ist aber inhaltlich unabhängig von BUG-89.
+
+**User Story:** Als Nutzer möchte ich bei Chancen vom Typ Goldene Stunde/Goldene Wolken/Himmelsröte eine tatsächlich berechnete Wolkenstimmung sehen, damit die Bewertung für meine Fotoplanung verlässlich ist.
+
+**Bezug:** Nicht Duplikat von **BUG-89** *(In Test)* — BUG-89 betrifft Darstellung/Hinweistext bei VORHANDENER Wolkenstimmung, dieses Ticket betrifft die fehlende BERECHNUNG der Wolkenstimmung selbst; blockiert aber BUG-89s vollständige Live-Verifikation. Eng verwandt mit **BUG-83** *(Done, 2026-07-22)* — behob damals einen Teilausfall (~165/172 Sonnenrichtung, ~168/172 Gegenrichtung) exakt desselben projizierten Wolkenwert-Abrufs; der hier live gemessene Zustand (0/500 gesetzte Werte) ist ein Totalausfall, könnte also eine Regression des BUG-83-Fixes sein oder eine neue, umfassendere Ursache haben — in der Analyse-Phase zuerst gegen BUG-83 prüfen. Betrifft denselben Code wie **US-131** *(Done)*, das diesen projizierten Zwei-Richtungen-Abruf ursprünglich eingeführt hat, und **TASK-75** *(Done)*, das die Wetter-API-Drosselung (Semaphore/Pacing) dafür kalibriert hat.
+
+🔗 **Beziehungsanalyse BUG-104 ↔ BUG-83 / US-131 / TASK-75 / BUG-89**
+- **Verwandt:** BUG-83 (Done, 2026-07-22) — engster Bezugspunkt: behandelt exakt dieselben zwei Felder/denselben Abrufmechanismus, damals aber nur ein Teilausfall (~95-98 % der Locations betroffen), nicht der jetzt beobachtete Totalausfall (100 % der 500 geprüften Chancen). Keine Dublette (unterschiedlicher Schweregrad/Zeitpunkt), aber mögliche Regression — zuerst prüfen, ob der BUG-83-Fix (Semaphore/Pacing-Kalibrierung) noch aktiv/korrekt greift oder ob eine andere Ursache (z. B. Timeout, Endpoint, geänderte Datenstruktur) vorliegt.
+- **Verwandt:** US-131 (Done) — führte die Berechnung/Felder `golden_cloud_score_sun_dir`/`golden_cloud_score_antisolar_dir` ein, betroffener Code, keine Dublette.
+- **Verwandt:** TASK-75 (Done) — kalibrierte die Drosselung für denselben Abruf, betroffener Code, keine Dublette.
+- **Abhängigkeit:** BUG-89 (In Test) — dieses Ticket blockiert BUG-89s vollständige Live-Verifikation (der Inline-Hinweistext aus BUG-89 kann live nirgends erscheinen, solange diese Felder überall null sind), ist aber kein Duplikat und inhaltlich unabhängig von BUG-89s eigentlichem Scope (Darstellung/Copy).
+- **Empfehlung:** Eigenständiges Ticket, kein Merge. Sequenzierung: sollte vor der finalen Live-Verifikation von BUG-89 analysiert/behoben werden, damit BUG-89 vollständig verifiziert werden kann.
+- **Begründung:** Fachlich klar abgegrenzt von BUG-89 (Berechnung vs. Darstellung) und technisch eigenständig behebbar; Bezug zu BUG-83/US-131/TASK-75 ist rein informativ (gleiche Codestelle), keiner dieser drei Done-Tickets beschreibt den hier neu festgestellten Totalausfall.
+- Grep-Gegencheck (Suchbegriffe „US-131", „golden_cloud_score", „cloudMoodScoreFor", „Wolkenstimmung") ergab keine bestehende offene oder abgeschlossene Dublette zu diesem konkreten Totalausfall-Befund; US-131 selbst ist als Feature bereits Done, nicht als offener Bug.
+
+📋 **Analyse-Spec (fotoalert-analyze, 2026-08-09)**
+
+**Root-Cause (code-/kommentar-verifiziert, NICHT live bestätigt — s. AK1):**
+`_apply_weather_to_event()` (`backend/main.py` Z. 493-571) setzt `golden_cloud_score_sun_dir`/`golden_cloud_score_antisolar_dir` (Z. 563/566) aus `_directional_cloud_values(sun_dir_forecast, ...)`/`(antisolar_dir_forecast, ...)` (Z. 633-653) — diese Werte hängen NICHT vom allgemeinen Fotografen-Standort-Forecast ab (der `golden_cloud_score` separat und unabhängig speist, Z. 550-554), sondern von zwei zusätzlichen, projizierten Forecast-Objekten, die pro Event über `_lookup_projected_forecasts()` (Z. 705-726) aus den Ergebnis-Dicts von `_fetch_weather_and_aerosol()` nachgeschlagen werden. Genau diese Entkopplung erklärt strukturell exakt das beobachtete Muster (allgemeines Wetter da, Richtungswert null) — kein Logikfehler in der Verzweigung selbst, alle Eingabefelder (`subject_lat/lon/azimuth`, `sunrise_azimuth`/`sunset_azimuth`) sind in `backend/precompute.py::_serialize()` (Z. 468-577) vollständig vorhanden und über `_load_caches()`/`_backfill_coords()` (Z. 339-380) verifiziert intakt — die Prämisse „fehlende Eingabedaten" ist damit widerlegt.
+
+Die eigentliche Ursache liegt sehr wahrscheinlich in der Wetter-API-Drosselung selbst — **und ist im Code bereits historisch dokumentiert, aber seit der letzten Kalibrierung nie live gegen genau diesen Aufteilungs-Effekt nachgetestet worden:**
+- `_plan_weather_fetch_tasks()` (Z. 1341-1375) dedupliziert den normalen „weather"-Task NUR pro eindeutiger Location (~315-319 laut BUG-99-Fund, `data_dev/fotoalert.db`), während „sun_dir"/„antisolar_dir"/„aerosol"-Tasks pro projiziertem Punkt (`subject_lat/lon` + tagesabhängigem `sunrise_azimuth`/`sunset_azimuth`, auf 3 Dezimalstellen gerundet) dedupliziert werden — der BUG-83-Kommentar in `WEATHER_API_MAX_CONCURRENT_REQUESTS` (Z. 1060-1079, wortgleich in `backend/tests/test_bug83.py` Docstring) hält fest: „Der 'Wetter'-Anteil (nur 1x pro Location, häuft sich am Anfang des Laufs) kommt fast immer durch, während 'Sonnenrichtung'/'Gegenrichtung' (bis zu 6x pro Location, über die GESAMTE Laufzeit verteilt) zu >95% fehlschlagen."
+- `_fetch_weather_and_aerosol()` (Z. 1234-1338) kappt seit BUG-99 (2026-08-04) die Gesamtlaufzeit hart bei `WEATHER_OVERLAY_MAX_TOTAL_SECONDS = 180.0` (Z. 1137) und bricht per `asyncio.wait_for(...)` alle zu diesem Zeitpunkt noch offenen Tasks ab (Z. 1318-1336) — der Docstring von `WEATHER_API_RETRY_BACKOFF_BASE_SECONDS` (Z. 1204-1231) rechnet selbst vor, dass ein Worst Case mit vielen 429-Retries auf den Richtungs-Abrufen ca. 324s statt 180s benötigen würde, und schließt explizit: „Trifft der Live-Test diesen Worst Case an, ist das ein Signal, dass Option A allein nicht ausreicht."
+- **Jede der drei bisherigen Kalibrierungsrunden dieser Konstanten (BUG-83 2026-07-21, TASK-75, BUG-99 2026-08-04) trägt im Code selbst den Vermerk „NICHT live nachgetestet — kein Internetzugriff aus der Sandbox" bzw. „Muss nach dem nächsten Live-Lauf (Stephan) ggf. weiter nachjustiert werden"** — eine gezielte Live-Nachmessung SPEZIELL für die Sonnenrichtung/Gegenrichtung-Fehlerquote nach der BUG-99-Ceiling-Einführung ist laut Codehistorie nie dokumentiert worden. Der beobachtete Sprung von BUG-83s Teilausfall (~165-168/172, also ~95-98 %) zu BUG-104s Totalausfall (0/500, 100 %) ist damit die naheliegende Fortsetzung eines bereits bekannten, nie vollständig geschlossenen Musters, nicht zwingend eine neue Ursache.
+
+⚠️ **Nicht live verifiziert** (kein laufender Server unter `localhost:8000` in dieser Analyse-Sitzung erreichbar, `device_bash`-Sandbox ohne Internetzugriff): Diese Analyse konnte NICHT direkt gegen `/job-status` oder die Server-Logs prüfen, ob tatsächlich `failed_sun_dir_locations`/`failed_antisolar_dir_locations` gefüllt sind bzw. die BUG-99-Timeout-Warnung auftritt. **AK1 macht genau diesen Check zur Pflicht-Voraussetzung, BEVOR eine der Drosselungs-Konstanten verändert wird.**
+
+**Fundstellen-Sweep** (Suchbegriffe `golden_cloud_score_sun_dir`, `golden_cloud_score_antisolar_dir`, `cloudMoodScoreFor` über die gesamte Codebasis, `_to_delete/` ausgeklammert): Rendering-seitig genau EIN Konsument — `web/index.html::cloudMoodScoreFor()` (Z. 3056), aufgerufen von genau zwei Stellen (Feed-Karte Z. 3283, Detail-Sheet Z. 4743) — kein zweiter, divergenter Render-Pfad in Karte/Kalender/Scout, da beide Aufrufer denselben Helper nutzen. Kein Vorkommen in `ios/` (Swift) — iOS-App konsumiert diese Felder nicht, kein Scope dort. Backend-seitig ausschließlich `backend/main.py` (Berechnung) und `backend/calculations/weather.py` (`calculate_golden_cloud_score`, `CLOUD_MOOD_PROJECTION_DISTANCE_M`).
+
+**Zustands-Check:**
+- Wartezustand: Der Wetter-Overlay-Lauf läuft ausschließlich im Hintergrund (3h-Cron + nach Precompute, s. `_startup_setup_scheduler()` Z. 2310); `/job-status` zeigt unverändert „lädt", solange kein `weather_status` gesetzt ist — kein neuer synchroner Wartezustand durch diesen Fix.
+- Leerzustand: Liegt im T+3-Fenster kein Goldene-Stunde-Event, liefert `_cloud_mood_projection_points()` `None` und es werden gar keine Richtungs-Tasks geplant — unverändertes, gewolltes Verhalten (kein Fehler, einfach keine Wolkenstimmung-Zeile).
+- Fehlerfall: Schlägt der Richtungs-Abruf für eine einzelne Location endgültig fehl (Retries ausgeschöpft), bleibt der Wert `None` und `/job-status` zeigt weiterhin die bestehende `_build_weather_error_message()`-Fehlermeldung mit Location-Namen (BUG-77/US-131-AK-11-Muster) — siehe AK3.
+
+**Scope:**
+Eingeschlossen: Root-Cause-Diagnose + Fix dafür, dass `golden_cloud_score_sun_dir`/`_antisolar_dir` für Goldene-Stunde-Events im T+3-Wetterfenster strukturell (nicht nur vereinzelt) berechnet werden, ohne die bestehende BUG-99/BUG-83-Drosselungshärtung zu verschlechtern.
+Explizit ausgeschlossen: Kein Beibehalten alter, bereits erfolgreich berechneter Richtungswerte bei einem transienten Fetch-Fehler im nächsten Lauf (`_apply_weather_to_event()` überschreibt `golden_cloud_score_sun_dir`/`_antisolar_dir` Z. 563/566 bei JEDEM Lauf bedingungslos, auch mit `None` — potenzielles „Flapping"-Verhalten zwischen Läufen). Dieses Verhalten ist unabhängig von BUG-104s Kernbefund (ein Totalausfall über ALLE Läufe hinweg, kein Wechsel zwischen Läufen) und wird hier bewusst NICHT mitbehoben, um den Fix klein und risikoarm zu halten — potenzieller Folgeticket-Kandidat.
+
+**Akzeptanzkriterien:**
+- [ ] AK1 (Diagnose-Pflicht vor Code-Änderung, Herkunft: Pre-Mortem Szenario 3/Live-Nichtverifizierbarkeit dieser Analyse): Bevor eine Wetter-Drosselungs-Konstante verändert wird, wird live gegen den laufenden Server geprüft: (a) enthält `/job-status` für die `weather`-Job-Zeile eine Fehlermeldung mit „Wolkenwert Sonnenrichtung fehlgeschlagen"/„Wolkenwert Gegenrichtung fehlgeschlagen"? (b) enthält das Server-Log die Zeile „BUG-99: Wetter-Overlay-Gesamtzeit-Obergrenze ... erreicht"? Ergebnis wird im Ticket dokumentiert, bevor Option A umgesetzt wird — zeigt der Check KEINE Fehlermeldung/Timeout-Zeile, ist die Timing-Hypothese widerlegt und Pre-Mortem-Szenario 3 (Logikfehler statt Timing) greift stattdessen.
+- [ ] AK2 (Kernverhalten): Nach dem Fix zeigt ein echter `/opportunities`-Abruf (`min_score=0.35`, `days=14`) für die beiden im Ticket genannten Referenz-Chancen („muggelturm_golden_eve_2026-08-10", „schloss_babelsberg_pfingstberg_golden_eve_2026-08-11") nach dem nächsten Wetter-Overlay-Lauf einen numerischen (nicht-null) Wert für `golden_cloud_score_sun_dir` bzw. `golden_cloud_score_antisolar_dir` — sofern für genau diese Location zu diesem Zeitpunkt kein dokumentierter, echter Netzwerkfehler vorliegt (s. AK3). Allgemeiner: Golden-Stunde-Events im T+3-Fenster mit bereits geladenem allgemeinem Wetter (`weather_score > 0`) zeigen in der überwiegenden Mehrheit einen gesetzten Richtungswert, nicht mehr 0 von 500.
+- [ ] AK3 (Edge Case, Regressionsschutz BUG-77/US-131-AK-11, Herkunft: bestehendes Verhalten, darf nicht brechen): Schlägt der Richtungs-Abruf für eine einzelne Location trotzdem endgültig fehl (Retries ausgeschöpft oder echter Netzwerkfehler), bleibt der Wert `None` — KEIN Fallback auf `golden_cloud_score` (Fotografen-Standort) — und `/job-status` zeigt weiterhin die bestehende Fehlermeldung mit Location-Namen.
+- [ ] AK4 (Edge Case, Negativfall zu AK2): Für Events, die keine Goldene Stunde sind (z. B. Mond-Alignment), bleiben `golden_cloud_score_sun_dir`/`_antisolar_dir` weiterhin `None` (unverändertes, gewolltes Verhalten aus US-131, keine Regression).
+- [ ] AK5a (Nicht-funktional: Performance/Skalierbarkeit, Herkunft: Pre-Mortem Szenario 1): Nach dem Fix bleibt die Gesamtlaufzeit eines vollen Wetter-Overlay-Laufs unter `WEATHER_OVERLAY_MAX_TOTAL_SECONDS` (180s) bei der realen Location-Zahl (~315-319).
+- [ ] AK5b (Nicht-funktional: Rate-Limit-Sicherheit, Herkunft: Pre-Mortem Szenario 1, BUG-99/TASK-75-Regressionsschutz): Die aggregierte HTTP-429-Quote steigt gegenüber dem zuletzt dokumentierten Referenzwert (BUG-83: ~4,8 % aggregiert) nicht spürbar an — kein Wiederauftreten der BUG-99-Server-Hänger-Bedingung.
+- [ ] AK6 (Sichtbarkeit, Herkunft: Ticket-Bezug BUG-89): Sobald `golden_cloud_score_sun_dir`/`_antisolar_dir` für mindestens eine Live-Chance gesetzt ist, erscheint die Wolkenstimmung-Zeile (inkl. BUG-89-Hinweistext) im Sheet für diese Chance über `cloudMoodScoreFor()` — ermöglicht BUG-89s ausstehende vollständige Live-Verifikation.
+- [ ] AK7 (Architektur/Konsistenz, Herkunft: Pre-Mortem Szenario 4, US-131-AK-4/AK-10-Muster): Der Fix gilt identisch für den 3h-Cronlauf (`_weather_overlay()`) UND den Einzel-Location-Fast-Path (`_weather_overlay_single()`, US-106) — beide liefern für dasselbe Test-Event nach dem Fix denselben `golden_cloud_score_sun_dir`-Wert, keine Divergenz zwischen den beiden Aufrufern von `_fetch_weather_and_aerosol()`.
+- [ ] AK8 (Grenzwert, Herkunft: Option-A-Umsetzung): Wird die Rundungsgenauigkeit der Projektions-Koordinaten-Schlüssel gelockert (Option A), bleibt der projizierte Punkt innerhalb einer definierten Toleranz (< 2 km Abweichung) zum unveränderten, exakt berechneten Punkt — verhindert, dass die Wolkenwerte für einen spürbar falschen Himmelsausschnitt abgefragt werden (Pre-Mortem Szenario 2).
+
+**Pre-Mortem:**
+- 💀 Szenario 1: Der Fix lockert Concurrency/Pacing/Ceiling weiter (statt das Task-Volumen zu senken) → Open-Meteo drosselt wieder härter (wie TASK-75/BUG-83 historisch beobachtet: 31 % → 21 % → 4,8 % 429-Quote je nach Drosselungsstufe) → BUG-99s Server-Hänger-Risiko kehrt zurück.
+  Auslöser: blinde Erhöhung der bereits inzident-kalibrierten Konstanten ohne den in AK1 geforderten Live-Check — genau das im Code selbst antizipierte Szenario („Trifft der Live-Test diesen Worst Case an...").
+  Frühwarnung: Serverlog zeigt erneut die BUG-99-Timeout-Warnung oder eine hohe 429-Quote in den Job-Status-Fehlermeldungen.
+  Gegenmaßnahme: AK5a/AK5b + Empfehlung Option A (Task-Volumen senken statt Drosselung lockern) + Pflicht-Live-Smoke-Test vor Release.
+- 💀 Szenario 2: Die für Option A vorgeschlagene gröbere Rundung der Projektions-Koordinaten (z. B. 3→2 Dezimalstellen) verschiebt den projizierten Punkt so weit, dass er nicht mehr sinnvoll „in Sichtachsen-Richtung, 30 km hinter dem Motiv" liegt.
+  Auslöser: zu grobe Rundung verfälscht die Richtung stärker, als der 30-km-Projektionsradius rechtfertigt.
+  Frühwarnung: AK8-Toleranztest schlägt fehl.
+  Gegenmaßnahme: AK8, moderate Rundungswahl (2 Dezimalstellen ≈ 1,1 km statt 3 ≈ 111 m, bei 30 km Projektionsdistanz geometrisch unkritisch).
+- 💀 Szenario 3 (Code-Verifikation widerlegt Timing-Hypothese): Der AK1-Diagnoseschritt zeigt KEINE Fehlermeldung/Timeout-Zeile — die Timing-/Drosselungs-Hypothese wäre dann widerlegt, die tatsächliche Ursache läge in der Logik (`_cloud_mood_projection_points()`/`_plan_weather_fetch_tasks()`/`_lookup_projected_forecasts()`), nicht im Netzwerk — obwohl diese Analyse den Datenfluss Ende-zu-Ende gelesen und strukturell korrekt befunden hat.
+  Auslöser: ein in dieser Analyse nicht sichtbarer Laufzeit-Zustand (z. B. veralteter, tatsächlich deployter Code-Stand, der vom hier gelesenen Repo-Stand abweicht).
+  Frühwarnung: genau der AK1-Diagnoseschritt selbst.
+  Gegenmaßnahme: für diesen Fall vorbereiteter Ausweichplan: ein gezielter Diagnose-Log-Durchlauf, der `_cloud_mood_projection_points()` und `_lookup_projected_forecasts()` für ein echtes Event aus dem aktuellen Feed-Cache protokolliert (Projektionspunkte, Lookup-Keys, Dict-Inhalt), um die exakte Stelle des Auseinanderlaufens zu finden, statt die Timing-Annahme unhinterfragt umzusetzen.
+- 💀 Szenario 4 (Zusammenspiel bestehender Bausteine): `_weather_overlay_single()` (Fast-Path bei Location-Edit, US-106) und `_weather_overlay()` (3h-Cron) nutzen denselben `_fetch_weather_and_aerosol()`-Helfer inkl. derselben Gesamtzeit-Obergrenze — ein Fix, der nur im Cron-Pfad ansetzt, behebt das Problem nur dort, während der für SCHNELLES Feedback nach Location-Edits gedachte Fast-Path weiterhin unter demselben Muster leidet oder unbeabsichtigt neue Nebenwirkungen bekommt.
+  Gegenmaßnahme: AK7 + Fix ausschließlich auf der gemeinsamen Helferebene (`_plan_weather_fetch_tasks()`/`_lookup_projected_forecasts()`) ansetzen, nicht in einem der beiden Aufrufer separat.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: `golden_cloud_score_sun_dir`/`golden_cloud_score_antisolar_dir`/`cloudMoodScoreFor` — genau 1 Render-Konsument (`web/index.html::cloudMoodScoreFor()`, 2 Aufrufer, kein iOS-Vorkommen), Backend nur `main.py`+`calculations/weather.py`
+- [x] Zustands-Check: Wartezustand unverändert (Hintergrund-Job), Leerzustand unverändert (kein Goldene-Stunde-Event → keine Tasks), Fehlerfall bestehendes BUG-77/US-131-Muster (s. AK3)
+- [x] Pre-Mortem durchgeführt: 4 Szenarien, alle mit AK/Gegenmaßnahme verankert
+- [x] Architektur analysiert: `backend/main.py` (`_apply_weather_to_event` Z. 493-571, `_directional_cloud_values` Z. 633-653, `_cloud_mood_projection_points` Z. 662-702, `_lookup_projected_forecasts` Z. 705-726, `_plan_weather_fetch_tasks` Z. 1341-1375, `_run_one_weather_fetch` Z. 1378-1422, `_fetch_weather_and_aerosol` Z. 1234-1338, `_weather_overlay`/`_weather_overlay_single` Z. 1533-1676, `/job-status` Z. 3224-3230, Drosselungs-Konstanten Z. 1029-1231); `backend/calculations/weather.py` (`CLOUD_MOOD_PROJECTION_DISTANCE_M` Z. 209, `fetch_weather_forecast`/`fetch_aerosol_forecast` Z. 450-565); `backend/discover/geometry.py` (`destination_point` Z. 8-33); `backend/precompute.py` (`_serialize` Z. 468-577, Quelle der Eingabefelder — verifiziert vollständig vorhanden); `web/index.html` (`cloudMoodScoreFor` Z. 3056, reiner Konsument, unverändert)
+- [x] Designer-Check: visuell? → nein (reine Backend-Datenlogik, Frontend-Konsument unverändert) — übersprungen
+- [x] Implementierungsoptionen: A (empfohlen) / B (Eskalationsstufe) / C (nicht empfohlen)
+- [x] Empfehlung: Option A — Task-Volumen der Richtungs-Abrufe senken durch moderat gröbere Cache-Key-Rundung, rührt die bereits inzident-kalibrierten Drosselungs-Konstanten nicht an
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): AK5 aus Granularität in AK5a (Laufzeit-Grenzwert)/AK5b (429-Quote) aufgeteilt; Vier-Kategorien-Lücke Architektur/Konsistenz mit AK7 (Cron- vs. Fast-Path-Konsistenz) geschlossen; Abwärtskompatibilitäts-Check deckte ein von BUG-104 unabhängiges, bestehendes Flapping-Verhalten auf (`_apply_weather_to_event` überschreibt bedingungslos, auch mit `None`) — bewusst als Scope-Ausschluss dokumentiert statt stillschweigend übernommen oder mitbehoben; Nebenläufigkeit/Berechtigungen als nicht relevant begründet (reiner Hintergrund-Batch-Job, kein neuer Endpoint)
+
+**Implementierungsoptionen:**
+
+*Option A — Task-Volumen der Richtungs-Abrufe senken (moderat gröbere Cache-Key-Rundung)* — ✅ empfohlen
+- Vorgehen: In `_plan_weather_fetch_tasks()` (Z. 1363-1373) und `_lookup_projected_forecasts()` (Z. 721-722) die Rundung der `sun_dir`/`antisolar_dir`/`aerosol`-Schlüssel von 3 auf 2 Dezimalstellen lockern (≈1,1 km statt ≈111 m Gitter) — bei 30 km Projektionsdistanz geometrisch unkritisch (AK8), senkt aber die Anzahl unterschiedlicher Tages-/Event-Kombinationen, die als „neuer" Punkt gelten, spürbar (BUG-83-Analyse: bis zu 6x pro Location durch diese Streuung).
+- Betroffene Dateien: `backend/main.py` (`_plan_weather_fetch_tasks`, `_lookup_projected_forecasts`)
+- Vorteile: Reduziert reale externe Request-Last strukturell statt nur Symptome zu verschieben; rührt NICHT an den bereits inzident-erprobten Konstanten (Concurrency/Pacing/Ceiling) — geringstes Regressionsrisiko gegenüber BUG-99/BUG-83; kleine, gut isoliert testbare Änderung.
+- Nachteile/Risiken: Pre-Mortem Szenario 2 (zu grobe Rundung verfälscht Projektionsrichtung) — durch AK8-Toleranztest abgesichert; löst das Problem nicht, falls die Ursache doch eine reine Logik-Lücke ist (Szenario 3).
+- Aufwand: klein–mittel.
+
+*Option B — Zweiphasiger Abruf mit separatem Zeitbudget für Richtungs-Fetches*
+- Vorgehen: `_fetch_weather_and_aerosol()` in zwei sequenzielle Aufrufe aufteilen — zuerst „weather"+„aerosol" (kleines, stark dedupliziertes Set, bestehendes Budget), danach „sun_dir"+„antisolar_dir" separat mit eigenem, für dieses Task-Muster kalibriertem `max_total_seconds` (der Parameter existiert laut BUG-99-Docstring bereits explizit für „einen künftigen Aufrufer mit einer strukturell anderen Location-Menge").
+- Betroffene Dateien: `backend/main.py` (`_fetch_weather_and_aerosol`-Aufrufer in `_weather_overlay` Z. 1562-1565 und `_weather_overlay_single` Z. 1650-1653, ggf. neue Konstante analog `WEATHER_OVERLAY_MAX_TOTAL_SECONDS`).
+- Vorteile: Isoliert das Risiko sauber — der bereits inzident-kritische „weather"-Pfad bleibt strukturell unverändert; Richtungs-Fetches bekommen ein realistischeres, separat kalibrierbares Budget statt vom selben Topf zu konkurrieren.
+- Nachteile/Risiken: Erhöht die Gesamtlaufzeit potenziell (zwei sequenzielle Phasen statt einer gemeinsamen `gather()`); berührt beide Aufrufer (Pre-Mortem Szenario 4) — größerer Diff, mehr Regressionsfläche als Option A.
+- Aufwand: mittel. Empfohlene Eskalationsstufe, falls AK1/Option A nicht ausreichen.
+
+*Option C — Drosselungs-Konstanten weiter lockern (Concurrency/Pacing/Ceiling erhöhen)* — nicht empfohlen
+- Vorgehen: `WEATHER_API_MAX_CONCURRENT_REQUESTS` erhöhen und/oder `WEATHER_OVERLAY_MAX_TOTAL_SECONDS` anheben.
+- Nachteile/Risiken: Exakt die Konstanten, die BUG-83 (nach einer echten 429-Explosion) und BUG-99 (nach einem echten Server-Hänger) bereits kalibriert haben — jede bisherige Anpassung trägt im Code den Vermerk „NICHT live nachgetestet"; ein weiteres blindes Drehen an denselben Reglern ist laut eigenem Pre-Mortem-Kommentar im Code („Trifft der Live-Test diesen Worst Case an...") genau das Szenario, vor dem gewarnt wird.
+- Aufwand: klein, aber hohes Risiko — deshalb nicht empfohlen, nur als Rückfalloption falls A/B nicht ausreichen.
+
+🚦 **Ampel-Ergebnis:**
+🔴 Rot — braucht Stephans Entscheidung: Kriterium 4 (Pre-Mortem-Risiko) nicht erfüllt. Die Root-Cause ist code-/kommentar-seitig stark plausibilisiert (dieselbe Drosselungs-Interaktion, die BUG-83 bereits 1:1 beschrieben hat: „Sonnenrichtung/Gegenrichtung ... zu >95 % fehlschlagen", verschärft durch BUG-99s seither hinzugekommene Gesamtzeit-Obergrenze), aber mangels laufendem Server/Internetzugriff in dieser Analyse-Sitzung NICHT live verifiziert — AK1 macht genau diesen Check zur Pflicht-Voraussetzung vor jeder Code-Änderung. Zusätzlich berühren alle drei Optionen direkt dieselben Wetter-API-Drosselungsparameter, die BUG-99 nach einem echten Produktions-Hänger und BUG-83 nach einer echten 429-Explosion kalibriert haben — eine Anpassung ohne den in AK1 geforderten Live-Check trägt laut Code-Kommentar selbst das dokumentierte Risiko eines Rückfalls in genau diese beiden Vorfälle (Pre-Mortem Szenario 1).
+
+🔍 **AK-Qualitäts-Check:**
+✅ durchgeführt — AK5 aus Granularität in AK5a (Laufzeit-Grenzwert 180s)/AK5b (429-Quote-Referenzwert) aufgeteilt; Vier-Kategorien-Lücke Architektur/Konsistenz mit AK7 (Cron- vs. Fast-Path-Konsistenz, US-131-AK-4/AK-10-Muster) geschlossen; Abwärtskompatibilitäts-Check deckte ein von BUG-104 unabhängiges, bestehendes Flapping-Verhalten auf (`_apply_weather_to_event` überschreibt Richtungswerte bei jedem Lauf bedingungslos, auch mit `None`) — bewusst als Scope-Ausschluss dokumentiert statt stillschweigend übernommen; Nebenläufigkeit/Berechtigungen als nicht relevant begründet (reiner Hintergrund-Batch-Job ohne neuen Endpoint).
+
+**Testplan:**
+- [ ] Automatisiert (Harness), `backend/tests/test_bug-104.py`, Marker `offline`+`regression`:
+  - AK2/AK3: `_apply_weather_to_event()` mit gemocktem `sun_dir_forecast`/`antisolar_dir_forecast` (einmal gesetzt, einmal `None`) → prüft numerischen Wert bzw. `None` ohne Fallback auf `golden_cloud_score`.
+  - AK4: Event mit nicht-Goldene-Stunde-`event_type` → `_cloud_mood_projection_points()` liefert `None`, keine Tasks geplant.
+  - AK7: `_plan_weather_fetch_tasks()`/`_lookup_projected_forecasts()` mit identischem Event einmal über `_weather_overlay()`-Pfad, einmal über `_weather_overlay_single()`-Pfad aufgerufen → identischer Schlüssel/Wert.
+  - AK8: `destination_point()` mit 3-Dezimalstellen- vs. 2-Dezimalstellen-gerundeten Koordinaten → Abstand < 2 km (Toleranztest).
+  - Pflicht-Regression: `test_bug83.py`, `test_us131.py`, `test_bug-99.py` bleiben grün (Drosselungs-Konstanten/Retry-Verhalten unverändert bei Option A).
+- [ ] Manuell:
+  1. **AK1 zuerst, vor jeder Code-Änderung:** `curl http://<server>/job-status` → Feld `jobs.weather` prüfen auf Fehlermeldung „Wolkenwert Sonnenrichtung/Gegenrichtung fehlgeschlagen"; Server-Log nach „BUG-99: Wetter-Overlay-Gesamtzeit-Obergrenze" durchsuchen. Ergebnis im Ticket dokumentieren.
+  2. Nach dem Fix: `curl "http://<server>/opportunities?min_score=0.35&days=14"` → für „muggelturm_golden_eve_2026-08-10" und „schloss_babelsberg_pfingstberg_golden_eve_2026-08-11" `golden_cloud_score_sun_dir`/`golden_cloud_score_antisolar_dir` prüfen (numerisch statt `null`).
+  3. Browser: Detail-Sheet einer Goldene-Stunde/Goldene-Wolken/Himmelsröte-Chance öffnen → Wolkenstimmung-Zeile (inkl. BUG-89-Hinweistext) sichtbar (AK6).
+  4. Regressionsmatrix (`PRODUCT.md` Sektion 12) für „Backend/Performance"-Tickets: Wetter-Overlay-Laufzeit nach einem vollen Cronlauf im `/job-status` prüfen (< 180s, AK5a).
+
+---
 
 ### BUG-101 · Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse zum Motiv `[ ]`
 
@@ -1494,7 +1622,7 @@ Keine offenen ❓ Questions — die einzige echte Weggabelung (Exempt-Set-Erweit
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-27 |
 
 **Beschreibung:** In `backend/main.py::_load_custom_locations()` wird die Kategorie eines Custom-Location-Eintrags beim Server-Start weiterhin über direkten Enum-Zugriff (`LocationCategory[...]`) geladen statt über die von BUG-84 eingeführte robuste `coerce_category_value()`-Fallback-Funktion. Zusätzlich ist dieser Ladepfad in main.py nicht pro Eintrag try/except-abgesichert — ein einzelner beschädigter Kategoriewert in der Datenbank würde das Laden ALLER Custom-Locations beim Serverstart abbrechen. `backend/precompute.py` hat für denselben Ladepfad bereits eine Pro-Eintrag-Absicherung (Referenzimplementierung vorhanden, main.py zieht sie nicht nach). Betrifft nur vorbestehende, bereits beschädigte Kategoriewerte — durch BUG-84s neue Patch-Validierung kann ein solcher Wert ab jetzt nicht mehr neu entstehen. Kein akutes Problem, aber ein Konsistenz-/Robustheitsrisiko am sensiblen Server-Start-Pfad.
@@ -1833,7 +1961,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-07-29 |
 
 **Beschreibung:** Bei der Live-Verifikation von BUG-91 (Release v1.22.50) wurde festgestellt, dass der `/health`-Endpoint ein `version`-Feld mit dem Wert „2.0.0" zurückgibt, was NICHT der tatsächlichen App-Release-Version entspricht (aktuell v1.22.50, sichtbar korrekt unter Einstellungen → „Über FotoAlert" in der App). Das `version`-Feld im Health-Check scheint eine separate Backend-/API-Schemaversion abzubilden statt der App-Release-Version. Das ist an sich kein Fehlverhalten, aber potenziell verwirrend, da der Health-Check-Endpoint an mehreren Stellen in der Doku/den Skills als Freigabe-/Versionsnachweis nach einem Release herangezogen wird, ohne dort zwischen den beiden Versionsbegriffen zu unterscheiden.
@@ -1852,7 +1980,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-07-31 |
 
 **Beschreibung:** Beim breiteren Testlauf `pytest backend/tests/ -m offline` im Zuge von BUG-94 (2026-07-31) traten 14 Fehlschläge + 3 Fehler auf, die im BUG-94-Ticket zunächst pauschal als „vorbestehend/umgebungsbedingt (fehlende `web/`/`deploy/`-Verzeichnisse in diesem Backend-only-Sandbox-Abzug)" eingeordnet wurden — eine grobe Einschätzung im Vorbeigehen, keine abschließende Verifikation. Nachträgliche echte Prüfung am realen Projektordner auf dem Mac (nicht nur im Cloud-Sandbox-Abzug) ergibt ein differenziertes Bild mit zwei getrennten, beide real existierenden Ursachen:
@@ -1874,7 +2002,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-08-01 |
 
 **Beschreibung:** Beim ersten Release-Push von BUG-92 (Commit `b9fdf66`, v1.22.53 — ausschließlich 4 numerische Backend-Änderungen, Threshold 0,40→0,35 in `backend/main.py`/`backend/precompute.py`, kein Bezug zu Auth/Login) schlug der CI-Job „Frontend-Check (Playwright)" (GitHub Actions Run #277) mit einem Login-Precondition-Fehler fehl (`Auth.isLoggedIn() blieb false`), während „Backend-Tests (pytest)" grün war. Ein von Stephan angestoßener Re-Run desselben Commits lief anschließend komplett grün (Frontend-Check 2m2s, Backend-Tests 2m17s, Deploy 20s). Die Einstufung als Flake erfolgte allein auf Basis dieses Re-Run-Erfolgs — die tatsächliche Ursache des ersten roten Laufs wurde nicht diagnostiziert (keine Log-Analyse des ersten Laufs, kein plausibler Zusammenhang zum Diff gefunden).
@@ -1893,7 +2021,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | noch von Stephan festzulegen |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-08-04 |
 
 **Beschreibung:** `release.sh` committet aktuell ohne Pathspec — der `git commit`-Aufruf nimmt dadurch nicht nur seine eigenen zwei Dateien (`web/index.html`, `sw.js`), sondern alles, was zu diesem Zeitpunkt zufällig bereits im Repo gestagt war, mit ins Release. Bei TASK-07 hat das nachweislich den Doku-Stand eines fremden, gerade in Bearbeitung befindlichen Tickets (BUG-99) in `BACKLOG.md` zurückgesetzt — der Code von BUG-99 selbst blieb dabei zum Glück unangetastet, nur der Ticket-Text im Backlog wurde überschrieben. Zweites, unabhängiges Problem im selben Skript: Die Versions-Ersetzung (per `sed` in `web/index.html`) wird nach dem Setzen nicht verifiziert. Bei TASK-07 blieb `APP_VERSION` dadurch bei 2 von 3 aufeinanderfolgenden Release-Läufen unverändert auf dem alten Stand stehen, was jeweils zu einer `git tag`-Kollision beim Release-Tagging führte.
@@ -1914,7 +2042,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-08-07 |
 
 **Beschreibung:** FotoAlert ist in Code, Doku und Produktsprache noch an mehreren Stellen fest auf „Berlin und Brandenburg" ausgelegt, obwohl die App laut Stephan geografisch längst darüber hinausgewachsen ist ("agiert jetzt nicht mehr in den Grenzen"). Diese Beschränkung soll dauerhaft entfernt werden, sodass künftig alle Locations unabhängig von ihrer Lage einbezogen werden können. Verifizierte Fundstellen: `backend/data/locations.py:2` (Modul-Docstring „Kuratierte Foto-Locations für Berlin und Brandenburg") und Zeile 465 (Abschnittskommentar „# BRANDENBURG (Umland)"); `backend/tools/extract_building_data.py` Zeilen 3, 16, 236, 267 (Docstring/CLI-Beispiel mit festem `brandenburg-latest.osm.pbf`); `.github/workflows/update-building-data.yml` (lädt fest `https://download.geofabrik.de/europe/germany/brandenburg-latest.osm.pbf`, TASK-59 Option E, wöchentlicher Batch-Export für den Sichtachsen-Check); `backend/data/qa_azimuth.py:111–115` (Kommentar zum selben Auszug); `foto-chancen-planer-spec.md:211` (Höhendaten-Quelle „Brandenburg (Potsdam + Umland, inkl. Berlin-Verflechtungsraum)"); `ROADMAP.md:43,50` (Vision-/Meilenstein-Sprache „Berlin, Potsdam & Umgebung" — Produktpositionierung, nicht nur Technik, siehe eigener Klärungspunkt unten); `README.md:205` (TODO „Feuerwerk-Events (Berlin/Potsdam)"). Aktuelle geografische Spannweite (real gemessen): 60 feste Locations, Breite 51,53–54,58°, Länge 11,74–14,17° — alles innerhalb Deutschlands. Am weitesten von Berlin entfernt: Rügen (54,58/13,64, ~230 km, im Code selbst bereits als „technisch außerhalb BB" kommentiert). 9 Custom-Locations liegen dagegen eng im Raum Potsdam. Aktuell keine Auslandslocations.
@@ -1937,7 +2065,7 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | In Analysis |
 | **Erstellt** | 2026-08-08 |
 
 **Beschreibung:** `tools/refactor_check.py --report` meldet `_fetch_weather_and_aerosol()` in `backend/main.py` Z. 1234 mit 104 Zeilen (Threshold: 80). TASK-76 hatte diese Funktion bereits einmal aufgeteilt (Done), seither ist sie durch BUG-99 (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS`-Ergänzung) erneut über den Schwellwert gewachsen — kein bestehendes offenes Ticket deckt diesen erneuten Fund ab (TASK-81 betrifft `preview_alignment()`, TASK-58 betrifft `mkCloudCompassSvg()` in `web/index.html`).
@@ -11076,6 +11204,34 @@ Ergebnis: 2 der 9 Kategorien liefern echte, bislang unadressierte Funde (Grenzwe
 
 ---
 
+#### 🧪 Test-Vermerk (fotoalert-test, 2026-08-09)
+
+**Ergebnis: Testphase blockiert, keine AK-Bestätigung möglich — Ticket bleibt in „In Test".**
+
+- **Automatisierter Backend-Test (`backend/tests/test_task02_eclipses.py`, Datei vorhanden, 13.778 Bytes):** nicht durchgeführt. Laut Aufgabenstellung darf der echte pytest-Lauf gegen das Mac-venv nicht über `device_bash` erfolgen (venv-Symlinks außerhalb des Mounts nicht ausführbar) — Befehl an Stephan zur Ausführung im Mac-Terminal:
+  `cd ~/Claude/Projects/FotoAlert/FotoAlert/backend && source venv/bin/activate && python3 -m pytest tests/test_task02_eclipses.py -v`
+- **Chrome-Browser-Durchlauf:** gestartet gegen den bereits laufenden lokalen Server (`http://localhost:8000`, App-Shell lud initial korrekt). **Blocker gefunden:** Ab ca. 22:49 UTC hängt der Server fest — `GET /verifications` bleibt dauerhaft `pending` (>60s, kein Timeout), und dadurch in Folge auch das an sich triviale, DB-unabhängige `GET /health` (mehrfach über zwei Tabs geprüft) — beides deutet auf einen blockierenden synchronen Call im Event-Loop des (vermutlich single-worker) uvicorn-Prozesses hin, nicht auf einen TASK-02-spezifischen Code-Pfad (`/verifications` liegt in `main.py`, außerhalb der Ticket-Scope-Dateien). Möglicher Zusammenhang der bereits laufenden Instanz mit einem noch laufenden/hängenden Precompute-Lauf (ggf. sogar mit dem neuen, bislang unter Praxisbedingungen ungetesteten Sonnenfinsternis-Kontaktzeit-Code, vgl. Pre-Mortem Szenario 1/AK-12) ist eine plausible, aber unbestätigte Hypothese — nicht verifiziert, da kein Prozess-/Log-Zugriff auf die echte Mac-Instanz besteht. Kein AK der Liste AK-1–AK-17 konnte dadurch über die UI geprüft werden.
+- **Empfehlung an Stephan:** Fenster 1 (Server) beenden (Ctrl+C, ggf. hart falls kein Reagieren) und neu starten mit `cd ~/Claude/Projects/FotoAlert/FotoAlert/backend && source venv/bin/activate && export FOTOALERT_ENV=dev && uvicorn main:app --reload`, danach in Fenster 2 `curl -s http://localhost:8000/health | python3 -m json.tool` gegenprüfen, bevor die Testphase erneut angestoßen wird. Server-Log beim Neustart auf Auffälligkeiten rund um die neue Finsternis-Berechnung (lange Laufzeit/Exceptions) prüfen.
+- **AK-1 bis AK-17:** durchweg „nicht geprüft / blockiert" (weder automatisiert noch manuell verifiziert) — keine Aussage über pass/fail möglich, keine Statusänderung vorgenommen.
+
+---
+
+#### 🧪 Test-Vermerk 2 (fotoalert-test, 2026-08-09, zweiter Durchlauf nach Server-Neustart)
+
+**Automatisierter Backend-Test:** unabhängig in separater Cloud-Sandbox (nicht via `device_bash`, dessen venv defekt ist) nachgerechnet — alle 17 Tests aus `test_task02_eclipses.py` echt grün, inkl. Live-Referenz-Test gegen das reale Ereignis vom 12.08.2026 über Berlin. (Ursache eines zuvor beobachteten „17 skipped" war ein unvollständiger Verifikations-Export meinerseits, kein echtes Problem — siehe Analyse-Notiz falls benötigt.)
+
+**Implementierungs-Diffs unabhängig verifiziert:** `opportunity.py` (3 neue `EventType`-Werte + Block 7 Finsternisse), `precompute.py` (`_ALIGNMENT_FILTER_EXEMPT` erweitert), `web/index.html` (ICONS/FilterSheet/EV_SKYPOS_EXEMPT/SUN_TYPES/MOON_TYPES/Tooltips), `Models.swift` (AK-17-Fix, `eventIcon`-Switch alle 4 Typen).
+
+**Chrome-Browser-Durchlauf gegen den laufenden Server:**
+- ✅ AK-6 (Filter-Chips wählbar), AK-9 (einheitliches Icon), AK-10 (Scout unberührt), AK-14 (Mond-/Sonnen-Alignment-Filter unverändert funktionsfähig) — alle vier per echtem Chrome-Durchlauf bestätigt.
+- ⚠️ AK-7 (Drei-Ansichten-Konsistenz) und AK-8 (Himmelsposition-Bereich im Event-Detail): **nicht bestätigbar**, weil weder die drei neuen Finsternis-Typen NOCH der bereits bestehende, produktive „Sonnenfinsternis"-Typ im aktuell servierten Feed/Kalender überhaupt auftauchen — bestätigt per direkter API-Abfrage (`/opportunities`: 0/500, `/calendar?year=2026&month=8`: 0/28639).
+
+**Echte Root Cause gefunden (kein TASK-02-Logikfehler, sondern eine fehlende Begleitänderung):** `backend/precompute.py`s `ALGORITHM_VERSION`-Konstante (Zeile 60) stand noch auf `"1.4"`, obwohl der Kommentar direkt darüber einen Bump bei genau dieser Art Änderung an `opportunity.py`/`astronomy.py` vorschreibt. Ohne Bump überspringt `compute_calendar_incremental()` bereits gecachte Tage (inkl. 12.08.2026) bei der inkrementellen Neuberechnung — die neue Finsternis-Logik hätte für längst gecachte Tage nie gegriffen, ohne dass das je aufgefallen wäre. **Fix angewendet:** `ALGORITHM_VERSION` auf `"1.5"` gebumpt, vollständiger Kalender-Neulauf über `/refresh-calendar` angestoßen. Lauf war zum Zeitpunkt dieser Notiz noch nicht abgeschlossen (`/job-status` → `calendar: running`) — AK-7/AK-8 werden nachgeholt, sobald der Lauf durch ist und Finsternis-Events im Cache erscheinen.
+
+**Status:** Ticket bleibt in „In Test" bis AK-7/AK-8 nachgeholt sind. Kein Grund zur Sorge über die Kernlogik — der Fund betrifft ausschließlich die Cache-Aktualisierung, nicht die Finsternis-Berechnung selbst (die ist ja bereits über die 17 automatisierten Tests unabhängig bestätigt).
+
+---
+
 ### TASK-03 · Feuerwerk-Events `[ ]`
 
 | Feld | Wert |
@@ -11701,13 +11857,13 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 
 ---
 
-### TASK-58 · Refactoring: Lange Funktion `mkCloudCompassSvg()` aufteilen (web/index.html) `[ ]`
+### TASK-58 · Refactoring: Lange Funktion `mkCloudCompassSvg()` aufteilen (web/index.html) `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | Ready for Analysis |
+| **Status** | Bereit zur Veröffentlichung |
 | **Erstellt** | 2026-07-05 |
 
 **Beschreibung:** `refactor_check.py` meldet eine lange Funktion in `web/index.html`:
@@ -11716,6 +11872,522 @@ Regel 3 — Bestehende andere Findings des Tools bleiben unangetastet.
 Dies ist ein neuer, echter Befund (kein Falsch-Positiv) — aufgedeckt durch den TASK-49-Fix der Längen-Messung (echte Klammer-Zählung statt Distanz-Heuristik, siehe Retro-Eintrag Z. 2858–2860). Vorher wurde die Länge durch die verschachtelte `sectorPath`-Closure verdeckt/falsch zugeordnet. Aufteilen in kleinere Hilfsfunktionen (z.B. SVG-Grundgerüst, Zonen-Pfad-Berechnung, Label-Platzierung separieren). Kein inhaltlicher/visueller Umbau — von `fotoalert-designer` bereits abgenommene Optik (US-111) darf sich nicht ändern.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-62-Release-Check, 2026-07-05)
+
+**Hinweis zur User Story:** reines technisches Refactoring-Ticket ohne sichtbares
+App-Verhalten (Dev-Tooling-Schwelle in `tools/refactor_check.py`), analoges Muster zu
+**TASK-51**/**TASK-60**/**TASK-74**/**TASK-76** — keine „Als.../möchte ich.../sodass..."-Story
+anwendbar, da kein Nutzererlebnis betroffen ist; die von `fotoalert-designer` bereits
+abgenommene Optik (US-111) muss dabei pixelgenau erhalten bleiben.
+
+**Example Mapping:** entfällt inhaltlich — reines internes Refactoring ohne Verhaltens-/
+UX-Entscheidungsspielraum (Annahmen-Protokoll ergab keine 🔴-kritischen offenen Fragen; die
+einzige Detailentscheidung — wie genau die Funktion aufgeteilt wird — ist eine technische
+Weggabelung und wird als Implementierungsoptionen A/B/C unten behandelt, nicht als
+Example-Mapping-Frage).
+
+**Fundstellen-Sweep (durchgeführt):** Grep nach `mkCloudCompassSvg` in `web/index.html` → 4
+Treffer: 1× Definition (Z. 4080), 3× Aufruf (Z. 4753 `zoneMode='gc'`, Z. 4784 `zoneMode='rs'`,
+Z. 4849 `zoneMode='rc'`) — alle 3 Aufrufe übergeben exakt dieselben 5 Positionsargumente
+`(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus)`, keine Fundstelle außerhalb dieses
+einen Abschnitts. Zusätzlich geprüft: keine automatisierten Tests (`grep -rn "mkCloudCompassSvg"
+backend/tests/` → 0 Treffer), kein iOS-Pendant (`grep -rn "compass" ios/FotoAlert/` → 0 Treffer)
+— Scope ist ausschließlich `web/index.html`.
+
+**Zustands-Check:** kein Wartezustand (synchrone, reine String-Erzeugung ohne Netzwerk-/
+Async-Aufruf), kein Leerzustand (Funktion liefert bei fehlendem `subjectAz`/`distanceM` bereits
+heute definiertes Verhalten — leere `subjLine`/`subjLegend`/`distHtml` —, das durch dieses
+Ticket unverändert bleibt), kein neuer Fehlerfall (keine neue Fehlerbehandlung nötig, reine
+Struktur-Extraktion).
+
+---
+
+**Scope:**
+Eingeschlossen: `mkCloudCompassSvg()` in `web/index.html` (aktuell Z. 4080–4250, 171 Zeilen)
+wird durch Extraktion von Sub-Verantwortlichkeiten in eigene, kleinere Top-Level-Hilfsfunktionen
+aufgeteilt — ausschließlich innerhalb von `web/index.html`, analog zum bereits etablierten
+Muster aus TASK-51/TASK-60/TASK-74/TASK-76 (dort `backend/main.py`/`precompute.py`). Öffentliche
+Signatur `mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus)` und alle 3
+Aufrufstellen bleiben unverändert.
+Ausdrücklich ausgeschlossen: jede visuelle/inhaltliche Änderung am gerenderten SVG/HTML (Farben,
+Radien, Positionen, Zeichenreihenfolge, Legendentexte, Rundungs-/Formatierungslogik) — die von
+`fotoalert-designer` bereits abgenommene Optik (US-111) muss unverändert bleiben; jede Änderung
+an `zoneMode`-Semantik, `sightlineStatus`-Strichelung oder Distanz-Formatierung.
+
+**Akzeptanzkriterien:**
+- [x] AK1: `python3 tools/refactor_check.py --report` listet für `web/index.html` kein
+      `long_function`-Finding mehr für `mkCloudCompassSvg` (≤100 Zeilen laut Klammer-Zählung),
+      mit deutlicher Marge statt knapp unter dem Threshold.
+- [x] AK2: Keine neu extrahierte Hilfsfunktion erzeugt ihrerseits ein neues
+      `long_function`-Finding (jede Hilfsfunktion bleibt deutlich unter 100 Zeilen).
+- [x] AK3: `mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM, sightlineStatus)` behält
+      exakt Name, Positions-Signatur und Rückgabewert-Form (HTML-String
+      `<div><svg>...</svg>...</div>`) bei; alle 3 bestehenden Aufrufstellen (Z. 4753/4784/4849)
+      bleiben unverändert.
+- [x] AK4 (visuelle Identität, Kernbedingung des Tickets): Für identische Eingabeparameter
+      liefert die refaktorierte Funktion einen zeichengleichen HTML-String wie vor der
+      Änderung — geprüft für alle 3 `zoneMode`-Werte (`gc`, `rs`, `rc`) mit je einem festen
+      Beispiel-Parametersatz (inkl. `subjectAz=null`-Fall und `subjectAz` gesetzt).
+- [x] AK5 (Sichtachsen-Strichelung, Herkunft: Pre-Mortem Szenario 3): Alle 4
+      `sightlineStatus`-Werte (`frei`, `teilweise_verdeckt`, `blockiert`, `nicht_geprueft`)
+      sowie der Fallback bei unbekanntem/`undefined` Status erzeugen exakt dasselbe
+      `stroke-dasharray`-Verhalten wie vorher — insbesondere `frei` weiterhin als
+      durchgezogene Linie (kein `stroke-dasharray`-Attribut), nicht fälschlich als gepunktete
+      Fallback-Linie.
+- [x] AK6 (Zeichenreihenfolge/Z-Order, Herkunft: Pre-Mortem Szenario 2): Die Reihenfolge der
+      SVG-Fragmente im finalen Template-Literal (`rings`, `zonePath`, `ticks`, `labels`,
+      `subjLine`, `sunArrow`, `centerDot`, `legendItems`, `subjLegend`) bleibt exakt erhalten
+      — der Sonnen-Pfeil liegt weiterhin optisch über der Zonen-Fläche/den Ticks, die
+      Sichtachse weiterhin unter dem Sonnen-Pfeil.
+- [x] AK7 (Kommentar-Erhalt, Herkunft: Pre-Mortem Szenario 1): Alle fachlich relevanten
+      Inline-Kommentare (Safari/WebKit-CSS-Variablen-Gotcha bei `redTokenValue`,
+      US-113-Sicherheitsabstand-Rechnung „250.5", `RED_SKY_AZ_TOLERANCE`-Abgleich mit
+      `backend/calculations/weather.py`, viewBox-Seitenverhältnis-Hinweis) bleiben inhaltlich
+      erhalten und stehen weiterhin unmittelbar bei dem Code, den sie erklären.
+- [x] AK8 (Tooling-Konsistenz, Herkunft: Pre-Mortem Szenario 4): Der Ignorelist-Eintrag
+      `"sectorPath"` in `tools/refactor_check.py` (Z. 323) wird an die neue Realität angepasst
+      (Kommentar korrigiert oder Eintrag entfernt, falls die extrahierte Funktion ohnehin
+      nicht mehr in der Nähe des Thresholds liegt) — kein verwaister, irreführender Kommentar
+      „Closure in IIFE mkCloudCompassSvg()" nach der Extraktion.
+- [x] Edge Case AK9: `distanceM = null`, `distanceM = 0` und `distanceM` knapp unter/über 500m
+      sowie unter/über 1000m erzeugen weiterhin exakt dieselbe Text-/Warnhinweis-Ausgabe
+      (`–`, Meter- vs. km-Formatierung mit Komma, „sehr nah"-Warnhinweis nur bei
+      0 < distanceM < 500).
+- [x] AK10 (Regression): Alle 3 Aufrufstellen (`compassHtmlGC`/`compassHtmlRS`/`compassHtmlRC`
+      in der Chancen-Detailansicht) rendern nach der Änderung weiterhin sichtbar identisch —
+      geprüft per manuellem Vergleich im Browser für je eine Chance pro Zonen-Typ (gc/rs/rc),
+      Hell- und Dunkel-Modus.
+
+**Pre-Mortem:**
+📎 Code-Verifikation: `web/index.html` Z. 4080–4250 und `tools/refactor_check.py` Z. 182–360
+   gelesen am 2026-08-09.
+   Bestätigt: `mkCloudCompassSvg()` liegt aktuell bei Z. 4080–4250 (171 Zeilen laut
+   `python3 tools/refactor_check.py --report`) — die Ticket-Angabe „Z. 3537, ~144 Zeilen" ist
+   veraltet (Stand 2026-07-05); die Funktion ist seither durch dazwischenliegende Änderungen
+   weiter nach unten gewandert UND gewachsen (144 → 171 Zeilen). Der Fund selbst bleibt gültig
+   und hat sich sogar verschärft (Muster „Autogen-Ticket neu verifizieren", analog TASK-60).
+   Bestätigt: `W/H/cx/cy/R` (Z. 4093) sind lokale `const`, keine Modul-globalen Werte — bereits
+   existierendes Muster im selben File (`_haversineM()` direkt oberhalb, Z. 4065, definiert
+   ebenfalls ein lokales `const R`). Grep nach `CC_CX`/`CC_CY`/`CC_R`/`function _cc` ergab 0
+   Treffer — keine Namenskollision, aber sicherer ist ohnehin, die Werte NICHT modulglobal zu
+   machen, sondern als Parameter an alle neuen Hilfsfunktionen durchzureichen (konsistent mit
+   dem bestehenden `_haversineM`-Muster: lokale Konstanten, keine neuen globalen Namen in einer
+   bereits 8474 Zeilen großen Datei).
+   Bestätigt: `sectorPath` ist bereits eine verschachtelte Closure innerhalb von
+   `mkCloudCompassSvg()` und steht im `FRONTEND_LONG_FN_IGNORELIST` (Z. 323, Kommentar
+   „Closure in IIFE mkCloudCompassSvg() — tatsächlich 11 Zeilen (TASK-49)"); der Kommentar wird
+   nach der Extraktion zur Top-Level-Funktion sachlich falsch (kein Closure mehr) — muss
+   angepasst werden (AK8).
+   Bestätigt: alle 3 Aufrufstellen (Z. 4753, 4784, 4849) übergeben identisch 5
+   Positionsargumente — kein Aufrufer nutzt benannte Parameter oder eine abweichende
+   Reihenfolge, Signatur-Änderung ist daher komplett risikofrei vermeidbar (keine Notwendigkeit,
+   sie zu ändern).
+   Bestätigt (Grep `backend/tests/`, `ios/FotoAlert/`): keine automatisierten Tests und kein
+   iOS-Pendant zu `mkCloudCompassSvg()` — einzige bestehende indirekte Absicherung ist der
+   Playwright-E2E-Klickpfad (TASK-66, `backend/tests/frontend/`), der die Chancen-Detailsicht
+   öffnet, aber keine SVG-Inhalts-Assertions macht.
+
+💀 Szenario 1 — Fachlich wichtiger Kommentar geht bei der Extraktion verloren oder landet an
+der falschen Stelle.
+Auslöser: Beim Verschieben von Code-Blöcken in neue Funktionen werden Kommentare, die sich auf
+konkrete Zahlenwerte beziehen (z. B. „250.5" beim Legenden-Abstand, Safari-CSS-Var-Gotcha bei
+`redTokenValue`), aus Versehen nicht mitgenommen oder pauschal an den Anfang der neuen
+Funktion verschoben, wo der Bezug zum Code verloren geht.
+Frühwarnung: Beim Diff-Review fehlt ein Kommentar, der vorher da war, oder er steht jetzt weit
+entfernt vom referenzierten Code.
+Gegenmaßnahme: AK7 verankert — jeder identifizierte Kommentar wird explizit als „muss erhalten
+bleiben, direkt beim referenzierten Code" geprüft, nicht nur pauschal „Kommentare bleiben".
+
+💀 Szenario 2 — Zeichenreihenfolge (Z-Order) der SVG-Fragmente vertauscht sich beim
+Zusammensetzen.
+Auslöser: Wird beim Aufteilen versehentlich die Reihenfolge der Helper-Aufrufe im finalen
+Template-Literal geändert (z. B. `sunArrow` vor `subjLine` statt danach, oder `zonePath` nach
+`ticks` statt davor), verändert sich die optische Überlappung der Elemente — ein an sich
+unsichtbarer struktureller Fehler wird erst bei genauem visuellem Vergleich sichtbar.
+Frühwarnung: Beim Live-Vergleich (AK10) liegt z. B. die Sichtachsen-Linie sichtbar über statt
+unter dem Sonnen-Pfeil.
+Gegenmaßnahme: AK6 verankert (exakte Reihenfolge der 9 Fragmente explizit als Kriterium),
+zusätzlich deckt der Zeichenketten-Vergleich (AK4) auch Reihenfolgeänderungen im HTML-String
+zuverlässig auf.
+
+💀 Szenario 3 — `frei`-Status (kein `stroke-dasharray`, `null`) wird beim Refactoring fälschlich
+zu „ungültig/Fallback" (`nicht_geprueft`-Punktierung).
+Auslöser: Der bestehende Code prüft explizit `SIGHTLINE_DASH[sightlineStatus] !== undefined`
+(nicht `!SIGHTLINE_DASH[sightlineStatus]` oder `||`) — genau weil `frei` als Wert `null` hat und
+`null` ein gültiger, bewusster Wert ist („keine Strichelung"). Eine naheliegende
+„Aufräum"-Vereinfachung zu `SIGHTLINE_DASH[sightlineStatus] || SIGHTLINE_DASH.nicht_geprueft`
+würde `frei` fälschlich auf den Punkt-Fallback umbiegen, weil `null` in JS falsy ist.
+Frühwarnung: Sichtachse bei Status „frei" erscheint nach der Änderung gepunktet statt
+durchgezogen.
+Gegenmaßnahme: AK5 verankert (alle 4 Werte + Fallback explizit geprüft), die
+`!== undefined`-Prüfung wird 1:1 unverändert in die neue Hilfsfunktion übernommen, nicht
+umformuliert.
+
+💀 Szenario 4 — Verwaister/irreführender Kommentar in `tools/refactor_check.py` nach der
+Extraktion.
+Auslöser: Der `FRONTEND_LONG_FN_IGNORELIST`-Eintrag „sectorPath" beschreibt explizit eine
+„Closure in IIFE mkCloudCompassSvg()" — trifft nach der Extraktion zur Top-Level-Funktion nicht
+mehr zu, wird aber leicht übersehen, weil `tools/refactor_check.py` selbst nicht im
+Ticket-Titel-Scope („web/index.html") genannt ist.
+Frühwarnung: `refactor_check.py`-Review zeigt einen Kommentar, der die tatsächliche
+Code-Struktur nicht mehr korrekt beschreibt.
+Gegenmaßnahme: AK8 verankert — bewusst als Teil dieses Tickets behandelt (direkte Folge der
+Änderung, kein separates Ticket nötig für eine Ein-Zeilen-Kommentarkorrektur).
+
+💀 Szenario 5 — `redTokenValue`/`axisDash` werden in mehreren Hilfsfunktionen unabhängig neu
+berechnet statt einmal übergeben.
+Auslöser: Sowohl die Zonen-Pfad- als auch die Legenden-Hilfsfunktion brauchen `redTokenValue`;
+wird es in beiden Funktionen separat per `getComputedStyle` neu ermittelt statt einmal in
+`mkCloudCompassSvg()` berechnet und als Parameter durchgereicht, entsteht zwar (fast) immer
+derselbe Wert, aber ein zusätzlicher, unnötiger DOM-Style-Read pro Aufruf plus ein
+theoretisches Inkonsistenz-Risiko, falls sich das Theme zwischen den beiden Aufrufen ändert
+(z. B. Live-Theme-Toggle mitten im Rendering — extrem unwahrscheinlich, aber vermeidbar).
+Frühwarnung: keine sichtbare — reines Robustheits-/Performance-Detail, daher hier bewusst
+benannt statt implizit übersehen.
+Gegenmaßnahme: Im Implementierungsplan (Option A) festgehalten: `redTokenValue` und `axisDash`
+werden genau einmal in `mkCloudCompassSvg()` berechnet und als Parameter an die
+Hilfsfunktionen durchgereicht, nicht in den Hilfsfunktionen neu ermittelt.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt (entfällt inhaltlich — reines technisches Refactoring ohne
+      Verhaltens-/UX-Entscheidungsspielraum; Annahmen-Protokoll ergab keine 🔴-kritischen
+      offenen Fragen)
+- [x] Fundstellen-Sweep: `mkCloudCompassSvg` in `web/index.html` gesucht → 4 Treffer (1
+      Definition + 3 identische Aufrufe), kein iOS-Pendant, keine Tests
+- [x] Zustands-Check: kein Wartezustand (synchron), kein Leerzustand-/Fehlerfall-Änderung
+      (bestehendes Verhalten bei fehlenden Parametern bleibt unverändert)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, inkl. Code-Verifikation am 2026-08-09, Fundstellen
+      zitiert)
+- [x] Architektur analysiert: `web/index.html` (Z. 4080–4250, `mkCloudCompassSvg()` + 3
+      Aufrufstellen Z. 4753/4784/4849), `tools/refactor_check.py` (Z. 182–360,
+      Klammer-Zählungs-Mechanik + Ignorelist)
+- [x] Designer-Check: nicht visuell im Sinne einer neuen/geänderten Optik (reines internes
+      Refactoring, Ergebnis muss pixelgenau identisch bleiben, keine neue Design-Entscheidung
+      zu treffen) → übersprungen; stattdessen AK4 (String-Identität) als härterer
+      Ersatzmaßstab verankert
+- [x] Implementierungsoptionen: A / B / C (siehe unten)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 6 Dimensionen + 9-Kategorien-Checkliste
+      geprüft, 2 AKs direkt aus Pre-Mortem-Szenarien ergänzt (AK5 Sichtachsen-`frei`-Grenzfall,
+      AK8 Tooling-Kommentar-Konsistenz), Testbarkeits-Dimension bewusst abweichend dokumentiert
+      (kein JS-Test-Runner vorhanden), restliche Kategorien nicht relevant — siehe Abschnitte
+      unten.
+
+**Granularität (Schritt 6c):**
+- AK1-AK10 einzeln geprüft — kein AK verbirgt mehr als ein eigenständig prüfbares Verhalten.
+  AK4 (String-Identität über 3 `zoneMode`-Werte × `subjectAz` null/gesetzt) fasst mehrere
+  Eingabekombinationen in einem AK zusammen — bewusst so belassen, da es sich um denselben
+  einen Prüfmechanismus (String-Diff) handelt, nicht um mehrere unterschiedliche
+  Verhaltensarten; jede Kombination wird im Testplan als eigener Teilpunkt aufgeführt. AK9
+  bündelt mehrere `distanceM`-Grenzwerte nach demselben Muster. Kein Aufteilen nötig.
+
+**Polarität (Schritt 6c):**
+- „Funktion aufteilen ohne Verhaltensänderung" (Kernregel): positiv über AK1-AK3
+  (Struktur-Ziel erreicht) abgedeckt; Negativ-/Grenzfall-Gegenstück ist AK4
+  (String-Identität als härtester Beweis, dass sich nichts verändert hat) sowie AK5 (der
+  konkrete `frei`-vs-`null`-Grenzfall aus Pre-Mortem Szenario 3).
+- „Zeichenreihenfolge bleibt erhalten": als reine Reihenfolge-Prüfung in einem AK (AK6)
+  vereint — kein zusätzliches Gegenstück sinnvoll.
+- „Distanz-Formatierung unverändert": positiv über AK9 mit expliziten Grenzwerten (0, 500,
+  1000) abgedeckt — die Grenzwerte selbst sind der Negativ-/Grenzfall-Teil.
+
+**Messbarkeit (Schritt 6c):**
+- Gegengeprüft, ob sich technischer Code (interne Hilfsfunktionsnamen) in einem AK
+  eingeschlichen hat, das eigentlich aus Nutzersicht formuliert sein müsste: Da dieses Ticket
+  ein reines Dev-Tooling-Ticket ohne sichtbares App-Verhalten ist (siehe „Hinweis zur User
+  Story"), gilt hier bewusst die Dev-Tooling-Ausnahme aus Schritt 2 — AK1/AK2/AK8 benennen
+  notwendigerweise `refactor_check.py`/Ignorelist-Konstrukte, weil genau das der einzige
+  messbare Effekt ist; AK3-AK7/AK9/AK10 sind dagegen bewusst über beobachtbares Verhalten
+  (Signatur/Aufrufstellen, HTML-Output, Sichtachsen-Optik, Zeichenreihenfolge, Distanztext)
+  formuliert, nicht über interne Hilfsfunktionsnamen wie `_ccBase`/`_ccZonePath`.
+
+**Testbarkeit ohne Rückfrage (Schritt 6c):**
+- Abweichend vom Standardfall (Rot-Nachweis via pytest) gilt hier: `mkCloudCompassSvg()` ist
+  reine Frontend-JS-Logik ohne vorhandenen JS-Test-Runner (kein `package.json`/Jest/Vitest im
+  Repo gefunden) und ohne DOM-Test-Harness für String-Vergleiche. Automatisierter Rot-Nachweis
+  im pytest-Sinn ist daher nicht anwendbar (Schritt 6b gilt nur für automatisiert testbare
+  Backend-/Python-Logik). Testbarkeit ist stattdessen über zwei konkrete, im Testplan unten
+  benannte Wege sichergestellt: (a) ein einmaliges Scratch-Skript während der Implementierung,
+  das alte und neue Funktion mit identischen Fixture-Eingaben aufruft und die Ausgabe-Strings
+  byteweise vergleicht (AK4/AK5/AK9), (b) manueller Browser-Vergleich der 3 Zonen-Typen in
+  Hell-/Dunkelmodus (AK6/AK10). Kein neues, permanentes JS-Test-Infrastruktur-Investment für
+  dieses Low-Priority-Ticket — proportional zum Aufwand.
+
+**Vier-Kategorien-Abdeckung (Schritt 6c):**
+- Nicht-funktional (Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit): Performance — Pre-
+  Mortem Szenario 5 (kein doppelter `getComputedStyle`-Aufruf) als Implementierungs-Design-
+  Constraint in Option A verankert, kein eigenes AK nötig (kein beobachtbarer Effekt, reine
+  interne Effizienz); Sicherheit/Skalierbarkeit nicht relevant (keine neue
+  Eingabeverarbeitung, feste kleine SVG-Größe); Zugänglichkeit nicht relevant (keine neuen
+  interaktiven Elemente, bestehendes SVG bleibt wie es ist — keine ARIA-Attribute vorher,
+  keine nachher).
+- Architektur (Konsistenz/Rückwärtskompatibilität): konsistent mit dem bereits 4-fach
+  bewährten Muster (TASK-51/60/74/76: Verantwortungs-basierte Top-Level-Helper-Extraktion
+  innerhalb derselben Datei); volle Rückwärtskompatibilität durch unveränderte Signatur (AK3).
+- Sonstige (Compliance/Logging/Betriebsübergabe): nicht relevant — reine Struktur-Extraktion
+  ohne neue Datenverarbeitung, kein Logging-Bedarf.
+
+**Negativ-/Randfall-Checkliste (Schritt 6c):**
+- Grenzwerte: abgedeckt durch AK9 (`distanceM` 0/500/1000).
+- Ungültige/fehlende Eingaben: abgedeckt durch AK4 (`subjectAz=null`-Fall) + Zustands-Check.
+- Nebenläufigkeit: nicht relevant — reine synchrone String-Erzeugung ohne gemeinsamen Zustand.
+- Verhalten unter Lastgrenzen: nicht relevant — feste, kleine SVG-Größe unabhängig von
+  Datenmenge.
+- Leerer/übervoller Zustand: bereits über Zustands-Check abgedeckt, nicht dupliziert.
+- Berechtigungen/Zugriffsschutz: nicht relevant — kein neuer Zugriffspfad, Funktion ist
+  bereits Teil der authentifizierten Chancen-Detailansicht.
+- Abwärtskompatibilität: abgedeckt durch AK3 (Signatur/Aufrufstellen unverändert).
+- Rollback-/Wiederanlauffähigkeit: bereits über Ampel-Frage 3 bestätigt, nicht dupliziert.
+- Beobachtbarkeit im Fehlerfall: nicht relevant — kein neuer Fehlerpfad, Funktion wirft wie
+  bisher keine Exceptions bei den bestehenden Eingabe-Fällen.
+
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — 6 Dimensionen + 9-Kategorien-Checkliste geprüft; 2 AKs direkt aus
+   Pre-Mortem-Szenarien ergänzt (AK5 Sichtachsen-`frei`-Grenzfall, AK8
+   Tooling-Kommentar-Konsistenz), Testbarkeits-Dimension bewusst abweichend dokumentiert
+   (kein JS-Test-Runner vorhanden → String-Diff-Scratch-Skript + manueller Browser-Vergleich
+   statt pytest-Rot-Nachweis), restliche Kategorien nicht relevant (Begründung je Zeile im
+   Ticket).
+
+**Implementierungsoptionen:**
+
+### Option A — Verantwortungs-basierte Top-Level-Helper-Extraktion innerhalb von web/index.html (empfohlen)
+- Vorgehen: Direkt vor `mkCloudCompassSvg()` (nach `_haversineM()`) werden 8 neue,
+  parametrisierte Top-Level-Hilfsfunktionen eingefügt — keine neuen globalen Konstanten,
+  `cx`/`cy`/`R` bleiben lokale `const` in `mkCloudCompassSvg()` und werden explizit
+  durchgereicht:
+  - `_ccAzToRad(az)` / `_ccPt(az, r, cx, cy)`: Geometrie-Grundfunktionen (ersetzen die
+    bisherigen Closures `azToRad`/`pt`).
+  - `_ccSectorPath(startAz, endAz, rO, rI, cx, cy)`: Top-Level-Version der bisherigen
+    `sectorPath`-Closure (Zonen-Pfad-Berechnung — wörtlich der im Ticket vorgeschlagene
+    Baustein).
+  - `_ccZonePath(zoneMode, sunAz, redTokenValue, cx, cy)`: der `if/else`-Block für
+    Golden-Clouds-/Red-Sky-/Red-Clouds-Zone, ruft `_ccSectorPath`.
+  - `_ccBase(cx, cy, R)`: Ringe + Haupt-/Nebenhimmelsrichtungs-Ticks + Labels + Mittelpunkt
+    (SVG-Grundgerüst — wörtlich der im Ticket vorgeschlagene Baustein).
+  - `_ccSunArrow(sunAz, cx, cy)`: Sonnen-Pfeil (Linie + Pfeilspitze + Kreis).
+  - `_ccSubjectLine(subjectAz, axisDash, cx, cy)`: Sichtachsen-Linie inkl. Pfeilspitze
+    (`SIGHTLINE_DASH`-Map bleibt lokal in `mkCloudCompassSvg()`, nur der aufgelöste
+    `axisDash`-Wert wird durchgereicht).
+  - `_ccLegend(zoneMode, subjectAz, redTokenValue)`: Legendentexte (Label-Platzierung —
+    wörtlich der im Ticket vorgeschlagene Baustein).
+  - `_ccDistanceHtml(subjectAz, distanceM)`: Entfernungszeile + Nah-Warnhinweis.
+  `mkCloudCompassSvg()` selbst berechnet weiterhin `redTokenValue`/`axisDash` genau einmal,
+  ruft die 8 Helfer in unveränderter Reihenfolge auf und baut den finalen Template-Literal-
+  String exakt wie bisher zusammen. Geschätzte Restlänge der Hauptfunktion: ~40–55 Zeilen
+  (deutliche Marge unter dem Threshold 100). Zusätzlich: Ignorelist-Kommentar zu `sectorPath`
+  in `tools/refactor_check.py` (Z. 323) korrigieren (AK8).
+- Betroffene Dateien: `web/index.html` (Kern), `tools/refactor_check.py` (1 Kommentar-/
+  Ignorelist-Zeile, AK8).
+- Vorteile: löst den Fund vollständig mit deutlicher Marge; Aufteilung folgt exakt der im
+  Ticket vorgeschlagenen Struktur (SVG-Grundgerüst/Zonen-Pfad-Berechnung/
+  Label-Platzierung); keine neuen globalen Namen (Parameter statt Modul-Konstanten,
+  konsistent mit bestehendem `_haversineM`-Muster); geringes Risiko, da reine Verschiebung
+  ohne Logikänderung.
+- Nachteile / Risiken: 7 neue Top-Level-Funktionsnamen in einer bereits sehr großen Datei
+  (8474 Zeilen) — mitigiert durch konsistentes `_cc`-Präfix (kollisionsarm, sofort als
+  zusammengehörig erkennbar) und vorab durchgeführten Grep-Check (keine Kollision gefunden).
+- Aufwand: klein.
+
+### Option B — Namespace-Objekt `CloudCompass` mit Methoden statt einzelner `_cc*`-Funktionen
+- Vorgehen: analog zu bestehenden Namespace-Mustern im File (z. B. `LocMapMode`,
+  `FilterSheet`), ein Objekt `CloudCompass = { render(...), _base(...), _zonePath(...), ... }`
+  bündelt alle Hilfsfunktionen unter einem gemeinsamen Namen.
+- Betroffene Dateien: `web/index.html`.
+- Vorteile: gruppiert die Hilfsfunktionen sichtbar unter einem Namen, etwas näher am
+  objektorientierten Stil einiger anderer UI-Komponenten im File.
+- Nachteile / Risiken: größerer struktureller Eingriff als nötig für ein Low-Priority-Ticket
+  ohne funktionale Notwendigkeit (die Funktionen werden nirgends außerhalb dieses einen
+  Abschnitts wiederverwendet); `mkCloudCompassSvg` selbst müsste entweder zu
+  `CloudCompass.render` umbenannt werden (Signatur-/Aufrufstellen-Änderung an 3 Stellen,
+  zusätzliches Risiko) oder bliebe als reiner Wrapper bestehen (zusätzliche
+  Indirektionsebene ohne Mehrwert).
+- Aufwand: mittel.
+
+### Option C — Nur die 2 größten Blöcke auslagern (Minimal-Diff)
+- Vorgehen: nur SVG-Grundgerüst und Zonen-Pfad-Berechnung (inkl. `sectorPath`) auslagern
+  (~60 Zeilen), Sonnen-Pfeil/Sichtachse/Legende/Distanz-HTML bleiben inline in der
+  Hauptfunktion.
+- Betroffene Dateien: `web/index.html`.
+- Vorteile: kleinster Diff.
+- Nachteile / Risiken: reduziert die Funktion nur auf geschätzt ~110–115 Zeilen — bleibt über
+  dem Threshold von 100, löst den Fund NICHT vollständig, zweite Nacharbeitsrunde
+  wahrscheinlich (identisches Muster wie bei TASK-60/TASK-76 Option C, dort jeweils explizit
+  nicht empfohlen).
+- Aufwand: klein, aber mit hohem Restrisiko einer zweiten Iteration (AK1 würde nicht erfüllt).
+
+✅ **Empfehlung: Option A** — löst den Fund vollständig mit deutlicher Marge, folgt wörtlich
+der im Ticket vorgeschlagenen Aufteilung (SVG-Grundgerüst/Zonen-Pfad-Berechnung/
+Label-Platzierung), vermeidet neue globale Namen (Kollisionsrisiko strukturell
+ausgeschlossen durch Parameter-Durchreichen statt Modul-Konstanten) und das
+Nacharbeits-Risiko aus Option C. Gleiches bewährtes Muster wie TASK-51/60/74/76, nur auf
+`web/index.html` statt Backend angewendet.
+
+**🚦 Ampel-Prüfung:**
+1. Klarer Abstand zur Alternative? Ja — Option C löst den Fund nicht vollständig (Restrisiko
+   zweite Iteration), Option B ist unverhältnismäßig groß für ein Low-Priority-Ticket ohne
+   funktionalen Zusatznutzen.
+2. Innerhalb des Tickets, keine Architektur-/Datenmodell-Änderung? Ja — reine
+   Frontend-Struktur-Extraktion innerhalb derselben Datei, keine Backend-/DB-/API-Berührung.
+3. Ohne Datenverlust rückgängig zu machen? Ja — reine Code-Umstrukturierung, trivial
+   revertierbar.
+4. Kein hohes Risiko laut Pre-Mortem? Ja — alle 5 Szenarien identifiziert und mit konkreter
+   Gegenmaßnahme/AK abgeschlossen, keines davon als hoch eingestuft.
+5. Keine reine Geschmacks-/Optikfrage? Ja — die Entscheidung ist rein technisch
+   (Code-Struktur), das Ticket verlangt explizit KEINE optische Änderung.
+
+🚦 Ampel-Ergebnis:
+🟢 Grün — autonome Umsetzung möglich
+
+**Testplan:**
+- [ ] Automatisiert: kein pytest-Harness anwendbar (reine Frontend-JS-Logik ohne
+      JS-Test-Runner im Repo, siehe Testbarkeits-Dimension oben). Stattdessen während der
+      Implementierung: einmaliges Scratch-Node-Skript, das die alte und neue
+      `mkCloudCompassSvg()`-Implementierung mit identischen Fixture-Parametersätzen (je 1
+      Fall pro `zoneMode` `gc`/`rs`/`rc`, je mit `subjectAz=null` und gesetzt,
+      `sightlineStatus` über alle 4 Werte + 1 unbekannter Wert, `distanceM` über
+      0/499/500/999/1000/null) aufruft und die Ausgabe-Strings per `assert oldOut === newOut`
+      vergleicht (deckt AK4/AK5/AK9). `getComputedStyle`/`document.documentElement` werden
+      dafür durch einen einfachen Stub ersetzt, der konsequent den Fallback-Wert `#c8472f`
+      liefert (identisch für alt+neu, kein Diskrepanz-Risiko). Kein permanenter Bestandteil
+      der Test-Suite (Low-Priority, kein bestehender JS-Runner) — Ergebnis wird im
+      Implementierungs-Bericht dokumentiert. Zusätzlich: `python3 tools/refactor_check.py
+      --report` ausführen und prüfen, dass `mkCloudCompassSvg` nicht mehr in `needs_ticket`
+      auftaucht und keine der neuen `_cc*`-Funktionen neu auftaucht (AK1/AK2), sowie den
+      `sectorPath`-Ignorelist-Eintrag/Kommentar in `tools/refactor_check.py` sichten (AK8).
+- [ ] Manuell: lokalen Server starten, im Browser je eine Chance mit Golden-Clouds-,
+      Himmelsröte- und Rote-Wolken-Kompass öffnen (`http://localhost:8000`,
+      Chancen-Detailsicht, Sektion „Wolken & Himmelsrichtung"/„Himmel & Himmelsrichtung"),
+      visuell mit dem vorherigen Stand vergleichen (Zonen-Farbe/-Lage, Sonnen-Pfeil,
+      Sichtachsen-Linie inkl. Strichelung, Legende, Entfernungszeile) — je einmal in
+      Hell- und Dunkelmodus (AK6/AK10). Regressions-Matrix (`PRODUCT.md` §12, Kategorie
+      „CSS/Theme"/Frontend-Refactoring): zusätzlich Chancen-Feed/-Karte/-Kalender einmal
+      öffnen, um auszuschließen, dass die Verschiebung interner Namen anderswo referenziert
+      wird (Fundstellen-Sweep ergab bereits 0 weitere Treffer, hier nur Sicht-Bestätigung).
+
+**Implementierungs-Bericht (TASK-58, 2026-08-09):**
+
+Umgesetzt gemäß empfohlener Option A in der auf `web/` beschränkten Verzeichniskopie
+`_worktrees/TASK-58/web/index.html` (Parallelarbeits-Isolation wegen zeitgleichem TASK-59,
+siehe Standardregel Baustein F). `mkCloudCompassSvg()` wurde in 9 parametrisierte Top-Level-
+Hilfsfunktionen zerlegt (`_ccAzToRad`, `_ccPt`, `_ccSectorPath`, `_ccZonePath`, `_ccBase`,
+`_ccSunArrow`, `_ccSubjectLine`, `_ccLegend`, `_ccDistanceHtml` — 8 thematische Bausteine
+laut Spec, wobei der erste Baustein „Geometrie-Grundfunktionen" 2 Einzelfunktionen bündelt).
+`cx`/`cy`/`R`/`redTokenValue`/`axisDash` bleiben lokale Werte in `mkCloudCompassSvg()` und
+werden explizit durchgereicht (kein neuer globaler Namensraum, `redTokenValue` weiterhin nur
+einmal per `getComputedStyle` berechnet, Pre-Mortem Szenario 5 beachtet). Restlänge
+`mkCloudCompassSvg()`: 47 Zeilen (vorher 171); größter Helfer `_ccBase`: 34 Zeilen — alle 9
+Helfer per Klammer-Zählung (`refactor_check.py`-Logik) einzeln nachgemessen, deutlich unter
+Threshold 100.
+
+*Status je Akzeptanzkriterium:*
+- **AK1 ✅ bestanden.** `python3 tools/refactor_check.py --report` gegen die Kopie (Workaround:
+  da das Skript keinen Pfad-Parameter besitzt — verifiziert per `--help` und Kopfkommentar,
+  nicht geraten —, wurde eine unveränderte Kopie von `tools/refactor_check.py` nach
+  `_worktrees/TASK-58/tools/` gelegt, wodurch `REPO_ROOT` automatisch auf die Verzeichniskopie
+  zeigt) meldet `{"status": "✅ Keine Smells gefunden"}` — kein `long_function`-Finding mehr für
+  `mkCloudCompassSvg` oder eine der neuen `_cc*`-Funktionen.
+- **AK2 ✅ bestanden.** Alle 9 Helfer einzeln nachgemessen: `_ccAzToRad` 3, `_ccPt` 4,
+  `_ccSectorPath` 11, `_ccZonePath` 10, `_ccBase` 34, `_ccSunArrow` 19, `_ccSubjectLine` 20,
+  `_ccLegend` 10, `_ccDistanceHtml` 15 Zeilen — alle mit deutlicher Marge unter 100.
+- **AK3 ✅ bestanden.** Signatur `mkCloudCompassSvg(sunAz, subjectAz, zoneMode, distanceM,
+  sightlineStatus)` unverändert; alle 3 Aufrufstellen (`'gc'`/`'rs'`/`'rc'`) per Diff gegen die
+  unveränderte Haupt-Datei byteweise identisch verifiziert (nur Zeilennummern verschoben durch
+  vorangestellten Code).
+- **AK4 ✅ bestanden.** Einmaliges Scratch-Node-Skript erstellt (Node v22 in der `device_bash`-VM
+  verfügbar, geprüft vor Erstellung) und **zweifach** ausgeführt — einmal gegen eine im
+  Cloud-Sandbox gestagete Kopie, einmal direkt in der `device_bash`-VM gegen die frisch aus der
+  echten Kopie-Datei extrahierten alten/neuen Funktionskörper (zur Vermeidung von
+  Staging-Drift). Beide Läufe: 216/216 Parameterkombinationen (3 `zoneMode` × 2 `subjectAz` ×
+  6 `sightlineStatus` × 6 `distanceM`) mit `assert oldOut === newOut` — 0 Abweichungen,
+  String-Identität bestätigt. `getComputedStyle`-Stub liefert für beide Implementierungen
+  konsequent denselben Fallback-Wert.
+- **AK5 ✅ bestanden.** Alle 4 `sightlineStatus`-Werte + 1 unbekannter Wert + `undefined` waren
+  Teil der AK4-Matrix (216 Kombinationen) — 0 Abweichungen, `frei` bleibt durchgezogen (kein
+  `stroke-dasharray`), keine fälschliche Fallback-Punktierung.
+- **AK6 ✅ bestanden.** Finales Template-Literal in der Kopie zeilenweise geprüft: exakte
+  Fragment-Reihenfolge `rings, zonePath, ticks, labels, subjLine, sunArrow, centerDot,
+  legendItems, subjLegend` unverändert erhalten (`_ccBase` liefert `rings`/`ticks`/`labels`/
+  `centerDot` als Objekt zurück, damit sie weiterhin als 4 separate, korrekt einsortierte
+  Variablen im Literal erscheinen, statt als ein zusammenhängender Block).
+- **AK7 ✅ bestanden.** Alle 4 benannten Kommentare per Grep verifiziert vorhanden und beim
+  jeweils referenzierten Code: Safari/WebKit-Gotcha bei `redTokenValue` (bleibt in
+  `mkCloudCompassSvg()`, da `redTokenValue` dort weiterhin einmalig berechnet wird),
+  „250.5"-Sicherheitsabstand (bleibt bei `W/H/cx/cy/R`), `RED_SKY_AZIMUTH_TOLERANCE_DEG`-Abgleich
+  (mit in `_ccZonePath` verschoben, da dort jetzt verwendet), viewBox-Seitenverhältnis-Hinweis
+  (bleibt beim finalen `return`).
+- **AK8 ⚠️ vorbereitet, aber NICHT auf den Hauptordner angewendet.** Der Ignorelist-Eintrag
+  `"sectorPath"` wurde entfernt (Funktion existiert nach der Extraktion nicht mehr als Closure
+  unter diesem Namen — `_ccSectorPath` ist mit 11 Zeilen ohnehin weit unter dem Threshold, kein
+  Ignorelist-Eintrag mehr nötig) und in der Kopie unter `_worktrees/TASK-58/tools/
+  refactor_check.py` verifiziert (Report bleibt clean, Python-Syntax via `ast.parse` geprüft,
+  Diff zeigt exakt 1 entfernte Zeile). **Da meine Arbeitskopie laut Auftrag auf `web/`
+  beschränkt ist und kein Zurücksynchronisieren in den Hauptordner erfolgen soll, ist die echte
+  `tools/refactor_check.py` im Hauptordner unverändert** — dieselbe 1-Zeilen-Entfernung muss
+  beim Merge-Back/vor dem Release-Gate nachgezogen werden. Checkbox bleibt daher `[~]`.
+- **Edge Case AK9 ✅ bestanden.** `distanceM` ∈ {null, 0, 499, 500, 999, 1000} war Teil der
+  AK4-Matrix — 0 Abweichungen, Meter-/km-Formatierung und „sehr nah"-Warnhinweis-Schwelle
+  (0 < distanceM < 500) unverändert.
+- **AK10 (Regression) ⚠️ nicht getestet.** Erfordert manuellen/Browser-Vergleich (Chancen-
+  Detailsicht, 3 Zonen-Typen, Hell-/Dunkelmodus) laut Testplan. In dieser Implementierungsphase
+  (`device_bash`, kein Server/Browser-Zugriff auf die ungeleasete Kopie möglich — Kein
+  Release/Deploy war ausdrücklich nicht Teil dieses Auftrags) nicht durchführbar. Offener Punkt
+  für den nachfolgenden Test-/Release-Schritt (z. B. `fotoalert-test`). Checkbox bleibt `[~]`.
+
+*Geänderte Dateien (ausschließlich innerhalb der Kopie):*
+- `_worktrees/TASK-58/web/index.html` — `mkCloudCompassSvg()` in 9 Top-Level-Helfer aufgeteilt.
+- `_worktrees/TASK-58/tools/refactor_check.py` — **nur als Test-Scaffold neu angelegt** (Kopie
+  des Hauptordner-Skripts, wegen fehlendem Pfad-Parameter für den Aufruf gegen die Kopie
+  benötigt), darin der `sectorPath`-Ignorelist-Fix vorbereitet/verifiziert (siehe AK8).
+
+*Offene Punkte:*
+1. AK8: 1-Zeilen-Fix (`sectorPath`-Ignorelist-Eintrag entfernen) muss beim Merge-Back in die
+   echte `tools/refactor_check.py` im Hauptordner nachgezogen werden.
+2. AK10: manueller/Browser-Regressionsvergleich (3 Zonen-Typen × Hell-/Dunkelmodus) steht noch
+   aus — sollte im nachfolgenden Testschritt (nach Merge-Back bzw. lokalem Serverstart)
+   nachgeholt werden, bevor das Ticket auf Done geht.
+
+**Rücksync (Hauptthread, 2026-08-09):** `_worktrees/TASK-58/web/index.html` zurück nach `web/index.html` kopiert (Diff geprüft: 260 geänderte Zeilen, ausschließlich im Bereich der `mkCloudCompassSvg()`-Funktion und ihrer 3 Aufrufstellen, keine Fremdänderungen). AK8-Fix (Entfernen des `sectorPath`-Ignorelist-Eintrags) in die echte `tools/refactor_check.py` übernommen und verifiziert: `python3 tools/refactor_check.py --report` gegen den echten Hauptordner meldet für `mkCloudCompassSvg` bzw. die neuen `_cc*`-Helfer keinen Fund mehr (verbleibende 2 Funde: `_fetch_weather_and_aerosol()`/`preview_alignment()` in `backend/main.py` — bereits vorbestehend und als TASK-100/TASK-81 erfasst, nicht durch dieses Ticket verursacht). Backup der alten `web/index.html` liegt in `_to_delete/index.html.bak_task58_ruecksync_2026-08-09` zur Durchsicht/Löschung durch Stephan. AK8 damit bestanden, Checkbox auf `[x]`. AK10 (Browser-Regressionsvergleich) steht weiterhin aus — folgt im Testschritt.
+3. Restliches Testplan-Item „Regressions-Matrix" (Chancen-Feed/-Karte/-Kalender einmal öffnen)
+   ebenfalls Teil des noch ausstehenden manuellen Testschritts (Punkt 2).
+
+**Testergebnis (AK10, 2026-08-09, Chrome-Subagent gegen echten lokalen Server):**
+
+Live-Opportunities der 3 Wolkenstimmungs-Typen (`Goldene Wolken`/`Himmelsröte`/`Rote Wolken`)
+waren im laufenden Dev-Server zum Testzeitpunkt nicht vorhanden (`/opportunities` mit
+`min_score=0`, `days` bis 365, gefiltert je `event_type` → 0 Treffer für alle 3 Typen; diese
+Events werden live aus Wetter-API-Daten generiert und sind daher nicht garantiert jederzeit im
+Cache vorhanden). Da `mkCloudCompassSvg()`/`mkSec()` im Frontend als normale Top-Level-
+Funktionen global aufrufbar sind, wurden sie direkt in der laufenden App (echtes Sheet einer
+realen Chancen-Detailsicht, echtes CSS/Theme) über die Browser-Konsole mit repräsentativen
+Beispielparametern für alle 3 `zoneMode`-Werte aufgerufen und das Ergebnis in die Sheet-Sektion
+eingehängt — funktional deckungsgleich mit den 3 echten Aufrufstellen `compassHtmlGC`/
+`compassHtmlRS`/`compassHtmlRC`, nur mit synthetischen statt Wetter-live-Daten gespeist.
+Geprüft: `gc` (Golden Clouds, `sightlineStatus='frei'`), `rs` (Himmelsröte,
+`teilweise_verdeckt` und zusätzlich `nicht_geprueft`/`distanceM=null`), `rc` (Rote Wolken,
+`blockiert`, `distanceM=450` → „sehr nah"-Warnhinweis) — je einmal in Hell- und Dunkelmodus
+(App-eigene `Theme.set()`-API, danach auf `auto` zurückgesetzt).
+
+Ergebnis: Zonen-Farbe/-Lage (gold/rosé je nach Typ), Sonnen-Pfeil, Sichtachsen-Linie inkl.
+Strichelung (durchgezogen bei `frei`, gestrichelt bei `teilweise_verdeckt`, Balken bei
+`blockiert`, gepunktet bei `nicht_geprueft`), Legende und Entfernungszeile (inkl. km-Format
+und „sehr nah"-Hinweis) rendern in beiden Farbmodi korrekt und konsistent mit AK4–AK9. Kein
+Weiß-auf-Weiß, kein unsichtbares Element, Zeichenreihenfolge (Sonnen-Pfeil über Zonenfläche,
+Sichtachse darunter) intakt. AK10 damit bestanden, Checkbox auf `[x]`.
+
+**Nebenbefund (kein TASK-58-Regression, da laut AK4 bytegleich zum Vorher-Stand):** Bei
+`zoneMode='rs'`/`'rc'` mit gesetztem `subjectAz` überlappt der lange Legendentext „Günstige
+Zone (±30° zum Gegenpunkt)"/„…zur Sonne" (SVG `<text x="8" y="263">`) sichtbar mit dem
+zweiten Legendeneintrag „- - Sichtachse" (`<text x="120" y="263">`), da der erste Text bei
+`font-size="10"` breiter als 112px ist und in die zweite Spalte hineinläuft. Vorbestehendes,
+rein kosmetisches Verhalten (kein TASK-58-Fund) — zur Aufnahme als neues Backlog-Ticket an
+den Hauptthread gemeldet statt hier eigenmächtig in die Inbox geschrieben (Kollisionsrisiko
+mit dem parallelen Kanban-Heartbeat-Schreiber während dieses Testlaufs vermieden).
+
+**Regressions-Matrix (PRODUCT.md §12, Testplan-Punkt 2):** Chancen-Feed (14-Tage-Feed),
+Karte und Jahreskalender je einmal geöffnet — alle 3 laden fehlerfrei, keine doppelten
+Inhalte, keine Layout-Brüche. Regressions-Matrix damit bestanden.
+
+**Refactor-Check (fotoalert-refactor, 2026-08-09, vor Release):** `python3 tools/refactor_check.py --report` gegen den echten Hauptordner ausgeführt: `auto_fixable: 0`, `needs_ticket: 2`. Beide Funde sind vorbestehend und **nicht** durch TASK-58 verursacht — `_fetch_weather_and_aerosol()` (`backend/main.py`) ist bereits als **TASK-100** erfasst, `preview_alignment()` (`backend/main.py`) bereits als **TASK-81**, beide in der Inbox, keine neuen Tickets nötig. Für `mkCloudCompassSvg()` und alle 9 neuen `_cc*`-Helfer in `web/index.html` (Z. 4078–4278) meldet der Check keinen `long_function`-Fund mehr — längste Funktion (`_ccBase()`) 36 Zeilen, deutlich unter dem Threshold von 80 (AK1/AK2 damit zusätzlich unabhängig bestätigt). Der 1-Zeilen-Fix in `tools/refactor_check.py` (Ignorelist-Eintrag `sectorPath` entfernt, AK8) ist im Hauptordner verifiziert — kein Rest-Vorkommen mehr per Grep. Keine Auto-Fixes nötig (Liste leer), keine pytest-Marker-Nachbesserung nötig (reine Frontend-Änderung, keine neuen Testdateien). Repo-Hygiene-Nebenbefund (dateibasiert, unabhängig von TASK-58): `backend/data_dev/` enthält ca. 9.930 vorbestehende `.fuse_hidden*`-Reste, `tools/_kanban_out/` mehrere alte Kanban-Sync-Artefakte — beides nicht durch dieses Ticket verursacht, nicht gelöscht (keine Freigabe eingeholt), zur Kenntnisnahme an Stephan gemeldet statt eigenmächtig entfernt. **Ergebnis: sauber für alle TASK-58-relevanten Funktionen — bereit für `fotoalert-release`.**
 
 ---
 
@@ -21882,7 +22554,7 @@ Verworfene Alternative: etablierte Rate-Limiting-Bibliothek (z. B. `slowapi`) �
 | **Typ** | Task |
 | **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-16 |
 
 **Beschreibung:** Bündel niedrig-schwerer Audit-Funde, in der Analyse ggf. splitten:
@@ -22222,7 +22894,7 @@ Betroffen ist ausschließlich `web/index.html` (Frontend-JS, kein Backend-Python
 | **Typ** | Task |
 | **Epic** | TASK-92 |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Ready for Analysis |
 | **Erstellt** | 2026-07-17 |
 
 **Beschreibung:** `tests/test_task67_feed_regression.py::TestNoDuplicateEvents::test_dedup_best_per_day_keeps_only_highest_score` baut seine beiden Test-Events relativ zur aktuellen Uhrzeit (`hours_from_now`). Läuft der Test zufällig kurz vor/nach Mitternacht, fallen zwei eigentlich nur Minuten auseinanderliegende Events auf zwei verschiedene Kalendertage — die Tages-Deduplizierung behält dann beide (korrektes Verhalten), der Test erwartet aber hart „nur 1" und schlägt fehl. Beobachtet im TASK-83-Release-CI-Lauf am 2026-07-17 kurz nach Mitternacht, beim Re-Run (andere Uhrzeit) sofort grün. Kein Produktivbug, reine Test-Flakiness. Fix: Testzeitpunkt auf ein festes Datum/Uhrzeit pinnen (z.B. per `freezegun` oder festen Timestamp-Objekten) statt `datetime.now() + timedelta(...)`.
