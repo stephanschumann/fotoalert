@@ -91,10 +91,18 @@ from models.schemas import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
+# TASK-95: BACKEND_API_SCHEMA_VERSION ist die Backend-/API-Schemaversion, NICHT die
+# App-Release-Version. Die App-Release-Version wird unabhaengig davon in
+# web/index.html (APP_VERSION) gepflegt und von release.sh gebumpt; Backend- und
+# Frontend-Releases laufen nachweislich nicht synchron. Wer den /health-Endpoint
+# oder die OpenAPI-Metadaten (title/description/version oben) als Nachweis fuer
+# eine bestimmte App-Release-Version heranzieht, verwechselt beide Versionsbegriffe.
+BACKEND_API_SCHEMA_VERSION = "2.0.0"
+
 app = FastAPI(
     title="FotoAlert API",
     description="Intelligente Foto-Chancen",
-    version="2.0.0",
+    version=BACKEND_API_SCHEMA_VERSION,
 )
 
 # TASK-83: explizite Origin-Liste statt Wildcard — Voraussetzung für allow_credentials=True
@@ -135,6 +143,7 @@ _IMAGE_DIR          = Path(__file__).parent / "data" / "location_images"
 _IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 _IMAGE_MAX_UPLOAD_BYTES = 1 * 1024 * 1024        # 1 MB: bis hier angenommen, automatisch komprimiert
 _IMAGE_HARD_LIMIT_BYTES = 20 * 1024 * 1024       # 20 MB: darüber klare Ablehnung ohne Verarbeitung
+_IMAGE_UPLOAD_CHUNK_BYTES = 1 * 1024 * 1024      # TASK-102: Chunk-Größe für Streaming-Größenprüfung beim Upload
 _IMAGE_TARGET_BYTES     = 500 * 1024             # ~500 KB Zielgröße nach Kompression
 _IMAGE_MAX_DIMENSION_PX = 2000                   # lange Kante nach Verkleinerung
 
@@ -165,6 +174,14 @@ def _load_custom_locations() -> None:
     """Lädt gespeicherte Custom-Locations aus SQLite und hängt sie an LOCATIONS.
     TASK-17: ersetzt JSON-basiertes Laden.
     Fallback: falls DB leer und JSON noch vorhanden, migriert automatisch.
+
+    TASK-94: Kategorie wird ueber coerce_category_value() gelesen (statt direktem
+    LocationCategory[...]-Zugriff) UND jeder Eintrag ist einzeln try/except-
+    abgesichert -- ein einzelner beschaedigter Eintrag (z.B. aus einer Zeit vor
+    BUG-84s Patch-Validierung) darf die uebrigen Eintraege im selben Batch nicht
+    am Laden hindern. Spiegelt bewusst precompute.py:_load_custom_locations()
+    (BUG-33-Referenzimplementierung fuer die Pro-Eintrag-Absicherung), damit
+    Server-Prozess und Recompute-Subprozess denselben robusten Ladepfad nutzen.
     """
     try:
         entries = _store.load_all_custom()
@@ -180,15 +197,19 @@ def _load_custom_locations() -> None:
                 entries = _store.load_all_custom()
                 if entries:
                     logger.info("Custom Locations auto-migriert aus JSON: %d Einträge", len(entries))
+    except Exception as exc:
+        logger.warning("Fehler beim Laden der Custom Locations: %s", exc)
+        return
 
-        ids_existing = {loc.id for loc in LOCATIONS}
-        added = 0
-        for e in entries:
-            if e.get("id") in ids_existing:
-                continue
+    ids_existing = {loc.id for loc in LOCATIONS}
+    added = 0
+    for e in entries:
+        if e.get("id") in ids_existing:
+            continue
+        try:
             loc = PhotoLocation(
                 id=e["id"], name=e["name"], description=e.get("description", ""),
-                category=LocationCategory[e.get("category", "SKYLINE")],
+                category=coerce_category_value(e.get("category", "SKYLINE")),
                 observer_lat=e["observer_lat"], observer_lon=e["observer_lon"],
                 subject_lat=e["subject_lat"], subject_lon=e["subject_lon"],
                 subject_name=e.get("subject_name", ""), subject_height_m=e.get("subject_height_m", 0),
@@ -203,10 +224,10 @@ def _load_custom_locations() -> None:
             LOCATIONS.append(loc)
             ids_existing.add(loc.id)
             added += 1
-        if added:
-            logger.info("Custom Locations geladen: %d Einträge aus SQLite", added)
-    except Exception as exc:
-        logger.warning("Fehler beim Laden der Custom Locations: %s", exc)
+        except Exception as exc:
+            logger.warning("Custom Location '%s' übersprungen (%s)", e.get("id"), exc)
+    if added:
+        logger.info("Custom Locations geladen: %d Einträge aus SQLite", added)
 
 
 def _save_custom_location(loc: PhotoLocation) -> None:
@@ -658,6 +679,33 @@ _BLUE_HOUR_TYPES = {"Blaue Stunde Morgen", "Blaue Stunde"}
 """US-132: Blaue-Stunde-Event-Typen, aus denen RED_CLOUDS-Events erzeugt werden
 können (Sonne bereits unter dem Horizont) — Pendant zu _GOLDEN_HOUR_TYPES."""
 
+PROJECTED_POINT_CACHE_PRECISION = 2
+"""BUG-104 (Option A, 2026-08-09): Rundungsgenauigkeit (Nachkommastellen) für die
+Cache-Keys der richtungsspezifischen Projektionspunkte (sun_dir/antisolar_dir/aerosol)
+in _plan_weather_fetch_tasks() UND _lookup_projected_forecasts() — beide Stellen
+MÜSSEN denselben Wert verwenden, sonst greift der Fetch beim Lookup ins Leere (Plan
+und Lookup laufen auseinander). Von 3 auf 2 Dezimalstellen vergröbert: Bei 3
+Nachkommastellen dedupliziert _plan_weather_fetch_tasks() die projizierten Punkte kaum
+(bis zu 6x mehr Einzel-Tasks pro Location als die 1x pro Location deduplizierten
+regulären Wetter-Fetches), was bei ~315-319 Locations zu 1176-1580 Einzel-Requests
+führt und das harte WEATHER_OVERLAY_MAX_TOTAL_SECONDS-Zeitbudget (BUG-99) sprengt,
+bevor die direktionalen Werte je gesetzt werden (live bestätigt, BUG-104 AK1: alle
+golden_cloud_score_sun_dir/_antisolar_dir blieben null). 2 Dezimalstellen bedeuten
+einen Rundungsfehler von maximal ±0.005° je Achse (≈0.79 km Worst-Case-Versatz am
+Äquator) — deutlich unter der AK8-Toleranz von <2 km."""
+
+
+def _projected_point_cache_key(lat: float, lon: float) -> str:
+    """BUG-104 (Refactor, 2026-08-10): Gemeinsamer Helfer für den auf
+    PROJECTED_POINT_CACHE_PRECISION Nachkommastellen gerundeten Cache-Key
+    eines projizierten Punkts — von _plan_weather_fetch_tasks() (Planung)
+    UND _lookup_projected_forecasts() (Lookup) verwendet, damit beide
+    Stellen strukturell nicht mehr auseinanderlaufen können (der
+    BUG-104-Kernfehlermodus). Reine Formatierung, keine Verhaltensänderung
+    gegenüber der vorherigen, an beiden Stellen wiederholten Inline-Bildung.
+    """
+    return f"{lat:.{PROJECTED_POINT_CACHE_PRECISION}f},{lon:.{PROJECTED_POINT_CACHE_PRECISION}f}"
+
 
 def _cloud_mood_projection_points(e):
     """
@@ -718,8 +766,8 @@ def _lookup_projected_forecasts(e, sun_dir_forecasts, antisolar_dir_forecasts, a
     if proj is None:
         return None, None, None
     (sun_lat, sun_lon), (anti_lat, anti_lon) = proj
-    sun_key = f"{sun_lat:.3f},{sun_lon:.3f}"
-    anti_key = f"{anti_lat:.3f},{anti_lon:.3f}"
+    sun_key = _projected_point_cache_key(sun_lat, sun_lon)
+    anti_key = _projected_point_cache_key(anti_lat, anti_lon)
     sun_fc = sun_dir_forecasts.get(sun_key)
     anti_fc = antisolar_dir_forecasts.get(anti_key)
     aero_fc = aerosol_forecasts.get(anti_key)
@@ -1278,24 +1326,58 @@ async def _fetch_weather_and_aerosol(
     gemeinsamer Default für alle heutigen Aufrufer korrekt ist, der Parameter aber trotzdem
     existiert.
 
-    Bei Erreichen der Obergrenze (Weg-Gate-Entscheidung Stephan, BUG-99): Teilergebnis wird
-    verwendet — bereits erfolgreich abgeschlossene Fetches behalten ihr Ergebnis, nur die
-    zum Abbruchzeitpunkt noch offenen Fetches werden abgebrochen (Task.cancel()) und laufen
-    über denselben BaseException-Zweig in _collect_weather_fetch_results() in denselben
-    BUG-77-failed_*-Sammelpfad wie ein regulärer Fehlschlag (kein separater Fehlerpfad, kein
-    stiller Datenverlust bereits erfolgreicher Ergebnisse — Pre-Mortem Szenario 3/4 im
-    BUG-99-Ticket). Bewusst NICHT `asyncio.wait_for()` direkt um `asyncio.gather()` OHNE
-    Nachbearbeitung: Ein durch `wait_for` bei Zeitüberschreitung abgebrochenes `gather()`
-    cancelt zwar automatisch alle noch offenen Kind-Tasks, bereits fertige Tasks bleiben
-    dabei aber mit ihrem Ergebnis erhalten — genau dieses Verhalten wird unten per erneutem
-    `asyncio.gather(*tasks, return_exceptions=True)` nach dem Cancel explizit eingesammelt,
-    damit die bereits fertigen Ergebnisse tatsächlich zurückgegeben werden (nicht nur
-    theoretisch erhalten bleiben, sondern auch abgefragt werden — vermeidet zusätzlich
-    "Task exception was never retrieved"-Warnungen). Dieses Muster wurde vorab isoliert
-    per Spike bestätigt (Ticket-Historie BUG-99).
+    TASK-100 (aus dieser Funktion extrahiert): Der eigentliche Zeitbudget-/Cancel-
+    Mechanismus (asyncio.wait_for()+Timeout+Cancel+Re-Gather, inkl. Teilergebnis-
+    Verhalten bei Erreichen der Obergrenze) lebt seit TASK-100 in
+    _run_weather_fetch_tasks_with_ceiling() — siehe dessen Docstring für die
+    vollständige BUG-99-Begründung (unverändert übernommen, nicht neu hergeleitet,
+    nur an den neuen Aufbewahrungsort verschoben).
     """
     tasks_meta = _plan_weather_fetch_tasks(near_events)
 
+    results = await _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds)
+
+    return _collect_weather_fetch_results(tasks_meta, results)
+
+
+async def _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds: float | None) -> list:
+    """
+    TASK-100 (aus _fetch_weather_and_aerosol extrahiert, Option A): Baut aus
+    `tasks_meta` die parallelen Abruf-Tasks (US-131 Nachtrag: Semaphore-Drosselung),
+    löst die effektive Gesamtzeit-Obergrenze auf und führt den BUG-99-Härtungsblock
+    aus (asyncio.wait_for()+Timeout+Cancel+Re-Gather). Gibt die rohe `results`-Liste
+    zurück, wie sie vorher direkt in _fetch_weather_and_aerosol() vorlag — die
+    Umwandlung in die Rückgabetupel bleibt weiterhin Aufgabe von
+    _collect_weather_fetch_results() (unverändert, TASK-76).
+
+    BUG-99: Die effektive Obergrenze wird HIER, bei JEDEM Aufruf dieser Funktion,
+    aus `max_total_seconds` bzw. (falls None) aus der Modulkonstante
+    WEATHER_OVERLAY_MAX_TOTAL_SECONDS aufgelöst — bewusst NICHT als gebundener
+    Default-Parameterwert dieser oder der aufrufenden Funktion (Python bindet
+    Default-Parameterwerte einmalig beim Modul-Import), damit ein Monkeypatch von
+    WEATHER_OVERLAY_MAX_TOTAL_SECONDS (z. B. in Tests wie
+    backend/tests/test_bug-99.py) auch weiterhin greift, wenn kein
+    max_total_seconds übergeben wird (s. Docstring von
+    WEATHER_OVERLAY_MAX_TOTAL_SECONDS für die vollständige Begründung).
+
+    Bei Erreichen der Obergrenze (Weg-Gate-Entscheidung Stephan, BUG-99): Teilergebnis
+    wird verwendet — bereits erfolgreich abgeschlossene Fetches behalten ihr Ergebnis,
+    nur die zum Abbruchzeitpunkt noch offenen Fetches werden abgebrochen
+    (Task.cancel()) und laufen über denselben BaseException-Zweig in
+    _collect_weather_fetch_results() in denselben BUG-77-failed_*-Sammelpfad wie ein
+    regulärer Fehlschlag (kein separater Fehlerpfad, kein stiller Datenverlust
+    bereits erfolgreicher Ergebnisse — Pre-Mortem Szenario 3/4 im BUG-99-Ticket).
+    Bewusst NICHT `asyncio.wait_for()` direkt um `asyncio.gather()` OHNE
+    Nachbearbeitung: Ein durch `wait_for` bei Zeitüberschreitung abgebrochenes
+    `gather()` cancelt zwar automatisch alle noch offenen Kind-Tasks, bereits
+    fertige Tasks bleiben dabei aber mit ihrem Ergebnis erhalten — genau dieses
+    Verhalten wird unten per erneutem `asyncio.gather(*tasks,
+    return_exceptions=True)` nach dem Cancel explizit eingesammelt, damit die
+    bereits fertigen Ergebnisse tatsächlich zurückgegeben werden (nicht nur
+    theoretisch erhalten bleiben, sondern auch abgefragt werden — vermeidet
+    zusätzlich "Task exception was never retrieved"-Warnungen). Dieses Muster
+    wurde vorab isoliert per Spike bestätigt (Ticket-Historie BUG-99).
+    """
     # US-131 Nachtrag: Drosselt die Anzahl GLEICHZEITIG laufender externer Requests
     # (s. WEATHER_API_MAX_CONCURRENT_REQUESTS) — asyncio.gather() plant weiterhin
     # ALLE Calls ein, das Semaphore lässt aber nie mehr als die konfigurierte
@@ -1335,7 +1417,7 @@ async def _fetch_weather_and_aerosol(
         # _collect_weather_fetch_results() (BaseException-Zweig, nicht nur Exception).
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    return _collect_weather_fetch_results(tasks_meta, results)
+    return results
 
 
 def _plan_weather_fetch_tasks(near_events) -> list:
@@ -1360,8 +1442,8 @@ def _plan_weather_fetch_tasks(near_events) -> list:
         if proj is None:
             continue
         (sun_lat, sun_lon), (anti_lat, anti_lon) = proj
-        sun_key = f"{sun_lat:.3f},{sun_lon:.3f}"
-        anti_key = f"{anti_lat:.3f},{anti_lon:.3f}"
+        sun_key = _projected_point_cache_key(sun_lat, sun_lon)
+        anti_key = _projected_point_cache_key(anti_lat, anti_lon)
         if sun_key not in seen["sun_dir"]:
             seen["sun_dir"].add(sun_key)
             tasks_meta.append(("sun_dir", sun_key, sun_lat, sun_lon, e["location_name"]))
@@ -1784,9 +1866,12 @@ async def _run_precompute(mode: str = "full") -> None:
             for j, t0 in t0s.items():
                 _job_error(j, t0, msg)
     except Exception as e:
+        # TASK-102: Voller Exception-Text nur ins Server-Log (logger.error), NICHT in
+        # den Job-Status, weil GET /job-status unauthentifiziert ist und last_error
+        # sonst rohe interne Fehlerdetails öffentlich preisgäbe.
         logger.error("Fehler beim Starten von precompute.py: %s", e)
         for j, t0 in t0s.items():
-            _job_error(j, t0, str(e))
+            _job_error(j, t0, "Interner Fehler bei der Vorberechnung — Details siehe Server-Log.")
     finally:
         _precompute_running = False
         # US-106 Teil 3: Offene Einzel-Neuberechnungen, die während dieses
@@ -2629,9 +2714,18 @@ def _dedup_best_per_day(events: list[dict]) -> list[dict]:
 
 @app.get("/health", response_model=HealthOut)
 async def health() -> HealthOut:
+    """Liefert den Backend-Betriebsstatus.
+
+    Hinweis (TASK-95): Das Feld ``version`` ist die Backend-/API-Schemaversion
+    (BACKEND_API_SCHEMA_VERSION), NICHT die App-Release-Version. Die tatsaechliche
+    App-Release-Version steht unter Einstellungen -> "Ueber FotoAlert" in der App
+    (Quelle: web/index.html APP_VERSION). Backend- und Frontend-Releases laufen
+    nicht synchron, ein unveraendertes ``version``-Feld hier ist bei einem reinen
+    Backend-Deploy ohne Aenderung der App-Release-Version erwartungsgemaess.
+    """
     return HealthOut(
         status="ok",
-        version="2.0.0",
+        version=BACKEND_API_SCHEMA_VERSION,
         locations_count=len(LOCATIONS),
     )
 
@@ -3107,7 +3201,10 @@ async def _run_sightline_refresh() -> None:
         _load_caches()
         _job_done("sightlines", t0)
     except Exception as exc:
-        _job_error("sightlines", t0, str(exc))
+        # TASK-102: Voller Exception-Text nur ins Server-Log (logger.error), NICHT in
+        # den Job-Status, weil GET /job-status unauthentifiziert ist und last_error
+        # sonst rohe interne Fehlerdetails öffentlich preisgäbe.
+        _job_error("sightlines", t0, "Interner Fehler beim Sichtachsen-Refresh — Details siehe Server-Log.")
         logger.error("Sichtachsen-Refresh fehlgeschlagen: %s", exc)
     finally:
         _sightline_refresh_running = False
@@ -3533,14 +3630,27 @@ async def upload_location_image(
     if not target_loc:
         raise HTTPException(status_code=404, detail="Location nicht gefunden.")
 
-    raw = await file.read()
+    # TASK-102: Größe während des Einlesens in Chunks prüfen statt die komplette
+    # Datei zuerst vollständig per await file.read() in den Speicher zu laden und
+    # erst danach gegen _IMAGE_HARD_LIMIT_BYTES zu prüfen — bricht spätestens einen
+    # Chunk über dem Limit ab, ohne den Rest einer überdimensionierten Datei noch
+    # einzulesen. Verhalten für gültige Uploads bis zur Grenze bleibt unverändert.
+    raw_chunks: list[bytes] = []
+    total_bytes = 0
+    while True:
+        chunk = await file.read(_IMAGE_UPLOAD_CHUNK_BYTES)
+        if not chunk:
+            break
+        total_bytes += len(chunk)
+        if total_bytes > _IMAGE_HARD_LIMIT_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Datei zu groß (mehr als {_IMAGE_HARD_LIMIT_BYTES // (1024*1024)} MB). Maximal {_IMAGE_HARD_LIMIT_BYTES // (1024*1024)} MB pro Upload erlaubt.",
+            )
+        raw_chunks.append(chunk)
+    raw = b"".join(raw_chunks)
     if not raw:
         raise HTTPException(status_code=400, detail="Datei ist leer.")
-    if len(raw) > _IMAGE_HARD_LIMIT_BYTES:
-        raise HTTPException(
-            status_code=413,
-            detail=f"Datei zu groß ({len(raw) // 1024} KB). Maximal {_IMAGE_HARD_LIMIT_BYTES // (1024*1024)} MB pro Upload erlaubt.",
-        )
 
     try:
         processed = _process_uploaded_image(raw)

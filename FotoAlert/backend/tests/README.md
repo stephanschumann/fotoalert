@@ -24,6 +24,25 @@ Datei geprüft (kein Raten). Ein automatisierter Test (`test_task79_readme_marke
 sichert nur ab, dass jede `*.py`-Datei überhaupt als Zeile vorkommt — nicht, dass die
 Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testdatei-Änderungen.
 
+**Marker `requires_full_checkout` (TASK-96, 2026-08-10):** `offline` bedeutet nur
+"deterministisch, ohne Netzwerk/externe Dienste" — das ist NICHT dasselbe wie
+"läuft auch bei einem Teil-Checkout, der nur `backend/` enthält" (z. B. ein schmal
+gestagter Cloud-Sandbox-Abzug oder ein CI-Job ohne vollständigen Checkout). Vier als
+`offline` markierte Testdateien lösen Pfade relativ zum Repo-Root außerhalb von
+`backend/` auf (`web/`, `deploy/`) und brechen deshalb bei einem Backend-only-Checkout,
+obwohl ihre Markierung etwas anderes suggeriert: `test_task84.py`,
+`test_task89_caddy_log_permissions.py`, `test_us105_section_order.py` und
+`test_us79_moon_rise_set.py`. Diese vier tragen deshalb zusätzlich den Marker
+`requires_full_checkout` (Option B aus der TASK-96-Analyse — ein reiner Pfad-Fix wurde
+bewusst verworfen, da er das eigentliche Problem, fehlende Sichtbarkeit der
+Repo-Root-Abhängigkeit, nur verdeckt hätte). Ein automatisierter Test
+(`test_task96_requires_full_checkout_marker.py`) sichert ab, dass jede Testdatei, die
+per Heuristik einen Pfad außerhalb von `backend/` referenziert (Path-Join mit dem
+Literal `"web"` oder `"deploy"`), auch tatsächlich diesen Marker trägt — künftige,
+strukturell gleiche Fälle bleiben so nicht unbemerkt unmarkiert (analog zum
+TASK-79-Muster, das die README-Tabellen-Vollständigkeit gegen alle Testdateien
+absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
+
 | Datei | Bereich | Läuft im Sandbox | Marker |
 |-------|---------|------------------|--------|
 | `test_api_regression.py` | API-Regressionssuite — Endpoint-Verhalten aus AKs (`data_dev`, TestClient) | ⏳ nur mit `--all` (FastAPI-Stack + App-Startup) | `api`, `regression` |
@@ -82,16 +101,20 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_task77_qa_cleanup_on_delete.py` | TASK-77: QA-Zeilen werden bei Location-Löschung mitentfernt | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task78_qa_transactional.py` | TASK-78: QA-Teilerfolg konsistent behandeln (Option B) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task79_readme_marker_sync.py` | TASK-79: diese README-Tabelle gegen die BUG-79-Testrealität + Vollständigkeit gegen alle Testdateien absichern | ✅ immer (offline, deterministisch) | `offline`, `regression` |
-| `test_task84.py` | TASK-84 (Nacharbeit): Vendor-Umstellung (Leaflet/astronomy-engine self-hosted unter `web/vendor/`) + CSP-Verschlankung (`deploy/Caddyfile`) statisch abgesichert | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task96_requires_full_checkout_marker.py` | TASK-96: Konsistenz zwischen Repo-Root-Pfadaufloesung und Marker `requires_full_checkout` gegen alle Testdateien absichern (analog TASK-79-Muster) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task97_ci_env_dev_guard.py` | TASK-97 (AK4): Regressionsguard, dass `FOTOALERT_ENV: dev` im `test-frontend`-Job von `.github/workflows/deploy.yml` erhalten bleibt (verhindert stillen Rückfall in den TASK-83-Cookie/Secure-Flag-Fehler aus CI-Run #277) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task-94.py` | TASK-94: `_load_custom_locations()` in main.py nutzt jetzt `coerce_category_value()` (statt direktem `LocationCategory[...]`-Zugriff) UND ist pro Eintrag try/except-abgesichert (Referenzimplementierung: `precompute.py:_load_custom_locations()`, BUG-33) — ein einzelner beschädigter Kategoriewert/Eintrag bricht das Laden der übrigen Custom-Locations beim Serverstart nicht mehr ab | ⏳ nur mit `--all` | `api`, `regression` |
+| `test_task-102.py` | TASK-102: Sicherheits-Härtungen Teil 1 — (a) `_run_precompute()`/`_run_sightline_refresh()` legen bei internem Fehler keinen rohen Exception-Text mehr in `_job_status` ab (GET /job-status ist unauthentifiziert), voller Text bleibt per `logger.error()` im Server-Log; (c) `upload_location_image()` prüft die Upload-Größe jetzt per Streaming-Read in Chunks statt erst nach vollständigem Einlesen | teils ✅ immer (2× `offline`), teils nur mit `--all` (3× `api`) | `offline`, `api`, `regression` |
+| `test_task84.py` | TASK-84 (Nacharbeit): Vendor-Umstellung (Leaflet/astronomy-engine self-hosted unter `web/vendor/`) + CSP-Verschlankung (`deploy/Caddyfile`) statisch abgesichert | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_task-85.py` | TASK-85: Harter Serverstart-Abbruch bei fehlendem/leerem `FOTOALERT_AUTH_SECRET`, kein Notwert-Fallback mehr | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task86.py` | TASK-86: Häufigkeits-Bremse `/preview-alignment` (AK-1), Kalender-Cache-Normalisierung + Höchstgröße (AK-2/AK-3), Login-Lockout (AK-4/AK-5), Geräte-Token-Validierung + Bremse `/register-device` (AK-6/AK-7), Regression Zeitraum-Deckelung/CORS (AK-8/AK-9) | teils ✅ immer (offline-Klassen: `rate_limit.py`-Unit-Tests + Cache-Normalisierung), teils nur mit `--all` (api-Klassen: `/login`, `/preview-alignment`, `/register-device`) | `offline`, `api`, `regression` |
-| `test_task89_caddy_log_permissions.py` | TASK-89: Caddy-Logdatei-Berechtigung bei Server-Neuaufbau (Text-/Grep-Check gegen `deploy/setup_server.sh`, kein echter Server-Neuaufbau) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task89_caddy_log_permissions.py` | TASK-89: Caddy-Logdatei-Berechtigung bei Server-Neuaufbau (Text-/Grep-Check gegen `deploy/setup_server.sh`, kein echter Server-Neuaufbau) | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_task_65_field_roundtrip.py` | TASK-65: generischer Feld-Rundreise-Test (Whitelist-Vollständigkeit aller Location-Felder) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us-129.py` | US-129: Datenvertrag `image_url` für Filter „Hat Beispielbild" | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us07.py` | US-07: Goldene Wolken & Himmelsröte Scoring (AKs) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us07_golden_cloud_score.py` | US-07: `calculate_golden_cloud_score()` Einzelszenarien | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us09_sightline.py` | US-09: Sichtachsen-Check / Hinderniserkennung (Raycast) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
-| `test_us105_section_order.py` | US-105: Sektionsreihenfolge im Chancen-Detail-Template (statischer Check gegen `web/index.html`) | ✅ immer (offline, deterministisch) | `offline`, `regression`, `frontend` |
+| `test_us105_section_order.py` | US-105: Sektionsreihenfolge im Chancen-Detail-Template (statischer Check gegen `web/index.html`) | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `frontend`, `requires_full_checkout` |
 | `test_us106.py` | US-106: neue/geänderte Location sofort komplett nutzbar (Wetter/Scout/Pending-Queue, gemockt) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us109.py` | US-109: Goldene Wolken & Himmelsröte als eigene Feed-Events | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_us112_weather_map.py` | US-112: Wetter-Overlay aus DWD-ICON + MET-Norway-Modelldaten (GRIB-Fixture, PNG) | teils ✅ immer (13× `offline`), teils nur mit `--all` (3× `api`) | `regression` (modulweit) + 13× `offline`, 3× `api` |
@@ -102,7 +125,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 | `test_us135.py` | US-135: Scout — nur zugängliche Standorte mit freier Sicht vorschlagen (Sichtachsen-Blockade durch Gebäude, Wald-/Wasser-/Bahn-Ausschluss inkl. Weg-Nähe-Ausnahme, Overpass-Cache, geteilter Rate-Limit-Tracker, Threadpool-Entkopplung) | ✅ immer (offline, deterministisch, Overpass-HTTP-Client gemockt) | `offline`, `regression` |
 | `test_us66_login.py` | US-66: Pflicht-Login mit Rollen-Erkennung (Token, `/login`, Endpunktschutz); 1 Test zusätzlich `smoke` | teils ✅ immer (offline-Klasse), teils nur mit `--all` (api-Klassen) | `offline`, `api`, `regression` (+1× `smoke`) |
 | `test_us67_composition.py` | US-67: Datengrundlage Himmelsposition (`composition_analysis`) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
-| `test_us79_moon_rise_set.py` | US-79: Mondaufgang/-untergang als eigene Event-Typen | ✅ immer (offline, deterministisch) | `offline`, `regression`, `frontend` |
+| `test_us79_moon_rise_set.py` | US-79: Mondaufgang/-untergang als eigene Event-Typen | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `frontend`, `requires_full_checkout` |
 | `test_us_125.py` | US-125: Beispielbild eigenständig löschen (Host) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us_126.py` | US-126: Bildausschnitt (Crop-Fokuspunkt) selbst wählen | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_us_128.py` | US-128: Bauwerkshöhe/-breite nachträglich per PATCH bearbeitbar | ⏳ nur mit `--all` | `api`, `regression` |
@@ -120,8 +143,11 @@ bewusst als Marker auf bestehenden Tests statt als neue, duplizierte Tests in
 
 **Marker-Pflicht:** Zusätzlich zur Ticket-ID im Docstring bekommt jeder neue Test mindestens
 einen passenden Marker aus der Tabelle oben (`offline`/`network`/`api`/`regression`/`frontend`/
-`slow`/`smoke`) — kein Test ohne Marker. Das hält die Suite selektiv ausführbar (z. B. schneller
-Regressionslauf vs. vollständiger Netzwerk-/API-Lauf).
+`slow`/`smoke`/`requires_full_checkout`) — kein Test ohne Marker. Das hält die Suite selektiv
+ausführbar (z. B. schneller Regressionslauf vs. vollständiger Netzwerk-/API-Lauf). Zusätzlich
+gilt seit TASK-96: jeder `offline`-Test, der Pfade außerhalb von `backend/` auflöst (`web/`,
+`deploy/`), bekommt zusätzlich `requires_full_checkout` — sonst schlägt
+`test_task96_requires_full_checkout_marker.py` fehl.
 
 ## Sicherheit: niemals Prod-Daten
 
