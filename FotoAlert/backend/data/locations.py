@@ -1,5 +1,8 @@
 """
-Kuratierte Foto-Locations für Berlin und Brandenburg.
+Kuratierte Foto-Locations (Schwerpunkt Berlin und Brandenburg, mit einzelnen
+Standorten darüber hinaus in Deutschland, z.B. Rügen). Kein fester
+geografischer Scope in Code oder Doku mehr — neue Locations können
+unabhängig von ihrer Lage ergänzt werden (siehe BACKLOG.md TASK-99).
 
 Jede Location enthält:
 - GPS-Koordinaten des optimalen Standpunkts

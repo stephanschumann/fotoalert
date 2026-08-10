@@ -15,13 +15,20 @@ wurden dabei faelschlich als "Scope-Creep" uebersprungen und werden hier nachgeh
 Statische Datei-/Konfig-Checks (Option B) - kein Netzwerk, kein laufender Server noetig.
 
 AKs siehe BACKLOG.md TASK-84 Implementation Spec.
+
+TASK-96-Hinweis: Diese Datei ist trotz `offline`-Markierung NICHT teil-checkout-faehig -
+sie loest Pfade relativ zum Repo-Root ausserhalb von backend/ auf (web/, deploy/) und
+bricht deshalb bei einem Checkout, der nur backend/ enthaelt. Deshalb zusaetzlich mit
+`requires_full_checkout` markiert (siehe backend/tests/README.md).
 """
 from pathlib import Path
 
 import pytest
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression]
+pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.requires_full_checkout]
 
+# TASK-96: _ROOT loest hier bewusst ausserhalb von backend/ auf (Repo-Root) - deshalb
+# `requires_full_checkout` oben zusaetzlich zu `offline` gesetzt.
 _ROOT = Path(__file__).parent.parent.parent
 _INDEX_HTML = _ROOT / "web" / "index.html"
 _CADDYFILE = _ROOT / "deploy" / "Caddyfile"

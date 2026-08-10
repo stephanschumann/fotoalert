@@ -112,10 +112,11 @@ _last_overpass_request_ts: Optional[float] = None
 # TASK-59 Option E (2026-08-02): lokale Batch-Cache-Datei statt Live-Anfrage
 # ---------------------------------------------------------------------------
 # Kein eigener Server mehr (siehe Weg-Gate-Entscheidung 2026-08-02, ersetzt die
-# Server-Entscheidung vom 2026-07-15). Stattdessen extrahiert ein geplanter
-# GitHub-Actions-Workflow (siehe .github/workflows/update-building-data.yml)
-# regelmäßig Gebäude-Footprints aus einem lokalen Geofabrik-Auszug für die
-# ~60 bekannten Basis-Locations (backend/data/locations.py) und committet das
+# Server-Entscheidung vom 2026-07-15). Stattdessen extrahiert ein wöchentlich
+# laufender GitHub-Actions-Workflow (produktiv seit 2026-08-02, siehe
+# .github/workflows/update-building-data.yml) regelmäßig Gebäude-Footprints
+# aus einem lokalen Geofabrik-Auszug für die ~60 bekannten Basis-Locations
+# (backend/data/locations.py) und committet das
 # Ergebnis als backend/data/cache/building_footprints.json ins Repo. Beide
 # Funktionen unten (_fetch_overpass_footprint, fetch_buildings_along_line)
 # schauen zuerst hier nach, BEVOR sie einen Live-Mirror kontaktieren.

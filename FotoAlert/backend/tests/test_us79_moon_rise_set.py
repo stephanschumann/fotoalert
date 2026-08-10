@@ -10,6 +10,11 @@ Prüft dass:
 
 Ausführen (vom Backend-Verzeichnis):
     pytest tests/test_us79_moon_rise_set.py -v
+
+TASK-96-Hinweis: Diese Datei ist trotz `offline`-Markierung NICHT teil-checkout-faehig -
+ein Test liest web/index.html relativ zum Repo-Root (ausserhalb von backend/) und bricht
+deshalb bei einem Checkout, der nur backend/ enthaelt. Deshalb zusaetzlich mit
+`requires_full_checkout` markiert (siehe backend/tests/README.md).
 """
 
 import sys
@@ -26,7 +31,12 @@ import pytest
 # Sicherstellen, dass Backend-Importe funktionieren
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.frontend]
+pytestmark = [
+    pytest.mark.offline,
+    pytest.mark.regression,
+    pytest.mark.frontend,
+    pytest.mark.requires_full_checkout,
+]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -132,6 +142,8 @@ def test_no_moonrise_no_event_when_moonrise_none():
 
 def test_frontend_filter_chips_contain_mondaufgang_monduntergang():
     """AK-NEU-B: FilterSheet._ET enthält 'Mondaufgang' und 'Monduntergang'."""
+    # TASK-96: loest hier bewusst ausserhalb von backend/ auf (Repo-Root) - deshalb
+    # `requires_full_checkout` fuer die gesamte Datei gesetzt (siehe pytestmark oben).
     html = (Path(__file__).parent.parent.parent / "web" / "index.html").read_text(encoding="utf-8")
 
     # Prüfe dass beide Typen im _ET-Array stehen

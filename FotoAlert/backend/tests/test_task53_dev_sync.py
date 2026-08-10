@@ -12,6 +12,12 @@ Hetzner-Live-Server möglich, daher wird `subprocess.run` gemockt):
 - Zusammenfassung zählt Zeilen je Kerntabelle korrekt (AK-5).
 - Kein echter SSH/SCP-Verbindungstest gegen den Live-Server — das ist ein
   manueller Testschritt für Stephan (siehe Testplan im BACKLOG.md-Ticket).
+
+Mit `requires_full_checkout` markiert (siehe backend/tests/README.md, TASK-96):
+der `sys.path`-Import von `sync_dev_from_live` unten löst `tools/` relativ zum
+Repo-Root auf, nicht relativ zu `backend/` — bei einem reinen Backend-Checkout
+existiert `tools/` nicht, der Import schlägt fehl, obwohl der Test als `offline`
+markiert ist (gefunden per Verifikations-Review am 2026-08-10, TASK-96-Nachbesserung).
 """
 
 from __future__ import annotations
@@ -25,11 +31,13 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+# `requires_full_checkout` unten: dieser Pfad loest "tools" relativ zum Repo-Root auf,
+# nicht relativ zu backend/ - existiert bei einem Backend-only-Checkout nicht (TASK-96).
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "tools"))
 
 import sync_dev_from_live as sync_tool
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression]
+pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.requires_full_checkout]
 
 
 # ---------------------------------------------------------------------------

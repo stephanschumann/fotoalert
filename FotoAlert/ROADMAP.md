@@ -40,14 +40,16 @@
 
 ## 🟢 NOW — Go-Live (MVP für offiziellen Launch)
 
-> Ziel: vollständiges, host-kuratiertes Launch-Erlebnis für Berlin, Potsdam & Umgebung.
+> Ziel: vollständiges, host-kuratiertes Launch-Erlebnis; aktueller Kuratierungs-Schwerpunkt
+> Berlin, Potsdam & Umgebung — die App selbst ist nicht mehr auf diese Region beschränkt
+> (Wetterkarten-Abdeckung: Deutschland, Österreich, Norditalien, Norwegen).
 > Der Großteil ist gebaut – kritisch sind drei serverseitige Lücken (unten **🔴**).
 
 ### Daten & Feeds
 
 | Roadmap-Punkt | Status | Tickets | Lücke / Rest |
 |---|---|---|---|
-| Verifizierte, host-kuratierte Standorte (Berlin/Potsdam/Umgebung) | ✅ | 55 Spots (Locations-DB), US-12 | Kuratierung laufend; Host-Verifikations-Loop hängt an US-68 |
+| Verifizierte, host-kuratierte Standorte (aktueller Schwerpunkt Berlin/Potsdam/Umgebung, App nicht auf diese Region beschränkt) | ✅ | 55 Spots (Locations-DB), US-12 | Kuratierung laufend; Host-Verifikations-Loop hängt an US-68 |
 | 14-Tage-Vorschau (rollend, aufsteigend, nach Tag gruppiert; Location · Wahrscheinlichkeit · Ereignis · Wetter) | ✅ | US-01, US-02 | — |
 | 365-Tage-Kalender (rollend, aufsteigend, nach Tag gruppiert; gleiche Felder) | ✅ | US-13, TASK-15 | — |
 | Nur **eine** Chance pro Location/Tag/Ereignis | ✅ | US-40, US-36, Feed-Dedup | — |

@@ -7,6 +7,11 @@ mkdir/touch/chown-Block für /var/log/caddy VOR dem Caddy-Reload enthält, damit
 `caddy validate` (root) die Logdatei aus deploy/Caddyfile nie mehr mit
 root-Besitzrechten anlegen kann, bevor der unprivilegierte "caddy"-User sie
 öffnet (siehe BACKLOG.md TASK-89 / Fund aus TASK-82-Testphase).
+
+TASK-96-Hinweis: Diese Datei ist trotz `offline`-Markierung NICHT teil-checkout-faehig -
+DEPLOY_DIR loest einen Pfad relativ zum Repo-Root ausserhalb von backend/ auf und bricht
+deshalb bei einem Checkout, der nur backend/ enthaelt. Deshalb zusaetzlich mit
+`requires_full_checkout` markiert (siehe backend/tests/README.md).
 """
 
 import re
@@ -14,8 +19,12 @@ from pathlib import Path
 
 import pytest
 
+# TASK-96: DEPLOY_DIR loest hier bewusst ausserhalb von backend/ auf (Repo-Root) -
+# deshalb Modul-weiter `requires_full_checkout`-Marker unten zusaetzlich zu `offline`.
 DEPLOY_DIR = Path(__file__).resolve().parents[2] / "deploy"
 SETUP_SCRIPT = DEPLOY_DIR / "setup_server.sh"
+
+pytestmark = pytest.mark.requires_full_checkout
 
 
 @pytest.fixture(scope="module")

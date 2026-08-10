@@ -27,19 +27,22 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 **Marker `requires_full_checkout` (TASK-96, 2026-08-10):** `offline` bedeutet nur
 "deterministisch, ohne Netzwerk/externe Dienste" — das ist NICHT dasselbe wie
 "läuft auch bei einem Teil-Checkout, der nur `backend/` enthält" (z. B. ein schmal
-gestagter Cloud-Sandbox-Abzug oder ein CI-Job ohne vollständigen Checkout). Vier als
-`offline` markierte Testdateien lösen Pfade relativ zum Repo-Root außerhalb von
-`backend/` auf (`web/`, `deploy/`) und brechen deshalb bei einem Backend-only-Checkout,
-obwohl ihre Markierung etwas anderes suggeriert: `test_task84.py`,
-`test_task89_caddy_log_permissions.py`, `test_us105_section_order.py` und
-`test_us79_moon_rise_set.py`. Diese vier tragen deshalb zusätzlich den Marker
+gestagter Cloud-Sandbox-Abzug oder ein CI-Job ohne vollständigen Checkout). Sechs als
+`offline`/`frontend` markierte Testdateien lösen Pfade relativ zum Repo-Root außerhalb von
+`backend/` auf (`web/`, `deploy/`, `tools/`, `docs/`) und brechen deshalb bei einem
+Backend-only-Checkout, obwohl ihre Markierung etwas anderes suggeriert: `test_task84.py`,
+`test_task89_caddy_log_permissions.py`, `test_us105_section_order.py`,
+`test_us79_moon_rise_set.py` (verifiziert in der TASK-96-Analyse, 2026-08-09/10) sowie
+`test_task53_dev_sync.py` und `test_task-66.py` (nachträglich per Verifikations-Review am
+2026-08-10 gefunden — sys.path-Import aus Repo-Root-`tools/` bzw. Screenshot-Pfad unter
+Repo-Root-`docs/`). Diese sechs tragen deshalb zusätzlich den Marker
 `requires_full_checkout` (Option B aus der TASK-96-Analyse — ein reiner Pfad-Fix wurde
 bewusst verworfen, da er das eigentliche Problem, fehlende Sichtbarkeit der
 Repo-Root-Abhängigkeit, nur verdeckt hätte). Ein automatisierter Test
 (`test_task96_requires_full_checkout_marker.py`) sichert ab, dass jede Testdatei, die
 per Heuristik einen Pfad außerhalb von `backend/` referenziert (Path-Join mit dem
-Literal `"web"` oder `"deploy"`), auch tatsächlich diesen Marker trägt — künftige,
-strukturell gleiche Fälle bleiben so nicht unbemerkt unmarkiert (analog zum
+Literal `"web"`, `"deploy"`, `"tools"` oder `"docs"`), auch tatsächlich diesen Marker trägt
+— künftige, strukturell gleiche Fälle bleiben so nicht unbemerkt unmarkiert (analog zum
 TASK-79-Muster, das die README-Tabellen-Vollständigkeit gegen alle Testdateien
 absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
 
@@ -77,7 +80,7 @@ absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
 | `test_task02_eclipses.py` | TASK-02: Sonnen-/Mondfinsternisse (vier Typen, Berlin/BB-Region), gegen reale, extern verifizierbare Ereignisse geprüft (Skyfield-Kontaktsuche + `eclipselib.lunar_eclipses()`) | ⏳ nur mit `--all` (Datei-Cache-Zugriff auf `de421.bsp`, wie bei `test_astronomy_regression.py`) | `regression`, `online` |
 | `test_task-41_precompute_refactor.py` | TASK-41: Refactoring `_run_single_location_flow()` in 4 Helferfunktionen | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task-60_patch_location_refactor.py` | TASK-60: Aufrufreihenfolge nach `patch_location()`-Refactoring | ⏳ nur mit `--all` | `api`, `regression` |
-| `test_task-66.py` | TASK-66: Playwright-Wrapper für 3 neue Klick-Durchläufe (echter Dev-Server nötig) | ⏭️ im Sandbox weiterhin übersprungen (kein Playwright/Dev-Server) — läuft jetzt real im test-frontend-Job (CI, BUG-100) | `frontend`, `regression` |
+| `test_task-66.py` | TASK-66: Playwright-Wrapper für 3 neue Klick-Durchläufe (echter Dev-Server nötig) | ⏭️ im Sandbox weiterhin übersprungen (kein Playwright/Dev-Server) — läuft jetzt real im test-frontend-Job (CI, BUG-100) — benötigt vollständigen Checkout (TASK-96) | `frontend`, `regression`, `requires_full_checkout` |
 | `test_task-83.py` | TASK-83: Login-Ticket als HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher (Login, Endpunktschutz, Zwangs-Logout, `/logout`, CORS-Credentials) | ⏳ nur mit `--all` (FastAPI-Stack + App-Startup) | `api`, `regression` (+1× `smoke`) |
 | `test_task43_qa_model.py` | TASK-43: QA-Datenmodell (Lock-Flags, QA-Tabellen, Geo-Hash) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task45_azimuth.py` | TASK-45: idealer Azimut automatisch aus Sichtlinie | ✅ immer (offline, deterministisch) | `offline`, `regression` |
@@ -85,7 +88,7 @@ absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
 | `test_task47_focal.py` | TASK-47: Brennweiten-Empfehlung aus Motivhöhe + Entfernung | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task48_qa_cron.py` | TASK-48: QA-Lauf automatisieren (Change-Detection, Single-Flight) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task48_qa_ondemand.py` | TASK-48: Endpoint `POST /run-qa-pass` (On-Demand-Trigger, Verbesserung gemockt) | ⏳ nur mit `--all` | `api`, `regression` |
-| `test_task53_dev_sync.py` | TASK-53: Live-Nutzerdaten periodisch nach Dev spiegeln (subprocess gemockt) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_task53_dev_sync.py` | TASK-53: Live-Nutzerdaten periodisch nach Dev spiegeln (subprocess gemockt) | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_task55_image_backup.py` | TASK-55: `location_images/` im Server-Backup mitsichern | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task59_own_overpass.py` | TASK-59: Optionaler eigener Overpass-Server (Code-Vorbereitung in `data/qa_azimuth.py`, komplett gemockt — der eigene Server existiert noch nicht) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task59_local_building_cache.py` | TASK-59 Option E: lokale Gebäudedaten-Cache-Nachschau in `data/qa_azimuth.py` vor dem Live-Mirror-Fallback (komplett gemockt) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
@@ -105,6 +108,7 @@ absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
 | `test_task97_ci_env_dev_guard.py` | TASK-97 (AK4): Regressionsguard, dass `FOTOALERT_ENV: dev` im `test-frontend`-Job von `.github/workflows/deploy.yml` erhalten bleibt (verhindert stillen Rückfall in den TASK-83-Cookie/Secure-Flag-Fehler aus CI-Run #277) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task-94.py` | TASK-94: `_load_custom_locations()` in main.py nutzt jetzt `coerce_category_value()` (statt direktem `LocationCategory[...]`-Zugriff) UND ist pro Eintrag try/except-abgesichert (Referenzimplementierung: `precompute.py:_load_custom_locations()`, BUG-33) — ein einzelner beschädigter Kategoriewert/Eintrag bricht das Laden der übrigen Custom-Locations beim Serverstart nicht mehr ab | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task-102.py` | TASK-102: Sicherheits-Härtungen Teil 1 — (a) `_run_precompute()`/`_run_sightline_refresh()` legen bei internem Fehler keinen rohen Exception-Text mehr in `_job_status` ab (GET /job-status ist unauthentifiziert), voller Text bleibt per `logger.error()` im Server-Log; (c) `upload_location_image()` prüft die Upload-Größe jetzt per Streaming-Read in Chunks statt erst nach vollständigem Einlesen | teils ✅ immer (2× `offline`), teils nur mit `--all` (3× `api`) | `offline`, `api`, `regression` |
+| `test_task-103.py` | TASK-103: Bearbeiten gespeicherter Orte auf Host beschränken (`PATCH /locations/{id}` von `auth.require_auth` auf `auth.require_host` umgestellt, Anlegen über `POST /preview-alignment` bleibt für User unverändert möglich) | ⏳ nur mit `--all` | `api`, `regression` |
 | `test_task84.py` | TASK-84 (Nacharbeit): Vendor-Umstellung (Leaflet/astronomy-engine self-hosted unter `web/vendor/`) + CSP-Verschlankung (`deploy/Caddyfile`) statisch abgesichert | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_task-85.py` | TASK-85: Harter Serverstart-Abbruch bei fehlendem/leerem `FOTOALERT_AUTH_SECRET`, kein Notwert-Fallback mehr | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_task86.py` | TASK-86: Häufigkeits-Bremse `/preview-alignment` (AK-1), Kalender-Cache-Normalisierung + Höchstgröße (AK-2/AK-3), Login-Lockout (AK-4/AK-5), Geräte-Token-Validierung + Bremse `/register-device` (AK-6/AK-7), Regression Zeitraum-Deckelung/CORS (AK-8/AK-9) | teils ✅ immer (offline-Klassen: `rate_limit.py`-Unit-Tests + Cache-Normalisierung), teils nur mit `--all` (api-Klassen: `/login`, `/preview-alignment`, `/register-device`) | `offline`, `api`, `regression` |

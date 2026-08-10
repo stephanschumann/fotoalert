@@ -208,7 +208,7 @@ Score = GATE_los · GATE_horizont · GATE_lichtfenster · (
 - **Wikidata/Wikipedia**: Bauwerkshöhen als Höhenquelle.
 
 ### Höhen & Verschattung
-**Brandenburg (Potsdam + Umland, inkl. Berlin-Verflechtungsraum) — LGB / geobasis-bb.de**
+**Höchstauflösende Region aktuell: Brandenburg (Potsdam + Umland, inkl. Berlin-Verflechtungsraum) — LGB / geobasis-bb.de**
 - **DGM1** (Digitales Geländemodell, 1 m) — Geländehöhen. Download: `https://data.geobasis-bb.de/geobasis/daten/dgm/`
 - **bDOM** (bildbasiertes Oberflächenmodell, aktuell 0,2 m, auch 1 m) — Höhen inkl. Bauwerken **und Vegetation**, bildet den Flugtag-Zustand ab. Download: `https://data.geobasis-bb.de/geobasis/daten/bdom/`
 - **LoD2-Gebäudemodelle** (CityGML, Höhengenauigkeit ~1 m) — `https://geobasis-bb.de/lgb/de/geodaten/3d-produkte/`

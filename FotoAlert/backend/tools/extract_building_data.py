@@ -13,7 +13,7 @@ nicht in dieser Datei stehen.
 Verwendung:
     cd FotoAlert/backend
     python3 tools/extract_building_data.py \
-        --pbf /pfad/zu/brandenburg-latest.osm.pbf \
+        --pbf /pfad/zu/<region>-latest.osm.pbf \
         --output data/cache/building_footprints.json \
         --radius 200
 

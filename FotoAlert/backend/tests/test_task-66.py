@@ -34,7 +34,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "frontend"))
 import run_frontend_check as rfc  # noqa: E402
 import spec as _spec  # noqa: E402
 
-pytestmark = [pytest.mark.frontend, pytest.mark.regression]
+pytestmark = [pytest.mark.frontend, pytest.mark.regression, pytest.mark.requires_full_checkout]
+# `requires_full_checkout`: screenshot_root unten loest "docs" relativ zum
+# Repo-Root auf, nicht relativ zu backend/ (TASK-96-Nachbesserung, 2026-08-10).
 
 BASE_URL = os.environ.get("FOTOALERT_TEST_BASE_URL", "http://localhost:8000")
 USER_PASSWORD = os.environ.get("FOTOALERT_USER_PASSWORD", "test-user-pw")

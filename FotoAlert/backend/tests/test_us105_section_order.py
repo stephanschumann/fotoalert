@@ -5,6 +5,11 @@ in der korrekten SOLL-Reihenfolge definiert sind.
 
 Ausführen (vom Workspace-Root):
     pytest FotoAlert/backend/tests/test_us105_section_order.py -v
+
+TASK-96-Hinweis: Diese Datei ist trotz `offline`-Markierung NICHT teil-checkout-faehig -
+INDEX_HTML loest einen Pfad relativ zum Repo-Root ausserhalb von backend/ auf und bricht
+deshalb bei einem Checkout, der nur backend/ enthaelt. Deshalb zusaetzlich mit
+`requires_full_checkout` markiert (siehe backend/tests/README.md).
 """
 
 import re
@@ -13,10 +18,17 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.frontend]
+pytestmark = [
+    pytest.mark.offline,
+    pytest.mark.regression,
+    pytest.mark.frontend,
+    pytest.mark.requires_full_checkout,
+]
 
 # Pfad relativ zu diesem Skript
 THIS_DIR = Path(__file__).parent
+# TASK-96: loest hier bewusst ausserhalb von backend/ auf (Repo-Root) - deshalb
+# `requires_full_checkout` oben zusaetzlich zu `offline` gesetzt.
 INDEX_HTML = THIS_DIR.parent.parent / "web" / "index.html"
 
 # SOLL-Reihenfolge laut US-105

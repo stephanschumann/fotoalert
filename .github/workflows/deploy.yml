@@ -5,6 +5,9 @@
 #   DEPLOY_SSH_KEY           – Privater SSH-Key (Ed25519) für Zugriff auf Hetzner-Server
 #   SERVER_IP                – IP-Adresse des Hetzner-Servers (z.B. 1.2.3.4)
 #   SERVER_USER              – SSH-Username auf dem Server (fotoalert)
+#   SERVER_KNOWN_HOSTS        – TASK-87(e): fest hinterlegter Server-Fingerabdruck (Ausgabe von
+#                              `ssh-keyscan -H <SERVER_IP>`, vorab vertrauenswürdig geprüft),
+#                              ersetzt das frühere live/ungeprüfte ssh-keyscan bei jedem Deploy
 #   FOTOALERT_USER_PASSWORD  – Test-Passwort für Playwright-Login (TASK-21)
 #   FOTOALERT_HOST_PASSWORD  – Host-Passwort für Dev-Server (TASK-21)
 #   FOTOALERT_AUTH_SECRET    – Auth-Secret für Dev-Server (TASK-21)
@@ -96,7 +99,23 @@ jobs:
         run: |
           python3 -m pytest tests/test_bug_85.py "tests/test_bug-80.py" "tests/test_task-66.py" -v
 
-      - name: Findings + Screenshots als CI-Artefakt hochladen
+      # TASK-97 (AK2): Bei jedem Job-Fehlschlag mehr Kontext als CI-Artefakt sichern,
+      # damit ein künftiger ähnlicher Fall (wie der ungeklärte CI-Run #277 — Login-
+      # Precondition-Fehler ohne Log-Auswertung) tatsächlich diagnostizierbar ist,
+      # statt wie damals nur per Re-Run-Erfolg als Flake eingestuft zu werden.
+      # Zeitpunkt (UTC) + Commit + Run-Verweis, damit sich das Artefakt eindeutig
+      # einem Lauf/Commit zuordnen lässt.
+      - name: CI-Kontext für Diagnose sichern
+        if: always()
+        run: |
+          {
+            echo "Zeitpunkt (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Commit: ${{ github.sha }}"
+            echo "Workflow-Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "Job-Status: ${{ job.status }}"
+          } > /tmp/fotoalert-ci-context.txt
+
+      - name: Findings + Screenshots + Server-Log als CI-Artefakt hochladen
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -104,6 +123,8 @@ jobs:
           path: |
             /tmp/findings.json
             /tmp/qa-screenshots/
+            /tmp/fotoalert-ci-server.log
+            /tmp/fotoalert-ci-context.txt
           if-no-files-found: ignore
 
       - name: Dev-Server stoppen
@@ -180,12 +201,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+          # TASK-87(e): fest hinterlegter Fingerabdruck statt live/ungeprüftem ssh-keyscan bei
+          # jedem Deploy-Lauf — verhindert, dass sich beim Verbindungsaufbau unbemerkt ein
+          # anderer Server als der echte ausgeben könnte. SERVER_KNOWN_HOSTS enthält die
+          # known_hosts-Zeilen aus einem vorab vertrauenswürdig geprüften `ssh-keyscan`.
+          echo "${{ secrets.SERVER_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
       - name: Deploy auf Server
         run: |
           ssh -i ~/.ssh/deploy_key \
-              -o StrictHostKeyChecking=no \
+              -o StrictHostKeyChecking=yes \
               -o ConnectTimeout=30 \
               "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}" \
               "bash /opt/fotoalert/app/FotoAlert/deploy/deploy.sh"

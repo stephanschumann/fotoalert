@@ -23,10 +23,12 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import json
 import math
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import List, Optional
 
@@ -107,6 +109,108 @@ def _dismiss_onboarding_if_present(page) -> None:
         pass  # Overlay ist gar nicht erschienen oder schon zu.
 
 
+def _safe_body_snippet(response, limit: int = 200) -> str:
+    """Best-effort Response-Body-Ausschnitt für Diagnose-Meldungen (TASK-97)."""
+    try:
+        text = response.text()
+        return text[:limit]
+    except Exception as exc:  # pragma: no cover - Diagnose darf nie selbst crashen
+        return "(Body nicht lesbar: {0})".format(exc)
+
+
+def _diagnose_login_failure(
+    page,
+    base_url: str,
+    password: str,
+    elapsed_ms: float,
+    console_errors: Optional[List[str]] = None,
+    page_errors: Optional[List[str]] = None,
+) -> str:
+    """TASK-97 (AK1) — Diagnose-Zusatzinfo für einen fehlgeschlagenen Login-
+    Precondition-Check.
+
+    Hintergrund: CI-Run #277 schlug mit "Auth.isLoggedIn() blieb false" fehl,
+    ein Re-Run desselben Commits lief grün. Die tatsächliche Ursache blieb
+    ungeklärt, weil das Finding damals außer der reinen Bool-Aussage keinerlei
+    HTTP-Status/Timing/Empfangsnachweis enthielt (siehe BACKLOG.md TASK-97).
+    Diese Funktion liefert genau das für künftige, ähnlich gelagerte Fälle:
+
+      - Wartezeit bis zum Timeout (Cold-Start-Timing, Pre-Mortem-Szenario A).
+      - Den vom Frontend selbst gesetzten Fehlertext (#login-err, siehe
+        LoginScreen.submit() in web/index.html: "Falsches Passwort." vs.
+        "Server nicht erreichbar." vs. leer=noch offen).
+      - Eine UNABHÄNGIGE zweite Anfrage direkt gegen /login (über
+        page.request, nicht über den Seiten-Fetch) — zeigt den tatsächlichen
+        Server-Zustand zum Zeitpunkt des Fehlschlags, unterscheidet dabei
+        insbesondere HTTP 429 (Rate-Limit/Login-Lockout, eigene Meldung lt.
+        Edge Case) von 401 (Passwort abgelehnt) und einem erneuten Erfolg
+        (spricht für einen transienten/Timing-Effekt statt für ein
+        grundsätzliches Auth-Problem).
+      - /health zum Vergleich (dieselbe Prüfung, die die CI vor dem
+        Frontend-Check bereits nutzt, um Server-Erreichbarkeit an sich von
+        einem spezifischen /login-Problem zu unterscheiden).
+      - Die bis dahin gesammelten Browser-Console-/Page-Errors.
+
+    Best-effort: jeder Diagnoseschritt ist einzeln try/except-abgesichert —
+    ein Fehler in der Diagnose selbst darf niemals das eigentliche Finding
+    verschlucken oder den Lauf zusätzlich zum Absturz bringen.
+    """
+    parts = ["Wartezeit bis Timeout: {0:.0f}ms".format(elapsed_ms)]
+
+    try:
+        err_text = page.locator("#login-err").text_content(timeout=2000)
+        parts.append("#login-err Text: {0!r}".format(err_text))
+    except Exception as exc:
+        parts.append("#login-err nicht lesbar: {0}".format(exc))
+
+    try:
+        parts.append("aktuelle URL: {0}".format(page.url))
+    except Exception:
+        pass
+
+    try:
+        probe = page.request.post(
+            base_url.rstrip("/") + "/login",
+            data=json.dumps({"password": password}),
+            headers={"Content-Type": "application/json"},
+            timeout=5000,
+        )
+        status = probe.status
+        if status == 429:
+            parts.append(
+                "Diagnose-Login-Probe: HTTP 429 (Rate-Limit/Login-Lockout aktiv) — {0}".format(
+                    _safe_body_snippet(probe)
+                )
+            )
+        elif status == 401:
+            parts.append("Diagnose-Login-Probe: HTTP 401 (Passwort wird vom Server abgelehnt)")
+        elif 200 <= status < 300:
+            parts.append(
+                "Diagnose-Login-Probe: HTTP 200 (Server akzeptiert das Passwort jetzt wieder — "
+                "spricht für einen transienten/Timing-Effekt, nicht für ein grundsätzliches "
+                "Auth-Problem)"
+            )
+        else:
+            parts.append(
+                "Diagnose-Login-Probe: HTTP {0} — {1}".format(status, _safe_body_snippet(probe))
+            )
+    except Exception as exc:
+        parts.append("Diagnose-Login-Probe fehlgeschlagen (Server evtl. nicht erreichbar): {0}".format(exc))
+
+    try:
+        health = page.request.get(base_url.rstrip("/") + "/health", timeout=5000)
+        parts.append("/health zum Zeitpunkt des Fehlschlags: HTTP {0}".format(health.status))
+    except Exception as exc:
+        parts.append("/health-Probe fehlgeschlagen: {0}".format(exc))
+
+    if console_errors:
+        parts.append("Browser-Console-Errors bislang: " + " | ".join(console_errors[-5:]))
+    if page_errors:
+        parts.append("Browser-Page-Errors bislang: " + " | ".join(page_errors[-5:]))
+
+    return "; ".join(parts)
+
+
 # --- Browser-Lauf ------------------------------------------------------------------
 def run_checks(
     base_url: str,
@@ -158,18 +262,35 @@ def run_checks(
 
         # 1) Login-Precondition (AK4) — Fail-Fast bei Infra-Problem.
         page.fill("#login-pw", password)
+        # TASK-97 (AK3): Zustand unmittelbar VOR dem Login-Klick festhalten (Pre-Mortem
+        # Szenario C: Onboarding-Overlay könnte den Klick verschlucken/verzögern) —
+        # unabhängig vom Ausgang, damit der Screenshot auch bei Erfolg als Referenz
+        # für spätere ähnliche Fälle im Artefakt liegt.
+        _shot("login-before-submit")
+        login_attempt_started = time.monotonic()
         page.click(".login-btn")
         try:
             # Auth/App sind top-level `const` → NICHT an window gebunden; per bare name prüfen.
             page.wait_for_function("() => typeof Auth !== 'undefined' && Auth.isLoggedIn()", timeout=timeout_ms)
         except Exception:
+            elapsed_ms = (time.monotonic() - login_attempt_started) * 1000
+            # TASK-97 (AK1): Diagnostik-Erweiterung statt reiner Bool-Aussage — HTTP-
+            # Status/Timing/Empfangsnachweis, damit ein künftiger ähnlicher Fall (wie
+            # der ungeklärte CI-Run #277) tatsächlich diagnostizierbar ist.
+            diagnostics = _diagnose_login_failure(
+                page, base_url, password, elapsed_ms, console_errors, page_errors
+            )
+            print(
+                "[TASK-97 Diagnose] login_precondition fehlgeschlagen: {0}".format(diagnostics),
+                file=sys.stderr,
+            )
             findings.append(
                 Finding(
                     view="login",
                     assertion_id="login_precondition",
                     expected="Auth.isLoggedIn() === true nach Submit mit Test-PW",
                     actual="Auth.isLoggedIn() blieb false (Login-Gate nicht passiert)",
-                    message="login precondition failed: not logged in after submit",
+                    message="login precondition failed: not logged in after submit — " + diagnostics,
                     screenshot_path=_shot("login-fail"),
                     timestamp=_now_iso(),
                     commit_sha=commit,
@@ -2720,6 +2841,11 @@ def run_mobile_checks(
     shot_dir.mkdir(parents=True, exist_ok=True)
     commit = _commit_sha()
     findings: List[Finding] = []
+    # TASK-97 (AK1): auch im Mobile-Pass Console-/Page-Errors mitschneiden, damit die
+    # Login-Diagnose (siehe _diagnose_login_failure) dieselbe Datenbasis wie im
+    # Desktop-Pass (run_checks) hat.
+    console_errors: List[str] = []
+    page_errors: List[str] = []
 
     # iPhone 14 Viewport
     IPHONE_WIDTH = 390
@@ -2744,6 +2870,12 @@ def run_mobile_checks(
         page = ctx.new_page()
         page.set_default_timeout(timeout_ms)
 
+        page.on("pageerror", lambda e: page_errors.append(str(e)))
+        page.on(
+            "console",
+            lambda m: console_errors.append(m.text) if m.type == "error" else None,
+        )
+
         page.goto(base_url, wait_until="domcontentloaded")
 
         # US-21, vierter Fix-Versuch: siehe Docstring von _dismiss_onboarding_if_present
@@ -2752,16 +2884,28 @@ def run_mobile_checks(
 
         # Login
         page.fill("#login-pw", password)
+        # TASK-97 (AK3): Zustand unmittelbar vor dem Login-Klick auch im Mobile-Pass.
+        _shot("mobile-login-before-submit")
+        login_attempt_started = time.monotonic()
         page.click(".login-btn")
         try:
             page.wait_for_function("() => typeof Auth !== 'undefined' && Auth.isLoggedIn()", timeout=timeout_ms)
         except Exception:
+            elapsed_ms = (time.monotonic() - login_attempt_started) * 1000
+            # TASK-97 (AK1): dieselbe Diagnostik-Erweiterung wie im Desktop-Pass.
+            diagnostics = _diagnose_login_failure(
+                page, base_url, password, elapsed_ms, console_errors, page_errors
+            )
+            print(
+                "[TASK-97 Diagnose] mobile_login_precondition fehlgeschlagen: {0}".format(diagnostics),
+                file=sys.stderr,
+            )
             findings.append(Finding(
                 view="mobile-login",
                 assertion_id="mobile_login_precondition",
                 expected="Login im Mobile-Viewport erfolgreich",
                 actual="Auth.isLoggedIn() blieb false im Mobile-Viewport",
-                message="mobile login failed",
+                message="mobile login failed — " + diagnostics,
                 screenshot_path=_shot("mobile-login-fail"),
                 timestamp=_now_iso(),
                 commit_sha=commit,

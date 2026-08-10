@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CameraHintOut(BaseModel):
@@ -114,5 +114,13 @@ class DailyBriefingOut(BaseModel):
 
 class HealthOut(BaseModel):
     status: str
-    version: str
+    version: str = Field(
+        ...,
+        description=(
+            "Backend-/API-Schemaversion, NICHT die App-Release-Version "
+            "(siehe web/index.html APP_VERSION). Backend- und Frontend-Releases "
+            "laufen nicht synchron; ein unveraendertes Feld ist bei einem reinen "
+            "Backend-Deploy erwartungsgemaess. Herkunft: TASK-95."
+        ),
+    )
     locations_count: int

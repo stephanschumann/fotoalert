@@ -3881,7 +3881,7 @@ def _trigger_patch_recompute(loc_id: str, allowed: dict) -> bool:
 
 
 @app.patch("/locations/{loc_id}")
-async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_auth)) -> dict:
+async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_host)) -> dict:
     """Aktualisiert Felder einer Location (alle Typen; Koordinaten + Name + Beschreibung + Höhenkorrektur)."""
     # US-128: Die drei vormals redundant gepflegten Feld-Listen (hier + main.py
     # _load_location_overrides + precompute.py _OVERRIDE_FIELDS) sind jetzt aus
