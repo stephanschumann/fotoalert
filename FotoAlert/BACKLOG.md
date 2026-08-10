@@ -2201,14 +2201,15 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 
 ---
 
-### US-135 · Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen `[~]`
+### US-135 · Scout: Nur zugängliche Standorte mit freier Sicht vorschlagen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-08-07 |
+| **Abgeschlossen** | 2026-08-10 |
 
 **Beschreibung:** Scout schlägt aktuell Fotografenstandorte vor, die zwar geometrisch/astronomisch korrekt zur gewünschten Himmelsausrichtung passen (Dreiecksberechnung aus bekannten Locations), in der Praxis aber teils untauglich sind — z. B. mitten im Wald ohne Weg, ohne erkennbaren freien Zugang. Die reine geometrische Berechnung prüft aktuell nicht, ob der errechnete Punkt real zugänglich ist oder ob die Sicht zum Motiv frei ist.
 
@@ -2253,14 +2254,14 @@ Nur ein Aufrufer von `_init_calendar_pass()` (geringes Streuungsrisiko bei Signa
 ⚠️ Annahme 3: Die neue Prüfung gilt ausschließlich für Scout-Tab-Vorschläge — bereits gespeicherte Standorte (mit eigener bestehender Sichtachsen-Prüfung) sind unverändert.
 
 **Akzeptanzkriterien:**
-- [~] Ein Scout-Vorschlag mit laut Live-Prüfung freier Sicht zum Motiv erscheint in der Scout-Liste.
-- [~] Ein Scout-Vorschlag, dessen Sicht laut Live-Prüfung komplett durch ein Gebäude blockiert ist, erscheint nicht in der Scout-Liste.
-- [~] Ein Scout-Vorschlag mitten im Wald ohne erkennbaren Weg in der Nähe erscheint nicht in der Scout-Liste.
-- [~] Ein Scout-Vorschlag im Wasser oder auf/direkt neben Bahngleisen erscheint nicht in der Scout-Liste.
-- [~] Edge Case: Kann für einen Kandidaten weder die Sichtlinien- noch die Erreichbarkeits-Prüfung durchgeführt werden (Datenquelle nicht erreichbar), erscheint er nicht in der Liste — ohne Label, ohne Fehlermeldung.
-- [~] Edge Case: Sind an einem Tag ungewöhnlich viele Prüfungen nicht durchführbar, zeigt der Scout-Tab denselben Leerzustand wie an einem Tag ohne passende Chancen — keine Fehlermeldung, kein Absturz.
-- [~] Edge Case: Während die tägliche Berechnung läuft, bleibt die bisherige Meldung/der zuletzt berechnete Bestand sichtbar (kein leerer Bildschirm während der Berechnung).
-- [~] Bereits gespeicherte Standorte sind von dieser neuen Prüfung unberührt — nur Scout-Tab-Vorschläge werden zusätzlich gefiltert.
+- [x] Ein Scout-Vorschlag mit laut Live-Prüfung freier Sicht zum Motiv erscheint in der Scout-Liste.
+- [x] Ein Scout-Vorschlag, dessen Sicht laut Live-Prüfung komplett durch ein Gebäude blockiert ist, erscheint nicht in der Scout-Liste.
+- [x] Ein Scout-Vorschlag mitten im Wald ohne erkennbaren Weg in der Nähe erscheint nicht in der Scout-Liste.
+- [x] Ein Scout-Vorschlag im Wasser oder auf/direkt neben Bahngleisen erscheint nicht in der Scout-Liste.
+- [x] Edge Case: Kann für einen Kandidaten weder die Sichtlinien- noch die Erreichbarkeits-Prüfung durchgeführt werden (Datenquelle nicht erreichbar), erscheint er nicht in der Liste — ohne Label, ohne Fehlermeldung.
+- [x] Edge Case: Sind an einem Tag ungewöhnlich viele Prüfungen nicht durchführbar, zeigt der Scout-Tab denselben Leerzustand wie an einem Tag ohne passende Chancen — keine Fehlermeldung, kein Absturz.
+- [x] Edge Case: Während die tägliche Berechnung läuft, bleibt die bisherige Meldung/der zuletzt berechnete Bestand sichtbar (kein leerer Bildschirm während der Berechnung).
+- [x] Bereits gespeicherte Standorte sind von dieser neuen Prüfung unberührt — nur Scout-Tab-Vorschläge werden zusätzlich gefiltert.
 
 **Pre-Mortem (Code-Verifikation gegen `qa_azimuth.py`, `pipeline.py`, `pipeline_base.py`, `sightline.py`, `main.py`, 2026-08-07):**
 - 💀 Overpass sperrt erneut Verbindungen (Wiederholung des realen US-09-Vorfalls) bei bis zu ~2000 Live-Anfragen/Tag (2 Prüfkategorien × ~1011 tägliche Scout-Kandidaten) → Gegenmaßnahme: Implementierungsoption A (siehe unten).
@@ -2279,7 +2280,7 @@ Verworfen: Option B (entkoppelte Hintergrund-Warteschlange, inkrementelles Nachl
 - Automatisiert geplant (`backend/tests/test_us135.py`): Filterverhalten bei frei/blockiert/Wald-ohne-Weg/Wasser/Bahn (gemockte Overpass-Antworten); „im Zweifel ausblenden" bei Timeout/Exception ohne Absturz; Cluster-Cache-Wiederverwendung (zwei nahe Kandidaten → nur ein Live-Call); Nutzung des bestehenden geteilten Rate-Limit-Trackers statt eines zweiten unabhängigen.
 - Manuell geplant: Scout-Tab im Browser öffnen, bekannte ungeeignete Kandidaten (Wald/Bahngleis) nicht mehr in der Liste finden; `/refresh-discover` manuell auslösen, im Server-Log die Anzahl tatsächlicher Overpass-Anfragen beim zweiten Lauf gegenprüfen (sollte stark sinken); Regressions-Matrix (PRODUCT.md §12) gegen die bestehende Sichtachsen-Prüfung gespeicherter Standorte prüfen (gemeinsame Rate-Limit-Ressource).
 
-**Status-Update:** Ready for Dev (Spec freigegeben inkl. Implementierungsoption A, 2026-08-07).
+**Status-Update:** Done. Root Cause der weiterhin sichtbaren Havel/Pfaueninsel-Fehlausschlüsse identifiziert und behoben: (1) Ring-Rekonstruktion aus offenen OSM-Wegsegmenten (`_stitch_way_segments_into_rings()`) plus Gerade-Ungerade-Lochregel für Multipolygon-Wasserflächen mit Inseln in `backend/discover/accessibility.py` ergänzt/verifiziert (Pfaueninsel als Loch in der Havel-Relation korrekt erkannt). (2) Eigentliche Grundursache, warum diese Logik bei realen Scout-Standpunkten (150-370m vom nächsten Wasserrand) nie griff: Overpass' `around:r`-Filter liefert eine Relation nur, wenn mindestens ein Mitgliedsknoten innerhalb des Radius liegt — bei `SCOUT_ACCESS_QUERY_RADIUS_M = 150` traf das nie zu. Radius auf 500m erhöht (Stephans Freigabe 2026-08-09), inkl. zweier gezielter Cache-Bereinigungen (veraltete Havel/Pfaueninsel-Einträge, dann Einträge mit altem Radius). Die grundsätzliche Architekturlücke „Cache prüft nicht, ob gespeicherte Einträge zum aktuellen Codestand passen“ separat als **BUG-103** erfasst. Unabhängige Gegenprüfung (gate-auditor) bestätigt: 29 eigene Tests grün, `_is_excluded()` gegen echte aktuelle Cache-Daten verifiziert (Zielpunkt korrekt als unzugänglich erkannt), README-Testmarker-Lücke (2 fehlende Zeilen) im selben Zug geschlossen. Released als v1.22.63, Commit `7ee45de` (+ Merge `eb759e6` wegen zeitgleichem TASK-59-Push), CI grün (Frontend-Check Playwright, Backend-Tests pytest, Deploy FotoAlert), Live-Verifikation im Browser bestätigt (Scout-Tab zeigt reale, plausible Standorte mit Score/Wetterlage/Distanz, z. B. Müggelsee 99%, Einsteinturm 97%) auf https://fotoalert.stephanschumann.com.
 
 ---
 
