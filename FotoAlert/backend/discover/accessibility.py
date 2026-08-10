@@ -164,10 +164,71 @@ def _is_excluded(standpoint_lat: float, standpoint_lon: float, data: dict) -> bo
     mitten im Wald OHNE Weg in der Naehe (qa_azimuth.SCOUT_ACCESS_PATH_
     RADIUS_M) liegt."""
     water_ways = data.get("water_ways") or []
+
+    # US-135 Nachbesserung (2026-08-09, Havel/Pfaueninsel-Beweisfall
+    # 52.429605/13.114616): Grosse mehrteilige Wasserflaechen liefert
+    # qa_azimuth.py jetzt als zu Ringen zusammengesetzte Multipolygon-
+    # Relationen (relation_id gesetzt) -- je Relation ggf. mehrere
+    # geschlossene Ringe (1x outer + 0..n inner fuer Inseln wie die
+    # Pfaueninsel selbst). Ein simples "in irgendeinem geschlossenen Ring"
+    # wuerde eine Insel (inner-Rolle) faelschlich als Wasser zaehlen, weil
+    # ein Punkt auf der Insel auch innerhalb des Aussenrings liegt. Deshalb
+    # gilt je Relation die Standard-Gerade-Ungerade-Regel fuer Multipolygone
+    # mit Loechern: ein Punkt zaehlt als "im Wasser", wenn er in einer
+    # UNGERADEN Anzahl der Ringe DERSELBEN Relation liegt (nur im outer ->
+    # 1 = ungerade -> Wasser; im outer UND zusaetzlich in einem inner/
+    # Insel-Ring -> 2 = gerade -> kein Wasser). Eigenstaendige Ways ohne
+    # relation_id (Alt-Fall: ein einzelner, bereits selbst geschlossener
+    # way["natural"="water"]) bilden weiterhin je ihre eigene Ein-Ring-Gruppe
+    # -- exakt das Verhalten von vor dieser Nachbesserung.
+    #
+    # US-135 Randfall-Nachbesserung (2026-08-09, Zweitpruefung): Ringe
+    # werden jetzt zusaetzlich nach role ("outer"/"inner", von qa_azimuth.py
+    # je Member-Way gesetzt) gruppiert. Scheitert die Rekonstruktion des
+    # Aussenrings einer Relation (z.B. Overpass liefert nicht alle Member-
+    # Ways -> offene Restsegmente, "closed" bleibt False), aber ein
+    # Innenring (z.B. die Pfaueninsel als Loch) wird trotzdem erfolgreich
+    # geschlossen, darf die Gerade-Ungerade-Regel NICHT alleine auf diesen
+    # Innenring angewendet werden -- sonst zaehlt ein Punkt AUF der Insel
+    # faelschlich als "im Wasser" (enclosing_count=1, ungerade), obwohl es
+    # Land ist. Deshalb: die Lochregel greift je Relation nur, wenn
+    # mindestens ein geschlossener OUTER-Ring vorhanden ist. Fehlt ein
+    # geschlossener Outer-Ring komplett, wird die Relation fuer die
+    # Lochregel uebersprungen -- der Fall degradiert defensiv auf den
+    # bestehenden 15m-Kantenpuffer weiter unten (lieber ein potenziell
+    # uebersehener Wasserpunkt als ein faelschlich verworfener Landpunkt).
+    # Eigenstaendige Ways ohne relation_id haben kein "role"-Feld und gelten
+    # weiterhin implizit als "outer" -- unveraendertes Alt-Verhalten.
+    ring_groups: dict = {}
     for w in water_ways:
+        if not w.get("closed"):
+            continue
         nodes = w.get("nodes") or []
-        if w.get("closed") and _point_in_polygon(standpoint_lat, standpoint_lon, nodes):
+        if len(nodes) < 3:
+            continue
+        group_key = w.get("relation_id")
+        if group_key is None:
+            group_key = id(w)
+        role = w.get("role") or "outer"
+        group = ring_groups.setdefault(group_key, {"outer": [], "inner": []})
+        group.setdefault(role, []).append(nodes)
+
+    for group in ring_groups.values():
+        outer_rings = group.get("outer") or []
+        if not outer_rings:
+            # Kein geschlossener Outer-Ring fuer diese Relation -- die
+            # Lochregel ist ohne Aussenring nicht anwendbar (siehe Kommentar
+            # oben). Ggf. vorhandene Inner-Ringe allein begruenden keinen
+            # Wasser-Ausschluss.
+            continue
+        rings = outer_rings + (group.get("inner") or [])
+        enclosing_count = sum(
+            1 for nodes in rings
+            if _point_in_polygon(standpoint_lat, standpoint_lon, nodes)
+        )
+        if enclosing_count % 2 == 1:
             return True
+
     if _min_distance_to_ways_m(standpoint_lat, standpoint_lon, water_ways) < qa_azimuth.SCOUT_ACCESS_WATER_LINE_BUFFER_M:
         return True
 
@@ -198,7 +259,12 @@ def filter_accessible_candidates(candidates: Sequence) -> list:
     Implementierungsoption A: Kandidaten werden vor der Live-Pruefung auf
     ein grobes Raster geclustert (ACCESSIBILITY_CLUSTER_SIZE_M) -- pro
     Rasterzelle genau EINE kombinierte Overpass-Live-/Cache-Anfrage
-    (qa_azimuth.get_scout_accessibility_data).
+    (qa_azimuth.get_scout_accessibility_data). WICHTIG (US-135 Nachbesserung
+    2026-08-08): Das Cluster buendelt NUR die Overpass-ANFRAGE, nicht das
+    VERDIKT -- jedes einzelne Cluster-Mitglied wird mit seinem eigenen
+    exakten Standpunkt gegen die gemeinsam geladenen Live-Daten geprueft,
+    weil der 50m-Wegradius (AK2) und die Wasserflaeche/-linie (AK4) feiner
+    sind als die 80m-Rasterzelle.
 
     Kann fuer eine Zelle keine Pruefung durchgefuehrt werden (Timeout/
     Fehler/kein Ergebnis -- auch bei einer Exception der Pruef-Funktion
@@ -242,16 +308,34 @@ def filter_accessible_candidates(candidates: Sequence) -> list:
             log.info("US-135: Cluster %s (%d Kandidaten) nicht pruefbar -- ausgeblendet.", key, len(members))
             continue
 
-        blocked = qa_azimuth.is_sightline_blocked_by_buildings(
-            rep_lat, rep_lon, rep_subject_lat, rep_subject_lon,
-            data.get("buildings") or [],
-        )
-        if blocked:
-            continue
+        # US-135 Nachbesserung (2026-08-08, realer Fall Schloss Pfaueninsel,
+        # Cluster mit 7 Mitgliedern Tage 10.-16.8., nur der Repraesentant lag
+        # nachweislich an Land): Die Rasterzelle (ACCESSIBILITY_CLUSTER_SIZE_M
+        # = 80m) buendelt NUR die Overpass-Anfrage -- eine Abfrage pro Zelle
+        # statt pro Kandidat. Das gemeinsam geladene 'data' darf aber nicht zu
+        # einem gemeinsamen VERDIKT fuehren: der 50m-Wegradius (AK2) und die
+        # Wasserlinie/-flaeche (AK4) sind feiner als die 80m-Zelle, zwei
+        # Mitglieder derselben Zelle koennen also einen unterschiedlichen
+        # tatsaechlichen Zugaenglichkeitsstatus haben. Deshalb jetzt jedes
+        # Mitglied einzeln (mit seinem eigenen exakten Standpunkt) gegen die
+        # bereits geladenen 'data' pruefen -- kein zusaetzlicher Overpass-Call,
+        # nur eine zusaetzliche lokale Pruefung pro Mitglied.
+        for member in members:
+            m_lat = _attr(member, "standpoint_lat")
+            m_lon = _attr(member, "standpoint_lon")
+            m_subject_lat = _attr(member, "subject_lat")
+            m_subject_lon = _attr(member, "subject_lon")
 
-        if _is_excluded(rep_lat, rep_lon, data):
-            continue
+            blocked = qa_azimuth.is_sightline_blocked_by_buildings(
+                m_lat, m_lon, m_subject_lat, m_subject_lon,
+                data.get("buildings") or [],
+            )
+            if blocked:
+                continue
 
-        accepted.extend(members)
+            if _is_excluded(m_lat, m_lon, data):
+                continue
+
+            accepted.append(member)
 
     return accepted

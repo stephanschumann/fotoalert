@@ -446,6 +446,78 @@ def _fetch_overpass_footprint(
     return best_nodes
 
 
+def _stitch_way_segments_into_rings(
+    segments: List[List[Tuple[float, float]]],
+) -> Tuple[List[List[Tuple[float, float]]], List[List[Tuple[float, float]]]]:
+    """US-135 Nachbesserung (2026-08-09, realer Fall 'Schloss Pfaueninsel –
+    Rundtuerme', Beweisfall Standpunkt 52.429605/13.114616): Grosse,
+    mehrteilige Wasserflaechen (Beispiel: relation 173239 'Havel') sind in
+    OSM als Multipolygon-RELATION mit vielen einzelnen Member-Way-Segmenten
+    gemappt -- KEIN einzelner Member-Way ist fuer sich genommen ein
+    geschlossener Ring, erst ALLE Segmente zusammen (an gemeinsamen
+    Endknoten aneinandergereiht) ergeben den durchgehenden See-Umriss. Ohne
+    diese Zusammensetzung blieb "closed" fuer jedes Segment False und der
+    Punkt-in-Polygon-Test in discover/accessibility.py._is_excluded() konnte
+    fuer solche Flaechen strukturell nie greifen (nur der 15m-Kantenpuffer
+    blieb wirksam, der bei einem Standpunkt hunderte Meter von jeder
+    einzelnen Uferkante entfernt nichts bringt).
+
+    Klassisches "Ways-zu-Ringen"-Problem bei OSM-Multipolygon-Relationen:
+    Segmente werden an gemeinsamen Endpunkten (exakte Koordinatengleichheit
+    -- Overpass liefert fuer denselben OSM-Knoten in "out geom" identische
+    lat/lon-Werte je Member) verkettet, bis ein Ring sich schliesst (erster
+    == letzter Knoten) oder kein passendes Segment mehr gefunden wird. Es
+    kann mehrere unzusammenhaengende Ringe geben (z.B. mehrere getrennte
+    Wasserflaechen oder -- Havel-Fall -- der Aussenring PLUS ein separater
+    Innenring je Insel; die Rollenzuordnung outer/inner erfolgt beim
+    Aufrufer, hier wird nur EINE Rollen-Gruppe auf einmal zusammengesetzt).
+
+    Gibt (geschlossene_ringe, offene_restsegmente) zurueck. Offene
+    Restsegmente entstehen z.B. bei einer unvollstaendigen Overpass-Antwort
+    (fehlendes Member) -- sie werden vom Aufrufer weiterhin als offene
+    water_ways-Eintraege gefuehrt, damit zumindest die bestehende
+    Kanten-Distanz-Pruefung (SCOUT_ACCESS_WATER_LINE_BUFFER_M) fuer sie
+    greift."""
+    remaining: List[List[Tuple[float, float]]] = [
+        list(seg) for seg in segments if len(seg) >= 2
+    ]
+    closed_rings: List[List[Tuple[float, float]]] = []
+    leftover: List[List[Tuple[float, float]]] = []
+
+    while remaining:
+        ring = remaining.pop(0)
+        progress = True
+        while progress and ring[0] != ring[-1]:
+            progress = False
+            for idx, seg in enumerate(remaining):
+                if seg[0] == ring[-1]:
+                    ring = ring + seg[1:]
+                    remaining.pop(idx)
+                    progress = True
+                    break
+                if seg[-1] == ring[-1]:
+                    ring = ring + list(reversed(seg))[1:]
+                    remaining.pop(idx)
+                    progress = True
+                    break
+                if seg[-1] == ring[0]:
+                    ring = seg[:-1] + ring
+                    remaining.pop(idx)
+                    progress = True
+                    break
+                if seg[0] == ring[0]:
+                    ring = list(reversed(seg))[:-1] + ring
+                    remaining.pop(idx)
+                    progress = True
+                    break
+        if len(ring) >= 4 and ring[0] == ring[-1]:
+            closed_rings.append(ring)
+        else:
+            leftover.append(ring)
+
+    return closed_rings, leftover
+
+
 # US-09: Suchradius/Timeout für Gebäudeabfragen ENTLANG der ganzen Sichtlinie
 # (nicht nur am Motiv wie bei TASK-45). Radius wird pro Aufruf anhand der
 # tatsächlichen Standort-Motiv-Distanz gewählt (siehe fetch_buildings_along_line).
@@ -665,7 +737,22 @@ def update_location_azimuth(
 # überhaupt mit abgefragt werden — der fachliche 50m-Schwellwert selbst wird
 # danach in Software exakt geprüft (discover/accessibility.py); der
 # Netz-Radius hier ist bewusst eine großzügigere Obermenge.
-SCOUT_ACCESS_QUERY_RADIUS_M: int = 150
+#
+# US-135 Nachbesserung (2026-08-09, realer Fall "Schloss Pfaueninsel -
+# Rundtuerme"): Overpass liefert bei einer relation[...](around:r,...)-
+# Abfrage nur dann UEBERHAUPT Daten der Relation (z.B. der grossen
+# Havel-Wasserflaeche, relation 173239), wenn MINDESTENS EIN Member-Knoten
+# der Relation innerhalb von r Metern um den Standpunkt liegt -- danach wird
+# zwar die GESAMTE Relation zurueckgegeben (inkl. weit entfernter Knoten),
+# aber ohne diesen einen "Trigger-Knoten" in Reichweite kommt gar nichts.
+# Bei 150m war das fuer real beobachtete Scout-Standpunkte 150-370m vom
+# naechsten Wasser-Wegpunkt entfernt NICHT der Fall -- die Havel-Relation
+# wurde nie mitgeliefert, wodurch der Ringschluss-Fix (siehe
+# _stitch_way_segments_into_rings) fuer genau diese Punkte wirkungslos
+# blieb (mangels Daten, nicht mangels Logik -- siehe US-135 Testprotokoll
+# 2026-08-09). Auf 500m angehoben, mit Sicherheitsabstand ueber dem
+# beobachteten Maximalfall, nach Ruecksprache mit Stephan (2026-08-09).
+SCOUT_ACCESS_QUERY_RADIUS_M: int = 500
 
 # Fachlicher AK-Schwellwert (US-135, von Stephan bestätigt 2026-08-07): ein
 # öffentlich begehbarer Weg innerhalb dieses Radius um den Standpunkt gilt
@@ -905,6 +992,17 @@ def fetch_scout_accessibility_data(
             is_forest_rel = tags.get("landuse") == "forest" or tags.get("natural") == "wood"
             is_water_rel = tags.get("natural") == "water" or "waterway" in tags
             if is_forest_rel or is_water_rel:
+                # US-135 Nachbesserung (2026-08-09, Havel/Pfaueninsel-Fall):
+                # Water-Member werden NICHT mehr einzeln als eigene
+                # water_ways-Eintraege durchgereicht -- sie werden zuerst je
+                # Rolle (outer/inner) gesammelt und danach ueber
+                # _stitch_way_segments_into_rings() zu durchgehenden,
+                # geschlossenen Ringen zusammengesetzt (siehe Docstring dort).
+                # Wald-Member bleiben unveraendert einzeln (bestehendes,
+                # bewusst konservatives Verhalten: jedes Member zaehlt fuer
+                # sich als moeglicher Wald-Ausschlussgrund, siehe Kommentar
+                # unten "role='inner' wird bewusst mitgezaehlt").
+                water_segments_by_role: dict = {}
                 for member in el.get("members") or []:
                     m_geom = member.get("geometry")
                     if not m_geom:
@@ -915,10 +1013,27 @@ def fetch_scout_accessibility_data(
                     if is_forest_rel and len(m_nodes) >= 3:
                         forest_ways.append({"nodes": m_nodes})
                     if is_water_rel:
-                        water_ways.append({
-                            "nodes": m_nodes,
-                            "closed": len(m_nodes) >= 3 and m_nodes[0] == m_nodes[-1],
-                        })
+                        role = member.get("role") or "outer"
+                        water_segments_by_role.setdefault(role, []).append(m_nodes)
+
+                if is_water_rel:
+                    rel_id = el.get("id")
+                    for role, segs in water_segments_by_role.items():
+                        closed_rings, leftover = _stitch_way_segments_into_rings(segs)
+                        for ring in closed_rings:
+                            water_ways.append({
+                                "nodes": ring,
+                                "closed": True,
+                                "relation_id": rel_id,
+                                "role": role,
+                            })
+                        for seg in leftover:
+                            water_ways.append({
+                                "nodes": seg,
+                                "closed": len(seg) >= 3 and seg[0] == seg[-1],
+                                "relation_id": rel_id,
+                                "role": role,
+                            })
             continue
 
         geom = el.get("geometry")

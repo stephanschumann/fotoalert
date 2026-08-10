@@ -717,3 +717,266 @@ def test_us135_wasser_kante_zwischen_sparsen_knoten_wird_erkannt(monkeypatch):
     result = accessibility.filter_accessible_candidates([c])
 
     assert result == []
+
+
+def test_us135_cluster_verdikt_gilt_nicht_pauschal_fuer_alle_mitglieder(monkeypatch):
+    """US-135 Nachbesserung (2026-08-08, realer Fall Schloss Pfaueninsel,
+    Cluster mit 7 Mitgliedern Tage 10.-16.8.): Ein Cluster buendelt NUR die
+    Overpass-Anfrage (ACCESSIBILITY_CLUSTER_SIZE_M), nicht das Verdikt.
+    Liegt der Repraesentant (erstes Mitglied) an Land, ein anderes Mitglied
+    derselben 80m-Rasterzelle aber nachweislich im Wasser, darf NUR das
+    tatsaechlich zugaengliche Mitglied in der Ergebnisliste bleiben --
+    Regressionsschutz gegen das vorherige Verhalten (accepted.extend(members)
+    fuer die GESAMTE Zelle anhand nur des Repraesentanten-Verdikts)."""
+    call_count = {"n": 0}
+
+    # c1 = Repraesentant (erstes Mitglied), liegt AUSSERHALB des Wasser-
+    # Polygons UND ausserhalb des 15m-Wasserlinienpuffers
+    # (qa_azimuth.SCOUT_ACCESS_WATER_LINE_BUFFER_M) -- lat=52.49985 liegt
+    # rund 28m suedlich der Polygon-Suedkante (lat=52.50010), damit greift
+    # weder die Flaechen- noch die Linienpuffer-Pruefung in _is_excluded().
+    c1 = _make_candidate(standpoint_lat=52.49985, standpoint_lon=13.40000,
+                          subject_id="motiv_cluster_mixed")
+    # c2 = zweites Mitglied derselben 80m-Zelle (~33m entfernt), liegt
+    # INNERHALB des Wasser-Polygons.
+    c2 = _make_candidate(standpoint_lat=52.50015, standpoint_lon=13.40000,
+                          subject_id="motiv_cluster_mixed")
+
+    # Geschlossenes Wasser-Polygon, das NUR c2 umschliesst; c1 liegt bewusst
+    # deutlich (>15m Pufferabstand) suedlich davon (Polygon beginnt erst bei
+    # lat=52.50010).
+    water_polygon = {
+        "nodes": [
+            (52.50010, 13.39995), (52.50010, 13.40005),
+            (52.50020, 13.40005), (52.50020, 13.39995),
+            (52.50010, 13.39995),
+        ],
+        "closed": True,
+    }
+    data = _empty_data()
+    data["water_ways"] = [water_polygon]
+
+    def _counting(**kw):
+        call_count["n"] += 1
+        return data
+
+    monkeypatch.setattr(accessibility.qa_azimuth, "get_scout_accessibility_data", _counting)
+
+    # Gegenprobe: c1 liegt wirklich ausserhalb des Polygons UND ausserhalb
+    # des 15m-Linienpuffers, c2 wirklich innerhalb des Polygons (belegt die
+    # Testkonstruktion, nicht nur behauptet).
+    assert accessibility._point_in_polygon(52.49985, 13.40000, water_polygon["nodes"]) is False
+    assert accessibility._min_distance_to_ways_m(52.49985, 13.40000, [water_polygon]) > qa_azimuth.SCOUT_ACCESS_WATER_LINE_BUFFER_M
+    assert accessibility._point_in_polygon(52.50015, 13.40000, water_polygon["nodes"]) is True
+
+    result = accessibility.filter_accessible_candidates([c1, c2])
+
+    # Cluster-Buendelung bleibt erhalten: weiterhin nur EIN Live-/Cache-Call
+    # fuer beide Mitglieder derselben Zelle.
+    assert call_count["n"] == 1
+    # Aber das Verdikt ist jetzt PRO MITGLIED korrekt: nur c1 (an Land)
+    # bleibt in der Liste, c2 (im Wasser) wird ausgeblendet.
+    assert result == [c1]
+
+
+# ---------------------------------------------------------------------------
+# US-135 Nachbesserung (2026-08-09, Beweisfall Standpunkt
+# 52.429605/13.114616, Motiv "Schloss Pfaueninsel - Rundtuerme"): Grosse,
+# mehrteilige Wasserflaechen wie die Havel sind in OSM als Multipolygon-
+# RELATION mit vielen Member-Way-SEGMENTEN gemappt (Beleg: relation 173239
+# "Havel", natural=water, Pfaueninsel als inner-Ring). Der gecachte
+# Overpass-Rohdaten-Eintrag fuer den Beweisfall enthaelt ~280 water_ways-
+# Segmente, ausnahmslos mit "closed": false -- KEIN einzelnes Segment ist
+# fuer sich ein geschlossener Ring, nur ALLE zusammen ergeben den
+# durchgehenden See-Umriss. Vor diesem Fix blieb "closed" fuer jedes Segment
+# False, der Punkt-in-Polygon-Test in accessibility.py._is_excluded() konnte
+# daher fuer solche Flaechen strukturell nie greifen. Die Tests unten
+# bilden diese Topologie bewusst vereinfacht (zwei Quadrate statt 280
+# Havel-Segmente) nach, decken aber denselben Fehlermechanismus ab: ein
+# Aussenring aus mehreren OFFENEN Segmenten, PLUS ein separater Innenring
+# (Insel, role="inner") -- die Pfaueninsel selbst darf nach der
+# Ringzusammensetzung nicht faelschlich als Wasser gelten.
+# ---------------------------------------------------------------------------
+
+def _havel_relation_elements(rel_id=173239):
+    """Vereinfachte Nachbildung der Havel-Relations-Topologie: ein
+    Aussenring (Quadrat, lat 52.500-52.504 / lon 13.400-13.404) aus VIER
+    einzelnen OFFENEN 2-Knoten-Segmenten (role='outer', wie die realen
+    Havel-Member-Ways -- keines davon ist fuer sich geschlossen), plus ein
+    kleineres Innenring-Quadrat (Insel, lat 52.501-52.502 / lon
+    13.401-13.402, role='inner') ebenfalls aus vier offenen Segmenten."""
+    return [
+        {
+            "type": "relation",
+            "id": rel_id,
+            "tags": {"natural": "water", "type": "multipolygon"},
+            "members": [
+                # Aussenring (Havel-Ufer) -- vier offene Segmente A-B-C-D-A
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 52.500, "lon": 13.400}, {"lat": 52.500, "lon": 13.404},
+                ]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 52.500, "lon": 13.404}, {"lat": 52.504, "lon": 13.404},
+                ]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 52.504, "lon": 13.404}, {"lat": 52.504, "lon": 13.400},
+                ]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 52.504, "lon": 13.400}, {"lat": 52.500, "lon": 13.400},
+                ]},
+                # Innenring (Insel, z.B. Pfaueninsel) -- vier offene Segmente E-F-G-H-E
+                {"type": "way", "role": "inner", "geometry": [
+                    {"lat": 52.501, "lon": 13.401}, {"lat": 52.501, "lon": 13.402},
+                ]},
+                {"type": "way", "role": "inner", "geometry": [
+                    {"lat": 52.501, "lon": 13.402}, {"lat": 52.502, "lon": 13.402},
+                ]},
+                {"type": "way", "role": "inner", "geometry": [
+                    {"lat": 52.502, "lon": 13.402}, {"lat": 52.502, "lon": 13.401},
+                ]},
+                {"type": "way", "role": "inner", "geometry": [
+                    {"lat": 52.502, "lon": 13.401}, {"lat": 52.501, "lon": 13.401},
+                ]},
+            ],
+        },
+    ]
+
+
+def test_us135_wasser_relation_aus_offenen_segmenten_wird_zu_ring_zusammengesetzt(monkeypatch):
+    """Root Cause 3 (Havel/Pfaueninsel): fetch_scout_accessibility_data()
+    muss die vier offenen Aussenring-Segmente der Relation zu EINEM
+    geschlossenen Ring zusammensetzen (nicht vier separate, allesamt
+    'closed': false Eintraege wie vor dem Fix) -- und denselben Schritt
+    unabhaengig fuer den Innenring (Insel)."""
+    monkeypatch.setattr(httpx, "Client", _client_factory({"elements": _havel_relation_elements()}))
+
+    result = qa_azimuth.fetch_scout_accessibility_data(52.5000, 13.4000, 52.5010, 13.4010)
+
+    water_ways = result["water_ways"]
+    # Zwei geschlossene Ringe: Aussenring (outer) + Innenring/Insel (inner) --
+    # keine acht Einzelsegmente mehr, keines davon mehr mit "closed": false.
+    assert len(water_ways) == 2
+    assert all(w["closed"] is True for w in water_ways)
+    assert all(w["relation_id"] == 173239 for w in water_ways)
+    roles = sorted(w["role"] for w in water_ways)
+    assert roles == ["inner", "outer"]
+    for w in water_ways:
+        nodes = w["nodes"]
+        assert len(nodes) == 5  # 4 distinct Eckpunkte + Wiederholung des Startknotens
+        assert nodes[0] == nodes[-1]
+
+
+def test_us135_havel_beweisfall_mehrteilige_wasserflaeche_schliesst_standpunkt_aus(monkeypatch, tmp_path):
+    """Der eigentliche Beweisfall (End-to-End, accessibility.py + qa_azimuth.py
+    zusammen): ein Standpunkt tief im rekonstruierten Aussenring, weit von
+    jeder einzelnen Uferkante entfernt (> SCOUT_ACCESS_WATER_LINE_BUFFER_M
+    zu jedem Segment, sonst wuerde schon der bisherige Kantenpuffer greifen
+    und der Test nichts ueber die Ringzusammensetzung beweisen), wird durch
+    filter_accessible_candidates() ausgeblendet -- vor dem Fix blieb dieser
+    Standpunkt faelschlich 'zugaenglich', weil kein Segment 'closed': true
+    war und der Punkt-in-Polygon-Test nie griff."""
+    # Standpunkt in der noerdlichen Haelfte des Sees, deutlich suedlich der
+    # Insel und deutlich (>15m) von jeder der acht Kantenlinien entfernt --
+    # nur ueber den zusammengesetzten Ring als 'im Wasser' erkennbar.
+    c = _make_candidate(standpoint_lat=52.5005, standpoint_lon=13.4035)
+    monkeypatch.setattr(httpx, "Client", _client_factory({"elements": _havel_relation_elements()}))
+    monkeypatch.setattr(qa_azimuth, "SCOUT_ACCESS_CACHE_PATH", tmp_path / "scout_access.json")
+
+    # Gegenprobe: der Standpunkt liegt wirklich weit von jeder Einzelkante
+    # entfernt -- der alte 15m-Kantenpuffer allein haette hier NICHT gegriffen.
+    data = qa_azimuth.fetch_scout_accessibility_data(52.5000, 13.4000, 52.5010, 13.4010)
+    edge_distance = accessibility._min_distance_to_ways_m(
+        52.5005, 13.4035, data["water_ways"],
+    )
+    assert edge_distance > qa_azimuth.SCOUT_ACCESS_WATER_LINE_BUFFER_M
+
+    result = accessibility.filter_accessible_candidates([c])
+
+    assert result == []
+
+
+def test_us135_insel_im_wasserpolygon_bleibt_zugaenglich(monkeypatch, tmp_path):
+    """Gegenprobe zum Havel-Beweisfall: ein Standpunkt AUF der Insel
+    (innerhalb des inner-Rings, z.B. nahe dem Schloss auf der Pfaueninsel)
+    darf NICHT faelschlich als Wasser ausgeschlossen werden, obwohl er auch
+    innerhalb des Aussenrings liegt -- die Loch-Regel (gerade Anzahl
+    umschliessender Ringe derselben Relation = kein Wasser) muss greifen,
+    sonst wuerde die gesamte Insel faelschlich als Wasser markiert."""
+    c = _make_candidate(standpoint_lat=52.5015, standpoint_lon=13.4015)
+    monkeypatch.setattr(httpx, "Client", _client_factory({"elements": _havel_relation_elements()}))
+    monkeypatch.setattr(qa_azimuth, "SCOUT_ACCESS_CACHE_PATH", tmp_path / "scout_access.json")
+
+    # Gegenprobe: der Insel-Punkt liegt tatsaechlich sowohl im Aussenring
+    # ALS AUCH im Innenring (das ist der Fall, der ohne Loch-Regel
+    # faelschlich als Wasser gezaehlt wuerde).
+    data = qa_azimuth.fetch_scout_accessibility_data(52.5000, 13.4000, 52.5010, 13.4010)
+    outer = next(w for w in data["water_ways"] if w["role"] == "outer")
+    inner = next(w for w in data["water_ways"] if w["role"] == "inner")
+    assert accessibility._point_in_polygon(52.5015, 13.4015, outer["nodes"]) is True
+    assert accessibility._point_in_polygon(52.5015, 13.4015, inner["nodes"]) is True
+
+    result = accessibility.filter_accessible_candidates([c])
+
+    assert result == [c]
+
+
+# ---------------------------------------------------------------------------
+# US-135 Randfall-Nachbesserung (2026-08-09, Zweitpruefung): Rekonstruktion
+# des Aussenrings scheitert (unvollstaendige Overpass-Antwort -> offene
+# Restsegmente), waehrend der Innenring (Insel) trotzdem erfolgreich
+# geschlossen wird. Vor dieser Nachbesserung landete in diesem Fall NUR der
+# Innenring in der Ring-Gruppe der Relation -- die Gerade-Ungerade-Regel
+# zaehlte fuer einen Punkt AUF der Insel enclosing_count=1 (ungerade) und
+# schloss ihn faelschlich als "im Wasser" aus, obwohl es Land ist.
+# ---------------------------------------------------------------------------
+
+def _havel_relation_elements_outer_unvollstaendig(rel_id=173239):
+    """Wie _havel_relation_elements(), aber das letzte Aussenring-Segment
+    (D-A, schliesst das Aussenring-Quadrat) fehlt -- simuliert eine
+    unvollstaendige Overpass-Antwort (fehlendes Member-Way). Die restlichen
+    drei Aussenring-Segmente lassen sich zu A-B-C-D verketten, aber NICHT
+    schliessen (bleiben als offenes Restsegment/"closed": False). Der
+    Innenring (Insel) ist vollstaendig und wird weiterhin erfolgreich zu
+    einem geschlossenen Ring zusammengesetzt."""
+    elements = _havel_relation_elements(rel_id=rel_id)
+    members = elements[0]["members"]
+    # Das vierte Mitglied (Index 3) ist das schliessende Aussenring-Segment
+    # D-A -- entfernen, um die Rekonstruktion des Aussenrings scheitern zu
+    # lassen, ohne den Innenring anzutasten.
+    assert members[3]["role"] == "outer"
+    del members[3]
+    return elements
+
+
+def test_us135_insel_ohne_rekonstruierbaren_aussenring_bleibt_zugaenglich(monkeypatch, tmp_path):
+    """Randfall (Zweitpruefung, nicht der urspruengliche Havel-Bug): Scheitert
+    die Rekonstruktion des Aussenrings einer Relation komplett (hier: ein
+    Member-Way fehlt, drei offene Restsegmente bleiben 'closed': False),
+    aber der Innenring (Insel) wird trotzdem erfolgreich geschlossen, darf
+    ein Standpunkt AUF der Insel NICHT allein aufgrund des Innenrings als
+    'im Wasser' ausgeschlossen werden -- die Gerade-Ungerade-Lochregel darf
+    ohne geschlossenen Aussenring nicht greifen. Der Fall degradiert
+    stattdessen defensiv auf den bestehenden 15m-Kantenpuffer."""
+    c = _make_candidate(standpoint_lat=52.5015, standpoint_lon=13.4015)
+    monkeypatch.setattr(
+        httpx, "Client",
+        _client_factory({"elements": _havel_relation_elements_outer_unvollstaendig()}),
+    )
+    monkeypatch.setattr(qa_azimuth, "SCOUT_ACCESS_CACHE_PATH", tmp_path / "scout_access.json")
+
+    # Vorbedingung pruefen: kein geschlossener Outer-Ring mehr fuer die
+    # Relation, aber der Inner-Ring (Insel) ist weiterhin geschlossen -- und
+    # der Standpunkt liegt tatsaechlich innerhalb dieses Innenrings (das ist
+    # exakt der Fall, der ohne die Randfall-Nachbesserung faelschlich als
+    # Wasser gezaehlt wuerde).
+    data = qa_azimuth.fetch_scout_accessibility_data(52.5000, 13.4000, 52.5010, 13.4010)
+    outer_ways = [w for w in data["water_ways"] if w["role"] == "outer"]
+    inner_ways = [w for w in data["water_ways"] if w["role"] == "inner"]
+    assert all(w["closed"] is False for w in outer_ways)
+    assert len(inner_ways) == 1
+    assert inner_ways[0]["closed"] is True
+    assert accessibility._point_in_polygon(52.5015, 13.4015, inner_ways[0]["nodes"]) is True
+
+    result = accessibility.filter_accessible_candidates([c])
+
+    assert result == [c]
