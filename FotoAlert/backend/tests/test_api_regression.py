@@ -25,7 +25,10 @@ class TestBug22RecomputeWhitelist:
     """BUG-22: Nur recompute-relevante Felder lösen einen Recompute aus.
 
     Seit US-66 (Option B) ist PATCH /locations/{id} geschützt → alle Requests
-    authentifiziert (auth_headers-Fixture).
+    authentifiziert. Seit TASK-103 ist PATCH zusätzlich auf die Host-Rolle
+    beschränkt (Bearbeiten gespeicherter Orte, Anlegen bleibt für User erlaubt)
+    — diese Tests prüfen reine PATCH-Funktionalität, nicht die Auth-Rolle
+    selbst, daher host_headers-Fixture statt auth_headers.
 
     AK:
     - PATCH auf focal_length_suggestions  → recompute_triggered True
@@ -33,29 +36,29 @@ class TestBug22RecomputeWhitelist:
     - PATCH auf name/description          → recompute_triggered False
     """
 
-    def test_focal_length_triggers_recompute(self, client, auth_headers):
-        r = client.patch(f"/locations/{LOC}", json={"focal_length_suggestions": [50, 135]}, headers=auth_headers)
+    def test_focal_length_triggers_recompute(self, client, host_headers):
+        r = client.patch(f"/locations/{LOC}", json={"focal_length_suggestions": [50, 135]}, headers=host_headers)
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is True
 
-    def test_floor_height_triggers_recompute(self, client, auth_headers):
-        r = client.patch(f"/locations/{LOC}", json={"observer_floor_height_m": 12.0}, headers=auth_headers)
+    def test_floor_height_triggers_recompute(self, client, host_headers):
+        r = client.patch(f"/locations/{LOC}", json={"observer_floor_height_m": 12.0}, headers=host_headers)
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is True
 
-    def test_name_does_not_trigger_recompute(self, client, auth_headers):
-        r = client.patch(f"/locations/{LOC}", json={"name": "Harness-Testname"}, headers=auth_headers)
+    def test_name_does_not_trigger_recompute(self, client, host_headers):
+        r = client.patch(f"/locations/{LOC}", json={"name": "Harness-Testname"}, headers=host_headers)
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is False
 
-    def test_unknown_field_rejected(self, client, auth_headers):
+    def test_unknown_field_rejected(self, client, host_headers):
         # Edge Case: kein einziges gültiges Feld → 400, kein stiller Erfolg.
-        r = client.patch(f"/locations/{LOC}", json={"voellig_unbekannt": 1}, headers=auth_headers)
+        r = client.patch(f"/locations/{LOC}", json={"voellig_unbekannt": 1}, headers=host_headers)
         assert r.status_code == 400
 
-    def test_invalid_focal_length_rejected(self, client, auth_headers):
+    def test_invalid_focal_length_rejected(self, client, host_headers):
         # Edge Case: Brennweite außerhalb 8–1200 mm → 422 (BUG-22-Validierung).
-        r = client.patch(f"/locations/{LOC}", json={"focal_length_suggestions": [5000]}, headers=auth_headers)
+        r = client.patch(f"/locations/{LOC}", json={"focal_length_suggestions": [5000]}, headers=host_headers)
         assert r.status_code == 422
 
 

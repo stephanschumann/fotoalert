@@ -23,6 +23,10 @@ Nutzt dieselben Fixtures/Konventionen wie test_us120.py/test_us_125.py/test_us_1
 test_bug29_calendar_single_recompute.py für main._load_location_overrides() und
 precompute._apply_location_overrides() (kein API-Roundtrip nötig, deterministisch,
 kein Netzwerk-/Subprozesszugriff).
+TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+nutzen daher host_headers statt auth_headers.
+
 """
 from __future__ import annotations
 
@@ -67,11 +71,11 @@ def test_location_id(client):
 # ---------------------------------------------------------------------------
 
 class TestPatchAcceptsHeightAndWidth:
-    def test_height_alone_is_accepted_and_persisted(self, client, auth_headers, test_location_id):
+    def test_height_alone_is_accepted_and_persisted(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": 105.0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["subject_height_m"] == 105.0
@@ -81,11 +85,11 @@ class TestPatchAcceptsHeightAndWidth:
         assert loc is not None
         assert loc["subject_height_m"] == 105.0
 
-    def test_width_alone_is_accepted_and_persisted(self, client, auth_headers, test_location_id):
+    def test_width_alone_is_accepted_and_persisted(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_width_m": 40.0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["subject_width_m"] == 40.0
@@ -94,11 +98,11 @@ class TestPatchAcceptsHeightAndWidth:
         loc = next((l for l in locations if l["id"] == test_location_id), None)
         assert loc["subject_width_m"] == 40.0
 
-    def test_height_and_width_together_in_one_request(self, client, auth_headers, test_location_id):
+    def test_height_and_width_together_in_one_request(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": 110.0, "subject_width_m": 80.0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         body = r.json()["updated"]
@@ -111,20 +115,20 @@ class TestPatchAcceptsHeightAndWidth:
 # ---------------------------------------------------------------------------
 
 class TestRecomputeTriggered:
-    def test_height_change_triggers_recompute(self, client, auth_headers, test_location_id):
+    def test_height_change_triggers_recompute(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": 120.0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is True
 
-    def test_width_change_triggers_recompute(self, client, auth_headers, test_location_id):
+    def test_width_change_triggers_recompute(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_width_m": 50.0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is True
@@ -135,55 +139,55 @@ class TestRecomputeTriggered:
 # ---------------------------------------------------------------------------
 
 class TestValidation:
-    def test_zero_height_is_valid(self, client, auth_headers, test_location_id):
+    def test_zero_height_is_valid(self, client, host_headers, test_location_id):
         """subject_height_m=0 ist ein realer Bestandswert (z.B. geltow_havelblick,
         Horizont-Ereignis ohne vertikales Motiv) und darf nicht abgelehnt werden."""
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": 0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["subject_height_m"] == 0.0
 
-    def test_zero_width_is_valid(self, client, auth_headers, test_location_id):
+    def test_zero_width_is_valid(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_width_m": 0},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["subject_width_m"] == 0.0
 
-    def test_negative_height_returns_422(self, client, auth_headers, test_location_id):
+    def test_negative_height_returns_422(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": -5},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422
 
-    def test_negative_width_returns_422(self, client, auth_headers, test_location_id):
+    def test_negative_width_returns_422(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_width_m": -1},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422
 
-    def test_wrong_type_height_returns_422(self, client, auth_headers, test_location_id):
+    def test_wrong_type_height_returns_422(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_height_m": "zehn"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422
 
-    def test_wrong_type_width_returns_422(self, client, auth_headers, test_location_id):
+    def test_wrong_type_width_returns_422(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_width_m": ["nicht", "erlaubt"]},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422
 

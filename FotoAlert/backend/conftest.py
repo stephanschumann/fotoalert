@@ -94,6 +94,18 @@ def auth_headers(user_token):
     return {"Authorization": f"Bearer {user_token}"}
 
 
+@pytest.fixture
+def host_headers(host_token):
+    """TASK-103: Analog zu auth_headers, aber für die Host-Rolle. Seit TASK-103 ist
+    PATCH /locations/{id} auf require_host beschränkt — bestehende PATCH-Tests, die
+    inhaltlich nur die PATCH-Funktionalität prüfen (nicht die Auth-Rolle selbst),
+    verwenden diese Fixture statt auth_headers, um weiterhin 200 zu erwarten. Der
+    Authorization-Header wird wie bei auth_headers serverseitig nicht mehr ausgewertet
+    (TASK-83) — die eigentliche Authentifizierung läuft über das Cookie, das host_token
+    bereits auf dem geteilten `client` gesetzt hat."""
+    return {"Authorization": f"Bearer {host_token}"}
+
+
 # ---------------------------------------------------------------------------
 # Feste Test-Locations (TASK-19-Seed-Ersatz + BUG-94-Nachbesserung 2026-07-31)
 # ---------------------------------------------------------------------------

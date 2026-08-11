@@ -41,6 +41,10 @@ Direktes Vorlagen-Muster: backend/tests/test_bug_68.py (gleiche Fehlerklasse --
 Feld fehlte in der PATCH-Whitelist --, gleiches Test-Setup: eigene, selbst-
 anlegende Location-Fixture + API-Roundtrip über den TestClient, siehe
 fotoalert-impl Pattern 12).
+TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+nutzen daher host_headers statt auth_headers.
+
 """
 from __future__ import annotations
 
@@ -149,13 +153,13 @@ class TestGetLiefertEchteWerte:
 
 class TestPatchWirktTatsaechlich:
     @pytest.mark.parametrize("loc_id_fixture", _BOTH_PATHS)
-    def test_category_and_difficulty_change_is_persisted(self, client, auth_headers, loc_id_fixture, request):
+    def test_category_and_difficulty_change_is_persisted(self, client, host_headers, loc_id_fixture, request):
         loc_id = request.getfixturevalue(loc_id_fixture)
 
         r = client.patch(
             f"/locations/{loc_id}",
             json={"category": "MILCHSTRASSE", "difficulty": 1},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["category"] == "MILCHSTRASSE"
@@ -174,12 +178,12 @@ class TestPatchWirktTatsaechlich:
         assert single["category_key"] == "MILCHSTRASSE"
         assert single["difficulty"] == 1
 
-    def test_only_category_changed_difficulty_left_alone(self, client, auth_headers, custom_location_id):
+    def test_only_category_changed_difficulty_left_alone(self, client, host_headers, custom_location_id):
         """Nur ein Feld ändern -- das andere darf nicht mitverändert werden."""
         r = client.patch(
             f"/locations/{custom_location_id}",
             json={"category": "NATUR"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
 
@@ -194,11 +198,11 @@ class TestPatchWirktTatsaechlich:
 # ---------------------------------------------------------------------------
 
 class TestUnveraendertBleibtUnveraendert:
-    def test_patch_without_category_or_difficulty_leaves_both_untouched(self, client, auth_headers, custom_location_id):
+    def test_patch_without_category_or_difficulty_leaves_both_untouched(self, client, host_headers, custom_location_id):
         r = client.patch(
             f"/locations/{custom_location_id}",
             json={"name": "Nur der Name ändert sich"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert "category" not in r.json()["updated"]
@@ -216,11 +220,11 @@ class TestUnveraendertBleibtUnveraendert:
 # ---------------------------------------------------------------------------
 
 class TestFehlerfallLaesstAltenWertUnangetastet:
-    def test_unknown_category_value_is_rejected_with_422(self, client, auth_headers, custom_location_id):
+    def test_unknown_category_value_is_rejected_with_422(self, client, host_headers, custom_location_id):
         r = client.patch(
             f"/locations/{custom_location_id}",
             json={"category": "REGENBOGEN_UNTERWASSER"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422, r.text
         assert r.json().get("detail")
@@ -229,11 +233,11 @@ class TestFehlerfallLaesstAltenWertUnangetastet:
         assert loc["category_key"] == "WASSER"  # unverändert, kein falscher Erfolg
 
     @pytest.mark.parametrize("bad_difficulty", [0, 4, -1, "sehr schwer"])
-    def test_out_of_range_difficulty_is_rejected_with_422(self, client, auth_headers, custom_location_id, bad_difficulty):
+    def test_out_of_range_difficulty_is_rejected_with_422(self, client, host_headers, custom_location_id, bad_difficulty):
         r = client.patch(
             f"/locations/{custom_location_id}",
             json={"difficulty": bad_difficulty},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 422, r.text
 

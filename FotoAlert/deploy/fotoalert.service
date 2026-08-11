@@ -23,9 +23,19 @@ Environment=PYTHONDONTWRITEBYTECODE=1
 # TASK-25 Option A: On-Demand-Engine aktiv (Kalender live, Feed nur leicht-refresht)
 Environment=FOTOALERT_ONDEMAND=1
 
-# Sicherheit (minimal, App braucht Dateisystem-Zugriff)
+# Sicherheit (TASK-102: erweitert um gaengige, fuer einen Python/FastAPI-Dienst
+# unkritische systemd-Sandbox-Direktiven. ProtectSystem=full statt strict gewaehlt,
+# weil WorkingDirectory (/opt/fotoalert/app/...) NICHT unter /usr, /boot oder /etc
+# liegt und damit ohnehin beschreibbar bleibt -- kein ReadWritePaths= noetig, kein
+# Risiko fuer den bestehenden Datenbank-/Bild-/Cache-Schreibzugriff unter data/.)
 NoNewPrivileges=true
 PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
 
 [Install]
 WantedBy=multi-user.target

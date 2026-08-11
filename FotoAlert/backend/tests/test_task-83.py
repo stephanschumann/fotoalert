@@ -116,9 +116,15 @@ class TestCookieAuthProtectsEndpoints:
 
     def test_request_with_cookie_after_login_succeeds_without_header(self):
         """Login + PATCH im selben (isolierten) Client teilen die Cookie-Jar automatisch —
-        kein Authorization-Header noetig, das Cookie traegt die Sitzung."""
+        kein Authorization-Header noetig, das Cookie traegt die Sitzung.
+
+        TASK-103 (2026-08-10): PATCH /locations/{id} verlangt seit TASK-103 die
+        Host-Rolle (vorher: jede eingeloggte Rolle) — der Login hier wechselt
+        deshalb vom User- auf das Host-Passwort, damit dieser Test weiterhin
+        seinen eigentlichen Zweck (Cookie-Auth ohne Authorization-Header) prueft,
+        statt an der neuen Rollenpruefung mit 403 zu scheitern."""
         with _fresh_client() as c:
-            login = c.post("/login", json={"password": "test-user-pw"})
+            login = c.post("/login", json={"password": "test-host-pw"})
             assert login.status_code == 200, login.text
             r = c.patch(f"/locations/{LOC}", json={"name": "Cookie-Auth-OK"})
             assert r.status_code == 200, r.text

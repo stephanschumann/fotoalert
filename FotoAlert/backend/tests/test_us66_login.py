@@ -84,7 +84,19 @@ class TestEndpointProtection:
         assert r.status_code == 401
 
     def test_protected_endpoint_with_user_token(self, client, auth_headers):
+        """TASK-103 (2026-08-10): PATCH /locations/{id} war bis TASK-103 für jede
+        eingeloggte Rolle offen (200 mit User-Token). TASK-103 beschränkt das
+        Bearbeiten gespeicherter Orte auf die Host-Rolle (Anlegen bleibt für User
+        weiterhin möglich, siehe test_bug67.py) — ein User-Token liefert daher
+        jetzt bewusst 403 statt wie zuvor 200. Das Gegenstück (Host-Zugang bleibt
+        200) steht direkt darunter."""
         r = client.patch(f"/locations/{LOC}", json={"name": "Auth-OK"}, headers=auth_headers)
+        assert r.status_code == 403, r.text
+
+    def test_protected_endpoint_with_host_token(self, client, host_headers):
+        """TASK-103: Gegenstück zu test_protected_endpoint_with_user_token — Host-
+        Zugang bleibt für PATCH /locations/{id} weiterhin erlaubt (200)."""
+        r = client.patch(f"/locations/{LOC}", json={"name": "Auth-OK"}, headers=host_headers)
         assert r.status_code == 200, r.text
 
     def test_host_only_endpoint_blocks_user(self, client, auth_headers):

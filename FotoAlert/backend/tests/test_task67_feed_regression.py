@@ -115,9 +115,30 @@ class TestMinScoreFilterYieldsAtLeastOneCard:
 
 class TestNoDuplicateEvents:
     def test_dedup_best_per_day_keeps_only_highest_score(self):
+        # TASK-91: Testzeitpunkte bewusst auf ein festes Datum/Uhrzeit gepinnt statt
+        # datetime.now()-basiert (hours_from_now) — verhindert Flakiness, wenn der Test
+        # zufaellig kurz vor/nach Mitternacht laeuft und die beiden Events dadurch auf
+        # zwei verschiedene Kalendertage fallen wuerden. Beide Zeitpunkte liegen bewusst
+        # weit von Mitternacht entfernt, am selben festen Kalendertag.
         day_events = [
-            _fake_event("Goldene Stunde Morgen", 0.4, location_id="loc-x", hours_from_now=1.0),
-            _fake_event("Goldene Stunde Morgen", 0.9, location_id="loc-x", hours_from_now=1.2),
+            {
+                "id": "loc-x-Goldene Stunde Morgen-1",
+                "location_id": "loc-x",
+                "event_type": "Goldene Stunde Morgen",
+                "overall_score": 0.4,
+                "alert_priority": 1,
+                "shoot_time": "2026-06-14T10:00:00+00:00",
+                "shoot_window_end": "2026-06-14T10:30:00+00:00",
+            },
+            {
+                "id": "loc-x-Goldene Stunde Morgen-2",
+                "location_id": "loc-x",
+                "event_type": "Goldene Stunde Morgen",
+                "overall_score": 0.9,
+                "alert_priority": 1,
+                "shoot_time": "2026-06-14T10:12:00+00:00",
+                "shoot_window_end": "2026-06-14T10:42:00+00:00",
+            },
         ]
         result = main._dedup_best_per_day(day_events)
         assert len(result) == 1

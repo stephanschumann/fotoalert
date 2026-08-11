@@ -12,6 +12,10 @@ aufbauen) funktioniert korrekt, hatte aber nichts Neues zu laden.
 Konvention (vgl. test_patch_cache_consistency.py): Jeder Test nennt im
 Docstring die Ticket-ID, deren AK er absichert. API-Tests laufen gegen den
 FastAPI-TestClient (conftest.py, client-Fixture).
+
+TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+nutzen daher host_headers statt auth_headers.
 """
 from __future__ import annotations
 
@@ -41,13 +45,13 @@ class TestBug61SubjectNamePersistence:
         weiterhin unverändert wie bisher, unabhängig von subject_name.
     """
 
-    def test_subject_name_patch_visible_in_get(self, client, auth_headers):
+    def test_subject_name_patch_visible_in_get(self, client, host_headers):
         """BUG-61 AK: PATCH subject_name -> GET locations gibt neuen Motivnamen zurück."""
         new_subject_name = "Havelblick von der Wublitzbrücke"
         r = client.patch(
             f"/locations/{LOC}",
             json={"subject_name": new_subject_name},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, f"PATCH fehlgeschlagen: {r.text}"
 
@@ -60,15 +64,15 @@ class TestBug61SubjectNamePersistence:
             f"der Server-Whitelist erlaubter Text-Felder."
         )
 
-    def test_subject_name_patch_does_not_overwrite_other_fields(self, client, auth_headers):
+    def test_subject_name_patch_does_not_overwrite_other_fields(self, client, host_headers):
         """BUG-61 AK: PATCH subject_name lässt name/description unberührt (Merge, kein Replace)."""
         desc = "Test-Beschreibung bleibt erhalten (BUG-61)"
-        client.patch(f"/locations/{LOC}", json={"description": desc}, headers=auth_headers)
+        client.patch(f"/locations/{LOC}", json={"description": desc}, headers=host_headers)
 
         r = client.patch(
             f"/locations/{LOC}",
             json={"subject_name": "Nur-Motiv-Test"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, f"PATCH fehlgeschlagen: {r.text}"
 
@@ -78,14 +82,14 @@ class TestBug61SubjectNamePersistence:
             "PATCH subject_name darf description nicht überschreiben (Merge, kein Replace)."
         )
 
-    def test_location_name_patch_still_works_regression_bug30(self, client, auth_headers):
+    def test_location_name_patch_still_works_regression_bug30(self, client, host_headers):
         """BUG-61 Regressionscheck: BUG-30-Fix für Location-Namen bleibt unverändert korrekt.
 
         Die Korrektur für subject_name darf den bereits funktionierenden
         Location-Namen-Fix (BUG-30) nicht beeinträchtigen.
         """
         new_name = "BUG61-Regression-Standortname"
-        r = client.patch(f"/locations/{LOC}", json={"name": new_name}, headers=auth_headers)
+        r = client.patch(f"/locations/{LOC}", json={"name": new_name}, headers=host_headers)
         assert r.status_code == 200, f"PATCH fehlgeschlagen: {r.text}"
 
         locations = client.get("/locations").json()

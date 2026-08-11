@@ -18,3 +18,17 @@ Environment=FOTOALERT_ONDEMAND=1
 
 # Timeout: Precompute darf max. 30 Minuten laufen
 TimeoutStartSec=1800
+
+# Sicherheit (TASK-102: bisher komplett ohne Sicherheits-Direktiven -- jetzt analog
+# zu fotoalert.service gehaertet. ProtectSystem=full statt strict, weil
+# WorkingDirectory (/opt/fotoalert/app/...) NICHT unter /usr, /boot oder /etc liegt
+# und damit ohnehin beschreibbar bleibt -- kein ReadWritePaths= noetig, kein Risiko
+# fuer den bestehenden Datenbank-/Cache-Schreibzugriff unter data/ bzw. data_dev/.)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true

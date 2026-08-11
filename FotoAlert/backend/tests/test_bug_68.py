@@ -27,6 +27,10 @@ test_bug29_calendar_single_recompute.py).
 Diese Tests sind nach dem Fix (Option a — Flag-Flip in LOCATION_FIELD_RULES)
 GRÜN. Vor dem Fix (override_reload/precompute_reload jeweils False) wären die
 beiden Reload-Klassen ROT.
+TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+nutzen daher host_headers statt auth_headers.
+
 """
 from __future__ import annotations
 
@@ -74,11 +78,11 @@ def test_location_id(client):
 # ---------------------------------------------------------------------------
 
 class TestPatchAcceptsSpecialNotesAndSubjectName:
-    def test_special_notes_alone_is_accepted_and_persisted(self, client, auth_headers, test_location_id):
+    def test_special_notes_alone_is_accepted_and_persisted(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"special_notes": "Neuer korrigierter Hinweis"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["special_notes"] == "Neuer korrigierter Hinweis"
@@ -88,11 +92,11 @@ class TestPatchAcceptsSpecialNotesAndSubjectName:
         assert loc is not None
         assert loc["special_notes"] == "Neuer korrigierter Hinweis"
 
-    def test_subject_name_alone_is_accepted_and_persisted(self, client, auth_headers, test_location_id):
+    def test_subject_name_alone_is_accepted_and_persisted(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_name": "Neues korrigiertes Motiv"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["updated"]["subject_name"] == "Neues korrigiertes Motiv"
@@ -101,11 +105,11 @@ class TestPatchAcceptsSpecialNotesAndSubjectName:
         loc = next((l for l in locations if l["id"] == test_location_id), None)
         assert loc["subject_name"] == "Neues korrigiertes Motiv"
 
-    def test_special_notes_and_subject_name_together_in_one_request(self, client, auth_headers, test_location_id):
+    def test_special_notes_and_subject_name_together_in_one_request(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"special_notes": "Kombi-Hinweis", "subject_name": "Kombi-Motiv"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         body = r.json()["updated"]
@@ -119,20 +123,20 @@ class TestPatchAcceptsSpecialNotesAndSubjectName:
 # ---------------------------------------------------------------------------
 
 class TestNoRecomputeTriggered:
-    def test_special_notes_change_does_not_trigger_recompute(self, client, auth_headers, test_location_id):
+    def test_special_notes_change_does_not_trigger_recompute(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"special_notes": "Löst keinen Recompute aus"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is False
 
-    def test_subject_name_change_does_not_trigger_recompute(self, client, auth_headers, test_location_id):
+    def test_subject_name_change_does_not_trigger_recompute(self, client, host_headers, test_location_id):
         r = client.patch(
             f"/locations/{test_location_id}",
             json={"subject_name": "Löst keinen Recompute aus"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, r.text
         assert r.json()["recompute_triggered"] is False

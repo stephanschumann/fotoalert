@@ -11,6 +11,10 @@ Location" (per Grep in backend/tests/ geprüft, siehe Ticket-Spec/Code-Verifikat
 Konvention (vgl. test_us_128.py/test_bug-61.py): API-Tests laufen gegen den
 FastAPI-TestClient (conftest.py, client-Fixture). Kein hartcodierter Location-Fixture
 nötig — die relevanten Fälle nutzen bewusst eine nicht-existente loc_id.
+TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+nutzen daher host_headers statt auth_headers.
+
 """
 from __future__ import annotations
 
@@ -25,32 +29,32 @@ class TestTask60ValidationBeforeExistenceCheck:
     """TASK-60 AK: Prüfreihenfolge bleibt exakt erhalten — Feld-Validierung (422)
     läuft VOR dem Existenz-Check der Location (404)."""
 
-    def test_invalid_coord_on_nonexistent_location_returns_422_not_404(self, client, auth_headers):
+    def test_invalid_coord_on_nonexistent_location_returns_422_not_404(self, client, host_headers):
         resp = client.patch(
             f"/locations/{_NONEXISTENT_LOC_ID}",
             json={"observer_lat": 999},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert resp.status_code == 422, resp.text
 
-    def test_invalid_focal_length_on_nonexistent_location_returns_422_not_404(self, client, auth_headers):
+    def test_invalid_focal_length_on_nonexistent_location_returns_422_not_404(self, client, host_headers):
         """Zweite, unabhängige Validierungsart (Liste statt Zahl) gegen denselben
         Pre-Mortem-Fall — deckt _validate_patch_fields() über mehr als einen
         Codepfad ab."""
         resp = client.patch(
             f"/locations/{_NONEXISTENT_LOC_ID}",
             json={"focal_length_suggestions": [9999]},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert resp.status_code == 422, resp.text
 
-    def test_valid_field_on_nonexistent_location_still_returns_404(self, client, auth_headers):
+    def test_valid_field_on_nonexistent_location_still_returns_404(self, client, host_headers):
         """Gegenprobe: ohne Validierungsfehler bleibt der 404-Pfad für eine
         nicht-existente Location unverändert erreichbar (kein Kollateralschaden
         durch die neue Aufrufreihenfolge/Helferfunktionen)."""
         resp = client.patch(
             f"/locations/{_NONEXISTENT_LOC_ID}",
             json={"name": "Irrelevanter Name"},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert resp.status_code == 404, resp.text

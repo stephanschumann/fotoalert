@@ -17,6 +17,10 @@ Warum diese Tests?
   BUG-30: PATCH auf `name` persistierte nicht korrekt (Override-Merge-Lücke).
 
   Diese Tests stellen sicher, dass PATCH → GET immer konsistent ist.
+
+  TASK-103 (2026-08-10): PATCH /locations/{id} ist auf die Host-Rolle beschränkt;
+  diese Tests prüfen reine PATCH-Funktionalität (nicht die Auth-Rolle selbst) und
+  nutzen daher host_headers statt auth_headers.
 """
 from __future__ import annotations
 
@@ -46,10 +50,10 @@ class TestBug30NamePersistence:
     AK: Erneuter PATCH {"name": "Y"} überschreibt, GET liefert "Y" (kein Append-Bug).
     """
 
-    def test_name_patch_visible_in_get(self, client, auth_headers):
+    def test_name_patch_visible_in_get(self, client, host_headers):
         """BUG-30 AK: PATCH name → GET locations gibt neuen Namen zurück."""
         new_name = "BUG30-Test-Standort"
-        r = client.patch(f"/locations/{LOC}", json={"name": new_name}, headers=auth_headers)
+        r = client.patch(f"/locations/{LOC}", json={"name": new_name}, headers=host_headers)
         assert r.status_code == 200, f"PATCH fehlgeschlagen: {r.text}"
 
         locations = client.get("/locations").json()
@@ -60,14 +64,14 @@ class TestBug30NamePersistence:
             f"Mögliche Regression von BUG-30 (Override-Merge-Lücke)."
         )
 
-    def test_name_patch_does_not_overwrite_other_fields(self, client, auth_headers):
+    def test_name_patch_does_not_overwrite_other_fields(self, client, host_headers):
         """BUG-30 AK: PATCH name lässt description unberührt (Merge, kein Replace)."""
         # Erst description setzen
         desc = "Test-Beschreibung bleibt erhalten"
-        client.patch(f"/locations/{LOC}", json={"description": desc}, headers=auth_headers)
+        client.patch(f"/locations/{LOC}", json={"description": desc}, headers=host_headers)
 
         # Dann nur name patchen
-        client.patch(f"/locations/{LOC}", json={"name": "Nur-Name-Patch"}, headers=auth_headers)
+        client.patch(f"/locations/{LOC}", json={"name": "Nur-Name-Patch"}, headers=host_headers)
 
         locations = client.get("/locations").json()
         loc = next((l for l in locations if l["id"] == LOC), None)
@@ -77,10 +81,10 @@ class TestBug30NamePersistence:
             "Regression von BUG-30 Override-Merge."
         )
 
-    def test_second_name_patch_overwrites_first(self, client, auth_headers):
+    def test_second_name_patch_overwrites_first(self, client, host_headers):
         """BUG-30 AK: Zweiter Name-PATCH überschreibt den ersten (kein Append-Bug)."""
-        client.patch(f"/locations/{LOC}", json={"name": "Erster Name"}, headers=auth_headers)
-        client.patch(f"/locations/{LOC}", json={"name": "Zweiter Name"}, headers=auth_headers)
+        client.patch(f"/locations/{LOC}", json={"name": "Erster Name"}, headers=host_headers)
+        client.patch(f"/locations/{LOC}", json={"name": "Zweiter Name"}, headers=host_headers)
 
         locations = client.get("/locations").json()
         loc = next((l for l in locations if l["id"] == LOC), None)
@@ -102,7 +106,7 @@ class TestBug29CoordinatesConsistency:
     Persistenz-Ebene (PATCH → GET-Roundtrip) ohne Ephemeriden-Zugriff.
     """
 
-    def test_coordinates_patch_visible_in_get(self, client, auth_headers):
+    def test_coordinates_patch_visible_in_get(self, client, host_headers):
         """BUG-29 AK: Neue Koordinaten erscheinen in GET /locations."""
         new_lat = 52.5100
         new_lon = 13.4200
@@ -110,7 +114,7 @@ class TestBug29CoordinatesConsistency:
         r = client.patch(
             f"/locations/{LOC}",
             json={"observer_lat": new_lat, "observer_lon": new_lon},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code == 200, f"PATCH fehlgeschlagen: {r.text}"
         assert r.json().get("recompute_triggered") is True, (
@@ -128,7 +132,7 @@ class TestBug29CoordinatesConsistency:
             f"observer_lon nach PATCH: {loc['observer_lon']} — erwartet ~{new_lon}."
         )
 
-    def test_coordinates_patch_does_not_affect_other_locations(self, client, auth_headers):
+    def test_coordinates_patch_does_not_affect_other_locations(self, client, host_headers):
         """BUG-29 AK: PATCH auf eine Location lässt andere unberührt."""
         # Alle Locations vor dem PATCH laden
         before = {l["id"]: l for l in client.get("/locations").json()}
@@ -137,7 +141,7 @@ class TestBug29CoordinatesConsistency:
         client.patch(
             f"/locations/{LOC}",
             json={"observer_lat": 52.5200},
-            headers=auth_headers,
+            headers=host_headers,
         )
 
         # Alle anderen Locations prüfen
@@ -151,12 +155,12 @@ class TestBug29CoordinatesConsistency:
                 f"observer_lat von {loc_id} nach PATCH auf {LOC} verändert — Kollateral-Schaden."
             )
 
-    def test_patch_invalid_coordinates_rejected(self, client, auth_headers):
+    def test_patch_invalid_coordinates_rejected(self, client, host_headers):
         """Edge Case: Koordinaten außerhalb des gültigen Bereichs → 422 (keine Persistenz)."""
         r = client.patch(
             f"/locations/{LOC}",
             json={"observer_lat": 999.0, "observer_lon": 13.40},
-            headers=auth_headers,
+            headers=host_headers,
         )
         assert r.status_code in (400, 422), (
             f"Ungültige Koordinaten (lat=999) sollten abgelehnt werden, bekam {r.status_code}."
