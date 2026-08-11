@@ -33,14 +33,24 @@ lines = text.split("\n")
 def lane_name_to_key(name):
     n=name.lower()
     for k,v in [("ready for analysis","analysis_ready"),("in analysis","analysis"),
+                ("wartet auf entscheidung","waiting_decision"),
                 ("ready for dev","dev_ready"),("in progress","inprogress"),
-                ("in test","test"),("retro","retro"),("excluded","excluded"),
+                ("in test","test"),("braucht dich","needs_you"),
+                ("bereit zur veröffentlichung","ready_to_release"),
+                ("retro","retro"),("excluded","excluded"),
                 ("inbox","inbox"),("done","done")]:
         if k in n: return v
     return None
 def status_to_key(s):
     s=(s or "").lower()
-    for k,v in [("done","done"),("in test","test"),("in progress","inprogress"),
+    # SPEC-W5 Baustein H (08.08.2026): WIP=1-Lane "Bereit zur Veröffentlichung". Der
+    # Zwischenzustand fuer ein zweites, wartendes Ticket bleibt bewusst im "test"-Bucket.
+    for k,v in [("done","done"),("braucht dich","needs_you"),
+                ("bereit zur veröffentlichung","ready_to_release"),
+                ("wartet auf freie veröffentlichungs","test"),
+                ("in test","test"),
+                ("in progress","inprogress"),
+                ("wartet auf entscheidung","waiting_decision"),
                 ("ready for analysis","analysis_ready"),("in analysis","analysis"),
                 ("ready for dev","dev_ready"),("excluded","excluded")]:
         if k in s: return v
@@ -57,7 +67,9 @@ for ln in lines:
         if len(cells)>=3:
             key=lane_name_to_key(cells[0])
             if key and key not in ("inbox","retro"):
-                for tid in re.findall(r'\b([A-Z]+-\d+)\b', cells[-1]): board[tid]=key
+                # Nur der tatsaechliche fettgedruckte Board-Eintrag zaehlt (**TASK-1**),
+                # nicht jede blosse Ticket-ID-Erwaehnung im Fliesstext der Zelle (E3-Fehlalarm-Fix, 2026-08-11)
+                for tid in re.findall(r'\*\*([A-Z]+-\d+)\*\*', cells[-1]): board[tid]=key
 
 errors=[]; warns=[]; ids=[]
 meta={}  # tid -> {"typ":..., "epic":...}  für den Epic-Verlust-Wächter (E4)
