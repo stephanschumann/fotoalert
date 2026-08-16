@@ -1854,8 +1854,11 @@ async def _run_precompute(mode: str = "full") -> None:
                 logger.info("  [precompute] %s", line)
         if proc.returncode == 0:
             logger.info("Vorberechnung abgeschlossen (mode=%s). Lade Caches neu...", mode)
-            _load_elevation_cache()
-            _load_caches()
+            # TASK-102: synchrone JSON-Parses (kann bei sehr grossem calendar.json
+            # den Event-Loop mehrere Sekunden bis Minuten blockieren) in Thread auslagern,
+            # damit /health und /job-status waehrenddessen weiter antworten.
+            await asyncio.to_thread(_load_elevation_cache)
+            await asyncio.to_thread(_load_caches)
             if mode in ("full", "feed"):
                 await _weather_overlay()
             for j, t0 in t0s.items():

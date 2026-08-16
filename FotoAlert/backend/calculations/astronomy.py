@@ -13,17 +13,20 @@ Berechnet:
 from __future__ import annotations
 
 import contextvars
+import logging
 import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 
 import numpy as np
-from skyfield import almanac
+from skyfield import almanac, eclipselib
 from skyfield.api import N, E, Star, load, wgs84
 from skyfield.data import mpc
 from skyfield.framelib import ecliptic_frame
 from skyfield.units import Angle
+
+logger = logging.getLogger(__name__)
 
 
 # Skyfield Timescale & Ephemeris (einmalig laden, gecacht)
@@ -179,6 +182,261 @@ def get_active_meteor_showers(target_date: date) -> list[MeteorShower]:
         except ValueError:
             pass
     return active
+
+
+# ---------------------------------------------------------------------------
+# TASK-02: Sonnen-/Mondfinsternisse
+#
+# Architektur-Entscheidung (Option A, BACKLOG.md TASK-02): analog zu
+# METEOR_SHOWERS/get_active_meteor_showers() sind Finsternisse Kalender-
+# ereignisse ohne echte Location-Abhängigkeit — die Kontaktzeiten-Suche läuft
+# von einem festen Berlin/BB-Referenzpunkt aus (Unterschiede innerhalb der
+# Region liegen im Sekundenbereich, fotografisch irrelevant, laut Analyse-Spec).
+#
+# Anders als bei Meteoritenschauern (reine Datumsarithmetik, beliebig oft
+# billig neu aufrufbar) ist die Sonnenfinsternis-Kontaktsuche eine echte,
+# vektorisierte Skyfield-Berechnung pro Neumond — und calculate_full_report()
+# wird pro Location UND pro Tag aufgerufen. AK-12 (Performance, Pre-Mortem
+# Szenario 1) verlangt "einmal pro Precompute-Zeitfenster, nicht pro
+# Location". Das wird hier über einen Jahres-Cache erreicht statt über eine
+# Umstrukturierung von find_opportunities_multi_day()/precompute.py: die
+# erste Anfrage für ein Kalenderjahr löst die teure Berechnung genau einmal
+# aus, jede weitere Anfrage (jede Location, jeder Tag desselben Precompute-
+# Laufs) ist danach ein billiger Dict-Lookup — siehe test_ak12_* in
+# test_task02_eclipses.py, das die tatsächliche Aufrufzahl der teuren
+# Jahres-Funktion zählt.
+# ---------------------------------------------------------------------------
+
+# Fester Referenzpunkt Berlin/Brandenburg (Analyse-Spec TASK-02): Kontaktzeiten-
+# Suche und Sichtbarkeits-Guards laufen von hier aus, nicht pro Location.
+BERLIN_REF_LAT = 52.52
+BERLIN_REF_LON = 13.405
+
+SUN_RADIUS_KM = 696_000.0
+MOON_RADIUS_KM = 1_737.1  # physischer Mondradius (km) — entspricht MOON_DIAMETER_KM/2
+                          # weiter unten; hier eigenständig, da diese Konstante vor
+                          # MOON_DIAMETER_KM im Modul steht (Definitionsreihenfolge).
+
+
+@dataclass
+class SolarEclipseEvent:
+    """Ergebnis der Sonnenfinsternis-Kontaktzeit-Suche für einen Referenzpunkt."""
+    date: date
+    c1: Optional[datetime]        # erste Berührung (Beginn des Kontaktfensters, UTC)
+    c4: Optional[datetime]        # letzte Berührung (Ende des Kontaktfensters, UTC)
+    max_time: datetime            # Zeitpunkt der größten Verfinsterung (UTC)
+    max_separation_deg: float     # minimale scheinbare Winkeltrennung Sonne–Mond
+    is_total: bool                # Mond bedeckt die Sonne vollständig (keine Ringform berücksichtigt)
+    visible: bool                 # AK-16: Sonne > 0° Höhe zum Zeitpunkt des Maximums
+
+
+@dataclass
+class LunarEclipseEvent:
+    """Ergebnis von skyfield.eclipselib.lunar_eclipses(), gefiltert auf Partial/Total."""
+    date: date
+    max_time: datetime            # Zeitpunkt der größten Verfinsterung (UTC)
+    magnitude: float              # umbral_magnitude laut Skyfield
+    is_total: bool
+    visible: bool                 # AK-5: Mond > 0° Höhe zum Zeitpunkt des Maximums
+
+
+def _angular_radius_deg(distance_km: float, body_radius_km: float) -> float:
+    """Scheinbarer Winkelradius eines Himmelskörpers aus Entfernung + physischem Radius."""
+    return math.degrees(math.asin(min(1.0, body_radius_km / distance_km)))
+
+
+def _find_new_moons(t0, t1) -> list:
+    """Liefert die Skyfield-Zeitpunkte aller Neumonde in [t0, t1]."""
+    eph = _get_eph()
+    f = almanac.moon_phases(eph)
+    times, events = almanac.find_discrete(t0, t1, f)
+    return [t for t, e in zip(times, events) if e == 0]
+
+
+def _solar_eclipse_event_for_new_moon(
+    new_moon_dt: datetime, lat: float, lon: float,
+) -> Optional[SolarEclipseEvent]:
+    """Sucht um einen Neumond-Zeitpunkt herum nach einer Sonnenfinsternis, gesehen
+    von (lat, lon). Gibt None zurück, wenn die Winkeltrennung Sonne–Mond die Summe
+    der scheinbaren Radien nie unterschreitet (kein Ereignis von diesem Ort aus)."""
+    eph = _get_eph()
+    observer = wgs84.latlon(lat * N, lon * E)
+    earth = eph["earth"]
+    sun = eph["sun"]
+    moon = eph["moon"]
+
+    t0 = _ts.tt_jd(new_moon_dt.tt - 0.5)  # ±12h um den Neumond
+    t1 = _ts.tt_jd(new_moon_dt.tt + 0.5)
+    times = _ts.linspace(t0, t1, 1441)  # ~1-Minuten-Auflösung
+
+    app_sun = (earth + observer).at(times).observe(sun).apparent()
+    app_moon = (earth + observer).at(times).observe(moon).apparent()
+    sep_deg = app_sun.separation_from(app_moon).degrees
+
+    sun_dist_km = app_sun.distance().km
+    moon_dist_km = app_moon.distance().km
+    sun_r_deg = np.degrees(np.arcsin(np.minimum(1.0, SUN_RADIUS_KM / sun_dist_km)))
+    moon_r_deg = np.degrees(np.arcsin(np.minimum(1.0, MOON_RADIUS_KM / moon_dist_km)))
+    sum_r_deg = sun_r_deg + moon_r_deg
+
+    mask = sep_deg < sum_r_deg
+    indices = np.where(mask)[0]
+    if len(indices) == 0:
+        return None  # kein Ereignis von diesem Ort aus sichtbar (geometrisch)
+
+    i_min = int(np.argmin(sep_deg))
+    max_time = times[i_min].utc_datetime()
+    max_sep = float(sep_deg[i_min])
+    diff_r_deg = abs(float(moon_r_deg[i_min]) - float(sun_r_deg[i_min]))
+    is_total = bool(moon_r_deg[i_min] > sun_r_deg[i_min] and max_sep < diff_r_deg)
+
+    c1 = times[indices[0]].utc_datetime()
+    c4 = times[indices[-1]].utc_datetime()
+
+    # AK-16: Sichtbarkeits-Guard — Sonne muss zum Zeitpunkt des Maximums über dem
+    # Horizont stehen (symmetrisch zu AK-5 bei Mondfinsternissen).
+    sun_pos_max = get_body_position(lat, lon, "sun", max_time)
+    visible = bool(sun_pos_max is not None and sun_pos_max.altitude > 0)
+
+    return SolarEclipseEvent(
+        date=max_time.date(),
+        c1=c1, c4=c4, max_time=max_time,
+        max_separation_deg=round(max_sep, 4),
+        is_total=is_total,
+        visible=visible,
+    )
+
+
+def _compute_solar_eclipses_for_year(year: int, lat: float, lon: float) -> list[SolarEclipseEvent]:
+    """Teure Skyfield-Berechnung: alle Sonnenfinsternisse eines Kalenderjahres von
+    (lat, lon) aus gesehen. NUR intern über den Jahres-Cache aufrufen (find_solar_eclipses/
+    get_solar_eclipse_for_date) — direkte Aufrufe umgehen das AK-12-Caching."""
+    t0 = _ts.utc(year - 1, 12, 15)
+    t1 = _ts.utc(year + 1, 1, 15)
+    events: list[SolarEclipseEvent] = []
+    for new_moon_t in _find_new_moons(t0, t1):
+        new_moon_dt = new_moon_t.utc_datetime()
+        try:
+            ev = _solar_eclipse_event_for_new_moon(new_moon_t, lat, lon)
+        except Exception as exc:
+            # AK-15: ein Fehler bei einem einzelnen Kandidaten darf die übrigen
+            # Neumonde des Jahres nicht mit zu Fall bringen — isoliert loggen.
+            logger.error(
+                "Sonnenfinsternis-Suche für Neumond %s (Jahr %d) fehlgeschlagen: %s: %s",
+                new_moon_dt.isoformat(), year, type(exc).__name__, exc,
+            )
+            continue
+        if ev is not None and ev.date.year == year:
+            events.append(ev)
+    return events
+
+
+_SOLAR_ECLIPSE_CACHE: dict[tuple, list[SolarEclipseEvent]] = {}
+
+
+def find_solar_eclipses(
+    start_date: date, end_date: date,
+    lat: float = BERLIN_REF_LAT, lon: float = BERLIN_REF_LON,
+) -> list[SolarEclipseEvent]:
+    """Sonnenfinsternisse im Zeitraum [start_date, end_date], gesehen von (lat, lon).
+
+    AK-12: pro (Jahr, gerundete Koordinate) wird die teure Berechnung genau einmal
+    ausgeführt und gecacht — beliebig viele Locations/Tage im selben Precompute-Lauf
+    teilen sich das Ergebnis."""
+    events: list[SolarEclipseEvent] = []
+    for year in range(start_date.year, end_date.year + 1):
+        key = (year, round(lat, 2), round(lon, 2))
+        if key not in _SOLAR_ECLIPSE_CACHE:
+            _SOLAR_ECLIPSE_CACHE[key] = _compute_solar_eclipses_for_year(year, lat, lon)
+        events.extend(_SOLAR_ECLIPSE_CACHE[key])
+    return [e for e in events if start_date <= e.date <= end_date]
+
+
+def get_solar_eclipse_for_date(
+    target_date: date,
+    lat: float = BERLIN_REF_LAT, lon: float = BERLIN_REF_LON,
+) -> Optional[SolarEclipseEvent]:
+    """Liefert die Sonnenfinsternis für genau target_date (oder None)."""
+    for ev in find_solar_eclipses(target_date, target_date, lat=lat, lon=lon):
+        if ev.date == target_date:
+            return ev
+    return None
+
+
+def _compute_lunar_eclipses_for_year(year: int, lat: float, lon: float) -> list[LunarEclipseEvent]:
+    """Teure Skyfield-Berechnung: alle Partial/Total-Mondfinsternisse eines Kalender-
+    jahres (Penumbral ausgeschlossen, Annahmen-Protokoll TASK-02). NUR intern über den
+    Jahres-Cache aufrufen (find_lunar_eclipses/get_lunar_eclipse_for_date)."""
+    eph = _get_eph()
+    t0 = _ts.utc(year, 1, 1)
+    t1 = _ts.utc(year + 1, 1, 1)
+    events: list[LunarEclipseEvent] = []
+    try:
+        times, codes, details = eclipselib.lunar_eclipses(t0, t1, eph)
+    except Exception as exc:
+        # AK-15: ein Fehler in der Jahres-Suche selbst darf den Gesamtlauf nicht
+        # abbrechen — isoliert loggen, keine Mondfinsternisse für dieses Jahr.
+        logger.error(
+            "Mondfinsternis-Suche für Jahr %d fehlgeschlagen: %s: %s",
+            year, type(exc).__name__, exc,
+        )
+        return events
+
+    for i, (t, code) in enumerate(zip(times, codes)):
+        code = int(code)
+        if code == 0:
+            continue  # Penumbral — bewusst nicht als eigener Typ geführt
+        try:
+            max_time = t.utc_datetime()
+            magnitude = float(details["umbral_magnitude"][i])
+            is_total = code == 2
+            # AK-5: Sichtbarkeits-Guard — Mond muss zum Zeitpunkt des Maximums über
+            # dem Horizont stehen.
+            moon_pos_max = get_body_position(lat, lon, "moon", max_time)
+            visible = bool(moon_pos_max is not None and moon_pos_max.altitude > 0)
+            events.append(LunarEclipseEvent(
+                date=max_time.date(),
+                max_time=max_time,
+                magnitude=round(magnitude, 3),
+                is_total=is_total,
+                visible=visible,
+            ))
+        except Exception as exc:
+            logger.error(
+                "Mondfinsternis-Verarbeitung für %s (Jahr %d) fehlgeschlagen: %s: %s",
+                t.utc_iso(), year, type(exc).__name__, exc,
+            )
+            continue
+    return events
+
+
+_LUNAR_ECLIPSE_CACHE: dict[tuple, list[LunarEclipseEvent]] = {}
+
+
+def find_lunar_eclipses(
+    start_date: date, end_date: date,
+    lat: float = BERLIN_REF_LAT, lon: float = BERLIN_REF_LON,
+) -> list[LunarEclipseEvent]:
+    """Mondfinsternisse (Partial/Total) im Zeitraum [start_date, end_date], Sichtbarkeits-
+    Guard bezogen auf (lat, lon). AK-12: pro (Jahr, gerundete Koordinate) gecacht."""
+    events: list[LunarEclipseEvent] = []
+    for year in range(start_date.year, end_date.year + 1):
+        key = (year, round(lat, 2), round(lon, 2))
+        if key not in _LUNAR_ECLIPSE_CACHE:
+            _LUNAR_ECLIPSE_CACHE[key] = _compute_lunar_eclipses_for_year(year, lat, lon)
+        events.extend(_LUNAR_ECLIPSE_CACHE[key])
+    return [e for e in events if start_date <= e.date <= end_date]
+
+
+def get_lunar_eclipse_for_date(
+    target_date: date,
+    lat: float = BERLIN_REF_LAT, lon: float = BERLIN_REF_LON,
+) -> Optional[LunarEclipseEvent]:
+    """Liefert die Mondfinsternis für genau target_date (oder None)."""
+    for ev in find_lunar_eclipses(target_date, target_date, lat=lat, lon=lon):
+        if ev.date == target_date:
+            return ev
+    return None
 
 
 # ---------------------------------------------------------------------------
