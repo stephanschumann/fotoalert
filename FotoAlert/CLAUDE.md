@@ -100,7 +100,7 @@ Verifikations-Subagent (§ Verifikation).
 - Kein Scope-Creep — nur was im Ticket steht; Extras als Vorschlag.
 - Kanban nach **jeder** Status-Änderung mitziehen (`tools/sync_kanban.py` → `update_artifact`).
 - PRODUCT.md nach jedem Ticket pflegen (Basis für Regression).
-- Server läuft **Python 3.9** — keine 3.10+-Syntax (`str|None`).
+- **Server (CI, lokale Entwicklung UND Produktion) läuft auf Python 3.12** — 3.10+-Syntax (`str|None`) ist überall sicher verwendbar. (Korrigiert 2026-08-16, TASK-105: Der Produktionsserver lief entgegen der bisherigen Annahme bereits seit Juni 2026 auf Python 3.12, nicht auf 3.9 wie hier zuvor dokumentiert — per direktem Server-Check verifiziert. Die ursprünglich geplante separate „Stufe-2"-Migration war dadurch nicht mehr nötig.)
 - **Subagenten-Erfolgsmeldung zu Schreiboperationen nie ungeprüft übernehmen** ("Datei X
   geändert/ergänzt" o.ä.): sofort nach dem Edit/Write per Grep/Read gegen die genannte
   Zielstelle verifizieren, Rohausgabe zitieren — nicht nur die Prosa-Zusammenfassung des

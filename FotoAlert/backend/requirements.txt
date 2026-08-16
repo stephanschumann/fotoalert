@@ -5,24 +5,24 @@ httpx==0.27.0
 skyfield==1.49
 astropy==6.0.1
 numpy==1.26.4
-pandas>=2.0.0
+pandas>=2.0.0,<3.0.0
 sqlalchemy==2.0.30
 aiosqlite==0.20.0
 pydantic==2.7.3
 pydantic-settings==2.3.0
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 pytz==2024.1
 # Push Notifications
-PyJWT==2.8.0
-cryptography==42.0.8
+PyJWT==2.13.0
+cryptography==49.0.0
 # US-112: Wetter-Karten-Overlay (DWD ICON-D2/-EU GRIB2 + MET Norway → PNG je Stunde)
 # eccodes (Python-Wheel bündelt die eccodes-Bibliothek; auf Hetzner ggf. zusätzlich
 # das System-Paket "libeccodes0"/"libeccodes-tools" via apt installieren, siehe US-112).
 eccodes==2.47.0
-Pillow==10.3.0
+Pillow==12.3.0
 # US-120: Datei-Upload (Beispielbild pro Location) — FastAPI braucht python-multipart
 # als Parser für multipart/form-data-Requests (UploadFile), sonst 500 beim Upload.
-python-multipart==0.0.9
+python-multipart==0.0.20
 # TASK-64: Backend-Testsuite als CI-Pflicht-Gate — pytest ist nur lokal vorausgesetzt,
 # fehlte hier bisher als deklarierte Abhängigkeit für den CI-Runner.
-pytest==8.2.2
+pytest==9.0.3

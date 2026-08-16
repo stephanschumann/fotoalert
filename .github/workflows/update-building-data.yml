@@ -40,10 +40,10 @@ jobs:
       - name: Code auschecken
         uses: actions/checkout@v4.2.2
 
-      - name: Python 3.9 einrichten
+      - name: Python 3.12 einrichten
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.12"
 
       - name: Extraktions-Abhängigkeiten installieren
         working-directory: FotoAlert/backend
