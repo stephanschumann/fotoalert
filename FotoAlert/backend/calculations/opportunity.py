@@ -28,6 +28,8 @@ from calculations.astronomy import (
     find_sun_alignment_times,
     get_body_position,
     get_moon_earth_distance_km,
+    get_solar_eclipse_for_date,
+    get_lunar_eclipse_for_date,
 )
 from calculations.weather import WeatherForecast, calculate_photo_weather_score
 from data.locations import PhotoLocation
@@ -48,6 +50,11 @@ class EventType(str, Enum):
     MILKY_WAY = "Milchstraße"
     METEOR_SHOWER = "Meteoritenschauer"
     ECLIPSE = "Sonnenfinsternis"
+    # TASK-02: drei weitere Finsternis-Typen, gleiches Icon wie ECLIPSE (AK-9,
+    # Designer-Entscheidung), nur über den Titel/Label-Text unterscheidbar.
+    PARTIAL_SOLAR_ECLIPSE = "Partielle Sonnenfinsternis"
+    LUNAR_ECLIPSE = "Mondfinsternis"
+    PARTIAL_LUNAR_ECLIPSE = "Partielle Mondfinsternis"
 
 
 @dataclass
@@ -832,6 +839,76 @@ async def find_opportunities(
                 camera_hints=_camera_hints_meteor(),
                 astronomy_report=astro,
                 alert_priority=2 if days_to_peak <= 1 and moon_factor > 0.7 else 1,
+            ))
+
+    # -----------------------------------------------------------------------
+    # 7. FINSTERNISSE (TASK-02): Sonnen-/Mondfinsternis, Berlin/BB-Referenzpunkt.
+    # AK-12 (Performance): get_solar_eclipse_for_date()/get_lunar_eclipse_for_date()
+    # sind pro Kalenderjahr gecacht (astronomy.py) — die teure Skyfield-Kontaktsuche
+    # läuft dadurch effektiv einmal pro Precompute-Zeitfenster, nicht pro Location,
+    # obwohl find_opportunities() weiterhin pro Location+Tag aufgerufen wird (wie bei
+    # active_meteor_showers, nur mit echtem statt implizitem Caching).
+    # -----------------------------------------------------------------------
+    solar_eclipse = get_solar_eclipse_for_date(target_date)
+    if solar_eclipse is not None and solar_eclipse.visible:
+        # AK-16: Sichtbarkeits-Guard bereits in astronomy.py angewendet (visible=False
+        # -> hier ausgeschlossen); AK-1/AK-2: Typ folgt der Total/Partial-Klassifizierung.
+        ecl_event_type = EventType.ECLIPSE if solar_eclipse.is_total else EventType.PARTIAL_SOLAR_ECLIPSE
+        w_s = _w_score(forecast, solar_eclipse.max_time, use_weather)
+        a_s = 0.95 if solar_eclipse.is_total else 0.85
+        overall_ecl = _overall(a_s, w_s, use_weather)
+        if overall_ecl >= min_score:
+            opportunities.append(PhotoOpportunity(
+                id=f"{location.id}_solar_eclipse_{solar_eclipse.date.isoformat()}",
+                location=location,
+                event_type=ecl_event_type,
+                title=f"{ecl_event_type.value} – {location.name}",
+                description=(
+                    f"{ecl_event_type.value}: größte Verfinsterung um "
+                    f"{_fmt_time(solar_eclipse.max_time)} (Ortszeit), Winkeltrennung "
+                    f"Sonne–Mond {solar_eclipse.max_separation_deg:.3f}°. "
+                    f"ACHTUNG: ND-Filter erforderlich!"
+                ),
+                shoot_time=solar_eclipse.max_time,
+                shoot_window_start=solar_eclipse.c1 or solar_eclipse.max_time,
+                shoot_window_end=solar_eclipse.c4 or solar_eclipse.max_time,
+                overall_score=round(overall_ecl, 2),
+                astronomy_score=round(a_s, 2),
+                weather_score=round(w_s, 2),
+                location_score=1.0,
+                camera_hints=_camera_hints_alignment(200, is_solar=True),
+                astronomy_report=astro,
+                alert_priority=3 if solar_eclipse.is_total else 2,
+            ))
+
+    lunar_eclipse = get_lunar_eclipse_for_date(target_date)
+    if lunar_eclipse is not None and lunar_eclipse.visible:
+        # AK-5: Sichtbarkeits-Guard bereits in astronomy.py angewendet.
+        ecl_event_type_m = EventType.LUNAR_ECLIPSE if lunar_eclipse.is_total else EventType.PARTIAL_LUNAR_ECLIPSE
+        w_s = _w_score(forecast, lunar_eclipse.max_time, use_weather)
+        a_s = 0.9 if lunar_eclipse.is_total else 0.75
+        overall_ecl_m = _overall(a_s, w_s, use_weather)
+        if overall_ecl_m >= min_score:
+            opportunities.append(PhotoOpportunity(
+                id=f"{location.id}_lunar_eclipse_{lunar_eclipse.date.isoformat()}",
+                location=location,
+                event_type=ecl_event_type_m,
+                title=f"{ecl_event_type_m.value} – {location.name}",
+                description=(
+                    f"{ecl_event_type_m.value}: größte Verfinsterung um "
+                    f"{_fmt_time(lunar_eclipse.max_time)} (Ortszeit), Magnitude "
+                    f"{lunar_eclipse.magnitude:.2f}."
+                ),
+                shoot_time=lunar_eclipse.max_time,
+                shoot_window_start=lunar_eclipse.max_time - timedelta(hours=1),
+                shoot_window_end=lunar_eclipse.max_time + timedelta(hours=1),
+                overall_score=round(overall_ecl_m, 2),
+                astronomy_score=round(a_s, 2),
+                weather_score=round(w_s, 2),
+                location_score=1.0,
+                camera_hints=_camera_hints_moon(200),
+                astronomy_report=astro,
+                alert_priority=3 if lunar_eclipse.is_total else 2,
             ))
 
     # Sortierung nach Gesamtscore (absteigend)

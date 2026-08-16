@@ -57,7 +57,10 @@ from data.store import LocationStore
 # die andere Ergebnisse für bereits berechnete Tage liefern würden.
 # Format: "MAJOR.MINOR" – Minor = kleine Scoring-Anpassung, Major = Struktur.
 # ─────────────────────────────────────────────────────────────────────────────
-ALGORITHM_VERSION = "1.4"  # US-07: Goldene Wolken & Himmelsröte Scoring
+ALGORITHM_VERSION = "1.5"  # TASK-02: 4 Finsternis-Typen — neue Events für bereits
+# berechnete Tage (Cache-Invalidierung laut Kommentar oben Zeile 56–57 zwingend nötig,
+# sonst überspringt compute_calendar_incremental() alle schon gecachten Datumswerte
+# und die neuen Finsternis-Events tauchen nie im Kalender/Feed auf).
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,6 +99,12 @@ _ALIGNMENT_FILTER_EXEMPT = {
     "Neumond",
     "Meteoritenschauer",
     "Sonnenfinsternis",
+    # TASK-02: drei weitere Finsternis-Typen — kein Celestial-Tracking auf einen
+    # Motivpunkt (analog zur bereits bestehenden "Sonnenfinsternis"-Ausnahme direkt
+    # darüber), composition_analysis ist für Finsternis-Ereignisse nicht vorhanden.
+    "Partielle Sonnenfinsternis",
+    "Mondfinsternis",
+    "Partielle Mondfinsternis",
     # US-109: Wetter-Overlay-Events (Laufzeit, kein eigener subject_azimuth nötig)
     "Goldene Wolken",
     "Himmelsröte",
