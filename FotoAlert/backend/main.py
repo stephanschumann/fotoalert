@@ -138,6 +138,15 @@ _CAL_CACHE          = _CACHE_DIR / "calendar.json"
 _ELEV_CACHE         = _CACHE_DIR / "elevations.json"
 _DISCOVER_CACHE     = _CACHE_DIR / "discover.json"
 
+# TASK-54: Festplatten-Cache für die Wetterkarten-PNGs (Option A, Weg-Gate
+# Stephan 2026-08-16). Metadaten (bounds/hourly_times/sources/attribution/
+# Bau-Zeitstempel) in einer JSON-Datei, die PNGs je Feld/Stunde als einzelne
+# Dateien darunter — analog zum bestehenden `_load_caches()`/`_load_discover_
+# cache()`-Muster, aber mit eigenem Unterordner statt einer einzigen JSON-Datei
+# (die PNG-Bytes würden als Base64 ~33% größer, siehe Ticket-Option-B-Vergleich).
+_WEATHER_MAP_CACHE_DIR  = _CACHE_DIR / "weather_map"
+_WEATHER_MAP_CACHE_META = _WEATHER_MAP_CACHE_DIR / "meta.json"
+
 # US-120: Beispielbild-Verzeichnis (Host-Upload pro Location, ein Bild, ersetzt beim erneuten Upload)
 _IMAGE_DIR          = Path(__file__).parent / "data" / "location_images"
 _IMAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -432,6 +441,63 @@ def _load_discover_cache() -> None:
                     str(_discover_cache.get("generated_at", "?"))[:16])
     except Exception as e:
         logger.error("Fehler beim Laden von discover.json: %s", e)
+
+
+def _load_weather_map_cache_from_disk() -> bool:
+    """TASK-54 (AK1/AK2/AK4): Lädt den zuletzt persistierten Wetterkarten-Cache
+    von Disk beim Start, analog zu `_load_caches()`/`_load_discover_cache()`.
+
+    Füllt `_weather_map_cache`/`_weather_map_png`/`_weather_map_updated_at` mit
+    dem zuletzt erfolgreich gebauten Stand, falls eine gültige Ablage existiert
+    (AK1: sofortige Anzeige nach Neustart, ohne auf den nächsten Hintergrund-Bau
+    zu warten). Gibt es noch keine Ablage (frischer Server, AK2) oder ist sie
+    beschädigt/unvollständig/unlesbar (AK4), bleiben die Modul-Globals
+    unverändert (None/leer) — der Server verhält sich dann exakt wie ohne
+    Disk-Cache, kein Absturz, nur ein Log-Hinweis im Fehlerfall. Ein einzelnes
+    fehlendes PNG (z.B. durch einen Absturz mitten im vorherigen Schreibvorgang)
+    lässt nur diese eine Stunde als `None` erscheinen (identisch zum bestehenden
+    Lücken-Verhalten des Prozess-Caches selbst) statt die gesamte Ablage zu
+    verwerfen.
+    """
+    global _weather_map_cache, _weather_map_png, _weather_map_updated_at
+
+    if not _WEATHER_MAP_CACHE_META.exists():
+        logger.info("TASK-54 Kein Wetterkarten-Disk-Cache vorhanden — Ist-Zustand (leer bis zum ersten Bau).")
+        return False
+
+    try:
+        meta = json.loads(_WEATHER_MAP_CACHE_META.read_text(encoding="utf-8"))
+        field_counts = meta.get("field_counts", {})
+
+        png_data: dict = {}
+        for field in ("cloud", "precip"):
+            n = int(field_counts.get(field, 0))
+            field_dir = _WEATHER_MAP_CACHE_DIR / field
+            frames: list = []
+            for idx in range(n):
+                path = field_dir / f"{idx}.png"
+                frames.append(path.read_bytes() if path.exists() else None)
+            png_data[field] = frames
+
+        updated_at_raw = meta.get("updated_at")
+        updated_at = datetime.fromisoformat(updated_at_raw) if updated_at_raw else None
+
+        _weather_map_cache = {
+            "bounds": meta["bounds"],
+            "hourly_times": meta["hourly_times"],
+            "sources": meta["sources"],
+            "n_points": meta.get("n_points", 0),
+            "attribution": meta["attribution"],
+            "attribution_url": meta["attribution_url"],
+        }
+        _weather_map_png = png_data
+        _weather_map_updated_at = updated_at
+        logger.info("TASK-54 Wetterkarten-Cache von Disk geladen (Bau: %s)", updated_at_raw or "?")
+        return True
+    except Exception as e:
+        logger.warning("TASK-54 Wetterkarten-Disk-Cache konnte nicht geladen werden "
+                        "(beschädigt/unvollständig?) — Server startet wie ohne Cache: %s", e)
+        return False
 
 
 async def _refresh_discover() -> None:
@@ -844,6 +910,14 @@ def _build_opportunity_title(event_type_label: str, location_id) -> str:
     location = get_location_by_id(location_id) if location_id else None
     subject_name = getattr(location, "subject_name", None) if location else None
     if not subject_name:
+        # BUG-95: Diagnose-Logging NUR im Fallback-Zweig (kein Logging bei jedem
+        # normalen Aufruf, sonst zu viel Rauschen) — Location-Kennung + Event-Typ auf
+        # INFO-Level, damit ein künftiger Einzelfall (leerer Motivname zur Laufzeit) in
+        # Minuten statt tagelanger Recherche geklärt werden kann.
+        logger.info(
+            "BUG-95 Diagnose: kein Motivname für Titel-Fallback (location_id=%s, event_type=%s)",
+            location_id, event_type_label,
+        )
         return event_type_label
     return f"{event_type_label} über {subject_name}"
 
@@ -1612,13 +1686,19 @@ def _build_weather_error_message(
     return "Wetter: Fehler — " + "; ".join(parts)
 
 
-async def _weather_overlay() -> None:
+async def _weather_overlay(triggered_by: str = "cron") -> None:
     """
     Holt Wetter-Daten für Events in den nächsten 3 Tagen und
     aktualisiert weather_score + overall_score in _feed_cache.
     Schnell: nur wenige Locations, nur 7-Tage-Forecast.
+
+    triggered_by: BUG-106 (AK4) — Herkunft des Laufs fürs Log ("startup" |
+    "cron", Default "cron" für Cron-/Precompute-Läufe), damit ein Abbruch kurz
+    nach einem Deploy im Log nicht mit einem echten API-Ausfall verwechselt wird.
     """
     global _weather_updated_at
+
+    logger.info("Wetter-Overlay-Lauf gestartet (Auslöser: %s)", triggered_by)
 
     t0 = _job_start("weather")
     if not _feed_cache:
@@ -1758,6 +1838,74 @@ async def _weather_overlay_single(loc_id: str) -> bool:
     return all_ok
 
 
+def _persist_weather_map_cache() -> None:
+    """TASK-54 (AK1/AK5): Schreibt den aktuellen Prozess-Cache der Wetterkarte
+    atomar auf die Festplatte (`backend/data/cache/weather_map/`), damit ein
+    Server-Neustart die zuletzt erfolgreich berechnete Karte sofort wieder
+    anzeigen kann (`_load_weather_map_cache_from_disk()`), statt bis zum
+    nächsten Hintergrund-Bau leer zu bleiben. Wird direkt im Erfolgspfad von
+    `_build_weather_map()` aufgerufen, nach dem Setzen der In-Memory-Variablen.
+
+    Atomares Schreiben (tmp-Datei + `os.replace()`, Pre-Mortem-Szenario 1):
+    verhindert eine halb geschriebene, korrupte Cache-Datei, falls der Prozess
+    exakt während des Schreibens abstürzt. Feste Overwrite-Semantik (AK5,
+    Pre-Mortem-Szenario 5): alte Bilder eines vorherigen Baus werden vor dem
+    Schreiben der neuen entfernt, keine Historie/Rotation — der Speicherbedarf
+    bleibt dadurch konstant (~144 Bilder, niedriger einstelliger MB-Bereich).
+    Kein zusätzlicher Lock nötig (Pre-Mortem-Szenario 3): der bestehende
+    Single-Flight-Guard `_weather_map_building` verhindert bereits, dass zwei
+    Bauläufe gleichzeitig hier ankommen. Rein additiv zum laufenden Server:
+    schlägt das Schreiben fehl, bleibt der Prozess-Cache unberührt — nur ein
+    geloggter Fehler, kein Raise (der Kartenbau selbst darf daran nie scheitern).
+    """
+    if _weather_map_cache is None:
+        return
+    try:
+        _WEATHER_MAP_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        field_counts = {}
+        for field in ("cloud", "precip"):
+            field_dir = _WEATHER_MAP_CACHE_DIR / field
+            field_dir.mkdir(parents=True, exist_ok=True)
+            # Alte Bilder eines vorherigen Baus entfernen (feste Overwrite-
+            # Semantik, AK5) — sonst wüchse die Ablage über mehrere Bauläufe
+            # mit unterschiedlicher Stundenzahl unbegrenzt an.
+            for old in field_dir.glob("*.png"):
+                try:
+                    old.unlink()
+                except OSError:
+                    pass
+
+            frames = _weather_map_png.get(field, [])
+            field_counts[field] = len(frames)
+            for idx, png_bytes in enumerate(frames):
+                if not png_bytes:
+                    continue
+                target = field_dir / f"{idx}.png"
+                tmp = field_dir / f".{idx}.png.tmp"
+                tmp.write_bytes(png_bytes)
+                _os.replace(tmp, target)
+
+        meta = {
+            "bounds": _weather_map_cache["bounds"],
+            "hourly_times": _weather_map_cache["hourly_times"],
+            "sources": _weather_map_cache["sources"],
+            "n_points": _weather_map_cache.get("n_points", 0),
+            "attribution": _weather_map_cache["attribution"],
+            "attribution_url": _weather_map_cache["attribution_url"],
+            "updated_at": _weather_map_updated_at.isoformat() if _weather_map_updated_at else None,
+            "field_counts": field_counts,
+        }
+        meta_tmp = _WEATHER_MAP_CACHE_DIR / ".meta.json.tmp"
+        meta_tmp.write_text(json.dumps(meta), encoding="utf-8")
+        _os.replace(meta_tmp, _WEATHER_MAP_CACHE_META)
+        logger.info("TASK-54 Wetterkarten-Cache persistiert: %d Bilder (cloud) / %d Bilder (precip)",
+                    sum(1 for b in _weather_map_png.get("cloud", []) if b),
+                    sum(1 for b in _weather_map_png.get("precip", []) if b))
+    except Exception as e:
+        logger.warning("TASK-54 Wetterkarten-Cache konnte nicht auf Disk persistiert werden "
+                        "(Prozess-Cache bleibt unberührt): %s", e)
+
+
 async def _build_weather_map() -> None:
     """US-112: Baut das Wetter-Karten-Overlay (weicher Verlauf) im Hintergrund.
 
@@ -1765,6 +1913,10 @@ async def _build_weather_map() -> None:
     interpoliert je Stunde zu einem PNG (Wolken + Niederschlag) und legt alles im
     Prozess-Cache ab. Robust: fällt eine Quelle aus, bleiben die anderen gültig.
     Wird nie aus dem Request-Pfad direkt awaited (kann ~Sekunden bis Minuten dauern).
+
+    TASK-54: Nach erfolgreichem Bau wird der neue Stand zusätzlich per
+    `_persist_weather_map_cache()` auf Disk gesichert (AK1/AK5) — rein additiv,
+    ändert nichts am bisherigen Prozess-Cache-Verhalten.
     """
     global _weather_map_cache, _weather_map_png, _weather_map_updated_at, _weather_map_building
 
@@ -1793,12 +1945,40 @@ async def _build_weather_map() -> None:
         _weather_map_updated_at = datetime.now(timezone.utc)
         logger.info("US-112 Wetter-Karte gebaut: %d Stützpunkte, Quellen=%s",
                     overlay["n_points"], overlay["sources"])
+        _persist_weather_map_cache()
         _job_done("weather-map", t0)
     except Exception as exc:
         logger.warning("US-112 Wetter-Karten-Bau fehlgeschlagen: %s", exc)
         _job_done("weather-map", t0)
     finally:
         _weather_map_building = False
+
+
+_STARTUP_WEATHER_MAP_DELAY_S = 30.0
+"""
+BUG-106 (2026-08-16, Weg-Gate Stephan — Option B): Beim Server-Start liefen
+_weather_overlay() und _build_weather_map() bisher zeitgleich als zwei parallele
+Hintergrund-Tasks und konkurrierten um Ressourcen — code-verifiziert der Grund,
+warum ausgerechnet der Start-Lauf eher an das bestehende 180s-Zeitbudget
+(WEATHER_OVERLAY_MAX_TOTAL_SECONDS, BUG-99) stieß (BACKLOG.md BUG-106). Analog zum
+bereits etablierten 20-Minuten-Abstand im eingeschwungenen 3h-Cron (siehe
+_startup_setup_scheduler, minute=0 vs. minute=20) wird der Karten-Bau beim Start
+um eine kurze Verzögerung nach hinten verschoben statt sofort parallel zu laufen.
+Bewusst deutlich kürzer als 20 Minuten (kein 3h-Rhythmus-Grund hier einschlägig,
+siehe Pre-Mortem) — lang genug, dass _weather_overlay() seine Netzwerk-Abrufe
+bereits gestartet hat, bevor der zusätzliche, CPU-lastige Karten-Bau einsetzt.
+"""
+
+
+async def _delayed_build_weather_map() -> None:
+    """BUG-106: Verzögerter Start-Wrapper für _build_weather_map(), s.o.
+
+    Nur für den Start-Pfad relevant — der 3h-Cron ruft _build_weather_map()
+    weiterhin direkt über den Scheduler auf (eigener, dort bereits bestehender
+    20-Minuten-Abstand, unverändert).
+    """
+    await asyncio.sleep(_STARTUP_WEATHER_MAP_DELAY_S)
+    await _build_weather_map()
 
 
 def _finalize_pending(loc_id: str) -> None:
@@ -2423,6 +2603,15 @@ async def startup() -> None:
     # 1. JSON-Caches laden (sofort)
     cache_ok = _load_caches()
 
+    # TASK-54: Zuletzt persistierten Wetterkarten-Cache von Disk laden (falls
+    # vorhanden) — gleicher synchroner Ladezeitpunkt wie die anderen Caches
+    # oben, damit der Karten-Tab nach einem Neustart sofort die letzte
+    # erfolgreich gebaute Karte zeigt (AK1), statt bis zum nächsten
+    # Hintergrund-Bau leer zu bleiben. Bewusst vor dem Test-/Sandbox-Kurzschluss
+    # unten, damit dieser rein synchrone Ladeschritt (kein Netzwerk) auch dort
+    # geprüft werden kann.
+    _load_weather_map_cache_from_disk()
+
     # Test-/Sandbox-Modus: hier abbrechen — keine Hintergrundjobs, kein Netzwerk, kein
     # Scheduler. Synchron geladene Daten (Locations, Overrides, Caches) stehen den
     # Endpoints zur Verfügung; alles Asynchrone/Periodische wird übersprungen.
@@ -2431,11 +2620,13 @@ async def startup() -> None:
         return
 
     # 2. Wetter-Overlay für T+0..T+3 (schnell, ~5s)
-    asyncio.create_task(_weather_overlay())
+    asyncio.create_task(_weather_overlay(triggered_by="startup"))
 
     # US-112: Wetter-Karten-Overlay (DWD ICON + MET Norway → PNG je Stunde) im
     # Hintergrund vorbauen, damit der Map-Tab beim ersten Einschalten schon Daten hat.
-    asyncio.create_task(_build_weather_map())
+    # BUG-106: nicht mehr zeitgleich mit dem Wetter-Overlay-Task oben starten, s.
+    # _delayed_build_weather_map()/_STARTUP_WEATHER_MAP_DELAY_S für den Hintergrund.
+    asyncio.create_task(_delayed_build_weather_map())
 
     # 2b. Scout-Cache laden (falls vorhanden) und ggf. neu berechnen
     _startup_check_discover_schema()
@@ -3456,6 +3647,7 @@ async def preview_alignment(req: PreviewAlignmentRequest, request: Request = Non
                         subject_height_m=req.subject_height_m, subject_width_m=req.subject_width_m,
                         target_date=target_date, body=body,
                         az_tolerance_deg=4.0, min_quality=0.15,
+                        elevation_difference_m=elevation_difference_m,
                     )
                     result.extend(aligns)
                 except Exception as e:
@@ -3781,6 +3973,17 @@ def _validate_patch_fields(allowed: dict) -> dict:
     normalisierten Dict zurück — MUSS vor dem target_loc-Lookup in patch_location() aufgerufen
     werden, sonst kippt die Fehler-Präzedenz für ungültige Felder gegen eine nicht-existente
     loc_id von 422 auf 404."""
+    # BUG-95: Nicht-Leer-Prüfung für Textfelder, die inhaltlich nicht leer sein dürfen
+    # (name, subject_name) — analog zum bestehenden Client-seitigen "Name"-Check, jetzt
+    # auch serverseitig, damit ein direkter API-Aufruf die Prüfung nicht umgehen kann.
+    # description/special_notes sind bewusst NICHT in dieser Menge, da sie legitim leer
+    # sein dürfen. Whitespace-only zählt ebenfalls als leer (erst trimmen, dann prüfen).
+    REQUIRED_NON_EMPTY_TEXT_FIELDS = {"name", "subject_name"}
+    for f in REQUIRED_NON_EMPTY_TEXT_FIELDS & TEXT_FIELDS & allowed.keys():
+        val = allowed[f]
+        if not isinstance(val, str) or not val.strip():
+            raise HTTPException(status_code=422, detail=f"{f} darf nicht leer sein.")
+
     # Koordinaten validieren
     for f in COORD_FIELDS & allowed.keys():
         val = allowed[f]
