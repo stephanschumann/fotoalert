@@ -360,9 +360,9 @@ FAIL: 1 Finding(s)
 
 **Umgesetzter Fix:** In `_check_bug88_sightline_nicht_geprueft_escalation` (`backend/tests/frontend/run_frontend_check.py`) wird nach einem Timeout des `Feed.data.length > 0`-Waits jetzt zusätzlich `Feed.data.length` direkt abgefragt: ist es tatsächlich `0`, gibt es einen dokumentierten Skip (Konsolenausgabe + `return findings`) statt eines Findings — analog zum bestehenden Muster der drei anderen Checks. Bleibt `Feed.data.length` nach dem Timeout aus einem anderen Grund uneindeutig (kein leerer Feed, aber trotzdem nicht bereit), bleibt es weiterhin ein echtes Finding, damit ein tatsächlicher Bug nicht stillschweigend verschluckt wird. Reine Testskript-Änderung, kein Eingriff in `web/index.html` oder sonstigen Produktivcode.
 
-**Status:** bleibt In Test (`[~]`) bis zur erfolgreichen Deploy-Verifikation. **Ampel:** bleibt 🟢 Grün (reine Testskript-Korrektur, kein Eingriff in Produktivcode).
+**Status:** Done — Fix committet (`06b5ccf`), GitHub-Actions-Lauf [#329](https://github.com/stephanschumann/fotoalert/actions/runs/32164194591) durchgehend grün (Frontend-Check 3m42s, Backend-Tests 3m10s, Deploy 23s), Live-Server läuft auf v1.22.66. **Ampel:** 🟢 Grün.
 
-**Testplan (Korrektur 4):** Fix committen und pushen, GitHub-Actions-Lauf für den neuen Commit abwarten — erwartet: Job „Frontend-Check (Playwright)" grün, Job „Deploy FotoAlert" läuft durch, Live-Server zeigt anschließend Version 1.22.66.
+**Testplan (Korrektur 4) — durchgeführt (18.08.2026):** Fix committet und gepusht, GitHub-Actions-Lauf #329 real beobachtet: alle drei Jobs grün, Deploy tatsächlich gelaufen (nicht übersprungen). Live-Verifikation im Browser (Chrome-Subagent) im Anschluss bestätigt: `APP_VERSION` liefert `1.22.66` (nach Bereinigung eines veralteten Service-Worker-Caches, der zunächst noch 1.22.65 auslieferte — bekannter, selbstauflösender SW-Stolperstein), Feed lädt ohne Fehler, BUG-87/BUG-88 live sichtbar (Filter-Chip „Daten fehlen", Tag-Farbe `#c07a16` = `var(--orange)`, Icon `#i-warn` statt `#i-eye`). Damit ist die ursprüngliche TASK-107-Fragestellung (Onboarding-Dismiss deckt Kalender-/Feed-Prüfung bei kaltem Serverstart nicht ab) über alle vier Korrekturrunden hinweg vollständig und real (nicht nur lokal) verifiziert.
 
 ---
 
