@@ -352,6 +352,18 @@ FAIL: 1 Finding(s)
 
 **Testplan (Korrektur 3):** Server neu starten (kalt, kein Vorwärmen) und `python3 backend/tests/frontend/run_frontend_check.py --base-url http://localhost:8000` erneut auf Stephans Mac laufen lassen. Erwartet: Idealerweise erscheint jetzt GAR KEIN Finding mehr in `findings.json` — alle drei bisherigen Findings (`calendar_shows_events_or_empty_state`, `bug88_feed_data_ready`, `bug88_feed_card_rendered`) wären damit behoben. Taucht dennoch etwas auf, ist das ein viertes, bisher unbekanntes Problem und braucht eine eigene Nachuntersuchung.
 
+### Korrektur 4 (18.08.2026)
+
+**Viertes Finding, diesmal erst im echten CI-Lauf sichtbar geworden:** Die lokale Verifikation auf Stephans (bereits warmem, dauerhaft laufendem) Mac-Server zeigte nach Korrektur 1-3 „OK: keine Findings." Der anschließende Release-Versuch (v1.22.66, Commit 811bd0f/100a810) löste den ersten ECHTEN CI-Lauf über dieses Testskript aus — GitHub-Actions-Lauf [#328](https://github.com/stephanschumann/fotoalert/actions/runs/32148714299) scheiterte im Job „Frontend-Check (Playwright)" erneut an `bug88_feed_data_ready`, diesmal mit einer anderen Fehlermeldung als beim ursprünglichen Fund: `Page.wait_for_function: Timeout 12000ms exceeded`. Der Job „Deploy FotoAlert" wurde dadurch übersprungen — **kein Live-Deploy erfolgt**, der Server lief unverändert auf der alten Version weiter (kein Schaden, nur kein Fortschritt).
+
+**Root Cause (code-verifiziert, kein Timing-Problem):** `.github/workflows/deploy.yml` setzt im `test-frontend`-Job explizit `FOTOALERT_NO_BACKGROUND: "1"`. Laut `backend/main.py` Zeile ~2618 bedeutet das: „Startup ohne Scheduler/Precompute/Netzwerk (Test-Modus)" — Precompute läuft in diesem CI-Job grundsätzlich **nie**, `Feed.data` bleibt dort strukturell dauerhaft leer. Anders als beim Kalender-Fund in Korrektur 2 (dort half ein längeres Timeout, weil der Server dort tatsächlich noch fertig rechnete) würde hier auch ein beliebig langes Timeout nichts bringen — es kommen schlicht nie Daten. Drei andere Checks in derselben Datei (`filter_reduces_results`, `event_detail_from_feed_card`, `hasimage_effect_on_locations`) kennen dieses CI-Verhalten bereits und überspringen sich bei leerem Feed mit einer dokumentierten Meldung statt einem harten Finding — `_check_bug88_sightline_nicht_geprueft_escalation` hatte dieses Skip-Muster bisher nicht.
+
+**Umgesetzter Fix:** In `_check_bug88_sightline_nicht_geprueft_escalation` (`backend/tests/frontend/run_frontend_check.py`) wird nach einem Timeout des `Feed.data.length > 0`-Waits jetzt zusätzlich `Feed.data.length` direkt abgefragt: ist es tatsächlich `0`, gibt es einen dokumentierten Skip (Konsolenausgabe + `return findings`) statt eines Findings — analog zum bestehenden Muster der drei anderen Checks. Bleibt `Feed.data.length` nach dem Timeout aus einem anderen Grund uneindeutig (kein leerer Feed, aber trotzdem nicht bereit), bleibt es weiterhin ein echtes Finding, damit ein tatsächlicher Bug nicht stillschweigend verschluckt wird. Reine Testskript-Änderung, kein Eingriff in `web/index.html` oder sonstigen Produktivcode.
+
+**Status:** bleibt In Test (`[~]`) bis zur erfolgreichen Deploy-Verifikation. **Ampel:** bleibt 🟢 Grün (reine Testskript-Korrektur, kein Eingriff in Produktivcode).
+
+**Testplan (Korrektur 4):** Fix committen und pushen, GitHub-Actions-Lauf für den neuen Commit abwarten — erwartet: Job „Frontend-Check (Playwright)" grün, Job „Deploy FotoAlert" läuft durch, Live-Server zeigt anschließend Version 1.22.66.
+
 ---
 
 ### BUG-106 · Wetter-Overlay-Job: Nach Server-Neustart kalter Cache kollidiert mit 180s-Zeitbudget (BUG-99) — viele Events bleiben ohne Wetterdaten `[x]`

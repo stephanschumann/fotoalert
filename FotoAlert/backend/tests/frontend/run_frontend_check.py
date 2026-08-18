@@ -2195,10 +2195,6 @@ def _check_bug88_sightline_nicht_geprueft_escalation(page, commit: str, shot) ->
     )
     try:
         page.wait_for_selector(_spec.FEED_CONTENT_SELECTOR, timeout=8000)
-        page.wait_for_function(
-            "() => typeof Feed !== 'undefined' && Array.isArray(Feed.data) && Feed.data.length > 0",
-            timeout=12000,
-        )
     except Exception as e:
         findings.append(
             Finding(
@@ -2206,6 +2202,46 @@ def _check_bug88_sightline_nicht_geprueft_escalation(page, commit: str, shot) ->
                 assertion_id="bug88_feed_data_ready",
                 expected="Feed.data mit mindestens einer Chance geladen",
                 actual="Feed nicht bereit: {0}".format(e),
+                message="feed data not ready for BUG-88 escalation check",
+                screenshot_path=shot("bug88-feed-not-ready"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    try:
+        page.wait_for_function(
+            "() => typeof Feed !== 'undefined' && Array.isArray(Feed.data) && Feed.data.length > 0",
+            timeout=12000,
+        )
+    except Exception:
+        # TASK-107 (Korrektur 4): kein hartes Finding mehr bei dauerhaft leerem Feed.
+        # Root Cause (CI-Lauf #328, 2026-08-18): .github/workflows/deploy.yml setzt im
+        # test-frontend-Job FOTOALERT_NO_BACKGROUND=1, wodurch main.py Precompute komplett
+        # überspringt (Zeile ~2618) — Feed.data bleibt dort strukturell dauerhaft leer,
+        # kein Timing-Problem, das ein längeres Timeout lösen würde (anders als beim
+        # Kalender-Fund in Korrektur 2). Analog zum bestehenden Skip-Muster bei
+        # filter_reduces_results/event_detail_from_feed_card/hasimage_effect_on_locations:
+        # dokumentierter Skip, wenn Feed.data nachweislich leer ist; alle anderen Fehler
+        # (z.B. Feed-Objekt kaputt) bleiben weiterhin ein echtes Finding.
+        feed_len = page.evaluate(
+            "() => (typeof Feed !== 'undefined' && Array.isArray(Feed.data)) ? Feed.data.length : -1"
+        )
+        if feed_len == 0:
+            print(
+                "[feed] bug88_feed_data_ready: übersprungen, Feed.data leer — "
+                "vermutlich FOTOALERT_NO_BACKGROUND in CI (kein Precompute-Lauf)"
+            )
+            return findings
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_feed_data_ready",
+                expected="Feed.data mit mindestens einer Chance geladen",
+                actual="Feed nicht bereit (Feed.data.length={0} nach Timeout, kein leerer-Feed-Fall)".format(
+                    feed_len
+                ),
                 message="feed data not ready for BUG-88 escalation check",
                 screenshot_path=shot("bug88-feed-not-ready"),
                 timestamp=_now_iso(),
