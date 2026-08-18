@@ -21,6 +21,7 @@ from pathlib import Path
 from discover import moon_pipeline, sun_pipeline
 from discover.pipeline_base import ScoutOpportunity, clear_weather_cache
 from discover.accessibility import filter_accessible_candidates
+from discover.subjects import refresh_subjects
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +36,15 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
     Gibt eine nach Score absteigende Gesamtliste zurück.
     Ein Fehler in einer Pipeline bricht die anderen nicht ab.
     """
+    # BUG-102: Motiv-/Ausschlusszonen-Daten zu Beginn jedes vollständigen
+    # Scout-Laufs frisch aus dem aktuellen Standort-Bestand ableiten, statt
+    # der beim ersten Modul-Import berechneten Momentaufnahme. Läuft am
+    # gemeinsamen Eintrittspunkt aller vier Auslöser (Endpoint, Cron,
+    # Server-Start, Debounce-Trigger) und damit innerhalb derselben
+    # Fehlerbehandlung wie der restliche Lauf (siehe main.py::_refresh_discover(),
+    # try/except um refresh_discover_cache() -> run_pipeline()).
+    refresh_subjects()
+
     clear_weather_cache()
 
     moon_result, sun_result = await asyncio.gather(

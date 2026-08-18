@@ -815,6 +815,19 @@ SCOUT_ACCESS_CACHE_COORD_TOLERANCE_DEG: float = 5e-4
 # Location-Bearbeitung), den Live-Call nicht jedes Mal neu auslösen.
 SCOUT_ACCESS_CACHE_TTL_DAYS: float = 7.0
 
+# BUG-103: analog zu precompute.py ALGORITHM_VERSION (dort Zeile ~60,
+# produktiv bewährt seit BUG-93) — Bump NUR bei Änderungen an der Rohdaten-
+# Erzeugung für einen Standpunkt (fetch_scout_accessibility_data(), z.B. dem
+# US-135-Ringschluss-Fix vom 09.08.2026), NICHT bei reinen Änderungen an der
+# nachgelagerten Filterlogik (is_sightline_blocked_by_*() werten die
+# gespeicherten Rohdaten bei jedem Aufruf ohnehin frisch aus, siehe BUG-103
+# Architektur-Analyse). Ohne dieses Feld blieb ein bereits vor einem
+# Logik-Fix gecachter Eintrag bis zu SCOUT_ACCESS_CACHE_TTL_DAYS unverändert
+# gültig — selbst ein Server-Neustart half nicht, weil der Cache erst beim
+# ersten tatsächlichen Zugriff danach unverändert von Platte gelesen wird
+# (Root Cause, realer Fall Pfaueninsel 08./09.08.2026).
+SCOUT_ACCESS_CACHE_VERSION: str = "1.0"
+
 _scout_access_cache_lock = threading.Lock()
 _scout_access_cache_entries: Optional[List[dict]] = None
 
@@ -862,23 +875,58 @@ def _save_scout_access_cache() -> None:
                         SCOUT_ACCESS_CACHE_PATH, e)
 
 
+def _scout_access_coords_match(
+    entry: dict,
+    observer_lat: float, observer_lon: float,
+    subject_lat: float, subject_lon: float,
+) -> bool:
+    """BUG-103: gemeinsame Koordinaten-Toleranzprüfung für Lese-
+    (_find_scout_access_cache_entry, inkl. TTL/Versionsprüfung) und
+    Schreibpfad (get_scout_accessibility_data: alten Eintrag für dieselbe
+    Koordinate ersetzen statt anhängen) — vermeidet doppelte Toleranz-Logik.
+    Bewusst OHNE TTL-/Versionsprüfung: beim Ersetzen soll JEDER, auch ein
+    bereits abgelaufener oder versions-veralteter Alteintrag für dieselbe
+    Koordinate entfernt werden (BUG-103 AK4)."""
+    tol = SCOUT_ACCESS_CACHE_COORD_TOLERANCE_DEG
+    if abs((entry.get("observer_lat") or 0.0) - observer_lat) >= tol:
+        return False
+    if abs((entry.get("observer_lon") or 0.0) - observer_lon) >= tol:
+        return False
+    if abs((entry.get("subject_lat") or 0.0) - subject_lat) >= tol:
+        return False
+    if abs((entry.get("subject_lon") or 0.0) - subject_lon) >= tol:
+        return False
+    return True
+
+
 def _find_scout_access_cache_entry(
     observer_lat: float, observer_lon: float,
     subject_lat: float, subject_lon: float,
 ) -> Optional[dict]:
-    """Sucht einen noch gültigen (TTL, SCOUT_ACCESS_CACHE_TTL_DAYS) Treffer
-    innerhalb der groben Cluster-Koordinatentoleranz. Kein Treffer -> None,
-    der Aufrufer holt die Daten dann live."""
-    tol = SCOUT_ACCESS_CACHE_COORD_TOLERANCE_DEG
+    """Sucht einen noch gültigen (TTL, SCOUT_ACCESS_CACHE_TTL_DAYS; BUG-103:
+    UND passender SCOUT_ACCESS_CACHE_VERSION) Treffer innerhalb der groben
+    Cluster-Koordinatentoleranz. Kein Treffer -> None, der Aufrufer holt die
+    Daten dann live."""
     now = datetime.now(timezone.utc)
     for entry in _load_scout_access_cache():
-        if abs((entry.get("observer_lat") or 0.0) - observer_lat) >= tol:
+        if not _scout_access_coords_match(
+            entry, observer_lat, observer_lon, subject_lat, subject_lon,
+        ):
             continue
-        if abs((entry.get("observer_lon") or 0.0) - observer_lon) >= tol:
-            continue
-        if abs((entry.get("subject_lat") or 0.0) - subject_lat) >= tol:
-            continue
-        if abs((entry.get("subject_lon") or 0.0) - subject_lon) >= tol:
+        # BUG-103: ein Eintrag aus einer älteren Berechnungslogik-Version
+        # (oder ganz ohne Versionsfeld — alle vor diesem Fix gespeicherten
+        # Bestandseinträge, AK5) gilt wie ein Cache-Miss, unabhängig von der
+        # TTL. Lazy-Check hier beim Lesen, bewusst KEINE Eager-Validierung
+        # aller Einträge beim Serverstart (Performance bei ~1,8 GB Cache-
+        # Datei, siehe BUG-103 Code-Verifikation).
+        if entry.get("algorithm_version") != SCOUT_ACCESS_CACHE_VERSION:
+            logger.info(
+                "US-135 Zugänglichkeits-Cache-Eintrag verworfen (Versions-"
+                "Mismatch: gespeichert=%s, aktuell=%s) für Standpunkt "
+                "(%s,%s) / Motiv (%s,%s) — wird live neu geprüft",
+                entry.get("algorithm_version"), SCOUT_ACCESS_CACHE_VERSION,
+                observer_lat, observer_lon, subject_lat, subject_lon,
+            )
             continue
         try:
             cached_at = datetime.fromisoformat(entry.get("cached_at"))
@@ -1108,12 +1156,28 @@ def get_scout_accessibility_data(
         "subject_lat": subject_lat,
         "subject_lon": subject_lon,
         "cached_at": datetime.now(timezone.utc).isoformat(),
+        # BUG-103: markiert, mit welchem Berechnungslogik-Stand dieser
+        # Eintrag erzeugt wurde — geprüft von _find_scout_access_cache_entry.
+        "algorithm_version": SCOUT_ACCESS_CACHE_VERSION,
         "data": data,
     }
     global _scout_access_cache_entries
     with _scout_access_cache_lock:
         if _scout_access_cache_entries is None:
             _scout_access_cache_entries = []
+        # BUG-103 AK4: einen etwaigen alten Eintrag für dieselbe Koordinate
+        # (unabhängig von dessen TTL/Version) ERSETZEN statt zusätzlich
+        # anhängen — behebt neben der Stale-Cache-Ursache auch das
+        # unbegrenzte Wachstum der Cache-Datei (Root Cause: ≈1,8 GB bei nur
+        # ≈2000 Einträgen, weil bisher jeder Miss nur angehängt wurde).
+        # Innerhalb desselben bestehenden _scout_access_cache_lock wie das
+        # bisherige Anhängen, kein neuer Race zwischen Lesen und Schreiben.
+        _scout_access_cache_entries = [
+            e for e in _scout_access_cache_entries
+            if not _scout_access_coords_match(
+                e, observer_lat, observer_lon, subject_lat, subject_lon,
+            )
+        ]
         _scout_access_cache_entries.append(entry)
         _save_scout_access_cache()
     return data
@@ -1145,6 +1209,57 @@ def is_sightline_blocked_by_buildings(
         c_lon = sum(n[1] for n in nodes) / len(nodes)
         dist_to_building = _scout_access_haversine_m(observer_lat, observer_lon, c_lat, c_lon)
         if dist_to_building <= 0 or dist_to_building >= subject_dist:
+            continue  # nicht zwischen Standpunkt und Motiv
+        span = _footprint_angular_span(observer_lat, observer_lon, nodes)
+        if not span:
+            continue
+        span_min, span_max = span
+        width = (span_max - span_min) % 360.0
+        offset = (subject_bearing - span_min) % 360.0
+        if offset <= width:
+            return True
+    return False
+
+
+def is_sightline_blocked_by_vegetation(
+    observer_lat: float,
+    observer_lon: float,
+    subject_lat: float,
+    subject_lon: float,
+    forest_ways: List[dict],
+) -> bool:
+    """BUG-101: grobe 2D-Sichtlinien-Blockprüfung durch Wald/Bäume, analog zu
+    is_sightline_blocked_by_buildings() — verwendet dieselbe grobe
+    Winkelbereichs-Logik (_footprint_angular_span) auf den bereits geladenen
+    forest_ways (US-135 fetch_scout_accessibility_data/get_scout_
+    accessibility_data), ohne zusätzliche Overpass-Anfrage (BUG-101 AK7).
+
+    Unterschied zu is_sightline_blocked_by_buildings(): dort wird eine
+    Distanz von 0 zum Flächenschwerpunkt übersprungen (Gebäude, in denen ein
+    Standpunkt liegt, kommen praktisch nicht vor). Bei Wald ist das der
+    Regelfall — US-135 Regel 2 kennt den Standpunkt "mitten im Wald" bereits
+    für die Zugänglichkeitsprüfung, und BUG-101 AK1 verlangt genau diesen
+    Fall auch für die Sichtprüfung ("Standpunkt liegt innerhalb eines
+    Wald-Polygons, dessen Winkelbereich die Peilung zum Motiv abdeckt").
+    Deshalb wird hier NUR auf "Waldfläche liegt nicht zwischen Standpunkt und
+    Motiv" geprüft (dist_to_forest >= subject_dist), nicht zusätzlich auf
+    dist_to_forest <= 0.
+
+    True, wenn mindestens eine Waldfläche zwischen Standpunkt und Motiv
+    liegt (oder der Standpunkt selbst darin bzw. an ihrem Flächenschwerpunkt
+    liegt) UND ihr horizontaler Winkelbereich vom Standpunkt aus gesehen die
+    Peilung zum Motiv vollständig überdeckt."""
+    subject_bearing = _norm(bearing_between(observer_lat, observer_lon, subject_lat, subject_lon))
+    subject_dist = _scout_access_haversine_m(observer_lat, observer_lon, subject_lat, subject_lon)
+
+    for f in forest_ways:
+        nodes = f.get("nodes") or []
+        if len(nodes) < 3:
+            continue
+        c_lat = sum(n[0] for n in nodes) / len(nodes)
+        c_lon = sum(n[1] for n in nodes) / len(nodes)
+        dist_to_forest = _scout_access_haversine_m(observer_lat, observer_lon, c_lat, c_lon)
+        if dist_to_forest >= subject_dist:
             continue  # nicht zwischen Standpunkt und Motiv
         span = _footprint_angular_span(observer_lat, observer_lon, nodes)
         if not span:

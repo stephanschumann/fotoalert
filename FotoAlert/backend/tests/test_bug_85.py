@@ -69,7 +69,9 @@ from __future__ import annotations
 import os
 import sys
 import urllib.request
+from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -159,15 +161,28 @@ def _inject_today_entry(page, event_type: str, overall_score: float = 0.9):
 
 def _inject_tomorrow_only_entry(page, event_type: str):
     """Ersetzt `Feed.data` durch genau 1 synthetischen Eintrag für "Morgen" (nie
-    "Heute") — für den weiterhin gültigen (nicht gebuggten) Tagline-Fall."""
+    "Heute") — für den weiterhin gültigen (nicht gebuggten) Tagline-Fall.
+
+    BUG-105: Der Zielzeitpunkt wird bewusst in Python berechnet, nicht im
+    Browser-JS von `page.evaluate()` — das liefe in der lokalen Zeitzone des
+    Test-Runners (in CI UTC), während die App "Heute"/"Morgen" fest gegen
+    Europe/Berlin klassifiziert (`formatDate()` in web/index.html). Um das
+    frühere Risikofenster um die Berliner Tagesgrenze (~22:00-00:00 UTC)
+    strukturell auszuschließen, liegt der Zielzeitpunkt auf Berlin-Mittag
+    (12:00) — maximaler 12h-Sicherheitsabstand zur Tagesgrenze in beide
+    Richtungen, übersteht auch den Sommerzeit-Wechsel. Ein künftiger Rotlauf
+    dieses Tests ist damit kein Zeitzonen-Fehlalarm mehr, sondern eine echte
+    Regression."""
+    berlin_tomorrow_noon = (
+        datetime.now(ZoneInfo("Europe/Berlin")) + timedelta(days=1)
+    ).replace(hour=12, minute=0, second=0, microsecond=0)
+    tomorrow_iso = berlin_tomorrow_noon.isoformat()
     page.evaluate(
-        """(eventType) => {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(20, 0, 0, 0);
+        """(args) => {
+            const [eventType, shootTime] = args;
             Feed.data = [{
                 event_type: eventType,
-                shoot_time: tomorrow.toISOString(),
+                shoot_time: shootTime,
                 overall_score: 0.9,
                 alert_priority: 0,
                 title: 'Test-Chance (BUG-85)',
@@ -177,7 +192,7 @@ def _inject_tomorrow_only_entry(page, event_type: str):
                 weather_score: 0,
             }];
         }""",
-        event_type,
+        [event_type, tomorrow_iso],
     )
 
 

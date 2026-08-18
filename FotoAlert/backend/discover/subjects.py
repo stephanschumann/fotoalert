@@ -226,8 +226,36 @@ def build_subjects(
 
 
 # ---------------------------------------------------------------------------
-# Gecachte Instanzen (einmal pro Prozess aufgebaut)
+# Gecachte Instanzen (einmal pro Prozess aufgebaut, per refresh_subjects()
+# vor jedem vollständigen Scout-Lauf neu befüllt — siehe BUG-102)
 # ---------------------------------------------------------------------------
 
 SUBJECTS, EXCLUSION_ZONES = build_subjects()
 SUBJECT_BY_ID: dict[str, DiscoverSubject] = {s.id: s for s in SUBJECTS}
+
+
+def refresh_subjects() -> None:
+    """
+    Berechnet SUBJECTS/EXCLUSION_ZONES/SUBJECT_BY_ID frisch aus dem aktuellen
+    Stand von data.locations.LOCATIONS und aktualisiert die bestehenden
+    Container IN-PLACE (BUG-102).
+
+    Python-Importsemantik: `from discover.subjects import SUBJECTS` bindet den
+    Namen im importierenden Modul (moon_pipeline.py, sun_pipeline.py,
+    pipeline_base.py) beim Import an das damalige Objekt. Eine simple
+    Neuzuweisung hier (`SUBJECTS = neue_liste`) würde nur die Modulvariable
+    `discover.subjects.SUBJECTS` aktualisieren — die drei bereits importierten
+    Namen in den Konsumenten-Modulen würden weiterhin auf die alte, beim
+    Prozessstart gebundene Liste zeigen. Deshalb wird hier ausschließlich der
+    INHALT der bestehenden Objekte ersetzt (Objektidentität/`id()` bleibt
+    unverändert), niemals eine Neuzuweisung vorgenommen.
+    """
+    new_subjects, new_exclusion_zones = build_subjects()
+
+    SUBJECTS[:] = new_subjects
+
+    EXCLUSION_ZONES.clear()
+    EXCLUSION_ZONES.update(new_exclusion_zones)
+
+    SUBJECT_BY_ID.clear()
+    SUBJECT_BY_ID.update({s.id: s for s in SUBJECTS})

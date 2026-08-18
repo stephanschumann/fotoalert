@@ -333,6 +333,19 @@ def filter_accessible_candidates(candidates: Sequence) -> list:
             if blocked:
                 continue
 
+            # BUG-101: analog zur Gebaeude-Sichtpruefung oben, zusaetzlich
+            # gegen Wald/Baeume pruefen -- nutzt dieselben bereits geladenen
+            # 'data' (forest_ways), kein zusaetzlicher Overpass-Call (AK7).
+            # Wirkt ZUSAETZLICH zur bestehenden Wald+Weg-Zugaenglichkeits-
+            # pruefung in _is_excluded() weiter unten (US-135 Regel 2), nicht
+            # anstelle davon (BUG-101 AK4).
+            blocked_by_vegetation = qa_azimuth.is_sightline_blocked_by_vegetation(
+                m_lat, m_lon, m_subject_lat, m_subject_lon,
+                data.get("forest_ways") or [],
+            )
+            if blocked_by_vegetation:
+                continue
+
             if _is_excluded(m_lat, m_lon, data):
                 continue
 

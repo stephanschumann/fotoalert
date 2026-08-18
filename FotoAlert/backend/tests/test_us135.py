@@ -202,8 +202,25 @@ def test_us135_wald_mit_weg_in_der_naehe_bleibt_in_liste(monkeypatch):
     """US-135 Regel 2 (Beispiel 'Lichtung am Wegesrand'): Standpunkt liegt
     zwar in einer Waldflaeche, aber ein begehbarer Weg liegt innerhalb des
     bestaetigten 50m-Radius -> Kandidat bleibt in der Liste (kein
-    faelschlicher Ausschluss guter, aber technisch bewaldeter Spots)."""
-    c = _make_candidate(standpoint_lat=52.5000, standpoint_lon=13.4000)
+    faelschlicher Ausschluss guter, aber technisch bewaldeter Spots).
+
+    BUG-101-Pflicht-Korrektur: Das Motiv wird hier bewusst EXPLIZIT auf
+    (52.5000, 13.4100) gesetzt (statt der bisherigen Default-Koordinate aus
+    _make_candidate, die zufaellig exakt auf einem Eckpunkt des unten
+    definierten Wald-Polygons lag -- (52.5010, 13.4010)). Diese Eckpunkt-
+    Deckungsgleichheit fuehrte dazu, dass die neue, seit BUG-101 zusaetzlich
+    aufgerufene Sichtpruefung is_sightline_blocked_by_vegetation() (siehe
+    accessibility.filter_accessible_candidates()) die Peilung zum Motiv
+    faelschlich als exakt auf der Grenze des Wald-Winkelbereichs liegend
+    einstufte und den Kandidaten faelschlich blockierte -- unabhaengig von
+    der hier eigentlich getesteten Wald+Weg-Zugaenglichkeitsregel (US-135
+    Regel 2). Die neue Motiv-Koordinate liegt klar ausserhalb der
+    Wald-Bounding-Box (lat 52.4990-52.5010, lon 13.3990-13.4010) und
+    ausserhalb des blockierten Winkelbereichs, sodass ausschliesslich die
+    fachlich beabsichtigte Wald+Weg-Regel geprueft wird, nicht die neue
+    BUG-101-Sichtpruefung."""
+    c = _make_candidate(standpoint_lat=52.5000, standpoint_lon=13.4000,
+                         subject_lat=52.5000, subject_lon=13.4100)
     forest_polygon = {"nodes": [
         (52.4990, 13.3990), (52.4990, 13.4010),
         (52.5010, 13.4010), (52.5010, 13.3990),

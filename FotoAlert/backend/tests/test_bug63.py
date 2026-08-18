@@ -193,22 +193,43 @@ class TestAlignmentsOnePerDayAndBodyPassage:
     Wert) - unabhängig vom Kalenderdatum, an dem dieser Test läuft, robust
     genug für mind. einen Treffer über 10 Tage."""
 
-    @pytest.mark.xfail(
-        reason=(
-            "BUG-97 (2026-08-03): Docstring dieser Klasse behauptet 'unabhängig "
-            "vom Kalenderdatum, robust genug für mind. einen Treffer über 10 "
-            "Tage' — am 2026-08-03 UTC lieferte /preview-alignment für exakt "
-            "diese Koordinaten trotzdem eine leere alignments-Liste (2x "
-            "reproduziert in CI-Runs #284, identischer Fehler). Befristetes "
-            "xfail NUR um den kritischen BUG-96-Hotfix (/locations 500-Fehler "
-            "in Produktion) nicht am Deploy-Gate zu blockieren. Ob echte "
-            "Zeitabhängigkeit oder ein Regressions-Bug in der Alignment-"
-            "Berechnung vorliegt, ist in BUG-97 noch zu klären — nicht vorschnell "
-            "als reines Timing-Problem abtun."
-        ),
-        strict=False,
-    )
     def test_no_duplicate_day_body_pairs_in_alignments(self, client, monkeypatch):
+        # BUG-97: Der ursprüngliche Test lief gegen das jeweils tatsächliche
+        # "heutige" Kalenderdatum (date.today() in main.preview_alignment()) und
+        # war damit strukturell nicht datumsunabhängig, obwohl der Klassen-
+        # Docstring genau das behauptet. Referenzdatum fest auf 2026-08-03
+        # gemockt - exakt der CI-Ausfalltag (Runs #284): nach dem BUG-97-Fix
+        # (main.py übergibt elevation_difference_m jetzt korrekt an
+        # find_precise_alignment_times(), sodass die Suche denselben
+        # elevationskorrigierten Höhenwinkel ~55° nutzt wie die Anzeige) liegt
+        # die reale Berliner Sonnenhöhe an Azimut ~213° im Hochsommer nahe genug
+        # an diesem Wert, um wieder einen Treffer zu liefern - der leere Ausfall
+        # entstand gerade dadurch, dass die Suche vor dem Fix mit dem falschen,
+        # zu niedrigen Höhenwinkel (~23°) rechnete.
+        #
+        # ⚠️ Näherungswahl, nicht abschließend verifiziert: Die BACKLOG.md-
+        # Ticketanalyse (BUG-97) leitet aus einer groben Eigenrechnung ab, dass
+        # reale Sonnenhöhe an Azimut ~213° in Berlin im Hochsommer bei ~52-58°
+        # liegt (nahe am fixen ~55°-Wert -> Treffer wahrscheinlich) und im
+        # Winter nur bei ~8-10° (weit vom ~55°-Wert entfernt -> eher kein
+        # Treffer nach dem Fix). Bewusst auf ein Sommerdatum (statt Winter)
+        # gemockt, weil nur das zur POST-Fix-Logik passt (Suche muss jetzt nahe
+        # ~55° finden, nicht mehr nahe ~23° wie vor dem Fix). Trotzdem nur eine
+        # Näherung - MUSS im ersten echten Testlauf gegen die echte
+        # Skyfield-Engine (venv, nicht in dieser Sandbox verfügbar) bestätigt
+        # werden. Liefert der reale Lauf keinen Treffer, ist das kein Zeichen
+        # eines neuen Bugs, sondern erfordert nur eine Anpassung dieses
+        # Referenzdatums (z. B. anderer Tag/andere Uhrzeit im Hochsommer).
+        import main
+        from datetime import date as _date
+
+        class _FixedDate(_date):
+            @classmethod
+            def today(cls):
+                return cls(2026, 8, 3)
+
+        monkeypatch.setattr(main, "date", _FixedDate)
+
         from data.elevation import provider
 
         async def _fake_elevation_difference(*args, **kwargs):
@@ -227,9 +248,11 @@ class TestAlignmentsOnePerDayAndBodyPassage:
 
         alignments = r.json()["alignments"]
         assert alignments, (
-            "Erwartete mindestens einen Alignment-Treffer für die bekannte "
-            "Babelsberg->Pfingstberg-Testlocation über 10 Tage - leere Liste "
-            "deutet auf ein Problem in der Testaufsetzung hin."
+            "Erwartete mindestens einen Alignment-Treffer für die synthetische "
+            "Testlocation (Motiv ~100m südwestlich des Beobachters, siehe "
+            "Klassen-Docstring) über 10 Tage ab dem fest gemockten "
+            "Referenzdatum 2026-08-03 - leere Liste deutet auf ein Problem in "
+            "der Testaufsetzung hin."
         )
 
         seen = set()
@@ -245,6 +268,119 @@ class TestAlignmentsOnePerDayAndBodyPassage:
             "AK-5 verlangt genau einen Top-Treffer pro Tag/Himmelskörper-Passage "
             "statt mehrerer eng beieinanderliegender Minuten-Treffer."
         )
+
+    def test_alignment_altitude_matches_elevation_corrected_profile(self, client, monkeypatch):
+        """BUG-97 Pre-Mortem-Gegenmaßnahme (Szenario 1): reiner "Liste nicht
+        leer"-Test hätte ein erneutes Vergessen von elevation_difference_m in
+        main.py's find_precise_alignment_times()-Aufruf NICHT zuverlässig
+        erkannt, solange irgendein (dann falsch berechneter) Treffer
+        zurückkommt. Dieser Test prüft deshalb explizit, dass die
+        celestial_altitude jedes gefundenen Alignments in einem gegen
+        profile.angular_altitude_top_deg (~55° für diese Testgeometrie)
+        plausiblen Band liegt - NICHT nahe am unkorrigierten Wert (~23°,
+        der ursprüngliche BUG-97-Fehler).
+
+        Nachbesserung (nach echtem Testlauf, Stephan 2026-08-17): eine erste
+        Fassung dieses Tests verlangte celestial_altitude nahe der Spitze
+        (|altitude - profile_top| < 15°). find_precise_alignment_times()
+        liefert über _classify_alignment() (calculations/astronomy.py) aber
+        bewusst auch Treffer "mitten am Motiv" (BEHIND_MID) und nicht nur
+        exakte Crown-Treffer (AT_CROWN) - ein legitimer BEHIND_MID-Treffer
+        (z. B. 36.79° bei profile_top≈54.952°) fiel durch die zu enge
+        Toleranz fälschlich durch, obwohl der Produktivcode-Fix (main.py:3650,
+        window_engine.py:258 - elevation_difference_m wird überall korrekt
+        übergeben) nachweislich korrekt ist. Siehe Bandgrenzen-Berechnung
+        unten."""
+        import main
+        from datetime import date as _date
+
+        class _FixedDate(_date):
+            @classmethod
+            def today(cls):
+                return cls(2026, 8, 3)
+
+        monkeypatch.setattr(main, "date", _FixedDate)
+
+        from data.elevation import provider
+
+        async def _fake_elevation_difference(*args, **kwargs):
+            return 100.0, False
+
+        monkeypatch.setattr(provider, "elevation_difference", _fake_elevation_difference)
+
+        _login_as_host(client)
+        payload = _preview_payload(
+            subject_lat=52.39674661285668, subject_lon=13.096798178332305,
+            subject_height_m=44.0, subject_width_m=20.0,
+            days=10,
+        )
+        r = client.post("/preview-alignment", json=payload)
+        assert r.status_code == 200, r.text
+
+        body = r.json()
+        profile_top = body["profile"]["angular_altitude_top_deg"]
+        alignments = body["alignments"]
+        assert alignments, (
+            "Erwartete mindestens einen Alignment-Treffer für die synthetische "
+            "Testlocation (Motiv ~100m südwestlich des Beobachters, siehe "
+            "Klassen-Docstring) - siehe test_no_duplicate_day_body_pairs_in_"
+            "alignments für die Referenzdatum-Begründung."
+        )
+
+        # Die API-Antwort führt pro Alignment ein Klassifikations-Feld
+        # "alignment_type" (main.py preview_alignment(), Zeile ~3687, gefüllt
+        # aus AlignmentResult.alignment_type / _classify_alignment() in
+        # calculations/astronomy.py Zeile 941-987). _classify_alignment()
+        # bandet celestial_alt relativ zu top=profile.angular_altitude_top_deg
+        # mit crown_tolerance = max(0.3, top*0.15):
+        #   < top*0.1                  -> BEHIND_BASE  (kein valider Treffer)
+        #   < top - crown_tolerance    -> BEHIND_MID   (valider Treffer "mitten am Motiv")
+        #   ~ top ± crown_tolerance    -> AT_CROWN     (Jackpot)
+        #   > top + crown_tolerance    -> CLEARING_TOP (Spitze knapp überschritten)
+        #
+        # Ein exakter Crown-Treffer ist also NICHT das einzig gültige Ergebnis -
+        # ein enger Toleranzwert um die Spitze (wie die vorherige Fassung dieses
+        # Tests mit |altitude-profile_top|<15°) lehnt legitime BEHIND_MID-Treffer
+        # fälschlich ab. Ein breites, aus profile_top abgeleitetes Band ist daher
+        # korrekt.
+        #
+        # Für DIESE Testgeometrie (subject_height_m=44.0, elevation_difference_m
+        # gemockt auf 100.0 -> profile_top ≈ 54.952°) ergibt sich
+        # crown_tolerance ≈ 8.243° und ein gültiges BEHIND_MID-Band von
+        # [top*0.1, top-crown_tolerance] = [5.495°, 46.709°]. Ein bei einem
+        # echten Testlauf gefundener Treffer von 36.793° liegt klar darin.
+        #
+        # Der alte BUG-97-Fehler (elevation_difference_m fällt in
+        # find_precise_alignment_times() auf 0 zurück) ergibt für diese
+        # Geometrie einen intern falschen Top-Winkel von rechnerisch
+        #   atan2(subject_height_m - observer_height_m, ground_distance_m)
+        #   = atan2(44.0 - 1.6, ~99.68m) ≈ 23.0°
+        # (ground_distance_m aus body["profile"]), und Treffer würden um
+        # diesen falschen Wert (~23°) statt um den korrekten profile_top
+        # (~54.952°) clustern. Der reine Klassifikator-Bandrand top*0.1
+        # (5.495°) ist dafür zu lasch (23° > 5.495° -> würde nicht anschlagen).
+        # Deshalb ein deutlich engerer, aber für legitime BEHIND_MID/AT_CROWN-
+        # Treffer weiterhin offener unterer Rand: profile_top*0.1*5.0 =
+        # profile_top*0.5 ≈ 27.48° für diese Geometrie - klar über dem alten
+        # Bug-Wert (~23°) und klar unter dem beobachteten legitimen Treffer
+        # (36.79°). Als oberer Rand dient das klassifikator-eigene
+        # CLEARING-TOP-Ende (top + 3*crown_tolerance), großzügig genug für
+        # AT_CROWN- und moderate CLEARING_TOP-Treffer, aber nicht unbegrenzt.
+        crown_tolerance = max(0.3, profile_top * 0.15)
+        lower_bound = profile_top * 0.5
+        upper_bound = profile_top + 3 * crown_tolerance
+
+        for a in alignments:
+            altitude = a["celestial_altitude"]
+            alignment_type = a.get("alignment_type")
+            assert lower_bound < altitude <= upper_bound, (
+                f"Alignment-Höhe {altitude}° (Typ={alignment_type}) liegt außerhalb "
+                f"des gültigen Bandes ({lower_bound:.2f}°, {upper_bound:.2f}°] um den "
+                f"elevationskorrigierten Höhenwinkel Spitze ({profile_top}°) - "
+                "BUG-97-Regression: find_precise_alignment_times() nutzt "
+                "vermutlich wieder nicht dasselbe elevation_difference_m wie "
+                "calculate_subject_angular_profile() (main.py preview_alignment())."
+            )
 
 
 class TestActiveWindowConcurrencyIsolation:

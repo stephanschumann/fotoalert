@@ -380,6 +380,10 @@ def run_checks(
         findings.extend(_check_filter_feed(page, commit, _shot))
 
         # 6b) TASK-67 (Etappe 3): Kalender-Ansicht lädt fehlerfrei + zeigt Termine.
+        # TASK-107: Onboarding-Overlay kann bei kaltem Serverstart bis hierher noch
+        # nicht dismissed sein (Docstring von _dismiss_onboarding_if_present) — daher
+        # hier gezielt vor der Prüfung noch einmal schließen.
+        _dismiss_onboarding_if_present(page)
         findings.extend(_check_calendar_view(page, commit, _shot))
 
         # 6c) TASK-67: Filter-Chip-Drei-Zustand (Verifikation) + Ausgrauen-Verhalten
@@ -421,6 +425,15 @@ def run_checks(
 
         # 6n) TASK-67 (Etappe 6): "Hat Beispielbild"-Chip Drei-Zustand + Effekt.
         findings.extend(_check_has_image_chip_tristate_and_effect(page, commit, _shot))
+
+        # 6o) BUG-88: Sichtachsen-Eskalation bei "Nicht geprüft" + sichtachsen-
+        #     relevantem Event-Typ (Feed-Karte + Detail-Sheet eskaliert,
+        #     LocationDetail bleibt neutral).
+        # TASK-107: Onboarding-Overlay kann bei kaltem Serverstart bis hierher noch
+        # nicht dismissed sein (Docstring von _dismiss_onboarding_if_present) — daher
+        # hier gezielt vor der Prüfung noch einmal schließen.
+        _dismiss_onboarding_if_present(page)
+        findings.extend(_check_bug88_sightline_nicht_geprueft_escalation(page, commit, _shot))
 
         # 7) Konsolen-/Page-Errors → Findings (AK2).
         for err in page_errors:
@@ -1208,6 +1221,12 @@ def _check_calendar_view(page, commit: str, shot) -> List["Finding"]:
     """
     _close_any_open_sheet(page)
     findings: List[Finding] = []
+    # TASK-107 (Korrektur): defensiv gegen Feed.setMode('scout')-Zustands-Leck aus
+    # vorherigen Checks (#feed-content bliebe sonst style.display:none hängen,
+    # unabhängig von der eigentlichen Laufreihenfolge in run_checks()).
+    page.evaluate(
+        "() => { if (typeof Feed !== 'undefined' && typeof Feed.setMode === 'function') Feed.setMode('feed'); }"
+    )
     page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "feed")
     try:
         page.wait_for_selector(_spec.FEED_MODE_BTN_SELECTOR, timeout=8000)
@@ -1232,7 +1251,7 @@ def _check_calendar_view(page, commit: str, shot) -> List["Finding"]:
         page.wait_for_function(
             "() => { const c = document.getElementById('feed-content'); "
             "return !!c && (c.querySelector('.cal-event') || c.querySelector('.empty')); }",
-            timeout=15000,
+            timeout=25000,
         )
     except Exception:
         findings.append(
@@ -2143,6 +2162,256 @@ def _check_sightline_chip_tristate_and_effect(page, commit: str, shot) -> List["
     return findings
 
 
+# --- BUG-88: Sichtachsen-Eskalation bei "Nicht geprüft" + sichtachsen-relevantem
+#     Event-Typ -----------------------------------------------------------------
+def _check_bug88_sightline_nicht_geprueft_escalation(page, commit: str, shot) -> List["Finding"]:
+    """BUG-88 (sightlineTagHtml(status, withInfo, escalate), web/index.html ~Zeile 1974):
+    Bei einer Chance mit sightline_status='nicht_geprueft' UND einem sichtachsen-
+    relevanten Event-Typ (SIGHTLINE_RELEVANT_TYPES) muss der Sichtachsen-Tag in
+    Feed-Karte (oppCard()) UND Detail-Sheet (Detail.open()) eskaliert dargestellt
+    werden (var(--orange) + #i-warn statt var(--muted) + #i-eye). Die LocationDetail-
+    Seite derselben Location (Zeile ~7082, bewusst OHNE escalate-Parameter) muss dabei
+    unverändert neutral/grau (var(--muted) + #i-eye) bleiben — Eskalation gilt nur im
+    Event-Kontext, nicht für die Location als Ganzes (Scope-Grenze, Regel 3 der Spec).
+
+    Vorgehen: Eine real geladene Chance (Feed.data[0]) wird deterministisch auf einen
+    sichtachsen-relevanten Event-Typ + sightline_status='nicht_geprueft' gesetzt (inkl.
+    eindeutigem Test-Titel zum Wiederfinden der Karte, unabhängig von der
+    Tages-Gruppierung in Feed.render()) und die zugehörige Location in Locations.all
+    spiegelbildlich mitgesetzt, damit LocationDetail denselben Status zeigt.
+    """
+    _close_any_open_sheet(page)
+    findings: List[Finding] = []
+
+    # TASK-107 (Korrektur): defensiv gegen Feed.setMode('scout')-Zustands-Leck aus
+    # vorherigen Checks (#feed-content bliebe sonst style.display:none hängen,
+    # unabhängig von der eigentlichen Laufreihenfolge in run_checks()).
+    page.evaluate(
+        "() => { if (typeof Feed !== 'undefined' && typeof Feed.setMode === 'function') Feed.setMode('feed'); }"
+    )
+    page.evaluate(
+        "() => { if (typeof Filter !== 'undefined') Filter.reset(); "
+        "if (typeof App !== 'undefined') App.nav('feed'); }"
+    )
+    try:
+        page.wait_for_selector(_spec.FEED_CONTENT_SELECTOR, timeout=8000)
+        page.wait_for_function(
+            "() => typeof Feed !== 'undefined' && Array.isArray(Feed.data) && Feed.data.length > 0",
+            timeout=12000,
+        )
+    except Exception as e:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_feed_data_ready",
+                expected="Feed.data mit mindestens einer Chance geladen",
+                actual="Feed nicht bereit: {0}".format(e),
+                message="feed data not ready for BUG-88 escalation check",
+                screenshot_path=shot("bug88-feed-not-ready"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    marker = "BUG88 Sichtachsen-Eskalations-Test"
+    loc_id = page.evaluate(
+        """(marker) => {
+            if (!Feed.data.length) return null;
+            const o = Feed.data[0];
+            o.title = marker;
+            o.event_type = 'Sonnen-Alignment';
+            o.sightline_status = 'nicht_geprueft';
+            // TASK-107 (Korrektur 3): overall_score explizit hoch setzen, sonst kann
+            // die Testkarte durch den Filter.reset()-Standardfilter (minScore: 70,
+            // web/index.html ~Zeile 3086) direkt wieder verworfen werden, falls die
+            // echte, vom Server gelieferte Chance in Feed.data[0] einen niedrigeren
+            // Score hatte (siehe Filter.apply(), web/index.html ~Zeile 3250).
+            o.overall_score = 1;
+            const locId = o.location_id;
+            if (typeof Locations !== 'undefined' && Array.isArray(Locations.all) && locId) {
+              const loc = Locations.all.find(l => l.id === locId);
+              if (loc) loc.sightline_status = 'nicht_geprueft';
+            }
+            if (typeof Filter !== 'undefined') Filter.reset();
+            Feed.render();
+            return locId || null;
+        }""",
+        marker,
+    )
+    if loc_id is None:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_setup_failed",
+                expected="Feed.data[0] konnte für den Eskalations-Testfall präpariert werden (inkl. location_id)",
+                actual="Setup schlug fehl oder Testchance hatte keine location_id",
+                message="could not prepare BUG-88 escalation test fixture",
+                screenshot_path=shot("bug88-setup-failed"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    try:
+        page.wait_for_function(
+            """(marker) => Array.from(document.querySelectorAll('#feed-content .opp-title'))
+                .some(t => t.textContent.trim() === marker)""",
+            arg=marker,
+            timeout=8000,
+        )
+    except Exception:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_feed_card_rendered",
+                expected="Feed-Karte mit Titel '{0}' im DOM nach Feed.render()".format(marker),
+                actual="Testkarte nicht gefunden",
+                message="feed card for BUG-88 escalation test did not render",
+                screenshot_path=shot("bug88-feed-card-missing"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    def _tag_state(container_sel: str, marker_arg=None):
+        return page.evaluate(
+            """({containerSel, marker}) => {
+                let root;
+                if (marker) {
+                    const titleEl = Array.from(document.querySelectorAll(containerSel + ' .opp-title'))
+                        .find(t => t.textContent.trim() === marker);
+                    root = titleEl ? titleEl.closest('.card') : null;
+                } else {
+                    root = document.querySelector(containerSel);
+                }
+                const tag = root ? root.querySelector('.tag-sightline') : null;
+                if (!tag) return null;
+                const use = tag.querySelector('svg use');
+                return {
+                    color: tag.style.color || '',
+                    iconHref: use ? use.getAttribute('href') : null,
+                };
+            }""",
+            {"containerSel": container_sel, "marker": marker_arg},
+        )
+
+    feed_tag = _tag_state(_spec.FEED_CONTENT_SELECTOR, marker)
+    shot("bug88-feed-card-escalated")
+    if not feed_tag or feed_tag.get("iconHref") != "#i-warn" or feed_tag.get("color") != "var(--orange)":
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_feed_card_escalated",
+                expected="Sichtachsen-Tag in der Feed-Karte: color=var(--orange), Icon=#i-warn (sightline_status='nicht_geprueft', sichtachsen-relevanter Typ)",
+                actual=str(feed_tag),
+                message="feed card sightline tag not escalated for nicht_geprueft",
+                screenshot_path=shot("bug88-feed-card-not-escalated"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+
+    # Detail-Sheet über denselben Weg wie ein echter Kartenklick (Detail.open()-Aufruf
+    # aus dem onclick-Handler der Testkarte).
+    page.evaluate(
+        """(marker) => {
+            const titleEl = Array.from(document.querySelectorAll('#feed-content .opp-title'))
+                .find(t => t.textContent.trim() === marker);
+            const card = titleEl ? titleEl.closest('.card') : null;
+            if (card) card.click();
+        }""",
+        marker,
+    )
+    try:
+        page.wait_for_selector(_spec.EVENT_DETAIL_SHEET_OPEN_SELECTOR, timeout=8000)
+    except Exception:
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_detail_sheet_opens",
+                expected=_spec.EVENT_DETAIL_SHEET_OPEN_SELECTOR + " nach Klick auf die Testkarte",
+                actual="Detail-Sheet öffnete sich nicht",
+                message="detail sheet did not open for BUG-88 escalation test",
+                screenshot_path=shot("bug88-detail-sheet-not-open"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    detail_tag = _tag_state("#detail-sheet")
+    shot("bug88-detail-sheet-escalated")
+    if not detail_tag or detail_tag.get("iconHref") != "#i-warn" or detail_tag.get("color") != "var(--orange)":
+        findings.append(
+            Finding(
+                view="feed",
+                assertion_id="bug88_detail_sheet_escalated",
+                expected="Sichtachsen-Tag im Detail-Sheet: color=var(--orange), Icon=#i-warn (identisch zur Feed-Karte, AK2)",
+                actual=str(detail_tag),
+                message="detail sheet sightline tag not escalated for nicht_geprueft",
+                screenshot_path=shot("bug88-detail-sheet-not-escalated"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+
+    page.evaluate("() => { if (typeof Detail !== 'undefined') Detail.close(); }")
+    try:
+        page.wait_for_selector(_spec.EVENT_DETAIL_SHEET_OPEN_SELECTOR, state="detached", timeout=5000)
+    except Exception:
+        pass
+
+    # LocationDetail-Seite derselben Location: MUSS unverändert neutral/grau bleiben
+    # (AK4 — bewusste Scope-Grenze, Eskalation gilt nur im Event-Kontext).
+    page.evaluate(
+        "(id) => { if (typeof LocationDetail !== 'undefined') LocationDetail.open(id); }",
+        loc_id,
+    )
+    try:
+        page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, timeout=8000)
+    except Exception:
+        findings.append(
+            Finding(
+                view="locations",
+                assertion_id="bug88_locdetail_opens",
+                expected=_spec.DETAIL_SHEET_OPEN_SELECTOR + " nach LocationDetail.open('{0}')".format(loc_id),
+                actual="Location-Detail-Sheet öffnete sich nicht",
+                message="location detail sheet did not open for BUG-88 check",
+                screenshot_path=shot("bug88-locdetail-not-open"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+        return findings
+
+    locdetail_tag = _tag_state("#loc-detail-sheet")
+    shot("bug88-locdetail-stays-neutral")
+    if not locdetail_tag or locdetail_tag.get("iconHref") != "#i-eye" or locdetail_tag.get("color") != "var(--muted)":
+        findings.append(
+            Finding(
+                view="locations",
+                assertion_id="bug88_locdetail_stays_neutral",
+                expected="Sichtachsen-Tag auf der LocationDetail-Seite bleibt bei 'nicht_geprueft' neutral: color=var(--muted), Icon=#i-eye (KEINE Eskalation, AK4/Scope-Grenze)",
+                actual=str(locdetail_tag),
+                message="location detail sightline tag was unexpectedly escalated (scope boundary violated)",
+                screenshot_path=shot("bug88-locdetail-wrongly-escalated"),
+                timestamp=_now_iso(),
+                commit_sha=commit,
+            )
+        )
+
+    page.evaluate("() => { if (typeof LocationDetail !== 'undefined') LocationDetail.close(); }")
+    try:
+        page.wait_for_selector(_spec.DETAIL_SHEET_OPEN_SELECTOR, state="detached", timeout=5000)
+    except Exception:
+        pass
+
+    return findings
+
+
 # --- TASK-67 (Etappe 6): "Hat Beispielbild"-Chip Drei-Zustand + Effekt -------------
 def _check_has_image_chip_tristate_and_effect(page, commit: str, shot) -> List["Finding"]:
     """"Hat Beispielbild"-Chip (FilterSheet._cycleHasImage()): Drei-Zustand-Zyklus
@@ -2298,6 +2567,15 @@ def _check_has_image_chip_tristate_and_effect(page, commit: str, shot) -> List["
             )
         )
     page.evaluate("() => { if (typeof FilterSheet !== 'undefined') FilterSheet.close(); }")
+
+    # TASK-107 (Korrektur): Feed.setMode('scout') oben blendet #feed-content dauerhaft
+    # aus (web/index.html Feed.setMode(), style.display = 'none'), bis irgendwer aktiv
+    # zurück in den Feed-Modus schaltet. App.nav() allein tut das NICHT (setzt nur
+    # .page/.tab-Klassen um, siehe App.nav() in web/index.html). Ohne diesen Reset bleibt
+    # #feed-content für alle nachfolgenden Checks unsichtbar (u.a. bug88_feed_data_ready).
+    page.evaluate(
+        "() => { if (typeof Feed !== 'undefined' && typeof Feed.setMode === 'function') Feed.setMode('feed'); }"
+    )
 
     # Effekt auf dem Orte-Tab (Ground Truth: Filter.applyToLocations(Locations.all)).
     page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "locations")
