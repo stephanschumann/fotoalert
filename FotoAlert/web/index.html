@@ -1626,7 +1626,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.65';
+const APP_VERSION = '1.22.66';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1957,7 +1957,7 @@ const SIGHTLINE_LABELS = {
   frei: 'Frei',
   teilweise_verdeckt: 'Teilweise verdeckt',
   blockiert: 'Blockiert',
-  nicht_geprueft: 'Nicht geprüft',
+  nicht_geprueft: 'Daten fehlen',
 };
 const SIGHTLINE_COLORS = {
   frei: 'var(--green)',
@@ -1971,13 +1971,17 @@ const SIGHTLINE_COLORS = {
 const SIGHTLINE_RELEVANT_TYPES = new Set([
   'Sonnen-Alignment', 'Mond-Alignment', 'Mondaufgang', 'Monduntergang', 'Himmelsröte',
 ]);
-function sightlineTagHtml(status, withInfo) {
+function sightlineTagHtml(status, withInfo, escalate) {
   const s = status || 'nicht_geprueft';
   const label = SIGHTLINE_LABELS[s] || SIGHTLINE_LABELS.nicht_geprueft;
-  const color = SIGHTLINE_COLORS[s] || SIGHTLINE_COLORS.nicht_geprueft;
+  // BUG-88: bei sichtachsen-zentralen Events (escalate=true) wird "nicht_geprueft"
+  // deutlicher hervorgehoben (Warnfarbe + Warn-Icon statt neutralem Grau + Augen-Icon).
+  const isEscalated = !!escalate && s === 'nicht_geprueft';
+  const color = isEscalated ? 'var(--orange)' : (SIGHTLINE_COLORS[s] || SIGHTLINE_COLORS.nicht_geprueft);
+  const icon = isEscalated ? 'i-warn' : 'i-eye';
   const info = withInfo
     ? `<button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('sightlineStatus')">i</button>` : '';
-  return `<span class="tag tag-sightline" style="color:${color}">${ic('i-eye',12)} ${label}</span>${info}`;
+  return `<span class="tag tag-sightline" style="color:${color}">${ic(icon,12)} ${label}</span>${info}`;
 }
 
 function oppCard(o) {
@@ -2002,7 +2006,7 @@ function oppCard(o) {
     ? `<span class="tag tag-verified">${ic('i-check',12)} Geprüft</span>` : '';
   const rated = Rating.feedTagHtml(o.location_id);
   const sightline = SIGHTLINE_RELEVANT_TYPES.has(o.event_type)
-    ? sightlineTagHtml(o.sightline_status, false) : '';
+    ? sightlineTagHtml(o.sightline_status, false, true) : '';
 
   return `<div class="card" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
     <div class="opp-card">
@@ -3771,7 +3775,7 @@ const FilterSheet = {
       ['frei',               `${ic('i-eye',13)} Frei`],
       ['teilweise_verdeckt', 'Teilweise verdeckt'],
       ['blockiert',          'Blockiert'],
-      ['nicht_geprueft',     'Nicht geprüft'],
+      ['nicht_geprueft',     SIGHTLINE_LABELS.nicht_geprueft],
     ].map(([v,l]) => chip3(l, sightlineState(v), `FilterSheet._cycleSightline('${v}')`)).join('');
 
     const gpsNote = s.maxDistKm > 0
@@ -4705,7 +4709,7 @@ const Detail = {
         <div class="sheet-hero-title">${esc(o.title)}</div>
         ${o.location_id ? `<div class="sheet-hero-loc">${ic('i-pin',13)} <button onclick="Detail.close();setTimeout(()=>LocationDetail.open('${o.location_id}'),300)" style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0;font-weight:500;text-align:left">${esc(Locations.nameFor(o.location_id, o.location_name))} →</button></div>` : ''}
         ${o.location_id ? `<div id="verify-badge-${o.location_id.replace(/[^a-z0-9]/gi,'_')}">${Verify.badgeHtml(o.location_id)}</div>` : ''}
-        ${SIGHTLINE_RELEVANT_TYPES.has(o.event_type) ? `<div style="margin-top:6px">${sightlineTagHtml(o.sightline_status, true)}</div>` : ''}
+        ${SIGHTLINE_RELEVANT_TYPES.has(o.event_type) ? `<div style="margin-top:6px">${sightlineTagHtml(o.sightline_status, true, true)}</div>` : ''}
       </div>
       <div class="sheet-score-bar">
         <div class="score-col"><div class="sc-val" style="color:${col}">${Math.round(o.overall_score*100)}%</div><div class="sc-lbl">Gesamt <button class="sc-info-btn" onclick="ScoreInfo.show('gesamt')">i</button></div></div>
@@ -6966,6 +6970,7 @@ const LocationDetail = {
 
     // Neue Felder einlesen
     const subject_name = (document.getElementById('edit-subject-name')?.value || '').trim();
+    if (!subject_name) { toast('Motivname darf nicht leer sein'); return; }
     const category = document.getElementById('edit-category')?.value || '';
     const special_notes = (document.getElementById('edit-special-notes')?.value || '').trim();
     const heightRaw = (document.getElementById('edit-subject-height')?.value || '').trim();
@@ -7905,7 +7910,7 @@ const ElementInfo = {
         <li><b>Frei:</b> keine Hindernisse auf der Sichtlinie gefunden</li>
         <li><b>Teilweise verdeckt:</b> ein Hindernis verdeckt nur den unteren Teil des Sichtfensters (z. B. knapp über dem Horizont), der obere Teil bleibt sichtbar</li>
         <li><b>Blockiert:</b> ein Hindernis verdeckt die komplette Ziellinie zum Motiv</li>
-        <li><b>Nicht geprüft:</b> die externen Höhen-/Gebäudedaten waren beim letzten Versuch nicht verfügbar — kein verlässliches Ergebnis, absichtlich nicht als „frei" gewertet</li>
+        <li><b>Daten fehlen:</b> die externen Höhen-/Gebäudedaten waren beim letzten Versuch nicht verfügbar — kein verlässliches Ergebnis, absichtlich nicht als „frei" gewertet</li>
       </ul>
       <p style="margin-top:8px">Der Status basiert auf Höhendaten und Gebäude-Umrissen, nicht auf Bäumen/Wald — bei Zweifeln hilft die manuelle Meldung „Sichtachse blockiert".</p>`,
   },
@@ -7989,7 +7994,7 @@ const ElementInfo = {
     },
     sichtachsenstatus: {
       title: 'Filter: Sichtachse',
-      html: `<p>Grenzt Locations nach Sichtachsen-Status ein — siehe ⓘ bei der Sichtachsen-Pille für die Bedeutung von Frei/Teilweise verdeckt/Blockiert/Nicht geprüft.</p>
+      html: `<p>Grenzt Locations nach Sichtachsen-Status ein — siehe ⓘ bei der Sichtachsen-Pille für die Bedeutung von Frei/Teilweise verdeckt/Blockiert/Daten fehlen.</p>
         <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`,
     },
   },
