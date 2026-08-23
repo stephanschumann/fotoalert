@@ -35,7 +35,7 @@ import uuid as _uuid
 from collections import OrderedDict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -76,12 +76,15 @@ from data.store import LocationStore, compute_geo_hash
 from data import backup
 from data import qa_azimuth, qa_focal, qa_description  # TASK-45/46/47: Auto-QA (Azimut, Beschreibung, Brennweite)
 from data.elevation import provider as _elevation_provider  # US-09: Höhenprofil für Sichtachsen-Check
+import observability  # US-38: Fehlerklassifizierer (Timeout/APIError/DataError/SubprocessError/Unknown)
 from models.schemas import (
     CameraHintOut,
     DailyBriefingOut,
     HealthOut,
+    JobStatus,
     LocationOut,
     OpportunityOut,
+    SubsystemStatus,
 )
 
 # ---------------------------------------------------------------------------
@@ -316,14 +319,23 @@ _scout_dirty:   bool = False             # Nachlauf-Flag (während Lauf erneut g
 _scout_debounce_task: Optional["asyncio.Task"] = None
 _SCOUT_DEBOUNCE_S: float = 90.0          # Fenster für mehrere schnelle Edits (Zielzeit < 2–3 Min)
 
-# Job-Status-Tracking (US-34)
+# Job-Status-Tracking (US-34, um "discover"+"error_class"/"spec" erweitert in US-38)
 _job_status: dict = {
-    "weather":  {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
-    "feed":     {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
-    "calendar": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},
-    "weather-map": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},  # US-112
-    "sightlines": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None},  # US-09
+    "weather":  {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},
+    "feed":     {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},
+    "calendar": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},
+    "weather-map": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},  # US-112
+    "sightlines": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},  # US-09
+    "discover": {"status": "idle", "last_run": None, "last_error": None, "duration_s": None, "error_class": None, "spec": None},  # US-38
 }
+
+# US-38: Debounce für Alarm-Mails — pro Job der Zeitpunkt des letzten
+# tatsächlich ausgelösten Alarms. Nur begrenzter Alarm pro Stunde, auch bei
+# wiederholtem Fehlschlag in kurzer Folge (AK9). Der strukturierte
+# logger.critical()-Log-Eintrag selbst ist NICHT debounced — nur der
+# Mail-Versand.
+_last_alert: dict = {}
+_ALERT_DEBOUNCE = timedelta(hours=1)
 
 # US-09: Single-Flight-Guard für den manuellen Sichtachsen-Refresh (analog zu
 # _precompute_running/_qa_pass_running — verhindert parallele Läufe).
@@ -334,22 +346,142 @@ def _job_start(job: str) -> float:
     import time as _time
     _job_status[job]["status"] = "running"
     _job_status[job]["last_error"] = None
+    _job_status[job]["error_class"] = None
+    _job_status[job]["spec"] = None
     return _time.monotonic()
+
+def _record_job_run(
+    job: str,
+    status: str,
+    duration_s: Optional[float],
+    error_class: Optional[str],
+    error_msg: Optional[str],
+    spec_suggestion: Optional[str],
+) -> None:
+    """US-38: Schreibt einen Job-Lauf in die SQLite-`job_runs`-Tabelle.
+
+    Edge Case (AK14): Schlägt der Insert selbst fehl (z.B. DB kurzzeitig
+    gesperrt), bricht dadurch NICHT der eigentliche Job ab — nur ein
+    logger.warning()-Fallback.
+    """
+    try:
+        _store.insert_job_run(
+            job=job,
+            status=status,
+            duration_s=duration_s,
+            error_class=error_class,
+            error_msg=error_msg,
+            spec_suggestion=spec_suggestion,
+        )
+    except Exception as exc:
+        logger.warning("US-38: job_runs-Insert fehlgeschlagen (Job='%s'): %s", job, exc)
 
 def _job_done(job: str, t0: float) -> None:
     """Markiert Job als fertig."""
     import time as _time
+    ts = datetime.now(timezone.utc).isoformat()
+    duration_s = round(_time.monotonic() - t0, 1)
     _job_status[job]["status"] = "done"
-    _job_status[job]["last_run"] = datetime.now(timezone.utc).isoformat()
-    _job_status[job]["duration_s"] = round(_time.monotonic() - t0, 1)
+    _job_status[job]["last_run"] = ts
+    _job_status[job]["duration_s"] = duration_s
+    _job_status[job]["last_error"] = None
+    _job_status[job]["error_class"] = None
+    _job_status[job]["spec"] = None
+
+    # AK5: strukturierter Log-Eintrag je Job-Lauf (Zeitstempel, Jobname, Dauer, Status).
+    logger.info(json.dumps({
+        "event": "job_run", "job": job, "status": "done",
+        "ts": ts, "duration_s": duration_s,
+    }))
+    _record_job_run(job, "done", duration_s, None, None, None)
+
+def _maybe_alert(job: str, error_class: str, msg: str, spec: dict, now: Optional[datetime] = None) -> None:
+    """US-38 (AK9): Sendet höchstens einen Alarm pro Stunde und Job.
+
+    Bei genau 1h (60min) Abstand bleibt der Job noch debounced — erst ein
+    Abstand STRIKT größer als eine Stunde löst einen erneuten Alarm aus
+    (Implementation Spec Schritt 4: "now - _last_alert[job] > timedelta(hours=1)").
+
+    `now` ist optional und dient ausschließlich Tests, die den Debounce-
+    Grenzfall exakt bei 1h ohne echten Zeitverzug prüfen wollen (US-38
+    Grenzfall-Test); alle regulären Aufrufer (z.B. `_job_error()`) lassen den
+    Parameter weg und erhalten unverändert die aktuelle Uhrzeit.
+    """
+    now = now or datetime.now(timezone.utc)
+    last = _last_alert.get(job)
+    if last is not None and (now - last) <= _ALERT_DEBOUNCE:
+        return
+    _last_alert[job] = now
+    _send_alert_email(job, error_class, msg, spec)
+
+def _send_alert_email(job: str, error_class: str, msg: str, spec: dict) -> None:
+    """US-38 Schritt 7: Optionaler E-Mail-Alarm, nur wenn FOTOALERT_ALERT_EMAIL
+    gesetzt ist — sonst No-Op (AK10: Log-Eintrag funktioniert trotzdem normal
+    weiter, kein Absturz). FOTOALERT_SMTP_PASS wird NIEMALS geloggt, auch nicht
+    im Fehlerfall eines fehlgeschlagenen SMTP-Versands (deshalb hier eine
+    generische Fehlermeldung ohne die ursprüngliche Exception-Message)."""
+    alert_to = _os.getenv("FOTOALERT_ALERT_EMAIL")
+    if not alert_to:
+        return
+    try:
+        import smtplib
+        from email.mime.text import MIMEText
+
+        smtp_host = _os.getenv("FOTOALERT_SMTP_HOST", "localhost")
+        smtp_port = int(_os.getenv("FOTOALERT_SMTP_PORT", "587"))
+        smtp_user = _os.getenv("FOTOALERT_SMTP_USER")
+        smtp_pass = _os.getenv("FOTOALERT_SMTP_PASS")
+
+        body = (
+            f"Job '{job}' fehlgeschlagen.\n\n"
+            f"Fehlerklasse: {error_class}\n"
+            f"Meldung: {msg}\n"
+            f"Betroffene Dateien: {', '.join(spec.get('files', []))}\n"
+            f"Vorschlag: {spec.get('suggestion', '')}\n"
+        )
+        mail = MIMEText(body, _charset="utf-8")
+        mail["Subject"] = f"[FotoAlert] Job-Alarm: {job} ({error_class})"
+        mail["From"] = smtp_user or alert_to
+        mail["To"] = alert_to
+
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as smtp:
+            smtp.starttls()
+            if smtp_user and smtp_pass:
+                smtp.login(smtp_user, smtp_pass)
+            smtp.send_message(mail)
+        logger.info("US-38: Alarm-Mail versendet (Job='%s').", job)
+    except Exception:
+        # Bewusst OHNE Exception-Details geloggt — FOTOALERT_SMTP_PASS darf
+        # unter keinen Umständen im Log landen, auch nicht indirekt über eine
+        # SMTP-Fehlermeldung.
+        logger.error("US-38: Alarm-Mail konnte nicht versendet werden (Job='%s').", job)
 
 def _job_error(job: str, t0: float, msg: str) -> None:
-    """Markiert Job als fehlgeschlagen."""
+    """Markiert Job als fehlgeschlagen, klassifiziert den Fehler (US-38),
+    schreibt den Lauf in job_runs und löst einen (debounced) Alarm aus."""
     import time as _time
+    error_class, affected_files, suggestion = observability.classify_error(msg)
+    spec = {"files": affected_files, "suggestion": suggestion}
+    ts = datetime.now(timezone.utc).isoformat()
+    duration_s = round(_time.monotonic() - t0, 1)
+
     _job_status[job]["status"] = "error"
-    _job_status[job]["last_run"] = datetime.now(timezone.utc).isoformat()
-    _job_status[job]["duration_s"] = round(_time.monotonic() - t0, 1)
+    _job_status[job]["last_run"] = ts
+    _job_status[job]["duration_s"] = duration_s
     _job_status[job]["last_error"] = msg
+    _job_status[job]["error_class"] = error_class
+    _job_status[job]["spec"] = spec
+
+    # AK5/AK6: strukturierter Log-Eintrag, IMMER (nicht debounced) — nur der
+    # Alarm-Mailversand unten ist debounced (AK9).
+    logger.critical(json.dumps({
+        "event": "job_error", "job": job, "status": "error",
+        "ts": ts, "duration_s": duration_s,
+        "error_class": error_class, "error_msg": msg, "spec": spec,
+    }))
+
+    _record_job_run(job, "error", duration_s, error_class, msg, suggestion)
+    _maybe_alert(job, error_class, msg, spec)
 
 # Scheduler
 scheduler = AsyncIOScheduler(timezone="Europe/Berlin")
@@ -523,6 +655,12 @@ async def _refresh_discover() -> None:
         return
 
     _scout_running = True
+    # US-38: Job-Status-Tracking für den Scout-/Discover-Job (vorher unsichtbar
+    # in /health und /job-status). Ein einzelner _job_start/_job_done/_job_error-
+    # Zyklus deckt den gesamten Aufruf ab, auch wenn intern per Dirty-Flag mehrere
+    # Pipeline-Pässe laufen — von außen ist das EIN "discover"-Lauf.
+    t0 = _job_start("discover")
+    last_error: Optional[str] = None
     try:
         while True:
             _scout_dirty = False
@@ -530,8 +668,10 @@ async def _refresh_discover() -> None:
                 logger.info("Scout-Pipeline startet (Volllauf)...")
                 await refresh_discover_cache(_DISCOVER_CACHE)
                 _load_discover_cache()
+                last_error = None
             except Exception as e:
                 logger.error("Scout-Pipeline fehlgeschlagen: %s", e)
+                last_error = str(e)
             # US-106: Wurde während des Laufs erneut eine Änderung gemeldet → genau
             # ein Nachlauf, dann fertig.
             if not _scout_dirty:
@@ -539,6 +679,10 @@ async def _refresh_discover() -> None:
             logger.info("Scout-Pipeline: Dirty-Flag gesetzt → genau ein Nachlauf.")
     finally:
         _scout_running = False
+        if last_error is not None:
+            _job_error("discover", t0, last_error)
+        else:
+            _job_done("discover", t0)
 
 
 def _trigger_discover_debounced() -> None:
@@ -2916,11 +3060,104 @@ async def health() -> HealthOut:
     (Quelle: web/index.html APP_VERSION). Backend- und Frontend-Releases laufen
     nicht synchron, ein unveraendertes ``version``-Feld hier ist bei einem reinen
     Backend-Deploy ohne Aenderung der App-Release-Version erwartungsgemaess.
+
+    US-38 (Observability & Self-Healing): zusätzlich zum bisherigen Gesamtstatus
+    liefert die Antwort jetzt ``subsystems`` (Backend/Cache/Wetter/Backup, je
+    eigener Status) und ``jobs`` (je Hintergrund-Job inkl. Fehlerklasse +
+    Lösungsvorschlag). Rein additiv — bestehende Konsumenten, die nur
+    ``status``/``version``/``locations_count`` lesen (z.B. deploy/deploy.sh),
+    funktionieren unverändert weiter. Kein Teilsystem-Lesefehler darf diesen
+    Endpoint mit HTTP 500 abstürzen lassen — jeder Block ist einzeln
+    try/except-abgesichert und fällt im Fehlerfall auf Status "unknown" zurück.
     """
+    import time as _time
+
+    # ---- Jobs (aus _job_status, inkl. discover/error_class/spec) ----------
+    jobs_out: Dict[str, JobStatus] = {}
+    any_job_error = False
+    for name, js in _job_status.items():
+        try:
+            jobs_out[name] = JobStatus(
+                status=js.get("status", "idle"),
+                last_run=js.get("last_run"),
+                duration_s=js.get("duration_s"),
+                last_error=js.get("last_error"),
+                error_class=js.get("error_class"),
+                spec=js.get("spec"),
+            )
+            if js.get("status") == "error":
+                any_job_error = True
+        except Exception:
+            jobs_out[name] = JobStatus(
+                status="unknown", last_run=None, duration_s=None,
+                last_error=None, error_class=None, spec=None,
+            )
+
+    # ---- Cache-Teilsystem (Alter der Feed-Cache-Datei) ---------------------
+    try:
+        if _precompute_running:
+            cache_status = "building"
+        elif _OPP_CACHE.exists():
+            cache_status = "ok"
+        else:
+            cache_status = "unknown"
+        cache_age_h = (
+            round((_time.time() - _OPP_CACHE.stat().st_mtime) / 3600, 2)
+            if _OPP_CACHE.exists() else None
+        )
+    except Exception:
+        cache_status = "unknown"
+        cache_age_h = None
+
+    # ---- Wetter-Teilsystem (gespiegelt vom "weather"-Job) ------------------
+    try:
+        weather_job = _job_status.get("weather", {})
+        w_status = weather_job.get("status", "idle")
+        weather_status = {"running": "running", "error": "error"}.get(w_status, "ok")
+        weather_age_h = None
+        if weather_job.get("last_run"):
+            last_run_dt = datetime.fromisoformat(weather_job["last_run"])
+            weather_age_h = round(
+                (datetime.now(timezone.utc) - last_run_dt).total_seconds() / 3600, 2
+            )
+    except Exception:
+        weather_status = "unknown"
+        weather_age_h = None
+
+    # ---- Backup-Teilsystem (US-34 liefert last_backup_age_hours()) --------
+    try:
+        backup_age_h = backup.last_backup_age_hours()
+        backup_status = "ok" if backup_age_h is not None else "unknown"
+    except Exception:
+        backup_age_h = None
+        backup_status = "unknown"
+
+    subsystems = SubsystemStatus(
+        backend="ok",
+        cache=cache_status,
+        cache_age_h=cache_age_h,
+        weather=weather_status,
+        weather_age_h=weather_age_h,
+        backup=backup_status,
+        backup_age_h=backup_age_h,
+    )
+
+    # AK2: mind. ein Teilsystem im Fehler-/Aufbau-Zustand ODER ein Job-Fehler
+    # → Gesamtstatus "degraded" (HTTP bleibt 200 OK).
+    overall = "ok"
+    if any_job_error:
+        overall = "degraded"
+    for s in (subsystems.backend, subsystems.cache, subsystems.weather, subsystems.backup):
+        if s in ("building", "running"):
+            overall = "degraded"
+
     return HealthOut(
-        status="ok",
+        status=overall,
         version=BACKEND_API_SCHEMA_VERSION,
         locations_count=len(LOCATIONS),
+        subsystems=subsystems,
+        jobs=jobs_out,
+        precompute_running=_precompute_running,
     )
 
 
@@ -3365,7 +3602,7 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
     Aktualisiert nur das Wetter-Overlay (T+3 Tage) im Hintergrund.
     Schnell: ~10–15s. Kein precompute nötig.
     """
-    background_tasks.add_task(_weather_overlay)
+    background_tasks.add_task(_weather_overlay, triggered_by="manual")
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
 
 

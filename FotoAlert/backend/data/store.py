@@ -11,11 +11,13 @@ Tabellen:
   location_ratings       — Sterne-Bewertungen pro Gerät (US-89)
   location_qa_state     — Lock-Flags + Change-Detection-Hash pro Location (TASK-43)
   location_qa_values    — Auto-generierte Felder für BASE-Locations (TASK-43)
+  job_runs              — Job-History für Observability, 30-Tage-Retention (US-38)
 
 TASK-17: SQLite-Migration + atomare Writes (Fundament)
 BUG-26:  location_verifications Tabelle + CRUD
 US-89:   location_ratings Tabelle + Upsert/Aggregation
 TASK-43: QA-Datenmodell (Lock-Flags, qa_values, geo_hash)
+US-38:   Observability & Self-Healing — job_runs-Tabelle + CLI-Auswertung
 """
 
 from __future__ import annotations
@@ -25,7 +27,7 @@ import json
 import logging
 import os
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -135,6 +137,22 @@ CREATE TABLE IF NOT EXISTS location_qa_values (
     sightline_angle_deg       REAL,           -- Verdeckungswinkel (Grad), None wenn nicht ermittelbar
     sightline_checked_at      TEXT            -- ISO-Timestamp des letzten Sichtachsen-Checks
 );
+
+-- US-38: Observability & Self-Healing — Job-History (SQLite-Persistenz,
+-- überlebt einen Server-Neustart, Grundlage für tools/job_history.py).
+CREATE TABLE IF NOT EXISTS job_runs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts              TEXT NOT NULL,          -- ISO-8601 UTC
+    job             TEXT NOT NULL,          -- "weather" | "feed" | "calendar" | "discover" | "backup" | ...
+    status          TEXT NOT NULL,          -- "done" | "error"
+    duration_s      REAL,
+    error_class     TEXT,                   -- "Timeout" | "APIError" | "DataError" | "SubprocessError" | "Unknown" | NULL
+    error_msg       TEXT,
+    spec_suggestion TEXT                    -- auto-generierter Lösungsvorschlag | NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_job_runs_ts  ON job_runs(ts);
+CREATE INDEX IF NOT EXISTS idx_job_runs_job ON job_runs(job);
 """
 
 
@@ -859,6 +877,69 @@ class LocationStore:
                 d["focal_length_suggestions"] = json.loads(d["focal_length_suggestions"])
             result.append(d)
         return result
+
+    # ------------------------------------------------------------------
+    # US-38: Observability — Job-History (job_runs)
+    # ------------------------------------------------------------------
+
+    def insert_job_run(
+        self,
+        job: str,
+        status: str,
+        duration_s: Optional[float] = None,
+        error_class: Optional[str] = None,
+        error_msg: Optional[str] = None,
+        spec_suggestion: Optional[str] = None,
+    ) -> None:
+        """US-38: Schreibt einen Job-Lauf in `job_runs` und räumt Läufe älter
+        als 30 Tage auf (Retention, jedes Insert).
+
+        Der Aufrufer (main.py `_job_done()`/`_job_error()`) fängt Exceptions
+        aus diesem Aufruf selbst per try/except ab (Fallback: nur
+        `logger.warning`, der Job selbst bricht dadurch nicht ab) — diese
+        Methode wirft daher bewusst normal weiter, statt Fehler hier bereits
+        stillschweigend zu verschlucken.
+        """
+        ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO job_runs (ts, job, status, duration_s, error_class, error_msg, spec_suggestion)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (ts, job, status, duration_s, error_class, error_msg, spec_suggestion),
+            )
+            conn.execute("DELETE FROM job_runs WHERE ts < datetime('now', '-30 days')")
+            conn.commit()
+
+    def load_job_runs(
+        self,
+        days: int = 7,
+        job: Optional[str] = None,
+        errors_only: bool = False,
+    ) -> list:
+        """US-38: Job-History der letzten `days` Tage.
+
+        Hinweis: `tools/job_history.py` liest die SQLite-Datei bewusst direkt
+        per `sqlite3` (Zero-Dependency-CLI, kein Import von backend/-Code
+        nötig) — diese Methode ist der Store-seitige Zugriffspfad, u.a. für
+        Tests und mögliche künftige API-Konsumenten.
+        """
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        sql = (
+            "SELECT id, ts, job, status, duration_s, error_class, error_msg, spec_suggestion "
+            "FROM job_runs WHERE ts >= ?"
+        )
+        params: list = [since]
+        if job:
+            sql += " AND job = ?"
+            params.append(job)
+        if errors_only:
+            sql += " AND status = 'error'"
+        sql += " ORDER BY ts DESC"
+        with self._connect() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [dict(row) for row in rows]
 
 
 # ---------------------------------------------------------------------------

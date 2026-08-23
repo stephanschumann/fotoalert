@@ -5,7 +5,7 @@ Pydantic-Schemas für die FastAPI REST-Responses.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 
@@ -112,6 +112,27 @@ class DailyBriefingOut(BaseModel):
     summary: str
 
 
+class JobStatus(BaseModel):
+    """US-38: Status eines einzelnen Hintergrund-Jobs für /health."""
+    status: str
+    last_run: Optional[str]
+    duration_s: Optional[float]
+    last_error: Optional[str]
+    error_class: Optional[str]
+    spec: Optional[Dict[str, Any]]
+
+
+class SubsystemStatus(BaseModel):
+    """US-38: Eigener Status je Teilsystem für /health (statt nur Gesamtstatus)."""
+    backend: str
+    cache: str
+    cache_age_h: Optional[float]
+    weather: str
+    weather_age_h: Optional[float]
+    backup: str
+    backup_age_h: Optional[float]
+
+
 class HealthOut(BaseModel):
     status: str
     version: str = Field(
@@ -124,3 +145,8 @@ class HealthOut(BaseModel):
         ),
     )
     locations_count: int
+    # US-38: additiv ergänzt — bestehende Konsumenten, die nur `status` lesen
+    # (z.B. deploy/deploy.sh), funktionieren unverändert weiter.
+    subsystems: SubsystemStatus
+    jobs: Dict[str, JobStatus]
+    precompute_running: bool
