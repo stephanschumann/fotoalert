@@ -25,6 +25,46 @@ os.environ.setdefault("FOTOALERT_AUTH_SECRET", "test-secret")
 sys.path.insert(0, str(Path(__file__).parent))
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _isolate_job_run_inserts(tmp_path_factory):
+    """BUG-107: Tests, die main._job_start()/_job_error()/_job_done() direkt
+    aufrufen (aktuell ausschließlich backend/tests/test_us38.py), schrieben bisher
+    ungemockt über den Modul-Singleton main._store in die geteilte
+    backend/data_dev/fotoalert.db (FOTOALERT_ENV=dev, s.o.) — dieselbe Datei, aus
+    der tools/job_history.py im Dev-Modus liest. Diese Fixture leitet für die
+    GESAMTE Testsitzung ausschließlich die eine Methode
+    `main._store.insert_job_run` auf die gleichnamige Methode einer frischen,
+    temporären LocationStore-Instanz um (dieselbe Technik wie AK11 in US-38,
+    dort pro Einzeltest über `LocationStore(db_path=tmp_path/...)` — hier
+    session-weit über `tmp_path_factory`, NICHT `tmp_path`, da das nicht
+    session-scoped ist). Alle anderen `_store`-Methoden (Locations, Bewertungen,
+    QA-Daten usw.) bleiben unverändert gegen die echte data_dev/fotoalert.db
+    bestehen — nur dieser eine Schreibpfad wird umgeleitet (Pre-Mortem
+    Szenario 1, AK5 sichert das ab).
+
+    Pre-Mortem Szenario 5: reines No-op, wenn `main` in dieser Umgebung nicht
+    importierbar ist (z.B. FastAPI-Stack fehlt) — try/except statt
+    `pytest.importorskip` auf Suite-Ebene, damit Tests, die main gar nicht
+    brauchen, von einem fehlenden Import hier nicht betroffen sind.
+    """
+    try:
+        import main as _main
+    except Exception:
+        yield
+        return
+
+    from data.store import LocationStore
+
+    db_path = tmp_path_factory.mktemp("bug107_job_runs") / "job_runs_isolated.db"
+    _throwaway_store = LocationStore(db_path=db_path)
+
+    _main._store.insert_job_run = _throwaway_store.insert_job_run
+    try:
+        yield
+    finally:
+        del _main._store.insert_job_run
+
+
 @pytest.fixture(scope="session")
 def client():
     """TestClient gegen main:app — geteilt von allen API-Tests.
