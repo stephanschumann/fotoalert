@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS location_qa_values (
 CREATE TABLE IF NOT EXISTS job_runs (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     ts              TEXT NOT NULL,          -- ISO-8601 UTC
-    job             TEXT NOT NULL,          -- "weather" | "feed" | "calendar" | "discover" | "backup" | ...
+    job             TEXT NOT NULL,          -- "weather" | "feed" | "calendar" | "weather-map" | "sightlines" | "discover" | ...
     status          TEXT NOT NULL,          -- "done" | "error"
     duration_s      REAL,
     error_class     TEXT,                   -- "Timeout" | "APIError" | "DataError" | "SubprocessError" | "Unknown" | NULL

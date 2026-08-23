@@ -8,10 +8,10 @@ zum Nachlesen (KEINE automatisch ausgeführte Änderung, Ticket-Kernanforderung)
 
 Python-3.9-kompatibel (Server läuft laut CLAUDE.md §5 weiterhin 3.9-kompatiblen
 Code, auch wenn der Produktionsserver selbst inzwischen auf 3.12 läuft) — daher
-`Tuple`/`Optional` aus `typing` statt `tuple[...]`/`X | None`.
+`Tuple` aus `typing` statt `tuple[...]`.
 """
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 # Reihenfolge ist relevant: die erste zutreffende Regel gewinnt.
 ERROR_RULES = [

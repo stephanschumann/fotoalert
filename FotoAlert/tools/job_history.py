@@ -46,7 +46,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--job", default=None,
-        help="Nur diesen Job anzeigen (z.B. weather, feed, calendar, discover, backup).",
+        help="Nur diesen Job anzeigen (z.B. weather, feed, calendar, discover, sightlines).",
     )
     parser.add_argument(
         "--errors-only", action="store_true",
