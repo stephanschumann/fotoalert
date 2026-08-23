@@ -42,6 +42,31 @@ pytestmark = [pytest.mark.offline, pytest.mark.regression]
 
 _REAL_DEV_DB = Path(__file__).resolve().parent.parent / "data_dev" / "fotoalert.db"
 
+
+def _idle_job() -> dict:
+    return {
+        "status": "idle", "last_run": None, "last_error": None,
+        "duration_s": None, "error_class": None, "spec": None,
+    }
+
+
+@pytest.fixture(autouse=True)
+def _reset_job_status():
+    """BUG-107-Nachtrag (CI-Fund, 2026-08-23): main._job_start()/_job_error()/_job_done()
+    schreiben direkt in das geteilte Modul-Global main._job_status. Ohne Reset blieb z.B.
+    main._job_status["feed"]["status"] == "error" (aus
+    test_known_us38_fixture_messages_do_not_appear_in_shared_dev_db unten) nach diesem
+    Testmodul stehen — main.health() meldete dadurch fuer ALLE spaeter in derselben
+    Sitzung laufenden Tests (u.a. test_health in test_task67_backend_regression.py)
+    faelschlich "degraded" statt "ok". Muster identisch zu
+    test_us38.py::_reset_job_state / test_bug77_weather_job_status.py."""
+    for key in ("weather", "feed"):
+        main._job_status[key] = _idle_job()
+    yield
+    for key in ("weather", "feed"):
+        main._job_status[key] = _idle_job()
+
+
 # Byte-identische Fehlermeldungen aus den bestehenden test_us38.py-Testfällen —
 # genau diese Strings wurden in den beiden echten, bereits entstandenen
 # Clustern vom 19./21.08.2026 in backend/data_dev/fotoalert.db gefunden.

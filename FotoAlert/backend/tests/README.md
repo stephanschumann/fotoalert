@@ -27,7 +27,7 @@ Marker-Angabe stimmt; das bleibt manuelle Sorgfaltspflicht bei künftigen Testda
 **Marker `requires_full_checkout` (TASK-96, 2026-08-10):** `offline` bedeutet nur
 "deterministisch, ohne Netzwerk/externe Dienste" — das ist NICHT dasselbe wie
 "läuft auch bei einem Teil-Checkout, der nur `backend/` enthält" (z. B. ein schmal
-gestagter Cloud-Sandbox-Abzug oder ein CI-Job ohne vollständigen Checkout). Sechs als
+gestagter Cloud-Sandbox-Abzug oder ein CI-Job ohne vollständigen Checkout). Sieben als
 `offline`/`frontend` markierte Testdateien lösen Pfade relativ zum Repo-Root außerhalb von
 `backend/` auf (`web/`, `deploy/`, `tools/`, `docs/`) und brechen deshalb bei einem
 Backend-only-Checkout, obwohl ihre Markierung etwas anderes suggeriert: `test_task84.py`,
@@ -35,7 +35,8 @@ Backend-only-Checkout, obwohl ihre Markierung etwas anderes suggeriert: `test_ta
 `test_us79_moon_rise_set.py` (verifiziert in der TASK-96-Analyse, 2026-08-09/10) sowie
 `test_task53_dev_sync.py` und `test_task-66.py` (nachträglich per Verifikations-Review am
 2026-08-10 gefunden — sys.path-Import aus Repo-Root-`tools/` bzw. Screenshot-Pfad unter
-Repo-Root-`docs/`). Diese sechs tragen deshalb zusätzlich den Marker
+Repo-Root-`docs/`) sowie `test_us38.py` (BUG-107-CI-Nachtrag, 2026-08-23 gefunden — laedt
+`tools/job_history.py` per Repo-Root-relativem Pfad). Diese sieben tragen deshalb zusätzlich den Marker
 `requires_full_checkout` (Option B aus der TASK-96-Analyse — ein reiner Pfad-Fix wurde
 bewusst verworfen, da er das eigentliche Problem, fehlende Sichtbarkeit der
 Repo-Root-Abhängigkeit, nur verdeckt hätte). Ein automatisierter Test
@@ -74,7 +75,7 @@ absichert, hier aber für Marker-Konsistenz statt Tabellen-Vollständigkeit).
 | `test_bug-87.py` | BUG-87: Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidierte zwischen Host-Verifikation und Sichtachsen-Datenverfügbarkeit — `SIGHTLINE_LABELS.nicht_geprueft` zeigt jetzt „Daten fehlen" statt „Nicht geprüft", Host-Verifikations-Wortlaut unverändert — benötigt vollständigen Checkout (TASK-96) | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_bug95.py` | BUG-95: Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigte trotz BUG-94-Fix weiterhin nur den Event-Typ statt das Motiv im Titel | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug107.py` | BUG-107: job_history.py zeigte Timeout/DataError-Häufungen aus test_us38.py-Testartefakten statt echter Job-Fehler — neue session-scoped autouse-Fixture in `conftest.py` leitet `main._store.insert_job_run` während der Testsitzung auf eine Wegwerf-DB um, geteilte `backend/data_dev/fotoalert.db` bleibt unberührt | ✅ immer (offline, deterministisch) | `offline`, `regression` |
-| `test_us38.py` | US-38: Observability & Self-Healing — job_runs-Tabelle (SQLite-Persistenz), Fehlerklassifizierer (observability.py), Alarm-Mail-Debounce, job_history.py-CLI | ✅ immer (offline, deterministisch) | `offline`, `regression` |
+| `test_us38.py` | US-38: Observability & Self-Healing — job_runs-Tabelle (SQLite-Persistenz), Fehlerklassifizierer (observability.py), Alarm-Mail-Debounce, job_history.py-CLI (laedt tools/job_history.py per Repo-Root-relativem Pfad) | ✅ immer (offline, deterministisch) — benötigt vollständigen Checkout (TASK-96) | `offline`, `regression`, `requires_full_checkout` |
 | `test_bug101.py` | BUG-101: Scout-Zugänglichkeitsprüfung erkannte nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse (Fund Schloss Pfaueninsel) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug102.py` | BUG-102: Motiv-Koordinaten `SUBJECTS` froren beim Serverstart ein — Scout-Chancen ignorierten nachträgliche Koordinatenkorrekturen (Fund Einsteinturm) | ✅ immer (offline, deterministisch) | `offline`, `regression` |
 | `test_bug103.py` | BUG-103: Scout-Zugänglichkeits-Cache prüfte beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen (Fund US-135, Pfaueninsel) | ✅ immer (offline, deterministisch) | `offline`, `regression` |

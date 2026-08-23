@@ -2,7 +2,7 @@
 
 Hintergrund: `offline` bedeutet nur "deterministisch, ohne Netzwerk/externe Dienste" -
 es garantiert NICHT, dass ein Test auch bei einem Teil-Checkout laeuft, der nur
-`backend/` enthaelt (z.B. CI-Job oder Sandbox-Abzug mit schmaler Datei-Auswahl). Sechs
+`backend/` enthaelt (z.B. CI-Job oder Sandbox-Abzug mit schmaler Datei-Auswahl). Sieben
 Testdateien loesen Pfade relativ zum Repo-Root ausserhalb von `backend/` auf (`web/`,
 `deploy/`, `tools/`, `docs/`) und brechen deshalb bei einem Backend-only-Checkout, obwohl
 sie als `offline`/`frontend` markiert sind: `test_task84.py`,
@@ -10,7 +10,8 @@ sie als `offline`/`frontend` markiert sind: `test_task84.py`,
 `test_us79_moon_rise_set.py` (verifiziert in der TASK-96-Analyse, 2026-08-09/10),
 `test_task53_dev_sync.py`, `test_task-66.py` (nachtraeglich per Verifikations-Review am
 2026-08-10 gefunden - die urspruengliche Heuristik unten erkannte nur `web`/`deploy`,
-nicht `tools`/`docs`).
+nicht `tools`/`docs`), `test_us38.py` (BUG-107-CI-Nachtrag, 2026-08-23 gefunden - laedt
+tools/job_history.py per Repo-Root-relativem Pfad, siehe _TOOLS_DIR).
 
 Dieser Test:
   1. Scannt alle *.py-Dateien in backend/tests/ heuristisch danach, ob sie einen
@@ -53,6 +54,7 @@ KNOWN_FULL_CHECKOUT_FILES = {
     "test_us79_moon_rise_set.py",
     "test_task53_dev_sync.py",
     "test_task-66.py",
+    "test_us38.py",
 }
 
 # Heuristik: ein Path-Join mit dem String-Literal "web", "deploy", "tools" oder "docs"

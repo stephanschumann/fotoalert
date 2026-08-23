@@ -6,7 +6,9 @@ drei explizit in der Negativ-/Randfall-Checkliste genannten Edge Cases
 (Alert-Debounce-Grenze bei genau 1h, ungültiger --days-Parameter,
 job_runs-Insert-Fehler bricht den Job nicht ab).
 
-Marker offline + regression (Ticket-Testplan). Die Fehlerklassifizierer-Tests
+Marker offline + regression + requires_full_checkout (TASK-96: laedt tools/job_history.py
+per Repo-Root-relativem Pfad, s.u. _TOOLS_DIR - bricht bei Backend-only-Checkout).
+Die Fehlerklassifizierer-Tests
 (observability.classify_error) sind zusätzlich als smoke markiert — Kernpfad
 für die Fehlerdiagnose, sollen im schnellen Vorlauf mitlaufen.
 
@@ -26,7 +28,7 @@ import main
 import observability
 from data.store import LocationStore
 
-pytestmark = [pytest.mark.offline, pytest.mark.regression]
+pytestmark = [pytest.mark.offline, pytest.mark.regression, pytest.mark.requires_full_checkout]
 
 _TOOLS_DIR = Path(__file__).resolve().parent.parent.parent / "tools"
 _JOB_KEYS = ("weather", "feed", "calendar", "weather-map", "sightlines", "discover")

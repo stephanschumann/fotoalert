@@ -31,6 +31,31 @@ import main
 pytestmark = [pytest.mark.regression]
 
 
+def _idle_job() -> dict:
+    return {
+        "status": "idle", "last_run": None, "last_error": None,
+        "duration_s": None, "error_class": None, "spec": None,
+    }
+
+
+@pytest.fixture(autouse=True)
+def _reset_job_status():
+    """BUG-107-Nachtrag (CI-Fund, 2026-08-23): beide TestXxxErrorNoRawLeak-Faelle unten
+    rufen main._run_precompute()/main._run_sightline_refresh() real auf und setzen dabei
+    main._job_status["feed"]/["sightlines"] auf "error" — ohne Reset blieb das nach diesem
+    Testmodul im geteilten Modul-Global main._job_status stehen. main.health() (US-38)
+    meldete dadurch fuer ALLE spaeter in derselben Sitzung laufenden Tests (u.a. test_health
+    in test_task67_backend_regression.py) faelschlich "degraded" statt "ok" — die Luecke
+    existierte schon vor US-38, wurde aber erst durch dessen neue any_job_error-Pruefung
+    in /health sichtbar. Muster identisch zu test_us38.py::_reset_job_state /
+    test_bug107.py::_reset_job_status."""
+    for key in ("feed", "sightlines"):
+        main._job_status[key] = _idle_job()
+    yield
+    for key in ("feed", "sightlines"):
+        main._job_status[key] = _idle_job()
+
+
 # ---------------------------------------------------------------------------
 # (a) Teil 1: precompute-Subprozess-Fehler (_run_precompute) — Job-Status ohne
 #     rohen Exception-Text, voller Text weiterhin im Server-Log.
