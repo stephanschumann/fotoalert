@@ -81,14 +81,17 @@ const LANES=[
  {k:"inbox",t:"📥 Inbox",s:"nicht freigegeben"},
  {k:"analysis_ready",t:"🚦 Ready for Analysis",s:"DEIN GATE",gate:1},
  {k:"analysis",t:"🔬 In Analysis",s:"Weg-Gate: deine Freigabe",gate:1},
+ {k:"waiting_decision",t:"⏸️ Wartet auf Entscheidung",s:"Weg-Gate/AK-Check Rot",gate:1},
+ {k:"needs_you",t:"🚩 Braucht dich",s:"Gate-Auditor-Abweichung",gate:1},
  {k:"dev_ready",t:"✅ Ready for Dev",s:"wartet auf Impl"},
  {k:"inprogress",t:"🔄 In Progress",s:"wird implementiert"},
  {k:"test",t:"🧪 In Test",s:"deine Test-Bestätigung",gate:1},
+ {k:"ready_to_release",t:"🎯 Bereit zur Veröffentlichung",s:"WIP=1: dein Release-Klick",gate:1},
  {k:"done",t:"✓ Done",s:"abgeschlossen"},
  {k:"retro",t:"🔁 Retro / Lernen",s:"auto: Memory/Tests/Skills",retro:1},
  {k:"excluded",t:"🚫 Excluded",s:"nie aufnehmen",excl:1},
 ];
-const PIPE=["inbox","analysis_ready","analysis","dev_ready","inprogress","test","done","retro"];
+const PIPE=["inbox","analysis_ready","analysis","waiting_decision","needs_you","dev_ready","inprogress","test","ready_to_release","done","retro"];
 const LK=Object.fromEntries(LANES.map(l=>[l.k,l.t]));
 const SKEY="fa_kanban_"+VERSION;
 let state={};

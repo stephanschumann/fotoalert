@@ -30,17 +30,27 @@ def read_backlog():
         t += "\n\n" + open(ARCHIVE, encoding="utf-8").read()
     return t
 
-LANE_KEYS = ["inbox","analysis_ready","analysis","dev_ready","inprogress","test","done","retro","excluded"]
+LANE_KEYS = ["inbox","analysis_ready","analysis","waiting_decision","needs_you","dev_ready",
+             "inprogress","test","ready_to_release","done","retro","excluded"]
 
 def status_to_key(status):
+    # Reihenfolge/Zuordnung bewusst deckungsgleich zu lint_backlog.py::status_to_key gehalten
+    # (BUG-108-Fund 2026-08-23: hier fehlten "wartet auf entscheidung"/"braucht dich"/
+    # "bereit zur veröffentlichung" komplett, wodurch solche Tickets still in "inbox" landeten,
+    # obwohl Status-Feld und Board-Tabelle bereits korrekt "Wartet auf Entscheidung" zeigten —
+    # lint_backlog.py prüft nur Board-vs-Status, nicht diesen Generator, daher blieb es lint-grün).
     s = (status or "").lower()
-    if "done" in s:               return "done"
-    if "in test" in s:            return "test"
-    if "in progress" in s:        return "inprogress"
-    if "ready for analysis" in s: return "analysis_ready"
-    if "in analysis" in s:        return "analysis"
-    if "ready for dev" in s:      return "dev_ready"
-    if "excluded" in s:           return "excluded"
+    if "done" in s:                                  return "done"
+    if "braucht dich" in s:                           return "needs_you"
+    if "bereit zur veröffentlichung" in s:            return "ready_to_release"
+    if "wartet auf freie veröffentlichungs" in s:     return "test"
+    if "in test" in s:                                return "test"
+    if "in progress" in s:                            return "inprogress"
+    if "wartet auf entscheidung" in s:                return "waiting_decision"
+    if "ready for analysis" in s:                     return "analysis_ready"
+    if "in analysis" in s:                            return "analysis"
+    if "ready for dev" in s:                          return "dev_ready"
+    if "excluded" in s:                               return "excluded"
     # ToDo / offen / leer / unbekannt -> Inbox
     return "inbox"
 

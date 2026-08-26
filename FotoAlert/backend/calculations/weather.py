@@ -220,6 +220,30 @@ urspruenglich fuer Option A vorgesehene RED_SKY_PROJECTION_DISTANCE_M).
 """
 
 
+RED_CLOUDS_PROJECTION_DISTANCE_M = 100_000
+"""
+BUG-108: Eigene, von CLOUD_MOOD_PROJECTION_DISTANCE_M unabhaengige Projektionsdistanz
+(Meter) entlang der Sichtachse, NUR fuer RED_CLOUDS ("Rote Wolken") — die Wolkendaten
+(ch/cl) werden am Punkt RED_CLOUDS_PROJECTION_DISTANCE_M in Sonnenrichtung
+(celestial_azimuth, Blaue-Stunde-Sonnenposition) abgefragt, nicht mehr am
+Fotografen-Standort. GOLDEN_CLOUDS und RED_SKY bleiben unveraendert bei den
+bestehenden 30 km (CLOUD_MOOD_PROJECTION_DISTANCE_M) — eine gemeinsame Distanz war
+laut BUG-108-Analyse nicht sinnvoll uebertragbar (RED_CLOUDS braucht celestial_azimuth
+als Projektionsrichtung, ein zeitlich anderer Azimut als sunrise_azimuth/
+sunset_azimuth). Folgt damit demselben bereits etablierten Muster einer pro-Typ
+unabhaengigen Konstante wie RED_CLOUDS_AZIMUTH_TOLERANCE_DEG (s.u.).
+
+Wert 100 km: von Stephan im Weg-Gate (BACKLOG.md BUG-108, 2026-08-23) explizit
+entschieden (Option C/Option-B-Distanz im Ticket, Beispielfall Schloss Babelsberg →
+Pfingstberg Belvedere: ca. 100 km entfernt vorhergesagtes Rotwolken-Band Richtung
+Magdeburg, das die bestehenden 30 km strukturell nicht abgedeckt haetten). Wie bei
+CLOUD_MOOD_PROJECTION_DISTANCE_M eine feste, pauschale Konstante ohne empirische
+Kalibrierung (keine trigonometrische Herleitung moeglich, da die Wetter-API keinen
+Anhaltspunkt fuer die tatsaechliche Entfernung des Wolkensignals liefert) — nach
+Live-Beobachtung ggf. nachjustierbar.
+"""
+
+
 def should_generate_golden_clouds_event(
     gcs: float,
     sun_azimuth: float,

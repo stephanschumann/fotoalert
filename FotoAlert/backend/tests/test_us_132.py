@@ -160,6 +160,15 @@ def _make_blue_hour_event(sun_altitude=-5, sun_azimuth=280, subject_azimuth=280,
         "celestial_azimuth": sun_azimuth,
         "celestial_altitude": sun_altitude,
         "subject_azimuth": subject_azimuth,
+        # BUG-108-Nachtrag (2026-08-23): _red_clouds_inputs() liest ch/cl seither vom
+        # eigenständigen RED_CLOUDS-Projektionspunkt (ch_red_clouds_dir/cl_red_clouds_dir),
+        # NICHT mehr aus weather_details (Fotografen-Standort) — analog zum bereits
+        # bestehenden US-131-Nachtrag unten (golden_cloud_score_sun_dir etc. für
+        # GOLDEN_CLOUDS/RED_SKY). Ohne diese beiden Felder bliebe "Rote Wolken" in
+        # diesen synthetischen Test-Event-Dicts fälschlich aus (kein Fallback, s.
+        # BACKLOG.md BUG-108 Weg-Gate-Entscheidung 2026-08-23).
+        "ch_red_clouds_dir": ch,
+        "cl_red_clouds_dir": cl,
         "composition_analysis": None,
         "moon_phase": None,
         "moon_illumination_pct": None,

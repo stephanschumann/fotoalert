@@ -28,12 +28,12 @@
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **BUG-21** *(Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **US-136** *(Login mit E-Mail/Passwort für mehrere Nutzer inkl. Account-Löschung/Passwort-Reset, 2FA explizit ausgeschlossen; direkt von Stephan nach Ready for Analysis freigegeben, 2026-08-16)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | *(leer)* |
+| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **BUG-110** *(Jahreskalender zeigt für den gesamten aktuellen Monat August 2026 keine Einträge, vermutlich Hintergrund-Job nie gelaufen, Fund aus Server-Status-Check 2026-08-25)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-108** *(Rote Wolken prüft nur lokales Wetter am Standort, keine Wolken-Projektion entlang der Blickrichtung; Weg-Gate-Entscheidung Stephan 2026-08-23: Frage 1 Option B (eigene, eigenständige 100-km-Distanz nur für „Rote Wolken"), Frage 2 Option A (kein Rückfall auf lokales Wetter bei Fetch-Fehlschlag am entfernten Punkt); Zeitbudget-Risiko aus Pre-Mortem bleibt als Implementierungs-Hinweis bestehen, AK 7 deckt es ab); Isolations-Kopie `_worktrees/BUG-108/backend/` angelegt (Parallelität zu TASK-59/US-38/BUG-107), da Änderungen laut Architektur-Analyse ausschließlich `backend/main.py`+`backend/calculations/weather.py` betreffen)* |
-| **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-109** *(„Warum Rote Wolken?"-Erklärungstext zeigt Wolkenwert vom Fotografen-Standort statt vom Projektions-Punkt, Fund aus Live-Verifikation von BUG-108 2026-08-25; Fix in web/index.html umgesetzt, echter pytest-Lauf backend/tests/test_bug109.py 7/7 grün 2026-08-26, Live-Browser-Verifikation 2026-08-26 bestaetigt, Root-Cause SW-Cache — s. Ticket-Notiz)* |
+| **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | **BUG-108** *(Rote Wolken prüft nur lokales Wetter am Standort, keine Wolken-Projektion entlang der Blickrichtung; Weg-Gate-Entscheidung Stephan 2026-08-23: Frage 1 Option B (eigene, eigenständige 100-km-Distanz nur für „Rote Wolken"), Frage 2 Option A (kein Rückfall auf lokales Wetter bei Fetch-Fehlschlag am entfernten Punkt); Isolations-Kopie `_worktrees/BUG-108/backend/` angelegt (Parallelität zu TASK-59/US-38/BUG-107); Live-Nachweis aller sechs Ansichten inkl. der zuvor offenen Chancen-Übersicht am 2026-08-26 per echtem Chrome-Browser bestätigt — wartet auf Stephans manuellen Release-Schritt (Merge Worktree-Fix in den Hauptordner + Deploy))* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-54** *(Festplatten-Cache Wetterkarten-PNGs — Implementierung + 8/8 neue Tests grün, volle Offline-Regression 580 passed/1 vorbestehend-unabhängig, manueller Neustart-Test von Stephan bestätigt, released v1.22.65 (Commit 99b4efd), GitHub-Actions-Lauf #325 grün (3m 33s), Health-Check bestätigt version 2.0.0/locations_count 172, Live-Verifikation im Browser bestätigt, 2026-08-17)* · **TASK-58** *(Refactoring mkCloudCompassSvg() in 9 Helferfunktionen, alle 10 AK bestanden, Gate-Auditor bestätigt, released v1.22.62, CI-Fehlalarm durch Zeitzonen-Randfall im Test aufgeklärt (nicht code-verursacht) und per Re-Run grün bestätigt, Live-Verifikation ok (Health-Check, alle 9 _cc*-Helfer live vorhanden), 2026-08-10)* · **TASK-89** *(Caddy-Log-Verzeichnis-Berechtigung bei Server-Neuaufbau: Schutz-Block in deploy/setup_server.sh war bereits vorhanden (Commit fb35944/v1.22.46), Release-/Commit-Stand nachtraeglich ueber die oeffentliche GitHub-Weboberflaeche verifiziert (kein offener Diff, Fix bestaetigt live auf main), kein Code-Deploy noetig, 2026-08-09)* · **US-134** *(Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern, zweiter Auslöseweg zusätzlich zum bestehenden Blur-Schwenk aus US-133; Test: 10/11 AK sofort gruen, AK7-Doppelaufruf-Bug gefunden und per onmousedown="event.preventDefault()" behoben, danach alle 11 AK bestaetigt; separate Verifikation: Bestaetigt; Refactor abgeschlossen; released v1.22.61, Deploy verifiziert (Health-Check ok, Live-Verifikation im Browser: Bestaetigen-Button + Kartenschwenk nach Cache-Bereinigung eines aktiven Service Workers bestaetigt), 2026-08-09)* · **TASK-101** *(Skill-Qualitäts-Audit — AK-Qualitäts-Check-Ergänzungen für fotoalert-analyze/fotoalert-orchestrator ausgeliefert und von Stephan installiert, 2026-08-09)* · **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* · **TASK-90** *(Genereller In-Flight-Dedup in `API.get()` gegen mehrfache gleichzeitige /opportunities-Abrufe beim App-Start (Option A), Live-Browser-Verifikation durch gate-auditor bestätigt (AK1/AK2/AK4/AK5/AK6 sowie AK3 real reproduziert), im Zuge des zeitgleichen US-134-Release (v1.22.61) mitgenommen, Live bestätigt (`API._inflightGet` aktiv, Health-Check ok, locations_count 172), 2026-08-09)* · **TASK-93** *(41 echte Alt-Tickets aus dem Erledigt-Block als vollwertige Sektionen nachgerüstet, 23 weitere waren bereits im Archiv erfasst, ursprüngliche 147er-Zahl widerlegt, 2026-08-10)* · **TASK-91** *(Testzeitpunkt in test_task67_feed_regression.py auf festes Datum gepinnt, echter pytest-Lauf 7/7 gruen bestaetigt, 2026-08-10)* · **TASK-94** *(main.py::_load_custom_locations() nutzt jetzt coerce_category_value() + Pro-Eintrag-Absicherung, echter pytest-Lauf 4/4 gruen + volle Regressionssuite ohne dadurch verursachte neue Fehlschlaege, 2026-08-10)* · **TASK-88** *(Skill-Doku-Update fotoalert-release/edge-cases.md ausgeliefert und von Stephan installiert bestaetigt, 2026-08-10)* · **TASK-103** *(PATCH /locations auf Host beschraenkt, aus dem Security-Sammelticket ausgegliedert; ueber einen fremden Sammel-Release versehentlich zurueckgesetzt (Commit 23af8cf, fehlende Testdateien liessen 31 Tests brechen), am 2026-08-11 korrekt mit allen Testdateien neu veroeffentlicht, echter pytest-Lauf 99/99 gruen, released v1.22.64 (Commit 5fc04f9), CI gruen (Lauf #315), 2026-08-11)* · **TASK-95** *(Health-Check-Feldbeschreibung ergänzt — klärt, dass das version-Feld eine Backend-Schemaversion ist, keine App-Release-Version; echter pytest-Lauf + volle Regressionssuite grün, released im Sechs-Ticket-Bundle (Commit 8af2694 + Korrektur-Commit 23af8cf nach CI-Rotfund, s. main.py-Zwischenstand-Fund), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, offener Punkt: fotoalert-release-Skilltext AK4 noch nicht angepasst, 2026-08-10)* · **TASK-96** *(Pytest-Marker requires_full_checkout für teil-checkout-abhängige offline-Tests + automatisierter Konsistenztest ergänzt (inkl. Nachbesserung tools/docs), echter pytest-Lauf 10/10 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-97** *(CI-Diagnostik bei Login-Precondition-Fehlern erweitert (Server-Log + Vor-Login-Screenshot + Diagnose-Helfer in beiden Login-Pfaden), echter pytest-Lauf 2/2 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-99** *(Feste Berlin/Brandenburg-Scope-Sprache in Doku/Kommentaren an den tatsächlichen, geografisch erweiterten Ist-Zustand angeglichen, reine Textänderung ohne Verhaltenseffekt, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-100** *(_fetch_weather_and_aerosol() weiter aufgeteilt (104→59 Zeilen, neuer Helfer _run_weather_fetch_tasks_with_ceiling() 78 Zeilen, beide unter dem 80-Zeilen-Schwellwert), Signatur + alle TASK-76-Helfer/Aufrufer unverändert, echter pytest-Lauf 20/20 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-98** *(release.sh gehärtet: Pathspec-Fix + Versions-Verifikation, released im Sechs-Ticket-Bundle (Commit 8af2694) + separater Ausführbar-Recht-Fix (Commit 64b8f54), CI grün (Lauf #313), Board-Status-Korrektur am 2026-08-13 nachgezogen (stand fälschlich weiter auf „Bereit zur Veröffentlichung"), 2026-08-10)* · **TASK-87** *(Sicherheits-Sammelticket abgeschlossen: SSH-Fingerabdruck-Pruefung per Secret SERVER_KNOWN_HOSTS statt Live-Scan, StrictHostKeyChecking=yes, drei Deploys in Folge erfolgreich (CI-Laeufe #313/#314/#315), Fehlermeldungen/Upload-Pruefreihenfolge/Systemdienst-Haertung sowie Host-only-Bearbeitung gespeicherter Orte bereits in den ausgegliederten Folge-Tickets umgesetzt, Sicherheitsluecken-Scan durchgefuehrt (Umsetzung als eigenes, noch offenes Ticket vorgemerkt), 2026-08-11)* · **BUG-104** *(Wolkenstimmung-Berechnung golden_cloud_score_sun_dir/_antisolar_dir lieferte für alle Chancen null — Root-Cause Cache-Key-Rundung der Projektions-Koordinaten (3→2 Dezimalstellen, Option A), 7 neue Tests + 48 Regressionstests grün, unabhängig verifiziert, refactored, released Commit 47b1fc5 (CI-Lauf #310 grün), doppelt live nachgewiesen: Nachtest 2026-08-11 04:01 UTC zeigt `/job-status` status done/last_error null/duration_s 76.4 (unter dem 180s-Budget) und 10/10 relevante Chancen mit geladenem Wetter mit gesetztem Richtungswert (vorher direkt nach Deploy 3/53); AK5b nur indirekt gestützt (kein exakter 429-Zähllauf), AK6 code-/datenseitig bestätigt ohne separaten UI-Screenshot, 2026-08-11)* · **TASK-102** *(Fehlermeldungen/Upload-Pruefreihenfolge mit echten Tests bestaetigt, Systemdienst-Haertung ueber das Veroeffentlichungs-Protokoll verifiziert (automatischer Gesundheits-Check nach Neustart bestand, kein Rollback ausgeloest) statt per direktem Server-Zugriff, released v1.22.64/40222bd, CI gruen (Lauf #316), 2026-08-11)* · **TASK-02** *(Vier neue Finsternis-Event-Typen (Sonnen-/Mondfinsternis total/partiell) im Kalender, 19/19 automatisierte Tests grün, Live-Verifikation bestätigt, erster Release-Commit ec05ce4 mit Scope-Fehler (Test-Gate verhinderte Deploy), korrigiert per Nachtrag-Commit b54ddbb, GitHub-Actions-Lauf #321 grün, Health-Check version 2.0.0/locations_count 172, 2026-08-16)* · **BUG-89** *(Wetter-Score/Wolkenstimmung: Inline-Hinweis, dreifach bestätigt (08.08./13.08./16.08.), bereits seit 2026-08-05 live v1.22.58 (Commit b589e0b), kein weiterer Deploy nötig, 2026-08-16)* · **BUG-56** *(Astronomie-Regressionstest Sonnenauf-/-untergang Berlin korrigiert, Commit 74c957f, released v1.20.14, Ticket-Status war bereits seit 2026-07-03 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter-Überlappung auf schmalen Bildschirmen behoben (Icon-Buttons), Commit b66ac09, released v1.21.5, Test bestätigt (Stephan, 2026-07-05), Ticket-Status war bereits seit 2026-07-05 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-64** *(Platzhaltertext ‚Automatisch erfasst via Quick Location Capture.' im Hinweise-Feld bei Bestands-Locations per Cleanup-Skript bereinigt (57 Locations), Commit f35c603, released v1.21.11, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt jetzt auch in Kartenansicht, beim Locations-Tab-Wechsel und im Scout, Commits 7e31cbb/ea7441b, released v1.22.39, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **TASK-104** *(Sicherheitsluecken-Bump: `PyJWT`→2.13.0, `cryptography`→49.0.0, `Pillow`→12.3.0, `python-multipart`→0.0.20, `pytest`→9.0.3 — 5 von 7 Paketen. `starlette` bewusst nicht gebumpt (Stephans Entscheidung Option B, bleibt transitiv ueber fastapi==0.111.0 bei 0.37.2, kein offener Punkt mehr), released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, 2026-08-16)* · **TASK-105** *(Python 3.9→3.12-Vereinheitlichung — Fund: Produktionsserver lief entgegen bisheriger Doku bereits seit Juni 2026 auf Python 3.12, urspruenglich geplante separate Stufe-2-Server-Migration dadurch nicht mehr noetig; CLAUDE.md Zeile 103 korrigiert; ein serverseitiger venv-Swap-Testversuch (Shebang-Pfad-Bug) fehlgeschlagen und sauber zurueckgerollt, kein bleibender Schaden; beide GitHub-Workflows (deploy.yml, update-building-data.yml) auf python-version 3.12 gepinnt, released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, Locations-Ansicht laedt echte Daten, 2026-08-16)* · **TASK-107** *(run_frontend_check.py: Onboarding-Dismiss deckt calendar_shows_events_or_empty_state/bug88_feed_data_ready bei kaltem Serverstart nicht ab, Fund per Live-Chrome-Verifikation 2026-08-17, Option B umgesetzt — Verifikation von Stephan final bestätigt, 2026-08-17)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03; Implementierung 17.08.2026 verifiziert, Regressionstest korrigiert, alle Tests grün, von Stephan final bestätigt)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-103** *(Scout-Zugänglichkeits-Cache prüft beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen, Fund aus US-135-Test, Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-106** *(Wetter-Overlay: kalter Cache nach Server-Neustart kollidiert mit dem 180s-Zeitbudget aus BUG-99, viele Events ohne Wetterdaten, Fund per Server-Log-Verifikation 2026-08-11; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-105** *(Test test_bug85_..._is_intentional fiel im Zeitfenster ~22:00–00:00 UTC fälschlich rot, Fund aus TASK-58-Release-Nachbereitung; Zeitzonenberechnung in `_inject_tomorrow_only_entry()` war bei Implementierungs-Verifikation 17.08.2026 bereits per `zoneinfo` auf Berlin-Mittag fixiert (Option A), `pytest tests/test_bug_85.py` → 3 passed, von Stephan bestätigt 17.08.2026) · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidierte zwischen Host-Verifikation und Sichtachsen-Datenverfügbarkeit — bei Implementierungs-Verifikation 17.08.2026 Fix (Option A) bereits vollständig im Code vorhanden: `SIGHTLINE_LABELS.nicht_geprueft`/FilterSheet-Chip-Referenz/ElementInfo-Popup/Filterbeschreibung zeigen „Daten fehlen", Host-Verifikations-Wortlaut unverändert, BUG-88-Eskalationslogik unberührt, dedizierter Regressionstest `backend/tests/test_bug-87.py` vorhanden; echte visuelle Browser-Verifikation steht noch aus und ist nur durch Stephan möglich, 2026-08-17)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse zeigen jetzt eskalierte Warnfarbe/Warndreieck-Icon statt neutralem Grau bei „Nicht geprüft" — `sightlineTagHtml()` Zeile 1973-1982 in `web/index.html`, Option A vollständig umgesetzt, in dieser Sitzung live im Browser UND per automatisiertem Playwright-Check bestätigt; Dark-Mode-Kontrast code-basiert plausibilisiert (separates, helleres Dark-Mode-Token `#e3a21a`, rechnerisch ≈7.3-8.1:1 Kontrast, kein Hinweis auf Problem) — echte visuelle Dark-Mode-Bestätigung durch Stephan steht noch aus; offene ❓-Frage Option A/B durch die erfolgreiche Umsetzung faktisch beantwortet, 2026-08-17)* · **TASK-92** *(Epic Security-Audit 2026-07-16 — alle Kern- und Folge-Kind-Tickets Done (Kind-Tickets-Liste im Ticket war veraltet: TASK-87/TASK-91/TASK-88 standen dort fälschlich noch als ToDo, obwohl längst abgeschlossen), kein eigener Code, reine Status-Nachpflege, Korrektur 2026-08-19)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
@@ -194,7 +194,7 @@ Stephan hat entschieden: die im „✅ Erledigt"-Abschnitt gefundenen 41 Alt-Ein
 |------|------|
 | **Typ** | Bug |
 | **Priorität** | Mittel |
-| **Status** | In Test |
+| **Status** | Bereit zur Veröffentlichung |
 | **Erstellt** | 2026-08-23 |
 
 **Beschreibung:** Der Ereignistyp „Rote Wolken" (`should_generate_red_clouds_event()`,
@@ -431,10 +431,11 @@ der Erzeugungsstelle reicht (Fundstellen-Sweep oben).
   Belvedere) liefert bei vergleichbarer Wetterlage (hohe Bewölkung entfernt, aber in
   Blickrichtung) nach der Umsetzung tatsächlich einen „Rote Wolken"-Kandidaten.
   *(Herkunft: Ticket-Beobachtungsfall)*
-- [~] Die „Rote Wolken"-Chance erscheint nach der Umsetzung an allen Stellen, an denen
+- [x] Die „Rote Wolken"-Chance erscheint nach der Umsetzung an allen Stellen, an denen
   Fotochancen generell sichtbar sind (Feed, Karte, Kalender, Scout, Chancen-Übersicht,
   Event-Detail) — nicht nur an einer einzelnen Ansicht. *(Herkunft: Fundstellen-Sweep,
   Vier-Kategorien-Abdeckung/Architektur)*
+  **Live-Nachweis Chancen-Übersicht (2026-08-26):** Lücke aus der unabhängigen Verifikation geschlossen — im laufenden Dev-Server (Worktree-Fix, `RED_CLOUDS_PROJECTION_DISTANCE_M = 100_000`) per echtem Chrome-Browser gezielt die zuvor ungeprüfte Ansicht kontrolliert: Location-Detail-Sektion „Nächste Events" (= Chancen-Übersicht pro Standort) zeigt für Schloss Babelsberg → Pfingstberg Belvedere korrekt „Rote Wolken über Belvedere auf dem Pfingstberg" (Do., 27. Aug., 57%), Klick öffnet das erwartete Event-Detail fehlerfrei. Alle sechs Ansichten damit live bestätigt.
 
 **🔍 AK-Qualitäts-Check:**
 ✅ durchgeführt — Negativ-Gegenstück zu Rule 2 ergänzt (Azimut außerhalb Toleranz → weiterhin
@@ -544,6 +545,27 @@ geändert wird):*
   PRODUCT.md Sektion 12 (Regressions-Matrix) für „Backend, Wetter/Score-Änderung" konsultieren —
   zusätzlich Feed/Karte/Kalender auf unveränderte Goldene-Wolken-/Himmelsröte-Karten prüfen
   (Regressionsschutz für die von diesem Ticket NICHT geänderten zwei anderen Typen).
+
+**Rücksync Worktree → Hauptordner (2026-08-26):** Vor dem Release-Gate wurden die
+BUG-108-Änderungen aus `_worktrees/BUG-108/backend/` per reinem Datei-Kopiervorgang (kein
+Git) in den Hauptordner zurückgespielt, da `fotoalert-release` ausschließlich gegen den
+Hauptordner arbeitet. Kopiert (`diff -rq` vorher/nachher belegt, danach 0 Unterschied für
+diese Dateien): `backend/main.py`, `backend/calculations/weather.py` (WEATHER_OVERLAY_MAX_
+TOTAL_SECONDS=1500.0 + red_clouds_dir-Projektionslogik), `backend/tests/test_bug108.py` (neu,
+24 Testfunktionen), sowie die Test-Nachträge `backend/tests/test_bug-99.py`,
+`backend/tests/test_bug106.py` (beide 180.0 → 1500.0 aktualisiert), `backend/tests/
+test_bug-94.py` und `backend/tests/test_us_132.py` (ch_red_clouds_dir/cl_red_clouds_dir in
+synthetischen Event-Fixtures ergänzt). Der Hauptordner enthält den vollständigen
+BUG-108-Stand nun ebenfalls.
+
+Bewusst NICHT überschrieben (echter Konflikt, Hauptordner war beim Diff neuer als der
+Worktree-Schnappschuss — von BUG-107/TASK-96/US-38 zwischenzeitlich geändert, während der
+BUG-108-Worktree bereits existierte): `backend/observability.py`, `backend/tests/README.md`,
+`backend/tests/test_bug107.py`, `backend/tests/test_task-102.py`, `backend/tests/
+test_task96_requires_full_checkout_marker.py`, `backend/tests/test_us38.py`. Nur zur
+Kenntnis, kein Blocker: `_worktrees/BUG-108/backend/_to_delete/` enthält reine
+Diagnose-Logs (kein Quellcode), `backend/venv_py39_backup` existiert nur im Hauptordner
+(unabhängig von BUG-108) — beides unangetastet gelassen.
 
 ---
 
@@ -679,6 +701,956 @@ Keine offenen ❓-Fragen — die einzige echte Entscheidung (WIE isoliert wird: 
 - Manuell (nach Umsetzung von Option A, auf Stephans Mac): (1) `cd backend && venv/bin/pytest tests/test_us38.py tests/test_bug107.py -v` — alle Tests grün, insbesondere die drei oben genannten AK1-Tests. (2) Direkt danach `python3 tools/job_history.py --days 1` (bzw. `--errors-only`) ausführen — die Ausgabe enthält KEINE der bekannten Fixture-Meldungen mehr. (3) Volle Backend-Regressionssuite laufen lassen — keine neuen Fehlschläge gegenüber dem vorherigen Stand. (4) Einmalig, nach Stephans Bestätigung: die 24 bereits bestehenden historischen Testartefakt-Zeilen (Cluster 19.08. 06:49:42–43Z + 21.08. 18:36:19–20Z) aus `backend/data_dev/fotoalert.db` per gezieltem `DELETE ... WHERE ts IN (...) AND error_msg IN (...)` entfernen (Fingerprint: exakte Zeitstempel + exakte Fehlermeldungstexte, NICHT pauschal `duration_s=0.0`, siehe Pre-Mortem Szenario 2) und mit `python3 tools/job_history.py --days 30` verifizieren, dass sie verschwunden sind, während die 6 echten `weather`/`weather-map`-Zeilen vom 21.08. erhalten bleiben.
 
 **Status-Empfehlung:** Ready for Dev (Option A, Weg-Gate 🟢 Grün)
+
+---
+
+### BUG-109 · „Warum Rote Wolken?"-Erklärungstext auf der Event-Detail-Ansicht zeigt Wolkenwert vom Fotografen-Standort statt vom Projektions-Punkt `[~]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Niedrig |
+| **Status** | In Test |
+| **Erstellt** | 2026-08-25 |
+
+**Beschreibung:** Auf der Event-Detail-Ansicht erklärt der Abschnitt „Warum Rote Wolken?" dem Nutzer,
+warum eine „Rote Wolken"-Fotochance erscheint. An mindestens einer Stelle in diesem
+Erklärungstext wird dabei weiterhin der Wolkenwert vom Fotografen-Standort genannt statt vom
+entfernten Projektions-Punkt (100 km in Blickrichtung — der eigentliche Kern von BUG-108).
+Betroffen ist ausschließlich der Erklärungstext; die tatsächliche Punktzahl/Bewertung der Chance
+reagiert bereits korrekt auf den Fernpunkt. Gefunden am Beispiel „Rote Wolken über Molecule Men
+und Fernsehturm" während der Live-Verifikation von BUG-108 (Chrome-Subagent, 2026-08-25).
+
+**Beobachtet vs. erwartet:** Erwartet: Der Erklärungstext benennt denselben Wolkenwert, der auch
+tatsächlich in die Berechnung eingeflossen ist (also den Wert am 100-km-Projektionspunkt in
+Blickrichtung). Beobachtet: Der Text nennt an dieser Stelle stattdessen den Wolkenwert am
+Fotografen-Standort — dem Nutzer wird damit die falsche Ursache für die Chance genannt
+(verwirrend, aber nicht falsch berechnet, da nur die Textausgabe betroffen ist).
+
+**User Story:** Als Fotograf, möchte ich, dass mir die App die tatsächliche Ursache einer „Rote
+Wolken"-Chance korrekt erklärt, sodass ich der angezeigten Begründung vertrauen kann und nicht
+fälschlich auf das Wetter an meinem eigenen Standort schließe.
+
+**Bezug:** Verwandt mit **BUG-108** *(In Test — Ereignistyp „Rote Wolken" nutzt jetzt den
+100-km-Projektionspunkt statt des Fotografen-Standorts für die Bewertung selbst), aber NICHT Teil
+von dessen Scope: BUG-108 befand sich zum Zeitpunkt dieses Funds bereits in der
+Verifikations-/Refactor-Phase, dieser Erklärungstext-Fund kam erst danach hinzu, bei der
+Live-Verifikation. Vermutlich dieselbe Codestelle/derselbe Baustein wie BUG-108
+(`_red_clouds_inputs()`/Erklärungstext-Baustein in `backend/main.py`), aber ausschließlich der
+Text-/Anzeige-Layer ist betroffen — die inhaltliche Analyse/Zuordnung ist Sache der Analyse-Phase.
+
+**Quelle:** Live-Verifikation von BUG-108, Chrome-Subagent, 2026-08-25.
+
+---
+
+**Example Mapping (fotoalert-analyze, 2026-08-25):**
+
+📎 Code-Verifikation: `web/index.html` (isRedClouds-Block, „Warum Rote Wolken?"-Erklärung
+in `Detail.open()`, Zeilen 4858-4902 zum Analysezeitpunkt), `backend/main.py` (Worktree
+`_worktrees/BUG-108/backend/`) `_red_clouds_inputs()` (Z. 1250ff.), `_build_red_clouds_event()`
+(Z. 1293ff.), `_apply_weather_to_event()` (Z. 802-820) gelesen am 2026-08-25.
+Bestätigt: Der Erklärungstext liest `ch`/`cl` aus `const wd = o.weather_details; ch = wd.cloud_cover_high_pct; cl = wd.cloud_cover_low_pct;`
+(Zeilen 4862-4864) — das ist derselbe `weather_details`-Block, der am Fotografen-Standort
+(`w_at = forecast.get_at(shoot_dt)`) befüllt wird. Die tatsächliche Bewertung
+(`_red_clouds_inputs()`/`should_generate_red_clouds_event()`) liest seit BUG-108 dagegen
+`e.get("ch_red_clouds_dir")`/`e.get("cl_red_clouds_dir")` — Werte vom 100-km-Projektionspunkt
+in Sonnenrichtung (`_red_clouds_projection_point()`, `RED_CLOUDS_PROJECTION_DISTANCE_M = 100_000`,
+`backend/calculations/weather.py:223`). Beide Felder werden in `_apply_weather_to_event()`
+direkt auf das Event-Dict `e` gesetzt (nicht in `weather_details` verschachtelt) und über
+`_copy.deepcopy(e)` in jedes „Rote Wolken"-Event übernommen — sie sind **garantiert nicht
+`None`**, sobald ein „Rote Wolken"-Event überhaupt existiert (`_build_red_clouds_event()`
+selbst gibt `None` zurück, wenn `ch`/`cl` fehlen, Z. 1310-1311) — kein Fehlerfall/Fallback-
+Zustand für die Erklärungstext-Anzeige nötig, solange das Event angezeigt wird.
+Widerlegt: Keine der ursprünglich vermuteten Fallback-Notwendigkeiten (z. B. „was, wenn der
+Projektionspunkt-Wert fehlt, aber das Event trotzdem angezeigt wird") — dieser Zustand ist
+durch den bestehenden Guard in `_build_red_clouds_event()` bereits strukturell ausgeschlossen.
+Rot-/Grün-Nachweis siehe Testplan unten (statischer Source-Check, direkt in dieser Sandbox
+ausgeführt, kein Server nötig).
+
+⚠️ **Cross-Ticket-Symbol-Check (Pflicht, Schritt 3, analog BUG-107/US-38-Retro):**
+`o.ch_red_clouds_dir`/`o.cl_red_clouds_dir` existieren als Backend-Felder **ausschließlich**
+im noch nicht gemergten BUG-108-Worktree (`_worktrees/BUG-108/backend/main.py`) —
+grep-verifiziert gegen den Hauptordner: `grep -n "ch_red_clouds_dir" backend/main.py` →
+**0 Treffer** (Hauptordner-`_red_clouds_inputs()` liest dort weiterhin
+`wd.get("cloud_cover_high_pct", 0)` direkt, identisch zum hier gemeldeten Frontend-Bug —
+BUG-108 selbst ist im Hauptordner noch nicht angekommen). **Abhängigkeit:** BUG-109 setzt
+BUG-108 voraus — die Felder, die der Fix lesen soll, existieren erst, wenn BUG-108s
+Backend-Änderung live ist. Der Code-Fix selbst (reine `web/index.html`-Änderung, s. u.) kann
+unabhängig vom Worktree-Merge geschrieben/getestet werden (statischer Source-Test hat keine
+Python-Abhängigkeit zu `main.py`), aber die **Release-/Live-Verifikation** von BUG-109 darf
+erst erfolgen, nachdem BUG-108 live ist — vorher blieben die betroffenen Zeilen im
+Erklärungstext einfach leer (bestehendes `!= null`-Guard-Muster greift, kein Absturz, aber
+auch kein sichtbarer Fixeffekt). Ausführliche Begründung: siehe Implementierungsoptionen.
+
+**Scope-Check:** Der Ticket-Titel benennt explizit „Rote Wolken" (nicht „alle
+Wolkenstimmungs-Erklärungstexte") — bewusster, enger Slice, kein impliziter größerer
+Designraum laut Ticket. Der Fundstellen-Sweep (unten) deckt aber einen **zweiten,
+strukturell identischen** Bugfall bei „Himmelsröte" auf, der nicht Teil dieses engen Slices
+ist — siehe Fundstellen-Sweep-Abschnitt für die Abgrenzungsentscheidung.
+
+📏 **Rule 1:** Der Abschnitt „Warum Rote Wolken?" zeigt bei „Hohe Wolken"/„Tiefe Wolken"
+den Wolkenwert vom 100-km-Projektionspunkt in Sonnenrichtung — demselben Wert, der
+tatsächlich darüber entscheidet, ob die Chance überhaupt erzeugt wird — nicht mehr den Wert
+am eigenen Standort des Fotografen.
+🟢 Example: Lokal (Fotografen-Standort) 8 % hohe Wolken (Bewertungsschwelle 20 % NICHT
+erreicht), am 100-km-Projektionspunkt in Sonnenrichtung 46 % hohe Wolken (Schwelle erreicht,
+Event wird deshalb erzeugt) → Erklärungstext zeigt „46 % ≥ 20 % ✓", nicht „8 % < 20 %".
+🟢 Example (Negativ-Gegenstück): Derselbe Fall wie oben — der Wert 8 % (Fotografen-Standort)
+taucht im Abschnitt „Warum Rote Wolken?" nicht mehr auf.
+
+📏 **Rule 2:** Das allgemein angezeigte Wetter am eigenen Standort (Abschnitt „Wetter zum
+Shoot-Zeitpunkt", inkl. der dortigen „Hohe Wolken"/„Tiefe Wolken"-Zeilen) bleibt unverändert
+das lokale Wetter — nur der Erklärungstext-Abschnitt wechselt die Datenquelle (identisch zu
+BUG-108 Rule 3, hier für den Anzeige-Layer erneut bestätigt).
+🟢 Example: Für dasselbe Event zeigt „Wetter zum Shoot-Zeitpunkt" weiterhin 8 % hohe Wolken
+(Fotografen-Standort), während „Warum Rote Wolken?" 46 % zeigt (Projektionspunkt) — zwei
+bewusst unterschiedliche, für sich je korrekte Werte an zwei verschiedenen Stellen derselben
+Ansicht.
+
+Keine offenen 🔴-Fragen zum Kernverhalten (Rules 1-2 sind durch die Code-Verifikation
+eindeutig belegt, kein Grenzfall mit mehreren sinnvollen Verhaltensweisen — anders als bei
+BUG-108 gibt es hier keine Distanz-/Fallback-Entscheidung zu treffen, die bereits abgeschlossen
+in BUG-108 getroffen wurde und hier nur konsumiert wird).
+
+⚠️ Annahme: Die Zeilen-Beschriftungen im Erklärungstext bleiben unverändert „Hohe Wolken"/
+„Tiefe Wolken" (kein Zusatz wie „(in Blickrichtung)"), obwohl im selben Sheet wenige
+Abschnitte darüber dieselben Beschriftungen für den lokalen Wert stehen — Default, weil
+„Himmelsröte"/„Goldene Wolken" (Wolkenstimmungs-Score) denselben Effekt (Score-Wert
+unterscheidet sich vom Wetter-Score) bereits produktiv mit einem separaten, aufklärenden
+Hinweistext im Wetter-Abschnitt lösen (`goldenCloudRow`: „Wetter-Score und Wolkenstimmung
+sind unabhängige Werte …"), nicht durch veränderte Zeilenlabels in der Warum-Sektion selbst
+— bitte bestätigen, falls Stephan hier eine Beschriftungsänderung für sinnvoller hält.
+
+---
+
+**Fundstellen-Sweep:** Gesucht nach `cloud_cover_high_pct`/`cloud_cover_low_pct` in
+`web/index.html` (6 Treffer gesamt) sowie nach „Warum " (Erklärungstext-Überschriften, 3
+Treffer: Goldene Wolken/Himmelsröte/Rote Wolken) und nach „Rote Wolken"/„Warum Rote" in
+`ios/FotoAlert/` (0 Treffer — iOS-App hat keine eigene Kopie dieser Erklärungstexte).
+Ergebnis der 6 `cloud_cover_*_pct`-Treffer:
+- 3 Treffer im Abschnitt „Wetter zum Shoot-Zeitpunkt" (`cloudHighRow`/`cloudLowRow`/
+  `cirrusNote`) — **korrekt lokal**, unverändert zu lassen (Rule 2/BUG-108 Rule 3).
+- 1 Treffer im isRedSky-Block („Warum Himmelsröte?") — **derselbe Bugmuster-Verdacht wie
+  BUG-109**: liest `cl`/`cm` aus `wd.cloud_cover_low_pct`/`cloud_cover_mid_pct` (Fotografen-
+  Standort), obwohl die tatsächliche RED_SKY-Bewertung seit US-131 (2026-07-13/14)
+  `cl_antisolar_dir`/`cm_antisolar_dir` (Gegenrichtungs-/Antisolarpunkt) verwendet
+  (`_cloud_mood_inputs()`, `backend/main.py` Z. 1111-1113, bereits im **Hauptordner**
+  vorhanden — US-131 ist lange released, dieser Bug besteht dort schon produktiv, unabhängig
+  von BUG-108). **Explizit NICHT Teil dieses Tickets** — der Ticket-Titel benennt „Rote
+  Wolken", nicht „Himmelsröte", und beide Fixes unterscheiden sich im Detail (RED_SKY braucht
+  `cl`+`cm`, RED_CLOUDS braucht `ch`+`cl` — kein 1:1-Copy-paste möglich, eigene Analyse
+  nötig). **Empfehlung an Stephan:** eigenes Folge-Ticket für den Himmelsröte-Erklärungstext
+  anlegen (unabhängig von BUG-108/BUG-109 sofort umsetzbar, da die benötigten Felder
+  `cl_antisolar_dir`/`cm_antisolar_dir` bereits im Hauptordner existieren — kein
+  Cross-Ticket-Abhängigkeitsrisiko wie bei BUG-109).
+- 1 Treffer im isRedClouds-Block — **der hier gemeldete BUG-109-Kernbefund.**
+- 1 Treffer im isGoldenClouds-Block: **kein Treffer** — dort wird gar kein Wolken-Prozentwert
+  angezeigt (nur Richtungs-/Winkelwerte), also keine analoge Fundstelle möglich.
+Zusätzlich alle sechs Ansichten-Klassen geprüft: Die „Warum Rote Wolken?"-Sektion ist Teil
+der EINEN gemeinsamen `Detail`-Komponente (`Detail.open(o)`), die von Feed-Karte, Karte,
+Kalender, Scout und Chancen-Übersicht identisch aufgerufen wird (grep: „Warum Rote Wolken?"
+kommt nur 1× im gesamten `web/index.html` vor) — eine Korrektur an dieser einen Stelle deckt
+strukturell alle sechs Ansichten ab, keine separate Fundstelle je Ansicht nötig (analog zu
+BUG-108s bereits verifizierter Feststellung, dass alle sechs Ansichten denselben
+`_feed_cache` nach `_inject_cloud_mood_events()` lesen — hier zusätzlich bestätigt für die
+Detail-Anzeige-Ebene selbst, nicht nur die Datenerzeugung).
+
+**Zustands-Check:** Wartezustand: kein neuer — die betroffenen Felder sind bereits Teil des
+beim Öffnen der Detail-Ansicht vorhandenen Event-Objekts (kein zusätzlicher Netzwerkaufruf,
+kein neuer Ladezustand). Leerzustand: n/a — die Sektion erscheint ohnehin nur, wenn
+`event_type === 'Rote Wolken'` ist (ein existierendes Event), kein „0 Ergebnisse"-Fall
+möglich. Fehlerfall: Fehlen die Projektionspunkt-Felder im geladenen Objekt (z. B. weil
+gegen den noch nicht auf BUG-108 aktualisierten Hauptordner-Server getestet wird, siehe
+Cross-Ticket-Abhängigkeit oben), blendet der bestehende `(ch != null)`/`(cl != null)`-Guard
+die jeweilige Zeile einfach aus — kein Absturz, kein „undefined %"-Text (AK6).
+
+---
+
+**Pre-Mortem (Code-verifiziert):**
+- 💀 Szenario 1 (Kernrisiko, Cross-Ticket-Abhängigkeit): BUG-109 wird released/manuell
+  verifiziert, BEVOR BUG-108s Backend-Änderung live ist → die im Erklärungstext erwarteten
+  Felder existieren serverseitig noch nicht → die Zeilen „Hohe Wolken"/„Tiefe Wolken"
+  verschwinden komplett aus dem Erklärungstext (kein Absturz, aber auch kein sichtbarer
+  Fixeffekt) → Stephan hält den Fix fälschlich für wirkungslos/kaputt.
+  Auslöser: Getrennte Release-Reihenfolge von BUG-108 (Backend) und BUG-109 (Frontend), ohne
+  dass die Abhängigkeit dokumentiert ist.
+  Frühwarnung: Live-Test zeigt eine „Rote Wolken"-Chance ohne „Hohe Wolken"/„Tiefe
+  Wolken"-Zeilen im Erklärungstext, obwohl das Event angezeigt wird.
+  Gegenmaßnahme: Cross-Ticket-Abhängigkeit explizit dokumentiert (oben) + Testplan verlangt
+  ausdrücklich, gegen den BUG-108-Worktree-Server zu testen, nicht gegen den
+  Hauptordner-Server, solange BUG-108 nicht gemerged ist.
+- 💀 Szenario 2: Der Fix wird versehentlich mit den ähnlich benannten RED_SKY-/
+  GOLDEN_CLOUDS-Feldern verwechselt (`cl_antisolar_dir`/`cl_sun_dir` statt
+  `cl_red_clouds_dir`) — alle drei „_dir"-Feld-Familien existieren im selben Codebereich.
+  Gegenmaßnahme: Testfälle prüfen exakt gegen `o.ch_red_clouds_dir`/`o.cl_red_clouds_dir`
+  (nicht nur „irgendein anderes Feld als lokal") — eine falsche-aber-andere Umsetzung fiele
+  im Test auf.
+- 💀 Szenario 3 (Zusammenspiel bestehender Bausteine): `wd` (= `o.weather_details`) wird für
+  den Fix nicht mehr gebraucht und aus dem Block entfernt — bricht, falls ein späterer Zusatz
+  im selben Block doch noch `wd` referenziert. Verifiziert: `wd` wird im gesamten
+  isRedClouds-Block (Zeilen 4858-4902) ausschließlich für die beiden zu ersetzenden
+  ch/cl-Zeilen verwendet, keine weitere Referenz — Entfernen ist gefahrlos.
+  Gegenmaßnahme: keine zusätzliche nötig, durch Code-Verifikation bereits ausgeschlossen.
+- 💀 Szenario 4 (aus dem Fundstellen-Sweep abgeleitet): Ein künftiges Ticket überträgt den
+  BUG-109-Fix-Ansatz unreflektiert 1:1 auf Himmelsröte, verwechselt dabei aber die
+  Feld-Paare (RED_CLOUDS = `ch`+`cl`, RED_SKY = `cl`+`cm` — unterschiedliche
+  Wolkenschicht-Kombination).
+  Gegenmaßnahme: Explizit im Fundstellen-Sweep dokumentiert (oben), damit ein Folge-Ticket
+  nicht blind kopiert, sondern eigene Feldnamen verifiziert.
+
+**Zusammenspiel bestehender Bausteine:** `_apply_weather_to_event()` (Worktree-Backend,
+BUG-108) → setzt `e["ch_red_clouds_dir"]`/`e["cl_red_clouds_dir"]` direkt auf das Event-Dict
+→ `_build_red_clouds_event()` kopiert das Dict per `deepcopy` nur dann in ein neues „Rote
+Wolken"-Event, wenn beide Felder nicht `None` sind → API liefert das Event-Dict ohne
+Schema-Filterung (kein `response_model` auf den Opportunity-Endpoints, verifiziert) →
+Frontend `Detail.open(o)` erhält dasselbe Objekt, aus dem bereits heute erfolgreich
+`cloudMoodScoreFor(o)` (`o.golden_cloud_score_antisolar_dir` etc.) gelesen wird — derselbe
+Mechanismus, hier nur für ein anderes Feldpaar erstmals im Erklärungstext genutzt.
+
+---
+
+**Architektur-Analyse:** Betroffen ist ausschließlich `web/index.html`, isRedClouds-Block
+innerhalb der gemeinsamen `Detail`-Komponente (Zeilen 4862-4864: zwei Zeilen `ch`/`cl`-
+Zuweisung werden auf `o.ch_red_clouds_dir`/`o.cl_red_clouds_dir` umgestellt, die nicht mehr
+benötigte `wd`-Zeile entfällt). Kein Backend-Code wird durch dieses Ticket geändert — die
+benötigten Felder liefert bereits BUG-108. `web/index.html` ist **kein** Bestandteil des
+BUG-108-Worktrees (`git worktree` isoliert dort ausschließlich `backend/` — verifiziert:
+`_worktrees/BUG-108/` enthält nur einen `backend/`-Ordner, kein `web/`) — die Datei existiert
+nur einmal, gemeinsam für alle Tickets, im Hauptordner. Einstiegspunkt-Datenquellen-Check:
+n/a im eigentlichen Sinn (kein neuer API-Endpoint, kein neuer Entry-Point) — die betroffene
+Sektion ist Teil der bereits von allen sechs Ansichten gemeinsam genutzten `Detail`-
+Komponente (siehe Fundstellen-Sweep).
+
+---
+
+**Akzeptanzkriterien:**
+- [~] AK1: Öffnet ein Fotograf die Event-Detail-Ansicht einer „Rote Wolken"-Chance, zeigt der
+  Abschnitt „Warum Rote Wolken?" bei „Hohe Wolken"/„Tiefe Wolken" denselben Wolkenwert, der
+  tatsächlich zur Erzeugung der Chance geführt hat (den Wert 100 km entfernt in
+  Blickrichtung) — nicht den Wert am eigenen Standort. *(Herkunft: Ticket-Kernbefund/Rule 1)*
+- [~] AK2 (Negativ-/Polaritäts-Gegenstück zu AK1): Der Wert am eigenen Standort taucht im
+  Abschnitt „Warum Rote Wolken?" nach der Korrektur nicht mehr auf. *(Herkunft: Rule 1,
+  AK-Qualitäts-Check Polarität)*
+- [~] AK3 (Regression/Abwärtskompatibilität): Der Abschnitt „Wetter zum Shoot-Zeitpunkt"
+  (inkl. der dortigen „Hohe Wolken"/„Tiefe Wolken"-Zeilen) bleibt unverändert am eigenen
+  Standort verankert — nur der Erklärungstext-Abschnitt wechselt die Datenquelle. *(Herkunft:
+  Rule 2, BUG-108 Rule 3 unverändert übernommen)*
+- [~] AK4 (Regression/Scope-Abgrenzung): Die Erklärungstexte „Warum Goldene Wolken?" und
+  „Warum Himmelsröte?" bleiben durch diese Änderung unverändert — nur der „Warum Rote
+  Wolken?"-Block wird angefasst. *(Herkunft: Fundstellen-Sweep, Scope-Entscheidung)*
+- [~] AK5 (Konsistenz Anzeige ↔ tatsächliche Bewertung): Die ✓-Markierungen bei „Hohe Wolken
+  ≥ 20 %" und „Tiefe Wolken < 30 %" im Erklärungstext stimmen nach der Korrektur mit der
+  Bedingung überein, unter der die Chance tatsächlich erzeugt wurde — es kann nicht mehr
+  vorkommen, dass eine angezeigte „Rote Wolken"-Chance ihre eigene Entstehungsbedingung als
+  nicht erfüllt darstellt (konkret nachgewiesen: lokal 8 % < 20 % ohne ✓ vs. Projektionspunkt
+  46 % ≥ 20 % mit ✓, siehe Rot-Nachweis im Testplan). Wird implizit durch AK1+AK2 abgedeckt,
+  kein separater Testfall nötig. *(Herkunft: Pre-Mortem/Rot-Nachweis-Befund)*
+- [~] AK6 (Fehlerfall/Robustheit): Fehlen die Projektionspunkt-Felder im geladenen
+  Event-Objekt (z. B. weil noch gegen den Hauptordner-Server vor BUG-108 getestet wird),
+  blendet der Erklärungstext die betroffenen Zeilen einfach aus — kein Absturz, kein
+  „undefined %"-Text. *(Herkunft: Cross-Ticket-Abhängigkeit/Pre-Mortem Szenario 1, bestehendes
+  Guard-Muster)*
+
+**🔍 AK-Qualitäts-Check:**
+✅ durchgeführt — Granularität: jedes AK prüft genau ein Verhalten (Anzeigequelle korrekt /
+alter Wert verschwunden / allgemeine Wetteranzeige unverändert / andere Erklärungstexte
+unverändert / Konsistenz Anzeige↔Bewertung / Fehlerfall), keine Vermischung. Polarität: AK1↔AK2
+explizites Positiv/Negativ-Paar, AK6 deckt den Fehlerfall-Rand ab. Messbarkeit: alle AKs aus
+Nutzersicht formuliert (keine Funktions-/Variablennamen in den AK-Sätzen selbst, nur in der
+Architektur-Analyse). Vier-Kategorien-Abdeckung: funktional (AK1/AK2/AK5), Architektur/
+Konsistenz (AK3/AK4), Sonstige/Betriebsübergabe (Cross-Ticket-Abhängigkeit zu BUG-108,
+gesondert als Abhängigkeits-Vermerk dokumentiert statt als AK). Performance/Sicherheit/
+Zugänglichkeit: nicht relevant (keine neuen Netzwerkaufrufe — Felder bereits im geladenen
+Objekt vorhanden; keine neue Berechtigung; keine neue UI-Struktur, nur andere Zahlen im
+bestehenden Layout). Testbarkeit: AK1/AK2/AK3/AK4/AK6 als statische Source-Tests in
+`backend/tests/test_bug109.py` umgesetzt und Rot-Nachweis real erbracht (siehe Testplan); AK5
+ist durch AK1+AK2 bereits automatisch mitgeprüft (kein redundanter Testfall). Herkunft:
+jedes AK trägt einen Herkunftsvermerk. Negativ-/Randfall-Checkliste: Grenzwerte (n/a, keine
+neue Schwellenlogik, nur Anzeigequelle wechselt — die 20%/30%-Schwellen selbst sind
+unverändert und bereits durch `should_generate_red_clouds_event()`-Tests abgedeckt),
+ungültige/fehlende Eingaben (AK6), Nebenläufigkeit (n/a, reine Anzeige), Lastgrenzen (n/a,
+keine neuen Netzwerkaufrufe), Leerzustand (n/a, Sektion existiert nur bei vorhandenem Event),
+Berechtigungen (n/a, unverändert), Abwärtskompatibilität (AK3/AK4), Rollback (trivial, 3-Zeilen-
+Änderung in einer Datei), Beobachtbarkeit im Fehlerfall (n/a, kein neuer Fehlerpfad, bestehendes
+Guard-Muster). Kernbefund: sechs granulare AKs, Cross-Ticket-Abhängigkeit zu BUG-108 explizit
+als eigener Vermerk (nicht versteckt in einem AK), zweiter Bugmuster-Fund (Himmelsröte)
+bewusst mit Begründung ausgeschlossen statt stillschweigend übernommen oder ignoriert.
+
+---
+
+**Implementierungsoptionen:**
+
+### Option A — Fix jetzt im Hauptordner umsetzen und testen, Release an BUG-108 koppeln (empfohlen)
+- Vorgehen: `web/index.html` isRedClouds-Block anpassen (`ch`/`cl` aus
+  `o.ch_red_clouds_dir`/`o.cl_red_clouds_dir` statt `o.weather_details` lesen, `wd`-Zeile
+  entfällt); Testdatei `backend/tests/test_bug109.py` im **Hauptordner** `backend/tests/`
+  ablegen (statischer Source-Check, keine Backend-Python-Abhängigkeit); Release/Live-
+  Verifikation ausdrücklich erst NACH (oder gemeinsam mit) BUG-108s Merge/Release ansetzen.
+- Betroffene Dateien: `web/index.html` (isRedClouds-Block, 2 Zeilen geändert, 1 Zeile
+  entfernt), `backend/tests/test_bug109.py` (neu, Hauptordner).
+- Vorteile: `web/index.html` ist ohnehin kein Bestandteil des BUG-108-Worktrees (git worktree
+  isoliert dort nur `backend/`) — der Fix gehört strukturell in den Hauptordner. Der
+  statische Source-Test hat keine Python-Abhängigkeit zu `main.py` und läuft unabhängig vom
+  BUG-108-Mergestand rot/grün (real in dieser Sandbox nachgewiesen, siehe Testplan) —
+  Implementierung und Test können sofort beginnen, ohne auf den Worktree-Merge zu warten. Die
+  bereits etablierte Pfad-Konvention für `web/`-Source-Tests (`Path(__file__).parent.parent.parent`,
+  wie in `test_bug-87.py`) funktioniert nur im Hauptordner korrekt — im Worktree gäbe es kein
+  `web/`-Verzeichnis zum Auflösen (verifiziert).
+- Nachteile/Risiken: Die **funktionale** Wirkung (tatsächlich korrekte Zahlen im Browser)
+  bleibt an BUG-108 gekoppelt — muss explizit im Testplan/Release-Hinweis dokumentiert werden,
+  sonst droht Pre-Mortem Szenario 1 (Release vor BUG-108, Zeilen bleiben leer).
+- Aufwand: klein.
+
+### Option B — Fix im BUG-108-Worktree entwickeln und gemeinsam mit dessen Backend-Änderung mergen
+- Vorgehen: `web/index.html` direkt bearbeiten (unvermeidlich im Hauptordner, da dort die
+  einzige Kopie liegt — der Worktree bietet dafür keinen eigenen Pfad), Testdatei aber in
+  `_worktrees/BUG-108/backend/tests/` ablegen, um sie zusammen mit BUG-108 zu mergen.
+- Betroffene Dateien: `web/index.html` (identisch zu Option A, zwangsläufig im Hauptordner),
+  `_worktrees/BUG-108/backend/tests/test_bug109.py`.
+- Vorteile: Testdatei und der Backend-Code, dessen Felder sie voraussetzt, liegen im selben
+  Verzeichnisbaum.
+- Nachteile/Risiken: Der Standard-Pfad-Trick zur `web/index.html`-Auflösung
+  (`Path(__file__).parent.parent.parent / "web" / "index.html"`) läuft im Worktree ins Leere
+  (kein `web/`-Ordner dort, verifiziert) — der Test bräuchte eine Sonderbehandlung
+  (z. B. hartcodierten Pfad zum tatsächlichen Projekt-Root), die von der etablierten
+  Konvention (`test_bug-87.py`) abweicht und leicht bei einem künftigen Worktree-Aufräumen
+  bricht; verschleiert zusätzlich, dass der Fix selbst *nicht* Teil des isolierten
+  Worktree-Diffs ist (er landet so oder so im Hauptordner, sobald `web/index.html` bearbeitet
+  wird) — der Worktree suggeriert eine Kapselung, die es für diese Datei technisch gar nicht
+  geben kann.
+- Aufwand: klein, aber mit unnötigem Pfad-Sonderfall.
+
+✅ **Empfehlung: Option A** — `web/index.html` liegt ohnehin außerhalb der Worktree-Isolation
+(die nur `backend/` umfasst), der etablierte Source-Test-Pfad-Trick funktioniert nur im
+Hauptordner, und der statische Test hat nachweislich keine Abhängigkeit zum BUG-108-
+Mergestand. Die einzige echte Abhängigkeit zu BUG-108 betrifft ausschließlich die
+**Release-Reihenfolge** (Live-Verifikation erst nach BUG-108), nicht die Implementierung
+selbst — dafür reicht ein expliziter Vermerk im Testplan, kein struktureller Umzug in den
+Worktree.
+
+---
+
+**🚦 Ampel-Ergebnis:**
+🟢 Grün — autonome Umsetzung möglich (klarer Abstand zu Option B — Option B hat einen
+konkret benannten strukturellen Nachteil, kein Gleichauf; der Eingriff bleibt strikt
+innerhalb des Tickets — der zusätzlich gefundene Himmelsröte-Bug wird bewusst NICHT
+mitgefixt, sondern als eigenes Folge-Ticket empfohlen; eine 3-Zeilen-Änderung in einer Datei
+ist ohne Datenverlust jederzeit rückgängig zu machen; das Pre-Mortem fand kein hohes Risiko —
+alle vier Szenarien haben eine konkrete, bereits im Test verankerte Gegenmaßnahme; keine
+Geschmacks-/Optikfrage, sondern eine Korrektheits-Korrektur der Datenquelle). Die einzige
+Bedingung ist keine Design-/Implementierungsentscheidung, sondern eine Release-
+Reihenfolge-Vorgabe (nicht vor BUG-108 live schalten) — bereits explizit im Testplan
+verankert, kein offener Entscheidungsbedarf bei Stephan.
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: `cloud_cover_high_pct`/`cloud_cover_low_pct`/„Warum " in
+  `web/index.html` gesucht (6 + 3 Treffer) — 1 Treffer korrekt (RED_CLOUDS-Ziel dieses
+  Tickets), 3 Treffer korrekt lokal (Wetter-Sektion, unverändert zu lassen), 1 Treffer
+  derselbe Bugmuster-Verdacht bei Himmelsröte (bewusst NICHT Teil dieses Tickets, Folge-Ticket
+  empfohlen), 1 Treffer n/a (Goldene Wolken zeigt keinen Wolken-Prozentwert). iOS-App: 0
+  Treffer (keine eigene Kopie des Erklärungstexts).
+- [x] Zustands-Check: kein neuer Wartezustand, kein Leerzustand-Fall möglich, Fehlerfall
+  (fehlende Projektionspunkt-Felder) über bestehendes Guard-Muster abgedeckt (AK6)
+- [x] Pre-Mortem durchgeführt: 4 Szenarien, Kernrisiko Release-Reihenfolge vor BUG-108
+- [x] Architektur analysiert: `web/index.html` (isRedClouds-Block, kein Backend-Code
+  betroffen); verifiziert, dass `web/index.html` kein Bestandteil des BUG-108-Worktrees ist
+- [x] Designer-Check: visuell? → nein im Sinne einer neuen Design-Entscheidung — bestehendes
+  Layout/bestehende Farben/bestehende ✓-Markierungs-Logik werden unverändert übernommen, nur
+  die zugrunde liegenden Zahlen wechseln die Quelle (kein neues Element, keine neue Farbe/
+  Größe/Position) → übersprungen, analog zu BUG-108s eigener Begründung für denselben
+  Bugmuster-Fall
+- [x] Implementierungsoptionen: A / B — siehe oben
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 6 granulare AKs, Cross-Ticket-Abhängigkeit
+  zu BUG-108 als eigener Vermerk, Himmelsröte-Fund bewusst mit Begründung ausgeschlossen
+
+**Testplan:**
+- [x] Automatisiert (Harness): `backend/tests/test_bug109.py` (Hauptordner, neu angelegt,
+  Marker `offline`+`regression`+`requires_full_checkout`, analog `test_bug-87.py`) — 7
+  Testfälle (AK1×2 Feld-Checks, AK2 Negativ-Check, AK3 Regression Wetter-Sektion, AK4×2
+  Regression Himmelsröte/Goldene-Wolken-Blöcke unverändert, AK6 Null-Guard-Erhalt). **Rot-
+  Nachweis real erbracht (2026-08-25, direkt in dieser Sandbox, ohne Server/FastAPI nötig):**
+  `test_ak1_...` (×2) und `test_ak2_...` schlagen gegen den aktuellen, ungefixten
+  `web/index.html`-Stand fehl (zeigen exakt den gemeldeten Bug: `ch`/`cl` kommen aus
+  `wd.cloud_cover_high_pct`/`cloud_cover_low_pct` statt aus
+  `o.ch_red_clouds_dir`/`o.cl_red_clouds_dir`); `test_ak3_...`, `test_ak4_...` (×2) und
+  `test_ak6_...` sind bereits grün (unverändert korrekt). **Grün-Nachweis simuliert:** die im
+  Testplan vorgeschlagene 2-Zeilen-Korrektur wurde probeweise auf einer isolierten Kopie von
+  `web/index.html` angewendet (NICHT in der echten Datei) — danach alle 7 Tests grün.
+  ⚠️ Die offizielle `pytest`-Ausführung selbst lief in dieser Sandbox nur nach Umgehung des
+  conftest-FastAPI-Gates (bekannte Einschränkung, macOS-ARM-venv nicht ausführbar, identisch
+  zu BUG-107/BUG-108-Testplänen) — der reguläre `pytest tests/test_bug109.py -v`-Lauf muss
+  auf Stephans Mac-Terminal bestätigt werden.
+- [ ] Manuell (auf Stephans Mac, **erst nachdem BUG-108s Backend live/gemerged ist** — siehe
+  Cross-Ticket-Abhängigkeit oben): `cd backend && venv/bin/pytest tests/test_bug109.py -v` —
+  alle 7 Tests grün. Danach: lokalen Server aus dem **BUG-108-Worktree** starten
+  (`cd _worktrees/BUG-108/backend && ...`, NICHT aus dem Hauptordner, solange BUG-108 dort
+  noch nicht gemerged ist) und unter `http://localhost:8000` eine „Rote Wolken"-Chance öffnen
+  (z. B. erneut „Rote Wolken über Molecule Men und Fernsehturm" oder eine aktuell vorhandene) —
+  Abschnitt „Warum Rote Wolken?" zeigt bei „Hohe Wolken"/„Tiefe Wolken" einen Wert, der von der
+  Zahl im Abschnitt „Wetter zum Shoot-Zeitpunkt" abweichen kann (Projektionspunkt vs.
+  Fotografen-Standort) — beide Werte bleiben für sich stimmig. PRODUCT.md Sektion 12
+  (Regressions-Matrix) für „Frontend, Anzeige-Änderung" konsultieren — zusätzlich „Warum
+  Goldene Wolken?"/„Warum Himmelsröte?" auf unveränderte Darstellung prüfen (Regressionsschutz
+  AK4).
+
+**Umsetzungs-Notiz (Implementierungsphase, 2026-08-26):** Fix umgesetzt in
+`web/index.html` (isRedClouds-Block, Z. 4862-4864 zum Zeitpunkt der Umsetzung):
+`const ch = o.ch_red_clouds_dir ?? null;` / `const cl = o.cl_red_clouds_dir ?? null;`
+ersetzen die bisherigen `wd.cloud_cover_high_pct`/`cloud_cover_low_pct`-Zeilen, die
+`wd`-Zeile entfaellt (unbenutzt). **Echter (nicht simulierter) `pytest`-Lauf** gegen
+`backend/tests/test_bug109.py` in dieser Sandbox erbracht (system-python3 + frisch per
+`bootstrap_sandbox.sh`/`pip install` nachgeruestetem FastAPI-Stack, umgeht damit erstmals
+das zuvor dokumentierte conftest-Gate): **7/7 Tests gruen** (`7 passed`), keine Skips.
+**Zusaetzlicher Live-Beleg** (echte, gerade laufende Serverdaten ueber fetch('/opportunities')
+im echten Chrome-Tab): von 18 aktuell aktiven „Rote Wolken“-Events weichen bei 6 der
+Projektionspunkt-Wert (`ch_red_clouds_dir`) und der lokale Wert
+(`weather_details.cloud_cover_high_pct`) real voneinander ab (Beispiel „Rote Wolken ueber
+Glienicker Bruecke“: lokal 1 %, Projektionspunkt 54 %) — bestaetigt, dass die Korrektur bei
+echten, aktuellen Daten sichtbar unterschiedliche Werte liefert, nicht nur bei
+synthetischen Testdaten.
+⚠️ **Offener Punkt fuer Stephan:** Die visuelle Live-Bestaetigung im „Warum Rote
+Wolken?“-Textblock selbst (dass genau der neue Wert dort angezeigt wird) konnte in dieser
+Sitzung NICHT erbracht werden — der unter http://localhost:8000 in Stephans Chrome
+bereits offene Server liefert laut Last-Modified-Header ein web/index.html vom
+2026-08-18 (501996 Bytes, enthaelt weder den BUG-109-Fix noch den alten, hier gemeldeten
+Bugcode in identischer Form) — vermutlich ein separater, dieser Sitzung unbekannter
+Serverprozess/Pfad, nicht der Hauptordner (web/index.html, heute editiert, 514563 Bytes)
+und nicht der BUG-108-Worktree (_worktrees/BUG-108/web/ existiert nicht auf der Platte,
+verifiziert). Ein ueber die Geraete-Bruecke selbst gestarteter Server ist aus bekannten
+technischen Gruenden fuer Stephans echten Chrome ohnehin nicht erreichbar. Bitte einmal
+selbst gegenpruefen: den tatsaechlich unter Port 8000 laufenden Serverprozess/Pfad
+identifizieren (oder ihn aus _worktrees/BUG-108/backend neu starten) und die Detailseite
+einer „Rote Wolken“-Chance nach Hard-Reload oeffnen.
+
+**Nachpruefung (2026-08-26, nach Stephans manuellem "Empty Caches" + Hard-Reload):**
+Ergebnis: **weiterhin NICHT geloest** — der offene Punkt bleibt offen, nichts wird als
+geloest markiert. Frisch belegt (neuer Chrome-Tab, da die Tab-Gruppen-Session der vorigen
+Pruefung zwischenzeitlich nicht mehr ansprechbar war -- selbe Origin http://localhost:8000):
+1) `fetch('/', {cache:'no-store'})` liefert weiterhin exakt denselben Stand wie vor Stephans
+Cache-Leerung: ETag `"c80cf678403f05be29cd04cd95579146"`, Last-Modified weiterhin
+`Tue, 18 Aug 2026 14:28:32 GMT`, Laenge weiterhin 501996 Bytes, `o.ch_red_clouds_dir` weiterhin
+NICHT im ausgelieferten HTML enthalten. Das beweist: Ursache ist KEIN Browser-Cache-Problem
+(das haette "Empty Caches" behoben) -- der Server selbst liefert unveraendert eine andere,
+unbekannte Datei aus, nicht die editierte Hauptordner-`web/index.html`.
+2) Live-Check exakt am selben Event "Rote Wolken ueber Glienicker Bruecke": Abschnitt
+"Warum Rote Wolken?" zeigt weiterhin "Hohe Wolken 1 % < 20 %" (alter Fotografen-Standort-Wert),
+obwohl `fetch('/opportunities')` fuer denselben Event `ch_red_clouds_dir: 54` liefert -- die
+Diskrepanz Anzeige (1 %) vs. korrekter Projektionspunkt-Wert (54 %) besteht unveraendert.
+**Fazit:** Der offene Punkt ist ein Server-/Deployment-Problem (falscher/unbekannter
+ausgelieferter Dateistand unter Port 8000), kein Cache-Problem und kein Fehler im Code-Fix
+selbst (der Fix in der Hauptordner-`web/index.html` ist unveraendert korrekt, s. o., echter
+pytest-Lauf 7/7 gruen). Bitte den tatsaechlich unter Port 8000 laufenden Serverprozess/Pfad
+identifizieren bzw. den Server neu aus dem Hauptordner-/BUG-108-Backend heraus starten, bevor
+eine erneute Live-Pruefung sinnvoll ist.
+
+**Root-Cause-Klaerung + Code-Analyse (2026-08-26, nach Stephans Hinweis auf zwei
+konkurrierende Mac-Prozesse PID 24472/25622, 54 Min. auseinander gestartet, von Stephan
+inzwischen beendet, Port 8000 verifiziert frei -- `curl` http_code 000):**
+`backend/main.py` (Hauptordner) loest `_web_dir` **absolut ueber `__file__`** auf:
+`_web_dir = pathlib.Path(__file__).parent.parent / "web"` -- NICHT relativ zum cwd, KEIN
+ENV-/CLI-Override vorhanden (grep negativ). Fuer den BUG-108-Worktree bedeutet das:
+`_worktrees/BUG-108/backend/main.py` haette `_worktrees/BUG-108/web` erwartet -- dieser
+Ordner existierte nicht, und `if _web_dir.exists(): app.mount(...)` (main.py Z. 4619f.)
+haette den Web-Mount deshalb komplett uebersprungen (die App haette "/" mit 404 beantwortet,
+NICHT mit einer alten Datei). Die vorher beobachtete alte, aber inhaltlich vollstaendige
+Auslieferung (501996 Bytes, 18.08., funktionierende UI) kann also nicht von einem
+unveraenderten Worktree-Start allein stammen -- Stephans Fund (zwei eigenstaendig auf dem Mac
+gestartete Prozesse, 25.08., vermutlich aus einer dritten, dieser Sitzung unbekannten
+Verzeichniskopie) ist die schluessigere Erklaerung und wird hiermit codeseitig nicht
+widerlegt, sondern ergaenzt.
+**Fix-Rezept entwickelt + statisch verifiziert:** Symlink `_worktrees/BUG-108/web` ->
+`../../web` angelegt (zeigt auf die echte, gemeinsame Hauptordner-`web/index.html` --
+keine Kopie, kein Backend-Code angefasst). Verifiziert: `_web_dir.exists()` liefert jetzt
+`True`; `_worktrees/BUG-108/web/index.html` (via Symlink) enthaelt `o.ch_red_clouds_dir`
+(grep-bestaetigt) -- der Symlink liefert also nachweislich den bereits gefixten Stand.
+**Live-HTTP-Bestaetigung selbst NICHT moeglich:** Drei methodisch unterschiedliche Versuche,
+den Worktree-Server (mit Symlink) in dieser Sandbox laufen zu lassen und per `curl` selbst
+innerhalb desselben Aufrufs abzufragen (Hintergrundstart+`--reload`; Hintergrundstart ohne
+reload mit Log-Wartepolling; `setsid`+`disown`+`</dev/null`), wurden alle drei vom Sandbox-
+Prozessmodell mit `Killed` beendet, bevor `curl` verbinden konnte (Log endet reproduzierbar
+kurz nach "Feed-Cache geladen", kein "Uvicorn running on"/"Application startup complete" mehr
+sichtbar) -- vermutlich Ressourcen-/Prozess-Limit dieser Sandbox fuer den schweren
+FastAPI+astropy+pandas+eccodes-Importgraph, nicht meinem Vorgehen zuzuschreiben. UNABHAENGIG
+davon gilt weiterhin: ein aus dieser Geraete-Bruecken-Sandbox gestarteter Server ist fuer
+Stephans echten Chrome ohnehin nicht erreichbar (in dieser Sitzung bereits unabhaengig
+belegt). Ich kann diesen letzten Schritt deshalb technisch nicht selbst abschliessen.
+**Bereit fuer Stephan (kein Codeeingriff mehr noetig, nur Start):** Symlink ist bereits
+angelegt und bleibt bestehen (kann von mir nicht geloescht werden -- Mount erlaubt kein `rm`
+auf dieser Datei; bei Bedarf bitte selbst entfernen, es ist NICHT Teil des eigentlichen
+Codefixes, nur eine lokale Test-Bruecke). Naechster Schritt in Stephans eigenem Terminal:
+```
+cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/_worktrees/BUG-108/backend
+FOTOALERT_ENV=dev /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend/venv/bin/uvicorn main:app --reload --port 8000
+```
+(Log muss "Application startup complete" zeigen.) Danach im Browser `http://localhost:8000`
+hart neu laden und die "Rote Wolken ueber Glienicker Bruecke"-Karte oeffnen -- Abschnitt
+"Warum Rote Wolken?" sollte dann "Hohe Wolken 54 % >= 20 %" statt bisher "1 % < 20 %" zeigen.
+Status/Lane bleibt In Test, weiterhin nichts als geloest markiert -- Bestaetigung steht aus.
+
+**Finale Live-Bestaetigung (2026-08-26, nach Stephans korrektem Server-Start ueber den
+Symlink): OFFENER PUNKT GELOEST.** Tatsaechlicher letzter Blocker war NICHT (mehr) der
+Server-Prozess, sondern eine **veraltete Service-Worker-Cache-Storage-Eintrag** (Cache-Name
+`fotoalert-v1.22.66`, enthielt exakt den alten Stand: ETag `"c80cf678..."`, Last-Modified
+18.08.) -- ein frischer `fetch('/', {cache:'no-store'})` lieferte ihn weiterhin aus der
+SW-Cache-Storage aus, auch nach Stephans korrektem Serverstart und auch nach seinem vorherigen
+manuellen "Empty Caches" (das leert Chromes HTTP-Cache, aber offenbar nicht zuverlaessig die
+SW-eigene Cache-Storage-API in diesem Fall). Beleg: `caches.keys()` zeigte genau diesen einen
+Eintrag mit dem alten Inhalt; `navigator.serviceWorker.controller` war aktiv gesetzt.
+Behoben per `caches.delete('fotoalert-v1.22.66')` + `registration.unregister()` (beides via
+`javascript_tool` im echten Chrome-Tab, `ok:true` fuer beide). Danach frischer
+`fetch('/', {cache:'no-store'})`: **neuer ETag `"e04894ea1b97c0fd04665f2e65937c41"`, neues
+Last-Modified `Wed, 26 Aug 2026 18:09:38 GMT`, `o.ch_red_clouds_dir` jetzt im HTML enthalten.**
+Live am Event "Rote Wolken ueber Glienicker Bruecke" (neu von Stephans Server berechnet, andere
+Werte als der vorherige Vergleichsfall): Abschnitt "Warum Rote Wolken?" zeigt jetzt
+**"Hohe Wolken 100 % >= 20 % (gruenes Haekchen)"** -- exakt der Projektionspunkt-Wert aus
+`fetch('/opportunities')` (`ch_red_clouds_dir: 100`), waehrend "Wetter zum Shoot-Zeitpunkt"
+weiterhin korrekt den lokalen Wert (18 %, `weather_details.cloud_cover_high_pct`) zeigt --
+AK1/AK2/AK3/AK5 damit live am echten, gerade laufenden Server bestaetigt.
+**Root-Cause-Gesamtbild (drei zusammenwirkende Faktoren, alle jetzt aufgeloest):**
+(1) fehlender `_worktrees/BUG-108/web`-Ordner -> per Symlink geloest; (2) zwei von Stephan
+selbst am 25.08. gestartete, konkurrierende lokale Server-Prozesse -> von Stephan beendet;
+(3) veralteter Service-Worker-Cache-Storage-Eintrag, der unabhaengig vom tatsaechlich
+laufenden Server-Prozess immer den alten Stand auslieferte -> per `caches.delete()` +
+SW-`unregister()` geloescht. **BUG-109 ist damit inhaltlich vollstaendig bestaetigt** (echter
+pytest-Lauf 7/7 gruen + jetzt echte Live-Browser-Bestaetigung). Status/Lane bleibt lt. Board-
+Legende bewusst `In Test` ("wartet auf Test-Bestaetigung") -- der naechste Schritt (Test-Gate-
+Bestaetigung/Uebergang Richtung Release) liegt bei Stephan bzw. dem naechsten Pipeline-Lauf,
+kein automatischer Lane-Sprung durch diese Notiz.
+
+**Status-Empfehlung:** In Analysis → Weg-Gate ausstehend (Option A, Ampel 🟢 Grün) — Stephan
+entscheidet über die empfohlene Option; zusätzlich zur Kenntnisnahme: Empfehlung, für den im
+Fundstellen-Sweep gefundenen Himmelsröte-Erklärungstext-Bug ein eigenes Folge-Ticket
+anzulegen (kein Blocker für BUG-109 selbst).
+
+---
+
+### BUG-110 · Jahreskalender zeigt für den gesamten aktuellen Monat (August 2026) keine Einträge `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Hoch |
+| **Status** | Wartet auf Entscheidung |
+| **Erstellt** | 2026-08-25 |
+**Wartet auf dich seit:** 2026-08-25 (Grund: Root-Cause-Hypothese nicht aus der Sandbox verifizierbar — echte Live-/Produktionsdaten fehlen, siehe offene Frage 1 in der Analyse)
+
+**Beschreibung:** Die Jahreskalender-Ansicht zeigt für den gesamten aktuellen Monat (August 2026)
+keine Einträge an — nicht nur einzelne Locations oder Tage betroffen, sondern der komplette Monat
+leer. Laut Server-Status vermutlich, weil der für die Kalenderberechnung zuständige
+Hintergrund-Job für diesen Zeitraum noch nie gelaufen ist. Fund aus Server-Status-Check im Zuge
+der Live-Verifikation von BUG-108, 2026-08-25.
+
+**Beobachtet vs. erwartet:** Erwartet: Der Jahreskalender zeigt für August 2026 eine realistische
+Anzahl an Fotochancen-Terminen (wie für andere Monate/Locations üblich). Beobachtet: Für den
+gesamten aktuellen Monat erscheint kein einziger Eintrag.
+
+**User Story:** Als Fotograf, möchte ich im Jahreskalender auch für den aktuellen Monat verlässlich
+meine Fotochancen sehen, sodass ich nicht fälschlich annehme, es gäbe diesen Monat keine
+Gelegenheiten.
+
+**Bezug:** Kein Zusammenhang mit BUG-108 (Wetter-/„Rote Wolken"-Projektionsfix) — eigenständiges
+Problem der Kalender-Datenerzeugung, unabhängig geprüft. Grep-Dublettencheck („Jahreskalender",
+„Kalenderansicht", „Kalender leer", „keine Einträge", „Job-Status", „nie gelaufen") ergab keine
+offene Dublette. Einziger inhaltlich benachbarter Treffer: **BUG-93** *(Done — Kalender-
+Vollneuberechnung nach einem `ALGORITHM_VERSION`-Bump lieferte 0 Events statt vollständiger
+Neuberechnung; bereits behoben und live verifiziert, 2026-08-03)* — anderer Mechanismus (dort:
+Cache/Versions-Bump-Logik lieferte fälschlich 0 neue Tage; hier vermutet: der zuständige
+Hintergrund-Job ist für den aktuellen Monat schlicht noch nie gelaufen). Keine Überschneidung,
+aber als Präzedenzfall für die Analyse-Phase relevant (gleicher Symptombereich „leerer
+Jahreskalender").
+
+**Quelle:** Server-Status-Check im Zuge der Live-Verifikation von BUG-108, 2026-08-25.
+
+---
+
+**Analyse (fotoalert-analyze, 2026-08-25):**
+
+📎 **Ticket-Praemisse-Check (Sonderfall, BUG-58-Muster) — Praemisse stimmt NICHT mit dem
+Code ueberein, 🔴 funktional kritisch:**
+
+Die Ticket-Hypothese lautet "der fuer die Kalenderberechnung zustaendige Hintergrund-Job
+ist fuer den aktuellen Monat noch nie gelaufen". Code-Verifikation (`backend/main.py`,
+`deploy/fotoalert.service`, `web/index.html`) zeigt: diese Hypothese trifft auf den in
+Produktion tatsaechlich aktiven Pfad nicht zu.
+
+- `deploy/fotoalert.service` Z. 24: `Environment=FOTOALERT_ONDEMAND=1` — in Produktion
+  aktiv gesetzt.
+- `web/index.html` `CalendarView.loadMonth()` (Z. ~2468–2471) sendet **immer** `month`
+  und `year` mit: `API.get(\`/calendar?month=\${m}&year=\${y}\`)`.
+- `backend/main.py` `get_calendar()` (Z. 3385–3421): `if FOTOALERT_ONDEMAND=="1" and
+  month and year:` — bei erfuellter Bedingung wird **ausschliesslich** live ueber
+  `_compute_month_all_locations()`/`_compute_location_month()` (Window-Engine,
+  `calculations/window_engine.py`) gerechnet. Der Batch-Cache `_calendar_cache` (befuellt
+  vom "calendar"-Job aus `precompute.py`, genau der im Ticket vermutete Hintergrund-Job)
+  wird in diesem Zweig **nicht einmal gelesen**.
+- Live bestaetigt am aktuell laufenden lokalen Dev-Server (Chrome-Browser-Subagent,
+  2026-08-25, `FOTOALERT_ONDEMAND` dort NICHT gesetzt → anderer, nicht-ondemand Zweig):
+  `GET /job-status` → `"calendar":{"status":"idle","last_run":null}` (Job lief nie) UND
+  `GET /calendar?month=8&year=2026` → `{"status":"no_cache","events":[],"total":0,...}`.
+  Das bestaetigt zwar woertlich das im Ticket beschriebene Symptom des Job-Status —
+  ABER **nur fuer den lokalen, nicht-ondemand Dev-Server**, dessen Code-Pfad in
+  Produktion wegen `FOTOALERT_ONDEMAND=1` gar nicht durchlaufen wird. Ob auf dem echten
+  Produktionsserver das Job-Status-Feld ebenso "idle"/"nie gelaufen" zeigt, ist dort
+  by design so (der Job wird im On-Demand-Betrieb absichtlich nie gebraucht) — das ist
+  also kein Fehlersignal, sondern erwartetes Verhalten.
+
+**Abgrenzung zu BUG-93 (Stephans Frage): anderer Mechanismus, bestaetigt.** BUG-93 betraf
+ausschliesslich `precompute.py::_init_calendar_pass()`/`compute_calendar_incremental()` —
+also genau den Batch-Pfad, der in Produktion (FOTOALERT_ONDEMAND=1) fuer `/calendar`-
+Anfragen mit `month`+`year` gar nicht aktiv ist. BUG-110 kann somit nicht auf denselben,
+bereits behobenen Reset-Propagierungsfehler zurueckgehen — es ist, wie im Ticket bereits
+vermutet, ein anderer Mechanismus, aber vermutlich ein anderer als der im Ticket
+genannte On-Demand-Pfad selbst (Details unten, Pre-Mortem).
+
+❓ **Frage 1 (blockierend, 🔴): Ist die Ticket-Beobachtung tatsaechlich am Produktions-
+server gemacht worden, und was zeigt `/calendar?month=8&year=2026` dort konkret?**
+Ohne SSH-Zugriff aus der Analyse-Sandbox (siehe `fotoalert-analyze`-Skill, Schritt 3 —
+kein Git/kein Live-Server-Zugriff im Sandbox) kann nicht abschliessend bestaetigt werden,
+ob der Live-Kalender wirklich leer ist (und falls ja: `status="ok"` mit `events=[]`, oder
+ein anderer Status) oder ob der Befund allein aus dem (im On-Demand-Betrieb irrefuehrenden)
+`/job-status`-Feld "calendar: idle" abgeleitet wurde. Zwei Optionen fuer Stephan:
+   Option A — Produktions-Log/curl pruefen: `curl https://<live-host>/calendar?month=8&year=2026`
+   direkt gegenpruefen, plus Server-Log um die Startzeit des Prozesses (`_prewarm_calendar()`-
+   Meldungen "On-Demand-Kalender vorgewaermt" bzw. "Kalender-Pre-Warm fehlgeschlagen").
+   Konsequenz: bestaetigt die echte Ursache, kein Rateweg.
+   Option B — Direkt den unten verifizierten Architektur-Defekt (leere Ergebnisse werden
+   dauerhaft gecacht) beheben, ohne die exakte Ausloese-Ursache zu kennen. Konsequenz:
+   behebt das Symptom robust fuer JEDEN denkbaren Ausloeser (inkl. des hier nicht mehr
+   reproduzierbaren), verzichtet aber auf eine bestaetigte Root-Cause-Dokumentation.
+
+**Vorschlag (kein Alleingang, da 🔴):** Mit Option B als Sofortmassnahme weitermachen
+(sie behebt einen echten, code-verifizierten Defekt unabhaengig vom genauen Ausloeser),
+Option A zusaetzlich als Diagnose-Schritt VOR dem Weg-Gate empfehlen, damit Stephan
+Gewissheit hat, ob der eigentliche Ausloeser damit auch wirklich erledigt ist.
+
+---
+
+### Example Mapping
+
+📏 **Rule 1:** Ein einmal fuer einen Monat berechnetes, aber wegen eines Fehlers bei
+JEDER Location leeres Ergebnis darf nicht dauerhaft als "korrektes leeres Ergebnis"
+gecacht werden — ein spaeterer Request fuer denselben Monat muss neu rechnen, solange
+noch kein einziges Mal ein nicht-leeres Ergebnis vorlag.
+🟢 Example: Server-Neustart → `_prewarm_calendar()` scheitert fuer alle 184 Locations
+(z.B. wegen eines zum Startzeitpunkt noch nicht vollstaendig geladenen Datensatzes) →
+`_ondemand_month_cache["2026-08-0.35"] = []`. Ein Nutzer oeffnet 10 Minuten spaeter den
+Kalender fuer August → **erwartet:** echte Events erscheinen (Neuberechnung, Ursache ist
+inzwischen behoben) — **nicht:** weiterhin leer.
+
+📏 **Rule 2:** Faellt nur EINE einzelne Location aus, duerfen die Events der uebrigen
+Locations trotzdem angezeigt werden (bestehendes Verhalten, nicht neu — wird nur
+regressionsgesichert).
+🟢 Example: Location X wirft eine Exception bei der Monatsberechnung, alle anderen 183
+Locations liefern normal → Kalender zeigt weiterhin deren Events, nur X fehlt fuer
+diesen Monat.
+
+⚠️ Annahme: Der Fix greift NUR am On-Demand-Pfad (`_compute_month_all_locations`,
+aktiv wenn `FOTOALERT_ONDEMAND=1`) an — der lokale, nicht-ondemand Batch-Pfad
+(`_calendar_cache`/`precompute.py`) ist von diesem Ticket nicht betroffen, da dort das
+Symptom "dauerhaft leer trotz behobener Ursache" strukturell nicht auftritt (jeder
+naechtliche Cron-Lauf um 05:30 rechnet den Batch ohnehin komplett neu; ein manuelles
+`/refresh-calendar` wirkt dort bereits). — bitte bestaetigen.
+
+### Fundstellen-Sweep (Pflicht, SPEC-W3)
+
+Suchbegriffe: `/calendar` (Frontend-Aufrufe), `_ondemand_month_cache`,
+`_compute_month_all_locations`. Ergebnis: **1 Fundstelle im Web-Frontend**
+(`web/index.html`, `CalendarView.loadMonth()`), **0 Fundstellen in der iOS-App**
+(`grep -rl "/calendar" ios/` → keine Treffer, die native App hat keine
+Jahreskalender-Ansicht). `_ondemand_month_cache` wird ausschliesslich von zwei
+Stellen beschrieben/gelesen: `_compute_month_all_locations()` selbst und
+`_prewarm_calendar()` (ruft nur `_compute_month_all_locations()` auf, kein
+eigener Zugriff). Sechs-Ansichten-Checkliste: Liste/Feed und Scout nutzen
+`/opportunities` (anderer Cache, `_feed_cache`, von diesem Bug nicht betroffen);
+Karte zeigt keine Kalender-Termine; Chancen-Uebersicht = Feed (s.o.); Event-Detail
+liest ein bereits geladenes Event-Objekt, nicht erneut `/calendar`. Kalender ist die
+einzige betroffene Ansicht.
+
+### Zustands-Check (Pflicht, SPEC-W3)
+
+- **Wartezustand:** Beim allerersten Request fuer einen noch nicht gecachten Monat
+  zeigt das Frontend bereits einen Spinner ("Jahreskalender wird geladen…", `CalendarView.show()`)
+  — unveraendert, kein neues AK noetig.
+- **Leerzustand:** Aktuell nicht unterscheidbar vom Fehlerfall — genau das ist der Kern
+  des Bugs: ein Monat ohne Fotochancen (legitim leer, z.B. sehr wenige Alignment-Events
+  in einem datenarmen Monat) sieht fuer den Nutzer IDENTISCH aus wie ein durch den
+  Architektur-Defekt permanent leer gecachter Monat. → eigenes AK (AK-4).
+- **Fehlerfall:** Wenn `_compute_location_month()` fuer eine Location wirft, wird das
+  aktuell nur serverseitig geloggt (`logger.error(...)`), der Client bekommt keinerlei
+  Hinweis, dass etwas fehlgeschlagen ist (Status bleibt `"ok"`). → eigenes AK (AK-2).
+
+---
+
+### Akzeptanzkriterien
+
+- [ ] **AK-1:** Wurde ein Monat einmal mit einem Ergebnis von 0 Events berechnet, WEIL
+  die Berechnung fuer JEDE Location im Monat fehlgeschlagen ist, liefert ein spaeterer
+  Aufruf desselben Monats wieder echte Events, sobald die zugrunde liegende Ursache
+  behoben ist — der Nutzer muss dafuer nicht auf einen Server-Neustart warten.
+  *(Herkunft: Pre-Mortem-Szenario 1 + Frage 1/Code-Verifikation.)*
+- [ ] **AK-2:** Schlaegt die Berechnung fuer ALLE Locations eines Monats fehl, wird das
+  im Server-Log NICHT mehr nur als Einzelzeile pro Location sichtbar, sondern zusaetzlich
+  als ein zusammenfassender Fehler-Log-Eintrag fuer den gesamten Monat, damit ein
+  Totalausfall von einem legitim leeren Monat unterscheidbar ist (Beobachtbarkeit im
+  Fehlerfall). *(Herkunft: Zustands-Check Fehlerfall, AK-Qualitaets-Check Kategorie
+  "Beobachtbarkeit im Fehlerfall".)*
+- [ ] **AK-3 (Edge Case / Regression):** Faellt nur eine einzelne Location innerhalb
+  eines Monats aus, bleiben die Events der uebrigen Locations weiterhin sichtbar — der
+  Fix darf diesen bestehenden Teilausfall-Fall nicht veraendern. *(Herkunft: bestehendes
+  Verhalten, Rule 2.)*
+- [ ] **Edge Case (AK-4):** Ein Monat, der tatsaechlich 0 Fotochancen enthaelt (kein
+  Fehler, sondern echtes Ergebnis — z.B. weil `min_score` sehr hoch gesetzt wurde), wird
+  weiterhin genau EINMAL berechnet und danach normal gecacht (kein Neurechnen bei jedem
+  Request) — der Fix darf nicht dazu fuehren, dass jeder leere-aber-korrekte Monat bei
+  jedem Aufruf neu (und damit langsamer) berechnet wird. *(Herkunft: Zustands-Check
+  Leerzustand, AK-Qualitaets-Check Kategorie "Performance".)*
+
+---
+
+### Pre-Mortem
+
+**Wissensbasis:** BUG-93 (verwandter Symptombereich, anderer Mechanismus, Details oben),
+BUG-27 (Frontend cached leere Monate bewusst nicht — Vorbild fuer AK-1), BUG-29
+("Recompute-Bug nur gueltig, wenn der Prozess einmal real gegen die geaenderten Daten
+lief" — hier: Ursache ohne Live-Log nicht abschliessend bestaetigt, s. Frage 1).
+
+📎 **Code-Verifikation (2026-08-25):**
+- `backend/main.py` Z. 3357–3379 (`_compute_month_all_locations`) gelesen: bestaetigt —
+  `if key in _ondemand_month_cache: return _ondemand_month_cache[key]` (Z. 3367–3369)
+  prueft nur auf Schluessel-Existenz, nicht auf Inhalt; `_ondemand_month_cache[key] = events`
+  (Z. 3378) schreibt bedingungslos, auch bei `events == []`.
+- `backend/main.py` Z. 3357 (`_compute_month_all_locations`, innerer Loop) gelesen:
+  bestaetigt — `except Exception as e: logger.error(...)` pro Location, KEIN Re-Raise,
+  kein Zaehler ueber Anzahl fehlgeschlagener vs. erfolgreicher Locations.
+- `backend/main.py` `trigger_calendar_refresh()` (Z. 3590–3596) gelesen: bestaetigt —
+  loest ausschliesslich `_run_precompute("calendar")` aus (Batch-Pfad, `_calendar_cache`),
+  keine Referenz auf `_ondemand_month_cache`. Admin-Aktion "Kalender neu berechnen" wirkt
+  im On-Demand-Betrieb also nicht auf das, was der Nutzer tatsaechlich sieht.
+- `backend/calculations/astronomy.py` Z. 55–73 gelesen: **Widerlegt** eine anfangs erwogene
+  Race-Condition-Hypothese (gleichzeitige Requests ueberschreiben sich gegenseitig das
+  aktive Zeitfenster) — `_active_window` ist bereits bewusst als `contextvars.ContextVar`
+  implementiert (Kommentar im Code nennt exakt dieses Risiko als Grund), nicht als
+  einfache globale Variable. Kein Bug an dieser Stelle.
+- `backend/calculations/opportunity.py` `find_opportunities()` Z. 344 (`days_until`)
+  gelesen: **Widerlegt** eine zweite anfangs erwogene Hypothese (Filterung basierend auf
+  "Tag liegt in der Vergangenheit" wuerde den kompletten August ausblenden, da Monatsstart
+  1. August in der Vergangenheit liegt) — `days_until` steuert ausschliesslich, ob Wetter
+  einbezogen wird (`use_weather`), und ist bei `astronomy_only=True` (Kalender-Pfad)
+  ohnehin immer `False`. Keine Datums-basierte Ausblendung im Kalender-Pfad gefunden.
+- `_ALIGNMENT_FILTER_EXEMPT` (`precompute.py`, referenziert in `_passes_alignment_filter`)
+  gelesen: Goldene/Blaue Stunde sind grundsaetzlich von der Alignment-Filterung
+  ausgenommen (`immer True`) — ein Totalausfall FUER ALLE Event-Typen an FAST JEDEM Tag
+  ueber ALLE Locations laesst sich dadurch nicht erklaeren; spricht zusaetzlich fuer
+  einen systemischen Fehler (Exception) statt fuer legitime Nulltreffer.
+
+**⚠️ Zusammenspiel bestehender Bausteine:** `_prewarm_calendar()` (Server-Start,
+`_ondemand`-Zweig) und ein normaler Nutzer-Request fuer denselben Monat rufen BEIDE
+`_compute_month_all_locations()` auf und schreiben in denselben, modul-globalen
+`_ondemand_month_cache`. Es gibt **keine Sperre** zwischen beiden Aufrufen (kein Lock,
+kein "wird gerade berechnet"-Status wie im Batch-Pfad ueber `_precompute_running`) — ein
+zweiter, gleichzeitiger Request fuer denselben noch nicht gecachten Monat rechnet aktuell
+komplett doppelt (Performance, nicht Korrektheit — `contextvars.ContextVar` verhindert
+inhaltliche Vermischung, siehe oben). Fuer AK-1/AK-4 nicht direkt relevant, aber als
+Nebenbefund dokumentiert (kein eigenes AK, da kein beobachtetes Korrektheitsproblem).
+
+💀 **Szenario 1:** Server-Neustart (z.B. im Zuge eines Deploys) → `_prewarm_calendar()`
+laeuft fuer den aktuellen Monat, scheitert fuer alle Locations an einer zum Startzeitpunkt
+noch nicht vollstaendig verfuegbaren Datenquelle (Timing-abhaengig, nicht abschliessend
+reproduziert) → Ergebnis wird als `[]` permanent gecacht → jeder Nutzer sieht fuer den
+Rest der Prozess-Laufzeit einen leeren Monat, unabhaengig davon, ob die Ursache laengst
+behoben waere.
+   Auslöser: bedingungslose Cache-Schreibung ohne Erfolgs-/Fehlerunterscheidung.
+   Frühwarnung: Server-Log zum Startzeitpunkt zeigt "Kalender-Pre-Warm fehlgeschlagen"
+   (bereits vorhandenes Log, aber niemand schaut routinemaessig danach).
+   Gegenmaßnahme: AK-1 (nicht dauerhaft cachen) + AK-2 (deutlicherer Log-Eintrag).
+
+💀 **Szenario 2:** Ein Nutzer oeffnet den Kalender fuer August GENAU in dem kurzen
+Zeitfenster, in dem `_prewarm_calendar()" noch laeuft (asynchron, "fire and forget" beim
+Start) — der Nutzer-Request und der Prewarm-Task rechnen denselben Monat parallel,
+doppelte Rechenlast auf dem Single-Worker-Event-Loop kurz nach dem Start (wenn ohnehin
+mehrere andere Startup-Tasks laufen: `_weather_overlay`, `_delayed_build_weather_map`,
+ggf. `_run_precompute`).
+   Auslöser: fehlende Koordination/Lock zwischen Prewarm und Live-Request fuer denselben
+   Schluessel.
+   Frühwarnung: spuerbar langsamere Antwortzeit kurz nach jedem Neustart.
+   Gegenmaßnahme: nicht Teil des Fixes (kein beobachtetes Korrektheitsproblem, nur
+   Performance) — als Nebenbefund dokumentiert, kein eigenes AK.
+
+💀 **Szenario 3:** Der eigentliche Ausloeser des Produktions-Vorfalls bleibt unbekannt
+(kein Log-Zugriff), der Fix (AK-1) behebt zwar die Cache-Vergiftung, aber falls die
+zugrunde liegende Exception-Ursache bei JEDEM Aufruf erneut auftritt (nicht nur beim
+Prewarm), wuerde der Kalender fuer August weiterhin leer bleiben — nur eben nicht mehr
+dauerhaft, sondern bei jedem einzelnen Request neu leer (und jedes Mal neu rechnend,
+also zusaetzlich langsam).
+   Auslöser: AK-1 behebt "dauerhaft falsch gecacht", nicht zwingend die zugrunde liegende
+   Fehlerursache selbst.
+   Frühwarnung: AK-2 (zusammenfassender Fehler-Log) macht genau diesen Fall nach dem Fix
+   sofort sichtbar, statt ihn erneut nur zu vermuten.
+   Gegenmaßnahme: AK-2 + Frage 1 (Live-Log-Pruefung) vor dem Weg-Gate.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien:**
+- `backend/main.py` — `_compute_month_all_locations()` (Z. 3357–3379, Cache-Logik),
+  `_prewarm_calendar()` (Z. 2695–2706, einziger weiterer Aufrufer), `get_calendar()`
+  (Z. 3385–3421, liest den Cache indirekt ueber `_compute_month_all_locations()`).
+- `backend/tests/test_bug110.py` (neu, Schritt 6b).
+- **Nicht betroffen (bewusst abgegrenzt):** `backend/precompute.py` (Batch-Pfad, in
+  Produktion fuer `/calendar` nicht aktiv, s.o.), `web/index.html` (Frontend-Caching
+  verhaelt sich bereits korrekt seit BUG-27, keine Aenderung noetig), `ios/` (kein
+  Kalender-Feature).
+
+**Designer-Check:** nicht visuell — reine Backend-Cache-/Fehlerbehandlungslogik, kein
+neues UI-Element, keine Farb-/Layout-Aenderung. Uebersprungen.
+
+---
+
+### Implementierungsoptionen
+
+### Option A — Leere Ergebnisse nicht cachen (analog BUG-27-Frontend-Muster)
+- Vorgehen: In `_compute_month_all_locations()` den Cache-Write nur ausfuehren, wenn
+  `events` nicht leer ist ODER wenn bekannt ist, dass keine einzige Location einen Fehler
+  geworfen hat (sonst: `[]` ist ein legitimes Ergebnis, s. AK-4). Dafuer zusaetzlich
+  zaehlen, wie viele Locations erfolgreich vs. fehlgeschlagen waren.
+- Betroffene Dateien: `backend/main.py` (`_compute_month_all_locations`).
+- Vorteile: Kleiner, gezielter Eingriff genau an der verifizierten Fehlerstelle; behebt
+  AK-1 UND AK-4 in einem Zug (Unterscheidung "leer weil Fehler" vs. "leer weil echt
+  keine Events").
+- Nachteile/Risiken: Behebt Szenario 3 (wiederkehrende Ursache) nicht — bei permanentem
+  Fehler wuerde jeder Request neu (und erfolglos) rechnen, spuerbar langsamer als vorher.
+- Aufwand: klein.
+
+### Option B — Option A + zusammenfassendes Fehler-Log + optionaler Fehlerstatus im Response
+- Vorgehen: Wie Option A, zusaetzlich: wenn ALLE Locations fehlschlagen, einen
+  zusammenfassenden `logger.error("On-Demand-Kalender %s-%s: ALLE %d Locations
+  fehlgeschlagen", ...)`-Eintrag schreiben (AK-2) statt nur N Einzelzeilen, die in der
+  Logflut leicht untergehen.
+- Betroffene Dateien: `backend/main.py` (`_compute_month_all_locations`,
+  ggf. `get_calendar()` fuer die Fehlerkommunikation an den Client).
+- Vorteile: Zusaetzlich zur Symptom-Behebung wird ein zukuenftiger Totalausfall beim
+  routinemaessigen Log-Blick sofort erkennbar (Szenario 3 wird beobachtbar, auch wenn
+  nicht automatisch behoben).
+- Nachteile/Risiken: Etwas groesserer Eingriff, ein neuer Zaehl-Mechanismus muss selbst
+  wieder getestet werden.
+- Aufwand: klein bis mittel.
+
+✅ **Empfehlung: Option B** — Option A allein behebt zwar das Kernsymptom (AK-1/AK-4),
+liesse aber Szenario 3 (wiederkehrende, noch unbestaetigte Ursache) erneut unbeobachtet
+durchlaufen — genau das Muster, das laut Pre-Mortem-Vorlage ("ein Pre-Mortem ohne
+Konsequenz ist verschwendet") vermieden werden soll. Der Mehraufwand fuer das
+zusammenfassende Log ist gering.
+
+---
+
+🚦 **Ampel-Ergebnis:**
+🔴 Rot — braucht Stephans Entscheidung: **Frage 1 (Ticket-Praemisse/Root-Cause) ist
+noch offen** — die empfohlene Option behebt einen echten, code-verifizierten Defekt,
+aber ob damit auch der tatsaechliche Ausloeser des konkreten Produktions-Vorfalls erledigt
+ist, kann ohne Log-/Live-Zugriff (Frage 1, Option A) nicht abschliessend bestaetigt
+werden. Kriterium 1 (klarer Abstand zur Alternative) ist damit indirekt betroffen: die
+Wahl zwischen "nur Symptom fixen" (Option A) und "Symptom + Beobachtbarkeit" (Option B)
+haengt selbst davon ab, wie wahrscheinlich ein wiederkehrender Ausloeser ist — das ist
+ohne Frage 1 nicht sicher einschaetzbar.
+
+---
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: `/calendar`, `_ondemand_month_cache`, `_compute_month_all_locations` — 1 Fundstelle (web/index.html CalendarView), 0 in iOS
+- [x] Zustands-Check: Wartezustand unveraendert (Spinner vorhanden); Leerzustand = Kernproblem (AK-4); Fehlerfall aktuell nicht sichtbar (AK-2)
+- [x] Pre-Mortem durchgeführt (inkl. Code-Verifikation, 2 Hypothesen widerlegt, 1 Frage offen)
+- [x] Architektur analysiert: `backend/main.py` (`_compute_month_all_locations`, `_prewarm_calendar`, `get_calendar`), `backend/tests/test_bug110.py` (neu)
+- [x] Designer-Check: visuell? → nein, übersprungen
+- [ ] Implementierungsoptionen: A / B
+- [ ] Empfehlung: Option B
+- [ ] AK-Qualitäts-Check durchgeführt (Schritt 6c): siehe unten
+
+**Testplan:**
+- [ ] Automatisiert (Harness): `backend/tests/test_bug110.py` (neu, Marker `offline`+`regression`) —
+  `test_all_locations_failing_then_recovering_still_returns_events_on_next_call` (AK-1,
+  Rot-Nachweis NICHT ausgefuehrt, s. Datei-Kopfkommentar — kein lauffaehiges Python in der
+  Analyse-Sandbox, bitte vor Implementierungsstart real laufen lassen),
+  `test_refresh_calendar_endpoint_has_no_effect_on_ondemand_cache` (AK-2, IST-Zustand-
+  Dokumentation), `test_single_failing_location_does_not_suppress_other_locations_events`
+  (AK-3, Regressionsschutz).
+- [ ] Manuell: Lokalen Dev-Server MIT `FOTOALERT_ONDEMAND=1` starten (Produktions-Modus
+  nachstellen, s. `deploy/fotoalert.service`), `http://localhost:8000` → Kalender-Tab
+  fuer den aktuellen Monat oeffnen. Regressionsmatrix (`PRODUCT.md` Abschnitt 12,
+  "Backend-Endpoint"): zusaetzlich Health + Locations + Feed + Scout pruefen.
+  **Vor Implementierung zusaetzlich (Frage 1, Option A):** Produktions-`/calendar`
+  direkt abfragen bzw. Produktions-Log um die letzte `_prewarm_calendar()`-Meldung
+  pruefen, um den tatsaechlichen Ausloeser zu bestaetigen oder auszuschliessen.
+
+---
+
+**AK-Qualitäts-Check (Schritt 6c, 2026-08-25):**
+- Granularität: AK-1 bis AK-4 pruefen je genau ein eigenstaendiges Verhalten — keine
+  Aufteilung noetig.
+- Polarität: AK-1 (positiv: Neuberechnung nach Fehlerbehebung) hat mit AK-4 (negativ:
+  KEINE Neuberechnung bei echtem Leerzustand) ein explizites Gegenstueck.
+- Messbarkeit: alle vier AKs in Alltagssprache/App-Verhalten formuliert, keine
+  Funktions-/Variablennamen als Kernaussage (Dateireferenzen nur zur Herkunft).
+- Vier-Kategorien-Abdeckung: funktional = AK-1/AK-3; nicht-funktional (Performance) =
+  AK-4 (kein zusaetzliches Neurechnen bei echtem Leerzustand); nicht-funktional
+  (Beobachtbarkeit) = AK-2; Architektur/Konsistenz = Rule 2/AK-3 (bestehendes
+  Teilausfall-Verhalten bleibt erhalten); Sonstige (Compliance/Logging) = AK-2 deckt
+  Logging bereits ab, keine weitere Betriebsuebergabe-Anforderung erkennbar.
+- Testbarkeit ohne Rückfrage: fuer AK-1/AK-3 durch `test_bug110.py` bereits konkret
+  vorgezeichnet (Rot-Nachweis fuer AK-1 noch ausstehend, s.o.); AK-2 und AK-4 sind
+  Log-/Perf-Kriterien, die im Rahmen der Implementierung um einen konkreten Test ergaenzt
+  werden (kein Log-Test in dieser Analyse-Phase geschrieben, da das exakte Log-Format
+  erst mit der Implementierungsentscheidung feststeht — als offener Punkt vermerkt statt
+  stillschweigend uebergangen).
+- Herkunftsnachvollziehbarkeit: jedes AK traegt einen `*(Herkunft: ...)*`-Vermerk.
+
+Negativ-/Randfall-Checkliste: Grenzwerte — nicht relevant (kein numerischer Schwellwert
+neu eingefuehrt). Ungueltige Eingaben — nicht relevant (kein neuer Nutzereingabe-Pfad).
+Nebenlaeufigkeit — Prewarm/Live-Request-Ueberschneidung als Nebenbefund dokumentiert
+(Pre-Mortem Szenario 2), kein eigenes AK da reines Performance-, kein Korrektheitsthema.
+Lastgrenzen — nicht relevant (Aenderung betrifft Fehlerpfad, keine Kapazitaetsgrenze).
+Leerer/uebervoller Zustand — bereits durch AK-4 abgedeckt. Berechtigungen — nicht
+betroffen (kein neuer geschuetzter Endpoint). Abwaertskompatibilitaet — Response-Contract
+von `/calendar` bleibt unveraendert (weiterhin `status/events/total`), keine Bruchstelle.
+Rollback-/Wiederanlauffaehigkeit — bereits durch Ampel-Frage 3 abgedeckt (rein additive
+Cache-Logik, jederzeit ohne Datenverlust rueckgaengig machbar). Beobachtbarkeit im
+Fehlerfall — bereits durch AK-2 abgedeckt.
+
+```
+🔍 AK-Qualitäts-Check:
+✅ durchgeführt — 4 AKs, alle sechs Dimensionen geprüft; Vier-Kategorien-Abdeckung
+   vollständig (Performance/Beobachtbarkeit/Architektur/Sonstige je begründet);
+   Negativ-Checkliste 9/9 durchgegangen, 3 davon bereits durch bestehende AKs
+   abgedeckt, Rest begründet nicht relevant; ein offener Punkt (Log-Test fürs exakte
+   Format folgt erst mit Implementierung, hier vermerkt statt übergangen).
+```
+
+---
+
+**Übergabe (Schritt 7):**
+
+**Kernbefund (1–3 Sätze):** Die Ticket-Prämisse ("Hintergrund-Job nie gelaufen") passt
+nicht zum tatsächlich aktiven Produktions-Code-Pfad (On-Demand, `FOTOALERT_ONDEMAND=1`) —
+anderer Mechanismus als BUG-93, wie von Stephan vermutet, aber wahrscheinlich auch anders
+als im Ticket selbst angenommen. Verifiziert ist stattdessen ein echter Architektur-Defekt:
+ein einmal leer berechneter Monat bleibt im On-Demand-Cache dauerhaft leer, selbst wenn die
+Ursache längst behoben ist — und der bestehende „Kalender neu berechnen"-Admin-Knopf wirkt
+darauf nicht.
+
+**Optionen + Empfehlung:** Option A (nur Cache-Fix) vs. Option B (Cache-Fix + Fehler-Log)
+— empfohlen: **Option B**.
+
+**Offene Frage (blockierend):** ❓ Frage 1 — ist der Live-Kalender auf dem echten
+Produktionsserver tatsächlich leer, und was zeigt das Server-Log rund um den letzten
+Prozess-Start? Aus der Analyse-Sandbox nicht prüfbar (kein Produktions-/SSH-Zugriff).
+
+**Weg-Gate:** Mit Option B implementieren — und parallel/vorab Frage 1 klären (Live-Check
+oder Server-Log)?
 
 ---
 
@@ -24806,6 +25778,26 @@ Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronis
 Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in derselben Datei, ist Done und unabhängig von diesem Fund). Aufteilen in kleinere Hilfsfunktionen (z. B. Fenster-Aktivierung/Elevation-Abruf, Alignment-Berechnung, Response-Aufbau separieren). Kein inhaltlicher Umbau — insbesondere die BUG-63-Fixes (`try/finally` um `set_active_window`/`clear_active_window`, `ContextVar`-Isolation, `asyncio.to_thread`) müssen unverändert erhalten bleiben.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-63, 2026-07-16)
+
+---
+
+### TASK-108 · Refactoring: Lange Funktionen `_apply_weather_to_event()`/`_weather_overlay()`/`health()` aufteilen (backend/main.py) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-08-25 |
+
+**Beschreibung:** `refactor_check.py` meldet gegen die BUG-108-Worktree-Version (`_worktrees/BUG-108/backend/`) drei lange Funktionen in `backend/main.py`:
+- `_apply_weather_to_event()` Z. 724 — 99 Zeilen (Threshold: 80)
+- `_weather_overlay()` Z. 2028 — 81 Zeilen (Threshold: 80)
+- `health()` Z. 3262 — 107 Zeilen (Threshold: 80)
+
+Ein viertes Finding (`preview_alignment()` Z. 4037 — 106 Zeilen) ist bereits durch das offene TASK-81 abgedeckt und hier bewusst ausgeklammert. Für `_apply_weather_to_event()`/`_weather_overlay()` existieren zwar die geschlossenen Vorgänger-Tickets TASK-76 bzw. TASK-74 — beide sind seither erneut über den Threshold gewachsen (BUG-108 selbst hat `_apply_weather_to_event()` um die 100-km-Projektionslogik erweitert), decken den aktuellen Fund also nicht mehr ab. Aufteilen in kleinere Hilfsfunktionen je Verantwortlichkeit. Kein inhaltlicher Umbau — rein strukturell.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-108)
 
 ---
 

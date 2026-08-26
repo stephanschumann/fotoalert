@@ -1,6 +1,7 @@
 """Regressionssuite — BUG-106: Wetter-Overlay-Job kollidiert beim Server-Start mit dem
-Wetter-Karten-Bau-Job um Ressourcen und stößt dadurch eher an das bestehende 180s-
-Zeitbudget (BUG-99).
+Wetter-Karten-Bau-Job um Ressourcen und stößt dadurch eher an das bestehende
+Zeitbudget-Sicherheitsnetz (WEATHER_OVERLAY_MAX_TOTAL_SECONDS, urspruenglich 180s
+durch BUG-99, Wert seit BUG-108 = 1500.0s).
 
 Implementierungsphase, 2026-08-16. Ticket: BUG-106.
 
@@ -200,16 +201,18 @@ def test_weather_overlay_startup_call_site_passes_triggered_by(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# Regel 3 / AK3 — das bestehende 180s-Sicherheitsnetz (BUG-99) selbst bleibt
-# unverändert; dieses Ticket ändert nur die Startbedingungen.
+# Regel 3 / AK3 — das bestehende Zeitbudget-Sicherheitsnetz (urspruenglich BUG-99,
+# Wert seit BUG-108 = 1500.0s) selbst bleibt unveraendert; dieses Ticket aendert nur
+# die Startbedingungen.
 # ---------------------------------------------------------------------------
 
 def test_weather_overlay_max_total_seconds_unchanged_by_bug106():
-    """BUG-106 Scope-Abgrenzung: Das bestehende 180s-Zeitbudget (BUG-99) wird von
-    diesem Ticket ausdrücklich NICHT verändert (Option B ändert nur das Timing der
-    beiden Start-Tasks, nicht das Sicherheitsnetz selbst)."""
-    assert main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS == 180.0, (
+    """BUG-106 Scope-Abgrenzung: Das bestehende Zeitbudget-Sicherheitsnetz
+    (WEATHER_OVERLAY_MAX_TOTAL_SECONDS, aktuell 1500.0s seit BUG-108; urspruenglich
+    180s durch BUG-99) wird von diesem Ticket ausdrücklich NICHT verändert (Option B
+    ändert nur das Timing der beiden Start-Tasks, nicht das Sicherheitsnetz selbst)."""
+    assert main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS == 1500.0, (
         f"WEATHER_OVERLAY_MAX_TOTAL_SECONDS wurde veraendert "
         f"({main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS}) — BUG-106 darf das bestehende "
-        f"BUG-99-Sicherheitsnetz nicht anfassen (siehe Ticket-Scope)."
+        f"Zeitbudget-Sicherheitsnetz nicht anfassen (siehe Ticket-Scope)."
     )

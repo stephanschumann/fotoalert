@@ -63,7 +63,7 @@ from calculations.astronomy import (
     calculate_subject_angular_profile,
     find_precise_alignment_times,
 )
-from calculations.weather import fetch_weather_forecast, fetch_aerosol_forecast, RED_SKY_AOD_THRESHOLD, CLOUD_MOOD_PROJECTION_DISTANCE_M, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event, should_generate_red_clouds_event
+from calculations.weather import fetch_weather_forecast, fetch_aerosol_forecast, RED_SKY_AOD_THRESHOLD, CLOUD_MOOD_PROJECTION_DISTANCE_M, RED_CLOUDS_PROJECTION_DISTANCE_M, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event, should_generate_red_clouds_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
 from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
 from discover.geometry import destination_point  # US-131: Projektion Wolken-/Dunstabfrage entlang Sichtachse
@@ -729,6 +729,7 @@ def _apply_weather_to_event(
     aerosol_forecast: object = None,
     sun_dir_forecast: object = None,
     antisolar_dir_forecast: object = None,
+    red_clouds_dir_forecast: object = None,
 ) -> bool:
     """
     US-106: Wetter-Anwendung für GENAU EIN Feed-Event (DRY-Helfer für Voll- und
@@ -762,6 +763,14 @@ def _apply_weather_to_event(
     und für das bestehende, von diesem Ticket nicht berührte US-07-Wolkenstimmungs-Filter
     im Frontend (`o.golden_cloud_score`) benötigt (AK-2: allgemeine Wetteranzeige bleibt
     am Fotografen-Standort verankert).
+
+    BUG-108: red_clouds_dir_forecast ist optional (Default None) — Wetter-Forecast am
+    EINEN für RED_CLOUDS projizierten Punkt (Sonnenrichtung/celestial_azimuth,
+    RED_CLOUDS_PROJECTION_DISTANCE_M = 100 km hinter dem Motiv, eigenständig von
+    sun_dir_forecast/antisolar_dir_forecast — andere Distanz, anderer Azimut). Liefert
+    e["ch_red_clouds_dir"]/e["cl_red_clouds_dir"]; bleiben None, wenn der Fetch fehlschlägt
+    oder das Event kein qualifizierendes Blaue-Stunde-Event ist — kein Fallback auf
+    weather_details/Fotografen-Standort (Weg-Gate-Entscheidung 2026-08-23).
     """
     shoot_dt = datetime.fromisoformat(e["shoot_time"])
     if shoot_dt > cutoff or shoot_dt < now_utc - timedelta(hours=1):
@@ -788,8 +797,10 @@ def _apply_weather_to_event(
 
     # US-131 (AK-8/9/11): entkoppelte Wolkenwerte GOLDEN_CLOUDS/RED_SKY — je eigener
     # Forecast-Parameter, keine geteilten Zwischenvariablen (Pre-Mortem TASK-76).
-    gcs_sun_dir, cl_sun_dir, cm_sun_dir = _directional_cloud_values(sun_dir_forecast, shoot_dt)
-    gcs_antisolar_dir, cl_antisolar_dir, cm_antisolar_dir = _directional_cloud_values(antisolar_dir_forecast, shoot_dt)
+    # BUG-108: _directional_cloud_values() gibt seit diesem Ticket zusaetzlich ch
+    # zurueck (4-Tupel) — hier fuer GOLDEN_CLOUDS/RED_SKY unveraendert ignoriert.
+    gcs_sun_dir, cl_sun_dir, cm_sun_dir, _ch_sun_dir = _directional_cloud_values(sun_dir_forecast, shoot_dt)
+    gcs_antisolar_dir, cl_antisolar_dir, cm_antisolar_dir, _ch_antisolar_dir = _directional_cloud_values(antisolar_dir_forecast, shoot_dt)
 
     e["golden_cloud_score_sun_dir"] = gcs_sun_dir
     e["cl_sun_dir"] = cl_sun_dir
@@ -797,6 +808,16 @@ def _apply_weather_to_event(
     e["golden_cloud_score_antisolar_dir"] = gcs_antisolar_dir
     e["cl_antisolar_dir"] = cl_antisolar_dir
     e["cm_antisolar_dir"] = cm_antisolar_dir
+
+    # BUG-108: RED_CLOUDS-Wolkenwerte (ch/cl) vom eigenen, unabhaengigen
+    # Projektionspunkt (Sonnenrichtung/celestial_azimuth, 100 km) — kein Fallback auf
+    # den Fotografen-Standort-Wert, wenn red_clouds_dir_forecast None ist (Fetch
+    # fehlgeschlagen ODER kein qualifizierendes Blaue-Stunde-Event).
+    _gcs_red_clouds_dir, cl_red_clouds_dir, _cm_red_clouds_dir, ch_red_clouds_dir = _directional_cloud_values(
+        red_clouds_dir_forecast, shoot_dt
+    )
+    e["ch_red_clouds_dir"] = ch_red_clouds_dir
+    e["cl_red_clouds_dir"] = cl_red_clouds_dir
 
     e["weather_status"] = "ok"
     return True
@@ -869,19 +890,28 @@ def _directional_cloud_values(dir_forecast: object, shoot_dt: datetime) -> tuple
     eigenem `dir_forecast`-Parameter aufgerufen (US-131 AK-11: keine geteilten
     Zwischenvariablen zwischen den beiden Aufrufen, siehe Pre-Mortem TASK-76).
 
-    Gibt (None, None, None) zurück, wenn kein Forecast vorhanden ist oder kein
-    Datenpunkt zum Aufnahmezeitpunkt existiert — kein Fallback auf einen anderen
-    Wert.
+    BUG-108: Gibt zusätzlich cloud_cover_high_pct (ch) als viertes Tupel-Element
+    zurück — wird von RED_CLOUDS benötigt (should_generate_red_clouds_event()
+    braucht ch, das hier zuvor nicht extrahiert wurde). Die beiden bestehenden
+    GOLDEN_CLOUDS-/RED_SKY-Aufrufer ignorieren den vierten Wert unverändert
+    (kein Verhaltensunterschied für diese beiden Typen, s. test_us131.py).
+
+    Gibt (None, None, None, None) zurück, wenn kein Forecast vorhanden ist oder
+    kein Datenpunkt zum Aufnahmezeitpunkt existiert — kein Fallback auf einen
+    anderen Wert.
     """
     if dir_forecast is None:
-        return None, None, None
+        return None, None, None, None
     w = dir_forecast.get_at(shoot_dt)
     if w is None:
-        return None, None, None
+        return None, None, None, None
     gcs = calculate_golden_cloud_score(
         w.cloud_cover_low_pct, w.cloud_cover_mid_pct, w.cloud_cover_high_pct,
     )
-    return round(gcs, 3), round(w.cloud_cover_low_pct), round(w.cloud_cover_mid_pct)
+    return (
+        round(gcs, 3), round(w.cloud_cover_low_pct), round(w.cloud_cover_mid_pct),
+        round(w.cloud_cover_high_pct),
+    )
 
 
 _GOLDEN_HOUR_TYPES = {"Goldene Stunde Morgen", "Goldene Stunde Abend"}
@@ -960,6 +990,51 @@ def _cloud_mood_projection_points(e):
     return sun_dir_point, antisolar_dir_point
 
 
+def _red_clouds_projection_point(e):
+    """
+    BUG-108: Berechnet den EINEN entlang der Sichtachse projizierten Punkt, an dem
+    Wolkendaten für RED_CLOUDS ("Rote Wolken") statt am Fotografen-Standort abgefragt
+    werden — Sonnenrichtung (celestial_azimuth, Blaue-Stunde-Sonnenposition),
+    RED_CLOUDS_PROJECTION_DISTANCE_M (100 km) hinter dem Motiv.
+
+    Bewusst KEIN gemeinsamer Task mit _cloud_mood_projection_points(): GOLDEN_CLOUDS/
+    RED_SKY projizieren mit sunrise_azimuth/sunset_azimuth, RED_CLOUDS braucht dagegen
+    celestial_azimuth (ein zeitlich anderer Azimut, da die Sonne zur Blauen Stunde
+    bereits unter dem Horizont steht) — ein gemeinsamer Task wäre laut BUG-108-Analyse
+    nicht automatisch korrekt gewesen.
+
+    Gemeinsamer Helfer für _plan_weather_fetch_tasks()/_lookup_red_clouds_forecast()
+    (Cronlauf, _weather_overlay()) und _weather_overlay_single() (Fast-Path) — beide
+    Pfade rufen exakt diese Funktion auf, damit sie für dieselbe Location/denselben
+    Event-Zeitpunkt denselben projizierten Punkt berechnen (analog AK-4/AK-10-
+    Konsistenzmuster aus US-131).
+
+    Gibt None zurück, wenn das Event kein qualifizierendes Blaue-Stunde-Event ist
+    oder subject_lat/subject_lon/subject_azimuth/celestial_azimuth fehlen (kein
+    Fehler — die Projektion wird in diesem Fall gar nicht erst berechnet, analog
+    AK-6 aus US-131).
+
+    Gibt bei Erfolg (lat, lon) zurück.
+    """
+    if e.get("event_type") not in _BLUE_HOUR_TYPES:
+        return None
+
+    subject_lat = e.get("subject_lat")
+    subject_lon = e.get("subject_lon")
+    subject_az = e.get("subject_azimuth")
+    if subject_lat is None or subject_lon is None or subject_az is None:
+        return None
+
+    # BUG-108: Sonnen-Azimut zur Blauen Stunde — celestial_azimuth, NICHT
+    # sunrise_azimuth/sunset_azimuth (das sind GOLDEN_CLOUDS-Felder eines zeitlich
+    # anderen Sonnenstands, s. Docstring oben).
+    sun_az = e.get("celestial_azimuth")
+    if sun_az is None:
+        return None
+
+    return destination_point(subject_lat, subject_lon, sun_az, RED_CLOUDS_PROJECTION_DISTANCE_M)
+
+
 def _lookup_projected_forecasts(e, sun_dir_forecasts, antisolar_dir_forecasts, aerosol_forecasts):
     """
     US-131 (Refactor-Check 2026-07-14): gemeinsamer Helfer für _weather_overlay() und
@@ -982,6 +1057,27 @@ def _lookup_projected_forecasts(e, sun_dir_forecasts, antisolar_dir_forecasts, a
     anti_fc = antisolar_dir_forecasts.get(anti_key)
     aero_fc = aerosol_forecasts.get(anti_key)
     return sun_fc, anti_fc, aero_fc
+
+
+def _lookup_red_clouds_forecast(e, red_clouds_dir_forecasts):
+    """
+    BUG-108: Analog zu _lookup_projected_forecasts(), aber für den EINEN
+    RED_CLOUDS-Projektionspunkt (_red_clouds_projection_point()) — gemeinsamer
+    Helfer für _weather_overlay() und _weather_overlay_single(), reines
+    Nachschlagen im bereits über _fetch_weather_and_aerosol() abgerufenen
+    Forecast-Dict.
+
+    Gibt None zurück, wenn das Event kein qualifizierendes Blaue-Stunde-Event ist
+    (_red_clouds_projection_point() gibt dann None zurück) oder der Fetch für
+    diesen Punkt fehlgeschlagen ist — kein Fallback (BUG-108 Weg-Gate-Entscheidung
+    2026-08-23).
+    """
+    point = _red_clouds_projection_point(e)
+    if point is None:
+        return None
+    lat, lon = point
+    key = _projected_point_cache_key(lat, lon)
+    return red_clouds_dir_forecasts.get(key)
 
 
 def _cloud_mood_inputs(e):
@@ -1153,14 +1249,24 @@ def _build_red_sky_event(e, aod, cl, cm, sun_az, subject_az):
 
 def _red_clouds_inputs(e):
     """
-    US-132: Prüft Eligibility eines Events für RED_CLOUDS-Generierung und
+    US-132/BUG-108: Prüft Eligibility eines Events für RED_CLOUDS-Generierung und
     extrahiert die Eingangswerte. Gibt None zurück, wenn das Event nicht eligible
     ist (kein Blaue-Stunde-Event, kein echtes Wetter-Overlay, fehlende
-    Wetterdetails). Pre-Mortem Szenario 3: nutzt bewusst NICHT golden_cloud_score
-    (bleibt für "Blaue Stunde" immer None), sondern greift direkt auf
-    cloud_cover_high_pct/cloud_cover_low_pct zu.
+    Wetterdetails).
 
-    Gibt bei Eligibility das Tupel (ch, cl, sun_alt, sun_az, subject_az) zurück.
+    BUG-108: ch/cl stammen jetzt vom eigenständigen RED_CLOUDS-Projektionspunkt
+    (_red_clouds_projection_point(), Sonnenrichtung/celestial_azimuth,
+    RED_CLOUDS_PROJECTION_DISTANCE_M = 100 km) statt wie zuvor aus
+    weather_details (Fotografen-Standort). Schlägt der Fetch am projizierten Punkt
+    fehl oder ist das Event kein qualifizierendes Blaue-Stunde-Event, bleiben
+    ch_red_clouds_dir/cl_red_clouds_dir None — kein Fallback auf den
+    Fotografen-Standort-Wert (Weg-Gate-Entscheidung 2026-08-23, konsistent zum
+    AK-11-Muster von GOLDEN_CLOUDS/RED_SKY aus US-131). Das allgemein angezeigte
+    Wetter am eigenen Standort (weather_details) bleibt davon unberührt (AK-Rule 3).
+
+    Gibt bei Eligibility das Tupel (ch, cl, sun_alt, sun_az, subject_az) zurück
+    (ch/cl können dabei None sein, s.o. — die Prüfung dafür liegt in
+    _build_red_clouds_event()).
     """
     if e.get("event_type") not in _BLUE_HOUR_TYPES:
         return None
@@ -1171,8 +1277,8 @@ def _red_clouds_inputs(e):
     if not wd:
         return None
 
-    ch = wd.get("cloud_cover_high_pct", 0)
-    cl = wd.get("cloud_cover_low_pct", 0)
+    ch = e.get("ch_red_clouds_dir")  # BUG-108: RED_CLOUDS-Projektionspunkt statt Fotografen-Standort
+    cl = e.get("cl_red_clouds_dir")
 
     # US-132/Pre-Mortem Szenario 2: Sonnenazimut/-höhe kommen aus celestial_azimuth/
     # celestial_altitude (opportunity.py-Ergänzung Blaue-Stunde-Block Morgen+Abend),
@@ -1193,8 +1299,14 @@ def _build_red_clouds_event(e, ch, cl, sun_alt, sun_az, subject_az):
     Event-Typ-Namen abgeleitet) — should_generate_red_clouds_event() macht diesen
     Check selbst hart (sun_altitude >= 0 → False), zusätzlich zur Eligibility-Prüfung
     über _BLUE_HOUR_TYPES.
+
+    BUG-108: ch/cl werden hier zusätzlich explizit auf None geprüft (Fetch am
+    RED_CLOUDS-Projektionspunkt fehlgeschlagen) — should_generate_red_clouds_event()
+    selbst bleibt unverändert (Pre-Mortem Szenario 4) und erwartet float, kein
+    Optional; der Guard hier verhindert sowohl einen TypeError beim Vergleich als
+    auch einen stillen Fallback (kein Kandidat statt Absturz oder falscher Wert).
     """
-    if sun_alt is None or sun_az is None or subject_az is None:
+    if sun_alt is None or sun_az is None or subject_az is None or ch is None or cl is None:
         return None
     if not should_generate_red_clouds_event(
         sun_altitude=sun_alt, ch=ch, cl=cl, sun_azimuth=sun_az, subject_azimuth=subject_az
@@ -1400,7 +1512,12 @@ Live-Lauf (Stephan) ggf. weiter nachjustiert werden.
 """
 
 
-WEATHER_OVERLAY_MAX_TOTAL_SECONDS = 180.0
+WEATHER_OVERLAY_MAX_TOTAL_SECONDS = 1500.0  # BUG-108: dauerhafter Wert (2026-08-25)
+# Gemessene Baseline (voller Lauf, 167 Locations, BUG-108-Zeitmessung 2026-08-25): 833.6s,
+# Budget bei dieser Messung testweise auf 900s gesetzt und NICHT erreicht (kein Abbruch).
+# Dauerhafter Wert mit Sicherheitsmarge nach BUG-99-Vorbild (Faktor ca. 1,73 auf die
+# gemessene Baseline) gesetzt, damit der seit BUG-108 zusaetzliche 4. Abruf-Typ
+# "red_clouds_dir" pro Location nicht mehr reihenweise per Timeout abgebrochen wird.
 """
 BUG-99 (2026-08-04, Weg-Gate Stephan — empfohlener Weg + Sicherheitsnetz):
 Gesamtzeit-Obergrenze für EINEN Lauf von _fetch_weather_and_aerosol(). Semaphore
@@ -1434,6 +1551,27 @@ nur die zum Abbruchzeitpunkt noch offenen Fetches werden abgebrochen und laufen 
 denselben BUG-77-failed_*-Sammelpfad wie ein regulärer Fehlschlag (kein separater
 Fehlerpfad, kein stiller Datenverlust bereits erfolgreicher Ergebnisse — s.
 _fetch_weather_and_aerosol()).
+
+BUG-108-Nachtrag (2026-08-23, Pre-Mortem Szenario 1, Kernrisiko des Tickets): Der
+neue RED_CLOUDS-Projektionstask ("red_clouds_dir") erhöht das Abfragevolumen
+zusätzlich zu den bereits bestehenden drei Projektions-Abrufen (sun_dir/
+antisolar_dir/aerosol, US-131) — Blaue-Stunde-Events kommen wie Goldene-Stunde-
+Events zweimal täglich pro Location vor. Bewusst NICHT durch eine Erhöhung dieser
+Konstante adressiert, sondern durch drei strukturelle Maßnahmen, die den neuen Task
+in die bereits bestehende Härtung einordnen statt einen eigenen Pfad zu öffnen:
+(1) derselbe _projected_point_cache_key()/PROJECTED_POINT_CACHE_PRECISION-Dedup wie
+bei sun_dir/antisolar_dir/aerosol (BUG-104-Lehre: unterschiedliche Rundung an
+Planungs- und Lookup-Stelle lässt Fetches ins Leere laufen — _red_clouds_projection_point()
+wird deshalb an BEIDEN Stellen als derselbe gemeinsame Helfer verwendet, analog
+_cloud_mood_projection_points()), (2) derselbe Semaphore-/Retry-/Pacing-Mechanismus
+(_run_one_weather_fetch(), WEATHER_API_MAX_CONCURRENT_REQUESTS/
+WEATHER_API_REQUEST_PACING_SECONDS) ohne separaten Codepfad, (3) derselbe
+WEATHER_OVERLAY_MAX_TOTAL_SECONDS-Kurzschluss als gemeinsames Sicherheitsnetz für
+ALLE Task-Arten inkl. der neuen. Ob diese drei Maßnahmen bei der realen, aktuellen
+Location-Zahl ausreichen, ist NICHT synthetisch nachgebaut (siehe BUG-104-Präzedenzfall:
+ein Unit-Test kann externe Netzwerklatenz/Rate-Limit-Verhalten nicht realistisch
+reproduzieren) — bleibt daher ein offener Live-Nachweis-Punkt für einen echten Lauf
+nach diesem Ticket (s. Rückgabe-Vertrag/Testplan).
 
 Zusammenspiel-Check (BUG-99, Pflicht vor Implementierung): _fetch_weather_and_aerosol()
 wird identisch von DREI Aufrufern genutzt — dem periodischen 3h-Cron
@@ -1499,7 +1637,7 @@ Pacing) — nicht, dass der Retry-Mechanismus selbst das Problem ist.
 
 async def _fetch_weather_and_aerosol(
     near_events, max_total_seconds: float | None = None
-) -> tuple[dict, dict, dict, dict, list, list, list, list]:
+) -> tuple[dict, dict, dict, dict, dict, list, list, list, list, list]:
     """
     TASK-74 (aus _weather_overlay extrahiert): Holt für jede unique Location aus
     near_events Wetter- und Aerosol-Forecast parallel via asyncio.gather.
@@ -1527,8 +1665,19 @@ async def _fetch_weather_and_aerosol(
     zu ändern.
 
     Gibt zurück: (loc_forecasts, aerosol_forecasts, sun_dir_forecasts,
-    antisolar_dir_forecasts, failed_locations, failed_aerosol_locations,
-    failed_sun_dir_locations, failed_antisolar_dir_locations)
+    antisolar_dir_forecasts, red_clouds_dir_forecasts, failed_locations,
+    failed_aerosol_locations, failed_sun_dir_locations,
+    failed_antisolar_dir_locations, failed_red_clouds_dir_locations)
+
+    BUG-108: Zusätzlich zu den drei bestehenden Projektions-Abrufen (sun_dir/
+    antisolar_dir/aerosol, US-131) plant _plan_weather_fetch_tasks() jetzt pro
+    qualifizierendem Blaue-Stunde-Event einen vierten, eigenständigen
+    Projektions-Task ("red_clouds_dir", eigene Distanz RED_CLOUDS_PROJECTION_DISTANCE_M
+    = 100 km, eigener Azimut celestial_azimuth) für RED_CLOUDS. Läuft durch
+    dieselbe Semaphore-/Retry-/Timeout-Härtung wie alle anderen Abruf-Arten (kein
+    separater, ungehärteter Pfad, Pre-Mortem Szenario 1) — erhöht aber das
+    Gesamt-Abfragevolumen zusätzlich, s. WEATHER_OVERLAY_MAX_TOTAL_SECONDS-Docstring
+    für die Zeitbudget-Einordnung.
 
     BUG-99 (2026-08-04, Weg-Gate Stephan — empfohlener Weg + Sicherheitsnetz): Zusätzlich
     zur bestehenden Nebenläufigkeits-/Retry-Härtung (US-131/BUG-83) begrenzt diese Funktion
@@ -1648,7 +1797,10 @@ def _plan_weather_fetch_tasks(near_events) -> list:
     geplantem Abruf.
     """
     tasks_meta: list = []
-    seen: dict = {"weather": set(), "aerosol": set(), "sun_dir": set(), "antisolar_dir": set()}
+    seen: dict = {
+        "weather": set(), "aerosol": set(), "sun_dir": set(), "antisolar_dir": set(),
+        "red_clouds_dir": set(),  # BUG-108
+    }
 
     for e in near_events:
         obs_key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
@@ -1656,21 +1808,39 @@ def _plan_weather_fetch_tasks(near_events) -> list:
             seen["weather"].add(obs_key)
             tasks_meta.append(("weather", obs_key, e["observer_lat"], e["observer_lon"], e["location_name"]))
 
+        # US-131: Goldene-Stunde-Projektion (sun_dir/antisolar_dir/aerosol) — gibt
+        # None zurück für Blaue-Stunde-Events (RED_CLOUDS), bewusst kein `continue`
+        # mehr davor (BUG-108): der RED_CLOUDS-Zweig unten muss für genau diese
+        # Events trotzdem laufen.
         proj = _cloud_mood_projection_points(e)
-        if proj is None:
-            continue
-        (sun_lat, sun_lon), (anti_lat, anti_lon) = proj
-        sun_key = _projected_point_cache_key(sun_lat, sun_lon)
-        anti_key = _projected_point_cache_key(anti_lat, anti_lon)
-        if sun_key not in seen["sun_dir"]:
-            seen["sun_dir"].add(sun_key)
-            tasks_meta.append(("sun_dir", sun_key, sun_lat, sun_lon, e["location_name"]))
-        if anti_key not in seen["antisolar_dir"]:
-            seen["antisolar_dir"].add(anti_key)
-            tasks_meta.append(("antisolar_dir", anti_key, anti_lat, anti_lon, e["location_name"]))
-        if anti_key not in seen["aerosol"]:
-            seen["aerosol"].add(anti_key)
-            tasks_meta.append(("aerosol", anti_key, anti_lat, anti_lon, e["location_name"]))
+        if proj is not None:
+            (sun_lat, sun_lon), (anti_lat, anti_lon) = proj
+            sun_key = _projected_point_cache_key(sun_lat, sun_lon)
+            anti_key = _projected_point_cache_key(anti_lat, anti_lon)
+            if sun_key not in seen["sun_dir"]:
+                seen["sun_dir"].add(sun_key)
+                tasks_meta.append(("sun_dir", sun_key, sun_lat, sun_lon, e["location_name"]))
+            if anti_key not in seen["antisolar_dir"]:
+                seen["antisolar_dir"].add(anti_key)
+                tasks_meta.append(("antisolar_dir", anti_key, anti_lat, anti_lon, e["location_name"]))
+            if anti_key not in seen["aerosol"]:
+                seen["aerosol"].add(anti_key)
+                tasks_meta.append(("aerosol", anti_key, anti_lat, anti_lon, e["location_name"]))
+
+        # BUG-108: eigener RED_CLOUDS-Projektionspunkt (Sonnenrichtung/
+        # celestial_azimuth, 100 km) — unabhängig vom Goldene-Stunde-Zweig oben, da
+        # nur Blaue-Stunde-Events qualifizieren (_GOLDEN_HOUR_TYPES/_BLUE_HOUR_TYPES
+        # sind disjunkt, beide Zweige können pro Event nie gleichzeitig Tasks
+        # liefern). Nutzt denselben _projected_point_cache_key()-Dedup-Mechanismus
+        # wie die Goldene-Stunde-Projektion (Pre-Mortem Szenario 1: kein neuer,
+        # ungehärteter Pfad).
+        rc_point = _red_clouds_projection_point(e)
+        if rc_point is not None:
+            rc_lat, rc_lon = rc_point
+            rc_key = _projected_point_cache_key(rc_lat, rc_lon)
+            if rc_key not in seen["red_clouds_dir"]:
+                seen["red_clouds_dir"].add(rc_key)
+                tasks_meta.append(("red_clouds_dir", rc_key, rc_lat, rc_lon, e["location_name"]))
 
     return tasks_meta
 
@@ -1731,17 +1901,25 @@ def _collect_weather_fetch_results(tasks_meta, results) -> tuple:
     Forecast-Dicts/Fehl-Listen zu.
 
     Gibt zurück: (loc_forecasts, aerosol_forecasts, sun_dir_forecasts,
-    antisolar_dir_forecasts, failed_locations, failed_aerosol_locations,
-    failed_sun_dir_locations, failed_antisolar_dir_locations)
+    antisolar_dir_forecasts, red_clouds_dir_forecasts, failed_locations,
+    failed_aerosol_locations, failed_sun_dir_locations,
+    failed_antisolar_dir_locations, failed_red_clouds_dir_locations)
+
+    BUG-108: red_clouds_dir_forecasts/failed_red_clouds_dir_locations neu — RED_CLOUDS-
+    Projektionspunkt (eigene Kind "red_clouds_dir"), läuft durch denselben
+    BaseException-/BUG-77-Sammelpfad wie die drei bestehenden Abruf-Arten (kein
+    separater, ungehärteter Fehlerpfad).
     """
     loc_forecasts: dict = {}  # Fotografen-Standort-Wetter
     aerosol_forecasts: dict = {}  # US-130/US-131: am Gegenrichtungs-/Antisolarpunkt
     sun_dir_forecasts: dict = {}  # US-131: Wetter in Sonnenrichtung (GOLDEN_CLOUDS)
     antisolar_dir_forecasts: dict = {}  # US-131: Wetter in Gegenrichtung (RED_SKY)
+    red_clouds_dir_forecasts: dict = {}  # BUG-108: Wetter in Sonnenrichtung, 100 km (RED_CLOUDS)
     failed_locations: list = []  # BUG-77: fehlgeschlagener Wetter-Abruf
     failed_aerosol_locations: list = []  # US-130: fehlgeschlagener Aerosol-Abruf
     failed_sun_dir_locations: list = []  # US-131: fehlgeschlagener Wolken-Abruf Sonnenrichtung
     failed_antisolar_dir_locations: list = []  # US-131: fehlgeschlagener Wolken-Abruf Gegenrichtung
+    failed_red_clouds_dir_locations: list = []  # BUG-108: fehlgeschlagener Wolken-Abruf RED_CLOUDS-Punkt
 
     for (kind, key, _lat, _lon, name), result in zip(tasks_meta, results):
         # BUG-99: BaseException statt Exception — asyncio.CancelledError (das ein per
@@ -1764,8 +1942,11 @@ def _collect_weather_fetch_results(tasks_meta, results) -> tuple:
                 # fatal — GOLDEN_CLOUDS gilt für dieses Event als "Signal nicht verfügbar",
                 # kein Fallback auf den Fotografen-Standort-Wert.
                 failed_sun_dir_locations.append(name)
-            else:  # antisolar_dir
+            elif kind == "antisolar_dir":
                 failed_antisolar_dir_locations.append(name)
+            else:  # red_clouds_dir (BUG-108) — analog: RED_CLOUDS gilt für dieses
+                # Event als "Signal nicht verfügbar", kein Fallback (Weg-Gate 2026-08-23).
+                failed_red_clouds_dir_locations.append(name)
             continue
 
         if kind == "weather":
@@ -1775,35 +1956,44 @@ def _collect_weather_fetch_results(tasks_meta, results) -> tuple:
             aerosol_forecasts[key] = result
         elif kind == "sun_dir":
             sun_dir_forecasts[key] = result
-        else:  # antisolar_dir
+        elif kind == "antisolar_dir":
             antisolar_dir_forecasts[key] = result
+        else:  # red_clouds_dir (BUG-108)
+            red_clouds_dir_forecasts[key] = result
 
     return (
         loc_forecasts, aerosol_forecasts, sun_dir_forecasts, antisolar_dir_forecasts,
-        failed_locations, failed_aerosol_locations, failed_sun_dir_locations, failed_antisolar_dir_locations,
+        red_clouds_dir_forecasts,
+        failed_locations, failed_aerosol_locations, failed_sun_dir_locations,
+        failed_antisolar_dir_locations, failed_red_clouds_dir_locations,
     )
 
 
 def _build_weather_error_message(
     failed_locations, failed_aerosol_locations,
     failed_sun_dir_locations=None, failed_antisolar_dir_locations=None,
+    failed_red_clouds_dir_locations=None,
 ) -> str | None:
     """
-    TASK-74 (aus _weather_overlay extrahiert): Baut die BUG-77/US-130/US-131-Fehlermeldung
-    für Teil-/Totalausfall des Wetter-, Aerosol- und/oder Wolken-Projektions-Abrufs.
-    Gibt None zurück, wenn alle Listen leer sind (kein Fehler).
+    TASK-74 (aus _weather_overlay extrahiert): Baut die BUG-77/US-130/US-131/BUG-108-
+    Fehlermeldung für Teil-/Totalausfall des Wetter-, Aerosol- und/oder
+    Wolken-Projektions-Abrufs. Gibt None zurück, wenn alle Listen leer sind (kein
+    Fehler).
 
     US-131: failed_sun_dir_locations/failed_antisolar_dir_locations sind optional
     (Default None → wie leere Liste behandelt), damit bestehende Aufrufer mit der
-    alten 2-Parameter-Signatur (BUG-77/US-130) unverändert weiterlaufen.
+    alten 2-Parameter-Signatur (BUG-77/US-130) unverändert weiterlaufen. BUG-108:
+    failed_red_clouds_dir_locations ebenso optional, aus demselben Grund.
     """
     failed_sun_dir_locations = failed_sun_dir_locations or []
     failed_antisolar_dir_locations = failed_antisolar_dir_locations or []
+    failed_red_clouds_dir_locations = failed_red_clouds_dir_locations or []
     if (
         not failed_locations
         and not failed_aerosol_locations
         and not failed_sun_dir_locations
         and not failed_antisolar_dir_locations
+        and not failed_red_clouds_dir_locations
     ):
         return None
     parts = []
@@ -1827,6 +2017,11 @@ def _build_weather_error_message(
         if len(failed_antisolar_dir_locations) > 5:
             names += f" …und {len(failed_antisolar_dir_locations) - 5} weitere"
         parts.append(f"Wolkenwert Gegenrichtung fehlgeschlagen für: {names}")
+    if failed_red_clouds_dir_locations:
+        names = ", ".join(failed_red_clouds_dir_locations[:5])
+        if len(failed_red_clouds_dir_locations) > 5:
+            names += f" …und {len(failed_red_clouds_dir_locations) - 5} weitere"
+        parts.append(f"Wolkenwert Rote-Wolken-Projektionspunkt fehlgeschlagen für: {names}")
     return "Wetter: Fehler — " + "; ".join(parts)
 
 
@@ -1867,7 +2062,9 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
 
     (
         loc_forecasts, aerosol_forecasts, sun_dir_forecasts, antisolar_dir_forecasts,
-        failed_locations, failed_aerosol_locations, failed_sun_dir_locations, failed_antisolar_dir_locations,
+        red_clouds_dir_forecasts,
+        failed_locations, failed_aerosol_locations, failed_sun_dir_locations,
+        failed_antisolar_dir_locations, failed_red_clouds_dir_locations,
     ) = await _fetch_weather_and_aerosol(near_events)
     # Anzahl unique Locations: jede unique Location landet entweder in loc_forecasts
     # (Wetter-Abruf erfolgreich) oder in failed_locations (fehlgeschlagen) — disjunkt.
@@ -1883,7 +2080,11 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
         sun_fc, anti_fc, aero_fc = _lookup_projected_forecasts(
             e, sun_dir_forecasts, antisolar_dir_forecasts, aerosol_forecasts
         )
-        if _apply_weather_to_event(e, loc_forecasts.get(key), now_utc, cutoff, aero_fc, sun_fc, anti_fc):
+        # BUG-108: eigenständiger RED_CLOUDS-Projektionspunkt (Sonnenrichtung, 100 km)
+        red_clouds_fc = _lookup_red_clouds_forecast(e, red_clouds_dir_forecasts)
+        if _apply_weather_to_event(
+            e, loc_forecasts.get(key), now_utc, cutoff, aero_fc, sun_fc, anti_fc, red_clouds_fc
+        ):
             updated += 1
 
     # US-109: GOLDEN_CLOUDS- und Himmelsröte-Events erzeugen
@@ -1900,6 +2101,7 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
     # für den Wetter-Abruf behoben hat.
     error_msg = _build_weather_error_message(
         failed_locations, failed_aerosol_locations, failed_sun_dir_locations, failed_antisolar_dir_locations,
+        failed_red_clouds_dir_locations,
     )
     if error_msg is not None:
         _job_error("weather", t0, error_msg)
@@ -1955,7 +2157,9 @@ async def _weather_overlay_single(loc_id: str) -> bool:
 
     (
         loc_forecasts, aerosol_forecasts, sun_dir_forecasts, antisolar_dir_forecasts,
-        failed_locations, _failed_aerosol_locations, _failed_sun_dir_locations, _failed_antisolar_dir_locations,
+        red_clouds_dir_forecasts,
+        failed_locations, _failed_aerosol_locations, _failed_sun_dir_locations,
+        _failed_antisolar_dir_locations, _failed_red_clouds_dir_locations,
     ) = await _fetch_weather_and_aerosol(near_events)
 
     ref = near_events[0]
@@ -1973,7 +2177,11 @@ async def _weather_overlay_single(loc_id: str) -> bool:
         sun_fc, anti_fc, aero_fc = _lookup_projected_forecasts(
             e, sun_dir_forecasts, antisolar_dir_forecasts, aerosol_forecasts
         )
-        if not _apply_weather_to_event(e, fc, now_utc, cutoff, aero_fc, sun_fc, anti_fc):
+        # BUG-108: eigenständiger RED_CLOUDS-Projektionspunkt (Sonnenrichtung, 100 km)
+        red_clouds_fc = _lookup_red_clouds_forecast(e, red_clouds_dir_forecasts)
+        if not _apply_weather_to_event(
+            e, fc, now_utc, cutoff, aero_fc, sun_fc, anti_fc, red_clouds_fc
+        ):
             all_ok = False
     logger.info("US-106 Single-Wetter für %s: %d/%d Events in T+3 aktualisiert",
                 loc_id, sum(1 for e in near_events if e.get("weather_status") == "ok"), len(near_events))

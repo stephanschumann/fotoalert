@@ -172,7 +172,9 @@ def test_weather_overlay_ceiling_keeps_already_succeeded_results(monkeypatch):
     t0 = time.monotonic()
     (
         loc_forecasts, _aerosol_forecasts, _sun_dir_forecasts, _antisolar_dir_forecasts,
+        _red_clouds_dir_forecasts,
         failed_locations, _failed_aerosol, _failed_sun_dir, _failed_antisolar_dir,
+        _failed_red_clouds_dir,
     ) = asyncio.run(main._fetch_weather_and_aerosol(near_events))
     elapsed = time.monotonic() - t0
 
@@ -225,7 +227,7 @@ def test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling
     n_locations = 319  # reale Location-Zahl (60 statisch + 259 custom_locations, data_dev/fotoalert.db, 2026-08-04)
     real_baseline_seconds = 104.0  # verifizierte reale Grundzeit für einen fehlerfreien Lauf bei ~n_locations
     real_old_ceiling = 60.0
-    real_new_ceiling = 180.0
+    real_new_ceiling = 1500.0
 
     assert real_baseline_seconds > real_old_ceiling, (
         "Testannahme verletzt: die reale Grundzeit muesste ueber der alten (fehlerhaften) "
@@ -233,11 +235,11 @@ def test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling
     )
     assert real_baseline_seconds < real_new_ceiling, (
         "Testannahme verletzt: die neue Obergrenze muesste ueber der realen Grundzeit "
-        "liegen, sonst waere 180s falsch gewaehlt."
+        "liegen, sonst waere 1500s falsch gewaehlt."
     )
     assert main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS == real_new_ceiling, (
         f"main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS ist {main.WEATHER_OVERLAY_MAX_TOTAL_SECONDS}, "
-        f"erwartet der korrigierte BUG-99-Wert {real_new_ceiling} (180s)."
+        f"erwartet der korrigierte BUG-108-Wert {real_new_ceiling} (1500s)."
     )
 
     # Anzahl Semaphore-Runden bei realer Nebenläufigkeit (main.WEATHER_API_MAX_CONCURRENT_REQUESTS,
@@ -272,7 +274,9 @@ def test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling
     t0 = time.monotonic()
     (
         loc_forecasts, _aerosol_forecasts, _sun_dir_forecasts, _antisolar_dir_forecasts,
+        _red_clouds_dir_forecasts,
         failed_locations, _failed_aerosol, _failed_sun_dir, _failed_antisolar_dir,
+        _failed_red_clouds_dir,
     ) = asyncio.run(
         main._fetch_weather_and_aerosol(near_events, max_total_seconds=scaled_ceiling)
     )

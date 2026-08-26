@@ -142,6 +142,12 @@ def _make_blue_hour_event(event_type="Blaue Stunde", sun_altitude=-5, ch=45, cl=
         "celestial_altitude": sun_altitude,
         "celestial_azimuth": sun_azimuth,
         "subject_azimuth": subject_azimuth,
+        # BUG-108-Nachtrag (2026-08-23): _red_clouds_inputs() liest ch/cl seither vom
+        # eigenständigen RED_CLOUDS-Projektionspunkt statt aus weather_details (analog
+        # test_us_132.py::_make_blue_hour_event) — ohne diese beiden Felder bliebe
+        # "Rote Wolken" hier fälschlich aus.
+        "ch_red_clouds_dir": ch,
+        "cl_red_clouds_dir": cl,
         "composition_analysis": None,
         "moon_phase": None,
         "moon_illumination_pct": None,
