@@ -1,5 +1,5 @@
 // FotoAlert Service Worker – Offline-Cache + Push Notifications
-const CACHE_NAME = 'fotoalert-v1.22.68';
+const CACHE_NAME = 'fotoalert-v1.22.69';
 const STATIC_ASSETS = ['/', '/manifest.json'];
 
 self.addEventListener('install', e => {
