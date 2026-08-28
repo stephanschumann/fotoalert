@@ -1626,7 +1626,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.67';
+const APP_VERSION = '1.22.68';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -4859,9 +4859,8 @@ const Detail = {
           // US-132: sun_az/sun_alt kommen aus celestial_azimuth/celestial_altitude
           // (Blaue-Stunde-Feld, siehe backend/main.py::_red_clouds_inputs) — NICHT aus
           // sunrise_azimuth/sunset_azimuth (das sind Goldene-Stunde-Felder).
-          const wd = o.weather_details;
-          const ch = wd ? wd.cloud_cover_high_pct : null;
-          const cl = wd ? wd.cloud_cover_low_pct : null;
+          const ch = o.ch_red_clouds_dir ?? null;
+          const cl = o.cl_red_clouds_dir ?? null;
           const sunAlt = o.celestial_altitude;
           const rcSunAz = o.celestial_azimuth;
           const rcSubAz = o.subject_azimuth ?? null;
