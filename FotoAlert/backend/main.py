@@ -1458,7 +1458,7 @@ ggf. weiter nachjustiert werden.
 """
 
 
-WEATHER_API_REQUEST_PACING_SECONDS = 0.35
+WEATHER_API_REQUEST_PACING_SECONDS = 0.5
 """
 US-131 2. Nachtrag: Zusätzlich zur Nebenläufigkeits-Begrenzung (s.
 WEATHER_API_MAX_CONCURRENT_REQUESTS) erzwingt dieser Wert einen Mindestabstand
@@ -1509,6 +1509,11 @@ Hänger-Risiko (unbegrenzte Gesamtdauer bei durchgehend nicht antwortenden
 Locations) wird primär über WEATHER_OVERLAY_MAX_TOTAL_SECONDS (s. u.) als
 Sicherheitsnetz behoben, nicht allein über das Pacing. Muss nach dem nächsten
 Live-Lauf (Stephan) ggf. weiter nachjustiert werden.
+
+BUG-111-Nachtrag (2026-08-28): Von 0.35s auf 0.5s angehoben
+(WEATHER_API_MAX_CONCURRENT_REQUESTS unverändert bei 4). Neuer gedeckelter
+Maximaldurchsatz: 4 Slots × (1 Request / 0.5s) = 8 Requests/Sekunde (vorher:
+≈11,4 Requests/Sekunde, ca. -30%). Details siehe BUG-111.
 """
 
 

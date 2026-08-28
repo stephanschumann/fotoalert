@@ -149,15 +149,16 @@ def test_option_a_max_concurrent_requests_auf_4_gesenkt():
     assert main.WEATHER_API_MAX_CONCURRENT_REQUESTS == 4
 
 
-def test_option_a_pacing_auf_0_35_angehoben():
+def test_option_a_pacing_auf_0_5_angehoben():
     """0.15s -> 0.25s (BUG-83) -> 0.35s (BUG-99, 2026-08-04, Weg-Gate Stephan —
-    empfohlener Weg): weitere moderate Stufe entlang des dokumentierten Trends
-    31%/21%/4,8% 429-Fehlerquote bei zunehmender Drosselung, senkt den gedeckelten
-    Maximaldurchsatz von ca. 16 auf ca. 11,4 Requests/Sekunde (siehe main.py-Docstring
-    für die Herleitung). Testname/Assertion an den historisch aktuellen Wert
-    nachgezogen — dieser Test ist ein bewusster Regressionsanker auf den JEWEILS
-    aktuellen Wert, kein Test auf einen für alle Zeit fixen Wert."""
-    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.35)
+    empfohlener Weg) -> 0.5s (BUG-111, 2026-08-28): weitere moderate Stufe entlang
+    des dokumentierten Trends 31%/21%/4,8% 429-Fehlerquote bei zunehmender
+    Drosselung, senkt den gedeckelten Maximaldurchsatz von ca. 11,4 auf ca. 8
+    Requests/Sekunde (siehe main.py-Docstring für die Herleitung). Testname/
+    Assertion an den historisch aktuellen Wert nachgezogen — dieser Test ist ein
+    bewusster Regressionsanker auf den JEWEILS aktuellen Wert, kein Test auf einen
+    für alle Zeit fixen Wert."""
+    assert main.WEATHER_API_REQUEST_PACING_SECONDS == pytest.approx(0.5)
 
 
 # ---------------------------------------------------------------------------
