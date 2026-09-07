@@ -912,7 +912,7 @@ class AlignmentResult:
 
 def calculate_subject_angular_profile(
     observer_lat: float, observer_lon: float,
-    subject_lat: float, subject_lon: float,
+    subject_lat: Optional[float], subject_lon: Optional[float],
     subject_height_m: float = 0.0,
     subject_width_m: float = 0.0,
     observer_height_m: float = 1.6,       # Augenhöhe Fotograf
@@ -935,6 +935,23 @@ def calculate_subject_angular_profile(
       → effective_height ≈ 15 + 50 − 1.6 = 63.4m
       → angular_altitude_top ≈ arctan(63.4 / 3200) ≈ 1.13°
     """
+    # Follow-up zu BUG-98: subject_lat/subject_lon koennen inzwischen None sein (z.B.
+    # Locations, die BUG-98 selbst als degeneriert/duplikathaft markiert und in
+    # backend/data/locations.py auf None gesetzt hat). Dieser Fall muss VOR jeder
+    # Arithmetik auf den Koordinaten abgefangen werden -- calculate_azimuth_alignment()
+    # rechnet sonst mit None und crasht hart (TypeError), statt den erwarteten
+    # is_degenerate-Pfad zu nehmen, den alle Aufrufer bereits fuer genau diesen Zweck
+    # abfragen.
+    if subject_lat is None or subject_lon is None:
+        return SubjectAngularProfile(
+            azimuth_deg=0.0,
+            ground_distance_m=0.0,
+            angular_altitude_base_deg=0.0,
+            angular_altitude_top_deg=0.0,
+            angular_width_deg=0.0,
+            is_degenerate=True,
+        )
+
     azimuth = calculate_azimuth_alignment(observer_lat, observer_lon, subject_lat, subject_lon)
     ground_dist = calculate_haversine_distance(observer_lat, observer_lon, subject_lat, subject_lon)
 
