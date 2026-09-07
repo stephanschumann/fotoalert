@@ -819,6 +819,14 @@ def calculate_full_report(lat: float, lon: float, target_date: date) -> Astronom
     )
 
 
+# BUG-98 (Regel 1, Option A): Mindestdistanz, unterhalb derer Beobachter- und
+# Motivkoordinaten als identisch/degeneriert gelten (GPS-Rundung, Datenpflegefehler oder
+# ein Panorama-/Aussichtspunkt ohne echtes Einzelmotiv). Verifiziert gegen den echten
+# Bestand (backend/data/locations.py): kleinste reale distance_m>0 ist 80m -- 5m liegt
+# damit weit unterhalb jeder echten Nah-Location und erfasst nur echte Duplikate.
+DEGENERATE_SUBJECT_DISTANCE_M = 5.0
+
+
 def calculate_azimuth_alignment(
     observer_lat: float, observer_lon: float,
     target_lat: float, target_lon: float,
@@ -881,6 +889,11 @@ class SubjectAngularProfile:
     angular_altitude_base_deg: float   # Höhenwinkel Basis (meist 0°)
     angular_altitude_top_deg: float    # Höhenwinkel Motivspitze
     angular_width_deg: float           # Halbe Winkelbreite des Motivs
+    # BUG-98 (Regel 1): True wenn Beobachter- und Motivkoordinaten identisch/degeneriert
+    # sind (ground_distance_m < DEGENERATE_SUBJECT_DISTANCE_M) -- azimuth_deg ist in diesem
+    # Fall ein rechnerisches Artefakt (atan2(0,0)=0 => faelschlich Nord) und darf von
+    # keinem Aufrufer als echte Sichtachse/Alignment-Grundlage verwendet werden.
+    is_degenerate: bool = False
 
 
 @dataclass
@@ -925,6 +938,12 @@ def calculate_subject_angular_profile(
     azimuth = calculate_azimuth_alignment(observer_lat, observer_lon, subject_lat, subject_lon)
     ground_dist = calculate_haversine_distance(observer_lat, observer_lon, subject_lat, subject_lon)
 
+    # BUG-98 (Regel 1, Option A): identische/quasi-identische Koordinaten liefern hier
+    # sonst einen scheinbar gueltigen, aber komplett irrefuehrenden Azimut (atan2(0,0)=0,
+    # exakt Nord). is_degenerate markiert diesen Fall fuer ALLE Aufrufer einheitlich, statt
+    # dass jeder Aufrufer den Sonderfall separat abfangen muss (AK1/AK2/AK7).
+    is_degenerate = ground_dist < DEGENERATE_SUBJECT_DISTANCE_M
+
     effective_height = max(0.0, subject_height_m + elevation_difference_m - observer_height_m)
     alt_top = math.degrees(math.atan2(effective_height, ground_dist)) if ground_dist > 0 else 0.0
     half_width = math.degrees(math.atan2(subject_width_m / 2, ground_dist)) if ground_dist > 0 and subject_width_m > 0 else 1.0
@@ -935,6 +954,7 @@ def calculate_subject_angular_profile(
         angular_altitude_base_deg=0.0,
         angular_altitude_top_deg=round(alt_top, 3),
         angular_width_deg=round(half_width, 3),
+        is_degenerate=is_degenerate,
     )
 
 
@@ -1029,6 +1049,9 @@ def find_precise_alignment_times(
         subject_height_m, subject_width_m,
         elevation_difference_m=elevation_difference_m,
     )
+    if profile.is_degenerate:
+        # BUG-98 AK2: identische/degenerierte Koordinaten -> keine Alignment-Chance.
+        return []
 
     eph = _get_eph()
     observer = wgs84.latlon(observer_lat * N, observer_lon * E)

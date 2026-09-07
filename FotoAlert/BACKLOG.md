@@ -25,19 +25,19 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **BUG-21** *(Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur)* · **BUG-98** *(Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch, Fund aus TASK-59-Verifikation 2026-08-03)* · **US-136** *(Login mit E-Mail/Passwort für mehrere Nutzer inkl. Account-Löschung/Passwort-Reset, 2FA explizit ausgeschlossen; direkt von Stephan nach Ready for Analysis freigegeben, 2026-08-16)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
-| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **BUG-110** *(Jahreskalender zeigt für den gesamten aktuellen Monat August 2026 keine Einträge, vermutlich Hintergrund-Job nie gelaufen, Fund aus Server-Status-Check 2026-08-25)* |
+| **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **US-136** *(Vollanalyse abgeschlossen 2026-09-04 — Weg-Gate Rot: kritischste offene Frage 0 aus ROADMAP.md (Zeile 94) noch unbeantwortet — Sign in with Apple statt Eigenbau-E-Mail/Passwort-System könnte den gesamten Ticket-Scope obsolet machen; zusätzlich 9 weitere offene Architektur-/Scope-Fragen (Rollenmodell, iOS-Umfang, DSGVO-Löschkaskade, US-84-Bezug u.a.), AK-Qualitäts-Check dadurch ebenfalls blockiert)* · **BUG-110** *(Jahreskalender zeigt für den gesamten aktuellen Monat August 2026 keine Einträge, vermutlich Hintergrund-Job nie gelaufen, Fund aus Server-Status-Check 2026-08-25)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-21** *(Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur — Option A implementiert, 7/7 neue Tests + volle Regression 942 passed/7 vorbestehend-unabhaengig/5 skipped, AK6 (echter iPhone-Geraetetest) noch offen)* · **BUG-98** *(Location-Daten identische Beobachter-/Motivkoordinaten — Option A implementiert (Code-Schutz `is_degenerate` + 15 Locations korrigiert), 33/33 neue Tests + volle Regression 978 passed/7 vorbestehend-unabhaengig/5 skipped)* |
 | **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-54** *(Festplatten-Cache Wetterkarten-PNGs — Implementierung + 8/8 neue Tests grün, volle Offline-Regression 580 passed/1 vorbestehend-unabhängig, manueller Neustart-Test von Stephan bestätigt, released v1.22.65 (Commit 99b4efd), GitHub-Actions-Lauf #325 grün (3m 33s), Health-Check bestätigt version 2.0.0/locations_count 172, Live-Verifikation im Browser bestätigt, 2026-08-17)* · **TASK-58** *(Refactoring mkCloudCompassSvg() in 9 Helferfunktionen, alle 10 AK bestanden, Gate-Auditor bestätigt, released v1.22.62, CI-Fehlalarm durch Zeitzonen-Randfall im Test aufgeklärt (nicht code-verursacht) und per Re-Run grün bestätigt, Live-Verifikation ok (Health-Check, alle 9 _cc*-Helfer live vorhanden), 2026-08-10)* · **TASK-89** *(Caddy-Log-Verzeichnis-Berechtigung bei Server-Neuaufbau: Schutz-Block in deploy/setup_server.sh war bereits vorhanden (Commit fb35944/v1.22.46), Release-/Commit-Stand nachtraeglich ueber die oeffentliche GitHub-Weboberflaeche verifiziert (kein offener Diff, Fix bestaetigt live auf main), kein Code-Deploy noetig, 2026-08-09)* · **US-134** *(Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern, zweiter Auslöseweg zusätzlich zum bestehenden Blur-Schwenk aus US-133; Test: 10/11 AK sofort gruen, AK7-Doppelaufruf-Bug gefunden und per onmousedown="event.preventDefault()" behoben, danach alle 11 AK bestaetigt; separate Verifikation: Bestaetigt; Refactor abgeschlossen; released v1.22.61, Deploy verifiziert (Health-Check ok, Live-Verifikation im Browser: Bestaetigen-Button + Kartenschwenk nach Cache-Bereinigung eines aktiven Service Workers bestaetigt), 2026-08-09)* · **TASK-101** *(Skill-Qualitäts-Audit — AK-Qualitäts-Check-Ergänzungen für fotoalert-analyze/fotoalert-orchestrator ausgeliefert und von Stephan installiert, 2026-08-09)* · **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* · **TASK-90** *(Genereller In-Flight-Dedup in `API.get()` gegen mehrfache gleichzeitige /opportunities-Abrufe beim App-Start (Option A), Live-Browser-Verifikation durch gate-auditor bestätigt (AK1/AK2/AK4/AK5/AK6 sowie AK3 real reproduziert), im Zuge des zeitgleichen US-134-Release (v1.22.61) mitgenommen, Live bestätigt (`API._inflightGet` aktiv, Health-Check ok, locations_count 172), 2026-08-09)* · **TASK-93** *(41 echte Alt-Tickets aus dem Erledigt-Block als vollwertige Sektionen nachgerüstet, 23 weitere waren bereits im Archiv erfasst, ursprüngliche 147er-Zahl widerlegt, 2026-08-10)* · **TASK-91** *(Testzeitpunkt in test_task67_feed_regression.py auf festes Datum gepinnt, echter pytest-Lauf 7/7 gruen bestaetigt, 2026-08-10)* · **TASK-94** *(main.py::_load_custom_locations() nutzt jetzt coerce_category_value() + Pro-Eintrag-Absicherung, echter pytest-Lauf 4/4 gruen + volle Regressionssuite ohne dadurch verursachte neue Fehlschlaege, 2026-08-10)* · **TASK-88** *(Skill-Doku-Update fotoalert-release/edge-cases.md ausgeliefert und von Stephan installiert bestaetigt, 2026-08-10)* · **TASK-103** *(PATCH /locations auf Host beschraenkt, aus dem Security-Sammelticket ausgegliedert; ueber einen fremden Sammel-Release versehentlich zurueckgesetzt (Commit 23af8cf, fehlende Testdateien liessen 31 Tests brechen), am 2026-08-11 korrekt mit allen Testdateien neu veroeffentlicht, echter pytest-Lauf 99/99 gruen, released v1.22.64 (Commit 5fc04f9), CI gruen (Lauf #315), 2026-08-11)* · **TASK-95** *(Health-Check-Feldbeschreibung ergänzt — klärt, dass das version-Feld eine Backend-Schemaversion ist, keine App-Release-Version; echter pytest-Lauf + volle Regressionssuite grün, released im Sechs-Ticket-Bundle (Commit 8af2694 + Korrektur-Commit 23af8cf nach CI-Rotfund, s. main.py-Zwischenstand-Fund), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, offener Punkt: fotoalert-release-Skilltext AK4 noch nicht angepasst, 2026-08-10)* · **TASK-96** *(Pytest-Marker requires_full_checkout für teil-checkout-abhängige offline-Tests + automatisierter Konsistenztest ergänzt (inkl. Nachbesserung tools/docs), echter pytest-Lauf 10/10 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-97** *(CI-Diagnostik bei Login-Precondition-Fehlern erweitert (Server-Log + Vor-Login-Screenshot + Diagnose-Helfer in beiden Login-Pfaden), echter pytest-Lauf 2/2 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-99** *(Feste Berlin/Brandenburg-Scope-Sprache in Doku/Kommentaren an den tatsächlichen, geografisch erweiterten Ist-Zustand angeglichen, reine Textänderung ohne Verhaltenseffekt, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-100** *(_fetch_weather_and_aerosol() weiter aufgeteilt (104→59 Zeilen, neuer Helfer _run_weather_fetch_tasks_with_ceiling() 78 Zeilen, beide unter dem 80-Zeilen-Schwellwert), Signatur + alle TASK-76-Helfer/Aufrufer unverändert, echter pytest-Lauf 20/20 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-98** *(release.sh gehärtet: Pathspec-Fix + Versions-Verifikation, released im Sechs-Ticket-Bundle (Commit 8af2694) + separater Ausführbar-Recht-Fix (Commit 64b8f54), CI grün (Lauf #313), Board-Status-Korrektur am 2026-08-13 nachgezogen (stand fälschlich weiter auf „Bereit zur Veröffentlichung"), 2026-08-10)* · **TASK-87** *(Sicherheits-Sammelticket abgeschlossen: SSH-Fingerabdruck-Pruefung per Secret SERVER_KNOWN_HOSTS statt Live-Scan, StrictHostKeyChecking=yes, drei Deploys in Folge erfolgreich (CI-Laeufe #313/#314/#315), Fehlermeldungen/Upload-Pruefreihenfolge/Systemdienst-Haertung sowie Host-only-Bearbeitung gespeicherter Orte bereits in den ausgegliederten Folge-Tickets umgesetzt, Sicherheitsluecken-Scan durchgefuehrt (Umsetzung als eigenes, noch offenes Ticket vorgemerkt), 2026-08-11)* · **BUG-104** *(Wolkenstimmung-Berechnung golden_cloud_score_sun_dir/_antisolar_dir lieferte für alle Chancen null — Root-Cause Cache-Key-Rundung der Projektions-Koordinaten (3→2 Dezimalstellen, Option A), 7 neue Tests + 48 Regressionstests grün, unabhängig verifiziert, refactored, released Commit 47b1fc5 (CI-Lauf #310 grün), doppelt live nachgewiesen: Nachtest 2026-08-11 04:01 UTC zeigt `/job-status` status done/last_error null/duration_s 76.4 (unter dem 180s-Budget) und 10/10 relevante Chancen mit geladenem Wetter mit gesetztem Richtungswert (vorher direkt nach Deploy 3/53); AK5b nur indirekt gestützt (kein exakter 429-Zähllauf), AK6 code-/datenseitig bestätigt ohne separaten UI-Screenshot, 2026-08-11)* · **TASK-102** *(Fehlermeldungen/Upload-Pruefreihenfolge mit echten Tests bestaetigt, Systemdienst-Haertung ueber das Veroeffentlichungs-Protokoll verifiziert (automatischer Gesundheits-Check nach Neustart bestand, kein Rollback ausgeloest) statt per direktem Server-Zugriff, released v1.22.64/40222bd, CI gruen (Lauf #316), 2026-08-11)* · **TASK-02** *(Vier neue Finsternis-Event-Typen (Sonnen-/Mondfinsternis total/partiell) im Kalender, 19/19 automatisierte Tests grün, Live-Verifikation bestätigt, erster Release-Commit ec05ce4 mit Scope-Fehler (Test-Gate verhinderte Deploy), korrigiert per Nachtrag-Commit b54ddbb, GitHub-Actions-Lauf #321 grün, Health-Check version 2.0.0/locations_count 172, 2026-08-16)* · **BUG-89** *(Wetter-Score/Wolkenstimmung: Inline-Hinweis, dreifach bestätigt (08.08./13.08./16.08.), bereits seit 2026-08-05 live v1.22.58 (Commit b589e0b), kein weiterer Deploy nötig, 2026-08-16)* · **BUG-56** *(Astronomie-Regressionstest Sonnenauf-/-untergang Berlin korrigiert, Commit 74c957f, released v1.20.14, Ticket-Status war bereits seit 2026-07-03 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter-Überlappung auf schmalen Bildschirmen behoben (Icon-Buttons), Commit b66ac09, released v1.21.5, Test bestätigt (Stephan, 2026-07-05), Ticket-Status war bereits seit 2026-07-05 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-64** *(Platzhaltertext ‚Automatisch erfasst via Quick Location Capture.' im Hinweise-Feld bei Bestands-Locations per Cleanup-Skript bereinigt (57 Locations), Commit f35c603, released v1.21.11, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt jetzt auch in Kartenansicht, beim Locations-Tab-Wechsel und im Scout, Commits 7e31cbb/ea7441b, released v1.22.39, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **TASK-104** *(Sicherheitsluecken-Bump: `PyJWT`→2.13.0, `cryptography`→49.0.0, `Pillow`→12.3.0, `python-multipart`→0.0.20, `pytest`→9.0.3 — 5 von 7 Paketen. `starlette` bewusst nicht gebumpt (Stephans Entscheidung Option B, bleibt transitiv ueber fastapi==0.111.0 bei 0.37.2, kein offener Punkt mehr), released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, 2026-08-16)* · **TASK-105** *(Python 3.9→3.12-Vereinheitlichung — Fund: Produktionsserver lief entgegen bisheriger Doku bereits seit Juni 2026 auf Python 3.12, urspruenglich geplante separate Stufe-2-Server-Migration dadurch nicht mehr noetig; CLAUDE.md Zeile 103 korrigiert; ein serverseitiger venv-Swap-Testversuch (Shebang-Pfad-Bug) fehlgeschlagen und sauber zurueckgerollt, kein bleibender Schaden; beide GitHub-Workflows (deploy.yml, update-building-data.yml) auf python-version 3.12 gepinnt, released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, Locations-Ansicht laedt echte Daten, 2026-08-16)* · **TASK-107** *(run_frontend_check.py: Onboarding-Dismiss deckt calendar_shows_events_or_empty_state/bug88_feed_data_ready bei kaltem Serverstart nicht ab, Fund per Live-Chrome-Verifikation 2026-08-17, Option B umgesetzt — Verifikation von Stephan final bestätigt, 2026-08-17)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03; Implementierung 17.08.2026 verifiziert, Regressionstest korrigiert, alle Tests grün, von Stephan final bestätigt)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-103** *(Scout-Zugänglichkeits-Cache prüft beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen, Fund aus US-135-Test, Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-106** *(Wetter-Overlay: kalter Cache nach Server-Neustart kollidiert mit dem 180s-Zeitbudget aus BUG-99, viele Events ohne Wetterdaten, Fund per Server-Log-Verifikation 2026-08-11; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-105** *(Test test_bug85_..._is_intentional fiel im Zeitfenster ~22:00–00:00 UTC fälschlich rot, Fund aus TASK-58-Release-Nachbereitung; Zeitzonenberechnung in `_inject_tomorrow_only_entry()` war bei Implementierungs-Verifikation 17.08.2026 bereits per `zoneinfo` auf Berlin-Mittag fixiert (Option A), `pytest tests/test_bug_85.py` → 3 passed, von Stephan bestätigt 17.08.2026) · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidierte zwischen Host-Verifikation und Sichtachsen-Datenverfügbarkeit — bei Implementierungs-Verifikation 17.08.2026 Fix (Option A) bereits vollständig im Code vorhanden: `SIGHTLINE_LABELS.nicht_geprueft`/FilterSheet-Chip-Referenz/ElementInfo-Popup/Filterbeschreibung zeigen „Daten fehlen", Host-Verifikations-Wortlaut unverändert, BUG-88-Eskalationslogik unberührt, dedizierter Regressionstest `backend/tests/test_bug-87.py` vorhanden; echte visuelle Browser-Verifikation steht noch aus und ist nur durch Stephan möglich, 2026-08-17)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse zeigen jetzt eskalierte Warnfarbe/Warndreieck-Icon statt neutralem Grau bei „Nicht geprüft" — `sightlineTagHtml()` Zeile 1973-1982 in `web/index.html`, Option A vollständig umgesetzt, in dieser Sitzung live im Browser UND per automatisiertem Playwright-Check bestätigt; Dark-Mode-Kontrast code-basiert plausibilisiert (separates, helleres Dark-Mode-Token `#e3a21a`, rechnerisch ≈7.3-8.1:1 Kontrast, kein Hinweis auf Problem) — echte visuelle Dark-Mode-Bestätigung durch Stephan steht noch aus; offene ❓-Frage Option A/B durch die erfolgreiche Umsetzung faktisch beantwortet, 2026-08-17)* · **TASK-92** *(Epic Security-Audit 2026-07-16 — alle Kern- und Folge-Kind-Tickets Done (Kind-Tickets-Liste im Ticket war veraltet: TASK-87/TASK-91/TASK-88 standen dort fälschlich noch als ToDo, obwohl längst abgeschlossen), kein eigener Code, reine Status-Nachpflege, Korrektur 2026-08-19)* · **BUG-108** *(Rote Wolken (RED_CLOUDS) projiziert Wolkendaten jetzt 100 km entlang der Sichtachse in Sonnenrichtung statt am Fotografen-Standort abzufragen, eigene Konstante `RED_CLOUDS_PROJECTION_DISTANCE_M`, kein Fallback bei Fetch-Fehlschlag; 24 neue + 4 aktualisierte Tests, echter pytest-Lauf 61/61 grün, released Commit `236c8d9` + Nachbesserung `d0e08f8` (CI-Fix fehlende README-Marker-Zeile), GitHub-Actions-Lauf #338 grün, Health-Check nach Deploy erreichbar (`version 2.0.0`), Live-Verifikation der Produktions-Events wegen anhaltendem `status: degraded`/Wetter-API-Drosselungs-Nebenbefund (Folgeticket BUG-111, Inbox) zum Zeitpunkt des Ticket-Abschlusses noch offen, 2026-08-27)* · **BUG-109** *(„Warum Rote Wolken?"-Erklärungstext auf der Event-Detail-Ansicht liest jetzt den Wolkenwert vom 100-km-Projektionspunkt (`ch_red_clouds_dir`/`cl_red_clouds_dir`) statt vom Fotografen-Standort, Fund aus Live-Verifikation von BUG-108 2026-08-25; Fix in web/index.html, pytest backend/tests/test_bug109.py als Teil von CI-Lauf #341 grün bestaetigt, released Commits b1e4883+2109c9f, CI grün, Health-Check ok (vorbestehender Wetter-Degraded-Zustand aus BUG-111 unveraendert). Live-Verhaltenscheck an einem echten Rote-Wolken-Event am Release-Tag nicht moeglich (Wetter-Job haengt, keine berechneten Wetterdaten im Feed) — stattdessen Live-Code-Fund von `ch_red_clouds_dir`/`cl_red_clouds_dir` im produktiven index.html bestaetigt, mit Stephan abgestimmt, 2026-08-28)* · **BUG-111** *(Wetter-API-Drosselung nach BUG-108 neu kalibriert — Option A (Pacing 0.35s→0.5s), unabhängig verifiziert (962/977 grün), Refactor abgeschlossen, released v1.22.69 (Commit a5388d4), GitHub-Actions-Lauf #343 grün (4m8s), Health-Check + Live-Rauchtest bestätigt; 429-Fehlerquoten-Nachweis (AK1-3) folgt über mehrere Produktions-Zyklen, 2026-08-28)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-106** *(Drei weitere synchrone `_load_elevation_cache()`/`_load_caches()`-Aufrufe im Event-Loop absichern (`_recompute_one()`, `startup()`, `_run_sightline_refresh()`), Nachzügler zum bereits behobenen TASK-102-Muster, Fund aus TASK-02-Refactor-Check 2026-08-14)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-106** *(Drei weitere synchrone `_load_elevation_cache()`/`_load_caches()`-Aufrufe im Event-Loop absichern (`_recompute_one()`, `startup()`, `_run_sightline_refresh()`), Nachzügler zum bereits behobenen TASK-102-Muster, Fund aus TASK-02-Refactor-Check 2026-08-14)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -52,7 +52,7 @@
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | Wartet auf Entscheidung |
 | **Erstellt** | 2026-08-16 |
 
 **Hinweis zum Pipeline-Gate:** Dieses Ticket wurde von Stephan bei der Anlage ausdrücklich und namentlich direkt von `Inbox` nach `Ready for Analysis` freigegeben (nicht der sonst übliche Intake-Stopp in der Inbox) — Stephan wollte die erste Komplexitätsanalyse sofort im selben Zug. Vermerk hier, damit das Überspringen des sonst üblichen Gates nachvollziehbar bleibt.
@@ -134,6 +134,346 @@
 6. Wie soll US-84 („Passwort-Änderung durch den Host") im neuen Modell behandelt werden — obsolet, oder als allgemeine „Passwort ändern"-Funktion für alle Nutzer in dieses Ticket überführt?
 7. Gibt es eine Erwartung an die ungefähre Nutzerzahl (grob), da das die Kosten-/Aufwandsabwägung Managed-Dienst vs. Eigenbau beeinflusst?
 8. Soll ein Nutzer sich mit mehreren Geräten gleichzeitig einloggen können (mehrere aktive Sessions), oder nur mit einem Gerät zur Zeit?
+
+---
+
+## fotoalert-analyze — Vollanalyse (2026-09-04)
+
+**Ausgangspunkt:** Die obige „Komplexitäts-Analyse (Vorabversion, 2026-08-16)" ist bereits eine solide
+Grobanalyse und wurde in dieser Vollanalyse gegen den echten Code erneut verifiziert (Fundstellen unten,
+Datei+Zeile) statt übernommen. Alle dortigen 8 offenen Fragen sind unten als nummerierte ❓-Fragen in
+das reguläre Example Mapping übernommen — plus **eine neue, kritischere Frage 0**, die vor allen anderen
+geklärt werden sollte.
+
+### Example Mapping
+
+📏 **Rule 1:** Ein Nutzer kann sich mit einer eigenen E-Mail-Adresse und einem selbstgewählten Passwort
+registrieren und künftig damit einloggen (ersetzt/ergänzt das rollenbasierte Zwei-Passwort-Login aus US-66).
+🟢 Example: Given eine E-Mail-Adresse, die noch nicht registriert ist, When der Nutzer sich mit E-Mail +
+Passwort registriert, Then wird ein Account angelegt, der Nutzer ist eingeloggt (Session-Cookie analog TASK-83).
+
+📏 **Rule 2:** Ein Nutzer kann sein Passwort selbst zurücksetzen, falls er es vergisst.
+🟢 Example: Given ein registrierter Account, When der Nutzer „Passwort vergessen" mit seiner E-Mail auslöst,
+Then erhält er einen Reset-Link/Code per E-Mail und kann damit ein neues Passwort setzen.
+
+📏 **Rule 3:** Ein Nutzer kann seinen eigenen Account endgültig löschen.
+🟢 Example: Given ein eingeloggter Nutzer, When er „Account löschen" bestätigt, Then wird sein Account entfernt
+bzw. seine personenbezogenen Daten anonymisiert, und er wird ausgeloggt.
+
+📏 **Rule 4:** Zwei-Faktor-Authentifizierung ist explizit kein Bestandteil (Scope-Ausschluss, von Stephan
+bei Anlage bestätigt, 2026-08-16) und wird in diesem Ticket nicht erneut zur Diskussion gestellt.
+
+**Offene Fragen (❓, alle 🔴 funktional kritisch — Example Mapping ist mit diesen Fragen noch NICHT
+abgeschlossen; Rules 1–3 oben sind vorläufige Arbeitshypothesen, keine bestätigten Regeln):**
+
+❓ **Frage 0 (NEU, kritischste Frage — vor allen anderen zu klären):** `ROADMAP.md` Zeile 94 markiert exakt
+diese Fragestellung bereits explizit als offene strategische Vorfrage, **bevor** Aufwand investiert wird:
+„Wird das [E-Mail/Passwort-Login + DSGVO-Speicherung] durch App-Store-Veröffentlichung + Apple-ID-Login
+obsolet? Entscheidung vor Aufwand." (`ROADMAP.md:94-104`, Abschnitt NEXT). Diese Vorfrage ist in US-136s
+Ticket-Text nicht erwähnt und war beim Freigeben nach „Ready for Analysis" (2026-08-16) nicht erkennbar
+mitbeantwortet — laut ROADMAP.md ist Go-Live über den App Store weiterhin das Ziel. Sign in with Apple
+würde Passwort-Hashing, Reset-Flow und E-Mail-Versand-Infrastruktur (die es aktuell alle drei nicht gibt,
+siehe Architektur-Analyse) komplett durch Apple abdecken lassen; zusätzlich verlangt Apple ohnehin eine
+In-App-Account-Löschfunktion für jede App mit eigener Kontoerstellung (App Store Review Guideline 5.1.1(v)) —
+diese Pflicht besteht unabhängig vom gewählten Auth-Verfahren.
+&nbsp;&nbsp;**Option A — Sign in with Apple (ggf. + weitere OAuth-Provider) statt Eigenbau:** Apple übernimmt
+Passwort, Reset und E-Mail-Verifizierung vollständig; deutlich weniger eigener Sicherheitscode; Kehrseite:
+Web-Frontend bräuchte zusätzlich „Sign in with Apple for Web" (JS-SDK + Server-seitige Signaturprüfung),
+und Nutzer ohne Apple-ID sind ausgeschlossen.
+&nbsp;&nbsp;**Option B — Eigenes E-Mail/Passwort-System wie im Ticket-Text beschrieben:** funktioniert
+identisch in Web und iOS, plattformunabhängig; Kehrseite: genau der Aufwand (Passwort-Hashing, Reset-
+Token, E-Mail-Versand-Infrastruktur, DSGVO-Löschkaskade), den die Roadmap-Notiz vor Beginn klären wollte.
+&nbsp;&nbsp;**Option C — Beides parallel (E-Mail/Passwort UND Sign in with Apple):** maximale Nutzer-
+Flexibilität, aber höchster Aufwand aller Optionen (zwei Auth-Wege dauerhaft parallel pflegen).
+
+❓ **Frage 1** *(aus Vorabversion 2026-08-16):* Bleibt das bestehende Host/User-Rollenkonzept (`backend/auth.py`)
+parallel bestehen, oder ersetzt das neue personenbezogene Login es vollständig? Falls parallel: Wie wird
+einem neuen Account eine Rolle zugewiesen (z. B. Stephan automatisch „Host", alle anderen automatisch „User")?
+Betrifft konkret 19 bestehende Endpunkte in `backend/main.py` (6× `Depends(auth.require_auth)`,
+13× `Depends(auth.require_host)`, Code-verifiziert per `grep -c`).
+
+❓ **Frage 2** *(aus Vorabversion):* Soll die native iOS-App von Anfang an abgedeckt werden, oder zunächst
+nur das Web-Frontend? iOS hat aktuell **überhaupt kein Login** — Code-verifiziert: `grep -rn "login\|Auth\|Keychain\|Password"` in `ios/FotoAlert/Services/APIService.swift` liefert null Treffer; die einzigen
+zwei Treffer im ganzen `ios/FotoAlert`-Baum (`FotoAlertApp.swift`, `NotificationService.swift`) sind
+`requestAuthorization()` für Push-Berechtigungen, kein Login-Code.
+
+❓ **Frage 3** *(aus Vorabversion):* Selbstgebaut vs. Managed-Auth-Dienst — siehe Frage 0, Sign in with Apple
+ist ein Spezialfall davon. Falls Frage 0 zugunsten Eigenbau entschieden wird, bleibt diese Frage weiterhin
+offen (z. B. Firebase Auth/Supabase Auth als Alternative zum vollständigen Eigenbau).
+
+❓ **Frage 4** *(aus Vorabversion):* Muss die E-Mail-Adresse per Bestätigungslink verifiziert werden, bevor
+der Account nutzbar ist, oder reicht direkter Login nach Registrierung?
+
+❓ **Frage 5** *(aus Vorabversion, DSGVO-relevant):* Was passiert konkret mit den Daten eines Nutzers bei
+Account-Löschung — sofort/unwiderruflich oder Karenzzeit/Soft-Delete? Betrifft es vom Nutzer angelegte
+Inhalte? Code-verifiziert (`backend/data/store.py:94-101`): `location_ratings` ist bereits an `device_id`
+gebunden (nicht an einen Login), `location_verifications` (`store.py:82-90`) hat **gar keine** Nutzer-/
+Geräte-Bindung (komplett anonym). Eine künftige Nutzer-Löschung träfe also auf zwei unterschiedliche,
+bereits bestehende Identitätskonzepte (`device_id` vs. künftige `user_id`), die erst zueinander in
+Beziehung gesetzt werden müssten.
+
+❓ **Frage 6** *(aus Vorabversion):* Wie wird US-84 („Passwort-Änderung durch den Host", Inbox, ToDo)
+behandelt — obsolet, oder in eine allgemeine „Passwort ändern"-Funktion für alle Nutzer überführt?
+
+❓ **Frage 7** *(⚪ Aufwandsfrage, nicht scope-kritisch — Default vorgeschlagen):* Grobe erwartete Nutzerzahl?
+⚠️ **Annahme:** klein (einstellig bis niedrig zweistellig, analog zur aktuellen Berlin/Brandenburg+erweitert-
+Nutzerbasis) — beeinflusst nur die Kosten-Abwägung Managed-Dienst vs. Eigenbau, nicht die Architektur
+grundsätzlich. Bitte bestätigen.
+
+❓ **Frage 8** *(aus Vorabversion):* Mehrere gleichzeitige Sessions/Geräte pro Nutzer erlaubt, oder nur eines?
+
+❓ **Frage 9** *(NEU, Fundstellen-Sweep):* Das bestehende Rate-Limiting (`backend/rate_limit.py`,
+`LoginLockout`, TASK-86) deckt aktuell ausschließlich `/login` und `/register-device` ab. Neue Endpunkte
+(Registrierung, Passwort-Reset-Anfrage) bräuchten eine eigene Missbrauchsbremse, sonst sind sie offen für
+E-Mail-Enumeration/Spam-Reset-Mails. ⚠️ **Annahme:** im selben Ticket mitgeliefert (sonst geht ein neuer,
+sicherheitsrelevanter Endpunkt ungeschützt live) — bitte bestätigen.
+
+**Example Mapping ist damit NICHT abgeschlossen** (10 offene Fragen, davon 9× 🔴). Die Rules 1–4 oben sind
+Arbeitshypothesen; verbindliche Akzeptanzkriterien können erst nach Beantwortung — insbesondere von
+Frage 0 — formuliert werden, da diese Frage den gesamten Lösungsraum verändert (eigener Passwort-Stack
+vs. Apple übernimmt ihn vollständig).
+
+### Fundstellen-Sweep (Pflicht)
+
+Suchbegriffe: `require_auth`, `require_host`, `fa_session`, `device_id`, `login`/`Login`/`Auth`/`Password`/
+`Keychain` (iOS), `DSGVO`/`GDPR`/`SMTP`/`bcrypt`/`argon2` (projektweit).
+
+- `backend/auth.py` (117 Zeilen) — vollständiger aktueller Auth-Kern, rollenbasiert, kein bcrypt/JWT für
+  Nutzer-Login (bewusste v1-Entscheidung laut Docstring), kein Widerruf einzelner Tokens möglich (nur
+  globaler Secret-Wechsel).
+- `backend/main.py:3704-3752` — `/login`/`/logout`-Endpunkte, TASK-86-Rate-Limiting bereits vorhanden;
+  19 weitere Endpunkte hängen an `require_auth`/`require_host` (6×/13×, exakt gezählt).
+- `backend/data/store.py` — 9 Tabellen, keine `users`-Tabelle; `device_id`-basierte Identität in
+  `location_ratings`, `device_tokens`, `camera_profiles`; `location_verifications` ganz ohne Bindung.
+- `backend/requirements.txt` — kein bcrypt/argon2/passlib; `cryptography==49.0.0` und `PyJWT==2.13.0`
+  sind vorhanden, aber für Push-Notification-JWTs (APNs) zweckgebunden, nicht für Nutzer-Passwort-Hashing.
+- `ios/FotoAlert/Services/APIService.swift` — kein Auth-/Login-/Keychain-Code (0 Treffer).
+- `web/index.html` — 5 Treffer für bestehenden Rollen-Login-Screen (TASK-83-Cookie-Flow), müsste auf
+  echtes E-Mail/Passwort-Formular umgebaut werden.
+- `ROADMAP.md:94-104,154,171` — die oben zitierte, noch unbeantwortete Strategiefrage (Frage 0).
+- Kein SMTP/Mailgun/SendGrid/Postmark-Code im Repo gefunden (Grep projektweit, 0 echte Treffer außerhalb
+  eines bereits als hypothetisch markierten AK-Beispiels in einem anderen Ticket) — E-Mail-Versand-
+  Infrastruktur existiert im Projekt noch nicht in irgendeiner Form.
+
+Alle Fundstellen sind entweder oben in eine ❓-Frage eingeflossen oder hier als Ist-Zustand dokumentiert.
+
+### Zustands-Check (Pflicht)
+
+Da die konkrete Lösung noch nicht feststeht (Frage 0), hier je Kernschritt nur der grundsätzliche Bedarf,
+keine finalen AKs:
+- **Registrierung/Login:** Wartezustand (Ladeindikator während Server-Roundtrip) nötig — neuer Zustand,
+  aktuell beim simplen Rollen-Login kaum sichtbar, wird bei echten Datenbank-Schreibzugriffen relevanter.
+- **Leerzustand:** nicht zutreffend (kein Listenscreen).
+- **Fehlerfall:** falsches Passwort (bereits vorhanden, TASK-86-Lockout-Muster übertragbar), doppelte
+  E-Mail bei Registrierung (neu, eigene Fehlermeldung nötig), abgelaufener/ungültiger Reset-Link (neu),
+  E-Mail-Zustellung schlägt fehl (neu, abhängig von Frage 0/3 — bei Sign in with Apple entfällt dieser
+  Fehlerfall komplett, da Apple die Zustellung übernimmt).
+
+### Pre-Mortem
+
+📎 **Code-Verifikation:** `backend/auth.py` (ganze Datei gelesen), `backend/main.py:3690-3760` (Login/Logout-
+Handler), `backend/data/store.py:55-150` (Tabellen-Schema), `backend/requirements.txt` (Abhängigkeiten),
+`ios/FotoAlert/Services/APIService.swift` + `ios/FotoAlert/FotoAlertApp.swift` + `NotificationService.swift`
+(grep auf Login/Auth/Keychain/Password), `ROADMAP.md:80-175`, `backend/rate_limit.py:1-20,88-144`
+(Login-Lockout-Klasse) — alle am 2026-09-04 gelesen. Alle Kernannahmen der Vorabversion vom 2026-08-16
+bestätigt: kein Multi-User-Datenmodell, kein Passwort-Hashing, keine E-Mail-Infrastruktur, kein iOS-Login.
+
+💀 **Szenario 1:** Ein vollständiger eigener E-Mail/Passwort-Stack wird gebaut (Frage 0 → Option B), und
+Monate später entscheidet sich Stephan beim tatsächlichen App-Store-Launch doch für Sign in with Apple
+(z. B. weil Apple es de facto nahelegt oder weil der Reset-E-Mail-Versand in der Praxis unzuverlässig ist).
+Der komplette Passwort-Hashing-/Reset-/E-Mail-Aufwand war dann Fehlinvestition.
+Auslöser: Frage 0 wird übersprungen/geraten statt von Stephan entschieden.
+Frühwarnung: ROADMAP.md nennt die Frage bereits selbst, seit vor Ticket-Anlage.
+Gegenmaßnahme: Frage 0 ist Pflicht-Bestandteil des Weg-Gates (siehe unten), keine Implementierung vor Antwort.
+
+💀 **Szenario 2:** Ein neues Passwort-Reset-System wird ohne eigene Rate-Limitierung gebaut; ein Angreifer
+nutzt den Reset-Endpunkt zur E-Mail-Enumeration (herausfinden, welche Adressen registriert sind) oder zum
+Spammen fremder Postfächer mit Reset-Mails.
+Auslöser: TASK-86-Rate-Limiting-Reflex wird bei neuen Endpunkten vergessen (deckt bislang nur `/login` und
+`/register-device` ab, Code-verifiziert).
+Frühwarnung: Kein automatisierter Test prüft Rate-Limits auf neuen Endpunkten.
+Gegenmaßnahme: Frage 9 explizit gestellt; Rate-Limiting für Registrierung/Reset als eigenes AK vorgesehen.
+
+💀 **Szenario 3:** Die DSGVO-Löschkaskade bei Account-Löschung ist unvollständig (analog zur bereits
+einmal aufgetretenen Fehlerklasse bei TASK-77, dort für Location-QA-Daten) — z. B. werden `location_ratings`
+(aktuell `device_id`-gebunden) nicht mitgelöscht, weil sie technisch nicht als „Nutzerdaten" erkannt werden,
+solange `device_id` und `user_id` zwei getrennte Identitätskonzepte bleiben (Frage 5).
+Auslöser: Zwei parallele Identitätskonzepte (Gerät vs. Account) werden nicht explizit zusammengeführt.
+Frühwarnung: Kein Test deckt „nach Account-Löschung sind alle mit diesem Account verknüpften Daten weg" ab.
+Gegenmaßnahme: Frage 5 muss beantwortet sein, bevor die Löschkaskade implementiert wird; eigener AK +
+Regressionstest pro betroffener Tabelle (analog TASK-77-Testmuster).
+
+💀 **Szenario 4:** Passwort-Hashing wird selbst und unsicher implementiert (z. B. schwacher Algorithmus,
+kein Salt, zu wenige Iterationen), weil im Projekt bislang kein Präzedenzfall existiert (Code-verifiziert:
+kein bcrypt/argon2/passlib in `requirements.txt`).
+Auslöser: „Bewusst einfach"-Stilprinzip aus US-66 (`auth.py`-Docstring: „kein bcrypt/JWT") wird unreflektiert
+auf ein Feature übertragen, bei dem echte Nutzerpasswörter auf dem Spiel stehen — anders als beim alten
+Zwei-Rollen-Modell mit nur zwei Server-seitigen Passwörtern.
+Frühwarnung: Kein automatisierter Sicherheits-Check für Hashing-Stärke vorhanden.
+Gegenmaßnahme: Implementierungsoptionen (unten) verlangen explizit einen geprüften Hashing-Algorithmus
+(bcrypt/argon2/scrypt über eine etablierte Bibliothek), nicht Marke Eigenbau.
+
+💀 **Szenario 5:** Bestehende `require_host`-geschützte Endpunkte (13 Stück, Code-verifiziert) verlieren
+bei der Umstellung auf echte Nutzeridentität implizit ihre Schutzwirkung, weil „Host" plötzlich unklar
+definiert ist (Frage 1) — z. B. kann sich versehentlich jeder neue registrierte Nutzer als „Host" ausgeben,
+wenn die Rollenzuweisung nicht sauber geregelt wird.
+Auslöser: Frage 1 wird stillschweigend mit „jeder neue Account ist automatisch Host" beantwortet.
+Frühwarnung: Bestehende `test_task103_*`/Endpoint-Schutz-Tests (TASK-103) würden bei falscher Rollenzuweisung
+weiterhin grün bleiben, wenn Stephans Account zufällig als Erster/Einziger getestet wird — echter Bug bliebe
+unentdeckt bis ein zweiter echter Nutzer sich registriert.
+Gegenmaßnahme: Frage 1 zwingend vor Implementierung klären; Regressionstest mit **zwei** unterschiedlichen
+Nutzerkonten (einer mit, einer ohne Host-Rechte) als Pflicht-AK vorsehen, sobald Rollenmodell feststeht.
+
+### Architektur-Analyse
+
+**Ist-Zustand (Code-verifiziert, 2026-09-04, deckt sich mit Vorabversion vom 2026-08-16):**
+FotoAlert ist aktuell kein Multi-User-System.
+- `backend/auth.py`: zwei geteilte Passwörter aus `.env`, stateless HMAC-Token kodiert nur die Rolle
+  (`host`/`user`), keine Identität, kein Einzelwiderruf.
+- `backend/main.py:3704-3752`: `/login`, `/logout`; `_SESSION_MAX_AGE_S` = 30 Tage; Cookie `fa_session`
+  HttpOnly/Secure(prod)/SameSite=Lax (TASK-83); TASK-86-Lockout bereits vor der Passwortprüfung aktiv.
+- `backend/data/store.py:55-150`: 9 Tabellen, keine `users`-Tabelle; Identität aktuell rein über
+  `device_id` (Bewertungen, Geräte-Tokens, Kameraprofile) oder gar nicht (`location_verifications`).
+- `backend/requirements.txt`: kein Passwort-Hashing-Paket vorhanden.
+- `ios/FotoAlert/Services/APIService.swift`: **kein** Auth-Header/Cookie-Handling, kein Login-Code —
+  die iOS-App sendet aktuell überhaupt keine Anmeldedaten.
+- `ROADMAP.md:94-104`: die App ist für App-Store-Launch vorgesehen; genau diese Login-Frage ist dort
+  bereits als strategisch-offen markiert, mit derselben Kernfrage wie hier in Frage 0.
+
+**Betroffene Backend-Komponenten (neu/geändert), abhängig von Frage 0/1:**
+- Neues Datenmodell `users` (bei Eigenbau) ODER Verifikation von Apple-Identitätstoken (bei Sign in with
+  Apple) + Verknüpfung mit bestehenden `device_id`-Datensätzen (Frage 5).
+- Neue/geänderte Endpunkte: Registrierung, Login, Passwort-Reset (bei Eigenbau), Account-Löschung
+  (in jedem Fall, unabhängig von Frage 0 — Apple verlangt In-App-Löschung ebenfalls).
+- Migration der 19 bestehenden `require_auth`/`require_host`-Endpunkte auf das neue Identitätsmodell.
+- Rate-Limiting-Erweiterung (Frage 9).
+
+**Betroffene iOS-Komponenten (komplett neu, da aktuell nicht vorhanden):**
+- Neuer Login-/Registrierungs-Screen.
+- Sicherer Credential-/Token-Speicher (Keychain).
+- `APIService.swift`: Auth-Header/Cookie-Handling ergänzen.
+- Re-Login-Flow bei abgelaufener Session.
+- Bei Sign in with Apple (Option A/C aus Frage 0): `AuthenticationServices`-Framework statt Eigenbau-UI.
+
+**Betroffene Web-Komponenten:**
+- `web/index.html`: bestehender Rollen-Login-Screen (TASK-83-Cookie-Muster) müsste auf E-Mail/Passwort-
+  Formular umgebaut werden (bei Eigenbau) oder um „Sign in with Apple for Web"-Button ergänzt werden.
+
+### Designer-Check
+
+Visuell sichtbar (neuer Login-/Registrierungs-Screen, neue Passwort-Reset-Maske, neuer „Account löschen"-
+Dialog) → `fotoalert-designer` wäre regulär Pflicht **vor** den Implementierungsoptionen. Hier bewusst
+zurückgestellt: Solange Frage 0 (Eigenbau- vs. Apple-Login) offen ist, würde ein Designer-Check auf einer
+von zwei grundverschiedenen UI-Formen aufsetzen (eigenes Formular vs. „Sign in with Apple"-Systembutton,
+dessen Aussehen von Apples Guidelines vorgegeben ist). Wird nachgeholt, sobald Frage 0 beantwortet ist.
+
+### Implementierungsoptionen + Empfehlung
+
+*(Hohe Flughöhe — echte Optionsbewertung kann erst nach Frage 0 verbindlich erfolgen; hier bereits so
+konkret wie möglich anhand des heutigen Wissensstands.)*
+
+**Option A — Sign in with Apple als primärer/alleiniger Login** *(setzt Frage 0 → Option A voraus)*
+- Vorgehen: iOS nutzt `AuthenticationServices` (Apple-natives SDK), Backend verifiziert Apples Identitäts-
+  Token serverseitig, legt bei Erstlogin einen `users`-Datensatz an (nur Apple-User-ID + optional E-Mail,
+  kein eigenes Passwort). Web nutzt „Sign in with Apple for Web" (JS-SDK).
+- Betroffene Dateien: `backend/auth.py` (neuer Verifikationspfad), `backend/main.py` (neue Endpunkte),
+  `backend/data/store.py` (neue `users`-Tabelle, schlank), `ios/FotoAlert/Services/APIService.swift` + neuer
+  Login-Screen, `web/index.html`.
+- Vorteile: kein eigenes Passwort-Hashing, kein Reset-Flow, keine E-Mail-Versand-Infrastruktur nötig (alle
+  drei fehlen aktuell komplett, siehe Architektur-Analyse); Account-Löschung technisch einfacher (kein
+  Passwort-Reset-Pfad, der mitgelöscht werden müsste); deckt sich mit ROADMAP.md-Empfehlung.
+- Nachteile/Risiken: Nutzer ohne Apple-ID ausgeschlossen (bei Web-Nutzung ggf. relevanter als bei iOS-only);
+  Web-Integration zusätzlicher Aufwand; entspricht nicht wörtlich dem im Ticket beschriebenen „E-Mail +
+  Passwort"-Text — bräuchte Stephans ausdrückliche Bestätigung, den Ticket-Scope entsprechend umzuschneiden.
+- Aufwand: mittel (kein eigener Sicherheits-/E-Mail-Stack, aber neues iOS-Auth-UI + Backend-Token-Verifikation
+  + Web-Integration).
+
+**Option B — Eigenes E-Mail/Passwort-System wie im Ticket-Text beschrieben** *(setzt Frage 0 → Option B voraus)*
+- Vorgehen: neue `users`-Tabelle (E-Mail, bcrypt/argon2-Hash, Zeitstempel), Registrierung/Login/Reset/
+  Löschung als neue Endpunkte, Anbindung eines Transactional-E-Mail-Dienstes für Reset-Mails (kompletter
+  Eigenbau des E-Mail-Versands wäre zusätzliches, unnötiges Risiko — Zustellbarkeit/Spam-Reputation).
+- Betroffene Dateien: `backend/auth.py`, `backend/main.py` (mehrere neue Endpunkte), `backend/data/store.py`
+  (neue Tabelle + Migration), neue `backend/email_service.py`-artige Anbindung, `backend/requirements.txt`
+  (Hashing-Bibliothek + E-Mail-SDK), `ios/FotoAlert` (kompletter neuer Login-Flow), `web/index.html`.
+- Vorteile: plattformunabhängig (identisch Web+iOS), kein Apple-ID-Zwang für Nutzer, entspricht wörtlich
+  dem Ticket-Text.
+- Nachteile/Risiken: größter Aufwand aller Optionen; komplett neue Sicherheitsinfrastruktur (Pre-Mortem
+  Szenario 4); komplett neue E-Mail-Infrastruktur; genau der Aufwand, den ROADMAP.md vor Beginn klären wollte.
+- Aufwand: groß.
+
+**Option C — Beides parallel (E-Mail/Passwort UND Sign in with Apple)**
+- Vorgehen: Kombination aus A + B.
+- Vorteile: maximale Nutzerflexibilität.
+- Nachteile/Risiken: höchster Aufwand aller Optionen, zwei dauerhaft zu pflegende Auth-Wege, zwei Angriffs-
+  flächen statt einer.
+- Aufwand: sehr groß.
+
+✅ **Vorläufige Tendenz (keine verbindliche Empfehlung — siehe Ampel unten):** Option A wirkt auf Basis der
+heutigen Faktenlage am stimmigsten (deckt sich mit ROADMAP.md, vermeidet den laut Pre-Mortem riskantesten
+Teil — selbstgebautes Passwort-Hashing plus neue E-Mail-Infrastruktur, die es beide im Projekt noch nie
+gab). Das ist aber **keine autonome Empfehlung**, sondern abhängig von Stephans Antwort auf Frage 0 — der
+Ticket-Text selbst fordert wörtlich „E-Mail und Passwort" (Option B), während ROADMAP.md eine andere
+Richtung nahelegt. Dieser Widerspruch zwischen Ticket-Text und Projekt-Roadmap kann nicht durch die Analyse
+selbst aufgelöst werden.
+
+### 🚦 Ampel-Ergebnis
+
+🔴 **Rot — braucht Stephans Entscheidung:** Mehrere Kriterien gleichzeitig nicht erfüllt —
+(1) Optionen liegen keineswegs klar auseinander bzw. widersprechen sich im Grundansatz (Ticket-Text
+„E-Mail+Passwort" vs. ROADMAP.md-Empfehlung „ggf. obsolet durch Apple-ID"); (2) der Eingriff verändert das
+Datenmodell fundamental (erste `users`-Tabelle im Projekt) und wirkt auf 19 bestehende geschützte
+Endpunkte; (4) das Pre-Mortem fand mehrere hohe Risiken (Szenario 1 Fehlinvestition, Szenario 4 unsicheres
+Passwort-Hashing, Szenario 5 Rollen-Schutzlücke). Autonome Umsetzung ist nicht möglich.
+
+### Akzeptanzkriterien (vorläufig — Platzhalter, blockiert bis Frage 0 beantwortet)
+
+Verbindliche, testbare Akzeptanzkriterien werden **nach** Klärung von Frage 0 (und den Folgefragen 1–9) in
+diesem Abschnitt ergänzt. Ohne diese Antworten würde jedes jetzt formulierte AK entweder gegen Sign in with
+Apple oder gegen ein Eigenbau-System geschrieben — beides mit grundverschiedenem Verhalten (z. B. „Passwort
+zurücksetzen" existiert bei Sign in with Apple im engeren Sinn gar nicht als App-Funktion, das übernimmt
+Apple vollständig).
+
+### Testplan
+
+- **Automatisiert (Harness):** Noch nicht geschrieben — bewusst zurückgestellt (siehe test-driven-development-
+  Grundsatz „Tests testen gegen die Spec"): es gibt aktuell keine stabile Spec, gegen die ein sinnvoller
+  Test geschrieben werden könnte, solange Frage 0 offen ist. Wird direkt im Anschluss an Stephans Antwort
+  nachgeholt (Schritt 6b), bevor Implementierung beginnt.
+- **Manuell:** Ebenfalls zurückgestellt, aus demselben Grund.
+- **Regressions-Hinweis (jetzt schon planbar, unabhängig von Frage 0):** Sobald implementiert, betrifft die
+  Änderung laut `PRODUCT.md`-Regressionsmatrix mindestens die Kategorien „Auth"/„Backend"/„Sheet" — alle
+  19 bestehenden `require_auth`/`require_host`-geschützten Endpunkte müssen nach der Umstellung erneut
+  gegen echte, unterschiedliche Nutzerkonten geprüft werden (Pre-Mortem Szenario 5).
+
+### 🔍 AK-Qualitäts-Check
+
+**Nicht vollständig durchführbar (Pflicht-Feststellung statt Übersprungen):** Der AK-Qualitäts-Check prüft
+laut Skill-Definition eine bereits fertige AK-Liste als Ganzes auf strukturelle Lücken. Da Example Mapping
+hier nicht abgeschlossen ist (10 offene Fragen, davon 9× 🔴, insbesondere die noch unbeantwortete Frage 0,
+die den gesamten Lösungsraum verändert) und der AK-Abschnitt oben bewusst nur ein Platzhalter ist, gibt es
+keine fertige AK-Liste, die sinnvoll gegen die sechs Dimensionen geprüft werden könnte — ein trotzdem
+durchgeführter Check würde nur gegen erfundene AKs prüfen und falsche Sicherheit erzeugen (genau das
+Problem, das der AK-Qualitäts-Check verhindern soll).
+
+Was jetzt schon geprüft werden kann und wurde:
+1. **Granularität/Polarität/Messbarkeit/Testbarkeit:** nicht anwendbar (kein AK vorhanden).
+2. **Vier-Kategorien-Abdeckung** (bereits jetzt sinnvoll prüfbar, unabhängig von Frage 0): Sicherheit
+   (Passwort-Hashing/Rate-Limiting) und Compliance (DSGVO-Löschkaskade, Art. 15/17) sind bereits als
+   Pre-Mortem-Szenarien 2–4 und Frage 5/9 erfasst — nicht vergessen. Performance/Skalierbarkeit: nicht
+   relevant bei der erwarteten kleinen Nutzerzahl (Frage 7). Architektur-Konsistenz: mit 19 betroffenen
+   Endpunkten explizit benannt (Pre-Mortem Szenario 5).
+3. **Herkunftsnachvollziehbarkeit:** alle Pre-Mortem-Szenarien sind oben mit ihrer auslösenden Frage
+   verknüpft (Szenario 1↔Frage 0, Szenario 2↔Frage 9, Szenario 3↔Frage 5, Szenario 5↔Frage 1).
+
+🔍 **AK-Qualitäts-Check:**
+⚠️ **nicht abschließend durchführbar — blockiert durch offene Frage 0/Example Mapping**: kein AK-Bestand
+vorhanden, gegen den strukturell geprüft werden könnte; wird nach Stephans Antworten nachgeholt, bevor die
+Implementierung beginnt (Pflicht-Wiederholung dieses Schritts, kein Freifahrtschein).
+
+**Status-Update (2026-09-04):** Weg-Gate 🔴 → **Wartet auf Entscheidung** — vor allem Frage 0 (Sign in with
+Apple vs. Eigenbau-Login, bereits in ROADMAP.md als offene Vorfrage markiert) entscheidet über den gesamten
+weiteren Lösungsraum und kann nicht durch die Analyse selbst beantwortet werden. Ticket blockiert die
+Kette nicht — Pipeline arbeitet mit den übrigen freigegebenen Tickets weiter.
 
 ---
 
@@ -3654,18 +3994,204 @@ Wird Frage 1 mit Option A beantwortet: Wie soll sich der Wetter-Overlay-Lauf ver
 
 ---
 
+### BUG-98 · Location-Daten: Beobachter- und Motivkoordinaten bei mehreren Locations identisch `[~]`
+
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | In Test |
 | **Erstellt** | 2026-08-03 |
+
+**Weg-Gate-Entscheidung (Stephan, 2026-09-04):** Option A gewählt — 15 sicher behebbare Locations (13× Kategorie 1 Panorama-/Aussichtspunkt-Locations + 2× Kategorie 3 kuratierte Duplikat-Fehler) jetzt korrigieren + Code-Schutz gegen identische Beobachter-/Motivkoordinaten direkt in der Azimut-Kernfunktion. Die 12 Kategorie-2-Locationscout-Import-Platzhalter bleiben in den Koordinaten vorerst unverändert (Regel 4/AK6), sind aber durch den Code-Schutz (Regel 1) vor der Fehlanzeige geschützt.
 
 **Beschreibung:** Bei der Verifikation von TASK-59 (Sichtachsen-Check) aufgefallen: Bei 27 der 60 festen Locations in `backend/data/locations.py` sind `observer_lat`/`observer_lon` exakt identisch mit `subject_lat`/`subject_lon` — es existiert also keine echte Sichtachse zwischen Fotograf-Standpunkt und Motiv. Betroffen: Brandenburger Tor – Tiergartenseite, Volkspark Friedrichshain – Bunkerberg, Müggelsee & Müggelturm, Wannsee – Großer Wannsee Ufer, Glienicker Brücke, Nikolaisee – Baumspiegelung, Havelland – Storchnest & Felder, Spreewald – Kanal-Perspektive Lübbenau, Stechlinsee – Dunkelster See Brandenburgs, Schorfheide – Herbstwald Uckermark, Elbtalaue Wittenberge – Gänsezug, Rügen – Königsstuhl (Grenzgebiet), Tempelhofer Feld – Startbahn-Perspektive, Teufelsberg – Abhörstation Panorama, Müggelspree Köpenick – Herbstreflexion, Berlin Skyline from Fischerinsel Skyscraper, Brandenburg Gate from behind Berlin, Haus der Kulturen der Welt Berlin, Berlin Cathedral (Berliner Dom), Tempodrom Berlin, Staircase of Hotel Bristol Berlin, Holocaust-Memorial Berlin, Castle Fürstlich Drehna, Rostiger Nagel - Rusty Nail, Schloss Steinhöfel, Wittstock – Stadtmauer & Westskyline, Brandenburg Landtag. Reines Datenpflegethema (Koordinatenkorrektur), kein TASK-59-Code-Bug.
 
 **User Story:** Als Nutzer, der sich bei der Aufnahmeplanung auf eine korrekt berechnete Sichtachse (Azimut vom Standpunkt zum Motiv) verlässt, möchte ich, dass jede Location echte, unterschiedliche Standort- und Motivkoordinaten hat, sodass Sichtachsen-Berechnung und Azimut-Ausrichtung für diese Locations nicht rechnerisch instabil oder bedeutungslos werden.
 
 **Bezug:** Fund aus TASK-59-Verifikation (Sichtachsen-Check), 2026-08-03. Dubletten-Check (Grep nach „observer_lat", „subject_lat", „Koordinaten identisch", „Location-Daten" in BACKLOG.md, 2026-08-03) ergab kein bestehendes Ticket zu diesem konkreten Datenqualitätsthema. Verwandter Kontext ohne Überschneidung: TASK-59 selbst nennt `observer_lat == subject_lat and observer_lon == subject_lon` als Sicherheitscheck/Skip-Bedingung für Chancen-Unterdrückung (BACKLOG.md Z. 12647–12648) — behebt damit den Symptomfall zur Laufzeit, korrigiert aber nicht die zugrunde liegenden Stammdaten; kein Merge, eigenständiges Ticket.
+
+---
+
+## Analyse (fotoalert-analyze, 2026-09-04)
+
+**Scope-Check:** Kein Slice-/Phase-1-Signal im Ticket — betrifft alle aktuell 27 identifizierten der 60 festen Locations, keine bewusste Teil-Abdeckung.
+
+**Annahmen-Protokoll:**
+- 🔴 Funktional kritisch → siehe ❓ Grenzfall-Frage unten (Umfang der Datenkorrektur für Kategorie 2).
+- ⚠️ Annahme (⚪ konventionell, bitte bestätigen): „Datenpflegethema" aus der Ticket-Beschreibung wird so gelesen, dass zusätzlich zur reinen Koordinatenkorrektur ein begleitender Code-Schutz im Scope liegt — eine reine Datenkorrektur ohne Code-Schutz lässt dieselbe Fehlerklasse bei jeder künftigen Host-Bearbeitung (PATCH) unbemerkt wieder entstehen (siehe Pre-Mortem Szenario 3).
+
+**⚠️ Code-Verifikation — wichtigster Einzelbefund:** Die Ticket-Prämisse „rechnerisch instabil oder bedeutungslos" ist bestätigt und konkreter als beschrieben: `calculate_azimuth_alignment()` (`backend/calculations/astronomy.py:822-837`) liefert bei identischen Koordinaten keinen Fehler und kein `None`, sondern einen scheinbar gültigen, aber komplett irreführenden Wert — `atan2(0,0)=0` → **exakt 0.0° (Nord)**, jedes Mal. Dieser Wert fließt über `calculate_subject_angular_profile()` (Z. 900-935, `ground_dist>0`-Guard fällt bei Distanz 0 in den `else`-Zweig) unverändert weiter in **alle vier per Grep verifizierten Aufrufer dieser einen Funktion** (kein Vermuten): `astronomy.find_precise_alignment_times()` (Fallback-Pfad), `calculations/window_engine.py:256` `WindowEphemeris.alignments()` (aktiver TASK-25-Pfad), `calculations/query_engine.py:125` (Drop-in-Ersatz), `main.py:4061` (`/preview-alignment`-Endpoint). Alle vier teilen sich denselben Rechenweg — ein einziger Fix-Punkt deckt strukturell alle vier ab.
+
+Frontend-seitig wird `subject_azimuth` nie `null` befüllt (`opportunity.py` Z. 403/443/484/540/667/704/799 schreiben immer einen gerundeten Zahlenwert); `web/index.html` prüft nur auf Existenz des Feldes (`hasSub = o.subject_lat && o.subject_lon`, Z. 4446/5067/5204; `CameraFOV.initMap()` Z. 4905-4907/6375-6377), nicht auf Sinnhaftigkeit. Ergebnis: **Kompass-Pfeil, Sichtachsen-Linie und „Azimut Sichtachse: 0.0°" werden für alle 27 Locations tatsächlich angezeigt** — aktiv irreführend (erfundene Nordrichtung statt „kein Motiv"), nicht nur kosmetisch fehlend.
+
+**Zweiter, schwererer Befund:** Da dieselbe Geometrie auch die Alignment-Chancen-Erzeugung speist, kann für diese 27 Locations rechnerisch eine **falsche „Mond-Alignment"-Chance** entstehen, sobald der Mond-Azimut nahe 0°/Nord liegt (bei Berlins Breite durch lunare Standstill-Zyklen real möglich). Kein reiner Anzeige-, sondern ein Daten-/Chancen-Erzeugungs-Bug.
+
+**Drei klar unterscheidbare Unterkategorien der 27 Fälle** (verifiziert per Skript-Auswertung gegen `backend/data/locations.py`, kein Schätzen):
+
+| Kategorie | Anzahl | Verifiziertes Merkmal | Beispiel |
+|---|---|---|---|
+| 1 — Panorama/Aussichtspunkt | 13 | `distance_m=0`, generischer `subject_name` (Panorama/Umland), kein reales Einzelmotiv | Volkspark Friedrichshain – Bunkerberg |
+| 2 — Locationscout-Import-Platzhalter | 12 | `distance_m=200.0` + Kommentar `# TODO: Motiv-GPS verfeinern` + bereits bestehendes US-128-Flag `subject_height_researched=False` | Berlin Cathedral (Berliner Dom) |
+| 3 — Kuratierte Location mit Duplikat-Fehler | 2 | Realer, benannter `distance_m` (500/150) + recherchierte `subject_height_m`/`subject_width_m`, Koordinaten trotzdem dupliziert | Brandenburger Tor – Tiergartenseite, Glienicker Brücke |
+
+(13+12+2 = 27, deckungsgleich mit der Ticket-Liste.) Kategorie-1-IDs: `volkspark_friedrichshain_wasserturm`, `muggelturm`, `wannsee_strandbad`, `nikolaisee_potsdam`, `schweriner_see_havelland`, `spreewald_kanal`, `stechlin_see`, `schorfheide_herbst`, `elbtalaue_wittenberge`, `rügen_kreidefelssen_jasmund`, `tempelhofer_feld_landebahn`, `teufelsberg`, `muggelspree_kopenick`. Kategorie-2-IDs: `berlin_skyline_from_fischerinsel_skyscra`, `brandenburg_gate_from_behind_berlin`, `haus_der_kulturen_der_welt_berlin`, `berlin_cathedral_berliner_dom`, `tempodrom_berlin`, `staircase_of_hotel_bristol_berlin`, `holocaust_memorial_berlin`, `castle_fuerstlich_drehna`, `rostiger_nagel_rusty_nail`, `schloss_steinhoefel`, `sunset_over_wittstock`, `brandenburg_landtag`. Kategorie-3-IDs: `brandenburger_tor_tiergarten`, `glienicker_brucke`.
+
+**Rules & Examples:**
+
+📏 **Regel 1 — Identische Beobachter-/Motivkoordinaten dürfen nie eine falsche Sichtachse/Alignment-Chance erzeugen (Code-Schutz, gilt für alle drei Kategorien UND jede künftige Location).**
+🟢 Beispiel: Eine beliebige Location (bestehend oder künftig per PATCH bearbeitet) mit `observer_lat==subject_lat`/`observer_lon==subject_lon` liefert `subject_azimuth=None` (nicht `0.0`), keinen Kompass-Pfeil, keine Sichtachsen-Linie, und erzeugt keine Mond-/Sonnen-Alignment-Chance.
+
+📏 **Regel 2 — Panorama-Locations (Kategorie 1) bekommen explizit „kein Motiv" statt dupliziertem Motiv.**
+🟢 Beispiel: „Volkspark Friedrichshain – Bunkerberg" hat nach der Korrektur `subject_lat=None`/`subject_lon=None`; die App zeigt den bereits bestehenden Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar" statt Kegelfläche/Sichtachse — identisches, bereits vorhandenes UI-Verhalten wie bei jeder anderen Location ohne Motiv.
+
+📏 **Regel 3 — Kuratierte Duplikat-Fehler (Kategorie 3) bekommen einen recherchierten, echten Beobachter-Standpunkt.**
+🟢 Beispiel: „Brandenburger Tor – Tiergartenseite" hat nach der Korrektur `observer_lat/lon` ungleich `subject_lat/lon`; die neue Distanz liegt innerhalb ±20% von `distance_m=500`, der Azimut Beobachter→Motiv liegt innerhalb ±15° um die in `solar_alignment_note` dokumentierten ~90°.
+
+📏 **Regel 4 — Kategorie 2 bleibt in den Koordinaten vorerst unverändert, ist aber durch Regel 1 vor der Fehlanzeige geschützt** (⚠️ Umfang siehe Grenzfall-Frage).
+🟢 Beispiel: „Berlin Cathedral (Berliner Dom)" behält vorerst `observer_lat==subject_lat` (weiterhin `# TODO: Motiv-GPS verfeinern`), zeigt aber dank Regel 1 keinen falschen Nordpfeil mehr.
+
+**❓ Grenzfall-Frage (🔴 funktional kritisch, Teil des Weg-Gates) — Umfang der Datenkorrektur für Kategorie 2 (12 Locationscout-Import-Platzhalter):** ✅ entschieden, siehe „Weg-Gate-Entscheidung" oben und „✅ Stephans Entscheidung" am Ende.
+
+- **Option A — gewählt.** Nur Code-Schutz (Regel 1) + Kategorie 1 (13× `subject_lat/lon=None`) + Kategorie 3 (2× recherchierter Beobachter-Standpunkt) jetzt in diesem Ticket. Kategorie 2 bleibt unverändert — bereits heute über `subject_height_researched=False`/`# TODO: Motiv-GPS verfeinern` als bekannt-unvollständig markiert (bestehender US-128-Mechanismus), keine neue GPS-Schätzung. **Konsequenz für die App:** alle 27 Locations zeigen sofort keine falsche Nordrichtung/Alignment-Chance mehr (Kernproblem behoben); bei den 12 Import-Platzhaltern bleibt die Sichtachsen-Sektion vorerst „kein Motiv" statt falsch, bis jemand die echten Koordinaten recherchiert. **Aufwand:** mittel. **Risiko:** keine neuen, unverifizierten Koordinaten im Datenbestand.
+- ~~Option B~~ — *(nicht gewählt)* zusätzlich auch die 12 Import-Platzhalter jetzt mit bestmöglich recherchierten Motiv-/Beobachter-Koordinaten versehen (Kartenrecherche anhand Name/Tags/`locationscout_url`). **Konsequenz für die App:** vollständige Bereinigung aller 27 Fälle in einem Rutsch, echte Sichtachsen auch für diese 12 Orte. **Aufwand:** groß. **Risiko:** Koordinaten ohne Feld-/Ortskenntnis, nur aus Kartenmaterial geschätzt — höheres Risiko neuer, plausibel wirkender aber falscher Daten (genau die Fehlerklasse, die dieses Ticket beheben soll).
+
+*(Entschieden: Option A, siehe „Weg-Gate-Entscheidung" oben und „✅ Stephans Entscheidung" am Ende.)*
+
+**Fundstellen-Sweep (Pflicht, SPEC-W3):** Suchbegriffe `subject_azimuth`, `CameraFOV.initMap`, `hasSub`/`hasSubject`, `distance_m=0`, `TODO: Motiv-GPS verfeinern` in `backend/` und `web/index.html`. Ergebnis: **eine einzige gemeinsame Komponente** (`CameraFOV`, Sektion „Karte & Blickwinkel") deckt alle sechs Ansichten-Klassen ab: **Liste** (Locations-Tab, Motiv-Distanz-Zeile Z. 5067, bei Degenerierung `0`), **Karte** (`MapMarkers.subject()`-Pin liegt exakt auf dem Beobachter-Pin, Z. 4517/6075/7349), **Kalender/Feed/Scout** (gemeinsame Event-Detail-Sektion `ev_fov`, Z. 4905-4907/5115-5116), **Chancen-Übersicht** (Kompass-SVG `mkCloudCompassSvg(...,o.subject_azimuth,...)`, Z. 4824/4828/4866/4890), **Event-Detail** (s. Kalender/Feed/Scout), **Location-Detail** (`loc_fov`-Sektion, `_fovArgs`, Z. 6375-6377). Kein zweiter, abweichender Render-Pfad gefunden (kein eigener SVG-Renderer wie bei BUG-59).
+
+**Zustands-Check (Pflicht, SPEC-W3):** Wartezustand — kein neuer Wartezustand, Azimut/Alignment werden serverseitig vorberechnet. Leerzustand — bereits vorhanden und wiederverwendet: „Keine Motivkoordinaten – Karte nicht verfügbar" (Kategorie 1 nach der Korrektur; Kategorie 2 zusätzlich falls Option A). Fehlerfall — `/preview-alignment` (main.py Z. 4040+) validiert aktuell nur den Wertebereich (-90..90/-180..180), nicht Koordinaten-Gleichheit → neuer Edge Case (AK9).
+
+**Designer-Check:** Nicht visuell im Sinne des Skills (keine neue Farbe/Komponente/Icon) — der bereits bestehende „Keine Motivkoordinaten"-Zustand wird nur öfter sichtbar. `fotoalert-designer` nicht konsultiert.
+
+**Pre-Mortem:**
+
+💀 **Szenario 1:** Der Guard wird nur in `calculate_subject_angular_profile()` eingebaut, `backend/calculations/sightline.py` (eigener, unabhängiger `_haversine_m`-Aufruf Z. 244) bleibt unberührt. Auslöser: zwei getrennte Distanz-Implementierungen für zwei Zwecke (Azimut-Alignment vs. Sichtachsen-Freiheit). Frühwarnung: `sightline_status` einer Kategorie-1/3-Location nach der Korrektur gegenprüfen (bleibt `nicht_geprueft`, kein Crash — bereits defensiv per try/except). Gegenmaßnahme: kein Fix an `sightline.py` nötig, aber als AK10 explizit „bewusst unverändert" dokumentiert. **Wichtig:** `backend/data/qa_azimuth.py` hat eine aktive TASK-59-Release-Sperre — darf in diesem Ticket unter keinen Umständen mitgenommen werden, selbst wenn `git status` es als geändert zeigt.
+
+💀 **Szenario 2:** Kategorie-1-Fix (`subject_lat/lon=None`) verändert den precompute-Cache-Key (`f"{loc.observer_lat},{loc.observer_lon}|{loc.subject_lat},{loc.subject_lon}"`, `precompute.py:659`) durch das Literal `"None"` im String — kein Crash, aber ein einmaliger Cache-Miss/Neuaufbau für genau diese 13 Locations beim ersten Lauf nach dem Deploy. Frühwarnung: nach Deploy einen `/refresh-calendar`- oder Feed-Vorberechnungs-Lauf für eine der 13 IDs beobachten. Gegenmaßnahme: kein Code-Fix nötig (harmlos), im Testplan als bekannter, unkritischer Nebeneffekt vermerkt.
+
+💀 **Szenario 3:** Ein Host bearbeitet künftig eine beliebige Location über das Bearbeiten-Formular (PATCH) und setzt Motiv-Koordinaten versehentlich identisch zum Standort — ohne Code-Schutz (Regel 1) entsteht sofort ein 28. Fall, unbemerkt bis zur nächsten zufälligen Verifikation (wie bei TASK-59). Frühwarnung: AK8 (PATCH-Pfad). Gegenmaßnahme: Guard an der Quelle wirkt automatisch bei jedem PATCH-Recompute, kein Sonderfall im PATCH-Handler nötig.
+
+💀 **Szenario 4:** Kategorie 3 — ein neu recherchierter Beobachter-Standpunkt (Brandenburger Tor/Glienicker Brücke) landet versehentlich auf privatem Grund oder widerspricht dem bestehenden `access_note`. Frühwarnung: `access_note` beider Locations vor der Korrektur lesen (Brandenburger Tor: „17. Juni Straße, öffentlich"; Glienicker Brücke: „Öffentlich, Uferweg auf beiden Seiten") und neuen Punkt dagegen plausibilisieren. Gegenmaßnahme: AK4 verlangt Konsistenz mit `solar_alignment_note`/`access_note`, nicht nur mit `distance_m`.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: `subject_azimuth`/`CameraFOV`/`hasSub`/`distance_m=0`/`TODO: Motiv-GPS verfeinern` — eine gemeinsame Komponente deckt alle 6 Ansichten-Klassen ab (siehe oben)
+- [x] Zustands-Check: siehe oben, ein neuer Edge Case (AK9)
+- [x] Pre-Mortem durchgeführt (4 Szenarien)
+- [x] Architektur analysiert: `backend/calculations/astronomy.py`, `backend/calculations/opportunity.py`, `backend/calculations/window_engine.py`, `backend/calculations/query_engine.py`, `backend/main.py` (`/preview-alignment`), `backend/data/locations.py`, `backend/precompute.py` (Cache-Key), `web/index.html` (CameraFOV/hasSub — nur Regressionsschutz)
+- [x] Designer-Check: nicht visuell — übersprungen
+- [x] Implementierungsoptionen: A (Guard an der Quelle, empfohlen) / B (Guard nur an der Serialisierungsgrenze)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): alle 11 AKs final (Weg-Gate-Entscheidung Option A löst AK6 auf), alle vier Kategorien mit Begründung abgedeckt, Rest ohne Lücke (Details siehe unten)
+
+### Option A — Guard direkt in `calculate_subject_angular_profile()` (empfohlen)
+- Vorgehen: `SubjectAngularProfile` (astronomy.py) um `is_degenerate: bool` erweitern, gesetzt wenn `ground_dist` unterhalb einer Mindestschwelle (Vorschlag 5 m, deckt GPS-Rundung ab) liegt. Alignment-Erzeugung (`find_precise_alignment_times`, `window_engine.alignments()`, `query_engine`-Drop-in) liefert bei `is_degenerate=True` sofort eine leere Ergebnisliste. `opportunity.py`/`precompute.py` setzen `subject_azimuth=None` statt eines Zahlenwerts, wenn das Profil degeneriert ist. `/preview-alignment` (main.py) liefert bei degenerierten Eingabe-Koordinaten einen erklärenden 400er statt eines stillen Fake-Ergebnisses (AK9).
+- Betroffene Dateien: `backend/calculations/astronomy.py` (Kernfunktion+Dataclass), `backend/calculations/opportunity.py`, `backend/main.py` (`/preview-alignment`-Endpoint + Location-Serialisierung), `backend/precompute.py` (nur Cache-Key-Beobachtung, siehe Pre-Mortem Szenario 2).
+- Vorteile: Ein Rechenweg, ein Fix, deckt alle 4 bestätigten Aufrufer strukturell ab; entspricht dem im Code bereits gelebten „ein Rechenweg, keine Drift"-Prinzip (vgl. `qa_focal.py`-Docstring).
+- Nachteile/Risiken: Zentrale, viel genutzte Funktion — volle Regressionssuite zwingend (AK5).
+- Aufwand: mittel.
+
+### Option B — Guard nur an der Serialisierungsgrenze
+- Vorgehen: Kernfunktion bleibt unverändert; jede Stelle, die `subject_azimuth`/Alignment-Ergebnisse nach außen gibt, prüft selbst auf Koordinaten-Gleichheit und filtert.
+- Betroffene Dateien: mehr Einzelstellen in `opportunity.py`/`main.py`, keine Änderung an `astronomy.py`.
+- Vorteile: kleinerer, isolierter Diff an der Kernfunktion.
+- Nachteile/Risiken: die fehlerhafte Geometrie bleibt bestehen — Alignment-Chancen werden weiterhin fälschlich berechnet und müssten an mind. 3 Erzeugungsstellen separat unterdrückt werden (Duplizierungsrisiko, analog Pre-Mortem Szenario 1); deckt `/preview-alignment` nicht ab.
+- Aufwand: mittel-groß, höheres Vergessens-Risiko.
+
+✅ **Empfehlung: Option A** — ein einziger, strukturell erzwungener Fix-Punkt statt mehrerer manuell zu pflegender Filterstellen; deckt nachweislich (per Grep, nicht vermutet) alle vier produktiven Aufrufer ab.
+
+---
+
+🚦 **Ampel-Ergebnis:**
+🔴 Rot — braucht Stephans Entscheidung: (1) Grenzfall-Frage Kategorie 2 (Option A/B, siehe oben) ist eine echte Scope-/Risiko-Abwägung, keine rein technische Entscheidung. (2) Option A berührt mit `calculate_subject_angular_profile()` eine zentrale, von vier verifizierten Aufrufern genutzte Kernfunktion — Ampel-Frage 2 (Architektur/andere Bereiche) nicht eindeutig „nein".
+
+---
+
+**Scope:**
+- ✅ Eingeschlossen: Code-Schutz gegen degenerierte Beobachter-/Motiv-Koordinaten (gilt für alle Locations, nicht nur die 27 bekannten); Datenkorrektur Kategorie 1 (13) + Kategorie 3 (2). Kategorie 2 (12) bleibt in den Koordinaten unverändert (Weg-Gate-Entscheidung Option A), ist aber durch den Code-Schutz abgedeckt.
+- ❌ Ausgeschlossen: `backend/data/qa_azimuth.py`/Sichtachsen-Check (`sightline_status`) — eigenständiger, bereits defensiver Codepfad, zusätzlich TASK-59-Release-Sperre (siehe Pre-Mortem Szenario 1); PhotoPills-Deep-Link-Parameter `a`/`b` (US-135-Kontext, kein direkter Bezug zu diesem Ticket).
+
+**Akzeptanzkriterien:**
+- [ ] AK1: Für jede Location mit identischen Beobachter-/Motivkoordinaten zeigt die App weder einen Kompass-Pfeil/eine Sichtachsen-Linie Richtung Norden noch einen numerischen „Azimut Sichtachse"-Wert — `subject_azimuth` ist `None` statt `0.0`. *(Herkunft: Code-Verifikation `calculate_azimuth_alignment` 0°-Degenerierung.)*
+- [ ] AK2: Für dieselben Fälle entsteht keine „Mond-Alignment"/„Sonnen-Alignment"-Chance mehr im Feed/Kalender/Scout. *(Herkunft: Pre-Mortem — false-positive Alignment-Chancen.)*
+- [ ] AK3 (Kategorie 1, 13 Panorama-Locations): `subject_lat`/`subject_lon` sind `None`; App zeigt den bestehenden Hinweistext „Keine Motivkoordinaten – Karte nicht verfügbar" in Feed, Kalender, Scout, Karte UND Location-Detail. *(Herkunft: Regel 2.)*
+- [ ] AK4 (Kategorie 3, Brandenburger Tor + Glienicker Brücke): Beobachter-Standpunkt weicht vom Motiv ab; Distanz liegt innerhalb ±20% des bestehenden `distance_m`; Azimut Beobachter→Motiv liegt innerhalb ±15° um den in `solar_alignment_note` dokumentierten Wert; neuer Standpunkt widerspricht nicht `access_note`. *(Herkunft: Regel 3, Pre-Mortem Szenario 4.)*
+- [ ] AK5 (Regression): Für alle ~33 der 60 festen Locations mit bereits unterschiedlichen Koordinaten ändert sich weder Azimut- noch Alignment-Verhalten (bestehende Astronomie-/Alignment-Tests bleiben unverändert grün).
+- [ ] AK6 (Kategorie 2, 12 Locationscout-Import-Platzhalter): Koordinaten bleiben unverändert (keine neue GPS-Schätzung); AK1/AK2 greifen trotzdem — kein falscher Nordpfeil/keine falsche Alignment-Chance auch für diese 12 Locations. *(Herkunft: Regel 4, Weg-Gate-Entscheidung Option A, 2026-09-04.)*
+- [ ] AK7 (Edge Case, Zukunftssicherheit): Der Schutz aus AK1/AK2 gilt für JEDE Location mit identischen Koordinaten — nicht nur die aktuell 27 bekannten Fälle, sondern auch eine künftig neu angelegte oder per PATCH bearbeitete Location. *(Herkunft: Pre-Mortem Szenario 3.)*
+- [ ] AK8 (Edge Case, PATCH-Pfad): Bearbeitet ein Host eine Location über das Bearbeiten-Formular und setzt Motiv-Koordinaten identisch zum Standort, greift derselbe Schutz sofort nach dem Speichern (ohne Server-Neustart).
+- [ ] AK9 (Edge Case, `/preview-alignment`): Ruft ein Nutzer den Alignment-Vorschau-Endpoint mit identischen Beobachter-/Motiv-Koordinaten auf, liefert die API einen erklärenden 400er statt eines stillen, bedeutungslosen Ergebnisses. *(Herkunft: Zustands-Check Fehlerfall.)*
+- [ ] AK10 (Sonstige/Betriebsübergabe, Abgrenzung): `backend/data/qa_azimuth.py`/`backend/calculations/sightline.py` (Sichtachsen-Check, `sightline_status`) bleiben in diesem Ticket bewusst unverändert (eigenständiger, bereits defensiver Codepfad, TASK-59-Release-Sperre) — dokumentiert, nicht stillschweigend ausgelassen. *(Herkunft: Pre-Mortem Szenario 1.)*
+- [ ] AK11 (Sonstige/Betriebsübergabe, Beobachtbarkeit): Wird der Guard zur Laufzeit für eine Location ausgelöst, wird das genau einmal pro betroffener Location-ID geloggt (nicht pro Request/Chance) — damit künftige, neu entstehende Fälle über die Server-Logs auffindbar sind statt erneut nur durch Zufallsfund wie bei TASK-59.
+- [ ] Edge Case: precompute-Cache-Key für Kategorie-1-Locations enthält nach der Korrektur das Literal `"None"` statt Koordinaten — einmaliger, unkritischer Cache-Miss beim ersten Lauf nach Deploy, kein Fehler. *(Herkunft: Pre-Mortem Szenario 2.)*
+
+**Vier-Kategorien-Abdeckung:**
+- Funktional: AK1-AK9.
+- Nicht-funktional (Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit): Performance — eine zusätzliche Float-Vergleichsprüfung pro Aufruf, keine messbare Auswirkung. Zugänglichkeit — verbessert sich (ersetzt eine irreführende Nordanzeige durch den bereits etablierten, verständlichen „kein Motiv"-Zustand). Sicherheit/Skalierbarkeit: kein neuer Aspekt.
+- Architektur (Konsistenz/Rückwärtskompatibilität): AK5, AK10.
+- Sonstige (Compliance/Logging/Betriebsübergabe): AK11.
+
+**Testplan:**
+- [ ] Automatisiert (Harness), `backend/tests/test_bug-98.py`, Marker `offline`, `regression`:
+  - `calculate_azimuth_alignment`/`calculate_subject_angular_profile` mit identischen Koordinaten → `is_degenerate=True`, kein Zahlen-Azimut als „gültig" interpretierbar (AK1).
+  - `find_precise_alignment_times()` UND `WindowEphemeris.alignments()` (beide Pfade einzeln, siehe Code-Verifikation oben) mit identischen Koordinaten → leere Ergebnisliste (AK2).
+  - Für alle 13 Kategorie-1-IDs: `subject_lat is None and subject_lon is None` in `backend/data/locations.py` (AK3).
+  - Für `brandenburger_tor_tiergarten`/`glienicker_brucke`: `observer_lat != subject_lat or observer_lon != subject_lon`, Distanz-/Azimut-Toleranzcheck wie AK4.
+  - Regressions-Stichprobe: 3-5 bestehende, unveränderte Locations (unterschiedliche Koordinaten) → identisches Azimut-/Alignment-Ergebnis wie vor dem Fix (AK5).
+  - `/preview-alignment` mit identischen Koordinaten → HTTP 400 (AK9, zusätzlich Marker `api`).
+- [ ] Manuell (unter http://localhost:8000, nach Implementierung):
+  1. Eine Kategorie-1-Location (z. B. Müggelsee & Müggelturm) im Location-Detail öffnen → Sektion „Karte & Blickwinkel" zeigt „Keine Motivkoordinaten – Karte nicht verfügbar" statt Kegelfläche.
+  2. Dieselbe Location als Feed-/Kalender-Chance (falls vorhanden) öffnen → kein Kompass-Pfeil, kein „Azimut Sichtachse"-Wert.
+  3. Brandenburger Tor – Tiergartenseite im Location-Detail öffnen → Beobachter-Pin und Motiv-Pin liegen sichtbar an unterschiedlichen Punkten auf der Karte.
+  4. `curl -s http://localhost:8000/locations | jq '.[] | select(.id=="muggelturm") | {subject_lat,subject_lon}'` → `null`/`null`.
+  - Regressions-Matrix (`PRODUCT.md` Sektion 12) konsultieren: Backend-Datenmodell-Änderung + Astronomie-Berechnung → zusätzlich Feed/Kalender/Scout/Location-Detail/Karte gegenprüfen (deckt sich mit dem Fundstellen-Sweep oben).
+
+---
+
+**🔍 AK-Qualitäts-Check (Schritt 6c):**
+
+1. **Granularität:** AK1/AK2 bewusst getrennt (Anzeige vs. Chancen-Erzeugung — zwei unabhängig prüfbare Verhaltensweisen). AK3/AK4/AK6 pro Kategorie getrennt, da unterschiedliche Datenkorrektur je Kategorie. Keine weitere Aufteilung nötig.
+2. **Polarität:** AK1/AK2 (negativ: keine falsche Anzeige/Chance) stehen AK5 (positiv: bestehende, korrekte Fälle bleiben unverändert funktionsfähig) gegenüber.
+3. **Messbarkeit:** gegengeprüft — kein AK verweist auf interne Funktions-/Variablennamen als Abnahmekriterium für Stephan; technische Namen stehen nur im Testplan, nicht in der App-Wirkungs-Formulierung der AKs.
+4. **Vier-Kategorien-Abdeckung:** siehe eigener Abschnitt oben.
+5. **Testbarkeit ohne Rückfrage:** AK1-AK11 sind nach der Weg-Gate-Entscheidung (Option A) vollständig, ohne offene Verzweigung testbar formuliert und werden in `test_bug-98.py` abgebildet.
+6. **Herkunftsnachvollziehbarkeit:** AK1/AK2/AK7/AK9/AK10/Edge-Case tragen einen expliziten Herkunftsvermerk (Code-Verifikation/Pre-Mortem-Szenario/Zustands-Check); AK3/AK4 verweisen auf Regel 2/3.
+
+**Negativ-/Randfall-Checkliste:**
+- Grenzwerte: die vorgeschlagene 5-m-Degenerations-Schwelle deckt GPS-Rundungsfehler ab — in der Implementierung anhand der kleinsten realen `distance_m`>0 im Bestand verifizieren, damit keine echte Nah-Location fälschlich erfasst wird.
+- Ungültige/fehlende Eingaben: AK9 (`/preview-alignment` 400er) deckt den interaktiven Eingabeweg ab.
+- Nebenläufigkeit: nicht relevant (keine gleichzeitigen Schreibzugriffe auf dieselbe Location in diesem Ticket).
+- Verhalten unter Lastgrenzen: nicht relevant (keine neue externe API, keine zusätzliche Netzwerklast).
+- Leerer/übervoller Zustand: bereits über den Zustands-Check (Leerzustand-Wiederverwendung) abgedeckt.
+- Berechtigungen/Zugriffsschutz: nicht relevant (keine neuen Endpunkte, `/preview-alignment` behält bestehenden Schutz).
+- Abwärtskompatibilität: AK5 + AK10.
+- Rollback-/Wiederanlauffähigkeit: reine Datenkorrektur (Kategorie 1/3) ist über den bestehenden Override-Mechanismus rückgängig machbar; Code-Guard ist ein reiner Additiv-Fix ohne Datenmigration.
+- Beobachtbarkeit im Fehlerfall: AK11.
+
+✅ durchgeführt — alle 11 AKs final (Weg-Gate-Entscheidung Option A löst AK6 auf), alle vier Kategorien mit Begründung abgedeckt (Sonstige neu ergänzt: AK11 Logging), restliche Checkliste ohne Lücke bestätigt.
+
+---
+
+**✅ Stephans Entscheidung:** **Weg-Gate-Entscheidung (Stephan, 2026-09-04): Option A** — nur die 15 sicher behebbaren Locations (13× Kategorie 1 + 2× Kategorie 3) jetzt korrigieren + Code-Schutz (Regel 1) gegen identische Beobachter-/Motivkoordinaten in der Azimut-Berechnung. Die 12 Kategorie-2-Platzhalter bleiben in den Koordinaten vorerst unverändert (Regel 4/AK6), aber durch den Code-Schutz vor der Fehlanzeige geschützt.
+
+---
+
+**🛠 Implementierung (2026-09-05):**
+
+- Code-Schutz (`SubjectAngularProfile.is_degenerate`, Schwelle `DEGENERATE_SUBJECT_DISTANCE_M = 5.0`) neu in `backend/calculations/astronomy.py`, konsumiert von allen vier verifizierten Aufrufern: `astronomy.find_precise_alignment_times()`, `calculations/window_engine.py:WindowEphemeris.alignments()`, `calculations/query_engine.py:find_precise_alignment_times_v2()` (je leere Ergebnisliste statt irreführendem 0.0°-Azimut) sowie `main.py`'s `/preview-alignment`-Endpoint (HTTP 400 statt stillem Ergebnis, AK9). `calculations/opportunity.py:find_opportunities()` liefert `subject_azimuth=None` und erzeugt keine Sun/Moon-Alignment-Chance mehr für degenerierte Locations (jede Opportunity betroffen, nicht nur Alignment-Events), inkl. Einmal-pro-Location-Logging (AK11).
+- Datenkorrektur in `backend/data/locations.py`: `subject_lat`/`subject_lon` auf `Optional[float]` erweitert; 13 Kategorie-1-Panorama-Locations (`volkspark_friedrichshain_wasserturm`, `muggelturm`, `wannsee_strandbad`, `nikolaisee_potsdam`, `schweriner_see_havelland`, `spreewald_kanal`, `stechlin_see`, `schorfheide_herbst`, `elbtalaue_wittenberge`, `rügen_kreidefelssen_jasmund`, `tempelhofer_feld_landebahn`, `teufelsberg`, `muggelspree_kopenick`) bekommen `subject_lat=subject_lon=None` (AK3); `brandenburger_tor_tiergarten` (neuer Beobachter-Standpunkt `13.37031`, Distanz 500 m, Azimut ≈89.99°) und `glienicker_brucke` (neuer Beobachter-Standpunkt `52.41497/13.11898`, Distanz 150 m, Azimut 280.0°) bekommen einen recherchierten, vom Motiv abweichenden Beobachter-Standpunkt (AK4). Die 12 Kategorie-2-Platzhalter bleiben unverändert (AK6).
+- Test: `backend/tests/test_bug-98.py` (neu, 33 Tests, Marker `offline`/`regression`, Klasse `TestPreviewAlignmentEndpointDegenerateGuard` zusätzlich `api`) deckt AK1-AK9 automatisiert ab — **33/33 grün**.
+  - Wichtiger Fund während der Testerstellung: `backend/data_dev/fotoalert.db` (`location_overrides`-Tabelle) enthält für mehrere der 15 betroffenen Locations bereits echte, ältere Overrides mit abweichenden Koordinaten — `main.py`/`precompute.py` wenden diese beim App-Start per `setattr()` auf die geteilten `LOCATIONS`-Objekte an. Da `_isolate_client_cookies` (`conftest.py`, autouse) die session-weite `client`-Fixture für JEDEN Test der Session anfordert, greift dieser Override-Merge faktisch vor dem ersten Testkörper der gesamten Session — unabhängig von der Dateireihenfolge. Der Test verwendet deshalb tiefe Kopien der `LOCATIONS`-Objekte, angelegt beim Modulimport (vor jedem Fixture-Setup), statt der geteilten Original-Objekte — ohne die aktive Dev-Datenbank anzufassen.
+- Regressionslauf (`pytest -m "not network and not online and not slow"`, komplette Suite inkl. `test_bug-98.py`): **978 grün / 7 rot / 5 skipped** (990 gesamt). Vergleich zur BUG-21-Baseline (942 grün / 7 rot / 5 skipped, 954 gesamt): **+36 gesamt (33 neue BUG-98-Tests + 3 aus zwischenzeitlich gelandeten anderen Tickets), alle davon grün; rot-Anzahl unverändert bei 7, skipped unverändert bei 5 — keine neue, durch BUG-98 verursachte Abweichung.** Einzeln gegengeprüft:
+  - `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` (Δt 1140s>90s, Mond-Passage 2026-07-04): verwendet die (von BUG-98 unberührten) `location_overrides`-Koordinaten (Distanz 94.2 m, `is_degenerate=False`) — der neue Guard greift dort nachweislich nicht (nur bei `is_degenerate=True` aktiv); vorbestehende Alt-/Neu-Engine-Präzisionsabweichung, nicht BUG-98-verursacht.
+  - `test_task79_readme_marker_sync.py::test_all_test_files_listed_in_readme_table`: war bereits vorher rot (fehlender `test_bug110.py`-Eintrag, unverändert durch dieses Ticket); `backend/tests/README.md` um die eigene Zeile für `test_bug-98.py` ergänzt, damit dieses Ticket den vorbestehenden Fehler nicht zusätzlich verschärft.
+  - `test_bug110.py`, `test_bug92.py` (2×), `test_us120.py`, `test_us_125.py`: thematisch unabhängig (Kalender-Cache-Konsistenz, Bilddatei-Löschung/Sandbox-Dateiberechtigungen) — keine Berührung mit Location-Koordinaten/Azimut-Berechnung.
+- Kein Git, kein Release, kein Zugriff auf `qa_azimuth.py`/`sightline.py` (AK10). Wegwerf-Test-Venv und alle Scratch-Skripte nach Abschluss entfernt (Regel 10).
+
+**Refactor abgeschlossen (fotoalert-refactor, 2026-09-06, vor Release):** Nur den durch BUG-98 geaenderten Code geprueft (`backend/calculations/astronomy.py` Degenerations-Guard, `window_engine.py`, `query_engine.py`, `opportunity.py`, `backend/main.py` `/preview-alignment`, `backend/data/locations.py` Koordinaten der 15 Locations, `backend/tests/test_bug-98.py`). `tools/refactor_check.py --report` deckt `astronomy.py`/`window_engine.py`/`query_engine.py`/`opportunity.py`/`data/locations.py` strukturell nicht ab (`BACKEND_FILES`-Liste) — dafuer Folgeticket **TASK-109** angelegt; manuelle Pruefung (pyflakes + Handpruefung der Guard-Logik in allen vier Aufrufern) ergab keinen neuen, durch BUG-98 verursachten Befund (vorhandene pyflakes-Funde in diesen Dateien sind alle vorbestehend und unberuehrt von den Guard-Stellen). `main.py`/`web/index.html` (durch `refactor_check.py` abgedeckt): keine neuen Funde; `preview_alignment()`-Laengenfund bleibt durch bestehendes TASK-81 abgedeckt. Testlauf real wiederholt (isoliertes Wegwerf-Venv, `device_bash`/Linux-VM statt Mac-venv, da Mac-venv-Python-Symlinks dort nicht ausfuehrbar): `pytest backend/tests/test_bug21.py backend/tests/test_bug-98.py` → 42/42 gruen; volle Suite `pytest backend/tests/` → dieselben 7 vorbestehenden roten Tests wie oben dokumentiert (`test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` erneut auf die bekannte, gitignorierte `data_dev/fotoalert.db`-Override-Altlast zurueckgefuehrt, unabhaengig reproduziert und bestaetigt — keine BUG-98-Regression), alle uebrigen gruen. Bereit fuer `fotoalert-release`.
+
+---
 
 ### BUG-84 · Kategorie UND Schwierigkeitsgrad im Bearbeiten-Formular: falsche Vorbelegung und wirkungsloses Speichern `[x]`
 
@@ -7738,34 +8264,154 @@ Begründung: Unterhalb des Schwellwerts bleibt die Fläche bewusst kaum sichtbar
 
 ---
 
-### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[ ]`
+### BUG-21 · Brennweiten-Eingabe: Kein Komma auf iOS-Tastatur `[~]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Mittel |
-| **Status** | Ready for Analysis |
+| **Status** | In Test |
 > **Problem:** Das Eingabefeld für Brennweite öffnet auf iOS eine numerische Tastatur ohne Komma-Taste.
 >
-> **Entscheidung: Option B – Tag-Chips**
-> Alle vier Lösungsoptionen dokumentiert, Option B wird implementiert:
+> **Weg-Gate-Entscheidung (Stephan, 2026-09-04): Option A** — `inputmode="decimal"` + tolerantere Trennzeichen-Erkennung (Komma/Semikolon). Die ursprünglich hier notierte „Option B – Tag-Chips" beruhte auf einer inzwischen widerlegten Single-Value-Annahme (siehe Analyse unten, Code-Verifikation) und ist durch diese Entscheidung ersetzt.
 >
-> - **Option A – `inputmode="decimal"`:** Zeigt auf iOS den Dezimalpunkt. Einfachste Lösung, kein nativer Komma-Key auf deutschen Tastaturen.
-> - **Option B – Tag-Chips (GEWÄHLT):** Horizontaler Chip-Slider mit Standardbrennweiten. Kein Tastatur-Problem, Touch-optimiert, schnelle Auswahl.
-> - **Option C – Stepper:** +-/−-Buttons. Umständlich bei großen Werten (600mm).
-> - **Option D – Hybrid:** Chip-Schnellauswahl + „Andere…"-Eingabefeld. Maximale Flexibilität, höchster Aufwand.
->
-> **Chip-Werte (Option B):** 10, 14, 20, 24, 28, 35, 50, 85, 100, 135, 200, 300, 400, 500, 600 mm
->
-> **Akzeptanzkriterien:**
-> - Horizontaler Chip-Slider mit allen 15 Werten (10–600 mm)
-> - Aktiver Chip visuell hervorgehoben
-> - Auswahl speichert `focal_length_mm` direkt (kein Submit nötig)
-> - Standardwert: zuletzt verwendete Brennweite oder 50 mm als Default
-> - Chips passen auf iPhone-SE-Breite; Overflow horizontal scrollbar
-> - Filter-Panel aktualisiert Ergebnisse direkt nach Chip-Tap
+> Vollständige Optionsübersicht (A–C) und die finalen Akzeptanzkriterien siehe Abschnitt „Analyse (fotoalert-analyze, 2026-09-04)" unten.
 >
 > **Abhängigkeiten:** US-32[x] (Filter-System)
+
+## Analyse (fotoalert-analyze, 2026-09-04)
+
+**Fundstellen-Sweep:** Suche nach `focal_length` / `inputmode="numeric"` in `web/index.html`, `ios/FotoAlert/**/*.swift`, `backend/**/*.py`: genau 1 Eingabefeld mit diesem Muster — `#edit-focal` im Bearbeiten-Formular einer Location (`LocationDetail.openEdit()`, web/index.html:6655-6656). Kein zweites Eingabefeld für Brennweite existiert (AddLocation-Formular berechnet Brennweiten-Empfehlungen serverseitig, keine manuelle Eingabe — web/index.html:7587). Die iOS-App (`ios/FotoAlert/`) hat keine eigene Bearbeiten-Oberfläche für Locations (reine Anzeige-App); betrifft ausschließlich die Web-App im mobilen Safari.
+
+**Zustands-Check:** Wartezustand: keine asynchrone Aktion beim Tippen, nur beim Speichern (bestehender "Speichert…"-Button-Zustand, unverändert). Leerzustand: leeres Feld zeigt Platzhalter "z.B. 200, 400, 600" (unverändert). Fehlerfall: ungültige/nicht-numerische Eingaben werden von `saveEdit()` aktuell still gefiltert (`parseInt(...).filter(n => !isNaN(n) && n > 0)`, web/index.html:6979-6982) — kein Hinweis an den Host, wenn ein Token nicht erkannt wurde; bereits bestehendes Verhalten, durch dieses Ticket nicht verschlechtert, aber als Pre-Mortem-Risiko relevant (siehe unten).
+
+**Code-Verifikation (Pflicht vor Pre-Mortem):** `web/index.html:6655-6658` gelesen: Eingabefeld ist `type="text" inputmode="numeric"`, bindet an `loc.focal_length_suggestions` (Join mit `, `). `saveEdit()` (web/index.html:6979-6982) parst den String durch `split(',')` — **nur Komma als Trennzeichen**, kein Semikolon/Leerzeichen-Fallback. Backend-Schema (`backend/models/schemas.py:43`, `backend/data/locations.py:92`) bestätigt: `focal_length_suggestions: list[int]` — eine **Liste**, kein Einzelwert. Reale Datenbasis (`backend/data/locations.py`, 62 Locations ausgezählt) zeigt Häufigkeitsverteilung 14mm(1) 20mm(1) 24mm(15) 35mm(22) 50mm(26) 70mm(18) 85mm(30) 135mm(38) 200mm(29) 300mm(12) 400mm(6) 500mm(1) 600mm(3) 800mm(1) — jede Location hat üblicherweise 3–4 gleichzeitige Werte. Server-Validierung `_validate_patch_fields()` (backend/main.py:4482-4492, BUG-22) akzeptiert jede Liste von Ints 8–1200mm, keine Obergrenze der Anzahl.
+
+**⚠️ Ticket-Prämisse widerspricht dem Code (🔴 kritisch — siehe Frage 1):** Die im Ticket bereits vorskizzierte „Entscheidung: Option B – Tag-Chips" geht von einer **Einzelwert**-Eingabe aus („Aktiver Chip" Singular, „speichert `focal_length_mm` direkt") — dieses Feld existiert im Schema nicht. Das tatsächliche Feld `focal_length_suggestions` ist eine **Liste** mit üblicherweise 3–4 gleichzeitigen Werten. Zusätzlich deckt die vorgeschlagene Chip-Werteliste (10–600mm, 15 Werte) zwei real vorkommende Werte nicht ab: **70mm (18× in der Datenbasis, sehr häufig)** und **800mm (1×)**. Eine 1:1-Umsetzung der bereits notierten Entscheidung würde beim ersten Speichern jeder betroffenen Location Daten unwiderruflich verlieren bzw. auf einen Wert reduzieren.
+
+**Pre-Mortem:**
+- 💀 Szenario 1: Chip-UI wird als reiner Single-Select gebaut (wie im Ticket vorskizziert) → jede Location mit mehreren Brennweiten (die meisten) verliert beim ersten Bearbeiten-Speichervorgang alle bis auf eine. Auslöser: unverifizierte Feldannahme (`focal_length_mm` statt `focal_length_suggestions`). Frühwarnung: genau diese Code-Verifikation. Gegenmaßnahme: 🔴 Frage 1 unten, AK explizit auf Mehrfachauswahl (falls Chip-Option gewählt wird).
+- 💀 Szenario 2: Chip-Werteliste ohne 70mm/800mm → Host öffnet eine Location mit 70mm, kein Chip ist aktiv (wirkt wie "nichts ausgewählt"), beim Speichern geht der reale Wert verloren. Auslöser: Chip-Liste wurde ohne Abgleich gegen echte Datenbasis festgelegt. Gegenmaßnahme: siehe Frage 1 — Liste erweitern oder Freitext-Fallback, sonst AK „bestehende Werte bleiben beim Öffnen erhalten" nicht erfüllbar.
+- 💀 Szenario 3: `inputmode="decimal"`-Fix behebt das Komma-Problem nicht für Hosts mit englischem iOS-Tastatur-Layout (Tastatur folgt der Tastatursprache, nicht der App-Sprache) → Bug bleibt für einen Teil der Nutzer bestehen. Frühwarnung: manueller Gerätetest mit deutschem UND englischem Tastatur-Layout (siehe Testplan). Gegenmaßnahme: zusätzlich Parser tolerant für Komma UND Punkt/Semikolon machen (AK5), damit auch bei fehlender Komma-Taste ein alternatives Trennzeichen funktioniert.
+- 💀 Szenario 4: Parser (`split(',')`) akzeptiert nur Komma; tippt ein Host versehentlich Punkt oder Semikolon als Trennzeichen, wird der Rest des Strings von `parseInt` stillschweigend abgeschnitten (`parseInt("200. 400 600")` → nur `200`) — Datenverlust ohne Fehlermeldung. Bereits heute bestehend, unabhängig vom Komma-Fix. Gegenmaßnahme: AK5 (Trennzeichen-Toleranz).
+
+**Architektur-Analyse:**
+- `web/index.html:6655-6656` — Eingabefeld `#edit-focal` (Kern der Änderung)
+- `web/index.html:6979-6982` — `saveEdit()`, Parsing-Logik (`focalRaw.split(',')...`)
+- `backend/models/schemas.py:43`, `backend/data/locations.py:92` — Schema-Bestätigung `list[int]`, keine Backend-Änderung nötig
+- `backend/main.py:4482-4492` — bestehende Server-Validierung (8–1200mm), keine Änderung nötig
+- Wiederverwendbare CSS-Bausteine falls Chip-Route gewählt wird: `.filter-chip`/`.filter-chip.active` (web/index.html:651-656, Single-Toggle-Chip-Optik) + `.alert-chips` (web/index.html:245, horizontales `overflow-x:auto`-Scrollen) — beide bereits im Code vorhanden, kein neues CSS-Pattern nötig, nur Multi-Active-Logik wäre neu.
+
+**Designer-Check:** Nur relevant falls Option B/D (Chips) gewählt wird — visuell sichtbare Änderung. `fotoalert-designer` wird erst nach Stephans Entscheidung zu Frage 1 hinzugezogen (Bauhaus-Check für ein neues Multi-Select-Chip-Muster), um keine Designarbeit für eine ggf. verworfene Option zu leisten.
+
+## Example Mapping
+
+📏 **Regel 1:** Der Host kann auf iOS beliebig viele kommagetrennte Brennweitenwerte eintippen, ohne dass ihm eine Trenn-Taste auf der Tastatur fehlt.
+🟢 Beispiel: Host öffnet das Bearbeiten-Formular auf dem iPhone (deutsches Tastatur-Layout), tippt ins Feld „Brennweiten-Empfehlungen" → die eingeblendete Tastatur bietet eine Taste zum Trennen der Werte → er tippt „200, 400, 600" vollständig ein und speichert erfolgreich.
+
+📏 **Regel 2:** Das bestehende Mehrfachwert-Verhalten bleibt erhalten — der Fix reduziert die Eingabe nicht auf einen einzigen Wert.
+🟢 Beispiel: Location hat `[50, 85, 135]`. Host öffnet Bearbeiten-Formular, ändert nichts an der Brennweite, speichert → `GET /locations/{id}` liefert weiterhin `focal_length_suggestions: [50, 85, 135]`.
+🟢 Beispiel (Negativ/Edge Case): Location hat `[400, 600, 800]` (enthält einen Wert außerhalb der ggf. neuen kuratierten Liste). Host öffnet das Formular, ändert nichts, speichert → alle drei Werte bleiben erhalten, `800` geht nicht verloren.
+
+❓ **Frage 1 (🔴 kritisch, Grenzfall mit mehreren sinnvollen Optionen — siehe Weg-Gate unten):** Die im Ticket bereits vorskizzierte Entscheidung „Option B – Tag-Chips" (Single-Select, `focal_length_mm`) passt nicht zum echten Datenmodell (`focal_length_suggestions`, Liste, üblicherweise 3–4 Werte gleichzeitig, reale Werte bis 800mm). Wie soll das Feld tatsächlich umgesetzt werden? Siehe **Implementierungsoptionen** unten für die ausformulierten Optionen mit Konsequenzen — Stephans Entscheidung ersetzt/bestätigt die bisherige Ticket-Notiz.
+
+**AK-Konsistenzcheck:** Noch nicht final möglich — Frage 1 ist die Voraussetzung für die endgültige AK-Liste; die unten stehenden Akzeptanzkriterien sind daher als **AK-Entwurf je Option** formuliert und werden nach Stephans Entscheidung auf die gewählte Option verengt.
+
+## Implementierungsoptionen + Empfehlung
+
+### Option A — `inputmode="decimal"` (minimal, textbasiert, empfohlen)
+- Vorgehen: `inputmode="numeric"` → `inputmode="decimal"` am bestehenden `#edit-focal`-Feld. Zusätzlich Parser in `saveEdit()` tolerant für Komma UND Semikolon/Punkt als Trennzeichen machen (AK5, entschärft Pre-Mortem Szenario 3+4 zusätzlich).
+- Betroffene Dateien: `web/index.html` (2 Stellen: Zeile 6656 Attribut, Zeile 6980 Split-Regex)
+- Vorteile: Ein-Zeilen-Änderung + eine kleine Parser-Härtung; keine Datenmodell-Änderung; volle Mehrfachwert- und Wertebereichs-Kompatibilität (kein 70mm/800mm-Problem, da keine kuratierte Liste); kein neuer UI-Baustein, kein Designer-Gate, kein Prototyp-Gate nötig (reine Attribut-/Logik-Änderung ohne neues sichtbares Element).
+- Nachteile/Risiken: Löst nur, wenn iOS bei `inputmode="decimal"` tatsächlich eine lokalisierte Trenn-Taste zeigt (auf deutschem Tastatur-Layout ist das dokumentiertes Standardverhalten, aber im Ticket-Text selbst mit „kein nativer Komma-Key" bezweifelt — diese Prämisse ist unverifiziert und wird im Testplan als AK6 mit echtem Gerätetest abgesichert, bevor das Ticket geschlossen wird). Bei abweichendem Tastatur-Sprachlayout (Englisch) evtl. weiterhin nur Punkt statt Komma verfügbar — durch AK5 (Parser-Toleranz) abgefangen.
+- Aufwand: klein
+
+### Option B — Multi-Select Tag-Chips + „Andere…"-Freitext (Hybrid, vormals „Option D" im Ticket, überarbeitet)
+- Vorgehen: Horizontaler Scroll-Chip-Slider mit den 15 Standardwerten **plus 70mm ergänzt** (reale Häufigkeit 18×, fehlt in der ursprünglichen Liste) — Mehrfachauswahl (jeder Chip toggelt unabhängig, nicht nur einer aktiv). Zusätzlich ein „Andere…"-Eingabefeld für Werte außerhalb der Liste (deckt z. B. das bestehende 800mm ab), selbst mit `inputmode="decimal"` (Option A als Unterbaustein).
+- Betroffene Dateien: `web/index.html` (neues Markup + CSS im Bearbeiten-Formular, `saveEdit()`-Logik erweitert um Chip-Zustand + Freitext-Merge), ggf. neue CSS-Klasse für Multi-Active-Chip-Zustand (Basis: `.filter-chip`/`.alert-chips`, s. Architektur).
+- Vorteile: Touch-optimiert, kein Tastatur-Problem für die 16 Standardwerte, schnelle Auswahl.
+- Nachteile/Risiken: Erheblich höherer Aufwand als Option A für dasselbe Kernproblem (fehlende Komma-Taste); neues UI-Element → Designer-Check (`fotoalert-designer`) UND Projekt-Pflicht-Prototyp-Gate vor Implementierungsstart (`feedback_fotoalert_prototype_before_impl`) zusätzlich nötig, bevor `fotoalert-impl` starten darf; Pre-Mortem Szenario 2 (Werteabdeckung) bleibt ein Restrisiko für zukünftige, noch nicht vorhersehbare Ausreißerwerte (das „Andere…"-Feld fängt das ab, macht die Chip-Auswahl selbst aber nicht mehr „kein Tastatur-Problem" im Vollumfang).
+- Aufwand: mittel–groß
+
+### Option C — Stepper (aus dem Ticket übernommen, weiterhin verworfen)
+- Bereits im Ticket korrekt verworfen („umständlich bei großen Werten"), durch die jetzt bestätigte Mehrfachwert-Notwendigkeit (3–4 gleichzeitige Werte pro Location) zusätzlich unpraktikabel — ein Stepper bildet nur einen Wert ab. Keine eigene Options-Tabelle, da die Ticket-eigene Begründung weiterhin trägt und sich durch die Mehrfachwert-Erkenntnis nur verstärkt.
+
+✅ **Empfehlung: Option A** — löst exakt das im Ticket beschriebene Problem (fehlende Komma-Taste) mit minimalem Aufwand, ohne Risiko für bestehende Mehrfachwert-Daten und ohne die Werteabdeckungs-Lücke (70mm/800mm), die Option B in ihrer bisherigen Form hätte. Option B bleibt eine legitime spätere UX-Verbesserung (schnellere Auswahl für Standardwerte), ist aber ein eigenständig größeres Vorhaben mit eigenem Designer-/Prototyp-Gate — kein Muss zur Behebung dieses Bugs.
+
+**⚠️ Offene Grenzfall-Wahlfrage aus Frage 1 — gehört mit ins selbe Weg-Gate:** Stephans ursprüngliche Ticket-Notiz „Option B" beruhte auf der inzwischen widerlegten Single-Value-Annahme. Diese Analyse empfiehlt stattdessen Option A. Stephan entscheidet: Option A (Empfehlung) / Option B in der hier korrigierten Multi-Select-Form / eine Kombination (z. B. Option A jetzt + Option B als späteres eigenes Ticket).
+
+## 🚦 Ampel-Ergebnis
+🔴 **Rot — braucht Stephans Entscheidung:** Kriterium 1 (klarer Abstand zur Alternative) nicht erfüllt — die im Ticket bereits notierte Entscheidung „Option B" widerspricht der jetzt verifizierten Datenlage (Mehrfachwert-Feld statt Einzelwert, Werteabdeckungslücke 70mm/800mm) und wird durch diese Analyse zugunsten von Option A revidiert vorgeschlagen. Eine so grundlegende Kurskorrektur einer bereits getroffenen Entscheidung braucht Stephans ausdrückliche Bestätigung, kein autonomes Überschreiben.
+
+✅ **Aufgelöst (Weg-Gate-Entscheidung Stephan, 2026-09-04):** Option A bestätigt. Status: Ready for Dev.
+
+**Weg-Gate-Entscheidung (Stephan, 2026-09-04): Option A** — die untenstehende AK-Liste ist final für Option A; die zuvor optionsabhängigen Alternativ-AKs für Option B (Multi-Select-Chips) wurden entfernt.
+
+**Akzeptanzkriterien (final, Option A):**
+- [x] AK1: Der Host kann im Bearbeiten-Formular einer Location auf dem iPhone mehrere Brennweitenwerte eintippen/auswählen, ohne dass ihm dafür eine Tastatur-Taste fehlt. *(Herkunft: Problem-Beschreibung Ticket + Regel 1)*
+- [x] AK2: Nach dem Speichern bleiben alle zuvor eingegebenen/ausgewählten Brennweitenwerte einer Location erhalten (keine Reduktion auf einen Wert). *(Herkunft: Regel 2, Pre-Mortem Szenario 1)*
+- [x] AK3: Edge Case — eine Location mit einem Brennweitenwert außerhalb einer eventuell kuratierten Liste (z. B. 800mm) verliert diesen Wert beim Öffnen+Speichern des Formulars nicht. *(Herkunft: Pre-Mortem Szenario 2, reale Datenbasis)*
+- [x] AK4: Edge Case — ein leeres Feld/keine Auswahl speichert weiterhin eine leere Liste (`focal_length_suggestions: []`), kein Fehler. *(Herkunft: Zustands-Check Leerzustand, bestehendes Verhalten bestätigt unverändert)*
+- [x] AK5: Der Parser akzeptiert neben Komma auch Semikolon als Trennzeichen zwischen Werten, ohne Werte stillschweigend zu verlieren. *(Herkunft: Pre-Mortem Szenario 3+4)*
+- [ ] AK6 (manueller Testschritt, kein automatisierter Test): Auf einem echten iPhone mit deutschem Tastatur-Layout zeigt die Tastatur beim Fokussieren des Felds tatsächlich eine Komma-Taste (`inputmode="decimal"` verifiziert am Gerät, nicht nur dokumentiertes Verhalten). *(Herkunft: Pre-Mortem Szenario 3, Ticket-eigene Zweifel an Option A) — noch offen, benötigt Stephans echten Geräte-Test.*
+
+**Vier-Kategorien-Abdeckung:**
+- Funktional: AK1-4 (Kernverhalten), AK5 (Robustheit) — abgedeckt.
+- Nicht-funktional (Performance/Sicherheit/Skalierbarkeit/Zugänglichkeit): kein Performance-Impact (reine Client-Attribut-Änderung), keine Sicherheitsrelevanz (Server validiert bereits serverseitig, unverändert), Zugänglichkeit: `inputmode="decimal"` verbessert die Eingabe-Ergonomie eher (spezifischere Tastatur) — kein neues Risiko.
+- Architektur/Rückwärtskompatibilität: Option A ändert weder Schema noch API — vollständig rückwärtskompatibel; Option B würde ein neues, noch nicht existierendes UI-Muster (Multi-Active-Chip) einführen, das gegen `.filter-chip` (bislang Single-Active) abzugrenzen ist (kein Konflikt, aber neue Variante).
+- Sonstige (Compliance/Logging/Betriebsübergabe): nicht relevant — keine neuen Log-/Compliance-Anforderungen.
+
+**AK-Qualitäts-Check (Schritt 6c):**
+Granularität (AK1/AK2 bewusst getrennt — Eingabe-Erlebnis vs. Persistenz-Garantie), Polarität (AK1 hat AK3/AK4 als Grenzfall-Pendants), Messbarkeit (alle AKs aus Nutzersicht formuliert, keine Funktions-/Variablennamen im AK-Text selbst), Vier-Kategorien-Abdeckung (siehe eigener Abschnitt oben), Testbarkeit ohne Rückfrage (AK1-5 automatisierbar, AK6 bewusst als manueller Gerätetest markiert), Herkunftsnachvollziehbarkeit (jedes AK trägt einen Herkunftsvermerk).
+Negativ-/Randfall-Checkliste: Grenzwerte (8–1200mm-Serverlimit bereits bestehend, unverändert), ungültige Eingaben (AK5 deckt Trennzeichen-Robustheit ab, nicht-numerische Zeichen bleiben wie bisher still gefiltert), Nebenläufigkeit (nicht relevant, Einzelnutzer-Formular), Lastgrenzen (nicht relevant), Leerer/übervoller Zustand (AK4 abgedeckt, keine Obergrenze der Werteanzahl bereits heute so), Berechtigungen (unverändert, PATCH bleibt host-only, TASK-103), Abwärtskompatibilität (Option A vollständig rückwärtskompatibel), Rollback (reine Attribut-/Logikänderung, jederzeit ohne Datenverlust rückgängig machbar), Beobachtbarkeit im Fehlerfall (kein neuer Fehlerpfad, bestehendes stilles Filtern bleibt, durch AK5 reduziert nicht eliminiert, bewusst kein neues Error-Logging in Scope).
+
+🔍 **AK-Qualitäts-Check: ✅ durchgeführt** — AK5/AK6 aus Pre-Mortem ergänzt (Parser-Robustheit + Geräteverifikation), Vier-Kategorien-Abdeckung dokumentiert (nicht-funktional/Architektur mit Begründung „nicht relevant" wo zutreffend), alle AKs mit Herkunftsvermerk, keine Granularitäts-Zusammenlegung nötig.
+
+**Testplan:**
+- [x] Automatisiert (Harness, `backend/tests/test_bug21.py`, Marker `offline, regression, requires_full_checkout` nach Muster `test_bug109.py`): statischer Source-Check auf `web/index.html` — `#edit-focal` trägt `inputmode="decimal"` (nicht mehr `"numeric"`), Split-Regex akzeptiert Komma UND Semikolon (AK1, AK5). Ergänzend ein API-Regressionstest (Marker `api, regression`, Muster `test_bug-84.py`): PATCH mit `focal_length_suggestions: [24, 35, 70, 800]` (Mehrfachwert inkl. Wert außerhalb einer evtl. kuratierten Liste) wird unverändert persistiert und über GET zurückgeliefert (AK2, AK3, AK4 mit leerer Liste zusätzlich).
+- [ ] Manuell (http://localhost:8000, echtes iPhone erforderlich für AK6 — Browser-Simulation zeigt keine echte iOS-Tastatur): Location-Bearbeiten-Formular öffnen (Host-Login), Feld „Brennweiten-Empfehlungen" fokussieren → Tastatur-Layout prüfen (Komma-Taste sichtbar? AK6), „200, 400, 600" eintippen und speichern → erneut öffnen, alle drei Werte vorhanden (AK1, AK2). Zusätzlich eine bestehende Location mit einem 70mm- oder 800mm-Wert öffnen, nichts ändern, speichern, erneut öffnen → Wert weiterhin vorhanden (AK3). Regressionsmatrix (PRODUCT.md Sektion 12, Formular-Änderung): restliche Formularfelder (Name, Kategorie, Schwierigkeit, Koordinaten) unverändert funktionsfähig nach der Änderung.
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: `focal_length`/`inputmode="numeric"` gesucht, 1 Fundstelle (`#edit-focal`)
+- [x] Zustands-Check: Warte-/Leer-/Fehlerfall dokumentiert, unverändert bis auf AK5
+- [x] Pre-Mortem durchgeführt (4 Szenarien)
+- [x] Architektur analysiert: web/index.html (Feld + Parser), Schema/Validierung bestätigt unverändert
+- [x] Designer-Check: visuell? → nur relevant falls Option B gewählt wird; für Option A übersprungen (reine Attribut-/Logikänderung ohne neues sichtbares Element)
+- [x] Implementierungsoptionen: A (empfohlen) / B (Multi-Select-Chips, korrigiert) / C (verworfen)
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): AK5/AK6 aus Pre-Mortem ergänzt, Vier-Kategorien-Abdeckung dokumentiert, Herkunftsvermerke vollständig
+
+**Status-Update (2026-09-04):** Weg-Gate 🔴 → **Wartet auf Entscheidung** — die bereits im Ticket notierte „Option B"-Entscheidung widerspricht der jetzt verifizierten Datenlage (Mehrfachwert-Feld, Werteabdeckungslücke 70mm/800mm); diese Analyse empfiehlt stattdessen Option A. Ticket blockiert die Kette nicht — Pipeline arbeitet mit den übrigen freigegebenen Tickets weiter.
+
+**Status-Update (2026-09-04, Weg-Gate-Entscheidung Stephan):** Weg-Gate 🔴 → ✅ **Option A** — Status: Ready for Dev. AK-Liste auf Option A vereinheitlicht (optionsabhängige Option-B-Alternativ-AKs entfernt).
+
+## Implementierung (fotoalert-impl, 2026-09-05)
+
+**Code-Änderungen (Option A, exakt nach AK-Liste):**
+- `web/index.html:6656` — `#edit-focal`: `inputmode="numeric"` → `inputmode="decimal"` (AK1/AK6).
+- `web/index.html:6981` — `saveEdit()`-Parser: `focalRaw.split(',')` → `focalRaw.split(/[,;]/)` (AK5, Komma UND Semikolon als Trennzeichen).
+- Keine Backend-/Schema-Änderung (wie in der Architektur-Analyse vorgesehen).
+
+**Neuer Test:** `backend/tests/test_bug21.py` — 2 Testgruppen:
+- `TestEditFocalInputAndParser` (4 Tests, Marker `offline, regression, requires_full_checkout`, Muster `test_bug109.py`): statischer Source-Check auf `web/index.html` — `inputmode="decimal"` vorhanden/`"numeric"` nicht mehr vorhanden (AK1), Split-Regex `/[,;]/` vorhanden/reines `split(',')` nicht mehr vorhanden (AK5).
+- `TestFocalLengthSuggestionsPersistUnchanged` (3 Tests, Marker `api, regression`, Muster `test_bug-84.py`): eigene, selbst-anlegende Test-Location mit Ausgangswert `[400, 600, 800]`; PATCH mit `[24, 35, 70, 800]` bleibt über Liste UND Einzelabruf unverändert (AK2/AK3), PATCH ohne Brennweiten-Feld lässt bestehende Mehrfachwerte unangetastet (AK2), PATCH mit `[]` persistiert als leere Liste ohne Fehler (AK4).
+- **Ergebnis:** `pytest backend/tests/test_bug21.py` → **7/7 grün** (isoliertes Wegwerf-Venv, `requirements.txt` sauber installiert, keine Mutation der geteilten `data_dev/fotoalert.db`).
+
+**README-Nachzug (Pflicht, TASK-79):** Zeile für `test_bug21.py` in `backend/tests/README.md` ergänzt (Marker-Tabelle) — ohne diesen Nachzug hätte `test_task79_readme_marker_sync.py` durch den neuen Test rot geschlagen.
+
+**Regressionslauf (volle Backend-Suite):** `pytest -m "not network and not online and not slow"` (isoliertes Wegwerf-Venv, echter Lauf über `device_bash`, zweimal ausgeführt — vor und nach einem zwischenzeitlichen Geräte-Verbindungsabbruch, Ergebnis beide Male deckungsgleich):
+**954 Tests gesammelt (27 durch Marker-Filter abgewählt) · 942 grün · 7 rot · 5 übersprungen** (Playwright/Frontend-Platzhalter, unverändert vorbestehend).
+
+Alle 7 roten Tests sind **vorbestehend bzw. Sandbox-Artefakte — keiner durch BUG-21 verursacht**, im Detail geprüft:
+- `test_bug110.py`, `test_bug92.py` (2×) — `MemoryError` beim Lesen der lokalen `data_dev/fotoalert.db`/`calendar.json`-Caches; Server-Log bestätigt vorbestehend korrupte Datenbank ("database disk image is malformed", bekanntes Muster aus BUG-70), unabhängig von der Brennweiten-Eingabe.
+- `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` — Timing-Toleranzüberschreitung (Δt 1140s > 90s), vorbestehender zeitfenster-abhängiger Flake, keine BUG-21-Berührung.
+- `test_task79_readme_marker_sync.py::test_all_test_files_listed_in_readme_table` — nach dem README-Nachzug für `test_bug21.py` (s. o.) bleibt ausschließlich die vorbestehende, unabhängige Lücke `test_bug110.py` übrig (isoliert re-verifiziert); außerhalb des BUG-21-Scopes, bewusst nicht mitgezogen.
+- `test_us120.py::TestDeleteRemovesImageFile`, `test_us_125.py::TestDeleteImageSuccess` — Bild-Lösch-Tests scheitern mit „Operation not permitted" beim Entfernen einer Fixture-Datei in `backend/data/location_images/`; Root Cause ist ein Berechtigungs-/Besitzverhältnis-Artefakt dieser Sandbox nach dem Geräte-Reconnect (Datei-Pfade in den Tracebacks zeigen zwei unterschiedliche Session-IDs für denselben gemounteten Ordner), keine BUG-21-Berührung (Bild-Upload/-Löschung ist ein komplett anderes Feature).
+
+**Nicht automatisiert (bewusst, siehe Testplan):** AK6 (echte iOS-Komma-Taste am Gerät) bleibt ein manueller Test durch Stephan — Browser-Simulation zeigt keine echte iOS-Tastatur.
+
+**Refactor abgeschlossen (fotoalert-refactor, 2026-09-06, vor Release):** Nur den durch BUG-21 geaenderten Code geprueft (`web/index.html` `#edit-focal`/`saveEdit()`-Parser, `backend/tests/test_bug21.py`). `tools/refactor_check.py --report` gegen den Hauptordner: kein Fund fuer `web/index.html` (Frontend-Regex sauber), `main.py` unveraendert vorbestehende Funde (unberuehrt von BUG-21). Keine Auto-Fixes, keine neuen Tickets fuer BUG-21-Code noetig. Testlauf real wiederholt (isoliertes Wegwerf-Venv, `device_bash`/Linux-VM statt Mac-venv): `pytest backend/tests/test_bug21.py backend/tests/test_bug-98.py` → 42/42 gruen; volle Suite `pytest backend/tests/` → dieselben 7 vorbestehenden roten Tests wie in der Implementierungsphase dokumentiert (keiner BUG-21/BUG-98-verursacht, siehe dortige Einzelpruefung), alle uebrigen gruen. Bereit fuer `fotoalert-release`.
 
 ---
 
@@ -26163,6 +26809,23 @@ Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronis
 Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in derselben Datei, ist Done und unabhängig von diesem Fund). Aufteilen in kleinere Hilfsfunktionen (z. B. Fenster-Aktivierung/Elevation-Abruf, Alignment-Berechnung, Response-Aufbau separieren). Kein inhaltlicher Umbau — insbesondere die BUG-63-Fixes (`try/finally` um `set_active_window`/`clear_active_window`, `ContextVar`-Isolation, `asyncio.to_thread`) müssen unverändert erhalten bleiben.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-63, 2026-07-16)
+
+---
+
+### TASK-109 · refactor_check.py: BACKEND_FILES deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Niedrig |
+| **Status** | ToDo |
+| **Erstellt** | 2026-09-06 |
+
+**Beschreibung:** Bei der fotoalert-refactor-Pruefung zu BUG-21/BUG-98 (Datei-Abdeckungs-Check, Pflicht seit BUG-107/US-38-Retro) festgestellt: `tools/refactor_check.py`s `BACKEND_FILES`-Liste deckt weiterhin nur `main.py`, `precompute.py`, `auth.py`, `scheduler.py`, `data/store.py`, `calculations/sun.py`, `calculations/moon.py`, `calculations/weather.py` sowie `discover/*.py` ab. Die fuer BUG-98 zentral geaenderten Dateien `calculations/astronomy.py`, `calculations/window_engine.py`, `calculations/query_engine.py`, `calculations/opportunity.py` und `data/locations.py` werden vom automatisierten Check NICHT mitgeprueft und mussten fuer BUG-98 manuell (pyflakes + Handpruefung) durchgesehen werden. Kein akuter Fund in diesen Dateien (manuell sauber), aber die strukturelle Luecke bleibt fuer kuenftige Tickets bestehen.
+
+**Vorschlag:** Die fuenf genannten Dateien in `BACKEND_FILES` (`tools/refactor_check.py`) ergaenzen, damit `--report`/`--fix` sie kuenftig automatisch abdeckt.
+
+**Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-21/BUG-98)
 
 ---
 

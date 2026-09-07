@@ -126,6 +126,10 @@ def find_precise_alignment_times_v2(
         subject_height_m, subject_width_m,
         elevation_difference_m=elevation_difference_m,
     )
+    if profile.is_degenerate:
+        # BUG-98 AK2: identische/degenerierte Beobachter-/Motivkoordinaten (Drop-in-Ersatz-
+        # Pfad) -> keine Alignment-Chance erzeugen.
+        return []
     apply_par = core.has_parallax(body)
 
     # Fenster identisch zur Alt-Engine: Sonne 4–21 Uhr, Mond 0–24 Uhr (UTC).

@@ -1626,7 +1626,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.69';
+const APP_VERSION = '1.22.70';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -6653,7 +6653,7 @@ const LocationDetail = {
         <p style="font-size:11px;color:var(--muted);margin:-8px 0 12px">Nur ausfüllen wenn du nicht auf Bodenniveau fotografierst (Dach, Hochhaus, Hügel-Aufstieg etc.)</p>
 
         <label>Brennweiten-Empfehlungen (mm, kommagetrennt)</label>
-        <input class="input-field" id="edit-focal" type="text" inputmode="numeric"
+        <input class="input-field" id="edit-focal" type="text" inputmode="decimal"
           placeholder="z.B. 200, 400, 600"
           value="${(loc.focal_length_suggestions||[]).join(', ')}">
 
@@ -6978,7 +6978,7 @@ const LocationDetail = {
     const observer_floor_height_m = floorRaw !== '' ? parseFloat(floorRaw) : null;
     const focalRaw = (document.getElementById('edit-focal')?.value || '').trim();
     const focal_length_suggestions = focalRaw
-      ? focalRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
+      ? focalRaw.split(/[,;]/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
       : [];
     const diffEl = document.querySelector('input[name="edit-difficulty"]:checked');
     const difficulty = diffEl ? parseInt(diffEl.value, 10) : 2;

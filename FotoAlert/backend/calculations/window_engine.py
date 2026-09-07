@@ -257,6 +257,10 @@ class WindowEphemeris:
             subject_height_m, subject_width_m,
             elevation_difference_m=elevation_difference_m,
         )
+        if profile.is_degenerate:
+            # BUG-98 AK2: identische/degenerierte Beobachter-/Motivkoordinaten (aktiver
+            # TASK-25-Fensterpfad) -> keine Alignment-Chance erzeugen.
+            return []
         b = self._bodies["moon" if body == "moon" else "sun"]
         lo, hi = self._day_slice(d)
         # Sonne wie Alt-Engine nur 4–21 Uhr betrachten
