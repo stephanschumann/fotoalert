@@ -14,6 +14,8 @@ Prüft:
 import re, sys, os
 from collections import Counter
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+
 # --- Epic-Verlust-Wächter (E4) ---------------------------------------------
 # Warum: Am 2026-07-23 hat ein Pipeline-Lauf das Security-Epic TASK-92 samt aller
 # 12 Kind-Verknüpfungen aus BACKLOG.md überschrieben — der Verlust fiel erst manuell
@@ -22,7 +24,7 @@ from collections import Counter
 # mit exakt dieser Epic-ID trägt. WICHTIG: Diese Liste beim Anlegen neuer Epics pflegen
 # (neues Epic + seine Kinder hier eintragen), sonst wacht der Wächter nur über TASK-92.
 EXPECTED_EPICS = {"TASK-92": ["TASK-82","BUG-81","TASK-83","TASK-84","TASK-85","TASK-86","TASK-87","TASK-88","TASK-89","TASK-90","TASK-91","BUG-82"]}
-_main = sys.argv[1] if len(sys.argv)>1 else "../../Foto Location Guide/FotoAlert/BACKLOG.md"
+_main = sys.argv[1] if len(sys.argv)>1 else os.path.join(HERE, "..", "BACKLOG.md")
 text = open(_main, encoding="utf-8").read()
 # Archiv (ausgelagerte Done-Tickets) mitprüfen, damit E1-Dup-Check über beide Dateien spannt
 _arch = os.path.join(os.path.dirname(os.path.abspath(_main)), "BACKLOG-ARCHIVE.md")
