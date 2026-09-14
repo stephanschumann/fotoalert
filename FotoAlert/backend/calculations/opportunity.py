@@ -8,6 +8,7 @@ technischen Hinweisen (Brennweite, Uhrzeit, Standort).
 
 from __future__ import annotations
 
+import logging
 import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -19,7 +20,7 @@ from calculations.astronomy import (
     AlignmentType,
     AstronomyReport,
     SubjectAngularProfile,
-    calculate_azimuth_alignment,
+    DEGENERATE_SUBJECT_DISTANCE_M,
     calculate_focal_length_for_subject,
     calculate_full_report,
     calculate_subject_angular_profile,
@@ -33,6 +34,13 @@ from calculations.astronomy import (
 )
 from calculations.weather import WeatherForecast, calculate_photo_weather_score
 from data.locations import PhotoLocation
+
+logger = logging.getLogger(__name__)
+
+# BUG-98 AK11: Prozessweites Set bereits geloggter Location-IDs mit degenerierten
+# Beobachter-/Motivkoordinaten -- verhindert Log-Spam (ein Log pro Location-ID ueber
+# die Prozesslaufzeit, nicht pro Request/Chance).
+_degenerate_logged_location_ids: set[str] = set()
 
 
 class EventType(str, Enum):
@@ -353,11 +361,29 @@ async def find_opportunities(
     moon = astro.moon
     mw = astro.milky_way
 
-    # Azimut vom Beobachter zum Motiv
-    subject_az = calculate_azimuth_alignment(
-        location.observer_lat, location.observer_lon,
-        location.subject_lat, location.subject_lon,
-    )
+    # Azimut vom Beobachter zum Motiv (BUG-98 AK1/AK3/AK6/AK7: None bei fehlenden ODER
+    # identischen/degenerierten Beobachter-/Motivkoordinaten -- kein irrefuehrender 0.0deg-
+    # Nordwert mehr, keine falsche Sichtachse/Alignment-Chance fuer solche Locations.
+    # subject_azimuth_out ist der fuer JEDE Opportunity wiederverwendete Anzeigewert.)
+    subject_az: Optional[float] = None
+    if location.subject_lat is not None and location.subject_lon is not None:
+        _subj_profile = calculate_subject_angular_profile(
+            location.observer_lat, location.observer_lon,
+            location.subject_lat, location.subject_lon,
+        )
+        if _subj_profile.is_degenerate:
+            if location.id not in _degenerate_logged_location_ids:
+                _degenerate_logged_location_ids.add(location.id)
+                logger.warning(
+                    "BUG-98 Guard: Location %s hat identische/degenerierte Beobachter-/"
+                    "Motivkoordinaten (ground_distance=%.1fm < %.1fm) -- subject_azimuth "
+                    "wird als None behandelt, keine Alignment-Chance erzeugt.",
+                    location.id, _subj_profile.ground_distance_m,
+                    DEGENERATE_SUBJECT_DISTANCE_M,
+                )
+        else:
+            subject_az = _subj_profile.azimuth_deg
+    subject_azimuth_out = round(subject_az, 1) if subject_az is not None else None
 
     # -----------------------------------------------------------------------
     # 1. GOLDENE STUNDE ABEND
@@ -366,7 +392,7 @@ async def find_opportunities(
     gh_eve_end = sun.golden_hour_evening_end
     sun_pos_gh = get_body_position(lat, lon, "sun", gh_eve_start)
     sun_alignment_bonus = 0.0
-    if sun_pos_gh:
+    if sun_pos_gh and subject_az is not None:
         az_diff = abs((sun_pos_gh.azimuth - subject_az + 180) % 360 - 180)
         if az_diff < 15:
             sun_alignment_bonus = 0.3
@@ -400,7 +426,7 @@ async def find_opportunities(
             weather_score=round(w_score, 2),
             location_score=1.0,
             camera_hints=_camera_hints_golden_hour(focal_mm),
-            subject_azimuth=round(subject_az, 1),
+            subject_azimuth=subject_azimuth_out,
             celestial_azimuth=round(sun_pos_gh.azimuth, 1) if sun_pos_gh else None,
             celestial_altitude=round(sun_pos_gh.altitude, 1) if sun_pos_gh else None,
             astronomy_report=astro,
@@ -440,7 +466,7 @@ async def find_opportunities(
             weather_score=round(w_score_bh, 2),
             location_score=1.0,
             camera_hints=_camera_hints_blue_hour(focal_mm_bh),
-            subject_azimuth=round(subject_az, 1),
+            subject_azimuth=subject_azimuth_out,
             celestial_azimuth=round(sun_pos_bh_eve.azimuth, 1) if sun_pos_bh_eve else None,
             celestial_altitude=round(sun_pos_bh_eve.altitude, 1) if sun_pos_bh_eve else None,
             astronomy_report=astro,
@@ -481,7 +507,7 @@ async def find_opportunities(
             weather_score=round(w_score_bh_morn, 2),
             location_score=1.0,
             camera_hints=_camera_hints_blue_hour(focal_mm_bh_morn),
-            subject_azimuth=round(subject_az, 1),
+            subject_azimuth=subject_azimuth_out,
             celestial_azimuth=round(sun_pos_bh_morn.azimuth, 1) if sun_pos_bh_morn else None,
             celestial_altitude=round(sun_pos_bh_morn.altitude, 1) if sun_pos_bh_morn else None,
             astronomy_report=astro,
@@ -491,8 +517,11 @@ async def find_opportunities(
     # -----------------------------------------------------------------------
     # 3. MOND-ALIGNMENT: Mond über/nahe dem Motiv
     # -----------------------------------------------------------------------
-    moon_align_times = find_moon_alignment_times(
-        lat, lon, subject_az, target_date, tolerance_deg=5.0
+    # BUG-98 AK2: keine Mond-Alignment-Suche ohne echten Subjekt-Azimut (fehlendes oder
+    # degeneriertes Motiv) -- sonst faelschliche Alignment-Chancen bei Mondazimut nahe 0deg.
+    moon_align_times = (
+        find_moon_alignment_times(lat, lon, subject_az, target_date, tolerance_deg=5.0)
+        if subject_az is not None else []
     )
     for align_time in moon_align_times:
         # US-36: Nur Events in goldener/blauer Stunde (±30 Min. bürgerliche Dämmerung)
@@ -537,7 +566,7 @@ async def find_opportunities(
                     weather_score=round(w_s, 2),
                     location_score=1.0,
                     camera_hints=_camera_hints_moon(focal_mm),
-                    subject_azimuth=round(subject_az, 1),
+                    subject_azimuth=subject_azimuth_out,
                     celestial_azimuth=round(moon_pos.azimuth, 1),
                     celestial_altitude=round(moon_pos.altitude, 1),
                     astronomy_report=astro,
@@ -552,6 +581,7 @@ async def find_opportunities(
     has_3d_data = (
         location.subject_height_m is not None
         and location.subject_height_m > 0
+        and subject_az is not None  # BUG-98: kein 3D-Alignment ohne echtes Motiv
     )
 
     if has_3d_data:
@@ -671,7 +701,7 @@ async def find_opportunities(
                     alert_priority=priority,
                 ))
 
-    else:
+    elif subject_az is not None:
         # Fallback: Nur Azimut-Check (für Locations ohne Gebäudehöhe)
         sun_align_times = find_sun_alignment_times(lat, lon, subject_az, target_date)
         for align_time in sun_align_times:
@@ -701,7 +731,7 @@ async def find_opportunities(
                         weather_score=round(w_s, 2),
                         location_score=1.0,
                         camera_hints=_camera_hints_alignment(focal_mm, is_solar=True),
-                        subject_azimuth=round(subject_az, 1),
+                        subject_azimuth=subject_azimuth_out,
                         celestial_azimuth=round(sun_pos.azimuth, 1),
                         celestial_altitude=round(sun_pos.altitude, 1),
                         astronomy_report=astro,
@@ -767,8 +797,11 @@ async def find_opportunities(
         moon_pos_mr = get_body_position(lat, lon, "moon", moon_dt)
         moon_az_mr = round(moon_pos_mr.azimuth, 1) if moon_pos_mr else None
 
-        # US-108: Azimut-basierte Filterung – nur FRONT-Zone zeigen
-        if moon_az_mr is None or _azimuth_zone(moon_az_mr, subject_az) != AzimuthZone.FRONT:
+        # US-108: Azimut-basierte Filterung – nur FRONT-Zone zeigen (BUG-98: nur wenn
+        # ein echtes Motiv/subject_az existiert -- sonst Richtung nicht einschraenken)
+        if moon_az_mr is None:
+            continue
+        if subject_az is not None and _azimuth_zone(moon_az_mr, subject_az) != AzimuthZone.FRONT:
             continue
 
         phase_score = _score_moon_phase_for_moonshot(moon.phase_fraction)
@@ -796,7 +829,7 @@ async def find_opportunities(
                 weather_score=round(w_s_mr, 2),
                 location_score=1.0,
                 camera_hints=_camera_hints_moon(200),
-                subject_azimuth=round(subject_az, 1),
+                subject_azimuth=subject_azimuth_out,
                 celestial_azimuth=moon_az_mr,
                 celestial_altitude=round(moon_pos_mr.altitude, 1) if moon_pos_mr else None,
                 astronomy_report=astro,

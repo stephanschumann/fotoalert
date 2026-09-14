@@ -72,8 +72,10 @@ class PhotoLocation:
     observer_lon: float
 
     # Motiv (Gebäude, Landmark, Natur)
-    subject_lat: float
-    subject_lon: float
+    # BUG-98: Optional -- Kategorie-1-Panorama-Locations haben nach der Datenkorrektur
+    # bewusst kein Motiv mehr (None statt dupliziertem Beobachter-Standort).
+    subject_lat: Optional[float]
+    subject_lon: Optional[float]
     subject_name: str
     subject_height_m: Optional[float] = None    # Bauwerkshöhe (absolut, z.B. laut Wikipedia)
     subject_width_m: Optional[float] = None     # Breite (für Brennweite)
@@ -280,7 +282,10 @@ LOCATIONS: list[PhotoLocation] = [
         name="Brandenburger Tor – Tiergartenseite",
         description="Das Tor mit langer Straße des 17. Juni – Sunrise-Alignment möglich.",
         category=LocationCategory.SKYLINE,
-        observer_lat=52.5163, observer_lon=13.3777,
+        # BUG-98: Beobachter-Standpunkt recherchiert -- ca. 500m westlich des Tors auf der
+        # Strasse des 17. Juni (Tiergartenseite), Azimut Beobachter->Motiv ~90 Grad, deckt
+        # sich mit solar_alignment_note (~90 Grad) und dem bestehenden distance_m=500.
+        observer_lat=52.5163, observer_lon=13.37031,
         subject_lat=52.5163, subject_lon=13.3777,
         subject_name="Brandenburger Tor",
         subject_height_m=26, subject_width_m=65,
@@ -317,7 +322,7 @@ LOCATIONS: list[PhotoLocation] = [
         description="Erhöhter Punkt mit Blick über die Stadt, nahe Fernsehturm-Sichtachse.",
         category=LocationCategory.AUSSICHT,
         observer_lat=52.5271, observer_lon=13.4360,
-        subject_lat=52.5271, subject_lon=13.4360,
+        subject_lat=None, subject_lon=None,
         subject_name="Berlin-Panorama Richtung Mitte",
         distance_m=0,
         best_times=[BestTime.GOLDEN_EVENING, BestTime.BLUE_HOUR],
@@ -333,7 +338,7 @@ LOCATIONS: list[PhotoLocation] = [
         description="Höchster natürlicher Aussichtspunkt Berlins, Blick über Müggelsee und Wälder.",
         category=LocationCategory.AUSSICHT,
         observer_lat=52.4052, observer_lon=13.6594,
-        subject_lat=52.4052, subject_lon=13.6594,
+        subject_lat=None, subject_lon=None,
         subject_name="Müggelsee & Berliner Umland",
         subject_height_m=115,
         distance_m=0,
@@ -351,7 +356,7 @@ LOCATIONS: list[PhotoLocation] = [
         description="Weiter Seespiegel, Segelboote, Abend-Panorama in warmes Licht getaucht.",
         category=LocationCategory.WASSER,
         observer_lat=52.4271, observer_lon=13.1724,
-        subject_lat=52.4271, subject_lon=13.1724,
+        subject_lat=None, subject_lon=None,
         subject_name="Großer Wannsee",
         distance_m=0,
         best_times=[BestTime.GOLDEN_EVENING, BestTime.GOLDEN_MORNING],
@@ -417,7 +422,10 @@ LOCATIONS: list[PhotoLocation] = [
         description="Die legendäre Agentenbrücke zwischen Berlin und Potsdam. "
                     "Abendlicht über der Havel, Spiegelungen.",
         category=LocationCategory.SKYLINE,
-        observer_lat=52.4152, observer_lon=13.1168,
+        # BUG-98: Beobachter-Standpunkt recherchiert -- ca. 150m ost-suedoestlich der Bruecke
+        # auf dem oestlichen Uferweg (Berlin-Seite), Azimut Beobachter->Motiv ~280 Grad, deckt
+        # sich mit solar_alignment_note (~280 Grad) und dem bestehenden distance_m=150.
+        observer_lat=52.41497, observer_lon=13.11898,
         subject_lat=52.4152, subject_lon=13.1168,
         subject_name="Glienicker Brücke & Havel",
         subject_width_m=130,
@@ -455,7 +463,7 @@ LOCATIONS: list[PhotoLocation] = [
         description="Kleiner See im Norden Potsdams, ruhiges Wasser, Kiefern-Silhouetten beim Sonnenuntergang.",
         category=LocationCategory.WASSER,
         observer_lat=52.4389, observer_lon=13.0545,
-        subject_lat=52.4389, subject_lon=13.0545,
+        subject_lat=None, subject_lon=None,
         subject_name="Nikolaisee & Waldsilhouette",
         distance_m=0,
         best_times=[BestTime.GOLDEN_EVENING, BestTime.GOLDEN_MORNING],
@@ -475,7 +483,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "Goldene Stunde mit langen Schatten über den Äckern.",
         category=LocationCategory.NATUR,
         observer_lat=52.8027, observer_lon=12.5847,
-        subject_lat=52.8027, subject_lon=12.5847,
+        subject_lat=None, subject_lon=None,
         subject_name="Havelland Weite & Windmühlen",
         distance_m=0,
         best_times=[BestTime.GOLDEN_MORNING, BestTime.GOLDEN_EVENING, BestTime.WINTER],
@@ -492,7 +500,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "Nebel am Morgen. Unvergleichliche Atmosphäre.",
         category=LocationCategory.NATUR,
         observer_lat=51.8671, observer_lon=13.9503,
-        subject_lat=51.8671, subject_lon=13.9503,
+        subject_lat=None, subject_lon=None,
         subject_name="Spreewald-Kanal",
         distance_m=0,
         best_times=[BestTime.GOLDEN_MORNING, BestTime.BLUE_HOUR],
@@ -509,7 +517,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "(kein Lichtverschmutzung), ideal für Milchstraße.",
         category=LocationCategory.MILCHSTRASSE,
         observer_lat=53.1427, observer_lon=13.0269,
-        subject_lat=53.1427, subject_lon=13.0269,
+        subject_lat=None, subject_lon=None,
         subject_name="Stechlinsee & Milchstraße",
         distance_m=0,
         best_times=[BestTime.NIGHT],
@@ -529,7 +537,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "Hirsche in der Dämmerung.",
         category=LocationCategory.NATUR,
         observer_lat=52.9827, observer_lon=13.5764,
-        subject_lat=52.9827, subject_lon=13.5764,
+        subject_lat=None, subject_lon=None,
         subject_name="Schorfheide Buchenwald",
         distance_m=0,
         best_times=[BestTime.GOLDEN_MORNING, BestTime.WINTER],
@@ -564,7 +572,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "vor Abendhimmel oder Vollmond.",
         category=LocationCategory.NATUR,
         observer_lat=53.0025, observer_lon=11.7381,
-        subject_lat=53.0025, subject_lon=11.7381,
+        subject_lat=None, subject_lon=None,
         subject_name="Kranichzug & Elbtalaue",
         distance_m=0,
         best_times=[BestTime.GOLDEN_EVENING, BestTime.GOLDEN_MORNING],
@@ -582,7 +590,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "einer der spektakulärsten Naturphotospots Nordostdeutschlands.",
         category=LocationCategory.NATUR,
         observer_lat=54.5808, observer_lon=13.6397,
-        subject_lat=54.5808, subject_lon=13.6397,
+        subject_lat=None, subject_lon=None,
         subject_name="Rügen Kreidefelsen",
         subject_height_m=118,
         distance_m=0,
@@ -605,7 +613,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "dramatische Wolken über der Piste.",
         category=LocationCategory.INDUSTRIE,
         observer_lat=52.4734, observer_lon=13.4025,
-        subject_lat=52.4734, subject_lon=13.4025,
+        subject_lat=None, subject_lon=None,
         subject_name="THF Feld & Skyline",
         distance_m=0,
         best_times=[BestTime.GOLDEN_EVENING, BestTime.GOLDEN_MORNING],
@@ -642,7 +650,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "360°-Panorama über Berlin, Graffiti-Kuppeln.",
         category=LocationCategory.INDUSTRIE,
         observer_lat=52.4978, observer_lon=13.2404,
-        subject_lat=52.4978, subject_lon=13.2404,
+        subject_lat=None, subject_lon=None,
         subject_name="Teufelsberg Aussicht",
         subject_height_m=120,
         distance_m=0,
@@ -662,7 +670,7 @@ LOCATIONS: list[PhotoLocation] = [
                     "spiegeln sich im Wasser.",
         category=LocationCategory.WASSER,
         observer_lat=52.4490, observer_lon=13.5795,
-        subject_lat=52.4490, subject_lon=13.5795,
+        subject_lat=None, subject_lon=None,
         subject_name="Müggelspree",
         distance_m=0,
         best_times=[BestTime.GOLDEN_MORNING, BestTime.GOLDEN_EVENING],

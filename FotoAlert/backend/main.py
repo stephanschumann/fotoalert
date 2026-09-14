@@ -62,6 +62,8 @@ import rate_limit  # TASK-86: Haeufigkeits-Bremse + Login-Lockout + Token-Validi
 from calculations.astronomy import (
     calculate_subject_angular_profile,
     find_precise_alignment_times,
+    calculate_haversine_distance,        # BUG-98 AK9
+    DEGENERATE_SUBJECT_DISTANCE_M,        # BUG-98 AK9
 )
 from calculations.weather import fetch_weather_forecast, fetch_aerosol_forecast, RED_SKY_AOD_THRESHOLD, CLOUD_MOOD_PROJECTION_DISTANCE_M, RED_CLOUDS_PROJECTION_DISTANCE_M, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event, should_generate_red_clouds_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
@@ -4053,6 +4055,18 @@ async def preview_alignment(req: PreviewAlignmentRequest, request: Request = Non
         raise HTTPException(status_code=400, detail="Ungültige Fotograf-Koordinaten.")
     if not (-90 <= req.subject_lat <= 90 and -180 <= req.subject_lon <= 180):
         raise HTTPException(status_code=400, detail="Ungültige Motiv-Koordinaten.")
+    # BUG-98 AK9: identische/degenerierte Beobachter-/Motivkoordinaten wuerden sonst
+    # ein stilles, bedeutungsloses Ergebnis liefern (Azimut faelschlich 0.0 Grad/Nord,
+    # siehe calculate_subject_angular_profile()/is_degenerate) -- stattdessen ein
+    # erklaerender 400er, bevor ueberhaupt Geodaten/Ephemeriden bemueht werden.
+    if calculate_haversine_distance(
+        req.observer_lat, req.observer_lon, req.subject_lat, req.subject_lon,
+    ) < DEGENERATE_SUBJECT_DISTANCE_M:
+        raise HTTPException(
+            status_code=400,
+            detail="Beobachter- und Motivkoordinaten sind identisch bzw. zu nah beieinander "
+                   "-- keine Sichtachse berechenbar.",
+        )
 
     # BUG-66: Geländeunterschied genau einmal pro Anfrage ermitteln (nicht in der
     # Alignment-Schleife weiter unten) und in die Winkelberechnung einfließen lassen.
