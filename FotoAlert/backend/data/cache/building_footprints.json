@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T07:52:43Z",
+  "generated_at": "2026-09-14T21:40:54Z",
   "source": "brandenburg-latest.osm.pbf",
   "radius_m": 200.0,
   "location_count": 60,
@@ -17290,7 +17290,7 @@
     {
       "location_id": "brandenburger_tor_tiergarten",
       "observer_lat": 52.5163,
-      "observer_lon": 13.3777,
+      "observer_lon": 13.37031,
       "subject_lat": 52.5163,
       "subject_lon": 13.3777,
       "buildings": [
@@ -17469,6 +17469,79 @@
             [
               52.5180464,
               13.3787239
+            ]
+          ],
+          "height_m": 9.0
+        },
+        {
+          "nodes": [
+            [
+              52.5169546,
+              13.3716552
+            ],
+            [
+              52.5169613,
+              13.3717644
+            ],
+            [
+              52.5170317,
+              13.3717527
+            ],
+            [
+              52.5170777,
+              13.3717451
+            ],
+            [
+              52.5170847,
+              13.371859
+            ],
+            [
+              52.5170898,
+              13.3719417
+            ],
+            [
+              52.5170445,
+              13.3719492
+            ],
+            [
+              52.5169706,
+              13.3719615
+            ],
+            [
+              52.5169776,
+              13.3720748
+            ],
+            [
+              52.5170337,
+              13.3720655
+            ],
+            [
+              52.517119,
+              13.3720513
+            ],
+            [
+              52.517112,
+              13.3719375
+            ],
+            [
+              52.517107,
+              13.3718564
+            ],
+            [
+              52.5171055,
+              13.3718314
+            ],
+            [
+              52.5171021,
+              13.3717764
+            ],
+            [
+              52.5170932,
+              13.3716321
+            ],
+            [
+              52.5169546,
+              13.3716552
             ]
           ],
           "height_m": 9.0
@@ -17751,6 +17824,249 @@
             ]
           ],
           "height_m": 12.0
+        },
+        {
+          "nodes": [
+            [
+              52.5174267,
+              13.3709235
+            ],
+            [
+              52.5173225,
+              13.370913
+            ],
+            [
+              52.5173264,
+              13.3708098
+            ],
+            [
+              52.5174305,
+              13.3708203
+            ],
+            [
+              52.5174267,
+              13.3709235
+            ]
+          ],
+          "height_m": 3.0
+        },
+        {
+          "nodes": [
+            [
+              52.5166861,
+              13.3719748
+            ],
+            [
+              52.5166864,
+              13.3720083
+            ],
+            [
+              52.516681,
+              13.372093
+            ],
+            [
+              52.5166685,
+              13.3721757
+            ],
+            [
+              52.5166477,
+              13.3722593
+            ],
+            [
+              52.5166225,
+              13.3723299
+            ],
+            [
+              52.5165256,
+              13.3722322
+            ],
+            [
+              52.5165319,
+              13.3722188
+            ],
+            [
+              52.5165487,
+              13.3721715
+            ],
+            [
+              52.5165629,
+              13.3721144
+            ],
+            [
+              52.5165715,
+              13.3720579
+            ],
+            [
+              52.5165752,
+              13.3720001
+            ],
+            [
+              52.516574,
+              13.3719419
+            ],
+            [
+              52.5165678,
+              13.3718846
+            ],
+            [
+              52.5165569,
+              13.3718292
+            ],
+            [
+              52.5165413,
+              13.3717769
+            ],
+            [
+              52.5165215,
+              13.3717287
+            ],
+            [
+              52.5164905,
+              13.3716754
+            ],
+            [
+              52.516573,
+              13.3715472
+            ],
+            [
+              52.5166078,
+              13.3716108
+            ],
+            [
+              52.5166368,
+              13.3716814
+            ],
+            [
+              52.5166596,
+              13.3717581
+            ],
+            [
+              52.5166756,
+              13.3718391
+            ],
+            [
+              52.516679,
+              13.3718707
+            ],
+            [
+              52.5167185,
+              13.371864
+            ],
+            [
+              52.516725,
+              13.3719681
+            ],
+            [
+              52.5166861,
+              13.3719748
+            ]
+          ],
+          "height_m": 0.2
+        },
+        {
+          "nodes": [
+            [
+              52.5165758,
+              13.3716477
+            ],
+            [
+              52.5165517,
+              13.3716825
+            ],
+            [
+              52.516577,
+              13.3717415
+            ],
+            [
+              52.5165952,
+              13.3718029
+            ],
+            [
+              52.516608,
+              13.3718678
+            ],
+            [
+              52.5166114,
+              13.3718993
+            ],
+            [
+              52.5165946,
+              13.3719027
+            ],
+            [
+              52.5165984,
+              13.3719586
+            ],
+            [
+              52.5166152,
+              13.3719569
+            ],
+            [
+              52.5166167,
+              13.3720034
+            ],
+            [
+              52.5166124,
+              13.3720713
+            ],
+            [
+              52.5166023,
+              13.3721376
+            ],
+            [
+              52.5165859,
+              13.3721886
+            ],
+            [
+              52.5166132,
+              13.3722167
+            ],
+            [
+              52.5166287,
+              13.3721528
+            ],
+            [
+              52.5166413,
+              13.3720804
+            ],
+            [
+              52.5166467,
+              13.3720201
+            ],
+            [
+              52.5166486,
+              13.3719648
+            ],
+            [
+              52.5166643,
+              13.3719623
+            ],
+            [
+              52.5166619,
+              13.3718813
+            ],
+            [
+              52.5166423,
+              13.3718817
+            ],
+            [
+              52.5166386,
+              13.3718477
+            ],
+            [
+              52.5166238,
+              13.3717791
+            ],
+            [
+              52.516603,
+              13.3717129
+            ],
+            [
+              52.5165758,
+              13.3716477
+            ]
+          ],
+          "height_m": 9.0
         },
         {
           "nodes": [
@@ -22156,8 +22472,8 @@
       "location_id": "elbtalaue_wittenberge",
       "observer_lat": 53.0025,
       "observer_lon": 11.7381,
-      "subject_lat": 53.0025,
-      "subject_lon": 11.7381,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -36523,8 +36839,8 @@
     },
     {
       "location_id": "glienicker_brucke",
-      "observer_lat": 52.4152,
-      "observer_lon": 13.1168,
+      "observer_lat": 52.41497,
+      "observer_lon": 13.11898,
       "subject_lat": 52.4152,
       "subject_lon": 13.1168,
       "buildings": []
@@ -134797,8 +135113,8 @@
       "location_id": "muggelspree_kopenick",
       "observer_lat": 52.449,
       "observer_lon": 13.5795,
-      "subject_lat": 52.449,
-      "subject_lon": 13.5795,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -138126,8 +138442,8 @@
       "location_id": "muggelturm",
       "observer_lat": 52.4052,
       "observer_lon": 13.6594,
-      "subject_lat": 52.4052,
-      "subject_lon": 13.6594,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -148784,8 +149100,8 @@
       "location_id": "nikolaisee_potsdam",
       "observer_lat": 52.4389,
       "observer_lon": 13.0545,
-      "subject_lat": 52.4389,
-      "subject_lon": 13.0545,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -164803,8 +165119,8 @@
       "location_id": "rügen_kreidefelssen_jasmund",
       "observer_lat": 54.5808,
       "observer_lon": 13.6397,
-      "subject_lat": 54.5808,
-      "subject_lon": 13.6397,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": []
     },
     {
@@ -164862,7 +165178,7 @@
               13.0693474
             ]
           ],
-          "height_m": 10.0
+          "height_m": 9.0
         },
         {
           "nodes": [
@@ -181809,16 +182125,16 @@
       "location_id": "schorfheide_herbst",
       "observer_lat": 52.9827,
       "observer_lon": 13.5764,
-      "subject_lat": 52.9827,
-      "subject_lon": 13.5764,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": []
     },
     {
       "location_id": "schweriner_see_havelland",
       "observer_lat": 52.8027,
       "observer_lon": 12.5847,
-      "subject_lat": 52.8027,
-      "subject_lon": 12.5847,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -182647,8 +182963,8 @@
       "location_id": "spreewald_kanal",
       "observer_lat": 51.8671,
       "observer_lon": 13.9503,
-      "subject_lat": 51.8671,
-      "subject_lon": 13.9503,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -189879,8 +190195,8 @@
       "location_id": "stechlin_see",
       "observer_lat": 53.1427,
       "observer_lon": 13.0269,
-      "subject_lat": 53.1427,
-      "subject_lon": 13.0269,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": []
     },
     {
@@ -197068,8 +197384,8 @@
       "location_id": "tempelhofer_feld_landebahn",
       "observer_lat": 52.4734,
       "observer_lon": 13.4025,
-      "subject_lat": 52.4734,
-      "subject_lon": 13.4025,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": []
     },
     {
@@ -198289,8 +198605,8 @@
       "location_id": "teufelsberg",
       "observer_lat": 52.4978,
       "observer_lon": 13.2404,
-      "subject_lat": 52.4978,
-      "subject_lon": 13.2404,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -201821,8 +202137,8 @@
       "location_id": "volkspark_friedrichshain_wasserturm",
       "observer_lat": 52.5271,
       "observer_lon": 13.436,
-      "subject_lat": 52.5271,
-      "subject_lon": 13.436,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": [
         {
           "nodes": [
@@ -202761,8 +203077,8 @@
       "location_id": "wannsee_strandbad",
       "observer_lat": 52.4271,
       "observer_lon": 13.1724,
-      "subject_lat": 52.4271,
-      "subject_lon": 13.1724,
+      "subject_lat": null,
+      "subject_lon": null,
       "buildings": []
     }
   ]
