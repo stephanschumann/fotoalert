@@ -72,8 +72,8 @@ class KnownLocation(NamedTuple):
     location_id: str
     observer_lat: float
     observer_lon: float
-    subject_lat: float
-    subject_lon: float
+    subject_lat: Optional[float]
+    subject_lon: Optional[float]
 
 
 # ---------------------------------------------------------------------------
@@ -175,7 +175,11 @@ def extract_buildings_for_locations(
         c_lat, c_lon = centroid
         height_m = _building_height(way.tags)
         for loc in locations:
-            near_subject = _haversine_m(c_lat, c_lon, loc.subject_lat, loc.subject_lon) <= radius_m
+            near_subject = (
+                loc.subject_lat is not None
+                and loc.subject_lon is not None
+                and _haversine_m(c_lat, c_lon, loc.subject_lat, loc.subject_lon) <= radius_m
+            )
             near_observer = _haversine_m(c_lat, c_lon, loc.observer_lat, loc.observer_lon) <= radius_m
             if near_subject or near_observer:
                 result[loc.location_id].append({

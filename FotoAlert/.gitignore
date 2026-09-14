@@ -17,10 +17,14 @@ backend/data/location_images/
 # FUSE-Reste (entstehen bei gleichzeitigem Datei-Zugriff über den gemounteten
 # Cowork-Ordner, z.B. während paralleler Server-/Precompute-Läufe)
 backend/data/.fuse_hidden*
+backend/data_dev/.fuse_hidden*
 
 # Kanban-Sync-Zwischenordner (tools/sync_kanban.py)
 tools/_kanban_out/
 tools/_kanban_tmp/
+
+# Aufräum-Sammelordner vor manueller Löschung durch Stephan (kein Löschen ohne Freigabe)
+_to_delete*/
 
 # Python-Artefakte
 __pycache__/
