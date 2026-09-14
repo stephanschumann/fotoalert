@@ -528,14 +528,15 @@ Stephan hat entschieden: die im „✅ Erledigt"-Abschnitt gefundenen 41 Alt-Ein
 
 ## 🐛 BugFixes
 
-### BUG-112 · Wöchentlicher Gebäudedaten-Extract crasht komplett bei Locations ohne Motivkoordinaten `[ ]`
+### BUG-112 · Wöchentlicher Gebäudedaten-Extract crasht komplett bei Locations ohne Motivkoordinaten `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | BugFix |
 | **Priorität** | Hoch |
-| **Status** | In Test |
+| **Status** | Done |
 | **Erstellt** | 2026-09-14 |
+| **Abgeschlossen** | 2026-09-14 |
 
 **Beschreibung:** Der wöchentliche GitHub-Actions-Workflow „Update Building Footprint Data" (`.github/workflows/update-building-data.yml`, TASK-59 Option E) schlägt bei jedem Lauf komplett fehl (zuletzt Run #34821982465, Job „Gebäudedaten aus Geofabrik-Auszug extrahieren", Schritt „Gebäudedaten extrahieren"): `extract_buildings_for_locations()` in `backend/tools/extract_building_data.py` (ca. Zeile 178) ruft `_haversine_m(c_lat, c_lon, loc.subject_lat, loc.subject_lon)` ohne None-Prüfung auf. 13 der 60 Locations in `backend/data/locations.py` haben bewusst `subject_lat=None`/`subject_lon=None` (reine Panorama-/Landschaftsmotive ohne festen Gebäude-Bezugspunkt, seit BUG-98 Kategorie 1 — gewolltes Datenmodell, kein Datenfehler). Sobald die Iteration über die Ways eine dieser 13 Locations erreicht, bricht das gesamte Skript mit `TypeError: must be real number, not NoneType` (Exit Code 1) ab — die Gebäudedaten-Datei wird dadurch bei JEDEM automatischen Lauf gar nicht aktualisiert, nicht nur unvollständig für diese 13 Locations, sondern komplett blockiert für alle 60.
 
@@ -728,13 +729,24 @@ neue Lücke.
       tests/test_bug112_extract_building_data.py -v`, mit installiertem FastAPI/skyfield-Stack
       oder nach Behebung der conftest-Abhängigkeit) — das ist eine Pflicht-Folgeaufgabe der
       Implementierungsphase, nicht der Analysephase.
-- [ ] Manuell: `cd backend && python3 tools/extract_building_data.py --pbf <region>.osm.pbf
-      --output data/cache/building_footprints.json --radius 200` gegen einen echten
-      Geofabrik-Auszug ausführen (Stephans Mac, `osmium` installiert) — erwartet: Exit Code 0,
-      `location_count: 60` in der Ausgabedatei, keine der 13 Motivkoordinaten-losen Locations
-      fehlt. Zusätzlich den GitHub-Actions-Workflow „Update Building Footprint Data" manuell
-      antriggern (`workflow_dispatch` falls vorhanden, sonst nächsten planmäßigen Lauf
-      beobachten) und Run-Log auf Exit Code 0 prüfen.
+- [x] Manuell: GitHub-Actions-Workflow „Update Building Footprint Data" per `workflow_dispatch`
+      manuell angetriggert (Run https://github.com/stephanschumann/fotoalert/actions/runs/34899503626)
+      — lief gegen den echten Geofabrik-Brandenburg-Auszug durch alle 60 Locations (inkl. der
+      13 ohne Motivkoordinaten), von Stephan als grün bestätigt (2026-09-14). Ersetzt den
+      lokalen Testplan-Schritt (kein `osmium`/PBF-Auszug in der Sandbox verfügbar) durch die
+      stärkere, echte CI-Verifikation gegen Produktionsdaten.
+
+**Release-/Live-Verifikation (2026-09-14):** Vier Dateien committed (`extract_building_data.py`
+Fix, `test_bug112_extract_building_data.py`, `BACKLOG.md`, `.gitignore`), Merge mit 4
+zwischenzeitlich auf `origin/main` gelandeten Commits nötig (lokaler Checkout war veraltet,
+inhaltlich keine Konflikte außer einem reinen Formulierungs-Konflikt bei TASK-109, zugunsten der
+BUG-112-Ergänzung aufgelöst) — gepusht als Merge-Commit `249ed12`. Kein `release.sh`-Lauf nötig:
+reiner Backend-Tooling-Fix für den separaten wöchentlichen Workflow, keine App-Versionsänderung/
+kein Deploy betroffen (`update-building-data.yml` hat bewusst keinen Deploy-Trigger, siehe
+Kommentarkopf der Workflow-Datei). Live-Verifikation direkt über einen manuell angetriggerten
+echten Lauf des betroffenen Workflows (nicht nur Health-Check/Rauchtest, da keine App-Seite
+berührt) — grün, siehe Testplan oben. Automatisierter pytest-Lauf zusätzlich von Stephan auf
+seinem Mac real bestätigt (6/6 grün, siehe Testphase).
 
 ---
 
