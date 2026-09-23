@@ -1626,7 +1626,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.22.70';
+const APP_VERSION = '1.23.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -7097,7 +7097,7 @@ const LocationDetail = {
 
       ${loc.locationscout_url && isSafeUrl(loc.locationscout_url) ? mkSec('loc_links',`${ic('i-link',15)} Links`,`<a class="loc-maps-btn" href="${esc(loc.locationscout_url)}" target="_blank" style="margin-top:4px">${ic('i-camera',13)} Locationscout</a>`) : ''}
 
-      ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locEvents')">i</button>`,`<div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
+      ${mkSec('loc_events',`${ic('i-cal',15)} Nächste Events <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locEvents')">i</button> <button class="el-info-btn" onclick="event.stopPropagation();LocationDetail.toggleEventFilter()" title="Nach Ereignistyp filtern">${ic('i-filter',9)}</button>`,`<div id="loc-events-filter-panel" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div><div id="loc-events-content"><div class="empty" style="padding:20px"><div class="spinner"></div></div></div>`)}
 
       ${mkSec('loc_rating',`${ic('i-starfill',15)} Bewertung`,`${Rating.inputHtml(loc.id)}`)}
 
@@ -7105,17 +7105,97 @@ const LocationDetail = {
     `;
   },
 
+  // US-137: lokaler Ereignistyp-Filter im "Nächste Events"-Abschnitt — unabhängig
+  // vom globalen Header-Filter (AK5), referenziert aber dieselbe Datenquelle
+  // FilterSheet._ET (AK6, strukturell garantiert statt einer zweiten, separat
+  // gepflegten Liste). AK7: wird bewusst NICHT persistiert — _loadEvents() setzt
+  // ihn bei jedem Öffnen der Detailansicht (auch für dieselbe Location) zurück.
+  _eventTypeFilter: [],
+
+  toggleEventFilter() {
+    const panel = document.getElementById('loc-events-filter-panel');
+    if (!panel) return;
+    const showing = panel.style.display === 'flex';
+    if (showing) { panel.style.display = 'none'; return; }
+    panel.style.display = 'flex';
+    this._renderEventFilterPanel();
+  },
+  _renderEventFilterPanel() {
+    const panel = document.getElementById('loc-events-filter-panel');
+    if (!panel) return;
+    const active = this._eventTypeFilter;
+    const chipStyle = 'font-size:11px;padding:4px 9px';
+    const allChip = `<span class="filter-chip${active.length===0?' active':''}" style="${chipStyle}" onclick="LocationDetail._resetEventTypeFilter()">Alle</span>`;
+    // AK6: exakt dieselbe Liste wie FilterSheet._ET — kein eigener, zweiter
+    // Ereignistyp-Katalog. AK12: wird IMMER vollständig angeboten, auch wenn der
+    // Standort kein Motiv hat (die gefilterte Liste zeigt dann konsequent den
+    // Leerzustand aus AK10, keinen Fehler).
+    const typeChips = FilterSheet._ET.map(([v, l]) =>
+      `<span class="filter-chip${active.includes(v)?' active':''}" style="${chipStyle}" onclick="LocationDetail._toggleEventType('${v.replace(/'/g, "\\'")}')">${esc(l)}</span>`
+    ).join('');
+    panel.innerHTML = allChip + typeChips;
+  },
+  _toggleEventType(v) {
+    const i = this._eventTypeFilter.indexOf(v);
+    if (i === -1) this._eventTypeFilter.push(v); else this._eventTypeFilter.splice(i, 1);
+    this._renderEventFilterPanel();
+    this._renderEventsList();
+  },
+  _resetEventTypeFilter() {
+    this._eventTypeFilter = [];
+    this._renderEventFilterPanel();
+    this._renderEventsList();
+  },
+
   async _loadEvents(locId) {
+    // AK7: lokaler Filter startet bei jedem Öffnen wieder bei "alle Typen".
+    this._eventTypeFilter = [];
+    const panel = document.getElementById('loc-events-filter-panel');
+    if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
+
+    this._eventsLoading = true;
+    this._eventsError = false;
+    this._rawEvents = null;
+    this._renderEventsList();  // AK8: Ladeanzeige statt leerer/eingefrorener Fläche
+
+    const loc = this._current;
     try {
-      const data = await API.get(`/opportunities?location_id=${locId}&days=30&min_score=0.3`);
-      const el = document.getElementById('loc-events-content');
-      if (!el) return;
+      let data = [];
+      // AK12: kein Motiv/keine Sichtachse -> /plan kann geometrisch nichts
+      // berechnen (subject_lat/subject_lon sind Pflichtparameter) - der Aufruf
+      // wird gar nicht erst gestartet, das Ergebnis bleibt konsistent leer statt
+      // einen technischen Fehler (422) zu provozieren.
+      if (loc && loc.subject_lat != null && loc.subject_lon != null) {
+        // US-137: /plan (bisher ungenutzter On-Demand-Endpunkt, TASK-25) statt des
+        // bisherigen festen 30-Tage-Feed-Horizonts (/opportunities?days=30) -
+        // findet das nächste tatsächliche Sonnen-Alignment auch über 30 Tage
+        // hinaus, bis zur backend-seitigen Obergrenze von 365 Tagen (AK1/AK2).
+        const params = new URLSearchParams({
+          observer_lat: loc.observer_lat, observer_lon: loc.observer_lon,
+          subject_lat: loc.subject_lat, subject_lon: loc.subject_lon,
+          subject_name: loc.subject_name || 'Motiv',
+          subject_height_m: loc.subject_height_m || 0,
+          subject_width_m: loc.subject_width_m || 0,
+          elevation_difference_m: loc.elevation_difference_m || 0,
+          observer_floor_height_m: loc.observer_floor_height_m || 0,
+          days: 365,
+          min_score: 0.3,
+        });
+        const resp = await API.get(`/plan?${params.toString()}`);
+        data = (resp && resp.events) || [];
+      }
+
+      this._eventsLoading = false;
+      this._rawEvents = data;
+
       // US-107: Heutiges Event für Sonnen-Azimut im Ausrichtungs-Abschnitt
+      // (unverändert, arbeitet bewusst auf den UNGEFILTERTEN Rohdaten - der
+      // lokale Ereignistyp-Filter betrifft nur die Event-Liste, nicht diesen
+      // separaten "Heute"-Block).
       const todayStr = new Date().toISOString().slice(0, 10);
       const todayEvt = (data && data.length) ? data.find(e => e.sunrise_utc && e.sunrise_utc.slice(0, 10) === todayStr) : null;
       const sunEl = document.getElementById('loc-sun-today');
       if (sunEl && todayEvt) {
-        const loc = this._current;
         const srAz = todayEvt.sunrise_azimuth;
         const ssAz = todayEvt.sunset_azimuth;
         const fmt2 = iso => new Date(iso).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
@@ -7145,38 +7225,83 @@ const LocationDetail = {
           </div>`;
       }
 
-      if (!data || data.length === 0) {
-        el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Keine Events in den nächsten 30 Tagen.</p>';
-        return;
-      }
-      const eventIcon = e => {
-        const t = (e.event_type||'').toLowerCase();
-        if (t.includes('moon')) return 'i-moon';
-        if (t.includes('sun')||t.includes('sonn')) return 'i-sun';
-        if (t.includes('milch')||t.includes('milky')) return 'i-milkyway';
-        if (t.includes('gold')) return 'i-sunrise';
-        if (t.includes('blue')||t.includes('blau')) return 'i-moon';
-        return 'i-star';
-      };
-      const fmt = iso => {
-        const d = new Date(iso);
-        return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) + ' ' +
-               d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-      };
-      const rows = data.slice(0, 8).map(e => `
-        <div class="loc-next-event-row" onclick="LocationDetail.close();setTimeout(()=>Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')}),300)">
-          <div class="loc-next-event-icon">${ic(eventIcon(e),18)}</div>
-          <div class="loc-next-event-body">
-            <div class="loc-next-event-title">${esc(e.title)}</div>
-            <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
-          </div>
-          <div class="loc-next-event-score">${Math.round((e.overall_score||0)*100)}%</div>
-        </div>`).join('');
-      el.innerHTML = rows;
+      this._renderEventsList();
     } catch(err) {
-      const el = document.getElementById('loc-events-content');
-      if (el) el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Events konnten nicht geladen werden.</p>';
+      this._eventsLoading = false;
+      this._eventsError = true;
+      this._renderEventsList();
     }
+  },
+
+  // US-137 AK2/AK8/AK9/AK10: rendert den "Nächste Events"-Listenbereich für den
+  // aktuellen Lade-/Fehler-/Filterzustand. Getrennt von _loadEvents(), damit ein
+  // Filterwechsel (_toggleEventType/_resetEventTypeFilter) die Liste ohne neuen
+  // Netzwerk-Request neu rendern kann.
+  _renderEventsList() {
+    const el = document.getElementById('loc-events-content');
+    if (!el) return;
+
+    if (this._eventsLoading) {  // AK8
+      el.innerHTML = '<div class="empty" style="padding:20px"><div class="spinner"></div></div>';
+      return;
+    }
+    if (this._eventsError) {  // AK9
+      el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Events konnten nicht geladen werden. Bitte später erneut versuchen.</p>';
+      return;
+    }
+
+    const raw = this._rawEvents || [];
+    if (raw.length === 0) {  // AK2 (auch AK12: kein Motiv -> konsistent derselbe Leerzustand)
+      el.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0">Kein bevorstehendes Sonnen-Alignment für diesen Standort in den nächsten 365 Tagen gefunden.</p>';
+      return;
+    }
+
+    // BUG-91/US-132 (Konsistenz mit dem globalen Filter, FilterSheet.apply()): "Goldene
+    // Stunde"/"Blaue Stunde" sind im Backend jeweils zwei event_type-Werte (Morgen/Abend) -
+    // ohne diese Erweiterung würde der Chip "Goldene Stunde" hier fälschlich immer den
+    // AK10-Leerzustand zeigen, obwohl es echte Treffer gibt.
+    const _ET_EXPAND = {
+      'Goldene Stunde': ['Goldene Stunde Abend', 'Goldene Stunde Morgen'],
+      'Blaue Stunde':   ['Blaue Stunde', 'Blaue Stunde Morgen'],
+    };
+    const activeFilter = this._eventTypeFilter;
+    const expandedFilter = activeFilter.flatMap(t => _ET_EXPAND[t] || [t]);
+    const filtered = activeFilter.length
+      ? raw.filter(e => expandedFilter.includes(e.event_type))
+      : raw;
+
+    if (filtered.length === 0) {  // AK10
+      const labels = activeFilter
+        .map(v => { const m = FilterSheet._ET.find(([fv]) => fv === v); return m ? m[1] : v; })
+        .join(', ');
+      el.innerHTML = `<p style="font-size:13px;color:var(--muted);padding:8px 0">Keine ${esc(labels)}-Ereignisse gefunden.</p>`;
+      return;
+    }
+
+    const eventIcon = e => {
+      const t = (e.event_type||'').toLowerCase();
+      if (t.includes('moon')) return 'i-moon';
+      if (t.includes('sun')||t.includes('sonn')) return 'i-sun';
+      if (t.includes('milch')||t.includes('milky')) return 'i-milkyway';
+      if (t.includes('gold')) return 'i-sunrise';
+      if (t.includes('blue')||t.includes('blau')) return 'i-moon';
+      return 'i-star';
+    };
+    const fmt = iso => {
+      const d = new Date(iso);
+      return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) + ' ' +
+             d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    };
+    const rows = filtered.slice(0, 8).map(e => `
+      <div class="loc-next-event-row" onclick="LocationDetail.close();setTimeout(()=>Detail.open(${JSON.stringify(e).replace(/"/g,'&quot;')}),300)">
+        <div class="loc-next-event-icon">${ic(eventIcon(e),18)}</div>
+        <div class="loc-next-event-body">
+          <div class="loc-next-event-title">${esc(e.title)}</div>
+          <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
+        </div>
+        <div class="loc-next-event-score">${Math.round((e.overall_score||0)*100)}%</div>
+      </div>`).join('');
+    el.innerHTML = rows;
   }
 };
 
