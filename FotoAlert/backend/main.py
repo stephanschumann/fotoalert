@@ -132,6 +132,9 @@ app.add_middleware(
 _preview_alignment_limiter = rate_limit.SlidingWindowRateLimiter(max_calls=20, window_seconds=60)
 _login_lockout = rate_limit.LoginLockout(max_failures=5, window_seconds=15 * 60)
 _register_device_limiter = rate_limit.SlidingWindowRateLimiter(max_calls=10, window_seconds=60)
+# US-137 (AK11): dieselbe Häufigkeits-Bremse wie bei /preview-alignment (20/60s) —
+# /plan ist ebenfalls ein rechenintensiver, stateless On-Demand-Endpunkt.
+_plan_limiter = rate_limit.SlidingWindowRateLimiter(max_calls=20, window_seconds=60)
 
 # ---------------------------------------------------------------------------
 # Cache-Pfade
@@ -3433,6 +3436,7 @@ async def get_plan(
     observer_floor_height_m: float = 0.0,
     days: int = 14,
     min_score: float = 0.35,
+    request: Request = None,
 ) -> dict:
     """
     TASK-25 / AK2: On-Demand-Plan für **beliebige** Koordinaten weltweit — ohne
@@ -3442,6 +3446,19 @@ async def get_plan(
     Geländehöhe: wird automatisch über den Elevation-Provider aufgelöst, wenn
     `elevation_difference_m` nicht angegeben ist. Fehlt die DEM-Abdeckung, läuft
     die Rechnung mit 0 weiter und `elevation_incomplete=true` markiert das.
+
+    US-137 (Option A, Weg-Gate Stephan): dieser bis dahin ungenutzte Endpunkt wird
+    jetzt vom Frontend aktiv genutzt (`LocationDetail._loadEvents()`, ersetzt den
+    bisherigen festen 30-Tage-Feed-Horizont) und deshalb wie `/preview-alignment`
+    gehärtet:
+      - Häufigkeits-Bremse (`_plan_limiter`, 20 Aufrufe/60s, AK11) — analog
+        `_preview_alignment_limiter`. `request` hat einen Default von `None`, damit
+        Direktaufrufe der Funktion ohne HTTP-Layer (z.B. Unit-Tests) unverändert
+        funktionieren; FastAPI liefert bei echten HTTP-Requests immer ein echtes
+        Request-Objekt, die Bremse greift also im echten Betrieb unverändert.
+      - Harte Tages-Obergrenze von 365 Tagen (`days = min(days, 365)`), analog zum
+        Cap-Muster aus BUG-63 (`days = min(req.days, 14)` bei /preview-alignment) —
+        verhindert einen unbegrenzt wachsenden On-Demand-Lauf.
     """
     from datetime import date as _date
     from data.locations import PhotoLocation, LocationCategory
@@ -3450,6 +3467,10 @@ async def get_plan(
     from calculations.window_engine import WindowEphemeris
     from precompute import _serialize
     import calculations.astronomy as _astro
+
+    if request is not None:
+        rate_limit.enforce_rate_limit(_plan_limiter, request)
+    days = min(days, 365)
 
     elevation_incomplete = False
     if elevation_difference_m is None:
@@ -3471,12 +3492,34 @@ async def get_plan(
     _astro.set_active_window(WindowEphemeris(observer_lat, observer_lon, start, days))
     try:
         opps = await _fomd(loc, start, days, None, min_score=min_score, astronomy_only=True)
+        # US-137 Performance-Fix 3 (2026-09-18, per cProfile GEGEN DEN ECHTEN
+        # ENDPUNKT-CODEPFAD bestätigt, nicht nur gegen die isolierte
+        # find_opportunities_multi_day-Funktion): _serialize() (precompute.py)
+        # berechnet pro Event bis zu 4x sunrise_azimuth/sunset_azimuth/
+        # moonrise_azimuth/moonset_azimuth via get_body_position(). Stand vorher
+        # geschah das ERST NACH `_astro.clear_active_window()` (unten) — ohne
+        # aktives Fenster fällt get_body_position() für JEDEN einzelnen Aufruf
+        # auf die langsame, nicht vektorisierte Direkt-Skyfield-Berechnung
+        # zurück (jeweils inkl. eigener Nutations-Matrix). Bei 365 Tagen/~1300
+        # Events macht das >1000 zusätzliche Einzel-Skyfield-Calls, die laut
+        # Profiling den GRÖSSTEN Teil der gemessenen Differenz zwischen der
+        # (isoliert schnellen) find_opportunities_multi_day-Berechnung und der
+        # tatsächlichen /plan-Antwortzeit ausmachten. Fix: Serialisierung läuft
+        # jetzt INNERHALB des try-Blocks, VOR `clear_active_window()` — dieselben
+        # get_body_position()-Aufrufe treffen so den schnellen, bereits
+        # aufgebauten Fenster-Array-Interpolationspfad. Ergebnis bitgenau
+        # unverändert (window-interpolierte und direkte Skyfield-Position sind
+        # bereits an jeder anderen Stelle dieser Engine austauschbar, siehe
+        # `_interp_angle_pre`-Docstring). `clear_active_window()` bleibt im
+        # `finally`, damit der globale Fenster-State auch bei einer Exception
+        # während der Serialisierung sauber zurückgesetzt wird.
+        events = [_serialize(o) for o in opps]
     finally:
         _astro.clear_active_window()
     return {"status": "ok", "on_demand": True, "days": days,
             "elevation_difference_m": elevation_difference_m,
             "elevation_incomplete": elevation_incomplete,
-            "count": len(opps), "events": [_serialize(o) for o in opps]}
+            "count": len(opps), "events": events}
 
 
 @app.get("/daily-briefing", response_model=DailyBriefingOut)
