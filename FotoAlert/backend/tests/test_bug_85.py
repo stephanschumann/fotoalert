@@ -238,7 +238,16 @@ def test_bug85_full_feed_filtered_to_zero_header_must_not_stay_stale():
         # ein komplett neuer Chromium-Prozess, gestartet NACHDEM der Frontend-Check-
         # Schritt bereits ca. 2:30 Min gelaufen war, trifft gelegentlich auf einen
         # ausgelasteten Runner. 30s als Puffer.
-        page.set_default_timeout(30000)
+        # US-137-Nachtrag (2026-09-24, Run #360/0fda687): 30000ms reichte in DIESEM
+        # Lauf erneut nicht -- Traceback zeigte 'Page.goto: Timeout 30000ms exceeded'
+        # an derselben Stelle. Anders als beim Mobile-Pass (seit der 30s-Erhoehung in
+        # Run #358 kein einziger weiterer Fehlschlag) ist dieser Test der SPAETESTE
+        # frische Browser-Start im gesamten Job -- er laeuft erst nach dem kompletten
+        # "Frontend-Check ausfuehren"-Schritt (~3:19 Min) UND nach test_bug85_regression_
+        # today_only_empty_tagline_is_intentional() im selben Prozess. Auf 60s verdoppelt,
+        # gleiche Verdopplungs-Logik wie beim Health-Check-Timeout (2s->10s) und dem
+        # Mobile-Pass (15s->30s), die seither stabil blieben.
+        page.set_default_timeout(60000)
         try:
             _login_and_reach_feed(page)
             _reset_filter_to_default(page)

@@ -94,6 +94,18 @@ def test_task66_click_flows_end_to_end():
         screenshot_root=Path(__file__).resolve().parents[2] / "docs" / "qa-screenshots",
         headless=True,
         host_password=HOST_PASSWORD,
+        # US-137-Nachtrag (2026-09-24, Run #360/0fda687): erster jemals beobachteter
+        # Fehlschlag dieses Tests -- Traceback zeigte 'Page.goto: Timeout 15000ms
+        # exceeded' beim allerersten page.goto() dieses run_checks()-Laufs. run_checks()
+        # startet hier (anders als der Desktop-Pass in run_frontend_check.py, der als
+        # ERSTER Browser im Job laeuft und nie auffaellig war) einen KOMPLETT neuen
+        # Chromium-Prozess ganz am Ende des "Backend-Playwright-Tests ausfuehren"-
+        # Schritts, nach dem gesamten "Frontend-Check ausfuehren"-Schritt (~3:19 Min)
+        # UND den vorherigen pytest-Funktionen im selben Prozess -- exakt dieselbe
+        # Ursachen-Kategorie wie bei den bereits behobenen Timeouts. Nur dieser eine
+        # Aufruf bekommt den Override; der Funktions-Default (15000ms, Zeile 220 in
+        # run_frontend_check.py) bleibt fuer den unauffaelligen Desktop-Pass unveraendert.
+        timeout_ms=30000,
     )
 
     task66_prefixes = (
