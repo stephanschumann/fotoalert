@@ -3147,7 +3147,19 @@ def run_mobile_checks(
     password: str,
     screenshot_root: Path,
     headless: bool = True,
-    timeout_ms: int = 15000,
+    # US-137-Nachtrag (2026-09-24, Run #357/68fff3c): 15000ms war fuer den allerersten
+    # page.goto() dieses Passes knapp zu eng -- Traceback zeigte
+    # "playwright._impl._errors.TimeoutError: Page.goto: Timeout 15000ms exceeded"
+    # direkt beim Start des Mobile-Passes (frischer Browser-Context, NACH bereits
+    # ca. 2:40 Min Desktop-Pass-Aktivitaet). Der Desktop-Pass selbst (identischer
+    # 15s-Default, Zeile 256) war im selben Lauf nicht betroffen -- der neue,
+    # frische Chromium-Context scheint direkt nach der Desktop-Teardown-Phase
+    # besonders anfaellig fuer Runner-Auslastungsspitzen zu sein. Gleiche
+    # Diagnose-Kategorie wie die drei bereits behobenen Timeouts in spec.py und
+    # run_frontend_check.py (Marker-Wait). Nur dieser Default (Mobile-Pass) erhoeht,
+    # der Desktop-Pass-Default bleibt unveraendert, da dort keine Auffaelligkeit
+    # belegt ist.
+    timeout_ms: int = 30000,
 ) -> List["Finding"]:
     """Mobile-Viewport-Pass: iPhone-14-Dimensionen, isMobile=True.
 
