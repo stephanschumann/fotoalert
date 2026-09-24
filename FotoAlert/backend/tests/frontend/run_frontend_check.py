@@ -730,10 +730,15 @@ def _check_location_create(page, commit: str, shot):
         # MapView.loadMarkers() auf (falls MapView.map bereits initialisiert ist,
         # siehe Baseline oben) — echtes Warten auf die dadurch gestiegene
         # MapView.markers.length statt eines Sleeps.
+        # US-137-Nachtrag (2026-09-24): 20000ms reichte auf dem GitHub-Actions-Runner
+        # knapp nicht mehr aus (Run #355, 0cfffbe) — laut Server-Log wurde die Location
+        # tatsächlich korrekt gespeichert ("Custom Location gespeichert"), nur rund 1s
+        # NACH Ablauf dieses Timeouts. Gleiche Ursache wie bei PREVIEW_ALIGNMENT_TIMEOUT_MS
+        # (spec.py) — Runner insgesamt langsamer als angenommen. 40000ms als Puffer.
         page.wait_for_function(
             "(n) => typeof MapView !== 'undefined' && MapView.markers && MapView.markers.length > n",
             arg=baseline_marker_count,
-            timeout=20000,
+            timeout=40000,
         )
     except Exception:
         findings.append(
