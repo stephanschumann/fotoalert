@@ -114,9 +114,15 @@ REQUIRED_SELECTOR_TIMEOUT_MS = 8000
 # berechnen" in _check_location_create (TASK-66). POST /preview-alignment fragt
 # Geländehöhen ab und sucht Sonne-/Mond-Alignments über 14 Tage — Stephan hat die
 # reale Dauer lokal mit ~20s gemessen (altes Timeout von 15000ms war zu knapp,
-# führte zu Falsch-Negativen). 35000ms = gemessene Dauer + Sicherheitspuffer für
-# langsamere Umgebungen (z. B. CI).
-PREVIEW_ALIGNMENT_TIMEOUT_MS = 35000
+# führte zu Falsch-Negativen).
+# US-137-Nachtrag (2026-09-24): 35000ms reichte auf dem GitHub-Actions-Runner
+# nicht mehr aus — drei aufeinanderfolgende CI-Läufe von Run #353/#354 (e2e2cf1/
+# 2745987) sind an genau dieser Stelle in den Timeout gelaufen, auch NACHDEM der
+# separate Ephemeriden-Download-Bug (BUG-79-Nachtrag) behoben war. Reale Dauer auf
+# dem Runner damit weiterhin ungeklärt, aber nachweislich > 35s. 60000ms als
+# großzügigerer Sicherheitspuffer, bis eine genauere Messung auf dem Runner selbst
+# vorliegt.
+PREVIEW_ALIGNMENT_TIMEOUT_MS = 60000
 
 # Externe Maps-/SV-Links liegen im LOCATION-Detail (#loc-detail-sheet), das über
 # LocationDetail.open(id) aus der Locations-View geöffnet wird. Dort sind es echte
