@@ -61,6 +61,34 @@ jobs:
           pip install playwright
           python -m playwright install chromium
 
+      # BUG-79-Nachtrag (US-137-Release, 2026-09-24): dieselbe Ephemeriden-Absicherung wie
+      # im test-backend-Job unten (BUG-79) fehlte hier im test-frontend-Job komplett. Der
+      # Dev-Server dieses Jobs lädt de421.bsp beim ersten Astronomie-Aufruf synchron und
+      # blockierend nach — bislang bei JEDEM Lauf dieses Jobs neu heruntergeladen (kein
+      # Cache-Schritt vorhanden, nicht nur gelegentlicher Cache-Miss), was den einzelnen
+      # Dev-Server-Prozess für die Downloaddauer blockiert und nachfolgende Playwright-
+      # Checks (u. a. save-location-btn-Sichtbarkeit, Karten-Filter-Marker) reihenweise in
+      # ihre Timeouts laufen lässt. Fund: zwei aufeinanderfolgende CI-Läufe von Run #353
+      # (e2e2cf1) mit identischem Fehlerbild, siehe fotoalert-ci-server.log beider Läufe.
+      - name: Ephemeride (de421.bsp) aus CI-Cache wiederherstellen
+        id: cache-ephemeris
+        uses: actions/cache@v4
+        with:
+          path: FotoAlert/backend/de421.bsp
+          key: de421-bsp-v1
+
+      - name: de421.bsp herunterladen (nur bei Cache-Miss, mit Timeout-Absicherung)
+        if: steps.cache-ephemeris.outputs.cache-hit != 'true'
+        timeout-minutes: 2
+        working-directory: FotoAlert/backend
+        run: |
+          echo "Cache-Miss: lade de421.bsp (~17 MB) mit begrenztem Timeout, damit ein"
+          echo "hängender/langsamer Drittserver nicht das Job-Timeout reißt."
+          curl -fSL --max-time 90 \
+            -o de421.bsp \
+            https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
+            || { echo "❌ de421.bsp-Download fehlgeschlagen oder Timeout (90s) überschritten"; exit 1; }
+
       - name: Dev-Server starten
         working-directory: FotoAlert/backend
         run: |
