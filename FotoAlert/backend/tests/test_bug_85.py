@@ -96,9 +96,18 @@ NON_ROUTINE_EVENT_TYPE = "Milchstraße"
 OTHER_NON_ROUTINE_EVENT_TYPE = "Mond-Alignment"
 
 
+# US-137-Nachtrag (2026-09-24, Run #356/95eaf66): timeout=2 war auf dem
+# GitHub-Actions-Runner knapp zu eng bemessen -- der Server-Log zeigte fuer
+# alle drei Dateien exakt einen erfolgreichen 200-OK-Health-Check-Aufruf
+# (kein Verbindungsfehler), die Tests wurden trotzdem als 'nicht erreichbar'
+# uebersprungen. Gleiche Ursache wie bei PREVIEW_ALIGNMENT_TIMEOUT_MS (spec.py)
+# und dem Marker-Update-Wait (run_frontend_check.py): der Runner war zu diesem
+# Zeitpunkt (nach ~3 Minuten Dev-Server-Aktivitaet) langsamer als der 2s-Client-
+# Timeout erlaubte. 10s als Puffer -- bei einem WIRKLICH toten Server bleibt der
+# Skip trotzdem schnell genug (Verbindung wird sofort verweigert, kein Warten).
 def _server_reachable() -> bool:
     try:
-        with urllib.request.urlopen(BASE_URL + "/health", timeout=2) as resp:
+        with urllib.request.urlopen(BASE_URL + "/health", timeout=10) as resp:
             return resp.status == 200
     except Exception:
         return False
