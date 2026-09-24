@@ -230,7 +230,15 @@ def test_bug85_full_feed_filtered_to_zero_header_must_not_stay_stale():
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
         page = browser.new_page()
-        page.set_default_timeout(15000)
+        # US-137-Nachtrag (2026-09-24, Run #358/a2785a2): 15000ms reichte fuer den
+        # allerersten page.goto() nach einem FRISCHEN browser.new_page()-Start nicht
+        # immer aus -- Traceback zeigte 'Page.goto: Timeout 15000ms exceeded' direkt
+        # beim Navigieren zu localhost:8000, obwohl der Server lief. Gleiche Ursache
+        # wie beim Mobile-Pass in run_frontend_check.py (dort bereits auf 30s erhoeht):
+        # ein komplett neuer Chromium-Prozess, gestartet NACHDEM der Frontend-Check-
+        # Schritt bereits ca. 2:30 Min gelaufen war, trifft gelegentlich auf einen
+        # ausgelasteten Runner. 30s als Puffer.
+        page.set_default_timeout(30000)
         try:
             _login_and_reach_feed(page)
             _reset_filter_to_default(page)
@@ -297,7 +305,15 @@ def test_bug85_regression_today_only_empty_tagline_is_intentional():
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
         page = browser.new_page()
-        page.set_default_timeout(15000)
+        # US-137-Nachtrag (2026-09-24, Run #358/a2785a2): 15000ms reichte fuer den
+        # allerersten page.goto() nach einem FRISCHEN browser.new_page()-Start nicht
+        # immer aus -- Traceback zeigte 'Page.goto: Timeout 15000ms exceeded' direkt
+        # beim Navigieren zu localhost:8000, obwohl der Server lief. Gleiche Ursache
+        # wie beim Mobile-Pass in run_frontend_check.py (dort bereits auf 30s erhoeht):
+        # ein komplett neuer Chromium-Prozess, gestartet NACHDEM der Frontend-Check-
+        # Schritt bereits ca. 2:30 Min gelaufen war, trifft gelegentlich auf einen
+        # ausgelasteten Runner. 30s als Puffer.
+        page.set_default_timeout(30000)
         try:
             _login_and_reach_feed(page)
             _reset_filter_to_default(page)
