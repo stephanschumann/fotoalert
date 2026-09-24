@@ -2768,11 +2768,20 @@ def _check_rating_flow(page, commit: str, shot) -> List["Finding"]:
             _spec.RATING_STAR_BTN_SELECTOR,
             "(els) => { if (els[3]) els[3].click(); }",
         )
+        # US-137-Nachtrag (2026-09-24, Run #359/36f2bb5): 8000ms war zweimal (Run #357
+        # und #359) knapp zu eng -- anders als die meisten anderen timeout=8000-Stellen
+        # in dieser Datei wartet dieser Check NICHT auf reine Client-Rendering-Reaktion,
+        # sondern Rating._set() (web/index.html) ist async und macht vorher ein echtes
+        # "await API.post(...)" gegen den Server, bevor die 'filled'-Klasse gesetzt wird
+        # -- also derselbe Backend-Roundtrip-Timing-Fall wie bei den bereits behobenen
+        # Timeouts, nur hier zusaetzlich durch einen DOM-Re-Render nach der Antwort.
+        # Nur diese eine Stelle erhoeht, nicht die anderen timeout=8000-Vorkommen in
+        # dieser Datei, da fuer die keine Auffaelligkeit belegt ist.
         page.wait_for_function(
             "(sel) => { const els = document.querySelectorAll(sel); "
             "return els.length >= 4 && els[3].classList.contains('filled'); }",
             arg=_spec.RATING_STAR_BTN_SELECTOR,
-            timeout=8000,
+            timeout=20000,
         )
     except Exception:
         findings.append(
