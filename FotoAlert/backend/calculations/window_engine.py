@@ -47,11 +47,25 @@ from .astronomy import (
 _OBLIQUITY_DEG = 23.4393  # mittlere Ekliptikschiefe (ausreichend für Phase)
 
 
-def _interp_angle(x, xp, deg_values):
-    """Winkel-Interpolation (Grad) über sin/cos → wrap-sicher."""
-    rad = np.radians(deg_values)
-    s = np.interp(x, xp, np.sin(rad))
-    c = np.interp(x, xp, np.cos(rad))
+def _interp_angle_pre(x, xp, sin_values, cos_values):
+    """Winkel-Interpolation (Grad) aus vorab berechneten sin/cos-Stützwerten →
+    wrap-sicher.
+
+    US-137 Performance-Fix (2026-09-18, reale Ursache per cProfile bestätigt):
+    Die ursprüngliche Fassung (`_interp_angle`) rechnete `np.radians(deg_values)`
+    + `np.sin`/`np.cos` bei JEDEM Aufruf über das GESAMTE Fenster-Array neu
+    (Größe ≈ Tage × 144), obwohl sich diese Werte pro WindowEphemeris-Instanz
+    nie ändern. Da `body_position()`/`azimuth_times()` pro Tag mehrfach
+    aufrufen, wuchs die Gesamtkosten dadurch mit O(Tage × Fenstergröße) =
+    O(Tage²) statt linear — real gemessen: allein diese Funktion trug bei 365
+    Tagen ~30 % der Gesamtlaufzeit (siehe BACKLOG.md US-137, Profiling-Protokoll
+    in outputs/2026-09-18_US-137-optimierung/). Fix: sin/cos werden einmal pro
+    Body beim Bau der Arrays (`_build()`) berechnet und hier nur noch per
+    np.interp (O(log n)) abgefragt — Ergebnis bitgenau identisch, da dieselben
+    sin/cos-Werte nur einmal statt wiederholt berechnet werden.
+    """
+    s = np.interp(x, xp, sin_values)
+    c = np.interp(x, xp, cos_values)
     return np.degrees(np.arctan2(s, c)) % 360.0
 
 
@@ -59,6 +73,8 @@ def _interp_angle(x, xp, deg_values):
 class _BodyArrays:
     alt: np.ndarray
     az: np.ndarray
+    az_sin: np.ndarray
+    az_cos: np.ndarray
     ra_hours: np.ndarray
     dec_deg: np.ndarray
     dist_au: np.ndarray
@@ -85,13 +101,21 @@ class WindowEphemeris:
         # (nur bei sichtbarem GC / explizitem Bedarf) → spart ~1/3 Aufbauzeit.
         for body in ("sun", "moon"):
             self._build(body)
+        # US-137 Performance-Fix 2 (2026-09-18): Milchstraße bekommt KEIN
+        # Vollauflösungs-Array wie Sonne/Mond (siehe _milkyway_position-Docstring).
+        self._milkyway_by_date: Optional[Dict[date, CelestialPosition]] = None
 
     def _build(self, body: str) -> "_BodyArrays":
         tr = core.compute_track(body, self.t0, self._t1, self.n)
         alt, az = qe.altaz(tr.ra_hours, tr.dec_deg, tr.distance_au,
                            tr.gast_hours, self.lat, self.lon, core.has_parallax(body))
+        az = np.asarray(az)
+        # US-137 Performance-Fix: sin/cos EINMAL hier berechnen (nicht bei jedem
+        # Interpolations-Aufruf neu, siehe _interp_angle_pre-Docstring).
+        az_rad = np.radians(az)
         arr = _BodyArrays(
-            alt=np.asarray(alt), az=np.asarray(az),
+            alt=np.asarray(alt), az=az,
+            az_sin=np.sin(az_rad), az_cos=np.cos(az_rad),
             ra_hours=tr.ra_hours, dec_deg=tr.dec_deg, dist_au=tr.distance_au,
         )
         self._bodies[body] = arr
@@ -113,16 +137,91 @@ class WindowEphemeris:
 
     # ---- Body-Position (interpoliert) ------------------------------------
     def body_position(self, body: str, dt: datetime) -> Optional[CelestialPosition]:
-        key = "milkyway" if body == "milkyway" else body
-        if key not in ("sun", "moon", "milkyway"):
+        if body == "milkyway":
+            return self._milkyway_position(dt)
+        if body not in ("sun", "moon"):
             from .astronomy import _get_body_position_direct as _gbp  # planets etc.
             return _gbp(self.lat, self.lon, body, dt)
-        b = self._body(key)
+        b = self._body(body)
         m = self._abs_minutes(dt)
         alt = float(np.interp(m, self.minutes, b.alt))
-        az = float(_interp_angle(m, self.minutes, b.az))
+        az = float(_interp_angle_pre(m, self.minutes, b.az_sin, b.az_cos))
         dist = float(np.interp(m, self.minutes, b.dist_au))
         return CelestialPosition(azimuth=az, altitude=alt, distance_au=dist)
+
+    # ---- Milchstraße: 1 Punkt/Tag statt Vollauflösungs-Array --------------
+    def _milkyway_position(self, dt: datetime) -> CelestialPosition:
+        """
+        US-137 Performance-Fix 2 (2026-09-18, per cProfile gegen den bereits
+        `_interp_angle_pre`-gefixten Code bestätigt): Sonne/Mond brauchen ihr
+        Vollauflösungs-Array (coarse_step_min-Raster über das GESAMTE Fenster),
+        weil Sonnenauf-/-untergang, Golden-/Blue-Hour-Übergänge und Alignments
+        minutengenaue Nulldurchgangssuche im Array brauchen. Die Milchstraße
+        (galaktisches Zentrum) wird dagegen NUR 1x pro Tag um 22:00 UTC
+        abgefragt (siehe `milky_way_info()`, einziger Aufrufer im gesamten
+        Backend) — ein Vollauflösungs-Array wie bei Sonne/Mond wäre dafür >100x
+        mehr Stützstellen als nötig (coarse_step_min=10 → 144 Punkte/Tag) und
+        machte laut Profiling rund 1/3 der teuren Skyfield-Nutationsrechnung
+        (`iau2000a`) in `_build()` aus, ohne dass die Zusatzauflösung je genutzt
+        wurde. Fix: EIN vektorisierter Skyfield-Call mit genau `days`
+        Stützstellen (exakt an den 22:00-UTC-Abfragezeitpunkten), gecacht über
+        die Lebensdauer dieser WindowEphemeris-Instanz.
+
+        Für den (aktuell im Backend nicht vorkommenden) Fall, dass jemand die
+        Milchstraßen-Position zu einer ANDEREN Uhrzeit abfragt, wird sicherheits-
+        halber nicht das falsche gecachte 22:00-Sample zurückgegeben, sondern
+        eine korrekte Einzelpunkt-Direktberechnung (`_direct_milkyway`).
+        """
+        dt_utc = dt.astimezone(timezone.utc)
+        d = dt_utc.date()
+        is_daily_grid_point = (dt_utc.hour, dt_utc.minute, dt_utc.second,
+                               dt_utc.microsecond) == (22, 0, 0, 0)
+        if is_daily_grid_point and self.start_date <= d < self.start_date + timedelta(days=self.days):
+            if self._milkyway_by_date is None:
+                self._build_milkyway_daily()
+            pos = self._milkyway_by_date.get(d)
+            if pos is not None:
+                return pos
+        return self._direct_milkyway(dt_utc)
+
+    def _build_milkyway_daily(self) -> None:
+        from .astronomy import _ts as ts, _get_eph
+        day_times = [
+            datetime(self.start_date.year, self.start_date.month, self.start_date.day,
+                     22, 0, tzinfo=timezone.utc) + timedelta(days=k)
+            for k in range(self.days)
+        ]
+        t = ts.utc([d.year for d in day_times], [d.month for d in day_times],
+                   [d.day for d in day_times], [d.hour for d in day_times],
+                   [d.minute for d in day_times], [d.second for d in day_times])
+        eph = _get_eph()
+        earth = eph["earth"]
+        astrometric = earth.at(t).observe(core._resolve_target("milkyway")).apparent()
+        ra, dec, dist = astrometric.radec(epoch="date")
+        alt, az = qe.altaz(ra.hours, dec.degrees, dist.au, t.gast,
+                           self.lat, self.lon, False)
+        alt = np.asarray(alt)
+        az = np.asarray(az)
+        dist_au = np.asarray(dist.au)
+        self._milkyway_by_date = {
+            day_times[k].date(): CelestialPosition(
+                azimuth=float(az[k]), altitude=float(alt[k]), distance_au=float(dist_au[k]))
+            for k in range(self.days)
+        }
+
+    def _direct_milkyway(self, dt_utc: datetime) -> CelestialPosition:
+        """Korrekte (aber nicht optimierte) Einzelpunkt-Direktberechnung, nur als
+        Fallback für Abfragezeiten außerhalb des 22:00-UTC-Tagesrasters."""
+        from .astronomy import _skyfield_time, _get_eph
+        t = _skyfield_time(dt_utc)
+        eph = _get_eph()
+        earth = eph["earth"]
+        astrometric = earth.at(t).observe(core._resolve_target("milkyway")).apparent()
+        ra, dec, dist = astrometric.radec(epoch="date")
+        alt, az = qe.altaz(ra.hours, dec.degrees, dist.au, t.gast,
+                           self.lat, self.lon, False)
+        return CelestialPosition(azimuth=float(np.asarray(az)), altitude=float(np.asarray(alt)),
+                                 distance_au=float(np.asarray(dist.au)))
 
     # ---- Crossing-Finder auf dem Höhen-Array -----------------------------
     def _day_slice(self, d: date):
@@ -318,7 +417,7 @@ class WindowEphemeris:
         day0 = (d - self.start_date).days * 24 * 60
         fine = np.arange(day0 + hours[0] * 60, day0 + hours[1] * 60, 1.0)
         alt = np.interp(fine, mins, b.alt[lo:hi])
-        az = _interp_angle(fine, mins, b.az[lo:hi])
+        az = _interp_angle_pre(fine, mins, b.az_sin[lo:hi], b.az_cos[lo:hi])
         azdiff = np.abs((az - target_az + 180) % 360 - 180)
         mask = (alt > alt_min) & (azdiff <= tolerance_deg)
         # AK6-Semantik: pro zusammenhängender Passage EIN Event an der engsten

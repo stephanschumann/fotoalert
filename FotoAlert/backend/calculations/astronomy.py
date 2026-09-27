@@ -780,11 +780,30 @@ def calculate_milky_way_info(
     )
 
 
-def calculate_full_report(lat: float, lon: float, target_date: date) -> AstronomyReport:
+def calculate_full_report(
+    lat: float, lon: float, target_date: date, include_planets: bool = True,
+) -> AstronomyReport:
     """Erstellt einen vollständigen Astronomiebericht für Standort und Datum.
 
     TASK-25: Bei aktiver Window-Engine werden Sun/Moon/MilkyWay aus den
     vorberechneten Fenster-Arrays abgeleitet (statt je 1 Skyfield-Call/Tag).
+
+    US-137 Performance-Fix (2026-09-18, reale Ursache per cProfile nach dem
+    ersten `_interp_angle_pre`-Fix bestätigt): Die Planeten-Positionen (Venus,
+    Mars, Jupiter, Saturn) werden über `get_body_position()` für Nicht-Sonne/
+    Mond/Milchstraße-Körper IMMER direkt per Skyfield gerechnet (kein
+    Window-Engine-Array dafür) — das sind 4 volle, nicht vektorisierte
+    `earth.at(t).observe(...)`-Aufrufe (inkl. teurer Nutations-Matrix,
+    `iau2000a`) PRO TAG. Für den `/plan`-Jahreskalender (`astronomy_only=True`
+    in `opportunity.find_opportunities`) wird `AstronomyReport.planet_positions`
+    nirgends gelesen (siehe `opportunity.py`: nur `sun`, `moon`, `milky_way`,
+    `active_meteor_showers` werden verwendet) — die Berechnung war für diesen
+    Pfad seit jeher totes Gewicht. Bei 365 Tagen macht das ~1460 überflüssige
+    direkte Skyfield-Calls aus, die laut Profiling ~35 % der Gesamtlaufzeit
+    dieses Codepfads ausmachten. `include_planets=False` überspringt den Block
+    komplett; der Default bleibt `True`, damit ein potenzieller künftiger
+    Aufrufer, der die Planetenpositionen tatsächlich braucht, unverändertes
+    Verhalten bekommt.
     """
     w = _win_for(lat, lon, target_date)
     if w is not None:
@@ -797,18 +816,19 @@ def calculate_full_report(lat: float, lon: float, target_date: date) -> Astronom
         milky_way = calculate_milky_way_info(lat, lon, target_date, sun_info=sun, moon_info=moon)
     showers = get_active_meteor_showers(target_date)
 
-    # Planeten
+    # Planeten (US-137: nur wenn tatsächlich gebraucht, siehe Docstring oben)
     planets = {}
-    gh_time = sun.golden_hour_evening_start
-    for body, name in [
-        ("venus", "Venus"),
-        ("mars", "Mars"),
-        ("jupiter barycenter", "Jupiter"),
-        ("saturn barycenter", "Saturn"),
-    ]:
-        pos = get_body_position(lat, lon, body, gh_time)
-        if pos and pos.altitude > 5:
-            planets[name] = pos
+    if include_planets:
+        gh_time = sun.golden_hour_evening_start
+        for body, name in [
+            ("venus", "Venus"),
+            ("mars", "Mars"),
+            ("jupiter barycenter", "Jupiter"),
+            ("saturn barycenter", "Saturn"),
+        ]:
+            pos = get_body_position(lat, lon, body, gh_time)
+            if pos and pos.altitude > 5:
+                planets[name] = pos
 
     return AstronomyReport(
         sun=sun,

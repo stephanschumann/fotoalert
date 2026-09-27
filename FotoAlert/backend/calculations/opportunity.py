@@ -356,7 +356,11 @@ async def find_opportunities(
     lon = location.observer_lon
 
     # Astronomie-Bericht
-    astro = calculate_full_report(lat, lon, target_date)
+    # US-137 Performance-Fix: planet_positions wird hier nirgends gelesen (nur
+    # sun/moon/milky_way/active_meteor_showers unten) -- bei astronomy_only=True
+    # (Jahreskalender) daher die teure, nicht vektorisierte Planeten-Direktberechnung
+    # ueberspringen (siehe Docstring von calculate_full_report).
+    astro = calculate_full_report(lat, lon, target_date, include_planets=not astronomy_only)
     sun = astro.sun
     moon = astro.moon
     mw = astro.milky_way
