@@ -25,6 +25,7 @@ Endpoints:
 from __future__ import annotations
 
 import asyncio
+import heapq  # BUG-113: sortierungserhaltender Kalender-Austausch je Standort
 import json
 import logging
 import copy as _copy
@@ -524,14 +525,23 @@ def _backfill_coords(events: list[dict]) -> None:
             e["sightline_angle_deg"] = getattr(loc, "sightline_angle_deg", None) if loc else None
 
 
-def _load_caches() -> bool:
-    """
-    Lädt die vorberechneten JSON-Caches von Disk.
-    Gibt True zurück wenn mindestens der Feed-Cache gefunden wurde.
-    """
-    global _feed_cache, _calendar_cache, _cache_loaded_at, _recompute_pending
+# BUG-113: Übergabedatei zwischen precompute.py (Einzel-Kalenderlauf) und dem
+# laufenden Server. Sie enthält ausschließlich die Kalender-Ereignisse des zuletzt
+# einzeln nachgerechneten Standorts — genau eine Datei, die bei jedem Einzellauf
+# überschrieben wird (kein Zuwachs je Standort). Der Server tauscht daraus nur
+# diesen einen Standort im Arbeitsspeicher aus, statt die große calendar.json
+# (aktuell ~1,1 GB) erneut komplett einzulesen.
+_CAL_SINGLE_DELTA_NAME = "calendar_single_last.json"
 
-    found = False
+
+def _load_feed_cache() -> bool:
+    """BUG-113: Lädt NUR den (kleinen) Feed-Cache opportunities.json.
+
+    Aus `_load_caches()` herausgelöst, damit die Nacharbeit nach dem Speichern
+    eines Standorts den Feed auffrischen kann, ohne dafür die sehr große
+    calendar.json mitzulesen.
+    """
+    global _feed_cache
 
     if _OPP_CACHE.exists():
         try:
@@ -540,11 +550,26 @@ def _load_caches() -> bool:
             _backfill_coords(_feed_cache)
             logger.info("Feed-Cache geladen: %d Events (berechnet: %s)",
                         len(_feed_cache), data.get("computed_at", "?")[:16])
-            found = True
+            return True
         except Exception as e:
             logger.error("Fehler beim Laden von opportunities.json: %s", e)
     else:
         logger.warning("opportunities.json nicht gefunden – Cache leer")
+    return False
+
+
+def _load_calendar_cache() -> None:
+    """BUG-113: Lädt NUR den Kalender-Cache calendar.json (Vollaufnahme).
+
+    Aus `_load_caches()` herausgelöst. Dieser Weg liest die gesamte Datei in
+    einem einzigen `json.loads()`-Aufruf und hält dabei den Python-Sperr-
+    mechanismus (GIL) über die volle Lesezeit — er bleibt deshalb den Stellen
+    vorbehalten, an denen der Server ohnehin niemandem antwortet (Serverstart)
+    bzw. an denen der komplette Kalender neu berechnet wurde (Volllauf,
+    nächtlicher Sichtachsen-Lauf). Die Einzel-Neuberechnung nach dem Speichern
+    nutzt stattdessen `_apply_calendar_delta()`.
+    """
+    global _calendar_cache
 
     if _CAL_CACHE.exists():
         try:
@@ -553,6 +578,124 @@ def _load_caches() -> bool:
             logger.info("Kalender-Cache geladen: %d Events", len(_calendar_cache))
         except Exception as e:
             logger.error("Fehler beim Laden von calendar.json: %s", e)
+
+
+def _calendar_sort_key(e: dict) -> tuple:
+    """BUG-113: Sortierschlüssel des Kalenders — identisch zu der Reihenfolge,
+    die precompute.py in calendar.json schreibt (shoot_time aufsteigend,
+    overall_score absteigend)."""
+    try:
+        score = float(e.get("overall_score") or 0.0)
+    except (TypeError, ValueError):
+        score = 0.0
+    return (e.get("shoot_time", ""), -score)
+
+
+def _swap_calendar_events(loc_id: str, neue_events: list) -> int:
+    """BUG-113: Tauscht im Arbeitsspeicher die Kalender-Ereignisse genau eines
+    Standorts aus, ohne die große calendar.json erneut einzulesen.
+
+    Bewusst als reine Python-Schleife (Listen-Komprehension + `heapq.merge`)
+    formuliert statt als ein einziger C-Aufruf: so gibt ein Worker-Thread den
+    GIL regelmäßig ab und der Server bleibt währenddessen antwortbereit — genau
+    das, was ein `json.loads()` über die ganze Datei NICHT tut (BUG-113 AK3).
+    Die Sortierung bleibt dabei erhalten.
+    """
+    global _calendar_cache
+
+    rest = [e for e in _calendar_cache if e.get("location_id") != loc_id]
+    neu = sorted(neue_events, key=_calendar_sort_key)
+    _calendar_cache = list(heapq.merge(rest, neu, key=_calendar_sort_key))
+    return len(neu)
+
+
+async def _apply_calendar_delta(loc_id: str, min_mtime: float = 0.0) -> bool:
+    """BUG-113 (Weg B, Schritt 2): Übernimmt das Ergebnis einer Einzel-Kalender-
+    berechnung in den laufenden Server, ohne die große calendar.json komplett
+    neu einzulesen.
+
+    Vorher las `_recompute_one()` dafür die ganze Datei neu (`_load_caches()`) —
+    ein einziger `json.loads()`-Aufruf, der den Server über die gesamte Lesezeit
+    anhielt (gemessen 1,3–1,7 s bei 150–200 MB, hochgerechnet ~7 s bei 1,1 GB).
+    Jetzt liest der Server nur die kleine Übergabedatei dieses einen Standorts.
+
+    `min_mtime` schützt davor, eine ältere Übergabedatei eines früheren Laufs
+    anzuwenden (Aufrufer setzt den Startzeitpunkt des Kalenderlaufs ein).
+
+    Fehlt die Übergabedatei, ist sie veraltet oder gehört sie zu einem anderen
+    Standort, bleibt der Kalender im Arbeitsspeicher unverändert — bewusst:
+    ein Vollneuladen an dieser Stelle würde genau die Blockade zurückholen, die
+    dieses Ticket beseitigt. Der nächste Volllauf bzw. Serverstart liest den
+    Kalender ohnehin wieder vollständig ein.
+    """
+    pfad = _CAL_CACHE.parent / _CAL_SINGLE_DELTA_NAME
+    try:
+        if not pfad.exists():
+            logger.warning("BUG-113: Kalender-Übergabedatei %s fehlt – Kalender im "
+                           "Arbeitsspeicher bleibt für %s unverändert.", pfad.name, loc_id)
+            return False
+        if min_mtime and pfad.stat().st_mtime < min_mtime:
+            logger.warning("BUG-113: Kalender-Übergabedatei %s ist älter als der gerade "
+                           "gelaufene Kalenderlauf – für %s ignoriert.", pfad.name, loc_id)
+            return False
+
+        def _lesen() -> dict:
+            return json.loads(pfad.read_text(encoding="utf-8"))
+
+        data = await asyncio.to_thread(_lesen)
+        if data.get("location_id") != loc_id:
+            logger.warning("BUG-113: Kalender-Übergabedatei gehört zu '%s', erwartet '%s' – "
+                           "ignoriert.", data.get("location_id"), loc_id)
+            return False
+
+        if not _calendar_cache:
+            # BUG-113 Nachbesserung (gate-auditor 2026-09-19, Punkt 2): Ist der
+            # Kalender im Arbeitsspeicher leer (z. B. weil das Einlesen beim
+            # Serverstart scheiterte), würde der Austausch danach NUR die Termine
+            # dieses einen Standorts enthalten und trotzdem "ok" melden — alle
+            # übrigen Standorte fehlten stillschweigend. Stattdessen einmalig den
+            # Voll-Ladeweg nehmen: precompute.py hat calendar.json in diesem Lauf
+            # bereits vollständig (inkl. dieses Standorts) geschrieben, das
+            # Ergebnis ist also korrekt und heilt den leeren Zustand. Bewusst in
+            # Kauf genommen: dieser seltene Fehlerpfad kann — wie der Serverstart —
+            # den Server für die Einlesezeit anhalten (json.loads hält den GIL);
+            # der Normalfall (Kalender geladen) bleibt der kleine Austausch.
+            logger.warning("BUG-113: Kalender im Arbeitsspeicher ist leer – statt des "
+                           "Austauschs für %s wird calendar.json vollständig neu geladen.",
+                           loc_id)
+            await asyncio.to_thread(_load_calendar_cache)
+            if not _calendar_cache:
+                logger.error("BUG-113: Kalender nach Vollneuladen weiterhin leer – "
+                             "Austausch für %s nicht angewendet.", loc_id)
+                return False
+            logger.info("BUG-113: Kalender vollständig neu geladen (%d Events gesamt).",
+                        len(_calendar_cache))
+            return True
+
+        anzahl = await asyncio.to_thread(_swap_calendar_events, loc_id, data.get("events", []))
+        logger.info("BUG-113: Kalender für %s ausgetauscht (%d Events dieses Standorts, "
+                    "%d gesamt) – ohne Vollneuladen der Kalenderdatei.",
+                    loc_id, anzahl, len(_calendar_cache))
+        return True
+    except Exception as e:
+        logger.error("BUG-113: Kalender-Austausch für %s fehlgeschlagen: %s", loc_id, e)
+        return False
+
+
+def _load_caches() -> bool:
+    """
+    Lädt die vorberechneten JSON-Caches von Disk.
+    Gibt True zurück wenn mindestens der Feed-Cache gefunden wurde.
+
+    BUG-113: Der Rumpf steckt jetzt in `_load_feed_cache()` und
+    `_load_calendar_cache()`. Diese Funktion bleibt der Voll-Ladeweg
+    (Serverstart, Volllauf, nächtlicher Sichtachsen-Lauf) und ist damit
+    unverändert in ihrem Verhalten.
+    """
+    global _cache_loaded_at
+
+    found = _load_feed_cache()
+    _load_calendar_cache()
 
     _cache_loaded_at = datetime.now(timezone.utc)
 
@@ -2700,8 +2843,12 @@ async def _recompute_one(loc_id: str) -> None:
         return
 
     logger.info("Single-Location FEED abgeschlossen (%s). Lade Feed-Cache neu.", loc_id)
-    _load_elevation_cache()
-    _load_caches()
+    # BUG-113 (Weg B, Schritt 2): nur den kleinen Feed neu einlesen — die große
+    # calendar.json wird hier gar nicht mehr angefasst (sie wurde in diesem
+    # Schritt auch nicht neu berechnet). Beide Ladevorgänge laufen zusätzlich im
+    # Worker-Thread statt im Server-Hauptstrang.
+    await asyncio.to_thread(_load_elevation_cache)
+    await asyncio.to_thread(_load_feed_cache)
 
     # US-106 Teil 1: gezielt Wetter für genau diese Location nachladen.
     weather_ready = await _weather_overlay_single(loc_id)
@@ -2717,14 +2864,19 @@ async def _recompute_one(loc_id: str) -> None:
     # Hält die Freigabe oben NICHT auf. Ein Fehler hier nimmt die bereits
     # erfolgte Feed/Wetter-Freigabe NICHT zurück (kein _recompute_pending-Eingriff).
     logger.info("US-106 Ziehe 365-Tage-Kalender für %s im Hintergrund nach …", loc_id)
+    import time as _time
+    _cal_started_at = _time.time()
     rc_cal = await _run_precompute_single_subproc(loc_id, "--calendar-only", "recompute-calendar")
     if rc_cal != 0:
         logger.error("Single-Location KALENDER fehlgeschlagen (exit %d) für %s – "
                      "Feed/Wetter bleiben freigegeben, Kalender zeigt vorerst den alten Stand.",
                      rc_cal, loc_id)
         return
-    logger.info("Single-Location KALENDER abgeschlossen (%s). Lade Kalender-Cache neu.", loc_id)
-    _load_caches()
+    logger.info("Single-Location KALENDER abgeschlossen (%s). Tausche die Events dieses "
+                "Standorts im Kalender aus.", loc_id)
+    # BUG-113 (Weg B, Schritt 2): nur die Ereignisse dieses einen Standorts
+    # austauschen statt die komplette Kalenderdatei erneut einzulesen.
+    await _apply_calendar_delta(loc_id, min_mtime=_cal_started_at)
 
 
 async def _run_precompute_single(loc_id: str, _allow_drain: bool = True) -> None:

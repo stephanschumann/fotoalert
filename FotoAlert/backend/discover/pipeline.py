@@ -30,6 +30,23 @@ log = logging.getLogger(__name__)
 # Kern-Pipeline
 # ---------------------------------------------------------------------------
 
+async def _run_pipeline_in_worker(run_coro_factory, days: int) -> list[ScoutOpportunity]:
+    """BUG-113: Führt eine Scout-Pipeline in einem eigenen Worker-Thread aus.
+
+    Die Pipelines sind zwar Coroutinen (sie holen pro Motiv das Wetter per
+    `await`), rechnen dazwischen aber lange rein synchron — direkt im
+    Event-Loop ausgeführt blockierten sie den gesamten Server für die volle
+    Rechenzeit. Der Worker-Thread bekommt deshalb seinen eigenen Event-Loop
+    (`asyncio.run`). Es werden keine an einen Loop gebundenen Objekte geteilt:
+    die Wetter-Abrufe legen ihren httpx-Client jeweils selbst an
+    (calculations/weather.py::fetch_weather_forecast).
+    """
+    def _worker() -> list[ScoutOpportunity]:
+        return asyncio.run(run_coro_factory(days))
+
+    return await asyncio.to_thread(_worker)
+
+
 async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
     """
     Führt alle Scout-Pipelines parallel aus.
@@ -47,9 +64,21 @@ async def run_pipeline(days: int = 14) -> list[ScoutOpportunity]:
 
     clear_weather_cache()
 
+    # BUG-113 (Weg B, Schritt 1 — "sichtbarer schneller Pfad zuerst"):
+    # moon_pipeline.run()/sun_pipeline.run() rechnen (Skyfield-Positionen,
+    # Scoring) ohne ein einziges `await` auf den Rechenschritten. Bis hier
+    # liefen sie direkt im Event-Loop und hielten den Server fuer die volle
+    # Rechenzeit an — gemessen 2026-09-19 (Linux-Nachbau, 14 Tage x 22 Motive):
+    # 9,2 s Mond + 8,2 s Sonne = ~17,5 s Stillstand; "Alignments berechnen"
+    # eines neuen Standorts dauerte dadurch 17,8 s statt 0,45 s.
+    # Jede Pipeline laeuft jetzt in einem eigenen Worker-Thread (gleiches
+    # Muster wie der bereits bestehende to_thread-Umzug von
+    # filter_accessible_candidates unten, US-135 — nur fuer die
+    # Rechenschleifen selbst). Reine Python-Rechenschleifen geben den GIL
+    # regelmaessig ab, der Hauptstrang bleibt dadurch antwortbereit.
     moon_result, sun_result = await asyncio.gather(
-        moon_pipeline.run(days),
-        sun_pipeline.run(days),
+        _run_pipeline_in_worker(moon_pipeline.run, days),
+        _run_pipeline_in_worker(sun_pipeline.run, days),
         return_exceptions=True,
     )
 

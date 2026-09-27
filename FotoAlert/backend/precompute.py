@@ -973,6 +973,34 @@ def _write_calendar_cache(cal_path, calendar: list, computed_meta: dict, compute
     )
 
 
+def _write_calendar_single_delta(cal_path, location_id: str, calendar: list,
+                                computed_at: str) -> int:
+    """BUG-113: Schreibt zusätzlich zur großen calendar.json eine kleine
+    Übergabedatei mit ausschließlich den Kalender-Ereignissen DIESER Location.
+
+    Der laufende Server (main.py::_apply_calendar_delta) übernimmt die Events
+    daraus und tauscht sie im Arbeitsspeicher aus, statt die komplette
+    calendar.json (aktuell ~1,1 GB) erneut einzulesen — dieses Einlesen hielt
+    den Server bisher über die gesamte Lesezeit an (BUG-113 AK3).
+
+    Immer derselbe Dateiname: die Datei ist ein Postfach für genau den zuletzt
+    gelaufenen Einzel-Kalenderlauf, kein wachsender Bestand je Standort. Der
+    Server prüft `location_id` und Änderungszeit, bevor er sie anwendet.
+    """
+    events = [e for e in calendar if e.get("location_id") == location_id]
+    delta_path = cal_path.parent / "calendar_single_last.json"
+    delta_path.write_text(
+        json.dumps(
+            {"location_id": location_id, "computed_at": computed_at, "events": events},
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    logger.info("  ↳ Übergabedatei %s geschrieben: %d Events für %s",
+                delta_path.name, len(events), location_id)
+    return len(events)
+
+
 def _write_feed_cache(feed_path, feed: list, computed_at: str) -> None:
     """Schreibt opportunities.json und loggt einen Health-Alert wenn der Feed zu klein ist."""
     feed_path.write_text(
@@ -1087,6 +1115,20 @@ async def _refresh_single_location_calendar(
         )
         cal_path = CACHE_DIR / "calendar.json"
         _write_calendar_cache(cal_path, calendar, computed_meta, computed_at)
+        # BUG-113: zusätzlich das kleine Postfach für den laufenden Server schreiben,
+        # damit dieser nur diesen einen Standort austauschen muss statt die ganze
+        # Kalenderdatei neu einzulesen.
+        # BUG-113 Punkt 6: eigenes try/except — scheitert NUR das Postfach, ist
+        # calendar.json bereits korrekt geschrieben; das darf nicht als
+        # "Kalenderberechnung fehlgeschlagen" im Protokoll landen.
+        try:
+            _write_calendar_single_delta(cal_path, location_id, calendar, computed_at)
+        except Exception as e:
+            logger.warning(
+                "  Übergabedatei für %s nicht geschrieben (%s) — Kalender ist berechnet, "
+                "der Server übernimmt den neuen Stand erst beim nächsten Voll-Laden",
+                location_id, e,
+            )
         logger.info(
             "  ✅ Kalender: %d Events gesamt nach Merge (%.1fs)",
             len(calendar), time.time() - t2,

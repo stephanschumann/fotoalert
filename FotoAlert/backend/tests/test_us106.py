@@ -336,6 +336,10 @@ def test_recompute_weather_fail_keeps_pending_but_runs_calendar(monkeypatch):
     monkeypatch.setattr(main, "_run_precompute_single_subproc", fake_subproc)
     monkeypatch.setattr(main, "_load_elevation_cache", lambda: None)
     monkeypatch.setattr(main, "_load_caches", lambda: None)
+    # BUG-113: _recompute_one() lädt nach dem Feed-Schritt nur noch den Feed-Cache
+    # (_load_feed_cache) statt _load_caches — ohne diese Attrappe liest der Test eine
+    # lokal vorhandene echte opportunities.json und überschreibt den Test-Feed.
+    monkeypatch.setattr(main, "_load_feed_cache", lambda: True)
 
     async def failing_fetch(lat, lon, days=7):
         raise RuntimeError("Open-Meteo down")
