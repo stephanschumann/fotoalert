@@ -9,9 +9,10 @@ from __future__ import annotations
 import logging
 import math
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
+from calculations.ortszeit import is_england
 from calculations.weather import WeatherForecast, calculate_photo_weather_score, fetch_weather_forecast
 from discover.subjects import EXCLUSION_ZONES
 
@@ -102,6 +103,39 @@ def sample_window(start: Optional[datetime], end: Optional[datetime]) -> list[da
         result.append(t)
         t += timedelta(minutes=SAMPLE_INTERVAL_MIN)
     return result
+
+
+# US-138 (Schritt 3): Bezugspunkt fuer die Lichtfenster (Blaue/Goldene Stunde).
+# Bisher fest Berlin fuer alle Motive; in England liegen die Sonnenzeiten (UTC) bis zu
+# rund 54 min daneben. Annahme: England-Motive (Regel aus calculations/ortszeit.py) nutzen
+# ihre eigenen Koordinaten, auf ein Viertelgrad-Raster gerundet (Sonnenzeit-Fehler < 1 min;
+# so teilen sich die Londoner Motive wenige Bezugspunkte -> kaum Mehr-Rechenzeit), alle anderen Berlin.
+LIGHT_REF_BERLIN = (52.52, 13.40)
+
+
+def light_reference(lat: float, lon: float) -> tuple:
+    """Bezugspunkt (lat, lon) fuer die Lichtfenster eines Motivs."""
+    if is_england(lat, lon):
+        return (round(lat * 4) / 4, round(lon * 4) / 4)
+    return LIGHT_REF_BERLIN
+
+
+def build_day_sessions(sun_info_fn, ref_lat: float, ref_lon: float, today: date, days: int) -> dict:
+    """Lichtfenster-Zeitpunkte je Tag und Session fuer einen Bezugspunkt.
+
+    sun_info_fn: calculate_sun_info (von der Pipeline uebergeben, damit Tests sie dort ersetzen koennen).
+    """
+    out: dict = {}
+    for delta in range(days):
+        d = today + timedelta(days=delta)
+        sun = sun_info_fn(ref_lat, ref_lon, d)
+        out[d.isoformat()] = {
+            "blue_morning":   sample_window(sun.blue_hour_morning_start,  sun.blue_hour_morning_end),
+            "golden_morning": sample_window(sun.golden_hour_morning_start, sun.golden_hour_morning_end),
+            "golden_evening": sample_window(sun.golden_hour_evening_start, sun.golden_hour_evening_end),
+            "blue_evening":   sample_window(sun.blue_hour_evening_start,   sun.blue_hour_evening_end),
+        }
+    return out
 
 
 def compute_d(apex_effective_m: float, body_alt_deg: float, alt_min_deg: float) -> Optional[float]:

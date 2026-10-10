@@ -33,6 +33,7 @@ from calculations.astronomy import (
     get_lunar_eclipse_for_date,
 )
 from calculations.weather import WeatherForecast, calculate_photo_weather_score
+from calculations.ortszeit import is_england as _is_england, london_hhmm as _london_hhmm
 from data.locations import PhotoLocation
 
 logger = logging.getLogger(__name__)
@@ -410,7 +411,7 @@ async def find_opportunities(
     if overall >= min_score:
         focal_mm = _focal_for_location(location, default_mm=50)
         desc = (
-            f"Goldene Stunde von {_fmt_time(gh_eve_start)} bis {_fmt_time(gh_eve_end)} (Ortszeit). "
+            f"Goldene Stunde von {_fmt_time(gh_eve_start, location)} bis {_fmt_time(gh_eve_end, location)}{_ortszeit_zusatz(location)}. "
             f"{_weather_label(w_score, use_weather)}."
         )
         if sun_alignment_bonus > 0:
@@ -459,7 +460,7 @@ async def find_opportunities(
             event_type=EventType.BLUE_HOUR_EVENING,
             title=f"Blaue Stunde – {location.name}",
             description=(
-                f"Optimales Fenster {_fmt_time(bh_start)}–{_fmt_time(bh_end)} UTC. "
+                f"Optimales Fenster {_fmt_time(bh_start, location)}–{_fmt_time(bh_end, location)}{_fenster_zusatz(location)}. "
                 "Künstliche Beleuchtung trifft Resttageslichts – ideal für illuminierte Gebäude."
             ),
             shoot_time=bh_start,
@@ -499,7 +500,7 @@ async def find_opportunities(
             event_type=EventType.BLUE_HOUR_MORNING,
             title=f"Blaue Stunde Morgen – {location.name}",
             description=(
-                f"Optimales Fenster {_fmt_time(bh_morning_start)}–{_fmt_time(bh_morning_end)} UTC. "
+                f"Optimales Fenster {_fmt_time(bh_morning_start, location)}–{_fmt_time(bh_morning_end, location)}{_fenster_zusatz(location)}. "
                 "Einsetzende Morgendämmerung trifft auf Resttageslicht der Nacht – ideal für "
                 "illuminierte Gebäude."
             ),
@@ -822,7 +823,7 @@ async def find_opportunities(
                 event_type=event_type_mr,
                 title=f"{label} – {location.name}",
                 description=(
-                    f"{label} um {_fmt_time(moon_dt)} (Ortszeit).{az_note} "
+                    f"{label} um {_fmt_time(moon_dt, location)}{_ortszeit_zusatz(location)}.{az_note} "
                     f"{phase_note}"
                 ),
                 shoot_time=moon_dt,
@@ -902,7 +903,7 @@ async def find_opportunities(
                 title=f"{ecl_event_type.value} – {location.name}",
                 description=(
                     f"{ecl_event_type.value}: größte Verfinsterung um "
-                    f"{_fmt_time(solar_eclipse.max_time)} (Ortszeit), Winkeltrennung "
+                    f"{_fmt_time(solar_eclipse.max_time, location)}{_ortszeit_zusatz(location)}, Winkeltrennung "
                     f"Sonne–Mond {solar_eclipse.max_separation_deg:.3f}°. "
                     f"ACHTUNG: ND-Filter erforderlich!"
                 ),
@@ -933,7 +934,7 @@ async def find_opportunities(
                 title=f"{ecl_event_type_m.value} – {location.name}",
                 description=(
                     f"{ecl_event_type_m.value}: größte Verfinsterung um "
-                    f"{_fmt_time(lunar_eclipse.max_time)} (Ortszeit), Magnitude "
+                    f"{_fmt_time(lunar_eclipse.max_time, location)}{_ortszeit_zusatz(location)}, Magnitude "
                     f"{lunar_eclipse.magnitude:.2f}."
                 ),
                 shoot_time=lunar_eclipse.max_time,
@@ -953,10 +954,31 @@ async def find_opportunities(
     return opportunities
 
 
-def _fmt_time(dt: datetime) -> str:
-    """Formatiert UTC-Zeit als HH:MM."""
+def _ist_england(location) -> bool:
+    """US-138 Schritt 2: Ort in England (Londoner Ortszeit)? Ohne Ort/Koordinaten: nein."""
+    return _is_england(getattr(location, "observer_lat", None), getattr(location, "observer_lon", None))
+
+
+def _fmt_time(dt: datetime, location=None) -> str:
+    """Formatiert UTC-Zeit als HH:MM.
+
+    Orte in England (US-138 Schritt 2): Londoner Ortszeit (GMT/BST) exakt.
+    Alle anderen Orte und Aufrufe ohne Ort: unveraendert die bisherige feste +2 h-Naeherung."""
+    if _ist_england(location):
+        return _london_hhmm(dt)
     local = dt + timedelta(hours=2)  # CEST Annäherung (vereinfacht)
     return local.strftime("%H:%M")
+
+
+def _ortszeit_zusatz(location) -> str:
+    """Wortlaut hinter einer Uhrzeit in Beschreibungstexten ('... um 18:20 (Ortszeit)')."""
+    return " Uhr London (Ortszeit)" if _ist_england(location) else " (Ortszeit)"
+
+
+def _fenster_zusatz(location) -> str:
+    """Wortlaut hinter einem Zeitfenster ('Optimales Fenster 19:10–19:45 UTC'); der bisherige
+    Wortlaut 'UTC' bleibt fuer alle Orte ausserhalb Englands unveraendert."""
+    return " Uhr London" if _ist_england(location) else " UTC"
 
 
 async def find_opportunities_multi_day(

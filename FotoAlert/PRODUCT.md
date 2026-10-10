@@ -195,6 +195,32 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 
 ---
 
+## 3b. England / London (US-138, im Arbeitsstand umgesetzt — nicht committet, nicht released)
+
+Hintergrund: Der Host reist im Oktober 2026 nach London. Unterstützt wird England (mit London), nicht ganz Großbritannien.
+
+| Funktion | Verhalten |
+|----------|-----------|
+| Wetterkarte (Schritt 1) | Kartenausschnitt reicht jetzt im Westen bis −6,0° (vorher 3,0°); Bildbreite 360 → 540 Pixel (`backend/calculations/weather_grib.py`: `BBOX_W`, `PNG_W`). London und die Küste bei Great Yarmouth liegen im Bild. Spike: ICON-D2 deckt London ab. |
+| Ortszeit für England-Orte (Schritt 2) | Ein Ort gilt als „England“, wenn seine Koordinaten im Kasten 49,8–55,9° N / 5,8° W–1,8° O liegen, abzüglich der französischen Kanalküste (Länge > 0,9° O und Breite < 50,85° N). Die Regel steht in `backend/calculations/ortszeit.py` (`is_england`) und gleichlautend im Frontend (`zoneForCoords` in `web/index.html`); ein Test prüft beide gegen dieselbe Punkttabelle. Londoner Zeit mit britischer Sommerzeit (letzter Sonntag im März bis letzter Sonntag im Oktober, jeweils 01:00 UTC). |
+| Anzeige der Ortszeit | Zeit mit dezentem Zusatz „Uhr London“, z. B. „06:30 Uhr London“; bei Zeitspannen steht der Zusatz nur einmal am Ende („06:41 – 07:48 Uhr London“). Im Browser-Test am 2026-10-10 zeigte der Feed die „Uhr London“-Zeiten korrekt. |
+| Orte außerhalb Englands | Unverändert Berliner Zeit; im Feed-Fenstertext bleibt für sie der Wortlaut „UTC“ (siehe Ticket BUG-115, bewusst nicht in US-138 geändert). |
+| Entdecken-Tab (Schritt 3) | Die Lichtfenster (Blaue/Goldene Stunde) eines England-Motivs werden für den Ort des Motivs gerechnet (Koordinaten auf ein Viertelgrad-Raster gerundet), alle anderen Motive weiterhin für Berlin (`backend/discover/pipeline_base.py`: `light_reference`; genutzt in `sun_pipeline.py`, `moon_pipeline.py`). |
+| Feed-Deckel, England zuerst (AK18) | Bleibt der Feed über der Grenze von 500 Chancen, kommen zuerst die Chancen der England-Orte hinein, die übrigen füllen bis 500 auf (`backend/main.py`). Folge im Dev-Stand: Die 12 London-Orte erzeugen mehr als 500 Chancen, alle 500 Plätze sind London, Berliner Orte fehlen im Feed. Stephan hat das für die Reise akzeptiert; die faire Aufteilung ist Ticket US-140. |
+
+**Nicht-funktionale Anforderungen / Messwerte (US-138):**
+- Laufzeit der Wetterkarte (AK5, Vorher-Messung): typisch ca. 600–630 s, Ausreißer ca. 920–976 s. Die Mehrzeit durch den Entdecken-Tab (Scout) ist unbekannt. Die frühere Simulation ohne Downloads ergab ca. 1,9-fache Kartenrechenzeit (Vorgabe: höchstens 1,5-fach) — nur Simulation, keine Messung auf dem Server.
+- AK9 (Anteil gescheiterter Wetterabfragen höchstens 2 Prozentpunkte höher, Lauf unter 25 Minuten) ist auf dem Produktionsserver nicht gemessen.
+
+**Bekannte Einschränkungen (US-138):**
+- Cornwall (westlich ca. 3,94° W) bekommt keine Wetterkarten-Daten, weil das hochaufgelöste Modell dort nicht abdeckt (Entscheidung Stephan, 2026-10-10); die Lichtzeiten dort sind korrekt.
+- Der Entdecken-Tab für London ist im Browser nicht bestätigt: die Scout-Berechnung hing, der Overpass-Dienst antwortete mit Fehler 500; der Erreichbarkeitsfilter für London ist ungetestet. Belegt sind nur die Pipeline-Tests.
+- Wales, Isle of Man und Nordirland liegen im England-Kasten und bekommen Londoner Zeit (gleiche Uhrzeit); Dublin und Edinburgh liegen außerhalb (steht so im Modul-Kommentar von `ortszeit.py`).
+- Feed-Deckel: siehe oben, England verdrängt im Dev-Stand alle anderen Orte aus dem Feed (Folgeticket US-140).
+
+---
+
+
 ## 4. Detail-Sheet (Chancen-Detailansicht)
 
 Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Events (US-96).
@@ -581,6 +607,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | TASK-83 | HttpOnly-Cookie-Auth implementiert + Backend-Testsuite grün (In Test); manuelle Browser-Verifikation (Chrome + Safari, Cookie-Attribute + Secure-über-`http://localhost`, `fa_api`-Allow-Liste) noch ausstehend |
 | BUG-113 | Nacharbeit nach dem Anlegen/Verschieben eines Standorts hält den Server im **Linux-Nachbau** nicht mehr an (Weg B, released v1.23.1/v1.23.2; gemessen: längster Stillstand beim Kalender-Austausch 0,05–0,08 s (Grenze 0,5 s), Scout-Lauf ohne spürbaren Stillstand; Tests `test_bug113.py` 6/6, `test_bug113_kalender_austausch.py` 5/5, `test_bug113_nachbesserung.py` 6/6 grün, auch unter Python 3.9). **Offen:** echte Sekunden auf Stephans Mac und auf Produktion (ungemessen), manuelle Prüfung von AK7 (Verschieben eines bestehenden Standorts); AK5 ist nur als Näherung im Nachbau belegt. Bekannter Sonderfall: ist der Kalender im Speicher leer (Start-Einlesen gescheitert), lädt der Server einmalig die komplette Kalenderdatei neu — dabei kann er für die Einlesezeit kurz stehen. |
 | BUG-113 Nebenbefund | `/calendar` liest die komplette `calendar.json` (~1,1 GB) bei jedem Aufruf nur für das Feld `computed_at` — gleiche Ursachenklasse wie BUG-113 AK3, aber anderer Auslöser; bewusst außerhalb des BUG-113-Scopes, eigenes Ticket BUG-114. **Behoben durch BUG-114 (umgesetzt 2026-09-29, noch nicht released):** der Server merkt sich den Berechnungszeitpunkt beim Laden des Kalenders (Serverstart/Volllauf) und beim Einzel-Austausch eines Standorts; `/calendar` liest die Datei nicht mehr — eine halb geschriebene Datei oder ein fehlender Zeitpunkt führt nicht mehr zu einem Serverfehler. |
+| US-138 | England/London (Karte bis −6° W, Ortszeit „Uhr London“, Entdecken-Tab, Feed-Deckel England zuerst) im Arbeitsstand umgesetzt und getestet (In Test); Refactor-Check und Release ausstehend; Entdecken-Tab im Browser nicht bestätigt, Details in Abschnitt 3b |
 
 ---
 
@@ -748,6 +775,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-09-27 | BUG-113 (Nachbesserung) | `main.py`-Anteil wiederhergestellt (war durch die US-137-Nachbesserung am 2026-09-24 überschrieben). Leerer Kalender im Speicher → einmaliges Vollneuladen statt eines Kalenders mit nur einem Standort. Neuer Test `test_bug113_nachbesserung.py` (AK3 mit echter Übergabedatei, AK4, AK5, AK6, leerer Kalender); `test_us106.py` um eine Attrappe für den neuen Feed-Ladeweg ergänzt (Freigabe Stephan 2026-09-27); Punkt 6: Fehlschreiben der Übergabedatei wird ehrlich als Warnung protokolliert (`test_bug113_punkt6.py`). Released als v1.23.1 (2026-09-27) bzw. v1.23.2 (2026-09-28, nur Versionsnummer), Deploy verifiziert (App liefert v1.23.2, Backend ok). Echte Sekunden auf Produktion weiterhin ungemessen. |
 | 2026-09-07 | BUG-98 | 15 Locations mit bislang identischen Beobachter-/Motivkoordinaten datenseitig korrigiert (13× fehlende Motivkoordinaten jetzt als `null` gekennzeichnet statt fälschlich gleich dem Standort, 2× recherchierter, abweichender Beobachter-Standpunkt); neuer Code-Schutz `is_degenerate` in der Azimut-Kernfunktion verhindert für JEDE Location mit identischen Koordinaten einen irreführenden 0°-Nordpfeil bzw. eine falsche Sonnen-/Mond-Alignment-Chance. NUTZERSICHTBAR. 33/33 neue Tests (`test_bug-98.py`) + volle Regression 978 passed/7 vorbestehend-unabhängig/5 skipped. Released v1.22.70 (Commit `29cb9ad`, gemeinsam mit BUG-21), CI grün, Health-Check + Live-Rauchtest bestätigt. Hotfix (Commit `d7eb187`, gleicher Tag) behebt einen Absturz bei absichtlich fehlenden Motiv-Koordinaten in einem älteren Berechnungspfad, der die neue `is_degenerate`-Prüfung noch nicht erreichte — CI danach erneut grün. |
 | 2026-10-10 | TASK-106 | Der manuelle Sichtachsen-Check (Menüpunkt „Sichtachsen aktualisieren“, nur vom Host auslösbar) hält den Server beim Abschluss nicht mehr an: statt wie bisher Feed **und** die rund 1,1 GB große Kalenderdatei komplett neu einzulesen, lädt er nur noch den kleinen Feed neu, und zwar im Nebenstrang (`backend/main.py`: `_run_sightline_refresh()`). Der Kalender im Speicher bleibt dabei unverändert; neue Sichtachsen-Werte erscheinen im Kalender erst nach dem nächsten Kalender-Lauf der Vorberechnung bzw. Serverstart. Gemessen auf Produktion **vorher**: Server-Antwort während des Checks bis zu 10,3–10,5 s verzögert; **Nachher-Messung nach Teil 1 (2026-10-10): 14,6–17,7 s — Ziel nicht erreicht**, weil die Gebäudeabfrage je Standort den Server ebenfalls anhielt (laut Codelesung; nicht gemessen). **Nachbesserung:** Die Gebäudeabfrage (`backend/calculations/sightline.py`) läuft jetzt ebenfalls im Nebenstrang; Tests `test_task106.py` 7/7, `test_task106_gebaeude.py` 6/6. **Abschluss (2026-10-10, Commits `dd5ad0e` und `5394e8c`, beide live):** Messung auf Produktion während des Checks, ohne gleichzeitige Wetter-Jobs: größte Server-Verzögerung **0,41 s** (Ziel ≤ 0,5 s erreicht; vorher 10,3–10,5 s). Frühere Ausschläge bis 2,6 s kamen von gleichzeitig laufenden Wetter-Jobs. Python 3.9 nur über CI geprüft. |
+| 2026-10-10 | US-138 | England mit London im Arbeitsstand (nicht released): Wetterkarte bis −6,0° W, Ortszeit „Uhr London“ für England-Orte per Koordinatenregel, Lichtfenster im Entdecken-Tab am Ort des Motivs, Feed-Deckel mit England zuerst. Offene Punkte und Messwerte siehe Abschnitt 3b. |
 
 ---
 

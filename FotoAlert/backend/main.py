@@ -69,6 +69,7 @@ from calculations.astronomy import (
 from calculations.weather import fetch_weather_forecast, fetch_aerosol_forecast, RED_SKY_AOD_THRESHOLD, CLOUD_MOOD_PROJECTION_DISTANCE_M, RED_CLOUDS_PROJECTION_DISTANCE_M, calculate_photo_weather_score, wmo_code_to_description, calculate_golden_cloud_score, should_generate_golden_clouds_event, should_generate_red_sky_event, should_generate_red_clouds_event
 from calculations import weather_grib  # US-112: DWD ICON + MET Norway → weicher PNG-Overlay
 from calculations import sightline as sightline_calc  # US-09: Sichtachsen-Check (Raycast)
+from calculations.ortszeit import is_england  # US-138 AK18: England-Chancen bei der Feed-Kappung zuerst
 from discover.geometry import destination_point  # US-131: Projektion Wolken-/Dunstabfrage entlang Sichtachse
 from data.locations import (
     LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory, coerce_category_value,
@@ -3399,22 +3400,29 @@ def _filter_feed(
             groups[t] = []
         groups[t].append(e)
 
-    # 3. Reihum je 1 Event pro Typ nehmen bis Cap erreicht
+    # 3. Reihum je 1 Event pro Typ nehmen (bisherige Reihenfolge). US-138 AK18: die Reihenfolge
+    #    wird zunächst vollständig gebildet; Chancen von England-Orten kommen bei der Kappung
+    #    zuerst hinein, die übrigen füllen in dieser Reihenfolge bis _CAP auf.
     type_keys = list(groups.keys())
     indices = {t: 0 for t in type_keys}
-    selected = []
-    while len(selected) < _CAP:
+    order = []
+    while True:
         added_any = False
         for t in type_keys:
-            if len(selected) >= _CAP:
-                break
             idx = indices[t]
             if idx < len(groups[t]):
-                selected.append(groups[t][idx])
+                order.append(groups[t][idx])
                 indices[t] = idx + 1
                 added_any = True
         if not added_any:
             break
+
+    england = [e for e in order if is_england(e.get("observer_lat"), e.get("observer_lon"))]
+    if england:
+        rest = [e for e in order if not is_england(e.get("observer_lat"), e.get("observer_lon"))]
+        selected = (england + rest)[:_CAP]
+    else:
+        selected = order[:_CAP]
 
     # 4. Ergebnis zeitlich sortieren für die Ausgabe
     selected.sort(key=lambda e: e["shoot_time"])

@@ -31,13 +31,13 @@
 | **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **US-136** *(Vollanalyse abgeschlossen 2026-09-04 — Weg-Gate Rot: kritischste offene Frage 0 aus ROADMAP.md (Zeile 94) noch unbeantwortet — Sign in with Apple statt Eigenbau-E-Mail/Passwort-System könnte den gesamten Ticket-Scope obsolet machen; zusätzlich 9 weitere offene Architektur-/Scope-Fragen (Rollenmodell, iOS-Umfang, DSGVO-Löschkaskade, US-84-Bezug u.a.), AK-Qualitäts-Check dadurch ebenfalls blockiert)* · **BUG-110** *(Jahreskalender zeigt für den gesamten aktuellen Monat August 2026 keine Einträge, vermutlich Hintergrund-Job nie gelaufen, Fund aus Server-Status-Check 2026-08-25)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
 | **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* · **US-138** *(Schritt 1 von 3 (Wetterkarte um England) im Arbeitsstand umgesetzt 2026-10-10, noch nicht committet — wartet auf deine Freigabe für die Anpassung eines Altests und auf Spike/Vorher-Messung am Mac)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-114** *(Option A umgesetzt 2026-09-29, 9/9 Tickettests laut Umsetzung grün — Zweitprüfung läuft)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-114** *(Option A umgesetzt 2026-09-29, 9/9 Tickettests laut Umsetzung grün — Zweitprüfung läuft)* · **US-138** *(Schritte 1–3 plus Feed-Deckel England-zuerst im Arbeitsstand umgesetzt und getestet 2026-10-10 — wartet auf Refactor-Check und dein Release; Entdecken-Tab im Browser nicht bestätigt)* |
 | **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | *(leer)* |
 | **🏁 Done** | abgeschlossen + deployed | **TASK-106** · **BUG-113** · **TASK-54** · **TASK-58** · **TASK-89** · **US-134** · **TASK-101** · **BUG-99** · **BUG-93** · **BUG-96** · **BUG-92** · **TASK-86** · **BUG-81** · **TASK-84** · **TASK-83** · **TASK-82** · **TASK-80** · **TASK-41** · **TASK-51** · **BUG-79** · **TASK-60** · **TASK-76** · **TASK-77** · **TASK-78** · **TASK-62** · **US-132** · **US-131** · **TASK-63** · **TASK-73** · **TASK-74** · **US-130** · **BUG-77** · **TASK-72** · **TASK-61** · **TASK-67** · **BUG-76** · **TASK-70** · **BUG-75** · **TASK-66** · **TASK-64** · **BUG-73** · **BUG-74** · **TASK-68** · **BUG-68** · **BUG-70** · **US-129** · **BUG-66** · **US-127** · **US-85** · **BUG-65** · **US-09** · **US-21** · **TASK-57** · **US-117** · **TASK-56** · **US-125** · **US-126** · **BUG-57** · **BUG-60** · **US-124** · **US-120** · **US-119** · **BUG-61** · **US-123** · **US-121** · **US-122** · **BUG-59** · **TASK-53** · **BUG-58** · **US-87** · **BUG-56** · **US-113** · **US-72** · **US-112** · **BUG-55** · **BUG-54** · **US-109** · **US-108** · **US-07** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **BUG-53** · **BUG-72** · **BUG-51** · **US-107** · **US-106** · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** · **BUG-34** · **TASK-42** · **BUG-84** · **BUG-91** · **BUG-90** · **BUG-94** · **TASK-90** · **TASK-93** · **TASK-91** · **TASK-94** · **TASK-88** · **TASK-103** · **TASK-95** · **TASK-96** · **TASK-97** · **TASK-99** · **TASK-100** · **TASK-98** · **TASK-87** · **BUG-104** · **TASK-102** · **TASK-02** · **BUG-89** · **BUG-62** · **BUG-64** · **BUG-82** · **TASK-104** · **TASK-105** · **TASK-107** · **BUG-97** · **BUG-101** · **BUG-102** · **BUG-103** · **BUG-106** · **BUG-95** · **BUG-105** · **BUG-87** · **BUG-88** · **TASK-92** · **BUG-108** · **BUG-109** · **BUG-111** · **BUG-21** · **BUG-98** · **US-137** · *(Abschluss-Details je Ticket: BACKLOG-ARCHIVE.md → „Gate-Board Done-Historie“ bzw. das Ticket selbst)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-112** *(release.sh gegen Doppelausführung + Commit-Vorschau — BUG-113-Retro, Mittel)* |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-112** *(release.sh gegen Doppelausführung + Commit-Vorschau — BUG-113-Retro, Mittel)* · **BUG-115** *(Feed-Zeitfenster bei Berliner Orten fälschlich als UTC beschriftet — Fund aus US-138-Test, Mittel)* · **US-140** *(Feed-Deckel: England und Rest fair aufteilen — nach Stephans Rückkehr von der Reise, Mittel)* |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -6052,7 +6052,7 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 |------|------|
 | **Typ** | User Story |
 | **Priorität** | Hoch |
-| **Status** | In Progress |
+| **Status** | In Test |
 | **Erstellt** | 2026-10-10 |
 
 **Hinweis zum Pipeline-Gate:** Von Stephan am 2026-10-10 im Chat ausdrücklich nach der Anlage freigegeben ("Erstelle ein Ticket und starte dann die Pipeline") — direkt von Inbox nach Ready for Analysis, ohne den sonst üblichen Intake-Stopp.
@@ -6062,6 +6062,10 @@ Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in ders
 **Prototyp-Freigabe (Stephan, 2026-10-10, Chat):** Kennzeichnung der Londoner Ortszeit nach Variante A freigegeben (dezenter Zusatz „London“ direkt an der Uhrzeit, z. B. „07:12 London“; kein Etikett im Kopf des Blattes). Der Designer-Check hatte Variante D empfohlen; Stephan hat bewusst A gewählt. Klarstellungen für die Umsetzung (Konsistenz-Check, 2026-10-10): (1) Bei Zeitspannen steht der Zusatz nur einmal am Ende („06:41 – 07:48 Uhr London“), nicht an jeder Zeit. (2) AK14 („in Worten, nicht nur über die Zahl“) ist mit dem Zusatz erfüllt, solange das Wort eindeutig als Londoner Zeit lesbar ist (der Wortlaut „London“ hinter der Zeit; Erinnerung, Teilen-Text und Zeiten im Entdecken-Tab verwenden denselben Zusatz). (3) Orte außerhalb Englands zeigen unverändert Berliner Zeit ohne Zusatz (AK15). Prototyp: https://claude.ai/artifact/TmcZm9PSXS5pQuv4gyMBR2 (privat, Beispieldaten).
 
 **Fortschritt Schritt 1 (Karte), 2026-10-10:** Im Arbeitsstand (nicht committet, nicht released): Kartengrenze West von 3,0 auf −6,0 Grad, Bildbreite 360 → 540 Pixel, Ersatz-Grenzen in der App angeglichen, neue Testdatei mit 9 Tests (4 davon vor der Änderung rot, danach grün). Offen: (1) Der bestehende Test zur Antwort der Wetterkarte erwartet die alte Grenze 3,0 fest als Zahl und ist durch die Änderung rot — Änderung am Altest nur durch Stephan. (2) Spike „deckt ICON-D2 London in Stunde 0–48 ab?“ nicht belegt (DWD aus der Sandbox gesperrt) — Mess-Skript liegt unter outputs/2026-10-10_US-138-schritt1/, muss auf Stephans Mac laufen (AK2). (3) AK5 gefährdet: Simulation ohne Downloads ca. 1,9-fache Rechenzeit der Karte statt höchstens 1,5-fach (nur Simulation, Messung auf dem Server nötig). (4) Vorher-Messung auf dem Server (AK5/AK9) steht aus. Schritte 2 (Ortszeit) und 3 (Entdecken-Tab) noch nicht begonnen.
+
+**Fortschritt Schritt 2 und 3, 2026-10-10:** Schritt 2 (Ortszeit) und Schritt 3 (Entdecken-Tab) sind im Arbeitsstand umgesetzt (nicht committet, nicht released). Spike-Ergebnis: ICON-D2 deckt London ab. Die alte Testzeile in test_us112 wurde mit Stephans Ja auf −6,0 geändert. AK1 angepasst: Cornwall braucht keine Wetterkarten-Daten (Entscheidung Stephan).
+
+**Fortschritt Feed-Deckel und Browser-Test, 2026-10-10 (abends):** Der Feed-Deckel (AK18) ist im Arbeitsstand umgesetzt (nicht committet, nicht released): bei Überfüllung bekommen England-Orte zuerst ihre Plätze. Tests dazu: test_us138_england, test_us138_ortszeit, test_us138_entdecken, test_us138_feeddeckel (zuletzt grün). Browser-Test (Chrome, Dev-Server): Der Feed zeigt die Zeiten der England-Orte korrekt mit „Uhr London". Folge des Feed-Deckels im Dev-Stand: Die 12 London-Orte erzeugen mehr als 500 Chancen, dadurch sind alle 500 Feed-Plätze London und Berliner Orte fallen im Feed komplett heraus. **Entscheidung Stephan (2026-10-10, Chat):** „das ist ok. wir ändern das, wenn ich zurück bin." Er akzeptiert das für die Reise; die faire Aufteilung steht im Folgeticket US-140 (Inbox). **Noch offen / nicht belegt:** (1) Entdecken-Tab im Browser NICHT bestätigt — die Scout-Berechnung hing, der Overpass-Dienst antwortete mit Fehler 500; der Erreichbarkeitsfilter für London ist ungetestet, belegt sind nur die Pipeline-Tests. (2) AK5/AK9 Messungen auf dem Server (Vorher-Messung Karte typisch ca. 600–630 s, Ausreißer ca. 920–976 s; Mehrzeit durch Scout unbekannt). Nicht von US-138 (vorbestehend): test_bug110 und test_ephemeris_engine sind rot; Datenbank-Integritätswarnung der Alt-Tabelle location_qa_values_old_corrupt (BUG-70) aus dem Live-Stand; Wetter-Fehler bei Brandenburger Orten. **Stand:** Test-Gate durchlaufen; Refactor-Check (fotoalert-refactor) und Release-Gate stehen aus, Release liegt bei Stephan.
 
 **Beschreibung:** Der Host reist im Oktober 2026 nach London und braucht dort Wetter- und alle weiteren Daten für Orte in England, speziell London. Gewünscht ist nur England mit London, nicht ganz Großbritannien. Heute deckt die Wetterkarte fest Deutschland, Österreich, Norditalien und Norwegen ab (43,0 bis 71,5 Grad Nord, 3 bis 21 Grad Ost); England liegt außerhalb. Das Wetter pro Ort kommt von einem Dienst, der schon jetzt oft die Abfragegrenze meldet; zusätzliche Orte verschärfen das.
 
@@ -6107,7 +6111,7 @@ Das Ticket vermutet: Karte zu klein (✔ bestätigt) und Wetter pro Ort verschä
 
 ##### Akzeptanzkriterien (Alltagssprache)
 *Karte*
-- [ ] **AK1** Auf der Wetterkarte sind Wolken und Regen auch über England zu sehen: London, Cornwall im Südwesten (ca. 50,1° N / 5,5° W) und die Küste bei Great Yarmouth im Osten (ca. 52,6° N / 1,7° O) liegen im Kartenbild und bekommen Farbwerte, sobald Wetterdaten da sind. *(Herkunft: Ticket)*
+- [ ] **AK1** Auf der Wetterkarte sind Wolken und Regen auch über England zu sehen: London und die Küste bei Great Yarmouth im Osten (ca. 52,6° N / 1,7° O) liegen im Kartenbild und bekommen Farbwerte, sobald Wetterdaten da sind. Cornwall (westlich ca. 3,94° W) braucht keine Wetterkarten-Daten: das hochaufgelöste Modell deckt es nicht ab, die Lichtzeiten dort sind korrekt (Entscheidung Stephan, 2026-10-10). *(Herkunft: Ticket)*
 - [ ] **AK2** Über London gibt es Kartenwerte auch in den ersten 48 Stunden, nicht erst ab Stunde 48. *(Herkunft: Pre-Mortem 2)*
 - [ ] **AK3** Deutschland, Österreich, Norditalien, Norwegen: Bei gleichen Modelldaten weichen die Bewölkungswerte an Berlin, München und Oslo höchstens 2 Prozentpunkte von vorher ab; die Karte springt beim Einschalten nicht. *(Herkunft: Pre-Mortem 3)*
 - [ ] **AK4** Fällt für England eine Datenquelle aus, bleibt der Rest der Karte unverändert und England zeigt transparent „keine Daten" — keine Fehlfarben, keine Fehlermeldung für die ganze Karte. *(Herkunft: Zustands-Check)*
@@ -6264,6 +6268,60 @@ Designer-Check: **ja, nötig** (sichtbare Kennzeichnung „Ortszeit London", AK1
 **User Story:** Als Host der App, möchte ich einzelne Länder oder Regionen in einem Menü ein- und ausschalten können, sodass ich Gebiete wie Norwegen und Italien pausieren kann, ohne Daten zu verlieren, und mehr Datendichte für Gebiete wie England bekomme.
 
 **Bezug:** Zweite Priorität nach US-138 (erst England abdecken, dann Gebiete pausieren). Grenzt an US-84 (Host-Passwort in den Einstellungen, nur gleicher Ort), US-136 (Mehrnutzer-Login; dort ändert sich ggf., wie "nur Host" erkannt wird), US-66 und TASK-103 (Done, Archiv: Host-Rechte). Zu klären in der Analyse: Wirkung auf Karte, Feed, Kalender und tägliche Vorberechnung, und was mit Orten ohne klare Landeszuordnung passiert.
+
+---
+
+### BUG-115 · Zeitfenster im Feed steht bei Berliner Orten als "UTC", zeigt aber Berliner Zeit `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | BugFix |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-10-10 |
+
+**Beschreibung:** Gefunden beim US-138-Test am 2026-10-10. Bei Orten in Berlin steht im Feed z. B. "Optimales Fenster 06:50–07:03 UTC". Die Zahlen sind aber Berliner Zeit (UTC plus 2 Stunden Sommerzeit), die Kennzeichnung "UTC" ist deshalb irreführend: Wer sie wörtlich nimmt, plant die Aufnahme zwei Stunden zu früh.
+
+**User Story:** Als Fotograf, der morgens ein Zeitfenster aus dem Feed liest, möchte ich, dass die Kennzeichnung hinter der Uhrzeit zu den Zahlen passt, sodass ich nicht zur falschen Zeit am Ort stehe.
+
+**Stand der Prüfung (Intake, 2026-10-10, nichts geraten):**
+- **Am Quelltext bestätigt** (`backend/calculations/opportunity.py`): `_fmt_time` rechnet für Orte außerhalb Englands fest UTC plus 2 Stunden ("CEST Annäherung", Z. 969). `_fenster_zusatz` (Z. 978–981) hängt für dieselben Orte trotzdem " UTC" an; die Texte "Optimales Fenster …" entstehen an zwei Stellen (Z. 463 und 503). Andere Zeitangaben nutzen dagegen " (Ortszeit)" (`_ortszeit_zusatz`) — die Kennzeichnung ist also uneinheitlich.
+- **Im Feed-Cache bestätigt** (`backend/data/cache/opportunities.json`, Stand 28.09.2026): Texte wie "Optimales Fenster 06:43–06:56 UTC" kommen hundertfach vor.
+- **Bewusst so gelassen:** In US-138 (AK15: Orte außerhalb Englands unverändert) und im Test `test_us138_ortszeit.py` Z. 412 ist der Wortlaut " UTC" für Berlin festgeschrieben. Eine Änderung muss diesen Test bewusst anpassen.
+- **Mögliche Nebenwirkung, in der Analyse zu prüfen:** Die feste +2-Stunden-Rechnung gilt auch im Winter (MEZ ist nur +1) — dann wäre nicht nur die Beschriftung, sondern auch die Uhrzeit um eine Stunde falsch. Nicht gemessen, nur aus dem Code gelesen.
+
+**Bezug (Überschneidungs-Check 2026-10-10, Grep im aktiven Backlog nach Zeit/UTC/Zeitzone/Ortszeit/Fenster):**
+- **US-138** *(In Progress)* — Ursprung des Fundes (England-Zeitumstellung). Abgrenzung: NICHT Teil von US-138 und nicht dort mitfixen; AK15 bleibt wie festgelegt.
+- Kein offenes Ticket beschreibt diese Beschriftung. Der Backlog-Treffer um Z. 4135 (Uhrzeit im Regler, UTC-Ziffern als Ortszeit gelesen) ist ein anderer Fehler in der Oberfläche, nicht der Feed-Text, und gehört einem abgeschlossenen/älteren Ticket.
+- Keine Dublette.
+
+**Erwartetes Nutzerverhalten (Ausgangspunkt für die Analyse, keine Lösungsvorgabe):** Die Kennzeichnung hinter dem Zeitfenster sagt die Wahrheit (Ortszeit statt "UTC") und ist mit den übrigen Zeitangaben einheitlich. Ob zusätzlich die Winterzeit korrekt gerechnet wird, klärt die Analyse.
+
+---
+
+### US-140 · Feed-Deckel: England und übrige Orte fair aufteilen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | ToDo |
+| **Erstellt** | 2026-10-10 |
+
+**Beschreibung:** Der Feed zeigt höchstens 500 Chancen. Mit US-138 (AK18) bekommen England-Orte dabei Vorrang, damit London-Termine nicht untergehen. Im Entwicklungsstand erzeugen die 12 London-Orte mehr als 500 Chancen; dadurch sind alle 500 Plätze London und Berliner Orte fehlen im Feed ganz (im Browser-Test am 2026-10-10 gesehen). Stephan hat das für die Londoner Reise ausdrücklich akzeptiert („das ist ok. wir ändern das, wenn ich zurück bin.“). Dieses Ticket löst das danach auf.
+
+**User Story:** Als Fotograf mit Orten in Deutschland und England möchte ich im Feed Chancen aus beiden Gebieten sehen, sodass weder England meine Heimatorte noch meine Heimatorte England verdrängen.
+
+**Zeitpunkt:** Erst nach Stephans Rückkehr von der Reise (Oktober 2026). Nicht vorher bearbeiten.
+
+**Lösungsrichtung (nur Vorschlag, Entscheidung offen):** Getrenntes Kontingent, z. B. 250 Plätze für England und 250 für den Rest. Alternativen gehören in die Analyse (z. B. Aufteilung nach Region je nach Schalter aus US-139, oder nach Entfernung zum Standort).
+
+**Bezug und Abgrenzung (nichts geraten, aus dem Backlog gelesen):**
+- **US-138** *(In Test)* — AK18 verlangt nur, dass England-Termine im gekappten Feed auffindbar sind; die dafür gebaute Regel „England zuerst“ ist hier der Auslöser. US-138 bleibt unverändert; die faire Aufteilung ist NICHT Teil von US-138.
+- **US-139** *(Ready for Analysis)* — Regionen-Schalter im Host-Menü (Länder pausieren). Anderes Ziel: dort schaltet der Host ganze Gebiete ab; hier geht es um die Platzverteilung im Feed, wenn mehrere Gebiete aktiv sind. Berührungspunkt: Die Aufteilung könnte sich an den aktiven Regionen aus US-139 orientieren, daher in der Analyse gemeinsam betrachten.
+- **BUG-115** *(ToDo)* — Beschriftung „UTC“ bei Berliner Orten im Feed; anderes Thema.
+
+**Erwartetes Nutzerverhalten (Ausgangspunkt für die Analyse, keine Lösungsvorgabe):** Der Feed enthält Chancen aus England und aus den übrigen Orten, auch wenn England sehr viele Chancen erzeugt.
 
 ---
 

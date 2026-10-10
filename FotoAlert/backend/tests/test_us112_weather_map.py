@@ -303,7 +303,7 @@ def test_weather_map_endpoint_schema(client):
     assert r.status_code == 200
     b = r.json()
     assert b["ready"] is True
-    assert b["bounds"] == [[43.0, 3.0], [71.5, 21.0]]
+    assert b["bounds"] == [[43.0, -6.0], [71.5, 21.0]]
     assert len(b["hourly_times"]) == 1
     assert b["frames"]["clouds"][0] == "/weather-map/png/cloud/0"
     assert b["frames"]["precip"][0] is None  # kein Bild → null, kein Fake-URL

@@ -6,6 +6,9 @@ Datenquellen (alle gratis + kommerziell nutzbar):
   - MET Norway Locationforecast 2.0 (Punkt-API, JSON) für Norwegen
     (ICON-D2/-EU-Schärfe für Norwegen bewusst über MET-Punkte ergänzt)
 
+Geltungsbereich der Karte: Deutschland, Österreich, Norditalien, Norwegen, England
+(US-138; Grenzen siehe BBOX_* unten).
+
 Felder:
   - Wolkendecke:  DWD CLCT (total cloud cover %)
   - Niederschlag: DWD TOT_PREC (akkumuliert mm → pro Stunde differenziert)
@@ -68,16 +71,20 @@ except Exception as _e:  # pragma: no cover
 
 DWD_OPENDATA = "https://opendata.dwd.de/weather/nwp"
 
-# Geltungsbereich (Bounding-Box des Overlays): DE + AT + Norditalien + Norwegen.
-# Süd 43.0 (Po-Ebene), Nord 71.5 (Nordnorwegen), West 3.0, Ost 21.0.
+# Geltungsbereich (Bounding-Box des Overlays): DE + AT + Norditalien + Norwegen
+# + England (US-138). Süd 43.0 (Po-Ebene), Nord 71.5 (Nordnorwegen),
+# West -6.0 (Cornwall/Land's End ca. 5.7° W), Ost 21.0.
 BBOX_S = 43.0
 BBOX_N = 71.5
-BBOX_W = 3.0
+BBOX_W = -6.0
 BBOX_E = 21.0
 
 # Render-Auflösung des PNG (Pixel). Bewusst moderat — weicher Verlauf, kleine
 # Dateien, schneller Render. Seitenverhältnis grob an die BBox angelehnt.
-PNG_W = 360
+# US-138: Breite im selben Verhältnis wie vorher mitgewachsen (20 Pixel je Grad
+# Länge: vorher 18° -> 360 px, jetzt 27° -> 540 px), damit die Schärfe über
+# Deutschland/Österreich/Norwegen unverändert bleibt (Pre-Mortem 3).
+PNG_W = 540
 PNG_H = 420
 
 # IDW-Interpolation

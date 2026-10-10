@@ -24,7 +24,7 @@ from discover.geometry import destination_point
 from discover.pipeline_base import (
     W_ALIGNMENT, W_PHASE, W_LICHT, W_KOMPOSITION, W_WETTER,
     ScoutOpportunity,
-    is_new_perspective, sample_window, compute_d,
+    is_new_perspective, compute_d, light_reference, build_day_sessions,
     score_licht, score_komposition, weather_desc, get_weather,
 )
 from discover.subjects import SUBJECTS, DiscoverSubject
@@ -71,17 +71,15 @@ async def run(days: int = 14) -> list[ScoutOpportunity]:
     today = date.today()
     all_opportunities: list[ScoutOpportunity] = []
 
-    # Lichtfenster für alle Tage
-    day_sessions: dict[str, dict[str, list[datetime]]] = {}
-    for delta in range(days):
-        d = today + timedelta(days=delta)
-        sun = calculate_sun_info(_SUN_REF_LAT, _SUN_REF_LON, d)
-        day_sessions[d.isoformat()] = {
-            "blue_morning":   sample_window(sun.blue_hour_morning_start,  sun.blue_hour_morning_end),
-            "golden_morning": sample_window(sun.golden_hour_morning_start, sun.golden_hour_morning_end),
-            "golden_evening": sample_window(sun.golden_hour_evening_start, sun.golden_hour_evening_end),
-            "blue_evening":   sample_window(sun.blue_hour_evening_start,   sun.blue_hour_evening_end),
-        }
+    # Lichtfenster je Bezugspunkt (US-138: Berlin, in England der Ort des Motivs),
+    # je Bezugspunkt und Tag nur einmal berechnet.
+    sessions_by_ref: dict = {}
+
+    def _sessions_for(subject):
+        ref = light_reference(subject.lat, subject.lon)
+        if ref not in sessions_by_ref:
+            sessions_by_ref[ref] = build_day_sessions(calculate_sun_info, ref[0], ref[1], today, days)
+        return sessions_by_ref[ref]
 
     log.info("[Sonne] Pipeline läuft (%d Motive × %d Tage)...", len(SUBJECTS), days)
 
@@ -89,7 +87,7 @@ async def run(days: int = 14) -> list[ScoutOpportunity]:
         weather_fc = await get_weather(subject.lat, subject.lon)
         sun_pos_cache: dict[datetime, Optional[CelestialPosition]] = {}
 
-        for day_str, sessions in day_sessions.items():
+        for day_str, sessions in _sessions_for(subject).items():
             for session_name, timestamps in sessions.items():
                 best: Optional[ScoutOpportunity] = None
 
