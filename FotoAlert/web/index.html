@@ -222,6 +222,9 @@
     .opp-type { font-size: 11px; color: var(--muted); }
     .opp-time { font-size: 11px; color: var(--text); margin-left: auto;
       font-variant-numeric: tabular-nums; }
+    /* US-138 Schritt 2: Zusatz "London" direkt an der Uhrzeit (Variante A, Prototyp-Freigabe) */
+    .zone { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: .2px; }
+    .tw-time .zone { display: block; margin: 2px 0 0; }
     .opp-title { font-size: 14px; font-weight: 600; white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .opp-location { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
@@ -1626,7 +1629,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.23.2';
+const APP_VERSION = '1.24.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1880,6 +1883,67 @@ function formatDate(iso, tz='Europe/Berlin') {
   if (dStr === tom.toLocaleDateString('de-DE',{timeZone:tz})) return 'Morgen';
   return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',timeZone:tz});
 }
+// ── US-138 Schritt 2: Ortszeit für Orte in England ─────────────────────────────
+// Regel "England-Ort": Koordinaten im Kasten 49,8–55,9° N / 5,8° W–1,8° O, ohne die
+// französische Kanalküste (Länge > 0,9° O und Breite < 50,85° N: Dieppe, Boulogne).
+// Dort gilt Londoner Ortszeit mit dem Zusatz „London" direkt an der Uhrzeit; überall sonst
+// (Deutschland, Norwegen, ...) unverändert Berliner Zeit ohne Zusatz (AK15).
+// Gleiche Regel serverseitig: backend/calculations/ortszeit.py (ein Test prüft beide).
+function zoneForCoords(lat, lon) {
+  if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return 'Europe/Berlin';
+  const inBox = lat >= 49.8 && lat <= 55.9 && lon >= -5.8 && lon <= 1.8;
+  const frenchCoast = lon > 0.9 && lat < 50.85;
+  return (inBox && !frenchCoast) ? 'Europe/London' : 'Europe/Berlin';
+}
+// Zeitzone des Ortes eines Termins/Standorts/Scout-Treffers (Koordinaten des Fotografen-
+// Standpunkts; ohne Koordinaten über die Orts-ID; sonst Berlin).
+function placeZone(o) {
+  if (!o) return 'Europe/Berlin';
+  let lat = o.observer_lat, lon = o.observer_lon;
+  if (lat == null || lon == null) { lat = o.standpoint_lat; lon = o.standpoint_lon; }
+  if ((lat == null || lon == null) && o.location_id != null) {
+    const l = Locations.all.find(x => x.id === o.location_id);
+    if (l) { lat = l.observer_lat; lon = l.observer_lon; }
+  }
+  return zoneForCoords(lat, lon);
+}
+const _ZONE_HTML = ' <span class="zone">London</span>';
+// Uhrzeit am Ort: Berlin "07:30 Uhr" · England "06:30 Uhr London" (html=true: Zusatz als Span)
+function timeAt(iso, o, html) {
+  const tz = placeZone(o);
+  const t = formatTime(iso, tz);
+  if (tz !== 'Europe/London') return t;
+  return html ? t + _ZONE_HTML : t + ' London';
+}
+// Zeitspanne am Ort: Zusatz nur einmal am Ende ("06:41 – 07:48 Uhr London")
+function timeRangeAt(isoA, isoB, o, html) {
+  const tz = placeZone(o);
+  if (tz !== 'Europe/London') return formatTime(isoA, tz) + ' – ' + formatTime(isoB, tz);
+  return formatTime(isoA, tz).replace(' Uhr', '') + ' – ' + formatTime(isoB, tz) + (html ? _ZONE_HTML : ' London');
+}
+// "Heute" / "Morgen" / Datum nach dem Kalendertag AM ORT (AK13)
+function dayAt(iso, o) { return formatDate(iso, placeZone(o)); }
+// Kalendertag-Schlüssel (YYYY-MM-DD): England nach Datum in London, alle anderen Orte
+// unverändert nach UTC-Datum (bisheriges Verhalten des Jahreskalenders)
+function dayKeyAt(iso, o) {
+  const d = new Date(iso);
+  if (placeZone(o) !== 'Europe/London') return d.toISOString().slice(0, 10);
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d);
+  const g = t => p.find(x => x.type === t).value;
+  return g('year') + '-' + g('month') + '-' + g('day');
+}
+// Uhrzeit im Jahreskalender: England in Londoner Zeit mit Zusatz, alle anderen Orte
+// unverändert (bisherige feste +2-h-Näherung)
+function calTimeAt(iso, o) {
+  if (placeZone(o) === 'Europe/London') return timeAt(iso, o, true);
+  const t = new Date(iso);
+  return String(t.getUTCHours() + 2).padStart(2, '0') + ':' + String(t.getUTCMinutes()).padStart(2, '0') + ' Uhr';
+}
+// Wochentag/Datum + Uhrzeit am Ort (nur für England-Orte aufgerufen; Ortsliste)
+function dateTimeAt(iso, o, html) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: placeZone(o) }) + ' ' + timeAt(iso, o, html);
+}
 function pct(v) { return Math.round(v*100) + '%'; }
 
 // Sonnenaufgang / -untergang für Berlin (UTC-Stunden, Spencer-Approximation)
@@ -2015,7 +2079,7 @@ function oppCard(o) {
         <div class="opp-meta">
           <span class="opp-icon">${icon}</span>
           <span class="opp-type">${o.event_type}</span>
-          <span class="opp-time">${formatTime(o.shoot_time)}</span>
+          <span class="opp-time">${timeAt(o.shoot_time, o, true)}</span>
         </div>
         <div class="opp-title">${esc(o.title)}</div>
         <div class="opp-location">${ic('i-pin',13)} ${esc(Locations.nameFor(o.location_id, o.location_name))}</div>
@@ -2028,7 +2092,7 @@ function oppCard(o) {
 function scoutCard(o) {
   const sesLabel  = SESSION_LABELS[o.session] || o.session;
   const icon      = eventIcon(sesLabel, 15, 'ct');
-  const time      = o.dt_utc ? formatTime(o.dt_utc) : '–';
+  const time      = o.dt_utc ? timeAt(o.dt_utc, o, true) : '–';
   const bearing   = bearingLabel(o.standpoint_lat, o.standpoint_lon, o.subject_lat, o.subject_lon);
   const distKm    = o.distance_m != null ? (Math.round(o.distance_m / 100) / 10).toLocaleString('de-DE') : null;
   const illumPct  = o.body_illumination_pct ?? o.moon_illumination_pct ?? null;
@@ -2164,7 +2228,7 @@ const Feed = {
           let html = `<div class="section-head" style="color:var(--muted);font-size:11px;letter-spacing:.04em;padding-top:10px;display:flex;align-items:center;gap:5px">${ic('i-cal',13)}TÄGLICHE CHANCEN · Kein besonderes Alignment in den nächsten 14 Tagen</div>`;
           const rGroups = {};
           for (const o of routineData) {
-            const day = formatDate(o.shoot_time);
+            const day = dayAt(o.shoot_time, o);
             if (!rGroups[day]) rGroups[day] = [];
             rGroups[day].push(o);
           }
@@ -2208,7 +2272,7 @@ const Feed = {
       const chips = high.slice(0,6).map(o =>
         `<div class="alert-chip" onclick="Detail.open(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           <div class="chip-icon">${eventIcon(o.event_type, 20)}</div>
-          <div class="chip-day">${formatDate(o.shoot_time)}</div>
+          <div class="chip-day">${dayAt(o.shoot_time, o)}</div>
           <div class="chip-name">${esc(Locations.nameFor(o.location_id, o.location_name))}</div>
         </div>`).join('');
       html += `<div id="alert-banner">
@@ -2220,7 +2284,7 @@ const Feed = {
     // Group by day
     const groups = {};
     for (const o of data) {
-      const day = formatDate(o.shoot_time);
+      const day = dayAt(o.shoot_time, o);
       if (!groups[day]) groups[day] = [];
       groups[day].push(o);
     }
@@ -2236,7 +2300,7 @@ const Feed = {
     el.innerHTML = html;
 
     // Update header
-    const today = data.filter(o => formatDate(o.shoot_time) === 'Heute');
+    const today = data.filter(o => dayAt(o.shoot_time, o) === 'Heute');
     const best = today.length ? Math.max(...today.map(o=>o.overall_score)) : null;
     document.getElementById('header-subtitle').textContent =
       best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Capture moments that matter.';
@@ -2528,7 +2592,7 @@ const CalendarView = {
     // Deduplizierung: pro Location + EventType + Tag nur bestes Event (höchster Score)
     const bestMap = new Map();
     for (const e of rawMonth) {
-      const day = new Date(e.shoot_time).toISOString().slice(0, 10);
+      const day = dayKeyAt(e.shoot_time, e);
       const key = `${e.location_id}|${e.event_type}|${day}`;
       const existing = bestMap.get(key);
       if (!existing || e.overall_score > existing.overall_score) {
@@ -2544,8 +2608,7 @@ const CalendarView = {
     // Gruppieren nach Tag
     const groups = {};
     for (const e of monthEvents) {
-      const d = new Date(e.shoot_time);
-      const key = d.toISOString().slice(0, 10);
+      const key = dayKeyAt(e.shoot_time, e);
       if (!groups[key]) groups[key] = [];
       groups[key].push(e);
     }
@@ -2576,17 +2639,13 @@ const CalendarView = {
 
         for (const e of evts) {
           const icon = eventIcon(e.event_type, 20);
-          const t = new Date(e.shoot_time);
-          // +2h CEST Annäherung
-          const hh = String(t.getUTCHours() + 2).padStart(2,'0');
-          const mm = String(t.getUTCMinutes()).padStart(2,'0');
           const prio = e.alert_priority >= 2 ? ` ${ic('i-star',12)}` : '';
           const moonTxt = e.moon_phase ? ` · ${e.moon_phase}` : '';
           html += `<div class="cal-event" onclick="CalendarView.openDetail(${JSON.stringify(e).replace(/"/g,'&quot;')})">
             <div class="cal-event-icon">${icon}</div>
             <div class="cal-event-body">
               <div class="cal-event-title">${esc(e.title)}${prio}</div>
-              <div class="cal-event-sub">${esc(Locations.nameFor(e.location_id, e.location_name))} · ${hh}:${mm} Uhr${moonTxt}</div>
+              <div class="cal-event-sub">${esc(Locations.nameFor(e.location_id, e.location_name))} · ${calTimeAt(e.shoot_time, e)}${moonTxt}</div>
             </div>
             <div class="cal-event-score">${Math.round(e.overall_score * 100)}%</div>
           </div>`;
@@ -4678,12 +4737,12 @@ const Detail = {
       ${o.celestial_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Himmelsobjekt</span><span class="ir-val">${o.celestial_azimuth.toFixed(1)}°</span></div>` : ''}
       ${o.celestial_altitude != null ? `<div class="info-row"><span class="ir-label">Höhe Himmelsobjekt</span><span class="ir-val">${o.celestial_altitude.toFixed(2)}°</span></div>` : ''}
       ${o.subject_azimuth != null ? `<div class="info-row"><span class="ir-label">Azimut Sichtachse</span><span class="ir-val">${o.subject_azimuth.toFixed(1)}°</span></div>` : ''}
-      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.sunrise_utc)}${o.sunrise_azimuth != null ? ` · ${o.sunrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
-      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.sunset_utc)}${o.sunset_azimuth != null ? ` · ${o.sunset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
-      ${o.moonrise_utc ? `<div class="info-row"><span class="ir-label">Mondaufgang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonrise_utc)}${o.moonrise_azimuth != null ? ` · ${o.moonrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
-      ${o.moonset_utc ? `<div class="info-row"><span class="ir-label">Monduntergang</span><span class="ir-val">${ic('i-moon',13)} ${formatTime(o.moonset_utc)}${o.moonset_azimuth != null ? ` · ${o.moonset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
-      ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">${ic('i-sunrise',13)} ${formatTime(o.blue_hour_morning_start)} – ${formatTime(o.golden_hour_morning_end)}</span></div>` : ''}
-      ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">${ic('i-sunset',13)} ${formatTime(o.golden_hour_evening_start)} – ${formatTime(o.blue_hour_evening_end)}</span></div>` : ''}
+      ${o.sunrise_utc ? `<div class="info-row"><span class="ir-label">Sonnenaufgang</span><span class="ir-val">${ic('i-sunrise',13)} ${timeAt(o.sunrise_utc, o, true)}${o.sunrise_azimuth != null ? ` · ${o.sunrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${o.sunset_utc ? `<div class="info-row"><span class="ir-label">Sonnenuntergang</span><span class="ir-val">${ic('i-sunset',13)} ${timeAt(o.sunset_utc, o, true)}${o.sunset_azimuth != null ? ` · ${o.sunset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${o.moonrise_utc ? `<div class="info-row"><span class="ir-label">Mondaufgang</span><span class="ir-val">${ic('i-moon',13)} ${timeAt(o.moonrise_utc, o, true)}${o.moonrise_azimuth != null ? ` · ${o.moonrise_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${o.moonset_utc ? `<div class="info-row"><span class="ir-label">Monduntergang</span><span class="ir-val">${ic('i-moon',13)} ${timeAt(o.moonset_utc, o, true)}${o.moonset_azimuth != null ? ` · ${o.moonset_azimuth.toFixed(1)}°` : ''}</span></div>` : ''}
+      ${(o.blue_hour_morning_start && o.golden_hour_morning_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Morgen</span><span class="ir-val">${ic('i-sunrise',13)} ${timeRangeAt(o.blue_hour_morning_start, o.golden_hour_morning_end, o, true)}</span></div>` : ''}
+      ${(o.golden_hour_evening_start && o.blue_hour_evening_end) ? `<div class="info-row"><span class="ir-label">Goldene/Blaue Std. Abend</span><span class="ir-val">${ic('i-sunset',13)} ${timeRangeAt(o.golden_hour_evening_start, o.blue_hour_evening_end, o, true)}</span></div>` : ''}
     `;
 
     const _wdot = col => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:5px;vertical-align:middle"></span>`;
@@ -4723,7 +4782,7 @@ const Detail = {
         </div>
       </div>
       ${mkSec('ev_desc',`${ic('i-doc',15)} Beschreibung`,`<p style="font-size:13px;color:var(--muted);line-height:1.6">${esc(o.description)}</p>`)}
-      ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('idealWindow')">i</button>`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${formatTime(o.shoot_window_start)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${formatTime(o.shoot_time)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${formatTime(o.shoot_window_end)}</div></div></div>`)}
+      ${mkSec('ev_zeit',`${ic('i-clock',15)} Ideales Zeitfenster <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('idealWindow')">i</button>`,`<div class="time-window"><div class="tw-col"><div class="tw-label">Start</div><div class="tw-time">${timeAt(o.shoot_window_start, o, true)}</div></div><div class="tw-col"><div class="tw-label">Optimal</div><div class="tw-time tw-optimal">${timeAt(o.shoot_time, o, true)}</div></div><div class="tw-col"><div class="tw-label">Ende</div><div class="tw-time">${timeAt(o.shoot_window_end, o, true)}</div></div></div>`)}
       ${(() => {
         const wd = o.weather_details;
         if (!wd) return mkSec('ev_wetter',`${ic('i-cloud',15)} Wetter <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('weather')">i</button>`,`${o.weather_description ? `<div class="info-row"><span class="ir-label">Wetter</span><span class="ir-val">${o.weather_description}</span></div>` : ''}<div class="info-row"><span class="ir-label">Prognose</span><span class="ir-val" style="color:var(--muted)">${ic('i-clock',13)} Verfügbar ab T-3 Tage</span></div>`);
@@ -5157,7 +5216,7 @@ const Detail = {
           icon: '/icons/icon-192.png'
         });
       }, ms);
-      toast(`🔔 Erinnerung gesetzt für ${formatTime(o.shoot_time)}`);
+      toast(`🔔 Erinnerung gesetzt für ${timeAt(o.shoot_time, o)}`);
     });
   },
   openInMaps(lat, lon, label) {
@@ -5233,11 +5292,11 @@ const Detail = {
     const locName = Locations.nameFor(o.location_id, o.location_name) || o.title || o.subject_name || 'Unbekannter Ort';
     const lines = [];
     lines.push(`${locName} – ${o.event_type}`);
-    lines.push(`Datum: ${new Date(o.shoot_time).toLocaleDateString('de-DE', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Europe/Berlin'})}`);
+    lines.push(`Datum: ${new Date(o.shoot_time).toLocaleDateString('de-DE', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone: placeZone(o)})}`);
     const windowStr = (o.shoot_window_start && o.shoot_window_end)
-      ? ` (Zeitfenster ${formatTime(o.shoot_window_start).replace(' Uhr','')}–${formatTime(o.shoot_window_end)})`
+      ? ` (Zeitfenster ${formatTime(o.shoot_window_start, placeZone(o)).replace(' Uhr','')}–${timeAt(o.shoot_window_end, o)})`
       : '';
-    lines.push(`Uhrzeit: ${formatTime(o.shoot_time)}${windowStr}`);
+    lines.push(`Uhrzeit: ${timeAt(o.shoot_time, o)}${windowStr}`);
     if (o.subject_lat != null && o.subject_lon != null) {
       lines.push(`Standort (Fotograf): ${o.observer_lat.toFixed(5)}, ${o.observer_lon.toFixed(5)}`);
       lines.push(`Motiv: ${locName}, ${o.subject_lat.toFixed(5)}, ${o.subject_lon.toFixed(5)}`);
@@ -5652,10 +5711,10 @@ const WeatherMap = {
   _savedView: null,     // {center, zoom} vor dem Einschalten (BUG-55)
   _CACHE_TTL_MS: 3600000, // 60 Minuten
 
-  // US-112: Fallback-Hülle (DE/AT/Norditalien/Norwegen-BBox), falls beim
+  // US-112: Fallback-Hülle (DE/AT/Norditalien/Norwegen/England-BBox, US-138), falls beim
   // Einschalten noch keine Bounds vom Server da sind. Robuste Quelle ist
   // this.data.bounds [[S,W],[N,E]] — siehe _gridBounds().
-  _FALLBACK_BOUNDS: [[43.0, 3.0], [71.5, 21.0]],
+  _FALLBACK_BOUNDS: [[43.0, -6.0], [71.5, 21.0]],
 
   // Farbpaletten
   _CLOUD_COLORS: [
@@ -7198,7 +7257,7 @@ const LocationDetail = {
       if (sunEl && todayEvt) {
         const srAz = todayEvt.sunrise_azimuth;
         const ssAz = todayEvt.sunset_azimuth;
-        const fmt2 = iso => new Date(iso).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+        const fmt2 = iso => placeZone(loc) === 'Europe/London' ? timeAt(iso, loc, true) : new Date(iso).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
         const motifAz = (loc && loc.subject_lat && loc.subject_lon) ? todayEvt.subject_azimuth : null;
         const srLabel = srAz != null ? ` · ${srAz.toFixed(1)}°` : '';
         const ssLabel = ssAz != null ? ` · ${ssAz.toFixed(1)}°` : '';
@@ -7287,7 +7346,8 @@ const LocationDetail = {
       if (t.includes('blue')||t.includes('blau')) return 'i-moon';
       return 'i-star';
     };
-    const fmt = iso => {
+    const fmt = (iso, ev) => {
+      if (placeZone(ev) === 'Europe/London') return dateTimeAt(iso, ev, true);
       const d = new Date(iso);
       return d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) + ' ' +
              d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
@@ -7297,7 +7357,7 @@ const LocationDetail = {
         <div class="loc-next-event-icon">${ic(eventIcon(e),18)}</div>
         <div class="loc-next-event-body">
           <div class="loc-next-event-title">${esc(e.title)}</div>
-          <div class="loc-next-event-meta">${fmt(e.shoot_time)}</div>
+          <div class="loc-next-event-meta">${fmt(e.shoot_time, e)}</div>
         </div>
         <div class="loc-next-event-score">${Math.round((e.overall_score||0)*100)}%</div>
       </div>`).join('');
@@ -7694,11 +7754,12 @@ const AddLocation = {
   },
   renderPreview(data) {
     const {profile, alignments} = data;
+    const _z = { observer_lat: this.obs ? this.obs.lat : null, observer_lon: this.obs ? this.obs.lng : null };
     const rows = alignments.slice(0,8).map(a => {
       const icon = ic(a.body === 'sun' ? 'i-sun' : 'i-moon', 14);
       return `<div class="align-row">
         <span class="ar-type">${icon} ${a.alignment_type}</span>
-        <span class="ar-time">${formatDate(a.time)} ${formatTime(a.time)}</span>
+        <span class="ar-time">${dayAt(a.time, _z)} ${timeAt(a.time, _z, true)}</span>
         <span class="ar-score" style="color:${scoreColor(a.quality_score)}">${Math.round(a.quality_score*100)}%</span>
       </div>`;
     }).join('');
