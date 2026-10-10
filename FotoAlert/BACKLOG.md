@@ -25,19 +25,19 @@
 
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
-| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | *(leer)* |
+| **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **TASK-113** *(Live-nach-Dev-Sync mit London-Orten, Hoch)* · **US-139** *(Host-Menü mit Regionen-Schaltern, Mittel)* |
 | **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **US-136** *(Vollanalyse abgeschlossen 2026-09-04 — Weg-Gate Rot: kritischste offene Frage 0 aus ROADMAP.md (Zeile 94) noch unbeantwortet — Sign in with Apple statt Eigenbau-E-Mail/Passwort-System könnte den gesamten Ticket-Scope obsolet machen; zusätzlich 9 weitere offene Architektur-/Scope-Fragen (Rollenmodell, iOS-Umfang, DSGVO-Löschkaskade, US-84-Bezug u.a.), AK-Qualitäts-Check dadurch ebenfalls blockiert)* · **BUG-110** *(Jahreskalender zeigt für den gesamten aktuellen Monat August 2026 keine Einträge, vermutlich Hintergrund-Job nie gelaufen, Fund aus Server-Status-Check 2026-08-25)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **BUG-114** *(Weg-Gate 2026-09-28: Option A „Zeitpunkt beim Laden merken“ — Umsetzung erst NACH Release der BUG-113-Nachbesserung, gleiche Stellen im Server-Code)* · **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* · **US-138** *(Weg-Gate: Option A gewählt 2026-10-10 — Karte erweitern + Ortszeit + Scout, Auslieferung in drei Schritten; vor Umsetzung noch Designer-Check + Prototyp-Freigabe für die Kennzeichnung „Ortszeit London“)* |
 | **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | *(leer)* |
-| **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | *(leer)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-114** *(Option A umgesetzt 2026-09-29, 9/9 Tickettests laut Umsetzung grün — Zweitprüfung läuft)* |
+| **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | **TASK-106** *(Test-Gate bestätigt 2026-10-10 durch gate-auditor, Code-Check ohne Findings — wartet auf Release-Klick; danach Nachher-Messung auf dem Server)* |
 | **🏁 Done** | abgeschlossen + deployed | **BUG-113** · **TASK-54** · **TASK-58** · **TASK-89** · **US-134** · **TASK-101** · **BUG-99** · **BUG-93** · **BUG-96** · **BUG-92** · **TASK-86** · **BUG-81** · **TASK-84** · **TASK-83** · **TASK-82** · **TASK-80** · **TASK-41** · **TASK-51** · **BUG-79** · **TASK-60** · **TASK-76** · **TASK-77** · **TASK-78** · **TASK-62** · **US-132** · **US-131** · **TASK-63** · **TASK-73** · **TASK-74** · **US-130** · **BUG-77** · **TASK-72** · **TASK-61** · **TASK-67** · **BUG-76** · **TASK-70** · **BUG-75** · **TASK-66** · **TASK-64** · **BUG-73** · **BUG-74** · **TASK-68** · **BUG-68** · **BUG-70** · **US-129** · **BUG-66** · **US-127** · **US-85** · **BUG-65** · **US-09** · **US-21** · **TASK-57** · **US-117** · **TASK-56** · **US-125** · **US-126** · **BUG-57** · **BUG-60** · **US-124** · **US-120** · **US-119** · **BUG-61** · **US-123** · **US-121** · **US-122** · **BUG-59** · **TASK-53** · **BUG-58** · **US-87** · **BUG-56** · **US-113** · **US-72** · **US-112** · **BUG-55** · **BUG-54** · **US-109** · **US-108** · **US-07** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **BUG-53** · **BUG-72** · **BUG-51** · **US-107** · **US-106** · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** · **BUG-34** · **TASK-42** · **BUG-84** · **BUG-91** · **BUG-90** · **BUG-94** · **TASK-90** · **TASK-93** · **TASK-91** · **TASK-94** · **TASK-88** · **TASK-103** · **TASK-95** · **TASK-96** · **TASK-97** · **TASK-99** · **TASK-100** · **TASK-98** · **TASK-87** · **BUG-104** · **TASK-102** · **TASK-02** · **BUG-89** · **BUG-62** · **BUG-64** · **BUG-82** · **TASK-104** · **TASK-105** · **TASK-107** · **BUG-97** · **BUG-101** · **BUG-102** · **BUG-103** · **BUG-106** · **BUG-95** · **BUG-105** · **BUG-87** · **BUG-88** · **TASK-92** · **BUG-108** · **BUG-109** · **BUG-111** · **BUG-21** · **BUG-98** · **US-137** · *(Abschluss-Details je Ticket: BACKLOG-ARCHIVE.md → „Gate-Board Done-Historie“ bzw. das Ticket selbst)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-106** *(Drei weitere synchrone `_load_elevation_cache()`/`_load_caches()`-Aufrufe im Event-Loop absichern (`_recompute_one()`, `startup()`, `_run_sightline_refresh()`), Nachzügler zum bereits behobenen TASK-102-Muster, Fund aus TASK-02-Refactor-Check 2026-08-14)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-112** *(release.sh gegen Doppelausführung + Commit-Vorschau — BUG-113-Retro, Mittel)* |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-112** *(release.sh gegen Doppelausführung + Commit-Vorschau — BUG-113-Retro, Mittel)* |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -518,7 +518,7 @@ Stephan hat entschieden: die im „✅ Erledigt"-Abschnitt gefundenen 41 Alt-Ein
 |------|------|
 | **Typ** | BugFix (Performance) |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 | **Erstellt** | 2026-09-19 |
 
 **Beschreibung:** Nebenbefund des Implementierungs-Agenten von BUG-113 (steht in PRODUCT.md, Abschnitt 13), beim Intake am Quelltext nachgeprüft. Beobachtet (aus dem Quelltext, noch nicht gemessen): Wenn der Kalender ohne Live-Berechnung abgerufen wird, liest der Server bei jedem einzelnen Aufruf die komplette Kalender-Datei (rund 1,1 GB) von der Platte ein und wertet sie vollständig aus — nur um daraus den Zeitpunkt der letzten Berechnung zu entnehmen, obwohl alle Kalendereinträge zu diesem Zeitpunkt bereits im Arbeitsspeicher des Servers liegen. Dieses Einlesen läuft im laufenden Serverbetrieb und hält den Server währenddessen an, sodass in dieser Zeit auch andere Anfragen (z. B. Feed, Karte, Gesundheitsprüfung) warten müssten. Erwartet: Der Kalender öffnet schnell und hält den Server nicht an — unabhängig davon, wie groß die Kalender-Datei ist.
@@ -628,7 +628,7 @@ Betroffen: nur `backend/main.py` (`get_calendar`, `_load_calendar_cache`, `_appl
 |------|--------|-----------------------|
 | Spec | ✅ | Analyse & Spec 2026-09-27 (dieser Abschnitt) |
 | Tests definiert | ✅ | backend/tests/test_bug114.py (9 Tests, 3 rot test-first) |
-| Implementierung | ⬜ | — |
+| Implementierung | ✅ | 2026-09-29 — Option A umgesetzt (`backend/main.py`), test_bug114 9/9 grün, siehe „🛠️ Umsetzung (BUG-114)“ |
 | Test bestanden | ⬜ | — |
 | Refactor-Check | ⬜ | — |
 | PRODUCT.md | ⬜ | — |
@@ -637,6 +637,27 @@ Betroffen: nur `backend/main.py` (`get_calendar`, `_load_calendar_cache`, `_appl
 
 
 **✅ Weg-Gate-Entscheidung (Stephan, 2026-09-28):** Frage 1 → **Option A** („Zeitpunkt beim Laden merken“). Frage 2 → **erst nach Release der BUG-113-Nachbesserung umsetzen** (dieselben Stellen in `backend/main.py`); bis dahin wartet BUG-114 in „Ready for Dev“. Blockiert durch: BUG-113 (Release).
+
+#### 🛠️ Umsetzung (BUG-114) · 2026-09-29
+
+**Was geändert (Alltagssprache):** Der Server merkt sich den Zeitpunkt „zuletzt berechnet“ jetzt in dem Moment, in dem er den Kalender ohnehin lädt (Serverstart, Volllauf, nächtlicher Sichtachsen-Lauf), und übernimmt ihn beim Nachrechnen eines einzelnen Standorts aus der kleinen Übergabedatei. Ein Kalender-Abruf liest dafür keine Datei mehr — er hält den Server nicht mehr an, und eine halb geschriebene Kalenderdatei oder ein fehlender Zeitpunkt führt nicht mehr zu einem Serverfehler. Umgesetzt wie am Weg-Gate entschieden (Option A), keine Abweichung.
+
+**Technisch (nur `backend/main.py`):** neue Modulvariable `_calendar_computed_at` (bei `_calendar_cache`); `_load_calendar_cache()` setzt sie zusammen mit den erfolgreich geladenen Einträgen (`data.get("computed_at")`, fehlt er → leer; scheitert das Laden, bleibt beides auf dem letzten Stand); `_apply_calendar_delta()` übernimmt `computed_at` aus der Übergabedatei nach erfolgreichem Austausch (fehlt er dort, bleibt der letzte Wert; der Leer-Kalender-Heilweg setzt ihn über `_load_calendar_cache()`); `get_calendar()` gibt die Variable zurück statt `json.loads(_CAL_CACHE.read_text())["computed_at"]`. Live-Berechnungs-Zweig, Standort-Löschen, `precompute.py`, Web-App unverändert. Python-3.9-Syntaxprüfung (`ast.parse(..., feature_version=(3,9))`) grün. Keine fremden Änderungen in `main.py` (Abgleich gegen Ausgangsstand per Prüfsumme vor und nach der Umsetzung).
+
+**Tests (Linux-VM auf Stephans Mac, Python 3.10, Wegwerf-venv, `-m "not network"`):**
+- `test_bug114.py`: **9/9 grün** (vorher 3 rot / 6 grün).
+- Regression Kalender/Laden/Austausch: `test_bug113.py`, `test_bug113_kalender_austausch.py`, `test_bug113_nachbesserung.py`, `test_bug113_punkt6.py` 20/20; `test_bug63.py`, `test_task79_readme_marker_sync.py`, `test_bug29_calendar_single_recompute.py`, `test_patch_cache_consistency.py`, `test_bug92.py`, `test_bug_68.py` + `test_bug110.py` 41/42; `test_bug-93.py`, `test_bug-99.py`, `test_task-41_precompute_refactor.py`, `test_task54_weather_map_disk_cache.py`, `test_us106.py`, `test_us38.py`, `test_us_128.py` 78/78; `test_task67_backend_regression.py` 5/5.
+- Alle 77 Testdateien mit offline-Tests (in 4 Läufen): **774 grün, 2 rot** — beide **vorbestehend**, mit unverändertem Ausgangsstand von `main.py` (Schattenkopie) ebenso rot: `test_bug110.py::…test_all_locations_failing_then_recovering…` (test-first-Test des noch offenen BUG-110) und `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` (Mond-Zeitabweichung 1140 s > 90 s). Beide berühren den geänderten Code nicht.
+
+**Akzeptanzkriterien:**
+- [x] AK1 Abruf hält den Server nicht an (Test 200 MB: grün, vorher 1,41 s)
+- [x] AK2 Zeitpunkt nach dem Laden
+- [x] AK3 Zeitpunkt nach Einzel-Nachberechnung
+- [x] AK4 Zeitpunkt nach Volllauf
+- [x] AK5 halb geschriebene Datei / Datei ohne Zeitpunkt → kein Serverfehler
+- [x] AK6 Leerzustand unverändert
+- [x] AK7 Filter + Live-Berechnung unverändert
+- [ ] AK8 Standort-Löschen lässt den Zeitpunkt unverändert — Code-Beleg: der Löschweg filtert nur `_calendar_cache` und fasst `_calendar_computed_at` nicht an; manuelle Prüfung steht aus.
 
 ### BUG-110 · Jahreskalender zeigt für den gesamten aktuellen Monat (August 2026) keine Einträge `[ ]`
 
@@ -1070,8 +1091,10 @@ oder Server-Log)?
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Niedrig |
-| **Status** | ToDo |
+| **Status** | Bereit zur Veröffentlichung |
 | **Erstellt** | 2026-08-15 |
+
+**Korrektur 2026-10-09 (Intake, am aktuellen Code geprüft, von Stephan bestätigt):** Von den drei unten genannten Stellen ist `_recompute_one()` bereits erledigt — seit BUG-113 („Weg B") laufen dort beide Ladevorgänge per `asyncio.to_thread` im Worker-Thread (`backend/main.py` ca. Z. 2863–2866). Die Zeilennummern unten (2161/2185/2421/3204) sind überholt. Offen sind nur noch **zwei** Stellen: `_run_sightline_refresh()` (`_load_caches()` ca. Z. 4058, blockierend am Ende des nächtlichen Laufs — echtes Hänger-Risiko) und `startup()` (ca. Z. 3130/3133, unkritisch, da vor dem Nutzer-Verkehr). Nebenbefund für die Analyse, nicht Teil dieses Tickets: zwei weitere synchrone `_load_discover_cache()`-Aufrufe (ca. Z. 833 und 3072), deren Blockierwirkung ungeprüft ist.
 
 **Beschreibung:** Im Zuge des heutigen Server-Hänger-Bugfixes aus TASK-02 (Test-Vermerk 3, 2026-08-14) wurde EINE von VIER Stellen in `backend/main.py` behoben, an denen die Cache-Neulade-Funktionen `_load_elevation_cache()`/`_load_caches()` synchron (also blockierend) direkt im Event-Loop des Servers aufgerufen werden, statt — wie an anderer Stelle bereits etabliert — über `asyncio.to_thread(...)` in einen separaten Thread ausgelagert zu werden. Das ist relevant, weil Pythons asyncio-Event-Loop in diesem Server (uvicorn, Single-Worker) nur einen einzigen Ausführungsstrang hat: Ein blockierender synchroner Aufruf irgendwo darin friert ALLE gleichzeitig laufenden Anfragen ein (z. B. `/health`, `/job-status`), nicht nur die eine Anfrage, die den Aufruf ausgelöst hat. Genau dieses Muster („alles hängt gleichzeitig") wurde während der TASK-02-Tests wiederholt beobachtet.
 
@@ -1087,6 +1110,224 @@ Die bereits behobene Stelle liegt in `_run_precompute()`. Drei weitere Stellen m
 **User Story:** Als Betreiber möchte ich, dass `/health` und `/job-status` auch während einer Einzel-Location-Neuberechnung, des nächtlichen Sichtachsen-Laufs oder des Serverstarts zuverlässig antworten, damit ich mich nicht erneut auf einen scheinbar hängenden Server verlassen muss, ohne zu wissen, ob er noch lebt.
 
 **Bezug:** Fund während TASK-02-Refactor-Check, 2026-08-14. Ursprung/Kontext: TASK-02 (Sonnenfinsternisse berechnen, Test-Vermerk 3, 2026-08-14) — dort wurde die vierte, bereits behobene Stelle dokumentiert. Vorbild-Muster: TASK-102 *(Done)* — etabliert `asyncio.to_thread(...)` als Lösungsmuster für genau diese Art blockierender synchroner Aufrufe. Keine Dublette gefunden (Grep gegen offene, nicht `[x]` markierte Tickets nach `_recompute_one`, `_run_sightline_refresh`, `asyncio.to_thread`, „blockierend...Event-Loop", „synchron...Event-Loop" ergab keinen Treffer zu diesem konkreten Fund).
+
+---
+
+**Weg-Gate-Entscheidung 2026-10-09 (Stephan):** Option B gewählt — der Sichtachsen-Check lädt am Ende nur den kleinen Feed im Nebenstrang neu; die große Kalenderdatei wird dabei nicht angefasst; der Serverstart bleibt unverändert; kein Ticket für die `_load_discover_cache()`-Aufrufe. Freigabe zur Umsetzung.
+
+**Teststand 2026-10-10:** Umsetzung nach Option B abgeschlossen (nur `backend/main.py`). Auf Stephans Mac (Python 3.12.15): `test_task106.py` 7 von 7 grün; Regressionsläufe (`test_task-102`, `test_bug113*`, `test_us09_sightline`, `test_us106`) 54 Punkte, keiner rot. Vorher-Messung auf dem Produktionsserver (900 Abfragen von `/health`, währenddessen „Sichtachsen aktualisieren" als Host): langsamste drei Antworten **10,34 s / 10,35 s / 10,47 s** (Ziel nachher: höchstens 0,5 s). Noch offen: Python 3.9 (nur in der CI nach dem Push), Nachher-Messung auf dem Server nach dem Release (entscheidet über Done), manuelle Schritte 3–6 der Test-Spezifikation, Eintrag in PRODUCT.md.
+
+**Test-Gate und Code-Check 2026-10-10:** Unabhängiger Prüfer (gate-auditor, frischer Kontext) hat die Tests selbst ausgeführt (Python 3.10: `test_task106.py` 7 von 7 grün, Nachbartests 54 grün; Gegenprobe mit zurückgebautem Fix: AK1–AK3 werden rot) und AK1–AK9 einzeln gegen den Code geprüft. Urteil: **Bestätigt** für alles vor dem Release Prüfbare, kein Scope-Übertritt. Code-Check (fotoalert-refactor): keine Findings an den geänderten Stellen. **Erst nach Release prüfbar:** AK1 auf dem Server (Ziel höchstens 0,5 s; Vorher 10,34 / 10,35 / 10,47 s), Python 3.9 in der CI, manuelle Schritte 3–6, Eintrag in PRODUCT.md. Nebenhinweis des Prüfers (nicht TASK-106): Beim Endpunkt `/plan` läuft `_fomd(...)` im Vergleich zur Sicherung vom 29.09. nicht mehr im Nebenstrang — Herkunft ungeklärt, Entscheidung bei Stephan.
+
+## Analyse TASK-106 (fotoalert-analyze, 2026-10-09)
+
+> Abgrenzung: Dieser Abschnitt gehört zu TASK-106 (Cache-Neuladen). Der weiter unten folgende Block „Analyse (fotoalert-analyze, 2026-09-04)" (Azimut, 27 Locations) gehört NICHT zu diesem Ticket und wurde weder gelesen noch verwendet.
+
+**Kurzfassung (30-Sekunden-Lesung):** Offen ist nur noch EINE Stelle, die wirklich etwas bewirkt: das Neuladen der Daten am Ende des Sichtachsen-Checks. Der im Ticket vorgesehene Weg („einfach in einen Nebenstrang verlegen", wie bei TASK-102) reicht dort aber **nicht**: die große Kalenderdatei lässt sich auch im Nebenstrang nicht ohne Stillstand einlesen (BUG-113 hat das gemessen: 1,31 s → 1,06 s bei 200 MB; hochgerechnet bleiben auf der echten Datei mehrere Sekunden Stillstand). Empfohlen wird deshalb, am Ende des Sichtachsen-Checks die Kalenderdatei gar nicht mehr neu einzulesen und nur den kleinen Feed im Nebenstrang neu zu laden. Der Serverstart bleibt unverändert (dort kann ohnehin niemand antworten).
+
+**Scope-Check:** Kein Slice. Der Scope ist durch die „Korrektur 2026-10-09" bereits auf zwei Stellen eingegrenzt und von Stephan bestätigt.
+
+**Scope — enthalten:**
+- Der Sichtachsen-Check (`_run_sightline_refresh()`, `backend/main.py` ca. Z. 4035–4067): das Neuladen am Ende (ca. Z. 4058) darf den Server nicht mehr anhalten.
+- Der Serverstart (`startup()`, ca. Z. 3130/3133): bewusst geprüft und entschieden (siehe Optionen) — nach Empfehlung unverändert, mit erklärendem Kommentar im Code.
+
+**Scope — ausgeschlossen (mit Begründung):**
+- `_recompute_one()` — erledigt durch BUG-113 (`asyncio.to_thread` für Höhen- und Feed-Cache, ca. Z. 2865–2866; Kalender per kleinem Austausch statt Neueinlesen).
+- `_load_discover_cache()` an ca. Z. 833 und 3072 — Nebenbefund, nicht im Scope (Antwort unten).
+- Speicherbedarf der Kalenderdatei an sich, die Frage „bleibt nach dem Sichtachsen-Check das Wetter im Feed erhalten?" und das Aktualisieren der Sichtachsen-Werte in vorhandenen Terminen — Nebenbefunde (siehe unten), nicht im Scope.
+
+### ⚠️ Befund zur Ticket-Prämisse (Code-Verifikation, gelesen 2026-10-09)
+
+📎 **Code-Verifikation:** `backend/main.py` (ca. Z. 536–730, 4035–4080, 3114–3185), `backend/precompute.py` (ca. Z. 495–512), `deploy/fotoalert.service`, `deploy/fotoalert-precompute.service`, `backend/tests/test_task-102.py`, `backend/tests/test_bug113_nachbesserung.py`, BACKLOG-ARCHIVE.md (BUG-113-Analyse, Pre-Mortem).
+- **Bestätigt:** Der Sichtachsen-Check ruft am Ende `_load_caches()` direkt im Hauptstrang auf (ca. Z. 4058; kein `asyncio.to_thread`). `_load_caches()` liest den Feed (`opportunities.json`) UND die Kalenderdatei (`calendar.json`) komplett neu ein.
+- **Bestätigt:** Der Server läuft mit genau einem Arbeitsprozess (`uvicorn … --workers 1`, `deploy/fotoalert.service` Z. 11) — ein blockierender Aufruf hält alle Anfragen an.
+- **Widerlegt (Teil 1):** Das Ticket nennt den Lauf „nächtlich". Im Code ist er es nicht: `_run_sightline_refresh` wird nur vom Endpunkt `POST /sightline-refresh` gestartet (nur Host); im Zeitplan (`_startup_setup_scheduler`) steht er nicht (Grep `_run_sightline_refresh` in `backend/*.py` ohne Tests: 4 Fundstellen, alle in diesem Block). Er läuft also nur, wenn ein Host ihn in der App auslöst (Frontend: `web/index.html` Z. 8527, „Sichtachsen aktualisiert"). Das mindert die Dringlichkeit, nicht die Art des Problems.
+- **Widerlegt (Teil 2):** Das Ticket nimmt an, das TASK-102-Muster (`asyncio.to_thread`) löse die Blockade. Für den Kalender stimmt das nicht: BUG-113 hat gemessen, dass das Einlesen der Kalenderdatei den internen Sperrmechanismus (GIL) die gesamte Rechenzeit hält; ein Thread-Umzug verkürzte den Stillstand nur von 1,31 s auf 1,06 s (BACKLOG-ARCHIVE.md, BUG-113 Pre-Mortem; der Docstring von `_load_calendar_cache()` sagt dasselbe). Auch der bereits umgesetzte Fix in `_run_precompute()` (ca. Z. 2560–2561) hat diese Einschränkung.
+- **Neuer Befund (Nutzen des Neuladens):** Der Sichtachsen-Check ändert die Sichtachsen-Werte im Speicher (`LOCATIONS`) und in der Datenbank — NICHT die Dateien `opportunities.json`/`calendar.json`. Das Neuladen liest also dieselben Dateien wie zuvor. Die Hilfsfunktion `_backfill_coords()` ergänzt Sichtachsen-Felder nur, wenn sie in einem Termin FEHLEN (`if "sightline_status" not in e`); `precompute.py` schreibt sie in jeden Termin (ca. Z. 509–510). Nach Codelage bringt das Neuladen die neuen Sichtachsen-Werte daher nicht in bereits vorhandene Termine (nicht am laufenden Server überprüft — **Annahme, durch den manuellen Test unten zu bestätigen**).
+- **Messung (Linux-Nachbau, 2026-10-09, Dateien aus dem lokalen Ordner, Python 3.10, keine Prod-Werte):** `opportunities.json` 44,5 MB → Lesen 0,12 s + Einlesen 0,25 s; `discover.json` 0,24 MB → 0,01 s + 0,02 s. `calendar.json` lokal 1 188 200 825 Byte (≈ 1,19 GB), **nicht neu gemessen** (Arbeitsspeicher der Messumgebung zu klein); Stillstandswerte dafür nur aus BUG-113 (1,3–1,7 s bei 150–200 MB gemessen; ≈ 7 s und ≈ 7 GB Spitze auf 1,1 GB **hochgerechnet**, nicht gemessen). Produktions-Dateigrößen: nicht geprüft.
+
+### Example Mapping
+
+📏 **Regel 1 — Der Server bleibt während und nach dem Sichtachsen-Check ansprechbar.**
+- 🟢 Beispiel 1a: Gegeben ein Host löst „Sichtachsen aktualisieren" aus und der Check ist bei der letzten Location fertig. Wenn das Auffrischen der Daten beginnt, dann antworten `/health` und `/job-status` weiterhin jeweils in höchstens 0,5 s am Stück.
+- 🟢 Beispiel 1b: Gegeben der Feed ist 44 MB groß. Wenn er am Ende neu geladen wird, dann dauert das Einlesen im Hintergrund (lokal gemessen 0,25 s) und blockiert den Server nicht.
+
+📏 **Regel 2 — Die große Kalenderdatei wird am Ende des Sichtachsen-Checks nicht noch einmal komplett eingelesen.**
+- 🟢 Beispiel 2a: Gegeben der Kalender hat im Arbeitsspeicher N Termine. Wenn der Sichtachsen-Check endet, dann hat der Kalender weiterhin dieselben N Termine, und die Kalenderdatei wurde nicht neu gelesen.
+- 🟢 Beispiel 2b (Gegenstück): Gegeben ein Voll- oder Kalenderlauf der Vorberechnung ist fertig. Dann wird der Kalender wie bisher neu geladen (unverändert, TASK-102).
+
+📏 **Regel 3 — Bestehendes Verhalten bleibt erhalten.**
+- 🟢 Beispiel 3a: Ein zweiter Klick auf „Sichtachsen aktualisieren" während der Check läuft wird weiter mit „läuft bereits" abgewiesen — auch während des Auffrischens am Ende.
+- 🟢 Beispiel 3b: Der Job-Status endet nach Erfolg auf „fertig", nach einem unerwarteten Fehler auf „Fehler" mit neutraler Meldung (Details nur im Server-Log, TASK-102).
+- 🟢 Beispiel 3c: Ist die Feed-Datei defekt, bleibt der bisherige Feed im Speicher und der Check meldet trotzdem „fertig" (heutiges Verhalten: der Lader fängt den Fehler selbst ab).
+
+📏 **Regel 4 — Der Serverstart bleibt wie er ist.**
+- 🟢 Beispiel 4a: Nach einem Neustart zeigt das Start-Log weiterhin „Bereit. Cache: N Feed-Events, M Kalender-Events", Feed und Kalender sind vor der ersten Anfrage geladen.
+
+**Annahmen-Protokoll:**
+- ✅ Klar aus Kontext: `_recompute_one()` ist erledigt (BUG-113), keine Arbeit dort.
+- ⚪ ⚠️ Annahme — bitte bestätigen: Die Dringlichkeit ist „niedrig" (Ticket-Priorität) und der Lauf wird nur von Hosts von Hand ausgelöst; es genügt daher eine kleine, gezielte Änderung.
+- 🔴 Funktional kritisch → die Weg-Frage (Neuladen am Ende: nur Feed im Nebenstrang / ganz weglassen / alles im Nebenstrang) — siehe Weg-Gate. Offen bis zu Stephans Wahl.
+
+### Fundstellen-Sweep & Zustands-Check
+
+**Fundstellen-Sweep („An welchen Stellen zeigt sich dieses Verhalten noch?")** — Suche per Grep in `backend/main.py`: Muster `_load_caches|_load_elevation_cache|_load_discover_cache|_load_feed_cache|_load_calendar_cache|asyncio.to_thread|run_in_executor`:
+- `_load_caches()` — 2 Aufrufe außerhalb der Definition im Hauptstrang: Serverstart (ca. Z. 3133, unkritisch) und Sichtachsen-Check (ca. Z. 4058, im Scope). Dazu 1 Aufruf per `asyncio.to_thread` in `_run_precompute()` (ca. Z. 2561, erledigt).
+- `_load_elevation_cache()` — ca. Z. 2560 (Thread, erledigt), ca. Z. 2865 (Thread, erledigt), ca. Z. 3130 (Serverstart, unkritisch). Der Sichtachsen-Check ruft sie nicht auf. Datei `elevations.json` lokal 62 KB, also nicht relevant.
+- `_load_discover_cache()` — ca. Z. 833 (nach jedem Scout-Lauf, im Hauptablauf) und ca. Z. 3072 (Serverstart): Nebenbefund, Antwort unten.
+- `_load_feed_cache()`/`_load_calendar_cache()` — von BUG-113 bereits aufgeteilt; Thread-Aufrufe in `_recompute_one()` und im Kalender-Austausch.
+- Ansichten in der App (Liste, Karte, Kalender, Scout, Chancen-Übersicht, Event-Detail): Der Eingriff liegt ausschließlich im Hintergrundjob; es ändert sich keine Ansicht. Alle lesen weiterhin die globalen Listen. Keine weiteren Fundstellen.
+
+**Zustands-Check:**
+- *Wartefall:* Während der Check läuft, zeigt die App wie bisher „läuft" (Job-Status „sightlines"). Am Ende (Auffrischen) soll nichts Spürbares mehr hängen → AK1.
+- *Leerfall:* Feed-Datei fehlt → der Lader meldet „nicht gefunden" im Log, der bisherige Feed bleibt (heutiges Verhalten); Kalender wird nicht angefasst → AK5.
+- *Fehlerfall:* Defekte Datei → alter Stand bleibt (AK5); unerwarteter Fehler im Nebenstrang → neutrale Job-Meldung, Details im Log, Sperre wird frei (AK6).
+
+### Akzeptanzkriterien
+
+> Messort der Tempo-AKs (Skill-Pflicht): **Produktionsserver**. Der Linux-Nachbau (Tests unten) beweist den Mechanismus, nicht die Prod-Zeit. Vorher-/Nachher-Messung siehe „Tests → Manuell".
+
+- [ ] **AK1 — Der Server bleibt ansprechbar.** Während der Sichtachsen-Check seine Daten am Ende auffrischt, antworten Status-Abfragen („läuft der Server?", Job-Status) jeweils in höchstens 0,5 s am Stück. *(Herkunft: Ticket-Benutzergeschichte; BUG-113-Messung: Thread-Umzug allein reicht beim Kalender nicht.)*
+- [ ] **AK2 — Der große Kalender wird nicht noch einmal komplett eingelesen.** Nach dem Sichtachsen-Check zeigt der Kalender dieselben Termine wie davor; die große Kalenderdatei wurde dafür nicht neu gelesen. *(Herkunft: Pre-Mortem 1, Befund zur Ticket-Prämisse.)*
+- [ ] **AK3 — Der Feed wird weiterhin aufgefrischt, ohne den Server anzuhalten.** Nach dem Sichtachsen-Check enthält der Feed den Stand der Feed-Datei; das Auffrischen läuft im Hintergrund, nicht im Hauptablauf des Servers. *(Herkunft: Regel 1.)*
+- [ ] **AK4 — Doppelstart bleibt verhindert.** Ein zweiter Start des Sichtachsen-Checks wird abgewiesen, solange der erste läuft — einschließlich des Auffrischens am Ende; nach Ende ist ein neuer Start wieder möglich, der Job-Status steht auf „fertig". *(Herkunft: bestehendes Verhalten US-09.)*
+- [ ] **AK5 — Defekte oder fehlende Feed-Datei.** Der bisherige Feed bleibt erhalten, der Server bleibt bedienbar, der Check bleibt nicht auf „läuft" hängen. *(Herkunft: Zustands-Check Fehlerfall.)*
+- [ ] **AK6 — Unerwarteter Fehler beim Auffrischen.** Der Job-Status zeigt „Fehler" mit neutraler Meldung (keine internen Pfade oder Texte), der volle Text steht im Server-Log, der Check lässt sich danach erneut starten. *(Herkunft: TASK-102, Zustands-Check.)*
+- [ ] **AK7 — Gleichzeitiges Lesen und Auffrischen.** Wer während des Auffrischens Feed-Daten abruft, bekommt entweder den kompletten alten oder den kompletten neuen Stand, nie eine halb gefüllte Liste. *(Herkunft: Auftrag „Gleichzeitigkeit"; Pre-Mortem 3.)*
+- [ ] **AK8 — Serverstart unverändert.** Nach einem Neustart sind Feed und Kalender wie bisher vor der ersten Anfrage geladen (Start-Log „Bereit. Cache: …"). *(Herkunft: Regel 4, Abgrenzung Serverstart.)*
+- [ ] **AK9 — Keine Verschlechterung für die Vorberechnung.** Voll-, Feed- und Kalenderlauf (`/refresh`, `/refresh-feed`, `/refresh-calendar`) laden Kalender und Feed danach weiterhin wie bisher neu; die Einzel-Neuberechnung nach dem Speichern eines Standorts verhält sich wie nach BUG-113. *(Herkunft: Abwärtskompatibilität.)*
+
+**AK-Konsistenzcheck:** Kein AK setzt eine andere Entscheidung als die Empfehlung (Option B) voraus. Wählt Stephan Option A, ist AK1 auf der großen Kalenderdatei nicht erfüllbar und AK2 entfällt; wählt er Option C, entfallen AK3 und AK7 (kein Neuladen mehr), AK2 bleibt.
+
+### Ist-Zustand-Gegencheck
+
+- BACKLOG.md auf angrenzende Tickets geprüft: **BUG-113** *(erledigt laut Archiv; dessen Messungen werden hier verwendet)*, **BUG-114** *(In Test; der Code liest den Berechnungszeitpunkt bereits aus dem Arbeitsspeicher — kein Berührungspunkt mehr)*, **BUG-110** *(Jahreskalender, anderes Symptom — unabhängig)*, **TASK-102** *(Done, Vorbild-Muster)*. Die Bezug-Zeile von BUG-114 („TASK-106 laut BUG-113-Umsetzung inhaltlich erledigt") ist nach Stephans Korrektur vom 2026-10-09 nur für `_recompute_one()` richtig, nicht für den Sichtachsen-Check.
+- Code-Konstanten direkt gelesen (nicht aus Erinnerung): Single-Worker (`--workers 1`), Sichtachsen-Drosselung `asyncio.sleep(1.0)` je Location, Cache-Pfade am Dateianfang von `main.py`.
+
+### Pre-Mortem
+
+📎 **Code-Verifikation (gelesen 2026-10-09):** siehe „Befund zur Ticket-Prämisse". **Zusammenspiel der Bausteine:** Sichtachsen-Check (async) → `_load_qa_values()` (synchron, Datenbank, wenige Millisekunden, bleibt im Hauptablauf, weil es die Location-Objekte verändert) → Neuladen. Danach läuft KEIN Wetter-Auffrischen (anders als in `_run_precompute()` und `_recompute_one()`) — Nebenbefund.
+
+💀 **Szenario 1 — Thread-Umzug ohne Wirkung („nur verschoben, nicht behoben").** *Auslöser:* Option A: `_load_caches` in den Nebenstrang, Kalender wird trotzdem komplett eingelesen. *Folge:* Der Server steht beim Ende des Checks weiter mehrere Sekunden, das Ticket wirkt erledigt, ist es aber nicht. *Frühwarnung:* Messung auf Prod (Tests → Manuell). *Gegenmaßnahme:* Empfehlung Option B; AK1/AK2; Tests AK1–AK3.
+
+💀 **Szenario 2 — Kalender bleibt unbemerkt alt.** *Auslöser:* Option B/C lesen den Kalender am Ende nicht mehr; ein anderer Prozess hätte `calendar.json` zwischenzeitlich neu geschrieben (z. B. ein von Hand auf dem Server gestartetes `precompute.py`). *Folge:* Der Kalender im Speicher bleibt bis zum nächsten Voll-/Kalenderlauf oder Neustart alt. *Bewertung:* Der Sichtachsen-Check liest die Datei nach Codelage heute nur zufällig neu; die planmäßigen Wege (`/refresh*`, 05:30-Lauf, Einzelberechnung) laden selbst nach. Der Systemd-Timer (`fotoalert-precompute.service`) startet `precompute.py --feed-only` und schreibt nur den Feed. *Gegenmaßnahme:* AK9 + Regressionstest; Hinweis in PRODUCT.md.
+
+💀 **Szenario 3 — Halb gefüllte Listen beim gleichzeitigen Lesen.** *Auslöser:* `_load_feed_cache()` weist die frisch eingelesene Liste dem Feed zu und füllt DANACH Kartenposition/Sichtachsen-Felder nach (`_backfill_coords`). Läuft das im Nebenstrang, kann eine Anfrage in dem Moment eine Liste lesen, bei der einzelnen Terminen noch Felder fehlen. *Bewertung:* Die Zuweisung selbst ist ein einziger Schritt (Austausch einer Referenz in Python — entweder alte oder neue Liste, nie eine halbe); nachgefüllt wird nur bei Terminen aus alten Dateiständen ohne diese Felder (heute schreibt `precompute.py` sie immer). Auswirkung daher sehr gering. Dieselbe Eigenschaft besteht bereits bei `_run_precompute()` und `_recompute_one()` (beide im Nebenstrang). *Gegenmaßnahme:* AK7 + Test (keine halbe Liste). Optionaler Härtungsschritt (erst nachfüllen, dann zuweisen) ist NICHT im Scope — im Weg-Gate vermerkt.
+
+💀 **Szenario 4 — Verlorene Änderung durch gleichzeitiges Schreiben.** *Auslöser:* Ein Vorgang im Hauptablauf, der den Feed ersetzt (`_inject_cloud_mood_events()`, Löschen eines Standorts), liest die alte Liste, während der Nebenstrang die neue zuweist; danach überschreibt der Hauptablauf mit einem aus der alten Liste abgeleiteten Stand. *Bewertung:* Fenster im Mikrosekundenbereich; Folge: Feed bis zum nächsten Wetter-/Vorberechnungslauf auf altem Stand. Gleiche Eigenschaft wie bei bestehenden Thread-Ladern (TASK-102, BUG-113) — kein neues Risiko, nur ein weiterer Auslöser. *Gegenmaßnahme:* Der Sichtachsen-Check ist von Hand und selten; Test AK7; kein Zusatzaufwand im Scope.
+
+💀 **Szenario 5 — Tests hängen am Datenbestand.** *Auslöser:* Tests, die `main` per App-Start laden, lesen in der Sandbox die 1,19-GB-Datei. *Gegenmaßnahme:* Die neuen Tests zeigen die Cache-Pfade auf `tmp_path` und rufen den Lauf direkt auf (kein App-Start, keine echten Dateien); volle Suite auf Stephans Mac.
+
+**Seiteneffekte auf bestehende Features:** `test_task-102.py` (ersetzt `_load_qa_values` durch einen Fehler und erreicht das Neuladen nicht), `test_bug113*.py`, `test_us106.py`, `test_us09_sightline.py`. Regressions-Matrix PRODUCT.md Sektion 12: Sichtachsen-Pille in Feed/Kalender/Scout/Karte/Locations-Tab, Feed und Kalender nach dem Check.
+
+### Architektur-Analyse
+
+**Betroffen:** nur `backend/main.py`, Funktion `_run_sightline_refresh()` (und ein Kommentar in `startup()`). Kein Datenmodell, keine API-Form, keine Frontend-Änderung (das Frontend lädt den Feed nach dem Check ohnehin selbst neu, `web/index.html` Z. 8527 `reloadFeed: true`).
+
+**Gleichzeitiger Zugriff beim Neuladen im Nebenstrang (belegt am Code):**
+- Feed und Kalender sind einfache globale Listen (`_feed_cache`, `_calendar_cache`). Der Lader ersetzt sie durch **Zuweisung einer neuen Liste**, nicht durch Umbau der alten. Das Ersetzen der Referenz ist in Python ein einziger, unteilbarer Schritt — Leser sehen entweder die alte oder die neue Liste vollständig.
+- Einschränkung 1: Die Feed-Liste wird zugewiesen, **bevor** `_backfill_coords()` sie nachfüllt (Szenario 3).
+- Einschränkung 2: Werden Feed und Kalender nacheinander ersetzt (Option A), sieht ein Leser kurz „neuer Feed + alter Kalender" (Dauer = Kalender-Einlesezeit); bei Option B/C entfällt das, weil der Kalender nicht neu geladen wird. `_cache_loaded_at` wird nirgends gelesen (Grep in `backend/*.py`: nur Zuweisungen), ein Auslassen ist folgenlos.
+- Einschränkung 3: Schreibende Vorgänge im Hauptablauf auf dieselbe Liste (Szenario 4).
+- Vorbilder, die dasselbe Muster schon produktiv nutzen: `_run_precompute()` und `_recompute_one()`.
+
+**Laufzeit (Linux-Nachbau, Prod nicht geprüft):** Feed 0,12 s + 0,25 s; Kalender nur aus BUG-113 (siehe oben); Scout-Cache 0,03 s. Serverstart: uvicorn öffnet die Netzwerkverbindung erst, nachdem der Start-Handler fertig ist (Wissen über uvicorn, nicht im Repository belegt); ein Nebenstrang innerhalb von `startup()` änderte daran nichts, weil `startup()` das Ergebnis abwartet und kurz danach (`cache_ok`) braucht. Nutzer-Verkehr beginnt erst nach dem Start → kein Nutzen, nur Risiko.
+
+### Implementierungsoptionen
+
+**Option A — „Wie bei TASK-102: alles in den Nebenstrang" (Ticket-Muster).** Am Ende des Checks laufen Feed und Kalender wie bisher, nur in einem Nebenstrang. *App-Wirkung:* Der Server steht beim Ende des Checks trotzdem noch mehrere Sekunden (hochgerechnet ≈ 6–7 s auf der echten Kalenderdatei; der Thread-Umzug brachte bei BUG-113 nur −19 %). *Dateien:* `backend/main.py` (1 Stelle). *Aufwand:* sehr klein. *Risiko:* gering, aber Ziel verfehlt (AK1 nicht erfüllbar); die Speicherspitze beim Kalender-Einlesen bleibt.
+
+**Option B — „Nur den kleinen Feed im Nebenstrang neu laden, Kalender nicht mehr anfassen" (empfohlen).** *App-Wirkung:* Der Server bleibt am Ende des Checks ansprechbar (Feed 0,25 s Einlesezeit lokal, im Nebenstrang); der Kalender in der App ist danach unverändert — er war es nach Codelage auch bisher, weil das Neuladen dieselben Dateien liest. *Dateien:* `backend/main.py` (Sichtachsen-Check: statt `_load_caches()` ein `await asyncio.to_thread(_load_feed_cache)`; Kommentar mit Verweis auf BUG-113; `startup()`: erklärender Kommentar, Verhalten unverändert); neue Testdatei. *Vorteile:* erreicht das Ziel messbar; nutzt die von BUG-113 bereits aufgeteilten Lader; gleiche Form wie `_recompute_one()`. *Nachteile/Risiken:* Szenario 2 (Kalender bleibt bis zum nächsten Lauf unverändert; praktisch ohne Wirkung); das Feed-Neuladen verwirft weiterhin das zuvor eingearbeitete Wetter im Feed (heutiges Verhalten, Nebenbefund). *Aufwand:* klein.
+
+**Option C — „Neuladen am Ende ganz weglassen".** Der Check ändert nur Werte in Speicher und Datenbank; kein Einlesen mehr. *App-Wirkung:* Server bleibt ansprechbar; zusätzlich entfällt das (möglicherweise unbeabsichtigte) Verwerfen des Wetters im Feed am Ende des Checks. Aber: der Code-Kommentar nennt als Zweck, die neuen Werte „sofort in Feed/Kalender-Events sichtbar" zu machen — das erreicht das Neuladen nach Codelage ohnehin nicht (Befund oben); mit C würde das auch nicht mehr versucht. *Dateien:* `backend/main.py`. *Aufwand:* klein; die Verhaltensänderung ist größer als bei B (Wetter-Verhalten), Rücknahme einfach. *Risiko:* mittel für die Erwartung (Absicht unklar, Entscheidung bei Stephan).
+
+**Serverstart (alle Optionen):** unverändert lassen (siehe Architektur). Nur Kommentar.
+
+✅ **Empfehlung: Option B** — erfüllt AK1 messbar (A nicht), ändert am sichtbaren Verhalten nichts (C ändert das Wetter-Verhalten und den dokumentierten Zweck), nutzt das BUG-113-Muster, rückholbar durch einen einzigen Austausch.
+
+### 🚦 Ampel-Prüfung (SPEC-W5 Baustein E)
+
+1. **Empfehlungs-Abstand klar?** — **Nein.** Zu A klar (A erfüllt das Ziel nachweislich nicht). Zu C nicht eindeutig: C ist die sauberste Lösung, wenn das Neuladen ohnehin wirkungslos ist, und fast gleichauf mit B; die Wahl hängt an der Absicht („sollen neue Sichtachsen-Werte nach dem Check in Feed/Kalender erscheinen?"), die nur Stephan kennt.
+2. **Eingriff bleibt im Ticket (keine Architektur-/Datenmodell-Wirkung)?** — **Ja.** Eine Funktion in einer Datei, kein Datenmodell, keine API-Form.
+3. **Ohne Datenverlust rückgängig zu machen?** — **Ja.** Reine Code-Änderung; keine Datei, Datenbank oder Cache wird verändert.
+4. **Pre-Mortem ohne hohes Risiko?** — **Ja.** Höchste Einstufung „gering" (Szenarien 2–4 mit geringer Wirkung und Gegenmaßnahmen).
+5. **Keine reine Geschmacks-/Optikfrage?** — **Ja.** Messbares Verhalten (Stillstand ≤ 0,5 s).
+
+🚦 **Ampel-Ergebnis:** 🔴 **Rot — braucht Stephans Entscheidung:** Kriterium 1 (Optionen B und C fast gleichauf), da die Wahl von der Absicht des Neuladens abhängt; zusätzlich weicht die Empfehlung vom im Ticket bestätigten Muster (reiner Thread-Umzug) ab.
+
+### Implementation Spec (für Option B)
+
+1. `backend/main.py`, `_run_sightline_refresh()`: `_load_caches()` (ca. Z. 4058) ersetzen durch `await asyncio.to_thread(_load_feed_cache)`; Kommentar aktualisieren (warum nicht der Kalender: Verweis auf den Docstring von `_load_calendar_cache()` und BUG-113; warum Thread). `_load_qa_values()` bleibt unverändert im Hauptablauf davor. Reihenfolge, Job-Status, Fehlerbehandlung (TASK-102) und Sperre bleiben unverändert.
+2. `startup()`: Verhalten unverändert; kurzer Kommentar, dass das Laden bewusst im Hauptablauf bleibt (der Server nimmt vor Ende des Starts keine Anfragen an; Ergebnis wird sofort gebraucht).
+3. Docstrings von `_load_caches()` und `_load_calendar_cache()`: „nächtlicher Sichtachsen-Lauf" korrigieren (der Check ist von Hand auslösbar, nicht nächtlich); `_load_caches()` bleibt Voll-Ladeweg für Serverstart und Vorberechnung.
+4. Option A (falls gewählt): `await asyncio.to_thread(_load_caches)`; AK1/AK2 anpassen, Rest-Stillstand auf Prod messen und dokumentieren. Option C (falls gewählt): Zeile ersatzlos streichen; AK3/AK7 entfallen, Test AK3 wird zu „Feed wird nicht neu geladen".
+5. Kein Eingriff in `_load_feed_cache()` (Härtung „erst nachfüllen, dann zuweisen" nur auf Stephans Ja, eigener Punkt).
+6. Python 3.9: `asyncio.to_thread` existiert ab 3.9 (bereits im Einsatz); keine neue Syntax.
+7. PRODUCT.md (Pflicht vor „Done"): Abschnitt Sichtachsen-Check/Caches ergänzen: Check ist manuell, lädt am Ende nur den Feed im Nebenstrang.
+
+### Nebenbefunde (nicht im Scope, zur Kenntnis/Entscheidung durch Stephan)
+
+- **`_load_discover_cache()` (ca. Z. 833, ca. Z. 3072):** Z. 833 läuft im Hauptablauf (nach jedem Scout-Lauf), Z. 3072 beim Serverstart (unkritisch). Messung lokal: `discover.json` 241 KB → Lesen 0,01 s + Einlesen 0,02 s ≈ 30 ms (Linux-Nachbau). Weit unter der 0,5-s-Grenze; Prod-Dateigröße nicht geprüft (spürbar erst bei mehreren MB). **Vorschlag: kein Ticket, kein Umbau.**
+- **Wetter im Feed nach dem Sichtachsen-Check:** Nach dem Neuladen wird anders als in der Vorberechnung und der Einzel-Neuberechnung kein Wetter-Auffrischen angestoßen (Code-Vergleich). Ob `opportunities.json` die Wetterwerte enthält, ist nicht geprüft (`weather_description` wird leer geschrieben). Möglicher Fund: Feed zeigt bis zum nächsten Wetterlauf (alle 3 h) keine Wetterbewertung. **Ungeprüft.**
+- **Sichtachsen-Werte in vorhandenen Terminen:** Nach Codelage erscheinen neue Sichtachsen-Werte erst nach dem nächsten Vorberechnungslauf in den Terminen (Befund oben). Ob das gewollt ist, entscheidet Stephan.
+- **BUG-114-Bezugszeile** nennt TASK-106 als „inhaltlich erledigt" — richtig nur für `_recompute_one()`.
+
+### Tests
+
+**Automatisiert (Test-Spezifikation, in der Analyse-Phase geschrieben):** `backend/tests/test_task106.py` (neu angelegt 2026-10-09, 7 Tests; Marker `offline` + `regression`; Cache-Pfade zeigen auf `tmp_path`, keine echten Dateien, keine Locations, kein Netz; Syntax Python-3.9-kompatibel; asyncio-Objekte nur innerhalb laufender Loops):
+
+| Test | Deckt | Soll |
+|---|---|---|
+| `test_ak1_neuladen_am_ende_haelt_server_nicht_an` | AK1 | Stillstand ≤ 0,5 s bei 0,6 s langem Lader |
+| `test_ak2_kalender_wird_am_ende_nicht_erneut_eingelesen` | AK2 | Kalender-Lader 0 Aufrufe, Kalender unverändert |
+| `test_ak3_feed_wird_neu_geladen_aber_nicht_im_hauptstrang` | AK3 | 1 Aufruf, anderer Thread |
+| `test_ak4_job_endet_done_sperre_gilt_bis_zum_schluss_und_wird_frei` | AK4 | Status „done", Sperre während Laden an, danach frei |
+| `test_ak5_defekte_feed_datei_alter_stand_bleibt_job_haengt_nicht` | AK5 | alter Feed bleibt, „done" |
+| `test_ak6_unerwarteter_fehler_neutrale_meldung_details_im_log` | AK6 | neutrale Meldung, Sentinel nur im Log, Sperre frei |
+| `test_ak7_gleichzeitige_leser_sehen_nie_eine_halbe_feed_liste` | AK7 | nur 3 oder 30 000 Einträge sichtbar |
+
+AK8 (Serverstart) und AK9 (Vorberechnung) sind durch bestehende Tests bzw. den manuellen Teil abgedeckt (kein App-Start in neuen Tests, wegen der 1,19-GB-Datei in der Sandbox).
+
+**Rot-Nachweis (ausgeführt 2026-10-09, Linux-Nachbau: Kopie des Codes ohne Cache-Dateien, Python 3.10, `FOTOALERT_ENV=dev`, `FOTOALERT_NO_BACKGROUND=1`):** `3 failed, 4 passed` gegen den unveränderten Code.
+- AK1 rot: „Sichtachsen-Lauf hielt den Server 0.61 s am Stück an (erlaubt: 0.5 s)".
+- AK2 rot: „Kalenderdatei wurde beim Sichtachsen-Lauf erneut eingelesen".
+- AK3 rot: „Feed-Neuladen lief im Hauptstrang des Servers statt im Nebenstrang".
+- AK4–AK7 grün gegen den Ist-Stand — sie sichern bestehendes Verhalten ab (Regression); AK5/AK7 nutzen den echten Feed-Lader gegen Dateien in `tmp_path`.
+- Python 3.9 selbst im Nachbau nicht verfügbar (3.10) — Syntax bewusst 3.9-kompatibel gehalten, **nicht** unter 3.9 ausgeführt.
+- Wählt Stephan Option A oder C, werden die betroffenen Tests (A: AK1/AK2, C: AK3/AK7) vor der Umsetzung angepasst.
+- Volllauf auf Stephans Mac: `cd backend && pytest tests/test_task106.py tests/test_task-102.py tests/test_bug113_nachbesserung.py tests/test_us09_sightline.py -q` (voller Backend-pytest scheitert in der Sandbox an `calendar.json`).
+
+**Manuell (Produktionsserver — Messort der Tempo-AKs):**
+1. *Vorher-Messung (vor der Umsetzung, im Mac-Terminal):* `for i in $(seq 1 900); do curl -s -o /dev/null -w "%{time_total}\n" "https://fotoalert.stephanschumann.com/health"; sleep 0.5; done | sort -n | tail -3` laufen lassen und währenddessen als Host in der App „Sichtachsen aktualisieren" auslösen. Erwartung heute: am Ende des Laufs Antworten deutlich über 0,5 s (Zahl notieren).
+2. *Nachher-Messung (nach Release, gleiche Schleife):* Erwartung: größter Wert ≤ 0,5 s.
+3. *Kalender unverändert:* Kalender-Ansicht vor und nach dem Check vergleichen — gleiche Termine, gleiche Anzahl (Stichprobe: ein Monat).
+4. *Doppelstart:* Während der Check läuft, „Sichtachsen aktualisieren" erneut tippen → Meldung „läuft bereits".
+5. *Serverstart:* Nach dem Release im Server-Log „Bereit. Cache: N Feed-Events, M Kalender-Events" prüfen, beide Zahlen > 0 (kurz nach dem Neustart kann `/health` „degraded" melden — bekannt, kein Fehler).
+6. *Regressions-Matrix PRODUCT.md Sektion 12:* Sichtachsen-Pille in Feed, Kalender, Scout, Karte, Locations-Tab; Vorberechnung manuell auslösen (`/refresh-feed`) → Feed danach aktuell.
+
+### AK-Qualitäts-Check (Schritt 6c)
+
+- **Granularität:** AK2/AK3 getrennt (Kalender vs. Feed); AK4 fasst Doppelstart-Sperre, Status und Freigabe als Aussagen eines Zustands zusammen, im Test je geprüft.
+- **Polarität:** Positiv (Server bleibt ansprechbar) und negativ (Kalender wird nicht neu gelesen; keine halbe Liste; Fehlerfälle AK5/AK6).
+- **Messbarkeit:** Keine Funktionsnamen in den AK-Texten; AK1 mit Grenzwert 0,5 s und Messort Produktion.
+- **Vier Kategorien:** funktional (AK2–AK5, AK8, AK9); nicht-funktional/Performance (AK1, Messort Prod) und Skalierbarkeit (Option B hängt nicht von der Kalendergröße ab); Architektur (Rückwärtskompatibilität AK9, kein Datenmodell-Eingriff); Sonstige: Logging/Beobachtbarkeit (AK6: Details im Log); Compliance/Betriebsübergabe: nicht relevant.
+- **Randfälle:** Grenzwerte — Feed leer/fehlend (AK5), Kalender wird nicht angefasst; ungültige Eingaben — defekte Datei (AK5); Nebenläufigkeit — AK7 + Szenarien 3/4; Last — Feed 44 MB gemessen; Berechtigungen — Endpunkt Host-only, unverändert; Abwärtskompatibilität — AK9; Rollback — Code-Änderung, einfach rückholbar; Beobachtbarkeit im Fehlerfall — AK6.
+- **Testbarkeit ohne Rückfrage:** Rot-Nachweis erbracht (AK1–AK3 rot, AK4–AK7 Regression grün).
+- **Herkunft:** an jedem AK vermerkt.
+- [x] AK-Qualitäts-Check durchgeführt: Sechs Dimensionen geprüft; Kernbefund: das Ticket-Muster (reiner Thread-Umzug) löst AK1 auf dem Kalender nachweislich nicht, daher ist die Weg-Frage B vs. C offen; AK-Liste sonst ohne strukturelle Lücke.
+
+🔍 **AK-Qualitäts-Check: ✅ durchgeführt — Thread-Umzug allein genügt für die große Kalenderdatei nicht (BUG-113-Messung); Weg-Gate nötig.**
+
+### ⛔ Weg-Gate — Entscheidungsvorlage
+
+**Frage — Soll der Sichtachsen-Check am Ende die Daten überhaupt noch neu laden?**
+- *Option B (empfohlen):* Nur der kleine Feed wird im Hintergrund neu geladen, der Kalender bleibt unangetastet. Verhalten für Nutzer unverändert, Server bleibt ansprechbar.
+- *Option C:* Gar kein Neuladen mehr am Ende. Server bleibt ansprechbar; die im Code genannte Absicht („neue Werte sofort in Feed/Kalender sichtbar") bleibt unerfüllt, wird aber nicht mehr nur scheinbar versucht.
+- *Option A:* Wie bei TASK-102 alles in den Hintergrund — erfüllt das Ziel auf der großen Kalenderdatei nach der BUG-113-Messung nicht (mehrere Sekunden Rest-Stillstand).
+
+*Nicht im Scope, ohne Frage:* `_load_discover_cache()` (≈ 30 ms, kein Handlungsbedarf), Wetter im Feed nach dem Check, Härtung „erst nachfüllen, dann zuweisen".
+
+**Status-Empfehlung:** In Analysis (Status-Feld und Board-Zeile nicht angefasst; das macht der Hauptthread).
 
 ---
 
@@ -5770,6 +6011,242 @@ Performance-Prämisse: nicht relevant (kein Optimierungsansatz, reine Synchronis
 Kein bestehendes Ticket deckt diesen Fund ab (TASK-51 betraf `startup()` in derselben Datei, ist Done und unabhängig von diesem Fund). Aufteilen in kleinere Hilfsfunktionen (z. B. Fenster-Aktivierung/Elevation-Abruf, Alignment-Berechnung, Response-Aufbau separieren). Kein inhaltlicher Umbau — insbesondere die BUG-63-Fixes (`try/finally` um `set_active_window`/`clear_active_window`, `ContextVar`-Isolation, `asyncio.to_thread`) müssen unverändert erhalten bleiben.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-63, 2026-07-16)
+
+---
+
+### TASK-113 · Live-Orte (inkl. London) einmalig in den Dev-Stand übernehmen `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-10-10 |
+
+**Hinweis zum Pipeline-Gate:** Von Stephan am 2026-10-10 im Chat ausdrücklich nach der Anlage freigegeben ("Erstelle ein Ticket und starte dann die Pipeline") — direkt von Inbox nach Ready for Analysis, ohne den sonst üblichen Intake-Stopp.
+
+**Beschreibung:** Die London-Orte liegen nur auf der Live-Umgebung, im Entwicklungsstand gibt es keinen Ort in England (geprüft: lokaler Datenordner und Dev-Stand ohne einen Ort in England). Damit US-138 und US-139 mit echten London-Daten entwickelt werden können, soll der Entwicklungsstand vorher mit dem Live-Stand abgeglichen werden. Dafür gibt es bereits ein Werkzeug (TASK-53, Done); hier geht es um den Lauf und die Prüfung, nicht um ein neues Werkzeug.
+
+**User Story:** Als Host und Entwickler der App, möchte ich, dass mein Entwicklungsstand dieselben Orte enthält wie die Live-App, sodass ich Neuerungen für London mit echten Daten ausprobieren kann.
+
+**Bezug:** Voraussetzung für US-138 und US-139 (zuerst umsetzen). Nutzt das Werkzeug aus TASK-53 (Done, Archiv, tools/sync_dev_from_live.py); das ältere sync-pull.sh stammt aus TASK-17/TASK-19. Kein neues Werkzeug erfinden. Zu klären: welches der beiden Werkzeuge gilt, ob der Lauf die London-Orte tatsächlich mitbringt, und ob der Dev-Stand danach zum Live-Stand passt.
+
+---
+
+### US-138 · England mit London: Wetter und Ortsdaten für die Reise abdecken `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Hoch |
+| **Status** | Ready for Dev |
+| **Erstellt** | 2026-10-10 |
+
+**Hinweis zum Pipeline-Gate:** Von Stephan am 2026-10-10 im Chat ausdrücklich nach der Anlage freigegeben ("Erstelle ein Ticket und starte dann die Pipeline") — direkt von Inbox nach Ready for Analysis, ohne den sonst üblichen Intake-Stopp.
+
+**Weg-Gate-Entscheidung (Stephan, 2026-10-10, Chat):** Option A gewählt (Empfehlung der Analyse): Wetterkarte nach Westen erweitern, Ortszeit für England-Orte, Entdecken-Tab für London mit eigenem Bezugspunkt, Auslieferung in drei Schritten (Karte + Messung, dann Ortszeit, dann Entdecken-Tab). Damit sind die Analyse-Fragen 1 (Zeitanzeige: Ortszeit mit Kennzeichnung) und 2 (Entdecken-Tab: mitrechnen) nach Empfehlung beantwortet, soweit in Option A enthalten. Frage 3 (Reisedatum): Stephan fliegt am 2026-10-11 nach London. Offen vor der Umsetzung: Designer-Check und Prototyp-Freigabe durch Stephan für die Kennzeichnung „Ortszeit London“ (Projektregel).
+
+**Beschreibung:** Der Host reist im Oktober 2026 nach London und braucht dort Wetter- und alle weiteren Daten für Orte in England, speziell London. Gewünscht ist nur England mit London, nicht ganz Großbritannien. Heute deckt die Wetterkarte fest Deutschland, Österreich, Norditalien und Norwegen ab (43,0 bis 71,5 Grad Nord, 3 bis 21 Grad Ost); England liegt außerhalb. Das Wetter pro Ort kommt von einem Dienst, der schon jetzt oft die Abfragegrenze meldet; zusätzliche Orte verschärfen das.
+
+**User Story:** Als Host der App, möchte ich für Orte in England, speziell London, dieselben Wetter- und Ortsdaten sehen wie für meine Orte in Deutschland, sodass ich meine Fotoreise nach London mit der App planen kann.
+
+**Bezug:** Grenzt an US-112 (Done, Archiv: Wetterkarte mit DWD und MET Norway; hier der feste Kartenausschnitt), BUG-58 (Done, Archiv: Zoom auf 50 km, betrifft nicht den Ausschnitt), TASK-99 (Done, Archiv: Berlin/Brandenburg-Beschränkung entfernt, der Kartenausschnitt blieb fest). Abhängig von BUG-99, BUG-111 und TASK-75 (Done, Archiv: Drosselung der Wetter-Abfragen; Last durch zusätzliche Orte neu bewerten). Möglicher Konflikt mit TASK-108 (offen: Wetter-Overlay-Funktion wird umgebaut). TASK-59 (In Progress: Gebäudedaten nur Berlin/Brandenburg), für London zu klären. Voraussetzung: TASK-113 (Dev-Stand mit London-Orten). Zu klären in der Analyse: ob Ausschnitt-Teil und Wetter-pro-Ort-Teil getrennte Tickets werden. Reisetermin Oktober 2026 beachten. US-139 baut darauf auf.
+
+**Status-Update (2026-10-10):** Analyse abgeschlossen → Weg-Gate 🔴 → **Wartet auf Entscheidung** (Kriterien 2 und 4, dazu zwei offene Grenzfälle, siehe Ampel). Ticket blockiert die Kette nicht. Lauf als Analyse-Subagent; kein Code, keine Tests und keine Daten wurden angefasst.
+
+#### 🔬 Analyse & Spec (US-138) · 2026-10-10
+
+##### Kernbefund in Alltagssprache
+Der Kartenausschnitt der Wetterkarte ist tatsächlich zu klein (England liegt westlich seiner Grenze) — das ist aber nur das kleinste Stück. Das **Wetter pro Ort** funktioniert für London **heute schon unverändert** (der Wetterdienst fragt weltweit nach Koordinaten, ohne Deutschland-Beschränkung). Die echten Stolpersteine für die Reise sind andere: (1) **Uhrzeiten**: die App zeigt alles in Berliner Zeit, London liegt immer eine Stunde dahinter — ein Sonnenaufgang um 7:10 Uhr in London stünde als 8:10 Uhr da. (2) **Abfragegrenze**: die Rechnung spricht dafür, dass die kostenlose Tagesgrenze des Wetterdienstes schon ohne London fast ausgereizt ist (Hochrechnung, nicht gemessen) — London würde sie nur um wenige Prozent erhöhen, aber das kann den Ausschlag geben. (3) **Entdecken-Tab (Scout)** rechnet seine Lichtfenster mit einem festen Berlin-Bezug — für London um rund 54 Minuten daneben. (4) **Feed**: die Chancen-Liste zeigt höchstens 500 Einträge von rund 16 000 (Stand lokaler Zwischenspeicher) — London-Orte können darin untergehen.
+
+##### 📊 Gemessen / belegt / Vermutung
+- **Belegt (Code gelesen 2026-10-10):** Kartenausschnitt fest in `backend/calculations/weather_grib.py` Z. 73–76 (Süd 43,0 · Nord 71,5 · West 3,0 · Ost 21,0); derselbe Ausschnitt filtert die Stützpunkte (Z. 209/213), bestimmt das Bildgitter (Z. 404–405, Bildgröße 360×420 Pixel in Z. 80–81) und die Kartengrenzen für die App (Z. 616). Breitengrade von England (ca. 50–56° N) liegen schon innerhalb; nur die Länge fehlt (England reicht von ca. 5,7° W bis ca. 1,8° O, Wert aus Allgemeinwissen, nicht aus einer Quelle belegt).
+- **Belegt (Code):** Die App holt die Kartengrenzen vom Server (`/weather-map`, Antwort-Feld bounds; web/index.html Z. ~5755 und ~5886). Die feste Ersatz-Hülle `_FALLBACK_BOUNDS` (Z. ~5658) wiederholt die Zahlen nur für den Fall „noch keine Daten". Karte und Grenzen werden gemeinsam auf der Platte gesichert (meta.json), alte Bilder bleiben also in sich stimmig bis zum nächsten Bau (Wetterkarte baut alle 3 h, Cache-Gültigkeit 1 h).
+- **Belegt (Code):** Datenquellen der Karte: DWD ICON-D2 nur für Stunde 0–48, ICON-EU nur für Stunde 48–72, MET Norway nur an 16 festen Punkten in Norwegen. Für England gibt es keinen eigenen Punktsatz.
+- **Belegt (Quelle, WebFetch 2026-10-10):** Open-Meteo-Dokumentation (open-meteo.com/en/docs/dwd-api): ICON-EU deckt „Europe" (~7 km), ICON-D2 „Central Europe" (~2 km), ICON Global die ganze Welt. DWD-Metadaten (gdk.gdi-de.org, ICON-D2): „Deutschland, Benelux, Schweiz, Österreich und Teile der Nachbarländer" — **England/London wird nicht genannt, die genauen Gitterkanten stehen in keiner abrufbaren Quelle.** → ob D2 London erreicht, ist **offen** (Spike, s. u.).
+- **Belegt (Quelle):** MET Norway Locationforecast liefert „für jeden Ort der Erde" (api.met.no/weatherapi/locationforecast/2.0/documentation; Rest der Welt aus dem ECMWF-Modell, ca. 9 km, docs.api.met.no/doc/locationforecast/datamodel). Pflicht-Kennung (User-Agent) ist im Code gesetzt. Ob die Nutzungsbedingungen weitere Grenzen nennen: nicht geprüft.
+- **Belegt (Code):** Wetter pro Ort: `backend/calculations/weather.py` Z. 474–540 fragt Open-Meteo mit Breite/Länge, ohne Modell- oder Regionsangabe, Zeitzone UTC; Luftdunst über `cams_global` (weltweit). Planung `_plan_weather_fetch_tasks` und Abrufe in `backend/main.py` enthalten keine Länder- oder Koordinatenprüfung (Fundstellen-Sweep unten). Sonnen-/Mondberechnung (`calculate_sun_info`, Skyfield) rechnet je Ort nach dessen Koordinaten und liefert UTC.
+- **Belegt (Code):** Wetter wird nur auf Termine der nächsten 3 Tage gelegt (`_weather_overlay`, Z. 2218) und läuft alle 3 h (Cron Z. 3109) plus nach der täglichen Vorberechnung, beim Serverstart und beim Einzel-Nachladen eines Ortes — mindestens 9 Läufe pro Tag. Drosselung: 4 gleichzeitig, 0,5 s Pause, 2 Wiederholungen bei 429, Gesamtgrenze 1500 s; Messung BUG-108: 833,6 s für 167 Orte; Messung TASK-75: 1186 Abfragen je Lauf (Kommentare in main.py Z. ~1572–1800).
+- **Belegt (Quelle, WebFetch 2026-10-10):** Open-Meteo kostenlos: 600/Minute, 5 000/Stunde, **10 000/Tag**; Abfragen mit mehr als 10 Wettergrößen zählen mehrfach (15 Größen = 1,5). Unsere Abfrage hat 12 Größen. Nichtkommerzielle Nutzung, Quellenangabe nötig.
+- **Hochrechnung (nicht gemessen):** 9 Läufe × rund 1 200 Abfragen ≈ 10 800 Abfragen pro Tag, bei Gewicht ≈ 1,2 (12 Größen, Annahme aus der Preisseite) ≈ 13 000 — also über dem Tageswert. Das würde die gemessenen 429-Fehler erklären. **Nicht belegt:** echte Abfragezahl pro Lauf heute (das Log zählt nur Orte und 429-Wiederholungen, nicht alle Abfragen), Zahl der London-Orte live, ob Open-Meteo die Grenze pro Tag tatsächlich so hart anwendet.
+- **Belegt (Code, lokale Kopie):** Im lokalen Zwischenspeicher (Stand 2026-09-28) liegen 18 084 Chancen für 332 Orte; nach Mindestwert 0,35 und Tages-Zusammenfassung 16 580; die App fragt den Feed ohne Ortsangabe ab (`/opportunities?min_score=…&days=14`, web/index.html Z. 2090), der Server kappt reihum nach Terminart auf 500. In meiner Nachrechnung kommen davon nur 160 der 332 Orte überhaupt vor. Lokale Kopie ≠ Produktion → Näherung.
+- **Nicht prüfbar aus der Sandbox:** London-Orte live (Anzahl, Koordinaten), Produktionslog, echte Gitterkanten der DWD-Dateien, Netzwerk-Livetests.
+
+##### Zu der Ticket-Prämisse
+Das Ticket vermutet: Karte zu klein (✔ bestätigt) und Wetter pro Ort verschärft die Abfragegrenze (⚠ teilweise): Wetter pro Ort braucht **keinen Umbau**; die Last wächst nur mit der Zahl der London-Orte (Annahme 10–20 Orte ⇒ rund +8–10 % Abfragen) — das Problem ist die schon bestehende Auslastung. Deshalb **kein Aufspalten in „Ausschnitt" und „Wetter pro Ort"**; sinnvoller ist die Aufteilung nach Umsetzungsschritten (Karte → Ortszeit → Scout), siehe Optionen.
+
+##### Example Mapping
+📏 **Regel 1 — Die Wetterkarte zeigt auch England.** 🟢 Beispiel: Gegeben ein Kartenstand mit Werten für Deutschland und England, wenn ich auf London zoome, dann ist die Fläche farbig (Wolken/Regen) statt leer. 🟢 Beispiel: Gegeben Stunde 10 von 72, wenn ich die Karte über London betrachte, dann gibt es Werte (nicht erst ab Stunde 48).
+📏 **Regel 2 — Deutschland, Österreich, Norditalien, Norwegen sehen aus wie vorher.** 🟢 Beispiel: Gegeben gleiche Modelldaten, wenn die Karte größer ist, dann weichen die Werte über Berlin, München und Oslo um höchstens 2 Prozentpunkte Bewölkung ab.
+📏 **Regel 3 — Jeder London-Ort bekommt sein eigenes Wetter wie ein deutscher Ort.** 🟢 Beispiel: Gegeben ein London-Ort mit Termin morgen früh, wenn der Wetterlauf läuft, dann zeigt der Termin Bewölkung, Regen, Sicht dieses Ortes. 🟢 Beispiel: Gegeben ein London-Ort, wenn der Wetterdienst nur für ihn „zu viele Anfragen" meldet, dann sieht Stephan den bestehenden Fehlerhinweis mit Ortsname und die deutschen Orte behalten ihr Wetter.
+📏 **Regel 4 — Eine Uhrzeit bedeutet die Zeit am Ort.** 🟢 Beispiel: Sonnenaufgang 15.10.2026 05:30 UTC → London-Ort „06:30 Uhr", Berliner Ort „07:30 Uhr". 🟢 Beispiel nach der Zeitumstellung (So 25.10.2026): 27.10. 05:30 UTC → London „05:30 Uhr", Berlin „06:30 Uhr".
+📏 **Regel 5 — Die Abfragegrenze bleibt eingehalten.** 🟢 Beispiel: Gegeben die London-Orte sind live aufgenommen, wenn ein Wetterlauf auf dem Server durchläuft, dann ist der Anteil gescheiterter Abfragen höchstens 2 Prozentpunkte höher als vorher.
+📏 **Regel 6 — Entdecken-Tab (Scout) passt zum Londoner Himmel (nur wenn Frage 2 so entschieden wird).** 🟢 Beispiel: Goldene-Stunde-Fenster eines London-Motivs liegen innerhalb ±15 Minuten um die Londoner Sonnenzeiten, nicht um die Berliner.
+❓ Offene Fragen (Abschnitt „Offene Fragen" unten): Frage 1 Zeitanzeige, Frage 2 Scout für London, Frage 3 Reisedatum.
+
+##### Scope
+**Eingeschlossen (je nach Weg-Gate-Entscheidung, siehe Optionen):** (a) Wetterkarte deckt England ab, ohne Deutschland/Österreich/Norditalien/Norwegen zu verändern; (b) Wetter pro Ort für London-Orte bestätigt und die Abfragegrenze vor/nach der Aufnahme gemessen; (c) Uhrzeiten und Tagesbezeichnungen („Heute", „Morgen") für London-Orte in Londoner Ortszeit; (d) Entdecken-Tab für London-Motive mit passenden Lichtfenstern (nur bei Frage 2 = „mitrechnen"); (e) Sichtlinien-Status für London-Orte ehrlich („geprüft" oder „nicht geprüft", nie fälschlich „frei").
+**Ausgeschlossen:** ganz Großbritannien (Schottland, Wales, Nordirland — die Karte zeigt sie zwangsläufig mit, sie werden aber nicht gezielt unterstützt); Pausenschalter pro Land (→ US-139); Umbau der Wetter-Funktionen in `main.py` (→ TASK-108); eigener Gebäudedaten-Server und Regionsauszug London (→ TASK-59, dessen 🚫 Release-Sperre auf `qa_azimuth.py` bleibt unangetastet); Live-Ortsdaten in den Dev-Stand (→ TASK-113, Voraussetzung für Tests mit echten London-Orten); Finsternis-Bezugspunkt Berlin (`astronomy.py` Z. 210–211; im Oktober 2026 gibt es nach meinem Wissen keine Finsternis — Annahme, nicht geprüft); Umstellung der nativen iOS-App (`ios/…` nutzt fest Europe/Berlin an 3 Stellen — nur falls Stephan sie auf der Reise nutzt, eigenes Ticket); Feed-Obergrenze 500 (nur als Risiko, siehe Pre-Mortem 7).
+
+##### Akzeptanzkriterien (Alltagssprache)
+*Karte*
+- [ ] **AK1** Auf der Wetterkarte sind Wolken und Regen auch über England zu sehen: London, Cornwall im Südwesten (ca. 50,1° N / 5,5° W) und die Küste bei Great Yarmouth im Osten (ca. 52,6° N / 1,7° O) liegen im Kartenbild und bekommen Farbwerte, sobald Wetterdaten da sind. *(Herkunft: Ticket)*
+- [ ] **AK2** Über London gibt es Kartenwerte auch in den ersten 48 Stunden, nicht erst ab Stunde 48. *(Herkunft: Pre-Mortem 2)*
+- [ ] **AK3** Deutschland, Österreich, Norditalien, Norwegen: Bei gleichen Modelldaten weichen die Bewölkungswerte an Berlin, München und Oslo höchstens 2 Prozentpunkte von vorher ab; die Karte springt beim Einschalten nicht. *(Herkunft: Pre-Mortem 3)*
+- [ ] **AK4** Fällt für England eine Datenquelle aus, bleibt der Rest der Karte unverändert und England zeigt transparent „keine Daten" — keine Fehlfarben, keine Fehlermeldung für die ganze Karte. *(Herkunft: Zustands-Check)*
+- [ ] **AK5** Der Aufbau der Karte dauert auf dem Produktionsserver höchstens das 1,5-fache des Vorher-Werts (Messort Produktionsserver; Vorher- und Nachher-Messung, während kein Wetterlauf läuft). *(Herkunft: Pre-Mortem 3)*
+- [ ] **AK6** Nach einem Neustart/Deploy zeigt die App die Karte weiter an (alte Bilder mit alten Grenzen, in sich stimmig) und England erscheint, sobald der erste Neubau durch ist (höchstens eine Stunde später). *(Herkunft: Pre-Mortem 4)*
+*Wetter pro Ort*
+- [ ] **AK7** Ein London-Ort mit Termin in den nächsten 3 Tagen zeigt Bewölkung, Regen und Sicht seiner eigenen Koordinaten (nicht die von Berlin). *(Herkunft: Regel 3)*
+- [ ] **AK8** Ein London-Ort mit Termin in mehr als 3 Tagen zeigt wie jeder andere Ort noch kein Wetter. *(Abwärtskompatibilität)*
+- [ ] **AK9** Nach Aufnahme der London-Orte ist auf dem Produktionsserver der Anteil gescheiterter Wetterabfragen pro Lauf höchstens 2 Prozentpunkte höher als vorher, und der Lauf bleibt unter 25 Minuten (Messort Produktionsserver, Vorher-/Nachher-Messung während kein anderer Wetterlauf läuft). *(Herkunft: Pre-Mortem 1)*
+- [ ] **AK10** Scheitert der Wetterabruf nur für London-Orte, zeigt die App den bestehenden Fehlerhinweis mit dem Ortsnamen; die deutschen Orte behalten ihr Wetter. *(Herkunft: Regel 3)*
+*Uhrzeiten (gilt, wenn Frage 1 = „Ortszeit")*
+- [ ] **AK11** Sonnenaufgang, Sonnenuntergang, Goldene/Blaue Stunde, Mondauf-/-untergang und Termin-Uhrzeit eines London-Ortes stehen in Londoner Zeit: 15.10.2026 05:30 UTC → „06:30 Uhr"; ein Berliner Ort zeigt dieselbe Zeit als „07:30 Uhr". *(Herkunft: Frage 1)*
+- [ ] **AK12** Nach der Zeitumstellung am 25.10.2026 stimmt es weiter: 27.10.2026 05:30 UTC → London „05:30 Uhr", Berlin „06:30 Uhr". *(Herkunft: Pre-Mortem 5)*
+- [ ] **AK13** Ein London-Termin, der in London noch am 14.10. liegt (22:30 UTC = 23:30 Uhr London = 00:30 Uhr Berlin am 15.10.), steht unter „14.10." bzw. „Heute/Morgen" nach dem Datum in London. *(Herkunft: Grenzfall)*
+- [ ] **AK14** Die Detailansicht kennzeichnet die Zeit eines London-Ortes als Ortszeit in Worten (z. B. „Ortszeit London"), nicht nur über die Zahl. Erinnerung und Teilen-Text nennen dieselbe Zeit wie die Anzeige. *(Herkunft: Pre-Mortem 5; Designer-Check offen)*
+- [ ] **AK15** Alle Orte außerhalb Englands (auch Norwegen) zeigen unverändert Berliner Zeit. *(Herkunft: Abwärtskompatibilität)*
+*Entdecken-Tab (gilt, wenn Frage 2 = „mitrechnen")*
+- [ ] **AK16** Die Lichtfenster für ein London-Motiv liegen höchstens 15 Minuten neben den Londoner Sonnenzeiten (nicht neben den Berliner); Berliner Motive liefern dieselben Ergebnisse wie vorher. *(Herkunft: Pre-Mortem 6)*
+*Sichtlinie / Auffindbarkeit*
+- [ ] **AK17** Ist der Gebäudedienst für einen London-Ort nicht erreichbar oder überlastet, steht dort „nicht geprüft" — nie „frei". *(Herkunft: Pre-Mortem 8; bestehendes Verhalten, nur bestätigen)*
+- [ ] **AK18** Für drei London-Orte ist mindestens ein kommender Termin in der App auffindbar (Feed, Kalender oder Ortsdetail), auch wenn der Feed-Auszug auf 500 Einträge gekappt ist. *(Herkunft: Pre-Mortem 7; Prüfweg ist offen — Kalender liest alle Orte, Ortsdetail nicht geprüft)*
+
+##### Pre-Mortem
+📎 **Code-Verifikation (2026-10-10, nur Lesen, kein Git):** gelesen `weather_grib.py` (gesamt), `weather.py` Z. 474–590, `main.py` (Wetterplanung/-lauf Z. 1103–2290, `_filter_feed` Z. 3355–3420, `/weather-map` Z. 4100–4140, Cron Z. 3100–3112), `astronomy.py` Z. 185–235/531–580, `discover/sun_pipeline.py`, `moon_pipeline.py`, `subjects.py`, `data/qa_azimuth.py` Z. 551–611, `data/elevation.py` Z. 1–60, `web/index.html` Z. 1870–1915, 5640–5900, `tools/lint_backlog.py`.
+Bestätigt: Koordinaten werden nirgends auf Deutschland beschränkt (Eingabeprüfung nur ±90/±180, `main.py` Z. 4275–4279); Sonne/Mond/Skyfield rechnen je Ort; Höhenkette EU-DEM → SRTM (global bis ca. 60° N) → Mapzen deckt England. Widerlegt: „England liegt schon im Wetter-Overlay" (West 3,0° O) und „Wetter für London braucht einen Umbau" (braucht keinen).
+- 💀 **1 Tagesgrenze des Wetterdienstes reißt, auch für Deutschland.** Auslöser: zusätzliche Orte bei ohnehin ≥ 9 Läufen/Tag. Frühwarnung: Anteil „HTTP 429" im Log, Lauf nahe 1500 s, Meldung „Obergrenze erreicht". Gegenmaßnahme: Vorher-Messung auf Produktion (Abfragen/Lauf, 429-Anteil, Laufzeit) VOR der Freigabe; AK9; kein stilles Verändern der Drosselwerte; Hebel bei Bedarf: US-139 (Norwegen/Italien pausieren) oder Abfragen nahe beieinander liegender Orte zusammenlegen (eigenes Ticket, würde auch deutsche Orte berühren).
+- 💀 **2 Karte über London leer in den ersten 48 h.** Auslöser: ICON-D2 reicht evtl. nicht bis England, und ICON-EU wird nur für 48–72 h geladen. Frühwarnung: Quellen-Zähler `icon_d2`/`icon_eu` im `/weather-map`-Antwortfeld sources; Werte über London fehlen. Gegenmaßnahme: **Spike vor der Umsetzung** — Kopfdaten (Gitterkanten) einer echten D2-Datei lesen (auf Stephans Mac/Server, nicht aus der Sandbox); reicht D2 nicht, ICON-EU auch für 0–48 h im Westen ergänzen (mehr Dateien, ≈ +96 Downloads) oder wie bei Norwegen MET-Punkte für England; AK2.
+- 💀 **3 Karte unschärfer/langsamer.** Auslöser: Ausschnitt rund 50 % breiter bei gleicher Bildgröße; mehr Pixel = mehr Rechenzeit/Speicher für 72 Stunden × 2 Felder. Frühwarnung: Bauzeit „Wetter-Karte gebaut" im Log. Gegenmaßnahme: Bildbreite im gleichen Verhältnis erhöhen, Bauzeit messen, Werte über Berlin/München/Oslo vergleichen (AK3, AK5).
+- 💀 **4 Alte Bilder nach dem Deploy.** Auslöser: Bilder samt Grenzen liegen auf der Platte; England fehlt bis zum ersten Neubau. Frühwarnung: `/weather-map` zeigt alte Grenzen. Gegenmaßnahme: nach Deploy Neubau anstoßen und prüfen; Grenzen kommen gemeinsam mit den Bildern aus derselben Datei, daher kein Versatz (AK6).
+- 💀 **5 Uhrzeit um eine Stunde falsch gelesen (größter Schaden auf der Reise).** Auslöser: die App rechnet überall fest in Berliner Zeit (`formatTime`/`formatDate` Z. 1870–1881, 23 Aufrufe, plus feste Stellen Z. 5236 und 5804); London liegt ganzjährig 1 Stunde dahinter, weil beide Zeiten am selben Tag (letzter Sonntag im Oktober, 25.10.2026) umgestellt werden (Allgemeinwissen, nicht belegt). Folge: Stephan steht um 8:10 Uhr am Ort, der Sonnenaufgang war um 7:10 Uhr. Gegenmaßnahme: Frage 1, AK11–AK15 mit festen Beispielwerten, Test über die Zeitumstellung hinweg.
+- 💀 **6 Entdecken-Tab liefert für London falsche Fenster.** Auslöser: beide Rechenwege (`sun_pipeline.py` Z. 34–35/78, `moon_pipeline.py` Z. 36–37/103) bilden die Lichtfenster für **alle** Motive mit dem Berliner Bezugspunkt (52,52 N / 13,40 O); Motive kommen aus `data/locations.py` und damit auch die London-Orte. Die Sonne geht in London rund 54 Minuten später (UTC) auf. Folge: Treffer fehlen oder zeigen falsche Zeiten. Gegenmaßnahme: Frage 2, AK16, Test mit zwei Motiven (Berlin/London).
+- 💀 **7 London-Termine gehen im Feed unter.** Auslöser: Feed kappt auf 500 reihum nach Terminart; App fragt ohne Ortsangabe. Ergebnis lokal: 160 von 332 Orten kommen im Auszug überhaupt vor. Gegenmaßnahme: AK18 prüfen; bei Misserfolg eigenes Folgeticket (Ortsfilter/Radius im Feed — nahe verwandt mit US-139).
+- 💀 **8 Gebäudedaten für das dichte London überlasten die öffentlichen Mirrors.** Auslöser: lokale Gebäudedatei kennt nur die Basis-Orte; London fällt auf die Live-Abfrage (`qa_azimuth.py` Z. 551ff.). Folge: „nicht geprüft" statt Absturz (ehrlich, Regel 4), nächtlicher QA-Lauf 01:00 dauert länger. Gegenmaßnahme: nichts ändern (TASK-59-Sperre), nur beobachten; AK17.
+**Zusammenspiel:** Karte: Wetter-Cron → `build_weather_overlay` (DWD/MET) → `render_all_pngs` → `_build_weather_map` → Platte → `/weather-map` → App liest Grenzen vom Server. Wetter pro Ort: Cron → `_plan_weather_fetch_tasks` → Open-Meteo (getrennt von der Karte, anderer Dienst). Beide Wege teilen sich nur den Cron-Takt — Änderungen an der Karte beeinflussen die Abfragegrenze nicht.
+Situative Checks: Cap+Sort (Pre-Mortem 7, 4b); Optimierungsleck: die Abfrage-Zusammenlegung (Hebel in 1) würde Orte als austauschbar behandeln, obwohl Wolken in 30 km Abstand abweichen können → falls später umgesetzt: eigenes AK + Test „zwei Orte mit gleichem Rasterfeld, unterschiedliches Wetter werden einzeln behandelt". Keine neue Eingabe, kein neuer Endpunkt, keine CSP-Änderung, keine Datenbank-Änderung.
+
+##### Fundstellen-Sweep & Zustands-Check
+**Fundstellen-Sweep:** (1) Kartenausschnitt — Suche `BBOX_|overlay_bounds|43\.0, 3\.0` in `backend/` (ohne venv/tests) und `web/`: `weather_grib.py` (Z. 73–76, 209, 213, 404–405, 616), `main.py` (2 Treffer `overlay_bounds`: Z. ~2460 und ~4121), `web/index.html` Fallback Z. 5658; Tests nutzen die Konstanten symbolisch (`test_us112_weather_map.py` Z. 79–80), brechen bei neuen Grenzen nicht. (2) Zeitzone — Suche `Europe/Berlin`: `web/index.html` 4 Stellen (Z. 1870, 1873, 5236, 5804), `main.py` 1 (Scheduler Z. 497), iOS 3; Aufrufe `formatTime(|formatDate(` = 23 Zeilen; Anzeigen **ohne** Zeitzone (Geräte-Zeit!) an Z. 2329, 6170, 7201, 7292–7293 — bereits uneinheitlich, bei der Umsetzung mitprüfen. Push-Nachrichten (`notifications/push.py`) enthalten keine Uhrzeitformatierung (Suche `strftime|astimezone|Uhr|ZoneInfo|timezone`: 0 Treffer). (3) Berlin-Bezug — Suche `52\.52|13\.40`: `discover/sun_pipeline.py`, `discover/moon_pipeline.py`, `astronomy.py` (Finsternisse), `web/index.html` (Kartenstart Z. 5408 und Hilfsfunktion `berlinSunTimes` Z. 1887, **ohne Aufrufer**, 1 Treffer = Definition). (4) Sichtlinien/Gebäude/Höhe — `qa_azimuth.py` Z. 551ff., `elevation.py` Z. 37. (5) Wetter-Planung — keine Länder-/Koordinatenprüfung (Suche `lat.*<|lon.*>` in `main.py`: nur Eingabeprüfung Z. 4275–4279, 4677–4679).
+**Zustands-Check:** *Warten:* Karte noch nicht gebaut → bestehender Leer-Antwort-Zustand mit eigenen Grenzen (unverändert). *Leer:* London-Ort ohne Termin in 3 Tagen → kein Wetter wie bisher (AK8); Karte ohne England-Daten → transparent (AK4). *Fehler:* DWD/MET nicht erreichbar → andere Quellen bleiben gültig (bestehendes Verhalten); Wetterdienst „zu viele Anfragen" → bestehender Hinweis (AK10); Gebäudedienst weg → „nicht geprüft" (AK17).
+
+##### Architektur-Analyse (technisch)
+Betroffen je nach Option: `backend/calculations/weather_grib.py` (Grenzen, Bildgröße, ggf. ICON-EU auch 0–48 h), `web/index.html` (Fallback-Grenzen Z. 5658; Zeitfunktionen Z. 1870–1881 und 23 Aufrufe; feste Stellen Z. 5236/5804), `backend/discover/sun_pipeline.py` und `moon_pipeline.py` (nur bei „Scout mitrechnen": Bezugspunkt je Region statt fest), Tests unter `backend/tests/`. **Nicht** betroffen: Wetterplanung/-abruf in `main.py` (daher keine Überschneidung mit TASK-108), `qa_azimuth.py`/`test_task59_own_overpass.py` (TASK-59-Release-Sperre), Datenbank, Rechenkern der Chancen.
+Zeitregel (Option A): England-Orte = Koordinaten in einem Kasten von ca. 49,8–55,9° N / 6,4° W–1,8° O → „Europe/London", sonst „Europe/Berlin". Bewusst ohne neue Bibliothek und ohne neues Datenfeld; Grenzfälle (Calais 1,85° O liegt knapp außerhalb, Irland/Wales/Schottland innerhalb) sind für diesen Zweck akzeptabel — Annahme, mit Stephan zu bestätigen (Teil von Frage 1).
+Designer-Check: **ja, nötig** (sichtbare Kennzeichnung „Ortszeit London", AK14) — in dieser Analyse nicht durchgeführt; vor der Umsetzung mit `fotoalert-designer` nachholen. Die größere Karte selbst fügt kein neues Bedienelement hinzu.
+
+##### Optionen (Alltagssprache)
+**Option A — Eine größere Karte, Orts-Wetter wie gehabt, Uhrzeiten in Ortszeit (Empfehlung)**
+- Vorgehen: Wetterkarte um den Westen vergrößern (bis ca. 6° W), Bildgröße im selben Verhältnis erhöhen, Ersatz-Grenzen in der App angleichen; vorher kurz prüfen, ob das genaue DWD-Modell London in den ersten 48 h erreicht, sonst das gröbere Europa-Modell dort dazunehmen. Wetter pro Ort bleibt unverändert, wird aber vor/nach der Aufnahme der London-Orte gemessen. Uhrzeiten für England-Orte in Londoner Zeit. Entdecken-Tab: Lichtfenster je Region (nur bei Frage 2 = „mitrechnen"). Empfohlene Reihenfolge der Auslieferung: ① Karte + Messung, ② Ortszeit, ③ Entdecken-Tab.
+- Betroffene Dateien: `backend/calculations/weather_grib.py`, `web/index.html`, ggf. `backend/discover/sun_pipeline.py`/`moon_pipeline.py`, neue Tests.
+- Vorteile: kleinster Eingriff in die Karte (Grenzen + Bildgröße, kein neuer Endpunkt); App bekommt die Grenzen schon heute vom Server; löst die Reise-relevanten Punkte (Karte, Zeit); keine Datenbank-Änderung, jederzeit rücknehmbar.
+- Nachteile / Risiken: Karte wird etwas breiter und rechnet länger (messen, AK5); Deutschland-Bild ändert sich minimal (AK3); Zeitumstellung berührt 23 Anzeigestellen; Schottland/Wales/Irland erscheinen mit auf der Karte.
+- Aufwand: mittel (Karte klein, Ortszeit mittel, Entdecken-Tab klein bis mittel).
+
+**Option B — Zweite, eigene England-Karte neben der bestehenden**
+- Vorgehen: Zusätzliches Kartenbild nur für England (ca. 49,5–56° N, 6,5° W–2,5° O) mit eigenem Aufbau, eigenem Speicher und eigenem Abruf; die App legt zwei Bilder übereinander. Rest wie Option A.
+- Betroffene Dateien: `weather_grib.py`, `main.py` (Kartenbau, `/weather-map`, Platten-Cache), `web/index.html` (zwei Bilder, Umschaltung), Tests.
+- Vorteile: Deutschland-Bild bleibt Pixel für Pixel gleich; England schärfer.
+- Nachteile / Risiken: doppelt so viele Karten-Bilder (2 × 2 × 72) und doppelter Speicher; berührt die Kartenfunktionen in `main.py`, an denen auch TASK-108 umbaut (Konflikt); mehr Stellen, die auseinanderlaufen können (Bildgrenzen, Cache).
+- Aufwand: groß.
+
+**Option C — Nur Orts-Wetter und Uhrzeiten, Karte bleibt vorerst unverändert**
+- Vorgehen: Keine Änderung an der Karte; Wetter pro Ort bestätigen und messen; Uhrzeiten in Ortszeit; Entdecken-Tab wie Option A.
+- Betroffene Dateien: `web/index.html`, ggf. `discover/*`, Tests.
+- Vorteile: kleinstes Risiko, schnell fertig; deckt die Zahlen pro Ort für die Reise ab.
+- Nachteile / Risiken: die Wetterkarte zeigt über London weiterhin nichts — der im Ticket genannte Kartenteil bleibt offen (müsste ein Folgeticket werden).
+- Aufwand: klein bis mittel.
+
+✅ **Empfehlung: Option A** — die Karte ist technisch der kleinste Teil (vier Grenzwerte + Bildgröße); Option B kostet ein Vielfaches und kollidiert mit TASK-108, Option C lässt den im Ticket genannten Kartenwunsch offen. Im Abgleich mit dem Pre-Mortem: die größten Risiken (Zeitverwechslung, Abfragegrenze) werden in A durch feste Beispiel-AKs und eine Vorher-Messung abgefangen, nicht durch Architekturumbau.
+
+⚠️ **Grenzfälle mit mehreren sinnvollen Verhaltensweisen (gehören ins selbe Weg-Gate):**
+❓ **Frage 1: Wie sollen Uhrzeiten für England-Orte angezeigt werden?**
+  Option 1 — Ortszeit: London-Orte zeigen Londoner Zeit (mit Kennzeichnung „Ortszeit London"), alle anderen Berliner Zeit. Konsequenz: auf der Reise stimmt jede Zeit mit der Uhr am Handgelenk; Anzeigen von Berliner und Londoner Orten in einer Liste laufen aber in zwei Zeiten.
+  Option 2 — Alles bleibt Berliner Zeit, London-Orte bekommen nur den Hinweis „Berliner Zeit": Konsequenz: kleinster Eingriff, aber Stephan muss in London jede Zeit im Kopf um eine Stunde zurückrechnen.
+  **Empfehlung: Option 1.**
+❓ **Frage 2: Wie soll der Entdecken-Tab (Scout) mit London-Motiven umgehen?**
+  Option 1 — Mitrechnen mit eigenem Londoner Bezugspunkt: Konsequenz: Scout-Treffer in London stimmen; kleiner Zusatzaufwand in zwei Rechenwegen.
+  Option 2 — London-Motive im Scout vorerst ausblenden (eigenes Folgeticket): Konsequenz: keine falschen Treffer, aber kein Scout in London.
+  Option 3 — Nichts tun: Konsequenz: London-Treffer mit rund 54 Minuten Versatz — nicht empfohlen (falsche Werte, vgl. Regel „nie raten").
+  **Empfehlung: Option 1**, falls die Reise nach dem ersten Release noch ≥ 1 Woche entfernt ist, sonst Option 2.
+
+🚦 **Ampel-Ergebnis:**
+🔴 Rot — braucht Stephans Entscheidung: **Kriterium 2** (Eingriff bleibt im Ticket: die Ortszeit berührt alle Termin-Anzeigen der App, der Scout zwei Rechenwege) und **Kriterium 4** (Pre-Mortem hohes Risiko: die Tagesgrenze des Wetterdienstes ist nach der Hochrechnung schon ohne London fast ausgereizt, ungemessen; Zeitverwechslung auf der Reise), dazu zwei offene Grenzfälle (Frage 1 und 2). Kriterien 1 (klarer Abstand A zu B/C), 3 (ohne Datenverlust rücknehmbar: keine Datenbank-/Datenmodell-Änderung) und 5 (keine reine Geschmacksfrage) sind erfüllt.
+
+##### Testplan
+**Automatisiert (nur formuliert — Testdatei `backend/tests/test_us138_england.py` wurde in dieser Analyse bewusst NICHT angelegt, weil der Auftrag keine Änderungen an Code/Tests erlaubt; sie wird als erster Schritt der Umsetzung angelegt und per Rot-Nachweis gegen den unveränderten Stand bestätigt):**
+- T1 (`offline`, `regression`) — AK1: Punkte London (51,5 N / 0,12 W), Land's End-Nähe (50,1 / −5,5), Great Yarmouth (52,6 / 1,7) liegen in den Kartengrenzen; Berlin, München, Oslo, Po-Ebene (44,9 N) weiterhin; Atlantikpunkt (51,5 / −9,0) liegt außerhalb. Erwartet heute: rot (West = 3,0).
+- T2 (`offline`, Erweiterung des vorhandenen GRIB-Prüfbilds): synthetische Datei mit Länge −6…+2, Breite 50…53, Wert 42 → mind. ein Stützpunkt mit Länge < 0, alle Stützpunkte innerhalb der Grenzen. Erwartet heute: rot (nur Länge ≥ 3,0).
+- T3 (`offline`) — AK1/AK4: Bild mit einem Stützpunkt bei London → Pixel bei London nicht transparent; Pixel weit entfernt (Atlantik) transparent.
+- T4 (`offline`, `regression`) — AK3: gleiche Stützpunkte über Berlin/München/Oslo vor und nach der Änderung → Wert am Ort ±2 Prozentpunkte.
+- T5 (`offline`) — Konsistenz: Ersatz-Grenzen in `web/index.html` (Textvergleich) gleich den Server-Grenzen.
+- T6 (`offline`, `regression`) — AK7/AK8: `_plan_weather_fetch_tasks` mit einem London-Termin (Standort 51,5 / −0,12, Termin in 2 Tagen) plant einen Wetterabruf mit genau diesen Koordinaten; Termin in 5 Tagen bekommt kein Wetter. Erwartet heute: grün (Bestätigung).
+- T7 (`offline`, `regression`) — AK10: Abruf-Fehler 429 nur für den London-Ort → Fehlerliste enthält nur diesen Ortsnamen, deutsche Orte behalten ihr Wetter.
+- T8 (Playwright, `regression`) — AK11–AK15: Fixtures 15.10.2026 05:30 UTC (London „06:30 Uhr", Berlin „07:30 Uhr"), 27.10.2026 05:30 UTC (London „05:30 Uhr", Berlin „06:30 Uhr"), 14.10.2026 22:30 UTC (London „14.10./23:30", Berlin „15.10./00:30"); Norwegen-Ort zeigt Berliner Zeit.
+- T9 (`offline`) — AK16 (nur bei Frage 2 = mitrechnen): Lichtfenster eines London-Motivs ±15 Min um `calculate_sun_info(51,5, −0,12)`; Berliner Motiv unverändert. Erwartet heute: rot (≈ 54 Min Versatz).
+- T10 (`offline`) — AK17: Gebäudeabfrage liefert „kein Ergebnis" → Status „nicht geprüft", nie „frei" (Bestandstest US-09 erweitern um London-Koordinaten).
+**Manuell (Dev-Stand erst nach TASK-113 mit London-Orten bestückt; sonst gegen Produktion):**
+1. Vorher-Messung auf Produktion (während `/health` → `jobs.weather.status` ≠ `running`): Anzahl Abfragen pro Lauf (aus dem Log zählen; falls nicht möglich, eine Zähl-Zeile ergänzen — kleiner Zusatz in der Umsetzung), 429-Anteil, Laufzeit; Anzahl und Koordinaten der London-Orte (über den angemeldeten Client der Web-App).
+2. Spike (Stephans Mac oder Server, kein Sandbox-Netz): eine ICON-D2-Datei laden, Gitterkanten lesen (West/Ost/Süd/Nord); Ergebnis ins Ticket.
+3. http://localhost:8000 → Wetterkarte → auf London zoomen: Wolken/Regen sichtbar (Stunde jetzt, +12 h, +60 h). Berlin/München/Oslo vorher/nachher vergleichen.
+4. London-Ort mit Termin heute/morgen öffnen: Wetter-Zeile gefüllt; Zeiten gegen eine Online-Sonnenzeitentabelle für London prüfen (±2 Min).
+5. Nachher-Messung auf Produktion wie Schritt 1; AK9 prüfen.
+6. Regressions-Matrix PRODUCT.md Sektion 12 (Feed, Kalender, Karte, Scout, Ortsdetail); Norwegen-Ort zeigt Berliner Zeit.
+
+**Daten-Validierung:**
+- [ ] ICON-D2-Gitterkanten (Spike) — offen.
+- [ ] Anzahl London-Orte live und deren Termine in 3 Tagen — offen.
+- [ ] Abfragen/Lauf und 429-Anteil Produktion (Vorher-Wert) — offen.
+- [ ] Reisedatum — offen (Frage 3).
+
+**Analyse & Planung:**
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: siehe oben (5 Muster)
+- [x] Zustands-Check: siehe oben
+- [x] Pre-Mortem durchgeführt (8 Szenarien)
+- [x] Architektur analysiert: weather_grib.py, web/index.html, discover/*, main.py (nur gelesen)
+- [ ] Designer-Check: ja, nötig für AK14 — nicht durchgeführt (offen, vor der Umsetzung)
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A
+- [x] AK-Qualitäts-Check durchgeführt: siehe unten (mit Vorbehalt Rot-Nachweis)
+
+##### AK-Qualitäts-Check
+🔍 **AK-Qualitäts-Check: ✅ durchgeführt — AK nach Teilen getrennt (Karte/Ort/Zeit/Scout/Sichtlinie), jedes Gegenstück vorhanden; offen bleibt der Rot-Nachweis der Tests und der Designer-Check.**
+1. *Granularität:* je AK ein prüfbares Verhalten; AK14 (Kennzeichnung + Erinnerung/Teilen) ist grenzwertig → bei der Umsetzung bei Bedarf teilen.
+2. *Polarität:* Karte AK3 (Deutschland unverändert) ↔ AK1; AK4 (Ausfall) ↔ AK2; Ort AK8 (kein Wetter ab Tag 4) ↔ AK7, AK10 ↔ AK7; Zeit AK15 (Nicht-England unverändert) ↔ AK11; Scout AK16 zweiter Halbsatz.
+3. *Messbarkeit:* AKs ohne Funktions-/Dateinamen; Zahlen: ±2 Prozentpunkte, ±15 Minuten, 1,5-fach, +2 Prozentpunkte/25 Minuten.
+4. *Vier Kategorien:* funktional AK1–AK16; nicht-funktional: Last/Laufzeit AK5/AK9, Zugänglichkeit AK14 (Zeit in Worten gekennzeichnet, nicht nur über Farbe/Zahl), Sicherheit nicht relevant (keine neue Eingabe, kein neuer Endpunkt); Architektur: Rückwärtskompatibilität AK3/AK6/AK15, kein Datenmodell-Eingriff; Sonstige: Lizenz — DWD und MET Norway bleiben unter CC BY 4.0 mit unveränderter Quellenangabe, Open-Meteo bleibt nichtkommerziell (private App), Beobachtbarkeit — Fehlerhinweis AK10 und eine Zähl-Zeile im Log (Umsetzung).
+5. *Testbarkeit:* alle AKs als Testfall T1–T10 oder manuelle Messung formuliert; **Rot-Nachweis noch offen** (keine Testdatei angelegt, s. Testplan).
+6. *Herkunft:* jeder AK trägt einen Herkunftsvermerk.
+*Negativ-/Randfall-Checkliste:* Grenzwerte — Cornwall/Great Yarmouth am Rand, Atlantikpunkt außerhalb (T1); Ungültige/fehlende Eingaben — Orte ohne Koordinaten gibt es nicht (Eingabeprüfung vorhanden), nicht zutreffend; Nebenläufigkeit — Kartenbau läuft über Sperrmarke `_weather_map_building` (unverändert), nicht zutreffend; Lastgrenzen — AK5/AK9; Leer/übervoll — AK4, AK8; Berechtigungen — keine neue Funktion, nicht zutreffend; Abwärtskompatibilität — AK3/AK6/AK15; Rollback — Karte baut sich nach Rücknahme neu, kein Datenverlust; Beobachtbarkeit im Fehlerfall — AK10, Zähl-Zeile.
+
+##### Offene Fragen an Stephan (nach Dringlichkeit)
+1. **Frage 1 — Zeitanzeige für England-Orte** (siehe Grenzfälle; Empfehlung: Ortszeit).
+2. **Frage 2 — Entdecken-Tab für London** (Empfehlung: mitrechnen, sonst ausblenden).
+3. **Frage 3 — Wann genau reist du?** Entscheidet, ob wir in drei Schritten ausliefern (Karte → Ortszeit → Scout) oder nur Karte und Ortszeit schaffen; Empfehlung: Auslieferung in Schritten, Karte + Messung zuerst.
+**Hinweis an den Hauptthread:** die Abfragezahl pro Lauf und die London-Ortsliste sind Messungen (Produktion), keine Fragen an Stephan.
+
+**Beziehungen (nicht geändert):** TASK-113 (Voraussetzung für Tests mit echten London-Orten im Dev-Stand) · US-139 (baut darauf auf; Pause von Norwegen/Italien senkt die Abfragelast und wäre der Hebel bei Pre-Mortem 1) · TASK-108 (Konflikt nur bei Option B) · TASK-59 (Release-Sperre auf `qa_azimuth.py` + Test, bleibt unberührt) · BUG-99/BUG-111/TASK-75 (Drosselwerte, bei Bedarf dort nachjustieren, nicht still hier).
+
+---
+
+### US-139 · Host-Menü mit Schaltern pro Land/Region (z. B. Norwegen, Italien pausieren) `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | User Story |
+| **Priorität** | Mittel |
+| **Status** | Ready for Analysis |
+| **Erstellt** | 2026-10-10 |
+
+**Hinweis zum Pipeline-Gate:** Von Stephan am 2026-10-10 im Chat ausdrücklich nach der Anlage freigegeben ("Erstelle ein Ticket und starte dann die Pipeline") — direkt von Inbox nach Ready for Analysis, ohne den sonst üblichen Intake-Stopp.
+
+**Beschreibung:** Der Host wünscht sich im Menü eine alphabetisch sortierte Liste mit je einem Schalter pro Land oder Region (aktivieren/deaktivieren), die nur er steuern kann. Damit sollen sich z. B. Norwegen und Italien pausieren lassen, ohne Daten zu löschen, damit die Datendichte (Wetterabfragen, Rechenzeit) dort hoch bleibt, wo sie gebraucht wird, zunächst England. Im Wetter-Code gibt es bisher keinen solchen Schalter (main.py und Frontend in der Analyse prüfen).
+
+**User Story:** Als Host der App, möchte ich einzelne Länder oder Regionen in einem Menü ein- und ausschalten können, sodass ich Gebiete wie Norwegen und Italien pausieren kann, ohne Daten zu verlieren, und mehr Datendichte für Gebiete wie England bekomme.
+
+**Bezug:** Zweite Priorität nach US-138 (erst England abdecken, dann Gebiete pausieren). Grenzt an US-84 (Host-Passwort in den Einstellungen, nur gleicher Ort), US-136 (Mehrnutzer-Login; dort ändert sich ggf., wie "nur Host" erkannt wird), US-66 und TASK-103 (Done, Archiv: Host-Rechte). Zu klären in der Analyse: Wirkung auf Karte, Feed, Kalender und tägliche Vorberechnung, und was mit Orten ohne klare Landeszuordnung passiert.
 
 ---
 

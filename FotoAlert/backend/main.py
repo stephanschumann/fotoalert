@@ -295,6 +295,10 @@ def _update_custom_location_file(loc_id: str, **fields) -> bool:
 # Flache Listen von dicts (aus JSON geladen, Wetter-Felder werden überschrieben)
 _feed_cache:     list[dict] = []   # 14-Tage Feed
 _calendar_cache: list[dict] = []   # 365-Tage Kalender
+# BUG-114: Berechnungszeitpunkt ("computed_at") des Kalenders im Arbeitsspeicher —
+# wird beim Laden bzw. Einzel-Austausch gesetzt, damit get_calendar() die große
+# calendar.json nicht bei jedem Abruf erneut einlesen muss.
+_calendar_computed_at: Optional[str] = None
 _discover_cache: dict       = {}   # Scout-Tab (Mond-Alignment-Chancen)
 
 _cache_loaded_at:   Optional[datetime] = None
@@ -566,15 +570,20 @@ def _load_calendar_cache() -> None:
     mechanismus (GIL) über die volle Lesezeit — er bleibt deshalb den Stellen
     vorbehalten, an denen der Server ohnehin niemandem antwortet (Serverstart)
     bzw. an denen der komplette Kalender neu berechnet wurde (Volllauf,
-    nächtlicher Sichtachsen-Lauf). Die Einzel-Neuberechnung nach dem Speichern
+    Kalenderlauf). Der manuelle Sichtachsen-Check lädt ihn seit TASK-106 nicht
+    mehr neu. Die Einzel-Neuberechnung nach dem Speichern
     nutzt stattdessen `_apply_calendar_delta()`.
     """
-    global _calendar_cache
+    global _calendar_cache, _calendar_computed_at
 
     if _CAL_CACHE.exists():
         try:
             data = json.loads(_CAL_CACHE.read_text(encoding="utf-8"))
             _calendar_cache = data.get("events", [])
+            # BUG-114: Zeitpunkt nur zusammen mit erfolgreich geladenen Einträgen
+            # übernehmen (fehlt er in der Datei → None). Scheitert das Laden, bleiben
+            # Einträge UND Zeitpunkt auf dem zuletzt bekannten Stand.
+            _calendar_computed_at = data.get("computed_at")
             logger.info("Kalender-Cache geladen: %d Events", len(_calendar_cache))
         except Exception as e:
             logger.error("Fehler beim Laden von calendar.json: %s", e)
@@ -628,6 +637,8 @@ async def _apply_calendar_delta(loc_id: str, min_mtime: float = 0.0) -> bool:
     dieses Ticket beseitigt. Der nächste Volllauf bzw. Serverstart liest den
     Kalender ohnehin wieder vollständig ein.
     """
+    global _calendar_computed_at
+
     pfad = _CAL_CACHE.parent / _CAL_SINGLE_DELTA_NAME
     try:
         if not pfad.exists():
@@ -673,6 +684,11 @@ async def _apply_calendar_delta(loc_id: str, min_mtime: float = 0.0) -> bool:
             return True
 
         anzahl = await asyncio.to_thread(_swap_calendar_events, loc_id, data.get("events", []))
+        # BUG-114: Berechnungszeitpunkt aus der Übergabedatei übernehmen (derselbe
+        # Wert, den der Einzellauf in calendar.json schreibt). Fehlt er dort, bleibt
+        # der zuletzt bekannte Zeitpunkt stehen.
+        if data.get("computed_at"):
+            _calendar_computed_at = data["computed_at"]
         logger.info("BUG-113: Kalender für %s ausgetauscht (%d Events dieses Standorts, "
                     "%d gesamt) – ohne Vollneuladen der Kalenderdatei.",
                     loc_id, anzahl, len(_calendar_cache))
@@ -689,8 +705,9 @@ def _load_caches() -> bool:
 
     BUG-113: Der Rumpf steckt jetzt in `_load_feed_cache()` und
     `_load_calendar_cache()`. Diese Funktion bleibt der Voll-Ladeweg
-    (Serverstart, Volllauf, nächtlicher Sichtachsen-Lauf) und ist damit
-    unverändert in ihrem Verhalten.
+    (Serverstart, Volllauf) und ist damit unverändert in ihrem Verhalten.
+    TASK-106: Der manuelle Sichtachsen-Check nutzt sie nicht mehr, sondern lädt
+    nur `_load_feed_cache()` im Nebenstrang.
     """
     global _cache_loaded_at
 
@@ -3115,6 +3132,8 @@ async def startup() -> None:
     _load_elevation_cache()
 
     # 1. JSON-Caches laden (sofort)
+    # TASK-106: Bewusst im Hauptablauf (kein asyncio.to_thread): der Server nimmt vor dem
+    # Ende des Starts keine Anfragen an, und das Ergebnis (cache_ok) wird sofort gebraucht.
     cache_ok = _load_caches()
 
     # TASK-54: Zuletzt persistierten Wetterkarten-Cache von Disk laden (falls
@@ -3841,8 +3860,9 @@ async def get_calendar(
 
     return {
         "status": "ok",
-        "computed_at": (json.loads(_CAL_CACHE.read_text())["computed_at"]
-                        if _CAL_CACHE.exists() else None),
+        # BUG-114: aus dem Arbeitsspeicher statt per erneutem Einlesen der
+        # kompletten calendar.json (hielt den Server pro Abruf sekundenlang an).
+        "computed_at": _calendar_computed_at,
         "total": len(events),
         "events": events,
     }
@@ -4036,10 +4056,16 @@ async def _run_sightline_refresh() -> None:
                 logger.warning("Sichtachsen-Refresh: %s übersprungen (%s)", loc.id, exc)
             await asyncio.sleep(1.0)  # Drosselung externer Dienste
         # Aktualisierten Stand aus dem Store erneut auf LOCATIONS anwenden (Konsistenz
-        # mit dem Start-Verhalten von _load_qa_values) und Feed/Kalender-Caches neu laden,
-        # damit die neuen Werte sofort in Feed/Kalender-Events sichtbar sind.
+        # mit dem Start-Verhalten von _load_qa_values) und den Feed neu laden.
         _load_qa_values()
-        _load_caches()
+        # TASK-106: Nur der kleine Feed wird neu geladen, und zwar im Nebenstrang
+        # (asyncio.to_thread), damit der Server beim Auffrischen ansprechbar bleibt.
+        # Die große calendar.json wird hier bewusst NICHT mehr neu eingelesen: ein
+        # Thread-Umzug allein hilft dort nicht, weil json.loads den GIL über die volle
+        # Lesezeit hält (BUG-113, siehe Docstring von _load_calendar_cache()). Der
+        # Kalender im Speicher bleibt unverändert; er wird weiterhin vom Volllauf bzw.
+        # Kalenderlauf der Vorberechnung neu geladen.
+        await asyncio.to_thread(_load_feed_cache)
         _job_done("sightlines", t0)
     except Exception as exc:
         # TASK-102: Voller Exception-Text nur ins Server-Log (logger.error), NICHT in
