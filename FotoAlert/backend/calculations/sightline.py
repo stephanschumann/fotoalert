@@ -25,6 +25,7 @@ Python-3.9-kompatibel.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import math
 from typing import List, Optional, Tuple
@@ -253,7 +254,11 @@ async def compute_location_sightline(loc, elevation_provider, num_samples: int =
                 "visible_from_deg": None, "reason": "hoehenprofil_fehler"}
 
     try:
-        buildings = fetch_buildings_along_line(observer_lat, observer_lon, subject_lat, subject_lon)
+        # TASK-106 (Variante A): im Nebenstrang, damit die blockierende Cache-Suche bzw.
+        # Live-Abfrage (httpx, time.sleep-Drosselung) den Server nicht anhält.
+        buildings = await asyncio.to_thread(
+            fetch_buildings_along_line, observer_lat, observer_lon, subject_lat, subject_lon,
+        )
     except Exception as exc:  # noqa: BLE001 — defensiv, fetch_buildings_along_line fängt bereits selbst ab
         logger.warning("Sichtachsen-Check: Gebäudeabfrage fehlgeschlagen (%s): %s", loc, exc)
         buildings = None
