@@ -73,11 +73,14 @@ from calculations.ortszeit import is_england  # US-138 AK18: England-Chancen bei
 from discover.geometry import destination_point  # US-131: Projektion Wolken-/Dunstabfrage entlang Sichtachse
 from data.locations import (
     LOCATIONS, get_location_by_id, PhotoLocation, LocationCategory, coerce_category_value,
-    COORD_FIELDS, TEXT_FIELDS, NUMERIC_FIELDS, LIST_FIELDS, CATEGORY_FIELDS, DIFFICULTY_FIELDS,
+    COORD_FIELDS, TEXT_FIELDS, NUMERIC_FIELDS, LIST_FIELDS, CATEGORY_FIELDS, DIFFICULTY_FIELDS, GEBIET_FIELDS,
     PATCHABLE_LOCATION_FIELDS, RECOMPUTE_TRIGGER_FIELDS, OVERRIDE_RELOAD_FIELDS,
 )
 from data.store import LocationStore, compute_geo_hash
 from data import backup
+from data import aktiv_regel, cache_io  # US-141/BUG-118: zentrale Aktiv-Regel, sicheres Schreiben der Zwischenspeicher
+from data import wetter_speicher  # BUG-117: Zwischenspeicher + Tagesstand der Wetterabrufe
+from data import gebiet_zustand as gz, gebiete as _gebiete_uebernahme, regionen as _regionen  # US-141 Baustein 2: Gebiets-Schalter
 from data import qa_azimuth, qa_focal, qa_description  # TASK-45/46/47: Auto-QA (Azimut, Beschreibung, Brennweite)
 from data.elevation import provider as _elevation_provider  # US-09: Höhenprofil für Sichtachsen-Check
 import observability  # US-38: Fehlerklassifizierer (Timeout/APIError/DataError/SubprocessError/Unknown)
@@ -168,6 +171,9 @@ _IMAGE_MAX_DIMENSION_PX = 2000                   # lange Kante nach Verkleinerun
 
 # TASK-17: Zentraler SQLite-Store für nutzereditierbare Daten
 _store = LocationStore()
+# US-141 Baustein 2: die zentrale Regel „ist dieser Ort aktiv?“ liest den Zustand der Gebiets-Schalter
+# bei JEDER Frage frisch aus dem Store (so wirkt ein Umschalten sofort überall).
+gz.registriere_quelle(lambda: _store.load_area_states())
 
 
 def _load_elevation_cache() -> None:
@@ -236,6 +242,7 @@ def _load_custom_locations() -> None:
                 focal_length_suggestions=e.get("focal_length_suggestions", []),
                 special_notes=e.get("special_notes", ""), difficulty=e.get("difficulty", 1),
                 observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
+                land=e.get("land"), region=e.get("region"),   # US-141 (kommt sonst aus den Korrekturen)
                 image_filename=e.get("image_filename"),
                 image_focus_x=e.get("image_focus_x"),
                 image_focus_y=e.get("image_focus_y"),
@@ -539,19 +546,145 @@ def _backfill_coords(events: list[dict]) -> None:
 _CAL_SINGLE_DELTA_NAME = "calendar_single_last.json"
 
 
+def _geloeschte_ids() -> set:
+    """BUG-118: Nummern aller Orte mit Lösch-Markierung (Tombstone). Die Frage „gelöscht?“
+    beantwortet die zentrale Regel (data/aktiv_regel.py). Ist die Datenbank nicht lesbar, gilt
+    „keine bekannt“ (Einlesen darf daran nicht scheitern)."""
+    try:
+        return aktiv_regel.geloeschte_ids(_store.load_all_overrides())
+    except Exception as exc:
+        logger.warning("Lösch-Markierungen nicht lesbar (%s) – Einlesen ohne Bereinigung", exc)
+        return set()
+
+
+# ---------------------------------------------------------------------------
+# US-141 Baustein 2: pausierte Gebiete
+# ---------------------------------------------------------------------------
+
+# Wird bei jedem Umschalten (und Umhängen eines Orts) erhöht. Eine laufende Monatsberechnung
+# merkt sich den Stand beim Start und speichert ihr Ergebnis nur, wenn er unverändert ist
+# (sonst würde sie nach dem Leeren des Speichers einen alten Stand wieder auffüllen).
+_gebiets_version = 0
+
+
+def _pausierte_ort_ids(z: Optional[dict] = None) -> set:
+    """Nummern aller Orte, deren Land oder Region ausgeschaltet ist (zentrale Regel, data/aktiv_regel.py)."""
+    try:
+        return gz.pausierte_ids(list(LOCATIONS), z)
+    except Exception as exc:
+        logger.warning("US-141: Gebiets-Zustand nicht lesbar (%s) – es gilt: nichts pausiert", exc)
+        return set()
+
+
+def _ohne_pausierte(termine: list, pausiert: Optional[set] = None) -> list:
+    """Entfernt die Termine pausierter Orte (Gruppe B). Ohne pausierte Orte kommt dieselbe Liste zurück."""
+    if pausiert is None:
+        pausiert = _pausierte_ort_ids()
+    if not pausiert:
+        return termine
+    return [e for e in termine if e.get("location_id") not in pausiert]
+
+
+def _feed_datei_lesen() -> dict:
+    """Liest die Feed-Datei (rund 30 MB) vollständig. Fehlt sie oder ist sie nicht lesbar, kommt ein leeres Wörterbuch
+    zurück (bei unlesbarer Datei mit Warnung). Reine Lese-Arbeit ohne Zugriff auf den Speicher des Servers, deshalb
+    darf sie in einem Hintergrund-Thread laufen (US-141 M2: nicht im Haupt-Thread der Ereignisschleife)."""
+    if not _OPP_CACHE.exists():
+        return {}
+    try:
+        daten = json.loads(_OPP_CACHE.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("US-141: Feed-Datei beim Einschalten nicht lesbar: %s", exc)
+        return {}
+    return daten if isinstance(daten, dict) else {}
+
+
+def _feed_wieder_einlesen(ids: set, daten: Optional[dict] = None) -> int:
+    """Holt die Feed-Termine wieder eingeschalteter Orte aus der Feed-Datei in den Speicher
+    (nur diese Orte; Wetterwerte der übrigen Termine im Speicher bleiben unberührt).
+    `daten`: schon (z. B. im Hintergrund-Thread) gelesener Inhalt der Feed-Datei; ohne Angabe wird sie hier gelesen.
+    Gibt die Zahl der ergänzten Termine zurück."""
+    global _feed_cache
+    if not ids:
+        return 0
+    if daten is None:
+        daten = _feed_datei_lesen()
+    vorhanden = {e.get("id") for e in _feed_cache}
+    neu = [e for e in daten.get("opportunities", [])
+           if e.get("location_id") in ids and e.get("id") not in vorhanden]
+    if neu:
+        _backfill_coords(neu)
+        _feed_cache = list(_feed_cache) + neu
+    return len(neu)
+
+
+def _nach_gebietsaenderung(vorher_pausiert: set, feed_daten: Optional[dict] = None) -> None:
+    """Nach jedem Umschalten oder Umhängen: Speicher bereinigen, damit pausierte Chancen sofort
+    verschwinden und eingeschaltete wieder da sind (Frage 22: bereits berechnete Chancen
+    pausierter Gebiete verschwinden sofort). Der Kalender-Speicher (sehr groß) wird nicht
+    angefasst, sondern beim Ausliefern gefiltert; der Monatsspeicher des Kalenders wird geleert.
+    `feed_daten`: schon gelesener Inhalt der Feed-Datei (siehe `_schalte_gebiet`); ohne Angabe liest die Funktion
+    die Datei bei Bedarf selbst."""
+    global _gebiets_version, _feed_cache
+    _gebiets_version += 1
+    _ondemand_month_cache.clear()
+    jetzt = _pausierte_ort_ids()
+    _feed_cache = _ohne_pausierte(_feed_cache, jetzt)
+    wieder_aktiv = set(vorher_pausiert) - jetzt
+    if wieder_aktiv:
+        n = _feed_wieder_einlesen(wieder_aktiv, feed_daten)
+        logger.info("US-141: %d Orte wieder aktiv, %d Feed-Termine aus der Datei übernommen", len(wieder_aktiv), n)
+
+
+def _entdecken_sichtbar(ergebnisse: list) -> list:
+    """Scout-Ergebnisse (Entdecken): ein Ergebnis wird ausgeblendet, wenn es zu Orten gehört
+    (Motiv innerhalb des Zusammenlege-Radius), die ALLE pausiert sind. Gehört es zu keinem Ort
+    oder zu mindestens einem aktiven, bleibt es."""
+    pausiert = _pausierte_ort_ids()
+    if not pausiert or not ergebnisse:
+        return ergebnisse
+    kandidaten = [(l.id, l.subject_lat, l.subject_lon) for l in LOCATIONS
+                  if getattr(l, "subject_lat", None) is not None and getattr(l, "subject_lon", None) is not None]
+    gemerkt: dict = {}
+    sichtbar = []
+    for o in ergebnisse:
+        la, lo = o.get("subject_lat"), o.get("subject_lon")
+        if la is None or lo is None:
+            sichtbar.append(o)
+            continue
+        key = (round(float(la), 5), round(float(lo), 5))
+        if key not in gemerkt:
+            ids = [i for (i, sla, slo) in kandidaten
+                   if abs(sla - la) < 0.01 and abs(slo - lo) < 0.02
+                   and calculate_haversine_distance(sla, slo, la, lo) < 200.0]
+            gemerkt[key] = (not ids) or any(i not in pausiert for i in ids)
+        if gemerkt[key]:
+            sichtbar.append(o)
+    return sichtbar
+
+
 def _load_feed_cache() -> bool:
     """BUG-113: Lädt NUR den (kleinen) Feed-Cache opportunities.json.
 
     Aus `_load_caches()` herausgelöst, damit die Nacharbeit nach dem Speichern
     eines Standorts den Feed auffrischen kann, ohne dafür die sehr große
     calendar.json mitzulesen.
+
+    BUG-118: Termine gelöschter Orte (Lösch-Markierung) werden beim Einlesen
+    aussortiert — auch wenn eine Vorberechnung sie noch in die Datei geschrieben hat.
     """
     global _feed_cache
 
     if _OPP_CACHE.exists():
         try:
             data = json.loads(_OPP_CACHE.read_text(encoding="utf-8"))
-            _feed_cache = data.get("opportunities", [])
+            termine = data.get("opportunities", [])
+            geloescht = _geloeschte_ids()
+            if geloescht:
+                termine = [e for e in termine if e.get("location_id") not in geloescht]
+            # US-141: Termine pausierter Orte werden nicht in den Speicher übernommen (Gruppe B).
+            termine = _ohne_pausierte(termine)
+            _feed_cache = termine
             _backfill_coords(_feed_cache)
             logger.info("Feed-Cache geladen: %d Events (berechnet: %s)",
                         len(_feed_cache), data.get("computed_at", "?")[:16])
@@ -581,6 +714,10 @@ def _load_calendar_cache() -> None:
         try:
             data = json.loads(_CAL_CACHE.read_text(encoding="utf-8"))
             _calendar_cache = data.get("events", [])
+            # BUG-118: Kalender-Termine gelöschter Orte nicht übernehmen (siehe _load_feed_cache).
+            geloescht = _geloeschte_ids()
+            if geloescht:
+                _calendar_cache = [e for e in _calendar_cache if e.get("location_id") not in geloescht]
             # BUG-114: Zeitpunkt nur zusammen mit erfolgreich geladenen Einträgen
             # übernehmen (fehlt er in der Datei → None). Scheitert das Laden, bleiben
             # Einträge UND Zeitpunkt auf dem zuletzt bekannten Stand.
@@ -611,12 +748,7 @@ def _swap_calendar_events(loc_id: str, neue_events: list) -> int:
     das, was ein `json.loads()` über die ganze Datei NICHT tut (BUG-113 AK3).
     Die Sortierung bleibt dabei erhalten.
     """
-    global _calendar_cache
-
-    rest = [e for e in _calendar_cache if e.get("location_id") != loc_id]
-    neu = sorted(neue_events, key=_calendar_sort_key)
-    _calendar_cache = list(heapq.merge(rest, neu, key=_calendar_sort_key))
-    return len(neu)
+    return _swap_calendar_events_many([loc_id], neue_events)
 
 
 async def _apply_calendar_delta(loc_id: str, min_mtime: float = 0.0) -> bool:
@@ -696,6 +828,68 @@ async def _apply_calendar_delta(loc_id: str, min_mtime: float = 0.0) -> bool:
         return True
     except Exception as e:
         logger.error("BUG-113: Kalender-Austausch für %s fehlgeschlagen: %s", loc_id, e)
+        return False
+
+
+def _swap_calendar_events_many(ids, neue_events: list) -> int:
+    """US-141 (Kalender beim Einschalten): wie _swap_calendar_events, aber für mehrere Orte in einem Schritt —
+    die Termine dieser Orte im Arbeitsspeicher werden ersetzt, alle anderen bleiben, die Sortierung bleibt erhalten."""
+    global _calendar_cache
+
+    ids = set(ids)
+    rest = [e for e in _calendar_cache if e.get("location_id") not in ids]
+    neu = sorted(neue_events, key=_calendar_sort_key)
+    _calendar_cache = list(heapq.merge(rest, neu, key=_calendar_sort_key))
+    return len(neu)
+
+
+_CAL_NACHLADEN_POSTFACH_NAME = "calendar_nachladen_last.jsonl"
+
+
+def _kalender_postfach_lesen(pfad: Path, pid) -> tuple:
+    """Liest das Postfach des Nachlade-Prozesses Zeile für Zeile (jede Zeile ist ein Ort; so hält kein einzelnes
+    Einlesen den Server an). Gibt (Kopfzeile, {Ort: [Termine]}) zurück; gehört die Datei zu einem anderen Prozess
+    (veraltet), wird ein Fehler geworfen."""
+    with open(pfad, "r", encoding="utf-8") as f:
+        kopf = json.loads(f.readline())
+        if pid is not None and kopf.get("pid") != pid:
+            raise ValueError("Postfach gehört zu Prozess %s, erwartet %s" % (kopf.get("pid"), pid))
+        je_ort: dict = {}
+        for zeile in f:
+            zeile = zeile.strip()
+            if not zeile:
+                continue
+            eintrag = json.loads(zeile)
+            je_ort[eintrag["location_id"]] = eintrag.get("events", [])
+    return kopf, je_ort
+
+
+async def _apply_calendar_nachladen(ids, pid) -> bool:
+    """US-141 (Kalender beim Einschalten): übernimmt die vom Nachlade-Prozess in calendar.json eingemischten
+    Kalendereinträge in den Arbeitsspeicher, ohne die große Datei neu einzulesen (Postfach, siehe
+    precompute._schreibe_kalender_postfach). Ist der Kalender im Arbeitsspeicher leer, wird bewusst NICHT die ganze
+    Datei geladen (das hielte den Server an): der nächste Start liest sie ohnehin vollständig ein."""
+    global _calendar_computed_at
+    pfad = _CAL_CACHE.parent / _CAL_NACHLADEN_POSTFACH_NAME
+    ids = set(ids)
+    try:
+        if not pfad.exists():
+            logger.warning("US-141: Kalender-Postfach %s fehlt – Kalender im Arbeitsspeicher bleibt unverändert.", pfad.name)
+            return False
+        kopf, je_ort = await asyncio.to_thread(_kalender_postfach_lesen, pfad, pid)
+        je_ort = {i: ev for i, ev in je_ort.items() if i in ids}
+        if not _calendar_cache:
+            logger.info("US-141: Kalender im Arbeitsspeicher ist leer – die eingemischten Orte erscheinen nach dem nächsten Start.")
+            return False
+        alle = [e for ev in je_ort.values() for e in ev]
+        anzahl = await asyncio.to_thread(_swap_calendar_events_many, je_ort.keys(), alle)
+        if kopf.get("computed_at"):
+            _calendar_computed_at = kopf["computed_at"]
+        logger.info("US-141: Kalender für %d nachgeladene Orte übernommen (%d Termine, %d gesamt) – ohne Vollneuladen.",
+                    len(je_ort), anzahl, len(_calendar_cache))
+        return True
+    except Exception as exc:
+        logger.error("US-141: Kalender-Postfach nicht übernommen: %s", exc)
         return False
 
 
@@ -838,6 +1032,7 @@ async def _refresh_discover() -> None:
             except Exception as e:
                 logger.error("Scout-Pipeline fehlgeschlagen: %s", e)
                 last_error = str(e)
+            _wetter_scout_buchen()      # BUG-117: Scout-Verbrauch auf den Tagesstand beim Wetterdienst buchen
             # US-106: Wurde während des Laufs erneut eine Änderung gemeldet → genau
             # ein Nachlauf, dann fertig.
             if not _scout_dirty:
@@ -1225,6 +1420,19 @@ def _lookup_projected_forecasts(e, sun_dir_forecasts, antisolar_dir_forecasts, a
     return sun_fc, anti_fc, aero_fc
 
 
+def _red_clouds_grid_key(lat: float, lon: float) -> str:
+    """BUG-117 (Weg-Gate 2026-10-18, Stephan: Rote-Wolken-Punkte dürfen gröber werden, Schrittweite 0,05 Grad):
+    Schlüssel, unter dem ein Rote-Wolken-Punkt zusammengefasst wird: Rasterzelle der Größe
+    WEATHER_RED_CLOUDS_GRID_STEP_DEG (ganzzahlige Zellnummern, keine Fließkomma-Randfehler). Zwei Termine in
+    derselben Zelle teilen sich EINEN Abruf; abgefragt wird (wie bisher) die Koordinate des ersten Termins der
+    Zelle, der Versatz ist also höchstens eine Zellendiagonale (gemessen an der lokalen Kopie: höchstens 4,5 km
+    bei 0,05 Grad).
+    NUR für Rote Wolken: Ortswetter, Sonnenrichtung, Gegenrichtung und Luftdunst bleiben bei
+    _projected_point_cache_key(). Planung und Nachschlagen MÜSSEN beide diese Funktion benutzen (BUG-104-Muster)."""
+    step = WEATHER_RED_CLOUDS_GRID_STEP_DEG
+    return f"rc:{int(round(lat / step))},{int(round(lon / step))}"
+
+
 def _lookup_red_clouds_forecast(e, red_clouds_dir_forecasts):
     """
     BUG-108: Analog zu _lookup_projected_forecasts(), aber für den EINEN
@@ -1242,7 +1450,7 @@ def _lookup_red_clouds_forecast(e, red_clouds_dir_forecasts):
     if point is None:
         return None
     lat, lon = point
-    key = _projected_point_cache_key(lat, lon)
+    key = _red_clouds_grid_key(lat, lon)   # BUG-117: gröberes Raster nur für Rote Wolken
     return red_clouds_dir_forecasts.get(key)
 
 
@@ -1806,6 +2014,52 @@ Pacing) — nicht, dass der Retry-Mechanismus selbst das Problem ist.
 """
 
 
+# ---------------------------------------------------------------------------
+# BUG-117 (2026-10-18, Weg-Gate Stephan: Weg B + gröbere Rote-Wolken-Punkte)
+# Der kostenlose Zugang von Open-Meteo erlaubt 10.000 Abrufe pro Tag (Preisseite, gelesen 2026-10-18); der
+# Wetterlauf stellte rechnerisch mehr. Alle Stellschrauben stehen hier an einer Stelle und sind leicht änderbar.
+# Offen (Stephan, Frage 5, Option C): Fenster, Takte, Gültigkeiten und das 70-%-Ziel werden ERST NACH DER
+# SERVER-MESSUNG (Ticket AK-16) neu bewertet. Bis dahin unverändert lassen.
+# ---------------------------------------------------------------------------
+WEATHER_NEAR_WINDOW_HOURS = 36
+"""Termine, die in den nächsten so vielen Stunden liegen, gelten als "nah" (heute/morgen)."""
+WEATHER_CACHE_VALID_NEAR_S = 2 * 3600
+"""Wetter für nahe Termine gilt im Zwischenspeicher 2 Stunden als frisch (Takt: alle 3 Stunden neu)."""
+WEATHER_CACHE_VALID_FAR_S = 12 * 3600
+"""Wetter für spätere Termine gilt 12 Stunden als frisch (also nur jeder vierte 3-Stunden-Lauf holt neu)."""
+WEATHER_DAILY_TARGET_SHARE = 0.70
+"""Ziel: höchstens 70 % des Tageslimits (Reserve). Wird nur ausgewiesen, nicht erzwungen."""
+WEATHER_RED_CLOUDS_GRID_STEP_DEG = 0.05
+"""Schrittweite des Rasters für die Rote-Wolken-Punkte (Stephan, 2026-10-18: Option A, höchstens 4,5 km Versatz)."""
+WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES = 6
+"""Notbremse: Nach so vielen endgültig fehlgeschlagenen Abrufen IN FOLGE (Limit 429, Dienst nicht verfügbar,
+Verbindung abgelehnt, Zeitüberschreitung) bricht der Lauf ab. Ein einziger Erfolg setzt den Zähler zurück."""
+_WETTER_SPEICHER_STANDARDORDNER = _CACHE_DIR
+# Im Test-Modus (FOTOALERT_NO_BACKGROUND=1) wird dieser echte Cache-Ordner nie beschrieben
+# (siehe _wetter_speicher_erlaubt()).
+
+_weather_run_active = False
+"""BUG-117 AK-6: True, solange ein Wetterlauf läuft: ein zweiter Auslöser startet keinen zweiten Lauf."""
+_weather_run_pending = False
+
+
+def _wetter_speicher_erlaubt() -> bool:
+    """Zwischenspeicher und Tagesstand liegen im Cache-Ordner. Im Test-Modus werden sie nur benutzt, wenn der
+    Cache-Ordner auf einen eigenen (Wegwerf-)Ordner umgelenkt wurde: die echten lokalen Caches bleiben unberührt
+    und ein Zwischenspeicher aus einem früheren Test kann keinen späteren Test beeinflussen."""
+    return not (_NO_BACKGROUND and _CACHE_DIR == _WETTER_SPEICHER_STANDARDORDNER)
+
+
+def _wetter_termin_zeit(e) -> datetime:
+    """Aufnahmezeit eines Termins als zeitzonenbehaftete Zeit; fehlt sie oder ist sie unlesbar, gilt der Termin als
+    "weit weg" (kein Schaden: dann gilt die längere Gültigkeit)."""
+    try:
+        t = datetime.fromisoformat(e["shoot_time"])
+        return t if t.tzinfo is not None else t.replace(tzinfo=timezone.utc)
+    except Exception:
+        return datetime.max.replace(tzinfo=timezone.utc)
+
+
 async def _fetch_weather_and_aerosol(
     near_events, max_total_seconds: float | None = None
 ) -> tuple[dict, dict, dict, dict, dict, list, list, list, list, list]:
@@ -1871,11 +2125,59 @@ async def _fetch_weather_and_aerosol(
     vollständige BUG-99-Begründung (unverändert übernommen, nicht neu hergeleitet,
     nur an den neuen Aufbewahrungsort verschoben).
     """
-    tasks_meta = _plan_weather_fetch_tasks(near_events)
+    zeiten: dict = {}
+    tasks_meta = _plan_weather_fetch_tasks(near_events, zeiten)
 
-    results = await _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds)
+    # BUG-117: Nur der reguläre Wetterlauf (er legt einen Lauf-Zustand an) nutzt den Zwischenspeicher; der
+    # schnelle Einzelort-Pfad (_weather_overlay_single) und direkte Aufrufe holen weiter immer frisch.
+    if _wetter_lauf_var.get() is not None and _wetter_speicher_erlaubt():
+        results = await _fetch_mit_zwischenspeicher(tasks_meta, zeiten, max_total_seconds)
+    else:
+        results = await _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds)
 
     return _collect_weather_fetch_results(tasks_meta, results)
+
+
+async def _fetch_mit_zwischenspeicher(tasks_meta, zeiten, max_total_seconds) -> list:
+    """BUG-117 (Weg B): Holt nur die Abrufe, die im Zwischenspeicher fehlen oder nicht mehr frisch sind.
+    Nahe Termine (WEATHER_NEAR_WINDOW_HOURS) gelten WEATHER_CACHE_VALID_NEAR_S als frisch, spätere
+    WEATHER_CACHE_VALID_FAR_S. Erfolgreich Geholtes wird gespeichert (auch bei vorzeitigem Abbruch der
+    Notbremse). Die Ergebnisliste hat dieselbe Reihenfolge wie `tasks_meta`."""
+    ordner = _CACHE_DIR
+    speicher = await asyncio.to_thread(wetter_speicher.speicher_laden, ordner)
+    jetzt = _time.time()
+    grenze = datetime.now(timezone.utc) + timedelta(hours=WEATHER_NEAR_WINDOW_HOURS)
+    results: list = [None] * len(tasks_meta)
+    offen: list = []
+    for i, (kind, key, _lat, _lon, _name) in enumerate(tasks_meta):
+        erster = zeiten.get((kind, key))
+        nah = erster is not None and erster <= grenze
+        max_alter = WEATHER_CACHE_VALID_NEAR_S if nah else WEATHER_CACHE_VALID_FAR_S
+        eintrag = speicher.get(f"{kind}|{key}")
+        if wetter_speicher.ist_frisch(eintrag, max_alter, jetzt):
+            try:
+                results[i] = wetter_speicher.forecast_aus_json(eintrag["f"])
+                continue
+            except Exception:
+                pass          # kaputter Eintrag zählt als "nicht im Zwischenspeicher"
+        offen.append(i)
+    logger.info("BUG-117: Wetter-Zwischenspeicher: %d von %d Abrufen frisch vorhanden, %d werden geholt",
+                len(tasks_meta) - len(offen), len(tasks_meta), len(offen))
+    if offen:
+        sub = [tasks_meta[i] for i in offen]
+        sub_results = await _run_weather_fetch_tasks_with_ceiling(sub, max_total_seconds)
+        neu = 0
+        for i, r in zip(offen, sub_results):
+            results[i] = r
+            if not isinstance(r, BaseException):
+                speicher[f"{tasks_meta[i][0]}|{tasks_meta[i][1]}"] = wetter_speicher.eintrag_aus_forecast(r)
+                neu += 1
+        if neu:
+            try:
+                await asyncio.to_thread(wetter_speicher.speicher_speichern, ordner, speicher)
+            except Exception as exc:
+                logger.warning("BUG-117: Wetter-Zwischenspeicher konnte nicht gespeichert werden: %s", exc)
+    return results
 
 
 async def _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds: float | None) -> list:
@@ -1958,7 +2260,22 @@ async def _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds: f
     return results
 
 
-def _plan_weather_fetch_tasks(near_events) -> list:
+def _sortiere_wetter_aufgaben(tasks_meta: list, zeiten: dict) -> list:
+    """
+    BUG-117 (aus _plan_weather_fetch_tasks herausgelöst, rein strukturell): Dringlichkeit: Termine der nächsten
+    Stunden zuerst, Standortwert vor den Richtungswerten. list.sort ist stabil: innerhalb gleicher Dringlichkeit
+    bleibt die bisherige Reihenfolge erhalten. Sortiert in place und gibt dieselbe Liste zurück.
+    """
+    grenze = datetime.now(timezone.utc) + timedelta(hours=WEATHER_NEAR_WINDOW_HOURS)
+    tasks_meta.sort(key=lambda m: (
+        0 if zeiten[(m[0], m[1])] <= grenze else 1,
+        0 if m[0] == "weather" else 1,
+        zeiten[(m[0], m[1])],
+    ))
+    return tasks_meta
+
+
+def _plan_weather_fetch_tasks(near_events, fruehester: Optional[dict] = None) -> list:
     """
     TASK-76 (aus _fetch_weather_and_aerosol extrahiert): Plant die abzurufenden
     Wetter-/Aerosol-/Richtungs-Tasks für `near_events`, dedupliziert pro
@@ -1966,8 +2283,22 @@ def _plan_weather_fetch_tasks(near_events) -> list:
 
     Gibt tasks_meta zurück: Liste aus (kind, key, lat, lon, location_name) je
     geplantem Abruf.
+
+    BUG-117: (1) Die Liste ist nach Dringlichkeit sortiert: zuerst Abrufe für Termine der nächsten
+    WEATHER_NEAR_WINDOW_HOURS Stunden (heute/morgen), davon zuerst der Standortwert vor den Richtungswerten,
+    danach die späteren Tage. Reicht das Zeitbudget nicht, fallen so die spätesten Termine weg.
+    (2) Rote-Wolken-Punkte werden auf ein gröberes Raster zusammengefasst (_red_clouds_grid_key()).
+    (3) Optional füllt `fruehester` {(Art, Schlüssel): frühester Termin} für den Zwischenspeicher/die Staffelung.
     """
     tasks_meta: list = []
+    zeiten: dict = fruehester if fruehester is not None else {}
+
+    def _merke(kind: str, key: str, e) -> None:
+        t = _wetter_termin_zeit(e)
+        alt = zeiten.get((kind, key))
+        if alt is None or t < alt:
+            zeiten[(kind, key)] = t
+
     seen: dict = {
         "weather": set(), "aerosol": set(), "sun_dir": set(), "antisolar_dir": set(),
         "red_clouds_dir": set(),  # BUG-108
@@ -1975,6 +2306,7 @@ def _plan_weather_fetch_tasks(near_events) -> list:
 
     for e in near_events:
         obs_key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
+        _merke("weather", obs_key, e)
         if obs_key not in seen["weather"]:
             seen["weather"].add(obs_key)
             tasks_meta.append(("weather", obs_key, e["observer_lat"], e["observer_lon"], e["location_name"]))
@@ -1988,6 +2320,9 @@ def _plan_weather_fetch_tasks(near_events) -> list:
             (sun_lat, sun_lon), (anti_lat, anti_lon) = proj
             sun_key = _projected_point_cache_key(sun_lat, sun_lon)
             anti_key = _projected_point_cache_key(anti_lat, anti_lon)
+            _merke("sun_dir", sun_key, e)
+            _merke("antisolar_dir", anti_key, e)
+            _merke("aerosol", anti_key, e)
             if sun_key not in seen["sun_dir"]:
                 seen["sun_dir"].add(sun_key)
                 tasks_meta.append(("sun_dir", sun_key, sun_lat, sun_lon, e["location_name"]))
@@ -2007,13 +2342,156 @@ def _plan_weather_fetch_tasks(near_events) -> list:
         # ungehärteter Pfad).
         rc_point = _red_clouds_projection_point(e)
         if rc_point is not None:
+            # BUG-117: gröberes Raster NUR für Rote Wolken (Zusammenfassen über die Rasterzelle)
             rc_lat, rc_lon = rc_point
-            rc_key = _projected_point_cache_key(rc_lat, rc_lon)
+            rc_key = _red_clouds_grid_key(rc_lat, rc_lon)
+            _merke("red_clouds_dir", rc_key, e)
             if rc_key not in seen["red_clouds_dir"]:
                 seen["red_clouds_dir"].add(rc_key)
                 tasks_meta.append(("red_clouds_dir", rc_key, rc_lat, rc_lon, e["location_name"]))
 
-    return tasks_meta
+    return _sortiere_wetter_aufgaben(tasks_meta, zeiten)
+
+
+import contextvars as _contextvars
+import time as _time
+
+
+class _WetterZaehler:
+    """US-141 Baustein 3 (AK-104): zählt die Anfragen EINES Wetterlaufs (jede Anfrage, auch Wiederholungen nach
+    429 und fehlgeschlagene), die abgelehnten (HTTP 429) und die Anfragen je Art (weather/aerosol/...).
+    Wird über eine Kontextvariable an die Abruf-Aufgaben weitergereicht (kostet nichts und braucht keine
+    Parameter in den bestehenden Funktionen). Enthält keine Ortsnamen."""
+
+    def __init__(self) -> None:
+        self.anfragen = 0
+        self.abgelehnt = 0
+        self.je_art: Dict[str, int] = {}
+        self.t0 = _time.monotonic()
+
+    def anfrage(self, art: str) -> None:
+        self.anfragen += 1
+        self.je_art[art] = self.je_art.get(art, 0) + 1
+
+    def zeile(self, name: str) -> str:
+        anteil = (100.0 * self.abgelehnt / self.anfragen) if self.anfragen else 0.0
+        arten = ", ".join("%s %d" % (k, v) for k, v in sorted(self.je_art.items())) or "–"
+        return "Wetterlauf %s: %d Anfragen, davon %d abgelehnt (429), Anteil %s %% · Dauer %s s · nach Art: %s" % (
+            name, self.anfragen, self.abgelehnt, ("%.1f" % anteil).replace(".", ","),
+            ("%.1f" % (_time.monotonic() - self.t0)).replace(".", ","), arten)
+
+
+_wetter_zaehler_var: "_contextvars.ContextVar" = _contextvars.ContextVar("wetter_zaehler", default=None)
+
+
+class _WetterLaufAbgebrochen(Exception):
+    """BUG-117: Dieser Abruf wurde gar nicht erst gestellt, weil die Notbremse den Lauf beendet hat."""
+
+
+def _wetter_fehlerart(exc: BaseException) -> tuple[str, bool]:
+    """BUG-117: Ordnet einen endgültig fehlgeschlagenen Abruf in Klartext ein. Gibt (Bezeichnung, systemisch)
+    zurück; "systemisch" heißt: spricht für ein Problem des Dienstes bzw. der Verbindung insgesamt (nicht für einen
+    einzelnen kaputten Ort) und zählt für die Notbremse."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        code = exc.response.status_code if exc.response is not None else None
+        if code == 429:
+            return "Zu viele Anfragen (429)", True
+        if code in (502, 503, 504):
+            return "Dienst nicht verfügbar (%d)" % code, True
+        return "HTTP-Fehler %s" % code, False
+    if isinstance(exc, httpx.TimeoutException):
+        return "Zeitüberschreitung", True
+    if isinstance(exc, httpx.TransportError):
+        return "Verbindung abgelehnt oder nicht erreichbar", True
+    return "Sonstiger Fehler", False
+
+
+class _WetterLaufZustand:
+    """BUG-117: Zustand EINES Wetterlaufs (über eine Kontextvariable an die Abruf-Aufgaben weitergereicht, wie der
+    Zähler). Führt die Notbremse (Fehlschläge in Folge) und sammelt die Ursachen für die Statusmeldung."""
+
+    def __init__(self) -> None:
+        self.in_folge = 0
+        self.abgebrochen = False
+        self.abbruch_grund: Optional[str] = None
+        self.fehlgeschlagen = 0
+        self.ursachen: Dict[str, int] = {}
+
+    def erfolg(self) -> None:
+        self.in_folge = 0
+
+    def fehler(self, exc: BaseException) -> None:
+        art, systemisch = _wetter_fehlerart(exc)
+        self.fehlgeschlagen += 1
+        self.ursachen[art] = self.ursachen.get(art, 0) + 1
+        self.in_folge = self.in_folge + 1 if systemisch else 0
+        if not self.abgebrochen and self.in_folge >= WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES:
+            self.abgebrochen = True
+            self.abbruch_grund = art
+            logger.warning("BUG-117: Notbremse: %d Abrufe in Folge fehlgeschlagen (%s); der Wetterlauf wird "
+                           "vorzeitig beendet.", self.in_folge, art)
+
+
+_wetter_lauf_var: "_contextvars.ContextVar" = _contextvars.ContextVar("wetter_lauf", default=None)
+
+
+def _naechster_wetterlauf_text() -> str:
+    """Uhrzeit des nächsten regulären Wetterlaufs (alle 3 Stunden, Berliner Zeit) für die Statusmeldung."""
+    try:
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("Europe/Berlin")
+        n = datetime.now(tz).replace(minute=0, second=0, microsecond=0)
+        while True:
+            n = n + timedelta(hours=1)
+            if n.hour % 3 == 0:
+                return "ca. %s Uhr (Berliner Zeit)" % n.strftime("%H:%M")
+    except Exception:
+        return "beim nächsten 3-Stunden-Lauf"
+
+
+def _wetter_fehlertext(error_msg: str, lauf: "_WetterLaufZustand") -> str:
+    """BUG-117 AK-5/AK-7: Ergänzt die Fehlermeldung um die Hauptursache in Klartext (mit Anteil) und, bei
+    vorzeitigem Abbruch, um den Grund und die Uhrzeit des nächsten Versuchs."""
+    text = error_msg
+    if lauf.abgebrochen:
+        limit = lauf.abbruch_grund and lauf.abbruch_grund.startswith("Zu viele")
+        kopf = ("Wetter: Wetterdienst-Limit erreicht" if limit
+                else "Wetter: Wetterdienst nicht erreichbar oder überlastet")
+        text = "%s. Lauf nach %d Fehlschlägen in Folge vorzeitig beendet (%s). Nächster Versuch %s. | %s" % (
+            kopf, WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES, lauf.abbruch_grund, _naechster_wetterlauf_text(),
+            error_msg.replace("Wetter: ", "", 1))
+    if lauf.ursachen and lauf.fehlgeschlagen:
+        haupt, n = max(lauf.ursachen.items(), key=lambda kv: kv[1])
+        text += "; Hauptursache: %s (%d von %d fehlgeschlagenen Abrufen, %s %%)" % (
+            haupt, n, lauf.fehlgeschlagen, ("%.0f" % (100.0 * n / lauf.fehlgeschlagen)))
+    return text
+
+
+def _wetter_tagesstand_buchen(zaehler: "_WetterZaehler") -> Optional[dict]:
+    """BUG-117 AK-3/AK-8/AK-12: Bucht die Anfragen dieses Laufs auf den Tagesstand (Datei im Cache-Ordner)."""
+    if not _wetter_speicher_erlaubt():
+        return None
+    try:
+        return wetter_speicher.tagesstand_buchen(
+            _CACHE_DIR, "ortswetter", zaehler.anfragen, zaehler.abgelehnt, wetter_speicher.gewichtet(zaehler.je_art))
+    except Exception as exc:
+        logger.warning("BUG-117: Tagesstand konnte nicht gespeichert werden: %s", exc)
+        return None
+
+
+def _wetter_scout_buchen() -> None:
+    """BUG-117: Bucht die Wetteranfragen des Scouts (Entdecken) auf den Tagesstand: sie zählen gegen dasselbe
+    Tageslimit. Der Scout-Zähler wird hier am Ende entnommen (gelesen und auf null gesetzt)."""
+    if not _wetter_speicher_erlaubt():
+        return
+    try:
+        from discover import pipeline_base
+        # BUG-117 Nachfund 2: lesen UND zurücksetzen in einem Schritt: jede Anfrage wird genau einmal gebucht
+        n, a = pipeline_base.zaehler_entnehmen()
+        d = wetter_speicher.tagesstand_buchen(_CACHE_DIR, "scout", n, a, n * wetter_speicher.GEWICHT_WETTER)
+        logger.info("%s", wetter_speicher.tagesstand_text(d))
+    except Exception as exc:
+        logger.warning("BUG-117: Scout-Verbrauch konnte nicht gebucht werden: %s", exc)
 
 
 async def _run_one_weather_fetch(kind: str, lat: float, lon: float, semaphore: "asyncio.Semaphore"):
@@ -2040,16 +2518,30 @@ async def _run_one_weather_fetch(kind: str, lat: float, lon: float, semaphore: "
     für diese Fälle unverändert erhalten (Regressions-Schutz, s. Akzeptanzkriterium).
     """
     async with semaphore:
+        # BUG-117: Hat die Notbremse den Lauf beendet, wird gar nicht erst angefragt (kein Abruf, kein Pacing).
+        lauf = _wetter_lauf_var.get()
+        if lauf is not None and lauf.abgebrochen:
+            raise _WetterLaufAbgebrochen("Wetterlauf vorzeitig beendet (Notbremse)")
         attempt = 0
         try:
             while True:
+                zaehler = _wetter_zaehler_var.get()
+                if zaehler is not None:
+                    zaehler.anfrage(kind)            # US-141 AK-104: jede Anfrage zählt, auch Wiederholungen
                 try:
                     if kind == "aerosol":
-                        return await fetch_aerosol_forecast(lat, lon, days=7)
-                    return await fetch_weather_forecast(lat, lon, days=7)
+                        ergebnis = await fetch_aerosol_forecast(lat, lon, days=7)
+                    else:
+                        ergebnis = await fetch_weather_forecast(lat, lon, days=7)
+                    if lauf is not None:
+                        lauf.erfolg()                # BUG-117: ein Erfolg setzt die Fehler-in-Folge-Zählung zurück
+                    return ergebnis
                 except httpx.HTTPStatusError as exc:
                     status_code = exc.response.status_code if exc.response is not None else None
-                    if status_code == 429 and attempt < WEATHER_API_MAX_RETRIES_ON_429:
+                    if status_code == 429 and zaehler is not None:
+                        zaehler.abgelehnt += 1
+                    if (status_code == 429 and attempt < WEATHER_API_MAX_RETRIES_ON_429
+                            and not (lauf is not None and lauf.abgebrochen)):
                         attempt += 1
                         backoff = WEATHER_API_RETRY_BACKOFF_BASE_SECONDS * attempt
                         logger.warning(
@@ -2059,6 +2551,10 @@ async def _run_one_weather_fetch(kind: str, lat: float, lon: float, semaphore: "
                         await asyncio.sleep(backoff)
                         continue
                     raise
+        except Exception as exc:
+            if lauf is not None:
+                lauf.fehler(exc)                     # BUG-117: Ursache merken, Notbremse prüfen
+            raise
         finally:
             await asyncio.sleep(WEATHER_API_REQUEST_PACING_SECONDS)
 
@@ -2197,6 +2693,49 @@ def _build_weather_error_message(
 
 
 async def _weather_overlay(triggered_by: str = "cron") -> None:
+    """US-141 AK-104: Hülle um den eigentlichen Wetterlauf. Zählt alle Wetter-Anfragen des Laufs und schreibt am
+    Ende genau EINE Zählzeile (Anfragen, abgelehnt/429, Anteil, Dauer) — auch bei Abbruch oder Fehler.
+
+    BUG-117: (1) Es läuft nie mehr als ein Wetterlauf gleichzeitig (AK-6). Ein zweiter Auslöser (Start,
+    Vorberechnung, Takt) legt sich dahinter: nach dem laufenden Lauf folgt höchstens EIN Nachlauf (der dank
+    Zwischenspeicher kaum Abrufe kostet), außer die Notbremse hat den Lauf beendet. (2) Die Zählzeile nennt
+    zusätzlich den Tagesstand beim Wetterdienst (AK-12)."""
+    global _weather_run_active, _weather_run_pending
+    if _weather_run_active:
+        _weather_run_pending = True
+        logger.info("BUG-117: Wetterlauf läuft bereits, Auslöser '%s' wird zusammengelegt (höchstens ein Nachlauf).",
+                    triggered_by)
+        return
+    _weather_run_active = True
+    try:
+        while True:
+            _weather_run_pending = False
+            zaehler = _WetterZaehler()
+            lauf = _WetterLaufZustand()
+            token = _wetter_zaehler_var.set(zaehler)
+            token_lauf = _wetter_lauf_var.set(lauf)
+            try:
+                await _weather_overlay_lauf(triggered_by)
+            finally:
+                _wetter_lauf_var.reset(token_lauf)
+                _wetter_zaehler_var.reset(token)
+                zeile = zaehler.zeile("Ortswetter (Auslöser: %s)" % triggered_by)
+                tag = _wetter_tagesstand_buchen(zaehler)
+                if tag is not None:
+                    zeile += " · " + wetter_speicher.tagesstand_text(tag)
+                logger.info("%s", zeile)
+            # BUG-117 Nachfund 1: auch nach einer Notbremse folgt der vorgemerkte Nachlauf (ein neu geladener Feed
+            # wäre sonst bis zum nächsten 3-Stunden-Takt ohne Wetter). Er läuft nacheinander, nie parallel (AK-6);
+            # endet er wieder mit Notbremse und ist nichts Neues vorgemerkt, ist Schluss.
+            if not _weather_run_pending:
+                break
+            triggered_by = "nachlauf"
+    finally:
+        _weather_run_active = False
+        _weather_run_pending = False
+
+
+async def _weather_overlay_lauf(triggered_by: str = "cron") -> None:
     """
     Holt Wetter-Daten für Events in den nächsten 3 Tagen und
     aktualisiert weather_score + overall_score in _feed_cache.
@@ -2219,10 +2758,13 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
     cutoff  = now_utc + timedelta(days=3)
 
     # Relevante Events: nächste 3 Tage
+    # US-141 (Gruppe B): Wetter wird nur für aktive Orte abgerufen.
+    pausiert = _pausierte_ort_ids()
     near_events = [
         e for e in _feed_cache
         if datetime.fromisoformat(e["shoot_time"]) <= cutoff
         and datetime.fromisoformat(e["shoot_time"]) >= now_utc - timedelta(hours=1)
+        and e.get("location_id") not in pausiert
     ]
 
     if not near_events:
@@ -2244,6 +2786,8 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
     # Scores in _feed_cache aktualisieren
     updated = 0
     for e in _feed_cache:
+        if e.get("location_id") in pausiert:
+            continue
         key = f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}"
         # US-131: pro Event den projizierten Sonnenrichtungs-/Gegenrichtungspunkt
         # nachschlagen (gemeinsamer Helfer mit _weather_overlay_single(), AK-4/AK-10;
@@ -2275,6 +2819,9 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
         failed_red_clouds_dir_locations,
     )
     if error_msg is not None:
+        lauf = _wetter_lauf_var.get()
+        if lauf is not None:
+            error_msg = _wetter_fehlertext(error_msg, lauf)    # BUG-117 AK-5/AK-7: Klartext statt "Unknown"
         _job_error("weather", t0, error_msg)
     else:
         _job_done("weather", t0)
@@ -2301,6 +2848,9 @@ async def _weather_overlay_single(loc_id: str) -> bool:
     Events in T+3 haben echtes Wetter ODER es gibt keine Events in T+3).
     """
     own_events = [e for e in _feed_cache if e.get("location_id") == loc_id]
+    # US-141: für einen pausierten Ort wird kein Wetter abgerufen; es gibt nichts nachzuladen.
+    if loc_id in _pausierte_ort_ids():
+        return True
     if not own_events:
         # Keine Events → es gibt nichts nachzuladen; Location gilt als fertig.
         return True
@@ -2606,6 +3156,8 @@ async def _drain_recompute_pending() -> None:
             return
         if loc_id not in _recompute_pending:
             continue  # zwischenzeitlich fertig geworden
+        if loc_id in _nachladen_stat["phase"]:
+            continue  # US-141: dieser Ort gehört zum direkten Nachladen (eigener Arbeiter)
         logger.info("US-106 Nachhol-Lauf für ausstehende Location: %s", loc_id)
         await _run_precompute_single(loc_id, _allow_drain=False)
 
@@ -2853,6 +3405,19 @@ async def _recompute_one(loc_id: str) -> None:
     """
     logger.info("Starte Single-Location Recompute: %s", loc_id)
 
+    # US-141: Ist der Ort pausiert (Land oder Region aus), werden nur seine Ortsdaten (Höhe, Sichtachse;
+    # Gruppe A) neu gerechnet — kein Feed, kein Kalender, kein Wetter (Gruppe B).
+    _ort = next((l for l in LOCATIONS if l.id == loc_id), None)
+    if _ort is not None and gz.ist_pausiert(_ort):
+        rc_ortsdaten = await _run_precompute_single_subproc(loc_id, "--ortsdaten-only", "recompute-ortsdaten")
+        if rc_ortsdaten != 0:
+            logger.error("Single-Location ORTSDATEN fehlgeschlagen (exit %d) für %s", rc_ortsdaten, loc_id)
+        else:
+            await asyncio.to_thread(_load_elevation_cache)
+            logger.info("US-141: %s ist pausiert – Ortsdaten aufgefrischt, kein Feed/Kalender/Wetter.", loc_id)
+        _recompute_pending.discard(loc_id)
+        return
+
     # --- Schritt 1: Feed schnell + gezieltes Wetter + Freigabe -----------------
     rc_feed = await _run_precompute_single_subproc(loc_id, "--feed-only", "recompute-feed")
     if rc_feed != 0:
@@ -2934,8 +3499,647 @@ async def _run_precompute_single(loc_id: str, _allow_drain: bool = True) -> None
 
 
 # ---------------------------------------------------------------------------
+# US-141 Baustein 3: Direktes Nachladen beim Einschalten eines Landes / einer Region
+# ---------------------------------------------------------------------------
+# Ablauf (Entscheidung 2, Regel 3): Schaltet der Host ein Gebiet ein, werden seine Orte SOFORT in eine
+# Warteschlange gestellt; genau EIN Hintergrundarbeiter holt sie ab und startet EINEN Rechenprozess
+# (precompute.py --feed-only --location-ids a,b,c) für alle Orte. Der Prozess schreibt alle paar Orte eine
+# Fortschrittsdatei; der Server gibt fertige Orte häppchenweise frei. Danach folgt das Wetter Ort für Ort
+# (gedrosselt wie jeder Wetterlauf: 4 gleichzeitig, 0,5 s Pause). Der Lauf wartet nicht hinter anderen Aufträgen
+# (_precompute_running) — Kollisionen mit dem Nachtlauf löst die Dateisperre in cache_io.
+
+NACHLADEN_FEED_S_JE_ORT = 10.0      # Richtwert aus dem Ticket, bis der Lauf eigene Messwerte hat
+NACHLADEN_WETTER_S_JE_ORT = 5.0
+NACHLADEN_KALENDER_S_JE_ORT = 25.0  # gemessen: etwa 25 s je Ort für 365 Tage (Fenster-Rechnung), bis es eigene Messwerte gibt
+NACHLADEN_KALENDER_SCHREIBEN_S = 120.0   # Richtwert: die große Kalenderdatei einmal lesen und atomar zurückschreiben
+NACHLADEN_ABFRAGE_S = 2.0           # so oft liest der Server die Fortschrittsdatei
+NACHLADEN_BEENDEN_WARTE_S = 10.0    # so lange wartet der Server auf einen beendeten Rechenprozess, bevor er ihn hart abbricht
+NACHLADEN_MAX_ARGUMENT_ZEICHEN = 60000   # Länge der Ort-Liste je Prozess (Betriebssystem-Grenze der Befehlszeile)
+_NACHLADEN_FORTSCHRITT = _CACHE_DIR / "nachladen_fortschritt.json"
+
+
+def _nachladen_mit_kalender() -> bool:
+    """US-141 (Entscheidung 2026-10-17): Beim Nachladen eines Gebiets wird der Kalender-Schritt nur LOKAL (ohne Live-Modus)
+    mitgerechnet. Im Live-Modus (FOTOALERT_ONDEMAND == "1") wird er übersprungen: Der Server rechnet /calendar dort
+    selbst live und liest calendar.json nicht (siehe /calendar, `if os.getenv("FOTOALERT_ONDEMAND", "0") == "1"`, und
+    `_ondemand` im Start); das Einmischen in die große Datei wäre auf dem Server riskant (Arbeitsspeicher).
+    Dieselbe Prüfung wie dort: Umgebungsvariable zur Laufzeit, nach load_dotenv() am Dateianfang (also .env UND Dienst-Umgebung)."""
+    return os.getenv("FOTOALERT_ONDEMAND", "0") != "1"
+
+_nachladen_queue: "OrderedDict[str, str]" = OrderedDict()    # wartende Orte -> Modus ("alles" | "kalender"), geordnet, ohne Doppelte
+_nachladen_worker: Any = None                                  # der eine Arbeiter (asyncio.Task)
+_nachladen_lauf: dict = {}                                     # der gerade laufende Prozess
+_nachladen_stat: dict = {"phase": {}, "t0": None, "feed_s": None, "wetter_s": [], "lauf_fertig": 0, "lauf_ids": set(),
+                         "kalender": {"ids": set(), "fertig": 0, "status": None, "s_je_ort": None, "t_start": None}}
+_nachladen_letzter_fehler: Optional[dict] = None
+
+
+def _nachladen_noetig(loc_id: str) -> bool:
+    """Ort existiert noch, ist nicht gelöscht und nicht (wieder) pausiert."""
+    if loc_id in _pausierte_ort_ids():
+        return False
+    return any(l.id == loc_id for l in LOCATIONS)
+
+
+def _nachladen_vergessen(ids) -> None:
+    """Orte aus Warteschlange, Anzeige, „wird aktualisiert“ und gespeichertem Zustand entfernen."""
+    ids = set(ids)
+    for i in ids:
+        _nachladen_queue.pop(i, None)
+        _nachladen_stat["phase"].pop(i, None)
+        _recompute_pending.discard(i)
+    kal = _nachladen_stat["kalender"]
+    kal["ids"] -= ids
+    try:
+        _store.vergiss_nachladen(ids)
+        _store.vergiss_nachladen_kalender(ids)
+    except Exception as exc:
+        logger.warning("US-141: Nachlade-Zustand nicht gelöscht: %s", exc)
+
+
+def _nachladen_anstossen(ids, quelle: str = "Einschalten", modus: str = "alles") -> None:
+    """Stellt Orte in die Warteschlange und sorgt dafür, dass der eine Arbeiter läuft. Kehrt sofort zurück.
+    `modus` "alles" = Chancen, Wetter und Kalender; "kalender" = nur noch der Kalender (Fortsetzen nach Neustart,
+    wenn die Chancen schon stehen)."""
+    global _nachladen_worker, _nachladen_letzter_fehler
+    if _NO_BACKGROUND:
+        return
+    mit_kalender = _nachladen_mit_kalender()
+    if modus == "kalender" and not mit_kalender:
+        # Live-Modus: es gibt keine Kalender-Nacharbeit; ein früher gemerkter offener Kalender wird verworfen (kein Endlos-Fortsetzen)
+        try:
+            _store.vergiss_nachladen_kalender(list(ids))
+        except Exception as exc:
+            logger.warning("US-141: Kalender-Zustand nicht gelöscht: %s", exc)
+        logger.info("US-141: Live-Modus – Kalender-Nacharbeit für %d Orte entfällt", len(list(ids)))
+        return
+    ids = [i for i in ids if _nachladen_noetig(i)]
+    if not ids:
+        return
+    try:
+        schleife = asyncio.get_running_loop()
+    except RuntimeError:
+        logger.warning("US-141: Nachladen ohne laufende Ereignisschleife – übersprungen")
+        return
+    if _nachladen_worker is not None and (_nachladen_worker.done() or _nachladen_worker.get_loop() is not schleife):
+        _nachladen_worker = None            # Überbleibsel einer beendeten Schleife
+    _nachladen_letzter_fehler = None
+    laufend = _nachladen_lauf.get("ids", set()) if _nachladen_worker is not None and not _nachladen_lauf.get("abgebrochen") else set()
+    neu = [i for i in ids if i not in laufend]
+    for i in neu:
+        if modus == "kalender" and _nachladen_queue.get(i) != "alles":
+            _nachladen_queue[i] = "kalender"
+            _nachladen_stat["phase"][i] = "fertig"          # Chancen und Wetter stehen schon
+        else:
+            _nachladen_queue[i] = "alles"
+            _nachladen_stat["phase"][i] = "wartet"
+            _recompute_pending.add(i)        # sofort „wird aktualisiert“
+    try:
+        if modus != "kalender":
+            _store.merke_nachladen(neu)
+        if mit_kalender:
+            _store.merke_nachladen_kalender(neu)
+    except Exception as exc:
+        logger.warning("US-141: Nachlade-Zustand nicht gespeichert: %s", exc)
+    logger.info("US-141: Nachladen (%s) – %d Orte eingereiht", quelle, len(neu))
+    if _nachladen_worker is None:
+        if _nachladen_stat["t0"] is None:
+            _nachladen_stat["t0"] = _time.monotonic()
+        _nachladen_worker = asyncio.ensure_future(_nachladen_arbeiter())
+
+
+def _nachladen_abbrechen(ids) -> None:
+    """Gebiet wurde (wieder) ausgeschaltet: Orte aus Warteschlange/Anzeige/Zustand nehmen; läuft der Prozess nur
+    noch für ausgeschaltete Orte, wird er beendet (kein weiterer Rechenschritt, Ergebnis verworfen)."""
+    ids = set(ids)
+    if not ids:
+        return
+    _nachladen_vergessen(ids)
+    lauf = _nachladen_lauf
+    if lauf and not lauf.get("abgebrochen"):
+        pausiert = _pausierte_ort_ids()
+        if not (set(lauf.get("ids", ())) - pausiert):
+            lauf["abgebrochen"] = True
+            proc = lauf.get("proc")
+            if proc is not None and getattr(proc, "returncode", None) is None:
+                try:
+                    proc.terminate()
+                except ProcessLookupError:
+                    pass
+                except Exception as exc:
+                    logger.warning("US-141: Nachladen-Prozess nicht beendet: %s", exc)
+            logger.info("US-141: Nachladen abgebrochen – Gebiet wurde ausgeschaltet")
+
+
+def _feed_orte_ersetzen(ids) -> int:
+    """Übernimmt die Feed-Termine genau dieser Orte aus der Feed-Datei in den Speicher und ersetzt dabei deren
+    bisherige Termine; alles andere (auch schon aufgespieltes Wetter anderer Orte) bleibt unberührt.
+    Pausierte oder gelöschte Orte werden nie übernommen. Gibt die Zahl der übernommenen Termine zurück."""
+    global _feed_cache
+    ids = set(ids) - _pausierte_ort_ids() - _geloeschte_ids()
+    if not ids or not _OPP_CACHE.exists():
+        return 0
+    try:
+        daten = json.loads(_OPP_CACHE.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("US-141: Feed-Datei beim Nachladen nicht lesbar: %s", exc)
+        return 0
+    neu = [e for e in daten.get("opportunities", []) if e.get("location_id") in ids]
+    _backfill_coords(neu)
+    _feed_cache = [e for e in _feed_cache if e.get("location_id") not in ids] + neu
+    return len(neu)
+
+
+def _nachladen_lies_fortschritt(pid) -> list:
+    """Fertige Orte laut Fortschrittsdatei des laufenden Prozesses (leer, wenn nicht lesbar oder fremd)."""
+    return list(_nachladen_lies_fortschritt_voll(pid).get("fertig", []))
+
+
+def _nachladen_lies_fortschritt_voll(pid) -> dict:
+    """Die ganze Fortschrittsdatei des laufenden Prozesses (leer, wenn nicht lesbar oder fremd)."""
+    try:
+        daten = json.loads(_NACHLADEN_FORTSCHRITT.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if pid is not None and daten.get("pid") != pid:
+        return {}
+    return daten if isinstance(daten, dict) else {}
+
+
+def _nachladen_freigeben(fertige) -> None:
+    """Fertig berechnete (und noch gewünschte) Orte in den Speicher übernehmen und als „Chancen bereit“ führen."""
+    fertige = {i for i in fertige if _nachladen_stat["phase"].get(i) == "rechnet"}
+    if not fertige:
+        return
+    n = _feed_orte_ersetzen(fertige)
+    for i in fertige:
+        if _nachladen_stat["phase"].get(i) == "rechnet":
+            _nachladen_stat["phase"][i] = "chancen"
+    logger.info("US-141: Nachladen – %d Orte freigegeben (%d Termine)", len(fertige), n)
+    try:
+        # fertig berechnet: bei einem Neustart müssen diese Orte nicht noch einmal gerechnet werden
+        _store.vergiss_nachladen(fertige)
+    except Exception as exc:
+        logger.warning("US-141: Nachlade-Zustand nicht gelöscht: %s", exc)
+
+
+async def _nachladen_kalender_stand(kal, pid, ids: list) -> None:
+    """US-141 (Kalender beim Einschalten): übernimmt den Stand des Kalender-Schritts aus der Fortschrittsdatei —
+    Zähler und Restzeit für die Anzeige; bei „fertig“ die eingemischten Orte in den Arbeitsspeicher; bei einem
+    Ende (fertig, übersprungen, Fehler) wird der gemerkte offene Kalender dieser Orte gelöscht."""
+    global _nachladen_letzter_fehler
+    if not kal:
+        return
+    st = _nachladen_stat["kalender"]
+    status = kal.get("status")
+    st["fertig"] = len(kal.get("fertig", []))
+    if st["t_start"] is None:
+        st["t_start"] = _time.monotonic()
+    if st["fertig"]:
+        st["s_je_ort"] = (_time.monotonic() - st["t_start"]) / st["fertig"]
+    if status in ("rechnet", "schreibt"):
+        st["status"] = "rechnet"
+        return
+    if st.get("beendet"):
+        return
+    st["beendet"] = True
+    if status == "fertig":
+        if kal.get("postfach"):
+            await _apply_calendar_nachladen(kal.get("fertig", []), pid)
+        st["status"] = "fertig"
+        if kal.get("fehler") and _nachladen_letzter_fehler is None:
+            _nachladen_letzter_fehler = {"orte": len(kal["fehler"]), "text":
+                "Für %d Orte konnte der Kalender nicht berechnet werden – er kommt mit dem nächsten Nachtlauf bzw. wird live berechnet" % len(kal["fehler"])}
+    else:
+        st["status"] = "fehler" if status == "fehler" else "uebersprungen"
+        if status == "fehler" and _nachladen_letzter_fehler is None:
+            _nachladen_letzter_fehler = {"orte": len(ids), "text":
+                "Der Kalender konnte nicht ergänzt werden (%s) – er kommt mit dem nächsten Nachtlauf bzw. wird live berechnet"
+                % (kal.get("text") or "unbekannter Grund")}
+        logger.warning("US-141: Kalender beim Nachladen nicht eingemischt (%s): %s", status, kal.get("text"))
+    try:
+        _store.vergiss_nachladen_kalender(ids)
+    except Exception as exc:
+        logger.warning("US-141: Kalender-Zustand nicht gelöscht: %s", exc)
+
+
+async def _prozess_sicher_beenden(proc, warte_s: Optional[float] = None) -> bool:
+    """US-141 M1: Beendet einen Rechenprozess und wartet, bis er wirklich weg ist: erst höflich (terminate), nach
+    `warte_s` Sekunden hart (kill). Gibt True zurück, wenn der Prozess beendet ist. Wirft nie eine Ausnahme."""
+    if proc is None or getattr(proc, "returncode", None) is not None:
+        return True
+    if warte_s is None:
+        warte_s = NACHLADEN_BEENDEN_WARTE_S
+    for schritt, beende in (("terminate", proc.terminate), ("kill", proc.kill)):
+        try:
+            beende()
+        except ProcessLookupError:
+            return True                      # schon weg
+        except Exception as exc:
+            logger.warning("US-141: Rechenprozess nicht beendet (%s): %s", schritt, exc)
+        try:
+            await asyncio.wait_for(proc.wait(), warte_s)
+            return True
+        except asyncio.TimeoutError:
+            logger.warning("US-141: Rechenprozess reagiert nach %s nicht (%.0f s) – nächster Schritt", schritt, warte_s)
+        except Exception as exc:
+            logger.warning("US-141: Warten auf den Rechenprozess fehlgeschlagen: %s", exc)
+            return getattr(proc, "returncode", None) is not None
+    logger.error("US-141: Rechenprozess lässt sich nicht beenden")
+    return False
+
+
+async def _nachladen_prozess(ids: list, modus: str = "alles") -> int:
+    """Startet EINEN Rechenprozess für die Orte und liest währenddessen den Fortschritt. Gibt den Rückgabewert
+    zurück (-1 bei Abbruch durch den Host).
+
+    `modus` "alles": Chancen, danach (im selben Prozess, also mit einer einzigen Sicherung) der Kalender dieser Orte;
+    sobald die Chancen stehen, holt der Server währenddessen das Wetter. `modus` "kalender": nur noch der Kalender
+    (Fortsetzen nach einem Neustart). Das Ergebnis (Stand der Chancen und des Kalenders) steht in
+    `_nachladen_lauf["ergebnis"]`, bis der Arbeiter es abgeholt hat."""
+    backend_dir = Path(__file__).parent
+    mit_kalender = _nachladen_mit_kalender()
+    args = [sys.executable, str(backend_dir / "precompute.py")]
+    if modus == "kalender":
+        args += ["--location-ids", ",".join(ids), "--nur-kalender"]
+    else:
+        args += ["--feed-only", "--location-ids", ",".join(ids)]
+        if mit_kalender:
+            args += ["--mit-kalender"]      # Live-Modus: nur Chancen (+ Wetter durch den Server), kein Kalender
+    lauf = {"ids": set(ids), "proc": None, "abgebrochen": False, "modus": modus, "ergebnis": {}}
+    _nachladen_lauf.clear()
+    _nachladen_lauf.update(lauf)
+    if modus != "kalender":
+        for i in ids:
+            _nachladen_stat["phase"][i] = "rechnet"
+    _nachladen_stat["lauf_ids"] = set(ids)
+    _nachladen_stat["kalender"].update(ids=(set(ids) if mit_kalender else set()), fertig=0,
+                                       status=("rechnet" if modus == "kalender" else "wartet" if mit_kalender else None),
+                                       s_je_ort=None, t_start=(_time.monotonic() if modus == "kalender" else None),
+                                       beendet=False)
+    try:
+        _NACHLADEN_FORTSCHRITT.unlink()      # alte Datei eines früheren Laufs
+    except OSError:
+        pass
+    logger.info("US-141: Nachladen startet Rechenprozess für %d Orte (%s, %s)", len(ids), modus,
+                "mit Kalender" if mit_kalender else "ohne Kalender – Live-Modus FOTOALERT_ONDEMAND=1")
+    t_lauf = _time.monotonic()
+    proc = await asyncio.create_subprocess_exec(
+        *args, cwd=str(backend_dir), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+    _nachladen_lauf["proc"] = proc
+    if _nachladen_lauf.get("abgebrochen"):
+        try:
+            proc.terminate()
+        except Exception:
+            pass
+    zu = asyncio.ensure_future(proc.communicate())
+    gesehen = 0
+    wetter_task = None
+    daten: dict = {}
+    pid = getattr(proc, "pid", None)
+
+    async def _stand_lesen() -> None:
+        nonlocal gesehen, wetter_task, daten
+        d = _nachladen_lies_fortschritt_voll(pid)
+        if not d:
+            return
+        daten = d
+        if modus != "kalender":
+            fertig = list(d.get("fertig", []))
+            if len(fertig) != gesehen:
+                gesehen = len(fertig)
+                _nachladen_stat["lauf_fertig"] = gesehen
+                _nachladen_stat["feed_s"] = (_time.monotonic() - t_lauf) / max(gesehen, 1)
+                _nachladen_freigeben(fertig)
+            if d.get("feed_fertig") and wetter_task is None and not _nachladen_lauf.get("abgebrochen"):
+                # Chancen aller Orte stehen: das Wetter wird jetzt geholt, während der Prozess den Kalender rechnet
+                _nachladen_freigeben(fertig)
+                if _nachladen_stat["kalender"]["t_start"] is None:
+                    _nachladen_stat["kalender"]["t_start"] = _time.monotonic()
+                wetter_task = asyncio.ensure_future(_nachladen_wetter(ids))
+        if d.get("kalender") and not _nachladen_lauf.get("abgebrochen"):
+            await _nachladen_kalender_stand(d["kalender"], pid, ids)
+
+    try:
+        while not zu.done():
+            await asyncio.wait({zu}, timeout=NACHLADEN_ABFRAGE_S)
+            if _nachladen_lauf.get("abgebrochen"):
+                continue
+            await _stand_lesen()
+        stdout, _ = zu.result()
+        if not _nachladen_lauf.get("abgebrochen"):
+            await _stand_lesen()                 # letzter Stand nach dem Ende des Prozesses
+    except asyncio.CancelledError:
+        zu.cancel()
+        if wetter_task is not None:
+            wetter_task.cancel()
+        try:
+            proc.terminate()
+        except Exception:
+            pass
+        raise
+    except Exception:
+        # US-141 M1: jede andere Ausnahme (Fortschritt/Kalender-Stand lesen, ...) beendet den Lauf als fehlgeschlagen.
+        # Der Rechenprozess wird sicher beendet, BEVOR die Funktion zurückkehrt – sonst könnte der Arbeiter einen
+        # zweiten Prozess starten, während der erste noch rechnet.
+        logger.exception("US-141: Nachladen-Überwachung gescheitert – der Rechenprozess wird beendet")
+        if wetter_task is not None:
+            wetter_task.cancel()
+            try:
+                await wetter_task
+            except BaseException:
+                pass
+        await _prozess_sicher_beenden(proc)
+        zu.cancel()
+        try:
+            await zu
+        except BaseException:
+            pass
+        _nachladen_lauf["ergebnis"] = {"feed_fertig": bool(daten.get("feed_fertig")), "kalender": daten.get("kalender"),
+                                       "wetter_gestartet": False}
+        return 1                                 # Arbeiter: „fehlgeschlagen“ (Fehleranzeige im Menü wie bisher)
+    if wetter_task is not None:
+        try:
+            await wetter_task
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("US-141: Wetter beim Nachladen abgebrochen")
+    _nachladen_lauf["ergebnis"] = {"feed_fertig": bool(daten.get("feed_fertig")), "kalender": daten.get("kalender"),
+                                   "wetter_gestartet": wetter_task is not None}
+    if stdout:
+        for zeile in stdout.decode(errors="replace").splitlines():
+            logger.info("  [precompute] %s", zeile)
+    return -1 if _nachladen_lauf.get("abgebrochen") else (proc.returncode or 0)
+
+
+async def _nachladen_wetter(ids: list) -> None:
+    """Wetter Ort für Ort (jeder Abruf wie der Wetterlauf gedrosselt). Eine Zählzeile für die ganze Phase."""
+    zaehler = _WetterZaehler()
+    token = _wetter_zaehler_var.set(zaehler)
+    try:
+        for i in ids:
+            if _nachladen_stat["phase"].get(i) != "chancen" or not _nachladen_noetig(i):
+                continue
+            _nachladen_stat["phase"][i] = "wetter"
+            t = _time.monotonic()
+            try:
+                bereit = await _weather_overlay_single(i)
+            except Exception as exc:
+                logger.warning("US-141: Wetter für einen nachgeladenen Ort fehlgeschlagen (%s)", exc)
+                bereit = False
+            if _nachladen_stat["phase"].get(i) != "wetter":
+                continue                                    # inzwischen ausgeschaltet
+            _nachladen_stat["wetter_s"].append(_time.monotonic() - t)
+            if bereit:
+                _finalize_pending(i)
+                _nachladen_stat["phase"][i] = "fertig"
+            else:
+                _recompute_pending.discard(i)               # nicht ewig „wird aktualisiert“: Wetter folgt im nächsten Lauf
+                _nachladen_stat["phase"][i] = "wetter_folgt"
+    finally:
+        _wetter_zaehler_var.reset(token)
+        if zaehler.anfragen:
+            logger.info("%s", zaehler.zeile("Ortswetter (Auslöser: Nachladen)"))
+
+
+async def _nachladen_arbeiter() -> None:
+    """Der eine Arbeiter: nimmt alles Wartende, rechnet es in einem Prozess (Chancen, dann Kalender; das Wetter
+    holt der Server dazwischen); wiederholt, bis nichts mehr wartet (zwischenzeitlich eingereihte Gebiete werden
+    angehängt). Orte, bei denen nach einem Neustart nur noch der Kalender fehlt, laufen in einem eigenen Prozess."""
+    global _nachladen_worker, _nachladen_letzter_fehler
+    try:
+        while True:
+            warte = [i for i in list(_nachladen_queue) if _nachladen_noetig(i)]
+            for i in [i for i in list(_nachladen_queue) if i not in warte]:
+                _nachladen_vergessen([i])
+            if not warte:
+                break
+            modus = _nachladen_queue.get(warte[0]) or "alles"
+            warte = [i for i in warte if (_nachladen_queue.get(i) or "alles") == modus]
+            # Befehlszeile begrenzen (sehr große Länder): in Abschnitten nacheinander
+            teil, laenge = [], 0
+            for i in warte:
+                if teil and laenge + len(i) + 1 > NACHLADEN_MAX_ARGUMENT_ZEICHEN:
+                    break
+                teil.append(i)
+                laenge += len(i) + 1
+            for i in teil:
+                _nachladen_queue.pop(i, None)
+            _nachladen_stat["lauf_fertig"] = 0
+            try:
+                rc = await _nachladen_prozess(teil, modus)
+            except Exception as exc:
+                logger.error("US-141: Nachladen konnte nicht starten: %s", exc)
+                rc = 1
+            lauf_ids = set(_nachladen_lauf.get("ids", ()))
+            abgebrochen = bool(_nachladen_lauf.get("abgebrochen"))
+            ergebnis = dict(_nachladen_lauf.get("ergebnis") or {})
+            _nachladen_lauf.clear()
+            _kst = _nachladen_stat["kalender"]
+            if _kst.get("status") in ("wartet", "rechnet"):
+                _kst["status"] = "uebersprungen"        # der Prozess ist zu Ende, ohne den Kalender-Schritt zu melden
+            # Orte, die während des Laufs ausgeschaltet wurden: ihr Ergebnis wird verworfen, auch aus der Datei
+            ausgeschaltet = {i for i in teil if not _nachladen_noetig(i)}
+            if ausgeschaltet and modus != "kalender":
+                await asyncio.to_thread(cache_io.orte_aus_feed_entfernen, _OPP_CACHE, ausgeschaltet)
+            # Stand der Chancen: ein Prozess, der erst im Kalender-Schritt scheitert (z. B. zu wenig Arbeitsspeicher),
+            # hat die Chancen schon vollständig geliefert -> sie bleiben gültig, nur der Kalender fehlt.
+            chancen_ok = modus != "kalender" and (rc == 0 or bool(ergebnis.get("feed_fertig")))
+            if modus == "kalender":
+                if rc != 0 and not abgebrochen:
+                    logger.error("US-141: Kalender beim Nachladen fehlgeschlagen (Rückgabewert %s)", rc)
+                    _nachladen_letzter_fehler = {"orte": len(teil), "text":
+                        "Der Kalender konnte nicht ergänzt werden – er kommt mit dem nächsten Nachtlauf bzw. wird live berechnet"}
+            elif chancen_ok and not abgebrochen:
+                _nachladen_freigeben([i for i in teil if _nachladen_stat["phase"].get(i) == "rechnet"])
+                if not ergebnis.get("wetter_gestartet"):
+                    await _nachladen_wetter(teil)
+                if rc != 0 and not _nachladen_mit_kalender():
+                    logger.error("US-141: Prozess endete nach den Chancen mit Rückgabewert %s – Chancen und Wetter sind gültig", rc)
+                elif rc != 0:
+                    logger.error("US-141: Prozess endete im Kalender-Schritt mit Rückgabewert %s – Chancen und Wetter "
+                                 "sind gültig, der Kalender kommt später", rc)
+                    if _nachladen_letzter_fehler is None:
+                        _nachladen_letzter_fehler = {"orte": len(teil), "text":
+                            "Der Kalender konnte nicht ergänzt werden – er kommt mit dem nächsten Nachtlauf bzw. wird live berechnet"}
+            elif rc != 0 and not abgebrochen:
+                logger.error("US-141: Nachladen fehlgeschlagen (Rückgabewert %s) – die Orte bleiben eingeschaltet, "
+                             "die Chancen kommen mit dem nächsten Nachtlauf", rc)
+                fertig_laut_datei = set(_nachladen_lies_fortschritt(None))
+                _nachladen_freigeben([i for i in teil if i in fertig_laut_datei])
+                for i in teil:
+                    if _nachladen_stat["phase"].get(i) in ("rechnet", "chancen"):
+                        _nachladen_stat["phase"][i] = "fehler"
+                        _recompute_pending.discard(i)
+                _nachladen_letzter_fehler = {"orte": len(teil), "text": "Nachladen fehlgeschlagen – die Chancen kommen mit dem nächsten Nachtlauf"}
+            try:
+                _store.vergiss_nachladen(teil)
+                _store.vergiss_nachladen_kalender(teil)      # Ende dieses Laufs: der Kalender-Schritt ist erledigt oder aufgegeben
+            except Exception as exc:
+                logger.warning("US-141: Nachlade-Zustand nicht gelöscht: %s", exc)
+            for i in lauf_ids:
+                if _nachladen_stat["phase"].get(i) == "rechnet":
+                    _nachladen_stat["phase"].pop(i, None)
+                if abgebrochen and i not in _nachladen_queue:
+                    _recompute_pending.discard(i)
+    except asyncio.CancelledError:
+        raise
+    except Exception:
+        logger.exception("US-141: Nachladen-Arbeiter abgebrochen")
+    finally:
+        _nachladen_lauf.clear()
+        _nachladen_worker = None
+        if not _nachladen_queue:
+            _nachladen_stat["phase"].clear()
+            _nachladen_stat.update(t0=None, feed_s=None, wetter_s=[], lauf_fertig=0)
+            _nachladen_stat["kalender"].update(ids=set(), fertig=0, status=None, s_je_ort=None, t_start=None, beendet=False)
+
+
+def _nachladen_info() -> dict:
+    """Stand des Nachladens für die Oberfläche (Menü „Länder & Regionen“): x von y Orten bereit, Wetter, Restzeit."""
+    phasen = dict(_nachladen_stat["phase"])
+    aktiv = bool(phasen) and _nachladen_worker is not None
+    bereit_phasen = ("chancen", "wetter", "fertig", "wetter_folgt")
+    gesamt = len(phasen)
+    bereit = sum(1 for p in phasen.values() if p in bereit_phasen)
+    rechnet = sum(1 for p in phasen.values() if p == "rechnet")
+    # Orte ohne Chancen erscheinen nie in der Datei: der Zähler des Prozesses zählt sie mit
+    bereit += max(0, min(_nachladen_stat.get("lauf_fertig", 0) - sum(
+        1 for i in _nachladen_stat.get("lauf_ids", ()) if phasen.get(i) in bereit_phasen), rechnet))
+    wetter_fertig = sum(1 for p in phasen.values() if p in ("fertig", "wetter_folgt"))
+    offen_feed = sum(1 for p in phasen.values() if p in ("wartet", "rechnet"))
+    offen_wetter = sum(1 for p in phasen.values() if p in ("wartet", "rechnet", "chancen", "wetter"))
+    wetter_liste = _nachladen_stat["wetter_s"]
+    feed_s = _nachladen_stat["feed_s"] or NACHLADEN_FEED_S_JE_ORT
+    wetter_s = (sum(wetter_liste) / len(wetter_liste)) if wetter_liste else NACHLADEN_WETTER_S_JE_ORT
+    # Kalender (Entscheidung 2026-10-15): läuft im Rechenprozess nach den Chancen, gleichzeitig mit dem Wetter
+    kal = _nachladen_stat["kalender"]
+    kal_status = kal.get("status")
+    kal_aktiv = aktiv and kal_status in ("wartet", "rechnet")
+    kal_gesamt = len(kal.get("ids", ())) if kal_status in ("wartet", "rechnet", "fertig") else 0
+    kal_bereit = kal_gesamt if kal_status == "fertig" else min(kal.get("fertig", 0), kal_gesamt)
+    kal_s = kal.get("s_je_ort") or NACHLADEN_KALENDER_S_JE_ORT
+    kal_rest_s = ((kal_gesamt - kal_bereit) * kal_s + NACHLADEN_KALENDER_SCHREIBEN_S) if kal_aktiv else 0.0
+    rest_s = offen_feed * feed_s + max(offen_wetter * wetter_s, kal_rest_s)
+    gruppen: Dict[tuple, dict] = {}
+    for l in LOCATIONS:
+        p = phasen.get(l.id)
+        if p is None:
+            continue
+        g = gruppen.setdefault((getattr(l, "land", None) or "", getattr(l, "region", None) or ""),
+                               {"land": getattr(l, "land", None) or "", "region": getattr(l, "region", None) or "",
+                                "gesamt": 0, "bereit": 0, "wetter": 0})
+        g["gesamt"] += 1
+        g["bereit"] += 1 if p in bereit_phasen else 0
+        g["wetter"] += 1 if p in ("fertig", "wetter_folgt") else 0
+    gebiete = []
+    for g in gruppen.values():
+        g["name"] = g["region"] or g["land"]
+        g["status"] = ("fertig" if g["wetter"] >= g["gesamt"] else "wetter" if g["bereit"] >= g["gesamt"] else "rechnet")
+        gebiete.append(g)
+    return {
+        "aktiv": aktiv,
+        "phase": (None if not aktiv else "chancen" if offen_feed else "wetter" if (offen_wetter or not kal_aktiv) else "kalender"),
+        "gesamt": gesamt,
+        "chancen_bereit": min(bereit, gesamt),
+        "wetter_bereit": wetter_fertig,
+        "kalender_aktiv": bool(kal_aktiv),
+        "kalender_gesamt": kal_gesamt,
+        "kalender_bereit": kal_bereit,
+        "rest_min": (max(1, int(math.ceil(rest_s / 60.0))) if aktiv else 0),
+        "gebiete": sorted(gebiete, key=lambda g: (g["land"], g["region"])),
+        "fehler": (_nachladen_letzter_fehler or {}).get("text"),
+        "ids": sorted(i for i, p in phasen.items() if p in ("wartet", "rechnet", "chancen", "wetter")),
+    }
+
+
+def _nachladen_fortsetzen(cache_ok: bool) -> None:
+    """Beim Start: unvollendetes Nachladen wieder aufnehmen (AK-61) — gespeicherte offene Orte plus aktive Orte,
+    die keine Chancen in der Feed-Datei haben. Pausierte und gelöschte Orte werden nie nachgeladen."""
+    if _NO_BACKGROUND or not cache_ok or not _feed_cache:
+        return
+    try:
+        gemerkt = _store.lade_nachladen()
+    except Exception as exc:
+        logger.warning("US-141: gespeicherter Nachlade-Zustand nicht lesbar: %s", exc)
+        gemerkt = set()
+    aktive = [l.id for l in gz.aktive_orte(LOCATIONS)]
+    aktive_set = set(aktive)
+    mit_chancen = {e.get("location_id") for e in _feed_cache}
+    offen = [i for i in aktive if i in gemerkt or i not in mit_chancen]
+    ungueltig = [i for i in gemerkt if i not in aktive_set]
+    if ungueltig:
+        try:
+            _store.vergiss_nachladen(ungueltig)
+        except Exception:
+            pass
+    if offen:
+        logger.info("US-141: Nachladen nach dem Start fortgesetzt für %d Orte", len(offen))
+        _nachladen_anstossen(offen, quelle="Neustart")
+    # Kalender beim Einschalten: Orte, deren Chancen schon stehen, bei denen aber der Kalender noch fehlte
+    try:
+        kal_offen = _store.lade_nachladen_kalender()
+    except Exception as exc:
+        logger.warning("US-141: gespeicherter Kalender-Zustand nicht lesbar: %s", exc)
+        kal_offen = set()
+    offen_set = set(offen)
+    nur_kal = [i for i in aktive if i in kal_offen and i not in offen_set]
+    ungueltig_kal = [i for i in kal_offen if i not in aktive_set]
+    if ungueltig_kal:
+        try:
+            _store.vergiss_nachladen_kalender(ungueltig_kal)
+        except Exception:
+            pass
+    if kal_offen and not _nachladen_mit_kalender():
+        # Live-Modus: kein Kalender-Schritt – gemerkte offene Kalender verwerfen, nichts fortsetzen
+        try:
+            _store.vergiss_nachladen_kalender(list(kal_offen))
+        except Exception:
+            pass
+        logger.info("US-141: Live-Modus – gemerkter offener Kalender für %d Orte verworfen (kein Kalender-Schritt)", len(kal_offen))
+        nur_kal = []
+    if nur_kal:
+        logger.info("US-141: Kalender nach dem Start für %d Orte nachgeholt", len(nur_kal))
+        _nachladen_anstossen(nur_kal, quelle="Neustart (Kalender)", modus="kalender")
+
+
+# ---------------------------------------------------------------------------
 # Startup / Shutdown
 # ---------------------------------------------------------------------------
+
+def _startup_gebiete() -> dict:
+    """US-141 Baustein 2: (1) Orte ohne Land/Region bekommen sie aus ihrer Lage und werden gebündelt
+    gespeichert, (2) die Gebiets-Schalter werden einmalig angelegt (Gebiete mit Orten an, leere aus).
+    Beides ist beliebig oft wiederholbar (schreibt nur Fehlendes) und sichert die Datenbank vorher,
+    sobald wirklich etwas geschrieben wird. Im Test-/Sandbox-Modus (FOTOALERT_NO_BACKGROUND=1) wird
+    nichts geschrieben, außer FOTOALERT_GEBIETE_MIGRATION=1 ist gesetzt."""
+    ergebnis = {"zugeordnet": 0, "neu": 0, "sicherung": None}
+    if _NO_BACKGROUND and _os.getenv("FOTOALERT_GEBIETE_MIGRATION", "0") != "1":
+        return ergebnis
+    try:
+        offen = {}
+        for loc in LOCATIONS:
+            if getattr(loc, "land", None):
+                continue
+            v = gz.vorschlag(loc.observer_lat, loc.observer_lon, loc.name)
+            loc.land, loc.region = v.land, v.region
+            offen[loc.id] = {"land": v.land, "region": v.region}
+        sicherung = None
+        if offen:
+            sicherung = _store.sichere_datenbank()
+            _store.upsert_overrides_bulk(offen)
+            ergebnis["zugeordnet"] = len(offen)
+        r = _gebiete_uebernahme.migriere_gebietszustand(_store, list(LOCATIONS), sichern=(sicherung is None))
+        ergebnis["neu"] = r.get("neu", 0)
+        ergebnis["sicherung"] = str(sicherung) if sicherung else r.get("sicherung")
+        if ergebnis["zugeordnet"] or ergebnis["neu"]:
+            logger.info("US-141: %d Orten Land/Region zugeordnet, %d Gebiets-Schalter angelegt (Sicherung: %s)",
+                        ergebnis["zugeordnet"], ergebnis["neu"], ergebnis["sicherung"])
+    except Exception as exc:
+        logger.error("US-141: Übernahme der Gebiete fehlgeschlagen (%s) – alle Orte bleiben aktiv", exc)
+    return ergebnis
+
 
 def _load_location_overrides() -> None:
     """Wendet Location-Overrides aus SQLite auf alle Locations an.
@@ -2961,7 +4165,7 @@ def _load_location_overrides() -> None:
                     logger.info("Location Overrides auto-migriert aus JSON: %d Einträge", len(overrides))
 
         # US-68 Slice 1: Tombstoned Locations vor dem Mapping herausfiltern
-        tombstoned_ids = {ov["id"] for ov in overrides if ov.get("deleted")}
+        tombstoned_ids = aktiv_regel.geloeschte_ids(overrides)   # BUG-118: die eine zentrale Frage „gelöscht?“
         if tombstoned_ids:
             LOCATIONS[:] = [l for l in LOCATIONS if l.id not in tombstoned_ids]
             logger.info("Tombstoned Locations beim Start entfernt: %s", tombstoned_ids)
@@ -2970,7 +4174,7 @@ def _load_location_overrides() -> None:
         applied = 0
         for ov in overrides:
             loc_id = ov.get("id")
-            if ov.get("deleted"):
+            if aktiv_regel.ist_geloescht(ov):
                 continue  # Tombstone – kein Feld-Apply
             loc = loc_map.get(loc_id)
             if loc:
@@ -3117,6 +4321,10 @@ def _startup_setup_scheduler(_precompute_mode: str) -> None:
 async def startup() -> None:
     logger.info("FotoAlert Backend v2 startet (Cache-First)...")
 
+    # US-141: Quelle des Gebiets-Zustands bei JEDEM Start neu festlegen (nicht nur beim Einlesen des Moduls):
+    # läuft precompute.main() im selben Prozess (Tests), setzt es eine eigene Quelle, die sonst stehen bliebe.
+    gz.registriere_quelle(lambda: _store.load_area_states())
+
     _startup_integrity_check()
 
     # 0. Custom Locations laden (persistent gespeicherte User-Spots)
@@ -3128,6 +4336,9 @@ async def startup() -> None:
 
     # 0b. Location Overrides laden (Koordinaten-Korrekturen für alle Location-Typen)
     _load_location_overrides()
+
+    # 0b'. US-141: Land/Region je Ort ergänzen, Gebiets-Schalter einmalig anlegen
+    _startup_gebiete()
 
     # 0b. Geländehöhen-Cache laden und Locations patchen
     _load_elevation_cache()
@@ -3155,6 +4366,9 @@ async def startup() -> None:
 
     # 2. Wetter-Overlay für T+0..T+3 (schnell, ~5s)
     asyncio.create_task(_weather_overlay(triggered_by="startup"))
+
+    # US-141 Baustein 3 (AK-61): unvollendetes Nachladen nach dem Neustart fortsetzen
+    _nachladen_fortsetzen(cache_ok)
 
     # US-112: Wetter-Karten-Overlay (DWD ICON + MET Norway → PNG je Stunde) im
     # Hintergrund vorbauen, damit der Map-Tab beim ersten Einschalten schon Daten hat.
@@ -3278,7 +4492,7 @@ def _compute_possible_bodies(observer_lat: float, ideal_azimuth_range: list | No
     return possible
 
 
-def _loc_to_out(loc) -> LocationOut:
+def _loc_to_out(loc, z: Optional[dict] = None, undecided: Optional[set] = None) -> LocationOut:
     az_range = list(loc.ideal_azimuth_range) if getattr(loc, 'ideal_azimuth_range', None) else None
     # BUG-96-Nachbesserung (2026-08-03): Der ursprüngliche BUG-96-Fix in
     # _compute_possible_bodies() griff NICHT — Pydantic validiert az_range
@@ -3318,6 +4532,9 @@ def _loc_to_out(loc) -> LocationOut:
     # Quelle fuer das Bearbeiten-Formular (ersetzt das nicht existente `category_key`-Feld,
     # das vorher nie geliefert wurde -- Ursache des Ausgangsbugs).
     _cat = coerce_category_value(loc.category)
+    # US-141: Land und Region (gespeichert, sonst aus den Koordinaten vorgeschlagen) und ob der Ort
+    # pausiert ist (Land oder Region aus). „paused“ ist abgeleitet, nie direkt gesetzt.
+    _land, _region = gz.gebiet_des_ortes(loc)
     return LocationOut(
         id=loc.id,
         name=loc.name,
@@ -3350,6 +4567,10 @@ def _loc_to_out(loc) -> LocationOut:
         # US-09: Sichtachsen-Status/Winkel (Default "nicht_geprueft", siehe PhotoLocation)
         sightline_status=getattr(loc, "sightline_status", None) or "nicht_geprueft",
         sightline_angle_deg=getattr(loc, "sightline_angle_deg", None),
+        land=_land,
+        region=_region,
+        paused=not gz.ist_aktiv(loc, z),
+        area_undecided=bool(undecided) and loc.id in undecided and not gz.ist_aktiv(loc, z),
     )
 
 
@@ -3364,7 +4585,8 @@ def _filter_feed(
     cutoff  = now_utc + timedelta(days=min(days, 14))
 
     result = []
-    for e in _feed_cache:
+    # US-141: Chancen pausierter Orte werden nie ausgeliefert (Gruppe B)
+    for e in _ohne_pausierte(_feed_cache):
         shoot_dt = datetime.fromisoformat(e["shoot_time"])
         # BUG-05: shoot_window_end als Cutoff verwenden (Fallback: shoot_time + 30 min)
         window_end_str = e.get("shoot_window_end")
@@ -3552,6 +4774,7 @@ async def health() -> HealthOut:
         status=overall,
         version=BACKEND_API_SCHEMA_VERSION,
         locations_count=len(LOCATIONS),
+        locations_active=len(gz.aktive_orte(LOCATIONS)),   # US-141: nur aktive (nicht pausierte) Orte
         subsystems=subsystems,
         jobs=jobs_out,
         precompute_running=_precompute_running,
@@ -3563,7 +4786,12 @@ async def get_locations(category: Optional[str] = None) -> list[LocationOut]:
     locs = LOCATIONS
     if category:
         locs = [l for l in locs if l.category.value.lower() == category.lower()]
-    return [_loc_to_out(l) for l in locs]
+    z = gz.zustaende()
+    try:
+        offen = _store.load_area_undecided()
+    except Exception:
+        offen = set()
+    return [_loc_to_out(l, z, offen) for l in locs]
 
 
 @app.get("/locations/{location_id}", response_model=LocationOut)
@@ -3571,7 +4799,119 @@ async def get_location(location_id: str) -> LocationOut:
     loc = get_location_by_id(location_id)
     if not loc:
         raise HTTPException(status_code=404, detail=f"Location '{location_id}' nicht gefunden.")
-    return _loc_to_out(loc)
+    try:
+        offen = _store.load_area_undecided()
+    except Exception:
+        offen = set()
+    return _loc_to_out(loc, None, offen)
+
+
+# ---------------------------------------------------------------------------
+# US-141 Baustein 2: Länder und Regionen schalten (nur Host)
+# ---------------------------------------------------------------------------
+
+def _lese_schalter(body: Any) -> bool:
+    wert = body.get("enabled") if isinstance(body, dict) else None
+    if not isinstance(wert, bool):
+        raise HTTPException(status_code=422, detail="Erwartet {\"enabled\": true|false}.")
+    return wert
+
+
+async def _schalte_gebiet(land: str, region: Optional[str], eintraege: list, an: bool) -> dict:
+    """Speichert den neuen Zustand, räumt die Speicher auf, stößt Entdecken neu an und protokolliert.
+    US-141 M2: Beim Einschalten wird die große Feed-Datei in einem Hintergrund-Thread gelesen, damit die
+    Ereignisschleife (alle anderen Anfragen) nicht stillsteht. Das Einarbeiten in den Speicher geschieht danach
+    wieder in der Ereignisschleife, ohne weiteren Wartepunkt dazwischen."""
+    feed_daten = await asyncio.to_thread(_feed_datei_lesen) if an else None
+    vorher = _pausierte_ort_ids()
+    _store.set_area_states_bulk(eintraege)
+    ziel = "Region %s (%s)" % (region, land) if region else "Land %s" % land
+    logger.info("US-141: %s %s", ziel, "EINGESCHALTET" if an else "AUSGESCHALTET")
+    _nach_gebietsaenderung(vorher, feed_daten)
+    # US-141 Baustein 3: Ausschalten bricht ein laufendes Nachladen dieser Orte ab, Einschalten stellt die Orte
+    # sofort in die Warteschlange des Nachladens (kehrt sofort zurück; gerechnet wird im Hintergrund).
+    jetzt = _pausierte_ort_ids()
+    _nachladen_abbrechen(jetzt - vorher)
+    _nachladen_anstossen([l.id for l in LOCATIONS if l.id in (vorher - jetzt)])
+    # Orte, die jetzt laufen, brauchen keine Entscheidung mehr
+    try:
+        _store.clear_area_undecided([l.id for l in LOCATIONS if gz.ist_aktiv(l)])
+    except Exception as exc:
+        logger.warning("US-141: offene Entscheidungen nicht bereinigt: %s", exc)
+    # AK-69: jedes Umschalten stößt einen Entdecken-Neulauf an (entprellt, Single-Flight)
+    _trigger_discover_debounced()
+    liste = gz.gebietsliste(list(LOCATIONS))
+    return {"ok": True, "land": land, "region": region, "enabled": an,
+            "locations_active": len(gz.aktive_orte(LOCATIONS)), "locations_count": len(LOCATIONS),
+            "laender": liste["laender"], "nachladen": _nachladen_info()}
+
+
+@app.get("/areas")
+async def get_areas(_role: str = Depends(auth.require_host)) -> dict:
+    """US-141: Alle Länder mit Regionen, Schalterzustand (Land: an/aus/teilweise, Region: an/aus)
+    und „aktive von gesamten Orten“ — für das Host-Menü „Regionen & Orte“."""
+    liste = gz.gebietsliste(list(LOCATIONS))
+    liste["nachladen"] = _nachladen_info()      # US-141 Baustein 3: Fortschritt des Nachladens
+    return liste
+
+
+@app.put("/areas/{land}")
+async def put_area_land(land: str, body: dict = Body(...), _role: str = Depends(auth.require_host)) -> dict:
+    """US-141: Land (Sammelschalter) an/aus: schaltet alle Regionen des Landes."""
+    an = _lese_schalter(body)
+    try:
+        eintraege = gz.eintraege_fuer_land(land, an)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unbekanntes Land.")
+    return await _schalte_gebiet(land, None, eintraege, an)
+
+
+@app.put("/areas/{land}/{region}")
+async def put_area_region(land: str, region: str, body: dict = Body(...), _role: str = Depends(auth.require_host)) -> dict:
+    """US-141: Region an/aus (Entscheidung 20: auch „Jetzt aktivieren“ für einen neuen Ort schaltet die Region)."""
+    an = _lese_schalter(body)
+    try:
+        eintraege = gz.eintraege_fuer_region(land, region, an)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unbekannte Region.")
+    return await _schalte_gebiet(land, region, eintraege, an)
+
+
+@app.post("/locations/{loc_id}/area-decision")
+async def post_area_decision(loc_id: str, body: dict = Body(...), _role: str = Depends(auth.require_host)) -> dict:
+    """US-141: Der Host lässt einen neuen Ort in ausgeschaltetem Gebiet ausgeschaltet („Ausgeschaltet lassen“).
+    Der Ort bleibt pausiert; nur der Hinweis „noch nicht entschieden“ verschwindet."""
+    if not any(l.id == loc_id for l in LOCATIONS):
+        raise HTTPException(status_code=404, detail="Location nicht gefunden.")
+    if not isinstance(body, dict) or body.get("decision") != "keep":
+        raise HTTPException(status_code=422, detail="Erwartet {\"decision\": \"keep\"}.")
+    _store.clear_area_undecided([loc_id])
+    logger.info("US-141: Ort %s bleibt ausgeschaltet (Entscheidung des Hosts)", loc_id)
+    return {"ok": True, "id": loc_id, "paused": True, "area_undecided": False}
+
+
+@app.get("/session")
+async def get_session(request: Request) -> dict:
+    """US-141: Rolle der laufenden Sitzung (das Sitzungscookie ist für die Seite unsichtbar). Nötig, damit die
+    Oberfläche den Host-Bereich zeigt, auch wenn der Browser die Anmeldung nur als Cookie kennt.
+    Ohne gültige Sitzung kommt 200 mit role=null (kein 401: ein Besucher vor der Anmeldung ist kein Fehler
+    und soll keine Fehlermeldung in der Browser-Konsole erzeugen)."""
+    try:
+        role = auth.role_for_token(request.cookies.get("fa_session", ""))
+    except Exception:
+        role = None
+    return {"role": role}
+
+
+@app.get("/area-suggestion")
+async def get_area_suggestion(lat: float, lon: float, _role: str = Depends(auth.require_auth)) -> dict:
+    """US-141: Land und Region für eine Lage (Vorschlag für die Anlege-Maske, nie nach Name), ob der
+    Vorschlag unsicher ist (Grenznähe) und ob dieses Gebiet gerade eingeschaltet ist."""
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise HTTPException(status_code=400, detail="Ungültige Koordinaten.")
+    z = gz.vorschlag(lat, lon)
+    return {"land": z.land, "region": z.region, "unsicher": z.unsicher,
+            "aktiv": gz.gebiet_ist_an(z.land, z.region)}
 
 
 @app.get("/opportunities")
@@ -3597,7 +4937,7 @@ async def get_opportunities(
 async def get_today_opportunities() -> list[dict]:
     today = date.today().isoformat()
     result = [
-        e for e in _feed_cache
+        e for e in _ohne_pausierte(_feed_cache)   # US-141: ohne pausierte Orte
         if e["shoot_time"][:10] == today
     ]
     result.sort(key=lambda e: -e["overall_score"])
@@ -3706,7 +5046,7 @@ async def daily_briefing(target_date: Optional[str] = None) -> DailyBriefingOut:
     d = date.fromisoformat(target_date) if target_date else date.today()
     day_str = d.isoformat()
 
-    day_opps = [e for e in _feed_cache if e["shoot_time"][:10] == day_str]
+    day_opps = [e for e in _ohne_pausierte(_feed_cache) if e["shoot_time"][:10] == day_str]   # US-141
     day_opps.sort(key=lambda e: (-e["alert_priority"], -e["overall_score"]))
     top10 = day_opps[:10]
 
@@ -3796,6 +5136,7 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
     365-Tage-Batch durch eine bedarfsgesteuerte, schnelle Monatsberechnung."""
     import asyncio as _asyncio
     from data.locations import LOCATIONS as _LOCS
+    version = _gebiets_version
     # TASK-86 (AK-2): Cache-Schlüssel rundet min_score auf 2 Nachkommastellen — die
     # tatsächliche Ergebnisfilterung (weiter unten/in get_calendar) bleibt exakt, nur
     # der Cache-Schlüssel wird normalisiert (bestätigte Annahme, Weg-Gate TASK-86).
@@ -3805,13 +5146,17 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
         _ondemand_month_cache.move_to_end(key)
         return _ondemand_month_cache[key]
     events: list = []
-    for i, loc in enumerate(_LOCS):
+    # US-141 (Gruppe B): der Kalender wird nur für aktive Orte gerechnet.
+    for i, loc in enumerate(gz.aktive_orte(list(_LOCS))):
         try:
             events.extend(await _compute_location_month(loc, year, month, min_score))
         except Exception as e:
             logger.error("On-Demand-Kalender %s %s-%s: %s", loc.id, year, month, e)
         if i % 8 == 0:
             await _asyncio.sleep(0)   # Event-Loop nicht blockieren
+    if version != _gebiets_version:
+        # Währenddessen wurde umgeschaltet: Ergebnis nicht speichern, aber ohne pausierte Orte ausliefern.
+        return _ohne_pausierte(events)
     _ondemand_month_cache[key] = events
     # TASK-86 (AK-3): Höchstgröße einhalten — ältesten Eintrag verdrängen (FIFO).
     while len(_ondemand_month_cache) > _ONDEMAND_MONTH_CACHE_MAX_SIZE:
@@ -3842,7 +5187,8 @@ async def get_calendar(
             if loc is None:
                 return {"status": "not_found", "events": [], "total": 0,
                         "message": f"Location {location_id} unbekannt."}
-            events = await _compute_location_month(loc, year, month, min_score)
+            # US-141: für einen pausierten Ort gibt es keinen Kalender (Anzeige: „pausiert“)
+            events = [] if gz.ist_pausiert(loc) else await _compute_location_month(loc, year, month, min_score)
         else:
             # Alle Locations: aus dem Monats-Cache (oder bei Bedarf einmal rechnen)
             events = await _compute_month_all_locations(year, month, min_score)
@@ -3865,6 +5211,9 @@ async def get_calendar(
         events = [e for e in events if int(e["shoot_time"][:4]) == year]
     if min_score != 0.35:
         events = [e for e in events if e["overall_score"] >= min_score]
+    # US-141: Termine pausierter Orte werden nie ausgeliefert (erst NACH den anderen Filtern, damit die
+    # große Kalenderliste nicht vollständig durchsucht wird)
+    events = _ohne_pausierte(events)
 
     return {
         "status": "ok",
@@ -3895,7 +5244,8 @@ async def get_discover(
             "message": "Scout-Pipeline läuft noch. Bitte in 1–2 Minuten neu laden.",
         }
 
-    opps = list(_discover_cache.get("opportunities", []))
+    # US-141: Ergebnisse, deren Orte alle pausiert sind, werden sofort ausgeblendet (der Neulauf folgt im Hintergrund)
+    opps = _entdecken_sichtbar(list(_discover_cache.get("opportunities", [])))
     cutoff = (date.today() + timedelta(days=days)).isoformat()
 
     if subject_id:
@@ -4040,6 +5390,9 @@ async def trigger_weather_refresh(background_tasks: BackgroundTasks, _role: str 
     Aktualisiert nur das Wetter-Overlay (T+3 Tage) im Hintergrund.
     Schnell: ~10–15s. Kein precompute nötig.
     """
+    if _weather_run_active:
+        # BUG-117 AK-6: kein zweiter Lauf neben dem laufenden
+        return {"status": "already_running", "message": "Wetterlauf läuft bereits."}
     background_tasks.add_task(_weather_overlay, triggered_by="manual")
     return {"status": "started", "message": "Wetter-Overlay gestartet (~10s)."}
 
@@ -4218,12 +5571,16 @@ class PreviewAlignmentRequest(BaseModel):
     save: bool = False
     category: str = "SKYLINE"  # US-76: LocationCategory-Key, Default = SKYLINE
     special_notes: str = ""  # BUG-65: optionaler Hinweise-Text aus der Anlage-Maske
+    # US-141: Land/Region wählt nur der Host bei der Anlage (sonst Vorschlag aus der Lage)
+    land: Optional[str] = None
+    region: Optional[str] = None
 
 
 async def _save_alignment_as_location(
     req: "PreviewAlignmentRequest",
     profile,
     focal_length_mm: int,
+    host: bool = False,
 ) -> Optional[str]:
     """
     Speichert das Alignment-Ergebnis als neue Custom Location.
@@ -4256,10 +5613,33 @@ async def _save_alignment_as_location(
         special_notes=req.special_notes,  # BUG-65: Nutzer-Hinweistext aus der Anlage-Maske durchreichen (BUG-60: weiterhin keine automatische Notiz)
         difficulty=1,
     )
+    # US-141: Land und Region aus der Lage (nie nach Name). Nur der Host darf sie bei der Anlage
+    # selbst wählen; für alle anderen zählt der Vorschlag.
+    _vorschlag = gz.vorschlag(req.observer_lat, req.observer_lon, req.subject_name)
+    _land, _region = _vorschlag.land, _vorschlag.region
+    if host and getattr(req, "land", None):
+        _land, _region = gz.normiere(req.land, getattr(req, "region", None))
+        if not _regionen.ist_gueltig(_land, _region):
+            raise HTTPException(status_code=422, detail="Die Region gehört nicht zu diesem Land.")
+    new_loc.land, new_loc.region = _land, _region
     LOCATIONS.append(new_loc)
     _save_custom_location(new_loc)
+    try:
+        _save_location_override(new_loc.id, land=_land, region=_region)
+    except Exception as exc:
+        logger.warning("US-141: Zuordnung für %s nicht gespeichert (%s) – sie wird beim nächsten Start ergänzt", new_loc.id, exc)
+    # US-141: Ein Ort in einem ausgeschalteten Land oder einer ausgeschalteten Region startet pausiert
+    # und bleibt es, bis der Host das Gebiet einschaltet (kein Feed, kein Wetter, kein „wird aktualisiert“).
+    _pausiert = gz.ist_pausiert(new_loc)
+    if _pausiert:
+        logger.info("US-141: neuer Ort %s startet pausiert (%s / %s ist aus)", new_loc.id, _land, _region)
+        try:
+            _store.mark_area_undecided(new_loc.id)
+        except Exception as exc:
+            logger.warning("US-141: offene Entscheidung für %s nicht vermerkt: %s", new_loc.id, exc)
     # BUG-35: Recompute als pending markieren bevor Task startet
-    _recompute_pending.add(new_loc.id)
+    if not _pausiert:
+        _recompute_pending.add(new_loc.id)
     # TASK-17: Recompute-Hook auch für neue Custom Locations triggern (war vorher missing)
     asyncio.create_task(_run_precompute_single(new_loc.id))
     # US-106 Teil 2: neue Location zeitnah auch im Entdecken-Bereich
@@ -4362,7 +5742,8 @@ async def preview_alignment(req: PreviewAlignmentRequest, request: Request = Non
 
     all_alignments.sort(key=lambda a: a.time)
 
-    saved = await _save_alignment_as_location(req, profile, focal_length_mm)
+    saved = await _save_alignment_as_location(req, profile, focal_length_mm, host=(_role == "host"))
+    _neu = next((l for l in LOCATIONS if l.id == saved), None) if saved else None
 
     return {
         "profile": {
@@ -4388,6 +5769,10 @@ async def preview_alignment(req: PreviewAlignmentRequest, request: Request = Non
         ],
         "saved": saved is not None,
         "location_id": saved,  # BUG-35: ID für Frontend-Polling
+        # US-141: wohin der neue Ort gehört und ob er pausiert startet (die Oberfläche zeigt dann den Hinweis)
+        "land": getattr(_neu, "land", None) if _neu else None,
+        "region": getattr(_neu, "region", None) if _neu else None,
+        "paused": gz.ist_pausiert(_neu) if _neu else False,
     }
 
 
@@ -4722,6 +6107,14 @@ def _validate_patch_fields(allowed: dict) -> dict:
             raise HTTPException(status_code=422, detail=f"{f} muss 1, 2 oder 3 sein.")
         allowed[f] = ival
 
+    # US-141: Land und Region — nur bekannte Werte (die feste Liste aus data/regionen.py)
+    for f in GEBIET_FIELDS & allowed.keys():
+        val = allowed[f]
+        if f == "land" and (not isinstance(val, str) or val not in _regionen.REGIONEN):
+            raise HTTPException(status_code=422, detail="land ist kein bekanntes Land.")
+        if f == "region" and val is not None and not isinstance(val, str):
+            raise HTTPException(status_code=422, detail="region muss ein Text oder leer sein.")
+
     # focal_length_suggestions validieren (BUG-22)
     if "focal_length_suggestions" in allowed:
         val = allowed["focal_length_suggestions"]
@@ -4748,10 +6141,43 @@ def _compute_patch_persist_fields(allowed: dict) -> dict:
     return allowed
 
 
+def _normiere_gebiet_patch(allowed: dict, target_loc) -> dict:
+    """US-141: Macht aus den angegebenen Feldern land/region ein gültiges Paar (beide werden immer
+    zusammen gespeichert). Nur Region -> Land bleibt; nur Land -> Region bleibt, wenn es dasselbe
+    Land ist, sonst der Vorschlag aus der Lage (falls dasselbe Land) oder „Ohne Region“.
+    Wirft 422 bei einer Region, die nicht zum Land gehört."""
+    if not (GEBIET_FIELDS & allowed.keys()):
+        return allowed
+    akt_land, akt_region = gz.gebiet_des_ortes(target_loc)
+    land = allowed.get("land", akt_land)
+    if "region" in allowed:
+        region = allowed["region"]
+    elif land == akt_land:
+        region = akt_region
+    else:
+        vorschlag = gz.vorschlag(target_loc.observer_lat, target_loc.observer_lon)
+        region = vorschlag.region if vorschlag.land == land else None
+    land, region = gz.normiere(land, region)
+    if not _regionen.ist_gueltig(land, region):
+        raise HTTPException(status_code=422, detail="Die Region gehört nicht zu diesem Land.")
+    neu = dict(allowed)
+    neu["land"], neu["region"] = land, region
+    return neu
+
+
 def _persist_location_patch(loc_id: str, persist_fields: dict) -> None:
     """TASK-60 (aus patch_location extrahiert): Custom-/Standard-Location-Verzweigung für die
     Persistierung eines PATCH. Wirft HTTPException(404) wenn eine Custom-Location nicht in der
-    Datei/DB gefunden wird."""
+    Datei/DB gefunden wird.
+
+    US-141: Land und Region werden immer als Korrektur (Override) gespeichert, auch für eigene Orte
+    (die Tabelle der eigenen Orte hat dafür keine Spalten)."""
+    gebiet = {k: v for k, v in persist_fields.items() if k in GEBIET_FIELDS}
+    if gebiet:
+        _save_location_override(loc_id, **gebiet)
+        persist_fields = {k: v for k, v in persist_fields.items() if k not in GEBIET_FIELDS}
+        if not persist_fields:
+            return
     if loc_id.startswith("custom_"):
         # subject_height_researched ist keine Spalte in custom_locations (Custom-Locations
         # werden nie mit False angelegt, Default bleibt beim Neu-Laden ohnehin True) — nicht an
@@ -4773,7 +6199,10 @@ def _trigger_patch_recompute(loc_id: str, allowed: dict) -> bool:
     needs_recompute = bool(RECOMPUTE_TRIGGER_FIELDS & allowed.keys())
     if needs_recompute:
         logger.info("Recompute-relevante Felder für '%s' geändert – starte Single-Location Recompute", loc_id)
-        _recompute_pending.add(loc_id)  # US-106: sofort pending, damit Banner ehrlich bleibt
+        # US-141: ein pausierter Ort bekommt nur seine Ortsdaten neu gerechnet (kein Feed/Wetter) —
+        # also auch kein „wird aktualisiert“-Hinweis.
+        if loc_id not in _pausierte_ort_ids():
+            _recompute_pending.add(loc_id)  # US-106: sofort pending, damit Banner ehrlich bleibt
         asyncio.create_task(_run_precompute_single(loc_id))
         _trigger_discover_debounced()  # US-106 Teil 2: Entdecken zieht zeitnah nach
     return needs_recompute
@@ -4799,6 +6228,10 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
     if not target_loc:
         raise HTTPException(status_code=404, detail="Location nicht gefunden.")
 
+    # US-141: Land/Region zu einem gültigen Paar machen (422 bei falscher Region)
+    allowed = _normiere_gebiet_patch(allowed, target_loc)
+    vorher_pausiert = _pausierte_ort_ids() if GEBIET_FIELDS & allowed.keys() else None
+
     persist_fields = _compute_patch_persist_fields(allowed)
     _persist_location_patch(loc_id, persist_fields)
 
@@ -4812,13 +6245,27 @@ async def patch_location(loc_id: str, body: dict = Body(...), _role: str = Depen
             v = coerce_category_value(v)
         setattr(target_loc, k, v)
 
+    # US-141: Umhängen in ein anderes Land/eine andere Region ändert, ob der Ort pausiert ist
+    if vorher_pausiert is not None:
+        _nach_gebietsaenderung(vorher_pausiert)
+        _trigger_discover_debounced()
+
     needs_recompute = _trigger_patch_recompute(loc_id, allowed)
 
     # TASK-18: Backup nach jedem erfolgreichen Edit (im Test-Modus aus – keine Git-Operationen)
     if not _NO_BACKGROUND:
         asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))
 
-    return {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute}
+    antwort = {"ok": True, "updated": allowed, "recompute_triggered": needs_recompute,
+               "paused": gz.ist_pausiert(target_loc)}
+    # AK-87: ändert der Host die Koordinaten, ändert sich die Zuordnung NICHT von selbst; die Antwort
+    # nennt nur den Vorschlag für die neue Lage (die Oberfläche fragt dann nach).
+    if COORD_FIELDS & allowed.keys() and not (GEBIET_FIELDS & allowed.keys()):
+        v = gz.vorschlag(target_loc.observer_lat, target_loc.observer_lon)
+        akt = gz.gebiet_des_ortes(target_loc)
+        antwort["gebiet_vorschlag"] = {"land": v.land, "region": v.region, "unsicher": v.unsicher,
+                                       "abweichend": (v.land, v.region) != tuple(akt)}
+    return antwort
 
 
 # ---------------------------------------------------------------------------
@@ -4866,6 +6313,15 @@ async def delete_location(loc_id: str, _role: str = Depends(auth.require_host)) 
     # Feed- und Kalender-Cache bereinigen (Events dieser Location)
     _feed_cache     = [e for e in _feed_cache     if e.get("location_id") != loc_id]
     _calendar_cache = [e for e in _calendar_cache if e.get("location_id") != loc_id]
+
+    # BUG-118 (AK1): auch die Feed-DATEI auf der Festplatte bereinigen. Bisher blieb sie unverändert;
+    # Serverstart, jede Einzel-Neuberechnung eines anderen Orts und die Sichtachsen-Prüfung lasen die
+    # alte Datei wieder ein, und die Termine des gelöschten Orts waren zurück. Die große calendar.json
+    # bleibt unangetastet (sie wird beim Einlesen bereinigt, siehe _load_calendar_cache).
+    try:
+        await asyncio.to_thread(cache_io.orte_aus_feed_entfernen, _OPP_CACHE, [loc_id])
+    except Exception as exc:
+        logger.warning("BUG-118: Feed-Datei nach dem Löschen von %s nicht bereinigt: %s", loc_id, exc)
 
     if not _NO_BACKGROUND:
         asyncio.create_task(asyncio.to_thread(backup.backup_after_edit, loc_id))

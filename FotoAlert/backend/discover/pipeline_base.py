@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import logging
 import math
+import threading
+import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import Optional
@@ -207,20 +209,64 @@ def weather_desc(hw) -> str:
 
 _weather_cache: dict[str, WeatherForecast] = {}
 
+# US-141 Baustein 3 (AK-104/105): Zähler der Wetteranfragen des Scouts (Entdecken). Der Scout
+# schöpft aus demselben Kontingent wie der Ortswetter-Lauf, wird aber getrennt ausgewiesen.
+# Jede Anfrage zählt (auch fehlgeschlagene); abgelehnte = HTTP 429. Läuft in Worker-Threads,
+# darum mit Sperre. Zurückgesetzt wird beim Leeren des Wetter-Caches (Beginn eines Scout-Laufs).
+_zaehler_lock = threading.Lock()
+_zaehler = {"anfragen": 0, "abgelehnt": 0, "start": time.monotonic()}
+
+
+def _ist_429(exc: BaseException) -> bool:
+    antwort = getattr(exc, "response", None)
+    return getattr(antwort, "status_code", None) == 429
+
 
 async def get_weather(lat: float, lon: float) -> Optional[WeatherForecast]:
     """Wetter-Forecast mit Positions-Caching (auf 0.1° gerundet)."""
     key = f"{round(lat, 1)},{round(lon, 1)}"
     if key not in _weather_cache:
+        with _zaehler_lock:
+            _zaehler["anfragen"] += 1
         try:
             fc = await fetch_weather_forecast(lat, lon, days=14)
             _weather_cache[key] = fc
         except Exception as e:
+            if _ist_429(e):
+                with _zaehler_lock:
+                    _zaehler["abgelehnt"] += 1
             log.warning("Wetter-API Fehler für %s: %s", key, e)
             return None
     return _weather_cache.get(key)
 
 
+def zaehlzeile(pipeline: str) -> str:
+    """Text der Zählzeile des Scouts (Entdecken): bisher gestellte Anfragen im laufenden Scout-Lauf,
+    davon abgelehnte (429), Anteil in Prozent, Dauer. Enthält keine Ortsnamen."""
+    with _zaehler_lock:
+        n, a, t0 = _zaehler["anfragen"], _zaehler["abgelehnt"], _zaehler["start"]
+    anteil = (100.0 * a / n) if n else 0.0
+    return ("Entdecken (Scout) %s: im Scout-Lauf bisher gesamt %d Anfragen, davon %d abgelehnt (429), "
+            "Anteil %s %% · Dauer %s s") % (
+        pipeline, n, a, ("%.1f" % anteil).replace(".", ","), ("%.1f" % (time.monotonic() - t0)).replace(".", ","))
+
+
+def zaehler_entnehmen() -> tuple:
+    """BUG-117 Nachfund 2: liefert (Anfragen, abgelehnt) seit der letzten Entnahme und setzt beide auf null,
+    in einem Schritt unter der Sperre. So wird jede Scout-Anfrage genau einmal auf den Tagesstand gebucht
+    (nicht doppelt, wenn ein Durchgang abbricht, und nichts geht zwischen Lesen und Zurücksetzen verloren).
+    Die Zählzeile des laufenden Scout-Laufs ist davon nicht betroffen (Entnahme erst nach dem Lauf)."""
+    with _zaehler_lock:
+        n, a = _zaehler["anfragen"], _zaehler["abgelehnt"]
+        _zaehler["anfragen"] = 0
+        _zaehler["abgelehnt"] = 0
+    return n, a
+
+
 def clear_weather_cache() -> None:
-    """Vor jedem Pipeline-Run leeren, damit kein Stale-Cache entsteht."""
+    """Vor jedem Pipeline-Run leeren, damit kein Stale-Cache entsteht (und die Anfragen-Zähler neu beginnen)."""
     _weather_cache.clear()
+    with _zaehler_lock:
+        _zaehler["anfragen"] = 0
+        _zaehler["abgelehnt"] = 0
+        _zaehler["start"] = time.monotonic()

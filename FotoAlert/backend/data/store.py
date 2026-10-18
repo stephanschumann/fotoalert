@@ -153,6 +153,41 @@ CREATE TABLE IF NOT EXISTS job_runs (
 
 CREATE INDEX IF NOT EXISTS idx_job_runs_ts  ON job_runs(ts);
 CREATE INDEX IF NOT EXISTS idx_job_runs_job ON job_runs(job);
+
+-- US-141 (Baustein 1): Ein-/Aus-Zustand je Land und Region (Wege-Gate Option A).
+-- region = '' ist der Eintrag des Landes selbst (nur für Länder ohne Regionen oder ein
+-- ausdrücklich ausgeschaltetes Land); sonst eine Zeile je Region. Fehlende Zeile heißt „an“.
+CREATE TABLE IF NOT EXISTS area_states (
+    land     TEXT    NOT NULL,
+    region   TEXT    NOT NULL DEFAULT '',
+    active   INTEGER NOT NULL DEFAULT 1,
+    updated  TEXT    DEFAULT NULL,
+    PRIMARY KEY (land, region)
+);
+
+-- US-141 (Baustein 2): Neue Orte in ausgeschaltetem Gebiet, über die der Host noch nicht entschieden hat
+-- (Hinweis „Jetzt aktivieren / Ausgeschaltet lassen“ bleibt, bis gewählt wurde).
+CREATE TABLE IF NOT EXISTS area_undecided (
+    location_id TEXT PRIMARY KEY,
+    created     TEXT DEFAULT NULL
+);
+
+-- US-141 (Baustein 3): Orte, für die nach dem Einschalten eines Gebiets noch nachgeladen wird. Übersteht einen
+-- Serverneustart (unvollendete Läufe werden beim Start wieder aufgenommen). Eine Zeile je Ort; sie wird
+-- gelöscht, sobald der Ort fertig ist, das Gebiet wieder ausgeschaltet oder der Ort gelöscht wurde.
+CREATE TABLE IF NOT EXISTS area_nachladen (
+    location_id TEXT PRIMARY KEY,
+    created     TEXT DEFAULT NULL
+);
+
+-- US-141 (Kalender beim Einschalten): Orte, deren Kalender nach dem Einschalten noch eingemischt werden muss.
+-- Getrennt von area_nachladen, weil die Chancen eines Orts früher fertig sind als sein Kalender: nach einem
+-- Neustart wird dann nur noch der Kalender nachgeholt. Die Zeile wird gelöscht, sobald der Kalender des Orts
+-- eingemischt oder der Schritt endgültig aufgegeben ist (Fehler, Gebiet ausgeschaltet, Ort gelöscht).
+CREATE TABLE IF NOT EXISTS area_nachladen_kalender (
+    location_id TEXT PRIMARY KEY,
+    created     TEXT DEFAULT NULL
+);
 """
 
 
@@ -390,6 +425,32 @@ class LocationStore:
             except Exception:
                 conn.execute("ROLLBACK")
                 raise
+
+    def upsert_overrides_bulk(self, aenderungen: dict) -> int:
+        """US-141: Mehrere Korrekturen in EINER Transaktion ergänzen (alles oder nichts).
+        aenderungen: {ort_id: {feld: wert, ...}}. Vorhandene Felder werden gemergt. Gibt die Zahl
+        der berührten Orte zurück."""
+        if not aenderungen:
+            return 0
+        with self._connect() as conn:
+            conn.execute("BEGIN")
+            try:
+                for loc_id, fields in aenderungen.items():
+                    row = conn.execute("SELECT fields FROM location_overrides WHERE id = ?", (loc_id,)).fetchone()
+                    if row:
+                        bestehend = json.loads(row["fields"])
+                        bestehend.update(fields)
+                        conn.execute("UPDATE location_overrides SET fields = ? WHERE id = ?",
+                                     (json.dumps(bestehend, ensure_ascii=False), loc_id))
+                    else:
+                        conn.execute("INSERT INTO location_overrides (id, fields) VALUES (?, ?)",
+                                     (loc_id, json.dumps(fields, ensure_ascii=False)))
+                conn.execute("COMMIT")
+            except Exception:
+                conn.execute("ROLLBACK")
+                raise
+        logger.info("Korrekturen gebündelt gespeichert: %d Orte", len(aenderungen))
+        return len(aenderungen)
 
     def load_all_overrides(self) -> list[dict]:
         """Lädt alle Overrides als Liste von dicts mit `id` + Feldern flach."""
@@ -720,6 +781,131 @@ class LocationStore:
                 "SELECT device_id, sensor, fl, ori, updated FROM camera_profiles"
             ).fetchall()
         return [dict(row) for row in rows]
+
+    # ------------------------------------------------------------------
+    # US-141: Zustand je Land und Region (area_states)
+    # ------------------------------------------------------------------
+
+    def load_area_states(self) -> dict:
+        """Liest den gespeicherten Zustand in der Form, die data.aktiv_regel erwartet:
+        {"laender": {land: bool}, "regionen": {(land, region): bool}}."""
+        laender: dict = {}
+        regionen: dict = {}
+        with self._connect() as conn:
+            rows = conn.execute("SELECT land, region, active FROM area_states").fetchall()
+        for row in rows:
+            if row["region"]:
+                regionen[(row["land"], row["region"])] = bool(row["active"])
+            else:
+                laender[row["land"]] = bool(row["active"])
+        return {"laender": laender, "regionen": regionen}
+
+    def set_area_state(self, land: str, region: str, active: bool) -> None:
+        """Setzt den Zustand einer Region (region='' = das Land selbst)."""
+        self.set_area_states_bulk([(land, region, active)])
+
+    def set_area_states_bulk(self, eintraege) -> int:
+        """Setzt mehrere Zustände in EINER Transaktion (alles oder nichts).
+        eintraege: Liste von (land, region, active). Gibt die Anzahl zurück."""
+        eintraege = [(l, r or "", 1 if a else 0) for (l, r, a) in eintraege]
+        with self._connect() as conn:
+            conn.executemany(
+                "INSERT INTO area_states (land, region, active, updated) "
+                "VALUES (?, ?, ?, datetime('now')) "
+                "ON CONFLICT(land, region) DO UPDATE SET active = excluded.active, "
+                "updated = excluded.updated",
+                eintraege,
+            )
+        return len(eintraege)
+
+    def seed_area_states(self, eintraege) -> int:
+        """Legt nur FEHLENDE Zustände an (INSERT OR IGNORE) und überschreibt nie einen
+        bestehenden — dadurch ist die Migration beliebig oft wiederholbar. Gibt die Zahl
+        der neu angelegten Zeilen zurück."""
+        neu = 0
+        with self._connect() as conn:
+            for (land, region, active) in eintraege:
+                cur = conn.execute(
+                    "INSERT OR IGNORE INTO area_states (land, region, active, updated) "
+                    "VALUES (?, ?, ?, datetime('now'))",
+                    (land, region or "", 1 if active else 0),
+                )
+                neu += cur.rowcount
+        return neu
+
+    # Die drei „Merklisten“ (area_undecided, area_nachladen, area_nachladen_kalender) haben denselben Aufbau
+    # (location_id, created). Die Tabellennamen sind feste Werte aus dem Code, nie Eingaben von außen.
+    def _merke_ids(self, tabelle: str, location_ids) -> int:
+        ids = [(i,) for i in location_ids]
+        if not ids:
+            return 0
+        with self._connect() as conn:
+            conn.executemany(
+                "INSERT OR IGNORE INTO %s (location_id, created) VALUES (?, datetime('now'))" % tabelle, ids)
+        return len(ids)
+
+    def _vergiss_ids(self, tabelle: str, location_ids) -> int:
+        ids = [(i,) for i in location_ids]
+        if not ids:
+            return 0
+        with self._connect() as conn:
+            conn.executemany("DELETE FROM %s WHERE location_id = ?" % tabelle, ids)
+        return len(ids)
+
+    def _lade_ids(self, tabelle: str) -> set:
+        with self._connect() as conn:
+            return {r[0] for r in conn.execute("SELECT location_id FROM %s" % tabelle).fetchall()}
+
+    def mark_area_undecided(self, location_id: str) -> None:
+        self._merke_ids("area_undecided", [location_id])
+
+    def clear_area_undecided(self, location_ids) -> int:
+        return self._vergiss_ids("area_undecided", location_ids)
+
+    def load_area_undecided(self) -> set:
+        return self._lade_ids("area_undecided")
+
+    def merke_nachladen(self, location_ids) -> int:
+        return self._merke_ids("area_nachladen", location_ids)
+
+    def vergiss_nachladen(self, location_ids) -> int:
+        return self._vergiss_ids("area_nachladen", location_ids)
+
+    def lade_nachladen(self) -> set:
+        return self._lade_ids("area_nachladen")
+
+    def merke_nachladen_kalender(self, location_ids) -> int:
+        return self._merke_ids("area_nachladen_kalender", location_ids)
+
+    def vergiss_nachladen_kalender(self, location_ids) -> int:
+        return self._vergiss_ids("area_nachladen_kalender", location_ids)
+
+    def lade_nachladen_kalender(self) -> set:
+        return self._lade_ids("area_nachladen_kalender")
+
+    def area_state_count(self) -> int:
+        with self._connect() as conn:
+            return conn.execute("SELECT COUNT(*) FROM area_states").fetchone()[0]
+
+    def sichere_datenbank(self, zusatz: str = "vor_gebiete") -> Optional[Path]:
+        """Konsistente Kopie der Datenbank neben der Datei (SQLite-Backup-Schnittstelle, auch
+        bei laufendem Betrieb sicher). Gibt den Pfad zurück, None wenn es noch keine Datei gibt.
+        Der Name passt bewusst NICHT auf das Muster fotoalert_*.db der Snapshot-Aufräumung."""
+        if not Path(self.db_path).exists():
+            return None
+        from datetime import datetime as _dt
+        ziel = Path(self.db_path).with_name(
+            "{}.{}_{}.bak".format(Path(self.db_path).stem, zusatz, _dt.now().strftime("%Y%m%d_%H%M%S")))
+        quelle = self._connect()
+        try:
+            kopie = sqlite3.connect(str(ziel))
+            try:
+                quelle.backup(kopie)
+            finally:
+                kopie.close()
+        finally:
+            quelle.close()
+        return ziel
 
     def integrity_check(self) -> list[str]:
         """Führt PRAGMA integrity_check aus.

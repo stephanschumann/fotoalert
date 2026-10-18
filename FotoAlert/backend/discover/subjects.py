@@ -18,6 +18,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
+from data import gebiet_zustand as gz  # US-141: nur aktive Orte liefern Motive
 from data.locations import LOCATIONS, LocationCategory
 
 
@@ -196,8 +197,20 @@ def build_subjects(
             and not _is_placeholder(loc))
     ]
 
+    # US-141 (Gruppe B): Motive entstehen nur aus AKTIVEN Orten (Land und Region an). Name, Höhe und
+    # Breite eines gemeinsamen Motivs kommen so vom aktiven Ort, auch wenn ein pausierter Ort zuerst
+    # in der Liste steht. Die Standpunkte ALLER Orte (auch der pausierten) bleiben Sperrzonen (siehe
+    # unten), damit der Scout nie einen schon bekannten Standpunkt als „neue Perspektive“ vorschlägt.
+    aktive = gz.aktive_orte(candidates)
+    aktive_ids = {loc.id for loc in aktive}
+    pausierte = [loc for loc in candidates if loc.id not in aktive_ids]
+
     # 2. Dedupliziere nach Subject-Koordinaten (DEDUP_RADIUS_M)
-    groups = _group_location_candidates(candidates)
+    groups = _group_location_candidates(aktive)
+    for g in groups:
+        for loc in pausierte:
+            if _haversine_m(loc.subject_lat, loc.subject_lon, g["subject_lat"], g["subject_lon"]) < _DEDUP_RADIUS_M:
+                g["observers"].append((loc.observer_lat, loc.observer_lon))
 
     # 3. Baue DiscoverSubject-Objekte
     subjects: list[DiscoverSubject] = []

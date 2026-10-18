@@ -24,7 +24,7 @@ from discover.geometry import destination_point
 from discover.pipeline_base import (
     D_MIN_M, D_MAX_M,
     W_ALIGNMENT, W_PHASE, W_LICHT, W_KOMPOSITION, W_WETTER,
-    ScoutOpportunity,
+    ScoutOpportunity, zaehlzeile,
     is_new_perspective, compute_d, light_reference, build_day_sessions,
     score_licht, score_komposition, weather_desc, get_weather,
 )
@@ -180,4 +180,5 @@ async def run(days: int = 14) -> list[ScoutOpportunity]:
                     all_opportunities.append(best)
 
     log.info("[Mond] %d Chancen gefunden.", len(all_opportunities))
+    log.info("%s", zaehlzeile("Mond"))
     return all_opportunities

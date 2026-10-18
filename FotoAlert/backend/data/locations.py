@@ -128,6 +128,12 @@ class PhotoLocation:
     # nutzt dieses Flag statt der reinen Magic-Number-Heuristik `height == 20`.
     subject_height_researched: bool = True
 
+    # US-141: Land und Region des Orts (aus den Koordinaten vorgeschlagen, vom Host änderbar).
+    # None = noch nicht zugeordnet; die Zuordnung wird beim Serverstart ergänzt und gespeichert.
+    # Region None bei Ländern ohne Regionen ("Sonstige").
+    land: Optional[str] = None
+    region: Optional[str] = None
+
 
 # ---------------------------------------------------------------------------
 # US-128: Zentrale Feld-Metadaten für PATCH /locations/{id} + Override-Reload
@@ -202,6 +208,13 @@ LOCATION_FIELD_RULES: dict[str, dict] = {
     # "numeric"-Regel (die würde auf float casten -- schemas.py:LocationOut.difficulty
     # ist int).
     "difficulty": {"kind": "difficulty", "recompute": False, "override_reload": True, "precompute_reload": True},
+
+    # US-141: Land und Region je Ort (Textwerte aus der festen Liste in data/regionen.py). Löst KEINE
+    # Neuberechnung aus (die Zuordnung ändert nur, welcher Schalter für den Ort gilt). main.py speichert
+    # sie immer als Korrektur (Override), auch für eigene Orte; die Prüfung auf gültige Werte steht in
+    # main.py (_validate_patch_fields / _normiere_gebiet_patch), nicht in der allgemeinen Textprüfung.
+    "land":   {"kind": "text", "recompute": False, "override_reload": True, "precompute_reload": True},
+    "region": {"kind": "text", "recompute": False, "override_reload": True, "precompute_reload": True},
 }
 
 # Abgeleitete Sichten (jeweils zur Laufzeit aus LOCATION_FIELD_RULES berechnet,
@@ -215,6 +228,8 @@ LIST_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] 
 # beide passen nicht zu den bestehenden "text"/"numeric"-Validierungen.
 CATEGORY_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "category")
 DIFFICULTY_FIELDS = frozenset(f for f, r in LOCATION_FIELD_RULES.items() if r["kind"] == "difficulty")
+# US-141: Land/Region werden zusammen und anders als die übrigen Textfelder behandelt.
+GEBIET_FIELDS = frozenset({"land", "region"})
 # Über den generischen PATCH-Endpoint akzeptierte Felder (main.py:patch_location) —
 # "image"- und "flag"-Felder bewusst ausgeschlossen (eigener Endpoint bzw. reiner
 # Seiteneffekt, kein direkt vom Host patchbarer Wert; unverändertes Verhalten für image).

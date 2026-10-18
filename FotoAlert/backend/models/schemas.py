@@ -56,6 +56,13 @@ class LocationOut(BaseModel):
     # US-09: Sichtachsen-Check (Raycast-Hinderniserkennung, einmalig vorberechnet)
     sightline_status: str = "nicht_geprueft"
     sightline_angle_deg: Optional[float] = None
+    # US-141: Land und Region des Orts (Region None bei „Sonstige“) und ob der Ort pausiert ist
+    # (Land oder Region ausgeschaltet). „paused“ wird nur abgeleitet, nie direkt gesetzt.
+    land: Optional[str] = None
+    region: Optional[str] = None
+    paused: bool = False
+    # US-141: neuer Ort in ausgeschaltetem Gebiet, über den der Host noch nicht entschieden hat
+    area_undecided: bool = False
 
 
 class OpportunityOut(BaseModel):
@@ -145,6 +152,8 @@ class HealthOut(BaseModel):
         ),
     )
     locations_count: int
+    # US-141: Zahl der aktiven (nicht pausierten) Orte; locations_count bleibt die Gesamtzahl.
+    locations_active: Optional[int] = None
     # US-38: additiv ergänzt — bestehende Konsumenten, die nur `status` lesen
     # (z.B. deploy/deploy.sh), funktionieren unverändert weiter.
     subsystems: SubsystemStatus

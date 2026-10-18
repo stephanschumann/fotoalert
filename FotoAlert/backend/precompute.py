@@ -22,6 +22,8 @@ Ausführung:
   python3 precompute.py --calendar-only           # Nur Kalender (inkrementell)
   python3 precompute.py --full                    # Kalender vollständig neu berechnen
   python3 precompute.py --feed-only --location-id pfingstberg  # Nur eine Location
+  python3 precompute.py --feed-only --location-ids a,b,c        # US-141: mehrere Orte in einem Lauf (Nachladen)
+  python3 precompute.py --feed-only --location-ids a,b,c --mit-kalender   # ... und danach deren Kalender
 
 Automatisch täglich per Cron (00:01 Uhr UTC):
   1 0 * * * cd "/Users/stephan/Claude/Projects/Foto Location Guide/FotoAlert/backend" && python3 precompute.py >> logs/precompute.log 2>&1
@@ -35,6 +37,7 @@ import hashlib
 import json
 import logging
 import math
+import os
 import sys
 import time
 from datetime import date, datetime, timedelta, timezone
@@ -51,6 +54,8 @@ from data.locations import (
     LOCATIONS, PhotoLocation, LocationCategory, coerce_category_value, PRECOMPUTE_OVERRIDE_FIELDS,
 )
 from data.store import LocationStore
+from data import aktiv_regel, cache_io   # US-141/BUG-118: zentrale Aktiv-Regel, sicheres Schreiben
+from data import gebiet_zustand as gz     # US-141 Baustein 2: welche Orte sind aktiv (Land/Region an)?
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Algorithmus-Version: Bump bei Änderungen an opportunity.py / astronomy.py,
@@ -181,6 +186,15 @@ def _apply_location_overrides() -> int:
         logger.warning("Location-Overrides nicht ladbar (%s) – rechne mit Basis-Koordinaten", exc)
         return 0
 
+    # BUG-118: Standard-Orte mit Lösch-Markierung (Tombstone) aus der Ortsliste nehmen, so wie es
+    # main.py:_load_location_overrides beim Serverstart tut. Bisher kannte dieser eigene Prozess die
+    # Markierung nicht und rechnete gelöschte Orte jede Nacht weiter — ihre Chancen kamen zurück.
+    # Die Frage „gelöscht?“ beantwortet die zentrale Regel (data/aktiv_regel.py).
+    geloescht = aktiv_regel.geloeschte_ids(overrides)
+    if geloescht:
+        LOCATIONS[:] = [l for l in LOCATIONS if l.id not in geloescht]
+        logger.info("BUG-118: %d gelöschte Standard-Orte von der Berechnung ausgenommen", len(geloescht))
+
     loc_map = {loc.id: loc for loc in LOCATIONS}
     applied = 0
     for ov in overrides:
@@ -244,6 +258,7 @@ def _load_custom_locations() -> int:
                 special_notes=e.get("special_notes", ""),
                 difficulty=e.get("difficulty", 1),
                 observer_floor_height_m=float(e.get("observer_floor_height_m", 0.0)),
+                land=e.get("land"), region=e.get("region"),   # US-141 (kommt sonst aus den Korrekturen)
             )
             LOCATIONS.append(loc)
             ids_existing.add(loc.id)
@@ -693,27 +708,45 @@ async def fetch_elevations(force_refetch_ids: set[str] | None = None) -> dict:
 # Schicht 2a: 14-Tage Feed (nicht inkrementell – immer frisch)
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def compute_feed(today: date) -> list[dict]:
+async def _feed_fuer_ort(loc, today: date) -> list[dict]:
+    """14-Tage-Chancen EINES Orts (ohne Wetter), mit dem Schärfezonen-Filter (US-57).
+    Wirft bei einem Rechenfehler; der Aufrufer entscheidet, wie er damit umgeht."""
+    opps = await find_opportunities_multi_day(
+        loc, today, days=14,
+        forecast=None, min_score=0.30,
+        astronomy_only=True,
+    )
+    serialized = [_serialize(o) for o in opps]
+    filtered = [e for e in serialized if _passes_alignment_filter(e)]
+    skipped = len(serialized) - len(filtered)
+    if skipped:
+        logger.info("    US-57: %d Event(s) außerhalb ±%.0f°-Schärfezone gefiltert", skipped, ALIGNMENT_TOLERANCE_DEG)
+    return filtered
+
+
+async def compute_feed(today: date, gerechnet_ids: "set | None" = None) -> list[dict]:
     """
     14-Tage Astronomy-Feed für alle Locations (ohne Wetter).
     Wird immer komplett neu berechnet – ist schnell und enthält
     den nächsten 2-Wochen-Horizont vollständig aktuell.
+
+    US-141 Baustein 3: Wird `gerechnet_ids` übergeben, trägt die Funktion dort die Nummern aller
+    Orte ein, für die sie gerechnet hat (die aktiven zu Beginn des Laufs). Der Schreibschritt
+    (_write_feed_cache) braucht das, um Termine von Orten zu behalten, die erst NACH dem Start dieses
+    Laufs eingeschaltet und von einem Nachlade-Lauf berechnet wurden.
     """
     results: list[dict] = []
-    for i, loc in enumerate(LOCATIONS):
-        logger.info("  Feed [%d/%d] %s", i + 1, len(LOCATIONS), loc.name)
+    # US-141 (Gruppe B): Chancen werden nur für AKTIVE Orte berechnet; pausierte Orte (Land oder
+    # Region aus) bleiben außen vor. Höhe und Sichtachse (Gruppe A) laufen für alle Orte weiter.
+    aktive = gz.aktive_orte(LOCATIONS)
+    if gerechnet_ids is not None:
+        gerechnet_ids.update(l.id for l in aktive)
+    if len(aktive) != len(LOCATIONS):
+        logger.info("  US-141: %d von %d Orten pausiert – nicht berechnet", len(LOCATIONS) - len(aktive), len(LOCATIONS))
+    for i, loc in enumerate(aktive):
+        logger.info("  Feed [%d/%d] %s", i + 1, len(aktive), loc.name)
         try:
-            opps = await find_opportunities_multi_day(
-                loc, today, days=14,
-                forecast=None, min_score=0.30,
-                astronomy_only=True,
-            )
-            serialized = [_serialize(o) for o in opps]
-            filtered = [e for e in serialized if _passes_alignment_filter(e)]
-            skipped = len(serialized) - len(filtered)
-            if skipped:
-                logger.info("    US-57: %d Event(s) außerhalb ±%.0f°-Schärfezone gefiltert", skipped, ALIGNMENT_TOLERANCE_DEG)
-            results.extend(filtered)
+            results.extend(await _feed_fuer_ort(loc, today))
         except Exception as e:
             logger.error("    Fehler bei %s: %s", loc.name, e)
     results.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
@@ -815,7 +848,8 @@ def _init_calendar_pass(
             if lid != location_id
         }
     else:
-        locations_to_process = list(LOCATIONS)
+        # US-141 (Gruppe B): der Kalender wird nur für aktive Orte gerechnet.
+        locations_to_process = gz.aktive_orte(LOCATIONS)
         new_meta = {}
 
     return valid_events, locations_to_process, new_meta, target_range, existing_meta
@@ -942,24 +976,17 @@ def _merge_and_write_feed(feed_path, location_id: str, new_events: list, compute
 
     Returns: Gesamtzahl der gemergten Events.
     """
-    existing_events = []
-    if feed_path.exists():
-        try:
-            existing_events = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
-        except Exception:
-            pass
-    merged = [e for e in existing_events if e["location_id"] != location_id] + new_events
-    merged.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
-    feed_path.write_text(
-        json.dumps({"computed_at": computed_at, "opportunities": merged}, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    return len(merged)
+    # US-141 (AK-59 bis AK-61): Lesen, Mischen und Schreiben passieren unter einer Dateisperre, damit
+    # zwei gleichzeitige Läufe (verschiedene Orte) einander keine Termine überschreiben; geschrieben
+    # wird atomar (Temp-Datei, fsync, austauschen) — nie eine halbe Datei.
+    return _merge_and_write_feed_many(feed_path, {location_id: new_events}, computed_at)
 
 
 def _write_calendar_cache(cal_path, calendar: list, computed_meta: dict, computed_at: str) -> None:
     """Schreibt calendar.json mit algorithm_version, computed_at, computed_locations und events."""
-    cal_path.write_text(
+    # US-141 (AK-59 bis AK-61): unter Dateisperre und atomar schreiben (siehe data/cache_io.py).
+    cache_io.gesperrt_atomar_schreiben(
+        cal_path,
         json.dumps(
             {
                 "algorithm_version": ALGORITHM_VERSION,
@@ -969,7 +996,6 @@ def _write_calendar_cache(cal_path, calendar: list, computed_meta: dict, compute
             },
             ensure_ascii=False,
         ),
-        encoding="utf-8",
     )
 
 
@@ -989,24 +1015,87 @@ def _write_calendar_single_delta(cal_path, location_id: str, calendar: list,
     """
     events = [e for e in calendar if e.get("location_id") == location_id]
     delta_path = cal_path.parent / "calendar_single_last.json"
-    delta_path.write_text(
+    cache_io.gesperrt_atomar_schreiben(
+        delta_path,
         json.dumps(
             {"location_id": location_id, "computed_at": computed_at, "events": events},
             ensure_ascii=False,
         ),
-        encoding="utf-8",
     )
     logger.info("  ↳ Übergabedatei %s geschrieben: %d Events für %s",
                 delta_path.name, len(events), location_id)
     return len(events)
 
 
-def _write_feed_cache(feed_path, feed: list, computed_at: str) -> None:
-    """Schreibt opportunities.json und loggt einen Health-Alert wenn der Feed zu klein ist."""
-    feed_path.write_text(
-        json.dumps({"computed_at": computed_at, "opportunities": feed}, ensure_ascii=False),
-        encoding="utf-8",
-    )
+def _merge_and_write_feed_many(feed_path, neue_je_ort: dict, computed_at: str) -> int:
+    """US-141 Baustein 3 (Nachladen): wie _merge_and_write_feed, aber für MEHRERE Orte in einem einzigen
+    Schreibvorgang. `neue_je_ort` = {Ort-ID: [Termine]}; die Termine dieser Orte in der Datei werden ersetzt
+    (ein Ort mit leerer Liste verliert seine alten Termine), alle übrigen bleiben unberührt.
+    Lesen, Mischen, Schreiben passieren unter der Dateisperre aus data/cache_io.py, geschrieben wird atomar.
+
+    Returns: Gesamtzahl der Termine in der Datei danach."""
+    ids = set(neue_je_ort)
+    with cache_io.gesperrt_aendern(feed_path):
+        vorhanden = []
+        if feed_path.exists():
+            try:
+                vorhanden = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
+            except Exception as exc:
+                logger.warning("  Feed-Datei %s nicht lesbar (%s) – sie wird nur mit den neuen Terminen neu geschrieben",
+                               feed_path.name, exc)
+        gemischt = [e for e in vorhanden if e.get("location_id") not in ids]
+        for termine in neue_je_ort.values():
+            gemischt.extend(termine)
+        gemischt.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
+        cache_io.atomar_schreiben(
+            feed_path,
+            json.dumps({"computed_at": computed_at, "opportunities": gemischt}, ensure_ascii=False),
+        )
+    return len(gemischt)
+
+
+def _zwischenzeitlich_nachgeladene_termine(feed_path, feed: list, gerechnet_ids: set) -> list:
+    """US-141 Baustein 3 (Kollision Nachtlauf <-> Nachladen): Schaltet der Host ein Gebiet NACH dem Start
+    dieses Vorberechnungslaufs ein, rechnet der Nachlade-Lauf dessen Orte und schreibt ihre Termine in die
+    Feed-Datei. Dieser Lauf kennt die Orte nicht (er hat sie nicht berechnet) und würde die Datei sonst ohne
+    sie überschreiben. Darum bleiben beim Schreiben (unter der Sperre) alle Termine erhalten, die jetzt in der
+    Datei stehen, zu einem Ort gehören, der JETZT aktiv ist und den dieser Lauf nicht berechnet hat."""
+    if not feed_path.exists():
+        return feed
+    try:
+        alt = json.loads(feed_path.read_text(encoding="utf-8")).get("opportunities", [])
+    except Exception:
+        return feed
+    aktiv_jetzt = {l.id for l in gz.aktive_orte(LOCATIONS)}
+    behalten = [e for e in alt if e.get("location_id") in aktiv_jetzt and e.get("location_id") not in gerechnet_ids]
+    if not behalten:
+        return feed
+    logger.info("  US-141: %d Termine von Orten, die während des Laufs nachgeladen wurden, bleiben erhalten",
+                len(behalten))
+    gemischt = list(feed) + behalten
+    gemischt.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
+    return gemischt
+
+
+def _write_feed_cache(feed_path, feed: list, computed_at: str, gerechnet_ids: "set | None" = None) -> None:
+    """Schreibt opportunities.json und loggt einen Health-Alert wenn der Feed zu klein ist.
+
+    US-141 Baustein 3: Mit `gerechnet_ids` (Orte, die dieser Lauf berechnet hat) bleiben zwischenzeitlich
+    von einem Nachlade-Lauf geschriebene Termine anderer aktiver Orte erhalten (siehe
+    _zwischenzeitlich_nachgeladene_termine). Ohne den Parameter gilt das bisherige Verhalten."""
+    # US-141 (AK-59 bis AK-61): unter Dateisperre und atomar schreiben (siehe data/cache_io.py).
+    if gerechnet_ids is None:
+        cache_io.gesperrt_atomar_schreiben(
+            feed_path,
+            json.dumps({"computed_at": computed_at, "opportunities": feed}, ensure_ascii=False),
+        )
+    else:
+        with cache_io.gesperrt_aendern(feed_path):
+            feed = _zwischenzeitlich_nachgeladene_termine(feed_path, feed, gerechnet_ids)
+            cache_io.atomar_schreiben(
+                feed_path,
+                json.dumps({"computed_at": computed_at, "opportunities": feed}, ensure_ascii=False),
+            )
     if len(feed) < HEALTH_FEED_MIN:
         logger.error(
             "🚨 HEALTH-ALERT [%s]: opportunities.json enthält nur %d Event(s) "
@@ -1159,6 +1248,12 @@ async def _run_single_location_flow(
         return
     loc = single_loc_list[0]
     logger.info("── Single-Location Recompute: %s ──", loc.name)
+    # US-141: Für einen pausierten Ort (Land oder Region aus) gibt es weder Feed noch Kalender
+    # (Gruppe B); Höhe und Sichtachse (Gruppe A) werden trotzdem aufgefrischt.
+    if (run_feed or run_calendar) and gz.ist_pausiert(loc):
+        logger.info("US-141: %s ist pausiert – nur Höhe und Sichtachse, kein Feed und kein Kalender", loc.name)
+        run_feed = False
+        run_calendar = False
 
     await _refresh_single_location_elevation(
         loc=loc, location_id=location_id, computed_at=computed_at, elev_path=elev_path,
@@ -1177,6 +1272,312 @@ async def _run_single_location_flow(
         )
 
     logger.info("=== Single-Location Recompute abgeschlossen in %.1fs ===", time.time() - t0)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# US-141 (Entscheidung 2026-10-15): Kalender beim Einschalten eines Gebiets sofort mitrechnen
+# ─────────────────────────────────────────────────────────────────────────────
+# Ablauf im Nachlade-Prozess: erst die Chancen (Feed, in Häppchen), dann der 365-Tage-Kalender NUR für die Orte
+# dieses Laufs. Der Kalender wird je Ort einzeln gerechnet (im Arbeitsspeicher) und am Ende in EINEM Schritt in
+# calendar.json eingemischt: Datei einmal lesen, die Einträge genau dieser Orte ersetzen, einmal atomar
+# zurückschreiben (nicht ein Schreibvorgang je Ort — jeder kostet das Lesen und Schreiben der ganzen, über 1 GB
+# großen Datei). Der Kalender-Schritt ist freiwillig: scheitert er (kein Platz, kein Kalender vorhanden, Fehler),
+# bleiben Chancen und Wetter gültig, der Nachtlauf holt den Kalender nach.
+
+NACHLADEN_KALENDER_TAGE = 365                       # wie der Nachtlauf: ab heute 365 Tage
+NACHLADEN_KALENDER_FENSTER_TAGE = 31                # so viele Tage je Rechenfenster (wie die Monatsberechnung des Servers)
+NACHLADEN_KALENDER_POSTFACH_NAME = "calendar_nachladen_last.jsonl"   # Übergabe an den laufenden Server
+NACHLADEN_KALENDER_BYTES_JE_ORT = 12 * 1024 * 1024  # grobe Schätzung des Zuwachses je Ort (Platzprüfung vorab)
+NACHLADEN_KALENDER_BYTES_JE_TERMIN = 2048           # grobe Schätzung je Termin (Platzprüfung kurz vor dem Schreiben)
+
+
+class KalenderNachladenFehler(RuntimeError):
+    """Der Kalender-Schritt des Nachladens konnte nicht abgeschlossen werden (Text ist für Menschen lesbar)."""
+
+
+async def _kalender_fuer_ort(loc, today: date) -> list:
+    """365-Tage-Kalender EINES Orts (nur Astronomie, Mindestwert 0,35, Schärfezonen-Filter) mit der Fenster-Rechnung
+    (WindowEphemeris) — derselbe Weg, den der Server für die Monatsübersicht benutzt, rund zehnmal schneller als
+    die Tag-für-Tag-Rechnung des Nachtlaufs. Wirft bei einem Rechenfehler; der Aufrufer entscheidet."""
+    from calculations.window_engine import WindowEphemeris
+    import calculations.astronomy as _astro
+
+    ergebnis: list = []
+    start = today
+    rest = NACHLADEN_KALENDER_TAGE
+    while rest > 0:
+        tage = min(NACHLADEN_KALENDER_FENSTER_TAGE, rest)
+        _astro.set_active_window(WindowEphemeris(loc.observer_lat, loc.observer_lon, start, tage))
+        try:
+            opps = await find_opportunities_multi_day(
+                loc, start, tage, None, min_score=0.35, astronomy_only=True,
+            )
+        finally:
+            _astro.clear_active_window()
+        ergebnis.extend(e for e in (_serialize(o) for o in opps) if _passes_alignment_filter(e))
+        start = start + timedelta(days=tage)
+        rest -= tage
+        await asyncio.sleep(0)
+    return ergebnis
+
+
+def _hoehen_aus_zwischenspeicher(orte: list, elev_path) -> int:
+    """Setzt die gespeicherten Geländehöhen (elevations.json, nur lesen, kein Netz) auf die Orte — wie es der
+    Nachtlauf vor der Kalenderrechnung tut. Fehlende Einträge bleiben unberührt. Gibt die Zahl gesetzter Orte zurück."""
+    try:
+        daten = json.loads(Path(elev_path).read_text(encoding="utf-8")).get("elevations", {})
+    except Exception:
+        return 0
+    n = 0
+    for loc in orte:
+        eintrag = daten.get(loc.id)
+        if not isinstance(eintrag, dict) or "elevation_difference_m" not in eintrag:
+            continue
+        try:
+            object.__setattr__(loc, "elevation_difference_m", eintrag["elevation_difference_m"])
+        except Exception:
+            setattr(loc, "elevation_difference_m", eintrag["elevation_difference_m"])
+        n += 1
+    return n
+
+
+def _kalender_einmischen(cal_path, neue_je_ort: dict, meta_je_ort: dict, computed_at: str) -> int:
+    """Mischt die Kalendereinträge der genannten Orte in calendar.json ein (eine Datei lesen, ein Schreibvorgang).
+
+    - Alles geschieht unter der Dateisperre (cache_io): ein gleichzeitiger anderer Schreiber wartet, der nächste
+      liest erst danach. Geschrieben wird atomar (Temp-Datei, fsync, austauschen): bricht der Vorgang ab
+      (Absturz, beendet, Platte voll), bleibt die bisherige Datei vollständig lesbar und die Temp-Datei wird entfernt.
+    - Vorher wird geprüft, ob genug Platz für alte plus neue Datei da ist (cache_io.ZuWenigPlatz statt Absturz).
+    - Die Einträge der Orte werden ERSETZT (nicht ergänzt); alle anderen Orte, ihre Meta-Angaben und der
+      Algorithmus-Stand der Datei bleiben unverändert (ein veralteter Stand bleibt als veraltet erkennbar,
+      damit der Nachtlauf neu rechnet). Meta der Orte: Koordinaten-Prüfsumme + alle 365 Tage als berechnet.
+    - Fehlt die Datei oder ist sie nicht lesbar/anders aufgebaut, wird NICHT geschrieben (KalenderNachladenFehler).
+    Gibt die Zahl der Termine in der Datei danach zurück."""
+    cal_path = Path(cal_path)
+    ids = set(neue_je_ort)
+    zuwachs = sum(len(v) for v in neue_je_ort.values()) * NACHLADEN_KALENDER_BYTES_JE_TERMIN
+    with cache_io.gesperrt_aendern(cal_path):
+        if not cal_path.exists():
+            raise KalenderNachladenFehler("es gibt noch keine Kalenderdatei (sie entsteht im Nachtlauf)")
+        cache_io.pruefe_platz_fuer_atomar(cal_path, zusatz_bytes=zuwachs)
+        try:
+            daten = json.loads(cal_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise KalenderNachladenFehler("die Kalenderdatei ist nicht lesbar (%s)" % exc)
+        termine = daten.get("events") if isinstance(daten, dict) else None
+        meta = daten.get("computed_locations") if isinstance(daten, dict) else None
+        if not isinstance(termine, list) or not isinstance(meta, dict):
+            raise KalenderNachladenFehler("die Kalenderdatei hat einen unerwarteten Aufbau")
+        behalten = [e for e in termine if e.get("location_id") not in ids]
+        del termine
+        for liste in neue_je_ort.values():
+            behalten.extend(liste)
+        behalten.sort(key=lambda r: (r["shoot_time"], -r["overall_score"]))
+        for lid, eintrag in meta_je_ort.items():
+            meta[lid] = eintrag
+        daten["events"] = behalten
+        daten["computed_locations"] = meta
+        daten["computed_at"] = computed_at
+        cache_io.atomar_schreiben(cal_path, json.dumps(daten, ensure_ascii=False))
+    return len(behalten)
+
+
+def _schreibe_kalender_postfach(cal_dir, neue_je_ort: dict, computed_at: str) -> int:
+    """Übergabe an den laufenden Server: eine Zeilendatei (JSON Lines) mit den neuen Kalendereinträgen der Orte —
+    Kopfzeile (Prozessnummer, Zeitpunkt, Orte), danach eine Zeile je Ort. Je Zeile lesbar, damit der Server den
+    Arbeitsspeicher nicht mit einem einzigen riesigen Einlesen anhält. Gibt die Zahl geschriebener Termine zurück."""
+    pfad = Path(cal_dir) / NACHLADEN_KALENDER_POSTFACH_NAME
+    zeilen = [json.dumps({"pid": os.getpid(), "computed_at": computed_at, "location_ids": sorted(neue_je_ort)},
+                         ensure_ascii=False)]
+    n = 0
+    for lid in sorted(neue_je_ort):
+        zeilen.append(json.dumps({"location_id": lid, "events": neue_je_ort[lid]}, ensure_ascii=False))
+        n += len(neue_je_ort[lid])
+    cache_io.gesperrt_atomar_schreiben(pfad, "\n".join(zeilen) + "\n")
+    return n
+
+
+async def _kalender_nachladen(orte: list, today: date, computed_at: str, feed_path, cal_path, elev_path,
+                              fortschritt) -> None:
+    """Der Kalender-Schritt des Nachlade-Laufs für `orte` (aktive Orte dieses Laufs). Meldet seinen Stand über
+    `fortschritt(kalender_dict)`. Wirft nie: jeder Fehler wird als Stand "fehler" mit Klartext gemeldet."""
+    kal = {"status": "rechnet", "gesamt": len(orte), "fertig": [], "fehler": [], "text": None, "termine": 0,
+           "postfach": False}
+
+    def _melde() -> None:
+        fortschritt(dict(kal, fertig=list(kal["fertig"]), fehler=list(kal["fehler"])))
+
+    def _ende(status: str, text: "str | None" = None) -> None:
+        kal["status"] = status
+        kal["text"] = text
+        _melde()
+
+    if not orte:
+        _ende("uebersprungen", "kein Ort zu rechnen")
+        return
+    try:
+        # früh prüfen (vor der langen Rechnung): gibt es einen Kalender, und reicht der Platz voraussichtlich?
+        if not cal_path.exists():
+            _ende("uebersprungen", "es gibt noch keine Kalenderdatei (sie entsteht im Nachtlauf)")
+            return
+        cache_io.pruefe_platz_fuer_atomar(cal_path, zusatz_bytes=len(orte) * NACHLADEN_KALENDER_BYTES_JE_ORT)
+        _hoehen_aus_zwischenspeicher(orte, elev_path)
+        _melde()
+        neue: dict = {}
+        meta: dict = {}
+        ziel = {(today + timedelta(days=i)).isoformat() for i in range(NACHLADEN_KALENDER_TAGE)}
+        for i, loc in enumerate(orte):
+            logger.info("  Kalender [%d/%d] %s", i + 1, len(orte), loc.name)
+            try:
+                neue[loc.id] = await _kalender_fuer_ort(loc, today)
+                meta[loc.id] = {"coordinates_hash": _location_hash(loc), "computed_dates": sorted(ziel)}
+                kal["fertig"].append(loc.id)
+            except Exception as exc:
+                kal["fehler"].append(loc.id)
+                logger.error("    Kalender-Fehler bei %s: %s – seine bisherigen Einträge bleiben", loc.name, exc)
+            _melde()
+        # wer inzwischen wieder ausgeschaltet wurde, wird nicht mehr eingemischt
+        noch_aktiv = {l.id for l in gz.aktive_orte(orte)}
+        for lid in [k for k in neue if k not in noch_aktiv]:
+            logger.info("US-141: %s wurde während des Laufs ausgeschaltet – Kalender nicht eingemischt", lid)
+            neue.pop(lid, None)
+            meta.pop(lid, None)
+        if not neue:
+            _ende("fehler" if kal["fehler"] else "uebersprungen",
+                  "für keinen Ort konnte ein Kalender berechnet werden" if kal["fehler"] else "kein Ort mehr aktiv")
+            return
+        kal["status"] = "schreibt"
+        _melde()
+        gesamt = _kalender_einmischen(cal_path, neue, meta, computed_at)
+        kal["termine"] = sum(len(v) for v in neue.values())
+        logger.info("  ✅ Kalender: %d Orte eingemischt (%d Termine neu, %d in der Datei)", len(neue), kal["termine"], gesamt)
+        try:
+            _schreibe_kalender_postfach(cal_path.parent, neue, computed_at)
+            kal["postfach"] = True
+        except Exception as exc:
+            logger.warning("  Kalender-Postfach nicht geschrieben (%s) – der Server übernimmt den neuen Stand "
+                           "erst beim nächsten Start", exc)
+        kal["fertig"] = [k for k in kal["fertig"] if k in neue]
+        _ende("fertig")
+    except cache_io.ZuWenigPlatz as exc:
+        logger.error("US-141: Kalender beim Nachladen übersprungen – %s", exc)
+        _ende("fehler", str(exc))
+    except KalenderNachladenFehler as exc:
+        logger.error("US-141: Kalender beim Nachladen übersprungen – %s", exc)
+        _ende("uebersprungen" if "noch keine Kalenderdatei" in str(exc) else "fehler", str(exc))
+    except Exception as exc:  # pragma: no cover - letzte Absicherung, der Lauf selbst bleibt gültig
+        logger.exception("US-141: Kalender beim Nachladen fehlgeschlagen")
+        _ende("fehler", "unerwarteter Fehler: %s" % exc)
+
+
+NACHLADEN_HAEPPCHEN = 5                         # US-141 Baustein 3: alle 5 Orte wird der Feed freigegeben
+NACHLADEN_FORTSCHRITT_NAME = "nachladen_fortschritt.json"   # liegt neben der Feed-Datei; der Server liest sie
+
+
+def _schreibe_nachlade_fortschritt(feed_path, fertig: list, gesamt: int, fehler: "list | None" = None,
+                                   extra: "dict | None" = None) -> None:
+    """US-141 Baustein 3: Welche Orte des laufenden Nachlade-Laufs sind in der Feed-Datei fertig?
+    Der Server liest die kleine Datei, gibt die fertigen Orte häppchenweise frei und zeigt „x von y
+    Orten bereit“. Atomar geschrieben (Leser brauchen keine Sperre); eine Fehlschrift bricht den Lauf nicht ab.
+
+    `extra` (Kalender beim Einschalten): zusätzliche Felder — `feed_fertig` (die Chancen aller Orte sind
+    geschrieben, der Server darf das Wetter holen) und `kalender` (Stand des Kalender-Schritts)."""
+    try:
+        daten = {"pid": os.getpid(), "gesamt": gesamt, "fertig": list(fertig), "fehler": list(fehler or [])}
+        if extra:
+            daten.update(extra)
+        cache_io.atomar_schreiben(
+            feed_path.with_name(NACHLADEN_FORTSCHRITT_NAME),
+            json.dumps(daten, ensure_ascii=False),
+        )
+    except Exception as exc:
+        logger.warning("  Fortschrittsdatei nicht geschrieben (%s) – der Lauf geht weiter", exc)
+
+
+async def _run_group_flow(
+    location_ids: list,
+    today: date,
+    computed_at: str,
+    feed_path,
+    t0: float,
+    haeppchen: int = NACHLADEN_HAEPPCHEN,
+    mit_feed: bool = True,
+    mit_kalender: bool = False,
+    cal_path=None,
+    elev_path=None,
+) -> None:
+    """US-141 Baustein 3 (direktes Nachladen): die 14-Tage-Chancen MEHRERER Orte in EINEM Prozess.
+
+    - Nur aktive, nicht gelöschte Orte (zentrale Regel); wer inzwischen wieder pausiert ist, wird übersprungen.
+    - Alle `haeppchen` Orte werden die Termine in die Feed-Datei gemischt (unter der Dateisperre, atomar) und
+      der Fortschritt vermerkt, damit der Server sie schon vor dem Ende freigeben kann (AK-20).
+    - Elevation und Sichtachse gehören NICHT dazu: Höhe und Sichtachse liefen auch im pausierten Zustand weiter.
+    - Kalender (Entscheidung 2026-10-15, `mit_kalender`): nach den Chancen werden die 365-Tage-Kalendereinträge
+      NUR dieser Orte gerechnet und in einem Schritt in calendar.json eingemischt (siehe _kalender_nachladen).
+      `mit_feed=False` (nur Kalender) setzt das Fortsetzen nach einem Neustart um, wenn die Chancen schon stehen.
+    - Ein fehlerhafter Ort lässt die anderen weiterlaufen und behält seine bisherigen Termine in der Datei.
+    - Sicherung: Der Prozess sichert einmal (in main() am Anfang) – ein Lauf, eine Sicherung (AK-72)."""
+    gewollt = [i for i in dict.fromkeys(location_ids) if i]
+    karte = {l.id: l for l in LOCATIONS}
+    unbekannt = [i for i in gewollt if i not in karte]
+    if unbekannt:
+        logger.warning("Nachladen: %d unbekannte/gelöschte Orte übersprungen: %s", len(unbekannt), unbekannt)
+    orte = [karte[i] for i in gewollt if i in karte]
+    aktive = gz.aktive_orte(orte)
+    aktive_ids = {l.id for l in aktive}
+    for l in orte:
+        if l.id not in aktive_ids:
+            logger.info("US-141: %s ist pausiert – beim Nachladen übersprungen", l.name)
+    logger.info("── Nachladen: %d Orte in einem Lauf ──", len(aktive))
+    fertig: list = []
+    fehler: list = []
+    puffer: dict = {}
+    cal_path = cal_path if cal_path is not None else feed_path.with_name("calendar.json")
+    elev_path = elev_path if elev_path is not None else feed_path.with_name("elevations.json")
+    if not mit_feed:
+        # nur Kalender (Fortsetzen nach Neustart): die Chancen dieser Orte stehen schon in der Feed-Datei
+        fertig = [l.id for l in aktive]
+    _schreibe_nachlade_fortschritt(feed_path, fertig, len(aktive), fehler,
+                                   extra={"feed_fertig": True} if not mit_feed else None)
+
+    def _abschicken() -> None:
+        if not puffer:
+            return
+        gesamt = _merge_and_write_feed_many(feed_path, puffer, computed_at)
+        fertig.extend(puffer.keys())
+        logger.info("  ✅ Feed: %d Orte freigegeben (%d von %d), %d Termine in der Datei",
+                    len(puffer), len(fertig), len(aktive), gesamt)
+        puffer.clear()
+        _schreibe_nachlade_fortschritt(feed_path, fertig, len(aktive), fehler)
+
+    for i, loc in enumerate(aktive if mit_feed else []):
+        logger.info("  Nachladen [%d/%d] %s", i + 1, len(aktive), loc.name)
+        try:
+            puffer[loc.id] = await _feed_fuer_ort(loc, today)
+        except Exception as exc:
+            fehler.append(loc.id)
+            logger.error("    Fehler bei %s: %s – bisherige Termine bleiben", loc.name, exc)
+            _schreibe_nachlade_fortschritt(feed_path, fertig, len(aktive), fehler)
+        if len(puffer) >= haeppchen:
+            _abschicken()
+    _abschicken()
+    logger.info("=== Nachladen abgeschlossen in %.1fs: %d fertig, %d fehlgeschlagen ===",
+                time.time() - t0, len(fertig), len(fehler))
+    if aktive and len(fehler) == len(aktive):
+        raise RuntimeError("Nachladen: für keinen der %d Orte konnten Chancen berechnet werden" % len(aktive))
+    if not mit_kalender:
+        return
+
+    # ── Kalender (Entscheidung 2026-10-15): zuletzt, nur für die Orte dieses Laufs ──
+    def _kalender_melden(kal: dict) -> None:
+        _schreibe_nachlade_fortschritt(feed_path, fertig, len(aktive), fehler,
+                                       extra={"feed_fertig": True, "kalender": kal})
+
+    _kalender_melden({"status": "rechnet", "gesamt": len(aktive), "fertig": [], "fehler": [], "text": None,
+                      "termine": 0, "postfach": False})
+    t_kal = time.time()
+    await _kalender_nachladen(aktive, today, computed_at, feed_path, cal_path, elev_path, _kalender_melden)
+    logger.info("=== Kalender beim Nachladen abgeschlossen in %.1fs ===", time.time() - t_kal)
 
 
 async def _run_standard_flow(
@@ -1213,8 +1614,9 @@ async def _run_standard_flow(
     if run_feed:
         logger.info("── Astronomy-Feed: 14 Tage (komplett frisch) ────────")
         t1 = time.time()
-        feed = await compute_feed(today)
-        _write_feed_cache(feed_path, feed, computed_at)
+        gerechnet: set = set()
+        feed = await compute_feed(today, gerechnet_ids=gerechnet)
+        _write_feed_cache(feed_path, feed, computed_at, gerechnet_ids=gerechnet)
         logger.info("✅ opportunities.json: %d Events (%.1fs)", len(feed), time.time() - t1)
 
     # ── Schicht 2b: 365-Tage Kalender (inkrementell) ─────────────────────────
@@ -1243,6 +1645,14 @@ async def _run_standard_flow(
             )
 
 
+def _parse_location_ids(wert) -> list:
+    """`--location-ids a,b,c` -> ['a', 'b', 'c'] (Leerstellen und leere Einträge fallen weg)."""
+    if not wert:
+        return []
+    teile = wert if isinstance(wert, (list, tuple)) else str(wert).split(",")
+    return [t.strip() for t in teile if t and t.strip()]
+
+
 async def main(args: argparse.Namespace) -> None:
     t0 = time.time()
     logger.info("=== FotoAlert Vorberechnung startet (Algorithmus v%s) ===", ALGORITHM_VERSION)
@@ -1262,6 +1672,8 @@ async def main(args: argparse.Namespace) -> None:
     # Koordinaten und der coordinates_hash ändert sich nie.
     _apply_location_overrides()
     logger.info("%d Locations nach Custom-Load + QA-Values + Overrides", len(LOCATIONS))
+    # US-141: Zustand der Gebiets-Schalter aus der Datenbank lesen (welche Orte sind pausiert?).
+    gz.registriere_quelle(lambda: LocationStore().load_area_states())
 
     # TASK-18: Snapshot vor Precompute (lokale Sicherung, 7 Versionen)
     from data import backup as _backup
@@ -1276,13 +1688,28 @@ async def main(args: argparse.Namespace) -> None:
     today = date.today()
     computed_at = datetime.now(timezone.utc).isoformat()
 
-    run_feed = not args.calendar_only
-    run_calendar = not args.feed_only
+    # US-141: --ortsdaten-only = nur Höhe und Sichtachse (Gruppe A), weder Feed noch Kalender.
+    ortsdaten_only = bool(getattr(args, "ortsdaten_only", False))
+    run_feed = not args.calendar_only and not ortsdaten_only
+    run_calendar = not args.feed_only and not ortsdaten_only
     location_id: str | None = getattr(args, "location_id", None)
+    # US-141 Baustein 3: --location-ids a,b,c = Nachlade-Lauf für mehrere Orte in EINEM Prozess (nur Feed).
+    location_ids = _parse_location_ids(getattr(args, "location_ids", None))
     feed_path = CACHE_DIR / "opportunities.json"
     elev_path = CACHE_DIR / "elevations.json"
 
-    if location_id:
+    if location_ids:
+        if args.calendar_only or ortsdaten_only:
+            raise SystemExit("--location-ids gilt für das Nachladen (Chancen, mit --mit-kalender auch der Kalender); "
+                             "--calendar-only und --ortsdaten-only gehören nicht dazu.")
+        nur_kalender = bool(getattr(args, "nur_kalender", False))
+        await _run_group_flow(
+            location_ids=location_ids, today=today, computed_at=computed_at, feed_path=feed_path, t0=t0,
+            mit_feed=not nur_kalender,
+            mit_kalender=bool(getattr(args, "mit_kalender", False)) or nur_kalender,
+            cal_path=CACHE_DIR / "calendar.json", elev_path=elev_path,
+        )
+    elif location_id:
         await _run_single_location_flow(
             location_id=location_id,
             today=today,
@@ -1310,7 +1737,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="FotoAlert Vorberechnung")
     parser.add_argument("--feed-only", action="store_true", help="Nur 14-Tage Feed berechnen")
     parser.add_argument("--calendar-only", action="store_true", help="Nur Kalender berechnen")
+    parser.add_argument("--ortsdaten-only", dest="ortsdaten_only", action="store_true",
+                        help="US-141: Nur Höhe und Sichtachse (für pausierte Orte), weder Feed noch Kalender")
     parser.add_argument("--full", action="store_true", help="Kalender vollständig neu berechnen (ignoriert Cache)")
     parser.add_argument("--location-id", default=None, help="Nur diese eine Location neu berechnen (Single-Location-Recompute nach PATCH)")
+    parser.add_argument("--location-ids", default=None,
+                        help="US-141: Nachladen – diese Orte (kommagetrennt) in EINEM Lauf neu berechnen, nur Feed")
+    parser.add_argument("--mit-kalender", dest="mit_kalender", action="store_true",
+                        help="US-141: beim Nachladen (--location-ids) nach den Chancen auch den 365-Tage-Kalender dieser Orte rechnen")
+    parser.add_argument("--nur-kalender", dest="nur_kalender", action="store_true",
+                        help="US-141: beim Nachladen (--location-ids) nur den Kalender dieser Orte rechnen (Fortsetzen nach Neustart)")
     args = parser.parse_args()
+    if getattr(args, "location_ids", None):
+        # US-141: Vom Server beendet (Gebiet wieder ausgeschaltet) -> sauber abbrechen. Eine halb geschriebene
+        # Temp-Datei räumt cache_io.atomar_schreiben dabei selbst weg; die Zieldatei bleibt unberührt.
+        import signal
+
+        def _beendet(signum, frame):  # pragma: no cover - nur im eigenen Prozess
+            raise SystemExit(128 + int(signum))
+
+        signal.signal(signal.SIGTERM, _beendet)
     asyncio.run(main(args))
