@@ -508,27 +508,6 @@
     .el-info-btn { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--muted); background: none; color: var(--muted); font-size: 9px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; }
     .el-info-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* ═══ US-21: Onboarding-Slides (erster App-Start) ═══ */
-    #onboarding-overlay { display: none; position: fixed; inset: 0; z-index: 5000;
-      background: var(--bg); flex-direction: column; }
-    #onboarding-overlay.open { display: flex; }
-    .onb-skip { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 16px; z-index: 5;
-      background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
-    .onb-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 40px 28px 0; text-align: center; gap: 22px; }
-    .onb-glyph { width: 104px; height: 104px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .onb-title { font-size: 20px; font-weight: 800; letter-spacing: -.2px; }
-    .onb-text { font-size: 15px; line-height: 1.55; color: var(--muted); max-width: 280px; }
-    .onb-footer { padding: 0 28px calc(env(safe-area-inset-bottom, 0px) + 26px); display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
-    .onb-dots { display: flex; justify-content: center; gap: 8px; }
-    .onb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); transition: .18s ease; }
-    .onb-dot.active { width: 22px; border-radius: 4px; background: var(--accent); }
-    .onb-nextrow { display: flex; align-items: center; gap: 10px; }
-    .onb-back { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface);
-      color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-    .onb-next-btn { flex: 1; height: 44px; border-radius: 12px; border: none; background: var(--accent); color: var(--on-accent);
-      font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-
     /* ═══ US-21: Header „?"-Button (gleiche Optik wie Suche/Filter/Refresh, keine Sonderstellung) ═══ */
     #help-btn { background: none; border: none; color: var(--muted); cursor: pointer;
       padding: 8px; border-radius: 50%; transition: color .2s;
@@ -783,7 +762,7 @@
 
     /* ── US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion ── */
     /* .fov-map-expand-btn: Klasse statt ID, da der Button pro CameraFOV-prefix
-       (ev/loc) mehrfach im DOM vorkommt (Feed/Kalender/Scout/Location-Detail teilen
+       (ev/loc) mehrfach im DOM vorkommt (Feed/Kalender/Location-Detail teilen
        sich dieselbe Komponente über Detail.open()). */
     .fov-map-expand-btn { position: absolute; top: 8px; right: 8px; z-index: 1000;
       width: 36px; height: 36px; min-width: 44px; min-height: 44px;
@@ -872,19 +851,6 @@
       background: var(--card); color: var(--muted); font-size: 13px; font-weight: 600;
       cursor: pointer; transition: all .2s; }
     .fmb-btn.active { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
-
-    /* ── Scout-Tab ───────────────────────────────────────────────── */
-    #scout-content { padding: 8px 14px 80px; }
-    .scout-actions { display: flex; margin-top: 8px; }
-    .scout-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: all .2s; text-align: center; }
-    .scout-btn:hover { background: var(--gold); color: var(--on-accent); border-color: var(--gold); }
-    .scout-btn-nav { width: 100%; }
-    .scout-day-header { font-size: 13px; font-weight: 700; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .04em; padding: 12px 0 4px; }
-    .scout-empty { text-align: center; padding: 48px 24px; color: var(--muted); font-size: 15px; }
-    .scout-moon-icon { font-size: 28px; margin-bottom: 8px; }
 
     /* ── Kalenderansicht ─────────────────────────────────────────── */
     .cal-nav { display: flex; align-items: center; justify-content: space-between;
@@ -1397,14 +1363,12 @@ function escJsAttr(s) {
       <div class="feed-mode-bar">
         <button class="fmb-btn active" id="fmb-feed" onclick="Feed.setMode('feed')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-cal"/></svg>14-Tage Feed</button>
         <button class="fmb-btn" id="fmb-calendar" onclick="Feed.setMode('calendar')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-calplus"/></svg>Jahreskalender</button>
-        <button class="fmb-btn" id="fmb-scout" onclick="Feed.setMode('scout')"><svg style="width:15px;height:15px;vertical-align:-2px;margin-right:5px"><use href="#i-viewpoint"/></svg>Scout</button>
       </div>
       <div id="recompute-banner" style="display:none;margin:8px 12px 0;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);align-items:center;gap:8px">
         <div class="spinner" style="width:14px;height:14px;flex-shrink:0"></div>
         <span id="recompute-banner-text">Chancen für neue Location werden berechnet…</span>
       </div>
       <div id="feed-content"><div class="empty"><div class="spinner"></div></div></div>
-      <div id="scout-content" style="display:none"></div>
     </div>
 
     <!-- MAP -->
@@ -1643,7 +1607,7 @@ function escJsAttr(s) {
   </div>
 </div>
 
-<!-- US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion (Chancen-/Kalender-/Scout-/Location-Detail) -->
+<!-- US-114: Vollbild-Overlay für die readonly Karte&Blickwinkel-Sektion (Chancen-/Kalender-/Location-Detail) -->
 <div id="fov-map-fs-overlay" onclick="CameraFOV.closeMapFullscreen()"></div>
 <div id="fov-map-fs-sheet">
   <div class="fov-map-fs-header">
@@ -1702,11 +1666,6 @@ function escJsAttr(s) {
   </div>
 </div>
 
-<!-- US-21: Onboarding-Slides (4 Screens, nur beim allerersten App-Start; erneut aufrufbar über Glossar) -->
-<div id="onboarding-overlay">
-  <div id="onboarding-screen"></div>
-</div>
-
 <!-- US-21: Glossar-Overlay (Bottom-Sheet, Suchfeld + Accordion, gruppiert nach Themen) -->
 <div id="glossary-overlay" onclick="Glossary.close()"></div>
 <div id="glossary-sheet">
@@ -1754,7 +1713,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.25.0';
+const APP_VERSION = '1.26.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2040,7 +1999,7 @@ function zoneForCoords(lat, lon) {
   const frenchCoast = lon > 0.9 && lat < 50.85;
   return (inBox && !frenchCoast) ? 'Europe/London' : 'Europe/Berlin';
 }
-// Zeitzone des Ortes eines Termins/Standorts/Scout-Treffers (Koordinaten des Fotografen-
+// Zeitzone des Ortes eines Termins/Standorts (Koordinaten des Fotografen-
 // Standpunkts; ohne Koordinaten über die Orts-ID; sonst Berlin).
 function placeZone(o) {
   if (!o) return 'Europe/Berlin';
@@ -2234,42 +2193,6 @@ function oppCard(o) {
   </div>`;
 }
 
-function scoutCard(o) {
-  const sesLabel  = SESSION_LABELS[o.session] || o.session;
-  const icon      = eventIcon(sesLabel, 15, 'ct');
-  const time      = o.dt_utc ? timeAt(o.dt_utc, o, true) : '–';
-  const bearing   = bearingLabel(o.standpoint_lat, o.standpoint_lon, o.subject_lat, o.subject_lon);
-  const distKm    = o.distance_m != null ? (Math.round(o.distance_m / 100) / 10).toLocaleString('de-DE') : null;
-  const illumPct  = o.body_illumination_pct ?? o.moon_illumination_pct ?? null;
-
-  const weatherTag = `<span class="tag tag-blue">${ic('i-cloud',12)} ${o.weather_description}</span>`;
-  const distTag    = distKm ? `<span class="tag tag-blue">${ic('i-nav',12)} ${distKm} km</span>` : '';
-  const illumTag   = illumPct != null
-    ? `<span class="tag tag-blue">${ic('i-moon',12)} ${Math.round(illumPct)}% beleuchtet</span>`
-    : '';
-
-  const navUrl  = `https://maps.apple.com/?daddr=${o.standpoint_lat},${o.standpoint_lon}&dirflg=d`;
-
-  return `<div class="card" onclick="Scout.openDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
-    <div class="opp-card">
-      ${scoreRing(o.score || 0)}
-      <div class="opp-body">
-        <div class="opp-meta">
-          <span class="opp-icon">${icon}</span>
-          <span class="opp-type">${sesLabel}</span>
-          <span class="opp-time">${time}</span>
-        </div>
-        <div class="opp-title">${esc(o.subject_name || '–')}</div>
-        <div class="opp-location">${ic('i-pin',13)} Blick vom ${bearing}</div>
-        <div class="opp-tags">${weatherTag}${distTag}${illumTag}</div>
-      </div>
-    </div>
-    <div class="scout-actions">
-      <button class="scout-btn scout-btn-nav" onclick="event.stopPropagation();window.open('${navUrl}','_blank')">${ic('i-nav',14)} Navigation</button>
-    </div>
-  </div>`;
-}
-
 // ═══════════════════════════════════════════════════════
 // FEED
 // ═══════════════════════════════════════════════════════
@@ -2281,14 +2204,8 @@ const Feed = {
     this.mode = m;
     document.getElementById('fmb-feed').classList.toggle('active', m === 'feed');
     document.getElementById('fmb-calendar').classList.toggle('active', m === 'calendar');
-    document.getElementById('fmb-scout').classList.toggle('active', m === 'scout');
-    // Scout hat eigenen Container; feed-content / cal wird ausgeblendet
-    document.getElementById('feed-content').style.display = m === 'scout' ? 'none' : '';
-    document.getElementById('scout-content').style.display = m === 'scout' ? '' : 'none';
     if (m === 'calendar') {
       CalendarView.show();
-    } else if (m === 'scout') {
-      Scout.show();
     } else {
       this.render();
     }
@@ -2456,199 +2373,6 @@ const Feed = {
     document.getElementById('header-subtitle').textContent =
       best ? `Heute: ${today.length} Chancen · Bester Score ${pct(best)}` : 'Capture moments that matter.';
   }
-};
-
-// ═══════════════════════════════════════════════════════
-// SCOUT-TAB (US-70)
-// ═══════════════════════════════════════════════════════
-const SESSION_LABELS = {
-  blue_morning:   'Blaue Stunde Morgen',
-  golden_morning: 'Goldene Stunde Morgen',
-  golden_evening: 'Goldene Stunde Abend',
-  blue_evening:   'Blaue Stunde Abend',
-  milky_way:      'Milchstraße',
-  moon:           'Mond-Alignment',
-};
-
-const Scout = {
-  data: null,   // null = nicht geladen, [] = keine Chancen, [...] = Daten
-  _loading: false,
-
-  async show() {
-    if (this.data !== null) { this.render(); return; }
-    if (this._loading) return;
-    this._loading = true;
-    document.getElementById('scout-content').innerHTML =
-      `<div style="text-align:center;padding:40px"><div class="spinner"></div><p style="color:var(--muted);margin-top:12px">Scout-Chancen werden berechnet…</p></div>`;
-    await this.load();
-    this._loading = false;
-  },
-
-  async load(retries = 3) {
-    try {
-      const res = await API.get('/discover');
-      if (res.status === 'calculating' && retries > 0) {
-        await new Promise(r => setTimeout(r, 5000));
-        return this.load(retries - 1);
-      }
-      this.data = res.opportunities || [];
-      if (Feed.mode === 'scout') this.render();
-    } catch(e) {
-      this.data = [];
-      if (Feed.mode === 'scout') {
-        document.getElementById('scout-content').innerHTML =
-          `<div class="scout-empty"><div class="scout-moon-icon">${ic('i-moon',40)}</div>Scout-Daten konnten nicht geladen werden.</div>`;
-      }
-    }
-  },
-
-  render() {
-    const el = document.getElementById('scout-content');
-    if ((!this.data || this.data.length === 0) && Gebiete.allPaused()) {
-      el.innerHTML = Gebiete.emptyAllHtml();
-      return;
-    }
-    if (!this.data || this.data.length === 0) {
-      el.innerHTML = `<div class="scout-empty">
-        <div class="scout-moon-icon">${ic('i-moon',40)}</div>
-        <p>Keine Scout-Chancen in den nächsten 14 Tagen gefunden.</p>
-        <p style="font-size:13px;margin-top:8px">Der Mond ist gerade nicht günstig für die ausgewählten Motive.</p>
-      </div>`;
-      return;
-    }
-
-    // Filter anwenden (US-80)
-    const filtered = Filter.applyToScout(this.data);
-    const n = this.data.length, nf = filtered.length;
-
-    if (nf === 0) {
-      el.innerHTML = `<div class="scout-empty">
-        <div class="scout-moon-icon">${ic('i-moon',40)}</div>
-        <p>Keine Scout-Chancen entsprechen den Filterkriterien.</p>
-        <p style="font-size:13px;margin-top:8px;color:var(--gold)">${n} Chancen vorhanden — Filter anpassen?</p>
-      </div>`;
-      return;
-    }
-
-    // Zähler-Header (nur bei aktivem Filter)
-    const countBar = (Filter.activeCount() > 0 && n !== nf)
-      ? `<div style="font-size:12px;color:var(--muted);padding:4px 0 10px">${nf} von ${n} Scout-Chancen</div>`
-      : '';
-
-    // Gruppieren nach Tag
-    const byDay = {};
-    for (const o of filtered) {
-      if (!byDay[o.day]) byDay[o.day] = [];
-      byDay[o.day].push(o);
-    }
-
-    let html = countBar;
-    for (const [day, opps] of Object.entries(byDay).slice(0, 14)) {
-      const d = new Date(day + 'T12:00:00Z');
-      const label = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-      html += `<div class="scout-day-header">${label}</div>`;
-      for (const o of opps) {
-        html += scoutCard(o);
-      }
-    }
-    el.innerHTML = html;
-  },
-
-  openDetail(o) {
-    // US-83: Scout → Detail Adapter (Feldnamen-Mapping aus ScoutOpportunity)
-    if (typeof o === 'string') o = JSON.parse(o);
-    const sesLabel = SESSION_LABELS[o.session] || o.session || '–';
-    // body_name aus session ableiten — Scout-Cache hat kein body_name-Feld
-    const bodyName = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
-    const bodyLabel = bodyName === 'sun' ? 'Sonne' : 'Mond';
-    // Scout-Cache nutzt moon_azimuth_deg / moon_altitude_deg statt body_azimuth_deg
-    const bodyAz  = o.moon_azimuth_deg  ?? o.body_azimuth_deg  ?? null;
-    const bodyAlt = o.moon_altitude_deg ?? o.body_altitude_deg ?? null;
-    const illumPct = o.moon_illumination_pct ?? o.body_illumination_pct ?? null;
-    const distKm = o.distance_m != null ? (Math.round(o.distance_m / 100) / 10) : null;
-    // Zeitfenster: ±15 Min um Optimal-Zeitpunkt
-    const shootMs = o.dt_utc ? new Date(o.dt_utc).getTime() : null;
-    const windowStart = shootMs ? new Date(shootMs - 15 * 60 * 1000).toISOString() : o.dt_utc;
-    const windowEnd   = shootMs ? new Date(shootMs + 15 * 60 * 1000).toISOString() : o.dt_utc;
-    const desc = `Scout-Standpunkt für ${o.subject_name || '–'} zur ${sesLabel}` +
-      (bodyAlt != null ? ` — ${bodyLabel} steht bei ${bodyAlt.toFixed(1)}° Höhe` : '') +
-      (bodyAz  != null ? `, Azimut ${bodyAz.toFixed(1)}°` : '') +
-      (distKm  != null ? `, Entfernung zum Motiv: ${distKm} km.` : '.');
-    // Kamera-Hints: nur wenn Brennweite vorhanden, mit sinnvollen Platzhaltern
-    const cameraHints = o.focal_length_equiv_mm != null
-      ? [{ focal_length_mm: o.focal_length_equiv_mm,
-           aperture_suggestion: bodyName === 'moon' ? 'f/5.6–f/8' : 'f/4–f/8',
-           shutter_suggestion:  bodyName === 'moon' ? '1/125s–1/500s' : '1/30s–1s',
-           iso_suggestion:      bodyName === 'moon' ? 'ISO 100–400' : 'ISO 400–1600',
-           tripod_required:     bodyName !== 'moon',
-           extra_tip:           bodyName === 'moon'
-             ? `${bodyLabel} bei ${illumPct != null ? Math.round(illumPct)+'% Beleuchtung' : 'aktueller Phase'}.`
-             : `${sesLabel} — Stativ empfohlen für lange Belichtungszeiten.` }]
-      : [];
-    const adapted = {
-      _isScout:           true,
-      _scoutRaw:          o,
-      title:              o.subject_name || '–',
-      overall_score:      o.score || 0,
-      astronomy_score:    o.score_alignment || o.score || 0,
-      weather_score:      o.score_wetter || 0,
-      event_type:         sesLabel,
-      shoot_time:         o.dt_utc,
-      shoot_window_start: windowStart,
-      shoot_window_end:   windowEnd,
-      observer_lat:       o.standpoint_lat,
-      observer_lon:       o.standpoint_lon,
-      subject_lat:        o.subject_lat,
-      subject_lon:        o.subject_lon,
-      subject_azimuth:    bodyAz,   // Azimut des Himmelskörpers = Blickachse vom Standpunkt
-      celestial_azimuth:  bodyAz,
-      celestial_altitude: bodyAlt,
-      moon_illumination_pct: bodyName === 'moon' ? illumPct : null,
-      weather_description: o.weather_description,
-      camera_hints:       cameraHints,
-      description:        desc,
-      location_id:        null,
-      location_name:      null,
-    };
-    Detail.open(adapted);
-  },
-
-  async _saveFromDetail() {
-    const o = Detail._currentScout;
-    if (!o) return;
-    const _katMap = {
-      '🏙 Skyline':      'SKYLINE',
-      '🌿 Natur':        'NATUR',
-      '🏛 Architektur':  'SKYLINE',
-      '🌉 Brücke':       'SKYLINE',
-      '🌊 Wasser':       'WASSER',
-      '🎡 Freizeitpark': 'SKYLINE',
-      '🏭 Industrie':    'INDUSTRIE',
-      '⛪ Kirche':       'SKYLINE',
-      '🗼 Turm':         'SKYLINE',
-      '🌳 Park':         'NATUR',
-    };
-    const category = _katMap[o.kategorie] || 'SKYLINE';
-    try {
-      await API.post('/preview-alignment', {
-        observer_lat:     o.standpoint_lat,
-        observer_lon:     o.standpoint_lon,
-        subject_lat:      o.subject_lat,
-        subject_lon:      o.subject_lon,
-        subject_name:     o.subject_name,
-        subject_height_m: 0,
-        subject_width_m:  0,
-        category:         category,
-        save:             true,
-      });
-      toast('✅ Location gespeichert!');
-      Detail.close();
-      await Locations.load();
-      await Feed.load();
-    } catch (err) {
-      toast('❌ ' + (err.message || 'Fehler beim Speichern'));
-    }
-  },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -3294,7 +3018,7 @@ const Filter = {
     // durch Object.assign mit diesen Defaults aufgefüllt → keine undefined.includes.
     // BUG-46: minRatingExcl (bool) = Drei-Zustand für Bewertung (false=≥N, true=<N).
     // verificationIncl/verificationExcl: Arrays mit 'verified'|'unverified'|'issues' (unabhängige Drei-Zustände).
-    // US-119: minScore-Default 0 → 70 (Feed/Kalender/Scout starten standardmäßig bei ≥70% Wahrscheinlichkeit).
+    // US-119: minScore-Default 0 → 70 (Feed/Kalender starten standardmäßig bei ≥70% Wahrscheinlichkeit).
     // US-09: sightlineIncl/sightlineExcl analog zu verificationIncl/verificationExcl
     // (Arrays mit 'frei'|'teilweise_verdeckt'|'blockiert'|'nicht_geprueft').
     // US-129: hasImage (bool, Filter aktiv?) + hasImageExcl (bool, Drei-Zustand:
@@ -3546,7 +3270,7 @@ const Filter = {
         if (s.sightlineIncl.length && !s.sightlineIncl.includes(cat)) return false;
         if (s.sightlineExcl.includes(cat)) return false;
       }
-      // US-129: "Hat Bild" — Drei-Zustand, nur Locations-Tab + Karte (nicht Feed/Kalender/Scout)
+      // US-129: "Hat Bild" — Drei-Zustand, nur Locations-Tab + Karte (nicht Feed/Kalender)
       if (s.hasImage) {
         const has = !!l.image_url;
         if (!s.hasImageExcl && !has) return false;
@@ -3579,59 +3303,6 @@ const Filter = {
       (loc.description || '').toLowerCase().includes(q) ||
       (loc.category || '').toLowerCase().includes(q)
     );
-  },
-
-  // Filtert Scout-Chancen (US-80/US-81)
-  // Anwendbare Dimensionen: Körpertyp (body_name), Tageszeit, Score, Brennweite, Entfernung
-  // Nicht anwendbar: difficulty, minRating, verification (kein Äquivalent in Scout-Daten)
-  applyToScout(data) {
-    const s = this.state;
-    const MORGEN = ['golden_morning', 'blue_morning'];
-    const ABEND  = ['golden_evening', 'blue_evening'];
-    // eventTypes → body_name-Mapping: Mond-Alignment → moon, Sonnen-Alignment → sun
-    const BODY_FILTER = new Set();
-    if (s.eventTypes.includes('Mond-Alignment'))   BODY_FILTER.add('moon');
-    if (s.eventTypes.includes('Sonnen-Alignment')) BODY_FILTER.add('sun');
-    // US-71: Exclude-Mapping (Mond-/Sonnen-Alignment ausschließen)
-    const BODY_EXCL = new Set();
-    if (s.eventTypesExcl.includes('Mond-Alignment'))   BODY_EXCL.add('moon');
-    if (s.eventTypesExcl.includes('Sonnen-Alignment')) BODY_EXCL.add('sun');
-    return data.filter(o => {
-      // Körpertyp-Filter (US-81): nur ausgewählte Himmelskörper zeigen
-      // body_name aus session ableiten (Scout-Cache hat kein body_name-Feld)
-      const _scoutBody = (o.session === 'milky_way' || o.session === 'moon') ? 'moon' : 'sun';
-      const _bodyName = o.body_name ?? _scoutBody;
-      if (BODY_FILTER.size > 0 && !BODY_FILTER.has(_bodyName)) return false;
-      if (BODY_EXCL.size > 0 && BODY_EXCL.has(_bodyName)) return false;  // US-71
-      // Tageszeit: Scout-Sessions auf morgen/abend mappen
-      if (s.tageszeit.length || s.tageszeitExcl.length) {
-        let slot = 'nacht';
-        if (MORGEN.includes(o.session)) slot = 'morgen';
-        else if (ABEND.includes(o.session)) slot = 'abend';
-        if (s.tageszeit.length && !s.tageszeit.includes(slot)) return false;
-        if (s.tageszeitExcl.length && s.tageszeitExcl.includes(slot)) return false;  // US-71
-      }
-      // Score (Scout: o.score; Feed: o.overall_score — unterschiedliche Feldnamen!)
-      if (s.minScore > 0 && o.score < s.minScore / 100) return false;
-      // Brennweite (direkt auf focal_length_equiv_mm)
-      if (s.minFocal > 0 && o.focal_length_equiv_mm < s.minFocal) return false;
-      if (s.maxFocal > 0 && o.focal_length_equiv_mm > s.maxFocal) return false;
-      // Entfernung: GPS-Standort → Fotografen-Standpunkt
-      if (s.maxDistKm > 0 && this._gps) {
-        const d = haversineKm(this._gps.lat, this._gps.lon, o.standpoint_lat, o.standpoint_lon);
-        if (d > s.maxDistKm) return false;
-      }
-      // BUG-82 (Scope-Erweiterung): Textsuche — sucht in Motiv-Name (subject_name) und
-      // Session-Label (SESSION_LABELS), da Scout-Einträge keine location_id-Bindung an
-      // gespeicherte Locations haben (openDetail() setzt location_id explizit auf null).
-      if (Search.query) {
-        const q = Search.query;
-        const sesLabel = SESSION_LABELS[o.session] || o.session || '';
-        const hay = [(o.subject_name || ''), sesLabel].join(' ').toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
   },
 
   async requestGps() {
@@ -3774,8 +3445,6 @@ const FilterSheet = {
       Feed.render();
     } else if (Feed.mode === 'calendar') {
       CalendarView.render();
-    } else if (Feed.mode === 'scout') {
-      Scout.render();
     }
     FilterSheet._updateResultCount();
   },
@@ -3804,9 +3473,6 @@ const FilterSheet = {
         count = Filter.apply(cached).length;
         label = `${count} von ${cached.length} Chancen (${MONTHS_DE[CalendarView.month]})` + Gebiete.chancenNote();
       }
-    } else if (Feed.mode === 'scout' && Scout.data) {
-      count = Filter.applyToScout(Scout.data).length;
-      label = `${count} von ${Scout.data.length} Scout-Chancen` + Gebiete.chancenNote();
     }
     el.textContent = label ? `↳ ${label} sichtbar` : '';
     el.style.color = count === 0 && label ? 'var(--warn, #f0a030)' : 'var(--muted)';
@@ -4019,14 +3685,8 @@ const FilterSheet = {
     // BUG-46: Ansichts-abhängiges Ausgrauen
     const isMapView      = App.current === 'map';
     const isLocationView = App.current === 'locations';
-    const isChancenOnly  = !isMapView && !isLocationView;  // Feed/Kalender/Scout
-    // US-129 (Scope-Erweiterung 2026-07-10): "Hat Bild" ist jetzt in Feed/Kalender aktiv,
-    // nur noch Entdecken (Scout) bleibt ausgegraut (dort keine location_id-Zuordnung möglich).
-    // BUG-76 (gefunden TASK-67 Etappe 6): Scout ist KEIN eigener App.nav()-Tab, sondern ein
-    // Unter-Modus des Feed-Tabs (Feed.setMode('scout')) — App.current bleibt dabei 'feed',
-    // die alte Bedingung "App.current === 'scout'" konnte daher nie zutreffen. Korrekt ist
-    // der tatsächliche Feed-Unter-Modus.
-    const isScoutOnly    = App.current === 'feed' && Feed.mode === 'scout';
+    const isChancenOnly  = !isMapView && !isLocationView;  // Feed/Kalender
+    // US-129 (Scope-Erweiterung 2026-07-10): "Hat Bild" ist in Feed/Kalender aktiv.
 
     // Chancen-spezifische Kriterien: Tageszeit, Mindest-Wahrscheinlichkeit
     // → ausgegraut auf Locations-Tab und Karte
@@ -4093,7 +3753,7 @@ const FilterSheet = {
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Linker Handle = Min · Rechter = Max · 800 mm = kein Limit</p>
         </div>`;
 
-    // Eventtyp: wirkt auf Map (via Feed-Daten BUG-23) und auf Chancen-Feed/Kalender/Scout.
+    // Eventtyp: wirkt auf Map (via Feed-Daten BUG-23) und auf Chancen-Feed/Kalender.
     // Auf Locations-Tab: kein direkter Effekt → ausgrauen.
     const etSection = isLocationView
       ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
@@ -4106,19 +3766,11 @@ const FilterSheet = {
 
     const verNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">nur zeigen</span> → <span style="color:var(--red)">ausblenden</span> → aus. Mehrere Chips kombinierbar.</p>`;
     const ratingNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">≥ N Sterne</span> → <span style="color:var(--red)">weniger als N Sterne</span> → aus</p>`;
-    // US-129 (Scope-Erweiterung): aktiv auf Locations-Tab, Karte, Feed und Kalender —
-    // nur noch bei Entdecken (Scout) ausgegraut, da Scout-Chancen keine location_id tragen.
+    // US-129 (Scope-Erweiterung): aktiv auf Locations-Tab, Karte, Feed und Kalender.
     const hasImageNote = `<p style="font-size:11px;color:var(--muted);margin-top:6px">Tippen: <span style="color:var(--gold)">Hat Bild</span> → <span style="color:var(--red)">Ohne Bild</span> → aus.</p>`;
-    const hasImageSection = isScoutOnly
-      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">${ic('i-image',15)} Beispielbild ${fInfoBtn('hatbild')}</h4>
-          <div class="filter-chips">${hasImageChips}</div>
-          <p style="font-size:11px;color:var(--muted);margin-top:6px">Bei Entdecken nicht verfügbar (Chancen ohne festen Ort)</p>
-        </div>`
-      : `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-image',15)} Beispielbild ${fInfoBtn('hatbild')}</h4><div class="filter-chips">${hasImageChips}</div>${hasImageNote}</div>`;
+    const hasImageSection = `<div class="filter-section"><h4 style="display:flex;align-items:center;gap:6px">${ic('i-image',15)} Beispielbild ${fInfoBtn('hatbild')}</h4><div class="filter-chips">${hasImageChips}</div>${hasImageNote}</div>`;
 
     // US-07: Wolkenstimmungs-Filter
-    const isScoutView = App.current === 'scout';
     const cloudMoodLabels = [['Alle', 0], ['Mäßig+', 2], ['Gut+', 3], ['Exzellent', 4]];
     const cloudMoodChips = cloudMoodLabels.map(([l, v]) => {
       const active = s.minCloudMood === v;
@@ -4130,12 +3782,6 @@ const FilterSheet = {
           <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
           <div class="filter-chips">${cloudMoodChips}</div>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Chancen-Feed verfügbar</p>
-        </div>`
-      : isScoutView
-      ? `<div class="filter-section" style="opacity:.45;pointer-events:none">
-          <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
-          <div class="filter-chips">${cloudMoodChips}</div>
-          <p style="font-size:11px;color:var(--muted);margin-top:6px">Nur im Feed verfügbar</p>
         </div>`
       : `<div class="filter-section">
           <h4 style="display:flex;align-items:center;gap:6px">☁️ Wolkenstimmung ${fInfoBtn('wolkenstimmung')}</h4>
@@ -4879,7 +4525,6 @@ const CameraFOV = {
 };
 
 const Detail = {
-  _currentScout: null,
   open(o) {
     if (typeof o === 'string') o = JSON.parse(o);
     const icon = eventIcon(o.event_type, 18);
@@ -5307,27 +4952,22 @@ const Detail = {
       })()}
       ${mkSec('ev_astro_live',`${ic('i-milkyway',15)} Himmelskörper-Bahnen`,`<button onclick="${o.location_id ? `AstroLive.openForDate('${o.location_id}','${o.shoot_time}')` : `AstroLive.openForLatLon(${o.observer_lat},${o.observer_lon},'${o.shoot_time}')`}" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button><p style="font-size:11px;color:var(--muted);margin:6px 0 0">Zeigt Sonne, Mond und Milchstraße für den Shoot-Zeitpunkt dieser Chance.</p>`)}
       <div class="sheet-actions">
-        ${o._isScout
-          ? `<button class="btn-primary" onclick="Scout._saveFromDetail()" style="background:var(--accent);color:var(--on-accent,#000);border:none">${ic('i-pin',15)} Als Location speichern</button>`
-          : `<button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+        <button class="btn-primary" onclick="Detail.addToCalendar(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           ${ic('i-calplus',15)} Zum Kalender hinzufügen
-        </button>`
-        }
+        </button>
         ${(o.observer_lat != null && o.observer_lon != null) ? `
         <button id="pp-btn" class="btn-primary" onclick="Detail.sendToPhotoPills(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-send',15)} An PhotoPills senden
         </button>
         <div id="pp-result"></div>` : ''}
-        ${!o._isScout ? `
         <button class="btn-primary" onclick="Detail.setReminder(${JSON.stringify(o).replace(/"/g,'&quot;')})" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${ic('i-bell',15)} Erinnerung setzen (30 Min. vorher)
         </button>
         <button id="verify-btn-${(o.location_id||'x').replace(/[^a-z0-9]/gi,'_')}" class="btn-primary" onclick="Verify.showForm('${o.location_id}','${escJsAttr(Locations.nameFor(o.location_id, o.location_name))}' )" style="background:var(--card);color:var(--gold);border:1px solid var(--gold)">
           ${Verify.getLast(o.location_id) ? ic('i-check',15)+' Erneut prüfen / Kommentar ändern' : ic('i-pin',15)+' Vor Ort geprüft markieren'}
-        </button>` : ''}
+        </button>
       </div>
     `;
-    Detail._currentScout = o._isScout ? o._scoutRaw : null;
     document.getElementById('detail-overlay').classList.add('open');
     document.getElementById('detail-sheet').classList.add('open');
     // US-58: FOV-Karte wenn Sektion bereits offen (localStorage)
@@ -5443,12 +5083,8 @@ const Detail = {
     Detail._showPhotoPillsFallback(o);
   },
   _buildPhotoPillsText(o) {
-    // Bug-Fix (AK7): Scout-Kandidaten haben weder location_id noch location_name
-    // (siehe Scout.openDetail() – beide werden dort explizit auf null gesetzt).
-    // Locations.nameFor() liefert dann null zurück ("null" landet sonst zweimal im
-    // Text). o.title trägt bei Scout-Objekten bereits den echten Motiv-Namen
-    // (Scout.openDetail(): title = o.subject_name || '–') – dieselbe Quelle, die
-    // auch der Sheet-Titel (sheet-hero-title, Detail.open()) korrekt anzeigt.
+    // Bug-Fix (AK7): Ohne location_id/location_name liefert Locations.nameFor() null zurück
+    // ("null" landet sonst zweimal im Text); deshalb Rückfall auf o.title bzw. o.subject_name.
     const locName = Locations.nameFor(o.location_id, o.location_name) || o.title || o.subject_name || 'Unbekannter Ort';
     const lines = [];
     lines.push(`${locName} – ${o.event_type}`);
@@ -6231,7 +5867,7 @@ const AstroLive = {
 
   openForLatLon(lat, lon, isoDate) {
     if (typeof Astronomy === 'undefined') { toast('Astronomie-Modul lädt noch – kurz erneut versuchen'); return; }
-    this.loc = { observer_lat: lat, observer_lon: lon, name: 'Scout-Standpunkt' };
+    this.loc = { observer_lat: lat, observer_lon: lon, name: 'Standpunkt' };
     document.getElementById('astro-content').innerHTML = this._html();
     document.getElementById('astro-overlay').classList.add('open');
     document.getElementById('astro-sheet').classList.add('open');
@@ -6444,7 +6080,7 @@ const AstroLive = {
     }
     // US-09: Linienstil der Sichtachse je Status — durchgezogen (frei), gestrichelt
     // (teilweise_verdeckt), unterbrochen/mit Balken (blockiert), gepunktet (nicht_geprueft
-    // bzw. kein Status bekannt, z.B. Scout-Standpunkt ohne Location-Datensatz).
+    // bzw. kein Status bekannt, z.B. Standpunkt ohne Location-Datensatz).
     const AXIS_DASH_BY_STATUS = {
       frei: false,
       teilweise_verdeckt: '5 4',
@@ -8287,14 +7923,12 @@ const Gebiete = {
       return false;
     } finally { this._busy = false; }
   },
-  // Nach jeder Änderung: Orte, Feed, Kalender, Entdecken und Karte neu holen
+  // Nach jeder Änderung: Orte, Feed, Kalender und Karte neu holen
   async refreshAfterChange() {
     try { Locations.all = await API.get('/locations'); } catch (e) { /* alter Stand */ }
     try { await Feed.load(); } catch (e) { /* Feed lädt selbst nach */ }
     try { CalendarView._monthCache.clear(); } catch (e) { /* ignorieren */ }
-    try { Scout.data = null; } catch (e) { /* ignorieren */ }
     if (Feed.mode === 'calendar') CalendarView.show();
-    else if (Feed.mode === 'scout') Scout.show();
     if (MapView.map) { try { await MapView.loadMarkers(); } catch (e) { /* Karte lädt beim nächsten Besuch */ } }
     if (App.current === 'locations') Locations.filter(Search.query);
     const cur = LocationDetail._current;
@@ -8878,7 +8512,7 @@ const ElementInfo = {
     },
     hatbild: {
       title: 'Filter: Beispielbild',
-      html: `<p>Grenzt Locations bzw. Foto-Chancen danach ein, ob die zugehörige Location bereits ein Beispielbild hat (Bildausschnitt-Feature). Wirkt auf Locations-Tab, Karte, Feed und Kalender. Bei Entdecken nicht verfügbar, da diese Chancen keinem festen Ort zugeordnet sind.</p>
+      html: `<p>Grenzt Locations bzw. Foto-Chancen danach ein, ob die zugehörige Location bereits ein Beispielbild hat (Bildausschnitt-Feature). Wirkt auf Locations-Tab, Karte, Feed und Kalender.</p>
         <p style="margin-top:8px">Tippen: <span style="color:var(--gold)">Hat Bild</span> → <span style="color:var(--red)">Ohne Bild</span> → aus.</p>`,
     },
     sichtachsenstatus: {
@@ -8990,102 +8624,8 @@ const ElementInfo = {
 };
 
 // ═══════════════════════════════════════════════════════
-// ONBOARDING (US-21) — 4 Einführungs-Slides beim allerersten App-Start.
-// Erscheint nur einmal (localStorage-Flag fa_onboarding_seen), ist aber jederzeit
-// über den Glossar-Eintrag „Onboarding erneut ansehen" erneut aufrufbar.
-// ═══════════════════════════════════════════════════════
-const Onboarding = {
-  _STORAGE_KEY: 'fa_onboarding_seen',
-  _idx: 0,
-
-  _slides: [
-    {
-      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="52" cy="52" r="30" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M52 6 A46 46 0 0 1 98 52 L52 52 Z" fill="var(--accent-2)"/><circle cx="52" cy="52" r="6" fill="var(--accent)"/></svg>`,
-      title: 'Willkommen bei FotoAlert',
-      text: 'FotoAlert zeigt dir, wann und wo gerade gutes Licht, spannende Himmelsereignisse oder besondere Fotomomente auf dich warten.',
-    },
-    {
-      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><rect x="22" y="22" width="26" height="26" fill="var(--accent)"/><rect x="56" y="22" width="26" height="26" fill="none" stroke="var(--accent-2)" stroke-width="3"/><circle cx="35" cy="69" r="13" fill="var(--accent-2)"/><rect x="56" y="56" width="26" height="26" fill="none" stroke="var(--muted)" stroke-width="3" transform="rotate(45 69 69)"/></svg>`,
-      title: 'Scores auf einen Blick',
-      text: 'Jede Foto-Chance bekommt einen Astronomie- und Wetter-Score von 0–100 %. Ein ⓘ neben jedem Wert erklärt dir jederzeit, wie er berechnet wird.',
-    },
-    {
-      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="35" cy="40" r="16" fill="var(--green)"/><circle cx="70" cy="40" r="16" fill="var(--orange)"/><circle cx="52" cy="75" r="16" fill="var(--red)"/></svg>`,
-      title: 'Schwierigkeitsgrade &amp; Event-Typen',
-      text: 'Farbige Badges zeigen dir sofort, wie anspruchsvoll ein Ort ist und um welche Art von Ereignis es sich handelt — vom Sonnenuntergang bis zur Sternennacht.',
-    },
-    {
-      glyph: `<svg class="onb-glyph" viewBox="0 0 104 104"><circle cx="52" cy="52" r="34" fill="none" stroke="var(--accent)" stroke-width="3"/><text x="52" y="61" text-anchor="middle" font-size="34" font-weight="800" fill="var(--accent)" font-family="-apple-system,sans-serif">?</text></svg>`,
-      title: 'Hilfe ist immer griffbereit',
-      text: 'Fragen tauchen später auf? Der „?"-Button oben im Header öffnet jederzeit das Glossar mit allen Erklärungen — auch dieses Onboarding kannst du dort erneut aufrufen.',
-    },
-  ],
-
-  // Beim App-Boot aufgerufen: zeigt Onboarding nur, wenn es noch nie gesehen wurde.
-  initialShowIfNeeded() {
-    if (!localStorage.getItem(this._STORAGE_KEY)) this.open();
-  },
-
-  // Manueller Re-Start (aus dem Glossar-Eintrag „Onboarding erneut ansehen").
-  restart() {
-    Glossary.close();
-    this.open();
-  },
-
-  open() {
-    this._idx = 0;
-    this._render();
-    document.getElementById('onboarding-overlay').classList.add('open');
-  },
-
-  close() {
-    localStorage.setItem(this._STORAGE_KEY, '1');
-    document.getElementById('onboarding-overlay').classList.remove('open');
-  },
-
-  next() {
-    if (this._idx >= this._slides.length - 1) { this.close(); return; }
-    this._idx++;
-    this._render();
-  },
-
-  back() {
-    if (this._idx <= 0) return;
-    this._idx--;
-    this._render();
-  },
-
-  _render() {
-    const s = this._slides[this._idx];
-    const isFirst = this._idx === 0;
-    const isLast = this._idx === this._slides.length - 1;
-    const dots = this._slides.map((_, i) => `<div class="onb-dot${i === this._idx ? ' active' : ''}"></div>`).join('');
-    const backBtn = isFirst ? '' : `<button class="onb-back" onclick="Onboarding.back()" aria-label="Zurück"><svg style="width:18px;height:18px"><use href="#i-chevleft"/></svg></button>`;
-    const nextLabel = isLast
-      ? `Los geht's`
-      : `Weiter <svg style="width:16px;height:16px"><use href="#i-chevright"/></svg>`;
-    const skipBtn = isLast ? '' : `<button class="onb-skip" onclick="Onboarding.close()">Überspringen</button>`;
-    document.getElementById('onboarding-screen').innerHTML = `
-      ${skipBtn}
-      <div class="onb-body">
-        ${s.glyph}
-        <div class="onb-title">${s.title}</div>
-        <div class="onb-text">${s.text}</div>
-      </div>
-      <div class="onb-footer">
-        <div class="onb-dots">${dots}</div>
-        <div class="onb-nextrow">
-          ${backBtn}
-          <button class="onb-next-btn" onclick="Onboarding.next()">${nextLabel}</button>
-        </div>
-      </div>`;
-  },
-};
-
-// ═══════════════════════════════════════════════════════
 // GLOSSAR (US-21) — zentrales Nachschlagewerk über den Header-„?"-Button.
 // Bottom-Sheet mit Suchfeld + Accordion, Einträge nach Themen gruppiert.
-// Erster Eintrag startet das Onboarding erneut (deckt AK „jederzeit wieder aufrufbar" ab).
 // ═══════════════════════════════════════════════════════
 const Glossary = {
   _query: '',
@@ -9094,7 +8634,6 @@ const Glossary = {
   // damit bei künftigen Score-/Typ-Änderungen nur eine Stelle aktuell gehalten werden muss).
   _entries() {
     return [
-      { section: 'Einführung', special: 'onboarding', q: 'Onboarding erneut ansehen', html: '' },
       { section: 'Scores', q: 'Gesamt-Score', html: ScoreInfo._texts.gesamt.html },
       { section: 'Scores', q: 'Astronomie-Score', html: ScoreInfo._texts.astro.html },
       { section: 'Scores', q: 'Wetter-Score', html: ScoreInfo._texts.wetter.html },
@@ -9103,7 +8642,7 @@ const Glossary = {
       { section: 'Kernbegriffe', q: 'Verifikationsstatus', html: ElementInfo._verification.html },
       { section: 'Kernbegriffe', q: 'Kartensymbole', html: ElementInfo._mapLegendData().html },
       // Scope-Erweiterung (2026-07-05): 2 neue Glossar-Einträge, Texte 1:1 aus dem US-21-Ticket.
-      { section: 'Kernbegriffe', q: 'Wie unterscheiden sich Feed, Kalender und Scout?', html: '<p>Der Feed zeigt dir als 14-Tage-Vorschau laufend aktuelle Foto-Chancen in zeitlicher Nähe. Der Kalender zeigt eine Monatsübersicht, durch die du frei vor- und zurückblättern kannst, um auch weiter in der Zukunft oder Vergangenheit liegende Chancen zu sehen. Scout (Betaversion) errechnet eigene Chancen unabhängig von deinen angelegten Standorten und schlägt dir mögliche neue Perspektiven auf bekannte Motive vor — diese Vorschläge sollen zum Erkunden einladen, sind aber nicht verifiziert und können fehlerhaft sein.</p>' },
+      { section: 'Kernbegriffe', q: 'Wie unterscheiden sich Feed und Kalender?', html: '<p>Der 14-Tage Feed zeigt dir laufend aktuelle Foto-Chancen deiner Orte für die nächsten zwei Wochen. Der Jahreskalender zeigt dieselben Chancen auf einen Blick über das ganze Jahr.</p>' },
       { section: 'Kernbegriffe', q: 'Wie funktionieren die Filter?', html: '<p>Wählst du mehrere Optionen innerhalb derselben Filtergruppe (z. B. zwei Event-Typen), werden dir Chancen gezeigt, die mindestens eine davon erfüllen. Kombinierst du dagegen mehrere Filtergruppen (z. B. Event-Typ UND Schwierigkeitsgrad), müssen beide Bedingungen gleichzeitig zutreffen. Beim Verifikations-Filter kannst du zusätzlich gezielt geprüfte oder ungeprüfte Standorte ausschließen.</p>' },
     ];
   },
@@ -9146,22 +8685,13 @@ const Glossary = {
         html += `<div class="glossary-section-label">${e.section}</div>`;
         lastSection = e.section;
       }
-      if (e.special === 'onboarding') {
-        html += `<div class="glossary-item">
-          <button class="glossary-q" onclick="Onboarding.restart()">
-            <span class="glossary-q-text">${e.q}</span>
-            <svg style="width:16px;height:16px"><use href="#i-chevright"/></svg>
-          </button>
-        </div>`;
-      } else {
-        html += `<div class="glossary-item" id="glossary-item-${i}">
-          <button class="glossary-q" onclick="Glossary.toggle(${i})">
-            <span class="glossary-q-text">${e.q}</span>
-            <svg style="width:16px;height:16px"><use href="#i-chevdown"/></svg>
-          </button>
-          <div class="glossary-a"><div class="glossary-a-inner">${e.html}</div></div>
-        </div>`;
-      }
+      html += `<div class="glossary-item" id="glossary-item-${i}">
+        <button class="glossary-q" onclick="Glossary.toggle(${i})">
+          <span class="glossary-q-text">${e.q}</span>
+          <svg style="width:16px;height:16px"><use href="#i-chevdown"/></svg>
+        </button>
+        <div class="glossary-a"><div class="glossary-a-inner">${e.html}</div></div>
+      </div>`;
     });
     list.innerHTML = html;
   },
@@ -9196,9 +8726,6 @@ const Search = {
     if (App.current === 'locations') Locations.filter(this._query);
     else if (App.current === 'map') MapView.applyFilter();
     else if (Feed.mode === 'calendar') CalendarView.render();
-    // BUG-82 (Scope-Erweiterung): eigener Zweig für Scout, sonst lief die Suche im
-    // wirkungslosen else-Zweig (Feed.render() statt Scout.render()).
-    else if (Feed.mode === 'scout') Scout.render();
     else Feed.render();
   },
 };
@@ -9275,8 +8802,6 @@ const App = {
     setTimeout(async () => {
       await Feed.load();
     }, 12000);
-    // US-21: Onboarding nur beim allerersten Start zeigen (localStorage-Flag)
-    Onboarding.initialShowIfNeeded();
   }
 };
 
