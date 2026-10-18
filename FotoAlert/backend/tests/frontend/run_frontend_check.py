@@ -400,8 +400,8 @@ def run_checks(
         # 6f) TASK-67: Wetter-Kartenansicht — Grundbedienung (Ebenen-Umschalter, Zeit-Slider).
         findings.extend(_check_weather_map_controls(page, commit, _shot))
 
-        # 6g) TASK-67: Entdecken-Modus (Scout) — Basistest.
-        findings.extend(_check_scout_mode(page, commit, _shot))
+        # 6g) US-142 T1: Umschaltleiste mit genau zwei Knoepfen (ersetzt den Scout-Basistest).
+        findings.extend(_check_mode_bar(page, commit, _shot))
 
         # 6h) TASK-67: Globale UI — "?"-Button öffnet Glossar (Abschnitt 2 PRODUCT.md).
         findings.extend(_check_help_glossary(page, commit, _shot))
@@ -2458,8 +2458,7 @@ def _check_has_image_chip_tristate_and_effect(page, commit: str, shot) -> List["
     """"Hat Beispielbild"-Chip (FilterSheet._cycleHasImage()): Drei-Zustand-Zyklus
     Aus -> gold "Hat Bild" -> rot "Ohne Bild" -> Aus (US-129). Wirkt auf Orte-Tab
     (hier real per Klick + Ground-Truth-Vergleich gegen Filter.applyToLocations()
-    verifiziert); bleibt bei Entdecken/Scout ausgegraut (isScoutOnly, web/index.html
-    ~Zeile 3570/3653).
+    verifiziert); ist in Feed und Kalender aktiv (US-142 T1: kein Ausgrauen mehr).
 
     Effekt auf Karte/Feed/Kalender NICHT hier per eigenem Browserlauf dupliziert —
     dieselbe s.hasImage/s.hasImageExcl-Prüflogik taucht an den jeweiligen
@@ -2569,51 +2568,7 @@ def _check_has_image_chip_tristate_and_effect(page, commit: str, shot) -> List["
     shot("hasimage-chip-tristate-done")
     page.evaluate("() => { if (typeof FilterSheet !== 'undefined') FilterSheet.close(); }")
 
-    # Ausgegraut-Check: NUR bei Entdecken/Scout (isScoutOnly).
-    page.evaluate(
-        "() => { if (typeof App !== 'undefined') App.nav('feed'); "
-        "if (typeof Feed !== 'undefined' && typeof Feed.setMode === 'function') Feed.setMode('scout'); }"
-    )
-    try:
-        page.wait_for_selector(_spec.SCOUT_CONTENT_SELECTOR, timeout=8000)
-        page.click(_spec.FILTER_BTN_SELECTOR)
-        page.wait_for_selector(_spec.FILTER_SHEET_OPEN_SELECTOR, timeout=8000)
-        opacity = page.eval_on_selector(
-            _spec.HASIMAGE_SECTION_SELECTOR, "el => getComputedStyle(el).opacity"
-        )
-        if opacity != "0.45":
-            findings.append(
-                Finding(
-                    view="filter",
-                    assertion_id="hasimage_dimmed_on_scout",
-                    expected="Beispielbild-Filter-Section bei Entdecken/Scout opacity 0.45 (ausgegraut, US-129)",
-                    actual="opacity = " + str(opacity),
-                    message="hasImage filter section not dimmed on scout view",
-                    screenshot_path=shot("hasimage-not-dimmed-scout"),
-                    timestamp=_now_iso(),
-                    commit_sha=commit,
-                )
-            )
-    except Exception as e:
-        findings.append(
-            Finding(
-                view="filter",
-                assertion_id="hasimage_dimmed_on_scout_check",
-                expected="Filter-Sheet + Beispielbild-Section bei Entdecken prüfbar",
-                actual="Check konnte nicht durchgeführt werden: {0}".format(e),
-                message="could not evaluate hasImage dimming on scout view",
-                screenshot_path=shot("hasimage-scout-check-failed"),
-                timestamp=_now_iso(),
-                commit_sha=commit,
-            )
-        )
-    page.evaluate("() => { if (typeof FilterSheet !== 'undefined') FilterSheet.close(); }")
-
-    # TASK-107 (Korrektur): Feed.setMode('scout') oben blendet #feed-content dauerhaft
-    # aus (web/index.html Feed.setMode(), style.display = 'none'), bis irgendwer aktiv
-    # zurück in den Feed-Modus schaltet. App.nav() allein tut das NICHT (setzt nur
-    # .page/.tab-Klassen um, siehe App.nav() in web/index.html). Ohne diesen Reset bleibt
-    # #feed-content für alle nachfolgenden Checks unsichtbar (u.a. bug88_feed_data_ready).
+    # Zurueck in den Feed-Modus (App.nav() allein schaltet den Modus nicht um).
     page.evaluate(
         "() => { if (typeof Feed !== 'undefined' && typeof Feed.setMode === 'function') Feed.setMode('feed'); }"
     )
@@ -3032,63 +2987,113 @@ def _check_weather_map_controls(page, commit: str, shot) -> List["Finding"]:
     return findings
 
 
-# --- TASK-67 (Etappe 3): Entdecken-Modus (Scout) — Basistest ----------------------
-def _check_scout_mode(page, commit: str, shot) -> List["Finding"]:
-    """Feed.setMode('scout') -> Scout.show(): #scout-content wird sichtbar und
-    fehlerfrei befüllt (Karte oder expliziter Leer-/Lade-Zustand, kein stiller Fehler).
+# --- US-142 T1: Umschaltleiste mit genau zwei Knoepfen ------------------------------
+def _check_mode_bar(page, commit: str, shot) -> List["Finding"]:
+    """Umschaltleiste im Tab "Chancen": genau zwei Knoepfe ("14-Tage Feed",
+    "Jahreskalender"), je etwa die halbe Breite (+-2 px) bei 390 px und 1280 px
+    Fensterbreite; dreimal Feed <-> Kalender wechselt ohne Konsolenfehler; kein
+    sichtbares "Scout"/"Entdecken" in der Leiste.
     """
     _close_any_open_sheet(page)
     findings: List[Finding] = []
-    page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "feed")
-    try:
-        page.wait_for_selector(_spec.SCOUT_MODE_BTN_SELECTOR, timeout=8000)
-        page.click(_spec.SCOUT_MODE_BTN_SELECTOR)
-        page.wait_for_function(
-            "(sel) => { const el = document.querySelector(sel); "
-            "return el && el.style.display !== 'none'; }",
-            arg=_spec.SCOUT_CONTENT_SELECTOR,
-            timeout=8000,
-        )
-    except Exception:
+    local_errors: List[str] = []
+    on_console = lambda m: local_errors.append(m.text) if m.type == "error" else None  # noqa: E731
+    on_pageerror = lambda e: local_errors.append(str(e))  # noqa: E731
+    page.on("console", on_console)
+    page.on("pageerror", on_pageerror)
+    orig_vp = page.viewport_size or {"width": 1280, "height": 800}
+
+    def _add(assertion_id, expected, actual, message, shot_name):
         findings.append(
             Finding(
-                view="scout",
-                assertion_id="scout_mode_activates",
-                expected=_spec.SCOUT_CONTENT_SELECTOR + " sichtbar nach Feed.setMode('scout')",
-                actual="Scout-Content wurde nicht rechtzeitig sichtbar",
-                message="scout content did not become visible after activating scout mode",
-                screenshot_path=shot("scout-not-visible"),
+                view="feed",
+                assertion_id=assertion_id,
+                expected=expected,
+                actual=actual,
+                message=message,
+                screenshot_path=shot(shot_name),
                 timestamp=_now_iso(),
                 commit_sha=commit,
             )
         )
+
+    try:
+        page.evaluate("(v) => { if (typeof App !== 'undefined') App.nav(v); }", "feed")
+        page.wait_for_selector(_spec.MODE_BAR_SELECTOR, timeout=8000)
+        for width in (390, 1280):
+            page.set_viewport_size({"width": width, "height": 800})
+            page.wait_for_timeout(300)
+            info = page.evaluate(
+                "(sel) => { const bar = document.querySelector('.feed-mode-bar'); "
+                "const b = [...document.querySelectorAll(sel)]; "
+                "const bw = bar ? bar.getBoundingClientRect().width : 0; "
+                "return { n: b.length, bar: bw, "
+                "w: b.map(x => x.getBoundingClientRect().width), "
+                "t: b.map(x => x.textContent.trim()), "
+                "barText: bar ? bar.textContent : '' }; }",
+                _spec.MODE_BAR_BTN_SELECTOR,
+            )
+            if info["n"] != 2:
+                _add("modebar_two_buttons_%d" % width, "genau 2 Knoepfe in der Umschaltleiste",
+                     "%d Knoepfe: %s" % (info["n"], info["t"]),
+                     "mode bar does not have exactly two buttons", "modebar-count-%d" % width)
+                continue
+            if abs(info["w"][0] - info["w"][1]) > 2:
+                _add("modebar_equal_width_%d" % width, "beide Knoepfe gleich breit (+-2 px)",
+                     "Breiten: %s" % info["w"], "mode bar buttons differ in width",
+                     "modebar-unequal-%d" % width)
+            for w in info["w"]:
+                if abs(w - info["bar"] / 2) > info["bar"] * 0.06:
+                    _add("modebar_half_width_%d" % width, "jeder Knopf etwa halbe Leistenbreite",
+                         "Knopf %.1f px bei Leiste %.1f px" % (w, info["bar"]),
+                         "mode bar button is not about half the bar width", "modebar-half-%d" % width)
+                    break
+            low = info["barText"].lower()
+            if "scout" in low or "entdecken" in low:
+                _add("modebar_no_scout_text_%d" % width, "kein Scout/Entdecken-Text in der Leiste",
+                     info["barText"].strip()[:80], "scout text still visible in mode bar",
+                     "modebar-scout-text-%d" % width)
+            shot("modebar-%d" % width)
+
+        # Feed <-> Kalender dreimal
+        page.set_viewport_size({"width": 390, "height": 800})
+        for i in range(3):
+            page.click(_spec.CALENDAR_MODE_BTN_SELECTOR)
+            page.wait_for_selector(_spec.CALENDAR_NAV_SELECTOR, timeout=15000)
+            cal_active = page.evaluate(
+                "() => document.getElementById('fmb-calendar').classList.contains('active') "
+                "&& !document.getElementById('fmb-feed').classList.contains('active')"
+            )
+            page.click(_spec.FEED_MODE_BTN_SELECTOR)
+            page.wait_for_function(
+                "() => document.getElementById('fmb-feed').classList.contains('active') "
+                "&& !document.getElementById('fmb-calendar').classList.contains('active') "
+                "&& !document.querySelector('#feed-content .cal-nav')",
+                timeout=8000,
+            )
+            if not cal_active:
+                _add("modebar_switch_highlight", "Kalender-Knopf hervorgehoben im Kalender-Modus",
+                     "Runde %d: falscher Knopf aktiv" % (i + 1),
+                     "wrong button highlighted after switching to calendar", "modebar-highlight")
+    except Exception as e:
+        _add("modebar_switch_failed", "Wechsel Feed <-> Kalender (3x) laeuft durch",
+             "Abbruch: {0}".format(e), "mode bar check failed: {0}".format(e), "modebar-failed")
+    finally:
+        try:
+            page.set_viewport_size(orig_vp)
+        except Exception:
+            pass
+        try:
+            page.remove_listener("console", on_console)
+            page.remove_listener("pageerror", on_pageerror)
+        except Exception:
+            pass
+    if local_errors:
+        _add("modebar_console_clean", "keine Konsolenfehler beim Umschalten",
+             " | ".join(local_errors[:3])[:300], "console errors while switching mode",
+             "modebar-console-errors")
+    try:
         page.click(_spec.FEED_MODE_BTN_SELECTOR)
-        return findings
-
-    try:
-        page.wait_for_function(
-            "(sel) => { const el = document.querySelector(sel); "
-            "return !!el && el.innerHTML.trim().length > 0; }",
-            arg=_spec.SCOUT_CONTENT_SELECTOR,
-            timeout=20000,
-        )
-    except Exception:
-        findings.append(
-            Finding(
-                view="scout",
-                assertion_id="scout_content_populated",
-                expected=_spec.SCOUT_CONTENT_SELECTOR + " erhält Inhalt (Karten, Lade- oder Leer-Hinweis)",
-                actual="Scout-Content blieb leer",
-                message="scout content stayed empty after activating scout mode",
-                screenshot_path=shot("scout-content-empty"),
-                timestamp=_now_iso(),
-                commit_sha=commit,
-            )
-        )
-
-    shot("scout-mode")
-    page.click(_spec.FEED_MODE_BTN_SELECTOR)
-    try:
         page.wait_for_selector(_spec.FEED_CONTENT_SELECTOR, timeout=8000)
     except Exception:
         pass

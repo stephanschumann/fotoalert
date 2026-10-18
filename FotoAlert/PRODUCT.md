@@ -24,28 +24,28 @@ FotoAlert ist eine PWA + iOS-App, die Fotografen automatisiert berechnet, **wann
 
 | Element | Verhalten |
 |---------|-----------|
-| Tab Bar (unten) | 5 Tabs: Feed · Karte · + (Quick Add) · Orte · Entdecken |
+| Tab Bar (unten) | 5 Tabs: Chancen (oben Umschaltleiste „14-Tage Feed“ / „Jahreskalender“, je halbe Breite; seit US-142 T1 ohne Scout) · Karte · + (Quick Add) · Orte · Einstellungen |
 | Aktiver Tab | `.active`-Klasse, nie `.open` |
 | Sheets | `.open`-Klasse für alle Bottom-Sheets; kein `.active` |
 | Theme | Automatisch Tag/Nacht basierend auf Systemeinstellung (US-97), manueller Umschalter in Einstellungen |
 | Design-System | Bauhaus-Tokens (`--bg`, `--surface`, `--accent`, `--text`, `--on-accent` etc.), Linien-Icon-Set (US-100) |
 | Safe Area | Alle Sheet-Header haben `env(safe-area-inset-top)` — gilt für: `#add-sheet .add-header`, `#detail-sheet`, `#loc-detail-sheet`, `#impressum-sheet` |
 | Logo | Bauhaus-Logo sichtbar (US-102) |
-| Onboarding (US-21) | 4 Einführungs-Slides (`Onboarding`-Objekt) beim allerersten App-Start; Fortschrittspunkte unten, „Weiter" wird auf Slide 4 zu „Los geht's", ab Slide 2 Zurück-Pfeil links, „Überspringen" oben rechts auf allen Screens außer dem letzten. Erscheint nur einmal (localStorage-Flag `fa_onboarding_seen`), danach nur noch über Glossar aufrufbar. |
+| Onboarding (US-21) | **Entfernt (US-143, 2026-10-18):** Es gibt keine Willkommens-Slides mehr — weder automatisch nach dem Login noch über das Glossar. Das Onboarding-Objekt, das Overlay, der Stil und der Merker `fa_onboarding_seen` sind aus der App entfernt (ein auf Geräten noch vorhandener alter Merker wird ignoriert). |
 | „?"-Header-Button (US-21) | Ganz rechts im Header, öffnet `Glossary.open()`. Seit Korrektur (2026-07-05) optisch identisch zu den übrigen Header-Icons (Suche/Filter/Refresh): gleiche Größe, gleiche graue Grundfarbe (`var(--muted)`), gleiches Hover-Verhalten — keine Sonderstellung mehr (vorherige Kreis-Outline in Akzentfarbe zurückgenommen). |
-| Glossar-Overlay (US-21) | Bottom-Sheet (22px Radius, gleiches Muster wie Filter-/Detail-Sheet) mit Suchfeld oben und Accordion-Einträgen, gruppiert nach Einführung/Scores/Kernbegriffe. Erster Eintrag „Onboarding erneut ansehen" startet die Slides neu. Texte werden aus `ScoreInfo._texts`/`ElementInfo`-Objekten wiederverwendet (eine Pflegestelle statt Duplikat). Seit Scope-Erweiterung (2026-07-05, US-21) zusätzlich 2 Einträge: „Wie unterscheiden sich Feed, Kalender und Scout?" (Text seit Korrektur 2026-07-05 fachlich präzisiert: Feed = 14-Tage-Feed, Kalender unverändert, Scout errechnet eigene Chancen unabhängig von Nutzer-Standorten, Betaversion, nicht verifiziert) und „Wie funktionieren die Filter?". |
+| Glossar-Overlay (US-21) | Bottom-Sheet (22px Radius, gleiches Muster wie Filter-/Detail-Sheet) mit Suchfeld oben und Accordion-Einträgen, gruppiert nach Scores/Kernbegriffe (der frühere Eintrag „Onboarding erneut ansehen" entfällt seit US-143). Texte werden aus `ScoreInfo._texts`/`ElementInfo`-Objekten wiederverwendet (eine Pflegestelle statt Duplikat). Seit Scope-Erweiterung (2026-07-05, US-21) zusätzlich 2 Einträge: „Wie unterscheiden sich Feed, Kalender und Scout?" (Text seit Korrektur 2026-07-05 fachlich präzisiert: Feed = 14-Tage-Feed, Kalender unverändert, Scout errechnet eigene Chancen unabhängig von Nutzer-Standorten, Betaversion, nicht verifiziert) und „Wie funktionieren die Filter?". |
 | Inline-ⓘ-Erklärungen (`.el-info-btn`, US-21) | 14px, dezent grau (`var(--muted)`), Hover→Gold. Bestehende 5 Stellen: Schwierigkeitsgrad-Badge, Event-Typ, Verifikations-Badge, Filter-Gruppen, Kartenlegende. Seit Scope-Erweiterung (2026-07-05) zusätzlich 10 Stellen im Chancen-Detail (Wetterwerte, Ideales Zeitfenster, Wolken/Kompass-Ausrichtung, Karte & Blickwinkel, Kompositions-Analyse, Koordinaten, Himmelsposition/Astronomie) und Location-Detail (Fotograf-Standort/Motiv/Ausrichtung — 3 Sektionen mit demselben Erklärtext, Nächste Events, Verifikationsbereich). Kartenlegende (`.map-legend-info-btn`) im gleichen Zug kleiner (22px statt 44px) und dezenter gemacht; Hover-Verhalten unverändert. Legendentext (`ElementInfo._mapLegendData()`) seit drittem Testdurchlauf (2026-07-05) nur noch 3 Punkte: Pin-Symbol (mit Inline-SVG-Beispiel), Kartenebenen-Umschalter, GPS-Zentrier-Button — der Fotograf-Standort/Motiv/Sichtachse-Absatz wurde komplett entfernt (auf dieser Übersichtskarte nicht relevant, nicht nur textlich korrigiert; verursachte zudem ein Block-in-Inline-Rendering-Problem, siehe Ticket). Layer-Switcher und GPS-Button sind beide verifiziert Teil des Haupt-Karten-Tabs (`#page-map`), keine Anzeige-Bugs gefunden. |
 
 **Pflicht-Regression globale UI:**
-- [ ] Tab-Wechsel funktioniert (alle 5 Tabs) (Teilabdeckung automatisiert: `run_frontend_check.py`-VIEWS-Loop deckt Feed/Karte/Orte/Einstellungen; Kalender-/Scout-Modus zusätzlich über `_check_calendar_view`/`_check_scout_mode` (TASK-67 Etappe 3, Playwright-Code geschrieben — lokaler Browser-Lauf durch Stephan noch ausstehend, Sandbox hat kein Playwright/Chromium); „+"-Tab bereits über TASK-66 `_check_location_create` abgedeckt)
+- [ ] Tab-Wechsel funktioniert (alle 5 Tabs) (Teilabdeckung automatisiert: `run_frontend_check.py`-VIEWS-Loop deckt Feed/Karte/Orte/Einstellungen; Kalender-Modus über `_check_calendar_view`, Umschaltleiste über `_check_mode_bar` (US-142 T1; früher `_check_scout_mode`) (TASK-67 Etappe 3, Playwright-Code geschrieben — lokaler Browser-Lauf durch Stephan noch ausstehend, Sandbox hat kein Playwright/Chromium); „+"-Tab bereits über TASK-66 `_check_location_create` abgedeckt)
 - [ ] Kein Tab zeigt seinen Inhalt doppelt
 - [ ] Kein Sheet öffnet sich ungewollt beim Laden
 - [ ] Theme-Wechsel (hell/dunkel) ändert alle Farbtokens konsistent
 - [ ] Alle Icons sichtbar in Safari (SVG `<use>` + `currentColor`-Attribute auf `<g>`, nicht per CSS-Klasse)
-- [ ] Onboarding erscheint beim ersten Start, nicht mehr nach Reload/zweitem Start
+- [ ] Es erscheinen nach dem Login keine Willkommens-Slides (US-143; früher: Onboarding beim ersten Start)
 - [ ] „?"-Button im Header immer erreichbar, öffnet Glossar (automatisiert: `run_frontend_check.py::_check_help_glossary`, TASK-67 Etappe 3, lokal grün bestätigt)
-- [ ] Glossar: Suche filtert Einträge live, Accordion klappt auf/zu, „Onboarding erneut ansehen" startet die Slides neu
-- [ ] Glossar zeigt die 2 neuen Einträge (Filter-Logik, Feed/Kalender/Scout-Unterschied)
+- [ ] Glossar: Suche filtert Einträge live, Accordion klappt auf/zu; kein Eintrag „Onboarding erneut ansehen" mehr (US-143)
+- [ ] Glossar zeigt die 2 neuen Einträge (Filter-Logik, Feed/Kalender-Unterschied; seit US-142 T1 ohne Scout)
 - [ ] Alle 15 ⓘ-Stellen (5 bestehend + 10 neu) öffnen das `ElementInfo`-Overlay mit dem korrekten Text
 - [ ] Kartenlegende-ⓘ wirkt klein/dezent im Ruhezustand, wird bei Hover gold
 
@@ -106,16 +106,16 @@ Seit US-129 hat auch „Hat Beispielbild" Drei-Zustände.
 
 | Kriterium | Drei-Zustände | Anmerkung |
 |---|---|---|
-| **Eventtyp** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für Chancen-Feed, Kalender, Scout, Karte |
-| **Tageszeit** | Ja (Off → nur zeigen → ausblenden → Off) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab** |
-| **Mindest-Wahrscheinlichkeit** | Nein (Slider 0–100%) | Nur Chancen-Feed + Kalender + Scout; **ausgegraut auf Karte + Locations-Tab**. Standardwert seit US-119: **70%** (vorher 0% = „Alle"); gilt geteilt für Feed/Kalender/Scout. Bestandsnutzer mit abweichendem gespeicherten Wert wurden einmalig auf 70% zurückgesetzt (Migrations-Flag `fotoalert_filters_v119_migrated`); ein danach selbst gewählter Wert bleibt dauerhaft erhalten |
+| **Eventtyp** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für Chancen-Feed, Kalender, Karte |
+| **Tageszeit** | Ja (Off → nur zeigen → ausblenden → Off) | Nur Chancen-Feed + Kalender; **ausgegraut auf Karte + Locations-Tab** |
+| **Mindest-Wahrscheinlichkeit** | Nein (Slider 0–100%) | Nur Chancen-Feed + Kalender; **ausgegraut auf Karte + Locations-Tab**. Standardwert seit US-119: **70%** (vorher 0% = „Alle"); gilt geteilt für Feed/Kalender. Bestandsnutzer mit abweichendem gespeicherten Wert wurden einmalig auf 70% zurückgesetzt (Migrations-Flag `fotoalert_filters_v119_migrated`); ein danach selbst gewählter Wert bleibt dauerhaft erhalten |
 | **Brennweite** | Nein (Dual-Handle-Slider) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (seit TASK-47: jede Location hat eine automatisch berechnete Brennweiten-Empfehlung als eigene Eigenschaft, filtert dort aktiv mit — **Klärung Stephan, 2026-07-12**: Code ist korrekt, ältere Doku-Zeilen zu „ausgegraut" waren nach TASK-47 nicht mehr nachgezogen) |
 | **Schwierigkeit** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Kategorie** | Ja (Off → nur zeigen → ausblenden → Off) | Gilt für alle Ansichten inkl. Karte + Locations-Tab |
 | **Mindest-Bewertung** | Ja (BUG-46): Off → ≥ N Sterne (gold) → < N Sterne (rot) → Off | Gilt für alle Ansichten |
 | **Entfernung (GPS)** | Nein (Einfach-Auswahl) | Gilt für alle Ansichten inkl. Karte + Locations-Tab (BUG-51). GPS-Dialog erscheint pro Session maximal einmal — laufende Anfragen werden dedupliziert via `Filter._gpsPromise`-Caching (BUG-52) |
 | **Verifikationsstatus** | Ja (BUG-46): „Geprüfte" hat Off → nur Geprüfte → alle außer Geprüfte → Off; andere Chips (Nicht geprüft, Probleme) togglen einfach | Gilt für alle Ansichten inkl. Karte |
-| **Hat Beispielbild** (US-129) | Ja: Off → Nur mit Bild (Rahmen `--accent`) → Nur ohne Bild (Rahmen `--red`, Label „Ohne Bild") → Off | Gilt für Locations-Tab, Karte, Chancen-Feed, Kalender (Lookup der Location über `location_id`); **ausgegraut bei Entdecken/Scout** (Scout-Chancen haben kein `location_id`-Äquivalent); ⓘ-Erklärtext am Filter-Chip |
+| **Hat Beispielbild** (US-129) | Ja: Off → Nur mit Bild (Rahmen `--accent`) → Nur ohne Bild (Rahmen `--red`, Label „Ohne Bild") → Off | Gilt für Locations-Tab, Karte, Chancen-Feed, Kalender (Lookup der Location über `location_id`); seit US-142 T1 nirgends mehr ausgegraut (den Scout gibt es in der Oberfläche nicht mehr); ⓘ-Erklärtext am Filter-Chip |
 | **Sichtachsen-Check** (US-09) | Ja: Off → nur diesen Status zeigen → diesen Status ausschließen → Off; Statuswerte: Frei / Teilweise verdeckt / Blockiert / Daten fehlen (bis BUG-87 „Nicht geprüft") | Gilt für Chancen-Feed, Kalender, Scout, Locations-Tab, Karte (Sichtachsen-Ergebnis ist Location-Eigenschaft); ⓘ-Erklärtext am Filter-Chip |
 
 **Geklärt (TASK-67 Etappe 6, Stephan 2026-07-12):** Frühere Doku-Zeilen führten Brennweite
@@ -143,12 +143,11 @@ hat. Entscheidung: Code ist korrekt, Tabellen oben wurden entsprechend korrigier
 - Rahmen `--red` (Ausschließen, Label wechselt zu „Ohne Bild"): zeigt nur Locations/Chancen ohne Beispielbild
 - Off: keine Filterung
 - Für Chancen im Feed/Kalender bestimmt die zugehörige Location (`location_id`-Lookup) den Bildstatus; eine Chance ohne auflösbare Location zählt als „ohne Bild" (eindeutige Zuordnung)
-- Bei Entdecken/Scout ist der Chip ausgegraut ohne Wirkung — Scout-Chancen haben kein `location_id`-Feld
 
 **Eventtyp — Sonderfall „Mond-Alignment" (BUG-91):**
 - Der Filter-Chip „Mond-Alignment" matcht seit BUG-91 nicht mehr ausschließlich `event_type === "Mond-Alignment"`: zusätzlich eingeschlossen sind Ereignisse mit `event_type` „Vollmond"/„Supermond", deren `composition_analysis.azimuth_delta_deg` UND `altitude_delta_deg` beide innerhalb der bestehenden ±2°-Toleranz liegen (`MOON_ALIGNMENT_TOLERANCE_DEG` im Frontend, Spiegel von `backend/precompute.py::ALIGNMENT_TOLERANCE_DEG`) — die großzügige Variante, von Stephan bewusst statt einer engeren eigenen Schwelle gewählt.
 - Der angezeigte Typ/Titel/Icon des Ereignisses ändert sich dabei NICHT: ein so eingeschlossenes Ereignis bleibt weiterhin als „Vollmond"/„Supermond" beschriftet, es taucht nur zusätzlich unter dem „Mond-Alignment"-Filter auf.
-- Gilt für Chancen-Feed, Kalender UND Karte (zentrale Hilfsmethode `Filter._matchesExpandedType()`, von `MapView.applyFilter()` mitgenutzt statt einer zweiten eigenen Prüfung). Der Scout-Modus (`Filter.applyToScout()`) ist unverändert, da er `event_type` gar nicht nutzt (matcht auf `body_name`).
+- Gilt für Chancen-Feed, Kalender UND Karte (zentrale Hilfsmethode `Filter._matchesExpandedType()`, von `MapView.applyFilter()` mitgenutzt statt einer zweiten eigenen Prüfung).
 - Fehlen die Ausrichtungsdaten (`composition_analysis` = null oder eines der beiden Delta-Felder nicht numerisch), gilt das Ereignis als nicht qualifiziert und bleibt ausschließlich unter „Vollmond"/„Supermond" auffindbar. Ein schwach ausgerichtetes Vollmond-/Supermond-Ereignis (Delta außerhalb ±2°) bleibt ebenfalls ausschließlich unter „Vollmond"/„Supermond" auffindbar — der Filter wird dadurch nicht von jeder Vollmond-Nacht geflutet.
 
 ### Ausgrauen-Verhalten (BUG-46)
@@ -160,23 +159,22 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 | **Karte** | Tageszeit, Mindest-Wahrscheinlichkeit |
 | **Locations-Tab** | Eventtyp, Tageszeit, Mindest-Wahrscheinlichkeit |
 | **Chancen-Feed / Kalender** | Nichts ausgegraut |
-| **Scout (Entdecken)** | Hat Beispielbild (US-129, kein `location_id`-Äquivalent bei Scout-Chancen) |
 
 ### Wirkungs-Übersicht nach Ansicht
 
-| Kriterium | Chancen-Feed | Kalender | Scout | Locations-Tab | Karte |
-|---|---|---|---|---|---|
-| Eventtyp | ✓ | ✓ | ✓ (body_name) | — (ausgegraut) | ✓ (via Feed-Daten) |
-| Tageszeit | ✓ | ✓ | ✓ (session) | — (ausgegraut) | — (ausgegraut) |
-| Wahrscheinlichkeit | ✓ | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
-| Brennweite | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Schwierigkeit | ✓ | ✓ | — | ✓ | ✓ |
-| Kategorie | ✓ | ✓ | — | ✓ | ✓ |
-| Mindest-Bewertung | ✓ | ✓ | — | ✓ | ✓ |
-| Entfernung (GPS) | ✓ | — | ✓ | — | ✓ |
-| Verifikation | ✓ | ✓ | — | ✓ | ✓ |
-| Hat Beispielbild (US-129) | ✓ | ✓ | — (ausgegraut) | ✓ | ✓ |
-| Sichtachsen-Check (US-09) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Kriterium | Chancen-Feed | Kalender | Locations-Tab | Karte |
+|---|---|---|---|---|
+| Eventtyp | ✓ | ✓ | — (ausgegraut) | ✓ (via Feed-Daten) |
+| Tageszeit | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
+| Wahrscheinlichkeit | ✓ | ✓ | — (ausgegraut) | — (ausgegraut) |
+| Brennweite | ✓ | ✓ | ✓ | ✓ |
+| Schwierigkeit | ✓ | ✓ | ✓ | ✓ |
+| Kategorie | ✓ | ✓ | ✓ | ✓ |
+| Mindest-Bewertung | ✓ | ✓ | ✓ | ✓ |
+| Entfernung (GPS) | ✓ | — | — | ✓ |
+| Verifikation | ✓ | ✓ | ✓ | ✓ |
+| Hat Beispielbild (US-129) | ✓ | ✓ | ✓ | ✓ |
+| Sichtachsen-Check (US-09) | ✓ | ✓ | ✓ | ✓ |
 
 **Pflicht-Regression Filter (BUG-46):**
 - [ ] Filter-Badge zeigt korrekte Anzahl aktiver Kriterien (automatisiert: `run_frontend_check.py::_check_filter_badge_count`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
@@ -188,10 +186,10 @@ Kriterien ohne Wirkung in der aktuellen Ansicht werden visuell gedimmt (opacity 
 - [ ] Karte zeigt nach Kategorie-Filter nur passende Pins (automatisiert: `run_frontend_check.py::_check_map_pin_filtering`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
 - [ ] Karte zeigt nach Verifikations-Filter nur passende Pins (automatisiert: `run_frontend_check.py::_check_map_pin_filtering`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
 - [ ] Sichtachsen-Check-Chip: Off → nur diesen Status → diesen Status ausschließen → Off (drei Tipp-Schritte, US-09) (automatisiert: `run_frontend_check.py::_check_sightline_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
-- [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Scout, Karte, Locations-Tab) — nicht ausgegraut (US-09) (Teilabdeckung automatisiert: `_check_sightline_chip_tristate_and_effect` prüft Nicht-Ausgegraut-Sein auf Feed/Karte/Locations-Tab sowie realen Filter-Effekt auf der Karte; Kalender/Scout und der volle Effekt-Nachweis auf Feed/Locations bleiben aufgrund identischer, bereits an anderer Stelle geprüfter Codepfade unautomatisiert, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
+- [ ] Sichtachsen-Check-Filter wirkt in allen Ansichten (Feed, Kalender, Karte, Locations-Tab) — nicht ausgegraut (US-09) (Teilabdeckung automatisiert: `_check_sightline_chip_tristate_and_effect` prüft Nicht-Ausgegraut-Sein auf Feed/Karte/Locations-Tab sowie realen Filter-Effekt auf der Karte; Kalender und der volle Effekt-Nachweis auf Feed/Locations bleiben aufgrund identischer, bereits an anderer Stelle geprüfter Codepfade unautomatisiert, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
 - [ ] „Hat Beispielbild"-Chip: Off → gold „Hat Bild" → rot „Ohne Bild" → Off (drei Tipp-Schritte, US-129) (automatisiert: `run_frontend_check.py::_check_has_image_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
 - [ ] „Hat Beispielbild" wirkt auf Locations-Tab, Karte, Feed und Kalender (nur mit/nur ohne Bild korrekt gefiltert); im Feed/Kalender additiv UND-kombinierbar mit den übrigen Chancen-Filtern (US-129) (Teilabdeckung automatisiert: `_check_has_image_chip_tristate_and_effect` prüft den Effekt nur auf dem Orte-Tab gegen `Filter.applyToLocations()`; Karte/Feed/Kalender bleiben offen, TASK-67 Etappe 6, lokal grün bestätigt 2026-07-12)
-- [ ] „Hat Beispielbild" bleibt bei Entdecken/Scout ausgegraut ohne Wirkung (US-129) (Test geschrieben: `run_frontend_check.py::_check_has_image_chip_tristate_and_effect`, TASK-67 Etappe 6, lokal ausgeführt 2026-07-12 — **schlägt aktuell fehl**, echter App-Bug gefunden und als **BUG-76** erfasst: die Ausgrauen-Bedingung `App.current === 'scout'` kann nie zutreffen, Scout ist kein eigener Reiter. Bleibt rot bis BUG-76 behoben ist.)
+- [ ] „Hat Beispielbild“ und „Wolkenstimmung“ sind im Feed und im Kalender bedienbar (nicht ausgegraut); der frühere Scout-Sonderfall (BUG-76) entfällt mit US-142 T1 (Prüfung: `_check_mode_bar` bzw. Filterfenster im Feed/Kalender)
 
 ---
 
@@ -447,34 +445,20 @@ Gilt für alle Einstiegspunkte: Feed, Kalender, Scout, Location-Zukünftige-Even
 
 ---
 
-## 8. Scout-Tab (Entdecken)
+## 8. Scout-Tab (Entdecken) — seit US-142 Teilschritt 1 aus der Oberfläche entfernt
 
-| Funktion | Verhalten |
-|----------|-----------|
-| Scout-Feed | Automatisiert berechnete Foto-Ephemeride (Mond-Alignments, US-70) |
-| Scout zieht nach Standort-Änderung nach (US-106) | Nach dem Verschieben/Anlegen einer Location wird der Scout-Volllauf zeitnah (wenige Minuten) angestoßen, sodass die Location im Entdecken-Bereich erscheint — nicht erst am nächsten Morgen. Mehrere schnelle Änderungen werden zu einem Lauf zusammengefasst (entprellt) und nie parallel ausgeführt (Single-Flight); ändert sich während eines Laufs erneut etwas, folgt genau ein Nachlauf. |
-| Scout-Karten | Identisches Design wie Feed-Karten: ScoreRing (farbcodiert), Session-Icon + Session-Label + Uhrzeit, Motivname, Location-Zeile „Blick vom [Himmelsrichtung]", Tag-Chips (Wetter, Entfernung, Mondbeleuchtung bei Mond-Chancen); Navigation-Button vollbreit am Kartenende (US-104) |
-| Scout-Detail | Klick auf Scout-Karte öffnet vollständige Detail-Ansicht (identisch mit Feed-Chancen): FOV-Karte, Koordinaten, Himmelsposition, Wetter, Kameraempfehlung, AstroLive-Bahn, Beschreibung (US-83, v1.18.0) |
-| Scout-Detail: Als Location speichern | Button „Als Location speichern" (SVG-Pin-Icon) in der Detailansicht; speichert den Scout-Standpunkt via POST `/preview-alignment` (save:true) als neue Location (US-83) |
-| Scout-Karten Klick | cursor:pointer auf Scout-Karten (Hover-Hand wie Feed-Karten) |
-| Suche (BUG-82) | Live-Textsuche filtert nach Motivname (`subject_name`) und Session-Bezeichnung — Scout-Chancen haben anders als Feed/Orte keine Bindung an eine gespeicherte Location (`location_id` ist bei Scout-Einträgen immer `null`), daher kein Standortname-Match. Wirkt sowohl beim direkten Tippen im Scout-Tab als auch beim automatischen Übernehmen einer bereits im Feed aktiven Suche beim Tab-Wechsel. Vor BUG-82 wirkungslos (Suche routete auf den unsichtbaren Feed-Container statt auf Scout). |
-| Korrekte Platzhalter-Erkennung (US-128) | Ob eine Location eine recherchierte Bauwerkshöhe hat, wird über ein explizites Datenfeld (`subject_height_researched`) bestimmt statt über eine Heuristik am Zahlenwert. Vorher wurden Locations mit exakt 20 m Bauwerkshöhe und fehlender Bauwerksbreite fälschlich als „unbearbeiteter Platzhalter" behandelt und aus der Scout-Pipeline ausgeschlossen — unabhängig vom tatsächlichen, ggf. korrekten Wert. |
-| Zugänglichkeits-/Sichtfreiheits-Filter (US-135) | Scout-Vorschläge werden zusätzlich gegen Sichtachse (Gebäude-Verdeckung), Wald-/Wasser-/Bahn-Lage geprüft, bevor sie im Scout-Tab erscheinen — unzugängliche oder verdeckte Kandidaten werden kommentarlos ausgeblendet (kein Label, keine Fehlermeldung). Bereits gespeicherte Standorte sind davon unberührt, nur Scout-Tab-Vorschläge werden zusätzlich gefiltert. |
+**Stand:** Die Funktion „Scout (Betaversion)“ ist in der App nicht mehr sichtbar. Die Umschaltleiste oben im Tab „Chancen“ hat nur noch die zwei Knöpfe „14-Tage Feed“ und „Jahreskalender“ (je etwa die halbe Breite; Prototyp von Stephan am 2026-10-18 freigegeben). Entfernt wurden: Scout-Knopf und -Ansicht, Scout-Karten, Scout-Detail samt „Als Location speichern“, Scout-Filter/-Zähler/-Ausgrauen, Scout-Suche, Scout-Neuladen nach Änderungen, der Scout-Abruf vom Browser aus und der Glossar-Satz zu Scout (Glossar-Eintrag heißt jetzt „Wie unterscheiden sich Feed und Kalender?“; **Wortlaut ist ein Vorschlag aus der Spec, von Stephan nicht ausdrücklich bestätigt**).
 
-**Pflicht-Regression Scout:**
-- [ ] Scout-Tab lädt ohne Fehler (Basistest automatisiert: `run_frontend_check.py::_check_scout_mode`, TASK-67 Etappe 3, übernommen aus TASK-69 AK7, lokal grün bestätigt)
-- [ ] ≥1 Scout-Karte sichtbar mit ScoreRing (links), Session-Icon + Label + Uhrzeit, Motivname, Location-Zeile „Blick vom [Richtung]", Tag-Chips
-- [ ] Location-Zeile zeigt NUR die Himmelsrichtung (kein Motivname-Duplikat): „Blick vom Nordosten"
-- [ ] Tag-Chips: Wetter-Text + Entfernung (km) + Mondbeleuchtung (nur bei Mond-Chancen)
-- [ ] Kein Standort-Button auf der Karte (nur Navigation-Button, vollbreit)
-- [ ] Navigation-Button öffnet Apple Maps-Routenführung zum Standpunkt; öffnet NICHT die Detailansicht
-- [ ] Karte antippen (außerhalb Button) → Detailansicht öffnet sich
-- [ ] Karte nicht doppelt (keine Render-Dopplung)
-- [ ] Klick auf Scout-Karte öffnet Detail-Sheet mit allen Sektionen (eingeklappt)
-- [ ] „Als Location speichern"-Button sichtbar (SVG-Icon, kein Emoji)
-- [ ] Klick auf „Als Location speichern" → Toast + neue Location in Locations-Tab
-- [ ] AstroLive-Sektion im Scout-Detail öffnet Bahn-Karte ohne Fehler
-- [ ] Suche filtert Scout-Chancen nach Motivname/Session-Bezeichnung; eine im Feed aktive Suche wird beim Wechsel in den Scout-Tab automatisch übernommen (BUG-82)
+**Noch vorhanden (bis Teilschritt 2/3, nur Server, von der App nicht mehr benutzt):** Endpunkte `/discover` und `/refresh-discover`, täglicher Lauf, Neuberechnung nach Ortsänderung, Job „discover“, Wetter-Konto „Entdecken“, Ordner `backend/discover/`, Zugänglichkeitsblock in `qa_azimuth.py` (Release-Sperre TASK-59), Daten-Dateien. Diese Abschnitte (11, 12, 3b–3d, Changelog) beschreiben den Server-Stand bis dahin weiter.
+
+**Bleibt (kein Scout):** Filter „Mond-Alignment“/„Sonnen-Alignment“, Herkunftsangabe „Locationscout“ im Ort-Detail, `discover/geometry.py`, Ortsfeld `subject_height_researched`.
+
+**Pflicht-Regression Umschaltleiste (US-142 T1):**
+- [ ] Genau zwei Knöpfe, je etwa halbe Breite (±2 px) bei 390 px und 1280 px, Hell und Dunkel (automatisiert: `run_frontend_check.py::_check_mode_bar`)
+- [ ] Feed → Kalender → Feed dreimal hintereinander: richtiger Knopf hervorgehoben, richtige Ansicht, keine Konsolenfehler (automatisiert: `_check_mode_bar`)
+- [ ] Nach dem Neuladen startet die App im 14-Tage-Feed
+- [ ] Nirgends „Scout“ oder „Entdecken“ sichtbar (Leiste, Filterfenster, Suche, Detail, Hilfe)
+- [ ] Quelltext-Schutz: `backend/tests/test_us142_t1.py`
 
 ---
 
@@ -640,7 +624,7 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | Änderungstyp | Pflicht-Regression |
 |---|---|
 | **CSS / Theme** | Alle 5 Tabs + alle Sheets in Hell UND Dunkel; kein Weiß-auf-Weiß, kein unsichtbarer Button |
-| **Detail-Sheet** | Alle Sektionen vorhanden + nicht doppelt; alle Einstiegspunkte (Feed, Kalender, Scout) |
+| **Detail-Sheet** | Alle Sektionen vorhanden + nicht doppelt; alle Einstiegspunkte (Feed, Kalender) |
 | **Feed-Rendering** | Feed-Karten nicht doppelt; Filter funktioniert; Score-Ring korrekt |
 | **Backend-Endpoint** | Health + Locations + Feed + Scout + Kalender (Schnell-Check oben) |
 | **Location-Edit** | curl PATCH + Browser UI-Pfad (nicht nur curl) |
@@ -838,6 +822,8 @@ Welche Sektionen müssen nach welcher Art von Änderung geprüft werden:
 | 2026-10-10 | US-138 | England mit London im Arbeitsstand (nicht released): Wetterkarte bis −6,0° W, Ortszeit „Uhr London“ für England-Orte per Koordinatenregel, Lichtfenster im Entdecken-Tab am Ort des Motivs, Feed-Deckel mit England zuerst. Offene Punkte und Messwerte siehe Abschnitt 3b. |
 | 2026-10-17 | US-141 | Nachladen im Live-Modus (`FOTOALERT_ONDEMAND=1`): kein Kalender-Schritt mehr, nur Chancen und Wetter; lokal unverändert. Nur in der Cloud geprüft, nicht released. Berichtigung: `calendar.json` ist live 369 MB (1,36 GB war die lokale Datei). |
 | 2026-10-18 | BUG-117 | Wetterabruf schont das Tageslimit des Wetterdienstes: Zwischenspeicher auf der Platte (Gültigkeit 2 h / 12 h), Staffelung nach Terminnähe (36 h), Notbremse nach 6 Fehlschlägen in Folge mit Klartextmeldung und nächster Versuchszeit, nie zwei Wetterläufe gleichzeitig (Hinweis „Wetterlauf läuft bereits.“), Rote-Wolken-Punkte im 0,05-Grad-Raster, Tagesstand (UTC) in Datei und Zählzeile; Nachlauf auch nach Notbremse und Scout-Verbrauch genau einmal gebucht (Nachfunde). Code fertig, lokal getestet, nicht committet, nicht released (Bündel mit US-141/BUG-118); Live-Messung (AK-1/2/3/12/16) steht aus. Details Abschnitt 3d. |
+| 2026-10-18 | US-142 (Teilschritt 1) | Scout aus der Oberfläche entfernt: Umschaltleiste im Tab „Chancen“ nur noch „14-Tage Feed“ und „Jahreskalender“ (je halbe Breite), Scout-Ansicht/-Karten/-Detail/-Filter/-Suche/-Glossar entfernt; Moduswechsel ohne Scout-Zugriff; Beispielbild-/Wolkenstimmungs-Filter nie mehr aus Scout-Gründen ausgegraut. Server, Endpunkte, Daten und `discover/` unverändert (Teilschritt 2/3). Tests: neu `test_us142_t1.py`, Browser-Check `_check_mode_bar` statt `_check_scout_mode`. Stand: Arbeitsstand, nicht released; Glossar-Wortlaut ist ein nicht bestätigter Vorschlag. |
+| 2026-10-18 | US-143 (Willkommens-Slides entfernen) | Die 4 Willkommens-Slides (Onboarding) sind ganz entfernt: kein automatisches Erscheinen nach dem Login, kein Glossar-Eintrag „Onboarding erneut ansehen", Overlay/Stil/Code und Merker `fa_onboarding_seen` gelöscht. Host-Dialog „Neuer Ort in ausgeschaltetem Gebiet" und Balken „Host muss freischalten" (US-141) unverändert. Tests: `backend/tests/test_us143.py`. |
 
 ---
 
@@ -854,8 +840,8 @@ Zwei Punkte, die schon länger als bekannte Lücke gelten, sowie ein Grenzfall s
 - Kein Sheet öffnet sich ungewollt beim Laden der App
 - Theme-Wechsel (hell/dunkel) ändert wirklich alle Farben konsistent
 - Alle Icons sind in Safari sichtbar (bekannte WebKit-Falle: ein grüner Chrome-Test würde das nicht auffangen)
-- Onboarding erscheint nur beim allerersten Start, nicht mehr danach
-- Glossar: Suche filtert live, Accordion klappt auf/zu, „Onboarding erneut ansehen" funktioniert
+- Keine Willkommens-Slides nach dem Login (US-143)
+- Glossar: Suche filtert live, Accordion klappt auf/zu
 - Glossar zeigt die 2 neuen Einträge korrekt
 - Alle 15 kleinen ⓘ-Erklär-Symbole öffnen den passenden Text
 - Kartenlegende-ⓘ wirkt im Ruhezustand klein/dezent, wird bei Berühren gold
@@ -930,18 +916,10 @@ Zwei Punkte, die schon länger als bekannte Lücke gelten, sowie ein Grenzfall s
 
 **Grenzfall / bekannte offene Automatisierungslücke:** Dass das Anlegen/Ändern einer Location automatisch eine Sichtachsenprüfung auslöst, läuft im Hintergrund-Prozess, ist aber bislang durch keinen Test abgedeckt — bewusst als offene Lücke vorgemerkt statt stillschweigend als erledigt markiert.
 
-### Scout-Tab / Entdecken (Abschnitt 8)
-- Scout-Karte sichtbar mit ScoreRing, Session-Symbol, Motivname, Location-Zeile, Tag-Chips
-- Location-Zeile zeigt nur die Himmelsrichtung, ohne Motivname-Dopplung
-- Tag-Chips zeigen Wetter, Entfernung, Mondbeleuchtung korrekt
-- Kein Standort-Button auf der Karte, nur der Navigation-Button
-- Navigation-Button öffnet Apple Maps, nicht die Detailansicht
-- Karte antippen öffnet die Detailansicht
-- Karte erscheint nicht doppelt
-- Klick auf Scout-Karte öffnet das Detail-Sheet vollständig und eingeklappt
-- „Als Location speichern"-Button ist sichtbar (echtes Symbol, kein Emoji)
-- Klick darauf zeigt Toast + neue Location im Orte-Tab
-- AstroLive-Sektion im Scout-Detail öffnet die Bahn-Karte fehlerfrei
+### Umschaltleiste Feed / Kalender (Abschnitt 8, seit US-142 T1)
+- Genau zwei Knöpfe „14-Tage Feed“ und „Jahreskalender“, gleich breit, Hell und Dunkel
+- Wechsel Feed ↔ Kalender (mehrfach) zeigt jeweils die richtige Ansicht ohne Fehlermeldung
+- Nirgends ein Scout-/Entdecken-Rest sichtbar (Filterfenster, Detail, Suche, Hilfe)
 
 ### Einstellungen (Abschnitt 9)
 - Slider auf 80 % → Feed zeigt sichtbar weniger Karten

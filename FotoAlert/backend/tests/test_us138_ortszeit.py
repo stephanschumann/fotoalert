@@ -297,10 +297,8 @@ def test_s1_keine_feste_berliner_zeit_mehr_an_ortsbezogenen_stellen():
 
 def test_s1_feed_karte_detail_erinnerung_teilen_nutzen_zentrale_funktionen():
     html = _html()
-    opp = _region(html, "function oppCard(", "function scoutCard(")
+    opp = _region(html, "function oppCard(", "const Feed = {")
     assert "timeAt(o.shoot_time, o, true)" in opp
-    scout = html[html.index("function scoutCard("):][:1500]
-    assert "timeAt(o.dt_utc," in scout
     assert html.count("dayAt(o.shoot_time, o)") == 4      # Feed-Gruppen (2x), Chips, Heute-Zaehler
     detail_zeit = html[html.index("mkSec('ev_zeit'"):][:900]
     assert detail_zeit.count("timeAt(") == 3 and "formatTime(" not in detail_zeit

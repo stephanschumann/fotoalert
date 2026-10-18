@@ -190,7 +190,7 @@ FILTER_MIN_SCORE_DEFAULT = 70  # Filter.defaultState() in web/index.html
 
 # --- TASK-67 (Etappe 3): Kalender, Filter-Chips, Bewertung, Detail-Sheet-aus-Feed,
 # Wetterkarte, Entdecken-Modus, globale UI/Filter-Grenzfälle ----------------------
-# Alle drei Feed-Modi (14-Tage-Feed / Jahreskalender / Scout) werden über dieselbe
+# Beide Feed-Modi (14-Tage-Feed / Jahreskalender) werden über dieselbe
 # feed-mode-bar innerhalb #page-feed umgeschaltet (Feed.setMode(...)), NICHT über die
 # Tab-Bar. Selektoren unten wurden per Grep aus web/index.html verifiziert (Stand
 # 2026-07-11), nicht angenommen.
@@ -201,10 +201,10 @@ CALENDAR_NAV_SELECTOR = ".cal-nav"
 CALENDAR_EVENT_SELECTOR = ".cal-event"
 CALENDAR_EMPTY_SELECTOR = ".empty"
 
-# Scout/Entdecken-Modus (Feed.setMode('scout') -> Scout.show()).
-SCOUT_MODE_BTN_SELECTOR = "#fmb-scout"
+# Umschaltleiste (US-142 T1): genau zwei Knoepfe, je etwa die halbe Breite.
 FEED_MODE_BTN_SELECTOR = "#fmb-feed"
-SCOUT_CONTENT_SELECTOR = "#scout-content"
+MODE_BAR_SELECTOR = ".feed-mode-bar"
+MODE_BAR_BTN_SELECTOR = ".feed-mode-bar .fmb-btn"
 
 # Filter-Sheet: Drei-Zustand-Chips (chip3-Pattern, web/index.html ab Zeile ~3466).
 # Kein eigenes id je Chip — Selektor über das onclick-Attribut (stabil, da Funktions-
@@ -214,7 +214,7 @@ FILTER_SHEET_OPEN_SELECTOR = "#filter-sheet.open"
 FILTER_BADGE_SELECTOR = "#filter-badge"
 VERIFICATION_CHIP_VERIFIED_SELECTOR = '[onclick="FilterSheet._cycleVerification(\'verified\')"]'
 # Tageszeit-Filter-Section wird auf Karte/Locations-Tab ausgegraut (BUG-46,
-# dimOnLocAndMap in FilterSheet._render()), auf Feed/Kalender/Scout nicht.
+# dimOnLocAndMap in FilterSheet._render()), auf Feed/Kalender nicht.
 TAGESZEIT_SECTION_SELECTOR = ".filter-section:has(h4:has-text('Tageszeit'))"
 
 # Bewertungsfunktion (Rating-Objekt, web/index.html ab Zeile ~2719): Sterne-Input
