@@ -1040,7 +1040,7 @@
     #toast { position: fixed; bottom: calc(var(--tab-h) + var(--safe-b) + 12px); left: 50%;
       transform: translateX(-50%) translateY(10px); background: var(--card);
       border: 1px solid var(--border); border-radius: 20px; padding: 8px 18px;
-      font-size: 13px; font-weight: 600; z-index: 200; opacity: 0; transition: all .25s;
+      font-size: 13px; font-weight: 600; z-index: 3000; opacity: 0; transition: all .25s;
       white-space: nowrap; pointer-events: none; }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -1061,6 +1061,113 @@
       #add-sheet, #edit-map-fs-sheet, #fov-map-fs-sheet, #add-map-fs-sheet {
         left: 50%; width: 480px; right: auto; top: 0; bottom: 0; margin-left: -240px;
       }
+    }
+
+    /* ── US-141: Länder & Regionen, Pausen-Kennzeichnung ───────────────────
+       Nur bestehende Tokens und Radien: Karte 14 / Sheet 22 / Button 12 / Pille 20 / Eingabe 10. */
+    .gb-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+    .gb-tag svg { width: 10px; height: 10px; }
+    .gb-tag-paused { color: var(--muted); background: var(--border); }
+    .gb-tag-on { color: var(--green); background: color-mix(in srgb, var(--green) 15%, transparent); }
+    .gb-tag-mixed { color: var(--accent-2); background: var(--accent-2-dim); }
+    .card.gb-paused .loc-icon { color: var(--muted); }
+    .gb-counter { padding: 6px 16px 2px; font-size: 13px; }
+    .gb-counter b { font-weight: 700; }
+    .gb-counter span { font-size: 11px; color: var(--muted); }
+    .gb-muted { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .marker-paused svg { opacity: .85; }
+
+    #gb-regions { position: fixed; inset: 0; z-index: 1200; background: var(--bg); display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); visibility: hidden; }
+    #gb-regions.open { transform: translateX(0); visibility: visible; }
+    .gb-head { display: flex; align-items: center; gap: 4px; padding: calc(env(safe-area-inset-top, 0px) + 6px) 8px 6px;
+      background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .gb-head h2 { font-size: 17px; font-weight: 800; flex: 1; text-align: center; padding-right: 44px; }
+    .gb-icon { background: none; border: none; color: var(--muted); width: 44px; height: 44px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; border-radius: 10px; flex-shrink: 0; }
+    .gb-icon svg { width: 20px; height: 20px; }
+    #gb-body { flex: 1; overflow-y: auto; padding-bottom: 24px; overscroll-behavior: contain; }
+    .gb-sum { padding: 10px 16px 0; font-size: 13px; font-weight: 600; }
+    .gb-sum small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; line-height: 1.45; }
+    .gb-explain { margin: 8px 12px 2px; padding: 10px 14px; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .gb-explain ul { margin: 0 0 0 18px; }
+    .gb-explain li { margin-bottom: 2px; }
+    .gb-explain li b { color: var(--text); }
+    .gb-land { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin: 6px 12px; overflow: hidden; }
+    .gb-land-head { display: flex; align-items: center; gap: 4px; padding: 4px 14px 4px 4px; min-height: 60px; }
+    .gb-tap { flex: 1; display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--text);
+      text-align: left; cursor: pointer; min-height: 52px; min-width: 0; padding: 0 4px; font-family: inherit; }
+    .gb-tap .gb-chev { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; transition: transform .2s; }
+    .gb-land.exp .gb-tap .gb-chev { transform: rotate(90deg); }
+    .gb-rname { font-size: 15px; font-weight: 600; display: block; }
+    .gb-rsub { font-size: 11px; color: var(--muted); display: block; margin-top: 1px; }
+    .gb-state { flex-shrink: 0; margin-right: 4px; }
+    .gb-regs { overflow: hidden; max-height: 0; transition: max-height .25s ease; background: var(--bg); }
+    .gb-land.exp .gb-regs { max-height: 6000px; }
+    .gb-reg { display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 38px; min-height: 52px; border-top: 1px solid var(--border); }
+    .gb-reg .gb-pn { flex: 1; min-width: 0; }
+    .gb-reg .gb-pn span { display: block; font-size: 13px; font-weight: 500; line-height: 1.3; }
+    .gb-reg .gb-pn small { font-size: 11px; color: var(--muted); display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+    .gb-rest { padding: 10px 14px 10px 38px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); line-height: 1.45; }
+    .gb-switch { appearance: none; -webkit-appearance: none; width: 44px; height: 26px; background: var(--border); border-radius: 13px;
+      cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; border: none; outline-offset: 3px; padding: 0; }
+    .gb-switch::before { content: ''; position: absolute; inset: -10px -6px; }
+    .gb-switch::after { content: ''; position: absolute; width: 20px; height: 20px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; }
+    .gb-switch[aria-checked="true"] { background: var(--accent); }
+    .gb-switch[aria-checked="true"]::after { left: 21px; }
+    .gb-switch[aria-checked="mixed"] { background: var(--accent-2); }
+    .gb-switch[aria-checked="mixed"]::after { left: 12px; }
+    .gb-info { margin: 8px 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .gb-info b { color: var(--text); }
+    /* US-141 Baustein 3: Fortschritt des Nachladens (Menü Länder & Regionen) */
+    .gb-nl { margin: 8px 12px 2px; padding: 10px 14px; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 13px; line-height: 1.45; }
+    .gb-nl b { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .gb-nl .gb-nl-bar { height: 6px; border-radius: 3px; background: var(--border); margin: 8px 0 6px; overflow: hidden; }
+    .gb-nl .gb-nl-bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s; }
+    .gb-nl small { display: block; font-size: 11px; color: var(--muted); }
+    .gb-nl ul { margin: 6px 0 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--muted); }
+    .gb-nl li { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+    .gb-nl.gb-nl-fehler { border-color: var(--red, #c0392b); }
+
+    #gb-modal { position: fixed; inset: 0; z-index: 2500; background: var(--overlay-bg); display: none; align-items: center; justify-content: center; padding: 20px; }
+    #gb-modal.open { display: flex; }
+    .gb-modal-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; width: 100%; max-width: 370px;
+      padding: 20px; max-height: 92%; overflow-y: auto; position: relative; }
+    .gb-modal-card h3 { font-size: 17px; font-weight: 800; line-height: 1.25; margin-bottom: 8px; padding-right: 30px; }
+    .gb-modal-card p { font-size: 13px; line-height: 1.55; color: var(--muted); margin-bottom: 10px; }
+    .gb-modal-card p b { color: var(--text); }
+    .gb-modal-card .gb-icon { position: absolute; top: 8px; right: 8px; }
+    .gb-mbtns { display: flex; gap: 10px; margin-top: 12px; }
+    .gb-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+      font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; min-height: 48px; font-family: inherit; }
+    .gb-btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 700; }
+    .gb-btn-equal { color: var(--accent); border: 1.5px solid var(--accent); font-weight: 700; }
+    .gb-modal-card.shake { animation: gbshake .3s; }
+    @keyframes gbshake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+    #gb-notice { display: none; margin: 0 12px 6px; padding: 9px 12px; background: var(--accent-2-bg); border: 1px solid var(--accent-2-bd);
+      border-radius: 10px; font-size: 12px; color: var(--text); align-items: center; gap: 8px; flex-shrink: 0; }
+    #gb-notice.show { display: flex; }
+    #gb-notice span { flex: 1; line-height: 1.4; }
+    #gb-notice button { background: none; border: none; color: var(--muted); width: 32px; height: 32px; cursor: pointer; flex-shrink: 0; }
+
+    .gb-box { display: flex; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin: 4px 0; }
+    .gb-box.attn { background: var(--accent-2-bg); border-color: var(--accent-2-bd); }
+    .gb-box .gb-pic { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--muted); color: var(--muted);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .gb-box.attn .gb-pic { border-color: var(--accent-2); color: var(--accent-2); }
+    .gb-box h5 { font-size: 14px; font-weight: 700; line-height: 1.35; margin-bottom: 4px; }
+    .gb-box p { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+    .gb-box p:last-child { margin-bottom: 0; }
+    .gb-box .gb-mbtns { margin-top: 0; }
+    .gb-row-sel { display: flex; gap: 8px; }
+    .gb-row-sel select { flex: 1; min-width: 0; }
+    @media (min-width: 600px) {
+      #gb-regions { left: 50%; width: 480px; right: auto; margin-left: -240px; }
     }
   </style>
 </head>
@@ -1092,6 +1199,9 @@
   <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19 3 19 Z"/><path d="M12 10 V14 M12 16.5 V16.6"/></g></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18 M18 6 6 18"/></g></symbol>
   <symbol id="i-expand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 H4 V9 M15 4 H20 V9 M4 15 V20 H9 M20 15 V20 H15"/></g></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 9 V15 M14 9 V15"/></g></symbol>
+  <symbol id="i-pausebare" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6 V18 M15 6 V18"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11 V16 M12 8 V8.2"/></g></symbol>
   <symbol id="i-chevright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 16 12 9 19"/></g></symbol>
   <symbol id="i-chevleft" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12 15 19"/></g></symbol>
   <symbol id="i-chevdown" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9 12 15 18 9"/></g></symbol>
@@ -1278,6 +1388,8 @@ function escJsAttr(s) {
     </div>
   </div>
 
+  <div id="gb-notice" role="status"></div>
+
   <!-- Pages -->
   <div id="pages">
     <!-- FEED -->
@@ -1461,6 +1573,10 @@ function escJsAttr(s) {
         <option value="MILCHSTRASSE">Milchstraße &amp; Astro</option>
       </select>
     </div>
+    <div class="form-section" id="gb-add-area">
+      <label>Land und Region</label>
+      <div id="gb-add-area-body" class="gb-muted">Wird aus dem Standort bestimmt, sobald er gesetzt ist.</div>
+    </div>
     <div class="form-section">
       <label>Optionale Angaben</label>
       <div class="input-row">
@@ -1616,6 +1732,15 @@ function escJsAttr(s) {
 </div>
 
 <!-- Toast -->
+<!-- US-141: Host-Menü „Länder & Regionen“, Hinweise für neue Orte in ausgeschalteten Gebieten -->
+<div id="gb-regions" aria-hidden="true" role="dialog" aria-label="Länder und Regionen">
+  <div class="gb-head">
+    <button class="gb-icon" onclick="Gebiete.close()" aria-label="Zurück"><svg viewBox="0 0 24 24"><use href="#i-chevleft"/></svg></button>
+    <h2>Länder &amp; Regionen</h2>
+  </div>
+  <div id="gb-body"></div>
+</div>
+<div id="gb-modal"></div>
 <div id="toast"></div>
 
 <!-- Scripts -->
@@ -1629,7 +1754,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.24.0';
+const APP_VERSION = '1.25.0';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -1755,6 +1880,12 @@ const API = {
       credentials: 'same-origin', body: JSON.stringify(body)
     }));
   },
+  async put(path, body) {
+    return this._check(await fetch(CFG.api + path, {
+      method: 'PUT', headers: this._headers({'Content-Type':'application/json'}),
+      credentials: 'same-origin', body: JSON.stringify(body)
+    }));
+  },
   async delete(path) {
     return this._check(await fetch(CFG.api + path, {
       method: 'DELETE', headers: this._headers(), credentials: 'same-origin'
@@ -1784,6 +1915,20 @@ const Auth = {
   // nächsten Laden ODER bei der nächsten geschützten Aktion").
   isLoggedIn() { return !!CFG.role; },
   isHost() { return CFG.role === 'host'; },
+  // US-141: Die Rolle der laufenden Sitzung beim Server erfragen (das Cookie ist für die Seite unsichtbar).
+  // Ohne bekannten fa_role-Hinweis (z. B. Anmeldung in einem anderen Fenster) bestimmt allein das Cookie, ob
+  // die Seite angemeldet ist. Ein 401 mit vorhandenem Hinweis lässt das alte Verhalten bestehen (der erste
+  // geschützte Aufruf meldet dann ab). Gibt zurück, ob die App starten darf.
+  async syncSession() {
+    try {
+      const r = await fetch(CFG.api + '/session', { credentials: 'same-origin' });
+      if (r.ok) {
+        const d = await r.json();
+        if (d && (d.role === 'host' || d.role === 'user')) { localStorage.setItem('fa_role', d.role); return true; }
+      }
+    } catch (e) { /* Server nicht erreichbar: alter Stand */ }
+    return !!CFG.role;
+  },
   async login(password) {
     // Raw fetch (nicht API.post): /login braucht kein Cookie und darf 401 nicht als Logout werten.
     const r = await fetch(CFG.api + '/login', {
@@ -2216,6 +2361,12 @@ const Feed = {
     const el = document.getElementById('feed-content');
     const data = Filter.apply(this.data);
     const n = this.data.length, nf = data.length;
+    if (!data.length && Gebiete.allPaused()) {
+      // US-141 (AK-95): eigene Meldung, wenn alle Gebiete aus sind – nicht „keine Chancen gefunden“
+      document.getElementById('header-subtitle').textContent = 'Alle Gebiete pausiert.';
+      el.innerHTML = Gebiete.emptyAllHtml();
+      return;
+    }
     if (!data.length) {
       // BUG-32: Soft-Fallback — wenn kein expliziter Filter aktiv und Non-Routine = 0,
       // Routine-Events (Goldene/Blaue Stunde) als Tägliche-Chancen-Sektion anzeigen.
@@ -2249,7 +2400,7 @@ const Feed = {
         : n > 0
           ? Filter.activeCount() > 0
             ? `Filter aktiv: ${n} Chancen, ${nf} entsprechen den Kriterien.`
-            : `Keine besonderen Chancen in den nächsten 14 Tagen.`
+            : `Keine besonderen Chancen in den nächsten 14 Tagen.${Gebiete.pausedCount() ? ' Pausierte Gebiete liefern keine Chancen.' : ''}`
           : `Keine Chancen gefunden. Mindest-Score: ${pct(CFG.minScore)}`;
       // BUG-85: dieser Zweig kehrt per `return` zurück, bevor die reguläre
       // Kopfzeilen-Aktualisierung weiter unten in render() erreicht wird — ohne
@@ -2353,6 +2504,10 @@ const Scout = {
 
   render() {
     const el = document.getElementById('scout-content');
+    if ((!this.data || this.data.length === 0) && Gebiete.allPaused()) {
+      el.innerHTML = Gebiete.emptyAllHtml();
+      return;
+    }
     if (!this.data || this.data.length === 0) {
       el.innerHTML = `<div class="scout-empty">
         <div class="scout-moon-icon">${ic('i-moon',40)}</div>
@@ -2623,7 +2778,9 @@ const CalendarView = {
       </div>
       <div class="cal-status">${monthEvents.length} Chancen · nur Astronomie${searchHint}</div>`;
 
-    if (!monthEvents.length) {
+    if (!monthEvents.length && Gebiete.allPaused()) {
+      html += Gebiete.emptyAllHtml();
+    } else if (!monthEvents.length) {
       html += `<div class="empty" style="padding-top:40px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
           <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
@@ -3395,7 +3552,7 @@ const Filter = {
         if (!s.hasImageExcl && !has) return false;
         if (s.hasImageExcl && has) return false;
       }
-      if (s.minScore > 0 && Feed.data && Feed.data.length) {
+      if (s.minScore > 0 && Feed.data && Feed.data.length && !l.paused) {  // US-141 (AK-93): pausierte Orte haben keine Chancen und bleiben sichtbar
         // Nur Locations anzeigen, die mindestens eine Chance mit ausreichend Score haben
         const hasEvent = Feed.data.some(e => e.location_id === l.id && e.overall_score >= s.minScore / 100);
         if (!hasEvent) return false;
@@ -3631,22 +3788,25 @@ const FilterSheet = {
     if (App.current === 'map') {
       count = MapView.markers.filter(({marker}) => MapView.map && MapView.map.hasLayer(marker)).length;
       const total = MapView.markers.length;
-      label = count === total ? `${total} Locations` : `${count} von ${total} Locations`;
+      const _pm = MapView.markers.filter(({marker, loc}) => loc.paused && MapView.map && MapView.map.hasLayer(marker)).length;
+      label = (count === total ? `${total} Locations` : `${count} von ${total} Locations`) + (_pm ? `, davon ${_pm} pausiert` : '');
     } else if (App.current === 'locations') {
-      count = Filter.applyToLocations(Locations.all).length;
-      label = `${count} von ${Locations.all.length} Locations`;
+      const _fl = Filter.applyToLocations(Locations.all);
+      count = _fl.length;
+      const _pl = _fl.filter(l => l.paused).length;
+      label = `${count} von ${Locations.all.length} Locations` + (_pl ? `, davon ${_pl} pausiert` : '');
     } else if (Feed.mode === 'feed' && Feed.data) {
       count = Filter.apply(Feed.data).length;
-      label = `${count} von ${Feed.data.length} Chancen`;
+      label = `${count} von ${Feed.data.length} Chancen` + Gebiete.chancenNote();
     } else if (Feed.mode === 'calendar') {
       const cached = CalendarView._monthCache.get(CalendarView._cacheKey());
       if (cached) {
         count = Filter.apply(cached).length;
-        label = `${count} von ${cached.length} Chancen (${MONTHS_DE[CalendarView.month]})`;
+        label = `${count} von ${cached.length} Chancen (${MONTHS_DE[CalendarView.month]})` + Gebiete.chancenNote();
       }
     } else if (Feed.mode === 'scout' && Scout.data) {
       count = Filter.applyToScout(Scout.data).length;
-      label = `${count} von ${Scout.data.length} Scout-Chancen`;
+      label = `${count} von ${Scout.data.length} Scout-Chancen` + Gebiete.chancenNote();
     }
     el.textContent = label ? `↳ ${label} sichtbar` : '';
     el.style.color = count === 0 && label ? 'var(--warn, #f0a030)' : 'var(--muted)';
@@ -5510,7 +5670,16 @@ const MapView = {
     this.markers = [];
     const col = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
     for (const loc of locs) {
-      const icon = L.divIcon({ className:'', html:
+      // US-141: pausierte Orte bleiben immer sichtbar, aber gedämpft und mit Pause-Zeichen
+      const icon = loc.paused ? L.divIcon({ className:'marker-paused', html:
+        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38" role="img" aria-label="pausiert">
+          <path d="M14 2C7 2 2 8 2 15c0 9 12 21 12 21s12-12 12-21C26 8 21 2 14 2z"
+                style="fill:var(--muted);stroke:var(--surface)" stroke-width="2.5"/>
+          <circle cx="14" cy="14" r="6.5" style="fill:var(--surface)"/>
+          <path d="M12 11.2 V16.8 M16 11.2 V16.8" style="stroke:var(--muted)" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+        iconSize:[28,38], iconAnchor:[14,36], popupAnchor:[0,-38]
+      }) : L.divIcon({ className:'', html:
         `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
           <path d="M14 2C7 2 2 8 2 15c0 9 12 21 12 21s12-12 12-21C26 8 21 2 14 2z"
                 fill="${col}" stroke="var(--surface)" stroke-width="2.5"/>
@@ -5522,6 +5691,7 @@ const MapView = {
       m.bindPopup(`<div class="map-popup">
         <h4>${esc(loc.name)}</h4>
         <p>${esc(loc.category)}<br><small>${esc(loc.description.slice(0,80))}…</small></p>
+        ${loc.paused ? `<p>${Gebiete.tagHtml(loc)}</p>` : ''}
         <span class="popup-btn" onclick="LocationDetail.open('${loc.id}')">Details →</span>
       </div>`);
       this.markers.push({ marker: m, loc });
@@ -5581,7 +5751,9 @@ const MapView = {
       let visible = true;
 
       // Eventtyp Include-Filter (BUG-23)
-      if (activeTypes.length > 0) {
+      // US-141 (AK-92): pausierte Orte haben keine Termine und bleiben bei JEDEM Ereignisfilter sichtbar
+      // (gleich bei „nur Art X“ und „Art X ausschließen“); die übrigen Ortsfilter wirken weiter.
+      if (activeTypes.length > 0 && !loc.paused) {
         if (locIdsWithMatch !== null) {
           visible = locIdsWithMatch.has(loc.id);
         } else {
@@ -5597,7 +5769,7 @@ const MapView = {
       }
 
       // Eventtyp Exclude-Filter (BUG-46)
-      if (visible && locIdsExcluded !== null && locIdsExcluded.has(loc.id)) visible = false;
+      if (visible && !loc.paused && locIdsExcluded !== null && locIdsExcluded.has(loc.id)) visible = false;
 
       // BUG-46: Schwierigkeit
       if (visible && s.difficulty.length && !s.difficulty.includes(loc.difficulty)) visible = false;
@@ -6379,15 +6551,16 @@ const Locations = {
 
     const html = this.sortByDistance(locs).map(l => {
       const fls = l.focal_length_suggestions.slice(0,3).map(f=>`<span class="tag tag-blue">${f}mm</span>`).join('');
-      return `<div class="card" onclick="LocationDetail.open('${l.id}')">
+      return `<div class="card${l.paused ? ' gb-paused' : ''}" onclick="LocationDetail.open('${l.id}')">
         <div class="loc-card">
           <div class="loc-icon" style="background:var(--surface)">${ic(catIcon[l.category]||'i-pin',22)}</div>
           <div class="loc-body">
             <h4>${esc(l.name)}</h4>
-            <p>${esc(l.category)}</p>
+            <p>${esc(l.category)}${l.land ? ' · ' + esc(Gebiete.where(l)) : ''}</p>
           </div>
           <span class="loc-diff ${diffCls[l.difficulty]||'diff-2'}">${diffLabel[l.difficulty]||'Mittel'}</span>
         </div>
+        ${l.paused ? `<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">${Gebiete.tagHtml(l)}${l.area_undecided && Auth.isHost() ? '<span class="gb-tag gb-tag-mixed">Entscheidung offen</span>' : ''}</div>` : ''}
         <p style="font-size:12px;color:var(--muted);margin:8px 0;line-height:1.5">${esc(l.description.slice(0,100))}…</p>
         <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
           ${fls}
@@ -6398,7 +6571,11 @@ const Locations = {
         ${l.access_note ? `<p style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:5px">${ic('i-walk',13)} ${esc(l.access_note)}</p>` : ''}
       </div>`;
     }).join('');
-    document.getElementById('locations-content').innerHTML = html || `<div class="empty"><p>Keine Locations gefunden.</p></div>`;
+    // US-141 (AK-94): Zähler „x von y Orten, davon n pausiert“ – pausierte Orte zählen mit
+    const _pz = locs.filter(l => l.paused).length;
+    const _cnt = this.all.length
+      ? `<div class="gb-counter" id="loc-counter"><b>${locs.length} von ${this.all.length} Orten</b> <span>· davon ${_pz} pausiert</span></div>` : '';
+    document.getElementById('locations-content').innerHTML = _cnt + (html || `<div class="empty"><p>Keine Locations gefunden.</p></div>`);
   }
 };
 
@@ -6664,6 +6841,7 @@ const LocationDetail = {
           })()}
         </select>
 
+        ${Gebiete.editHtml(loc)}
         <label>Beschreibung</label>
         <div class="geocode-row">
           <textarea class="input-field" id="edit-desc" rows="3">${esc(loc.description||'')}</textarea>
@@ -7043,6 +7221,8 @@ const LocationDetail = {
     const difficulty = diffEl ? parseInt(diffEl.value, 10) : 2;
 
     const body = {name, description, subject_name, category, special_notes, difficulty, focal_length_suggestions};
+    const _gbEdit = Gebiete.editChange(LocationDetail._current || {});
+    if (_gbEdit) Object.assign(body, _gbEdit);  // US-141: Land/Region (nur Host)
     if (subject_height_m !== null && !isNaN(subject_height_m)) body.subject_height_m = subject_height_m;
     if (observer_floor_height_m !== null && !isNaN(observer_floor_height_m) && observer_floor_height_m >= 0) body.observer_floor_height_m = observer_floor_height_m;
     if (obsCoords) { body.observer_lat = obsCoords.lat; body.observer_lon = obsCoords.lon; }
@@ -7058,11 +7238,12 @@ const LocationDetail = {
       toast('✓ Location aktualisiert');
       LocationDetail.open(locId);
       Locations.render(Filter.applyToLocations(Locations.all));
+      Gebiete.afterEdit(res, locId, body);  // US-141: ggf. Rückfrage zum Gebiet, Ansichten neu laden
       // Feed und Kalender neu rendern damit location_name-Links sofort aktuell sind
       if (Feed.data) Feed.render();
       // US-106: Wurde eine Neuberechnung ausgelöst (Koordinaten o.ä. geändert),
       // Banner + Wetter-Nachlade-Hinweis zeigen, bis Feed UND Wetter stehen.
-      if (res && res.recompute_triggered) {
+      if (res && res.recompute_triggered && !res.paused) {
         Feed.startPendingPoll(locId);
       }
     } catch(e) {
@@ -7139,6 +7320,7 @@ const LocationDetail = {
         <button onclick="AstroLive.open('${loc.id}')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--on-accent);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">${ic('i-milkyway',15)} Live-Astro (Sonne · Mond · Milchstraße)</button>
         <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px">${esc(loc.description)}</p>
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${fls}${sightlineTagHtml(loc.sightline_status, true)}</div>
+        ${Gebiete.heroHtml(loc)}
       </div>
 
       ${mkSec('loc_obs',`${ic('i-pin',15)} Fotograf-Standort <button class="el-info-btn" onclick="event.stopPropagation();ElementInfo.show('locStandpoint')">i</button>`,`<div class="info-row"><span class="ir-label">Koordinaten</span><span class="ir-val" style="font-family:monospace;font-size:12px">${obsLat}°N, ${obsLon}°E</span></div>${(loc.observer_floor_height_m||0) > 0 ? `<div class="info-row"><span class="ir-label">Gebäudehöhe</span><span class="ir-val">+${loc.observer_floor_height_m} m über Gelände</span></div>` : ''}<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="loc-maps-btn" href="${obsAppleUrl}" target="_blank">${ic('i-map',13)} Apple Maps</a><a class="loc-maps-btn" href="${obsGoogleUrl}" target="_blank">${ic('i-map',13)} Google Maps</a><a class="loc-maps-btn" href="${svUrl}" target="_blank" style="color:var(--accent);border-color:var(--accent)">${ic('i-eye',13)} Street View</a></div>`)}
@@ -7299,6 +7481,12 @@ const LocationDetail = {
   _renderEventsList() {
     const el = document.getElementById('loc-events-content');
     if (!el) return;
+
+    // US-141: bei einem pausierten Ort ersetzt die Pausen-Meldung die automatische Chancenliste
+    if (this._current && this._current.paused) {
+      el.innerHTML = Gebiete.pauseBoxHtml(this._current);
+      return;
+    }
 
     if (this._eventsLoading) {  // AK8
       el.innerHTML = '<div class="empty" style="padding:20px"><div class="spinner"></div></div>';
@@ -7523,6 +7711,7 @@ const AddLocation = {
     if (flyTo && this.map) this.map.setView([lat, lng], 14);
     this.drawLine();
     this._syncFsMarkers(); // US-124: Vollbild-Karte (falls offen) sofort nachziehen
+    Gebiete.onObserver(lat, lng);  // US-141: Land und Region aus dem Standort vorschlagen
   },
   setSubject(lat, lng, flyTo = false) {
     this.subj = {lat, lng};
@@ -7788,6 +7977,7 @@ const AddLocation = {
         category: document.getElementById('add-category').value,  // US-76
         save: true
       };
+      Object.assign(body, Gebiete.addSelection());  // US-141: Host darf Land/Region selbst wählen
       const result = await API.post('/preview-alignment', body);
       toast('✅ Location gespeichert!');
       // US-127: gestagtes Beispielbild (falls vorhanden) VOR reset() sichern —
@@ -7808,7 +7998,11 @@ const AddLocation = {
       // BUG-35: Feed sofort neu laden + Polling starten wenn Recompute läuft
       await Feed.load();
       if (result && result.location_id) {
-        Feed.startPendingPoll(result.location_id);
+        const _neu = Locations.all.find(l => l.id === result.location_id);
+        // US-141: ein Ort in ausgeschaltetem Gebiet wird nicht berechnet – kein „wird berechnet“-Hinweis,
+        // stattdessen die Meldung bzw. (Host) der nicht wegklickbare Hinweis
+        if (_neu && _neu.paused) Gebiete.afterCreate(result.location_id);
+        else Feed.startPendingPoll(result.location_id);
         // US-127: automatischer Bild-Upload direkt im Anschluss, sobald die
         // location_id vorliegt — eigener try/catch, damit ein Upload-Fehler die
         // bereits erfolgreiche Location-Anlage nicht zurücknimmt (AK „Bild-Upload
@@ -7862,6 +8056,505 @@ const AddLocation = {
     if (preview) preview.innerHTML = '';
     const saveBtn = document.getElementById('save-location-btn');
     if (saveBtn) saveBtn.style.display = 'none';
+    Gebiete.resetAdd();
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// US-141: LÄNDER & REGIONEN (Host-Menü), Pausen-Kennzeichnung, Hinweis bei neuen Orten
+// Ein Ort läuft nur, wenn sein Land UND seine Region eingeschaltet sind. „Pausiert“ heißt: sichtbar und
+// bearbeitbar, aber ohne Wetter und Chancen. Die Entscheidung trifft der Server (Feld paused an jedem Ort);
+// diese Oberfläche rechnet sie nie selbst aus.
+// ═══════════════════════════════════════════════════════
+const Gebiete = {
+  areas: null,            // Antwort von GET /areas (nur Host)
+  _exp: new Set(),        // aufgeklappte Länder im Menü
+  _modal: null,           // gerade offener Dialog
+  _hintFor: null,         // Orts-ID, zu der der Hinweis „Jetzt aktivieren / Ausgeschaltet lassen“ offen ist
+  _busy: false,
+  _trap: false,
+  _sugTimer: null,
+  addState: { land: null, region: null, unsicher: false, aktiv: true },
+  OHNE: 'Ohne Region',
+
+  _n(n, one, many) { return n === 1 ? one : many; },
+  _enc(s) { return encodeURIComponent(s); },
+  _path(land, region) { return '/areas/' + this._enc(land) + (region ? '/' + this._enc(region) : ''); },
+
+  // ── Abfragen auf den geladenen Orten ───────────────────
+  locs() { return Locations.all || []; },
+  pausedCount() { return this.locs().filter(l => l.paused).length; },
+  allPaused() { const a = this.locs(); return a.length > 0 && a.every(l => l.paused); },
+  where(l) { return (l.region && l.region !== this.OHNE) ? `${l.region}, ${l.land}` : (l.land || 'Sonstige'); },
+  tagHtml(l) { return l && l.paused ? `<span class="gb-tag gb-tag-paused">${ic('i-pausebare', 10)}pausiert</span>` : ''; },
+  // Zusatz für die Trefferzahlen von Chancen: pausierte Orte liefern keine und zählen dort nicht mit
+  chancenNote() { const n = this.pausedCount(); return n ? ` · ohne ${n} pausierte ${this._n(n, 'Ort', 'Orte')}` : ''; },
+
+  emptyAllHtml() {
+    const host = Auth.isHost();
+    return `<div class="empty gb-empty">${ic('i-pause', 48)}
+      <h3 style="font-size:16px;font-weight:700;color:var(--text)">Alle Gebiete pausiert</h3>
+      <p>Es werden gerade keine Chancen berechnet. Die Orte selbst bleiben auf Karte und in der Liste sichtbar.</p>
+      ${host ? `<button class="btn-primary" style="width:auto;padding:10px 20px" onclick="Gebiete.open()">Länder &amp; Regionen öffnen</button>`
+             : '<p>Der Host kann Länder und Regionen wieder einschalten.</p>'}</div>`;
+  },
+
+  // ── Daten vom Server (nur Host) ───────────────────────
+  async loadAreas() {
+    this.areas = await API.get('/areas');
+    const n = this.areas && this.areas.nachladen;
+    if (n && n.aktiv) { this._nlZuletzt = n; this._banner(n); this.startNachladenPoll(); }
+    return this.areas;
+  },
+  async ensureAreas() { if (Auth.isHost() && !this.areas) { try { await this.loadAreas(); } catch (e) { /* Menü lädt beim Öffnen neu */ } } },
+
+  summary(a) {
+    const L = (a && a.laender) || [];
+    const on = L.filter(c => c.zustand === 'an').length, mixed = L.filter(c => c.zustand === 'teilweise').length;
+    const act = L.reduce((s, c) => s + c.aktiv, 0), tot = L.reduce((s, c) => s + c.gesamt, 0);
+    return `${on} von ${L.length} Ländern an${mixed ? ` (${mixed} teilweise)` : ''} · ${act} von ${tot} Orten aktiv`;
+  },
+  async fillSettingsSummary() {
+    const el = document.getElementById('gb-settings-summary');
+    if (!el) return;
+    try { await this.loadAreas(); const e2 = document.getElementById('gb-settings-summary'); if (e2) e2.textContent = this.summary(this.areas); }
+    catch (e) { el.textContent = 'Zustand nicht verfügbar'; }
+  },
+
+  // ── Menü „Länder & Regionen“ ──────────────────────────
+  async open() {
+    if (!Auth.isHost()) return;
+    const el = document.getElementById('gb-regions');
+    el.classList.add('open'); el.setAttribute('aria-hidden', 'false');
+    const body = document.getElementById('gb-body');
+    body.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+    try { await this.loadAreas(); this.renderMenu(); }
+    catch (e) { body.innerHTML = '<div class="empty"><p>Länder und Regionen konnten nicht geladen werden.</p></div>'; }
+  },
+  close() {
+    const el = document.getElementById('gb-regions');
+    el.classList.remove('open'); el.setAttribute('aria-hidden', 'true');
+    const s = document.getElementById('gb-settings-summary');
+    if (s && this.areas) s.textContent = this.summary(this.areas);
+  },
+  _stateTag(z) {
+    return `<span class="gb-tag ${z === 'an' ? 'gb-tag-on' : z === 'teilweise' ? 'gb-tag-mixed' : 'gb-tag-paused'}">${z}</span>`;
+  },
+  _landHtml(c) {
+    const exp = this._exp.has(c.name), solo = c.regionen.length === 0;
+    const chk = c.zustand === 'an' ? 'true' : c.zustand === 'aus' ? 'false' : 'mixed';
+    const rOn = c.regionen.filter(r => r.zustand === 'an').length;
+    const sub = `${c.gesamt} ${this._n(c.gesamt, 'Ort', 'Orte')} · ${c.aktiv} aktiv` + (solo ? ' · ohne Regionen' : ` · ${rOn} von ${c.regionen.length} Regionen an`);
+    const regs = solo
+      ? `<div class="gb-rest">Keine Regionen. „${esc(c.name)}“ sammelt Orte außerhalb der Länderliste und hat nur diesen einen Schalter.</div>`
+      : c.regionen.map(r => `<div class="gb-reg"><div class="gb-pn"><span>${esc(r.name)}</span>
+            <small>${r.gesamt} ${this._n(r.gesamt, 'Ort', 'Orte')} · ${r.aktiv} aktiv${r.zustand === 'aus' ? ' <span class="gb-tag gb-tag-paused">aus</span>' : ''}</small></div>
+          <button class="gb-switch" role="switch" aria-checked="${r.zustand === 'an'}" aria-label="${esc(r.name)} ein/aus"
+            data-gb-reg="${esc(r.name)}" data-gb-land="${esc(c.name)}"></button></div>`).join('');
+    return `<div class="gb-land ${exp ? 'exp' : ''}" data-gb-landbox="${esc(c.name)}">
+      <div class="gb-land-head">
+        <button class="gb-tap" data-gb-exp="${esc(c.name)}" aria-expanded="${exp}"><svg class="gb-chev" viewBox="0 0 24 24"><use href="#i-chevright"/></svg>
+          <span><span class="gb-rname">${esc(c.name)}</span><span class="gb-rsub">${sub}</span></span></button>
+        <span class="gb-state">${this._stateTag(c.zustand)}</span>
+        <button class="gb-switch" role="switch" aria-checked="${chk}" aria-label="${esc(c.name)} ein/aus" data-gb-lsw="${esc(c.name)}"></button>
+      </div>
+      <div class="gb-regs">${regs}</div></div>`;
+  },
+  renderMenu() {
+    const body = document.getElementById('gb-body');
+    if (!body || !this.areas) return;
+    const prev = body.scrollTop;
+    body.innerHTML = `<div class="gb-sum">${esc(this.summary(this.areas))}
+        <small>Ausgeschaltete Orte bleiben sichtbar und bearbeitbar. Pausiert werden nur Wetter, Chancen und Hintergrundrechnung. Nichts wird gelöscht.</small></div>
+      ${this.nachladenHtml()}
+      <div class="gb-explain"><ul>
+        <li><b>Land aus</b> = alle Regionen aus. <b>Land an</b> = alle Regionen an.</li>
+        <li>Schaltest du eine einzelne Region aus, steht das Land auf <b>teilweise</b>.</li>
+        <li>Es gibt <b>keine Schalter für einzelne Orte</b>. Orte erscheinen hier nur als Zähler.</li>
+        <li>Beim Einschalten erscheinen vorhandene Chancen sofort wieder; die Orte werden dann gleich neu berechnet (Chancen zuerst, danach das Wetter). Den Stand siehst du hier.</li></ul></div>
+      ${this.areas.laender.map(c => this._landHtml(c)).join('')}
+      <div class="gb-info"><b>Die Wetterkarte ist nicht ortsgebunden</b> und belastet das Kontingent von Open-Meteo nicht. Sie läuft für das ganze Kartengebiet weiter &ndash; ein Land oder eine Region auszuschalten ändert dort nichts. Der Gewinn beim Pausieren liegt im <b>Wetterabruf je Ort</b>.</div>`;
+    body.scrollTop = prev;
+  },
+  // ── US-141 Baustein 3: Fortschritt des Nachladens ──────
+  nachladenText(n) {
+    const rest = n.rest_min ? ` · ca. ${n.rest_min} Min.` : '';
+    const kal = n.kalender_aktiv && n.kalender_gesamt ? ` · Kalender wird ergänzt (${n.kalender_bereit} von ${n.kalender_gesamt})` : '';
+    if (n.phase === 'kalender') return `${n.chancen_bereit} von ${n.gesamt} Orten bereit · Kalender wird ergänzt (${n.kalender_bereit} von ${n.kalender_gesamt})${rest}`;
+    if (n.phase === 'wetter') return `${n.chancen_bereit} von ${n.gesamt} Orten bereit · Wetter wird geholt (${n.wetter_bereit} von ${n.gesamt})${kal}${rest}`;
+    return `${n.chancen_bereit} von ${n.gesamt} Orten bereit · Wetter folgt${rest}`;
+  },
+  nachladenHtml() {
+    const n = this.areas && this.areas.nachladen;
+    if (!n) return '';
+    if (!n.aktiv) {
+      return n.fehler ? `<div class="gb-nl gb-nl-fehler" id="gb-nl" role="status"><b>${esc(n.fehler)}</b></div>` : '';
+    }
+    const teile = n.kalender_gesamt ? 3 : 2;      // Chancen, Wetter und (wenn dabei) Kalender
+    const teil = n.gesamt ? Math.round(100 * (n.chancen_bereit + n.wetter_bereit + (n.kalender_gesamt ? n.kalender_bereit : 0)) / (teile * n.gesamt)) : 0;
+    return `<div class="gb-nl" id="gb-nl" role="status" aria-live="polite"><b><span class="spinner" style="width:14px;height:14px"></span>Orte werden neu berechnet</b>
+      <div class="gb-nl-bar"><i style="width:${teil}%"></i></div>
+      <span id="gb-nl-text">${esc(this.nachladenText(n))}</span>
+      <ul>${(n.gebiete || []).map(g => `<li><span>${esc(g.name)}</span><span>${g.bereit} von ${g.gesamt} bereit${g.status === 'fertig' ? ' · fertig' : ''}</span></li>`).join('')}</ul>
+      <small>Du kannst weiterarbeiten. Schaltest du das Gebiet wieder aus, wird die Berechnung abgebrochen.</small></div>`;
+  },
+  _nlTimer: null,
+  _nlZuletzt: null,
+  // Fragt den Stand ab, solange das Nachladen läuft; zeigt ihn im Menü und im Hinweisbalken an.
+  startNachladenPoll() {
+    if (this._nlTimer || !Auth.isHost()) return;
+    this._nlTick(true);
+    this._nlTimer = setInterval(() => this._nlTick(false), 3000);
+  },
+  stopNachladenPoll() { if (this._nlTimer) { clearInterval(this._nlTimer); this._nlTimer = null; } },
+  _banner(n) {
+    const banner = document.getElementById('recompute-banner'), txt = document.getElementById('recompute-banner-text');
+    if (!banner) return;
+    if (n && n.aktiv) {
+      banner.style.display = 'flex';
+      if (txt) txt.textContent = this.nachladenText(n);
+    } else { banner.style.display = 'none'; }
+  },
+  async _nlTick(first) {
+    if (this._busy) return;
+    let a;
+    try { a = await API.get('/areas'); } catch (e) { return; }
+    const vorher = this._nlZuletzt;
+    const n = a.nachladen || null;
+    this.areas = a;
+    this._nlZuletzt = n;
+    this._banner(n);
+    const neuPending = new Set((n && n.aktiv && n.ids) || []);        // Karten: „Wetter wird nachgeladen“
+    const pendingGeaendert = neuPending.size !== Feed.pendingLocations.size;
+    Feed.pendingLocations = neuPending;
+    if (!this._modal && document.getElementById('gb-regions').classList.contains('open')) this.renderMenu();
+    const ende = vorher && vorher.aktiv && !(n && n.aktiv);
+    const mehr = n && vorher && n.aktiv && n.chancen_bereit > vorher.chancen_bereit;
+    if (ende || mehr) {
+      try { await Feed.load(); } catch (e) { /* Feed lädt selbst nach */ }
+    } else if (pendingGeaendert) {
+      try { Feed.render(); } catch (e) { /* nächster Durchlauf */ }
+    }
+    if (!n || !n.aktiv) {
+      this.stopNachladenPoll();
+      if (ende) toast(n && n.fehler ? n.fehler : 'Alle Orte sind neu berechnet', 4000);
+    }
+  },
+  onMenuClick(e) {
+    const ex = e.target.closest('[data-gb-exp]');
+    if (ex) { const n = ex.dataset.gbExp; this._exp.has(n) ? this._exp.delete(n) : this._exp.add(n); this.renderMenu(); return; }
+    const ls = e.target.closest('[data-gb-lsw]');
+    if (ls) { this.landToggle(ls.dataset.gbLsw); return; }
+    const rs = e.target.closest('[data-gb-reg]');
+    if (rs) { this.regionToggle(rs.dataset.gbLand, rs.dataset.gbReg); }
+  },
+  landToggle(name) {
+    const c = this.areas.laender.find(x => x.name === name); if (!c) return;
+    if (c.zustand === 'teilweise') {
+      const rOn = c.regionen.filter(r => r.zustand === 'an').length;
+      this.modal({
+        title: `${esc(name)} ist teilweise an`,
+        body: `<p>${rOn} von ${c.regionen.length} Regionen sind an. Der Länder-Schalter schaltet <b>alle Regionen gemeinsam</b> um &ndash; ein Einzelmuster geht dabei verloren.</p>`,
+        buttons: [{ label: 'Alle ausschalten', cls: 'gb-btn', act: () => this._apply(this._path(name), false, name) },
+                  { label: 'Alle einschalten', cls: 'gb-btn gb-btn-primary', act: () => this._apply(this._path(name), true, name) }],
+        dismissable: true });
+      return;
+    }
+    this._apply(this._path(name), c.zustand === 'aus', name);
+  },
+  regionToggle(land, region) {
+    const c = this.areas.laender.find(x => x.name === land); if (!c) return;
+    const r = c.regionen.find(x => x.name === region); if (!r) return;
+    this._apply(this._path(land, region), r.zustand !== 'an', region);
+  },
+  // Schaltet und lädt danach alle Ansichten neu. Gibt true zurück, wenn es geklappt hat.
+  async _apply(path, on, label) {
+    if (this._busy) return false;
+    this._busy = true;
+    try {
+      const res = await API.put(path, { enabled: on });
+      if (res && res.laender) this.areas = { laender: res.laender, nachladen: res.nachladen || null };
+      this._nlZuletzt = (this.areas && this.areas.nachladen) || null;
+      await this.refreshAfterChange();
+      this.renderMenu();
+      if (this.areas && this.areas.nachladen && this.areas.nachladen.aktiv) { this._banner(this.areas.nachladen); this.startNachladenPoll(); }
+      else { this._banner(null); }
+      toast(on ? `${label} eingeschaltet` : `${label} ausgeschaltet – Orte bleiben sichtbar`, 3500);
+      return true;
+    } catch (e) {
+      toast('Umschalten fehlgeschlagen: ' + e.message, 3500);
+      try { await this.loadAreas(); this.renderMenu(); } catch (e2) { /* bleibt */ }
+      return false;
+    } finally { this._busy = false; }
+  },
+  // Nach jeder Änderung: Orte, Feed, Kalender, Entdecken und Karte neu holen
+  async refreshAfterChange() {
+    try { Locations.all = await API.get('/locations'); } catch (e) { /* alter Stand */ }
+    try { await Feed.load(); } catch (e) { /* Feed lädt selbst nach */ }
+    try { CalendarView._monthCache.clear(); } catch (e) { /* ignorieren */ }
+    try { Scout.data = null; } catch (e) { /* ignorieren */ }
+    if (Feed.mode === 'calendar') CalendarView.show();
+    else if (Feed.mode === 'scout') Scout.show();
+    if (MapView.map) { try { await MapView.loadMarkers(); } catch (e) { /* Karte lädt beim nächsten Besuch */ } }
+    if (App.current === 'locations') Locations.filter(Search.query);
+    const cur = LocationDetail._current;
+    if (cur && document.getElementById('loc-detail-sheet').classList.contains('open')
+        && !document.getElementById('edit-name')) LocationDetail.open(cur.id);
+    try { FilterSheet._updateResultCount(); } catch (e) { /* Filterfenster zu */ }
+    this.checkUndecided();
+  },
+
+  // ── Dialoge ───────────────────────────────────────────
+  modal(o) {
+    const w = document.getElementById('gb-modal');
+    w.innerHTML = `<div class="gb-modal-card" role="dialog" aria-modal="true" aria-labelledby="gb-modal-title">
+      ${o.dismissable ? `<button class="gb-icon" data-gbm="x" aria-label="Schließen">${ic('i-x', 20)}</button>` : ''}
+      <h3 id="gb-modal-title">${o.title}</h3>${o.body}
+      <div class="gb-mbtns">${o.buttons.map((b, i) => `<button class="${b.cls}" data-gbm="${i}">${b.label}</button>`).join('')}</div></div>`;
+    w.classList.add('open');
+    w._o = o; this._modal = o;
+    if (!o.dismissable) this._trapOn();
+    const first = w.querySelector('[data-gbm="0"]'); if (first) first.focus();
+  },
+  closeModal() {
+    const w = document.getElementById('gb-modal');
+    const o = w._o;
+    w.classList.remove('open'); w.innerHTML = ''; w._o = null; this._modal = null;
+    if (o && o.hint) { this._hintFor = null; this._trap = false; }
+  },
+  onModalClick(e) {
+    const w = document.getElementById('gb-modal'), o = w._o; if (!o) return;
+    const btn = e.target.closest('[data-gbm]');
+    if (btn) {
+      if (btn.dataset.gbm === 'x') { this.closeModal(); if (o.onDismiss) o.onDismiss(); return; }
+      const b = o.buttons[+btn.dataset.gbm]; this.closeModal(); if (b.act) b.act(); return;
+    }
+    if (e.target === w) {
+      if (o.dismissable) { this.closeModal(); if (o.onDismiss) o.onDismiss(); }
+      else { const m = w.querySelector('.gb-modal-card'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake'); }
+    }
+  },
+  // Der Hinweis zu einem neuen Ort lässt sich nicht wegklicken – auch nicht mit der Zurück-Taste
+  // (die Seite legt dafür einen Verlaufseintrag an und legt ihn nach „Zurück“ wieder auf).
+  _trapOn() { try { history.pushState({ gb: 1 }, ''); this._trap = true; } catch (e) { /* ohne Verlauf */ } },
+  onPop() { if (this._hintFor) { try { history.pushState({ gb: 1 }, ''); } catch (e) { /* ignorieren */ } } },
+  onKey(e) {
+    if (e.key !== 'Escape') return;
+    const o = this._modal;
+    if (o && o.dismissable) { this.closeModal(); if (o.onDismiss) o.onDismiss(); }
+    // nicht wegklickbarer Hinweis: Esc tut nichts
+  },
+
+  async confirmRegionOn(land, region, after) {
+    let n = null, landAus = false;
+    try {
+      const a = await this.loadAreas();
+      const L = a.laender.find(x => x.name === land);
+      if (L) { landAus = L.zustand === 'aus'; const R = region ? L.regionen.find(x => x.name === region) : null; n = R ? R.gesamt : L.gesamt; }
+    } catch (e) { /* ohne Ortszahl */ }
+    const name = region || land;
+    const anz = n == null ? '' : ` mit ${n} ${this._n(n, 'Ort', 'Orten')}`;
+    this.modal({
+      title: `${esc(name)}${anz} einschalten?`,
+      body: `<p>Eingeschaltet wird ${region ? 'die <b>ganze Region ' + esc(name) + '</b>' : '<b>' + esc(name) + '</b> als Ganzes'}, nicht nur der neue Ort${n == null ? '' : (n === 1 ? ': der Ort wird wieder berechnet' : ': alle ' + n + ' Orte werden wieder berechnet')}.${landAus && region ? ` ${esc(land)} zeigt danach „teilweise“.` : ''}</p>
+        <p>Vorhandene Chancen erscheinen sofort wieder; die Orte werden gleich neu berechnet, danach folgt das Wetter. Den Stand siehst du im Menü „Länder &amp; Regionen“.</p>`,
+      buttons: [{ label: 'Abbrechen', cls: 'gb-btn', act: () => { if (after) after(false); } },
+                { label: region ? 'Region einschalten' : 'Einschalten', cls: 'gb-btn gb-btn-primary',
+                  act: async () => { const ok = await this._apply(this._path(land, region), true, name); if (after) after(ok); } }],
+      dismissable: true, onDismiss: () => { if (after) after(false); } });
+  },
+
+  // ── Neuer Ort in ausgeschaltetem Gebiet ───────────────
+  checkUndecided() {
+    const offen = this.locs().filter(l => l.paused && l.area_undecided);
+    if (!offen.length) { this.hideNotice(true); return; }
+    if (Auth.isHost()) { this.hideNotice(true); if (!this._modal) this.hostHint(offen[0]); }
+    else this.showNotice(offen);
+  },
+  hostHint(loc) {
+    if (this._hintFor === loc.id) return;
+    this._hintFor = loc.id;
+    this.modal({
+      hint: true,
+      title: 'Neuer Ort in ausgeschaltetem Gebiet',
+      body: `<p>„<b>${esc(loc.name)}</b>“ liegt in <b>${esc(this.where(loc))}</b>. Dieses Gebiet ist ausgeschaltet, der Ort ist deshalb vorerst <b>pausiert</b>: Er bleibt sichtbar und bearbeitbar, aber Wetter und Chancen werden nicht berechnet.</p>
+        <p style="margin-bottom:0">„Jetzt aktivieren“ schaltet das <b>ganze Gebiet</b> ein, nicht nur diesen Ort &ndash; vorher fragt die App nach. Bis du gewählt hast, bleibt der Ort aus.</p>`,
+      buttons: [{ label: 'Jetzt aktivieren', cls: 'gb-btn gb-btn-equal', act: () => this.activate(loc.id) },
+                { label: 'Ausgeschaltet lassen', cls: 'gb-btn gb-btn-equal', act: () => this.keepOff(loc.id) }],
+      dismissable: false });
+  },
+  activate(id) {
+    const loc = this.locs().find(l => l.id === id); if (!loc) return;
+    const region = loc.region && loc.region !== this.OHNE ? loc.region : (loc.region === this.OHNE ? this.OHNE : null);
+    this.confirmRegionOn(loc.land, region, (ok) => {
+      if (!ok) toast('Gebiet bleibt aus. Der Hinweis erscheint beim Ort erneut.', 3500);
+    });
+  },
+  async keepOff(id) {
+    try { await API.post('/locations/' + this._enc(id) + '/area-decision', { decision: 'keep' }); }
+    catch (e) { toast('Konnte nicht gespeichert werden: ' + e.message, 3500); return; }
+    await this.refreshAfterChange();
+    toast('Ort bleibt ausgeschaltet.', 3000);
+  },
+  showNotice(offen) {
+    const el = document.getElementById('gb-notice'); if (!el) return;
+    const key = offen.map(l => l.id).sort().join(',');
+    let seen = ''; try { seen = sessionStorage.getItem('gb_notice_x') || ''; } catch (e) { /* ohne Speicher */ }
+    if (seen === key) { el.classList.remove('show'); return; }
+    el._key = key;
+    const n = offen.length;
+    el.innerHTML = `${ic('i-info', 16)}<span><b>Host muss freischalten.</b> ${n === 1 ? 'Ein neuer Ort liegt' : n + ' neue Orte liegen'} in einem pausierten Gebiet; Wetter und Chancen gibt es erst, wenn der Host das Gebiet einschaltet.</span>
+      <button aria-label="Hinweis schließen" onclick="Gebiete.hideNotice()">${ic('i-x', 16)}</button>`;
+    el.classList.add('show');
+  },
+  hideNotice(onlyHide) {
+    const el = document.getElementById('gb-notice'); if (!el) return;
+    if (!onlyHide && el._key) { try { sessionStorage.setItem('gb_notice_x', el._key); } catch (e) { /* ohne Speicher */ } }
+    el.classList.remove('show');
+  },
+  // Direkt nach dem Speichern eines neuen Orts
+  afterCreate(id) {
+    const loc = this.locs().find(l => l.id === id);
+    if (!loc || !loc.paused) return;
+    if (Auth.isHost()) { this.hostHint(loc); return; }
+    this.modal({
+      title: 'Ort gespeichert – Host muss freischalten',
+      body: `<p>„<b>${esc(loc.name)}</b>“ liegt in <b>${esc(this.where(loc))}</b>. Dieses Gebiet ist pausiert. Der Ort ist gespeichert und sichtbar, aber Wetter und Chancen werden erst berechnet, wenn der <b>Host</b> das Gebiet einschaltet.</p>`,
+      buttons: [{ label: 'Verstanden', cls: 'gb-btn gb-btn-primary', act: () => this.hideNotice() }] });
+  },
+
+  // ── Ortsdetail ────────────────────────────────────────
+  heroHtml(loc) {
+    if (!loc.paused) return '';
+    const host = Auth.isHost();
+    let html = `<div style="margin-top:8px">${this.tagHtml(loc)}</div>`;
+    if (loc.area_undecided) {
+      html += host
+        ? `<div class="gb-box attn"><div class="gb-pic">${ic('i-info', 18)}</div><div style="flex:1"><h5>Neuer Ort in ausgeschaltetem Gebiet – noch nicht entschieden</h5>
+            <p>${esc(this.where(loc))} ist aus, dieser Ort ist deshalb vorerst pausiert. „Jetzt aktivieren“ schaltet das ganze Gebiet ein (mit Rückfrage).</p>
+            <div class="gb-mbtns"><button class="gb-btn gb-btn-equal" onclick="Gebiete.activate('${esc(loc.id)}')">Jetzt aktivieren</button>
+            <button class="gb-btn gb-btn-equal" onclick="Gebiete.keepOff('${esc(loc.id)}')">Ausgeschaltet lassen</button></div></div></div>`
+        : `<div class="gb-box attn"><div class="gb-pic">${ic('i-info', 18)}</div><div><h5>Host muss freischalten</h5>
+            <p>Der Ort ist gespeichert. Das Gebiet ${esc(this.where(loc))} ist pausiert – der Host entscheidet, ob es eingeschaltet wird.</p></div></div>`;
+    }
+    return html;
+  },
+  pauseBoxHtml(loc) {
+    const host = Auth.isHost();
+    const region = loc.region && loc.region !== this.OHNE ? loc.region : (loc.region === this.OHNE ? this.OHNE : null);
+    const name = region || loc.land;
+    return `<div class="gb-box"><div class="gb-pic">${ic('i-pause', 18)}</div><div><h5>Dieser Ort ist pausiert – Wetter und Chancen werden nicht berechnet</h5>
+      <p>Das Gebiet ${esc(this.where(loc))} ist ausgeschaltet. Die Ortsdaten kannst du trotzdem bearbeiten. Einzelne Orte lassen sich nicht schalten, nur Länder und Regionen.</p>
+      ${host ? `<button class="btn-primary" onclick="Gebiete.activate('${esc(loc.id)}')">${esc(name)} einschalten …</button>`
+             : '<p style="color:var(--text);font-weight:600">Nur der Host kann Länder und Regionen einschalten.</p>'}</div></div>`;
+  },
+
+  // ── Land und Region wählen (Anlegen und Bearbeiten, nur Host) ──
+  isOn(land, region) {
+    const L = this.areas && this.areas.laender.find(c => c.name === land);
+    if (!L) return true;
+    if (!L.regionen.length) return L.zustand !== 'aus';
+    const R = L.regionen.find(r => r.name === region);
+    return R ? R.zustand === 'an' : L.zustand !== 'aus';
+  },
+  _regSel(p, land, region) {
+    const L = this.areas.laender.find(c => c.name === land);
+    if (!L || !L.regionen.length) return `<select class="input-field" id="${p}-region" style="appearance:auto" disabled><option value="">–</option></select>`;
+    const names = L.regionen.map(r => r.name); if (!names.includes(this.OHNE)) names.push(this.OHNE);
+    return `<select class="input-field" id="${p}-region" style="appearance:auto" onchange="Gebiete.onSel('${p}')">${names.map(n =>
+      `<option value="${esc(n)}" ${n === region ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>`;
+  },
+  selectsHtml(p, land, region) {
+    const lo = this.areas.laender.map(c => `<option value="${esc(c.name)}" ${c.name === land ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+    return `<div class="gb-row-sel"><select class="input-field" id="${p}-land" style="appearance:auto" onchange="Gebiete.onSel('${p}',true)">${lo}</select>${this._regSel(p, land, region)}</div>`;
+  },
+  _statusTag(on) {
+    return on ? '<span class="gb-tag gb-tag-on">Gebiet ist eingeschaltet – der Ort läuft direkt</span>'
+              : `<span class="gb-tag gb-tag-paused">${ic('i-pausebare', 10)}Gebiet ist ausgeschaltet – der Ort startet pausiert</span>`;
+  },
+  onSel(p, landChanged) {
+    const land = document.getElementById(p + '-land').value;
+    let region = document.getElementById(p + '-region')?.value || null;
+    if (landChanged) {
+      const L = this.areas.laender.find(c => c.name === land);
+      region = L && L.regionen.length ? this.OHNE : null;
+      const old = document.getElementById(p + '-region');
+      if (old) old.outerHTML = this._regSel(p, land, region);
+    }
+    if (p === 'add') { this.addState.land = land; this.addState.region = region; this.addState.aktiv = this.isOn(land, region); }
+    const st = document.getElementById(p + '-area-status');
+    if (st) st.innerHTML = this._statusTag(this.isOn(land, region));
+  },
+  // Anlege-Maske: Vorschlag aus dem Standort holen
+  onObserver(lat, lon) {
+    clearTimeout(this._sugTimer);
+    this._sugTimer = setTimeout(async () => {
+      try {
+        const s = await API.get(`/area-suggestion?lat=${lat}&lon=${lon}`);
+        this.addState = { land: s.land, region: s.region, unsicher: !!s.unsicher, aktiv: !!s.aktiv };
+        await this.ensureAreas();
+        this._renderAdd();
+      } catch (e) { /* Vorschlag fehlt – Maske bleibt nutzbar */ }
+    }, 250);
+  },
+  _renderAdd() {
+    const el = document.getElementById('gb-add-area-body'); if (!el) return;
+    const st = this.addState;
+    if (!st.land) { el.innerHTML = 'Wird aus dem Standort bestimmt, sobald er gesetzt ist.'; return; }
+    const host = Auth.isHost() && this.areas;
+    let html = host ? this.selectsHtml('add', st.land, st.region)
+      : `<div style="font-size:14px;font-weight:600;color:var(--text)">${esc(st.region ? st.region + ', ' + st.land : st.land)}</div><div class="gb-muted">Aus dem Standort bestimmt.</div>`;
+    const aktiv = host ? this.isOn(st.land, st.region) : st.aktiv;
+    html += `<div id="add-area-status" style="margin-top:8px">${this._statusTag(aktiv)}</div>`;
+    if (st.unsicher) html += `<div class="gb-muted" style="margin-top:6px;color:var(--accent-2)">Der Standort liegt nahe an einer Grenze. ${host ? 'Bitte Land und Region prüfen.' : 'Der Host kann die Zuordnung später korrigieren.'}</div>`;
+    el.innerHTML = html;
+  },
+  addSelection() {
+    if (!Auth.isHost() || !this.areas || !document.getElementById('add-land')) return {};
+    const land = document.getElementById('add-land').value;
+    const region = document.getElementById('add-region')?.value || null;
+    return region ? { land, region } : { land };
+  },
+  resetAdd() { this.addState = { land: null, region: null, unsicher: false, aktiv: true }; this._renderAdd(); },
+  editHtml(loc) {
+    if (!Auth.isHost() || !this.areas) return '';
+    const land = loc.land || 'Sonstige', region = loc.region || null;
+    return `<label>Land und Region</label>${this.selectsHtml('edit', land, region)}
+      <div id="edit-area-status" style="margin:6px 0 10px">${this._statusTag(this.isOn(land, region))}</div>`;
+  },
+  // nur wenn der Host Land oder Region wirklich geändert hat
+  editChange(loc) {
+    const l = document.getElementById('edit-land'); if (!l) return null;
+    const land = l.value, region = document.getElementById('edit-region')?.value || null;
+    if (land === (loc.land || 'Sonstige') && (region || null) === (loc.region || null)) return null;
+    return region ? { land, region } : { land };
+  },
+  // Nach dem Bearbeiten: hat sich die Lage in ein anderes Gebiet verschoben, fragt die App nach (AK-87)
+  async afterEdit(res, locId, body) {
+    const v = res && res.gebiet_vorschlag;
+    if (v && v.abweichend && !('land' in body)) {
+      const ziel = v.region ? `${v.region}, ${v.land}` : v.land;
+      this.modal({
+        title: 'Neue Lage – anderes Gebiet?',
+        body: `<p>Die neue Lage liegt laut Koordinaten in <b>${esc(ziel)}</b>. Die Zuordnung des Orts ändert sich nicht von selbst.${v.unsicher ? ' Die Lage ist nahe einer Grenze, der Vorschlag ist unsicher.' : ''}</p>`,
+        buttons: [{ label: 'So lassen', cls: 'gb-btn', act: () => this.refreshAfterChange() },
+                  { label: 'Zuordnung ändern', cls: 'gb-btn gb-btn-primary', act: async () => {
+                    try { await API.patch('/locations/' + this._enc(locId), v.region ? { land: v.land, region: v.region } : { land: v.land }); }
+                    catch (e) { toast('Zuordnung nicht geändert: ' + e.message, 3500); }
+                    await this.refreshAfterChange(); } }],
+        dismissable: true, onDismiss: () => this.refreshAfterChange() });
+      return;
+    }
+    await this.refreshAfterChange();
+  },
+
+  // ── Start ─────────────────────────────────────────────
+  afterLoad() { this.ensureAreas(); this.checkUndecided(); },
+  init() {
+    document.getElementById('gb-body').addEventListener('click', e => this.onMenuClick(e));
+    document.getElementById('gb-modal').addEventListener('click', e => this.onModalClick(e));
+    window.addEventListener('popstate', () => this.onPop());
+    document.addEventListener('keydown', e => this.onKey(e));
   }
 };
 
@@ -7920,6 +8613,16 @@ const Settings = {
           </div>
         </div>
       </div>
+      ${Auth.isHost() ? `<div class="settings-section">
+        <h3>Host</h3>
+        <div class="settings-group">
+          <div class="settings-row" role="button" tabindex="0" style="cursor:pointer" onclick="Gebiete.open()"
+               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();Gebiete.open()}">
+            <div class="sr-label"><span>Länder &amp; Regionen</span><small id="gb-settings-summary">…</small></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="color:var(--muted);flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+        </div>
+      </div>` : ''}
       <div class="settings-section">
         <h3>Konto</h3>
         <div class="settings-group">
@@ -7945,6 +8648,7 @@ const Settings = {
         </div>
       </div>
     `;
+    if (Auth.isHost()) Gebiete.fillSettingsSummary();
   }
 };
 
@@ -8210,6 +8914,7 @@ const ElementInfo = {
       title: 'Kartensymbole',
       html: `<div style="display:flex;flex-direction:column;gap:10px">
           <p><span style="display:inline-flex;align-items:center;gap:8px">${pinSvg} <b>Jeder Pin markiert eine Foto-Location.</b></span> Tippe auf einen Pin, um Namen und eine kurze Beschreibung zu sehen — von dort kommst du mit einem weiteren Klick direkt zu allen Details dieser Location.</p>
+          <p><span style="display:inline-flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="19" viewBox="0 0 28 38" style="vertical-align:middle"><path d="M14 2C7 2 2 8 2 15c0 9 12 21 12 21s12-12 12-21C26 8 21 2 14 2z" style="fill:var(--muted);stroke:var(--surface)" stroke-width="2.5"/><circle cx="14" cy="14" r="6.5" style="fill:var(--surface)"/><path d="M12 11.2 V16.8 M16 11.2 V16.8" style="stroke:var(--muted)" stroke-width="2" stroke-linecap="round"/></svg> <b>Grauer Pin mit Pause-Zeichen = pausierter Ort.</b></span> Das Land oder die Region des Orts ist ausgeschaltet: Der Ort bleibt sichtbar und bearbeitbar, aber es gibt keine Wetter- und Chancenberechnung.</p>
           <p>Mit diesen drei Knöpfen wechselst du die Kartenansicht: Standard-Karte, Satellitenbild oder eine abgedunkelte Nachtansicht, die z. B. beim Blick auf Sternenlocations weniger blendet.</p>
           <p>Dieser Knopf zentriert die Karte auf deinen aktuellen Standort, damit du siehst, welche Locations in deiner Nähe sind.</p>
         </div>`,
@@ -8564,6 +9269,8 @@ const App = {
     }
     // Lade Feed (Verify._cache + Rating._cache/_mine sind jetzt befüllt → Badges/Filter korrekt)
     await Feed.load();
+    // US-141: Host-Daten holen, offene Entscheidungen zu neuen Orten melden
+    Gebiete.afterLoad();
     // Wetter-Overlay läuft im Backend ~10s nach Start – dann stilles Re-Fetch
     setTimeout(async () => {
       await Feed.load();
@@ -8579,6 +9286,7 @@ const App = {
 const RefreshMenu = {
   _open: false,
   _pollTimer: null,
+  _hint: {},   // BUG-117 AK-6: Hinweistext des Servers je Job ("läuft bereits"), solange der Job läuft
 
   // Endpoint und Beschriftung je Job
   _cfg: {
@@ -8624,9 +9332,11 @@ const RefreshMenu = {
       const el = document.getElementById('rms-' + key);
       const row = document.getElementById('rmi-' + key);
       if (!el || !row) continue;
+      if (info.status !== 'running') delete this._hint[key];
       if (info.status === 'running') {
         el.className = 'rmi-status';
-        el.innerHTML = '<span class="rmi-spin">⟳</span> Läuft…';
+        el.innerHTML = '<span class="rmi-spin">⟳</span> ';
+        el.appendChild(document.createTextNode(this._hint[key] || 'Läuft…'));
         row.classList.add('running');
       } else if (info.status === 'done' && info.last_run) {
         row.classList.remove('running');
@@ -8662,16 +9372,26 @@ const RefreshMenu = {
     el.innerHTML = '<span class="rmi-spin">⟳</span> Gestartet…';
     row.classList.add('running');
 
+    let antwort = null;
     try {
-      await API.post(cfg.endpoint, {});
+      antwort = await API.post(cfg.endpoint, {});
     } catch(e) {
       el.className = 'rmi-status err';
       el.textContent = e.message;
       row.classList.remove('running');
       return;
     }
+    // BUG-117 AK-6: Läuft der Job schon, meldet der Server "already_running" mit einem Hinweissatz
+    // (Feld "message", z. B. "Wetterlauf läuft bereits."). Den zeigen wir statt "Gestartet…" und warten
+    // über das bestehende Polling auf das Ende des laufenden Laufs.
+    if (antwort && antwort.status === 'already_running') {
+      this._hint[key] = antwort.message || 'Läuft bereits.';
+      el.innerHTML = '<span class="rmi-spin">⟳</span> ';
+      el.appendChild(document.createTextNode(this._hint[key]));
+    }
 
     // Polling bis Job fertig
+    if (this._pollTimer) clearInterval(this._pollTimer);   // BUG-117: nie zwei Timer nebeneinander
     this._pollTimer = setInterval(async () => {
       try {
         const data = await API.get('/job-status');
@@ -8694,7 +9414,15 @@ const RefreshMenu = {
 // ═══════════════════════════════════════════════════════
 // US-66: Beim Start nur initialisieren, wenn eingeloggt — sonst Login-Screen zeigen.
 Theme.init();
-if (Auth.isLoggedIn()) { App.init(); } else { LoginScreen.show(); }
+Gebiete.init();
+if (Auth.isLoggedIn()) {
+  App.init();
+  // US-141: die Rolle des Cookies nachziehen (z. B. Host-Menü sichtbar/unsichtbar machen)
+  const _alt = CFG.role;
+  Auth.syncSession().then(() => { if (CFG.role !== _alt) { Settings.render(); Gebiete.afterLoad(); } });
+} else {
+  Auth.syncSession().then(ok => { if (ok) { App.init(); } else { LoginScreen.show(); } });
+}
 </script>
 </body>
 </html>
