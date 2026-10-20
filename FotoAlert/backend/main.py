@@ -2034,6 +2034,18 @@ WEATHER_RED_CLOUDS_GRID_STEP_DEG = 0.05
 WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES = 6
 """Notbremse: Nach so vielen endgültig fehlgeschlagenen Abrufen IN FOLGE (Limit 429, Dienst nicht verfügbar,
 Verbindung abgelehnt, Zeitüberschreitung) bricht der Lauf ab. Ein einziger Erfolg setzt den Zähler zurück."""
+WEATHER_CRON_MINUTE = 7
+"""BUG-117 Nachbesserung: Minute, zu der der planmäßige Wetterlauf startet (alle 3 Stunden, Berliner Zeit). Bewusst
+NICHT die volle Stunde: zur vollen Stunde wurden 7 von 9 Läufen nach 2-6 s von der Notbremse beendet."""
+WEATHER_CRON_HOUR = "*/3"
+"""Stunden des planmäßigen Wetterlaufs (alle 3 Stunden: 00, 03, 06, ... Berliner Zeit)."""
+WEATHER_NOTBREMSE_RETRY_DELAY_S = 720
+"""BUG-117 Nachbesserung: So viele Sekunden (12 Minuten) nach einem Lauf, den die Notbremse beendet hat, wird
+GENAU EIN Wiederholungsversuch angesetzt (Auslöser "notbremse-retry")."""
+WEATHER_NOTBREMSE_RETRY_SKIP_IF_NEXT_RUN_WITHIN_S = 1200
+"""Steht ohnehin innerhalb dieser Zeit (20 Minuten, gerechnet ab Ende des Laufs) ein planmäßiger Wetterlauf an,
+wird kein Wiederholungsversuch angesetzt."""
+WEATHER_NOTBREMSE_RETRY_TRIGGER = "notbremse-retry"
 _WETTER_SPEICHER_STANDARDORDNER = _CACHE_DIR
 # Im Test-Modus (FOTOALERT_NO_BACKGROUND=1) wird dieser echte Cache-Ordner nie beschrieben
 # (siehe _wetter_speicher_erlaubt()).
@@ -2041,6 +2053,10 @@ _WETTER_SPEICHER_STANDARDORDNER = _CACHE_DIR
 _weather_run_active = False
 """BUG-117 AK-6: True, solange ein Wetterlauf läuft: ein zweiter Auslöser startet keinen zweiten Lauf."""
 _weather_run_pending = False
+_weather_retry_verbraucht = False
+"""BUG-117 Nachbesserung: True, sobald für den aktuellen planmäßigen Lauf ein Wiederholungsversuch angesetzt wurde.
+Zurückgesetzt, wenn ein planmäßiger Lauf (Auslöser "cron") beginnt oder ein Lauf ohne Notbremse endet."""
+_WEATHER_RETRY_JOB_ID = "weather-notbremse-retry"
 
 
 def _wetter_speicher_erlaubt() -> bool:
@@ -2416,6 +2432,9 @@ class _WetterLaufZustand:
         self.abbruch_grund: Optional[str] = None
         self.fehlgeschlagen = 0
         self.ursachen: Dict[str, int] = {}
+        self.ausloeser = "cron"                 # BUG-117 Nachbesserung: Auslöser des Laufs (für den Wiederholungsversuch)
+        self.retry_zeit_berechnet = False
+        self.retry_zeit: Optional[datetime] = None
 
     def erfolg(self) -> None:
         self.in_folge = 0
@@ -2435,16 +2454,71 @@ class _WetterLaufZustand:
 _wetter_lauf_var: "_contextvars.ContextVar" = _contextvars.ContextVar("wetter_lauf", default=None)
 
 
-def _naechster_wetterlauf_text() -> str:
-    """Uhrzeit des nächsten regulären Wetterlaufs (alle 3 Stunden, Berliner Zeit) für die Statusmeldung."""
+def _naechster_planlauf(jetzt: datetime) -> datetime:
+    """Nächster planmäßiger Wetterlauf nach `jetzt` (Berliner Zeit): alle 3 Stunden zur Minute WEATHER_CRON_MINUTE
+    (Stunden 0, 3, 6, ...), passend zum Planer-Eintrag in _startup_setup_scheduler()."""
+    n = jetzt.replace(minute=WEATHER_CRON_MINUTE, second=0, microsecond=0)
+    while n <= jetzt or n.hour % 3 != 0:
+        n = n + timedelta(hours=1)
+    return n
+
+
+def _notbremse_retry_zeit(lauf: "_WetterLaufZustand") -> Optional[datetime]:
+    """BUG-117 Nachbesserung: Zeitpunkt des Wiederholungsversuchs nach einer Notbremse oder None, wenn keiner
+    vorgesehen ist. Regeln: nur wenn der Planer läuft; höchstens einer je planmäßigem Lauf (kein Retry nach einem
+    Retry, nicht noch einer, wenn schon einer angesetzt wurde); keiner, wenn innerhalb von
+    WEATHER_NOTBREMSE_RETRY_SKIP_IF_NEXT_RUN_WITHIN_S ohnehin ein planmäßiger Lauf ansteht. Das Ergebnis wird
+    einmal je Lauf berechnet, damit Statustext und tatsächlich angesetzter Lauf übereinstimmen."""
+    if lauf.retry_zeit_berechnet:
+        return lauf.retry_zeit
+    lauf.retry_zeit_berechnet = True
+    lauf.retry_zeit = None
+    if not lauf.abgebrochen or lauf.ausloeser == WEATHER_NOTBREMSE_RETRY_TRIGGER or _weather_retry_verbraucht:
+        return None
+    try:
+        if not scheduler.running:
+            return None
+        from zoneinfo import ZoneInfo
+        jetzt = datetime.now(ZoneInfo("Europe/Berlin"))
+        if (_naechster_planlauf(jetzt) - jetzt).total_seconds() <= WEATHER_NOTBREMSE_RETRY_SKIP_IF_NEXT_RUN_WITHIN_S:
+            return None
+        lauf.retry_zeit = jetzt + timedelta(seconds=WEATHER_NOTBREMSE_RETRY_DELAY_S)
+    except Exception:
+        lauf.retry_zeit = None
+    return lauf.retry_zeit
+
+
+def _notbremse_retry_ansetzen(lauf: "_WetterLaufZustand") -> bool:
+    """BUG-117 Nachbesserung: Setzt den Wiederholungsversuch über den vorhandenen Planer (APScheduler, einmaliger
+    "date"-Eintrag) an. Der Lauf selbst geht wie jeder andere durch _weather_overlay() und damit durch die
+    bestehende Lauf-Sperre (nie zwei Wetterläufe gleichzeitig)."""
+    global _weather_retry_verbraucht
+    zeit = _notbremse_retry_zeit(lauf)
+    if zeit is None or _weather_retry_verbraucht:
+        return False
+    try:
+        scheduler.add_job(_weather_overlay, "date", run_date=zeit, kwargs={"triggered_by": WEATHER_NOTBREMSE_RETRY_TRIGGER},
+                          id=_WEATHER_RETRY_JOB_ID, replace_existing=True, misfire_grace_time=600)
+    except Exception as exc:
+        logger.warning("BUG-117: Wiederholungsversuch konnte nicht angesetzt werden: %s", exc)
+        return False
+    _weather_retry_verbraucht = True
+    logger.info("BUG-117: Notbremse - Wiederholungsversuch des Wetterlaufs für %s angesetzt.", zeit.strftime("%H:%M:%S"))
+    return True
+
+
+def _naechster_wetterlauf_text(lauf: Optional["_WetterLaufZustand"] = None) -> str:
+    """Uhrzeit des nächsten Versuchs für die Statusmeldung: der Wiederholungsversuch nach der Notbremse, falls
+    einer vorgesehen ist, sonst der nächste reguläre Wetterlauf (alle 3 Stunden zur Minute WEATHER_CRON_MINUTE,
+    Berliner Zeit)."""
     try:
         from zoneinfo import ZoneInfo
-        tz = ZoneInfo("Europe/Berlin")
-        n = datetime.now(tz).replace(minute=0, second=0, microsecond=0)
-        while True:
-            n = n + timedelta(hours=1)
-            if n.hour % 3 == 0:
-                return "ca. %s Uhr (Berliner Zeit)" % n.strftime("%H:%M")
+        if lauf is not None:
+            zeit = _notbremse_retry_zeit(lauf)
+            if zeit is not None:
+                return "ca. %s Uhr (Berliner Zeit, Wiederholungsversuch)" % zeit.strftime("%H:%M")
+        n = _naechster_planlauf(datetime.now(ZoneInfo("Europe/Berlin")))
+        return "ca. %s Uhr (Berliner Zeit)" % n.strftime("%H:%M")
     except Exception:
         return "beim nächsten 3-Stunden-Lauf"
 
@@ -2458,7 +2532,7 @@ def _wetter_fehlertext(error_msg: str, lauf: "_WetterLaufZustand") -> str:
         kopf = ("Wetter: Wetterdienst-Limit erreicht" if limit
                 else "Wetter: Wetterdienst nicht erreichbar oder überlastet")
         text = "%s. Lauf nach %d Fehlschlägen in Folge vorzeitig beendet (%s). Nächster Versuch %s. | %s" % (
-            kopf, WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES, lauf.abbruch_grund, _naechster_wetterlauf_text(),
+            kopf, WEATHER_ABORT_AFTER_CONSECUTIVE_FAILURES, lauf.abbruch_grund, _naechster_wetterlauf_text(lauf),
             error_msg.replace("Wetter: ", "", 1))
     if lauf.ursachen and lauf.fehlgeschlagen:
         haupt, n = max(lauf.ursachen.items(), key=lambda kv: kv[1])
@@ -2700,18 +2774,21 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
     Vorberechnung, Takt) legt sich dahinter: nach dem laufenden Lauf folgt höchstens EIN Nachlauf (der dank
     Zwischenspeicher kaum Abrufe kostet), außer die Notbremse hat den Lauf beendet. (2) Die Zählzeile nennt
     zusätzlich den Tagesstand beim Wetterdienst (AK-12)."""
-    global _weather_run_active, _weather_run_pending
+    global _weather_run_active, _weather_run_pending, _weather_retry_verbraucht
     if _weather_run_active:
         _weather_run_pending = True
         logger.info("BUG-117: Wetterlauf läuft bereits, Auslöser '%s' wird zusammengelegt (höchstens ein Nachlauf).",
                     triggered_by)
         return
     _weather_run_active = True
+    if triggered_by == "cron":
+        _weather_retry_verbraucht = False      # neuer planmäßiger Lauf: wieder ein Wiederholungsversuch möglich
     try:
         while True:
             _weather_run_pending = False
             zaehler = _WetterZaehler()
             lauf = _WetterLaufZustand()
+            lauf.ausloeser = triggered_by
             token = _wetter_zaehler_var.set(zaehler)
             token_lauf = _wetter_lauf_var.set(lauf)
             try:
@@ -2728,6 +2805,12 @@ async def _weather_overlay(triggered_by: str = "cron") -> None:
             # wäre sonst bis zum nächsten 3-Stunden-Takt ohne Wetter). Er läuft nacheinander, nie parallel (AK-6);
             # endet er wieder mit Notbremse und ist nichts Neues vorgemerkt, ist Schluss.
             if not _weather_run_pending:
+                # BUG-117 Nachbesserung: Endet der letzte Lauf mit Notbremse, folgt (höchstens) ein Wiederholungsversuch
+                # über den Planer; ein Lauf ohne Notbremse hebt die Sperre für den nächsten Fall wieder auf.
+                if lauf.abgebrochen:
+                    _notbremse_retry_ansetzen(lauf)
+                else:
+                    _weather_retry_verbraucht = False
                 break
             triggered_by = "nachlauf"
     finally:
@@ -3034,8 +3117,8 @@ _weather_overlay() und _build_weather_map() bisher zeitgleich als zwei parallele
 Hintergrund-Tasks und konkurrierten um Ressourcen — code-verifiziert der Grund,
 warum ausgerechnet der Start-Lauf eher an das bestehende 180s-Zeitbudget
 (WEATHER_OVERLAY_MAX_TOTAL_SECONDS, BUG-99) stieß (BACKLOG.md BUG-106). Analog zum
-bereits etablierten 20-Minuten-Abstand im eingeschwungenen 3h-Cron (siehe
-_startup_setup_scheduler, minute=0 vs. minute=20) wird der Karten-Bau beim Start
+bereits etablierten Abstand (seit BUG-117 Nachbesserung 13 statt 20 Minuten) im eingeschwungenen 3h-Cron (siehe
+_startup_setup_scheduler, Minute 7 vs. Minute 20) wird der Karten-Bau beim Start
 um eine kurze Verzögerung nach hinten verschoben statt sofort parallel zu laufen.
 Bewusst deutlich kürzer als 20 Minuten (kein 3h-Rhythmus-Grund hier einschlägig,
 siehe Pre-Mortem) — lang genug, dass _weather_overlay() seine Netzwerk-Abrufe
@@ -3048,7 +3131,7 @@ async def _delayed_build_weather_map() -> None:
 
     Nur für den Start-Pfad relevant — der 3h-Cron ruft _build_weather_map()
     weiterhin direkt über den Scheduler auf (eigener, dort bereits bestehender
-    20-Minuten-Abstand, unverändert).
+    Abstand: Minute 20 gegenüber Minute 7 des Wetterlaufs, d. h. 13 Minuten).
     """
     await asyncio.sleep(_STARTUP_WEATHER_MAP_DELAY_S)
     await _build_weather_map()
@@ -4311,7 +4394,7 @@ def _startup_setup_scheduler(_precompute_mode: str) -> None:
     scheduler.add_job(_run_qa_pass, "cron", hour=1, minute=0)   # täglich 01:00 (großer Puffer vor Recompute 05:30)
     scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
                       "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
-    scheduler.add_job(_weather_overlay,  "cron", minute=0, hour="*/3") # alle 3h
+    scheduler.add_job(_weather_overlay,  "cron", minute=WEATHER_CRON_MINUTE, hour=WEATHER_CRON_HOUR) # alle 3h, Minute 7 (BUG-117: nicht zur vollen Stunde)
     scheduler.add_job(_build_weather_map, "cron", minute=20, hour="*/3") # US-112: Karten-Overlay alle 3h
     scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
     scheduler.start()
@@ -5146,17 +5229,33 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
         _ondemand_month_cache.move_to_end(key)
         return _ondemand_month_cache[key]
     events: list = []
+    # BUG-110: Orte zählen, damit "leer wegen Fehlern" von "echt leer" unterscheidbar ist.
+    aktive = gz.aktive_orte(list(_LOCS))
+    failed_count = 0
     # US-141 (Gruppe B): der Kalender wird nur für aktive Orte gerechnet.
-    for i, loc in enumerate(gz.aktive_orte(list(_LOCS))):
+    for i, loc in enumerate(aktive):
         try:
             events.extend(await _compute_location_month(loc, year, month, min_score))
         except Exception as e:
+            failed_count += 1
             logger.error("On-Demand-Kalender %s %s-%s: %s", loc.id, year, month, e)
         if i % 8 == 0:
             await _asyncio.sleep(0)   # Event-Loop nicht blockieren
     if version != _gebiets_version:
         # Währenddessen wurde umgeschaltet: Ergebnis nicht speichern, aber ohne pausierte Orte ausliefern.
         return _ohne_pausierte(events)
+    if aktive and failed_count == len(aktive):
+        # BUG-110 (AK-2): Totalausfall als EIN Eintrag sichtbar machen, nicht nur als
+        # Einzelzeilen pro Ort.
+        logger.error(
+            "On-Demand-Kalender %s-%02d: ALLE %d Orte fehlgeschlagen — Monat bleibt leer "
+            "und wird nicht zwischengespeichert", year, month, len(aktive),
+        )
+    if not events and failed_count:
+        # BUG-110 (AK-1): ein wegen Fehlern leeres Ergebnis nie zwischenspeichern, sonst
+        # bleibt der Monat bis zum Neustart leer. Ein echt leeres Ergebnis (kein Fehler,
+        # AK-4) wird weiterhin normal zwischengespeichert.
+        return events
     _ondemand_month_cache[key] = events
     # TASK-86 (AK-3): Höchstgröße einhalten — ältesten Eintrag verdrängen (FIFO).
     while len(_ondemand_month_cache) > _ONDEMAND_MONTH_CACHE_MAX_SIZE:
