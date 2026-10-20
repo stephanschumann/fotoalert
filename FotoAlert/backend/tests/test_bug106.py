@@ -107,7 +107,7 @@ def test_startup_uses_delayed_wrapper_not_direct_build_weather_map_task():
 
 def test_cron_schedule_keeps_existing_20_minute_gap(monkeypatch):
     """BUG-106 AK5 (Regression): `_startup_setup_scheduler()` muss weiterhin
-    `_weather_overlay` auf Minute 0 und `_build_weather_map` auf Minute 20 jeder
+    `_weather_overlay` auf Minute 7 (seit BUG-117, vorher 0) und `_build_weather_map` auf Minute 27 (vorher 20) jeder
     3-Stunden-Periode legen — exakt das bereits bestehende, bewusst gewählte
     Muster, an dem dieses Ticket nichts ändern soll (Scope: nur der Start-Pfad).
     """
@@ -133,13 +133,13 @@ def test_cron_schedule_keeps_existing_20_minute_gap(monkeypatch):
     _, w_trigger, w_kwargs = weather_jobs[0]
     _, m_trigger, m_kwargs = map_jobs[0]
 
-    assert w_trigger == "cron" and w_kwargs.get("hour") == "*/3" and w_kwargs.get("minute") == 0, (
+    assert w_trigger == "cron" and w_kwargs.get("hour") == "*/3" and w_kwargs.get("minute") == 7, (
         f"_weather_overlay-Cron-Job veraendert: trigger={w_trigger!r}, kwargs={w_kwargs} "
-        f"— erwartet minute=0, hour='*/3' (unveraendert seit BUG-99/US-112)."
+        f"— erwartet minute=7, hour='*/3' (BUG-117: nicht mehr zur vollen Stunde; Stephan-Freigabe 2026-10-20)."
     )
-    assert m_trigger == "cron" and m_kwargs.get("hour") == "*/3" and m_kwargs.get("minute") == 20, (
+    assert m_trigger == "cron" and m_kwargs.get("hour") == "*/3" and m_kwargs.get("minute") == 27, (
         f"_build_weather_map-Cron-Job veraendert: trigger={m_trigger!r}, kwargs={m_kwargs} "
-        f"— erwartet minute=20, hour='*/3' (bestehender 20-Minuten-Abstand, unveraendert)."
+        f"— erwartet minute=27, hour='*/3' (20-Minuten-Abstand zum Wetterlauf bleibt; Stephan-Freigabe 2026-10-20)."
     )
 
 

@@ -3117,8 +3117,8 @@ _weather_overlay() und _build_weather_map() bisher zeitgleich als zwei parallele
 Hintergrund-Tasks und konkurrierten um Ressourcen — code-verifiziert der Grund,
 warum ausgerechnet der Start-Lauf eher an das bestehende 180s-Zeitbudget
 (WEATHER_OVERLAY_MAX_TOTAL_SECONDS, BUG-99) stieß (BACKLOG.md BUG-106). Analog zum
-bereits etablierten Abstand (seit BUG-117 Nachbesserung 13 statt 20 Minuten) im eingeschwungenen 3h-Cron (siehe
-_startup_setup_scheduler, Minute 7 vs. Minute 20) wird der Karten-Bau beim Start
+bereits etablierten 20-Minuten-Abstand im eingeschwungenen 3h-Cron (siehe
+_startup_setup_scheduler, Minute 7 vs. Minute 27) wird der Karten-Bau beim Start
 um eine kurze Verzögerung nach hinten verschoben statt sofort parallel zu laufen.
 Bewusst deutlich kürzer als 20 Minuten (kein 3h-Rhythmus-Grund hier einschlägig,
 siehe Pre-Mortem) — lang genug, dass _weather_overlay() seine Netzwerk-Abrufe
@@ -3131,7 +3131,7 @@ async def _delayed_build_weather_map() -> None:
 
     Nur für den Start-Pfad relevant — der 3h-Cron ruft _build_weather_map()
     weiterhin direkt über den Scheduler auf (eigener, dort bereits bestehender
-    Abstand: Minute 20 gegenüber Minute 7 des Wetterlaufs, d. h. 13 Minuten).
+    Abstand: Minute 27 gegenüber Minute 7 des Wetterlaufs, d. h. 20 Minuten).
     """
     await asyncio.sleep(_STARTUP_WEATHER_MAP_DELAY_S)
     await _build_weather_map()
@@ -4395,7 +4395,7 @@ def _startup_setup_scheduler(_precompute_mode: str) -> None:
     scheduler.add_job(_functools.partial(_run_precompute, _precompute_mode),
                       "cron", hour=5, minute=30)   # täglich 05:30 (On-Demand: nur Feed)
     scheduler.add_job(_weather_overlay,  "cron", minute=WEATHER_CRON_MINUTE, hour=WEATHER_CRON_HOUR) # alle 3h, Minute 7 (BUG-117: nicht zur vollen Stunde)
-    scheduler.add_job(_build_weather_map, "cron", minute=20, hour="*/3") # US-112: Karten-Overlay alle 3h
+    scheduler.add_job(_build_weather_map, "cron", minute=27, hour="*/3") # US-112: Karten-Overlay alle 3h (BUG-117: Minute 27, 20 Min. nach dem Wetterlauf um :07)
     scheduler.add_job(_refresh_discover, "cron", hour=5,  minute=45)   # täglich 05:45 (nach precompute)
     scheduler.start()
 
