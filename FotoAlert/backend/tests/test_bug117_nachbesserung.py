@@ -29,7 +29,9 @@ class PlanerAttrappe:
 
 
 @pytest.fixture
-def planer(monkeypatch):
+def planer(monkeypatch, isoliert):
+    # 'isoliert' = Wegwerf-Cache-Ordner und frischer Tageszähler (wie in test_bug117.py), sonst hängt das Ergebnis
+    # vom Zustand auf der Platte ab (lokal anders als in der CI).
     p = PlanerAttrappe()
     monkeypatch.setattr(main, "scheduler", p)
     monkeypatch.setattr(main, "_weather_retry_verbraucht", False)
@@ -41,8 +43,11 @@ def _retry_jobs(planer):
 
 
 def _berlin(h, m):
+    # Immer der HEUTIGE Berliner Tag: Die Test-Termine (_feed) liegen relativ zur echten Uhr; ein festes Datum
+    # rückte sie mit der Zeit aus dem Vorhersagefenster (Test lief nur am Tag der Erstellung).
     from zoneinfo import ZoneInfo
-    return datetime(2026, 10, 19, h, m, 0, tzinfo=ZoneInfo("Europe/Berlin"))
+    heute = datetime.now(ZoneInfo("Europe/Berlin")).date()
+    return datetime(heute.year, heute.month, heute.day, h, m, 0, tzinfo=ZoneInfo("Europe/Berlin"))
 
 
 def _feste_uhr(monkeypatch, jetzt):
