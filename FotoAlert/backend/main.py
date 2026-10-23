@@ -672,6 +672,13 @@ def _load_feed_cache() -> bool:
 
     BUG-118: Termine gelöschter Orte (Lösch-Markierung) werden beim Einlesen
     aussortiert — auch wenn eine Vorberechnung sie noch in die Datei geschrieben hat.
+
+    BUG-119: Die Feed-Datei enthält nie Wetter. Früher setzte das Neuladen deshalb alle Wetterwerte zurück, bis
+    der nächste Wetterlauf fertig war (zu hohe Werte, Tage verschwanden aus dem Feed). Jetzt wird das zuletzt
+    gespeicherte Wetter (Zwischenspeicher auf der Platte, ohne Netzabruf) auf der NEUEN Liste aufgelegt, danach
+    werden die Besonderen Ereignisse neu erzeugt — und erst dann ersetzt die fertige Liste den alten Stand. So
+    sieht eine gleichzeitige Feed-Abfrage nie einen Zwischenstand ohne Wetter. Der Auslöser (Start,
+    Vorberechnung, Einzel-Ort, Sichtachsen) kommt über `_feed_ausloeser_var` und dient nur dem Log.
     """
     global _feed_cache
 
@@ -684,8 +691,16 @@ def _load_feed_cache() -> bool:
                 termine = [e for e in termine if e.get("location_id") not in geloescht]
             # US-141: Termine pausierter Orte werden nicht in den Speicher übernommen (Gruppe B).
             termine = _ohne_pausierte(termine)
+            _backfill_coords(termine)
+            # BUG-119: gespeichertes Wetter auf der neuen Liste auflegen, BEVOR sie den alten Stand ersetzt.
+            # Ein Fehler hier darf das Einlesen nie scheitern lassen: dann gilt der Zustand wie früher (ohne Wetter).
+            try:
+                aufgelegt = _gespeichertes_wetter_auflegen(termine, _feed_ausloeser_var.get())
+                if aufgelegt:
+                    termine = _cloud_mood_events_neu_erzeugen(termine)
+            except Exception as exc:
+                logger.warning("BUG-119: Gespeichertes Wetter konnte nicht aufgelegt werden (%s) – Feed ohne Wetter bis zum Wetterlauf", exc)
             _feed_cache = termine
-            _backfill_coords(_feed_cache)
             logger.info("Feed-Cache geladen: %d Events (berechnet: %s)",
                         len(_feed_cache), data.get("computed_at", "?")[:16])
             return True
@@ -1758,24 +1773,34 @@ def _inject_cloud_mood_events() -> None:
     damit wiederholte Wetter-Overlay-Läufe keine Duplikate erzeugen.
     """
     global _feed_cache
+    _feed_cache = _cloud_mood_events_neu_erzeugen(_feed_cache)
+
+
+def _cloud_mood_events_neu_erzeugen(termine: list) -> list:
+    """
+    BUG-119 (aus _inject_cloud_mood_events herausgelöst, Verhalten unverändert): Gibt eine NEUE Liste zurück, in
+    der alle bisherigen Besonderen Ereignisse (gc_/rs_/rc_) entfernt und frisch erzeugt sind. Die übergebene Liste
+    wird nicht ersetzt — so kann das Neuladen des Feeds die fertige Liste in einem Schritt austauschen.
+    """
     # Alte Cloud-Mood-Events aus vorherigen Wetter-Overlay-Läufen entfernen
-    _feed_cache = [
-        e for e in _feed_cache
+    liste = [
+        e for e in termine
         if not (
             e.get("id", "").startswith("gc_")
             or e.get("id", "").startswith("rs_")
             or e.get("id", "").startswith("rc_")
         )
     ]
-    neue_events, zu_entfernende_ids = _generate_cloud_mood_events(_feed_cache)
+    neue_events, zu_entfernende_ids = _generate_cloud_mood_events(liste)
     if zu_entfernende_ids:
-        _feed_cache = [e for e in _feed_cache if e["id"] not in zu_entfernende_ids]
-    _feed_cache.extend(neue_events)
+        liste = [e for e in liste if e["id"] not in zu_entfernende_ids]
+    liste.extend(neue_events)
     if neue_events:
         logger.info(
             "US-109 Cloud-Mood: %d neue Events erzeugt, %d Goldene-Stunde-Events unterdrückt",
             len(neue_events), len(zu_entfernende_ids),
         )
+    return liste
 
 
 WEATHER_API_MAX_CONCURRENT_REQUESTS = 4
@@ -2196,6 +2221,80 @@ async def _fetch_mit_zwischenspeicher(tasks_meta, zeiten, max_total_seconds) -> 
     return results
 
 
+WEATHER_BRIDGE_MAX_AGE_S = 24 * 3600
+"""BUG-119: Beim Neuladen des Feeds darf gespeichertes Wetter bis zu 24 Stunden alt sein (reine Überbrückung bis
+zum nächsten Wetterlauf). Bewusst getrennt von WEATHER_CACHE_VALID_NEAR_S/-FAR_S (2 h / 12 h): diese bestimmen
+weiter, wann der reguläre Wetterlauf frisch abruft, und bleiben unverändert."""
+WEATHER_BRIDGE_COVER_TOLERANCE = timedelta(minutes=30)
+"""BUG-119: Eine gespeicherte Vorhersage gilt nur dann für einen Termin, wenn sie dessen Zeitpunkt abdeckt (erste bis
+letzte Stunde, mit halber Stunde Toleranz). `WeatherForecast.get_at` nimmt sonst still die nächstgelegene Stunde."""
+
+def _gespeichertes_wetter_auflegen(termine: list, ausloeser: str = "unbekannt") -> int:
+    """
+    BUG-119 (Option A): Legt das zuletzt gespeicherte Wetter (Zwischenspeicher auf der Platte) auf die Termine der
+    nächsten 3 Tage der übergebenen NEUEN Liste. Kein Netzabruf, kein Schreiben in den Zwischenspeicher. Verändert
+    nur die Termine dieser Liste (frisch aus der Feed-Datei gelesen, noch nicht im Umlauf).
+
+    Verwendet wird derselbe Planer (`_plan_weather_fetch_tasks`) und dieselbe Auswertung (`_apply_weather_to_event`,
+    `_lookup_*`) wie der reguläre Wetterlauf — nur dass die Vorhersagen aus dem Zwischenspeicher kommen, bis zu
+    WEATHER_BRIDGE_MAX_AGE_S alt. Eine Vorhersage wird nur genutzt, wenn sie den Termin zeitlich abdeckt; sonst
+    bleibt der Termin ohne Wetter (wie heute). Termine jenseits von 3 Tagen bleiben unberührt. Im Test-Modus ist
+    der echte Cache-Ordner gesperrt (`_wetter_speicher_erlaubt`).
+
+    Gibt die Zahl der Termine zurück, auf die Wetter aufgelegt wurde.
+    """
+    if not _wetter_speicher_erlaubt():
+        return 0
+    t0 = _time.monotonic()
+    now_utc = datetime.now(timezone.utc)
+    cutoff = now_utc + timedelta(days=3)
+    untergrenze = now_utc - timedelta(hours=1)
+    nah = [e for e in termine if untergrenze <= _wetter_termin_zeit(e) <= cutoff]
+
+    speicher = wetter_speicher.speicher_laden(_CACHE_DIR) if nah else {}
+    prognosen: dict = {"weather": {}, "aerosol": {}, "sun_dir": {}, "antisolar_dir": {}, "red_clouds_dir": {}}
+    if speicher:
+        jetzt = _time.time()
+        for kind, key, _lat, _lon, _name in _plan_weather_fetch_tasks(nah):
+            eintrag = speicher.get(f"{kind}|{key}")
+            if not wetter_speicher.ist_frisch(eintrag, WEATHER_BRIDGE_MAX_AGE_S, jetzt):
+                continue
+            try:
+                prognosen[kind][key] = wetter_speicher.forecast_aus_json(eintrag["f"])
+            except Exception:
+                continue            # kaputter Eintrag zählt als "nicht im Zwischenspeicher"
+
+    spannen: dict = {}              # id(Vorhersage) -> (erste Stunde, letzte Stunde)
+
+    def deckt(fc, zeit) -> bool:
+        if fc is None or not fc.hourly:
+            return False
+        if id(fc) not in spannen:
+            zeiten = [h.time for h in fc.hourly]
+            spannen[id(fc)] = (min(zeiten), max(zeiten))
+        erste, letzte = spannen[id(fc)]
+        return erste - WEATHER_BRIDGE_COVER_TOLERANCE <= zeit <= letzte + WEATHER_BRIDGE_COVER_TOLERANCE
+
+    mit = 0
+    for e in nah:
+        zeit = _wetter_termin_zeit(e)
+        fc = prognosen["weather"].get(f"{e['observer_lat']:.3f},{e['observer_lon']:.3f}")
+        if not deckt(fc, zeit):
+            continue
+        sun_fc, anti_fc, aero_fc = _lookup_projected_forecasts(
+            e, prognosen["sun_dir"], prognosen["antisolar_dir"], prognosen["aerosol"])
+        rc_fc = _lookup_red_clouds_forecast(e, prognosen["red_clouds_dir"])
+        # Richtungswerte, die den Termin nicht abdecken, gelten als "nicht verfügbar" (kein Fallback)
+        sun_fc, anti_fc, aero_fc, rc_fc = (f if deckt(f, zeit) else None for f in (sun_fc, anti_fc, aero_fc, rc_fc))
+        if _apply_weather_to_event(e, fc, now_utc, cutoff, aero_fc, sun_fc, anti_fc, rc_fc):
+            mit += 1
+    dauer = _time.monotonic() - t0
+    # Ohne Ortsnamen (AK-13)
+    logger.info("BUG-119: Wetter wieder aufgelegt (Auslöser: %s): %d Termine mit gespeichertem Wetter, %d ohne · Dauer %s s",
+                ausloeser, mit, len(nah) - mit, ("%.1f" % dauer).replace(".", ","))
+    return mit
+
+
 async def _run_weather_fetch_tasks_with_ceiling(tasks_meta, max_total_seconds: float | None) -> list:
     """
     TASK-100 (aus _fetch_weather_and_aerosol extrahiert, Option A): Baut aus
@@ -2371,6 +2470,10 @@ def _plan_weather_fetch_tasks(near_events, fruehester: Optional[dict] = None) ->
 
 import contextvars as _contextvars
 import time as _time
+
+_feed_ausloeser_var: "_contextvars.ContextVar" = _contextvars.ContextVar("feed_ausloeser", default="unbekannt")
+"""BUG-119: Wer den Feed neu lädt ("start" | "vorberechnung" | "einzel-ort" | "sichtachsen"). Nur für die Log-Zeile;
+Aufrufer setzen es vor dem Neuladen (Kontextvariablen werden an Worker-Threads weitergegeben)."""
 
 
 class _WetterZaehler:
@@ -3194,6 +3297,7 @@ async def _run_precompute(mode: str = "full") -> None:
             # den Event-Loop mehrere Sekunden bis Minuten blockieren) in Thread auslagern,
             # damit /health und /job-status waehrenddessen weiter antworten.
             await asyncio.to_thread(_load_elevation_cache)
+            _feed_ausloeser_var.set("vorberechnung")   # BUG-119: nur für die Log-Zeile
             await asyncio.to_thread(_load_caches)
             if mode in ("full", "feed"):
                 await _weather_overlay()
@@ -3514,6 +3618,7 @@ async def _recompute_one(loc_id: str) -> None:
     # Schritt auch nicht neu berechnet). Beide Ladevorgänge laufen zusätzlich im
     # Worker-Thread statt im Server-Hauptstrang.
     await asyncio.to_thread(_load_elevation_cache)
+    _feed_ausloeser_var.set("einzel-ort")        # BUG-119: nur für die Log-Zeile
     await asyncio.to_thread(_load_feed_cache)
 
     # US-106 Teil 1: gezielt Wetter für genau diese Location nachladen.
@@ -4429,6 +4534,7 @@ async def startup() -> None:
     # 1. JSON-Caches laden (sofort)
     # TASK-106: Bewusst im Hauptablauf (kein asyncio.to_thread): der Server nimmt vor dem
     # Ende des Starts keine Anfragen an, und das Ergebnis (cache_ok) wird sofort gebraucht.
+    _feed_ausloeser_var.set("start")             # BUG-119: nur für die Log-Zeile
     cache_ok = _load_caches()
 
     # TASK-54: Zuletzt persistierten Wetterkarten-Cache von Disk laden (falls
@@ -5525,6 +5631,7 @@ async def _run_sightline_refresh() -> None:
         # Lesezeit hält (BUG-113, siehe Docstring von _load_calendar_cache()). Der
         # Kalender im Speicher bleibt unverändert; er wird weiterhin vom Volllauf bzw.
         # Kalenderlauf der Vorberechnung neu geladen.
+        _feed_ausloeser_var.set("sichtachsen")   # BUG-119: nur für die Log-Zeile
         await asyncio.to_thread(_load_feed_cache)
         _job_done("sightlines", t0)
     except Exception as exc:
