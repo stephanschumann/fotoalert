@@ -26,18 +26,18 @@
 | Lane | Bedeutung | Ticket-IDs |
 |------|-----------|-----------|
 | **🚦 Ready for Analysis** | *Dein Gate* — freigegeben für die Agenten | **TASK-113** *(Live-nach-Dev-Sync mit London-Orten, Hoch)* · *(US-139 am 2026-10-10 in US-141 gemerged, siehe Done)* |
-| **🔬 In Analysis** | Pre-Mortem + Spec laufen | *(leer)* — *(US-141 am 2026-10-11 nach Stephans „Implementieren“ nach In Progress verschoben)* |
+| **🔬 In Analysis** | Pre-Mortem + Spec laufen | **TASK-119** *(Akzeptanztest-Grundgerüst Vier-Schichten — Spec fertig 2026-10-24, Tests stehen aus)* · **TASK-120** *(Fingerabdruck-Schutz — Spec fertig 2026-10-24, 3 Fragen offen, Tests stehen aus)* · **TASK-121** *(Ausgangskopie + Vergleich — Spec fertig 2026-10-24, Tests stehen aus)* · *(US-141 am 2026-10-11 nach Stephans „Implementieren“ nach In Progress verschoben)* · **TASK-116** *(Backlog bereinigen: verwaister Text unter TASK-108 — Spec fertig 2026-10-24, Weg A entschieden, Tests stehen aus)* |
 | **⛔ Weg-Gate** | Optionen vorgelegt — Stephan wählt | *(leer — BUG-119 am 2026-10-23: Stephan wählt Option A, umgesetzt, siehe In Test)* · *(Hinweis: technisch dieselbe Lane wie "In Analysis", siehe Kanban-Spalte oben)* |
 | **⏸️ Wartet auf Entscheidung** | *Weg-Gate/AK-Qualitäts-Check Rot* — braucht deine Entscheidung | **US-136** *(Vollanalyse abgeschlossen 2026-09-04 — Weg-Gate Rot: kritischste offene Frage 0 aus ROADMAP.md (Zeile 94) noch unbeantwortet — Sign in with Apple statt Eigenbau-E-Mail/Passwort-System könnte den gesamten Ticket-Scope obsolet machen; zusätzlich 9 weitere offene Architektur-/Scope-Fragen (Rollenmodell, iOS-Umfang, DSGVO-Löschkaskade, US-84-Bezug u.a.), AK-Qualitäts-Check dadurch ebenfalls blockiert)* |
 | **🚩 Braucht dich** | *Gate-Auditor fand Abweichung zwischen Selbstauskunft und Faktenlage* — Stephan muss entscheiden | *(leer)* |
-| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-09** *(Bortle-Karte — Weg-Gate-Entscheidung 2026-08-16: Flächen-Overlay + statisches Overlay-Bild; Implementierung startet erst nach Machbarkeits-Check der VIIRS-Datenbeschaffung)* |
-| **🔄 In Progress** | wird gerade implementiert | **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* · **US-142** *(Teilschritt 1 mit v1.26.0 ausgeliefert, 2026-10-19; T2 Server/Daten wartet auf Abschluss BUG-117 und ca. 1 Tag nach Release 1; T3 Reste nur mit Freigabe, 🚫 Release-Sperre TASK-59; Bündel-Ausnahme von WIP=1 mit US-143 beendet)* |
-| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **BUG-119** *(Feed ohne Wetter nach Neuladen: Option A umgesetzt 2026-10-23, nur Backend, automatisierte Tests grün, Server-Messung AK-12 und manuelle Prüfung offen)* · **BUG-117** *(Wetterabruf-Limit, v1.25.0 ausgeliefert, Live-Messung AK-1/2/3/12/16 offen)* · *(US-138 am 2026-10-11 nach Release v1.24.0 geschlossen, siehe Done)* |
+| **✅ Ready for Dev** | Spec freigegeben, wartet auf Implementierung | **TASK-118** *(Live-Check mit Rücksprung — Tests eingefroren 2026-10-27, Umsetzung nach TASK-117 und TASK-119)* · *(leer — TASK-09 am 2026-10-23 nach In Progress verschoben)* |
+| **🔄 In Progress** | wird gerade implementiert | **TASK-117** *(Probelauf vor dem Hochladen — Tests eingefroren 2026-10-26, Umsetzung läuft)* · **TASK-59** *(Option A gewählt, Freigabe 2026-07-15 — 🚫 Release-Sperre aktiv: qa_azimuth.py + test_task59_own_overpass.py nicht in andere Releases mitnehmen)* · **US-142** *(Teilschritt 1 mit v1.26.0 ausgeliefert, 2026-10-19; T2 Server/Daten wartet auf Abschluss BUG-117 und ca. 1 Tag nach Release 1; T3 Reste nur mit Freigabe, 🚫 Release-Sperre TASK-59; Bündel-Ausnahme von WIP=1 mit US-143 beendet)* |
+| **🧪 In Test** | implementiert, wartet auf (Test-)Bestätigung | **TASK-09** *(Bortle-Karte: Refactor- und Gate-Prüfung 2026-10-24 ohne Blocker, Browserprüfung am echten lokalen Server erfolgreich; offen: iPhone/Safari, Fehlerfall gegen neue Serverfassung, England/London nicht abgedeckt — Details im Ticket)* · **BUG-119** *(Feed ohne Wetter nach Neuladen: Option A umgesetzt 2026-10-23, nur Backend, automatisierte Tests grün, Server-Messung AK-12 und manuelle Prüfung offen)* · **BUG-117** *(Wetterabruf-Limit, v1.25.0 ausgeliefert, Live-Messung AK-1/2/3/12/16 offen)* · *(US-138 am 2026-10-11 nach Release v1.24.0 geschlossen, siehe Done)* |
 | **🎯 Bereit zur Veröffentlichung** | WIP=1 — Test-Gate + Refactor abgeschlossen, wartet auf Stephans Release-Klick | *(leer — US-143 und US-142 Teilschritt 1 am 2026-10-19 mit v1.26.0 ausgeliefert; die frühere Bündel-Ausnahme von WIP=1 ist damit beendet)* |
-| **🏁 Done** | abgeschlossen + deployed | **BUG-110** *(Jahreskalender: leeres Fehler-Ergebnis wird nicht mehr gespeichert, Deploy #384 grün, Done 2026-10-23; Totalausfall nur per Test belegt)* · **US-143** *(Willkommens-Slides ganz entfernt, v1.26.0, Done 2026-10-19; Live-Check „onboarding=0 scout=0 knoepfe=2“; offen: Host-Dialog/Balken auf frischem Gerät, Laufzeit Frontend-Check, Aufräum-Ticket, Retro)* · **US-141** *(Host-Schalter für Länder und Regionen, v1.25.0, Done 2026-10-18 auf Stephans Anweisung; Live-Prüfung iPhone/Server offen, Retro offen)* · **BUG-118** *(gelöschte Standard-Orte, v1.25.0, Done 2026-10-18 mit US-141)* · **US-138** *(England/London, v1.24.0, geschlossen 2026-10-11; AK5/AK9-Messungen offen, Retro offen)* · **US-139** *(gemerged in US-141 am 2026-10-10, kein eigener Code)* · **BUG-114** · **TASK-106** · **BUG-113** · **TASK-54** · **TASK-58** · **TASK-89** · **US-134** · **TASK-101** · **BUG-99** · **BUG-93** · **BUG-96** · **BUG-92** · **TASK-86** · **BUG-81** · **TASK-84** · **TASK-83** · **TASK-82** · **TASK-80** · **TASK-41** · **TASK-51** · **BUG-79** · **TASK-60** · **TASK-76** · **TASK-77** · **TASK-78** · **TASK-62** · **US-132** · **US-131** · **TASK-63** · **TASK-73** · **TASK-74** · **US-130** · **BUG-77** · **TASK-72** · **TASK-61** · **TASK-67** · **BUG-76** · **TASK-70** · **BUG-75** · **TASK-66** · **TASK-64** · **BUG-73** · **BUG-74** · **TASK-68** · **BUG-68** · **BUG-70** · **US-129** · **BUG-66** · **US-127** · **US-85** · **BUG-65** · **US-09** · **US-21** · **TASK-57** · **US-117** · **TASK-56** · **US-125** · **US-126** · **BUG-57** · **BUG-60** · **US-124** · **US-120** · **US-119** · **BUG-61** · **US-123** · **US-121** · **US-122** · **BUG-59** · **TASK-53** · **BUG-58** · **US-87** · **BUG-56** · **US-113** · **US-72** · **US-112** · **BUG-55** · **BUG-54** · **US-109** · **US-108** · **US-07** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **BUG-53** · **BUG-72** · **BUG-51** · **US-107** · **US-106** · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** · **BUG-34** · **TASK-42** · **BUG-84** · **BUG-91** · **BUG-90** · **BUG-94** · **TASK-90** · **TASK-93** · **TASK-91** · **TASK-94** · **TASK-88** · **TASK-103** · **TASK-95** · **TASK-96** · **TASK-97** · **TASK-99** · **TASK-100** · **TASK-98** · **TASK-87** · **BUG-104** · **TASK-102** · **TASK-02** · **BUG-89** · **BUG-62** · **BUG-64** · **BUG-82** · **TASK-104** · **TASK-105** · **TASK-107** · **BUG-97** · **BUG-101** · **BUG-102** · **BUG-103** · **BUG-106** · **BUG-95** · **BUG-105** · **BUG-87** · **BUG-88** · **TASK-92** · **BUG-108** · **BUG-109** · **BUG-111** · **BUG-21** · **BUG-98** · **US-137** · *(Abschluss-Details je Ticket: BACKLOG-ARCHIVE.md → „Gate-Board Done-Historie“ bzw. das Ticket selbst)* |
+| **🏁 Done** | abgeschlossen + deployed | **TASK-112** *(gemerged in TASK-117 am 2026-10-24, kein eigener Code)* · **BUG-110** *(Jahreskalender: leeres Fehler-Ergebnis wird nicht mehr gespeichert, Deploy #384 grün, Done 2026-10-23; Totalausfall nur per Test belegt)* · **US-143** *(Willkommens-Slides ganz entfernt, v1.26.0, Done 2026-10-19; Live-Check „onboarding=0 scout=0 knoepfe=2“; offen: Host-Dialog/Balken auf frischem Gerät, Laufzeit Frontend-Check, Aufräum-Ticket, Retro)* · **US-141** *(Host-Schalter für Länder und Regionen, v1.25.0, Done 2026-10-18 auf Stephans Anweisung; Live-Prüfung iPhone/Server offen, Retro offen)* · **BUG-118** *(gelöschte Standard-Orte, v1.25.0, Done 2026-10-18 mit US-141)* · **US-138** *(England/London, v1.24.0, geschlossen 2026-10-11; AK5/AK9-Messungen offen, Retro offen)* · **US-139** *(gemerged in US-141 am 2026-10-10, kein eigener Code)* · **BUG-114** · **TASK-106** · **BUG-113** · **TASK-54** · **TASK-58** · **TASK-89** · **US-134** · **TASK-101** · **BUG-99** · **BUG-93** · **BUG-96** · **BUG-92** · **TASK-86** · **BUG-81** · **TASK-84** · **TASK-83** · **TASK-82** · **TASK-80** · **TASK-41** · **TASK-51** · **BUG-79** · **TASK-60** · **TASK-76** · **TASK-77** · **TASK-78** · **TASK-62** · **US-132** · **US-131** · **TASK-63** · **TASK-73** · **TASK-74** · **US-130** · **BUG-77** · **TASK-72** · **TASK-61** · **TASK-67** · **BUG-76** · **TASK-70** · **BUG-75** · **TASK-66** · **TASK-64** · **BUG-73** · **BUG-74** · **TASK-68** · **BUG-68** · **BUG-70** · **US-129** · **BUG-66** · **US-127** · **US-85** · **BUG-65** · **US-09** · **US-21** · **TASK-57** · **US-117** · **TASK-56** · **US-125** · **US-126** · **BUG-57** · **BUG-60** · **US-124** · **US-120** · **US-119** · **BUG-61** · **US-123** · **US-121** · **US-122** · **BUG-59** · **TASK-53** · **BUG-58** · **US-87** · **BUG-56** · **US-113** · **US-72** · **US-112** · **BUG-55** · **BUG-54** · **US-109** · **US-108** · **US-07** · **BUG-48** · **BUG-49** · **BUG-50** · **BUG-52** · **BUG-53** · **BUG-72** · **BUG-51** · **US-107** · **US-106** · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** · **BUG-34** · **TASK-42** · **BUG-84** · **BUG-91** · **BUG-90** · **BUG-94** · **TASK-90** · **TASK-93** · **TASK-91** · **TASK-94** · **TASK-88** · **TASK-103** · **TASK-95** · **TASK-96** · **TASK-97** · **TASK-99** · **TASK-100** · **TASK-98** · **TASK-87** · **BUG-104** · **TASK-102** · **TASK-02** · **BUG-89** · **BUG-62** · **BUG-64** · **BUG-82** · **TASK-104** · **TASK-105** · **TASK-107** · **BUG-97** · **BUG-101** · **BUG-102** · **BUG-103** · **BUG-106** · **BUG-95** · **BUG-105** · **BUG-87** · **BUG-88** · **TASK-92** · **BUG-108** · **BUG-109** · **BUG-111** · **BUG-21** · **BUG-98** · **US-137** · *(Abschluss-Details je Ticket: BACKLOG-ARCHIVE.md → „Gate-Board Done-Historie“ bzw. das Ticket selbst)* |
 | **🔁 Retro / Lernen** | auto nach Done: Erkenntnisse → Memory/Tests, Skill-Vorschläge zur Freigabe | *(transient — läuft automatisch)* |
 | **🚫 Excluded** | explizit ausgeschlossen — nie aufnehmen | *(leer)* |
-| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-112** *(release.sh gegen Doppelausführung + Commit-Vorschau — BUG-113-Retro, Mittel)* · **BUG-115** *(Feed-Zeitfenster bei Berliner Orten fälschlich als UTC beschriftet — Fund aus US-138-Test, Mittel)* · **US-140** *(Feed-Deckel: England und Rest fair aufteilen — nach Stephans Rückkehr von der Reise, Mittel)* · **BUG-116** *(Nächtlicher Server-Precompute wird seit 25.09. jedes Mal nach 30 Minuten abgebrochen — Fund aus Release v1.24.0, Hoch)* · **BUG-117** *(Wetterabruf auf dem Server schlägt für fast alle Orte fehl, /health „degraded“ — Fund 2026-10-10 nach Release v1.24.0, Hoch)* · **TASK-115** *(Wetterkarte: Bauzeit auf dem Server wieder in die Nähe des Vorwerts — AK5 aus US-138 verfehlt, Mittel)* · **TASK-114** *(Wetterdienste je Land vergleichen: verfügbarste Daten, längste Vorschau — Vorarbeit für US-141, Mittel)*· **US-144** *(Wetter-Reichweite über 3 Tage hinaus + Verhalten des 70-%-Filters ohne Wetter — erst nach BUG-117-Live-Messung → BUG-119 → TASK-108, Mittel)* |
+| **📥 Inbox** | offene Tickets, **nicht** freigegeben | US-84 · US-94 · **US-104** · **TASK-50** *(Service-Worker Auto-Update nach Release)* · **US-114** *(Vollbild-Karten-Overlay auch bei Chancen, Kalender und Scout)* · **TASK-55** *(Server-Backup um location_images/ erweitern)* · **TASK-81** *(Lange Funktion preview_alignment() in backend/main.py, Fund durch fotoalert-refactor nach BUG-63)* · **TASK-109** *(refactor_check.py BACKEND_FILES-Liste deckt calculations/astronomy.py, window_engine.py, query_engine.py, opportunity.py, data/locations.py nicht ab, Fund durch fotoalert-refactor nach BUG-98)* · **TASK-110** *(split_backlog.py überschreibt das bestehende Archiv statt es zu ergänzen, Fund aus Token-Optimierung 2026-09-29)* · **+ alle übrigen offenen Tickets unten (außer TASK-09/TASK-54, s. In Analysis)** · **TASK-111** *(Backlog-Prüfung erkennt verschwundene Ticket-Blöcke — BUG-113-Retro, Hoch)* · **TASK-122** *(Technische Git-Sperre in der Agenten-Umgebung — Regel-16-Wiederholung, Hoch)* · **BUG-115** *(Feed-Zeitfenster bei Berliner Orten fälschlich als UTC beschriftet — Fund aus US-138-Test, Mittel)* · **US-140** *(Feed-Deckel: England und Rest fair aufteilen — nach Stephans Rückkehr von der Reise, Mittel)* · **BUG-116** *(Nächtlicher Server-Precompute wird seit 25.09. jedes Mal nach 30 Minuten abgebrochen — Fund aus Release v1.24.0, Hoch)* · **BUG-117** *(Wetterabruf auf dem Server schlägt für fast alle Orte fehl, /health „degraded“ — Fund 2026-10-10 nach Release v1.24.0, Hoch)* · **TASK-115** *(Wetterkarte: Bauzeit auf dem Server wieder in die Nähe des Vorwerts — AK5 aus US-138 verfehlt, Mittel)* · **TASK-114** *(Wetterdienste je Land vergleichen: verfügbarste Daten, längste Vorschau — Vorarbeit für US-141, Mittel)*· **US-144** *(Wetter-Reichweite über 3 Tage hinaus + Verhalten des 70-%-Filters ohne Wetter — erst nach BUG-117-Live-Messung → BUG-119 → TASK-108, Mittel)* |
 
 **So benutzt du das Board:**
 1. **Freigeben:** Ticket-ID von `Inbox` nach `Ready for Analysis` verschieben → Agenten dürfen starten.
@@ -2940,11 +2940,63 @@ Ausdrücklich ausgeschlossen (bis Klärung, siehe Fragen unten): Migration/Zurü
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | Ready for Dev |
+| **Status** | In Test |
 
 **Weg-Gate-Entscheidung (Stephan, 2026-08-16):** Grenzfall-Option A (Flächen-Overlay über die ganze sichtbare Karte, nicht Einzelwert je Location) UND Implementierungsoption A (statisches, einmalig aufbereitetes Overlay-Bild nach dem Vorbild des bestehenden Wetterkarten-Layers `WeatherMap`/US-112) — beide von Stephan bestätigt.
 
-**🚧 Blocker vor Implementierungsstart (Machbarkeits-Check, 2026-08-16, korrigiert 2026-08-16):** Die für Option A nötige einmalige Datenbeschaffung (VIIRS-Nachtlichtdaten, Earth Observation Group, `eogdata.mines.edu`) ist aus dieser Cloud-Sandbox heraus **nicht durchführbar** — echte getestete Befunde, kein Raten: (1) Der Host verlangt eine kostenlose, aber verifizierte EOG-Kontoregistrierung für den Download. (2) Es gibt keinen Kachel-/Ausschnitts-Service (WMS/WCS) — nur globale Jahres-Rasterdateien im mehrere-GB-Bereich. (3) Direkter Netzwerkzugriff (`curl`/`wget`/`pip`/`requests`) auf `eogdata.mines.edu` ist durch die Sandbox-Netzwerk-Policy aktiv blockiert (`403 policy denial`, zweifach reproduziert; `pypi.org` im selben Test problemlos erreichbar — es ist also gezielt dieser Host, kein allgemeines Netzwerkproblem). `rasterio`/`GDAL` für die Radiance→Bortle-Umrechnung sind dagegen problemlos in der Sandbox installierbar (getestet) — das Blockierende ist ausschließlich der Rohdaten-Download selbst. **Korrektur:** Der ursprüngliche Machbarkeits-Check ist fälschlich von einem Berlin/Brandenburg-Ausschnitt (< 2 MB) ausgegangen — TASK-99 (2026-08-10, Done) hat diese Scope-Beschränkung bereits projektweit entfernt, Stephans bestätigter Geltungsbereich ist DE/AT/NL/NO/Norditalien/CH (dieselbe BBox wie der bestehende Wetter-Layer, 43.0–71.5°N/3.0–21.0°E). Das ändert nichts am Kern-Blocker (Host bleibt blockiert, Registrierung bleibt nötig), macht aber den vollen Ausschnitt geografisch ca. 60× größer als ursprünglich angenommen — siehe korrigierten Zielgrößen-Hinweis bei AK8. Lizenz laut EOG: CC BY 4.0, vorgeschriebener Text „Please cite EOG as the data source and papers relevant to the EOG product you are using" (exakter Pflicht-Attributionstext nicht wortwörtlich auf einer offiziellen Lizenzseite verifiziert — vor Umsetzung das verlinkte Lizenz-PDF im Volltext prüfen). **Empfehlung:** Stephan besorgt die Rohdaten (inkl. EOG-Registrierung) selbst über einen Rechner mit freiem Internetzugang, schneidet sie auf den vollen App-Geltungsbereich zu (oder übergibt sie roh) — die eigentliche Bildaufbereitung (Radiance→Bortle-PNG, inkl. Herunterrechnen auf eine handhabbare Pixelauflösung nach dem Vorbild des Wetter-Layers) und die Frontend-/Backend-Integration können danach problemlos in der Sandbox erfolgen. Implementierung dieses Tickets bleibt bis dahin blockiert.
+**✅ Blocker aufgehoben (2026-10-23):** Die Rohdaten liegen vor. Stephan hat das VIIRS-Jahreskomposit 2025 der Earth Observation Group (eine Datei von 11,6 GB) besorgt, der Ausschnitt 3–21 °E / 43–71,5 °N (15 Bogensekunden, 6840 × 4320 Zellen) wurde daraus herausgeschnitten. Beide Dateien liegen ausschließlich im Aufräumordner (`_to_delete/`, per `.gitignore` ausgeschlossen) und gehören nicht ins Repository. Negative Messwerte (80 Stück) werden als 0 behandelt.
+
+**🎨 Prototyp-Entscheidung (Stephan, 2026-10-23): Farbskala „Variante A“.** Klasse 1–2 `#0a143c`, 3 `#1e468c`, 4 `#288c96`, 5 `#bec83c`, 6 `#f0aa28`, 7 `#eb641e`, 8 `#d22838`, 9 `#faebfa`. Einstufung als Näherung aus der Strahlungsdichte r (nW/cm²/sr): r < 0,25 → 1–2 („sehr dunkel“); < 1,0 → 3; < 3,0 → 4; < 8,0 → 5; < 20,0 → 6; < 50,0 → 7; < 120,0 → 8; sonst 9. In der Legende steht ausdrücklich „Näherung aus Satellitendaten“.
+
+**🔧 Umsetzungsstand (2026-10-23, Status In Progress — alles Wesentliche gebaut und geprüft, ein Prüfpunkt steht aus, siehe „Noch offen“):**
+
+*Gebaut (Arbeitsstand, nicht committet, nicht released):*
+- Einmaliges Aufbereitungsskript `tools/build_bortle_overlay.py` (nur numpy + Pillow): rechnet den Ausschnitt in die Kartenprojektion um (sonst säßen Städte nach Norden hin zu weit nördlich), stuft nach den Schwellen ein und schreibt ein transparentes PNG mit Skala A. Ergebnis: 2160 × 6752 Pixel, 0,95 MB (AK8: niedriger einstelliger MB-Bereich eingehalten; ein Pixel ≈ 0,5 km, nahe an der Rohauflösung), abgelegt unter `backend/data/light_pollution/bortle_overlay.png`.
+- Server: neue Adressen `GET /light-pollution-map` (Grenzen, Datenjahr, Quellenangabe + Link, Legende, Bildadresse; 503 mit Klartext, wenn die Datei fehlt) und `GET /light-pollution-map/png` (das Bild; 404, wenn es fehlt). Begründung für den Server-Weg statt reiner Datei unter `web/`: nur so gibt es bei fehlender Datei eine definierte Fehlerantwort (AK5), und Farben/Klassen/Quelle haben genau eine Quelle der Wahrheit. Neue Dateien: `backend/calculations/light_pollution.py`, `backend/light_pollution_routes.py`; in `backend/main.py` nur zwei Zeilen (Import + Einbinden).
+- Oberfläche (`web/index.html`): neuer Schalter „Lichtverschmutzung“ (Mond-mit-Stern-Symbol, Aria-Label, `aria-pressed`) unter dem Wetter-Schalter, eigene Karten-Ebene (`BortleMap`, Pane-zIndex 240, unter dem Wetter-Layer 250), Legende mit Klassenzahlen + Quellenangabe unten links (liegt die Wetter-Legende dort, rückt die neue darüber), Fehlermeldung „Lichtverschmutzungs-Karte nicht verfügbar“. Wetter-Code und Mini-Karten unverändert.
+- Deckkraft je Klasse (nachvollziehbar festgelegt, Klasse 1–2 bewusst fast durchsichtig, weil sie ~81 % der Fläche ausmacht): 1–2: 45/255 (18 %), 3: 47 %, 4: 59 %, 5: 65 %, 6: 71 %, 7: 76 %, 8: 82 %, 9: 88 %. Erster Wert war 60 (24 %); nach Sichtprüfung der Basiskarte auf 45 gesenkt, danach nochmals angesehen.
+- Service Worker (`sw.js`) und Sicherheitsrichtlinie (Caddy, `img-src 'self'`) geprüft: beide brauchen keine Änderung (Bild kommt von der eigenen Adresse, wird nicht vorab im Offline-Speicher abgelegt).
+- Tests: `backend/tests/test_task09_bortle_map.py` (37 Prüfungen) + Zeile in `backend/tests/README.md`; `PRODUCT.md` (Abschnitt 5, Endpoints, Pflicht-Regression, Changelog, offene Punkte) nachgezogen.
+
+*Geprüft (wirklich ausgeführt und beobachtet):*
+- Test-first: Die 37 Prüfungen waren vor dem Bau rot (Modul/Adressen/Oberfläche fehlten), danach 37/37 grün — in einer Kopie des Projekts auf dem Geräte-Linux (Python 3.10, nicht auf Stephans Mac). Zwei eigene Fehler im neuen Testtext vor dem ersten grünen Lauf korrigiert (falscher Suchbereich für „nur auf der Hauptkarte“; Fehlertext liegt im HTML statt im Skript; Farbabstand-Kriterium auf Nachbarklassen statt Gruppenbildung umgestellt). Bestehende Tests wurden nicht verändert.
+- Regression in der Kopie: alle übrigen 143 Testdateien ohne neuen Rotstand (1458 grün, 18 übersprungen wegen fehlendem Playwright). Neun anfangs rote Prüfungen (Bug-100, Task-105, Task-84, Task-97) und drei Fehler (Task-89) lagen nur an in der Kopie fehlenden Dateien (`.github`, `deploy`, `CLAUDE.md`) und sind mit diesen Dateien grün; `test_task02_eclipses.py` lief in der Kopie in die 40-s-Zeitgrenze (Umgebung, nicht ausgewertet). README-Abgleich (Task-79) und Marker-Prüfung (Task-96) grün. Voller Lauf auf dem Mac steht noch aus.
+- Browser (Chrome gegen Stephans lokalen Server, Port 8000): **Fehlerfall echt:** dieser Server läuft noch die alte Fassung (Adresse liefert 404) → Tipp auf den Schalter zeigt die Meldung, Schalter bleibt aus, App bedienbar (AK5). **Erfolgsfall mit nachgestellter Serverantwort** (Metadaten im Browser simuliert, echtes Bild aus einer Testkopie): Schalter an/aus samt `aria-pressed`, Fläche passt geografisch (Berlin als helle Insel, Prignitz/Brandenburg überwiegend dunkel), Legende mit Klassenzahlen und Quellenlink, Basiskartenbeschriftung bleibt lesbar; gleichzeitig mit Wetter-Layer „Niederschlag“: beide Legenden übereinander ohne Überlappung, Ebenen 240/250, Wetter-Schalter unabhängig (AK6); weit nach Westen (England/Frankreich) gezoomt: dort keine Einfärbung, kein Fehler (AK3). Testbild danach nach `_to_delete/` verschoben.
+
+*Noch offen / nicht geprüft:*
+- Die **echte** Adresse am laufenden lokalen Server ist nicht per Browser geprüft: der Server läuft ohne Neuladen noch die alte Fassung — Neustart durch Stephan nötig, danach Tipp auf den Schalter (Serverseite ist nur per Test an einer schlanken Test-App geprüft, nicht gegen die volle App). Deshalb Status In Progress statt In Test.
+- Prüfung auf dem iPhone/Safari (Ursprungsgerät der Nutzung) fehlt; Lesbarkeit der Legende bei 375 px nur über die schmale App-Spalte in Chrome gesehen.
+- Kein Playwright-Browsertest geschrieben (Playwright im Geräte-Linux nicht vorhanden); die Oberfläche ist über Textprüfungen am Quelltext und die manuelle Chrome-Prüfung abgesichert.
+- Symbol des Schalters (Mond mit Stern) ist ein Vorschlag von Claude; kein Icon-Varianten-Check über den Designer-Agenten erfolgt (Memory-Regel „mehrere Varianten zeigen“).
+- Farbskala bei Rot-Grün-Schwäche: Klasse 5 (`#bec83c`) und 6 (`#f0aa28`) liegen sehr nah beieinander (Farbabstand ≈ 8, übrige Nachbarklassen ≥ 25) — Variante A ist beschlossen und wurde nicht geändert; Gegenmaßnahme: Klassenzahlen stehen als Text in der Legende (AK9), im Test als bekannte Ausnahme dokumentiert.
+- Geltungsbereich: Bild deckt nur 3–21 °E ab. **England/London (US-138, Karte reicht bis −6 °W) ist nicht abgedeckt** — dort bleibt die Ebene leer. Eine Erweiterung wäre ein eigener Datenschritt.
+- Lizenztext: Auf der EOG-Produktseite (`eogdata.mines.edu/products/vnl/`, 2026-10-23 gelesen) steht „Please cite EOG as the data source and papers relevant to the EOG product you are using“ und das Lizenz-PDF verlangt Namensnennung mit Hinweis auf Änderungen; als Kurz-Quellenzeile nennt es „Source: EOG, Colorado School of Mines“. Eine vorgeschriebene Wortlaut-Formel für Karten gibt es nicht; verwendet wird die von Stephan vorgegebene Zeile „Earth Observation Group, Payne Institute, Colorado School of Mines (VIIRS Nighttime Lights 2025, CC BY 4.0)“ samt Link, plus Hinweis „Näherung aus Satellitendaten“. Zusätzlich empfohlen (nicht umgesetzt, Entscheidung Stephan): Zitat der Fachveröffentlichung (Elvidge et al. 2021, Remote Sensing 13(5), 922) z. B. in der Datenschutz-/Impressumsseite, falls gewünscht.
+- Datenstand: Jahreskomposit 2025 (steht in der Quellenangabe); Aktualisierung = Skript mit neuem Ausschnitt erneut laufen lassen.
+
+*Dateien dieses Tickets (für den Commit):* `backend/calculations/light_pollution.py`, `backend/light_pollution_routes.py`, `backend/data/light_pollution/bortle_overlay.png`, `backend/main.py`, `backend/tests/test_task09_bortle_map.py`, `backend/tests/README.md`, `tools/build_bortle_overlay.py`, `web/index.html`, `PRODUCT.md`, `BACKLOG.md`. Hinweis: `web/index.html` ist zugleich Release-Datei von `release.sh` (Versionsbump) — vor dem Release `git diff --stat` gegen fremde Änderungen (US-138/US-141/BUG-117) abgleichen.
+
+**🔎 Prüfung vor „In Test“ (2026-10-24, unabhängig vom Umsetzungsbericht neu nachgeprüft — Ergebnis: ohne Blocker, Status In Test):**
+
+*Code-Qualität:* Das Prüfskript deckt von den neuen Dateien nur die Haupt-Serverdatei ab (die Lücke ist schon in TASK-109 erfasst); die vier neuen Dateien wurden deshalb von Hand mit dem Fehlersuchwerkzeug und per Sichtprüfung durchgesehen. Ein Befund im eigenen Code: ein nicht mehr benutzter Import samt Typ-Kommentar im Berechnungsmodul — entfernt, danach ohne Befund. Alle Testfunktionen tragen passende Marker. Befunde in Fremdcode (ungenutzte Importe und überlange Funktionen in Haupt-Serverdatei, Wetter- und Entdeckungs-Modulen) wurden nur gemeldet, nicht angefasst.
+
+*Tests (wirklich ausgeführt, in einer Kopie auf dem Geräte-Linux, Python 3.10, nicht auf dem Mac):* Die 37 Prüfungen dieses Tickets grün. Alle 144 Testdateien nach der Korrektur erneut durchlaufen: keine einzige rot (1470 grün, übersprungen nur wegen fehlendem Playwright bzw. fehlendem Voll-Checkout; eine Datei lief beim ersten Mal in die Zeitgrenze und ist einzeln erneut grün: 19 von 19). Zusätzlich Abgleich der Test-Übersicht und Marker-Regel grün. Bestehende Tests nicht verändert. Voller Lauf auf dem Mac steht weiter aus.
+
+*Reproduzierbarkeit:* Das Aufbereitungsskript hatte als Standardbreite 1080, das ausgelieferte Bild ist aber 2160 breit (Aufruf damals mit 2160). Standard und Aufrufbeispiel im Skript auf 2160 angepasst. Kontrolle: Skript mit den Rohdaten-Ausschnitt neu laufen lassen — das erzeugte Bild ist Byte für Byte identisch mit dem ausgelieferten.
+
+*Akzeptanzkriterien einzeln (am tatsächlichen Code belegt):*
+- AK1 erfüllt: Schalter „Lichtverschmutzung“ in der Oberfläche vorhanden, schaltet eine eigene Ebene, Wetter-Schalter bleibt unabhängig. Belegt im Quelltext und per Test; Browser (Stephan/Chrome, echter lokaler Server, 2026-10-23) erfolgreich.
+- AK2 erfüllt: Bild nutzt 8 Klassen der beschlossenen Skala (Verteilung: 81,4 % / 8,0 % / 6,8 % / 2,3 % / 1,0 % / 0,4 % / 0,1 % / 0,0 %), Legende mit Farbe und Klassenzahl wird aus den Server-Daten gebaut; Berlin hell / Brandenburg dunkel durch Test belegt.
+- AK3 erfüllt: Bild reicht nur über 3–21 °E / 43–71,5 °N, außerhalb bleibt die Karte uneingefärbt, kein Fehler (Test + Browser). Folge: England/London bleibt leer (bekannte Grenze, siehe oben).
+- AK4 erfüllt: Quellenzeile mit Datensatz, Jahr, Lizenz CC BY 4.0 und Link in der Legende; Link wird auf sicheres Adressschema geprüft.
+- AK5 erfüllt, mit Einschränkung: Server antwortet bei fehlender Datei definiert (503 bzw. 404, per Test), Oberfläche zeigt Meldung, Schalter bleibt aus (Browser gegen alte Serverfassung gesehen). Gegen die NEUE Serverfassung ist der Fehlerfall nicht beobachtet.
+- AK6 erfüllt (Einschränkung zur Optik bekannt): eigene Ebene mit Stufe 240 unter dem Wetter-Layer 250, unabhängig schaltbar, Legenden rücken übereinander. Bei gleichzeitigem Einschalten verdeckt der Wetter-Layer die Bortle-Farben teilweise (dokumentiert, nicht geändert).
+- AK7 erfüllt: Im Quelltext kommt die Ebene nur in der Hauptkarte vor (Schalter, Legende, Meldung, Ebenen-Objekt); Mini-Karten unverändert.
+- AK8 erfüllt: 0,95 MB, Obergrenze im Test 6 MB. Der Vergleich „nicht spürbar länger als beim Wetter-Layer“ wurde nicht gemessen.
+- AK9 teilweise belegt: Aria-Label und Pressed-Zustand vorhanden; Klassenzahlen stehen als Text in der Legende. Klasse 5 und 6 farblich sehr nah (Variante A beschlossen, nicht geändert).
+
+*Weiterhin offen:* iPhone/Safari ungeprüft; Fehlerfall gegen neue Serverfassung; Voll-Testlauf auf dem Mac; England/London nicht abgedeckt; Symbol des Schalters ohne Varianten-Check (die Lage als eigener Knopf unter der Wetter-Gruppe hat Stephan am 2026-10-23 bestätigt, das Symbol selbst nicht); Zitat der Fachveröffentlichung optional.
+
+**🚧 (AUFGEHOBEN 2026-10-23, siehe oben) Blocker vor Implementierungsstart (Machbarkeits-Check, 2026-08-16, korrigiert 2026-08-16):** Die für Option A nötige einmalige Datenbeschaffung (VIIRS-Nachtlichtdaten, Earth Observation Group, `eogdata.mines.edu`) ist aus dieser Cloud-Sandbox heraus **nicht durchführbar** — echte getestete Befunde, kein Raten: (1) Der Host verlangt eine kostenlose, aber verifizierte EOG-Kontoregistrierung für den Download. (2) Es gibt keinen Kachel-/Ausschnitts-Service (WMS/WCS) — nur globale Jahres-Rasterdateien im mehrere-GB-Bereich. (3) Direkter Netzwerkzugriff (`curl`/`wget`/`pip`/`requests`) auf `eogdata.mines.edu` ist durch die Sandbox-Netzwerk-Policy aktiv blockiert (`403 policy denial`, zweifach reproduziert; `pypi.org` im selben Test problemlos erreichbar — es ist also gezielt dieser Host, kein allgemeines Netzwerkproblem). `rasterio`/`GDAL` für die Radiance→Bortle-Umrechnung sind dagegen problemlos in der Sandbox installierbar (getestet) — das Blockierende ist ausschließlich der Rohdaten-Download selbst. **Korrektur:** Der ursprüngliche Machbarkeits-Check ist fälschlich von einem Berlin/Brandenburg-Ausschnitt (< 2 MB) ausgegangen — TASK-99 (2026-08-10, Done) hat diese Scope-Beschränkung bereits projektweit entfernt, Stephans bestätigter Geltungsbereich ist DE/AT/NL/NO/Norditalien/CH (dieselbe BBox wie der bestehende Wetter-Layer, 43.0–71.5°N/3.0–21.0°E). Das ändert nichts am Kern-Blocker (Host bleibt blockiert, Registrierung bleibt nötig), macht aber den vollen Ausschnitt geografisch ca. 60× größer als ursprünglich angenommen — siehe korrigierten Zielgrößen-Hinweis bei AK8. Lizenz laut EOG: CC BY 4.0, vorgeschriebener Text „Please cite EOG as the data source and papers relevant to the EOG product you are using" (exakter Pflicht-Attributionstext nicht wortwörtlich auf einer offiziellen Lizenzseite verifiziert — vor Umsetzung das verlinkte Lizenz-PDF im Volltext prüfen). **Empfehlung:** Stephan besorgt die Rohdaten (inkl. EOG-Registrierung) selbst über einen Rechner mit freiem Internetzugang, schneidet sie auf den vollen App-Geltungsbereich zu (oder übergibt sie roh) — die eigentliche Bildaufbereitung (Radiance→Bortle-PNG, inkl. Herunterrechnen auf eine handhabbare Pixelauflösung nach dem Vorbild des Wetter-Layers) und die Frontend-/Backend-Integration können danach problemlos in der Sandbox erfolgen. Implementierung dieses Tickets bleibt bis dahin blockiert. *(Historisch — die Daten liegen seit 2026-10-23 vor.)*
 
 **Beschreibung:** Auf der Hauptkarte soll eine zuschaltbare Lichtverschmutzungs-Ebene (Bortle-Skala) sichtbar werden, damit Fotografen einschätzen können, wie dunkel der Himmel an einem Ort tatsächlich ist — wichtig für Milchstraßen-/Astro-Aufnahmen. Code-verifiziert (`backend/data/locations.py`): Es gibt aktuell **60 Locations gesamt, davon genau 1 mit `category=LocationCategory.MILCHSTRASSE`** — der Ticket-Wortlaut „für Milchstraßen-Locations" trifft auf die reale Datenlage kaum zu, wenn er als „nur für die eine markierte Location" gelesen wird (siehe offene Frage 1/Grenzfall unten).
 
@@ -7812,6 +7864,19 @@ Ziel: Rechnung bestätigen oder verwerfen (Regel „erst messen“, feedback_val
 - **Gesundheitsseite (19.10. ca. 19:15 UTC): „degraded“**, Wetter „error“ (letzter Lauf 19:07 UTC, 503), 159 von 213 Orten aktiv. → **AK-2 nicht erfüllt**, solange ein Lauf mit 503-Notbremse als „Fehler“ gilt. (Ob die 159 aktiven Orte mit US-141 zusammenhängen, ist nicht geprüft.)
 **Entscheidungsbedarf (Vorschlag, noch nichts geändert):** (a) Planer-Zeitpunkt von „volle Stunde“ auf eine ungerade Minute (z. B. :07) verschieben; (b) Notbremse-Lauf nach kurzer Pause (z. B. 10–15 Min.) automatisch einmal wiederholen statt bis zum nächsten 3-Stunden-Takt zu warten; (c) Lauf mit Notbremse nicht als „Fehler“/„degraded“ werten, solange der Zwischenspeicher noch gültig ist. Gehört zu BUG-117 (AK-2/AK-1) oder ist ein eigenes Ticket – Entscheidung bei Stephan.
 
+**Messergebnis 6 (2026-10-26, Dateien `_to_delete/bug117_messung_6_*`, Stand 20:19 UTC; ausgewertet von einem Unter-Agenten, nur gelesen):**
+- Belegt: Alle 24 Takt-Läufe seit dem Deploy (23.10. 22:07 bis 26.10. 20:07 UTC) starteten bei hh:07:00; die Zeitumstellung am 25.10. ohne Auffälligkeit.
+- Belegt: 10 Notbremsen (23.10. 22:07; 24.10. 10:07, 13:07, 16:07; 25.10. 02:07, 08:07, 17:07, 23:07; 26.10. 08:07, 17:07, jeweils UTC). Jede hatte genau einen Wiederholungsversuch („notbremse-retry“) exakt 12 Minuten später, 10 von 10 erfolgreich (51–65 s). Notbremse-Anteil 10 von 24 Takt-Läufen (42 %), vorher 7 von 9 (78 %).
+- Belegt: 0 Ablehnungen wegen zu vieler Anfragen (429) in allen 45 Zählzeilen seit 23.10. 20:30 UTC. Fehler: 503 (76 Abrufe) und 1 Zeitüberschreitung; die 502 im Journal stammen von Overpass, nicht vom Wetterdienst.
+- Belegt: Tagesverbrauch 23.10. 36,0 % (gemischt), 24.10. 39,9 %, 25.10. 39,0 %, 26.10. bis 20:19 UTC 35,1 % (von 10.000, gewichtet). „Entdecken“ steht immer auf 0 (Ursache offen).
+- AK-1 für das Fenster 24.10. 01:07 bis 25.10. 01:07 UTC erfüllt (8 Läufe, 0 abgelehnt); die „5 %“-Klausel gilt für die Notbremse-Läufe formal nicht (100 % von 6–9 Abrufen), danach fehlerfreie Wiederholung — Auslegung offen (Stephan).
+- AK-2 nicht belegt (kein /health-Stand in Messung 6). Der Wetter-Job stand nach einer Notbremse rund 13 Minuten, nach Einzelausfällen bis zu rund 2 h 40 min auf „error“ (Schluss, nicht beobachtet: dann „degraded“).
+- AK-12 belegt (45 von 45 Zählzeilen). AK-8 im Betrieb belegt (Zähler lief über 8 Neustarts weiter). AK-3: zwei volle neue Tage unter 40 %, dritter voller Tag (26.10.) erst am 27.10. abschließbar.
+- Nicht beobachtet: Überspringen der Wiederholung bei nahem Planlauf (Fall trat nicht auf); „läuft bereits“ im Betrieb.
+- Vermutung (nicht belegt): 503-Überlast tagsüber häufiger (7 von 10 Notbremsen zwischen 08 und 17 UTC).
+- Offen vor Done: /health nach einem Wiederholungslauf (AK-2); Tagesendstand 26.10. (AK-3); Entscheidung zur Bewertung „Notbremse = Fehler“ (Vorschlag (c) aus Messung 5).
+- **Entscheidung Stephan, 2026-10-27 (Wortlaut: „Der Fehler ist erst weg, wenn es problemlos funktioniert, normale Bedingungen.“):** Vorschlag (c) (Notbremse mit erfolgreicher Wiederholung nicht mehr als Fehler werten) wird nicht umgesetzt, sinngemäß gelesen (Claude, nicht von Stephan bestätigt). BUG-117 gilt erst als behoben, wenn die Wetterläufe unter normalen Bedingungen ohne Notbremse durchlaufen; die heutigen 42 % Notbremse-Läufe (503 des Wetterdienstes) sind dafür noch zu viel. Status bleibt In Test.
+
 ### 🔧 Nachbesserung 2026-10-19 (Vorschlag 1 + 2, Stephan hat freigegeben) – im Code umgesetzt, NOCH NICHT veröffentlicht
 - **Umgesetzt (`backend/main.py`):** Wetterlauf startet alle 3 Stunden zur Minute 7 statt 0 (`WEATHER_CRON_MINUTE = 7`); nach einem Notbremse-Ende wird nach 720 s genau ein Wiederholungsversuch angesetzt (Auslöser „notbremse-retry"), nicht wenn in den nächsten 20 Minuten ohnehin ein Planlauf ansteht, nie parallel, höchstens einer je Planlauf; Statustext „Nächster Versuch ca. … (Wiederholungsversuch)" passt dazu.
 - **Geprüft (von mir ausgeführt, Sandbox mit mitgebrachten Paketen):** `test_bug117.py` + `test_bug117_nachfunde.py` + neue `test_bug117_nachbesserung.py` (13 neue Tests): **45 bestanden, 2 übersprungen** (Browser-Menütests nur in CI).
@@ -8537,6 +8602,1427 @@ Beide Tickets ändern `web/index.html`, inhaltlich unabhängig. Vorschlag: US-14
 
 ---
 
+### TASK-116 · Backlog bereinigen: Texte erledigter Tickets (TASK-87/88/102/103/104/105) hängen verwaist unter TASK-108 `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-10-23 |
+
+**Beschreibung:** Fund aus dem Prüfbericht zu TASK-108: Direkt unter dem Kopf von TASK-108 hängen in BACKLOG.md 554 Zeilen Text (Stand 2026-10-24: Z. 9912 bis Dateiende 10465 — Zeilennummern wandern, maßgeblich sind Inhalt und Prüfsumme; Stand 2026-10-23: Z. 8631 bis 9184), die nicht zu TASK-108 gehören, sondern zu bereits erledigten Tickets (u. a. Sicherheits-Sammelticket TASK-87, TASK-103, TASK-104, TASK-105, TASK-88; Zuordnung je Abschnitt siehe Analyse). Von diesen Tickets liegt im Archiv nur noch der Kopf (Tabelle, Beschreibung, User Story), der Körper (Analyse, Umsetzung, Zwischenstände, Entscheidungen) steht nur noch hier. Erwartet: TASK-108 enthält nur seine eigene Beschreibung, der fremde Text liegt unverändert im Archiv. **Datenverlust-Risiko:** Der Text existiert nach aktuellem Stand ausschließlich in BACKLOG.md und in Sicherungskopien; jedes Verschieben, Kürzen oder Neuschreiben der Datei kann ihn endgültig vernichten (siehe Pre-Mortem).
+
+**User Story:** Als Product Owner möchte ich, dass jedes Ticket im Backlog nur seinen eigenen Text enthält und die Geschichte erledigter Tickets vollständig im Archiv liegt, sodass ich Tickets nicht mit fremden Inhalten verwechsle und beim Aufräumen nie Ticket-Historie verloren geht.
+
+**Bezug:** TASK-108 (hier soll der fremde Text raus; TASK-108 selbst bleibt unberührt, sollte aber erst nach dieser Bereinigung freigegeben werden). TASK-110 (Auslagerungswerkzeug überschreibt das Archiv — gleiche Schadensklasse, anderer Auslöser; Abhängigkeit siehe Pre-Mortem). TASK-111 (Prüfung auf verschwundene Ticket-Blöcke — würde den Verlust, aber nicht diese Fehlzuordnung erkennen). TASK-93 (frühere Backlog-Aufräumung, keine Dublette). Reihenfolge: unabhängig vom Wetter-Strang; vor der Freigabe von TASK-108 und **vor TASK-110** (Entscheidung Stephan 2026-10-24: damit der Text zuerst gesichert ist). Keine Dublette gefunden (Suche nach „verwaist", „Archiv", „split_backlog" in BACKLOG.md und Archiv).
+
+**Quelle:** Prüfbericht zu TASK-108, von Stephan zur Anlage und zum Pipeline-Start freigegeben 2026-10-23.
+
+#### 🔬 Analyse & Spec (TASK-116) · 2026-10-24
+
+> **Grundlage:** Analyse vom 2026-10-23 (Belege, Optionen, Pre-Mortem unten übernommen und ergänzt) + **Entscheidungen Stephan vom 24.10.2026** (verbindlich, gehen jeder abweichenden Aussage in der Fassung vom 23.10. vor) + neuer Pipeline-Stand vom 24.10.2026 (kein eigenes Weg-Gate, keine Ampel; Entscheidungen fallen im Dialog).
+> **Status-Empfehlung:** In Analysis — Spec fertig, Tests stehen aus.
+> **🗣️ Entscheidungsstand (2026-10-24):** alle 3 Fragen entschieden, keine Frage offen (Weg A; Reihenfolge vor TASK-110; 2026-10-26: Regel für „zugeordnet“ in der Zuordnungsliste). Alles Weitere ist als technische Festlegung ohne Verhaltenswirkung für Stephan eingetragen.
+
+##### Kernbefund in Alltagssprache
+Unter dem Ticket TASK-108 hängen 554 Zeilen Text, die zu fünf bis sechs längst erledigten Sicherheits- und Abhängigkeits-Tickets gehören. Im Archiv liegen von diesen Tickets nur die Köpfe; der Text mit Analyse, Entscheidungen und Zwischenständen existiert sonst nirgends außer in der Arbeitsdatei und in Sicherungskopien, die zum Löschen vorgesehen sind. Der Text wird deshalb unverändert ans Ende des Archivs verschoben, mit Kopf, Zuordnungsliste und Prüfsumme, und das Verschieben wird von einem prüfenden Werkzeug erledigt, das vorher und nachher dieselben Zahlen misst. Nachgemessen am 24.10.2026: Der Text ist unversehrt (gleiche Prüfsumme), steht aber inzwischen an einer ganz anderen Stelle der Datei (Zeile 9912 statt 8631), weil darüber neue Tickets eingefügt wurden — Zeilennummern taugen daher nicht als Anker.
+
+##### Getroffene Entscheidungen
+| # | Entscheidung | Datum | Eingearbeitet in |
+|---|---|---|---|
+| 1 | **Weg A:** Der verwaiste Text wird unverändert als Anhang ans Ende des Archivs verschoben, mit Zuordnungsliste, Prüfsumme und Sicherung. Der Anhang kommt ganz ans Archivende, weil dahinter kein Ticket mehr steht und die Kanban-Zuordnung der Archivtickets so unberührt bleibt. (Antwort „a" auf die Weg-Frage; Option B und C damit verworfen.) | 2026-10-24 | AK1–AK8, AK16 |
+| 2 | **Reihenfolge:** TASK-116 läuft **vor** TASK-110, damit der Text zuerst gesichert ist. (Ersetzt die frühere Aussage „nach oder zusammen mit TASK-110".) | 2026-10-24 | AK7, AK16, Nicht-Ziele, Pre-Mortem 💀8 |
+| 3 | **Regel für „zugeordnet“ in der Zuordnungsliste:** Ein Abschnitt gilt als „zugeordnet“, wenn er genau ein Ticket mindestens zweimal nennt; sonst steht er in der Zuordnungsliste nur als „Einschätzung“. Ein einzelner Verweis wie „siehe TASK-802“ reicht nicht. Der Text selbst wird unverändert verschoben; die Regel betrifft nur die Zuordnungsliste. (Antwort „Vorschlag akzeptiert“. Ersetzt in diesem Punkt die technische Festlegung vom 24.10. „zugeordnet steht nur, wo der Text selbst das Ticket nennt“.) | 2026-10-26 | AK6, TF-06 |
+
+##### Technische Festlegungen (ohne Verhaltenswirkung für Stephan)
+- ✅ **Technische Festlegung (2026-10-24): Umsetzung als ein Werkzeug mit Prüfmodus und Ausführen** statt von Hand zusammengesetzter Einzelbefehle. Grund: Das Pre-Mortem nennt das Ein-Schritt-Skript (Lesen, Ändern, Zurückschreiben) als Hauptrisiko; ein Werkzeug misst Prüfsumme, Zeilen- und Zeichensumme, Ticketzahl und Spaltenzuordnung vor und nach dem Verschieben mit demselben Code, ist beliebig oft wiederholbar (auch nur prüfend, ohne zu schreiben) und kann so den Nachweis technisch erzwingen, statt ihn zu behaupten. Es ist kein Release-Skript und fällt nicht unter das Verbot von Einmal-Skripten beim Hochladen. Die Datei bleibt danach als Prüfwerkzeug liegen (Wiederholbarkeit AK17).
+- ✅ **Technische Festlegung (2026-10-24): Zuordnungsliste ohne Stephans Vorab-Bestätigung.** Die Liste ist eine Lesehilfe und ändert keinen Inhalt. Sie führt je Abschnitt die im Text tatsächlich genannten Ticketnummern auf; „zugeordnet" steht nur, wo der Text selbst das Ticket nennt, sonst „Einschätzung" oder „nicht zugeordnet". Sie ist als nicht bestätigt gekennzeichnet. Korrigieren kann Stephan jederzeit; verloren gehen kann dabei nichts. (Änderung gegenüber der Fassung vom 23.10., die eine Bestätigung vor dem Verschieben verlangte: Pipeline-Stand 24.10. kennt keine Pflicht-Durchsicht durch Stephan.)
+- ✅ **Technische Festlegung (2026-10-24): Schreibreihenfolge „erst Archiv, prüfen, dann Backlog".** Bei einem Abbruch steht der Text höchstens doppelt, nie gar nicht (AK14, AK15).
+- ✅ **Technische Festlegung (2026-10-24): Fundort am Inhalt, nicht an Zeilennummern** (Beginn: Leerzeile nach dem Trennstrich unter TASK-108, Ende: Dateiende, Gegenprobe Prüfsumme). Grund: Nachmessung 24.10. — der Text ist um 1.281 Zeilen gewandert.
+- ✅ **Technische Festlegung (2026-10-24): Ticketzahl und Zeilensummen werden relativ gemessen** (unmittelbar vor und nach dem Lauf, im selben Lauf). Grund: Die absoluten Zahlen der Fassung vom 23.10. (369/370) sind bereits überholt; heute meldet die Backlog-Prüfung 375 Tickets, 0 Fehler, 0 Warnungen.
+- ✅ **Technische Festlegung (2026-10-24): Sicherungen** gehen in den dafür vorgesehenen Sicherungsordner des Projekts (Regel BACKLOG-Schutz, Zeitstempel im Namen). Sie werden erst nach erfolgreichem Release **und** nach Behebung von TASK-110 vom Aufräum-Gate eingeschlossen. Das ersetzt „außerhalb des Projektordners" der Fassung vom 23.10. (von der Agenten-Umgebung aus nicht erreichbar).
+- ✅ **Technische Festlegung (2026-10-24): Tests arbeiten mit kleinen künstlichen Übungsdateien**, nie mit dem echten Backlog (Test-Isolation; bei GitHub sieht der Test sonst einen anderen Stand). Der Nachweis am echten Stand erfolgt einmalig an einer Kopie bei der Umsetzung und wird im Ticket protokolliert.
+- ✅ **Technische Festlegung (2026-10-24): Kein Git** — weder lesend noch schreibend. Die frühere Bitte, den Git-Verlauf nach älteren Fassungen zu durchsuchen, entfällt: Beim Verschieben geht nichts verloren, eine ältere Fassung wird nicht gebraucht.
+
+##### Scope
+**Eingeschlossen:** (1) das Werkzeug mit Prüfmodus und Ausführen; (2) das einmalige Verschieben der 554 Zeilen aus dem Backlog ans Archivende mit Kopf, Zuordnungsliste, Endemarke; (3) vollständige Vorher-/Nachher-Messung und Sicherung; (4) der Bericht, ob weitere verwaiste Abschnitte existieren (nur Bericht, kein Verschieben); (5) die Tests des Werkzeugs an Übungsdateien. *Der Effekt zeigt sich nur in den Dateien des Backlogs und im Kanban-Board, nicht in der App.*
+
+##### Nicht-Ziele
+- Der **Inhalt** des verwaisten Textes wird nicht umgeschrieben, gekürzt, korrigiert, neu formatiert oder neu gegliedert; auch nicht Rechtschreibung, Zeilenenden oder Leerzeichen.
+- **TASK-108** wird nicht umgebaut: Sein eigener Text (Kopf bis „Quelle") bleibt Zeichen für Zeichen, sein Status bleibt ToDo.
+- **TASK-110** wird nicht umgebaut, nicht ergänzt und nicht ausgeführt; das Auslagerungswerkzeug wird weder geändert noch gestartet. Ob die Ursache (Blockende an „## ") dort ergänzt wird, entscheidet Stephan in der Analyse von TASK-110.
+- **Kein Ticket wird auf Done gesetzt** oder in eine andere Lane verschoben, auch nicht die sechs Tickets, zu denen der Text gehört (TASK-87/88/102/103/104/105). Deren Köpfe im Archiv bleiben unverändert.
+- Weitere verwaiste Abschnitte (falls der Bericht welche findet) werden **nicht** verschoben, sondern als Folgeticket vorgeschlagen.
+- Keine Lint-Warnung gegen neue Fälle und kein Umbau von Lint oder Kanban-Erzeugung (eigenes Folgeticket, falls gewünscht).
+- Keine App-Änderung (kein Backend, keine Oberfläche, keine Datenbank, kein Server, kein Deploy-Code), keine Skill-Änderung.
+- Kein Git in irgendeiner Form; keine Kanban-Erzeugung durch den Umsetzer (macht der Hauptthread).
+- Sicherungskopien werden nicht gelöscht.
+
+##### Erlaubte Bereiche
+- `BACKLOG.md` — **ändern, eng begrenzt:** (a) den verwaisten Text entfernen (Fundort per Inhalt), (b) Felder, Protokoll und Status von TASK-116 selbst, (c) die Board-Zeile von TASK-116. Alles andere, auch parallele Änderungen anderer Tickets, bleibt unangetastet.
+- `BACKLOG-ARCHIVE.md` — **nur ergänzen:** ein Anhang (Kopf, Zuordnungsliste, Text, Endemarke) am Dateiende; der bestehende Inhalt bleibt unverändert.
+- `tools/` — **neu:** ein Werkzeug (Prüfmodus + Ausführen; Name legt die Umsetzung fest). Lesen erlaubt: die Backlog-Prüfung, die Kanban-Erzeugung, das Auslagerungswerkzeug — nur lesen, nicht ändern, nicht für Ausgaben ausführen (Kanban-Erzeugung nie direkt aufrufen).
+- `backend/tests/` — **neu:** eine Testdatei für das Werkzeug (Ort/Form legt der Test-Agent fest); `backend/tests/README.md` — **nur ergänzen** (Pflicht-Übersicht).
+- Sicherungsordner des Projekts — **neu:** Sicherungskopien beider Dateien und das Messprotokoll.
+- `PRODUCT.md` — **nur ergänzen:** Änderungsprotokoll-Zeile nach Abschluss.
+- **Tabu:** alles andere, insbesondere `backend/main.py`, alles unter `web/`, `release.sh`, `.github/`, bestehende Tests, Skills, die Kanban-Datei (Sync nur durch den Hauptthread), der Text von TASK-108 und TASK-110.
+
+##### Belege (Fassung 2026-10-23 übernommen; Nachmessung 2026-10-24 siehe darunter)
+- Der fremde Text beginnt in der Leerzeile 8631 und läuft bis Dateiende Z. 9184: 554 Zeilen, 78.657 Zeichen, Prüfsumme der Zeilenfolge `f0bae246229e6b136aa9d62c4ca25915`. Der Prüfbericht nannte „über 270 Zeilen" — es sind mehr als doppelt so viele. Sie bestehen aus 17 Abschnitten, jeweils mit Überschrift „## …" oder „### …" (Analyse, Stephans Entscheidungen, Echter Sicherheits-Scan, Zwischenstände Schritt 1 bis 3, Entscheidung Option C, Example Mapping bis Testplan, Abschlüsse, Umsetzungen).
+- Im Archiv stehen von den 5 genannten Tickets nur die Köpfe (TASK-87 Z. 28493, TASK-103 Z. 28513, TASK-104 Z. 28540, TASK-105 Z. 28574, TASK-88 Z. 28631; je 20 bis 34 Zeilen). Zeile-für-Zeile-Vergleich der 385 nicht leeren Textzeilen gegen das Archiv: nur 18 Zeilen kommen dort ebenfalls vor, und das sind reine Allerweltszeilen (Trennstriche, Code-Zaun, „### Example Mapping" usw.). **Der Körper steht also NICHT im Archiv, es gibt außerhalb von BACKLOG.md keine zweite vollständige Fassung im aktiven Bestand.**
+- Weitere Kopien des Textes: 12 Sicherungen in `_to_delete` (2026-10-18 bis 2026-10-23, jeweils identisch ab Z. ~8442) und ein verstecktes Überbleibsel (Stand 2026-10-18 17:42). Alle liegen im Ordner „_to_delete" und sind damit zum Löschen vorgesehen — keine verlässliche Dauerablage. Ob Git eine ältere Fassung enthält, wurde aus der Sandbox bewusst nicht geprüft (kein Git-Zugriff erlaubt) und ist offen.
+- Ursache im Werkzeug (Code gelesen): `tools/split_backlog.py` beendet einen Ticketblock an der ersten Zeile, die mit „## " beginnt. Alles ab dieser Zeile wird als „aktiv" behalten, auch wenn der Kopf des Tickets schon ins Archiv gewandert ist. Erledigte Tickets mit Unterabschnitten („## Analyse", „## Abschluss") verlieren so nur den Kopf an das Archiv; der Körper bleibt in BACKLOG.md hängen und hängt am letzten verbliebenen Ticket davor (hier TASK-108). Das erklärt das Bild vollständig, **bewiesen ist aber nur der Code-Mechanismus, nicht, dass genau ein bestimmter Auslagerungslauf es erzeugt hat** (Archiv zuletzt am 2026-10-10 geschrieben; die älteste vorhandene Sicherung mit dem Muster ist vom 2026-10-18).
+- Wirkung auf die Werkzeuge (Code gelesen und Lint gelaufen): Lint, Kanban-Erzeugung und Auslagerungswerkzeug beenden TASK-108 ebenfalls an der ersten „## "-Zeile (Z. 8632). Folge: Lint meldet 369 Tickets, 0 Fehler, 0 Warnungen; die Kanban-Karte von TASK-108 zeigt nur seinen Kopf; die Ticketzahl 369 (56 aktiv + 313 im Archiv) bleibt vom Verwaisen unberührt. **Nichts schlägt Alarm — der Fehler ist für alle Prüfungen unsichtbar.** Nur Leser, die bis zur nächsten „### "-Überschrift mit Ticketnummer lesen, sehen den überlangen Block (z. B. Skill-Agenten, die Blöcke per Suche ausschneiden).
+- Das Muster ist nicht auf die letzten 554 Zeilen beschränkt: BACKLOG.md hat 48 Abschnitte mit „## …"-Überschrift außerhalb der Spurenüberschriften (zusammen 7.747 Zeilen). Die meisten sind übliche Analysen noch aktiver Tickets (die Vorlage selbst erzeugt solche Abschnitte). Ob außer den hier genannten weitere verwaiste darunter sind, ist **ungeprüft** — z. B. Z. 480 („Analyse 2026-08-10", Ticket-Überschriften zählen) und Z. 498 („Umsetzung") hängen unter dem Gate-Board/US-136 und passen thematisch nicht dazu.
+
+**Nachmessung am 2026-10-24 (selbst gemessen, sicher):**
+- Der Text beginnt jetzt in der Leerzeile 9912 (direkt nach dem Trennstrich unter TASK-108 „Quelle: … fotoalert-refactor (BUG-108)") und läuft bis Dateiende Z. 10.465: **554 Zeilen, 78.657 Zeichen, Prüfsumme der Zeilenfolge `f0bae246229e6b136aa9d62c4ca25915` — identisch zum 23.10.** Der Text ist also unversehrt, aber um 1.281 Zeilen nach hinten gewandert (neue Tickets TASK-117 bis TASK-121 u. a. weiter oben). **Die im Ticket und in der Fassung vom 23.10. genannten Zeilennummern (8631/9184) sind veraltet.**
+- Gesamtlage: Backlog 10.465 Zeilen (1.628.335 Byte), Archiv 28.970 Zeilen (3.290.048 Byte); Backlog-Prüfung: **375 Tickets, 0 Fehler, 0 Warnungen**; im Sicherungsordner liegen 19 Backlog-Sicherungen.
+- Nachgezählt: **16 Hauptabschnitte** („## ", nicht 17) und 9 Unterabschnitte („### ", alle im Abschnitt „Stephans Entscheidung … Option C"); **keine einzige Zeile des Textes sieht wie ein Ticket-Kopf aus** (0 Treffer auf das Muster, das Backlog-Prüfung und Kanban-Erzeugung verwenden) — der Text erzeugt also weder Karten noch Ticketnummern; Zugangsdaten stehen nicht darin (nur der Name eines GitHub-Geheimnisses und Platzhalter).
+- Das Auslagerungswerkzeug wird von keinem Skript, keinem Release und keiner Pipeline-Datei aufgerufen (Suche im Projekt: Treffer nur in Ticket-Texten) — es läuft nur von Hand. Das begrenzt das Risiko aus der Reihenfolge „TASK-116 vor TASK-110" (siehe 💀8).
+- 📎 Code-Verifikation (24.10.): Backlog-Prüfung ausgeführt (375/0/0). Regeln gelesen: Ticket-Kopf = Zeile „### <ID> · …"; ein Ticket-Block endet an der nächsten „### "- oder „## "-Zeile; Lanes kommen aus dem Status-Feld. Ein am Archivende angehängter Block mit „## "-Überschrift beendet nur den Block des letzten Archivtickets (dessen Status-Tabelle steht oben im Block) und beeinflusst kein Ticket dahinter, weil dahinter keins steht.
+
+**Zuordnung der 16 Hauptabschnitte zu Tickets (Textzeile = Zeile im verschobenen Text, Zeile 1 = führende Leerzeile; Ticketnummern per Skript im Abschnittstext gezählt am 2026-10-24; „Einschätzung" ist nicht bewiesen):**
+
+| Textzeilen | Überschrift | Im Text genannte Ticketnummern | Einschätzung |
+|---|---|---|---|
+| 2–36 | Analyse (2026-08-10) | US-120, US-126 (nur Verweise) | TASK-87 (Sicherheitspunkte a–h) |
+| 37–44 | Stephans Entscheidungen (2026-08-10) | TASK-103 | TASK-87 (Entscheidung zu (b) betrifft TASK-103) |
+| 45–64 | Echter pip-audit-Lauf (2026-08-10) | keine | TASK-87 |
+| 65–70 | Abschluss (2026-08-11) | TASK-102, -103, -104 | unklar |
+| 71–82 | Implementierung (2026-08-10) | TASK-94 | unklar (TASK-102/-103?) |
+| 83–90 | Nachtrag (2026-08-11) | TASK-95 | unklar |
+| 91–173 | Zwischenstand Schritt 1 (2026-08-13) | BUG-83, BUG-84 | TASK-104/-105, unklar |
+| 174–233 | Zwischenstand Schritt 2 PyJWT | TASK-105 (4×) | TASK-105 |
+| 234–255 | Zwischenstand Schritt 3 starlette (2026-08-16) | TASK-105 (15×), TASK-104 | TASK-105 |
+| 256–261 | Abschluss (2026-08-16) | TASK-105 (3×), TASK-104 | TASK-105 (mit TASK-104) |
+| 262–485 | Entscheidung Option C mit Example Mapping bis Testplan | TASK-104 (13×), TASK-83, TASK-80, TASK-105 | TASK-104 |
+| 486–491 | Abschluss (2026-08-16) | TASK-104 | TASK-104 |
+| 492–501 | Implementierung (2026-08-10) | keine | unklar |
+| 502–507 | Abschluss (2026-08-11) | keine | unklar |
+| 508–536 | Analyse (2026-08-10) | BUG-80 (3×), TASK-88 (2×), US-133 | TASK-88 |
+| 537–554 | Implementierung (2026-08-10) | TASK-88, BUG-80, TASK-101 | TASK-88 |
+
+Mehrere Abschnitte sind nicht eindeutig zuzuordnen; sie erscheinen in der Zuordnungsliste des Archivs ausdrücklich als „Einschätzung" oder „nicht zugeordnet", nie als Tatsache (AK6).
+
+##### Optionen (Wirkung für Stephan) — **entschieden am 2026-10-24: Option A**
+- **Option A — Text unverändert ins Archiv verschieben.** Der gesamte Bereich (Z. 8631 bis Ende) wird Zeichen für Zeichen als ein eigener Anhang ans Ende des Archivs gestellt, mit einer Zuordnungsliste (welcher Abschnitt zu welchem Ticket gehört) als Kopf. BACKLOG.md verliert die 554 Zeilen, TASK-108 hat danach nur noch seinen Kopf. Vorteil: nichts geht verloren, Historie ist am richtigen Ort, die Datei wird kleiner. Nachteil/Risiko: Ein Schreibvorgang auf beide Dateien; ohne Vorbehalte gegen TASK-110 kann ein späterer Auslagerungslauf das Archiv überschreiben. Aufwand: klein bis mittel. Als Anhang am Archivende (nicht mitten zwischen die Köpfe), weil „## "-Zeilen mitten im Archiv die Zuordnung der 38 Archivtickets ohne Status-Feld ändern könnten (siehe Pre-Mortem).
+- **Option B — Überschriften ergänzen, Text bleibt in BACKLOG.md.** Vor die fremden Abschnitte kommen Ticket-Überschriften (TASK-87 usw. als „Körper-Anhang"). Vorteil: kein Verschieben. Nachteil: 554 Zeilen erledigter Tickets bleiben im aktiven Backlog, die Köpfe stehen doppelt (Archiv + aktiv) → doppelte Ticket-IDs, Lint-Fehler E1 und Kanban-Zählung 369 wäre nicht mehr haltbar; der nächste Auslagerungslauf zerschneidet es erneut. Nicht empfohlen.
+- **Option C — nichts verschieben, nur Warnung in der Backlog-Prüfung.** Vorteil: kein Eingriff in die Daten. Nachteil: Fehler bleibt bestehen und wächst weiter, TASK-108 bleibt irreführend; eine Warnung ohne Bereinigung löst nichts. Sinnvoll höchstens als Ergänzung zu A.
+
+✅ **Empfehlung: Option A** (Anhang am Archivende, unverändert, mit Prüfsumme, Sicherung und Zuordnungsliste), bei Bedarf plus eine Lint-Warnung gegen neue Fälle (eigenes Folgeticket, nicht Teil dieses Tickets). Die Werkzeug-Ursache (Block endet an „## ") gehört als zusätzliche Anforderung zu TASK-110, nicht hierher — Stephan entscheidet, ob er das dort ergänzt haben will.
+
+Entscheidung Stephan 2026-10-24: **Option A**, Reihenfolge **vor TASK-110**. Eine Ampel und ein eigenes Weg-Gate gibt es im neuen Pipeline-Stand nicht mehr; das Datenverlust-Risiko wird durch AK2, AK7, AK9, AK11, AK14, AK15 und die Tests abgefangen, nicht durch ein zusätzliches Gate.
+
+##### Pre-Mortem
+
+**Pre-Mortem (Code-Verifikation: `split_backlog.py`, `lint_backlog.py`, `gen_kanban.py` gelesen am 2026-10-23, Archiv per Skript ausgewertet):**
+- 💀 Alles weg: Der Text wird beim Schreiben aus einer veralteten Kopie überschrieben oder nur in einer Datei geändert. Auslöser: Mount-Zwischenspeicher, Ein-Schritt-Skript (Lesen, Ändern, Zurückschreiben). Frühwarnung: Zeilensumme stimmt nicht. Gegenmaßnahme: Neuen Stand getrennt erzeugen, prüfen, Prüfsumme der Quelle direkt vor dem Kopieren erneut vergleichen, erst dann ersetzen; Sicherung beider Dateien außerhalb des Projektordners. → AK 2, 3, 7, 10, 11.
+- 💀 Paralleler Schreiber: Der Hintergrundlauf (Heartbeat) oder eine zweite Sitzung ändert BACKLOG.md zwischen Prüfung und Schreiben; deren Änderung geht verloren oder Zeilennummern verschieben sich. Frühwarnung: Prüfsumme der Datei vor dem Schreiben weicht ab. Gegenmaßnahme: nur inhaltsbasiert über Kontext-Text arbeiten, nie über Zeilennummern; vor dem Schreiben erneut vergleichen, bei Abweichung abbrechen und neu beginnen. → AK 9, 11.
+- 💀 Archiv wird später überschrieben: Ein Auslagerungslauf (TASK-110, Fehler bestätigt im Ticket) schreibt das Archiv nur mit den neu ausgelagerten Tickets neu — der angehängte Text wäre erneut weg. Gegenmaßnahme: TASK-110 vor dem nächsten Auslagerungslauf beheben oder bis dahin keinen Auslagerungslauf starten; zusätzlich Sicherung nach Abschluss aufheben. → AK 7, Reihenfolge.
+- 💀 Kanban-Spalten kippen: Das Archiv wird von der Kanban-Erzeugung mit gelesen; jede „## "-Zeile ändert die Abschnittszuordnung für alle Tickets dahinter. 38 von 313 Archivtickets haben kein Status-Feld und hängen an Abschnitt oder Markierung. Mitten im Archiv eingefügte „## "-Zeilen könnten Karten aus „Done" nach „Inbox" kippen. Gegenmaßnahme: Anhang ganz ans Ende (dahinter kein Ticket); Vorher/Nachher-Vergleich der Spaltenzuordnung aller 369 Tickets. → AK 5, 8.
+- 💀 Falsche Zuordnung: Ein Abschnitt wird dem falschen Ticket zugeschrieben und später dort gelesen. Gegenmaßnahme: Zuordnungsliste mit Stephan bestätigen, unklare Abschnitte als „nicht zugeordnet" kennzeichnen statt zu raten. → AK 6.
+- Zusammenspiel der Bausteine: Reihenfolge Sicherung → neue Dateien in Outputs erzeugen → Zeilen- und Prüfsummenvergleich → Lint auf neuer Datei → Ersetzen → Lint, Ticketzahl, Doppel-IDs auf Original. Seiteneffekte nur auf Backlog-Prüfung, Kanban-Zählung, Auslagerungswerkzeug und Agenten, die Blöcke ausschneiden; keine App-Funktion betroffen.
+- 💀8 **Auslagerungswerkzeug läuft zwischen TASK-116 und TASK-110 und überschreibt das Archiv samt Anhang** (Folge der Entscheidung „vor TASK-110"). Nachmessung: nichts ruft es automatisch auf, es läuft nur von Hand. Frühwarnung: Archiv wird plötzlich kleiner. Gegenmaßnahme: Warnhinweis im Kopf des Anhangs (AK16); die Sicherung des Archivs mit Anhang bleibt bis TASK-110 behoben ist (AK7); das Werkzeug dieses Tickets führt es nie aus (Nicht-Ziele).
+- 💀9 **Zeilennummern veraltet:** Bewiesen — der Text stand am 23.10. in Z. 8631, am 24.10. in Z. 9912 (neue Tickets weiter oben). Auslöser: Ausschneiden „von Zeile X bis Y". Frühwarnung: Prüfsumme des ausgeschnittenen Bereichs ≠ Soll. Gegenmaßnahme: Fundort am Inhalt plus Prüfsumme (AK13, AK11).
+- 💀10 **Abbruch mitten im Schreiben** (Fenster zu, Mount hängt): Archiv erweitert, Backlog noch nicht gekürzt (Text doppelt) oder umgekehrt (Text in keiner Datei). Gegenmaßnahme: feste Reihenfolge erst Archiv, prüfen, dann Backlog; ein Folgelauf erkennt den Zwischenzustand und macht nur das Kürzen fertig (AK14, AK15).
+- 💀11 **Der Test fasst das echte Backlog an oder sieht bei GitHub einen anderen Stand** (Test-Isolation, BUG-113-Muster): Gegenmaßnahme: nur künstliche Übungsdateien in einem Wegwerf-Ordner; Echtstand-Nachweis nur an einer Kopie bei der Umsetzung, protokolliert (TF-21).
+- 💀12 **Stille Änderung am Text beim Kopieren** (Zeilenenden, Leerzeichen am Zeilenende, Sonderzeichen wie „—" und „✅"): Gegenmaßnahme: bytegenaue Übernahme und Prüfsumme über den Text im Archiv (AK2).
+- 💀13 **Der Anhang erzeugt eine neue Karte oder Ticketnummer** (eine Zeile im Text oder im Kopf sieht wie ein Ticket-Kopf aus): Nachmessung — im Text 0 Treffer; der Kopf des Anhangs enthält ebenfalls keine solche Zeile. Gegenmaßnahme: AK19, AK5.
+- *Hinweis zur Fassung vom 23.10.:* Die dort genannte Gegenmaßnahme „Git-Verlauf der Datei durch Stephan prüfen lassen" entfällt (kein Git, keine Klickliste für Stephan; AK9 und AK14 ersetzen sie).
+
+**Fundstellen-Sweep:** Suche nach „## "-Abschnitten außerhalb der Spurenüberschriften (Regex `^## ` ohne Spuren-Emoji): 48 Treffer, 7.747 Zeilen; bei jedem einzelnen stimmen höchstens 4 längere Zeilen mit dem Archiv überein, also steht auch dort der Text nicht im Archiv. Ob die Ticket-Köpfe dazu im Archiv liegen (verwaist) oder die Tickets noch aktiv sind, ist ungeprüft — die Prüfung, welche davon verwaist sind, ist Teil der Umsetzung (AK 12). Vorkommen von „Echter pip-audit-Lauf" im Projekt: nur BACKLOG.md, 12 Sicherungen, 1 verstecktes Überbleibsel.
+**Zustands-Check:** Wartefall: laufender Hintergrundlauf → vor Start prüfen/abwarten. Leerfall: keine weiteren verwaisten Abschnitte → Ergebnis „0" im Ticket festhalten. Fehlerfall: eine Zeile weicht ab oder Prüfsumme ändert sich → nichts schreiben, Meldung mit Zeilennummer.
+
+##### Akzeptanzkriterien (Alltagssprache; Herkunft in Klammern)
+*Geändert gegenüber der Fassung vom 23.10.: AK5 (relative Zahlen), AK6 (keine Vorab-Bestätigung, ehrliche Kennzeichnung), AK7 (Aufbewahrung), AK9 und AK11 (präzisiert); neu: AK13–AK19.*
+- [ ] **AK1** Nach der Bereinigung enthält das Ticket TASK-108 nur noch seine eigene Beschreibung (vom Kopf bis zur Zeile „Quelle" und seinem Trennstrich); darunter steht bis zum Dateiende nichts mehr. *(Beschreibung)*
+- [ ] **AK2** Der verschobene Text steht im Archiv Zeichen für Zeichen unverändert; seine Prüfsumme dort ist genau die, die er vorher im Backlog hatte (heute `f0bae246229e6b136aa9d62c4ca25915`, 554 Zeilen, 78.657 Zeichen). *(Pre-Mortem 💀1, 💀12)*
+- [ ] **AK3** Die Summe der Zeilen und die Summe der Zeichen aus Backlog plus Archiv ist nachher genau gleich vorher plus die ausdrücklich ergänzten Kopf-, Hinweis- und Listenzeilen des Anhangs; deren Anzahl steht im Ticket. Beide Messungen stammen aus demselben Lauf. *(Pre-Mortem 💀1; Entscheidung 1)*
+- [ ] **AK4** Alle anderen Ticketblöcke in Backlog und Archiv sind nachher unverändert (Block-für-Block-Vergleich, 0 Abweichungen); Ausnahme ist allein das Ticket TASK-116 selbst. *(Datenverlust-Vorgabe)*
+- [ ] **AK5** Die Zahl der Tickets ist nachher dieselbe wie unmittelbar vorher (heute 375); keine Ticketnummer kommt doppelt vor; die Backlog-Prüfung meldet vorher und nachher 0 Fehler und 0 Warnungen. *(Pre-Mortem 💀4; Zahlen am 24.10. neu gemessen)*
+- [ ] **AK6** Der Anhang enthält eine Zuordnungsliste: jeder Hauptabschnitt mit Überschrift, Textzeilen, den im Text genannten Ticketnummern und einer Einschätzung. „Zugeordnet" steht nur bei einem Abschnitt, der genau ein Ticket mindestens zweimal nennt (Entscheidung Stephan 2026-10-26: ein einzelner Verweis wie „siehe TASK-802“ reicht nicht); sonst „Einschätzung" oder „nicht zugeordnet". Die Liste ist ausdrücklich als nicht von Stephan bestätigt gekennzeichnet und erfindet keine Zuordnung. *(Pre-Mortem 💀5; Entscheidung 1; Festlegung 24.10.)*
+- [ ] **AK7** Vor jeder Änderung liegt von beiden Dateien eine vollständige Sicherungskopie im Sicherungsordner des Projekts (Zeitstempel im Namen, Prüfsumme im Protokoll). Die Sicherungen bleiben mindestens, bis die Bereinigung veröffentlicht und TASK-110 behoben ist; gelöscht werden sie nur durch Stephans Aufräum-Freigabe. *(Pre-Mortem 💀1, 💀3, 💀8; Entscheidung 2)*
+- [ ] **AK8** Jede Karte im Kanban-Board steht nachher in derselben Spalte wie vorher (gemessen mit denselben Regeln, nach denen das Board gebaut wird), auch die 38 Archivtickets ohne Status-Feld; die Karte von TASK-108 zeigt nur ihre eigene Beschreibung. Wechselt in einer Probe eine Karte die Spalte, meldet die Messung Rot. *(Pre-Mortem 💀4; Gegenprobe wegen bestehendem Verhalten)*
+- [ ] **AK9** Hat sich Backlog oder Archiv zwischen Prüfung und Schreiben verändert (z. B. durch den Hintergrundlauf oder eine zweite Sitzung), wird nichts geschrieben; die Meldung sagt das, und der Vorgang beginnt von vorn. Änderungen anderer gehen dabei nie verloren. *(Pre-Mortem 💀2)*
+- [ ] **AK10** Rückweg: Aus den Sicherungen lässt sich der Vorher-Stand beider Dateien wiederherstellen (gleiche Prüfsummen wie vorher), vorgeführt an Übungskopien. *(Ampel-Frage 3 der Fassung vom 23.10.)*
+- [ ] **AK11** Fehlerfälle: Wird der Text nicht gefunden, mehrfach gefunden, stimmt seine Prüfsumme oder Zeilenzahl nicht, ist eine Datei nicht beschreibbar oder die Sicherung nicht anlegbar, wird keine der beiden Dateien angefasst. Die Meldung nennt den Grund und bei einer Abweichung die Nummer der ersten abweichenden Zeile (nicht deren Inhalt). *(Zustands-Check; Pre-Mortem 💀9)*
+- [ ] **AK12** Vor Abschluss steht im Ticket, ob außer diesen 554 Zeilen weitere verwaiste Abschnitte existieren (Ticket-Kopf nur im Archiv, Körper im aktiven Backlog): entweder „0" oder eine Liste mit Fundstellen, aus der ein Folgeticket entsteht. Gefundene weitere Abschnitte werden nicht verschoben. *(Fundstellen-Sweep)*
+- [ ] **AK13** Der Text wird an seinem Inhalt erkannt (Beginn nach dem Trennstrich unter TASK-108, Ende am Dateiende, Gegenprobe Prüfsumme), nicht an Zeilennummern: Steht er wegen neuer Tickets weiter oben an anderer Stelle (heute Zeile 9912 statt 8631), wird er trotzdem gefunden. *(Pre-Mortem 💀9; Nachmessung 24.10.)*
+- [ ] **AK14** Abbruchsicher: Zuerst wird der Anhang im Archiv geschrieben und geprüft, erst danach wird der Backlog gekürzt. Bricht der Vorgang dazwischen ab, steht der Text höchstens in beiden Dateien, nie in keiner, und keine Datei ist halb beschrieben. *(Pre-Mortem 💀10)*
+- [ ] **AK15** Wiederholbar: Ein zweiter Lauf nach erfolgreichem Abschluss ändert nichts und meldet „bereits erledigt". Nach einem Abbruch im Zwischenzustand (Text in beiden Dateien) macht der nächste Lauf nur das Kürzen des Backlogs fertig und hängt keinen zweiten Anhang an. *(Pre-Mortem 💀10)*
+- [ ] **AK16** Der Anhang beginnt mit einem Kopf: eigene Überschrift mit Datum und Herkunft (TASK-116, aus dem Backlog unter TASK-108), Zeilenzahl, Prüfsumme, Hinweis „unverändert übernommen", Hinweis „Zuordnung ist Einschätzung", Warnung „Das Auslagerungswerkzeug überschreibt bis zur Behebung von TASK-110 das Archiv" — und endet mit einer klaren Endemarke, damit der Originaltext später ohne Kopf wieder herausgelöst werden kann. *(Entscheidung 1 und 2; Pre-Mortem 💀8)*
+- [ ] **AK17** Das Werkzeug lässt sich jederzeit nur prüfend starten (schreibt nichts) und zeigt dann Prüfsummen, Zeilen- und Zeichensummen, Ticketzahl, Spaltenzuordnung, Ergebnis der Backlog-Prüfung und den Stand („noch zu tun", „Zwischenzustand", „erledigt"). Vor und nach dem Verschieben liefert es dasselbe Format; die Ergebnisse stehen im Ticket. *(Festlegung 24.10.: wiederholbar prüfbar)*
+- [ ] **AK18** Passwörter und Geheimnisse erscheinen nie in Ausgabe oder Protokoll des Werkzeugs; es gibt Zahlen, Prüfsummen und Zeilennummern aus, keine Zeileninhalte. *(Qualitäts-Check Dimension 9)*
+- [ ] **AK19** Edge Case: Würde der zu verschiebende Text oder der neue Kopf eine Zeile enthalten, die wie ein Ticket-Kopf aussieht (neue Karte oder Ticketnummer), bricht das Werkzeug vor jeder Änderung ab und nennt die Zeilennummer. Heute trifft das nicht zu (0 Treffer). *(Pre-Mortem 💀13)*
+
+**Nicht-funktionale und sonstige Abdeckung:** Leistung/Skalierung nicht relevant (einmaliger Vorgang, zwei Dateien unter 4 MB). Sicherheit: AK18, keine Zugangsdaten nötig, nur lokale Dateien. Zugänglichkeit nicht relevant. Architektur/Abwärtskompatibilität: Backlog-Prüfung, Board-Spalten und Archiv bleiben gleich lesbar (AK5, AK8, AK19). Betriebsübergabe/Protokoll: Prüfsummen und Zahlen im Ticket (AK3, AK17), Aufbewahrung der Sicherung (AK7).
+
+##### Testfall-Liste in Fachsprache
+*Form:* Vom Grundgerüst für Gherkin (TASK-119) liegen unter `backend/tests/akzeptanz/` der Pilot (`testfaelle/TASK-119_pilot.feature`) und die Selbstprüfungen (`selbstpruefung/`); es fehlt der Ordner `fachsprache/` mit Schritten und Treibern für Backlog-Dateien. Für TASK-116 gibt es daher keine `.feature`-Datei, sondern Fachsprache-Testfälle in den Beschreibungen von pytest-Tests mit Ausführungsangabe (Näheres im Abschnitt „Tests geschrieben“). *Vier-Schichten-Modell:* (1) Testfälle: unten, eingefroren durch den Test-Agenten; (2) Fachsprache: wenige neue Schritte, z. B. „Ein Backlog mit fremdem Text unter einem Ticket liegt vor", „Das Werkzeug verschiebt den Text", „Das Archiv endet mit dem Anhang"; (3) Treiber: ruft das Werkzeug auf Übungsdateien auf und liest die Dateien zurück, legt nie selbst ein Ergebnis fest; (4) System im Test: kleine, feste, künstliche Übungsdateien in einem Wegwerf-Ordner (keine Uhrzeit, kein Wetter, kein Netz, nie das echte Backlog). Alle automatischen Fälle laufen auch bei GitHub (Linux, Python 3.12). Erwartete Werte kommen aus der Übungsdatei, die der Test selbst aufbaut (Zeilen- und Zeichenzahl von Hand gezählt), nicht aus dem Werkzeug.
+
+| ID | AK | Testfall (Fachsprache) | Ausführung |
+|---|---|---|---|
+| TF-01 | AK1 | *Angenommen* ein Übungsbacklog mit einem Ticket, dessen eigener Text mit „Quelle" und Trennstrich endet, und darunter drei fremde Abschnitte. *Wenn* das Werkzeug ausführt. *Dann* endet der Backlog mit dem Trennstrich des Tickets; kein Zeichen der fremden Abschnitte steht mehr darin. | automatisch, Übungsdateien |
+| TF-02 | AK2 | *Angenommen* dasselbe Übungsbacklog (erwartete Prüfsumme vorher von Hand berechnet). *Wenn* verschoben wurde. *Dann* ist die Prüfsumme des Anhangs im Archiv gleich der von vorher. *Gegenprobe:* Ein absichtlich verändertes Zeichen im Anhang lässt die Prüfung Rot melden. | automatisch |
+| TF-03 | AK3 | *Angenommen* Übungsdateien mit bekannter Zeilen- und Zeichenzahl (z. B. 40+80 Zeilen). *Wenn* verschoben wurde. *Dann* ist die Summe nachher gleich vorher plus der gemeldeten Anzahl ergänzter Kopf-/Hinweis-/Listenzeilen. | automatisch |
+| TF-04 | AK4 | *Angenommen* Übungsdateien mit fünf weiteren Tickets im Backlog und drei im Archiv. *Wenn* verschoben wurde. *Dann* sind alle acht Ticketblöcke Zeichen für Zeichen unverändert. *Gegenprobe:* Wird in der Übung ein anderer Block absichtlich verändert, meldet die Prüfung Rot. | automatisch |
+| TF-05 | AK5 | *Angenommen* Übungsdateien mit 8 Tickets. *Wenn* verschoben wurde. *Dann* zählt die Prüfung weiterhin 8 Tickets, keine doppelte Nummer, 0 Fehler, 0 Warnungen. *Gegenprobe:* Ein absichtlich doppelter Ticketkopf macht die Prüfung Rot. | automatisch |
+| TF-06 | AK6 | *Angenommen* ein Übungstext mit drei Abschnitten: einer nennt „TASK-901", einer nennt keine Ticketnummer, einer nennt „TASK-902" nur als Verweis. *Wenn* verschoben wurde. *Dann* listet die Zuordnungsliste alle drei Abschnitte mit ihren genannten Nummern, kennzeichnet nur den ersten als „zugeordnet", die übrigen als „Einschätzung" oder „nicht zugeordnet", und trägt den Vermerk „nicht bestätigt". | automatisch |
+| TF-07 | AK7 | *Angenommen* Übungsdateien. *Wenn* das Werkzeug ausführt. *Dann* liegen vor der ersten Änderung zwei Sicherungskopien mit Zeitstempel im Namen und gleicher Prüfsumme wie die Originale; das Werkzeug löscht keine Sicherung (auch nicht ältere). | automatisch |
+| TF-08 | AK8 | *Angenommen* Übungsdateien mit Tickets in verschiedenen Spalten, darunter zwei Archivtickets ohne Status-Feld. *Wenn* verschoben wurde. *Dann* steht jede Karte in derselben Spalte wie vorher; die Karte des Ausgangstickets zeigt nur ihre Beschreibung. *Gegenprobe:* Wechselt in der Probe eine Karte die Spalte, meldet die Messung Rot. | automatisch |
+| TF-09 | AK9 | *Angenommen* die Übungsdatei des Backlogs wird zwischen Prüfung und Schreiben von außen um eine Zeile ergänzt. *Wenn* das Werkzeug schreiben will. *Dann* schreibt es nichts, beide Dateien sind byte-gleich zum Zustand nach der fremden Ergänzung, und die Meldung nennt die Veränderung. | automatisch (Veränderung zwischen den Schritten simuliert) |
+| TF-10 | AK10 | *Angenommen* verschoben wurde. *Wenn* die Sicherungen zurückgespielt werden. *Dann* haben beide Dateien wieder die Prüfsummen von vorher. | automatisch |
+| TF-11 | AK11 | Vier Einzelfälle, jeweils *Dann* beide Dateien unverändert und Meldung mit Grund: (a) der fremde Text fehlt ganz; (b) er kommt zweimal vor; (c) eine Zeile des Textes weicht von der erwarteten Prüfsumme ab — Meldung nennt die Nummer der ersten abweichenden Zeile, nicht deren Inhalt; (d) das Archiv ist schreibgeschützt. | automatisch (d: wo der Schreibschutz technisch nicht herstellbar ist, mit nicht anlegbarer Sicherung als Ersatz und im Protokoll benannt) |
+| TF-12 | AK12 | *Angenommen* eine Übung mit einem zweiten verwaisten Abschnitt (Ticket-Kopf nur im Archiv, Körper im Backlog) hinter einem anderen Ticket. *Wenn* der Bericht läuft. *Dann* wird der Fund mit Fundstelle gemeldet und nicht verschoben. *Und* in einer Übung ohne weiteren Fund meldet der Bericht „0". | automatisch |
+| TF-13 | AK13 | *Angenommen* dasselbe Übungsbacklog, aber mit 300 zusätzlichen Zeilen weiter oben. *Wenn* verschoben wird. *Dann* wird derselbe Text gefunden und verschoben, ohne dass eine Zeilennummer angegeben wurde. | automatisch |
+| TF-14 | AK14 | *Angenommen* der Vorgang wird nach dem Schreiben des Archivs, vor dem Kürzen des Backlogs abgebrochen. *Dann* steht der Text im Archiv **und** noch im Backlog (nie in keiner); das Archiv ist vollständig und lesbar. Zweiter Fall: Abbruch vor dem ersten Schreiben → beide Dateien unverändert. | automatisch (Abbruch an festen Stellen simuliert) |
+| TF-15 | AK15 | *Angenommen* verschoben wurde. *Wenn* das Werkzeug erneut läuft. *Dann* meldet es „bereits erledigt" und beide Dateien bleiben byte-gleich. *Und* nach dem Abbruch aus TF-14 kürzt der nächste Lauf nur den Backlog, ohne zweiten Anhang; das Archiv enthält genau einen Anhang. | automatisch |
+| TF-16 | AK16 | *Angenommen* verschoben wurde. *Dann* beginnt der Anhang mit Überschrift (Datum, Herkunft TASK-116), nennt Zeilenzahl, Prüfsumme, „unverändert übernommen", „Zuordnung ist Einschätzung" und die Warnung zu TASK-110, und endet mit einer Endemarke; der Text zwischen Kopf und Endemarke hat die Prüfsumme von vorher. | automatisch |
+| TF-17 | AK17 | *Angenommen* Übungsdateien in den drei Zuständen „noch zu tun", „Zwischenzustand", „erledigt". *Wenn* nur geprüft wird. *Dann* nennt das Werkzeug den richtigen Zustand mit allen Messwerten, und beide Dateien sind danach byte-gleich zu vorher; das Format der Ausgabe ist vor und nach dem Verschieben dasselbe. | automatisch |
+| TF-18 | AK18 | *Angenommen* ein Übungstext enthält eine Zeile mit einem Wort wie „Passwort: abc123xyz". *Wenn* das Werkzeug verschiebt, prüft und bei einer Abweichung abbricht. *Dann* kommt „abc123xyz" in keiner Ausgabe und in keinem Protokoll vor. | automatisch |
+| TF-19 | AK19 | *Angenommen* ein Übungstext enthält eine Zeile, die wie ein Ticket-Kopf aussieht. *Wenn* das Werkzeug ausführt. *Dann* bricht es vor jeder Änderung ab, nennt die Zeilennummer, beide Dateien unverändert. | automatisch |
+| TF-20 | AK5, AK8 | *Angenommen* die Übungsdateien nach dem Verschieben. *Wenn* die echte Backlog-Prüfung und die echte Spaltenregel des Boards auf sie angewandt werden. *Dann* melden beide dasselbe wie vor dem Verschieben (Brücke zu den echten Regeln, nicht nur zu einer Nachbildung). | automatisch, Übungsdateien |
+| TF-21 | AK2, AK3, AK5, AK13 | *Angenommen* eine Kopie der echten Dateien von heute. *Wenn* das Werkzeug an der Kopie ausführt. *Dann* wandern genau 554 Zeilen mit 78.657 Zeichen und der Prüfsumme `f0bae246229e6b136aa9d62c4ca25915`; Ticketzahl vorher = nachher; Backlog-Prüfung 0 Fehler, 0 Warnungen. | Nachweis bei der Umsetzung an Kopie, protokolliert (nie im Dauer-Testlauf, nie am Original) |
+
+##### Pre-Mortem (Zusammenfassung; Einzelszenarien oben)
+Hauptrisiken: Datenverlust beim Schreiben (💀1, 💀10), paralleler Schreiber (💀2), Archiv später überschrieben (💀3, 💀8), Kanban-Spalten kippen (💀4), falsche Zuordnung (💀5), veraltete Zeilennummern (💀9), Test-Isolation (💀11), stille Textänderung (💀12), ungewollte Karte (💀13). Jede Gegenmaßnahme ist AK oder Testfall (siehe Verweise).
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt (Regeln: Text unverändert; nichts geht verloren; Board und Zählungen bleiben gleich; Wiederholung und Abbruch sind sicher; Zuordnung ehrlich).
+- [x] Fundstellen-Sweep: Suchmuster „## " außerhalb der Spurenüberschriften (48 Treffer, 7.747 Zeilen) und „### <ID> ·" im verschobenen Text (0 Treffer); „Echter pip-audit-Lauf" kommt nur im Backlog, in 12 Sicherungen und einem versteckten Überbleibsel vor. Die Prüfung weiterer verwaister Abschnitte ist AK12.
+- [x] Zustands-Check: Warte-/Leer-/Fehlerfall siehe Zustands-Check oben und AK9, AK11, AK14, AK15.
+- [x] Pre-Mortem durchgeführt (13 Szenarien).
+- [x] Architektur analysiert: betroffen sind nur die beiden Backlog-Dateien und ein neues Werkzeug; Backlog-Prüfung und Kanban-Erzeugung werden nur gelesen.
+- [x] Designer-Check: nicht sichtbar in der App — übersprungen.
+- [x] Optionen: A / B / C — **A entschieden von Stephan am 2026-10-24**.
+- [x] Alle Fragen entschieden (2), Datum je Frage in der Entscheidungstabelle.
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): siehe unten.
+
+##### AK-Qualitäts-Check
+1. **Granularität:** 19 AKs, je ein prüfbares Verhalten; das frühere Sammel-AK zum Fundort/Abbruch/Wiederholung ist in AK13–AK15 aufgeteilt.
+2. **Polarität:** AK2 (Gegenprobe verändertes Zeichen), AK4, AK5, AK8 (Gegenproben bei bestehendem Verhalten), AK9, AK11, AK19 sind die Gegenstücke zur Verlust-Regel.
+3. **Messbarkeit:** Prüfsumme, Zeilen-/Zeichensumme, Ticketzahl, Spaltenvergleich, 0 Fehler/0 Warnungen — alles Zahlen; kein AK nennt Funktions- oder Dateinamen.
+4. **Vier Kategorien:** funktional AK1–AK6, AK12–AK17; nicht-funktional (Leistung nicht relevant, Sicherheit AK18, Zugänglichkeit nicht relevant); Architektur/Abwärtskompatibilität AK5, AK8, AK19; Sonstige (Protokoll/Betriebsübergabe AK3, AK7, AK17).
+5. **Testbarkeit:** jedes AK hat mindestens einen Testfall (TF-01 bis TF-21), jeder Testfall nennt sein AK; Rot-Nachweis: das Werkzeug existiert heute nicht, alle neuen Tests scheitern, weil das Verhalten fehlt. Bei bestehendem Verhalten (AK5/AK8 Backlog-Prüfung und Spaltenregel) sind Gegenproben mit absichtlich falscher Erwartung vorgesehen.
+6. **Herkunft:** alle AKs aus Pre-Mortem, Entscheidung oder Festlegung tragen einen Herkunftsvermerk.
+7. **Nicht-Ziele und erlaubte Bereiche:** konkret (je Datei mit Art), Tabu-Liste nennt Backend-Hauptdatei und Weboberfläche.
+8. **Entscheidungen:** beide Fragen mit Datum entschieden, keine offene Annahme; alle übrigen Punkte als technische Festlegung mit Grund.
+9. **Geheimnisse:** AK18 und TF-18; der Text enthält nach Nachmessung keine Zugangsdaten.
+- **Negativ-/Randfall-Checkliste:** *Grenzwerte* — Text am Dateiende ohne Schlusszeilenumbruch und Archiv ohne Schlusszeilenumbruch: von AK2/AK11/TF-02 mitgedeckt (Prüfsumme über Bytes). *Ungültige Eingaben* — Text fehlt/doppelt/abweichend: AK11. *Nebenläufigkeit* — gleichzeitige Schreibzugriffe: AK9. *Lastgrenzen* — nicht zutreffend (einmalig, unter 4 MB). *Leerer/übervoller Zustand* — keine weiteren Funde: AK12 „0"; leeres Archiv-Ende: durch AK16 abgedeckt. *Berechtigungen* — Datei nicht beschreibbar: AK11. *Abwärtskompatibilität* — AK5, AK8, AK19. *Rollback/Wiederanlauf* — AK10, AK14, AK15. *Beobachtbarkeit im Fehlerfall* — AK11, AK17.
+- [x] **AK-Qualitäts-Check durchgeführt:** 19 AKs, 21 Testfälle, jedes AK abgedeckt; neue Lücken der Fassung vom 23.10. geschlossen (veraltete Zeilennummern, Abbruch mitten im Schreiben, Wiederholung, Test-Isolation, Ticket-Kopf-ähnliche Zeile, Aufbewahrung der Sicherung bis TASK-110); Rot-Nachweis beschrieben, nicht ausgeführt (kein Code in der Analyse).
+
+##### Testplan
+- [ ] **Test-Agent (vor der Umsetzung):** TF-01 bis TF-20 als automatische Tests an Übungsdateien (Marker `offline`, `regression`), Testdatei neu unter `backend/tests/`; Rot-Nachweis je Test; Eintrag in `backend/tests/README.md`.
+- [ ] **Nachweis bei der Umsetzung (Umsetzer, an Kopie der echten Dateien, protokolliert im Ticket):** TF-21; danach das echte Verschieben mit Vorher-/Nachher-Messung (AK2, AK3, AK5, AK8, AK12) und Ergebnis im Ticket.
+- [ ] **Regression:** vollständige Backend-Suite; Regressions-Matrix `PRODUCT.md` §12: keine App-Bereiche betroffen (nur Dokumentationsdateien und ein Werkzeug); zusätzlich Backlog-Prüfung 0/0 und Board-Zählung unverändert. Browser-Durchlauf nicht nötig (keine Oberflächenänderung).
+- [ ] **Kanban:** Sync nur durch den Hauptthread nach Statuswechseln.
+
+**Status (2026-10-24):** Spec fertig, Tests stehen aus — keine Frage offen.
+
+##### 🧊 Tests geschrieben (Test-Agent, 2026-10-24) — warten auf automatische Test-Prüfung
+**Vermerk:** Tests geschrieben, warten auf automatische Test-Prüfung (Phase 4 macht ein anderer Agent). Status bleibt „In Analysis“.
+- **Neue Testdatei (1):** `backend/tests/test_task116_backlog_verschieben.py` — 37 Tests (zweiter Versuch nach Modus T, 2026-10-26), Marker `offline`, `regression`, `requires_full_checkout`. Eintrag in `backend/tests/README.md` (Marker-Tabelle) ergänzt. Keine neuen Fachsprache-Schritte, keine Treiber, kein Werkzeug gebaut. **Zum Fachsprache-Grundgerüst (genauer als zuvor):** unter `backend/tests/akzeptanz/` liegen schon die Ordner `testfaelle/` (mit der Pilot-Datei `TASK-119_pilot.feature`) und `selbstpruefung/` (Wächter und Prüfungen des Pilots aus TASK-119). Es fehlt der Ordner `fachsprache/` mit Schritten und Treibern für Backlog-Dateien. Für TASK-116 gilt deshalb: Gherkin-Testfälle (`.feature`) werden nicht verwendet, weil es keinen Schritt und keinen Treiber für „Backlog verschieben“ gibt und der Test-Agent keine Treiber schreibt; die Testfälle stehen als Fachsprache in den Beschreibungen der pytest-Tests. Der Wächter gegen Bedienbegriffe und gegen still verschwundene Schritte betrifft nur `.feature`-Dateien und damit diese Tests nicht; die Beschreibungen wurden von Hand auf Bedienbegriffe geprüft (keine Klicks, Webadressen, Knopf- oder CSS-Namen; Datei-, Modus- und Schlüsselnamen stehen nur im Schnittstellen-Block am Dateianfang, der das Werkzeug beschreibt).
+- **Fingerabdruck der neuen Testdatei (SHA-256), gültig seit 2026-10-27:** `f2db1415ee47e77fdaf469b32588c0f3a6d9a8af34a0c3b7387c930a3ee61d35` (Freigabe Stephan 2026-10-27: Ziffern im Ausgabe-Schlüssel-Parser der Testhilfe `lauf()` erlaubt; TF-08 Körperprüfung der Karte präzisiert, ohne Prüfstärke zu senken). *Überholt (Stand 2026-10-26, nicht mehr verwenden):* `2233215d5d5dd6715f3f52f0c6ae82815bcfc8824900a97584b646c78cd6d306`. *Überholt (erster Stand vom 2026-10-24, 34 Tests, nicht mehr verwenden):* `4b2a31104a2369d5d8c1e94c66fba5c9d8ff6707b76c5572e2073868ebbf67e0`. Fingerabdrücke neuer Fachsprache-Schritte: keine (es gibt keine).
+- **Bestehende Tests unverändert:** Prüfsummenliste aller 172 bestehenden Dateien unter `backend/tests/` plus `pytest.ini` und `conftest.py` (174 Zeilen) vorher/nachher verglichen (`_to_delete/pruefsummen_TASK-116_vorher.txt`, `…_nachher2.txt` vom 2026-10-26): einziger Unterschied außer der neuen Datei ist `README.md` (Zeile für die neue Testdatei ergänzt, wie in der Spec erlaubt).
+- **Zuordnung Kriterium → Test:** AK1 TF-01 · AK2 TF-02 (2 Läufe + Gegenprobe) · AK3 TF-03 · AK4 TF-04 (+ Gegenprobe) · AK5 TF-05 (+ Gegenprobe), TF-20a · AK6 TF-06 (4 Abschnitte, Textzeilen-Spalte) · AK7 TF-07 (mit Prüfsummen im Protokoll) · AK8 TF-08 (+ Gegenprobe), TF-20b · AK9 TF-09 · AK10 TF-10 · AK11 TF-11a–g (a Text fehlt, b mehrfach, c abweichende Zeile, d Archiv nicht beschreibbar, e abweichende Zeilenzahl, f abweichende Prüfsumme, g Backlog nicht beschreibbar) · AK12 TF-12 (2) · AK13 TF-13 · AK14 TF-14 (2) · AK15 TF-15 (2) · AK16 TF-16 (Zeilenzahl und Prüfsumme in festen Kopfzeilen „Zeilen: N“ / „Prüfsumme (MD5): X“) · AK17 TF-17 (3 Zustände) · AK18 TF-18 · AK19 TF-19. TF-20 steht in zwei Tests (AK5 und AK8), weil jeder Test zu genau einem Kriterium gehört.
+- **Rot-Nachweis (2026-10-26, zweiter Versuch):** alle 37 Tests rot, Ursache bei jedem: „Werkzeug fehlt noch: backlog_verschieben.py gibt es noch nicht“ (Verhalten fehlt, kein Testfehler). Die Übungswelt selbst ist gültig: vor dem ersten Werkzeug-Aufruf bestehen die Vorbedingungen mit der echten Backlog-Prüfung (21 Tickets, 0 Fehler, 0 Warnungen) und der echten Spaltenregel des Boards (Spalten von Hand erwartet). Dieselben 37 roten Ergebnisse im frischen Abbild des GitHub-Standes (Kopie nach `~/ci_t116`, Python 3.10 hier, GitHub nutzt 3.12): keine lokalen Dateien, keine Uhrzeit und kein Kalenderdatum relativ zur echten Uhr in den Tests.
+- **Schnittstelle des Werkzeugs — VERBINDLICH für den Umsetzer (Festlegung 2026-10-26):** Werkzeug `tools/backlog_verschieben.py` mit `--backlog`, `--archiv`, `--ticket`, `--sicherung` und genau einem Modus `--pruefen` (schreibt nichts), `--ausfuehren`, `--nachweis` (mit `--vorher-backlog`/`--vorher-archiv`) oder `--bericht`; Zusätze `--erwartet-md5`, `--erwartet-zeilen`, `--erwartet-text`. Ausgabe als „SCHLÜSSEL=Wert“-Zeilen, nie Zeileninhalte; Schlüssel u. a. `ZUSTAND`, `ERGEBNIS`, `GRUND`, `TEXT_ZEILEN`, `TEXT_ZEICHEN`, `TEXT_MD5`, `TICKETS`, `SUMME_ZEILEN`, `SUMME_ZEICHEN`, `ERGAENZTE_ZEILEN`, `ERGAENZTE_ZEICHEN`, `SICHERUNG_BACKLOG_MD5`, `SICHERUNG_ARCHIV_MD5`, `ABWEICHENDE_ZEILE`, `KOPFARTIGE_ZEILE`, `NACHWEIS`, `VERWAISTE_ABSCHNITTE`, `FUND`. Anhang im Archiv mit den Marken `<!-- TASK-116-ANHANG-BEGINN -->`, `<!-- TASK-116-TEXT-BEGINN -->`, `<!-- TASK-116-TEXT-ENDE -->`, `<!-- TASK-116-ANHANG-ENDE -->`; Kopf mit festen Zeilen „Zeilen: N“ und „Prüfsumme (MD5): X“ und der Zuordnungstabelle `| Textzeilen | Überschrift | Genannte Tickets | Einschätzung |`. **Prüfhaken `T116_ABBRUCH_NACH` (`sicherung`/`archiv`, Rückgabewert 99) und `T116_HAKEN_NACH_PRUEFUNG` (Skript zwischen Prüfung und Schreiben) sind bewusst im Werkzeug vorgesehen**, damit Abbruch (AK14, AK15) und fremder Schreiber (AK9) ohne Eingriff in die echten Dateien prüfbar sind; sie bleiben im Werkzeug und ändern ohne diese Umgebungsvariablen nichts. Der Umsetzer baut das Werkzeug genau so und ändert die Tests nie. Hält er eine Abweichung der Schnittstelle für nötig, meldet er das, und Stephan entscheidet. Einzelheiten im Kopf der Testdatei.
+- **Nur geschrieben, nicht gegen eine Umsetzung ausgeführt:** der grüne Weg aller 37 Tests (es gibt noch kein Werkzeug). **Spätere Prüfung (wer/wann/wie):** TF-21 — Umsetzer, einmalig an einer Kopie der echten Dateien, Ergebnis ins Ticket (554 Zeilen, 78.657 Zeichen, Prüfsumme `f0bae246229e6b136aa9d62c4ca25915`, Ticketzahl vorher = nachher, 0 Fehler / 0 Warnungen).
+- **Modus T bestätigt 2026-10-26** (gate-auditor, frischer unabhängiger Prüfer, zweiter Lauf): alle 19 Kriterien haben mindestens einen Test, kein Test ohne Kriterium (TF-21 bewusst später an Kopie); alle 37 Tests selbst ausgeführt und rot, einzige Ursache „Werkzeug fehlt noch“; bestehende Tests laut Prüfsummen vorher/nachher2 unverändert (nur neue Testdatei und README.md); SHA-256 der Testdatei neu berechnet und gleich `2233215d5d5dd6715f3f52f0c6ae82815bcfc8824900a97584b646c78cd6d306`. Testfälle dürfen eingefroren werden.
+- **Modus T erneut bestätigt 2026-10-27, Fingerabdruck f2db1415…** (gate-auditor, frischer unabhängiger Prüfer, dritter Lauf; voller Wert `f2db1415ee47e77fdaf469b32588c0f3a6d9a8af34a0c3b7387c930a3ee61d35`): Prüfsumme selbst neu berechnet und gleich; Unterschied zur Fassung vom 2026-10-26 (Prüfsumme `2233215d…`) sind genau die zwei freigegebenen Änderungen (Ziffern im Parser `lauf()`, TF-08 Körperprüfung präzisiert, ohne Prüfung zu entfernen oder zu lockern); alle 37 Tests selbst ausgeführt, 37/37 grün; Werkzeug unverändert (27303 Bytes, 2026-10-26 20:43); Gegenprobe mit Stub („ok“) scheitert weiter (34 von 37 rot); Backlog-Prüfung 0 Fehler, 0 Warnungen.
+- **Umfangsprüfung (Modus U) bestätigt 2026-10-27** (gate-auditor, frischer unabhängiger Prüfer, Vergleich gegen `_worktrees/TASK-116/`, ohne Git): Neu sind genau `tools/backlog_verschieben.py` (alle Teile ordnen sich AK1–AK19 zu), die zwei freigegebenen Korrekturen der Testdatei (Fingerabdruck `f2db1415…` stimmt) und die README-Zeile; `lint_backlog.py`, `gen_kanban.py`, `split_backlog.py`, `sync_kanban.py` per Prüfsumme unverändert; keine Löschungen; BACKLOG-ARCHIVE.md unverändert; der verwaiste Text steht noch unverändert am Dateiende von BACKLOG.md (554 Zeilen, Prüfsumme `f0bae246…`), der echte Lauf wartet auf Stephans Freigabe.
+- **Echter Lauf auf dem Backlog (2026-10-27, Freigabe Stephan „ja“, ausgeführt von Claude):** 554 Zeilen (MD5 f0bae246229e6b136aa9d62c4ca25915) vom Ende der BACKLOG.md ins Archiv-Ende verschoben (Archiv 28.970 → 29.564 Zeilen, Backlog 10.669 → 10.115). Vorher/nachher: 376 Tickets, 0 doppelte IDs, Backlog-Prüfung 0 Fehler/0 Warnungen, Board-Spalten aller 376 Tickets identisch, Nachweis grün, zweiter Lauf meldet „erledigt“. Sicherungen: `_to_delete/BACKLOG.vor_task116_2026-10-27-0905.md` und `BACKLOG-ARCHIVE.vor_task116_2026-10-27-0905.md`. Noch offen: Veröffentlichung, Live-Gang, Done, Retro. Hinweis: Archiv nicht mit split_backlog neu auslagern, bis TASK-110 gebaut ist.
+
+---
+
+### TASK-117 · Probelauf vor dem Hochladen: Release prüft lokal genau wie GitHub und bricht bei Rot vor dem Hochladen ab `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Progress |
+| **Erstellt** | 2026-10-23 |
+
+**Beschreibung:** Wenn Stephan eine neue Version veröffentlicht, laufen vor dem Hochladen auf seinem Mac genau dieselben Prüfungen wie danach bei GitHub (dieselben Tests einschließlich des automatischen Oberflächen-Checks, dieselbe Python-Version), und zwar auf genau der Fassung, die hochgeladen wird. Ist auch nur eine Prüfung rot, bricht der Vorgang ab, bevor etwas hochgeladen wird, und sagt klar, was rot ist. Das ist der einzige Weg zu einem Release: Es gibt keine eigenen Einmal-Skripte pro Ticket mehr, Stephan startet nur noch einen festen Befehl und muss selbst nichts prüfen (Entscheidung Option A, 23.10.2026). Warum: Releases scheitern oft, weil Tests erst online rot werden — 7 der letzten 40 Änderungen waren Nachbesserungen oder Reparaturen der Online-Prüfung, im Aufräumordner liegen 14 Einmal-Skripte.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich, dass ein Release schon auf meinem Mac abbricht, wenn die Online-Prüfung rot werden würde, sodass ich nur noch einen festen Befehl starte und keine Nachbesserungs-Releases mehr nötig sind.
+
+**Bezug:** Zielbild `QUALITAETS-PIPELINE.md` (Abschnitt 3, Phase 2 Schritte 6–7; Abschnitt 4 „Probelauf im Release-Skript"; Abschnitt 5 Option A; Abschnitt 6 Baustein 1). Verwandt: **TASK-112** *(Inbox — Release-Befehl gegen Doppelausführung + Vorschau der mitveröffentlichten Änderungen; gleicher Befehl, anderes Symptom → bei Umsetzung zusammen prüfen, Merge-Kandidat)*, **TASK-98**, **TASK-88** *(Done — frühere Härtungen desselben Release-Befehls)*, **TASK-64**, **TASK-21**, **BUG-100** *(Done — Inhalt der Online-Prüfung, die der Probelauf nachbilden muss)*, **TASK-97**, **BUG-79** *(Done — online rot, lokal nicht; genau die Fehlerklasse, gegen die das Ticket wirkt)*. Nachgelagert: **TASK-119** (Akzeptanztest-Grundgerüst läuft dann im Probelauf mit), **TASK-118** (Live-Check nach dem Veröffentlichen).
+
+---
+
+
+#### 🔬 Analyse & Spec (TASK-117, inkl. TASK-112) · 2026-10-24
+
+> **Grundlage:** Analyse-Entwurf `docs/analyse-entwurf/TASK-117_TASK-112.md` (2026-10-23) + **Entscheidungen Stephan vom 24.10.2026** (verbindlich, gehen jeder abweichenden Aussage im Entwurf vor) + Zielbild `QUALITAETS-PIPELINE.md`.
+> **Status-Empfehlung:** In Analysis — Testfälle stehen, die Tests selbst schreibt der Test-Agent (Phase 1, Schritt 4) noch.
+
+##### Bezug: TASK-112 ist in TASK-117 aufgegangen
+**TASK-112** („release.sh gegen Doppelausführung absichern und mitveröffentlichte Commits anzeigen") ist laut Entscheidung Stephan vom **24.10.2026** in TASK-117 aufgegangen. Abdeckung: TASK-112 Punkt 1 (Abbruch bei „nichts Neues") → **AK18**, zusätzlich **AK19** (Doppelstart während des Laufs); TASK-112 Punkt 2 (Vorschau der mitveröffentlichten Änderungen) → **AK17**. Die Ja/Nein-Frage, an die TASK-112 die Vorschau andocken wollte, entfällt (Entscheidung 3, → **AK28**). TASK-112 wird mit Verweis auf TASK-117 geschlossen (Statuswechsel macht der Hauptthread).
+
+##### Kernbefund in Alltagssprache
+Der heutige Release-Befehl lädt hoch, ohne vorher irgendetwas zu prüfen, und nimmt nur die Versionsnummer mit — die eigentlichen Ticket-Änderungen brauchen deshalb ein zweites Hochladen und oft ein Einmal-Skript (14 Stück im Aufräumordner). Künftig gibt es **einen** festen Befehl: Er zeigt, was live geht, prüft auf einer sauberen Kopie genau dieser Fassung dasselbe wie GitHub und lädt nur bei Grün hoch — Ticket-Änderungen und Versionsnummer gemeinsam in einem einzigen Upload.
+
+##### Entscheidungen Stephan (24.10.2026) — eingearbeitet
+| # | Entscheidung | Eingearbeitet in |
+|---|---|---|
+| 1 | Ticket-Änderungen + neue Versionsnummer gehen **gemeinsam in einem Upload** hinaus — genau die vorher als zum Ticket gehörig aufgelisteten Dateien, sonst nichts | AK22, AK23, AK25 |
+| 2 | Auch reine Backend- oder Doku-Änderungen laufen **immer** über denselben Befehl mit Probelauf; neue Versionsnummer nur, wenn sich mehr als Doku ändert | AK26, AK27 |
+| 3 | **Keine Ja/Nein-Rückfrage** mehr; der Befehl zeigt die Liste und bricht bei Fremdem selbst ab | AK17, AK23, AK24, AK28 |
+| 4 | Probelauf darf **bis zu 10 Minuten** dauern; tatsächliche Dauer wird bei der Umsetzung gemessen und Stephan gemeldet | AK13, AK14 |
+| 5 | GitHub-Prüfung darf **eng begrenzt** angepasst werden: gemeinsame Prüfliste + dieselbe feste Browser-Werkzeug-Version; Prüfinhalte unverändert | AK10, AK11, Nicht-Ziele |
+| 6 | Git **nur** in Wegwerf-Übungsablagen außerhalb des Projekts für Tests dieses Befehls; diese werden nach jedem Testlauf automatisch gelöscht, auch bei Abbruch/Fehlschlag; im echten Projekt bleibt Git tabu | AK32, AK33 |
+| — | Merge TASK-112 → TASK-117; Option A bestätigt (saubere Kopie, leere Daten, Entwicklungsdaten unberührt) | Bezug, AK3–AK5, Optionen |
+
+##### Scope
+**Eingeschlossen:** Umbau des festen Release-Befehls (Vorab-Prüfungen, Vorschau, Probelauf auf sauberer Kopie, gemeinsamer Upload, Zurücknehmen bei Rot); eine gemeinsame Prüfliste, die Mac und GitHub aufrufen; feste Browser-Werkzeug-Version auf beiden Seiten; automatische Tests für den Befehl in Wegwerf-Übungsablagen.
+**Ausgeschlossen:** siehe „Nicht-Ziele". *Der Effekt zeigt sich ausschließlich beim Veröffentlichen, nicht in der App.*
+
+##### Akzeptanzkriterien (Alltagssprache, final)
+
+**A · Probelauf vor dem Hochladen**
+- [ ] **AK1** Vor jedem Hochladen laufen auf Stephans Mac dieselben Prüfungen wie bei GitHub: die komplette Backend-Testsuite, der automatische Oberflächen-Check und die drei Browser-Tests.
+- [ ] **AK2** Die Prüfungen laufen mit Python 3.12. Ist auf dem Mac eine andere Version aktiv, bricht der Befehl ab, bevor er irgendetwas verändert, und sagt, welche Version gefunden wurde und welche nötig ist.
+- [ ] **AK3** Geprüft wird genau die Fassung, die hochgeladen wird: Dateien im Arbeitsordner, die nicht mitgehen, laufen im Probelauf nicht mit und können ihn weder rot noch grün machen. *(Herkunft: Entwurf B6)*
+- [ ] **AK4** Jede Datei, die mitgeht, ist im Probelauf enthalten — eine rote mitgehende Testdatei macht den Probelauf rot. *(Polarität zu AK3)*
+- [ ] **AK5** Der Probelauf startet mit leerem Datenbestand wie bei GitHub; Stephans Entwicklungsdaten sind danach unverändert. *(Herkunft: Entwurf B7, Option A bestätigt 24.10.2026)*
+- [ ] **AK6** Ist auch nur eine einzige Prüfung rot, wird nichts hochgeladen.
+- [ ] **AK7** Bei Rot nennt der Befehl, welcher Prüfblock (Backend, Oberflächen-Check oder Browser-Tests) und welcher Test rot war, und wo das vollständige Protokoll liegt.
+- [ ] **AK8** Nach einem roten Probelauf ist alles wie vor dem Start: alte Versionsnummer, nichts eingecheckt, nichts hochgeladen. Ein erneuter Start nach der Reparatur zählt die Versionsnummer genau einmal hoch. *(Herkunft: Pre-Mortem S2, TASK-98-Muster)*
+- [ ] **AK9** Findet der Probelauf keine Tests, oder wird ein ganzer Prüfblock bzw. werden Tests wegen fehlender Werkzeuge (z. B. Browser fehlt) übersprungen, gilt das als rot, nie als grün; die Meldung nennt den Grund. *(Herkunft: Pre-Mortem S3, BUG-100-Muster)*
+- [ ] **AK10** Mac und GitHub prüfen nach derselben gemeinsamen Prüfliste: Wird dort ein Prüfschritt ergänzt, läuft er auf beiden Seiten mit. Welche Tests und Prüfungen GitHub ausführt, bleibt dabei inhaltlich genau wie heute. *(Entscheidung 5)*
+- [ ] **AK11** Mac und GitHub nutzen dieselbe fest eingestellte Version des Browser-Werkzeugs; GitHub installiert nicht mehr „die jeweils neueste". *(Entscheidung 5, Entwurf B8)*
+- [ ] **AK12** Ein auf dem Mac laufender Entwicklungsserver stört den Probelauf nicht und läuft danach unverändert weiter; der Probelauf beendet seinen eigenen Testserver hinterher wieder — auch bei Rot. *(⚠️ Annahme aus Entwurf: eigener Port — bitte bestätigen)*
+- [ ] **AK13** Während des Probelaufs zeigt der Befehl, welcher Prüfblock gerade läuft; am Ende nennt er die Gesamtdauer des Probelaufs.
+- [ ] **AK14** Der Probelauf dauert auf Stephans Mac höchstens 10 Minuten. Die tatsächliche Dauer wird bei der Umsetzung auf dem Mac gemessen, im Ticket festgehalten und Stephan gemeldet. *(Entscheidung 4; Messort: Stephans Mac, nicht die Agenten-Umgebung)*
+- [ ] **AK15** Passwörter und Geheimnisse erscheinen nie im Protokoll oder in der Ausgabe des Befehls — weder bei Grün noch bei Rot noch in mitgeschriebenen Server- oder Testprotokollen. *(Herkunft: Lücke aus dem AK-Qualitäts-Check des Entwurfs)*
+- [ ] **AK16** Die saubere Prüfkopie wird nach dem Probelauf wieder entfernt — bei Grün, Rot und Abbruch; nur das Protokoll bleibt erhalten. *(⚠️ Annahme, abgeleitet aus Aufräum-Pflicht — bitte bestätigen)*
+
+**B · Ein Befehl, nichts Fremdes, nichts doppelt (inkl. TASK-112)**
+- [ ] **AK17** Vor dem Probelauf zeigt der Befehl die vollständige Liste dessen, was live gehen wird (Dateien und noch nicht veröffentlichte Commits), und legt sie im Protokoll ab. *(TASK-112 Punkt 2)*
+- [ ] **AK18** Hat sich seit dem letzten Release nichts geändert, bricht der Befehl mit der Meldung „Nichts Neues zu veröffentlichen" ab — keine neue Version, nichts hochgeladen, kein Deploy. *(TASK-112 Punkt 1)*
+- [ ] **AK19** Wird der Befehl gestartet, während er bereits läuft, bricht der zweite Aufruf sofort ab, ohne etwas zu verändern; der erste läuft ungestört weiter.
+- [ ] **AK20** Hat GitHub einen neueren Stand als der Mac (z. B. durch das automatische Gebäudedaten-Update), bricht der Befehl vor jeder Änderung ab und sagt, dass zuerst geholt werden muss. *(Herkunft: Entwurf B4)*
+- [ ] **AK21** Ist Git auf dem Mac gerade blockiert (Sperrdatei vorhanden), bricht der Befehl vor jeder Änderung ab und sagt das. *(Herkunft: Entwurf B4)*
+- [ ] **AK22** Die Änderungen des Tickets gehen zusammen mit der neuen Versionsnummer in **einem einzigen Upload** hinaus — genau die vorher als zum Ticket gehörig aufgelisteten Dateien, sonst nichts. Ein Ticket ergibt genau einen Deploy. *(Entscheidung 1)*
+- [ ] **AK23** Der Befehl bricht vor jeder Änderung ab und nennt den Grund nur dann, wenn etwas, das nicht zum Ticket gehört, **tatsächlich mit hochgehen würde** – z. B. eine Datei der Ticket-Liste, die zusätzlich Änderungen eines anderen Tickets enthält, oder fremde, schon vorgemerkte Commits. *(Entscheidung 1 + 3, präzisiert durch Stephan am 24.10.2026: „liegen lassen“)*
+- [ ] **AK23a** Dateien im Arbeitsordner, die weder auf der Ticket-Liste stehen noch ausdrücklich ausgeschlossen sind (neue oder geänderte Dateien anderer, unveröffentlichter Arbeit), gehen **nicht** mit und führen **nicht** zum Abbruch; die Vorschau führt sie unter „bleibt hier, wird nicht veröffentlicht“ auf. *(Entscheidung Stephan 24.10.2026, Kriterien-Frage aus dem Test-Agenten)*
+- [ ] **AK23b** Einzige Ausnahme von AK23: Die Ticket-Liste (Backlog) geht immer vollständig mit, auch wenn sie Einträge anderer Tickets enthält; sie führt nie zum Abbruch als „fremd“. Vor dem Hochladen legt **der Release-Befehl selbst** automatisch eine Sicherungskopie der Ticket-Liste an (Ablage wie Orchestrator „BACKLOG-Schutz“). *(Entscheidung Stephan 24.10.2026; Urheber der Kopie technische Festlegung 24.10.2026, Regel 0)*
+- [ ] **AK24** Liegen noch nicht veröffentlichte Commits vor, die nicht zu diesem Release gehören, bricht der Befehl vor jeder Änderung ab und nennt sie. *(Entscheidung 3; Herkunft BUG-113: fremder Zwischen-Commit bei v1.23.1)*
+- [ ] **AK25** Fehlt die Liste der zum Ticket gehörenden Dateien, ist sie leer oder nennt sie eine Datei, die es nicht gibt, bricht der Befehl vor jeder Änderung ab und sagt, was fehlt. *(Herkunft: Zustands-Check Leer-/Fehlerfall)*
+- [ ] **AK26** Auch eine Veröffentlichung, die nur Backend oder nur Doku ändert, läuft über denselben Befehl mit vollständigem Probelauf. Ändert sie ausschließlich Doku, bleibt die Versionsnummer unverändert, und der Befehl sagt das. *(Entscheidung 2)*
+- [ ] **AK27** Ändert eine Veröffentlichung mehr als Doku (z. B. nur Backend, ohne sichtbare App-Änderung), bekommt sie eine neue Versionsnummer. *(Entscheidung 2, Polarität zu AK26)*
+- [ ] **AK28** Der Befehl stellt keine Ja/Nein-Rückfrage mehr. Nach grünem Probelauf lädt er ohne weitere Rückfrage hoch und zeigt am Ende Version (oder „keine neue Version"), die mitveröffentlichten Commits und den Link zur GitHub-Prüfung. *(Entscheidung 3)*
+- [ ] **AK29** Bricht Stephan den Befehl mittendrin ab (Fenster schließen oder Abbruch-Tastenkombination), bleibt nichts halb verändert, und der nächste Start funktioniert normal. *(Herkunft: Zustands-Check, Pre-Mortem S2)*
+- [ ] **AK30** Ist GitHub nicht erreichbar, bricht der Befehl vor jeder Änderung mit einer verständlichen Meldung ab. *(Herkunft: Zustands-Check Fehlerfall)*
+- [ ] **AK31** Was heute schon abgesichert ist, bleibt erhalten: Abbruch bei Merge-Konflikt, Abbruch bei schon vergebener Versionsnummer, vollständiges Zurücksetzen bei gescheitertem Einchecken oder Hochladen, klare Anleitung, falls nur das nachträgliche Versionskennzeichen scheitert. *(Abwärtskompatibilität TASK-88/TASK-98)*
+
+**C · Tests dieses Befehls**
+- [ ] **AK32** Wegwerf-Übungsablagen werden nach jedem Testlauf automatisch gelöscht, auch bei Abbruch oder Fehlschlag. *(Entscheidung 6)*
+- [ ] **AK33** Die Tests dieses Befehls lassen das echte Projekt und das echte GitHub unberührt: Sie verändern nichts im Projektordner, laden nirgends außer in die Wegwerf-Übungsablage hoch, und Git wird ausschließlich in diesen Übungsablagen außerhalb des Projekts benutzt. *(Entscheidung 6, Pre-Mortem S6)*
+
+**Annahmen – Stand 24.10.2026:**
+- ✅ Von Stephan bestätigt (24.10.2026): Als „Doku" (AK26) gelten ausschließlich Markdown-Textdateien (Endung `.md`, z. B. Backlog, Produktbeschreibung, Test-Übersicht). Jede andere geänderte Datei bedeutet „mehr als Doku" → neue Versionsnummer.
+- ✅ Technische Festlegung (24.10.2026, ohne Verhaltenswirkung): Auf dem Mac genügt die lokale Passwortdatei statt der GitHub-Geheimnisse; das Prüfergebnis ist dasselbe.
+- ✅ Technische Festlegung (24.10.2026): Der Probelauf nutzt einen eigenen Port (AK12).
+- ✅ Technische Festlegung (24.10.2026, deckt sich mit Stephans Aufräum-Vorgabe): Prüfkopie wird hinterher entfernt, Protokoll bleibt (AK16).
+- ✅ Technische Festlegung (24.10.2026): Aufruf bleibt in der Form „Art der Version + Kurzbeschreibung"; bei reiner Doku wird die Art ignoriert (AK26).
+
+##### Nicht-Ziele (final)
+- Live-Check nach dem Deploy und automatischer Rücksprung (**TASK-118**).
+- Test-Fingerabdruck / Einfrieren der Tests, auch nicht für den Release-Befehl selbst (Baustein 3); Ausgangskopie für den Prüfer (Baustein 4).
+- Vier-Schichten-Grundgerüst und feste Platzhalter für Uhrzeit, Wetter, Sternendaten (**TASK-119**).
+- **Inhalt der Prüfungen ändern:** keine Tests hinzufügen (außer den Tests dieses Befehls), entfernen, lockern, überspringen oder reparieren — auch nicht den lokal roten Ephemeriden-Test aus Entwurf B6 (falls echt: eigenes Ticket).
+- Geheimnisse, Deploy-Job, Server-Zugang und die Ausnahme für Gebäudedaten-Updates in der GitHub-Prüfung ändern.
+- Server-seitiges Deploy-Skript, Server-Neustart, Rücksprunglogik auf dem Server.
+- App-Code (Oberfläche, Backend), Datenbank, Sicherheitsregeln.
+- Skill-Anpassungen (`fotoalert-release` usw., Baustein 7) — separat als Skill-Paket.
+- Veröffentlichungen ohne Stephans Befehl auslösen (Option B des Zielbilds).
+- Aufräumen der Einmal-Skripte in `_to_delete/`.
+- Git im echten Projekt in der Agenten-Umgebung (Regel 16 bleibt; Ausnahme nur Übungsablagen, Entscheidung 6).
+
+##### Erlaubte Bereiche (final)
+- `FotoAlert/release.sh` — Umbau.
+- **Neu:** eine gemeinsame Prüfliste (ein Skript), die Mac und GitHub aufrufen, unter `FotoAlert/tools/` *(⚠️ Annahme zum Ort; ohne Verhaltenswirkung)*.
+- `.github/workflows/deploy.yml` (Repo-Root) — **nur** (a) Aufruf der gemeinsamen Prüfliste statt der heutigen Einzelschritte in den beiden Prüf-Jobs, (b) feste Version des Browser-Werkzeugs. Geheimnisse, Auslöser, Ausnahme Gebäudedaten, Deploy-Job und Prüfinhalt unverändert.
+- **Neu:** eine feste Ablage für die „Was geht mit"-Liste des Tickets (Form legt die Umsetzung fest; Verhalten durch AK22/AK25 bestimmt).
+- **Neu:** Tests für den Befehl unter `FotoAlert/backend/tests/` (Ort/Form folgt dem Test-Agenten) samt Eintrag in `FotoAlert/backend/tests/README.md` (Pflicht-Übersicht, Entwurf B5).
+- `BACKLOG.md` / `PRODUCT.md` — nur Ticket-Status und Changelog durch die zuständigen Phasen.
+
+##### Testfall-Liste in Fachsprache
+*Ausführung heute (TASK-119 fehlt):* Der echte Befehl läuft in einer **Übungsablage** (Wegwerf-Repo im Temp-Ordner außerhalb des Projekts) mit einem **Wegwerf-GitHub** (lokales Gegenstück) und einer **Platzhalter-Prüfliste**, die auf Wunsch grün, rot, „0 Tests" oder „übersprungen" meldet und protokolliert, welche Dateien sie sah. Fälle mit **echter Prüfliste** (TF-01, TF-05, TF-12, TF-14, TF-16) laufen nur auf Stephans Mac mit echtem Browser. Mac-spezifische Teile des Befehls müssen für Tests, die bei GitHub mitlaufen, auch unter Linux funktionieren (siehe Pre-Mortem S7).
+
+| TF | AK | Testfall (Fachsprache) | Ausführung |
+|---|---|---|---|
+| TF-01 | AK1 | *Sauberer Stand mit Ticket-Änderung* → *Release starten* → *Probelauf meldet* Backend-Testsuite, Oberflächen-Check und Browser-Tests jeweils als gelaufen | Mac, echte Prüfliste, Übungsablage als Kopie des echten Stands; Protokoll auf die drei Blöcke prüfen |
+| TF-02 | AK2 | *Mac hat Python 3.11 aktiv* → *Release starten* → *Abbruch „Python 3.12 nötig, 3.11 gefunden"*, *nichts verändert* | Übungsablage, Platzhalter-Python mit anderer Versionsangabe |
+| TF-03 | AK3 | *Nicht mitgehende rote Testdatei liegt im Arbeitsordner* → *Release starten* → *Probelauf grün*, Datei nicht in der gesehenen Dateiliste | Übungsablage + protokollierende Platzhalter-Prüfliste |
+| TF-04 | AK4 | *Mitgehende rote Testdatei* → *Release starten* → *Probelauf rot*, *nichts auf GitHub angekommen* | wie TF-03 |
+| TF-05 | AK5 | *Entwicklungsdaten mit 319 Orten vorhanden* → *Release starten* → *Probelauf sieht leeren Datenbestand*; *Entwicklungsdaten unverändert* | Mac, echte Prüfliste; Prüfsumme der Entwicklungsdatenbank vorher = nachher; Ortszahl im Probelauf protokolliert = 0 |
+| TF-06 | AK6 | *Prüfliste meldet rot* → *Release starten* → *nichts auf GitHub angekommen* | Übungsablage, Platzhalter „rot"; Stand des Wegwerf-GitHub vorher = nachher |
+| TF-07 | AK7 | *Prüfliste meldet rot im Block Oberflächen-Check, Test X* → *Release starten* → *Meldung nennt Block, Test X und Protokollpfad*; Protokoll existiert dort | Übungsablage, Platzhalter „rot mit Block/Testname" |
+| TF-08 | AK8 | *Prüfliste rot* → *Release starten* → *Versionsnummer alt, nichts eingecheckt* → *Prüfliste grün* → *Release starten* → *Version genau +1* | Übungsablage, Platzhalter umschaltbar |
+| TF-09 | AK9 | *Prüfliste findet keine Tests* → *Release starten* → *als rot gewertet*, Grund genannt | Übungsablage, Platzhalter „0 Tests" |
+| TF-10 | AK9 | *Prüfliste meldet Browser-Tests übersprungen* → *Release starten* → *als rot gewertet*, Grund genannt | Übungsablage, Platzhalter „übersprungen" |
+| TF-11 | AK10 | *Mac-Probelauf und GitHub-Prüfung* → *rufen dieselbe Prüfliste auf*; *GitHub-Prüfliste bekommt Zusatzschritt* → *Mac-Probelauf führt ihn aus* | Dateivergleich der GitHub-Prüfbeschreibung (auch ohne Git in der Sandbox) + Übungsablage mit ergänzter Platzhalter-Prüfliste |
+| TF-12 | AK10 | *Gemeinsame Prüfliste aktiv* → *GitHub-Prüfung läuft* → *dieselben Tests mit derselben Anzahl wie vor dem Umbau* | erster echter Lauf bei GitHub: Testanzahl und Ergebnis je Job gegen den letzten Lauf vor dem Umbau vergleichen |
+| TF-13 | AK11 | *Browser-Werkzeug-Version auf Mac und in GitHub-Prüfung* → *beide gleich und fest eingestellt* | Dateivergleich; Probelauf protokolliert die verwendete Version |
+| TF-14 | AK12 | *Lokaler Entwicklungsserver läuft* → *Release starten* (grün und einmal rot) → *lokaler Server antwortet weiter*, *kein Testserver bleibt übrig* | Mac, echte Prüfliste; Prozessliste vorher/nachher |
+| TF-15 | AK13 | *Release starten* → *Anzeige je laufendem Prüfblock* und *Gesamtdauer am Ende* | Übungsablage, Ausgabe prüfen |
+| TF-16 | AK14 | *Release starten auf aktuellem echten Stand* → *Probelauf-Dauer ≤ 10 min*, Dauer im Ticket notiert und gemeldet | Mac, echte Prüfliste, Messlauf bei der Umsetzung |
+| TF-17 | AK15 | *Passwörter und Geheimnisse mit bekannten Prüfwerten gesetzt* → *Release starten* (grün und rot) → *kein Prüfwert in Ausgabe, Protokoll, Server- und Testprotokollen* | Übungsablage + Platzhalter-Prüfliste, die die Werte nutzt; Volltextsuche nach den Prüfwerten; am Mac zusätzlich mit echter Prüfliste |
+| TF-18 | AK16 | *Release starten* (grün / rot / Abbruch) → *keine Prüfkopie mehr vorhanden*, *Protokoll vorhanden* | Übungsablage, Temp-Ordner vorher/nachher zählen |
+| TF-19 | AK17 | *Zwei Ticket-Dateien und ein unveröffentlichter Ticket-Commit* → *Release starten* → *Liste zeigt genau diese*, *Protokoll enthält sie*, Liste erscheint vor dem Probelauf | Übungsablage |
+| TF-20 | AK18 | *Erfolgreiches Release* → *Release erneut starten* → *„Nichts Neues zu veröffentlichen"*, *keine neue Version*, *nichts auf GitHub angekommen* | Übungsablage |
+| TF-21 | AK19 | *Release läuft* (Platzhalter-Prüfliste wartet) → *Release ein zweites Mal starten* → *zweiter Aufruf bricht sofort ab*, *erster endet normal* | Übungsablage, zwei Aufrufe parallel |
+| TF-22 | AK20 | *GitHub hat einen neueren Stand* → *Release starten* → *Abbruch „erst holen"*, *nichts verändert* | Übungsablage, Zusatz-Commit im Wegwerf-GitHub |
+| TF-23 | AK21 | *Git-Sperrdatei liegt vor* → *Release starten* → *Abbruch mit Hinweis*, *nichts verändert* | Übungsablage |
+| TF-24 | AK22 | *Ticket mit Code-, Test- und Doku-Datei gelistet* → *Release starten* → *auf GitHub genau ein neuer Stand* mit genau diesen Dateien und der neuen Versionsnummer | Übungsablage; Commit-Anzahl und Dateiliste im Wegwerf-GitHub |
+| TF-25 | AK23 | *Datei der Ticket-Liste enthält zusätzlich einen schon eingecheckten Commit eines anderen Tickets* → *Release starten* → *Abbruch, Commit genannt*, *nichts verändert*, *kein Probelauf* | Übungsablage |
+| TF-26 | AK23a | *Fremde, schon vorgemerkte Datei, nicht auf der Ticket-Liste* → *Release starten* → *kein Abbruch*, *Release mit Probelauf*, *die Datei kommt nicht bei GitHub an, bleibt im Arbeitsordner unverändert und erscheint in der Vorschau unter „bleibt hier“* (Klarstellung 24.10.2026 nach Modus T: folgt aus Stephans Entscheidung „liegen lassen“) | Übungsablage |
+| TF-27 | AK24 | *Fremder unveröffentlichter Commit* → *Release starten* → *Abbruch, Commit genannt* | Übungsablage |
+| TF-28 | AK25 | *Ticket-Dateiliste fehlt* / *ist leer* / *nennt nicht vorhandene Datei* → *Release starten* → jeweils *Abbruch mit Hinweis*, *nichts verändert* | Übungsablage, je ein Fall |
+| TF-29 | AK26 | *Nur Doku geändert* → *Release starten* → *Probelauf läuft vollständig*, *auf GitHub angekommen*, *Versionsnummer unverändert*, Meldung „keine neue Version" | Übungsablage |
+| TF-30 | AK27 | *Nur Backend geändert* → *Release starten* → *Versionsnummer +1* | Übungsablage |
+| TF-31 | AK28 | *Prüfliste grün* → *Release starten* ohne Eingabe → *auf GitHub angekommen ohne Rückfrage*; Abschlussmeldung mit Version, Commits, Link | Übungsablage, Eingabe geschlossen (keine Tastatureingabe möglich) |
+| TF-32 | AK29 | *Probelauf läuft* → *Stephan bricht ab* → *Versionsnummer alt, nichts eingecheckt, keine Sperre übrig* → *Release starten* → *läuft normal* | Übungsablage, Abbruchsignal senden |
+| TF-33 | AK30 | *GitHub nicht erreichbar* → *Release starten* → *Abbruch mit Meldung*, *nichts verändert* | Übungsablage, Wegwerf-GitHub nicht erreichbar gemacht |
+| TF-34 | AK31 | *Merge-Konflikt* / *Version schon vergeben* / *Hochladen scheitert* / *Versionskennzeichen scheitert* → jeweils bisheriges Verhalten (Abbruch bzw. Zurücksetzen bzw. Anleitung) | Übungsablage, je ein Fall |
+| TF-35 | AK32 | *Testlauf grün* / *Testlauf mit absichtlich rotem Test* / *Testlauf abgebrochen* → jeweils *keine Übungsablage mehr im Temp-Ordner* | Testsuite des Befehls in den drei Varianten; Temp-Ordner vorher/nachher zählen |
+| TF-37 | AK23a | *Neue und geänderte Dateien anderer Arbeit (nicht gelistet, nicht ausgeschlossen)* → *Release starten* → *kein Abbruch*, *genau ein Upload ohne diese Dateien*, *Dateien unverändert*, *Prüfliste sieht sie nicht*, *Vorschau führt sie unter „bleibt hier, wird nicht veröffentlicht“* | Übungsablage |
+| TF-38 | AK23b | *Backlog mit Einträgen anderer Tickets, nicht auf der Ticket-Liste* → *Release starten* → *kein Abbruch*, *genau ein Upload mit vollständigem Backlog und Ticket-Dateien* | Übungsablage; Sicherungskopie (Ablage laut Orchestrator „BACKLOG-Schutz“) als spätere Prüfung |
+| TF-36 | AK33 | *Testsuite des Befehls läuft* → *Projektordner unverändert* (Prüfsummen vorher = nachher), *echtes GitHub ohne neuen Stand*, *Hochladeziel jedes Testfalls ist die Übungsablage* | Prüfsummenvergleich + Kontrolle des Hochladeziels je Testfall |
+
+Neue Fachsprache-Schritte: *Release starten*, *Prüfliste meldet grün / rot (Block, Test) / 0 Tests / übersprungen*, *GitHub hat neueren Stand*, *GitHub nicht erreichbar*, *Ticket-Dateiliste enthält / fehlt / ist leer*, *fremde Datei geändert / vorgemerkt*, *fremder Commit*, *Versionsnummer ist*, *auf GitHub angekommen*, *Entwicklungsdaten unverändert*, *Stephan bricht ab*, *keine Übungsablage / Prüfkopie mehr vorhanden*, *kein Prüfwert in Ausgabe und Protokoll*.
+
+##### Fundstellen-Sweep & Zustands-Check
+**Fundstellen-Sweep** (aus Entwurf übernommen, dort dokumentiert): `release.sh` einzige feste Release-Stelle; Suche nach dem Befehl in `backend/tests/*.py`: 0 Treffer (keine Tests vorhanden); 14 Einmal-Skripte in `_to_delete/` → Schutzschritte in AK19–AK25; `.github/workflows/deploy.yml` (Vorlage des Probelaufs); `update-building-data.yml` nur über AK20 betroffen; `sync-pull.sh` nicht betroffen (Grund für AK5); Skill `fotoalert-release` → Baustein 7, nicht hier. App-Ansichten (Liste, Karte, Kalender, Scout, Chancen-Übersicht, Event-Detail): nicht betroffen — kein App-Verhalten ändert sich.
+**Zustands-Check:** Vorab-Prüfungen — Warten: sofort · Leer: „Nichts Neues" (AK18), Dateiliste leer (AK25) · Fehler: GitHub nicht erreichbar (AK30), Sperrdatei (AK21). Probelauf — Warten: Fortschritt + Dauer (AK13/AK14) · Leer: 0 Tests = rot (AK9) · Fehler: rot → Abbruch, Zurücknehmen, Meldung (AK6–AK8). Hochladen — Fehler: Zurücksetzen wie heute (AK31). Abbruch durch Stephan (AK29).
+**Prototyp-Regel:** nicht ausgelöst (kein Bedienkonzept der App). **Designer-Check:** nicht nötig (keine sichtbare App-Änderung).
+
+##### Pre-Mortem
+📎 **Code-Verifikation** (Entwurf 2026-10-23, gezielt nachgelesen 2026-10-24): `release.sh` Z. 1–70 und Fehlerpfade Z. 115–201; `.github/workflows/deploy.yml` Z. 1–120.
+- Bestätigt: Der Befehl prüft vor dem Hochladen nichts und fragt heute Ja/Nein (Z. 57).
+- Bestätigt: Versionsersetzung nutzt die Mac-spezifische Form der Textersetzung (Z. 115, 129) → läuft so nicht unter Linux.
+- Bestätigt: Die GitHub-Prüfung übergibt das Test-Passwort als Aufruf-Parameter an den Oberflächen-Check und schreibt das Server-Protokoll in eine Datei; installiert das Browser-Werkzeug ohne feste Version.
+- Bestätigt: Zurücksetzen bei gescheitertem Einchecken/Hochladen und Anleitung bei gescheitertem Versionskennzeichen existieren (Muster für AK8/AK31).
+- Offen (nur auf dem Mac klärbar): ob Chromium auf dem Mac installiert ist; Dauer des Probelaufs; ob der lokal rote Ephemeriden-Test bei GitHub ebenfalls rot wäre.
+- Kein Git ausgeführt, keine Tests ausgeführt (Regel 16).
+
+**Zusammenspiel:** Vorab-Prüfungen (Sperrdatei, läuft schon, GitHub erreichbar/neuer, Dateiliste, Fremdes, „Nichts Neues") → Liste zeigen und protokollieren → Versionsnummer (falls nicht nur Doku) + Ticket-Dateien lokal festschreiben → saubere Kopie genau dieses Stands mit leerem Datenbestand → gemeinsame Prüfliste (Backend, Testserver, Oberflächen-Check, Browser-Tests, Testserver stoppen) → grün: ein Upload + Versionskennzeichen; rot/Abbruch: lokalen Stand vollständig zurücknehmen, Prüfkopie entfernen. Kritische Kombinationen: Abbruch zwischen Festschreiben und Hochladen; Testserver kollidiert mit Stephans Server; Gebäudedaten-Bot schreibt während des Probelaufs auf GitHub (→ Hochladen scheitert → Zurücksetzen nach AK31, Neustart).
+
+- 💀 **S1 Mac und GitHub laufen auseinander.** Auslöser: Prüfschritt nur auf einer Seite ergänzt; Browser-Werkzeug-Version driftet. Frühwarnung: Probelauf grün, GitHub rot. → Gegenmaßnahme: gemeinsame Prüfliste + feste Version (AK10, AK11, TF-11–TF-13).
+- 💀 **S2 Halber Stand nach Rot oder Abbruch.** Auslöser: Version schon festgeschrieben, Zurücknehmen unvollständig → nächster Start zählt doppelt hoch. → AK8, AK29, TF-08, TF-32.
+- 💀 **S3 Falsches Grün.** Auslöser: Browser fehlt, Tests werden still übersprungen (BUG-100-Muster), oder 0 Tests gefunden. → AK9, TF-09, TF-10.
+- 💀 **S4 Umbau der GitHub-Prüfung beschädigt die einzige harte Schranke.** Auslöser: Beim Umstellen auf die gemeinsame Prüfliste fällt ein Test oder Job unbemerkt weg. Frühwarnung: geringere Testanzahl im ersten Lauf. → AK10 (Inhalt unverändert), TF-12 (Testanzahl-Vergleich vor/nach Umbau).
+- 💀 **S5 Releases dauerhaft blockiert.** Auslöser: Mac-spezifisch roter Test (z. B. Ephemeriden-Test aus Entwurf B6), der bei GitHub grün ist → Druck, Tests zu lockern. → Gegenmaßnahme: erster echter Probelauf auf dem aktuellen Stand als Messlauf in der Umsetzung (TF-16); Abweichungen werden eigene Tickets, Testinhalt bleibt Nicht-Ziel; Stephan wird mit Ursache gemeldet (Zielbild Phase 2).
+- 💀 **S6 Tests des Befehls laden ins echte GitHub hoch oder verändern das Projekt.** Auslöser: Übungsablage erbt das echte Hochladeziel, oder Test läuft versehentlich im Projektordner — besonders, weil diese Tests selbst im Probelauf und bei GitHub mitlaufen. → AK33, TF-36; AK32/TF-35 gegen liegengebliebene Übungsablagen.
+- 💀 **S7 Neue Tests machen die GitHub-Prüfung rot.** Auslöser: Mac-spezifische Teile des Befehls laufen unter Linux nicht. → Gegenmaßnahme: Befehl plattformneutral machen oder Tests entsprechend kennzeichnen — Entscheidung in der Umsetzung, aber ohne Test zu überspringen, der bei GitHub laufen soll (AK9-Logik gilt auch hier).
+- 💀 **S8 Geheimnisse im Protokoll.** Auslöser: Protokoll schreibt Aufruf-Parameter oder Umgebung mit; Passwort steht als Parameter im Aufruf. → AK15, TF-17.
+
+**Seiteneffekte:** jeder künftige Release (alle Tickets), Skill `fotoalert-release` (Baustein 7, separat), GitHub-Prüfung (eng begrenzt). App selbst unberührt.
+
+##### Architektur-Analyse (technisch)
+Betroffen: `FotoAlert/release.sh` (Ablauf), `.github/workflows/deploy.yml` (beide Prüf-Jobs: Aufruf der gemeinsamen Prüfliste, feste Browser-Werkzeug-Version), neue Prüfliste unter `FotoAlert/tools/`, Testumgebung (`backend/tests/conftest.py` Datenpfad, `tests/frontend/run_frontend_check.py` Port-/Passwort-Parameter), `backend/requirements.txt` (Browser-Werkzeug dort heute nicht enthalten). Saubere Kopie: eingecheckte Fassung in einen Temp-Ordner auspacken (Git auf dem Mac erlaubt), Python-Umgebung und Ephemeridendatei nur verlinken/kopieren, Datenbank leer. Passwörter: Mac aus lokaler Passwortdatei, GitHub aus Geheimnissen.
+
+##### Optionen
+- **Option A — Release-Befehl umbauen + gemeinsame Prüfliste für Mac und GitHub** *(Wiederverwendung des bestehenden Befehls)*. Vorab-Prüfungen fest einbauen → Liste zeigen → festschreiben → Probelauf in sauberer Kopie über die Prüfliste, die auch GitHub aufruft → grün: ein Upload / rot: zurücknehmen. Vorteile: Mac und GitHub können nicht auseinanderlaufen (S1 dauerhaft geschlossen); ein Befehl für alles. Nachteile: GitHub-Prüfung wird angefasst (S4). Aufwand: mittel (≈1–1,5 Tage inkl. Tests).
+- **Option B — Prüfschritte auf dem Mac nachgebaut, GitHub unverändert, plus Abgleich-Test.** Vorteil: GitHub unangetastet. Nachteil: zwei Beschreibungen derselben Prüfung, S1 nur gemeldet statt verhindert. Aufwand: mittel.
+- **Option C — Probelauf im Arbeitsordner (wie `ci_nachstellen.sh`).** Verletzt „genau die Fassung, die hochgeladen wird" und berührt Entwicklungsdaten. Nicht empfohlen.
+
+✅ **Gewählt: Option A** (von Stephan am 24.10.2026 bestätigt). Begründung: Sie schließt S1 dauerhaft, statt es nur zu melden; der Eingriff in die GitHub-Prüfung ist durch Entscheidung 5 freigegeben und auf „dieselbe Prüfliste aufrufen + feste Browser-Version" begrenzt; S4 ist durch AK10/TF-12 abgesichert. Option B entfällt, weil Frage 5 mit Ja beantwortet ist.
+
+##### 🚦 Ampel-Ergebnis (neu bewertet nach Stephans Entscheidungen)
+1. Klarer Abstand der Empfehlung? — **Ja** (Option A bestätigt, Frage 5 = Ja → B ohne Vorteil, C verworfen).
+2. Eingriff bleibt im Ticket? — **Nein:** berührt die GitHub-Prüfung (die einzige harte Schranke) und den Ablauf aller künftigen Releases — freigegeben, aber über das Ticket hinaus wirksam.
+3. Ohne Datenverlust rückgängig? — **Ja.**
+4. Kein hohes Risiko laut Pre-Mortem? — **Nein:** S5 (dauerhaft blockierte Releases) bleibt hoch, solange kein echter Probelauf auf dem Mac gemessen wurde; S4 (Schranke beschädigt) ist abgesichert, aber folgenreich.
+5. Keine reine Geschmacksfrage? — **Ja.**
+
+🔴 **Rot — braucht Stephans Entscheidung: Wirkung über das Ticket hinaus (Kriterium 2) und hohes Risiko laut Pre-Mortem (Kriterium 4)**, da die GitHub-Prüfung umgebaut wird und der erste echte Probelauf (Dauer, Mac-spezifisch rote Tests) noch ungemessen ist. Alle sechs Fragen sind beantwortet; die Rot-Wertung verlangt keine neue Wegentscheidung, sondern Stephans reguläre Freigabe der Testfälle (Phase 1, Schritt 5) mit Kenntnis dieser Restrisiken — keine autonome Umsetzung ohne diese Freigabe.
+
+##### 🔍 AK-Qualitäts-Check
+- **Granularität:** AK3/AK4, AK6/AK7, AK23/AK24, AK26/AK27, AK32/AK33 getrennt; je AK ein prüfbares Verhalten.
+- **Polarität:** R1 Fassung (AK3 ↔ AK4), R2 Rot (AK6 ↔ AK28), R3 Nichts Neues (AK18 ↔ AK22), R4 Fremdes (AK17 ↔ AK23/AK24), Doku (AK26 ↔ AK27).
+- **Messbarkeit:** keine Funktions-, Datei- oder Klassennamen in den AKs.
+- **Vier Kategorien:** funktional AK1–AK13, AK17–AK31; nicht-funktional — Dauer AK14, Sicherheit AK15 (Lücke aus Entwurf geschlossen), Ressourcen AK16/AK32; Architektur — Gleichlauf AK10/AK11, Rückwärtskompatibilität AK31; Sonstiges — Nachvollziehbarkeit/Protokoll AK7, AK17, Betriebssicherheit AK33.
+- **Testbarkeit:** jedes AK hat ≥1 Testfall (36 Testfälle); Rot-Nachweis folgt durch den Test-Agenten (Phase 1, Schritt 4).
+- **Herkunft:** vermerkt an allen AKs aus Entscheidungen 1–6, Pre-Mortem, Zustands-Check und Entwurfsbelegen.
+- **Negativ-/Randfälle:** Grenzwerte (0 Tests AK9, 10-min-Grenze AK14); ungültige/fehlende Eingaben (Dateiliste AK25, falsche Python-Version AK2, falsche Versionsart bestehend AK31); Nebenläufigkeit (Doppelstart AK19, Bot auf GitHub AK20); Lastgrenzen (Dauer AK14); Berechtigungen/Geheimnisse (AK15); Abwärtskompatibilität (AK31); Rollback (AK8, AK29); Beobachtbarkeit (AK7, AK13, AK17).
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt (Rules R1–R4 aus Entwurf; alle Questions 1–6 durch Stephan am 24.10.2026 beantwortet)
+- [x] Fundstellen-Sweep: `release.sh` in `backend/tests/*.py` 0 Treffer; 14 Einmal-Skripte gelesen; App-Ansichten nicht betroffen
+- [x] Zustands-Check: Leer → AK18/AK25/AK9 · Fehler → AK30/AK21/AK6–AK8/AK31 · Warten → AK13/AK14 · Abbruch → AK29
+- [x] Pre-Mortem durchgeführt (8 Szenarien, Code-Verifikation)
+- [x] Architektur analysiert: `release.sh`, `.github/workflows/deploy.yml`, neue Prüfliste `tools/`, `conftest.py`, `run_frontend_check.py`, `requirements.txt`
+- [x] Designer-Check: visuell? → nein: übersprungen
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A (von Stephan bestätigt 24.10.2026)
+- [x] AK-Qualitäts-Check durchgeführt: 33 AKs, alle mit Testfall; Lücken „Geheimnisse im Protokoll" (AK15) und „Übungsablagen löschen" (AK32) geschlossen; 5 ⚠️ Annahmen zur Bestätigung
+
+##### Testplan
+- [ ] **Automatisiert (Test-Agent, test-first):** neue Testdatei unter `FotoAlert/backend/tests/` für TF-02–TF-04, TF-06–TF-11, TF-13, TF-15, TF-17–TF-36 (Übungsablage + Platzhalter-Prüfliste); Marker `offline`, `regression`, zusätzlich `requires_full_checkout` (Befehl liegt außerhalb von `backend/`); kein `smoke`. Eintrag in `backend/tests/README.md`. Rot-Nachweis gegen den unveränderten Befehl Pflicht.
+- [ ] **Nur auf Stephans Mac (echte Prüfliste, echter Browser):** TF-01, TF-05, TF-14, TF-16, TF-17 (Ergänzung mit echter Prüfliste) — als Messlauf in der Umsetzung, Ergebnis und Dauer ins Ticket.
+- [ ] **Beim ersten GitHub-Lauf nach dem Umbau:** TF-12 (Testanzahl und Ergebnis je Job gegen den letzten Lauf vor dem Umbau).
+- [ ] **Regression:** vollständige Backend-Testsuite und Oberflächen-Check unverändert grün; App-Bereiche laut `PRODUCT.md` Sektion 12 nicht berührt (kein App-Code geändert).
+
+
+#### 🧊 Eingefroren (Orchestrator Phase 5, 2026-10-26)
+
+- Automatische Test-Prüfung (gate-auditor Modus T, Runde 2): **Bestätigt** am 2026-10-26.
+- Fingerabdrücke (SHA-256) der eingefrorenen Testdateien:
+  - `backend/tests/test_task117_release.py` — `a58227ae6236c964ceef815d0aaac09a8df7f5a05dbb40aa766a2c9e48b984d5` (neu seit 2026-10-27; vorher `4f2318e2…588597`. Grund: Testfehler in TF-29 – Vergleich von „keine neue Version“ mit großem V gegen kleingeschriebene Ausgabe war nie erfüllbar. Korrektur genau einer Zeile auf beidseitige Kleinschreibung, Anforderung unverändert. **Ausdrücklich von Stephan freigegeben am 2026-10-27.**)
+  - `backend/tests/task117_adapter.py` — `99812378f3c526ea9d6096548683dcebe28aa96ca4191cd2011acef7f8da4fa3`
+- Ausgangskopie: `_worktrees/TASK-117.ausgang/` (392 Dateien, schreibgeschützt), Prüfsummenliste `_worktrees/TASK-117.ausgang.sha256` — `e3dba0ec8aadf43bc853840ba311fb353044b1416a93a9fe3c390db7fde13ba5`. Arbeitskopie: `_worktrees/TASK-117/`.
+- Hinweis: Fingerabdruck und Ausgangskopie von Hand gebildet (TASK-120/TASK-121 noch nicht live); technisch erzwungen ist die Sperre noch nicht.
+
+### TASK-118 · Echter Live-Check nach dem Veröffentlichen mit automatischem Rücksprung auf die letzte funktionierende Version `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | Ready for Dev |
+| **Erstellt** | 2026-10-23 |
+
+**Beschreibung:** Nachdem eine neue Version automatisch live gegangen ist, prüft ein Kurztest die wichtigsten Abläufe auf der echten Seite (zum Beispiel Anmelden, Karte öffnen, Feed anzeigen) — nicht nur, ob der Server antwortet. Schlägt der Kurztest fehl, springt die App automatisch auf die letzte funktionierende Version zurück und Stephan bekommt eine Meldung mit dem Grund. Warum: Stephan hat am 23.10.2026 entschieden, dass bei grünen Prüfungen automatisch veröffentlicht wird; der heutige Rücksprung greift nur, wenn der Server gar nicht antwortet, und eine kaputte, aber erreichbare Seite bliebe live.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich, dass eine neue Version nach dem Live-Gang an ihren wichtigsten Abläufen geprüft und bei einem Fehler automatisch zurückgenommen wird, sodass Nutzer nie länger als wenige Minuten eine kaputte App sehen und ich davon sofort erfahre.
+
+**Bezug:** Zielbild `QUALITAETS-PIPELINE.md` (Abschnitt 3, Phase 2 Schritte 9–11; Abschnitt 4 „Rücksprung nach fehlgeschlagenem Live-Check"; Abschnitt 6 Baustein 2). Verwandt: **US-39** *(Done, Archiv — bestehender Rücksprung, heute nur bei fehlender Server-Antwort; dieses Ticket erweitert ihn, keine Dublette)*, **TASK-33** *(Done, Archiv — Prüfung nach dem Deploy auf Mindestmengen von Feed, Orten und Kalender, ohne Rücksprung; Überschneidung, Abgrenzung nötig)*, **TASK-14** *(Done, Archiv — automatische Veröffentlichung)*, **TASK-95** *(Done — Versionsangabe der Server-Statusabfrage, nutzbar zur Prüfung „richtige Version live")*, **TASK-50** *(Inbox — neue Version im Browser automatisch übernehmen; beeinflusst, ob der Live-Check die neue Fassung überhaupt sieht)*, **US-136** *(Wartet auf Entscheidung — ein neues Login-Verfahren würde den Ablauf „Anmelden" im Kurztest ändern)*. Unabhängig von **TASK-117**, aber gemeinsam die Release-Absicherung (Zielbild: zuerst Bausteine 1 und 2).
+
+---
+
+
+#### Implementation Spec TASK-118 – Echter Live-Check mit automatischem Rücksprung
+
+> Stand: 24.10.2026 · Grundlage: Analyse-Entwurf `docs/analyse-entwurf/TASK-118.md` (23.10.2026) und die verbindlichen
+> „Entscheidungen Stephan (24.10.2026)“ (E1–E6). Wo Entwurf und Entscheidungen abweichen, gelten die Entscheidungen.
+> Herkunftsvermerke in Klammern: E = Entscheidung Stephan, B = Befund im Entwurf, PM = Pre-Mortem.
+> Status-Empfehlung: **In Analysis** – Testfälle müssen noch vom Test-Agenten geschrieben und rot nachgewiesen werden.
+
+#### Scope
+
+**Eingeschlossen:** Nach jeder automatischen Veröffentlichung prüft ein rein lesender Browser-Kurztest von GitHub aus über
+die öffentliche Adresse sechs Prüfpunkte. Vor der Veröffentlichung läuft derselbe Kurztest als Vorab-Probe gegen die alte
+Version. Scheitert der Kurztest nach der Veröffentlichung, springt die App ohne Rückfrage auf die zuletzt bestätigte
+Version zurück, wird erneut geprüft, und Stephan wird über die GitHub-Benachrichtigung informiert. Dabei wird die
+bestehende Lücke geschlossen, dass sich der Server nach einem Rücksprung weiter die kaputte Version als aktuellen Stand merkt.
+
+**Gewählter Weg:** Option A (E: „Option A bestätigt“), siehe Abschnitt „Implementierungsoptionen“.
+
+#### Akzeptanzkriterien
+
+**Vorab-Probe vor dem Veröffentlichen**
+- [ ] AK1 Vor jeder automatischen Veröffentlichung läuft der Kurztest einmal gegen die noch laufende alte Version. (E3)
+- [ ] AK2 Scheitert diese Vorab-Probe, wird nichts veröffentlicht: Die alte Version läuft unverändert weiter, der GitHub-Lauf endet rot, und die Meldung lautet „Prüfung nicht einsatzbereit“ mit dem gescheiterten Prüfpunkt. (E3)
+- [ ] AK3 Edge Case: Ist das Live-Check-Geheimnis bei GitHub nicht angelegt oder leer, scheitert die Vorab-Probe sofort, ohne einen Anmeldeversuch an der echten Seite; die Meldung nennt, dass das Geheimnis fehlt (nur den Namen, nie einen Wert). (E1)
+- [ ] AK4 Edge Case: Lehnt die echte Seite den Prüf-Zugang ab, versucht der Kurztest die Anmeldung in diesem Lauf kein zweites Mal – höchstens ein Fehlversuch pro Lauf, die Anmeldesperre (5 Fehlversuche in 15 Minuten) wird dadurch nicht ausgelöst. (B10, PM2)
+
+**Live-Check nach dem Veröffentlichen – die sechs Prüfpunkte**
+- [ ] AK5 Nach jeder automatischen Veröffentlichung startet der Kurztest ohne Zutun. Er ruft die App über ihre öffentliche Adresse auf, so wie Nutzer sie sehen, in einem frisch gestarteten Browser ohne Zwischenspeicher, und erst nachdem auch die mitveröffentlichten Webserver-Einstellungen übernommen sind. (B1, B14, PM3)
+- [ ] AK6 Prüfpunkt 1: Die Seite zeigt die gerade veröffentlichte App-Version. Zeigt sie eine andere Version, gilt der Kurztest als gescheitert mit dem Grund „falsche Version live“. (E4, B7)
+- [ ] AK7 Prüfpunkt 2: Die Anmeldung mit dem Prüf-Zugang gelingt, danach ist der Kurztest angemeldet. (E4)
+- [ ] AK8 Prüfpunkt 3: Die Karte öffnet sich und zeigt mindestens eine Ortsmarkierung. Fehlende Kartenbilder fremder Anbieter zählen nicht als Fehler. (E4)
+- [ ] AK9 Prüfpunkt 4: Der Feed öffnet sich und zeigt mindestens einen Eintrag ohne Fehlermeldung; ein leerer Feed gilt als gescheitert. Mehr als ein Eintrag wird bewusst nicht verlangt. (E4, BUG-117)
+- [ ] AK10 Prüfpunkt 5: Der Kalender öffnet sich ohne Fehlermeldung. (E4)
+- [ ] AK10a Prüfpunkt 6 (ergänzt von Stephan am 24.10.2026): Auf den geprüften Seiten tritt kein Programmfehler aus dem eigenen FotoAlert-Code auf; ein solcher Fehler gilt als gescheitert und löst – nach der Wiederholung aus AK11 – den Rücksprung aus. Fehler aus fremden Quellen (z. B. Kartendienst) lösen keinen Rücksprung aus, werden aber in der Meldung an Stephan aufgeführt.
+- [ ] AK11 Scheitert ein Prüfpunkt (außer einer abgelehnten Anmeldung, AK4), wird er genau einmal wiederholt; erst wenn auch die Wiederholung scheitert, gilt der Kurztest als gescheitert. (PM2)
+- [ ] AK12 Edge Case: Meldet die Server-Statusabfrage „degraded“ (z. B. Wetterstörung wie BUG-117) oder sind Kartenbilder fremder Anbieter nicht erreichbar, ist das allein kein Grund für einen Rücksprung, solange die sechs Prüfpunkte bestehen. (B8, PM2)
+- [ ] AK13 Bestehen alle sechs Prüfpunkte, bleibt die neue Version live, wird als „zuletzt bestätigte Version“ vermerkt, und der GitHub-Lauf endet grün. (E2)
+- [ ] AK14 Der Kurztest verändert keine Daten der echten App: Es werden keine Orte, Bilder, Bewertungen oder Einstellungen angelegt oder geändert; er meldet sich nur mit Gast-Rechten an. (E: „nur liest“, B9, PM4)
+
+**Automatischer Rücksprung**
+- [ ] AK15 Ist der Kurztest nach der Veröffentlichung gescheitert, springt die App ohne Rückfrage auf die zuletzt bestätigte Version zurück – nicht einfach auf die vorherige. (E2)
+- [ ] AK16 Scheitern zwei Veröffentlichungen nacheinander, landet die App beide Male auf derselben zuletzt bestätigten Version – nie auf einer Version, die ihren eigenen Live-Check nicht bestanden hat. (E2, B3, PM1)
+- [ ] AK17 Nach einem Rücksprung merkt sich der Server die zurückgeholte Version als seinen aktuellen Stand: Nach einem Neustart des Servers läuft die zurückgeholte Version, und ein erneutes Anstoßen der Veröffentlichung ohne neuen Code bringt die kaputte Version nicht still zurück – sie wird höchstens erneut veröffentlicht und dann wieder vollständig geprüft. (Bestehende Lücke B2/B4, PM1)
+- [ ] AK18 Ein Rücksprung setzt auch die mitveröffentlichten Webserver-Einstellungen und die Service-Worker-Datei auf den Stand der zurückgeholten Version zurück. (B6, PM5)
+- [ ] AK19 Nach dem Rücksprung läuft derselbe Kurztest gegen die zurückgeholte Version; sein Ergebnis steht in der Meldung. (E6b)
+- [ ] AK20 Kurztest, gegebenenfalls Rücksprung und erneuter Kurztest dauern zusammen höchstens 10 Minuten – gemessen vom Start des Kurztests nach der Veröffentlichung bis zum Ende des Kurztests gegen die zurückgeholte Version. (E6b)
+- [ ] AK21 Der Rücksprung setzt nur die App zurück, nie die Datenbank: Daten, die Nutzer zwischen Veröffentlichung und Rücksprung angelegt haben, sind danach noch vorhanden. (E6c)
+- [ ] AK22 Edge Case: Gelingt der Rücksprung nicht oder scheitert auch der Kurztest gegen die zurückgeholte Version, endet der Lauf rot mit der Meldung „Rücksprung fehlgeschlagen – manueller Eingriff nötig“ und dem letzten bekannten Zustand; es folgt kein weiterer automatischer Rücksprung.
+- [ ] AK23 Antwortet der Server nach dem Neustart gar nicht, wird wie bisher zurückgesprungen – jetzt ebenfalls auf die zuletzt bestätigte Version und mit derselben Wirkung wie in AK17. (B1)
+- [ ] AK24 Edge Case: Gibt es beim allerersten Lauf noch keine bestätigte Version, gilt die vor diesem Lauf laufende Version als bestätigt, sobald die Vorab-Probe gegen sie bestanden ist. (Entwurf F2, von Stephan bestätigt am 24.10.2026)
+
+**Meldung an Stephan**
+- [ ] AK25 Nach einem Rücksprung erfährt Stephan über die GitHub-Benachrichtigung zum roten Lauf, ohne selbst nachzusehen: welche Version zurückgenommen wurde, welcher Prüfpunkt woran scheiterte (mit Bildschirmfoto), auf welche Version zurückgesprungen wurde und ob das geklappt hat. (E6a)
+- [ ] AK26 Ein Lauf mit Rücksprung endet immer rot – auch wenn der Rücksprung gelang –, damit das Ticket nicht auf Done geht. (Zielbild Schritt 11)
+- [ ] AK27 Die Benachrichtigung über einen roten Lauf kommt tatsächlich in Stephans Postfach an; das ist vor dem ersten echten Live-Check geprüft. (E6a)
+
+**Sicherheit des Zugangs**
+- [ ] AK28 Für den Live-Check gibt es ein eigenes GitHub-Geheimnis, das nur der Live-Check benutzt; die bestehenden Geheimnisse für den Test-Server bleiben unverändert und werden vom Live-Check nicht benutzt. Das Passwort steht in keiner Datei des Projekts. (E1)
+- [ ] AK29 Kein Geheimnis erscheint im Klartext – nicht im Lauf-Protokoll, nicht auf Bildschirmfotos, nicht in Ergebnisdateien und nicht in der Meldung an Stephan. (Auftrag, PM2)
+
+**Ablauf-Schutz und Bestehendes**
+- [ ] AK30 Edge Case: Werden zwei Veröffentlichungen kurz nacheinander angestoßen, laufen sie nacheinander; ein Rücksprung der ersten nimmt die zweite nicht unbemerkt mit zurück. (B13, PM5)
+- [ ] AK31 Der Übungsschalter (Teststufe 3) und der Schalter zum absichtlichen Scheitern (Brandprobe) sind bei normalen Veröffentlichungen nie aktiv; sie lassen sich nur beim manuellen Anstoßen eines Laufs wählen. (PM6)
+- [ ] AK32 Stephan kann weiterhin von Hand auf eine frühere Version zurückspringen (mit Rückfrage); der automatische Rücksprung braucht dagegen keine Eingabe. (B5)
+- [ ] AK33 Der automatische Rücksprung ist einmal auf der echten Seite nachgewiesen („Brandprobe“): erst nachdem die Teststufen 1–3 grün sind, zu einem vorher mit Stephan abgesprochenen Termin, mit beobachtetem Rücksprung, gemessener Dauer (AK20) und angekommener Benachrichtigung (AK27). (E5)
+
+#### Nicht-Ziele (final)
+
+- Datenbank zurücksetzen oder Daten wiederherstellen (TASK-18 / `restore.sh`). (E6c)
+- Python-Pakete beim Rücksprung herabstufen. (technische Festlegung 24.10.2026, gedeckt durch E6c: nur die App wird zurückgesetzt)
+- Neues Anmeldeverfahren oder eigenes Prüfkonto (US-136); Umstellung auf ein Prüfkonto erst nach US-136. (E1)
+- Service-Worker-Verhalten in den Browsern der Nutzer ändern (TASK-50). Wer die kaputte Fassung geöffnet hatte, bekommt die zurückgeholte beim nächsten Öffnen; mehr verspricht das Ticket nicht.
+- Eigener Benachrichtigungsdienst (Push, eigene Mail). (E6a)
+- Test-/Staging-Server.
+- Probelauf vor dem Hochladen (TASK-117), Release-Skript (TASK-112), Testgerüst (TASK-119), Test-Fingerabdruck (Baustein 3).
+- Änderungen am bestehenden Oberflächen-Check; er läuft weiter nur gegen den Test-Server.
+- Weitere Prüfpunkte (Scout, Event-Detail, Chancen-Übersicht) über die sechs (E4 + Ergänzung 24.10.2026) hinaus.
+- Beheben des Wetterfehlers BUG-117.
+
+#### Erlaubte Bereiche (final)
+
+- `.github/workflows/deploy.yml` (Repo-Root): Vorab-Probe, Live-Check-Schritt, Rücksprung-Aufruf, Meldung, Reihenfolge-Sperre, Übungs- und Brandprobe-Schalter (nur bei manuellem Anstoß), Kopfkommentar um das neue Geheimnis ergänzen.
+- `FotoAlert/deploy/deploy.sh`, `FotoAlert/deploy/rollback.sh` bzw. ein neues, nicht-interaktives Rücksprung-Skript in `FotoAlert/deploy/`; `deploy.sh` nutzt für seinen eigenen Rücksprung dieselbe Mechanik.
+- Eine kleine Statusdatei auf dem Server für die Marke „zuletzt bestätigte Version“ (außerhalb der Datenbank).
+- `FotoAlert/deploy/DEPLOYMENT-GUIDE.md` (Abschnitt Rücksprung und Live-Check).
+- Ein neuer, rein lesender Kurztest unter `FotoAlert/backend/tests/` (eigener Unterordner), der Bausteine des bestehenden Oberflächen-Checks wiederverwenden darf, ohne ihn zu ändern; die Anmeldung in genau einem Baustein gekapselt (wegen US-136).
+- Neue Tests unter `FotoAlert/backend/tests/` für Vorab-Probe, Kurztest und Rücksprung.
+- Nur falls AK6 anders nicht lösbar: die Server-Statusabfrage um ein zusätzliches, rein lesendes Feld für den Code-Stand ergänzen, bestehende Felder unverändert – **braucht Stephans Freigabe im Weg-Gate.**
+- **Nicht erlaubt:** `web/index.html`, `web/sw.js`, Anmeldelogik, Datenbank und Datenbankschema, bestehende Tests, bestehende GitHub-Geheimnisse.
+
+#### Umsetzungsschritte (Reihenfolge)
+
+1. **Voraussetzungen von Stephan nachsehen lassen** (ohne SSH/Git durch Claude): (a) welche Server-Befehle der Server-Benutzer real ausführen darf (B15); (b) ob GitHub-Benachrichtigungen bei fehlgeschlagenen Läufen per Mail eingeschaltet sind (E6a, AK27).
+2. Rücksprung-Mechanik mit Marke „zuletzt bestätigt“ bauen; Ordner und Befehle als Einstellung übergebbar (Voraussetzung für Teststufe 1).
+3. Rein lesenden Kurztest bauen (sechs Prüfpunkte, eine Wiederholung, kein zweiter Anmeldeversuch, Geheimnisse maskiert).
+4. GitHub-Ablauf erweitern: Vorab-Probe → Veröffentlichen → Live-Check → ggf. Rücksprung → erneuter Live-Check → Meldung; Reihenfolge-Sperre; Schalter nur bei manuellem Anstoß.
+5. **Anleitung für Stephan: Live-Check-Geheimnis anlegen** – als eigener Schritt rechtzeitig vor dem ersten echten Live-Check. Name des Geheimnisses: **`FOTOALERT_LIVECHECK_PASSWORD`**, Inhalt: das Gast-Passwort der echten Seite. Claude schreibt eine nummerierte Schritt-für-Schritt-Anleitung (Repository-Einstellungen → Geheimnisse für GitHub-Abläufe → neues Repository-Geheimnis anlegen, Name exakt wie oben, Wert nur von Stephan eingegeben). **Alle Menü- und Knopfnamen werden unmittelbar vor dem Schreiben der Anleitung bei GitHub nachgeprüft, nicht aus dem Gedächtnis angegeben.** Claude sieht das Passwort nie; es steht in keiner Datei. Hinweis in der Anleitung: Ändert Stephan das Gast-Passwort, muss er das Geheimnis mitändern; ohne angelegtes Geheimnis scheitert die Vorab-Probe und es wird nicht veröffentlicht (AK3).
+6. Teststufen 1–3 grün.
+7. Brandprobe (Teststufe 4) zum mit Stephan abgesprochenen Termin.
+8. `DEPLOYMENT-GUIDE.md` nachziehen.
+
+#### Testfall-Liste (Fachsprache)
+
+*Teststufen:* **1** Wegwerf-Nachbau (Rücksprung-Logik in einer Wegwerf-Kopie eines kleinen Git-Projekts mit den Versionen „gut“, „kaputt 1“, „kaputt 2“; Dienst-Neustart, Webserver-Neuladen und Statusabfrage durch mitschreibende Platzhalter ersetzt; offline) · **2** Attrappen-Server (Kurztest gegen lokalen Test-Server bzw. Attrappen mit gezielt kaputtem Verhalten) · **3** GitHub-Übungsschalter (echter GitHub-Ablauf per manuellem Anstoß, Kurztest gegen den Test-Server im Lauf, Veröffentlichen/Rücksprung als Platzhalter) · **4** Brandprobe Live (einmalig, angekündigt, echte Seite).
+
+*Fachsprache-Schritte (Vorschlag):* „Version X ist live und bestätigt“, „Version Y wird veröffentlicht“, „Vorab-Probe läuft“, „Live-Check läuft“, „Prüfpunkt P scheitert“, „App springt zurück“, „Server wird neu gestartet“, „Veröffentlichung wird ohne neuen Code erneut angestoßen“, „Prüf-Zugang fehlt / ist ungültig“, „Fremddienst ist gestört“, „Stephan erhält Meldung“.
+
+| TF | AK | Testfall | Stufe |
+|---|---|---|---|
+| T1 | AK1 | Version Y wird veröffentlicht → vor dem Veröffentlichen läuft die Vorab-Probe gegen Version X. | 3 |
+| T2 | AK2 | Vorab-Probe scheitert bei Prüfpunkt „Karte“ → nichts wird veröffentlicht, X läuft weiter, Lauf rot, Meldung „Prüfung nicht einsatzbereit“ nennt „Karte“. | 2, 3 |
+| T3 | AK3 | Prüf-Zugang fehlt → Vorab-Probe rot ohne Anmeldeversuch (Server zählt 0 Anmeldeversuche), Meldung nennt den Namen des Geheimnisses. | 2, 3 |
+| T4 | AK4 | Prüf-Zugang ist ungültig → genau ein Anmeldeversuch pro Lauf; drei Läufe nacheinander lösen keine Sperre aus. | 2 |
+| T5 | AK5 | Version Y wird veröffentlicht → Live-Check läuft automatisch über die öffentliche Adresse, frischer Browser, nach dem Webserver-Schritt. | 3, 4 |
+| T6 | AK6 | Seite liefert noch Version X aus, erwartet ist Y → Live-Check rot „falsche Version live“. | 2 |
+| T7 | AK6 | Seite liefert Y aus → Prüfpunkt 1 grün. | 2 |
+| T8 | AK7 | Gültiger Prüf-Zugang → Anmeldung gelingt, Gast-Rolle aktiv. | 2 |
+| T9 | AK8 | Version erreichbar, Karte zeigt keine Orte → rot beim Prüfpunkt „Karte“. | 2 |
+| T10 | AK9 | Feed ohne Einträge → rot beim Prüfpunkt „Feed“. | 2 |
+| T11 | AK9 | Feed mit genau einem Eintrag → Prüfpunkt „Feed“ grün. | 2 |
+| T12 | AK10 | Kalender zeigt Fehlermeldung → rot beim Prüfpunkt „Kalender“. | 2 |
+| T12a | AK10a | Auf einer geprüften Seite tritt ein Programmfehler aus dem eigenen FotoAlert-Code auf → rot beim Prüfpunkt „Programmfehler“. | 2 |
+| T12b | AK10a | Nur eine fremde Quelle (z. B. Kartendienst) meldet einen Programmfehler, alle übrigen Prüfpunkte bestehen → grün, kein Rücksprung, Fehler erscheint in der Meldung. | 2 |
+| T13 | AK11 | Prüfpunkt scheitert einmal und besteht bei der Wiederholung → grün; scheitert zweimal → rot; nie ein dritter Versuch. | 2 |
+| T14 | AK12 | Server meldet „degraded“, Kartenbilder fremder Anbieter gesperrt, sechs Prüfpunkte bestehen → grün, kein Rücksprung. | 2 |
+| T15 | AK13 | Alle Prüfpunkte grün → Y bleibt live, Marke „zuletzt bestätigt“ zeigt Y, Lauf grün. | 1, 2 |
+| T16 | AK14 | Nach dem Kurztest ist der Datenbestand unverändert (Orte, Bilder, Bewertungen, Einstellungen vorher = nachher). | 2 |
+| T17 | AK15 | X bestätigt, Y scheitert → danach läuft X. (Auslöser „Server stumm“: bestehendes Verhalten, heute schon grün, mit Gegenprobe; Auslöser „Live-Check rot“: heute rot. Klarstellung 24.10.2026) | 1 |
+| T18 | AK16 | X bestätigt, Y scheitert, Z scheitert → nach beiden Rücksprüngen läuft X, nie Y. | 1 |
+| T19 | AK17 | Nach Rücksprung auf X: Server wird neu gestartet → X läuft. (Auslöser „Server stumm“: prüft bestehendes Verhalten und ist heute schon grün; Auslöser „Live-Check rot“: gegen heutigen Stand rot. Die Lücke „kaputte Version kommt zurück“ zeigen T20/T21. Klarstellung 24.10.2026 nach Modus-T-Befund.) | 1 |
+| T20 | AK17 | Nach Rücksprung auf X: Veröffentlichung wird ohne neuen Code erneut angestoßen → Y läuft nicht ungeprüft; entweder X bleibt oder Y wird erneut vollständig geprüft. (gegen heutigen Stand rot zu erwarten) | 1 |
+| T21 | AK17 | Nach Rücksprung auf X meldet der Server X als aktuellen Stand, nicht Y. | 1 |
+| T22 | AK18 | Y hat geänderte Webserver-Einstellungen und Service-Worker-Datei → nach Rücksprung sind beide auf Stand X, Webserver wurde neu geladen. | 1 |
+| T23 | AK19 | Nach Rücksprung läuft der Kurztest gegen X; Ergebnis steht in der Meldung. | 1, 3 |
+| T24 | AK20 | Zeit vom Start des Live-Checks bis Ende des Kurztests gegen X ≤ 10 Minuten (Ablauf mit Platzhaltern und echt). | 3, 4 |
+| T25 | AK21 | Zwischen Veröffentlichung und Rücksprung wird ein Datensatz angelegt → nach Rücksprung noch vorhanden; Datenbank wurde nicht angefasst. (Auslöser „Server stumm“: bestehendes Verhalten, heute schon grün, mit Gegenprobe; Auslöser „Live-Check rot“: heute rot. Klarstellung 24.10.2026) | 1, 4 |
+| T26 | AK22 | Platzhalter-Dienst bleibt nach Rücksprung stumm → Lauf rot, Meldung „Rücksprung fehlgeschlagen – manueller Eingriff nötig“, kein zweiter Rücksprung. | 1 |
+| T27 | AK23 | Server antwortet nach Neustart gar nicht → Rücksprung auf zuletzt bestätigte Version, Server meldet sie als aktuellen Stand. | 1 |
+| T28 | AK24 | Keine Marke vorhanden, Vorab-Probe gegen laufende Version grün → diese gilt als bestätigt; Vorab-Probe rot → keine Marke, nichts veröffentlicht. | 1, 2 |
+| T29 | AK25 | Nach Rücksprung enthält die Lauf-Zusammenfassung: zurückgenommene Version, Prüfpunkt mit Grund, Bildschirmfoto, Zielversion, Ergebnis. | 3 |
+| T30 | AK26 | Rücksprung gelungen → Lauf endet trotzdem rot. | 3 |
+| T31 | AK27 | Bei einem roten Übungslauf bzw. der Brandprobe kommt die Mail bei Stephan an (Stephan bestätigt). | 3, 4 |
+| T32 | AK28 | Live-Check nutzt nur `FOTOALERT_LIVECHECK_PASSWORD`; Projektdateien enthalten keinen Passwortwert; bestehende Geheimnisse unverändert. | 2, 3 |
+| T33 | AK29 | Lauf-Protokoll, Bildschirmfotos (Pixel-/Textprüfung des Eingabefelds) und Ergebnisdateien werden nach dem Testwert des Geheimnisses durchsucht → 0 Treffer. | 2, 3 |
+| T34 | AK30 | Zwei Läufe kurz nacheinander angestoßen → der zweite wartet, bis der erste inkl. Rücksprung fertig ist. | 3, 4 |
+| T35 | AK31 | Normale Veröffentlichung (Anstoß durch neuen Code) → Übungs- und Brandprobe-Schalter sind aus und nicht setzbar. | 3 |
+| T36 | AK32 | Manueller Rücksprung fragt weiterhin nach; automatischer Rücksprung läuft ohne Eingabe durch. | 1 |
+| T37 | AK33 | Brandprobe: nach grünen Stufen 1–3, zum abgesprochenen Termin, harmlose Version veröffentlicht, Live-Check per Schalter absichtlich gescheitert → Rücksprung beobachtet, Dauer gemessen, Mail angekommen, danach normale Veröffentlichung. | 4 |
+
+#### Pre-Mortem
+
+📎 **Code-Verifikation:** übernommen aus dem Entwurf (gelesen 23.10.2026); am 24.10.2026 erneut gelesen: `deploy/deploy.sh` Z. 20–50 und 82–116, `deploy/rollback.sh` Z. 1–40, Kopf von `.github/workflows/deploy.yml`.
+- Bestätigt: Automatischer Rücksprung holt nur Dateien des Vorgängers zurück (`git checkout "$PREV_COMMIT" -- .`), der gespeicherte Stand bleibt auf der kaputten Version (Z. 94–95).
+- Bestätigt: Bei erneutem Anstoßen ohne neuen Code setzt `git reset --hard HEAD` die Dateien auf den kaputten Stand und beendet mit „Kein neuer Code“ ohne Neustart (Z. 28–38).
+- Bestätigt: Manueller Rücksprung fragt „[j/N]“ und geht standardmäßig nur einen Stand zurück (`HEAD~1`).
+- Bestätigt: Kein Geheimnis mit dem Namen `FOTOALERT_LIVECHECK_PASSWORD` vorhanden; Name kollidiert nicht.
+
+- 💀 **PM1 Rücksprung landet auf einer kaputten Version** (höchstes Risiko) – Ziel „vorheriger Stand“ statt „zuletzt bestätigt“, gespeicherter Stand nicht nachgezogen. → Gegenmaßnahme: Marke „zuletzt bestätigt“, Rücksprung zieht den gespeicherten Stand nach; AK15–AK17, AK23; T17–T21, T27.
+- 💀 **PM2 Gute Version wird fälschlich zurückgenommen** – falscher Zugang, Anmeldesperre, „degraded“, Fremd-Kartenbilder, GitHub-Netz. → Gegenmaßnahme: Vorab-Probe, kein zweiter Anmeldeversuch, eine Wiederholung je Prüfpunkt, nur eigene Seite zählt; AK1–AK4, AK11, AK12; T2–T4, T13, T14.
+- 💀 **PM3 Live-Check grün, obwohl die neue Version kaputt ist** – alte Fassung aus Zwischenspeicher oder vor dem Webserver-Schritt geprüft. → Gegenmaßnahme: frischer Browser über öffentliche Adresse nach dem Webserver-Schritt, Versionsabgleich; AK5, AK6; T5, T6.
+- 💀 **PM4 Kurztest beschädigt echte Daten** – Wiederverwendung des schreibenden Oberflächen-Checks. → Gegenmaßnahme: eigener, rein lesender Kurztest mit Gast-Rechten; AK14; T16.
+- 💀 **PM5 Rücksprung unvollständig oder Läufe überholen sich** – Webserver-Einstellungen nicht zurückgesetzt, keine Reihenfolge-Sperre, fehlende Server-Rechte (B15, nicht prüfbar). → Gegenmaßnahme: AK18, AK30; Umsetzungsschritt 1a (Stephan sieht Rechte nach); T22, T34.
+- 💀 **PM6 Übungs-/Brandprobe-Schalter bleibt in Produktion aktiv** – z. B. Standardwert falsch gesetzt, jede Veröffentlichung wird absichtlich zurückgenommen oder nicht echt geprüft. → Gegenmaßnahme: AK31; T35.
+- 💀 **PM7 Geheimnis gerät in Protokoll oder Bildschirmfoto** – Ausgabe des Werts beim Fehler, Bildschirmfoto mit Klartext-Eingabefeld. → Gegenmaßnahme: AK29; T33.
+
+**Seiteneffekte:** Release-Ablauf (`release.sh`, Tags aus US-39), bestehender Frontend-/Backend-Job (unverändert), Konsumenten der Statusabfrage, Datensicherung (`restore.sh`) – Absicherung durch Vollsystem-Regression.
+
+#### Analyse & Planung
+
+- [x] Example Mapping durchgeführt (Entwurf, R1–R4; alle Fragen F1–F8 durch E1–E6 beantwortet)
+- [x] Fundstellen-Sweep: `HEALTH_URL`, `rollback`, `git checkout`, `git reset` in `deploy/` → `deploy.sh`, `rollback.sh`, `restore.sh` (Nicht-Ziel); `verify-deploy` → nur Archiv (TASK-33-Nachkontrolle existiert nicht mehr); `concurrency` in `deploy.yml` → 0 Treffer; App-Ansichten werden nicht geändert, nur geprüft.
+- [x] Zustands-Check: Warten (Neuaufbau/„degraded“ kein Fehler, AK12; begrenzte Wartezeit innerhalb AK20) · Leer (Feed leer → rot, AK9; keine bestätigte Version → AK24; Geheimnis fehlt → AK3) · Fehler (Prüfpunkt rot → Wiederholung/Rücksprung, AK11/AK15; Rücksprung scheitert → AK22; Server antwortet nicht → AK23).
+- [x] Pre-Mortem durchgeführt (PM1–PM7)
+- [x] Architektur analysiert: `.github/workflows/deploy.yml`, `deploy/deploy.sh`, `deploy/rollback.sh`, `deploy/Caddyfile`, `deploy/fotoalert-sudoers`, `deploy/fotoalert.service`, `web/sw.js`, `backend/main.py` (Statusabfrage, Version, Anmelden), `backend/auth.py`, `tests/frontend/run_frontend_check.py`
+- [x] Designer-Check: visuell? → nein, übersprungen (keine sichtbare Änderung der App)
+- [x] Implementierungsoptionen: A / B / C
+- [x] Empfehlung: Option A – von Stephan am 24.10.2026 bestätigt
+- [ ] AK-Qualitäts-Check durchgeführt (Schritt 6c): vorläufig erfüllt (siehe unten); endgültig erst nach Rot-Nachweis durch den Test-Agenten
+
+#### Implementierungsoptionen
+
+- **Option A – Kurztest von GitHub aus, Rücksprung per zweitem Serveraufruf (gewählt):** Browser-Kurztest über die öffentliche Adresse, Vorab-Probe, nicht-interaktiver Rücksprung auf dem Server mit Marke „zuletzt bestätigt“, Reihenfolge-Sperre. Aufwand mittel (ca. 1–1,5 Tage inkl. Tests und Brandprobe, *Einschätzung*).
+- Option B – alles auf dem Server ohne Browser: prüft nicht die Seite, wie Nutzer sie sehen; Zugang müsste zusätzlich auf dem Server liegen.
+- Option C – B und A kombiniert: zwei Prüfstellen, Zugang an zwei Orten, größter Aufwand.
+
+✅ **Gewählt: Option A** – einzige Option, die eine erreichbare, aber kaputte Seite wirklich erkennt; nutzt vorhandenes Browser-Werkzeug und die Geheimnisverwaltung von GitHub; behebt zugleich die Schwächen des heutigen Rücksprungs (PM1). Die Vorab-Probe entschärft das Fehlalarm-Risiko (PM2).
+
+#### Abhängigkeiten
+
+- **TASK-50** (Service Worker): keine Blockade. Der frische Prüf-Browser sieht immer die aktuelle Fassung; Nutzer mit geöffneter kaputter Fassung bekommen die zurückgeholte beim nächsten Öffnen. TASK-50-Text ist teilweise überholt (sofortige Übernahme neuer Fassungen ist bereits vorhanden).
+- **US-136** (neues Anmeldeverfahren): keine Blockade. Anmeldung im Kurztest in genau einem Baustein gekapselt; nach US-136 Umstellung auf ein eigenes Prüfkonto (E1).
+- **TASK-117** (Probelauf vor dem Hochladen): unabhängig, Reihenfolge egal; der Kurztest läuft im Probelauf nicht gegen Produktion.
+- Weitere Bezüge: TASK-119 (Testfälle sind für das Vier-Schichten-Gerüst formuliert), BUG-117 (Grund für AK9/AK12), TASK-33 (Nachkontrolle existiert nicht mehr; dieses Ticket ersetzt sie fachlich).
+
+#### Ampel-Prüfung
+
+1. Klarer Abstand der Empfehlung? – ja.
+2. Bleibt im Ticket? – eingeschränkt: berührt Server-Ablauf und Zugangsgeheimnisse.
+3. Ohne Datenverlust umkehrbar? – ja (Datenbank wird nie angefasst, AK21).
+4. Kein hohes Risiko? – nein: automatischer Eingriff in Produktion; Server-Rechte (B15) ungeprüft.
+5. Keine Geschmacksfrage? – ja.
+
+🚦 Ampel-Ergebnis:
+🔴 Rot – braucht Stephans Entscheidung: hohes Risiko laut Pre-Mortem und Sicherheitsbezug, da der automatische Rücksprung auf dem Produktionsserver eingreift (PM1/PM2), die realen Server-Rechte nicht prüfbar sind (B15) und ein neues Zugangsgeheimnis eingeführt wird. Die Wegfragen sind entschieden; Rot betrifft die Gates Brandprobe-Termin, Geheimnis anlegen und Server-Rechte.
+
+#### AK-Qualitäts-Check (Schritt 6c, vorläufig)
+
+1. Granularität: Prüfpunkte, Rücksprung, Dauerhaftigkeit, Dauer, Meldung einzeln (AK6–AK10, AK15–AK20). ✅
+2. Polarität: Vorab-Probe grün/rot (AK1/AK2), Prüfpunkte mit Gegenfall (T6/T7, T10/T11), Rücksprung gelingt/scheitert (AK15/AK22), Fehlalarm-Schutz (AK12). ✅
+3. Messbarkeit: keine Funktions-/Datei-/Klassennamen in den AKs; nur der Name des Geheimnisses steht in den Umsetzungsschritten und Testfällen. ✅
+4. Vier Kategorien: funktional AK1–AK27; nicht-funktional – Dauer AK20, Sicherheit AK28/AK29/AK14/AK4; Architektur – eine Rücksprung-Mechanik, Rückwärtskompatibilität AK23/AK32; Sonstiges – Beobachtbarkeit AK25/AK22, Betriebsübergabe DEPLOYMENT-GUIDE (Schritt 8). ✅
+5. Testbarkeit ohne Rückfrage: jedes AK hat ≥1 Testfall; Rot-Nachweis steht aus (Test-Agent). T20–T21 sowie T19 (Auslöser „Live-Check rot“) müssen gegen den heutigen Stand rot sein; T19 (Auslöser „Server stumm“) prüft bestehendes Verhalten. ⏳
+6. Herkunft: je AK in Klammern vermerkt. ✅
+- Grenzwerte: Feed „mindestens 1“ (AK9), 10 Minuten (AK20), genau eine Wiederholung (AK11). Ungültige/fehlende Eingaben: AK3, AK4. Nebenläufigkeit: AK30. Lastgrenzen: nicht relevant (ein Prüf-Browser, wenige Aufrufe). Berechtigungen: Gast-Rechte (AK14), Server-Rechte offen (Schritt 1a). Abwärtskompatibilität: AK23, AK32, bestehende Tests unverändert. Rücksprung: Kern des Tickets. Beobachtbarkeit: AK22, AK25.
+
+#### Testplan
+
+- [ ] Automatisiert (Test-Agent, nach Freigabe): Stufe 1 (T15, T17–T23, T25–T28, T36) als pytest offline; Stufe 2 (T2–T4, T6–T14, T16, T28, T32, T33) als pytest + Playwright gegen lokalen Test-Server/Attrappen; Rot-Nachweis je Testfall.
+- [ ] GitHub, Stufe 3 (T1–T3, T5, T23, T24, T29–T35): manuell angestoßene Läufe mit Übungsschalter.
+- [ ] Live, Stufe 4 (T5, T24, T25, T31, T34, T37): einmalige Brandprobe zum abgesprochenen Termin, erst nach grünen Stufen 1–3.
+- [ ] Regression: Vollsystem-Regression inkl. bestehendem Frontend- und Backend-Job.
+
+
+#### 🧊 Eingefroren (Orchestrator Phase 5, 2026-10-27)
+
+- Automatische Test-Prüfung (gate-auditor Modus T, Runde 4): **Bestätigt** am 2026-10-27 (nach 3 Korrekturversuchen des Test-Agenten).
+- Fingerabdrücke (SHA-256) der eingefrorenen Testdateien in `backend/tests/task118/`:
+  - `__init__.py` — `d6df16a4ea2ffaf7a57129cba445e5d02c898e2144cdc22a6af09f67b3424c4b`
+  - `attrappe.py` — `21248feaee27451360c8018c62131d7a8440173c1d29d09ef2dd43c3768df63a`
+  - `schnittstelle.py` — `a2ddf23e31f7a60e375a95a434bd3f20ee201643e3faf7dc027540d02d9e9d65`
+  - `server_nachbau.py` — `58102035c9251297d3bf812a07f98f7cc62c8d522bfcb45970e1ef5abeed97e3`
+  - `test_task118_kurztest.py` — `ecdca6243beb80479cc4039c0509ca05370a67116db3ead17d44545e27ac6586`
+  - `test_task118_ruecksprung.py` — `2af9769331edecacc8226db2df83c48df215764a9147f9955941922edafe15c3`
+- Ausgangskopie: wird erst beim Start der Umsetzung angelegt (Reihenfolge TASK-117 → TASK-119 → TASK-118), damit sie den dann aktuellen Stand nach dem Rücksync von TASK-117 enthält.
+- Hinweis: Fingerabdruck von Hand gebildet (TASK-120 noch nicht live); technisch erzwungen ist die Sperre noch nicht.
+
+### TASK-119 · Grundgerüst für Akzeptanztests nach dem Vier-Schichten-Modell (Dave Farley) mit festen Platzhaltern und einem Pilot-Testfall `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Mittel |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-10-23 |
+
+**Beschreibung:** Es entsteht ein Grundgerüst, in dem Akzeptanztests wie eine lesbare Spezifikation aussehen: oben Testfälle in Fachsprache („Fotograf speichert einen Ort und findet ihn nach dem Neuladen wieder"), darunter eine wiederverwendbare Fachsprache aus Schritten wie „Ort speichern" oder „Wetter für morgen ist Regen", darunter Treiber, die diese Schritte im Browser oder direkt am Server ausführen, und feste Platzhalter für Uhrzeit, Wetter und Sternendaten. Ein erster Pilot-Testfall läuft damit durch; alle bestehenden Tests bleiben unverändert. Warum: Stephan soll Akzeptanztests als Spezifikation lesen und freigeben können, die Tests sollen bei Umbauten der Oberfläche nicht brechen, und feste Platzhalter sollen dafür sorgen, dass Tests auf dem Mac und online dasselbe Ergebnis liefern.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich Akzeptanztests in verständlicher Fachsprache lesen und freigeben können, die lokal und online gleich ausfallen, sodass das, was ich freigebe, genau das ist, was geprüft wird.
+
+**Bezug:** Zielbild `QUALITAETS-PIPELINE.md` (Abschnitt 3a Vier-Schichten-Modell, Abschnitt 3 Phase 1 Schritt 4, Abschnitt 6 Baustein 9). Abhängigkeit: idealerweise nach **TASK-117**, damit der Probelauf diese Tests mitlaufen lässt. Verwandt: **TASK-67** *(Done, Archiv — Pflicht-Regression in automatisierte Tests überführt, enthält TASK-69; bestehende Tests, die hier ausdrücklich unverändert bleiben)*, **TASK-21**, **TASK-64**, **BUG-100** *(Done — Einbindung von Browser- und Server-Tests in die Online-Prüfung; neue Tests müssen dort mitlaufen)*, **BUG-79**, **TASK-97** *(Done — Online-Fehler durch Downloads/Fremddaten bzw. Anmelde-Vorbedingung; Fehlerklasse, gegen die die festen Platzhalter wirken)*. Nachgelagert laut Zielbild: Baustein 3 (Test-Fingerabdruck) und die Skill-Bausteine 5–7 — dafür gibt es noch keine Tickets.
+
+---
+
+
+#### 🔬 Analyse & Implementation Spec (TASK-119) · 2026-10-24
+
+> Analyse-Subagent, 24.10.2026. Grundlage: Analyse-Entwurf `docs/analyse-entwurf/TASK-119.md` (23.10.2026) und **Stephans verbindliche Entscheidungen vom 24.10.2026** (Fragen 1–7), die jeder abweichenden Aussage im Entwurf vorgehen. Zielbild: `QUALITAETS-PIPELINE.md`, Abschnitt 3a und Phase 1.
+> **Status-Empfehlung:** In Analysis — die Tests (Phase 1, Schritt 4) stehen noch aus; danach automatische Test-Prüfung und Einfrieren ohne Stephan (Entscheidung 24.10.2026).
+
+##### Kernbefund in Alltagssprache
+Das Grundgerüst lässt sich bauen, ohne die App selbst anzufassen. Zwei Dinge müssen dafür im ganzen Testlauf fest stehen: die Uhrzeit (die App fragt an rund 70 Stellen im Server und an 15 Stellen im Browser selbst nach „jetzt") und die Sternendaten (die App lädt sie sonst aus dem Internet). Der Pilot „Goldene Stunde Abend am 21.06.2027" braucht weder Wetter noch Geländehöhe noch Ortsnamen aus dem Internet und läuft deshalb sauber über beide Wege: direkt am Server und durch den Browser. Das größte Risiko ist ein Platzhalter, der nur halb wirkt (Server fest, Browser echt) — dagegen schützen das Gegenstück am 22.06.2027 und die Uhr-Gleichheitsprüfung.
+
+##### Getroffene Entscheidungen (Stephan, 24.10.2026)
+| # | Entscheidung | gewählt | Begründung |
+|---|---|---|---|
+| 1 | Form der Testfälle | **Deutsches Gherkin** („Angenommen … Wenn … Dann …") als reine Textdateien; Nachweis der deutschen Schlüsselwörter zu Beginn; sonst automatischer Rückfall auf Fachsprache in Python mit Meldung an Stephan | Stephans Freigabe ist der Kern des Zielbilds; reine Textdateien sind am besten lesbar und am saubersten einzufrieren |
+| 2 | Pilot | Goldene Stunde Abend 21.06.2027, „Pilot-Ort Tempelhofer Feld", Blick nach Westen, plus Gegenstück 22.06.2027; zuerst prüfen, ob der Ort die Goldene Stunde Abend überhaupt zeigt | klein, durchläuft alle vier Schichten, braucht nur Uhr und Sternendaten; „Ort speichern" verworfen, weil es den Ortsnamen aus dem Internet holt |
+| 3 | Erwarteter Wert | aus einem anerkannten Sonnenstandsrechner, nicht aus der App; ±2 Minuten; Quelle und Wert im Testfall | sonst prüft der Test die App gegen sich selbst |
+| 4 | Sternendaten | kleiner, mitgelieferter Auszug für den Testzeitraum, kein Download; bestehende Tests unberührt | Tests fallen lokal und online gleich aus; Rechnen außerhalb des Zeitraums fällt sofort auf |
+| 5 | Test-Werkzeuge | eigene Liste nur für Tests, nie auf dem Produktionsserver | normale Abhängigkeitsliste wird beim Deploy auf dem Server installiert |
+| 6 | Treiber | beide Wege in diesem Ticket (Server und Browser), derselbe unveränderte Pilot-Text | nur so ist „ein Text, zwei Wege" wirklich belegt |
+| 7 | Rahmen | (a) Fingerabdruck nur vorbereiten (eigene, saubere Ablage für Testfälle und Fachsprache), Prüfung = eigenes Ticket (Baustein 3); (b) deutsche Namen; (c) höchstens 2 Minuten zusätzliche Laufzeit bei GitHub | — |
+
+Technische Weggabelungen ohne Stephan-Relevanz (aus dem Entwurf, durch die Entscheidungen gedeckt): Uhr für den ganzen Testprozess einfrieren plus feste Browser-Uhr (statt zentraler Uhr im Produktionscode — Nicht-Ziel; statt Einzelstellen ersetzen — lückenhaft, verworfen).
+
+##### Scope
+**Eingeschlossen:** Vier-Schichten-Grundgerüst (Testfälle → Fachsprache → Treiber für Server und Browser → echte App mit festen Platzhaltern für Uhrzeit, Wetter und Sternendaten plus Sperre gegen ungeplante Internetzugriffe); Pilot-Testfall mit Gegenstück; Selbstprüfungen des Grundgerüsts (Testfall-Liste unten); Einbindung in die GitHub-Prüfung; eigene Liste für Test-Werkzeuge; vorbereitete Ablage für den späteren Fingerabdruck.
+
+**Nicht-Ziele (final):**
+- Keine Migration, Umbenennung oder Änderung bestehender Tests, Testhelfer, der gemeinsamen Test-Vorbereitung und des bestehenden Browser-Checks. Bestehende Tests nutzen weiter ihre bisherigen Sternendaten.
+- Keine Änderung am Verhalten der App: kein Produktionscode im Server, keine Oberfläche, keine Daten.
+- Keine zentrale „Uhr" im Produktionscode (wäre ein eigenes Ticket).
+- Keine Fingerabdruck-Berechnung als Prüfschritt, keine Fingerabdruck-Prüfung lokal oder bei GitHub (Baustein 3); kein Probelauf im Release-Skript (TASK-117); kein Live-Check (TASK-118); keine Skill-Änderungen (Bausteine 5–7).
+- Keine weiteren fachlichen Testfälle außer Pilot und Gegenstück; die Selbstprüfungen des Grundgerüsts zählen nicht dazu.
+- Keine echten Platzhalter für Geländehöhe, Ortsname, Wetterkarte und Push — nur die Sperre, die solche Zugriffe meldet.
+- Keine Mobil-/iOS-Variante, kein zweiter Browser.
+- Keine Änderung an der normalen Abhängigkeitsliste des Servers und am Deploy-Skript.
+
+**Erlaubte Bereiche (final):**
+- Ein **neuer** Unterordner im Server-Testordner für das Grundgerüst (alles darin neu, inkl. Sternendaten-Auszug).
+- Test-Doku: ein **neuer Abschnitt**; bestehende Zeilen unverändert.
+- Test-Konfiguration: **eine** neue Kennzeichnung für Akzeptanztests ergänzen; bestehende Zeilen unverändert.
+- GitHub-Prüfung: Schritte **ergänzen** (Test-Werkzeuge installieren, beide Wege ausführen, „übersprungen = rot"); bestehende Schritte unverändert.
+- Neue, separate Liste der Test-Werkzeuge.
+
+##### Example Mapping (final)
+📏 **R1 – Testfälle sprechen nur Fachsprache.** 🟢 Gegeben der Pilot, wenn Stephan ihn liest, dann kommt darin kein Klick, keine Adresse, kein Knopfname vor. 🟢 Gegeben ein Testfall mit „klicke auf …", wenn die Prüfung läuft, dann meldet sie einen Fachsprachen-Verstoß.
+📏 **R2 – Derselbe Text läuft über zwei Wege mit gleichem Ergebnis.** 🟢 Gegeben der Pilot, wenn er über den Server-Weg läuft, dann ist er grün; über den Browser-Weg ebenfalls, ohne dass am Text etwas anders ist.
+📏 **R3 – Die Welt des Tests ist fest.** 🟢 Gegeben „heute ist 21.06.2027, 12:00 Uhr", wenn der Test nachts auf dem Mac oder mittags bei GitHub läuft, dann ist das Ergebnis identisch. 🟢 Gegeben derselbe Ort und „heute ist 22.06.2027", dann steht die Goldene Stunde vom 21.06. nicht mehr in der Liste. 🟢 Gegeben ein Testfall, der unbeabsichtigt echtes Wetter braucht, dann bricht er mit einer Meldung ab, die den Wetterdienst nennt.
+📏 **R4 – Bestehendes bleibt unberührt.** 🟢 Gegeben die vollständige bestehende Testsuite, wenn das Grundgerüst hinzukommt, dann liefert sie vorher und nachher dasselbe Ergebnis.
+📏 **R5 – Testfälle und Fachsprache sind einfrierbar abgelegt.** 🟢 Gegeben eine Änderung nur am Browser-Treiber, dann ist in der Ablage der Testfälle und der Fachsprache keine Datei verändert.
+❓ Offene Questions: 0 (alle Fragen am 24.10.2026 beantwortet). Eine Bestätigung ist erbeten, blockiert aber nicht (siehe „Bestätigung erbeten" unten).
+
+##### Akzeptanzkriterien (final, Alltagssprache)
+*Testfälle und Fachsprache*
+- [ ] **AK-1** Die Testfälle sind kurze deutsche Texte im Aufbau „Angenommen … Wenn … Dann …", die ohne Programmierkenntnisse lesbar sind und nur Fachsprache enthalten. *(Herkunft: Frage 1; messbar durch die automatische Test-Prüfung, Entscheidung 24.10.2026)*
+- [ ] **AK-2** Bevor weitere Teile des Grundgerüsts entstehen, ist nachgewiesen, dass die deutschen Schlüsselwörter zuverlässig verstanden werden: Ein deutscher Probetext läuft grün, und ein absichtlich falsch geschriebenes Schlüsselwort führt zu einer Fehlermeldung statt zu einem stillen Überspringen. *(Herkunft: Frage 1)*
+- [ ] **Edge Case AK-3** Gelingt dieser Nachweis nicht, werden die Testfälle als kurze Fachsprache-Blöcke in Python geschrieben, und Stephan erhält eine Meldung mit dem Grund, bevor weitergearbeitet wird. *(Herkunft: Frage 1)*
+- [ ] **AK-4** Steht in einem Testfall ein Bedienhinweis (Klicken, Tippen, Webadresse, Knopfname), meldet eine Prüfung diesen Fachsprachen-Verstoß und nennt Testfall und Zeile. *(Herkunft: R1)*
+- [ ] **AK-5** Testfälle, Fachsprache-Schritte und Testorte tragen deutsche Namen. *(Herkunft: Frage 7b)*
+
+*Pilot*
+- [ ] **AK-6** Bevor der Pilot geschrieben wird, ist geprüft, dass der „Pilot-Ort Tempelhofer Feld" mit Blick nach Westen am Testtag 21.06.2027 in seinen nächsten Ereignissen eine Goldene Stunde Abend zeigt. Zeigt er sie nicht, bekommt Stephan einen angepassten Vorschlag; der Pilot wird nicht eigenmächtig geändert. *(Herkunft: Frage 2)*
+- [ ] **AK-7** Die erwartete Beginn-Uhrzeit der Goldenen Stunde Abend stammt aus einem anerkannten Sonnenstandsrechner, nicht aus der App. Name der Quelle, Abfragedatum und abgelesener Wert stehen im Testfall; akzeptiert wird eine Abweichung von höchstens 2 Minuten. *(Herkunft: Frage 3)*
+- [ ] **AK-8** Der Pilot ist über den Server-Weg grün.
+- [ ] **AK-9** Derselbe, unveränderte Pilot-Text ist über den Browser-Weg grün. *(Herkunft: Frage 6)*
+- [ ] **AK-10** Der Browser-Weg wartet, bis die Ladeanzeige der Ereignisliste verschwunden ist, statt eine feste Zeit zu warten. Verschwindet sie nicht innerhalb eines festgelegten Höchstmaßes, wird der Test rot und sagt, dass die Liste nicht fertig geladen hat. *(Herkunft: Zustands-Check)*
+- [ ] **AK-11** Schlägt der Pilot fehl, sagt die Meldung in Fachsprache, was erwartet und was gefunden wurde (z. B. „Erwartet: Goldene Stunde Abend am 21.06.2027, Beginn zwischen [VON] und [BIS] Uhr – gefunden: keine").
+- [ ] **Edge Case AK-12** Wird im Pilot zur Probe eine falsche erwartete Uhrzeit (mehr als 2 Minuten daneben) oder ein falsches Datum eingesetzt, wird er rot. *(Ersetzt beim Pilot den Rot-Nachweis, weil das geprüfte Verhalten schon existiert)*
+
+*Feste Welt (Platzhalter)*
+- [ ] **AK-13** Der Pilot liefert auf dem Mac und bei GitHub dasselbe Ergebnis, unabhängig von echter Uhrzeit und echtem Datum des Laufs. *(Herkunft: Pre-Mortem 1)*
+- [ ] **AK-14** Gegenstück: Ist der feste Testtag Dienstag, 22.06.2027, steht die Goldene Stunde Abend vom 21.06.2027 nicht mehr in der Liste. *(Herkunft: Frage 2, Pre-Mortem 1)*
+- [ ] **AK-15** Server und Browser stehen im Test auf demselben festen Tag und derselben festen Uhrzeit. *(Herkunft: Pre-Mortem 1)*
+- [ ] **AK-16** Die neuen Akzeptanztests verwenden den mitgelieferten Sternendaten-Auszug und laufen ohne Internet; Sternendaten werden dabei weder lokal noch bei GitHub heruntergeladen. *(Herkunft: Frage 4)*
+- [ ] **Edge Case AK-17** Fehlt der Sternendaten-Auszug oder ist er beschädigt, bricht der Test sofort mit einer klaren Meldung ab und lädt nichts herunter. *(Herkunft: Frage 4)*
+- [ ] **Edge Case AK-18** Braucht eine Rechnung einen Tag außerhalb des Auszugs, bricht der Test mit einer Meldung ab, die den Zeitraum des Auszugs nennt — er rechnet nicht still weiter und lädt nichts nach. *(Herkunft: Pre-Mortem 6)*
+- [ ] **AK-19** Ein Testfall kann festes Wetter vorgeben (z. B. „das Wetter für morgen ist Regen"); die App bekommt dann genau dieses Wetter.
+- [ ] **Edge Case AK-20** Versucht ein Akzeptanztest unbeabsichtigt, Wetter, Geländehöhe oder einen Ortsnamen aus dem Internet zu holen, wird er rot, und die Meldung nennt den Dienst. *(Herkunft: R3)*
+- [ ] **AK-21** Die Akzeptanztests verändern Stephans lokale Dev-Daten und Zwischenspeicher nicht: Sie lesen und schreiben ausschließlich in eigenen Wegwerf-Ablagen, und kein Testort bleibt in Stephans Daten liegen. Änderungen durch einen parallel laufenden Dev-Server zählen nicht als Verstoß. *(Herkunft: Pre-Mortem 5; Klarstellung 24.10.2026 nach Modus-T-Befund — Sinn unverändert: die Tests lassen Stephans Daten in Ruhe)*
+
+*Bestehendes und Betrieb*
+- [ ] **AK-22** Alle bestehenden Tests liefern vorher und nachher ein identisches Ergebnis: dieselben Tests mit demselben Ausgang (bestanden, übersprungen, fehlgeschlagen) — lokal und bei GitHub. *(Herkunft: Ticket, Zielbild 3a, Pre-Mortem 4)*
+- [ ] **AK-23** Keine bestehende Testdatei, kein Testhelfer, keine gemeinsame Test-Vorbereitung und kein bestehender Browser-Check ist verändert; die bestehenden Tests nutzen weiter ihre bisherigen Sternendaten. *(Herkunft: Ticket, Frage 4)*
+- [ ] **AK-24** Bei GitHub laufen beide Wege des Pilots tatsächlich; wird dort einer übersprungen, ist die Prüfung rot. *(Herkunft: Pre-Mortem 2, BUG-100)*
+- [ ] **AK-25** Die neuen Test-Werkzeuge stehen in einer eigenen Liste nur für Tests und werden nie auf dem Produktionsserver installiert; die normale Abhängigkeitsliste des Servers ist unverändert. *(Herkunft: Frage 5)*
+- [ ] **AK-26** Die GitHub-Prüfung dauert mit dem Grundgerüst höchstens 2 Minuten länger als vorher (Messort GitHub; Vorher- und Nachher-Dauer der Prüfung aus den Protokollen, Mittel aus je 3 Läufen). *(Herkunft: Frage 7c)*
+
+*Vorbereitung Fingerabdruck (Baustein 3)*
+- [ ] **AK-27** Testfälle und Fachsprache liegen in einer eigenen Ablage, getrennt von Treibern und Platzhaltern; in dieser Ablage steht keine Bedien- oder Platzhalter-Technik. Eine Änderung nur an einem Treiber verändert dort keine Datei. *(Herkunft: Frage 7a, R5)*
+- [ ] **AK-28** Jeder Fachsprache-Schritt steht einzeln mit seinem Satz und seiner Bedeutung in Worten, sodass später je Schritt ein eigener Fingerabdruck gebildet werden kann; ein neu hinzukommender Schritt verändert die bestehenden Schritte nicht. *(Herkunft: Frage 7a)*
+- [ ] **AK-29** Ein Tippfehler im ersten Schritt eines Szenarios kann einen Schritt nie unbemerkt verschwinden lassen: Steht unter „Szenario:" oder „Grundlage:" Text, der nicht als Schritt erkannt wird, weist ein Wächter den Testfall zurück und der Lauf wird rot. *(Herkunft: Fund des Test-Agenten 24.10.2026 – das Gherkin-Werkzeug liest solche Zeilen sonst still als Beschreibung; von Stephan freigegeben 24.10.2026)*
+
+##### Pilot-Testfall (deutsches Gherkin, zur Freigabe)
+[VON]/[BIS] und die Quellenangabe bleiben Platzhalter, bis der unabhängige Sonnenstandsrechner befragt ist (AK-7) und die Vorabprüfung des Ortes (AK-6) bestanden ist.
+
+```gherkin
+# language: de
+Funktion: Nächste Ereignisse eines Ortes
+
+  # Erwartete Uhrzeit: unabhängige Quelle [QUELLE], abgefragt am [ABFRAGEDATUM],
+  # Beginn Goldene Stunde Abend am 21.06.2027 für den Pilot-Ort: [WERT] Uhr; Toleranz ±2 Minuten.
+
+  Grundlage:
+    Angenommen es gibt den Ort „Pilot-Ort Tempelhofer Feld" mit Blick nach Westen auf ein Motiv in 1 km Entfernung
+
+  Szenario: Die Goldene Stunde am Abend des Testtags erscheint
+    Angenommen heute ist Montag, der 21. Juni 2027, 12:00 Uhr Berliner Zeit
+    Wenn der Fotograf die nächsten Ereignisse dieses Ortes ansieht
+    Dann steht in der Liste eine „Goldene Stunde Abend" am 21. Juni 2027
+    Und sie beginnt zwischen [VON] und [BIS] Uhr Berliner Zeit
+    Und kein Ereignis in der Liste liegt vor dem 21. Juni 2027
+
+  Szenario: Am Folgetag ist der Testtag vorbei (Gegenstück)
+    Angenommen heute ist Dienstag, der 22. Juni 2027, 12:00 Uhr Berliner Zeit
+    Wenn der Fotograf die nächsten Ereignisse dieses Ortes ansieht
+    Dann steht in der Liste keine „Goldene Stunde Abend" am 21. Juni 2027
+```
+Wochentage nachgerechnet: 21.06.2027 = Montag, 22.06.2027 = Dienstag. [VON]/[BIS] = abgelesener Wert −2 / +2 Minuten.
+
+Fachsprache-Schritte, die dafür entstehen: *heute ist …*, *es gibt den Ort … mit Blick nach … auf ein Motiv in … Entfernung*, *der Fotograf sieht die nächsten Ereignisse dieses Ortes an*, *in der Liste steht (k)eine … am …*, *sie beginnt zwischen … und …*, *kein Ereignis in der Liste liegt vor …*. Vorbereitet, im Pilot nicht benutzt: *das Wetter für morgen ist …*.
+
+##### Testfall-Liste für das Grundgerüst (Fachsprache)
+| # | Testfall | Art | Prüft |
+|---|---|---|---|
+| T-01 | Die automatische Test-Prüfung bestätigt für Pilot und Gegenstück: nur Fachsprache, keine Bedien- oder Technikbegriffe, jeder Satz einem Kriterium zugeordnet. | automatisch | AK-1 |
+| T-02 | Ein deutscher Probetext mit „Angenommen … Wenn … Dann" läuft grün. | automatisch | AK-2 |
+| T-03 | Ein Probetext mit falsch geschriebenem Schlüsselwort führt zu einer Fehlermeldung, nicht zu „übersprungen". | automatisch | AK-2 |
+| T-04 | Ist der Nachweis aus T-02/T-03 gescheitert, liegen die Testfälle als Python-Fachsprache vor und die Meldung an Stephan ist erfolgt. | Nachweis (nur im Rückfall) | AK-3 |
+| T-05 | Ein Testfall mit „klicke auf …" wird als Fachsprachen-Verstoß mit Testfall und Zeile gemeldet. | automatisch | AK-4 |
+| T-06 | Ein Testfall mit einer Webadresse wird als Fachsprachen-Verstoß gemeldet; der Pilot nicht. | automatisch | AK-4 |
+| T-07 | Alle Testfälle, Schritte und Testorte haben deutsche Namen. | Durchsicht | AK-5 |
+| T-08 | Der Pilot-Ort zeigt am 21.06.2027 eine Goldene Stunde Abend in seinen nächsten Ereignissen (Vorabprüfung; sonst Vorschlag an Stephan). | automatisch, vor dem Pilot | AK-6 |
+| T-09 | Im Pilot sind Quelle, Abfragedatum und Wert eingetragen, und [VON]/[BIS] liegen genau 2 Minuten um den Wert. | Durchsicht | AK-7 |
+| T-10 | Der Pilot ist über den Server-Weg grün. | automatisch | AK-8 |
+| T-11 | Der Pilot ist über den Browser-Weg grün, mit demselben Text. | automatisch | AK-9 |
+| T-12 | Bleibt die Ladeanzeige stehen, wird der Browser-Weg nach dem Höchstmaß rot mit dem Hinweis „Liste nicht fertig geladen". | automatisch | AK-10 |
+| T-13 | Mit falsch erwartetem Datum wird der Pilot rot und sagt in Fachsprache, was erwartet und was gefunden wurde. | automatisch | AK-11, AK-12 |
+| T-14 | Mit einer erwarteten Uhrzeit 5 Minuten daneben wird der Pilot rot. | automatisch | AK-12 |
+| T-15 | Der Pilot liefert lokal und bei GitHub dasselbe Ergebnis (Protokolle beider Läufe verglichen). | Nachweis beim Abschluss | AK-13 |
+| T-16 | Mit dem Testtag 22.06.2027 steht die Goldene Stunde vom 21.06.2027 nicht mehr in der Liste (Gegenstück). | automatisch | AK-14 |
+| T-17 | Server und Browser nennen im Test denselben Tag und dieselbe Uhrzeit. | automatisch | AK-15 |
+| T-18 | Ohne Internet läuft der Pilot grün durch, und es wurde keine Sternendaten-Datei geladen. | automatisch | AK-16 |
+| T-19 | Ohne Sternendaten-Auszug bricht der Test mit klarer Meldung ab und lädt nichts. | automatisch | AK-17 |
+| T-20 | Eine Rechnung für einen Tag außerhalb des Auszugs bricht mit einer Meldung ab, die den Zeitraum nennt. | automatisch | AK-18 |
+| T-21 | Ist „das Wetter für morgen ist Regen" gesetzt, bekommt die App für morgen Regen. | automatisch | AK-19 |
+| T-22 | Ein Test, der echtes Wetter anfragen würde, wird rot und nennt den Wetterdienst. | automatisch | AK-20 |
+| T-23 | Ein Test, der Geländehöhe oder einen Ortsnamen anfragen würde, wird rot und nennt den Dienst. | automatisch | AK-20 |
+| T-24 | Ein Testlauf öffnet Stephans Dev-Daten und Zwischenspeicher nie zum Schreiben (alle Schreibzugriffe landen in der Wegwerf-Ablage), und danach liegt kein Pilot-Ort in Stephans Daten. | automatisch | AK-21 |
+| T-25 | Die bestehende Suite liefert vorher und nachher dieselben Tests mit demselben Ausgang (lokal und GitHub). | Nachweis beim Abschluss | AK-22 |
+| T-26 | Keine bestehende Testdatei, kein Testhelfer, keine gemeinsame Test-Vorbereitung ist verändert (Vergleich mit der Ausgangskopie). | Nachweis beim Abschluss | AK-23 |
+| T-27 | Das GitHub-Protokoll zeigt beide Wege ausgeführt; ein absichtlich übersprungener Weg macht die Prüfung rot. | Nachweis beim Abschluss | AK-24 |
+| T-28 | Die normale Abhängigkeitsliste ist unverändert; die Test-Werkzeuge stehen nur in der eigenen Liste. | automatisch | AK-25 |
+| T-29 | Die GitHub-Prüfung ist im Mittel aus je 3 Läufen höchstens 2 Minuten länger als vorher. | Nachweis beim Abschluss | AK-26 |
+| T-30 | In der Ablage für Testfälle und Fachsprache steht keine Treiber- oder Platzhalter-Technik. | automatisch | AK-27 |
+| T-31 | Jeder Fachsprache-Schritt hat einen eigenen Satz und eine Bedeutung in Worten. | automatisch | AK-28 |
+| T-32 | Ein Testfall, in dem direkt unter „Szenario:" oder „Grundlage:" ein falsch geschriebener Schritt steht (z. B. „Angenomen …"), wird vom Wächter zurückgewiesen und ist rot – er wird nie still grün. | automatisch | AK-29 |
+| T-33 | Ein korrekt geschriebener Testfall ohne Beschreibungstext passiert den Wächter. | automatisch | AK-29 |
+
+##### Pre-Mortem
+📎 **Code-Verifikation:** übernommen aus dem Entwurf (gelesen am 23.10.2026, Fundstellen siehe Technische Notizen). Am 24.10.2026 zusätzlich geprüft: Test-Konfiguration hat noch keine Kennzeichnung für Akzeptanztests; ein Unterordner für das Grundgerüst existiert noch nicht; Wochentage des Pilots nachgerechnet.
+**Zusammenspiel:** Testfall → Fachsprache → Treiber (Server-Weg: Anfrage im selben Prozess; Browser-Weg: echter Browser gegen eigenen Testserver) → Server rechnet mit Fenster-Engine und Sternendaten unter fester Uhr. Kritisch: Uhr im Server fest, im Browser echt (oder umgekehrt); Uhr/Sternendaten prozessweit getauscht, während in derselben Sitzung bestehende Tests laufen.
+
+- 💀 **1 – Platzhalter wirkt nur halb.** Server fest, Browser echt, oder eine Stelle im Server fragt doch die echte Uhr; lokal grün, nachts/online rot (Muster TASK-91, BUG-105, BUG-117). → Gegenmaßnahme: Uhr prozessweit einfrieren, Browser-Uhr festsetzen; AK-13, AK-14, AK-15.
+- 💀 **2 – Browser-Weg läuft bei GitHub still nicht** (BUG-100). → Gegenmaßnahme: „übersprungen = rot" bei GitHub, Browser-Weg ausdrücklich im Browser-Schritt aufrufen; AK-24.
+- 💀 **3 – Treiber mogelt oder Test prüft sich selbst.** Erwarteter Wert aus der App abgeschrieben oder Server-Weg baut die Anfrage anders als die Oberfläche. → Gegenmaßnahme: unabhängige Quelle im Testfall (AK-7), Server-Weg nutzt dieselben Ortsdaten wie die Oberfläche, Treiber liefern nur Beobachtungen, verglichen wird in der Fachsprache; Prüfer-Vorlage jeder Treiber-Änderung (Zielbild 3a); Probe mit falscher Erwartung (AK-12).
+- 💀 **4 – Neues stört Bestehendes.** Eingefrorene Uhr oder Sternendaten-Auszug bleibt nach dem Akzeptanztest aktiv; Häufigkeitsbremse der Ereignisliste (20 Aufrufe/Minute) oder gemeinsame Test-Vorbereitung greift über. → Gegenmaßnahme: Platzhalter strikt pro Testfall an und danach zurück, Browser-Weg mit eigenem Testserver in eigenem Prozess; AK-22, AK-23.
+- 💀 **5 – Nebenwirkungen außerhalb des Tests.** Test-Werkzeuge landen auf dem Produktionsserver oder ein Testort bleibt in Stephans Dev-Daten. → Gegenmaßnahme: eigene Werkzeugliste (AK-25), Wegwerf-Datenbank und Wegwerf-Zwischenspeicher pro Lauf (AK-21).
+- 💀 **6 – Sternendaten-Auszug zu knapp oder rechnet anders.** Die Ereignisliste rechnet 365 Tage ab Testtag plus Suchränder; ein zu kurzer Auszug bricht mitten im Pilot ab, ein fehlerhaft geschnittener liefert andere Uhrzeiten. → Gegenmaßnahme: Zeitraum mit Reserve wählen (Technische Notizen), einmaliger Vergleich Pilot-Ergebnis Auszug gegen Gesamtdatei beim Erstellen, klare Meldung bei Tagen außerhalb (AK-18), eigene Prüfsumme des Auszugs (AK-17).
+- 💀 **7 – Deutsche Schlüsselwörter werden still ignoriert** und Szenarien gelten als „nicht gefunden" statt rot. → Gegenmaßnahme: Nachweis zuerst (AK-2, T-03), Rückfall mit Meldung (AK-3).
+- 💀 **8 – Eingefrorene Uhr legt Wartezeiten lahm.** Steht die Uhr völlig still, können Zeitlimits von Testserver, Browser-Steuerung oder Netzwerk-Bibliothek hängen bleiben. → Gegenmaßnahme: in der Umsetzung prüfen, ob die Uhr ab dem festen Startpunkt weiterlaufen muss (Ergebnis bleibt deterministisch, weil 12:00 Uhr weit von Tagesgrenzen und vom Ereignis entfernt ist); Höchstlaufzeit pro Testfall; AK-10, AK-26.
+
+**Seiteneffekte auf Nachbarbereiche:** GitHub-Prüfung (Laufzeit, neue Schritte), Test-Doku, TASK-117 (Probelauf muss dieselben Schritte mitnehmen). Keine App-Ansicht betroffen.
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt (5 Regeln, alle mit Beispiel; 0 offene Questions)
+- [x] Fundstellen-Sweep (aus Entwurf 23.10.2026, nicht erneut gezählt): Uhrzeit Server `datetime.now|date.today|utcnow|time.time()` → 28 Hauptprogramm, 18 Vorberechnung, 4 Speicher, 4 Sicherung, 3 Wetter-Zwischenspeicher, 2 Wetter, je 1 in Entdecken-Pipelines, Sichtachse, Chancen-Berechnung, Wetterkarte, Push; Uhrzeit Browser `new Date()|Date.now()` → 15; Sternendaten: 1 Ladestelle, 13 Nutzer; weitere Fremdquellen: Open-Meteo (2), OpenTopoData, Nominatim, DWD/MET Norway. App-Bereiche Liste, Karte, Kalender, Chancen-Übersicht, Event-Detail: nicht verändert; der Pilot berührt nur „Nächste Events" im Ort-Detail; Scout seit US-142 entfernt.
+- [x] Zustands-Check: Warten → AK-10; Leer (Ort ohne Motiv) → nicht Teil des Pilots, späterer Testfall; Fehler im Grundgerüst (Sternendaten fehlen/außerhalb, ungeplanter Internetzugriff, Testserver startet nicht) → AK-17, AK-18, AK-20 sowie Serverprotokoll in der Fehlermeldung des Browser-Wegs.
+- [x] Pre-Mortem durchgeführt (8 Szenarien)
+- [x] Architektur analysiert (siehe Technische Notizen)
+- [x] Designer-Check: visuell? → nein, übersprungen (keine sichtbare Änderung der App)
+- [x] Implementierungsoptionen: siehe „Getroffene Entscheidungen"
+- [x] Empfehlung: von Stephan am 24.10.2026 entschieden
+- [ ] AK-Qualitäts-Check durchgeführt (Schritt 6c): vorläufig durchgeführt, siehe unten — Rot-Nachweis folgt mit den Tests
+
+##### AK-Qualitäts-Check (vorläufig, vor den Tests)
+- **Granularität:** Entwurfs-AK-15 in AK-22 (gleiches Ergebnis) und AK-23 (nichts verändert) geteilt; Gherkin-Nachweis (AK-2) und Rückfall (AK-3) getrennt.
+- **Polarität:** R1 → AK-4; R2 → AK-12; R3 → AK-14, AK-17, AK-18, AK-20; R4 → AK-22/23; R5 → AK-27/28.
+- **Messbarkeit:** keine Funktions-, Datei- oder Klassennamen; AK-1 wird über die automatische Test-Prüfung gemessen (Entscheidung 24.10.2026: keine manuelle Freigabe der Testfälle durch Stephan).
+- **Vier Kategorien:** funktional AK-1–21; nicht-funktional Laufzeit AK-26, Zugriffsschutz: Browser-Weg meldet sich mit Test-Passwort in der Dev-Umgebung an (bestehende Regel, kein neues AK); Architektur: Rückwärtskompatibilität AK-22/23, Schichtentrennung AK-27/28; Sonstiges/Betrieb: AK-24, AK-25, Beobachtbarkeit AK-11, AK-20.
+- **Testbarkeit:** Rot-Nachweis folgt in der Testphase; beim Pilot ersetzt durch Falsch-Erwartungs-Probe (AK-12), weil das Verhalten schon existiert; Selbstprüfungen des Grundgerüsts sind vor der Umsetzung echt rot.
+- **Herkunft:** jedes AK aus Frage oder Pre-Mortem vermerkt.
+- **Checkliste:** Grenzwerte – AK-18 (Rand des Auszugs), 12:00 Uhr bewusst weit von Mitternacht; ungültige Eingaben – AK-3, AK-4, AK-17; Nebenläufigkeit – nicht relevant außer Häufigkeitsbremse (Pre-Mortem 4); Lastgrenzen – AK-26; Berechtigungen – Test-Passwort, Dev-Umgebung; Abwärtskompatibilität – AK-22/23; Rollback – reine Ergänzung, löschbar; Beobachtbarkeit – AK-11, AK-20, Serverprotokoll.
+
+##### 🚦 Ampel-Ergebnis
+🟢 Grün — autonome Umsetzung möglich. Begründung je Prüffrage: (1) Abstand: alle Weggabelungen von Stephan entschieden; (2) im Ticket: nur neue Dateien in erlaubten Bereichen plus ergänzende Schritte in der GitHub-Prüfung, keine Datenbank-, Sicherheitsregel- oder App-Änderung; (3) ohne Datenverlust rückgängig: ja, reine Ergänzung; (4) Pre-Mortem: kein hohes Risiko, mittlere Risiken 1, 2 und 6 durch AKs abgesichert; (5) keine Optikfrage. Die Pipeline-Freigabe der Testfälle durch Stephan (Phase 1, Schritt 5) und ein angepasster Pilot-Vorschlag (falls AK-6 scheitert) bleiben davon unberührt.
+
+##### Bestätigung erbeten (nicht blockierend)
+- **Fingerabdruck-Berechnung:** Der Entwurf sah vor, eine Berechnung des Fingerabdrucks schon mitzubauen. Stephans Entscheidung 7a nennt „nur vorbereiten (eigene, saubere Ablage)". Diese Spec folgt Stephans Wortlaut: nur Ablage (AK-27, AK-28), Berechnung und Prüfung in Baustein 3. Soll eine Berechnung doch schon hier entstehen, kommen zwei AKs hinzu (Zeichen geändert → Fingerabdruck anders; Treiber geändert → gleich).
+- **Pilot-Text:** Gegenüber dem Entwurf steht „heute ist …" jetzt in jedem Szenario statt in der Grundlage, damit das Gegenstück nicht einen bereits gesetzten Tag überschreiben muss. Inhalt unverändert.
+
+##### Testplan
+- [ ] **Automatisiert:** alle mit „automatisch" markierten Testfälle (T-02, T-03, T-05, T-06, T-08, T-10–T-14, T-16–T-24, T-28, T-30, T-31) im neuen Unterordner des Server-Testordners; Kennzeichnungen: neue Akzeptanztest-Kennzeichnung + `offline` + `api` (Server-Weg) bzw. `frontend` (Browser-Weg) + `regression` für Pilot und Gegenstück. Ticket-ID TASK-119 in jedem Testfall vermerkt.
+- [ ] **Nachweis beim Abschluss:** T-04 (nur im Rückfall), T-15, T-25, T-26, T-27, T-29 — mit Protokoll-Auszügen im Ticket.
+- [ ] **Automatische Test-Prüfung (statt Stephans Durchsicht):** T-01, T-07, T-09.
+- [ ] **Manuell:** keine Browser-Klickprüfung nötig, die App ändert sich nicht. Regressions-Matrix (PRODUCT.md §12): kein passender Änderungstyp; gefordert ist die vollständige bestehende Suite vorher/nachher (T-25).
+
+---
+
+##### Technische Notizen (für die Umsetzung — nicht Teil der Freigabe-Sprache)
+*Übernommen aus dem Entwurf vom 23.10.2026; nicht erneut gelesen, soweit nicht anders vermerkt.*
+- **Lokal:** Python 3.12.15 (venv), Playwright 1.64, jplephem 2.24 (mit skyfield); **kein** freezegun, time-machine, pytest-bdd. **CI:** Python 3.12, `pip install playwright` ohne Version → Version pinnen (Browser-Uhr braucht `page.clock`, ab 1.45).
+- **Uhr Server:** `/plan` macht `from datetime import date as _date` lokal, `start = _date.today()` → Monkeypatch von `main.date` greift nicht; `/preview-alignment` nutzt `date.today()`. Vorschlag `time-machine` (C-Ebene). Ob `time.monotonic` mitbetroffen ist und ob die Uhr mit `tick=True` laufen muss: in der Umsetzung prüfen (Pre-Mortem 8). **Browser:** `page.clock.set_fixed_time()` / `install()`.
+- **Sternendaten:** `astronomy._get_eph()` → `skyfield.api.load("de421.bsp")` (relativ zum Arbeitsverzeichnis, Download bei Fehlen); `ephemeris_core` nutzt `_astro._get_eph()`. Platzhalter ohne Produktionsänderung: `astronomy._eph` vorab auf den Auszug setzen (pro Testfall, danach zurück) + Download-Sperre. Auszug z. B. `python -m jplephem excerpt <start> <ende> de421.bsp <ziel>`; Zeitraum mit Reserve (Vorschlag 2027-05-01 bis 2028-08-31, deckt 365 Tage ab 22.06.2027 plus Suchränder) — Größe und Ergebnisgleichheit **unverifiziert**, beim Erstellen gegen die Gesamtdatei vergleichen; Prüfsumme des Auszugs ablegen.
+- **Wetter:** `calculations.weather.fetch_weather_forecast` / `fetch_aerosol_forecast` (httpx, Open-Meteo), in `main` importiert → Ersetzen über `main.fetch_weather_forecast` wie in `test_bug-104.py`. **Netzsperre:** httpx-Transport bzw. Socket global sperren, Meldung je Host (open-meteo, opentopodata, nominatim, DWD/MET Norway).
+- **Speicher:** `LocationStore(db_path=…)` parametrierbar, `main._store` Modul-Singleton (Z. 177); `_CACHE_DIR` umlenkbar wie in `test_bug117.py`. Ob ein Austausch von `main._store` alle Leser erreicht, ist **unverifiziert** — vor Umsetzung prüfen; Rückfall: eindeutige Test-ID + garantiertes Aufräumen.
+- **Browser-Weg:** eigener Startprozess (Platzhalter aktivieren → `uvicorn.run(main.app, port=8765)`), vom Test gestartet/gestoppt; Login mit Test-Passwort (TASK-97-Muster). CI: zusätzlicher Schritt im Job `test-frontend`; im Job `test-backend` Browser-Weg überspringen, aber mit Schalter „übersprungen = rot" im Browser-Schritt (AK-24).
+- **Häufigkeitsbremse** `/plan` 20/60 s — Limiter pro Test zurücksetzen oder eigener Prozess.
+- **Root-`conftest.py`** gilt auch für Unterordner (autouse `_isolate_client_cookies`); ein eigenes `conftest.py` im Unterordner darf nur ergänzen.
+- `test_task79_readme_marker_sync.py` / `test_task96_…` prüfen nur `tests/*.py` (nicht rekursiv). Da eine neue Kennzeichnung in `pytest.ini` hinzukommt: prüfen, ob die Marker-Synchronprüfung (TASK-79) einen README-Eintrag dafür verlangt, und ihn im neuen README-Abschnitt ergänzen — sonst wird ein bestehender Test rot (AK-22).
+- **Werkzeugliste:** `backend/requirements-test.txt` (neu), in beiden CI-Jobs installieren; **nicht** `requirements.txt` (`deploy/deploy.sh` Z. 71).
+- **Gherkin:** erste Zeile `# language: de` nötig. Ob das eingesetzte Werkzeug (Vorschlag pytest-bdd) die Schlüsselwörter `Funktion`, `Grundlage`, `Szenario`, `Angenommen`, `Wenn`, `Dann`, `Und` versteht, ist Gegenstand von AK-2; ist `Funktion` nicht bekannt, ist `Funktionalität` das gleichbedeutende Gherkin-Schlüsselwort (keine inhaltliche Änderung, Stephan informieren). Satzmuster mit typografischen Anführungszeichen „…" im Schritt-Parser berücksichtigen.
+- **Vorgeschlagene Ablage:**
+```
+backend/tests/akzeptanz/
+  testfaelle/            # Schicht 1 – einzufrieren (TASK-119_pilot.feature)
+  fachsprache/           # Schicht 2 – einzufrieren: je Schritt Satz + Bedeutung (Docstring), keine Technik
+  treiber/server/        # Schicht 3
+  treiber/browser/       # Schicht 3
+  platzhalter/           # Schicht 4 – Uhr, Wetter, Sternendaten, Netzsperre
+  system/                # Start des Testservers mit Platzhaltern
+  daten/                 # Sternendaten-Auszug + Prüfsumme
+```
+- **Fachsprachen-Wächter (AK-4):** Wortliste (klick, tippe, Knopf, Button, http, `/`, `#` außerhalb von Kommentarzeilen, CSS-artige Zeichen) über `testfaelle/`; Kommentarzeilen mit Quellenangabe (AK-7) ausnehmen oder Quellenangabe ohne Webadresse schreiben.
+- **Auffällige Anweisungstexte in gelesenen Dateien:** keine gefunden.
+
+### TASK-120 · Eingefrorene Tests technisch schützen: Fingerabdruck wird lokal und bei GitHub automatisch geprüft `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-10-24 |
+
+**Beschreibung:** Sind die Testfälle und die Fachsprache eines Tickets nach der automatischen Test-Prüfung eingefroren, wird ihr Fingerabdruck im Ticket gespeichert. Ändert sich danach auch nur ein Zeichen, stoppt die Pipeline sofort, lokal vor jedem weiteren Schritt und bei GitHub vor dem Live-Gang. Bisher gibt es dafür keine technische Sperre, nur eine Regel im Skill. Ein Agent könnte Tests also unbemerkt lockern.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich, dass eingefrorene Tests nachweislich unverändert bleiben, sodass „grün“ immer gegen genau die Anforderungen geprüft ist, die im Dialog festgelegt wurden.
+
+**Bezug:** QUALITAETS-PIPELINE.md Abschnitt 3 Phase 1 Schritt 5, Abschnitt 4 und Abschnitt 6 (Baustein 3). Baut auf TASK-119 auf (Ablage für Testfälle und Fachsprache, vorbereitet für Fingerabdrücke) und auf TASK-117 (gemeinsame Prüfliste für Mac und GitHub). Von Stephan am 24.10.2026 angelegt und direkt für die Pipeline freigegeben.
+
+
+#### 🔬 Analyse & Spec (TASK-120) · 2026-10-24
+> **Grundlage:** Entwurf `docs/analyse-entwurf/TASK-120.md` (24.10.2026) + **Entscheidungen Stephan vom 24.10.2026, Fragen 1–8** (verbindlich, gehen jeder abweichenden Aussage im Entwurf vor) + `skills-entwurf/ENTSCHEIDUNGEN.md` + Schnittstellen aus den Specs TASK-117, TASK-118, TASK-119, TASK-121. Geschrieben nach dem neuen Analyse-Skill-Entwurf (`skills-entwurf/fotoalert-analyze/`), Durchgang 3.
+> **Status-Empfehlung:** In Analysis — Spec fertig bis auf drei offene Fragen (9–11, je mit Empfehlung; Umsetzung folgt bis zur Antwort der Empfehlung *nicht* — Tests dürfen schon geschrieben werden, die von 9–11 abhängigen Testfälle sind markiert). Tests stehen aus.
+
+##### Kernbefund in Alltagssprache
+Heute schützt nur eine Regel die eingefrorenen Tests; technisch kann jeder Agent einen Test, seinen gespeicherten Fingerabdruck und sogar die Prüfung selbst ändern. Künftig bekommt jede eingefrorene Testfall-Datei, jeder Fachsprache-Schritt, jede Testdatei und jedes Prüfwerkzeug einen Fingerabdruck im Ticket. Vor jedem Pipeline-Schritt, im Probelauf und bei GitHub wird nachgerechnet; GitHub vergleicht zusätzlich mit dem früher Hochgeladenen. Gültig ändern kann einen eingefrorenen Stand nur Stephan mit einem einzigen Befehl, der einen geheimen Schlüssel aus seinem Schlüsselbund nutzt. Der erste Bestand (rund 165 bestehende Testdateien + Prüfwerkzeuge) entsteht einmalig: ein Agent berechnet ihn, Stephan bestätigt ihn mit demselben Befehl, und GitHub prüft, dass dabei keine bestehende Testdatei verändert wurde.
+
+##### Getroffene Entscheidungen
+| # | Entscheidung | Datum | Eingearbeitet in |
+|---|---|---|---|
+| 1 | Option B: Fingerabdruck im Ticket + Vergleich mit früheren Uploads bei GitHub + geheimer Schlüssel (Schlüsselbund + GitHub-Geheimnis, für Agenten unerreichbar); Bestätigungsbefehl nur, wenn Stephan einen Test ändert; Claude liefert jeweils eine Schritt-für-Schritt-Anleitung, Menü-/Knopfnamen unmittelbar vorher geprüft | 24.10.2026 | AK-20, AK-22, AK-26–AK-32, Umsetzungsschritt U3 |
+| 2 | Option C: eingefroren werden Testfälle + Fachsprache (je Schritt), alle neuen Testdateien eines Tickets, alle bestehenden Tests und die Prüfwerkzeuge (Release-Befehl, gemeinsame Prüfliste, GitHub-Prüfbeschreibung, Fingerabdruck-Prüfung); spätere Änderungen daran nur mit Stephans Schlüssel; Werkzeuge aus TASK-117/118 erst nach deren Fertigstellung | 24.10.2026 | AK-1, AK-3, AK-6–AK-9, AK-29, Reihenfolge |
+| 3 | Neu setzen nur Stephan über den festen Bestätigungsbefehl mit Schlüssel; eine Textzeile „Stephan, Datum: Grund" macht nichts gültig | 24.10.2026 | AK-26, AK-27 |
+| 4 | Schutz bleibt nach Done dauerhaft; Tests laufen als Regression weiter | 24.10.2026 | AK-18 |
+| 5 | Bei Rot: anhalten, Stephan Test und Ticket melden, nichts automatisch zurückdrehen | 24.10.2026 | AK-10, AK-11 |
+| 6 | Kommentarzeilen zählen zum Fingerabdruck | 24.10.2026 | AK-13 |
+| 7 | Testdatei ohne Fingerabdruck bei GitHub = rot, nichts geht live | 24.10.2026 | AK-23 |
+| 8 | Pilot aus TASK-119 normal einfrieren, sobald die Test-Prüfung ihn bestätigt; höchstens 30 s Zusatzdauer je Probelauf und GitHub-Prüfung | 24.10.2026 | AK-33, AK-34 |
+| 9 | *offen* — Hilfsroutine „offene Sheets schließen" (Treiber) in einer bestehenden Testdatei | — | AK-35 (vorläufig nach Empfehlung) |
+| 10 | *offen* — Feste Platzhalter (Uhrzeit, Wetter, Sternendaten) mit einfrieren? | — | AK-14 (vorläufig nach Empfehlung) |
+| 11 | *offen* — Schutz des Schlüssels auf dem Mac (Bestätigungs- und Release-Starter außerhalb des Projektordners) | — | AK-31, AK-32 (vorläufig nach Empfehlung) |
+
+##### Offene Fragen (neu aus der Finalisierung, nach Wichtigkeit)
+- ✅ **Frage 11 entschieden (Stephan, 24.10.2026): Option A.** Bestätigungsbefehl und Release-Starter liegen außerhalb des Projektordners; jeder Schlüsselzugriff löst eine sichtbare macOS-Abfrage aus (bei der Einrichtung auf Stephans Mac zu verifizieren). — Ursprüngliche Frage: **Wie wird der Schlüssel auf deinem Mac wirklich unerreichbar?** Befund: Alles, was du auf dem Mac startest (Release-Befehl, im Probelauf die Tests neuer Tickets), schreiben Agenten. Solcher Code läuft mit deinen Rechten und könnte den Schlüssel aus dem Schlüsselbund lesen und in eine Projektdatei schreiben — dann wäre Entscheidung 1 („für Agenten unerreichbar") ausgehebelt. Ebenso könnte ein Agent den Prüfschritt aus der GitHub-Prüfbeschreibung oder dem Release-Befehl entfernen; GitHub prüft nach der mit hochgeladenen Beschreibung.
+  Option A — *zwei kleine feste Befehle außerhalb des mit Claude verbundenen Projektordners* (einmalig von dir eingerichtet): ein **Bestätigungsbefehl** (einziger Befehl, der den Schlüssel liest) und ein **Release-Starter**, der vor dem Start des Release-Befehls prüft, dass Release-Befehl, Prüfliste, GitHub-Prüfbeschreibung und Fingerabdruck-Prüfung genau dem zuletzt von dir bestätigten Stand entsprechen (Vergleichsliste liegt ebenfalls außerhalb des Projektordners). Zusätzlich wird der Schlüsselbund-Eintrag so angelegt, dass jeder Zugriff eine sichtbare macOS-Abfrage auslöst; du erlaubst sie nur, während du selbst den Bestätigungsbefehl ausführst. *Konsequenz:* dein fester Release-Befehl heißt künftig anders und liegt woanders (weiter ein Befehl); erscheint während eines Releases eine Schlüsselbund-Abfrage, lehnst du ab und meldest es.
+  Option B — *alles im Projektordner wie im Entwurf*: kein Zusatzaufwand, aber der Schlüssel ist nur so sicher wie der Code, den du startest; das Abschalten der Prüfung fiele nur der unabhängigen Umfangsprüfung (Agent) auf.
+  ✅ Empfehlung: **A**, weil nur so Entscheidung 1 tatsächlich gilt. (Ob macOS die Abfrage wie beschrieben zeigt, wird bei der Einrichtung auf deinem Mac geprüft — nicht verifiziert.)
+- ✅ **Frage 9 entschieden (Stephan, 24.10.2026): Option B** – einmalige Verlegung in eine eigene Treiber-Datei vor dem Erstbestand, Verhalten unverändert, abgedeckt durch die Erstbestand-Bestätigung. — Ursprüngliche Frage: **Die Hilfsroutine „offene Sheets schließen" liegt in einer bestehenden Testdatei des Oberflächen-Checks.** Sie gilt als Treiber (darf angepasst werden, ENTSCHEIDUNGEN.md 24.10.2026), wird aber mit der ganzen Datei eingefroren (Entscheidung 2).
+  Option A — *bleibt, wo sie ist, und ist eingefroren*: jede Anpassung braucht deinen Bestätigungsbefehl (bisher: nur melden).
+  Option B — *wird vor dem Erstbestand einmalig in eine eigene Treiber-Datei verlegt* (Verhalten unverändert, der Oberflächen-Check ruft sie dort auf); diese einmalige Änderung einer bestehenden Testdatei deckst du mit der ohnehin fälligen Erstbestand-Bestätigung ab; danach darf die Routine ohne Bestätigung angepasst werden.
+  ✅ Empfehlung: **B** — eine einzige Bestätigung statt einer bei jeder späteren Anpassung; der Oberflächen-Check selbst bleibt eingefroren.
+- ✅ **Frage 10 entschieden (Stephan, 24.10.2026): Option A** – feste Platzhalter werden mit eingefroren; jede Änderung braucht Stephans Bestätigung. — Ursprüngliche Frage: **Werden die festen Platzhalter (Uhrzeit, Wetter, Sternendaten aus TASK-119) mit eingefroren?** Von ihnen hängt der erwartete Wert ab (z. B. „zwischen 20:35 und 20:39"). Option A — *ja*: wer den Platzhalter-Himmel verstellt, wird rot; jede Änderung braucht deine Bestätigung. Option B — *nein*, wie Treiber frei änderbar (so stand es im Entwurf, AK-10). ✅ Empfehlung: **A** — entspricht dem Wortlaut von Entscheidung 2 („alle neuen Testdateien") und verhindert, dass ein Test über veränderte Platzhalter grün gemacht wird; Platzhalter ändern sich selten.
+
+##### Technische Festlegungen (ohne Verhaltenswirkung)
+- ✅ Technische Festlegung (24.10.2026): Rechenverfahren SHA-256 über den exakten Inhalt, ohne jede Bereinigung von Leerzeichen oder Zeilenenden — „ein Zeichen" heißt ein Zeichen; im Projekt gibt es keine Zeilenende-Umwandlung (`.gitattributes` fehlt).
+- ✅ Technische Festlegung (24.10.2026): **Einheiten des Fingerabdrucks:** je Testfall-Datei (`backend/tests/akzeptanz/testfaelle/`), je Fachsprache-**Schritt** (vollständiger Quelltext der Schritt-Definition: Satzmuster, Bedeutung in Worten, Prüfcode, einschließlich Kommentarzeilen — ermittelt über die Python-Quelltextstruktur, nicht über Zeilennummern), je sonstiger Datei. Eine Fachsprache-*Datei* bekommt keinen eigenen Fingerabdruck (TASK-119 AK-28). Ein Schritt trägt einen Vermerk, welches Ticket ihn eingeführt hat. — Grund: parallele Tickets ergänzen dieselbe Fachsprache-Datei.
+- ✅ Technische Festlegung (24.10.2026): **Eingefrorener Bereich (Option C, nach Entscheidung 2):** (a) alle Dateien unter `backend/tests/` außer `__pycache__/`, `*.pyc`, Markdown-Dateien (`*.md`, reine Beschreibung, beeinflussen kein Ergebnis) und dem Treiber-Ordner `backend/tests/akzeptanz/treiber/` (Schicht 3, ENTSCHEIDUNGEN.md + TASK-119 AK-27); Platzhalter je nach Frage 10; (b) Testeinstellungen `backend/pytest.ini`, `backend/conftest.py` (sie bestimmen, welche Tests überhaupt laufen); (c) Prüfwerkzeuge: `release.sh`, die gemeinsame Prüfliste aus TASK-117 (`tools/`), `.github/workflows/deploy.yml` (Repo-Root), `tools/gate_check.py`, das neue Fingerabdruck-Werkzeug, der Bestätigungsbefehl und (Frage 11 A) Release-Starter samt Vergleichsliste-Erzeugung. Neu angelegte Dateien in (a) gehören zum Ticket, das sie anlegt.
+- ✅ Technische Festlegung (24.10.2026): **Speicherform:** je Ticket ein maschinenlesbarer Block „🔒 Eingefroren" (eine Zeile je Einheit: Ablage in Worten + Pfad/Schritt, Fingerabdruck, Datum, „Test-Prüfung bestätigt am …"); Erstbestand im Ticket TASK-120. Gesucht in `BACKLOG.md` **und** `BACKLOG-ARCHIVE.md`; maßgeblich ist der Inhalt, nicht die Datei, in der der Block steht (Archivierung ändert nichts).
+- ✅ Technische Festlegung (24.10.2026): **Bestätigung:** Stephans Bestätigung ist eine Zeile im Block mit Ticket, Liste der bestätigten Einheiten samt neuem Fingerabdruck, Datum, Grund und einem HMAC-SHA256-Siegel über genau diese Angaben. Agenten können Fingerabdrücke berechnen, aber kein gültiges Siegel. Das Siegel selbst ist nicht geheim.
+- ✅ Technische Festlegung (24.10.2026): **Regel der GitHub-Prüfung:** Vergleichsstand = der vorherige Stand auf GitHub (bei normalem Upload der Stand vor dem Upload; bei manuellem Anstoß der Vorgänger des geprüften Stands); geholt gezielt mit Verlaufstiefe 1, nicht der ganze Verlauf. (1) Jede Einheit, die im Vergleichsstand eingefroren war, ist unverändert — oder durch ein gültiges Siegel abgedeckt. (2) Neue Einheiten ohne Siegel sind erlaubt, wenn sie im Vergleichsstand nicht existierten (neues Ticket nach Test-Prüfung). (3) Jede Datei im eingefrorenen Bereich hat einen Eintrag. (4) Ein geänderter oder gelöschter Eintrag ist wie eine geänderte Datei. Ein Gebäudedaten-Upload des Bots ändert nur seine Datendatei und ist für die Regel neutral.
+- ✅ Technische Festlegung (24.10.2026): **Lokal (Agenten-Umgebung)** wird nur Datei gegen Eintrag geprüft (kein Schlüssel, kein Git); die Siegel prüfen der Probelauf auf dem Mac (Git dort erlaubt) und GitHub. Angedockt an den bestehenden Schritt-Check (`tools/gate_check.py`, vor impl/test/refactor/verification/release/done) und als eigener Schritt in die gemeinsame Prüfliste (TASK-117), damit Probelauf und GitHub dieselbe Prüfung ausführen.
+- ✅ Technische Festlegung (24.10.2026): **Name des GitHub-Geheimnisses: `FOTOALERT_TESTSIEGEL_KEY`**; Schlüsselbund-Eintrag „fotoalert-testsiegel". Geprüft: kollidiert nicht mit `FOTOALERT_LIVECHECK_PASSWORD` (TASK-118) und den bestehenden `DEPLOY_SSH_KEY`, `SERVER_IP`, `SERVER_USER`, `SERVER_KNOWN_HOSTS`, `FOTOALERT_USER_PASSWORD`, `FOTOALERT_HOST_PASSWORD`, `FOTOALERT_AUTH_SECRET` (Suche „TESTSIEGEL" im Repo: 0 Treffer). Der Schlüssel ist 32 Zufallsbytes, wird nie als sichtbarer Aufrufparameter übergeben und steht in keiner Datei.
+- ✅ Technische Festlegung (24.10.2026): Die Fingerabdruck-Prüfung bei GitHub ist ein eigener Job, von dem der Deploy-Job abhängt (zusätzlich zu den beiden Prüf-Jobs); Geheimnisse, Auslöser, Ausnahme Gebäudedaten und Deploy-Job bleiben unverändert.
+
+##### Scope
+**Eingeschlossen:** Einfrieren (Fingerabdrücke bilden und im Ticket speichern) nach bestätigter Test-Prüfung; Prüfen vor jedem Pipeline-Schritt, im Probelauf und bei GitHub inkl. Vergleich mit dem vorherigen Upload; Bestätigungsbefehl mit Schlüssel; einmalige Einrichtung von Schlüssel und GitHub-Geheimnis mit Anleitung für Stephan; einmaliger Erstbestand für bestehende Tests und Prüfwerkzeuge; Pflicht, Backlog/Archiv im Upload mitzunehmen; Tests dieses Tickets in Wegwerf-Übungsablagen; Doku-Ergänzung der Gate-Konvention.
+
+##### Nicht-Ziele
+- Ausgangskopie und Änderungsvergleich für die Umfangsprüfung (**TASK-121**).
+- Probelauf, Release-Ablauf, gemeinsame Prüfliste und „Was geht mit"-Liste selbst (**TASK-117**) — hier kommt nur ein Prüfschritt bzw. eine Pflichtprüfung hinzu; Live-Check und Rücksprung (**TASK-118**); Grundgerüst, Wächter, Pilot (**TASK-119**).
+- Inhalt von Prüfungen ändern: keine bestehenden Tests lockern, reparieren, entfernen oder in das Vier-Schichten-Modell umziehen (Ausnahme nur nach Frage 9 B: Verlegung der einen Hilfsroutine, Verhalten unverändert).
+- Automatisches Zurückdrehen oder Wiederherstellen bei Rot (Entscheidung 5).
+- App-Code, Oberfläche, Datenbank, Server, `deploy/`, bestehende GitHub-Geheimnisse, Gebäudedaten-Ablauf (`update-building-data.yml`), der veraltete `.forgejo/`-Ablauf.
+- Skill-Anpassungen (Orchestrator, Test-, Umsetzungs-, Aufräum-, Release-Skill, Gate-Auditor) — Bausteine 5–8; Hinweise siehe Testplan.
+- GitHub-Einstellungen durch Agenten; Geheimnis anlegen macht nur Stephan.
+- Git im echten Projekt in der Agenten-Umgebung (Regel 16); Verlaufstests nur in Wegwerf-Git unter `/tmp`.
+
+##### Erlaubte Bereiche
+- `FotoAlert/tools/gate_check.py` — *nur ergänzen*: Aufruf der Fingerabdruck-Prüfung vor den Phasen; bestehende Gate-Logik unverändert.
+- `FotoAlert/tools/` — *neu*: Fingerabdruck-Werkzeug (Einfrieren, Prüfen, Erstbestand vorschlagen, Siegel prüfen), Bestätigungsbefehl, Einrichtungsbefehl für den Schlüssel; bei Frage 11 A zusätzlich Release-Starter (Quelle im Projekt, Installation außerhalb durch Stephan).
+- Gemeinsame Prüfliste aus TASK-117 (`FotoAlert/tools/`) — *nur ergänzen*: Aufruf der Fingerabdruck-Prüfung.
+- `FotoAlert/release.sh` — *nur ergänzen*: Abbruch vor dem Hochladen, wenn eingefrorene Dateien oder Einträge mitgehen sollen, aber Backlog bzw. Archiv nicht in der Liste stehen, oder wenn der Erstbestand bzw. eine vorgemerkte Änderung unbestätigt ist.
+- `.github/workflows/deploy.yml` (Repo-Root) — *nur ergänzen*: neuer Job Fingerabdruck-Prüfung (gezieltes Holen des Vergleichsstands), `needs` des Deploy-Jobs, Kopfkommentar um `FOTOALERT_TESTSIEGEL_KEY`.
+- `FotoAlert/backend/tests/task120/` — *neu*: Tests dieses Tickets; `FotoAlert/backend/tests/README.md` — *nur ergänzen*: Eintrag.
+- Nur bei Frage 9 B: `FotoAlert/backend/tests/akzeptanz/treiber/browser/` — *neu*: Datei mit der verlegten Hilfsroutine; `FotoAlert/backend/tests/frontend/run_frontend_check.py` — *ändern*, ausschließlich: Routine entfernen und von dort aufrufen.
+- `FotoAlert/BACKLOG.md` / `BACKLOG-ARCHIVE.md` — nur Block „🔒 Eingefroren" (Einfrieren, Erstbestand, Bestätigung) und Status durch die zuständigen Phasen.
+- `FotoAlert/docs/gate-status-konvention.md` — *nur ergänzen*: Abschnitt Fingerabdruck.
+(Alles andere ist tabu. Bestehende Tests nie — außer der in Frage 9 B genannten einen Verlegung.)
+
+##### Akzeptanzkriterien
+*Dev-Werkzeug ohne App-Verhalten: Die Wirkung zeigt sich nie in der App, sondern während die Agenten arbeiten, im Probelauf vor dem Hochladen und in der GitHub-Prüfung.*
+
+*Einfrieren*
+- [ ] **AK-1** Nach bestätigter automatischer Test-Prüfung bekommt jede Testfall-Datei und jeder Fachsprache-Schritt des Tickets einen eigenen Fingerabdruck im Ticket — je Datei bzw. je Schritt, nicht je Fachsprache-Datei. *(Herkunft: Ticket, TASK-119 AK-28, Entscheidung 2)*
+- [ ] **AK-2** Bei jedem Fingerabdruck steht in Worten, was eingefroren ist, das Datum und dass die Test-Prüfung vorher bestätigt hat. *(Herkunft: User Story „nachweislich")*
+- [ ] **AK-3** Mit eingefroren werden alle übrigen neuen Testdateien desselben Tickets (auch normale Python-Tests, z. B. Übungsablagen und Attrappen). *(Herkunft: Entscheidung 2)*
+- [ ] **Edge Case AK-4** Fehlt beim Einfrieren eine zu sichernde Datei, bricht das Einfrieren ab und es wird kein unvollständiger Satz gespeichert. *(Herkunft: Zustands-Check)*
+- [ ] **AK-5** Hat ein Ticket keine Tests (z. B. reines Doku-Ticket), meldet die Prüfung „keine eingefrorenen Tests für dieses Ticket" und hält nichts auf. *(Herkunft: Zustands-Check Leerfall)*
+
+*Erstbestand (einmalig)*
+- [ ] **AK-6** Einmalig bekommt der gesamte eingefrorene Bestand einen Fingerabdruck: alle bestehenden Testdateien, die Testeinstellungen und die Prüfwerkzeuge (Release-Befehl, gemeinsame Prüfliste, GitHub-Prüfbeschreibung, Fingerabdruck-Prüfung, Bestätigungsbefehl). *(Herkunft: Entscheidung 2, Auftrag Erstbestand)*
+- [ ] **AK-7** Der Erstbestand gilt erst, wenn Stephan ihn einmal mit seinem Bestätigungsbefehl gesiegelt hat. Bis dahin bricht der Release-Befehl vor dem Hochladen mit „Erstbestand wartet auf Stephans Bestätigung" ab — GitHub wird nie wegen eines fehlenden Erstbestands rot, nichts geht live. *(Herkunft: Auftrag „nicht sofort alles rot, kein Agent allein gültig")*
+- [ ] **Edge Case AK-8** Die GitHub-Prüfung ist rot, wenn eine Datei des Erstbestands sich gegenüber dem vorherigen Upload verändert hat und nicht zu den von diesem Ticket erlaubten Bereichen gehört — ein Agent kann also keinen veränderten bestehenden Test in den Erstbestand schmuggeln, auch nicht mit Stephans Siegel. *(Herkunft: Pre-Mortem 1/7)*
+- [ ] **AK-9** Alle bestehenden Tests liefern vor und nach diesem Ticket dieselben Tests mit demselben Ergebnis; keine bestehende Testdatei ist verändert (einzige Ausnahme nach Frage 9 B). *(Herkunft: Zielbild 3a)*
+
+*Prüfen lokal*
+- [ ] **AK-10** Vor jedem weiteren Pipeline-Schritt (Umsetzung, Testlauf, Aufräumen, Umfangsprüfung, Release, Done) wird jeder Fingerabdruck nachgerechnet; stimmt einer nicht, startet der Schritt nicht, die Pipeline hält an und nichts wird zurückgedreht. *(Herkunft: Ticket, Entscheidung 5)*
+- [ ] **AK-11** Die Meldung an Stephan nennt Ticket, betroffenen Test bzw. Schritt in Worten und die Art: verändert, gelöscht, neu ohne Fingerabdruck oder Bestätigung fehlt. *(Herkunft: Entscheidung 5, Beobachtbarkeit)*
+- [ ] **Edge Case AK-12** Gelöscht oder umbenannt ist rot wie verändert. *(Herkunft: Pre-Mortem 3)*
+- [ ] **Edge Case AK-13** Eine Änderung nur an einer Kommentarzeile (z. B. Quellenangabe des erwarteten Werts) ist rot. *(Herkunft: Entscheidung 6)*
+- [ ] **AK-14** Eine Änderung nur an einem Treiber oder am App-Code hält nichts auf. *(Platzhalter: entschieden nach Frage 10 Option A — eine Platzhalter-Änderung ist rot.)* *(Herkunft: Polarität zu R1, TASK-119 AK-27)*
+
+*Mehrere Tickets und Dauerhaftigkeit*
+- [ ] **AK-15** Ergänzt ein Ticket einen neuen Schritt in einer Fachsprache-Datei, in der ein anderes Ticket Schritte eingefroren hat, bleibt das andere Ticket grün. *(Herkunft: TASK-119 AK-28, Auftrag)*
+- [ ] **Edge Case AK-16** Ändert ein Ticket einen Schritt, den ein anderes Ticket eingefroren hat, ist das rot, und die Meldung nennt das Ticket, das ihn eingefroren hat. *(Herkunft: R4)*
+- [ ] **Edge Case AK-17** Ist ein Eingefroren-Block beschädigt oder das Ticket weder im Backlog noch im Archiv zu finden, ist die Prüfung rot und sagt das — nie stillschweigend grün. *(Herkunft: Zustands-Check)*
+- [ ] **AK-18** Nach Done und nach dem Verschieben ins Archiv bleiben die Fingerabdrücke gültig und werden weiter geprüft; die Tests laufen als Regression mit. *(Herkunft: Entscheidung 4)*
+
+*Probelauf und GitHub*
+- [ ] **AK-19** Der Probelauf vor dem Hochladen prüft die Fingerabdrücke (Datei gegen Eintrag) und vergleicht mit dem Stand auf GitHub; bei Rot wird nichts hochgeladen. Das Siegel prüft allein GitHub, weil nach Entscheidung 11 A nur der Bestätigungsbefehl den Schlüssel lesen darf. *(Herkunft: Ticket, TASK-117 AK10; Klarstellung 26.10.2026 nach Kriterien-Frage des Test-Agenten — Widerspruch zu Frage 11 A/AK-31 aufgelöst)*
+- [ ] **AK-20** Die GitHub-Prüfung führt die Prüfung aus, bevor irgendetwas live geht; bei Rot startet kein Deploy. *(Herkunft: Ticket, Entscheidung 1)*
+- [ ] **AK-21** Die GitHub-Prüfung erkennt eine Änderung auch dann, wenn ein Agent Test **und** Fingerabdruck gemeinsam geändert hat — für alles, was schon einmal hochgeladen war. *(Herkunft: Pre-Mortem 1, Entscheidung 1)*
+- [ ] **AK-22** Eine Änderung mit gültigem Siegel von Stephan ist bei GitHub grün; dieselbe Änderung ohne oder mit gefälschtem Siegel ist rot. *(Herkunft: Entscheidung 1/3)*
+- [ ] **Edge Case AK-23** Liegt bei GitHub im eingefrorenen Bereich eine Datei ohne Fingerabdruck, ist die Prüfung rot und nichts geht live. *(Herkunft: Entscheidung 7)*
+- [ ] **Edge Case AK-24** Ist der vorherige Stand bei GitHub nicht abrufbar, ist die Prüfung rot mit dieser Begründung. *(Herkunft: Zustands-Check Fehlerfall)*
+- [ ] **AK-25** Gehen eingefrorene Dateien oder neue/geänderte Fingerabdrücke mit, muss die Dateiliste des Uploads Backlog (und, wenn geändert, Archiv) enthalten; sonst bricht der Release-Befehl vor dem Hochladen ab und nennt, was fehlt. *(Herkunft: Pre-Mortem 3, Auftrag, TASK-117 AK25)*
+
+*Bestätigung durch Stephan*
+- [ ] **AK-26** Nur Stephans Bestätigungsbefehl macht einen veränderten eingefrorenen Stand gültig; er braucht als Eingabe nur die Ticket-Nummer, zeigt die betroffenen Tests/Werkzeuge in Worten und schreibt Datum, Grund und Siegel ins Ticket. *(Herkunft: Entscheidung 3)*
+- [ ] **Edge Case AK-27** Eine von einem Agenten geschriebene Zeile „Stephan … bestätigt" oder ein selbst berechnetes Siegel macht nichts grün. *(Herkunft: Entscheidung 3, Kernbefund 3)*
+- [ ] **Edge Case AK-28** Ein Siegel deckt genau die genannten Einheiten in genau dieser Fassung; wird danach weiter geändert, ist es wieder rot. *(Herkunft: Pre-Mortem 6)*
+- [ ] **AK-29** Ändert ein späteres Ticket mit Stephans Zustimmung ein Prüfwerkzeug oder einen bestehenden Test, hält die Pipeline mit der Meldung „wartet auf deine Bestätigung" an und nennt genau den einen Befehl, den Stephan ausführen soll; danach läuft sie ohne weiteres Zutun weiter. *(Herkunft: Entscheidung 2, Auftrag)*
+
+*Schlüssel und Geheimnisse*
+- [ ] **AK-30** Fehlt das GitHub-Geheimnis oder ist es leer, ist die GitHub-Prüfung rot und nennt nur den Namen des Geheimnisses. *(Herkunft: Zustands-Check, analog TASK-118 AK3)*
+- [ ] **AK-31** Der Schlüssel erscheint nie in einer Projektdatei, einer Ausgabe, einem Protokoll, dem Ticket oder (nach der Einrichtung) der Zwischenablage; Agenten können ihn nicht lesen. *(Nach Frage 11 A: jeder Zugriff auf den Schlüsselbund-Eintrag löst eine sichtbare Abfrage aus, und nur der Bestätigungsbefehl liest ihn.)* *(Herkunft: Skill 6c Dimension 9, Entscheidung 1)*
+- [ ] **AK-32** *(nach Frage 11 A)* Wurden Release-Befehl, Prüfliste, GitHub-Prüfbeschreibung oder Fingerabdruck-Prüfung ohne Stephans Siegel geändert, startet der Release-Starter den Release-Befehl nicht und meldet das. *(Herkunft: Pre-Mortem 2)*
+
+*Betrieb*
+- [ ] **AK-33** Die Prüfung verlängert Probelauf und GitHub-Prüfung jeweils um höchstens 30 Sekunden (Messort Stephans Mac bzw. GitHub, Mittel aus 3 Läufen, Vorher/Nachher). *(Herkunft: Entscheidung 8)*
+- [ ] **AK-34** Der Pilot-Testfall aus TASK-119 wird wie jeder Testfall eingefroren, sobald die Test-Prüfung ihn bestätigt hat. *(Herkunft: Entscheidung 8)*
+- [ ] **AK-35** *(nach Frage 9 B)* Die Hilfsroutine zum Schließen offener Sheets liegt in einer Treiber-Datei; eine Änderung an ihr hält nichts auf; der Oberflächen-Check findet vorher und nachher dieselben Befunde. *(Herkunft: Hinweis Hauptthread 24.10.2026, ENTSCHEIDUNGEN.md)*
+
+##### Testfall-Liste in Fachsprache
+*Form:* Fachsprache-Testfall + Ausführungsangabe, weil `backend/tests/akzeptanz/fachsprache/` noch nicht existiert (nur `testfaelle/`); sobald es existiert, als deutsches Gherkin. *Ausführung „automatisch"* = automatischer Test in einer **Wegwerf-Übungsablage unter `/tmp`** (Übungs-Backlog, Übungs-Testfälle, Übungs-Schritte, Übungsschlüssel — nie der echte Schlüssel), die nach jedem Lauf **automatisch gelöscht wird, auch bei Abbruch**; **Verlaufsfälle** (Vergleich mit früherem Upload) mit **Wegwerf-Git unter `/tmp`** als Stand „vorher" und „Upload" (Entscheidung 24.10.2026, ENTSCHEIDUNGEN.md). Läuft in der Agenten-Umgebung, auf dem Mac und bei GitHub. Erwartete Fingerabdrücke werden **unabhängig** mit dem SHA-256-Standardwerkzeug des Betriebssystems über denselben Inhalt nachgerechnet, erwartete Siegel mit der HMAC-Standardbibliothek. Verhalten existiert heute nicht → echter Rot-Nachweis möglich.
+
+| ID | AK | Testfall (Fachsprache) | Ausführung |
+|---|---|---|---|
+| T-01 | AK-1 | *Angenommen* ein Übungs-Ticket mit zwei Testfällen und drei neuen Schritten in einer Fachsprache-Datei ist von der Test-Prüfung bestätigt, *wenn* eingefroren wird, *dann* stehen im Ticket genau fünf Fingerabdrücke (2 Dateien, 3 Schritte), jeder gleich dem unabhängig nachgerechneten Wert. | automatisch |
+| T-02 | AK-2 | *Dann* nennt jeder Eintrag in Worten, was eingefroren ist, das Datum und die bestätigte Test-Prüfung. | automatisch |
+| T-03 | AK-3 | *Angenommen* das Übungs-Ticket hat zusätzlich eine normale Python-Testdatei und eine Attrappe, *wenn* eingefroren wird, *dann* haben auch diese je einen Fingerabdruck. | automatisch |
+| T-04 | AK-4 | *Angenommen* eine zu sichernde Datei fehlt, *wenn* eingefroren wird, *dann* bricht es ab und das Ticket enthält keinen Eingefroren-Block. | automatisch |
+| T-05 | AK-5 | *Angenommen* ein Ticket ohne Tests, *wenn* geprüft wird, *dann* „keine eingefrorenen Tests für dieses Ticket", grün. | automatisch |
+| T-06 | AK-6 | *Angenommen* eine Übungsablage mit 5 bestehenden Testdateien, Testeinstellungen und 4 Prüfwerkzeugen, *wenn* der Erstbestand vorgeschlagen wird, *dann* hat jede dieser Dateien genau einen Eintrag; Treiber-Ordner und Beschreibungsdateien haben keinen. | automatisch |
+| T-07 | AK-7 | *Angenommen* der Erstbestand ist vorgeschlagen, aber nicht gesiegelt, *wenn* der Release-Befehl läuft, *dann* bricht er vor dem Hochladen mit „Erstbestand wartet auf Stephans Bestätigung" ab und das Wegwerf-GitHub ist unverändert. | automatisch, Wegwerf-Git |
+| T-08 | AK-7 | *Angenommen* der Erstbestand ist mit dem Übungsschlüssel gesiegelt, *wenn* hochgeladen und geprüft wird, *dann* grün. | automatisch, Wegwerf-Git |
+| T-09 | AK-8 | *Angenommen* im Vorher-Stand liegt eine bestehende Testdatei, *wenn* ein Agent sie verändert, den Erstbestand vorschlägt und dieser gesiegelt wird, *dann* ist die GitHub-Prüfung rot und nennt diese Datei. | automatisch, Wegwerf-Git |
+| T-10 | AK-8 | *Gegenprobe:* Ist nur der Release-Befehl (erlaubter Bereich dieses Tickets) im selben Upload verändert und gesiegelt, *dann* grün. | automatisch, Wegwerf-Git |
+| T-11 | AK-9 | Bestehende Suite liefert vorher und nachher dieselben Tests mit demselben Ausgang; Fingerabdruck jeder bestehenden Testdatei gleich der Ausgangskopie (Ausnahme nach Frage 9 B dokumentiert). | Nachweis beim Abschluss |
+| T-12 | AK-10, AK-11 | *Angenommen* ein Übungs-Testfall ist eingefroren, *wenn* in „zwischen 20:35 und 20:39" eine Ziffer geändert wird und der nächste Schritt starten soll, *dann* startet er nicht, die Meldung nennt Ticket, Testfall und „verändert", und die Datei ist danach unverändert in der geänderten Fassung (nichts zurückgedreht). | automatisch |
+| T-13 | AK-10 | *Angenommen* nichts Eingefrorenes ist geändert, *dann* darf jeder Schritt (Umsetzung, Testlauf, Aufräumen, Umfangsprüfung, Release, Done) starten. | automatisch |
+| T-14 | AK-10 | *Wenn* nur die Bedeutung in Worten eines eingefrorenen Schritts geändert wird, *dann* rot; ebenso, wenn nur sein Prüfcode geändert wird. | automatisch |
+| T-15 | AK-12 | *Wenn* ein eingefrorener Testfall gelöscht bzw. umbenannt wird, *dann* rot mit „gelöscht". | automatisch |
+| T-16 | AK-13 | *Wenn* nur eine Kommentarzeile mit der Quellenangabe geändert wird, *dann* rot. | automatisch |
+| T-17 | AK-14 | *Wenn* nur eine Treiber-Datei oder App-Code geändert wird, *dann* grün. *(Nach Frage 10 A zusätzlich: wenn nur ein Platzhalter-Wert geändert wird, dann rot.)* | automatisch |
+| T-18 | AK-15 | *Angenommen* Ticket A hat Schritte in einer Fachsprache-Datei eingefroren, *wenn* Ticket B dort einen neuen Schritt ergänzt, *dann* bleibt A grün. | automatisch |
+| T-19 | AK-16 | *Wenn* B einen von A eingefrorenen Schritt ändert, *dann* rot, die Meldung nennt A. | automatisch |
+| T-20 | AK-17 | *Angenommen* der Eingefroren-Block ist beschädigt bzw. das Ticket fehlt in Backlog und Archiv, *dann* rot mit Klartext. | automatisch |
+| T-21 | AK-18 | *Angenommen* das Ticket ist Done und ins Archiv verschoben, *dann* werden seine Fingerabdrücke dort gefunden; eine Änderung an seinem Testfall ist weiter rot. | automatisch |
+| T-22 | AK-19 | *Angenommen* ein eingefrorener Testfall ist verändert, *wenn* der Probelauf läuft, *dann* ist er rot und im Wegwerf-GitHub kommt nichts an. | automatisch, Wegwerf-Git, Probelauf aus TASK-117 mit Platzhalter-Prüfliste |
+| T-23 | AK-20 | *Angenommen* ein eingefrorener Testfall ist verändert, *wenn* die GitHub-Prüfung läuft, *dann* rot und der Deploy-Schritt startet nicht. | automatisch (Übungsablage mit derselben Prüfung) + beim ersten GitHub-Lauf (absichtlich veränderte Kopie über manuellen Anstoß, Deploy-Job „übersprungen") |
+| T-24 | AK-21 | *Angenommen* der Vorher-Stand enthält den eingefrorenen Testfall, *wenn* im Upload Testfall **und** Fingerabdruck gemeinsam geändert sind, *dann* rot. | automatisch, Wegwerf-Git |
+| T-25 | AK-22 | *Wenn* dieselbe Änderung mit gültigem Übungssiegel kommt, *dann* grün; mit einem Siegel über einen anderen Schlüssel bzw. ohne Siegel, *dann* rot. | automatisch, Wegwerf-Git |
+| T-26 | AK-23 | *Angenommen* im Upload liegt im eingefrorenen Bereich eine Datei ohne Eintrag (Ticket nicht mit hochgeladen), *dann* rot mit „neu ohne Fingerabdruck". | automatisch, Wegwerf-Git |
+| T-27 | AK-24 | *Angenommen* der Vorher-Stand ist nicht abrufbar, *dann* rot mit „Vergleichsstand nicht verfügbar". | automatisch, Wegwerf-Git |
+| T-28 | AK-25 | *Angenommen* eine eingefrorene Datei steht in der Dateiliste, das Backlog nicht, *wenn* der Release-Befehl läuft, *dann* Abbruch vor dem Hochladen mit Hinweis auf das Backlog; mit Backlog in der Liste läuft er weiter. | automatisch, Wegwerf-Git |
+| T-29 | AK-26 | *Angenommen* Stephan hat einen Testfall geändert, *wenn* der Bestätigungsbefehl nur mit der Ticket-Nummer läuft, *dann* zeigt er den Testfall in Worten, und im Ticket stehen Datum, Grund und ein Siegel, das unabhängig mit dem Übungsschlüssel nachgerechnet stimmt. | automatisch (Übungsschlüssel) + einmal echt auf Stephans Mac (Nachweis beim Abschluss) |
+| T-30 | AK-27 | *Wenn* ein Agent „Stephan 24.10.2026: ok" ins Ticket schreibt bzw. ein Siegel ohne den Schlüssel berechnet und den Fingerabdruck anpasst, *dann* bleibt es lokal im Probelauf und bei GitHub rot. | automatisch, Wegwerf-Git |
+| T-31 | AK-28 | *Angenommen* eine Änderung ist gesiegelt, *wenn* danach ein weiteres Zeichen geändert wird, *dann* rot. | automatisch |
+| T-32 | AK-29 | *Angenommen* ein Übungs-Ticket ändert mit vermerkter Zustimmung ein Prüfwerkzeug, *wenn* der nächste Schritt starten soll, *dann* hält die Pipeline mit „wartet auf deine Bestätigung" und genau einem Befehl samt Ticket-Nummer an; nach dessen Ausführung startet der Schritt. | automatisch (Übungsschlüssel) |
+| T-33 | AK-30 | *Angenommen* das Geheimnis fehlt bzw. ist leer, *dann* ist die GitHub-Prüfung rot, die Meldung nennt `FOTOALERT_TESTSIEGEL_KEY` und keinen Wert. | automatisch (Übungsablage) + beim ersten GitHub-Lauf ist das Geheimnis gesetzt (grün) |
+| T-34 | AK-31 | *Angenommen* ein Übungsschlüssel mit bekanntem Prüfwert, *wenn* eingefroren, bestätigt, geprüft (grün und rot) und hochgeladen wird, *dann* findet die Volltextsuche den Prüfwert in keiner Datei der Übungsablage, keiner Ausgabe, keinem Protokoll. | automatisch |
+| T-35 | AK-31 | Nach der echten Einrichtung: Volltextsuche nach einem Teil des Schlüssels ist nicht möglich (Wert unbekannt) — stattdessen: Agenten-Umgebung findet keinen Schlüsselbund-Zugang und keine Datei mit dem Eintragsnamen samt Wert; *(Frage 11 A)* Zugriff außerhalb des Bestätigungsbefehls löst eine sichtbare Abfrage aus. | nur auf Stephans Mac, Nachweis beim Abschluss |
+| T-36 | AK-32 | *(Frage 11 A)* *Angenommen* die GitHub-Prüfbeschreibung wurde ohne Siegel geändert (Prüfschritt entfernt), *wenn* der Release-Starter läuft, *dann* startet er den Release-Befehl nicht und nennt die Datei. | automatisch, Übungsablage mit Übungs-Vergleichsliste |
+| T-37 | AK-33 | Dauer von Probelauf und GitHub-Prüfung vorher/nachher, Mittel aus 3 Läufen, Zuwachs je ≤ 30 s. | Nachweis beim Abschluss (Mac und GitHub) |
+| T-38 | AK-34 | *Angenommen* der Pilot ist von der Test-Prüfung bestätigt, *wenn* eingefroren wird, *dann* hat der Pilot-Testfall und jeder von ihm genutzte Schritt einen Fingerabdruck. | Nachweis beim Abschluss (echter Stand) |
+| T-39 | AK-35 | *(Frage 9 B)* Oberflächen-Check vor und nach der Verlegung: dieselben Befunde; eine Änderung an der verlegten Routine ist grün, eine an der Prüflogik des Oberflächen-Checks rot. | automatisch (Fingerabdruck-Teil) + Nachweis beim Abschluss (Befundvergleich mit echtem Browser auf dem Mac) |
+
+##### Umsetzungsschritte und Reihenfolge
+**Abhängigkeiten (Pflicht):** TASK-120 setzt **TASK-117** (gemeinsame Prüfliste, „Was geht mit"-Liste, Probelauf) und **TASK-119** (Fachsprache-Ablage mit einzelnen Schritten und Ticket-Vermerk) voraus — Umsetzung erst, wenn beide Done sind. **TASK-117, TASK-118 und TASK-120** (sowie TASK-119) ändern alle `.github/workflows/deploy.yml`; TASK-117 und TASK-121 zusätzlich `release.sh`; TASK-117 außerdem bestehende Testdateien (`conftest.py`, `run_frontend_check.py`). Nach Entscheidung 2 wird erst nach deren Fertigstellung eingefroren.
+**Empfohlene Reihenfolge:** TASK-117 → TASK-119 → TASK-118 → TASK-121 → **TASK-120**. Kommt TASK-118 oder TASK-121 doch nach TASK-120, braucht ihre Änderung an Prüfbeschreibung bzw. Release-Befehl je einmal Stephans Bestätigungsbefehl (AK-29). Uploads nie gleichzeitig; jedes dieser Tickets ein eigener Upload (TASK-117 AK22).
+1. **U1 Werkzeug + Tests** (Agenten): Fingerabdruck-Werkzeug, Andocken an den Schritt-Check, Prüfschritt in der gemeinsamen Prüfliste, GitHub-Job, Release-Pflichtprüfung (AK-25), Bestätigungsbefehl, Einrichtungsbefehl; bei Frage 11 A Release-Starter. Bei Frage 9 B: Verlegung der Hilfsroutine (vor U4).
+2. **U2 Abnahme** wie üblich (Tests grün, Umfangsprüfung).
+3. **U3 Einmalige Einrichtung des Schlüssels — Anleitung für Stephan** (eigener Schritt, rechtzeitig vor U4). Claude schreibt eine nummerierte Schritt-für-Schritt-Anleitung; **alle Menü- und Knopfnamen bei GitHub werden unmittelbar vor dem Schreiben nachgeprüft, nicht aus dem Gedächtnis**. Inhalt: (a) Stephan startet auf dem Mac den Einrichtungsbefehl: er erzeugt den Schlüssel, legt ihn im Schlüsselbund unter „fotoalert-testsiegel" ab, zeigt ihn nie an und legt ihn für kurze Zeit in die Zwischenablage; (b) Stephan legt bei GitHub in den Repository-Einstellungen ein neues Repository-Geheimnis für die Abläufe an, Name exakt `FOTOALERT_TESTSIEGEL_KEY`, Wert per Einfügen; (c) der Einrichtungsbefehl leert danach die Zwischenablage; (d) bei Frage 11 A: Bestätigungsbefehl und Release-Starter an den in der Anleitung genannten Ort außerhalb des Projektordners kopieren (einmalig). Claude sieht den Schlüssel nie. Hinweis in der Anleitung: Geht der Schlüssel verloren oder wird er erneuert, muss das Geheimnis mitgeändert und der Bestand neu gesiegelt werden; ohne Geheimnis ist die GitHub-Prüfung rot (AK-30).
+4. **U4 Erstbestand** — ein Agent schlägt den Erstbestand vor (Block im Ticket TASK-120, unbesiegelt; nichts ist rot, weil der Release-Befehl vorher anhält, AK-7). Stephan führt **einen** Befehl aus: den Bestätigungsbefehl mit „TASK-120". Danach Release wie immer; GitHub prüft beim ersten Lauf, dass keine bestehende Testdatei außerhalb der erlaubten Bereiche verändert wurde (AK-8).
+5. **U5 Pilot** einfrieren nach seiner Test-Prüfung (AK-34); bis TASK-120 live ist, erledigt der Orchestrator das Einfrieren von Hand und benennt die Lücke (ENTSCHEIDUNGEN.md).
+**Ablauf für spätere Tickets, die mit Stephans Zustimmung ein Prüfwerkzeug oder einen bestehenden Test ändern:** Zustimmung steht in der Entscheidungstabelle des Tickets → die Umsetzung merkt die Einheiten im Ticket als „zur Bestätigung vorgemerkt" vor (mit Grund aus der Entscheidung) → Schritt-Check hält mit „wartet auf deine Bestätigung" an (AK-29) → der Hauptthread nennt Stephan genau einen Befehl: *Bestätigungsbefehl + Ticket-Nummer* → danach weiter ohne Zutun; Backlog geht mit dem Upload mit (AK-25).
+
+##### Pre-Mortem
+📎 **Code-Verifikation** (gelesen am 24.10.2026): `tools/gate_check.py` Kopf und Funktionsliste (Phasen impl/test/refactor/verification/release/done/retro; Backlog + Archiv); `.github/workflows/deploy.yml` vollständig (Auschecken ohne Verlaufstiefe, zwei Prüf-Jobs, Deploy-Job `needs`, 7 bestehende Geheimnisse im Kopfkommentar); `.gitignore` (BACKLOG nicht ausgeschlossen, `.forgejo/` ausgeschlossen); `backend/pytest.ini`; `backend/tests/` (165 Dateien, davon 158 Python, 1 `.feature`, 2 Sh-Starter, 1 Bild, 3 Markdown; Unterordner `task118/` mit 6 Dateien bereits vorhanden, `akzeptanz/` nur `testfaelle/`); `run_frontend_check.py` Z. 1183–1210 (Hilfsroutine, 7 Aufrufe im selben File); `deploy/deploy.sh` Z. 1–60.
+- Bestätigt: Prüfung findet Tickets auch im Archiv; Deploy hängt nur an den beiden Prüf-Jobs; Geheimnisname frei.
+- Widerlegt: „Fachsprache je Datei einfrieren" (Skill-Entwürfe) — verträgt sich nicht mit parallelen Tickets → je Schritt.
+- Neu belegt: Die Hilfsroutine „offene Sheets schließen" steht in einer bestehenden Testdatei (→ Frage 9). TASK-117 ändert `conftest.py` und `run_frontend_check.py` (→ Erstbestand erst danach).
+- Unverifiziert: Verhalten der macOS-Schlüsselbund-Abfrage (Frage 11, wird bei U3 auf dem Mac geprüft).
+**Zusammenspiel:** Test-Prüfung bestätigt → Einfrieren → Schritt-Check vor jeder Phase → Umsetzung/Aufräumen → Umfangsprüfung → Probelauf (gemeinsame Prüfliste, Siegel, Vergleich mit GitHub-Stand) → Upload mit Backlog → GitHub-Job (Vergleichsstand, Siegel mit Geheimnis) → Deploy → Live-Check (TASK-118).
+- 💀 **1 Agent ändert Test und Fingerabdruck gemeinsam** → Verlaufsvergleich (AK-21, T-24); Restlücke zwischen Einfrieren und erstem Upload: Umfangsprüfer bekommt die Referenzwerte aus dem Test-Prüfungs-Urteil, nicht aus dem Ticket (Skill-Hinweis).
+- 💀 **2 Prüfung wird abgeschaltet** (Prüfschritt aus GitHub-Beschreibung oder Release-Befehl entfernt; GitHub prüft nach der hochgeladenen Beschreibung) → Prüfwerkzeuge eingefroren (AK-6); Release-Starter außerhalb des Projekts (Frage 11 A, AK-32, T-36); Umfangsprüfung meldet Änderung außerhalb erlaubter Bereiche.
+- 💀 **3 Tests hochgeladen, Ticket nicht** → AK-23/T-26, AK-25/T-28.
+- 💀 **4 Paralleles Ticket macht anderes rot** → Fingerabdruck je Schritt (AK-15, T-18).
+- 💀 **5 Erstbestand sofort rot oder blockiert alles** → unbesiegelter Erstbestand hält nur den Release-Befehl lokal an (AK-7, T-07); Erstbestand erst nach TASK-117/118/121 (Reihenfolge).
+- 💀 **6 Bestätigung fälschbar oder zu weit** → Siegel über exakte Einheiten (AK-27, AK-28).
+- 💀 **7 Veränderter bestehender Test wird in den Erstbestand geschmuggelt** (Stephan siegelt ohne Durchsicht) → GitHub vergleicht Erstbestand mit vorherigem Upload (AK-8, T-09).
+- 💀 **8 Schlüssel wird von Code abgegriffen, den Stephan auf dem Mac startet** (Release-Befehl, Tests im Probelauf) → Frage 11 A (sichtbare Abfrage, Schlüssel nur im Bestätigungsbefehl), AK-31, T-35.
+- 💀 **9 Falscher Alarm** (Zeilenenden, Archivierung, Bot-Upload der Gebäudedaten, manueller Anstoß) → keine Umwandlung (verifiziert), Archiv mitlesen (T-21), Bot-Upload neutral, klare Meldung (AK-11).
+**Rollback:** reine Ergänzung; Prüfschritt und Job lassen sich ohne Datenverlust entfernen (Entfernen selbst braucht dann Stephans Siegel). **Seiteneffekte:** Probelauf (TASK-117), GitHub-Prüfung (TASK-118/119), Schritt-Check, Release-Dateiliste.
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt (Entwurf, R1–R4)
+- [x] Fundstellen-Sweep: „Fingerabdruck" (7 Dateien), „Prüfsumme" (14), „shasum|sha256|hashlib" (6) — keine bestehende Test-Fingerabdruck-Prüfung; „TESTSIEGEL" 0 Treffer; „_close_any_open_sheet" 1 Definition + 7 Aufrufe in einer Datei. App-Ansichten (Liste, Karte, Kalender, Chancen-Übersicht, Event-Detail) nicht betroffen; Scout seit US-142 entfernt.
+- [x] Zustands-Check: Einfrieren (Leer → AK-5, Fehler → AK-4), Prüfen (Leer → grün, Fehler → AK-17/AK-24/AK-30), Erstbestand (unbesiegelt → AK-7), Bestätigung (fehlt → AK-29)
+- [x] Pre-Mortem durchgeführt (9 Szenarien)
+- [x] Architektur analysiert: `tools/gate_check.py`, `.github/workflows/deploy.yml`, `release.sh`, gemeinsame Prüfliste (TASK-117), `backend/tests/`, `backend/pytest.ini`, `backend/conftest.py`, `run_frontend_check.py`
+- [x] Designer-Check: visuell? → nein, übersprungen
+- [x] Optionen: A / B / C — B entschieden von Stephan am 24.10.2026
+- [ ] Alle Fragen entschieden: 1–8 ja (24.10.2026); **9–11 offen**
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 35 AKs, 39 Testfälle, jedes AK ≥1 Testfall; Lücken Erstbestand-Schmuggel (AK-8), Upload ohne Backlog (AK-25), Schlüssel-Abgriff auf dem Mac (AK-31/Frage 11) geschlossen bzw. als Frage gestellt
+
+##### AK-Qualitäts-Check
+1. **Granularität:** Prüfen lokal / Probelauf / GitHub getrennt (AK-10, AK-19, AK-20); verändert / gelöscht / Kommentar getrennt (AK-10, AK-12, AK-13). ✅
+2. **Polarität:** R1 → AK-14; Erstbestand AK-7 ↔ AK-8; Verlauf AK-21 ↔ AK-22; Bestätigung AK-26 ↔ AK-27/28; mehrere Tickets AK-15 ↔ AK-16. ✅
+3. **Messbarkeit:** keine Funktions- oder Dateinamen in den AKs; nur der Name des Geheimnisses in Festlegungen, Testfällen und Umsetzungsschritten. ✅
+4. **Vier Kategorien:** funktional AK-1–29, AK-34; nicht-funktional — Sicherheit (Kern: AK-8, AK-21–23, AK-27, AK-30–32), Laufzeit AK-33; Architektur — Rückwärtskompatibilität AK-9, Wiederverwendung Schritt-Check und Prüfliste; Sonstiges/Betrieb — Beobachtbarkeit AK-11/AK-17, Betriebsübergabe U3/U4 und Ablauf für spätere Tickets. ✅
+5. **Testbarkeit:** jedes AK ≥1 Testfall, jeder Testfall nennt sein AK; Rot-Nachweis möglich (Verhalten neu). ✅
+6. **Herkunft:** vermerkt. ✅
+7. **Nicht-Ziele/erlaubte Bereiche:** konkret je Datei mit Art. ✅
+8. **Entschieden:** Fragen 1–8 entschieden; **9–11 offen** (AK-14 Platzhalter-Teil, AK-31 Zusatz, AK-32, AK-35 vorläufig nach Empfehlung). ⚠️
+9. **Geheimnisse:** AK-31 + T-34/T-35; Schlüssel nie als Aufrufparameter, nie in Datei, Zwischenablage geleert. ✅
+**Negativ-/Randfälle:** Grenzwerte — ein Zeichen (T-12), Kommentar (T-16), 30 s (AK-33); ungültige Eingaben — beschädigter Block (AK-17), falsches Siegel (T-25); Nebenläufigkeit — zwei offene Tickets in einer Fachsprache-Datei (AK-15/16), gleichzeitige Uploads ausgeschlossen durch Reihenfolge und Doppelstart-Sperre aus TASK-117; Lastgrenzen — ~165 Dateien, AK-33; Berechtigungen — nur Stephans Schlüssel (AK-26/27/31); Abwärtskompatibilität — AK-9, Tickets ohne Tests AK-5; Rollback — reine Ergänzung, bestätigen; Beobachtbarkeit — AK-11, AK-17, AK-24, AK-30.
+
+##### Testplan
+- [ ] **Test-Agent (vor der Umsetzung):** T-01–T-10, T-12–T-34, T-36 (T-36 erst nach Frage 11) als neue Tests unter `backend/tests/task120/`, je mit Wegwerf-Übungsablage bzw. Wegwerf-Git unter `/tmp`, automatisch gelöscht auch bei Abbruch; Marker `offline` + `regression` + `requires_full_checkout` (Werkzeug liegt außerhalb von `backend/`); Ticket-ID TASK-120 in jedem Testfall; Übungsschlüssel nur im Test erzeugt. Rot-Nachweis gegen den heutigen Stand (Werkzeug fehlt). Eintrag in `backend/tests/README.md`.
+- [ ] **Nachweis beim Abschluss / nur auf Stephans Mac / beim ersten GitHub-Lauf:** T-11, T-23 (GitHub-Teil), T-29 (echter Befehl), T-33 (GitHub-Teil), T-35, T-37, T-38, T-39.
+- [ ] **Regression:** vollständige Suite vor und nach; Regressions-Matrix `PRODUCT.md` §12: kein App-Bereich betroffen; Release-Absicherung (Probelauf, GitHub-Prüfung, Live-Check) vollständig.
+- [ ] **Hinweise an Bausteine 5–8 (nicht hier umsetzen):** Umsetzungs- und Test-Skill-Entwurf von „dateibasiert" auf „je Datei bzw. je Schritt" ändern; Orchestrator übergibt dem Umfangsprüfer die Referenz-Fingerabdrücke aus dem Test-Prüfungs-Urteil; Einfrieren ruft das Werkzeug statt Handrechnung auf; Release-Skill nimmt bei eingefrorenen Dateien Backlog/Archiv in die Dateiliste auf; ENTSCHEIDUNGEN.md-Eintrag „Hilfsroutine darf angepasst werden" nach Frage 9 nachziehen.
+
+### TASK-121 · Ausgangskopie vor jeder Umsetzung und Änderungsvergleich ohne Git für die Umfangsprüfung `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | In Analysis |
+| **Erstellt** | 2026-10-24 |
+
+**Beschreibung:** Vor jeder Umsetzung wird automatisch eine Ausgangskopie des Codes angelegt. Nach der Umsetzung und nach dem Aufräumen erzeugt ein Hilfswerkzeug daraus einen vollständigen Änderungsvergleich, ohne Git. Diesen bekommt der unabhängige Umfangsprüfer, um jede einzelne Änderung einem Akzeptanzkriterium zuzuordnen. Ohne echten Vergleich lassen sich beiläufig eingebaute Zusätze kaum zuverlässig erkennen.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich, dass jede Code-Änderung nachweislich auf ein vereinbartes Kriterium zurückgeht, sodass nichts eingebaut wird, was ich nicht spezifiziert habe.
+
+**Bezug:** QUALITAETS-PIPELINE.md Abschnitt 3 Phase 2 Schritte 3 und 5, Abschnitt 6 (Baustein 4). Neuer Prüf-Modus U im Skill gate-auditor (Entwurf unter skills-entwurf/). Muss mit der Ticket-Isolation per Verzeichniskopie zusammenpassen und darf Änderungen paralleler Tickets nicht diesem Ticket zuschreiben. Von Stephan am 24.10.2026 angelegt und direkt für die Pipeline freigegeben.
+
+
+#### 🔬 Analyse & Spec (TASK-121) · 2026-10-24
+> Grundlage: Entwurf `docs/analyse-entwurf/TASK-121.md` (24.10.2026) + **Entscheidungen Stephan vom 24.10.2026** (Fragen 1–5, inkl. Abwandlung bei Frage 5), die jeder abweichenden Aussage im Entwurf vorgehen; dazu `skills-entwurf/ENTSCHEIDUNGEN.md` und Zielbild `QUALITAETS-PIPELINE.md` (Phase 2, Baustein 4).
+> **Status-Empfehlung:** In Analysis — Spec fertig, Tests stehen aus.
+
+##### Kernbefund in Alltagssprache
+Heute gibt es kein Werkzeug, das vor einer Umsetzung den Ausgangsstand festhält und danach jede Änderung einzeln zeigt; Arbeitskopien gab es nur fallweise und unvollständig (BUG-108), parallele Arbeit hat Änderungen schon überschrieben (BUG-113). Künftig arbeitet jedes Ticket in seiner eigenen Projektkopie; ein Hilfswerkzeug legt dazu eine unantastbare Ausgangskopie an, zeigt die Änderungen des Tickets in einzelnen, nummerierten Blöcken und überträgt sie sicher zurück. In der App ändert sich nichts — die Wirkung zeigt sich bei jedem künftigen Ticket ab der Umsetzung. Nach Done und Retro bleibt nur der Änderungsvergleich erhalten; die großen Kopien werden beim nächsten ohnehin laufenden Release-Befehl auf dem Mac gelöscht, ohne dass Stephan etwas tun muss.
+
+##### Getroffene Entscheidungen
+| # | Entscheidung | Datum | Eingearbeitet in |
+|---|---|---|---|
+| 1 | Jede Umsetzung läuft immer in einer eigenen Projektkopie, auch ohne erkennbare Überschneidung. | 24.10.2026 (Stephan) | Option A, AK-1, AK-2, AK-8 |
+| 2 | Andere Stellen derselben Datei werden beim Zurückübertragen automatisch zusammengeführt, danach laufen alle Tests erneut; dieselbe Stelle → Pipeline hält an, meldet den Konflikt, nie überschreiben. | 24.10.2026 (Stephan) | AK-16 – AK-19 |
+| 3 | Backlog, Archiv und Kanban-Board gehören nicht in den Vergleich (Schutz über TASK-111); alle übrigen Dokumente gehören hinein und müssen wie Code einem Kriterium zugeordnet werden. | 24.10.2026 (Stephan) | AK-3, AK-4, AK-7 |
+| 4 | Kopiert und verglichen wird alles Hochladbare; ausgeschlossen ist, was GitHub nie bekommt (Datenbanken, Zwischenspeicher, Testausgaben). Liegengelassene Sicherungsdateien bleiben bewusst drin. | 24.10.2026 (Stephan) | AK-3, AK-5 |
+| 5 | **Abwandlung der Empfehlung:** Nach Done und Retro wird nur der Änderungsvergleich aufbewahrt (im Aufräumordner); Arbeitskopie und Ausgangskopie werden gelöscht (Aufräumordner bereits 11 GB, je Ticket sonst ca. 80 MB). | 24.10.2026 (Stephan) | AK-22 – AK-25 |
+| Option | **Option A** — eigene Arbeitskopie je Ticket, Vergleich Arbeitskopie gegen Ausgangskopie (folgt aus Entscheidung 1). | 24.10.2026 (Stephan) | gesamte Spec |
+
+##### Technische Festlegungen (ohne Verhaltenswirkung)
+- ✅ Technische Festlegung (24.10.2026): **Löschweg für die großen Kopien = der eine Release-Befehl auf dem Mac.** Das Werkzeug *löscht* in der Agenten-Umgebung nie, es *verschiebt* nach Done und Retro die Kopien eines Tickets in einen Vormerk-Ordner `_worktrees/_loeschen/<ID>_<datum>/` (mit Vormerk-Datei) und den Vergleich in den Aufräumordner. Der Release-Befehl (`release.sh`) ruft am Ende eines erfolgreichen Laufs ein kleines Lösch-Skript auf, das ausschließlich vorgemerkte Einträge in `_worktrees/_loeschen/` endgültig entfernt. — Grund, belegt am 24.10.2026: (a) Löschen im verbundenen Ordner schlägt in der Agenten-Umgebung fehl (`rm _worktrees/.loeschprobe_task121` → „Operation not permitted", Exit 1), Verschieben innerhalb des Ordners klappt (Datei und Ordner erfolgreich verschoben); (b) ein Ort mit erlaubtem Löschen, der über Sitzungen erhalten bleibt, existiert nicht: das Zuhause der Agenten-Umgebung ist sitzungsgebunden (`/sessions/<sitzungs-id>`, daneben fremde Sitzungsordner), `/tmp` liegt in der flüchtigen Umgebung; die Kopien müssen aber von Umsetzung bis Done über mehrere Sitzungen erhalten bleiben; (c) `release.sh` läuft laut Kopf („läuft auf dem Mac") direkt auf dem Mac ohne diese Sperre und wird ohnehin nach jedem Ticket gestartet (`ENTSCHEIDUNGEN.md`: Sicherung und Done-Doku reisen mit dem einen Release-Befehl). Damit entsteht keine neue Bitte an Stephan. Folge: Die Kopien eines Tickets verschwinden nicht im Moment von Done/Retro, sondern beim nächsten Release-Lauf; sichtbar ist nur eine Hinweiszeile im Release-Ausgabetext.
+- ✅ Technische Festlegung (24.10.2026): Das Lösch-Skript ist eine eigene, kleine Shell-Datei (`tools/kopien_loeschen.sh`), läuft unter macOS und Linux gleich, und ist damit ohne den Release-Befehl in Wegwerf-Übungsablagen testbar. `release.sh` bekommt nur einen nicht-fatalen Aufruf nach dem erfolgreichen Tag-Push; ein Fehler dort bricht den Release nie ab.
+- ✅ Technische Festlegung (24.10.2026): Sicherungen des Lösch-Skripts: Ziel muss exakt `<Projektordner>/_worktrees/_loeschen` sein (aufgelöster Pfad, keine symbolischen Verknüpfungen verfolgt); gelöscht wird nur ein Unterordner mit Vormerk-Datei; vor dem Löschen Schreibrechte wiederherstellen (die Kopien sind schreibgeschützt). Alles andere bleibt unberührt und wird ggf. als „nicht vorgemerkt, belassen" gemeldet.
+- ✅ Technische Festlegung (24.10.2026): Ablage: Arbeitskopie `_worktrees/<ID>/`, Ausgangskopie `_worktrees/<ID>.ausgang/`, Zwischenstand `_worktrees/<ID>.zwischenstand/`, Vergleiche `_worktrees/<ID>.vergleich/` (bis Done/Retro), danach Vergleich in `_to_delete/vergleich_<ID>_<datum>/`.
+- ✅ Technische Festlegung (24.10.2026): Reihenfolge beim Anlegen: erst Arbeitskopie aus dem Hauptordner, dann Ausgangskopie aus der Arbeitskopie, dann Fingerabdruck-Abgleich beider; Fingerabdruck sha256 je Datei + Gesamt-Fingerabdruck; Gesamt-Fingerabdruck steht im Ticket. Nur der Orchestrator legt an (Phase 5), der Umsetzer bekommt nur den Pfad.
+- ✅ Technische Festlegung (24.10.2026): Schutz der Ausgangskopie über Fingerabdruck, Schreibschutz nur zusätzlich — belegt: über den verbundenen Ordner zeigt die Agenten-Umgebung die gesetzten Dateirechte nicht zuverlässig an (`chmod 444` → Anzeige weiter `-rw-------`, Schreibversuch trotzdem abgewiesen). Vor jedem Vergleich und jedem Zurückübertragen Neuberechnung; Abweichung = Abbruch.
+- ✅ Technische Festlegung (24.10.2026): Ausschlussregel: beide `.gitignore`-Listen (Projekt- und Repo-Wurzel) plus feste Liste: Datenbankdateien samt Begleitdateien (`*.db`, `*.db-*`), `backend/cache/`, `_worktrees/`, `_to_delete*/`, `tools/_kanban_out/`, `tools/_release_check/`, `.fuse_hidden*`, `__pycache__/`, Testausgaben. Backlog (`BACKLOG.md`), Archiv (`BACKLOG-ARCHIVE.md`) und Kanban-Board (`fotoalert-kanban.html`) werden weder kopiert noch verglichen noch zurückübertragen (Folge aus Entscheidung 3: die Pipeline pflegt sie im Hauptordner). Sicherungs-/Notizdateien wie `*.bak` werden nicht ausgeschlossen (Entscheidung 4).
+- ✅ Technische Festlegung (24.10.2026): Blockbildung fest und deterministisch: 3 Zeilen Umfeld, ab 7 unveränderten Zeilen Abstand neuer Block; Blockkennung `<datei>#<n>` mit Zeilenbereich vorher/nachher und nächstgelegener vorangehender Abschnittszeile (Funktion, Klasse, HTML-Kommentar-Überschrift). Neue/gelöschte Datei = ein Block; Binärdateien nur neu/geändert/gelöscht mit Größe und Fingerabdruck; Zeilenende- und Leerzeichen-Änderungen gekennzeichnet. Python 3 ohne Zusatzpakete (Agenten-Umgebung: Python 3.10.12).
+- ✅ Technische Festlegung (24.10.2026): Zurückübertragen je Datei als Drei-Wege-Abgleich Ausgangskopie / Arbeitskopie / Hauptordner: Hauptordner unverändert → übernehmen; sonst Blöcke einzeln anwenden, wenn ihre Zeilenbereiche keine fremde Änderung berühren; sonst Abbruch **ohne jede Teiländerung** im Hauptordner (alles oder nichts über alle Dateien).
+- ✅ Technische Festlegung (24.10.2026): Nach Bestätigung des ersten Vergleichs wird ein Zwischenstand gesichert (gleiche Regeln) — Grundlage für den Teilvergleich nach dem Aufräumen.
+- ✅ Technische Festlegung (24.10.2026): Repo-Wurzel-`.gitignore` bekommt eine Zeile für `FotoAlert/_worktrees/` (wirkt nur auf die Git-Anzeige).
+- ✅ Technische Festlegung (24.10.2026): Bis das Werkzeug live ist, legt der Orchestrator die Kopien für TASK-121 selbst von Hand an und benennt die Lücke (`ENTSCHEIDUNGEN.md`, Eintrag zu TASK-120/TASK-121).
+
+##### Scope
+**Eingeschlossen:** Anlegen von Arbeits- und Ausgangskopie je Ticket; Änderungsvergleich in nummerierten Blöcken (nach Umsetzung und nach Aufräumen, inkl. Teilvergleich); Schutz der Ausgangskopie; sicheres Zurückübertragen mit automatischem Zusammenführen bzw. Anhalten bei Konflikt; Wegräumen nach Done/Retro (Vergleich aufbewahren, Kopien zum Löschen vormerken); endgültiges Löschen vorgemerkter Kopien durch den Release-Befehl.
+
+##### Nicht-Ziele
+- Einfrieren und Prüfen der Test-Fingerabdrücke lokal und bei GitHub (**TASK-120**).
+- Die Umfangsprüfung selbst und alle Skill-Anpassungen (gate-auditor Modus U, Orchestrator inkl. „nach Zusammenführen alle Tests erneut", Umsetzung, Aufräumen — Bausteine 6–8).
+- Schutz von BACKLOG.md gegen Überschreiben, Prüfung verschwundener Ticket-Blöcke (**TASK-111**).
+- Probelauf und sonstiger Umbau des Release-Befehls (**TASK-117**), Live-Check (**TASK-118**), Akzeptanztest-Gerüst (**TASK-119**). Am Release-Befehl nur der eine Lösch-Aufruf.
+- Automatisches Entfernen beanstandeter Änderungen (macht der Umsetzer, danach neuer Vergleich).
+- Erkennen verschobener Code-Abschnitte als „verschoben" (erscheinen als entfernt + neu).
+- Lokaler Server bzw. Browser-Test gegen die Arbeitskopie (späteres Ticket laut `ENTSCHEIDUNGEN.md`).
+- Leeren oder Verkleinern des bestehenden Aufräumordners (11 GB, davon eine 11,6-GB-Bilddatei).
+- Jede Änderung an der App (Server, Oberfläche, iOS).
+
+##### Erlaubte Bereiche
+- `tools/ausgangskopie.py` — *neu*: Anlegen, Vergleich, Zwischenstand, Zurückübertragen, Wegräumen/Vormerken.
+- `tools/kopien_loeschen.sh` — *neu*: endgültiges Löschen vorgemerkter Kopien.
+- `release.sh` — *nur ergänzen*: ein nicht-fataler Aufruf von `tools/kopien_loeschen.sh` nach dem erfolgreichen Tag-Push plus eine Ausgabezeile; bestehende Zeilen unverändert.
+- `../.gitignore` (Repo-Wurzel) — *nur ergänzen*: eine Zeile `FotoAlert/_worktrees/`.
+- `backend/tests/` — *neu*: nur neue Testdateien des Test-Agenten für TASK-121.
+- `backend/tests/README.md` — *nur ergänzen*: Zeile(n) für die neuen Testdateien.
+(Alles andere ist tabu. Bestehende Tests nie.)
+
+##### Akzeptanzkriterien
+*Für Stephan: ein Werkzeug für die Agenten; in der App ändert sich nichts. Erlebbar wird es bei jedem künftigen Ticket ab der Umsetzung — der Prüfer sieht jede Änderung einzeln — und beim Release als eine Hinweiszeile.*
+- [ ] **AK-1** Beim Umsetzungsstart eines Tickets entstehen eine Arbeitskopie und eine Ausgangskopie mit identischem Inhalt; ihr gemeinsamer Fingerabdruck steht im Ticket. *(Herkunft: R1, Entscheidung 1)*
+- [ ] **AK-2** Das gilt für jedes Ticket, auch wenn gerade kein anderes Ticket offen ist oder dieselben Dateien anfasst. *(Herkunft: Entscheidung 1)*
+- [ ] **AK-3** Die Kopien enthalten alles Hochladbare — Programm, Oberfläche, Tests, Skripte, Server-Einstellungen und Dokumente wie Produktbeschreibung und Test-Übersicht — und nichts, was GitHub nie bekommt: keine Datenbanken, Zwischenspeicher, Testausgaben, Nutzerdaten, Geheimnis-Dateien, Aufräumordner oder anderen Arbeitskopien. *(Herkunft: R2, Entscheidungen 3 und 4, BUG-108)*
+- [ ] **AK-4** Ticket-Liste, Archiv und Kanban-Board erscheinen nie im Änderungsvergleich und werden beim Zurückübertragen nie überschrieben. *(Herkunft: Entscheidung 3)*
+- [ ] **Edge Case AK-5** Eine liegengelassene Sicherungsdatei im Code-Bereich erscheint in der Kopie und, wenn das Ticket sie anlegt, als neue Datei im Vergleich. *(Herkunft: Entscheidung 4)*
+- [ ] **Edge Case AK-6** Existiert für das Ticket schon eine Ausgangskopie, wird keine neue angelegt; die alte bleibt unverändert, es kommt eine klare Meldung. *(Herkunft: R1)*
+- [ ] **AK-7** Der Vergleich zeigt jede Änderung des Tickets: geänderte, neue und gelöschte Dateien, Dokumente eingeschlossen. *(Herkunft: R3, Entscheidung 3)*
+- [ ] **AK-8** Änderungen, die ein anderes Ticket nach dem Start im Hauptordner macht, erscheinen nicht im Vergleich; unveröffentlichter Code anderer Tickets, der beim Start schon da war, ebenfalls nicht. *(Herkunft: R3, BUG-113, BUG-108, Pre-Mortem S1)*
+- [ ] **AK-9** Weit auseinanderliegende Änderungen in derselben Datei erscheinen als getrennte, nummerierte Blöcke mit Datei, Zeilenbereich vorher/nachher und nächstgelegenem Abschnitt. *(Herkunft: R4, Pre-Mortem S4)*
+- [ ] **Edge Case AK-10** Reine Leerzeichen-, Einrückungs- oder Zeilenende-Änderungen erscheinen als eigener, so gekennzeichneter Block. *(Herkunft: R4)*
+- [ ] **Edge Case AK-11** Bei Binärdateien zeigt der Vergleich nur neu/geändert/gelöscht mit Größe, ohne Inhalt. *(Herkunft: R4)*
+- [ ] **Edge Case AK-12** Hat das Ticket nichts geändert, sagt der Vergleich ausdrücklich „keine Änderung". *(Herkunft: Zustands-Check)*
+- [ ] **AK-13** Nach dem Aufräumen liefert das Werkzeug den Gesamtvergleich gegen dieselbe Ausgangskopie und zusätzlich nur die Änderungen seit dem bestätigten ersten Vergleich. *(Herkunft: R5)*
+- [ ] **Edge Case AK-14** Wurde die Ausgangskopie verändert (Zeile geändert, Datei hinzugefügt oder entfernt), gibt es weder Vergleich noch Zurückübertragen, sondern die Meldung „Ausgangskopie verändert" mit der betroffenen Datei. *(Herkunft: R6, Pre-Mortem S5)*
+- [ ] **Edge Case AK-15** Fehlt die Ausgangskopie, gibt es keinen Vergleich, sondern die Meldung „kein prüfbarer Vergleich". *(Herkunft: R6, Modus U)*
+- [ ] **AK-16** Beim Zurückübertragen wird eine Datei, die im Hauptordner seit dem Start unverändert ist, mit dem Stand des Tickets übernommen. *(Herkunft: R7)*
+- [ ] **AK-17** Hat ein anderes Ticket dieselbe Datei an anderen Stellen geändert, werden beide Änderungen automatisch zusammengeführt; keine der beiden geht verloren. *(Herkunft: Entscheidung 2)*
+- [ ] **AK-18** Nach einem automatischen Zusammenführen meldet das Werkzeug ausdrücklich, welche Dateien zusammengeführt wurden und dass jetzt alle Tests erneut laufen müssen. *(Herkunft: Entscheidung 2)*
+- [ ] **Edge Case AK-19** Betreffen beide Tickets dieselbe Stelle, wird nichts zurückübertragen — auch keine andere Datei —, der Hauptordner bleibt unverändert, und die Meldung nennt Datei und Stelle des Konflikts. Es wird nie überschrieben. *(Herkunft: Entscheidung 2, BUG-113, Pre-Mortem S2)*
+- [ ] **AK-20** Inhalte von Geheimnis-Dateien erscheinen nie in Kopie, Vergleich oder Meldungen. *(Herkunft: Skill 6c Punkt 9)*
+- [ ] **AK-21** Anlegen und Vergleich dauern in der Agenten-Umgebung je höchstens 30 Sekunden bei heutiger Projektgröße. *(Herkunft: Messung 24.10.2026 unter 1 s; Grenze mit Puffer)*
+- [ ] **AK-22** Nach Done und Retro liegt der Änderungsvergleich des Tickets im Aufräumordner; Arbeits- und Ausgangskopie sind zum Löschen vorgemerkt und unter den aktiven Arbeitskopien liegt für das Ticket nichts mehr. *(Herkunft: Entscheidung 5)*
+- [ ] **AK-23** Beim nächsten Release-Befehl werden vorgemerkte Kopien endgültig gelöscht, ohne dass Stephan etwas zusätzlich tun muss; der Release zeigt dazu eine Hinweiszeile (welche Tickets, wie viel Platz frei wurde). *(Herkunft: Entscheidung 5, Technische Festlegung Löschweg)*
+- [ ] **Edge Case AK-24** Das Löschen trifft nie etwas anderes als vorgemerkte Kopien: aktive Kopien anderer Tickets, aufbewahrte Vergleiche, der Aufräumordner und alles im Projekt bleiben unberührt; ein Eintrag ohne Vormerkung bleibt liegen und wird gemeldet. *(Herkunft: Pre-Mortem S6)*
+- [ ] **Edge Case AK-25** Gibt es nichts zu löschen oder scheitert das Löschen, läuft der Release trotzdem unverändert durch und meldet das in einer Zeile. *(Herkunft: Pre-Mortem S7)*
+- [ ] **AK-26** Bestehende Tests, die App und der übrige Ablauf des Release-Befehls verhalten sich unverändert. *(Herkunft: Regression)*
+
+##### Testfall-Liste in Fachsprache
+*Form:* Fachsprache (Gerüst `backend/tests/akzeptanz/fachsprache/` existiert noch nicht, nur `testfaelle/`). *Ausführung „automatisch"* = automatischer Test, der für jeden Lauf eine **Wegwerf-Übungsablage unter `/tmp`** mit erfundenen Dateien aufbaut und sie nach dem Lauf **automatisch löscht, auch bei Abbruch**; läuft in der Agenten-Umgebung, auf dem Mac und bei GitHub. Erwartete Werte stammen aus der Konstruktion der Übungsablage (unabhängig vom Werkzeug). Git wird nicht benötigt.
+
+| ID | AK | Testfall (Fachsprache) | Ausführung |
+|---|---|---|---|
+| T-01 | AK-1 | Angenommen ein Übungsprojekt mit 5 Code-Dateien. Wenn die Umsetzung für Ticket X startet, dann gibt es Arbeits- und Ausgangskopie mit je genau denselben 5 Dateien und gleichem Fingerabdruck, und der Fingerabdruck wird ausgegeben. | automatisch |
+| T-02 | AK-2 | Angenommen im Übungsprojekt gibt es kein anderes offenes Ticket und keine fremde Kopie. Wenn die Umsetzung für X startet, dann entstehen trotzdem beide Kopien. | automatisch |
+| T-03 | AK-3 | Angenommen das Übungsprojekt enthält zusätzlich Produktbeschreibung, Test-Übersicht, eine Datenbank mit Begleitdateien, einen Zwischenspeicher-Ordner, eine Testausgabe, eine Geheimnis-Datei, einen Aufräumordner und eine fremde Arbeitskopie. Wenn kopiert wird, dann sind alle Code-Dateien und beide Dokumente da und genau die sechs anderen fehlen. | automatisch |
+| T-04 | AK-3 | Gegenprobe: Eine Datei, die nur in der Repo-Wurzel-Ausschlussliste steht, fehlt ebenfalls; die dort ausdrücklich ausgenommene Datei (Ausnahme-Muster) ist enthalten. | automatisch |
+| T-05 | AK-4 | Angenommen Ticket-Liste, Archiv und Kanban-Board liegen im Übungsprojekt und werden in der Arbeitskopie verändert. Dann tauchen sie weder in der Kopie noch im Vergleich auf, und nach dem Zurückübertragen sind sie im Hauptordner unverändert. | automatisch |
+| T-06 | AK-5 | Angenommen eine liegengelassene Sicherungsdatei im Code-Bereich. Dann ist sie in beiden Kopien; legt das Ticket eine neue Sicherungsdatei an, erscheint sie als neue Datei im Vergleich. | automatisch |
+| T-07 | AK-6 | Angenommen eine Ausgangskopie für X existiert. Wenn erneut angelegt wird, dann kommt eine Meldung und der Fingerabdruck der alten bleibt gleich. | automatisch |
+| T-08 | AK-7 | Angenommen eine Code-Datei geändert, eine neu, eine gelöscht und die Produktbeschreibung um eine Zeile ergänzt. Dann zeigt der Vergleich genau diese vier, sonst nichts. | automatisch |
+| T-09 | AK-8 | Angenommen nach dem Start von X ändert ein anderes Ticket eine Datei im Hauptordner. Dann enthält der Vergleich von X diese Änderung nicht. | automatisch |
+| T-10 | AK-8 | Angenommen beim Start von X lag eine fremde, unveröffentlichte Änderung im Hauptordner. Dann erscheint sie nicht im Vergleich von X. | automatisch |
+| T-11 | AK-9 | Angenommen eine Datei mit 9 000 Zeilen, Änderungen in Zeile 100, 4 000 und 8 500. Dann drei Blöcke mit passenden Zeilenbereichen und je der nächstgelegenen vorangehenden Abschnittszeile. | automatisch |
+| T-12 | AK-9 | Grenzwert: zwei Änderungen mit 6 unveränderten Zeilen dazwischen ergeben einen Block, mit 7 zwei Blöcke. | automatisch |
+| T-13 | AK-10 | Nur Einrückung geändert → ein Block, als Leerzeichen-Änderung gekennzeichnet; nur Zeilenende geändert → ein Block, als Zeilenende-Änderung gekennzeichnet. | automatisch |
+| T-14 | AK-11 | Ein Bild geändert, eines neu, eines gelöscht → je ein Block ohne Inhalt, mit Größe vorher/nachher. | automatisch |
+| T-15 | AK-12 | Nichts geändert → Ergebnis „keine Änderung", null Blöcke. | automatisch |
+| T-16 | AK-13 | Erster Vergleich bestätigt, danach eine weitere Zeile geändert. Dann enthält der Gesamtvergleich alle Änderungen und der Teilvergleich genau diese eine. | automatisch |
+| T-17 | AK-14 | Je eine Variante: Zeile in der Ausgangskopie geändert / Datei hinzugefügt / Datei entfernt → kein Vergleich, Meldung nennt die Datei. | automatisch |
+| T-18 | AK-14 | Angenommen die Ausgangskopie ist verändert. Wenn zurückübertragen werden soll, dann bleibt der Hauptordner Datei für Datei unverändert (Fingerabdruck vorher = nachher). | automatisch |
+| T-19 | AK-15 | Ausgangskopie fehlt → Ergebnis „kein prüfbarer Vergleich". | automatisch |
+| T-20 | AK-16 | Angenommen X hat eine Datei geändert, die im Hauptordner seit dem Start unverändert ist. Dann steht nach dem Zurückübertragen im Hauptordner exakt der Stand von X. | automatisch |
+| T-21 | AK-17 | Angenommen X ändert Zeile 10, ein anderes Ticket hat im Hauptordner Zeile 500 derselben Datei geändert. Dann enthält die Datei danach beide Änderungen. | automatisch |
+| T-22 | AK-17 | Grenzwert: fremde Änderung direkt angrenzend an den Block von X (berührt seinen Zeilenbereich) gilt als dieselbe Stelle → Verhalten wie T-24. | automatisch |
+| T-23 | AK-18 | Nach dem Zusammenführen aus T-21 nennt die Meldung die zusammengeführte Datei und „alle Tests erneut nötig". | automatisch |
+| T-24 | AK-19 | Angenommen X und ein anderes Ticket ändern dieselbe Zeile; X hat zusätzlich eine zweite, konfliktfreie Datei geändert. Dann ist der Hauptordner danach vollständig unverändert (beide Dateien), und die Meldung nennt Datei und Zeilenbereich. | automatisch |
+| T-25 | AK-20 | Geheimnis-Datei mit erkennbarem Kunstwert im Übungsprojekt → der Wert steht in keiner Kopie, keinem Vergleich, keiner Meldung. | automatisch |
+| T-26 | AK-21 | Anlegen und Vergleich auf dem echten Projektstand (nur lesend, Kopie in eine Wegwerf-Ablage unter `/tmp`, danach gelöscht) je ≤ 30 s. | Nachweis beim Abschluss, nur Agenten-Umgebung |
+| T-27 | AK-22 | Angenommen X ist Done mit Retro. Wenn weggeräumt wird, dann liegt der Vergleich im Aufräumordner, die Kopien liegen im Vormerk-Ordner mit Vormerk-Datei, und unter den aktiven Arbeitskopien gibt es nichts mehr zu X. | automatisch |
+| T-28 | AK-23 | Angenommen zwei vorgemerkte Kopien. Wenn das Lösch-Skript läuft, dann sind beide weg, und die Ausgabe nennt beide Tickets und den frei gewordenen Platz. | automatisch |
+| T-29 | AK-23 | Beim ersten echten Release-Lauf nach der Umsetzung (mit mindestens einer vorgemerkten Kopie) ist der Vormerk-Ordner danach leer und die Hinweiszeile steht in der Release-Ausgabe; Stephan macht dafür nichts zusätzlich. | Nachweis beim Abschluss, nur auf Stephans Mac (Agent prüft danach den Ordner) |
+| T-30 | AK-24 | Angenommen neben zwei vorgemerkten Kopien liegen eine aktive Kopie eines anderen Tickets, ein unmarkierter Eintrag im Vormerk-Ordner, ein Vergleich und ein Aufräumordner. Dann bleiben alle vier Datei für Datei unverändert, der unmarkierte Eintrag wird gemeldet. | automatisch |
+| T-31 | AK-24 | Angenommen der Vormerk-Ordner ist eine Verknüpfung auf einen anderen Ordner, oder das Skript wird mit einem anderen Ziel aufgerufen. Dann wird nichts gelöscht und eine Meldung ausgegeben. | automatisch |
+| T-32 | AK-24 | Angenommen eine vorgemerkte Kopie enthält schreibgeschützte Dateien. Dann wird sie trotzdem vollständig gelöscht. | automatisch |
+| T-33 | AK-25 | Leerer bzw. fehlender Vormerk-Ordner → Ergebnis „nichts zu löschen", Rückgabe erfolgreich. Löschen scheitert (nicht beschreibbarer Eintrag) → eine Meldungszeile, Rückgabe so, dass der aufrufende Release nicht abbricht. | automatisch |
+| T-34 | AK-25, AK-26 | Der Aufruf im Release-Befehl steht nach dem erfolgreichen Tag-Push, ist nicht-fatal, und alle übrigen Zeilen des Release-Befehls sind unverändert (Vergleich alter/neuer Stand zeigt genau einen ergänzten Block). | automatisch (über das Werkzeug selbst, auf dem Ticket-Vergleich) + Umfangsprüfung |
+| T-35 | AK-26 | Volle Regression grün, vorher/nachher gleiches Ergebnis. | automatisch |
+| T-36 | AK-1, AK-7 | Gegenprobe zum Rot-Nachweis: Ein Testfall mit absichtlich falscher Erwartung (z. B. „Vergleich zeigt 3 statt 4 Änderungen" in T-08) muss rot werden. | automatisch |
+
+##### Pre-Mortem
+📎 Code-Verifikation (24.10.2026): `release.sh` vollständig gelesen (208 Zeilen) — läuft auf dem Mac, enthält bisher kein Löschen und keine Aufräumschritte; Ende nach Tag-Push ist der einzige Punkt, an dem der Release sicher erfolgreich war. Löschprobe im verbundenen Ordner → „Operation not permitted"; Verschieben von Datei und Ordner innerhalb des Ordners → erfolgreich (beide Proben danach nach `_to_delete/` verschoben). Zuhause der Agenten-Umgebung `/sessions/<sitzungs-id>`, sitzungsgebunden. `_worktrees/` leer. Beide `.gitignore` gelesen: `.env`, `*.env`, `.DS_Store`, `.fuse_hidden*` (nur unter `backend/data*`) erfasst. **TASK-117** (In Analysis) baut denselben Release-Befehl um.
+- 💀 **S1 Fremde Änderungen im Vergleich** → Prüfer lässt fremden Code entfernen. Auslöser: Vergleich gegen Hauptordner. Frühwarnung: Blöcke in Dateien, die das Ticket nicht kennt. Gegenmaßnahme: Option A, AK-8, T-09/T-10.
+- 💀 **S2 Zurückübertragen überschreibt paralleles Ticket** (BUG-113-Klasse). Gegenmaßnahme: Drei-Wege-Abgleich, alles-oder-nichts, AK-17/AK-19, T-21/T-22/T-24.
+- 💀 **S3 Teilkopie** → Tests in der Arbeitskopie scheitern an fehlenden Dateien (BUG-108). Gegenmaßnahme: AK-3, T-03/T-04; Abgleich nach dem Kopieren.
+- 💀 **S4 Vergleich unlesbar** (Riesenblock in der großen Oberflächendatei). Gegenmaßnahme: AK-9, T-11/T-12; bleibt bei großen zusammenhängenden Umbauten begrenzt.
+- 💀 **S5 Ausgangskopie still angepasst**, damit eine Zusatzänderung verschwindet. Gegenmaßnahme: Fingerabdruck im Ticket, AK-14, T-17/T-18.
+- 💀 **S6 Lösch-Skript löscht das Falsche** (aktive Kopie, Vergleich, Projektdateien). Auslöser: falscher Pfad, Verknüpfung, fehlende Vormerkung. Frühwarnung: Ausgabe nennt unerwartete Einträge. Gegenmaßnahme: feste Zielprüfung, nur vorgemerkte Unterordner, Verknüpfungen nicht verfolgen, AK-24, T-30/T-31.
+- 💀 **S7 Release bricht wegen des Aufräumens ab** oder bleibt an schreibgeschützten Dateien hängen. Gegenmaßnahme: Aufruf erst nach erfolgreichem Tag-Push, nicht-fatal, Schreibrechte vor dem Löschen wiederherstellen, AK-25, T-32/T-33.
+- 💀 **S8 Gleichzeitiger Umbau des Release-Befehls durch TASK-117** → eine der beiden Änderungen geht verloren. Gegenmaßnahme: Ergänzung ist ein einziger, abgegrenzter Block am Ende; Reihenfolge: TASK-121 nach TASK-117 umsetzen oder per Zusammenführen nach Entscheidung 2 (Konflikt → Anhalten); T-34.
+- 💀 **S9 Kopien stapeln sich**, wenn lange kein Release läuft (je Ticket ca. 76 MB). Frühwarnung: Release-Hinweiszeile nennt Platz. Gegenmaßnahme: akzeptiert — jeder Ticketabschluss endet mit einem Release, und Daten bleiben ausgeschlossen.
+- Seiteneffekt: Browser-Tests gegen Stephans lokalen Server sehen die Arbeitskopie erst nach dem Zurückübertragen (Nicht-Ziel, späteres Ticket).
+
+##### Analyse & Planung
+- [x] Example Mapping durchgeführt (R1–R7, Entwurf Abschnitt 2)
+- [x] Fundstellen-Sweep: Suche `_worktrees` in .md/.py/.sh — Skills-Entwürfe (Orchestrator Phase 5/8/10/11, Umsetzung, Aufräumen, Prüfer Modus U), 2 bestehende Tests nur als Kommentar, Backlog/Archiv als Verlauf; App-Ansichten (Liste, Karte, Kalender, Scout, Chancen, Event-Detail) nicht betroffen
+- [x] Zustands-Check: Anlegen (Warten < 1 s; Hauptordner fehlt → Meldung; unvollständig → Abbruch, halbe Kopie verschoben), Vergleich (leer → AK-12; Ausgangskopie fehlt/verändert → AK-14/15), Zurückübertragen (Konflikt → AK-19), Löschen (leer/Fehler → AK-25)
+- [x] Pre-Mortem durchgeführt (S1–S9)
+- [x] Architektur analysiert: `release.sh`, beide `.gitignore`, `tools/`, `_worktrees/`, `backend/pytest.ini`, Skill-Entwürfe Orchestrator/Umsetzung/Aufräumen/Prüfer
+- [x] Designer-Check: visuell? → nein, übersprungen
+- [x] Optionen: A / B / C — Option A entschieden von Stephan am 24.10.2026 (Entscheidung 1)
+- [x] Alle Fragen entschieden (5), Datum je Frage in der Entscheidungstabelle
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 26 AKs, 36 Testfälle, beidseitig rückverfolgbar; Löschweg ohne neue Bitte an Stephan über den Release-Befehl abgesichert (AK-23–25)
+
+##### AK-Qualitäts-Check
+1. **Granularität:** AK-13 (Gesamt + Teil) und AK-3 (enthält/enthält nicht) bündeln bewusst ein Verhalten mit getrennten Testfällen; Zurückübertragen in AK-16–19 aufgeteilt, Löschen in AK-22–25.
+2. **Polarität:** jede Rule mit Gegenstück — AK-6, 12, 14, 15, 19, 24, 25.
+3. **Messbarkeit:** keine Funktionsnamen in den AKs; AK-21 mit Zahl; AK-23 mit beobachtbarer Hinweiszeile.
+4. **Vier Kategorien:** funktional AK-1–19, 22–24; nicht-funktional AK-20 (Sicherheit), AK-21 (Tempo, Messort Agenten-Umgebung, kein Produktionsbezug, da Entwicklungswerkzeug), AK-24 (Löschschutz); Architektur AK-8, AK-26 (Rückwärtskompatibilität Release/Tests); Sonstige: Beobachtbarkeit über Meldungen (AK-6, 14, 15, 18, 19, 23, 25), Betriebsübergabe ohne Zutun Stephans (AK-23).
+5. **Testbarkeit:** jedes AK hat ≥1 Testfall, jeder Testfall nennt sein AK; T-29 nur auf dem Mac beim ersten echten Release, T-26 als Abschluss-Nachweis.
+6. **Herkunft:** alle AKs mit Vermerk (Rule, Entscheidung, Pre-Mortem, Skill).
+7. **Nicht-Ziele und erlaubte Bereiche:** konkret, je Datei mit Art.
+8. **Entscheidungen:** alle 5 Fragen und die Option entschieden (24.10.2026); keine offene ⚠️ Annahme.
+9. **Geheimnisse:** AK-20; die Spec nennt nur Dateinamen-Muster, keine Inhalte.
+
+*Negativ-/Randfälle:* Grenzwerte T-12, T-22; ungültige/fehlende Eingaben AK-6, AK-15, T-31; Nebenläufigkeit zentral (AK-8, AK-17, AK-19); Lastgrenzen AK-21; leerer Zustand AK-12, AK-25 (bestätigt); Berechtigungen: Ausgangskopie nur durch Orchestrator, Löschen nur vorgemerkter Einträge (AK-24), schreibgeschützte Dateien T-32; Abwärtskompatibilität: keine bestehenden Arbeitskopien (`_worktrees/` leer), Release-Ablauf sonst unverändert (AK-26); Rollback: Zurückübertragen alles-oder-nichts, Release bricht nie wegen Aufräumen ab (bestätigt, Pre-Mortem S2/S7); Beobachtbarkeit im Fehlerfall: jede Abbruchmeldung nennt Ursache und Datei. Optimierungsleck (4b): nicht ausgelöst.
+
+##### Testplan
+- [ ] **Test-Agent (vor der Umsetzung):** alle mit „automatisch" markierten Testfälle (T-01–T-25, T-27, T-28, T-30–T-36) als neue Testdateien in `backend/tests/`, je mit Wegwerf-Übungsablage unter `/tmp` (automatisch gelöscht, auch bei Abbruch); Kennzeichnungen `offline` + `regression` + `requires_full_checkout` (Werkzeug liegt außerhalb von `backend/`); Ticket-ID TASK-121 in jedem Testfall. Rot-Nachweis vor der Umsetzung (Werkzeug fehlt), Gegenprobe T-36.
+- [ ] **Nachweis beim Abschluss:** T-26 (Agenten-Umgebung, echter Projektstand nur lesend); T-29 nur auf Stephans Mac beim ersten echten Release-Lauf nach der Umsetzung — Stephan startet den Release wie immer, der Agent prüft danach den Vormerk-Ordner.
+- [ ] **Hinweis Umsetzung:** Für TASK-121 selbst legt der Orchestrator die Kopien noch von Hand an (Werkzeug existiert noch nicht); Reihenfolge zu TASK-117 beachten (Pre-Mortem S8).
+- [ ] **Regression:** vollständige Suite; Regressions-Matrix `PRODUCT.md` §12: Entwicklungswerkzeug/Release-Skript — keine App-Bereiche betroffen.
+
+### TASK-122 · Technische Git-Sperre in der Agenten-Umgebung: Git-Aufrufe in Stephans Projektordnern werden verweigert `[ ]`
+
+| Feld | Wert |
+|------|------|
+| **Typ** | Task |
+| **Priorität** | Hoch |
+| **Status** | ToDo |
+| **Erstellt** | 2026-10-24 |
+
+**Beschreibung:** In der Arbeitsumgebung der Agenten soll jeder Git-Aufruf innerhalb von Stephans verbundenen Projektordnern technisch verweigert werden; nur in Wegwerf-Übungsablagen außerhalb der Projekte bleibt Git nutzbar. Anlass: Regel 16 wurde trotz Text zum vierten Mal verletzt (BUG-107, BUG-111, 29.09.2026, Spec-Agent TASK-120 am 24.10.2026 mit einem rein lesenden Befehl). Nach Regel 0 und Regel 12 Punkt 7 ist der nächste Schritt eine technische Sperre statt weiteren Texts.
+
+**User Story:** Als Product Owner von FotoAlert möchte ich, dass kein Agent versehentlich Git in meinem Projekt benutzen kann, sodass mein Terminal nie durch eine zurückgelassene Sperrdatei blockiert wird.
+
+**Bezug:** projekt-grundausstattung Regel 0, 12 (Punkt 7) und 16; QUALITAETS-PIPELINE.md Abschnitt 4. Projektübergreifend relevant (auch Flow Game, Spec or Regret). Von Claude am 24.10.2026 angelegt; liegt in der Inbox, Stephan entscheidet über die Aufnahme.
+
 ### TASK-111 · Backlog-Prüfung soll verschwundene Ticket-Blöcke erkennen `[ ]`
 
 | Feld | Wert |
@@ -8556,13 +10042,13 @@ Beide Tickets ändern `web/index.html`, inhaltlich unabhängig. Vorschlag: US-14
 
 ---
 
-### TASK-112 · release.sh gegen Doppelausführung absichern und mitveröffentlichte Commits anzeigen `[ ]`
+### TASK-112 · release.sh gegen Doppelausführung absichern und mitveröffentlichte Commits anzeigen `[x]`
 
 | Feld | Wert |
 |------|------|
 | **Typ** | Task |
 | **Priorität** | Mittel |
-| **Status** | ToDo |
+| **Status** | Done (gemerged in TASK-117 am 2026-10-24) |
 | **Erstellt** | 2026-09-29 |
 
 **Beschreibung:** Aus der BUG-113-Retro (2026-09-29). Ein versehentlich erneut eingefügter `release.sh`-Befehl erzeugte v1.23.2 ohne jeden neuen Inhalt (nur Versionsnummer) und einen zusätzlichen Deploy mit Neustart. Außerdem ging bei v1.23.1 unbemerkt ein fremder Commit (US-137-Nachtrag `54af4ec`) zwischen den eigenen Commits mit hinaus, weil jeder Push auf `main` sofort veröffentlicht. Vorschlag: (1) `release.sh` bricht mit einer klaren Meldung ab, wenn der letzte Commit bereits ein `release:`-Commit ist und seitdem nichts Neues dazugekommen ist; (2) vor der `[j/N]`-Frage listet es alle Commits seit dem letzten Release-Tag auf, damit sichtbar ist, was mit veröffentlicht wird.
@@ -8626,559 +10112,5 @@ Beide Tickets ändern `web/index.html`, inhaltlich unabhängig. Vorschlag: US-14
 Ein viertes Finding (`preview_alignment()` Z. 4037 — 106 Zeilen) ist bereits durch das offene TASK-81 abgedeckt und hier bewusst ausgeklammert. Für `_apply_weather_to_event()`/`_weather_overlay()` existieren zwar die geschlossenen Vorgänger-Tickets TASK-76 bzw. TASK-74 — beide sind seither erneut über den Threshold gewachsen (BUG-108 selbst hat `_apply_weather_to_event()` um die 100-km-Projektionslogik erweitert), decken den aktuellen Fund also nicht mehr ab. Aufteilen in kleinere Hilfsfunktionen je Verantwortlichkeit. Kein inhaltlicher Umbau — rein strukturell.
 
 **Quelle:** Automatisch erstellt durch fotoalert-refactor (BUG-108)
-
----
-
-## Analyse (fotoalert-analyze, 2026-08-10)
-
-**Sandbox-Limits:** Kein `git`-Kommando ausgeführt (harte Regel), alle Aussagen per `grep`/`sed`/`find` gegen den echten Working Tree verifiziert. Nicht prüfbar aus der Sandbox: echter SSH-Zugriff zum Server, GitHub-Branch-Protection-Einstellungen, ein echter `pip-audit`-Lauf (kein Netzwerkzugriff im Gerätetool), Git-Historie.
-
-**Befund je Punkt (Code-Verifikation, Einschätzung, Risiko):**
-- **(a)** `GET /job-status` ist unauthentifiziert; 2 von 4 `_job_error()`-Aufrufstellen (`main.py:1804`, `main.py:3125`) geben rohen Python-Exception-Text weiter. **Noch offen**, Risiko niedrig-mittel (Informationspreisgabe ohne Auth).
-- **(b)** `PATCH /locations/{id}` verlangt nur `require_auth` (jede Rolle), `DELETE`/Bild-Endpunkte verlangen `require_host`. Diskrepanz bestätigt. **Noch offen**, Risiko mittel (kompromittierter „user"-Login kann kuratierte Locations manipulieren).
-- **(c)** `await file.read()` liest die komplette Datei ein, bevor die 20-MB-Grenze geprüft wird; keine vorgelagerte Body-Size-Grenze in `deploy/Caddyfile`. **Noch offen**, Risiko niedrig-mittel (Endpoint bereits `require_host`-geschützt).
-- **(d)** `fotoalert.service` hat nur `NoNewPrivileges`/`PrivateTmp`; `fotoalert-precompute.service` **komplett ohne** Sicherheits-Direktiven — Ticket-Aussage bestätigt. **Noch offen**, Risiko mittel (Eindämmung im RCE-Fall).
-- **(e)** `.github/workflows/deploy.yml` nutzt `StrictHostKeyChecking=no` + Live-`ssh-keyscan` statt hinterlegtem Fingerprint (Zeilen 183/188). Branch-Schutz für `main` nicht im Code prüfbar. **SSH-Teil noch offen**, Risiko kritisch bei Auswirkung (voller Server-Zugriff bzw. Push=Deploy ohne Schutz).
-- **(f)** `find` nach Debug-HTML im gesamten Working Tree (inkl. Archiv/Worktrees) — **0 Treffer**. **Bereits gelöst** im aktuellen Stand; Git-Historie nicht prüfbar (Restrisiko, falls dort noch ein gültiges Token steckt).
-- **(g)** Betrifft die externe Website locationscout.net, kein Repo-Bezug — reine Handlungsempfehlung an Stephan, kein Ticket-Code möglich.
-- **(h)** `backend/requirements.txt` bestätigt `Pillow==10.3.0`/`python-multipart==0.0.9`. Kein echter `pip-audit`-Lauf aus der Sandbox möglich — Einschätzung erst nach echtem Scan möglich, keine Vermutung.
-
-**Splitting-Empfehlung (das Ticket selbst fordert das):** Gebündelt umsetzbar in einem Rutsch: **(a)+(c)+(d)** — reine Härtungen ohne Rechte-/Verhaltensänderung, autonom umsetzbar (🟢/🟡). Eigene Entscheidungs-Tickets: **(b)** Rechteänderung mit möglicher Workflow-Auswirkung auf Stephan selbst, **(e)** Produktions-SSH + Branch-Schutz außerhalb des Repo-Scopes, **(h)** braucht erst einen echten `pip-audit`-Lauf von Stephan. **(f)** kann direkt als erledigt vermerkt werden, **(g)** bleibt eine Notiz ohne Ticket.
-
-**Pre-Mortem:** (1) Fix zu (b) blockiert Stephans eigenen Workflow, falls er selbst per user-Login Location-Felder bearbeitet — vor Umsetzung klären. (2) SSH-Fix (e) bricht die Deploy-Pipeline bei falschem/veraltetem Host-Key-Fingerprint — Testlauf über `workflow_dispatch` vor dem ersten scharfen Push. (3) Zu strikte systemd-Direktiven (d) verhindern den Service-Start (fehlende `ReadWritePaths` für `backend/data/`, Uploads, Logs) — schrittweises Ausrollen, jede Stufe von Stephan auf dem echten Server bestätigen lassen. (4) Dependency-Bump (h) ändert Bildverarbeitung unerwartet — volle Testsuite + manueller Bild-Check nach jedem Bump.
-
-**Akzeptanzkriterien (a+c+d, direkt umsetzbar):**
-- [ ] AK-a1: `GET /job-status` liefert bei Job-Fehler eine generische `last_error`-Meldung statt rohem Exception-Text; voller Text bleibt im Server-Log; beide Fundstellen (`main.py:1804`, `main.py:3125`) umgestellt.
-- [ ] AK-c1: Datei > 20 MB wird per 413 abgelehnt, ohne vorher vollständig in den RAM eingelesen zu werden; gültiger Upload ≤ 20 MB bleibt unverändert funktionsfähig (Regression gegen US-120/US-126).
-- [ ] AK-c2 Edge Case: Chunked-Upload ohne Content-Length wird ebenfalls per Streaming-Grenze abgefangen.
-- [ ] AK-d1: `fotoalert-precompute.service` erhält mindestens `NoNewPrivileges`/`PrivateTmp`; `fotoalert.service` zusätzlich `ProtectSystem`/`ProtectHome`/`PrivateDevices`/`ProtectKernelTunables`/`ProtectKernelModules`/`ProtectControlGroups`.
-- [ ] AK-d2: Nach Rollout auf dem echten Server bestätigt Stephan `systemctl status` „active" für beide Units + funktionierenden Health-Check/Testupload/Precompute-Lauf.
-
-**Ampel:** (a) 🟢 · (b) 🔴 Stephan-Entscheidung nötig · (c) 🟢 · (d) 🟡 Code autonom, Wirksamkeit nur auf echtem Server prüfbar · (e) 🔴 Stephan-Aktion/Entscheidung nötig (Server-Fingerprint, GitHub-Settings) · (f) 🟢 bereits gelöst · (g) kein Repo-Ticket · (h) 🟡 Umsetzung risikoarm, aber Scan-Ergebnis fehlt.
-
-**Status-Update (2026-08-10):** Weg-Gate gemischt → **Wartet auf Entscheidung** (Gesamtticket, wegen (b)/(e)/(h)). Teile (a)/(c)/(d) sind bereits als Ready-for-Dev-fähig identifiziert und werden nach Stephans Freigabe des Splittings als eigenes Ticket ausgegliedert.
-
-**Konkrete Fragen an Stephan:**
-1. **Splitting:** Ticket wie oben vorgeschlagen in 3-4 Teile aufteilen (a+c+d sofort umsetzbar, b/e/h eigene Entscheidungs-Tickets)?
-2. **(b):** Nutzt du den „user"-Login aktuell, um Location-Felder zu bearbeiten? Soll das künftig ganz wegfallen (nur noch Host, wie bei Löschen/Bild), oder soll „user" ein eingeschränktes Feld-Set behalten?
-3. **(e):** Kannst du den SSH-Host-Key-Fingerprint deines Servers ermitteln (`ssh-keyscan -H <SERVER_IP>`) und als Secret hinterlegen? Soll ich dir die Schritte für GitHub Branch Protection auf `main` zusammenstellen, oder machst du das selbst?
-4. **(h):** Kannst du `pip-audit -r backend/requirements.txt` einmal mit Internetzugang laufen lassen und mir das Ergebnis schicken?
-
-## Stephans Entscheidungen (2026-08-10)
-
-**(b):** "Ich habe User. Diese sollen Standorte anlegen, aber nicht bearbeiten können. Das gilt für jetzt, wird sich aber in Zukunft ggfs ändern. Dann sollen sie ihre Standorte ändern können, aber dazu brauchen wir ein sauberes User-Management." → Umgesetzt in **TASK-103**: Bearbeiten (`PATCH /locations/{id}`) jetzt nur noch Host, Anlegen (`POST /preview-alignment` mit Speichern) bleibt für User unverändert möglich. Die künftige Erweiterung (User bearbeitet eigene Orte) braucht echtes User-Management (Besitzer-Zuordnung pro Standort) — bewusst nicht Teil dieses Tickets, eigener künftiger Vorschlag falls gewünscht.
-
-**(e):** "Aktuell bin ich der Einzige, der daran arbeitet. Es sollte ansonsten prinzipiell niemand in der Lage sein, außer mir, etwas reinzuschreiben. Das mit dem Fingerabdruck beim ersten Verbindungsaufbau kann ich dir nicht beantworten, das weiß ich nicht." → Zwei getrennte Themen dahinter: (1) *Fingerabdruck-Prüfung beim Deploy* — technische Lücke im Code (GitHub-Actions-Workflow vertraut beim Verbinden blind dem Server, statt einen fest hinterlegten Schlüssel zu prüfen); dafür bräuchte ich den echten Fingerabdruck deines Servers, den ich nicht selbst ermitteln kann (kein Serverzugriff von hier). (2) *Wer kann auf `main` schreiben* — reine GitHub-Einstellungsfrage (Repo → Settings → Collaborators/Zugriffsrechte), kein Code, kann nur Stephan selbst einsehen. Beide Punkte bleiben offen, siehe Rückfragen unten.
-
-**(h):** "Was für einen Scan? Ich starte keine Scans selbst..." → Korrektur meinerseits: Das kann ich selbst, dafür braucht es keinen Eingriff von Stephan. Echter `pip-audit`-Lauf gegen `backend/requirements.txt` in der Cloud-Sandbox (mit Internetzugang) nachgeholt, siehe Ergebnis unten.
-
-## Echter pip-audit-Lauf (2026-08-10)
-
-Echt ausgeführt (`pip-audit -r backend/requirements.txt`, öffentliche Sicherheitslücken-Datenbank, Rohdaten, keine Vermutung): **60 gemeldete Sicherheitslücken in 7 von 20 Paketen** (Mehrfachnennungen durch mehrere Datenbank-Quellen pro Lücke möglich, Rohwert ungefiltert):
-
-- `Pillow` 10.3.0 → 24 Meldungen, Fix ab 12.1.1/12.2.0/12.3.0 (genau die im Ticket genannte Bildverarbeitung)
-- `python-multipart` 0.0.9 → 7 Meldungen, Fix ab 0.0.18–0.0.31 (genau die im Ticket genannte Upload-Hilfsbibliothek)
-- `cryptography` 42.0.8 → 8 Meldungen, Fix ab 43.0.1–49.0.0
-- `PyJWT` 2.8.0 → 10 Meldungen, Fix ab 2.12.0/2.13.0
-- `starlette` 0.37.2 (FastAPI-Unterbau) → 9 Meldungen, Fix ab 0.40.0–1.3.1
-- `python-dotenv` 1.0.1 → 1 Meldung, Fix ab 1.2.2
-- `pytest` 8.2.2 → 1 Meldung (nur Testwerkzeug, kein Produktionsrisiko), Fix ab 9.0.3
-
-**Einordnung, keine Panik:** Eine gemeldete Lücke heißt nicht automatisch "real ausnutzbar in dieser App" — das hängt davon ab, ob der betroffene Code-Pfad überhaupt genutzt wird. Das habe ich hier noch nicht einzeln geprüft. Reines Hochziehen der Versionen ist außerdem nicht risikofrei (siehe Pre-Mortem oben, Punkt 4: `Pillow`-Bump kann Bildverarbeitung unerwartet verändern) — bräuchte danach einen vollen Testlauf + manuellen Bild-Check. Vorschlag: eigenes kleines Ticket dafür, mit Versions-Bump + Regressionstest je Paket, priorisiert nach Pillow/python-multipart (dein ursprünglicher Verdacht) zuerst. Sag Bescheid, ob das gewünscht ist.
-
-**Rückfragen (e) — Stand 2026-08-10, beide Teile jetzt bearbeitet:**
-1. ✅ Zugriff: Stephan hat in GitHub geprüft — "Direct access, 0 collaborators have access to this repository. Only you can contribute." Kein Handlungsbedarf, Punkt bereits erledigt.
-2. ✅ Fingerabdruck: Stephan hat `grep "<IP>" ~/.ssh/known_hosts` ausgeführt (IP per DNS-Auflösung von `fotoalert.stephanschumann.com` ermittelt, keine Geheimnispreisgabe nötig) — bereits vorhandener, vertrauenswürdiger Eintrag aus einer früheren eigenen Verbindung, kein blindes Erst-Vertrauen nötig. `.github/workflows/deploy.yml` entsprechend angepasst: `ssh-keyscan` beim Deploy-Lauf entfernt, stattdessen wird der Fingerabdruck aus einem neuen Secret `SERVER_KNOWN_HOSTS` geladen; `StrictHostKeyChecking` von `no` auf `yes` verschärft (bricht jetzt hart ab, falls der Server jemals einen anderen Schlüssel zeigt, statt das stillschweigend zu ignorieren).
-
-**⚠️ Wichtig, bevor das released wird:** Das neue Secret `SERVER_KNOWN_HOSTS` muss in GitHub angelegt sein, BEVOR dieser Code-Stand released wird — sonst schlägt der nächste Deploy fehl (Verbindung ohne bekannten Fingerabdruck wird jetzt hart abgelehnt statt wie bisher blind akzeptiert). Repo → Settings → Secrets and variables → Actions → New repository secret → Name `SERVER_KNOWN_HOSTS`, Wert = genau die drei Zeilen aus Stephans `known_hosts`-Auszug (ssh-ed25519/ssh-rsa/ecdsa-sha2-nistp256). Noch nicht released — wartet auf Stephans Bestätigung, dass das Secret gesetzt ist.
-
-## Abschluss (2026-08-11)
-
-Stephan hat das Secret `SERVER_KNOWN_HOSTS` gesetzt (bestätigt: „SERVER_KNOWN_HOSTS erledigt"). Danach liefen drei Veröffentlichungen in Folge unter der neuen, strengeren Prüfung (`StrictHostKeyChecking=yes`, fester Fingerabdruck statt Live-Scan) erfolgreich durch: CI-Läufe #313 (Commit 23af8cf), #314 (Commit 1245d11) und #315 (Commit 5fc04f9, v1.22.64) — alle grün, Server danach jedes Mal über den Gesundheits-Check erreichbar bestätigt. Damit ist (e) vollständig geschlossen. (b) wurde bereits vorher nach TASK-103 ausgegliedert und ist dort erledigt. (h) wurde mit einem echten Sicherheitslücken-Scan beantwortet, die Umsetzung selbst läuft als eigenes Ticket TASK-104 (bewusst noch nicht umgesetzt, wartet auf Stephans Freigabe). (a)/(c)/(d) liefen über TASK-102 (Status dort separat, (d) wartet noch auf Stephans Server-Bestätigung). (f) war schon vorher erledigt, (g) betrifft keine eigene Code-Maßnahme. Damit sind alle Teilpunkte des Sammeltickets abgeschlossen.
-
----
-
-## Implementierung (2026-08-10)
-
-**Code:** `backend/main.py:3884`, `patch_location()` — `Depends(auth.require_auth)` zu `Depends(auth.require_host)` geändert. Das war die gesamte funktionale Änderung.
-
-**Tests:** Neue `host_headers`-Fixture in `conftest.py`. Neun bestehende Testdateien, die PATCH bisher mit dem User-Zugang als Erfolgsfall geprüft hatten (Testzweck war Feldverhalten, nicht Rollenprüfung), auf den Host-Zugang umgestellt: `test_api_regression.py`, `test_patch_cache_consistency.py`, `test_bug-61.py`, `test_task-83.py`, `test_bug-84.py`, `test_bug_68.py`, `test_task-60_patch_location_refactor.py`, `test_us_128.py`. `test_us66_login.py::test_protected_endpoint_with_user_token` von "User→200" auf "User→403" gedreht, neuer Test für "Host→200" ergänzt. Neue Datei `tests/test_task-103.py` deckt AK1–AK4 explizit ab, in `tests/README.md` registriert.
-
-**Echter pytest-Lauf:** Gezielter Lauf der 7 betroffenen/neuen Testdateien: **70 passed, 0 failed**. Zusätzlich volle Backend-Regressionssuite (826 gesammelte Tests, Teil-Checkout ohne Frontend/Deploy-Dateien, `test_task53_dev_sync.py` wie bei TASK-94 bereits bekannt ausgeklammert): 799 passed, 17 failed, 3 errors, 6 skipped, 1 xpassed — alle Fails/Errors geprüft, ausschließlich vorbestehende Checkout-Lücken (fehlende `web/`/`deploy/`/`.github`-Dateien), keiner mit Auth/PATCH verwandt. Hinweis zur Sorgfalt: Der abschließende pytest-Summary-Banner der vollen Suite fehlte im Log-Mitschnitt (Capture-Artefakt) — die Zahl 799 passed wurde daher rechnerisch aus der Gesamtzahl 826 minus den einzeln aufgelisteten Fail/Error/Skip/XPass-Fällen ermittelt, nicht direkt aus einer finalen Tally-Zeile abgelesen.
-
-**Nebenfund:** Vier der neun betroffenen Testdateien (`test_bug-84.py`, `test_bug_68.py`, `test_task-60_patch_location_refactor.py`, `test_us_128.py`) waren in der Vorab-Analyse nicht erkannt worden und wurden erst durch den echten vollen Testlauf sichtbar — ohne diesen Lauf wären das stille Regressionen geblieben.
-
-**Aufräum-Hinweis an Stephan:** Ein Scratch-Tarball außerhalb des Repos (`/Users/stephan/Claude/Projects/FotoAlert/_task103_scratch/fotoalert_backend.tar.gz`, ca. 1 MB) konnte vom Hilfs-Programm nicht automatisch gelöscht werden ("Operation not permitted"). Harmlos, kann bei Gelegenheit manuell gelöscht werden.
-
-## Nachtrag (2026-08-11): versehentlich zurückgesetzt und korrekt neu veröffentlicht
-
-Nach der ursprünglichen Umsetzung ist die Änderung an `main.py` über die gemeinsam genutzte Arbeitskopie versehentlich mit in einen fremden Sammel-Release (Commit 8af2694, Tickets TASK-95/96/97/98/99/100) hineingerutscht — ohne die zugehörigen, ebenfalls angepassten Testdateien. Dadurch schlugen dort 31 Tests fehl (CI-Lauf #311, Deploy korrekt nicht ausgelöst). Die betroffene Zeile wurde daraufhin einzeln zurückgesetzt (Commit 23af8cf), wodurch die Host-Beschränkung vorübergehend NICHT mehr aktiv war, obwohl dieses Ticket zu diesem Zeitpunkt bereits als „Done" vermerkt war.
-
-Am 2026-08-11 korrekt nachgezogen: `Depends(auth.require_host)` erneut gesetzt, diesmal zusammen mit allen zugehörigen Testdateien im selben Release. Echter pytest-Lauf: gezielt 99 von 99 Tests grün (die vorher betroffenen Testdateien + `test_task-103.py`), volle Regressionssuite ohne dadurch verursachte neue Fehlschläge. Released als v1.22.64 (Commit 5fc04f9), CI grün (Lauf #315), Server-Gesundheits-Check danach bestätigt (`status: ok`). AK1–AK5 damit real bestätigt.
-
----
-
-## Zwischenstand (2026-08-13) — Schritt 1 abweichend von AK1, siehe Begründung
-
-**Wichtiger Befund VOR der Umsetzung (AK5-Fall, an Stephan zurückgemeldet statt durchgezogen):**
-Ein echter Versions-/Kompatibilitäts-Check gegen die reale PyPI-Metadatenlage (2026-08-13) zeigt: Von den
-60 gemeldeten Lücken lässt sich ein Teil NICHT ohne einen Python-Runtime-Sprung schließen, weil die
-jeweils reparierte Version die Unterstützung für Python 3.9 bereits eingestellt hat (Prod/CI laufen laut
-`CLAUDE.md` + mehreren realen CI-Läufen — zuletzt BUG-84, 2026-07-27, „unter echtem Python 3.9.25" —
-bestätigt auf Python 3.9):
-
-- **`Pillow`** — Fix ausschließlich ab 12.1.1/12.2.0/12.3.0 (echte OSV-Daten), `Pillow>=12.0.0` verlangt
-  `requires_python: >=3.10`. Kein Fix in der 11.x-Reihe verfügbar (letzte 3.9-kompatible Linie).
-- **`python-multipart`** — von den 7 Lücken lässt sich nur die älteste (fixed_in 0.0.18) noch unter
-  Python 3.9 installieren (0.0.20 ist die letzte 3.9-kompatible Version); ab 0.0.21 gilt `>=3.10`.
-  Die restlichen 6 Lücken (u. a. Path Traversal GHSA-wp53, zwei DoS-Lücken, Content-Length-Bug) blieben
-  bei einem 3.9-gebundenen Bump ungeschlossen.
-- **`python-dotenv`** — Fix-Version 1.2.2 verlangt `>=3.10`.
-- **`pytest`** — Fix-Version 9.0.3 verlangt `>=3.10` (laut Ticket ohnehin „kein Produktionsrisiko", aber
-  auch der CI-Runner selbst müsste mitziehen).
-
-Damit sind **4 der 7 Pakete** genau der AK5-Edge-Case: „Falls ein Bump eine echte
-Breaking-Change-Migration erfordert […] wird das VOR der Umsetzung als eigener Punkt an Stephan
-zurückgemeldet statt einfach durchgezogen." Das betrifft ausdrücklich auch die beiden in AK1 als
-„zuerst" benannten Pakete (`Pillow`, `python-multipart`) — hier NICHT stillschweigend umgangen, sondern
-zurückgestellt bis Stephan entschieden hat, ob/wann der Python-3.9→3.10(+)-Sprung selbst angegangen wird
-(eigenes, größeres Ticket, betrifft `deploy/setup_server.sh`, das bereits `python3.12` vorsieht — aber
-laut allen realen CI-Läufen noch nicht auf den aktuell laufenden Server angewendet wurde).
-
-**`starlette`** zusätzlich separat zurückgestellt: Voller Fix (14 Meldungen) verlangt `starlette==1.3.1`
-— ein Sprung von `0.37.2` über die 0.x→1.x-Grenze, direkt an die FastAPI-Version gekoppelt. Das ist
-exakt das in AK5 selbst genannte Beispiel („ein größerer FastAPI/Starlette-Versionssprung mit
-API-Änderungen") — ebenfalls an Stephan zurückgemeldet statt umgesetzt.
-
-**Tatsächlich umgesetzt (Ersatz-Schritt 1, höchste Schwere unter den sicher upgradebaren Paketen):**
-`cryptography` 42.0.8 → **49.0.0** in `backend/requirements.txt` (Zeile 17). Von den 7 betroffenen
-Paketen hat `cryptography` mit 12 real abgefragten Meldungen (OSV/PyPI-Vulnerabilitätsdaten, u. a.
-mehrere statisch gelinkte OpenSSL-Sicherheitslücken) die höchste Zahl unter den nicht 3.9-blockierten
-Paketen; `49.0.0` erlaubt `>=3.9` (schließt nur exakt 3.9.0/3.9.1 aus, unser Prod-Stand 3.9.6/3.9.25 ist
-kompatibel). Im eigenen Code wird `cryptography` nirgends direkt verwendet (`grep` bestätigt), sondern
-ausschließlich indirekt über `PyJWT`s ES256-Signierung in `backend/notifications/push.py`
-(`_get_jwt_token()`); `PyJWT==2.8.0` deklariert nur eine Untergrenze (`cryptography>=3.4.0`), keine
-Obergrenze — geringes Breaking-Change-Risiko.
-
-**Echte Verifikation, ehrlich eingeordnet:**
-- Realer, ausgeführter Smoke-Test (Sandbox-Python 3.10, `cryptography==48.0.0` als naher Stand-in für
-  49.0.0, `PyJWT==2.3.0`): EC-P256-Schlüssel erzeugt, `jwt.encode(..., algorithm="ES256")` +
-  `jwt.decode(...)` erfolgreich — genau der Codepfad aus `notifications/push.py`. Ergebnis: OK.
-- **Voller Backend-pytest-Lauf konnte in dieser Sitzung NICHT ausgeführt werden** — echter Blocker,
-  keine Behauptung: `backend/venv/bin/python3` ist ein Symlink auf
-  `/Library/Developer/CommandLineTools/usr/bin/python3` (Stephans echtes Mac-Terminal), über die
-  Geräte-Brücke (`device_bash`, eigene Linux-VM ohne Internet) nicht ausführbar. Der Cloud-Sandbox-Kanal
-  hat zwar Internet, aber weder Python 3.9 verfügbar noch installierbar (kein passendes apt-Paket, PPA-
-  Zugriff vom Proxy geblockt — deckungsgleich mit dem bereits dokumentierten Fund bei BUG-83); der
-  Versuch, den Backend-Code testweise per Tar-Transfer in die Cloud-Sandbox zu holen, wurde dort vom
-  Sicherheits-Klassifizierer beim Entpacken blockiert (bewusst nicht umgangen). **Offener Punkt für
-  Stephan** — bitte in seinem echten Mac-Terminal ausführen und Ergebnis zurückmelden:
-  ```
-  cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
-  source venv/bin/activate
-  pip install -r requirements.txt
-  pytest tests/ -v
-  ```
-
-**Aufräum-Hinweis:** `_to_delete/task104_backend_transfer/` (Tar-Transferversuch, ca. 16 MB) und
-`_to_delete/task104_kanban_out/` (Kanban-Sync-Output) können bei Gelegenheit manuell geleert werden.
-
-**Notiz (2026-08-13):** Voller Backend-Regressionslauf steht weiterhin aus (nur Smoke-Test gegen `cryptography` 42.0.8→49.0.0 gelaufen, siehe oben) — technisch nicht aus der Sandbox ausführbar. Muss auf Stephans echtem Mac-Terminal nachgeholt werden, fertiger Befehl bereits oben hinterlegt (Abschnitt "Echte Verifikation, ehrlich eingeordnet"):
-```
-cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
-source venv/bin/activate
-pip install -r requirements.txt
-pytest tests/ -v
-```
-
-**Bestätigungs-Notiz zum `cryptography`-Schritt (2026-08-13, von Stephan freigegeben):**
-Beide pytest-Läufe sind dokumentiert und liefern konsistent dasselbe Bild — ein voller
-Suite-Lauf sowie ein gezielter Wiederholungslauf nur der 3 Fehlschläge zeigen dieselben 3 roten
-Tests: `test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`,
-`test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]`,
-`test_ephemeris_engine.py::test_ak1b_latency_365day`. Alle drei sind Zeit-/Lastschwellen-Tests
-zu Wetter-Overlay-Timing bzw. der Astronomie-Engine — thematisch unabhängig von
-`cryptography`/Auth/JWT. Stephan hat entschieden, diese 3 Fehlschläge nicht als
-`cryptography`-Regression zu werten, und weiter mit dem nächsten Paket zu machen.
-
-## Zwischenstand (2026-08-13) — Schritt 2: `PyJWT`
-
-**Recherche (Quelle: bereits dokumentierter `pip-audit`-Fund vom 2026-08-10, zusätzlich per
-`pip-audit`-Neulauf gegen `PyJWT==2.8.0` in der Cloud-Sandbox bestätigt):** `PyJWT` 2.8.0 hat
-genau eine gemeldete Sicherheitslücke — `PYSEC-2026-120` / `CVE-2026-32597` /
-`GHSA-752w-5fwx-jx9f`: PyJWT validiert den `crit`-("Critical")-Header-Parameter aus RFC 7515
-§4.1.11 nicht — enthält ein JWS-Token ein `crit`-Array mit PyJWT unbekannten Erweiterungen,
-wird das Token trotzdem akzeptiert statt abgelehnt (MUST-Vorgabe der RFC verletzt). Gleiche
-Schwachstellenklasse wie CVE-2025-59420 (Authlib, CVSS 7.5 HIGH). Fix ab `2.12.0`
-(`fix_versions` laut OSV/pip-audit), `2.13.0` (aktuell neueste PyPI-Version) enthält den Fix
-ebenfalls.
-
-**Python-3.9-Kompatibilitätscheck (Pflicht nach dem TASK-105-Fund):** Über die echten
-PyPI-JSON-Metadaten geprüft — `PyJWT` 2.10.0 bis 2.13.0 deklarieren durchgehend
-`requires_python: >=3.9`. Anders als bei den vier in TASK-105 dokumentierten Paketen ist
-`PyJWT` **nicht** blockiert — Prod-Python 3.9 bleibt kompatibel.
-
-**Umgesetzt:** `PyJWT` 2.8.0 → **2.13.0** in `backend/requirements.txt` (Zeile 16).
-
-**Testlauf — gleicher Blocker wie beim `cryptography`-Schritt, erneut bestätigt:** Ein Versuch,
-`./venv/bin/pip install -r requirements.txt` und `./venv/bin/pytest tests/ -v` in dieser Sitzung
-über `device_bash` auszuführen, scheitert mit `bad interpreter: No such file or directory` —
-`backend/venv/bin/python3` ist weiterhin ein Symlink auf
-`/Library/Developer/CommandLineTools/usr/bin/python3` (Stephans echtes Mac-Terminal), über die
-Geräte-Brücke nicht ausführbar. **Voller Backend-pytest-Lauf für den PyJWT-Bump konnte in dieser
-Sitzung NICHT ausgeführt werden** — offener Punkt für Stephan, bitte in seinem echten
-Mac-Terminal ausführen und Ergebnis zurückmelden:
-```
-cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
-source venv/bin/activate
-pip install -r requirements.txt
-pytest tests/ -v
-```
-Erwartung: identisch zum `cryptography`-Schritt sollten nur die bereits bekannten 3 Fehlschläge
-(`test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`,
-`test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]`,
-`test_ephemeris_engine.py::test_ak1b_latency_365day`) rot bleiben. Zeigen sich zusätzliche, davon
-abweichende Fehlschläge, ist das ein möglicher echter Befund im Zusammenhang mit dem
-`PyJWT`-Bump (z. B. `_get_jwt_token()`/ES256-Signierpfad in `backend/notifications/push.py`) und
-NICHT durch Testanpassung zu beheben, sondern zurückzumelden.
-
-**Stand der 60 gemeldeten Lücken / 7 Pakete:**
-- `cryptography` — Bump umgesetzt (Schritt 1), voller Regressionslauf steht auf Stephans Mac noch aus.
-- `PyJWT` — Bump umgesetzt (dieser Schritt), voller Regressionslauf steht auf Stephans Mac noch aus.
-- `Pillow`, `python-multipart`, `python-dotenv`, `pytest` — blockiert durch Python-3.9-EOL, siehe TASK-105.
-- `starlette` — zurückgestellt (großer 0.x→1.x-Versionssprung, AK5-Fall).
-
-Damit sind rechnerisch noch 5 der ursprünglich 7 betroffenen Pakete offen (4 blockiert in
-TASK-105, 1 zurückgestellt) bzw. 2 der 7 mit umgesetztem, aber noch nicht auf dem echten
-Mac-Terminal verifiziertem Bump.
-
-**Bestätigungs-Notiz zu den Testläufen `cryptography` + `PyJWT` (2026-08-13):**
-
-Zwei Pakete wurden bisher Paket für Paket mit jeweils vollem Regressionstest bearbeitet: `cryptography` 42.0.8 → 49.0.0 sowie `PyJWT` 2.8.0 → 2.13.0 (Fix für `CVE-2026-32597`, `crit`-Header-Validierung).
-
-- **Nach dem `cryptography`-Bump:** voller Testlauf (838 Tests) — Ergebnis 3 failed / 831 passed / 6 skipped / 1 xpassed. Gezielter Retest derselben 3 fehlgeschlagenen Tests: erneut 3 failed (gleiche Werte, keine Zufallsstreuung). Bewertung: vermutlich vorbestehende, last-/timing-empfindliche Tests, thematisch nicht mit Auth-/Crypto-Code verbunden.
-- **Nach dem kombinierten Testlauf** (`cryptography` + `PyJWT` zusammen, 838 Tests): Ergebnis 1 failed / 833 passed / 6 skipped / 1 xpassed, Laufzeit 544.40s. Einziger Fehlschlag: `tests/test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` — einer der bereits bekannten 3 Fälle. Die anderen beiden (`test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`, `test_ephemeris_engine.py::test_ak1b_latency_365day`) traten in diesem Lauf NICHT auf.
-- **Bewertung über alle drei Läufe:** Die Anzahl der Fehlschläge schwankt zwischen 1 und 3, aber immer innerhalb derselben bekannten 3 Tests — es sind KEINE neuen oder anderen Fehlschläge aufgetreten. Das stützt die Einschätzung „vorbestehende, last-/timing-empfindliche Tests, keine Regression durch die `cryptography`-/`PyJWT`-Bumps" — als Einschätzung, nicht als Gewissheit gekennzeichnet, da kein echter Vorher-Baseline-Lauf ohne die Bumps existiert.
-
-
-## Zwischenstand (2026-08-16) — Schritt 3: `starlette`, per Pipeline-Orchestrator-Lauf recherchiert
-
-**Korrektur der bisherigen Einordnung:** `starlette` wurde bisher als eigenständiger AK5-Fall (Breaking-Change-Sprung) neben den 4 TASK-105-Paketen geführt. Echte Recherche gegen PyPI-Vulnerability-Daten (2026-08-16) zeigt: Der VOLLE Fix (alle 7 zugrundeliegenden CVEs, im Ticket bisher als „14 Meldungen“ gezählt — das sind 7 CVEs, jede doppelt als GHSA+PYSEC gelistet) verlangt `starlette>=1.3.1`, was zwingend `fastapi>=0.135.0` und damit **Python >=3.10** voraussetzt — also denselben TASK-105-Blocker wie `Pillow`/`python-multipart`/`python-dotenv`/`pytest`. `starlette` gehört damit inhaltlich als fünftes Paket zu TASK-105, nicht daneben.
-
-**Aber: echter Teilfix ohne Python-Sprung möglich.** `starlette==0.49.3` (letzte 3.9-kompatible 0.x-Version, benötigt `fastapi>=0.121.0`) schließt bereits 3 der 7 CVEs (CVE-2024-47874/GHSA-f96h-pmfr-66vw, CVE-2025-54121/GHSA-2c2j-9gv5-cj73, GHSA-7f5h-v6xp-fcq8) — ohne Python-Sprung, ohne den Umbau der `@app.on_event`-Hooks in `backend/main.py` (Zeilen 2404/2468), die erst ab starlette 1.0 entfernt werden. Kein eigener Code importiert `starlette` direkt (nur zwei Testdateien, `test_task86.py`/`test_task-102.py`, typbezogen).
-
-**Implementierungsoptionen:**
-
-*Option A — Voller, gekoppelter Bump (`fastapi>=0.135.0` + `starlette>=1.3.1`):* Schließt alle 7 CVEs, setzt Python 3.10 voraus (TASK-105 muss also vorher entschieden UND umgesetzt sein) und erfordert den Umbau der zwei `on_event`-Hooks auf `lifespan`. Eigenes Mini-Projekt, kein Ein-Zeilen-Bump.
-
-*Option B — Zurückstellen bis TASK-105 entschieden ist:* `starlette` bleibt auf `0.37.2`, wird gemeinsam mit den 4 bereits blockierten Paketen im selben Zug behandelt, sobald Stephan die Python-Frage entscheidet. Vermeidet einen Doppel-Umbau (erst Teilfix, kurz danach nochmal Vollfix samt Python-Sprung).
-
-*Option C — Teilfix jetzt, ohne Python-Sprung (`fastapi>=0.121.0` + `starlette==0.49.3`):* Schließt 3 der 7 CVEs, bleibt auf Python 3.8/3.9 lauffähig, kein `on_event`-Umbau nötig (nur deprecated-Warnung, nicht entfernt). 4 CVEs bleiben bis zur TASK-105-Entscheidung offen — wie bei den anderen vier TASK-105-Paketen. Empfehlung des Rechercheberichts: eigener Regressionslauf gegen den `fastapi`-Minor-Bump vor Übernahme, auch wenn der Sprung laut FastAPI-Semver additiv/kompatibel sein sollte.
-
-✅ **Empfehlung (Recherche):** Option B als Standardweg (vermeidet Doppel-Umbau), Option C als Kompromiss falls Stephan schon vor der TASK-105-Entscheidung einen Teil-Sicherheitsgewinn will. Option A erst nach TASK-105-Entscheidung.
-
-**❓ Offene Entscheidung für Stephan:** Option B (zurückstellen, mit TASK-105 zusammen behandeln), Option C (Teilfix jetzt umsetzen, unabhängig von TASK-105) oder direkt Option A im Rahmen einer TASK-105-Umsetzung? Bis zur Entscheidung bleibt `starlette` unverändert.
-
-**Quellen:** PyPI-JSON-API (`pypi.org/pypi/starlette/<version>/json`, `pypi.org/pypi/fastapi/<version>/json`, Felder `vulnerabilities`/`requires_dist`/`requires_python`, live abgefragt 2026-08-16); Starlette Release Notes (starlette.dev/release-notes/).
-
-**Stephans Entscheidung (2026-08-16):** Option B — `starlette` bleibt unangetastet und wird zusammen mit den anderen 4 blockierten Paketen behandelt, sobald die Python-Frage aus TASK-105 entschieden ist. Kein Teilfix jetzt. Damit sind alle 5 verbleibenden Pakete (`Pillow`, `python-multipart`, `python-dotenv`, `pytest`, `starlette`) einheitlich über TASK-105 blockiert — TASK-104 hat aktuell keinen weiteren eigenständig umsetzbaren Schritt mehr, bis Stephan TASK-105 entscheidet.
-
-## Abschluss (2026-08-16)
-
-Gemeinsam mit TASK-105 released (kombinierter Commit 8db8e5d, main, GitHub-Actions-Lauf #323 komplett gruen: Frontend-Check, Backend-Tests, Deploy FotoAlert). Umgesetzt in diesem finalen Release: `PyJWT`→2.13.0, `cryptography`→49.0.0, `Pillow`→12.3.0, `python-multipart`→0.0.20, `pytest`→9.0.3 — insgesamt 5 der urspruenglich 7 identifizierten Pakete. `starlette` wurde bewusst NICHT gebumpt und bleibt transitiv ueber `fastapi==0.111.0` bei `0.37.2` — das ist Stephans explizite Entscheidung „Option B" aus der TASK-105-Diskussion, kein offener Punkt mehr fuer dieses Ticket. Ein vollstaendiger `fastapi`/`starlette`-Sprung (inkl. `on_event`→`lifespan`-Migration) bleibt als separates, zukuenftiges Ticket offen — nicht Teil von TASK-104/TASK-105. Live-Health-Check bestaetigt: `https://fotoalert.stephanschumann.com/health` liefert `{"status":"ok","version":"2.0.0","locations_count":172}`.
-
----
-
-## Stephans Entscheidung (2026-08-16): Option C — kombinierter Release
-
-Stufe 1 (CI+lokal) und Stufe 2 (Prod) werden NICHT gestuft, sondern in einem gemeinsamen Release gefahren — löst die Stufe-1/Stufe-2-Kopplung im Deploy-Skript sauber auf, ohne die Reihenfolge umzukehren oder getrennte Requirements-Dateien einzuführen.
-
-**Ausdrücklich NICHT Teil dieses Releases:** `starlette`/`fastapi`-Vollfix (siehe TASK-104, Option A) — der erfordert zusätzlich den Umbau der `@app.on_event`-Hooks in `backend/main.py` auf `lifespan` (echte Code-Migration, kein reiner Versions-Bump) und wurde nicht separat freigegeben. Bleibt offen für einen eigenen Umsetzungsschritt, sobald Python >=3.10 aus diesem Release live ist.
-
-**Ablaufplan (Reihenfolge wichtig — vermeidet den in „Blockierender Fund“ oben beschriebenen fehlschlagenden Auto-Deploy):**
-
-1. **Server-Python zuerst umstellen** (Stephans Mac-Terminal, SSH als root): neues venv mit Python 3.12 parallel zum bestehenden aufbauen, mit den bereits vorbereiteten neuen Paketversionen befüllen, per Sanity-Import prüfen, DANN erst gegen das bestehende venv tauschen und den Dienst neu starten. Altes venv bleibt als Rückfallebene liegen (`venv_39_backup`).
-2. **Erst danach committen + pushen** (Stephans Mac-Terminal, im Repo): die bereits lokal vorbereiteten Dateien (`deploy.yml`, `update-building-data.yml`, `requirements.txt`, `CLAUDE.md`, `test_task-105.py`, `BACKLOG.md`) — das automatische CI+Deploy läuft dann gegen das bereits umgestellte Server-venv und sollte beim ersten Versuch grün durchlaufen.
-3. **Live-Verifikation** (Chrome-Browser-Subagent, nach grünem Deploy): Health-Check + Stichprobe der App-Kernfunktionen.
-
-Exakte Befehle für Schritt 1 und 2 liefert der Hauptthread direkt im Chat als kopierbare Codeblöcke (Terminal-Fenster-Modell beachten — Schritt 1 läuft in einer SSH-Sitzung zum Server, Schritt 2 im lokalen Repo-Terminal auf dem Mac, nicht mischen).
-
----
-
-### Example Mapping
-
-**Scope-Check:** Das Ticket klingt nach einer reinen Abhängigkeits-Frage, ist bei näherer Prüfung aber ein Infrastruktur-Vorhaben mit Wirkung auf Produktionsserver, beide CI-Workflow-Dateien, Stephans lokale Entwicklungsumgebung und eine als harte Projektregel in `CLAUDE.md` §5 verankerte Aussage („Server läuft **Python 3.9**") — keine intentionale, in sich geschlossene Einschränkung, sondern ein erster, noch ungeklärter Slice eines größeren Vorhabens. Deshalb unten explizite Fragen statt stiller Annahmen.
-
-**Annahmen-Protokoll:**
-
-❓ **Frage 1 (🔴 kritisch — Zielversion):** Auf welche Python-Version soll gesprungen werden?
-- Option 3.10 — kleinstmöglicher Sprung, deckt die `requires_python`-Untergrenze aller vier blockierten Pakete knapp ab; widerspricht aber der bereits im Repo vorbereiteten `python3.12`-Weichenstellung in `deploy/setup_server.sh` (zwei separate Ziel-Infrastrukturen zu pflegen).
-- Option 3.11 — Zwischenstand ohne erkennbaren Vorteil gegenüber 3.10 oder 3.12, keine Fundstelle im Repo, die 3.11 nahelegt.
-- Option 3.12 — deckt sich mit dem bereits vorbereiteten (aber laut Ticketbeschreibung noch nicht angewendeten) `python3.12` in `deploy/setup_server.sh` (Zeile 37/82), längste Update-Runway vor der nächsten EOL.
-❓ **Frage 2 (🔴 kritisch — Reihenfolge):** Zuerst CI + Stephans Mac auf die Zielversion heben und dort vollständig verifizieren, dann erst Prod (gestuft) — oder Prod im selben Release-Zyklus mitziehen (direkt)?
-❓ **Frage 3 (🔴 kritisch — Grenzfall, siehe Implementierungsoptionen C):** Rechtfertigen alle vier blockierten Pakete zusammen den Runtime-Sprung, oder reicht als Zwischenlösung das eine noch 3.9-kompatible Teil-Update (`python-multipart` 0.0.9 → 0.0.20, schließt aber nur 1 von 6 verbleibenden Lücken dieses Pakets)?
-
-⚠️ **Annahme:** Der bereits real gefundene Nebeneffekt bei `pandas` (unbegrenzter Pin `pandas>=2.0.0` löst unter Python 3.12 auf Version 3.0.5 statt der aktuell installierten 2.3.3 auf, siehe Pre-Mortem) wird beim Bump mit einer expliziten Obergrenze (`<3.0.0`) abgefangen, nicht separat als eigener, ungeprüfter Major-Versionssprung mitgenommen — bitte bestätigen.
-⚠️ **Annahme:** Die reale Ubuntu-Version des laufenden Hetzner-Servers wird vor der Prod-Umsetzung verifiziert (Dokumentation nennt „Ubuntu 22.04", ein Kommentar im Skript selbst nennt bereits „Ubuntu 26.04" — Diskrepanz ungeklärt, siehe Pre-Mortem Szenario 2) — bitte bestätigen, dass dieser Check vor jeder Prod-Umsetzung erfolgt.
-
-**Rules + Examples (auf Basis bestätigter Fakten + markierter Annahmen):**
-
-📏 **Rule 1:** Die gewählte Python-Zielversion muss nicht nur die vier blockierten Pakete, sondern die komplette bestehende `requirements.txt` ohne Konflikt installieren.
-🟢 Example: Gegeben `requirements.txt` mit den vier reparierten Versionen (Pillow 12.3.0, python-multipart 0.0.20, python-dotenv 1.2.2, pytest 9.0.3) plus Rest, wenn gegen Python 3.12.3 installiert wird, dann installieren alle 20 Pakete ohne Fehlermeldung (echt verifiziert, siehe Pre-Mortem Code-Verifikation).
-
-📏 **Rule 2:** CI, Stephans lokale Entwicklungsumgebung und der Produktionsserver verwenden nach Abschluss dieselbe Python-Version — kein Ort bleibt zurück.
-🟢 Example: Gegeben beide GitHub-Workflow-Dateien (`deploy.yml`, `update-building-data.yml`) und `CLAUDE.md` §5, wenn die Migration abgeschlossen ist, dann pinnen beide Workflows dieselbe neue Version und `CLAUDE.md` behauptet nicht mehr „Server läuft Python 3.9".
-
-📏 **Rule 3:** Ein Fehlschlag beim Prod-Wechsel darf nicht zu dauerhaftem Ausfall oder Datenverlust führen.
-🟢 Example: Gegeben ein neu aufgebautes venv unter neuem Pfad, wenn der Health-Check danach rot bleibt, dann läuft der Dienst unverändert mit dem alten venv weiter (kein In-Place-Überschreiben ohne Fallback).
-
-**Fertig:** Alle drei 🔴-Fragen bleiben bewusst offen — sie werden unten im Weg-Gate gemeinsam mit den Implementierungsoptionen vorgelegt (siehe Regel „Grenzfälle mit mehreren sinnvollen Verhaltensweisen").
-
----
-
-### Fundstellen-Sweep & Zustands-Check (Schritt 1b)
-
-**Fundstellen-Sweep:** Suchbegriff „Python 3.9" in `BACKLOG.md` → 23 Treffer über die gesamte Ticket-Historie (u. a. TASK-83-CI-Fehlschlag, US-38, US-72, US-112, BUG-60). Suchbegriff `from __future__ import annotations` in `backend/*.py` (ohne `tests/`, ohne `venv/`) → **59 Dateien**, die exakt wegen der 3.9-Kompatibilität so geschrieben sind. Suchbegriff `Optional[` (Python-3.9-Konvention statt `X | None`) → **38 Dateien**. Zusätzlich: `CLAUDE.md` §5 („Harte Projektregeln") Zeile 103 — „Server läuft **Python 3.9** — keine 3.10+-Syntax". `.github/workflows/deploy.yml` UND `.github/workflows/update-building-data.yml` pinnen beide unabhängig voneinander `python-version: "3.9"`. `.forgejo/workflows/deploy.yml` pinnt ebenfalls 3.9, ist aber laut TASK-80 als inaktive Kopie markiert (GitHub Actions ist die einzige aktive Pipeline) — für dieses Ticket nicht scope-relevant, aber bei einer künftigen Reaktivierung müsste sie mitgezogen werden. `deploy/setup_server.sh` sieht bereits `python3.12` vor (Zeilen 37, 82), `deploy/deploy.sh` dagegen installiert nur Abhängigkeiten in das *bestehende* venv (`"$VENV_DIR/bin/pip" install ...`, Zeile 71) und wechselt die Python-Version selbst **nicht** — der normale Auto-Deploy-Pfad bei jedem Push zieht einen Python-Versionswechsel also nicht automatisch mit. `deploy/DEPLOYMENT-GUIDE.md` Zeile 181 dokumentiert „Image: Ubuntu 22.04". Sechs Ansichten-Klassen (Liste/Karte/Kalender/Scout/Chancen-Übersicht/Event-Detail): nicht anwendbar — reines Backend-/Infrastruktur-Ticket ohne UI-Bezug, keine Fundstelle in einer dieser Ansichten.
-
-**Zustands-Check:**
-- **Wartezustand:** Während des eigentlichen Bump-Vorgangs auf dem Server (venv-Neuaufbau + Dependency-Install) ist der bestehende Dienst nur betroffen, wenn in-place gewechselt wird — bei der empfohlenen Parallel-venv-Strategie (siehe Option A) läuft der alte Dienst währenddessen unverändert weiter, kein sichtbarer Wartezustand für Nutzer der App.
-- **Leerzustand:** Nicht relevant — kein Datenzustand betroffen.
-- **Fehlerfall:** Schlägt der Wechsel fehl (Paket-Konflikt, apt-Paket nicht verfügbar, Health-Check bleibt rot), bleibt der bestehende Dienst auf der alten venv/Version aktiv, sofern Option A (Parallel-venv, kein In-Place-Überschreiben) umgesetzt wird — siehe eigenes Akzeptanzkriterium.
-
----
-
-### Pre-Mortem
-
-**📎 Code-Verifikation (echt durchgeführt, 2026-08-13):**
-- `CLAUDE.md` Zeile 103 gelesen: bestätigt „Server läuft **Python 3.9** — keine 3.10+-Syntax (`str|None`)" als harte Projektregel, keine Vermutung.
-- `.github/workflows/deploy.yml` Zeilen 50–53, 148–151 UND `.github/workflows/update-building-data.yml` Zeile 43–46 gelesen: beide pinnen unabhängig voneinander `python-version: "3.9"` über `actions/setup-python@v5` — zwei getrennte Fundstellen, nicht eine.
-- `deploy/deploy.sh` vollständig gelesen: Zeile 71 installiert nur `pip install -r requirements.txt` in das **bestehende** `$VENV_DIR` — bestätigt, dass der normale CI/CD-Auto-Deploy-Pfad die Python-Interpreter-Version NICHT mitwechselt; ein Versionssprung erfordert einen zusätzlichen, gezielten Schritt (Re-Lauf von `setup_server.sh`-Teilen oder gleichwertig) gegen den bereits laufenden Server.
-- `deploy/deploy.sh` Zeilen 92–112 gelesen: bestehender Rollback-Automatismus macht bei rotem Health-Check ausschließlich `git checkout $PREV_COMMIT` (Code) + Service-Neustart — **kein** Zurücksetzen der venv/Python-Version. Widerlegt die stille Annahme „Rollback ist bereits abgesichert": der bestehende Automatismus deckt einen Python-Versionswechsel nicht ab, weil er nur für reine Code-Änderungen gebaut wurde.
-- Echter `pip install`-Test (Cloud-Sandbox mit Internet, nicht die Geräte-Brücke) unter frisch aufgesetztem Python 3.12.3: komplette `requirements.txt` inkl. aller vier TASK-104-Zielversionen (Pillow 12.3.0, python-multipart 0.0.20, python-dotenv 1.2.2, pytest 9.0.3) installiert **ohne Konflikt** — 20/20 Pakete erfolgreich. Bestätigt Rule 1.
-- Dabei entdeckt (nicht vermutet): `pandas>=2.0.0` (kein Obergrenze in `requirements.txt`) löst unter Python 3.12 auf **3.0.5** auf; das aktuell unter Python 3.9 installierte, im Mount vorgefundene venv hat **2.3.3** installiert (`backend/venv/lib/python3.9/site-packages/pandas-2.3.3.dist-info`). Realer, durch den Runtime-Sprung ausgelöster ungeplanter Major-Versionssprung einer fünften Bibliothek, zusätzlich zu den vier eigentlichen Zielpaketen.
-- `deploy/setup_server.sh` Kommentarzeile 80 gelesen: „Ubuntu 26.04 hat Python 3.14 als Standard […] deshalb explizit 3.12 verwenden" — widerspricht dem in Kopfzeile 3 und `DEPLOYMENT-GUIDE.md` Zeile 181 dokumentierten „Ubuntu 22.04". Auf echtem, unverändertem Ubuntu 22.04 (Jammy) ist `python3.12` nicht ohne Zusatz-Repository (z. B. deadsnakes-PPA) über die Standard-`apt`-Quellen installierbar — das Skript fügt keine PPA hinzu. Es ist unklar, ob das Skript je gegen ein frisches 22.04-Image getestet wurde oder ob der reale Server inzwischen auf einer neueren, nicht dokumentierten Ubuntu-Version läuft.
-- Historischer Präzedenzfall real verifiziert (nicht neu, aber für dieses Pre-Mortem hochrelevant): TASK-83, Release `v1.22.42`, GitHub-Actions-Run #253 — CI-Runner lief unter Python 3.9.25, eine vorherige Verifikation lief unter Python 3.11; ein `asyncio.Semaphore(1)`-Konstruktionsmuster verhielt sich zwischen den beiden Versionen unterschiedlich und blockierte den Deploy (Gate griff korrekt, kein Prod-Schaden) — echter Beleg dafür, dass Python-Versionsunterschiede zwischen Verifikations- und Zielumgebung bei diesem Projekt bereits einmal einen realen, wenn auch abgefangenen, Fehlschlag verursacht haben.
-
-**Versagensszenarien:**
-
-💀 **Szenario 1 — Prod-venv-Wechsel schlägt mitten im Umbau fehl → Dienst bleibt down.**
-Auslöser: In-Place-Überschreiben des bestehenden venv statt Parallelaufbau.
-Frühwarnung: Health-Check nach dem Wechsel rot.
-Gegenmaßnahme: Neues venv unter eigenem Pfad parallel aufbauen, systemd-Unit-Verweis (`__VENV_DIR__`-Ersetzungsmuster existiert bereits in `setup_server.sh`) erst nach grünem Health-Check + vollem Regressionstest umbiegen, altes venv als Fallback stehen lassen → eigenes AK.
-
-💀 **Szenario 2 — `apt-get install python3.12` scheitert auf dem echten Server, weil Ubuntu 22.04 dieses Paket nicht ohne Zusatz-Repository anbietet.**
-Auslöser: Diskrepanz zwischen dokumentierter Server-Version (22.04) und Skript-Kommentar (26.04), keine PPA im Skript.
-Frühwarnung: `apt-cache policy python3.12` vorab auf dem echten Server geprüft.
-Gegenmaßnahme: Vor jeder Prod-Umsetzung reale Server-Version + Paketverfügbarkeit von Stephan verifizieren lassen (`lsb_release -a`, `apt-cache policy python3.12`) → eigenes AK.
-
-💀 **Szenario 3 — `pandas` springt unbeabsichtigt von 2.x auf 3.x mit.**
-Auslöser: echter, oben dokumentierter pip-Install-Fund (2.3.3 vs. 3.0.5).
-Frühwarnung: `pip list` nach der Installation gegen die Vorher-Liste diffen.
-Gegenmaßnahme: `requirements.txt` bekommt beim Bump eine explizite Obergrenze für `pandas` (`<3.0.0`) → eigenes AK.
-
-💀 **Szenario 4 — CI und Prod driften auseinander, weil nur eine der beiden Workflow-Dateien aktualisiert wird.**
-Auslöser: zwei getrennte, unabhängige `python-version: "3.9"`-Pins in `deploy.yml` UND `update-building-data.yml`; historischer Präzedenzfall TASK-83 zeigt, dass genau diese Art Versions-Drift real zu einem CI-Fehlschlag geführt hat.
-Frühwarnung: Fundstellen-Sweep (oben) listet beide Dateien namentlich.
-Gegenmaßnahme: beide Workflow-Dateien im selben Schritt ändern → eigenes AK.
-
-💀 **Szenario 5 — Stephans lokale Mac-Entwicklungsumgebung bleibt auf Python 3.9, während CI/Prod bereits gewechselt sind.**
-Auslöser: Reihenfolge-Entscheidung (Frage 2) offen; lokales venv unter `backend/venv/lib/python3.9/` bereits mehrfach als eigenständige Fehlerquelle dokumentiert (venv-Symlink-Problem in den TASK-104-Zwischenständen).
-Frühwarnung: `backend/venv/bin/python3 --version` vor jedem lokalen Testlauf prüfen.
-Gegenmaßnahme: lokales Mac-venv im selben Zug wie CI neu mit Zielversion aufbauen (altes venv umbenennen statt löschen) → eigenes AK.
-
-**Zusammenspiel bestehender Bausteine:** `setup_server.sh` legt das Prod-venv einmalig mit fester Python-Version an; `deploy.sh` installiert bei jedem Push nur Pakete in dieses bestehende venv, wechselt aber nie die Interpreter-Version selbst; die systemd-Units (`fotoalert.service`, `fotoalert-precompute.service`) referenzieren den venv-Pfad nur indirekt über einen bei der Ersteinrichtung einmalig ersetzten Platzhalter (`__VENV_DIR__`). Ein Python-Versionssprung auf dem laufenden Server ist damit **kein automatischer Nebeneffekt eines normalen Releases**, sondern erfordert einen bewusst separaten, manuell angestoßenen Schritt — der bestehende Auto-Rollback in `deploy.sh` (nur `git checkout`) deckt diesen Schritt nicht ab (siehe Code-Verifikation oben).
-
-**Zwei Pflicht-Checkfragen:**
-- E2E-/Filter-/datenbezogenes Ticket? Nein, kein Frontend-Filter-Bezug — nicht anwendbar.
-- Pre-Mortem empfiehlt eine „sicherere" Option (B, gestuft) — dasselbe Risiko erneut gegen Option B geprüft? Ja: Auch bei gestufter Reihenfolge bleiben Szenario 1–3 (Prod-Wechsel selbst, apt-Verfügbarkeit, pandas-Pin) unverändert bestehen, weil sie den Prod-Schritt selbst betreffen, unabhängig davon, wann er erfolgt — Option B reduziert nur das Risiko aus Szenario 4/5 (Environment-Drift), nicht 1–3. Alle fünf Szenarien fließen deshalb unabhängig von der gewählten Reihenfolge in die Akzeptanzkriterien ein.
-
----
-
-### Architektur-Analyse
-
-**Betroffene Dateien (wirklich gelesen, nicht überflogen):**
-- `backend/requirements.txt` — die vier TASK-104-Zielpakete + `pandas`-Obergrenze.
-- `.github/workflows/deploy.yml` (zwei `python-version: "3.9"`-Stellen, Zeilen 50–53 + 148–151) und `.github/workflows/update-building-data.yml` (Zeile 43–46) — beide CI-Pipelines.
-- `.forgejo/workflows/deploy.yml` — laut TASK-80 inaktive Kopie, nicht im Scope, aber als Fundstelle dokumentiert.
-- `deploy/setup_server.sh` (Zeilen 36–37, 79–84) — Ziel-Python-Version + apt-Pakete für Neuaufbau; Kommentar-Diskrepanz Ubuntu-Version (Zeile 3 vs. 80).
-- `deploy/deploy.sh` (Zeile 71, Zeilen 92–112) — bestätigt: kein automatischer Versionswechsel, bestehender Rollback deckt nur Code ab.
-- `deploy/DEPLOYMENT-GUIDE.md` (Zeile 181) — dokumentierte Server-Version.
-- `CLAUDE.md` §5 (Zeile 103) — harte Projektregel, muss nach Umsetzung aktualisiert werden.
-- 59 Dateien unter `backend/` mit `from __future__ import annotations` und 38 mit `Optional[`-Konvention — werden durch einen Python-Sprung NICHT beschädigt (postponed evaluation of annotations funktioniert unter jeder neueren Version weiter), sind aber ein Beleg für die Größe der bestehenden 3.9-Konvention; keine Änderung an diesen Dateien selbst nötig oder im Scope dieses Tickets.
-
-**Designer-Check:** Nicht visuell — kein UI-Element, keine Karten-/Overlay-Änderung, kein App-Screenshot betroffen. Übersprungen.
-
----
-
-### Implementierungsoptionen + Empfehlung
-
-**Option A — Gestufter Sprung auf Python 3.12, zuerst CI + lokal verifizieren, dann Prod mit Parallel-venv-Strategie (empfohlen)**
-- Vorgehen: (1) `requirements.txt` auf die vier reparierten Versionen + `pandas<3.0.0`-Obergrenze anheben. (2) Beide GitHub-Workflow-Dateien im selben Schritt von `"3.9"` auf `"3.12"` ändern. (3) Stephans lokales Mac-venv parallel neu mit 3.12 aufbauen (altes venv umbenennen, nicht löschen). (4) Volle Backend-Testsuite lokal + im echten CI-Lauf grün bekommen. (5) Erst danach, nach Klärung von Pre-Mortem-Szenario 2 (reale Server-/Ubuntu-Version + apt-Verfügbarkeit): neues Prod-venv parallel unter neuem Pfad aufbauen, erst nach grünem Health-Check + vollem Regressionstest den systemd-Unit-Verweis umbiegen, altes venv als Fallback erhalten. (6) `CLAUDE.md` §5 aktualisieren.
-- Betroffene Dateien: siehe Architektur-Analyse.
-- Vorteile: Fehler werden lokal/CI entdeckt, bevor Prod betroffen ist; schließt die real gefundene Rollback-Lücke (Szenario 1), statt sie zu riskieren; volle Kontrolle über Reihenfolge.
-- Nachteile/Risiken: mehr Einzelschritte, die eigentlichen Sicherheitslücken bleiben bis zum letzten Schritt offen; erfordert Stephans manuellen Eingriff auf dem echten Server (kein vorhandener Automatismus für einen Interpreter-Wechsel).
-- Aufwand: mittel bis groß.
-
-**Option B — Direkter Sprung, Prod im selben Release-Zyklus mitgezogen**
-- Vorgehen: requirements.txt + beide CI-Workflows + Prod-venv in einem zusammenhängenden Release ändern.
-- Vorteile: schneller abgeschlossen, ein Release-Zyklus statt zwei.
-- Nachteile/Risiken: kombiniert alle fünf Pre-Mortem-Szenarien ungefiltert in einem einzigen, sofort live wirksamen Schritt; kein vorheriger Kompatibilitätsnachweis vor dem Prod-Wechsel; widerspricht der in TASK-104 selbst etablierten Konvention (AK5: Breaking-Change-Migrationen vorab zurückmelden statt durchziehen).
-- Aufwand: mittel (bei höherem Risiko).
-
-**Option C — Nur das eine noch 3.9-kompatible Teil-Update einspielen, Runtime-Sprung ganz zurückstellen**
-- Vorgehen: kein Python-Wechsel; nur `python-multipart` 0.0.9 → 0.0.20 (letzte 3.9-kompatible Version) einspielen, die übrigen drei Pakete bleiben auf ihrer laut TASK-104 verwundbaren Version.
-- Vorteile: kein Infrastruktur-Risiko, sofort umsetzbar.
-- Nachteile/Risiken: schließt nur 1 von 6 verbleibenden `python-multipart`-Lücken und lässt `Pillow` (höchste gemeldete Lückenzahl, „Stephans ursprünglicher Verdacht") komplett ungefixt, weil dafür laut TASK-104-Recherche **kein** 3.9-kompatibler Fix existiert — löst das eigentliche, dringendste Problem nicht, verschiebt es nur.
-- Aufwand: klein — bei geringstem Nutzen.
-
-✅ **Empfehlung: Option A.** Löst tatsächlich alle vier blockierten Pakete (im Gegensatz zu C), begrenzt das reale, dokumentierte Risiko aus dem Pre-Mortem durch eine gestufte Reihenfolge mit Parallel-venv-Fallback (im Gegensatz zu B) und führt die bereits im Repo vorbereitete, aber noch nicht angewendete `python3.12`-Weichenstellung in `setup_server.sh` konsequent zu Ende, statt eine zweite, konkurrierende Zielversion (3.10/3.11) einzuführen.
-
-**Offene Grenzfall-Wahlfragen (aus Example Mapping, hier erneut vorgelegt):**
-❓ Frage 1 (Zielversion 3.10 / 3.11 / **3.12 empfohlen**) — siehe oben.
-❓ Frage 2 (Reihenfolge gestuft **(Option A, empfohlen)** vs. direkt (Option B)) — siehe oben.
-❓ Frage 3 (alle vier Pakete umsetzen **(Option A, empfohlen)** vs. nur Teil-Update (Option C)) — siehe oben.
-
----
-
-### 🚦 Ampel-Ergebnis
-
-🔴 **Rot — braucht Stephans Entscheidung:**
-- **Frage 2 (Ampel-Kriterium 2 — Scope-Grenze):** Der Eingriff bleibt nicht innerhalb des Tickets, sondern verändert Produktions-Runtime, beide CI-Workflow-Dateien, Stephans lokale Entwicklungsumgebung und eine als harte Projektregel in `CLAUDE.md` §5 verankerte, projektweite Aussage — mit Wirkung auf mind. 59 Dateien, die explizit auf der bisherigen Python-3.9-Konvention aufbauen.
-- **Frage 4 (Ampel-Kriterium 4 — Pre-Mortem-Risiko):** Das Pre-Mortem fand reales, teils bereits historisch eingetretenes Risiko — den dokumentierten TASK-83-CI-Fehlschlag (v1.22.42, GitHub-Actions-Run #253) durch exakt diesen Python-Versionsunterschied, eine verifizierte Rollback-Lücke im bestehenden `deploy.sh`-Automatismus (deckt nur Code, nicht die Python-Runtime ab) sowie eine ungeklärte Diskrepanz zwischen dokumentierter (22.04) und im Skript erwähnter (26.04) Ubuntu-Version des echten Servers.
-
-Zusätzlich fehlt bei allen drei offenen Grenzfall-Fragen (Zielversion, Reihenfolge, Paket-Umfang) noch Stephans explizite Wahl — auch wenn die Empfehlung (3.12, gestuft, alle vier Pakete) in jedem Fall klar begründet ist.
-
----
-
-### Analyse & Planung
-
-- [x] Example Mapping durchgeführt
-- [x] Fundstellen-Sweep: „Python 3.9" (23 Treffer BACKLOG.md), `from __future__ import annotations` (59 Dateien), `Optional[` (38 Dateien), plus CLAUDE.md/CI-Workflows/Deploy-Skripte namentlich geprüft
-- [x] Zustands-Check: Warte-/Leer-/Fehlerfall je Kernschritt dokumentiert (kein Nutzer-sichtbarer Wartezustand bei Parallel-venv-Strategie, Leerzustand nicht relevant, Fehlerfall über Rollback-AK abgesichert)
-- [x] Pre-Mortem durchgeführt (5 Szenarien, echte Code-Verifikation inkl. echtem pip-Install-Test unter Python 3.12.3)
-- [x] Architektur analysiert: `backend/requirements.txt`, `.github/workflows/deploy.yml`, `.github/workflows/update-building-data.yml`, `deploy/setup_server.sh`, `deploy/deploy.sh`, `deploy/DEPLOYMENT-GUIDE.md`, `CLAUDE.md` §5
-- [x] Designer-Check: visuell? → nein, übersprungen
-- [x] Implementierungsoptionen: A (gestuft, empfohlen) / B (direkt) / C (Teil-Update, ungenügend)
-- [x] Empfehlung: Option A — Zielversion 3.12, gestufte Reihenfolge (CI+lokal zuerst, dann Prod mit Parallel-venv)
-- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 8 AKs auf 6 Dimensionen geprüft, alle vier Negativ-/Randfall-Kategorien mit Trigger explizit adressiert (Rollback, Beobachtbarkeit, Grenzwerte, Berechtigungen als „nicht relevant" begründet), Herkunft jedes AK auf Pre-Mortem-Szenario oder Frage zurückverfolgt — Details siehe eigener Abschnitt unten
-
----
-
-### Akzeptanzkriterien
-
-- [x] **AK1:** Nach dem Sprung installieren sich alle bisher verwendeten Software-Bausteine (die komplette Abhängigkeitsliste des Backends) ohne Fehlermeldung unter der neuen Python-Version — inklusive der vier ursprünglich blockierten (Bildverarbeitung, Datei-Upload-Hilfsbibliothek, Umgebungsvariablen-Hilfsbibliothek, Testwerkzeug). *(Herkunft: Pre-Mortem Code-Verifikation, echter pip-Install-Test bestanden.)*
-- [x] **AK2:** Die komplette automatisierte Backend-Testsuite läuft nach dem Sprung durch, ohne dass neue, durch den Versionswechsel verursachte Fehlschläge auftreten (bereits bekannte, unabhängige Fehlschläge zählen nicht als Regression, wie bereits in TASK-104 dokumentiert). *(Herkunft: bestehende Projektkonvention, TASK-104 AK1/AK3.)*
-- [ ] **AK3 Edge Case:** Falls beim Umbau des Produktionsservers ein Fehler auftritt (App startet nicht, Gesundheits-Check schlägt fehl), lässt sich die alte, funktionierende Umgebung ohne Datenverlust und ohne manuellen Server-Zugriff über den bereits vorhandenen Automatismus hinaus wiederherstellen. *(Herkunft: Pre-Mortem Szenario 1, verifizierte Rollback-Lücke im bestehenden `deploy.sh`.)*
-- [ ] **AK4:** Sowohl der automatische Prüflauf (beide GitHub-Workflows) als auch Stephans eigener Rechner als auch der Produktionsserver verwenden danach dieselbe Python-Version — keiner der drei Orte bleibt versehentlich auf der alten Version zurück. *(Herkunft: Pre-Mortem Szenario 4/5, realer TASK-83-Präzedenzfall.)*
-- [ ] **AK5:** Die im Projekt dokumentierte, harte Regel „Server läuft Python 3.9" wird nach dem Sprung auf die neue, tatsächlich verwendete Version aktualisiert. *(Herkunft: Fundstellen-Sweep, CLAUDE.md §5.)*
-- [x] **AK6 Edge Case:** Eine bereits vorhandene, bisher unbegrenzte Versionsspanne einer Datenverarbeitungs-Bibliothek (aktuell „ab Version 2, ohne Obergrenze") wird beim Sprung nicht ungeprüft mit auf eine neue Hauptversion (3) gezogen, sondern bewusst auf die bisherige Hauptversion begrenzt. *(Herkunft: Pre-Mortem Szenario 3, echter Fund: pandas löst unter der neuen Version auf 3.0.5 statt der aktuell installierten 2.3.3 auf.)*
-- [ ] **AK7:** Vor der Umsetzung auf dem echten Produktionsserver ist geklärt (nicht nur angenommen), welche Betriebssystem-Version dort tatsächlich läuft und ob die vorgesehene neue Python-Version dort ohne ein zusätzliches Software-Verzeichnis installierbar ist. *(Herkunft: Pre-Mortem Szenario 2, Diskrepanz Dokumentation „Ubuntu 22.04" vs. Skript-Kommentar „Ubuntu 26.04".)*
-- [ ] **AK8:** Von den vier ursprünglich blockierten Software-Bausteinen wird für jeden einzeln dokumentiert, ob die zugehörige Sicherheitslücke damit vollständig oder nur teilweise geschlossen ist — kein Baustein gilt stillschweigend als „erledigt", wenn das nicht zutrifft (z. B. bei der Datei-Upload-Hilfsbibliothek, deren letzte 3.9-kompatible Version laut TASK-104-Recherche nur 1 von 7 gemeldeten Lücken schließt — die volle Reparatur braucht ohnehin den Runtime-Sprung). *(Herkunft: bestehende Projektkonvention, TASK-104 AK4.)*
-
-**🔍 AK-Qualitäts-Check (Schritt 6c):**
-
-*Sechs Dimensionen:*
-1. **Granularität:** Jedes AK prüft genau ein eigenständiges Verhalten; AK4 (Versionsgleichheit CI/lokal/Prod) wurde bewusst NICHT mit AK5 (CLAUDE.md-Textänderung) zusammengelegt, da beide unabhängig voneinander scheitern können.
-2. **Polarität:** AK1 (positiver Installationserfolg) hat mit AK6/AK8 je ein Negativ-/Grenzfall-Gegenstück (nicht ungeprüft mitziehen / nicht stillschweigend als erledigt gelten); AK2 (Testsuite grün) hat mit AK3 (Fehlerfall Rollback) sein Gegenstück.
-3. **Messbarkeit:** Alle acht AKs in Alltagssprache über App-/Betriebs-Wirkung formuliert, keine Funktions- oder Variablennamen als Entscheidungsgrundlage (Ausnahme: `pandas`/„Datenverarbeitungs-Bibliothek" in AK6 bewusst umschrieben) — beim erneuten Durchgang kein technischer Begriff gefunden, der sich eingeschlichen hätte.
-4. **Vier-Kategorien-Abdeckung:** Funktional (AK1/AK2/AK4/AK8) ✓; Nicht-funktional/Sicherheit (AK8 — Lücken-Status je Paket) ✓, Performance/Skalierbarkeit/Zugänglichkeit nicht relevant (reines Infrastruktur-Ticket ohne UI/Last-Bezug); Architektur/Rückwärtskompatibilität (AK6 — pandas-Obergrenze verhindert ungeplanten Breaking Change) ✓; Sonstige/Betriebsübergabe (AK5 — Projektdoku aktualisiert, AK7 — Server-Voraussetzung geklärt) ✓.
-5. **Testbarkeit ohne Rückfrage:** Für AK4/AK5/AK6 real als pytest-Fälle geschrieben und gegen den aktuellen Code-Stand ausgeführt (siehe Testplan) — alle drei liefern den erwarteten Rot-Nachweis, bestätigt eindeutige Testbarkeit ohne Rückfrage.
-6. **Herkunftsnachvollziehbarkeit:** Jedes AK trägt oben einen expliziten Herkunftsvermerk (Pre-Mortem-Szenario oder bestehende Projektkonvention).
-
-*Negativ-/Randfall-Checkliste:*
-| Kategorie | Ergebnis |
-|---|---|
-| Grenzwerte | nicht relevant — kein numerischer Schwellwert im Scope |
-| Ungültige/fehlende Eingaben | AK1 deckt den Fall „Installation schlägt fehl" implizit über den Erfolgsnachweis ab |
-| Nebenläufigkeit | nicht relevant — kein gleichzeitiger Mehrnutzer-Schreibzugriff betroffen |
-| Verhalten unter Lastgrenzen | nicht relevant — kein Last-/Performance-Bezug |
-| Leerer/übervoller Zustand | bereits im Zustands-Check (Schritt 1b) behandelt, hier nur bestätigt: nicht relevant |
-| Berechtigungen/Zugriffsschutz | nicht relevant — keine Rollen-/Auth-Änderung |
-| Abwärtskompatibilität | AK6 (pandas-Obergrenze) deckt den einzigen real gefundenen Abwärtskompatibilitäts-Risikofall ab |
-| Rollback-/Wiederanlauffähigkeit | AK3, bereits ausformuliert — nur bestätigt, nicht dupliziert |
-| Beobachtbarkeit im Fehlerfall | AK7 deckt Vorab-Beobachtbarkeit ab (Server-Voraussetzung klären, bevor blind losgelegt wird); der bestehende `deploy.sh`-Health-Check-Log bleibt für den eigentlichen Fehlerfall unverändert zuständig |
-
----
-
-### Testplan
-
-- [x] **Automatisiert (Harness):** Neue Datei `backend/tests/test_task-105.py` angelegt (Marker `offline`, `regression`, `requires_full_checkout`), deckt AK4/AK5/AK6 als datei-inhaltliche Regressionstests ab: `test_ak6_pandas_pin_has_explicit_upper_bound`, `test_ak4_both_github_workflows_pin_same_non_39_python_version`, `test_ak5_claude_md_hard_rule_updated`. **Rot-Nachweis (2026-08-13, echt durchgeführt** als äquivalentes Text-/Regex-Skript außerhalb von pytest, da im Geräte-Brücken-Sandbox kein `pytest`-Modul installierbar war — Syntax der eigentlichen Testdatei separat per `python3 -m py_compile` geprüft, fehlerfrei): alle drei Prüfungen schlagen erwartungsgemäß fehl — `pandas` hat weiterhin keine Obergrenze (`pandas>=2.0.0`), beide Workflow-Dateien pinnen weiterhin `"3.9"`, `CLAUDE.md` behauptet weiterhin „Server läuft Python 3.9". In `backend/tests/README.md` registriert (TASK-79-Konvention). AK1/AK2/AK3/AK7/AK8 sind prozess-/betriebsabhängig (echter Server-Zugriff, echter Testsuite-Lauf unter neuer Version, manuelle Server-Recherche) und bleiben manuelle Prüfpunkte — siehe unten.
-- [x] **Stufe 1 real getestet (2026-08-13, Stephans Mac):** Lokaler venv-Neuaufbau unter Python 3.12.14, `pip install -r requirements.txt` fehlerfrei (AK1 real bestätigt). Volle Backend-Testsuite: 841 Tests, 2 failed, 835 passed, 6 skipped, 1 xpassed, Laufzeit 576.42s. Beide Fehlschläge geprüft, keine Regression durch den Versionswechsel: `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` (bekannter, vorbestehender last-/timing-empfindlicher Test, identisch mit dem einzigen Fehlschlag im letzten TASK-104-Kombi-Testlauf) und `test_task-105.py::TestTask105PythonVersionMigrationConsistency::test_ak5_claude_md_hard_rule_updated` (bewusst rot, da AK5/CLAUDE.md-Aktualisierung erst in Stufe 2 erfolgt). Die beiden anderen TASK-105-eigenen Tests (AK4-Workflow-Check, AK6-pandas-Obergrenze) sind grün. 3 Tests übersprungen, weil `playwright` in der neuen lokalen venv fehlt — als unkritisch verifiziert: `deploy.yml` installiert Playwright bewusst separat nur für den CI-Job, nicht über `requirements.txt` (Zeilen 59-62); kein TASK-105-Fund, betrifft nur die lokale Testumgebung.
-- [ ] **Manuell (nach Stephans Weg-Gate-Entscheidung, unter der jeweils gewählten Option):**
-  1. `pip install -r backend/requirements.txt` unter der Zielversion lokal/CI ausführen → AK1.
-  2. `pytest tests/ -v` unter der Zielversion → AK2 (Vergleich gegen die bereits bekannten, unabhängigen Fehlschläge aus dem `cryptography`/`PyJWT`-Zwischenstand).
-  3. `lsb_release -a` + `apt-cache policy python3.12` auf dem echten Hetzner-Server ausführen und Ergebnis zurückmelden → AK7 (PFLICHT vor jedem Prod-Schritt, siehe Pre-Mortem Szenario 2).
-  4. Nach dem Prod-Wechsel: `/health`-Endpoint grün, danach gezielt einen roten Testlauf simulieren (z. B. durch einen absichtlich falschen Pfad) um den Rollback-Pfad einmal real zu beobachten → AK3.
-  5. Für jedes der vier TASK-104-Pakete den tatsächlichen Lücken-Schließungsstatus dokumentieren (vollständig/teilweise) → AK8.
-
-**Deploy-Risikofund (2026-08-13):** Push/Workflow-Dispatch JETZT würde einen echten Produktions-Deploy auslösen (kein Branch-Schutz am deploy-Job), der in `deploy.sh` Schritt 4 wegen der jetzt Python-≥3.10-pflichtigen Paketversionen gegen das bestehende Python-3.9-Server-venv fehlschlagen würde — VOR dem Health-Check-Rollback, also ohne automatische Reparatur. Push/Dispatch bleibt deshalb zurückgestellt, bis Stufe 2 (Server-Python-Umstellung) im selben Deploy-Fenster bereit ist.
-
-## Abschluss (2026-08-16)
-
-Gemeinsam mit TASK-104 released (kombinierter Commit 8db8e5d, main, GitHub-Actions-Lauf #323 komplett gruen: Frontend-Check, Backend-Tests, Deploy FotoAlert). Ueberraschender Fund waehrend der Umsetzung: Der Produktionsserver lief entgegen der bisherigen Doku bereits seit Juni 2026 auf Python 3.12 (nicht 3.9) — die urspruenglich geplante separate „Stufe-2"-Server-Migration war dadurch nicht mehr noetig. CLAUDE.md Zeile 103 wurde entsprechend korrigiert. Ein serverseitiger venv-Swap-Testversuch schlug zwischenzeitlich fehl (Shebang-Pfad-Bug in einem Migrationsskript) und wurde erfolgreich zurueckgerollt, ohne bleibenden Schaden — der Server lief am Ende auf der urspruenglichen, bereits-3.12-basierten venv weiter, keine Downtime im finalen Zustand. Beide GitHub-Workflow-Dateien (`deploy.yml`, `update-building-data.yml`) wurden auf `python-version: "3.12"` gepinnt. Live-Health-Check bestaetigt: `https://fotoalert.stephanschumann.com/health` liefert `{"status":"ok","version":"2.0.0","locations_count":172}`, Locations-Ansicht laedt echte Daten (per Chrome-Browser bestaetigt).
-
----
-
-## Implementierung (fotoalert-impl, 2026-08-10)
-
-**(a) Fehlermeldungen:** `backend/main.py` — an den 2 echten Fundstellen (precompute-Subprozess-Fehlerpfad, manueller Sichtachsen-Refresh) liefert die Status-Abfrage jetzt nur noch eine allgemeine Meldung; der volle technische Text bleibt im Server-Protokoll erhalten. **Real getestet:** 2 neue automatisierte Tests, beide grün (`2 passed`).
-
-**(c) Upload-Größenprüfung:** `backend/main.py`, `upload_location_image()` — liest die Datei jetzt in Stücken statt auf einmal und bricht sofort ab, sobald die 20-MB-Grenze überschritten wird, bevor der Rest gelesen wird. **Real getestet:** 5 neue automatisierte Tests grün, zusätzlich 61 bestehende Tests aus verwandten Bereichen als Regressionsschutz erneut grün (0 Fehlschläge).
-
-**(d) Systemdienst-Absicherung:** Beide Dienst-Dateien (`deploy/fotoalert.service`, `deploy/fotoalert-precompute.service`) haben jetzt die für diese Art App üblichen Betriebssystem-Schutzmaßnahmen erhalten (vorher hatte der zweite Dienst gar keine). Bewusst eine etwas vorsichtigere Variante gewählt, die laut Code-Prüfung mit den tatsächlich benötigten Schreibrechten der App verträglich sein sollte — **eine echte Bestätigung auf dem Server steht aber noch aus, das kann aus dieser Arbeitsumgebung nicht geprüft werden (AK5).**
-
-**Status-Update (2026-08-10):** → **In Test**. (a)/(c) sind durch echte automatisierte Tests bestätigt. (d) braucht noch deine Bestätigung nach dem Ausrollen: einmal `systemctl daemon-reload` + Neustart beider Dienste, dann prüfen ob die App normal erreichbar ist, ein Bild-Upload funktioniert und die tägliche Vorausberechnung durchläuft.
-
-## Abschluss (2026-08-11)
-
-AK5 konnte nicht per direktem Server-Login bestätigt werden (Stephan hatte das SSH-Passwort nicht zur Hand). Stattdessen wurde das Veröffentlichungs-Protokoll des Deploys direkt geprüft (GitHub-Actions-Log, Commit `40222bd`, Lauf #316): `systemctl daemon-reload` lief fehlerfrei, `fotoalert.service` wurde neu gestartet, der eingebaute automatische Gesundheits-Check (bis zu 5 Versuche über 25s) war erfolgreich — bei einem Fehlschlag hätte das Deploy-Skript automatisch zurückgerollt, das Protokoll zeigt stattdessen "✅ Deploy erfolgreich!". Das bestätigt die Systemdienst-Härtung für den Hauptdienst unter echter Last (Neustart + Erreichbarkeitsprüfung), nicht nur einen Momentzustand. Einschränkung: Der Neustart-Befehl für den zweiten Dienst (`fotoalert-precompute`, läuft nur nach Zeitplan über einen Timer) lief ebenfalls fehlerfrei, ob der nächste geplante Lauf selbst sauber durchläuft, ist damit aber nicht zu 100% bestätigt — geringes Risiko, da reine Absicherungs-Direktiven ohne Verhaltensänderung. Stephan hat zugestimmt, das Ticket auf dieser Basis abzuschließen.
-
----
-
-## Analyse (fotoalert-analyze, 2026-08-10)
-
-**Code-Verifikation:** Verifiziert: `release.sh` Zeilen 66–92 (Merge-Konflikt-Pre-Check, TASK-88-Kommentar, `git status --porcelain`-basiert, läuft vor den sed-Edits), `fotoalert-release`/SKILL.md ca. Zeilen 206–242 (dokumentiertes `git stash push`/Release/`git stash pop`-Muster inkl. Verweis auf `references/edge-cases.md`), `references/edge-cases.md` ca. Zeilen 43–218 (Merge-Konflikt-Behandlung beim `stash pop`, insbes. Schritt 4 „`git commit -m "merge: <kurzbeschreibung>"`“ und der `git show --stat HEAD`-Pflichtcheck aus BUG-80).
-
-**Kritische Bewertung:** Der release.sh-Check (Zeilen 66–92) und die dokumentierte Ad-hoc-Commit-Lücke in `edge-cases.md` sind **nicht dieselbe Fundstelle**, sondern zwei unterschiedliche Stellen im Ablauf. Der release.sh-Check greift nur, wenn `release.sh` **gestartet wird, während bereits** ein ungelöster Konflikt im Arbeitsverzeichnis liegt — er läuft ganz am Anfang des Skripts, vor jeder eigenen Mutation. Der reale Vorfall (US-133/v1.22.34) entstand laut Ticket-Text aber **während** eines `stash pop` — ein Schritt, der laut `fotoalert-release`-SKILL.md typischerweise **um** den `release.sh`-Aufruf herum liegt (Push vor dem Release, Pop danach). Zu dem Zeitpunkt, an dem `release.sh` seinen Pre-Check ausführt, existiert der Konflikt, der später beim Pop auftritt, noch gar nicht — der Check kann ihn strukturell nicht sehen. Der release.sh-Check ist damit eine echte, aber andere Absicherung: er schließt „Release-Start in bereits konfliktbehaftetem Arbeitsverzeichnis“ — nicht „Konflikt entsteht während des vom Skill dokumentierten Stash-Zyklus, der `release.sh` umschließt“. Genau Letzteres ist der in `edge-cases.md` dokumentierte Fall, und genau dort steht weiterhin die Ad-hoc-Message ohne Tag-Pflicht für den Fall eines gleichzeitig anstehenden Versionsbumps. → **Ticket ist teilweise gelöst, mit konkret benennbarer, noch offener Lücke in `edge-cases.md`.**
-
-**Pre-Mortem:**
-- 💀 Die Ergänzung in `edge-cases.md` wird geschrieben, aber der nächste Konflikt-Vorfall wiederholt sich trotzdem, weil die Ad-hoc-Recovery de facto von einer Ebene ausgeführt wird, die die Referenzdatei im Konfliktmoment nicht konsultiert. Gegenmaßnahme: Ergänzung an der bereits existierenden, nachweislich schon einmal konsultierten Stelle platzieren (Schritt 4 des bestehenden Abschnitts „Merge-Konflikt beim stash pop“, nicht ein neuer, separater Abschnitt) — dieselbe Stelle, die bereits für den BUG-80-Fix erfolgreich erweitert wurde.
-- 💀 Die neue Formulierung verlangt „Standard-Message + Tag, wenn Versionsbump aussteht“, aber die Erkennung „steht gerade ein Versionsbump aus?“ bleibt vage. Gegenmaßnahme: AK verlangt eine konkrete, prüfbare Erkennungsregel statt einer vagen Formulierung (AK2).
-- 💀 Bleibt Auto-Recovery (Commit+Tag) Standardverhalten statt Abbruch bevorzugt zu empfehlen, bleibt das Risiko bestehen, dass ein automatisch aufgelöster Konflikt in einer release-relevanten Datei (nicht nur PRODUCT.md, sondern z. B. `index.html`/`sw.js`) unbemerkt falschen Code committet und taggt — ein Tag ist danach nur noch mit `git tag -d`/Force-Push korrigierbar, während ein Abbruch vor jedem Commit risikofrei ist. Gegenmaßnahme: Abbruch als bevorzugte Standardreaktion dokumentieren, Auto-Recovery nur als eng definierte Ausnahme (AK3/AK4).
-
-**Akzeptanzkriterien** *(reines Dev-Tooling ohne App-Erlebnis — Effekt zeigt sich beim nächsten Release-Lauf mit Konflikt)*:
-- [ ] AK1 — In `references/edge-cases.md`, Abschnitt „Merge-Konflikt beim `stash pop`“ (bestehender Schritt 4) wird ergänzt: Ist zum Zeitpunkt des Konflikts bereits ein Versionsbump für ein laufendes Release vorbereitet, **bevorzugt der Ablauf einen sauberen Abbruch vor jedem Commit** (analog zur bereits etablierten Abbruch-Logik in `release.sh` Zeilen 66–92) statt eines automatischen Konflikt-Commits.
-- [ ] AK2 — Die Erkennungsregel „Versionsbump steht aus“ wird konkret und prüfbar formuliert (z. B. `APP_VERSION` in `web/index.html` gegen die zuletzt getaggte Version vergleichen), nicht als vage Beschreibung.
-- [ ] AK3 — Entscheidet sich Stephan/die ausführende Routine explizit gegen den Abbruch und für Auto-Recovery (z. B. weil der Konflikt nachweislich nur eine unkritische Doku-Datei wie `PRODUCT.md` betrifft), MUSS der resultierende Commit die Standard-Message `release: vX.Y.Z – <Beschreibung>` statt der bisherigen Ad-hoc-Message `merge: ...` verwenden, UND direkt im Anschluss `git tag vX.Y.Z` sowie Push von Commit und Tag ausgeführt werden.
-- [ ] AK4 — Edge Case: Betrifft der Konflikt nicht nur eine Doku-Datei, sondern eine für das Release selbst relevante Datei (`web/index.html`, `web/sw.js` oder `release.sh`), ist Auto-Recovery **nicht zulässig** — es gilt ausschließlich der saubere Abbruch, auch wenn ein Versionsbump bereits vorbereitet ist.
-- [ ] AK5 — Edge Case: `edge-cases.md` erhält an der Ergänzungsstelle einen expliziten Ein-Satz-Hinweis, dass der bestehende TASK-88-Pre-Check in `release.sh` (Zeilen 66–92) ausschließlich Konflikte abdeckt, die **vor** dem Start von `release.sh` bereits bestehen, und den hier behandelten `stash pop`-Fall (Konflikt entsteht **während** des vom `fotoalert-release`-Skill umschließenden Ablaufs) nicht abdeckt — damit künftige Leser die beiden Absicherungen nicht fälschlich für identisch halten.
-- [ ] AK6 — Die neue Formulierung wird sprachlich an das bestehende Muster des BUG-80-Zusatzes angeglichen, damit der Abschnitt als konsistente Abfolge von Pflichtprüfungen lesbar bleibt statt als lose angehängter Einzelfall.
-
-**AK-Qualitäts-Check:** Granularität (AK3 bündelt Standard-Message UND Tag+Push bewusst als ein AK, da beide untrennbar zusammengehören), Polarität (AK1↔AK3 Abbruch vs. korrekte Ausnahme, AK3↔AK4 Doku-Konflikt erlaubt vs. Code-Konflikt verbietet Auto-Recovery), Messbarkeit (alle AKs an konkreten Artefakten wie Commit-Message-Wortlaut, Tag-Vorhandensein, betroffene Datei festgemacht), Vier-Kategorien-Abdeckung (funktional AK1–AK4, Architektur/Konsistenz AK5–AK6, Performance/Sicherheit nicht relevant für dieses Doku-Ticket), Testbarkeit ohne Rückfrage (reines Dev-Tooling ohne Produktivcode-Pfad — Testplan bleibt ein gezielt nachgestellter Konfliktfall gegen AK1–AK4), Herkunftsnachvollziehbarkeit (jedes AK trägt seine Herkunft aus These-Bestätigung bzw. konkretem Pre-Mortem-Szenario).
-
-**Implementierungsoptionen:**
-(A, empfohlen) Abbruch bevorzugt, Auto-Recovery nur als eng definierte Ausnahme — Ergänzung von AK1–AK6 an der bestehenden Stelle in `references/edge-cases.md` (Schritt 4), keine Strukturänderung der Datei, ausschließlich Doku, kein Produktivcode betroffen, konsistent mit dem in `release.sh` bereits etablierten „Abbruch vor Mutation“-Prinzip, deckt beide im Ticket genannten Ziele (a) und (b) ab.
-(B) Nur Ad-hoc-Message durch Standard-Message+Tag ersetzen (nur AK3), Auto-Recovery bleibt Standard, kein Abbruch-Vorzug — kleinerer Diff, lässt aber das Risiko aus Pre-Mortem-Szenario 3 offen (automatisch aufgelöster Konflikt im Release-Träger selbst könnte weiterhin unbemerkt fehlerhaft getaggt werden) und erfüllt Ziel (a) des Tickets nicht, obwohl das Ticket es als gleichwertige Option nennt.
-
-**Ampel: 🟢 Grün** — Option A ist klar vorzuziehen, bleibt vollständig innerhalb des Tickets, ändert weder Architektur noch Produktivcode (reine Ergänzung in `edge-cases.md`), ist jederzeit verlustfrei über Git revidierbar, und das Pre-Mortem fand kein hohes Risiko, nur Doku-Hygiene-Risiken, die durch AK5/AK6 bereits adressiert sind.
-
-**Status-Update (2026-08-10):** Weg-Gate 🟢 → automatisch weiter nach **Ready for Dev**.
-
-## Implementierung (fotoalert-impl, 2026-08-10)
-
-**Umsetzung von Option A (AK1–AK6):** Kein App-Code betroffen — das Ziel dieses Tickets ist eine Doku-Ergänzung im Skill `fotoalert-release`, nicht im FotoAlert-Repo selbst. `references/edge-cases.md`, Abschnitt „Merge-Konflikt beim `stash pop`" wurde an Schritt 4 erweitert:
-- **AK1/AK4 (Abbruch bevorzugt):** Neue Fallunterscheidung vor dem Commit — ist ein Versionsbump für ein laufendes Release vorbereitet ODER ist die konfliktbehaftete Datei selbst `web/index.html`/`web/sw.js`/`release.sh`, wird nicht mehr automatisch aufgelöst/committet, sondern sauber abgebrochen und Stephan konfrontiert.
-- **AK2 (Erkennungsregel):** Konkret als Vergleich `APP_VERSION` in `web/index.html` gegen die zuletzt gepushte/getaggte Version formuliert, keine vage Beschreibung mehr.
-- **AK3 (Auto-Recovery-Ausnahme):** Bei explizitem Stephan-Wunsch trotz Doku-Konflikt jetzt Pflicht: Standard-Message `release: vX.Y.Z – <Beschreibung>` statt `merge: ...`, plus sofortiges `git tag vX.Y.Z` + Push von Commit und Tag.
-- **AK5 (Abgrenzung):** Eigener Absatz erklärt, dass der release.sh-Pre-Check (Zeilen 66–92) nur Konflikte VOR Skriptstart abdeckt, nicht den hier behandelten `stash pop`-Fall.
-- **AK6 (Konsistenz):** Neuer „Real (TASK-88): …"-Absatz im selben Stil wie der bestehende „Real (BUG-80): …"-Absatz ergänzt, damit der Abschnitt als konsistente Pflichtprüfungs-Abfolge lesbar bleibt.
-
-**Ausgeliefert:** Aktualisiertes Skill-Paket `fotoalert-release.skill` per Chat an Stephan gesendet (Claude kann Skill-Dateien in dieser Session nicht dauerhaft selbst ändern — die Installation muss Stephan im Client bestätigen, analog TASK-101).
-
-**Selbst-Verifikation gegen AK1–AK6:** Diff gegen die editierte `edge-cases.md` gelesen und Punkt für Punkt gegen jedes AK geprüft (alle 6 vorhanden, keine Auto-Test-Möglichkeit, da reine Prozess-Doku ohne Codepfad — siehe AK-Qualitäts-Check in der Analyse).
-
-**Status-Update (2026-08-10):** → **In Test** — wartet auf Stephans Bestätigung, dass das ausgelieferte Skill-Paket installiert wurde und die neue Fallunterscheidung inhaltlich passt.
-
-**Abschluss (2026-08-10):** Stephan hat die Installation des Skill-Pakets im Chat bestätigt ("Skill installiert"). Hinweis zur Grenze dieser Bestätigung: Der Inhalt der installierten Datei auf Stephans Account kann von hier aus nicht mehr automatisiert nachgeprüft werden (Skills sind in dieser Sitzung nur über einen Nur-Lese-Sitzungscache einsehbar, keine Live-Sicht auf sein Konto) -- die Bestätigung stützt sich auf seine Aussage, nicht auf einen eigenen Nachweis.
 
 ---

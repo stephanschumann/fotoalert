@@ -28968,3 +28968,597 @@ Betroffen ist ausschließlich `web/index.html` (Frontend-JS, kein Backend-Python
 > Ursprünglicher Inhalt der Done-Zeile im Gate-Board von BACKLOG.md, wörtlich übernommen. Im Board stehen seitdem nur noch die Ticket-IDs.
 
 **BUG-113** *(Nacharbeit nach Standort-Anlage friert den Server nicht mehr ein — v1.23.1/v1.23.2, 2026-09-28)* · **TASK-54** *(Festplatten-Cache Wetterkarten-PNGs — Implementierung + 8/8 neue Tests grün, volle Offline-Regression 580 passed/1 vorbestehend-unabhängig, manueller Neustart-Test von Stephan bestätigt, released v1.22.65 (Commit 99b4efd), GitHub-Actions-Lauf #325 grün (3m 33s), Health-Check bestätigt version 2.0.0/locations_count 172, Live-Verifikation im Browser bestätigt, 2026-08-17)* · **TASK-58** *(Refactoring mkCloudCompassSvg() in 9 Helferfunktionen, alle 10 AK bestanden, Gate-Auditor bestätigt, released v1.22.62, CI-Fehlalarm durch Zeitzonen-Randfall im Test aufgeklärt (nicht code-verursacht) und per Re-Run grün bestätigt, Live-Verifikation ok (Health-Check, alle 9 _cc*-Helfer live vorhanden), 2026-08-10)* · **TASK-89** *(Caddy-Log-Verzeichnis-Berechtigung bei Server-Neuaufbau: Schutz-Block in deploy/setup_server.sh war bereits vorhanden (Commit fb35944/v1.22.46), Release-/Commit-Stand nachtraeglich ueber die oeffentliche GitHub-Weboberflaeche verifiziert (kein offener Diff, Fix bestaetigt live auf main), kein Code-Deploy noetig, 2026-08-09)* · **US-134** *(Bestätigen-Button neben allen 4 Koordinaten-Eingabefeldern, zweiter Auslöseweg zusätzlich zum bestehenden Blur-Schwenk aus US-133; Test: 10/11 AK sofort gruen, AK7-Doppelaufruf-Bug gefunden und per onmousedown="event.preventDefault()" behoben, danach alle 11 AK bestaetigt; separate Verifikation: Bestaetigt; Refactor abgeschlossen; released v1.22.61, Deploy verifiziert (Health-Check ok, Live-Verifikation im Browser: Bestaetigen-Button + Kartenschwenk nach Cache-Bereinigung eines aktiven Service Workers bestaetigt), 2026-08-09)* · **TASK-101** *(Skill-Qualitäts-Audit — AK-Qualitäts-Check-Ergänzungen für fotoalert-analyze/fotoalert-orchestrator ausgeliefert und von Stephan installiert, 2026-08-09)* · **BUG-99** *(Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung — Weg-Gate beantwortet, Option A implementiert (`WEATHER_OVERLAY_MAX_TOTAL_SECONDS` in `_fetch_weather_and_aerosol()`), Verifikationsfund 2026-08-04: ursprünglicher 60s-Startwert war bei der echten Location-Zahl (~315-319, nicht die eingefrorenen 9 aus der alten Prod-Kopie) bereits für einen fehlerfreien Lauf zu niedrig (Grundzeit ≈104s) — auf 180s korrigiert, neuer Regressionstest ergänzt, volle Backend-Testsuite auf dem echten Mac-Repo grün (744 passed, 1 vorbestehender/unabhängiger Fund in `test_ephemeris_engine.py`, 1 dokumentiertes, vorbestehendes xfail, 5 skipped ohne Playwright), Rauchtest gegen den echten laufenden Server von Stephan bestätigt ("passt"), released v1.22.57, Deploy verifiziert (Health-Check ok, realer Lauf mit 142s Laufzeit erfolgreich innerhalb der neuen 180s-Grenze), 2026-08-04)* · **BUG-93** *(Kalender-Vollneuberechnung nach `ALGORITHM_VERSION`-Bump berechnete 0 Events statt vollständig neu — `_init_calendar_pass()` gibt `existing_meta` jetzt als 5. Rückgabewert zurück (Option A), `compute_calendar_incremental()` nutzt diesen statt seiner alten Kopie, Single-Location-Pfad (BUG-29) unverändert, 3 automatisierte Tests (`test_bug-93.py`) + Pflicht-Regression `test_bug29_calendar_single_recompute.py` 7/7 grün, zwei echte `/refresh-calendar`-Läufe auf Stephans Mac zeigten 387.610 Events über ~315 Locations statt der 0, die den Bug ausmachten, von Stephan bestätigt ("passt"), released v1.22.55 Commit 854c23f, CI grün, `refactor_check.py` sauber, Live-Verifikation im Jahreskalender August 2026 bestätigt (173 echte Chancen statt 0; ein zeitgleich beobachteter, unabhängiger Server-Hänger durch Wetterdienst-Rate-Limit in der täglichen Feed-Vorberechnung als eigenständiges Folgeticket erfasst (Analyse: siehe „In Analysis"-Spalte)), 2026-08-03)* · **BUG-96** *(🔴 Kritisch, Produktions-Ausfall: `/locations` 500 durch Pydantic-Validierungsfehler in `LocationOut` (korrupte `ideal_azimuth_min`/`focal_length_suggestions`-Werte bei 24 custom_-Locations) — erster Fix griff nicht (falscher Ansatzpunkt), echter Fix in `_loc_to_out()` (Commit 64c9f8f, CI-Run #287), per Chrome live verifiziert (Karte/Locations-Tab/Feed wieder normal), Root-Cause als historisch identifiziert (Spalten-Verschiebungsfehler, im aktuellen Code nicht mehr reproduzierbar), 24 korrupte DB-Zeilen bereinigt, Service neugestartet, Health-Check grün, 2026-08-03)* · **BUG-92** *(Kalender verwendete serverseitig eine höhere Mindest-Wahrscheinlichkeitsgrenze (0,40) als der Feed (effektiv 0,35), wodurch Termine mit Score 0,35–0,40 im Kalender nie berechnet wurden, unabhängig von jeglicher Nutzer-Filtereinstellung — Grenze in allen vier Fundstellen (`backend/main.py` 3×, `backend/precompute.py` 1×) auf 0,35 angeglichen, 9 automatisierte Tests (`backend/tests/test_bug92.py`), unabhängige Verifikations- und Refactor-Phase durchgeführt, released v1.22.53 Commit b9fdf66, CI grün nach einem bestätigten Flake-Re-Run (Frontend-Check), Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation im Browser bestätigt (Jahreskalender August 2026: 3075 Chancen bei ≥35% vs. 2732 bei ≥40% — das vorher komplett ausgeblendete 0,35–0,40-Band ist jetzt sichtbar), 2026-08-01)* · **TASK-86** *(Offene Endpunkte gegen Missbrauch härten: Rate-Limiting für Planungs-Endpunkt/Login/Geräte-Registrierung + Kalender-Cache-Normalisierung mit Höchstgröße, unterwegs entdeckte X-Forwarded-For-Spoofing-Lücke in client_identity() geschlossen, released v1.22.44 + Nachbesserung v1.22.45 (CI-Regressionen: Token-Testdatenlänge, preview_alignment Direktaufruf-Kompatibilität), CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-23)* · **BUG-81** *(Gespeicherte/reflektierte XSS über ungefilterte Text-/Beschreibungsfelder unterbunden, neue Escape-Helfer esc()/isSafeUrl()/escJsAttr(), Nachbesserungsrunde nach Testfund (10 weitere Fundstellen), Nebenbefund (Textsuche wirkt nicht in Kartenansicht) als eigenes Ticket ins Backlog ausgelagert, released v1.22.38, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-84** *(Leaflet + astronomy-engine self-hosted, CSP verschlankt, released v1.22.37, CI grün, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-83** *(Login-Ticket via HttpOnly/Secure/SameSite=Lax-Cookie statt Browser-Speicher, `fa_api`-Freitextfeld durch feste Auswahl ersetzt; unterwegs ein Safari-spezifischer Cookie-Bug gefunden+behoben (Secure-Flag nur in Produktion) und ein versehentlich mitgereister Vendor-Pfad aus einem parallel laufenden, noch nicht fertigen Ticket im Release-Commit per Folgecommit korrigiert; alle 9 AKs manuell bestätigt (Chrome+Safari), 10/10 automatisierte Tests grün, released v1.22.36 + 1 Fix-Commit, Health bestätigt version 2.0.0/locations_count 172, 2026-07-17)* · **TASK-82** *(Schutz-Header + CSP live ausgeliefert (Caddy), Option B inkl. automatischem Konfig-Abgleich in deploy.sh, zwei CSP-Nachbesserungsrunden (connect-src) nach Live-Browser-Test, released v1.22.35 + 2 Folgecommits, Health bestätigt version 2.0.0/locations_count 172, 2026-07-16)* · **TASK-80** *(Kopfkommentar in `.forgejo/workflows/deploy.yml` als inaktiv gekennzeichnet — Codeberg/Forgejo-Pipeline wird nicht mehr genutzt, GitHub Actions ist einzige aktive Deploy-Pipeline; BUG-79-Fix bewusst nicht portiert, kein Deploy nötig, reine CI-Doku-Änderung, 2026-07-15)* · **TASK-41** *(_run_single_location_flow() in backend/precompute.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, inkl. Nachbesserungsrunde für fehlendes Fehlerhandling in 2 Helfern nach unabhängiger Verifikation, released v1.22.31, CI-Lauf #230 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **TASK-51** *(startup() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.30, CI-Lauf #228 grün, Health bestätigt version 2.0.0/locations_count 164, 2026-07-15)* · **BUG-79** *(CI-Ephemeriden-Download gecacht + timeout-abgesichert (actions/cache, Key de421-bsp-v1), irreführender Kommentar + Marker-Fehlklassifizierung bei test_moon_earth_distance_in_physical_range korrigiert, released Commit d699644, CI-Run #227 nach Re-Run grün (Cache-Hit + Download korrekt übersprungen verifiziert), Health bestätigt version 2.0.0/locations_count 161, kein Frontend-Versionsbump nötig, 2026-07-14)* · **TASK-60** *(patch_location() in backend/main.py in 4 Helferfunktionen aufgeteilt, kein Verhaltensumbau, released v1.22.29, CI-Lauf #226 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-76** *(6 Helper aus `_apply_weather_to_event()`/`_fetch_weather_and_aerosol()` extrahiert, kein Verhaltensumbau, released v1.22.28, CI-Lauf #223 nach Re-Run grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14 — erster CI-Lauf deckte vorbestehenden, unabhängigen Ephemeriden-Download-Bug in test_astronomy_regression.py auf, Folgeticket vorgesehen)* · **TASK-77** *(Cleanup bei Location-Löschung: QA-Daten (location_qa_state/location_qa_values) werden jetzt sowohl beim harten Löschen als auch beim Softlöschen/Tombstonen mitentfernt (Option B), released v1.22.27, CI-Lauf #221 grün, Health bestätigt version 2.0.0/locations_count 161, zusätzlich manuell bestätigt für beide Löscharten, 2026-07-14)* · **TASK-78** *(QA-Teilerfolg konsistent behandeln: Prüf-Eintrag wird bei Teilfehler immer nachgezogen, Option B, PRAGMA busy_timeout ergänzt, released v1.22.26, CI-Lauf #219 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-62** *(Klärung: 60 fehlende QA-Werte + 15 verwaiste `location_qa_values`-Einträge — Diagnose abgeschlossen, kein Code-Deploy nötig; `MISTRAL_API_KEY` live am Server bestätigt nicht gesetzt, Option C umgesetzt inkl. zwei Folge-Tickets in der Inbox, 2026-07-14)* · **US-132** *(Rote Wolken: neuer Event-Typ RED_CLOUDS für hohe Wolken in Sonnenrichtung bei Sonne unter dem Horizont, inkl. symmetrischem „Blaue Stunde Morgen"-Block, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **US-131** *(Wolken-/Dunstabfrage für Himmelsröte & Goldene Wolken: Projektion entlang der Sichtachse statt Fotografen-Standort, Option B — vollständig, inkl. Wetter-API-Drosselung Semaphore+Pacing, released v1.22.24, CI-Lauf #213 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-14)* · **TASK-63** *(Epic: Automatisiertes Regressionstesting — alle 8 Kind-Tickets Done, direkt von Stephan freigegeben, kein eigener Code, 2026-07-13)* · **TASK-73** *(US-130-Nacharbeit: Aerosol-Signal im Fast-Path + fehlender Job-Status-Test behoben, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **TASK-74** *(Refactoring: lange Funktionen _weather_overlay()/_generate_cloud_mood_events() aufgeteilt, released v1.22.23, CI-Lauf #211 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **US-130** *(Himmelsröte: Aerosol-/Dunst-Signal, released v1.22.22, CI-Lauf #209 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-13)* · **BUG-77** *(Live-Wetter-Abruf für Himmelsröte scheitert still, Fix in `_weather_overlay()`, released v1.22.21, CI-Lauf #207 grün, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **TASK-72** *(Bestehende Tests nachträglich mit pytest-Markern taggen – Altbestand, released Commit 6cf7d79, CI-Lauf #205 grün, Health bestätigt version 2.0.0/locations_count 161, enthält nachgeholten TASK-70-Rest, 2026-07-12)* · **TASK-61** *(Backup-Mechanismus auf alle 8 DB-Tabellen erweitert, Option B, released v1.22.20, live bestätigt: Precompute-Trigger + alle 8 Dateien im Backup-Repo, 2026-07-12)* · **TASK-67** *(PRODUCT.md-Pflicht-Regression, voller Scope inkl. TASK-69-Zusammenlegung, released CI-Lauf #199, Health bestätigt version 2.0.0/locations_count 161, 2026-07-12)* · **BUG-76** *(Scout-Ausgrauen-Fix für Hat-Beispielbild-Filter, direkt im Zuge von TASK-67 released, 2026-07-12)* · **TASK-70** *(Smoke-Test-Marker + Marker-Pflicht für neue Tests, kein Deploy nötig, `pytest --markers` + `pytest -m smoke` real verifiziert, 2026-07-12)* · **BUG-75** *(Live-Astro-Übersicht: Datum/Uhrzeit-Übernahme + Mittelpunkt-Slider korrigiert, released v1.22.18, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-66** *(E2E-Ausbau: echte Klick-Durchläufe im Playwright-Check, released v1.22.17, CI-Lauf #191 grün, Health bestätigt locations_count 160, 2026-07-11)* · **TASK-64** *(Backend-pytest-Suite als CI-Pflicht-Gate vor jedem Deploy, verifiziert im echten CI-Lauf v1.22.12, GitHub Actions #Backend-Tests grün in 2m 11s, Deploy + Health-Check ok, 2026-07-11)* · **BUG-73** *(US-120-Nachtrag-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-74** *(US-125-Test, Sandbox-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **TASK-68** *(Ephemeris-Passagen-Test, transienter CI-Fehlalarm bestätigt, verifiziert im selben echten CI-Lauf v1.22.12, 2026-07-11)* · **BUG-68** *(Flag-Flip in LOCATION_FIELD_RULES, released v1.22.10, Health bestätigt locations_count 160, 2026-07-11)* · **BUG-70** *(Journal-Warnung „database disk image is malformed" beim Service-Start, QA-Values — Option A umgesetzt, released v1.22.9, live bestätigt 2026-07-10 22:38 UTC)* · **US-129** *(Filter „Hat Beispielbild" für Locations, Karte, Feed und Kalender, released v1.22.8, 2026-07-10)* · **BUG-66** *(Höhenwinkel Spitze berücksichtigt jetzt Geländeunterschied, released v1.22.4, 2026-07-09)* · **US-127** *(Beispielbild bereits bei der Neuanlage einer Location hochladbar, released 2026-07-09, Health-Check bestätigt version 2.0.0)* · **US-85** *(Sichtfeld-Trichter mit gestrichelter Verlängerung, released v1.22.2, 2026-07-08)* · **BUG-65** *(Hinweise-Feld in Detailansicht + Neuanlage-Maske, released v1.22.1, 2026-07-07)* · **US-09** *(Sichtachsen-Check – Hinderniserkennung, released v1.22.0, 2026-07-06)* · **US-21** *(App-Beschreibung, Onboarding + ⓘ-Erklärungen an allen zentralen UI-Elementen inkl. Detail-Sheets/Kartenlegende/Glossar, released v1.21.9, 2026-07-06)* · **TASK-57** *(refactor_check.py: Wurzelursache der Falsch-Positive behoben, kein Deploy nötig, 2026-07-05)* · **US-117** *(Karten-Tab öffnet mit GPS-Standort + 5-km-Radius, released v1.21.4, 2026-07-05)* · **TASK-56** *(DB-Snapshot-Ordner aus Git-Tracking genommen, .gitignore ergänzt, kein Deploy nötig, 2026-07-05)* · **US-125** *(Host kann Beispielbild löschen, released v1.21.3, 2026-07-05)* · **US-126** *(Host kann Bildausschnitt/Fokuspunkt selbst wählen, released v1.21.3, 2026-07-05)* · **BUG-57** *(Verwaiste Testdatei test_us72_weather_map.py entfernt, kein Deploy nötig, 2026-07-05)* · **BUG-60** *(Hinweise-Feld bei Neuanlage leer, released v1.21.2, 2026-07-04)* · **US-124** *(Vollbild-Modus Anlege-Karte, released v1.21.2, 2026-07-04)* · **US-120** *(Beispielbild-Upload, Host-Upload + Hoch-/Querformat mittig + Löschen-Kaskade, released 2026-07-04)* · **US-119** *(Feed-Standardfilter Wahrscheinlichkeit ≥70%, released v1.20.22, 2026-07-04)* · **BUG-61** *(Motivname serverseitig zur Whitelist hinzugefügt, released 2026-07-04)* · **US-123** *(Kartenansicht-Umschalter Satellit/Standard für Location-Karten, released v1.20.20, 2026-07-04)* · **US-121** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **US-122** *(Dublette geschlossen, kein Code geändert, 2026-07-04)* · **BUG-59** *(Wetter-Overlay bei leichtem Wetter sichtbar, Schwellwert-Deckkraft, released v1.20.18, 2026-07-04)* · **TASK-53** *(Dev-Sync-Werkzeug Live→Dev, committed 2026-07-04, kein Deploy nötig)* · **BUG-58** *(Wolken-/Niederschlag-Umschalter zoomt auf 50-km-Radius statt Europa, released 2026-07-04)* · **US-87** *(Vollbild-Overlay Bearbeiten-Karte, released 2026-07-03)* · **BUG-56** *(Astronomie-Regressionstest korrigiert, released 2026-07-03)* · **US-113** *(Himmelsröte-Chance nur bei Sichtachse im Gegenpunkt-Sektor der Sonne, released 2026-07-02)* · **US-72** *(Wetterkarte Grid-Overlay + Slider, released 2026-07-01)* · **US-112** *(Wetter-Overlay DWD ICON-D2/EU + MET Norway, weicher Verlauf, released 2026-07-01)* · **BUG-55** *(Wetterkarte Auto-Zoom-Fix, released 2026-06-30)* · **BUG-54** *(Sections._def Goldene Wolken/Himmelsröte + Position, released 2026-06-30)* · **US-109** *(Goldene Wolken & Himmelsröte, released 2026-06-30)* · **US-108** *(Azimut-Filterung Mondauf/-untergang, released 2026-06-30)* · **US-07** *(Golden Cloud Score, released 2026-06-30)* · **BUG-48** *(Round-Robin-Cap im /opportunities-Feed, released 2026-06-29)* · **BUG-49** *(Doppeltes Suchfeld entfernt, released 2026-06-29)* · **BUG-50** *(HINWEISE-Feld speicherbar, released 2026-06-29)* · **BUG-52** *(GPS-Dialog nur einmal pro Session, released 2026-06-29)* · **BUG-53** *(Pin-Emoji nicht mehr in Location-Namen, released 2026-06-29)* · **BUG-72** *(US-66-Endpoint-Schutz-Test, behoben durch ensure_seed_location-Fixture, kein Deploy nötig, 2026-07-11)* · **BUG-51** *(Entfernungsfilter Locations-Tab, released 2026-06-29)* · **US-107** *(Sonnen-Alignment, released 2026-06-29)* · **US-106** *(v1.19.5 released 2026-06-28)* · **BUG-47** · **BUG-46** · **TASK-45** · **TASK-47** · **TASK-48** *(Epic Datensync, v2.0.x released 2026-06-28)* · **BUG-34** *(iOS-Zoom Fix, released 2026-06-28)* · **TASK-42** *(Falsch-Positiv, kein Handlungsbedarf, 2026-07-03)* · **BUG-84** *(Kategorie- und Schwierigkeitsgrad-Anzeige im Bearbeiten-Formular korrigiert (`category_key`-Feld ergänzt) und Persistenz beim Speichern nachgerüstet (Backend verwarf beide Felder trotz Erfolgsmeldung), Scope während Analyse um `difficulty` erweitert; Nachbesserungsrunde nötig (CI-Fehlschlag durch `.get()`-None-Handling in `store.py` bei frischem Checkout + fehlende README-Marker-Zeilen), released v1.22.47 + Nachbesserung Commit bc4ab35, CI grün, Health bestätigt version 2.0.0/locations_count 172, Live-Verifikation (Anzeige + echtes Speichern/Zurücksetzen) bestätigt, 2026-07-27)* · **BUG-91** *(Filter „Mond-Alignment"-Chip zeigt jetzt zusätzlich Vollmond-/Supermond-Ereignisse mit gutem Alignment zum Motiv (±2°, bestehende `ALIGNMENT_TOLERANCE_DEG`-Toleranz wiederverwendet) in Feed, Kalender UND Karte, Beschriftung bleibt unverändert „Vollmond"/„Supermond" — reine Frontend-Filterlogik-Erweiterung (`Filter._matchesExpandedType()`), kein Backend-/Datenmodell-Change, Scout unberührt, released v1.22.50, CI grün, Health-Check ok, Live-Verifikation im Browser bestätigt (Mond-Alignment-Filter zeigt gut ausgerichtete Vollmond-Nächte, weiterhin korrekt als „Vollmond" beschriftet), 2026-07-29)* · **BUG-90** *(Kompositions-Analyse-Sektion erscheint jetzt auch bei Mondaufgang-/Monduntergang-Ereignissen (Höhe Himmelsobjekt + Versatz in Metern und Grad), released v1.22.49, Commit d555a70, GitHub Actions Run #268 grün, Health-Check bestätigt version 2.0.0/locations_count 171, Live-Verifikation an zwei Mondaufgang/-untergang-Events per Chrome-Browser bestätigt, 2026-07-30)* · **BUG-94** *(Kartentitel bei Wolkenstimmungs-Chancen (Rote Wolken/Goldene Wolken/Himmelsröte) nennen jetzt das Motiv statt nur den Event-Typ (Muster „Event-Typ über Motiv"), zentraler Titel-Baustein _build_opportunity_title() + zweiter, generischer Konsistenz-Wächter-Test für das separate opportunity.py-Baumuster (deckt alle künftigen Chancenarten automatisch ab), released v1.22.52 + Nachbesserung Commit 5f1ae66 (CI-Regression durch geteilte Test-Fixture-Nebenwirkung behoben, README-Marker-Lücke geschlossen), CI grün (707 passed/5 skipped/0 failed), Health-Check grün, Live-Verifikation im Browser bestätigt (~30/31 geprüfte Karten korrekt, 1 Einzelfall als eigenständiges Folgeticket in der Inbox erfasst), 2026-07-31)* · **TASK-90** *(Genereller In-Flight-Dedup in `API.get()` gegen mehrfache gleichzeitige /opportunities-Abrufe beim App-Start (Option A), Live-Browser-Verifikation durch gate-auditor bestätigt (AK1/AK2/AK4/AK5/AK6 sowie AK3 real reproduziert), im Zuge des zeitgleichen US-134-Release (v1.22.61) mitgenommen, Live bestätigt (`API._inflightGet` aktiv, Health-Check ok, locations_count 172), 2026-08-09)* · **TASK-93** *(41 echte Alt-Tickets aus dem Erledigt-Block als vollwertige Sektionen nachgerüstet, 23 weitere waren bereits im Archiv erfasst, ursprüngliche 147er-Zahl widerlegt, 2026-08-10)* · **TASK-91** *(Testzeitpunkt in test_task67_feed_regression.py auf festes Datum gepinnt, echter pytest-Lauf 7/7 gruen bestaetigt, 2026-08-10)* · **TASK-94** *(main.py::_load_custom_locations() nutzt jetzt coerce_category_value() + Pro-Eintrag-Absicherung, echter pytest-Lauf 4/4 gruen + volle Regressionssuite ohne dadurch verursachte neue Fehlschlaege, 2026-08-10)* · **TASK-88** *(Skill-Doku-Update fotoalert-release/edge-cases.md ausgeliefert und von Stephan installiert bestaetigt, 2026-08-10)* · **TASK-103** *(PATCH /locations auf Host beschraenkt, aus dem Security-Sammelticket ausgegliedert; ueber einen fremden Sammel-Release versehentlich zurueckgesetzt (Commit 23af8cf, fehlende Testdateien liessen 31 Tests brechen), am 2026-08-11 korrekt mit allen Testdateien neu veroeffentlicht, echter pytest-Lauf 99/99 gruen, released v1.22.64 (Commit 5fc04f9), CI gruen (Lauf #315), 2026-08-11)* · **TASK-95** *(Health-Check-Feldbeschreibung ergänzt — klärt, dass das version-Feld eine Backend-Schemaversion ist, keine App-Release-Version; echter pytest-Lauf + volle Regressionssuite grün, released im Sechs-Ticket-Bundle (Commit 8af2694 + Korrektur-Commit 23af8cf nach CI-Rotfund, s. main.py-Zwischenstand-Fund), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, offener Punkt: fotoalert-release-Skilltext AK4 noch nicht angepasst, 2026-08-10)* · **TASK-96** *(Pytest-Marker requires_full_checkout für teil-checkout-abhängige offline-Tests + automatisierter Konsistenztest ergänzt (inkl. Nachbesserung tools/docs), echter pytest-Lauf 10/10 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-97** *(CI-Diagnostik bei Login-Precondition-Fehlern erweitert (Server-Log + Vor-Login-Screenshot + Diagnose-Helfer in beiden Login-Pfaden), echter pytest-Lauf 2/2 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-99** *(Feste Berlin/Brandenburg-Scope-Sprache in Doku/Kommentaren an den tatsächlichen, geografisch erweiterten Ist-Zustand angeglichen, reine Textänderung ohne Verhaltenseffekt, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-100** *(_fetch_weather_and_aerosol() weiter aufgeteilt (104→59 Zeilen, neuer Helfer _run_weather_fetch_tasks_with_ceiling() 78 Zeilen, beide unter dem 80-Zeilen-Schwellwert), Signatur + alle TASK-76-Helfer/Aufrufer unverändert, echter pytest-Lauf 20/20 grün, released im Sechs-Ticket-Bundle (Commit 8af2694/23af8cf), CI grün (Lauf #313), Health-Check + Live-Verifikation bestätigt, 2026-08-10)* · **TASK-98** *(release.sh gehärtet: Pathspec-Fix + Versions-Verifikation, released im Sechs-Ticket-Bundle (Commit 8af2694) + separater Ausführbar-Recht-Fix (Commit 64b8f54), CI grün (Lauf #313), Board-Status-Korrektur am 2026-08-13 nachgezogen (stand fälschlich weiter auf „Bereit zur Veröffentlichung"), 2026-08-10)* · **TASK-87** *(Sicherheits-Sammelticket abgeschlossen: SSH-Fingerabdruck-Pruefung per Secret SERVER_KNOWN_HOSTS statt Live-Scan, StrictHostKeyChecking=yes, drei Deploys in Folge erfolgreich (CI-Laeufe #313/#314/#315), Fehlermeldungen/Upload-Pruefreihenfolge/Systemdienst-Haertung sowie Host-only-Bearbeitung gespeicherter Orte bereits in den ausgegliederten Folge-Tickets umgesetzt, Sicherheitsluecken-Scan durchgefuehrt (Umsetzung als eigenes, noch offenes Ticket vorgemerkt), 2026-08-11)* · **BUG-104** *(Wolkenstimmung-Berechnung golden_cloud_score_sun_dir/_antisolar_dir lieferte für alle Chancen null — Root-Cause Cache-Key-Rundung der Projektions-Koordinaten (3→2 Dezimalstellen, Option A), 7 neue Tests + 48 Regressionstests grün, unabhängig verifiziert, refactored, released Commit 47b1fc5 (CI-Lauf #310 grün), doppelt live nachgewiesen: Nachtest 2026-08-11 04:01 UTC zeigt `/job-status` status done/last_error null/duration_s 76.4 (unter dem 180s-Budget) und 10/10 relevante Chancen mit geladenem Wetter mit gesetztem Richtungswert (vorher direkt nach Deploy 3/53); AK5b nur indirekt gestützt (kein exakter 429-Zähllauf), AK6 code-/datenseitig bestätigt ohne separaten UI-Screenshot, 2026-08-11)* · **TASK-102** *(Fehlermeldungen/Upload-Pruefreihenfolge mit echten Tests bestaetigt, Systemdienst-Haertung ueber das Veroeffentlichungs-Protokoll verifiziert (automatischer Gesundheits-Check nach Neustart bestand, kein Rollback ausgeloest) statt per direktem Server-Zugriff, released v1.22.64/40222bd, CI gruen (Lauf #316), 2026-08-11)* · **TASK-02** *(Vier neue Finsternis-Event-Typen (Sonnen-/Mondfinsternis total/partiell) im Kalender, 19/19 automatisierte Tests grün, Live-Verifikation bestätigt, erster Release-Commit ec05ce4 mit Scope-Fehler (Test-Gate verhinderte Deploy), korrigiert per Nachtrag-Commit b54ddbb, GitHub-Actions-Lauf #321 grün, Health-Check version 2.0.0/locations_count 172, 2026-08-16)* · **BUG-89** *(Wetter-Score/Wolkenstimmung: Inline-Hinweis, dreifach bestätigt (08.08./13.08./16.08.), bereits seit 2026-08-05 live v1.22.58 (Commit b589e0b), kein weiterer Deploy nötig, 2026-08-16)* · **BUG-56** *(Astronomie-Regressionstest Sonnenauf-/-untergang Berlin korrigiert, Commit 74c957f, released v1.20.14, Ticket-Status war bereits seit 2026-07-03 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-62** *(Wetter-Filter/Kartenmodus-Umschalter-Überlappung auf schmalen Bildschirmen behoben (Icon-Buttons), Commit b66ac09, released v1.21.5, Test bestätigt (Stephan, 2026-07-05), Ticket-Status war bereits seit 2026-07-05 Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-64** *(Platzhaltertext ‚Automatisch erfasst via Quick Location Capture.' im Hinweise-Feld bei Bestands-Locations per Cleanup-Skript bereinigt (57 Locations), Commit f35c603, released v1.21.11, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **BUG-82** *(Kartenfilter-Sync: Textsuche wirkt jetzt auch in Kartenansicht, beim Locations-Tab-Wechsel und im Scout, Commits 7e31cbb/ea7441b, released v1.22.39, Ticket-Status war bereits Done — Gate-Board listete die ID nur fälschlich weiter in der Inbox-Lane, Korrektur 2026-08-16)* · **TASK-104** *(Sicherheitsluecken-Bump: `PyJWT`→2.13.0, `cryptography`→49.0.0, `Pillow`→12.3.0, `python-multipart`→0.0.20, `pytest`→9.0.3 — 5 von 7 Paketen. `starlette` bewusst nicht gebumpt (Stephans Entscheidung Option B, bleibt transitiv ueber fastapi==0.111.0 bei 0.37.2, kein offener Punkt mehr), released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, 2026-08-16)* · **TASK-105** *(Python 3.9→3.12-Vereinheitlichung — Fund: Produktionsserver lief entgegen bisheriger Doku bereits seit Juni 2026 auf Python 3.12, urspruenglich geplante separate Stufe-2-Server-Migration dadurch nicht mehr noetig; CLAUDE.md Zeile 103 korrigiert; ein serverseitiger venv-Swap-Testversuch (Shebang-Pfad-Bug) fehlgeschlagen und sauber zurueckgerollt, kein bleibender Schaden; beide GitHub-Workflows (deploy.yml, update-building-data.yml) auf python-version 3.12 gepinnt, released im TASK-104/105-Kombi-Release Commit 8db8e5d, GitHub-Actions-Lauf #323 gruen, Health-Check bestaetigt version 2.0.0/locations_count 172, Locations-Ansicht laedt echte Daten, 2026-08-16)* · **TASK-107** *(run_frontend_check.py: Onboarding-Dismiss deckt calendar_shows_events_or_empty_state/bug88_feed_data_ready bei kaltem Serverstart nicht ab, Fund per Live-Chrome-Verifikation 2026-08-17, Option B umgesetzt — Verifikation von Stephan final bestätigt, 2026-08-17)* · **BUG-97** *(Alignment-Regressionstest test_bug63.py liefert leere Liste trotz Docstring-Zusage „datumsunabhängig", befristet xfail um BUG-96-Hotfix nicht zu blockieren, Fund aus BUG-96-Notfallbehebung 2026-08-03; Implementierung 17.08.2026 verifiziert, Regressionstest korrigiert, alle Tests grün, von Stephan final bestätigt)* · **BUG-101** *(Scout-Zugänglichkeitsprüfung erkennt nur Gebäude-Verdeckung, keine Bäume/Wald in der Sichtachse, Fund aus Live-Test von US-135, Schloss Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-102** *(Motiv-Koordinaten SUBJECTS frieren beim Serverstart ein, Scout-Chancen ignorieren nachträgliche Koordinatenkorrekturen, Fund bei Einsteinturm; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-103** *(Scout-Zugänglichkeits-Cache prüft beim Wiederverwenden gespeicherter Einträge nicht, ob sie zum aktuellen Programmstand passen, Fund aus US-135-Test, Pfaueninsel; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-106** *(Wetter-Overlay: kalter Cache nach Server-Neustart kollidiert mit dem 180s-Zeitbudget aus BUG-99, viele Events ohne Wetterdaten, Fund per Server-Log-Verifikation 2026-08-11; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-95** *(Einzelne Wolkenstimmungs-Karte (Berliner Dom – Lustgarten Spreeseite) zeigt trotz BUG-94-Fix weiterhin nur Event-Typ statt Motiv im Titel, Ursache noch ungeklärt, Fund aus Live-Verifikation von BUG-94; Implementierung 17.08.2026 verifiziert, Tests ergänzt, alle Tests grün, von Stephan final bestätigt)* · **BUG-105** *(Test test_bug85_..._is_intentional fiel im Zeitfenster ~22:00–00:00 UTC fälschlich rot, Fund aus TASK-58-Release-Nachbereitung; Zeitzonenberechnung in `_inject_tomorrow_only_entry()` war bei Implementierungs-Verifikation 17.08.2026 bereits per `zoneinfo` auf Berlin-Mittag fixiert (Option A), `pytest tests/test_bug_85.py` → 3 passed, von Stephan bestätigt 17.08.2026) · **BUG-87** *(Badge-Wortlaut „Geprüft"/„Nicht geprüft" kollidierte zwischen Host-Verifikation und Sichtachsen-Datenverfügbarkeit — bei Implementierungs-Verifikation 17.08.2026 Fix (Option A) bereits vollständig im Code vorhanden: `SIGHTLINE_LABELS.nicht_geprueft`/FilterSheet-Chip-Referenz/ElementInfo-Popup/Filterbeschreibung zeigen „Daten fehlen", Host-Verifikations-Wortlaut unverändert, BUG-88-Eskalationslogik unberührt, dedizierter Regressionstest `backend/tests/test_bug-87.py` vorhanden; echte visuelle Browser-Verifikation steht noch aus und ist nur durch Stephan möglich, 2026-08-17)* · **BUG-88** *(Sichtachsen-Alignment-Ereignisse zeigen jetzt eskalierte Warnfarbe/Warndreieck-Icon statt neutralem Grau bei „Nicht geprüft" — `sightlineTagHtml()` Zeile 1973-1982 in `web/index.html`, Option A vollständig umgesetzt, in dieser Sitzung live im Browser UND per automatisiertem Playwright-Check bestätigt; Dark-Mode-Kontrast code-basiert plausibilisiert (separates, helleres Dark-Mode-Token `#e3a21a`, rechnerisch ≈7.3-8.1:1 Kontrast, kein Hinweis auf Problem) — echte visuelle Dark-Mode-Bestätigung durch Stephan steht noch aus; offene ❓-Frage Option A/B durch die erfolgreiche Umsetzung faktisch beantwortet, 2026-08-17)* · **TASK-92** *(Epic Security-Audit 2026-07-16 — alle Kern- und Folge-Kind-Tickets Done (Kind-Tickets-Liste im Ticket war veraltet: TASK-87/TASK-91/TASK-88 standen dort fälschlich noch als ToDo, obwohl längst abgeschlossen), kein eigener Code, reine Status-Nachpflege, Korrektur 2026-08-19)* · **BUG-108** *(Rote Wolken (RED_CLOUDS) projiziert Wolkendaten jetzt 100 km entlang der Sichtachse in Sonnenrichtung statt am Fotografen-Standort abzufragen, eigene Konstante `RED_CLOUDS_PROJECTION_DISTANCE_M`, kein Fallback bei Fetch-Fehlschlag; 24 neue + 4 aktualisierte Tests, echter pytest-Lauf 61/61 grün, released Commit `236c8d9` + Nachbesserung `d0e08f8` (CI-Fix fehlende README-Marker-Zeile), GitHub-Actions-Lauf #338 grün, Health-Check nach Deploy erreichbar (`version 2.0.0`), Live-Verifikation der Produktions-Events wegen anhaltendem `status: degraded`/Wetter-API-Drosselungs-Nebenbefund (Folgeticket BUG-111, Inbox) zum Zeitpunkt des Ticket-Abschlusses noch offen, 2026-08-27)* · **BUG-109** *(„Warum Rote Wolken?"-Erklärungstext auf der Event-Detail-Ansicht liest jetzt den Wolkenwert vom 100-km-Projektionspunkt (`ch_red_clouds_dir`/`cl_red_clouds_dir`) statt vom Fotografen-Standort, Fund aus Live-Verifikation von BUG-108 2026-08-25; Fix in web/index.html, pytest backend/tests/test_bug109.py als Teil von CI-Lauf #341 grün bestaetigt, released Commits b1e4883+2109c9f, CI grün, Health-Check ok (vorbestehender Wetter-Degraded-Zustand aus BUG-111 unveraendert). Live-Verhaltenscheck an einem echten Rote-Wolken-Event am Release-Tag nicht moeglich (Wetter-Job haengt, keine berechneten Wetterdaten im Feed) — stattdessen Live-Code-Fund von `ch_red_clouds_dir`/`cl_red_clouds_dir` im produktiven index.html bestaetigt, mit Stephan abgestimmt, 2026-08-28)* · **BUG-111** *(Wetter-API-Drosselung nach BUG-108 neu kalibriert — Option A (Pacing 0.35s→0.5s), unabhängig verifiziert (962/977 grün), Refactor abgeschlossen, released v1.22.69 (Commit a5388d4), GitHub-Actions-Lauf #343 grün (4m8s), Health-Check + Live-Rauchtest bestätigt; 429-Fehlerquoten-Nachweis (AK1-3) folgt über mehrere Produktions-Zyklen, 2026-08-28)* · **BUG-21** *(Brennweiten-Eingabe: iOS-Tastatur zeigt jetzt eine Komma-Taste (`inputmode="decimal"`), Parser akzeptiert zusätzlich Semikolon als Trennzeichen, 7/7 neue Tests + volle Regression 942 passed/7 vorbestehend-unabhaengig/5 skipped, released v1.22.70 (Commit `29cb9ad`, gemeinsam mit BUG-98), CI grün, Health-Check + Live-Rauchtest bestätigt, 2026-09-07)* · **BUG-98** *(Location-Daten: Code-Schutz `is_degenerate` gegen identische Beobachter-/Motivkoordinaten in der Azimut-Kernfunktion + 15 Locations datenseitig korrigiert (13× fehlende Motivkoordinaten, 2× abweichender Beobachter-Standpunkt), 33/33 neue Tests + volle Regression 978 passed/7 vorbestehend-unabhaengig/5 skipped, released v1.22.70 (Commit `29cb9ad`, gemeinsam mit BUG-21), CI grün, Health-Check + Live-Rauchtest bestätigt; Hotfix (Commit `d7eb187`) behebt Absturz bei degenerierten `None`-Motivkoordinaten in einem älteren Berechnungspfad, CI danach erneut grün, 2026-09-07)* · **US-137** *(Nächstes Sonnen-Alignment über 30 Tage hinaus + lokaler Ereignistyp-Filter im Standort-Detail „Nächste Events" — Backend `/plan` gehärtet (Rate-Limit 20/60s analog `/preview-alignment`, Tages-Cap `min(days,365)` analog BUG-63), Frontend `LocationDetail._loadEvents()` auf `/plan` umgestellt + neuer lokaler Filter referenziert `FilterSheet._ET`; 8 neue automatisierte Tests grün, volle Offline-Regression, alle 12 AK verifiziert, released v1.23.0 (Commit a6facd7, CI-Lauf #352); Release-Lauf sowie sieben Folge-Läufe rot durch sieben unabhängige, rein CI-infrastrukturelle Timing-Randfälle (zu knapp bemessene Playwright-Timeouts bei frischen Browser-Starts spät im CI-Job, nicht app-seitig verursacht) — nach schrittweiser Behebung erster vollständig grüner Lauf #361 (Commit 20bd812, 7m20s, alle drei Jobs inkl. Deploy grün), Health-Check nach Deploy erreichbar (version 2.0.0, backend/cache ok), 2026-09-24)*
+
+## Anhang TASK-116 (Beginn)
+<!-- TASK-116-ANHANG-BEGINN -->
+## Verwaister Text unter TASK-108 – verschoben durch TASK-116 am 2026-10-27
+
+Herkunft: Backlog, Text direkt unter dem Ticket TASK-108 (hinter dem Trennstrich unter der Quelle-Zeile bis Dateiende), durch TASK-116 ins Archiv verschoben am 2026-10-27.
+Zeilen: 554
+Prüfsumme (MD5): f0bae246229e6b136aa9d62c4ca25915
+Zeichen: 77095
+
+Hinweise:
+- Der Text zwischen den Marken TEXT-BEGINN und TEXT-ENDE ist unverändert übernommen (Byte für Byte; Zeilenzahl und Prüfsumme oben gelten genau für diese Bytes; der eine zusätzliche Zeilenumbruch vor der Text-Endemarke gehört nicht zum Text).
+- Zuordnung ist Einschätzung: Die Liste unten ist nicht bestätigt. "zugeordnet" steht nur, wenn ein Abschnitt genau ein Ticket mindestens zweimal nennt; sonst "Einschätzung" oder "nicht zugeordnet". Der Text selbst bleibt davon unberührt.
+- Warnung: Das Auslagerungswerkzeug überschreibt bis zur Behebung von TASK-110 das Archiv; ein Lauf davor würde diesen Anhang entfernen. Bis dahin kein Auslagerungslauf, Sicherung des Archivs aufheben.
+
+Zuordnungsliste (Textzeile 1 = führende Leerzeile; ein Abschnitt reicht von seiner Überschrift bis vor die nächste Überschrift):
+
+| Textzeilen | Überschrift | Genannte Tickets | Einschätzung |
+|---|---|---|---|
+| 2–36 | Analyse (fotoalert-analyze, 2026-08-10) | US-120 (1x), US-126 (1x) | Einschätzung |
+| 37–44 | Stephans Entscheidungen (2026-08-10) | TASK-103 (1x) | Einschätzung |
+| 45–64 | Echter pip-audit-Lauf (2026-08-10) | — | nicht zugeordnet |
+| 65–70 | Abschluss (2026-08-11) | TASK-102 (1x), TASK-103 (1x), TASK-104 (1x) | Einschätzung |
+| 71–82 | Implementierung (2026-08-10) | TASK-94 (1x) | Einschätzung |
+| 83–90 | Nachtrag (2026-08-11): versehentlich zurückgesetzt und korrekt neu veröffentlicht | TASK-95 (1x) | Einschätzung |
+| 91–173 | Zwischenstand (2026-08-13) — Schritt 1 abweichend von AK1, siehe Begründung | BUG-83 (1x), BUG-84 (1x) | Einschätzung |
+| 174–233 | Zwischenstand (2026-08-13) — Schritt 2: `PyJWT` | CVE-2025 (1x), CVE-2026 (2x), PYSEC-2026 (1x), TASK-105 (4x) | Einschätzung |
+| 234–255 | Zwischenstand (2026-08-16) — Schritt 3: `starlette`, per Pipeline-Orchestrator-Lauf recherchiert | CVE-2024 (1x), CVE-2025 (1x), TASK-104 (1x), TASK-105 (15x) | zugeordnet |
+| 256–261 | Abschluss (2026-08-16) | TASK-104 (1x), TASK-105 (3x) | zugeordnet |
+| 262–485 | Stephans Entscheidung (2026-08-16): Option C — kombinierter Release | BUG-60 (1x), TASK-104 (13x), TASK-105 (2x), TASK-79 (1x), TASK-80 (2x), TASK-83 (5x), US-112 (1x), US-38 (1x), US-72 (1x) | Einschätzung |
+| 486–491 | Abschluss (2026-08-16) | TASK-104 (1x) | Einschätzung |
+| 492–501 | Implementierung (fotoalert-impl, 2026-08-10) | — | nicht zugeordnet |
+| 502–507 | Abschluss (2026-08-11) | — | nicht zugeordnet |
+| 508–536 | Analyse (fotoalert-analyze, 2026-08-10) | BUG-80 (3x), TASK-88 (2x), US-133 (1x) | Einschätzung |
+| 537–554 | Implementierung (fotoalert-impl, 2026-08-10) | BUG-80 (1x), TASK-101 (1x), TASK-88 (1x) | Einschätzung |
+
+<!-- TASK-116-TEXT-BEGINN -->
+
+## Analyse (fotoalert-analyze, 2026-08-10)
+
+**Sandbox-Limits:** Kein `git`-Kommando ausgeführt (harte Regel), alle Aussagen per `grep`/`sed`/`find` gegen den echten Working Tree verifiziert. Nicht prüfbar aus der Sandbox: echter SSH-Zugriff zum Server, GitHub-Branch-Protection-Einstellungen, ein echter `pip-audit`-Lauf (kein Netzwerkzugriff im Gerätetool), Git-Historie.
+
+**Befund je Punkt (Code-Verifikation, Einschätzung, Risiko):**
+- **(a)** `GET /job-status` ist unauthentifiziert; 2 von 4 `_job_error()`-Aufrufstellen (`main.py:1804`, `main.py:3125`) geben rohen Python-Exception-Text weiter. **Noch offen**, Risiko niedrig-mittel (Informationspreisgabe ohne Auth).
+- **(b)** `PATCH /locations/{id}` verlangt nur `require_auth` (jede Rolle), `DELETE`/Bild-Endpunkte verlangen `require_host`. Diskrepanz bestätigt. **Noch offen**, Risiko mittel (kompromittierter „user"-Login kann kuratierte Locations manipulieren).
+- **(c)** `await file.read()` liest die komplette Datei ein, bevor die 20-MB-Grenze geprüft wird; keine vorgelagerte Body-Size-Grenze in `deploy/Caddyfile`. **Noch offen**, Risiko niedrig-mittel (Endpoint bereits `require_host`-geschützt).
+- **(d)** `fotoalert.service` hat nur `NoNewPrivileges`/`PrivateTmp`; `fotoalert-precompute.service` **komplett ohne** Sicherheits-Direktiven — Ticket-Aussage bestätigt. **Noch offen**, Risiko mittel (Eindämmung im RCE-Fall).
+- **(e)** `.github/workflows/deploy.yml` nutzt `StrictHostKeyChecking=no` + Live-`ssh-keyscan` statt hinterlegtem Fingerprint (Zeilen 183/188). Branch-Schutz für `main` nicht im Code prüfbar. **SSH-Teil noch offen**, Risiko kritisch bei Auswirkung (voller Server-Zugriff bzw. Push=Deploy ohne Schutz).
+- **(f)** `find` nach Debug-HTML im gesamten Working Tree (inkl. Archiv/Worktrees) — **0 Treffer**. **Bereits gelöst** im aktuellen Stand; Git-Historie nicht prüfbar (Restrisiko, falls dort noch ein gültiges Token steckt).
+- **(g)** Betrifft die externe Website locationscout.net, kein Repo-Bezug — reine Handlungsempfehlung an Stephan, kein Ticket-Code möglich.
+- **(h)** `backend/requirements.txt` bestätigt `Pillow==10.3.0`/`python-multipart==0.0.9`. Kein echter `pip-audit`-Lauf aus der Sandbox möglich — Einschätzung erst nach echtem Scan möglich, keine Vermutung.
+
+**Splitting-Empfehlung (das Ticket selbst fordert das):** Gebündelt umsetzbar in einem Rutsch: **(a)+(c)+(d)** — reine Härtungen ohne Rechte-/Verhaltensänderung, autonom umsetzbar (🟢/🟡). Eigene Entscheidungs-Tickets: **(b)** Rechteänderung mit möglicher Workflow-Auswirkung auf Stephan selbst, **(e)** Produktions-SSH + Branch-Schutz außerhalb des Repo-Scopes, **(h)** braucht erst einen echten `pip-audit`-Lauf von Stephan. **(f)** kann direkt als erledigt vermerkt werden, **(g)** bleibt eine Notiz ohne Ticket.
+
+**Pre-Mortem:** (1) Fix zu (b) blockiert Stephans eigenen Workflow, falls er selbst per user-Login Location-Felder bearbeitet — vor Umsetzung klären. (2) SSH-Fix (e) bricht die Deploy-Pipeline bei falschem/veraltetem Host-Key-Fingerprint — Testlauf über `workflow_dispatch` vor dem ersten scharfen Push. (3) Zu strikte systemd-Direktiven (d) verhindern den Service-Start (fehlende `ReadWritePaths` für `backend/data/`, Uploads, Logs) — schrittweises Ausrollen, jede Stufe von Stephan auf dem echten Server bestätigen lassen. (4) Dependency-Bump (h) ändert Bildverarbeitung unerwartet — volle Testsuite + manueller Bild-Check nach jedem Bump.
+
+**Akzeptanzkriterien (a+c+d, direkt umsetzbar):**
+- [ ] AK-a1: `GET /job-status` liefert bei Job-Fehler eine generische `last_error`-Meldung statt rohem Exception-Text; voller Text bleibt im Server-Log; beide Fundstellen (`main.py:1804`, `main.py:3125`) umgestellt.
+- [ ] AK-c1: Datei > 20 MB wird per 413 abgelehnt, ohne vorher vollständig in den RAM eingelesen zu werden; gültiger Upload ≤ 20 MB bleibt unverändert funktionsfähig (Regression gegen US-120/US-126).
+- [ ] AK-c2 Edge Case: Chunked-Upload ohne Content-Length wird ebenfalls per Streaming-Grenze abgefangen.
+- [ ] AK-d1: `fotoalert-precompute.service` erhält mindestens `NoNewPrivileges`/`PrivateTmp`; `fotoalert.service` zusätzlich `ProtectSystem`/`ProtectHome`/`PrivateDevices`/`ProtectKernelTunables`/`ProtectKernelModules`/`ProtectControlGroups`.
+- [ ] AK-d2: Nach Rollout auf dem echten Server bestätigt Stephan `systemctl status` „active" für beide Units + funktionierenden Health-Check/Testupload/Precompute-Lauf.
+
+**Ampel:** (a) 🟢 · (b) 🔴 Stephan-Entscheidung nötig · (c) 🟢 · (d) 🟡 Code autonom, Wirksamkeit nur auf echtem Server prüfbar · (e) 🔴 Stephan-Aktion/Entscheidung nötig (Server-Fingerprint, GitHub-Settings) · (f) 🟢 bereits gelöst · (g) kein Repo-Ticket · (h) 🟡 Umsetzung risikoarm, aber Scan-Ergebnis fehlt.
+
+**Status-Update (2026-08-10):** Weg-Gate gemischt → **Wartet auf Entscheidung** (Gesamtticket, wegen (b)/(e)/(h)). Teile (a)/(c)/(d) sind bereits als Ready-for-Dev-fähig identifiziert und werden nach Stephans Freigabe des Splittings als eigenes Ticket ausgegliedert.
+
+**Konkrete Fragen an Stephan:**
+1. **Splitting:** Ticket wie oben vorgeschlagen in 3-4 Teile aufteilen (a+c+d sofort umsetzbar, b/e/h eigene Entscheidungs-Tickets)?
+2. **(b):** Nutzt du den „user"-Login aktuell, um Location-Felder zu bearbeiten? Soll das künftig ganz wegfallen (nur noch Host, wie bei Löschen/Bild), oder soll „user" ein eingeschränktes Feld-Set behalten?
+3. **(e):** Kannst du den SSH-Host-Key-Fingerprint deines Servers ermitteln (`ssh-keyscan -H <SERVER_IP>`) und als Secret hinterlegen? Soll ich dir die Schritte für GitHub Branch Protection auf `main` zusammenstellen, oder machst du das selbst?
+4. **(h):** Kannst du `pip-audit -r backend/requirements.txt` einmal mit Internetzugang laufen lassen und mir das Ergebnis schicken?
+
+## Stephans Entscheidungen (2026-08-10)
+
+**(b):** "Ich habe User. Diese sollen Standorte anlegen, aber nicht bearbeiten können. Das gilt für jetzt, wird sich aber in Zukunft ggfs ändern. Dann sollen sie ihre Standorte ändern können, aber dazu brauchen wir ein sauberes User-Management." → Umgesetzt in **TASK-103**: Bearbeiten (`PATCH /locations/{id}`) jetzt nur noch Host, Anlegen (`POST /preview-alignment` mit Speichern) bleibt für User unverändert möglich. Die künftige Erweiterung (User bearbeitet eigene Orte) braucht echtes User-Management (Besitzer-Zuordnung pro Standort) — bewusst nicht Teil dieses Tickets, eigener künftiger Vorschlag falls gewünscht.
+
+**(e):** "Aktuell bin ich der Einzige, der daran arbeitet. Es sollte ansonsten prinzipiell niemand in der Lage sein, außer mir, etwas reinzuschreiben. Das mit dem Fingerabdruck beim ersten Verbindungsaufbau kann ich dir nicht beantworten, das weiß ich nicht." → Zwei getrennte Themen dahinter: (1) *Fingerabdruck-Prüfung beim Deploy* — technische Lücke im Code (GitHub-Actions-Workflow vertraut beim Verbinden blind dem Server, statt einen fest hinterlegten Schlüssel zu prüfen); dafür bräuchte ich den echten Fingerabdruck deines Servers, den ich nicht selbst ermitteln kann (kein Serverzugriff von hier). (2) *Wer kann auf `main` schreiben* — reine GitHub-Einstellungsfrage (Repo → Settings → Collaborators/Zugriffsrechte), kein Code, kann nur Stephan selbst einsehen. Beide Punkte bleiben offen, siehe Rückfragen unten.
+
+**(h):** "Was für einen Scan? Ich starte keine Scans selbst..." → Korrektur meinerseits: Das kann ich selbst, dafür braucht es keinen Eingriff von Stephan. Echter `pip-audit`-Lauf gegen `backend/requirements.txt` in der Cloud-Sandbox (mit Internetzugang) nachgeholt, siehe Ergebnis unten.
+
+## Echter pip-audit-Lauf (2026-08-10)
+
+Echt ausgeführt (`pip-audit -r backend/requirements.txt`, öffentliche Sicherheitslücken-Datenbank, Rohdaten, keine Vermutung): **60 gemeldete Sicherheitslücken in 7 von 20 Paketen** (Mehrfachnennungen durch mehrere Datenbank-Quellen pro Lücke möglich, Rohwert ungefiltert):
+
+- `Pillow` 10.3.0 → 24 Meldungen, Fix ab 12.1.1/12.2.0/12.3.0 (genau die im Ticket genannte Bildverarbeitung)
+- `python-multipart` 0.0.9 → 7 Meldungen, Fix ab 0.0.18–0.0.31 (genau die im Ticket genannte Upload-Hilfsbibliothek)
+- `cryptography` 42.0.8 → 8 Meldungen, Fix ab 43.0.1–49.0.0
+- `PyJWT` 2.8.0 → 10 Meldungen, Fix ab 2.12.0/2.13.0
+- `starlette` 0.37.2 (FastAPI-Unterbau) → 9 Meldungen, Fix ab 0.40.0–1.3.1
+- `python-dotenv` 1.0.1 → 1 Meldung, Fix ab 1.2.2
+- `pytest` 8.2.2 → 1 Meldung (nur Testwerkzeug, kein Produktionsrisiko), Fix ab 9.0.3
+
+**Einordnung, keine Panik:** Eine gemeldete Lücke heißt nicht automatisch "real ausnutzbar in dieser App" — das hängt davon ab, ob der betroffene Code-Pfad überhaupt genutzt wird. Das habe ich hier noch nicht einzeln geprüft. Reines Hochziehen der Versionen ist außerdem nicht risikofrei (siehe Pre-Mortem oben, Punkt 4: `Pillow`-Bump kann Bildverarbeitung unerwartet verändern) — bräuchte danach einen vollen Testlauf + manuellen Bild-Check. Vorschlag: eigenes kleines Ticket dafür, mit Versions-Bump + Regressionstest je Paket, priorisiert nach Pillow/python-multipart (dein ursprünglicher Verdacht) zuerst. Sag Bescheid, ob das gewünscht ist.
+
+**Rückfragen (e) — Stand 2026-08-10, beide Teile jetzt bearbeitet:**
+1. ✅ Zugriff: Stephan hat in GitHub geprüft — "Direct access, 0 collaborators have access to this repository. Only you can contribute." Kein Handlungsbedarf, Punkt bereits erledigt.
+2. ✅ Fingerabdruck: Stephan hat `grep "<IP>" ~/.ssh/known_hosts` ausgeführt (IP per DNS-Auflösung von `fotoalert.stephanschumann.com` ermittelt, keine Geheimnispreisgabe nötig) — bereits vorhandener, vertrauenswürdiger Eintrag aus einer früheren eigenen Verbindung, kein blindes Erst-Vertrauen nötig. `.github/workflows/deploy.yml` entsprechend angepasst: `ssh-keyscan` beim Deploy-Lauf entfernt, stattdessen wird der Fingerabdruck aus einem neuen Secret `SERVER_KNOWN_HOSTS` geladen; `StrictHostKeyChecking` von `no` auf `yes` verschärft (bricht jetzt hart ab, falls der Server jemals einen anderen Schlüssel zeigt, statt das stillschweigend zu ignorieren).
+
+**⚠️ Wichtig, bevor das released wird:** Das neue Secret `SERVER_KNOWN_HOSTS` muss in GitHub angelegt sein, BEVOR dieser Code-Stand released wird — sonst schlägt der nächste Deploy fehl (Verbindung ohne bekannten Fingerabdruck wird jetzt hart abgelehnt statt wie bisher blind akzeptiert). Repo → Settings → Secrets and variables → Actions → New repository secret → Name `SERVER_KNOWN_HOSTS`, Wert = genau die drei Zeilen aus Stephans `known_hosts`-Auszug (ssh-ed25519/ssh-rsa/ecdsa-sha2-nistp256). Noch nicht released — wartet auf Stephans Bestätigung, dass das Secret gesetzt ist.
+
+## Abschluss (2026-08-11)
+
+Stephan hat das Secret `SERVER_KNOWN_HOSTS` gesetzt (bestätigt: „SERVER_KNOWN_HOSTS erledigt"). Danach liefen drei Veröffentlichungen in Folge unter der neuen, strengeren Prüfung (`StrictHostKeyChecking=yes`, fester Fingerabdruck statt Live-Scan) erfolgreich durch: CI-Läufe #313 (Commit 23af8cf), #314 (Commit 1245d11) und #315 (Commit 5fc04f9, v1.22.64) — alle grün, Server danach jedes Mal über den Gesundheits-Check erreichbar bestätigt. Damit ist (e) vollständig geschlossen. (b) wurde bereits vorher nach TASK-103 ausgegliedert und ist dort erledigt. (h) wurde mit einem echten Sicherheitslücken-Scan beantwortet, die Umsetzung selbst läuft als eigenes Ticket TASK-104 (bewusst noch nicht umgesetzt, wartet auf Stephans Freigabe). (a)/(c)/(d) liefen über TASK-102 (Status dort separat, (d) wartet noch auf Stephans Server-Bestätigung). (f) war schon vorher erledigt, (g) betrifft keine eigene Code-Maßnahme. Damit sind alle Teilpunkte des Sammeltickets abgeschlossen.
+
+---
+
+## Implementierung (2026-08-10)
+
+**Code:** `backend/main.py:3884`, `patch_location()` — `Depends(auth.require_auth)` zu `Depends(auth.require_host)` geändert. Das war die gesamte funktionale Änderung.
+
+**Tests:** Neue `host_headers`-Fixture in `conftest.py`. Neun bestehende Testdateien, die PATCH bisher mit dem User-Zugang als Erfolgsfall geprüft hatten (Testzweck war Feldverhalten, nicht Rollenprüfung), auf den Host-Zugang umgestellt: `test_api_regression.py`, `test_patch_cache_consistency.py`, `test_bug-61.py`, `test_task-83.py`, `test_bug-84.py`, `test_bug_68.py`, `test_task-60_patch_location_refactor.py`, `test_us_128.py`. `test_us66_login.py::test_protected_endpoint_with_user_token` von "User→200" auf "User→403" gedreht, neuer Test für "Host→200" ergänzt. Neue Datei `tests/test_task-103.py` deckt AK1–AK4 explizit ab, in `tests/README.md` registriert.
+
+**Echter pytest-Lauf:** Gezielter Lauf der 7 betroffenen/neuen Testdateien: **70 passed, 0 failed**. Zusätzlich volle Backend-Regressionssuite (826 gesammelte Tests, Teil-Checkout ohne Frontend/Deploy-Dateien, `test_task53_dev_sync.py` wie bei TASK-94 bereits bekannt ausgeklammert): 799 passed, 17 failed, 3 errors, 6 skipped, 1 xpassed — alle Fails/Errors geprüft, ausschließlich vorbestehende Checkout-Lücken (fehlende `web/`/`deploy/`/`.github`-Dateien), keiner mit Auth/PATCH verwandt. Hinweis zur Sorgfalt: Der abschließende pytest-Summary-Banner der vollen Suite fehlte im Log-Mitschnitt (Capture-Artefakt) — die Zahl 799 passed wurde daher rechnerisch aus der Gesamtzahl 826 minus den einzeln aufgelisteten Fail/Error/Skip/XPass-Fällen ermittelt, nicht direkt aus einer finalen Tally-Zeile abgelesen.
+
+**Nebenfund:** Vier der neun betroffenen Testdateien (`test_bug-84.py`, `test_bug_68.py`, `test_task-60_patch_location_refactor.py`, `test_us_128.py`) waren in der Vorab-Analyse nicht erkannt worden und wurden erst durch den echten vollen Testlauf sichtbar — ohne diesen Lauf wären das stille Regressionen geblieben.
+
+**Aufräum-Hinweis an Stephan:** Ein Scratch-Tarball außerhalb des Repos (`/Users/stephan/Claude/Projects/FotoAlert/_task103_scratch/fotoalert_backend.tar.gz`, ca. 1 MB) konnte vom Hilfs-Programm nicht automatisch gelöscht werden ("Operation not permitted"). Harmlos, kann bei Gelegenheit manuell gelöscht werden.
+
+## Nachtrag (2026-08-11): versehentlich zurückgesetzt und korrekt neu veröffentlicht
+
+Nach der ursprünglichen Umsetzung ist die Änderung an `main.py` über die gemeinsam genutzte Arbeitskopie versehentlich mit in einen fremden Sammel-Release (Commit 8af2694, Tickets TASK-95/96/97/98/99/100) hineingerutscht — ohne die zugehörigen, ebenfalls angepassten Testdateien. Dadurch schlugen dort 31 Tests fehl (CI-Lauf #311, Deploy korrekt nicht ausgelöst). Die betroffene Zeile wurde daraufhin einzeln zurückgesetzt (Commit 23af8cf), wodurch die Host-Beschränkung vorübergehend NICHT mehr aktiv war, obwohl dieses Ticket zu diesem Zeitpunkt bereits als „Done" vermerkt war.
+
+Am 2026-08-11 korrekt nachgezogen: `Depends(auth.require_host)` erneut gesetzt, diesmal zusammen mit allen zugehörigen Testdateien im selben Release. Echter pytest-Lauf: gezielt 99 von 99 Tests grün (die vorher betroffenen Testdateien + `test_task-103.py`), volle Regressionssuite ohne dadurch verursachte neue Fehlschläge. Released als v1.22.64 (Commit 5fc04f9), CI grün (Lauf #315), Server-Gesundheits-Check danach bestätigt (`status: ok`). AK1–AK5 damit real bestätigt.
+
+---
+
+## Zwischenstand (2026-08-13) — Schritt 1 abweichend von AK1, siehe Begründung
+
+**Wichtiger Befund VOR der Umsetzung (AK5-Fall, an Stephan zurückgemeldet statt durchgezogen):**
+Ein echter Versions-/Kompatibilitäts-Check gegen die reale PyPI-Metadatenlage (2026-08-13) zeigt: Von den
+60 gemeldeten Lücken lässt sich ein Teil NICHT ohne einen Python-Runtime-Sprung schließen, weil die
+jeweils reparierte Version die Unterstützung für Python 3.9 bereits eingestellt hat (Prod/CI laufen laut
+`CLAUDE.md` + mehreren realen CI-Läufen — zuletzt BUG-84, 2026-07-27, „unter echtem Python 3.9.25" —
+bestätigt auf Python 3.9):
+
+- **`Pillow`** — Fix ausschließlich ab 12.1.1/12.2.0/12.3.0 (echte OSV-Daten), `Pillow>=12.0.0` verlangt
+  `requires_python: >=3.10`. Kein Fix in der 11.x-Reihe verfügbar (letzte 3.9-kompatible Linie).
+- **`python-multipart`** — von den 7 Lücken lässt sich nur die älteste (fixed_in 0.0.18) noch unter
+  Python 3.9 installieren (0.0.20 ist die letzte 3.9-kompatible Version); ab 0.0.21 gilt `>=3.10`.
+  Die restlichen 6 Lücken (u. a. Path Traversal GHSA-wp53, zwei DoS-Lücken, Content-Length-Bug) blieben
+  bei einem 3.9-gebundenen Bump ungeschlossen.
+- **`python-dotenv`** — Fix-Version 1.2.2 verlangt `>=3.10`.
+- **`pytest`** — Fix-Version 9.0.3 verlangt `>=3.10` (laut Ticket ohnehin „kein Produktionsrisiko", aber
+  auch der CI-Runner selbst müsste mitziehen).
+
+Damit sind **4 der 7 Pakete** genau der AK5-Edge-Case: „Falls ein Bump eine echte
+Breaking-Change-Migration erfordert […] wird das VOR der Umsetzung als eigener Punkt an Stephan
+zurückgemeldet statt einfach durchgezogen." Das betrifft ausdrücklich auch die beiden in AK1 als
+„zuerst" benannten Pakete (`Pillow`, `python-multipart`) — hier NICHT stillschweigend umgangen, sondern
+zurückgestellt bis Stephan entschieden hat, ob/wann der Python-3.9→3.10(+)-Sprung selbst angegangen wird
+(eigenes, größeres Ticket, betrifft `deploy/setup_server.sh`, das bereits `python3.12` vorsieht — aber
+laut allen realen CI-Läufen noch nicht auf den aktuell laufenden Server angewendet wurde).
+
+**`starlette`** zusätzlich separat zurückgestellt: Voller Fix (14 Meldungen) verlangt `starlette==1.3.1`
+— ein Sprung von `0.37.2` über die 0.x→1.x-Grenze, direkt an die FastAPI-Version gekoppelt. Das ist
+exakt das in AK5 selbst genannte Beispiel („ein größerer FastAPI/Starlette-Versionssprung mit
+API-Änderungen") — ebenfalls an Stephan zurückgemeldet statt umgesetzt.
+
+**Tatsächlich umgesetzt (Ersatz-Schritt 1, höchste Schwere unter den sicher upgradebaren Paketen):**
+`cryptography` 42.0.8 → **49.0.0** in `backend/requirements.txt` (Zeile 17). Von den 7 betroffenen
+Paketen hat `cryptography` mit 12 real abgefragten Meldungen (OSV/PyPI-Vulnerabilitätsdaten, u. a.
+mehrere statisch gelinkte OpenSSL-Sicherheitslücken) die höchste Zahl unter den nicht 3.9-blockierten
+Paketen; `49.0.0` erlaubt `>=3.9` (schließt nur exakt 3.9.0/3.9.1 aus, unser Prod-Stand 3.9.6/3.9.25 ist
+kompatibel). Im eigenen Code wird `cryptography` nirgends direkt verwendet (`grep` bestätigt), sondern
+ausschließlich indirekt über `PyJWT`s ES256-Signierung in `backend/notifications/push.py`
+(`_get_jwt_token()`); `PyJWT==2.8.0` deklariert nur eine Untergrenze (`cryptography>=3.4.0`), keine
+Obergrenze — geringes Breaking-Change-Risiko.
+
+**Echte Verifikation, ehrlich eingeordnet:**
+- Realer, ausgeführter Smoke-Test (Sandbox-Python 3.10, `cryptography==48.0.0` als naher Stand-in für
+  49.0.0, `PyJWT==2.3.0`): EC-P256-Schlüssel erzeugt, `jwt.encode(..., algorithm="ES256")` +
+  `jwt.decode(...)` erfolgreich — genau der Codepfad aus `notifications/push.py`. Ergebnis: OK.
+- **Voller Backend-pytest-Lauf konnte in dieser Sitzung NICHT ausgeführt werden** — echter Blocker,
+  keine Behauptung: `backend/venv/bin/python3` ist ein Symlink auf
+  `/Library/Developer/CommandLineTools/usr/bin/python3` (Stephans echtes Mac-Terminal), über die
+  Geräte-Brücke (`device_bash`, eigene Linux-VM ohne Internet) nicht ausführbar. Der Cloud-Sandbox-Kanal
+  hat zwar Internet, aber weder Python 3.9 verfügbar noch installierbar (kein passendes apt-Paket, PPA-
+  Zugriff vom Proxy geblockt — deckungsgleich mit dem bereits dokumentierten Fund bei BUG-83); der
+  Versuch, den Backend-Code testweise per Tar-Transfer in die Cloud-Sandbox zu holen, wurde dort vom
+  Sicherheits-Klassifizierer beim Entpacken blockiert (bewusst nicht umgangen). **Offener Punkt für
+  Stephan** — bitte in seinem echten Mac-Terminal ausführen und Ergebnis zurückmelden:
+  ```
+  cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
+  source venv/bin/activate
+  pip install -r requirements.txt
+  pytest tests/ -v
+  ```
+
+**Aufräum-Hinweis:** `_to_delete/task104_backend_transfer/` (Tar-Transferversuch, ca. 16 MB) und
+`_to_delete/task104_kanban_out/` (Kanban-Sync-Output) können bei Gelegenheit manuell geleert werden.
+
+**Notiz (2026-08-13):** Voller Backend-Regressionslauf steht weiterhin aus (nur Smoke-Test gegen `cryptography` 42.0.8→49.0.0 gelaufen, siehe oben) — technisch nicht aus der Sandbox ausführbar. Muss auf Stephans echtem Mac-Terminal nachgeholt werden, fertiger Befehl bereits oben hinterlegt (Abschnitt "Echte Verifikation, ehrlich eingeordnet"):
+```
+cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
+source venv/bin/activate
+pip install -r requirements.txt
+pytest tests/ -v
+```
+
+**Bestätigungs-Notiz zum `cryptography`-Schritt (2026-08-13, von Stephan freigegeben):**
+Beide pytest-Läufe sind dokumentiert und liefern konsistent dasselbe Bild — ein voller
+Suite-Lauf sowie ein gezielter Wiederholungslauf nur der 3 Fehlschläge zeigen dieselben 3 roten
+Tests: `test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`,
+`test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]`,
+`test_ephemeris_engine.py::test_ak1b_latency_365day`. Alle drei sind Zeit-/Lastschwellen-Tests
+zu Wetter-Overlay-Timing bzw. der Astronomie-Engine — thematisch unabhängig von
+`cryptography`/Auth/JWT. Stephan hat entschieden, diese 3 Fehlschläge nicht als
+`cryptography`-Regression zu werten, und weiter mit dem nächsten Paket zu machen.
+
+## Zwischenstand (2026-08-13) — Schritt 2: `PyJWT`
+
+**Recherche (Quelle: bereits dokumentierter `pip-audit`-Fund vom 2026-08-10, zusätzlich per
+`pip-audit`-Neulauf gegen `PyJWT==2.8.0` in der Cloud-Sandbox bestätigt):** `PyJWT` 2.8.0 hat
+genau eine gemeldete Sicherheitslücke — `PYSEC-2026-120` / `CVE-2026-32597` /
+`GHSA-752w-5fwx-jx9f`: PyJWT validiert den `crit`-("Critical")-Header-Parameter aus RFC 7515
+§4.1.11 nicht — enthält ein JWS-Token ein `crit`-Array mit PyJWT unbekannten Erweiterungen,
+wird das Token trotzdem akzeptiert statt abgelehnt (MUST-Vorgabe der RFC verletzt). Gleiche
+Schwachstellenklasse wie CVE-2025-59420 (Authlib, CVSS 7.5 HIGH). Fix ab `2.12.0`
+(`fix_versions` laut OSV/pip-audit), `2.13.0` (aktuell neueste PyPI-Version) enthält den Fix
+ebenfalls.
+
+**Python-3.9-Kompatibilitätscheck (Pflicht nach dem TASK-105-Fund):** Über die echten
+PyPI-JSON-Metadaten geprüft — `PyJWT` 2.10.0 bis 2.13.0 deklarieren durchgehend
+`requires_python: >=3.9`. Anders als bei den vier in TASK-105 dokumentierten Paketen ist
+`PyJWT` **nicht** blockiert — Prod-Python 3.9 bleibt kompatibel.
+
+**Umgesetzt:** `PyJWT` 2.8.0 → **2.13.0** in `backend/requirements.txt` (Zeile 16).
+
+**Testlauf — gleicher Blocker wie beim `cryptography`-Schritt, erneut bestätigt:** Ein Versuch,
+`./venv/bin/pip install -r requirements.txt` und `./venv/bin/pytest tests/ -v` in dieser Sitzung
+über `device_bash` auszuführen, scheitert mit `bad interpreter: No such file or directory` —
+`backend/venv/bin/python3` ist weiterhin ein Symlink auf
+`/Library/Developer/CommandLineTools/usr/bin/python3` (Stephans echtes Mac-Terminal), über die
+Geräte-Brücke nicht ausführbar. **Voller Backend-pytest-Lauf für den PyJWT-Bump konnte in dieser
+Sitzung NICHT ausgeführt werden** — offener Punkt für Stephan, bitte in seinem echten
+Mac-Terminal ausführen und Ergebnis zurückmelden:
+```
+cd /Users/stephan/Claude/Projects/FotoAlert/FotoAlert/backend
+source venv/bin/activate
+pip install -r requirements.txt
+pytest tests/ -v
+```
+Erwartung: identisch zum `cryptography`-Schritt sollten nur die bereits bekannten 3 Fehlschläge
+(`test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`,
+`test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]`,
+`test_ephemeris_engine.py::test_ak1b_latency_365day`) rot bleiben. Zeigen sich zusätzliche, davon
+abweichende Fehlschläge, ist das ein möglicher echter Befund im Zusammenhang mit dem
+`PyJWT`-Bump (z. B. `_get_jwt_token()`/ES256-Signierpfad in `backend/notifications/push.py`) und
+NICHT durch Testanpassung zu beheben, sondern zurückzumelden.
+
+**Stand der 60 gemeldeten Lücken / 7 Pakete:**
+- `cryptography` — Bump umgesetzt (Schritt 1), voller Regressionslauf steht auf Stephans Mac noch aus.
+- `PyJWT` — Bump umgesetzt (dieser Schritt), voller Regressionslauf steht auf Stephans Mac noch aus.
+- `Pillow`, `python-multipart`, `python-dotenv`, `pytest` — blockiert durch Python-3.9-EOL, siehe TASK-105.
+- `starlette` — zurückgestellt (großer 0.x→1.x-Versionssprung, AK5-Fall).
+
+Damit sind rechnerisch noch 5 der ursprünglich 7 betroffenen Pakete offen (4 blockiert in
+TASK-105, 1 zurückgestellt) bzw. 2 der 7 mit umgesetztem, aber noch nicht auf dem echten
+Mac-Terminal verifiziertem Bump.
+
+**Bestätigungs-Notiz zu den Testläufen `cryptography` + `PyJWT` (2026-08-13):**
+
+Zwei Pakete wurden bisher Paket für Paket mit jeweils vollem Regressionstest bearbeitet: `cryptography` 42.0.8 → 49.0.0 sowie `PyJWT` 2.8.0 → 2.13.0 (Fix für `CVE-2026-32597`, `crit`-Header-Validierung).
+
+- **Nach dem `cryptography`-Bump:** voller Testlauf (838 Tests) — Ergebnis 3 failed / 831 passed / 6 skipped / 1 xpassed. Gezielter Retest derselben 3 fehlgeschlagenen Tests: erneut 3 failed (gleiche Werte, keine Zufallsstreuung). Bewertung: vermutlich vorbestehende, last-/timing-empfindliche Tests, thematisch nicht mit Auth-/Crypto-Code verbunden.
+- **Nach dem kombinierten Testlauf** (`cryptography` + `PyJWT` zusammen, 838 Tests): Ergebnis 1 failed / 833 passed / 6 skipped / 1 xpassed, Laufzeit 544.40s. Einziger Fehlschlag: `tests/test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` — einer der bereits bekannten 3 Fälle. Die anderen beiden (`test_bug-99.py::test_weather_overlay_realistic_scale_error_free_run_stays_within_new_ceiling`, `test_ephemeris_engine.py::test_ak1b_latency_365day`) traten in diesem Lauf NICHT auf.
+- **Bewertung über alle drei Läufe:** Die Anzahl der Fehlschläge schwankt zwischen 1 und 3, aber immer innerhalb derselben bekannten 3 Tests — es sind KEINE neuen oder anderen Fehlschläge aufgetreten. Das stützt die Einschätzung „vorbestehende, last-/timing-empfindliche Tests, keine Regression durch die `cryptography`-/`PyJWT`-Bumps" — als Einschätzung, nicht als Gewissheit gekennzeichnet, da kein echter Vorher-Baseline-Lauf ohne die Bumps existiert.
+
+
+## Zwischenstand (2026-08-16) — Schritt 3: `starlette`, per Pipeline-Orchestrator-Lauf recherchiert
+
+**Korrektur der bisherigen Einordnung:** `starlette` wurde bisher als eigenständiger AK5-Fall (Breaking-Change-Sprung) neben den 4 TASK-105-Paketen geführt. Echte Recherche gegen PyPI-Vulnerability-Daten (2026-08-16) zeigt: Der VOLLE Fix (alle 7 zugrundeliegenden CVEs, im Ticket bisher als „14 Meldungen“ gezählt — das sind 7 CVEs, jede doppelt als GHSA+PYSEC gelistet) verlangt `starlette>=1.3.1`, was zwingend `fastapi>=0.135.0` und damit **Python >=3.10** voraussetzt — also denselben TASK-105-Blocker wie `Pillow`/`python-multipart`/`python-dotenv`/`pytest`. `starlette` gehört damit inhaltlich als fünftes Paket zu TASK-105, nicht daneben.
+
+**Aber: echter Teilfix ohne Python-Sprung möglich.** `starlette==0.49.3` (letzte 3.9-kompatible 0.x-Version, benötigt `fastapi>=0.121.0`) schließt bereits 3 der 7 CVEs (CVE-2024-47874/GHSA-f96h-pmfr-66vw, CVE-2025-54121/GHSA-2c2j-9gv5-cj73, GHSA-7f5h-v6xp-fcq8) — ohne Python-Sprung, ohne den Umbau der `@app.on_event`-Hooks in `backend/main.py` (Zeilen 2404/2468), die erst ab starlette 1.0 entfernt werden. Kein eigener Code importiert `starlette` direkt (nur zwei Testdateien, `test_task86.py`/`test_task-102.py`, typbezogen).
+
+**Implementierungsoptionen:**
+
+*Option A — Voller, gekoppelter Bump (`fastapi>=0.135.0` + `starlette>=1.3.1`):* Schließt alle 7 CVEs, setzt Python 3.10 voraus (TASK-105 muss also vorher entschieden UND umgesetzt sein) und erfordert den Umbau der zwei `on_event`-Hooks auf `lifespan`. Eigenes Mini-Projekt, kein Ein-Zeilen-Bump.
+
+*Option B — Zurückstellen bis TASK-105 entschieden ist:* `starlette` bleibt auf `0.37.2`, wird gemeinsam mit den 4 bereits blockierten Paketen im selben Zug behandelt, sobald Stephan die Python-Frage entscheidet. Vermeidet einen Doppel-Umbau (erst Teilfix, kurz danach nochmal Vollfix samt Python-Sprung).
+
+*Option C — Teilfix jetzt, ohne Python-Sprung (`fastapi>=0.121.0` + `starlette==0.49.3`):* Schließt 3 der 7 CVEs, bleibt auf Python 3.8/3.9 lauffähig, kein `on_event`-Umbau nötig (nur deprecated-Warnung, nicht entfernt). 4 CVEs bleiben bis zur TASK-105-Entscheidung offen — wie bei den anderen vier TASK-105-Paketen. Empfehlung des Rechercheberichts: eigener Regressionslauf gegen den `fastapi`-Minor-Bump vor Übernahme, auch wenn der Sprung laut FastAPI-Semver additiv/kompatibel sein sollte.
+
+✅ **Empfehlung (Recherche):** Option B als Standardweg (vermeidet Doppel-Umbau), Option C als Kompromiss falls Stephan schon vor der TASK-105-Entscheidung einen Teil-Sicherheitsgewinn will. Option A erst nach TASK-105-Entscheidung.
+
+**❓ Offene Entscheidung für Stephan:** Option B (zurückstellen, mit TASK-105 zusammen behandeln), Option C (Teilfix jetzt umsetzen, unabhängig von TASK-105) oder direkt Option A im Rahmen einer TASK-105-Umsetzung? Bis zur Entscheidung bleibt `starlette` unverändert.
+
+**Quellen:** PyPI-JSON-API (`pypi.org/pypi/starlette/<version>/json`, `pypi.org/pypi/fastapi/<version>/json`, Felder `vulnerabilities`/`requires_dist`/`requires_python`, live abgefragt 2026-08-16); Starlette Release Notes (starlette.dev/release-notes/).
+
+**Stephans Entscheidung (2026-08-16):** Option B — `starlette` bleibt unangetastet und wird zusammen mit den anderen 4 blockierten Paketen behandelt, sobald die Python-Frage aus TASK-105 entschieden ist. Kein Teilfix jetzt. Damit sind alle 5 verbleibenden Pakete (`Pillow`, `python-multipart`, `python-dotenv`, `pytest`, `starlette`) einheitlich über TASK-105 blockiert — TASK-104 hat aktuell keinen weiteren eigenständig umsetzbaren Schritt mehr, bis Stephan TASK-105 entscheidet.
+
+## Abschluss (2026-08-16)
+
+Gemeinsam mit TASK-105 released (kombinierter Commit 8db8e5d, main, GitHub-Actions-Lauf #323 komplett gruen: Frontend-Check, Backend-Tests, Deploy FotoAlert). Umgesetzt in diesem finalen Release: `PyJWT`→2.13.0, `cryptography`→49.0.0, `Pillow`→12.3.0, `python-multipart`→0.0.20, `pytest`→9.0.3 — insgesamt 5 der urspruenglich 7 identifizierten Pakete. `starlette` wurde bewusst NICHT gebumpt und bleibt transitiv ueber `fastapi==0.111.0` bei `0.37.2` — das ist Stephans explizite Entscheidung „Option B" aus der TASK-105-Diskussion, kein offener Punkt mehr fuer dieses Ticket. Ein vollstaendiger `fastapi`/`starlette`-Sprung (inkl. `on_event`→`lifespan`-Migration) bleibt als separates, zukuenftiges Ticket offen — nicht Teil von TASK-104/TASK-105. Live-Health-Check bestaetigt: `https://fotoalert.stephanschumann.com/health` liefert `{"status":"ok","version":"2.0.0","locations_count":172}`.
+
+---
+
+## Stephans Entscheidung (2026-08-16): Option C — kombinierter Release
+
+Stufe 1 (CI+lokal) und Stufe 2 (Prod) werden NICHT gestuft, sondern in einem gemeinsamen Release gefahren — löst die Stufe-1/Stufe-2-Kopplung im Deploy-Skript sauber auf, ohne die Reihenfolge umzukehren oder getrennte Requirements-Dateien einzuführen.
+
+**Ausdrücklich NICHT Teil dieses Releases:** `starlette`/`fastapi`-Vollfix (siehe TASK-104, Option A) — der erfordert zusätzlich den Umbau der `@app.on_event`-Hooks in `backend/main.py` auf `lifespan` (echte Code-Migration, kein reiner Versions-Bump) und wurde nicht separat freigegeben. Bleibt offen für einen eigenen Umsetzungsschritt, sobald Python >=3.10 aus diesem Release live ist.
+
+**Ablaufplan (Reihenfolge wichtig — vermeidet den in „Blockierender Fund“ oben beschriebenen fehlschlagenden Auto-Deploy):**
+
+1. **Server-Python zuerst umstellen** (Stephans Mac-Terminal, SSH als root): neues venv mit Python 3.12 parallel zum bestehenden aufbauen, mit den bereits vorbereiteten neuen Paketversionen befüllen, per Sanity-Import prüfen, DANN erst gegen das bestehende venv tauschen und den Dienst neu starten. Altes venv bleibt als Rückfallebene liegen (`venv_39_backup`).
+2. **Erst danach committen + pushen** (Stephans Mac-Terminal, im Repo): die bereits lokal vorbereiteten Dateien (`deploy.yml`, `update-building-data.yml`, `requirements.txt`, `CLAUDE.md`, `test_task-105.py`, `BACKLOG.md`) — das automatische CI+Deploy läuft dann gegen das bereits umgestellte Server-venv und sollte beim ersten Versuch grün durchlaufen.
+3. **Live-Verifikation** (Chrome-Browser-Subagent, nach grünem Deploy): Health-Check + Stichprobe der App-Kernfunktionen.
+
+Exakte Befehle für Schritt 1 und 2 liefert der Hauptthread direkt im Chat als kopierbare Codeblöcke (Terminal-Fenster-Modell beachten — Schritt 1 läuft in einer SSH-Sitzung zum Server, Schritt 2 im lokalen Repo-Terminal auf dem Mac, nicht mischen).
+
+---
+
+### Example Mapping
+
+**Scope-Check:** Das Ticket klingt nach einer reinen Abhängigkeits-Frage, ist bei näherer Prüfung aber ein Infrastruktur-Vorhaben mit Wirkung auf Produktionsserver, beide CI-Workflow-Dateien, Stephans lokale Entwicklungsumgebung und eine als harte Projektregel in `CLAUDE.md` §5 verankerte Aussage („Server läuft **Python 3.9**") — keine intentionale, in sich geschlossene Einschränkung, sondern ein erster, noch ungeklärter Slice eines größeren Vorhabens. Deshalb unten explizite Fragen statt stiller Annahmen.
+
+**Annahmen-Protokoll:**
+
+❓ **Frage 1 (🔴 kritisch — Zielversion):** Auf welche Python-Version soll gesprungen werden?
+- Option 3.10 — kleinstmöglicher Sprung, deckt die `requires_python`-Untergrenze aller vier blockierten Pakete knapp ab; widerspricht aber der bereits im Repo vorbereiteten `python3.12`-Weichenstellung in `deploy/setup_server.sh` (zwei separate Ziel-Infrastrukturen zu pflegen).
+- Option 3.11 — Zwischenstand ohne erkennbaren Vorteil gegenüber 3.10 oder 3.12, keine Fundstelle im Repo, die 3.11 nahelegt.
+- Option 3.12 — deckt sich mit dem bereits vorbereiteten (aber laut Ticketbeschreibung noch nicht angewendeten) `python3.12` in `deploy/setup_server.sh` (Zeile 37/82), längste Update-Runway vor der nächsten EOL.
+❓ **Frage 2 (🔴 kritisch — Reihenfolge):** Zuerst CI + Stephans Mac auf die Zielversion heben und dort vollständig verifizieren, dann erst Prod (gestuft) — oder Prod im selben Release-Zyklus mitziehen (direkt)?
+❓ **Frage 3 (🔴 kritisch — Grenzfall, siehe Implementierungsoptionen C):** Rechtfertigen alle vier blockierten Pakete zusammen den Runtime-Sprung, oder reicht als Zwischenlösung das eine noch 3.9-kompatible Teil-Update (`python-multipart` 0.0.9 → 0.0.20, schließt aber nur 1 von 6 verbleibenden Lücken dieses Pakets)?
+
+⚠️ **Annahme:** Der bereits real gefundene Nebeneffekt bei `pandas` (unbegrenzter Pin `pandas>=2.0.0` löst unter Python 3.12 auf Version 3.0.5 statt der aktuell installierten 2.3.3 auf, siehe Pre-Mortem) wird beim Bump mit einer expliziten Obergrenze (`<3.0.0`) abgefangen, nicht separat als eigener, ungeprüfter Major-Versionssprung mitgenommen — bitte bestätigen.
+⚠️ **Annahme:** Die reale Ubuntu-Version des laufenden Hetzner-Servers wird vor der Prod-Umsetzung verifiziert (Dokumentation nennt „Ubuntu 22.04", ein Kommentar im Skript selbst nennt bereits „Ubuntu 26.04" — Diskrepanz ungeklärt, siehe Pre-Mortem Szenario 2) — bitte bestätigen, dass dieser Check vor jeder Prod-Umsetzung erfolgt.
+
+**Rules + Examples (auf Basis bestätigter Fakten + markierter Annahmen):**
+
+📏 **Rule 1:** Die gewählte Python-Zielversion muss nicht nur die vier blockierten Pakete, sondern die komplette bestehende `requirements.txt` ohne Konflikt installieren.
+🟢 Example: Gegeben `requirements.txt` mit den vier reparierten Versionen (Pillow 12.3.0, python-multipart 0.0.20, python-dotenv 1.2.2, pytest 9.0.3) plus Rest, wenn gegen Python 3.12.3 installiert wird, dann installieren alle 20 Pakete ohne Fehlermeldung (echt verifiziert, siehe Pre-Mortem Code-Verifikation).
+
+📏 **Rule 2:** CI, Stephans lokale Entwicklungsumgebung und der Produktionsserver verwenden nach Abschluss dieselbe Python-Version — kein Ort bleibt zurück.
+🟢 Example: Gegeben beide GitHub-Workflow-Dateien (`deploy.yml`, `update-building-data.yml`) und `CLAUDE.md` §5, wenn die Migration abgeschlossen ist, dann pinnen beide Workflows dieselbe neue Version und `CLAUDE.md` behauptet nicht mehr „Server läuft Python 3.9".
+
+📏 **Rule 3:** Ein Fehlschlag beim Prod-Wechsel darf nicht zu dauerhaftem Ausfall oder Datenverlust führen.
+🟢 Example: Gegeben ein neu aufgebautes venv unter neuem Pfad, wenn der Health-Check danach rot bleibt, dann läuft der Dienst unverändert mit dem alten venv weiter (kein In-Place-Überschreiben ohne Fallback).
+
+**Fertig:** Alle drei 🔴-Fragen bleiben bewusst offen — sie werden unten im Weg-Gate gemeinsam mit den Implementierungsoptionen vorgelegt (siehe Regel „Grenzfälle mit mehreren sinnvollen Verhaltensweisen").
+
+---
+
+### Fundstellen-Sweep & Zustands-Check (Schritt 1b)
+
+**Fundstellen-Sweep:** Suchbegriff „Python 3.9" in `BACKLOG.md` → 23 Treffer über die gesamte Ticket-Historie (u. a. TASK-83-CI-Fehlschlag, US-38, US-72, US-112, BUG-60). Suchbegriff `from __future__ import annotations` in `backend/*.py` (ohne `tests/`, ohne `venv/`) → **59 Dateien**, die exakt wegen der 3.9-Kompatibilität so geschrieben sind. Suchbegriff `Optional[` (Python-3.9-Konvention statt `X | None`) → **38 Dateien**. Zusätzlich: `CLAUDE.md` §5 („Harte Projektregeln") Zeile 103 — „Server läuft **Python 3.9** — keine 3.10+-Syntax". `.github/workflows/deploy.yml` UND `.github/workflows/update-building-data.yml` pinnen beide unabhängig voneinander `python-version: "3.9"`. `.forgejo/workflows/deploy.yml` pinnt ebenfalls 3.9, ist aber laut TASK-80 als inaktive Kopie markiert (GitHub Actions ist die einzige aktive Pipeline) — für dieses Ticket nicht scope-relevant, aber bei einer künftigen Reaktivierung müsste sie mitgezogen werden. `deploy/setup_server.sh` sieht bereits `python3.12` vor (Zeilen 37, 82), `deploy/deploy.sh` dagegen installiert nur Abhängigkeiten in das *bestehende* venv (`"$VENV_DIR/bin/pip" install ...`, Zeile 71) und wechselt die Python-Version selbst **nicht** — der normale Auto-Deploy-Pfad bei jedem Push zieht einen Python-Versionswechsel also nicht automatisch mit. `deploy/DEPLOYMENT-GUIDE.md` Zeile 181 dokumentiert „Image: Ubuntu 22.04". Sechs Ansichten-Klassen (Liste/Karte/Kalender/Scout/Chancen-Übersicht/Event-Detail): nicht anwendbar — reines Backend-/Infrastruktur-Ticket ohne UI-Bezug, keine Fundstelle in einer dieser Ansichten.
+
+**Zustands-Check:**
+- **Wartezustand:** Während des eigentlichen Bump-Vorgangs auf dem Server (venv-Neuaufbau + Dependency-Install) ist der bestehende Dienst nur betroffen, wenn in-place gewechselt wird — bei der empfohlenen Parallel-venv-Strategie (siehe Option A) läuft der alte Dienst währenddessen unverändert weiter, kein sichtbarer Wartezustand für Nutzer der App.
+- **Leerzustand:** Nicht relevant — kein Datenzustand betroffen.
+- **Fehlerfall:** Schlägt der Wechsel fehl (Paket-Konflikt, apt-Paket nicht verfügbar, Health-Check bleibt rot), bleibt der bestehende Dienst auf der alten venv/Version aktiv, sofern Option A (Parallel-venv, kein In-Place-Überschreiben) umgesetzt wird — siehe eigenes Akzeptanzkriterium.
+
+---
+
+### Pre-Mortem
+
+**📎 Code-Verifikation (echt durchgeführt, 2026-08-13):**
+- `CLAUDE.md` Zeile 103 gelesen: bestätigt „Server läuft **Python 3.9** — keine 3.10+-Syntax (`str|None`)" als harte Projektregel, keine Vermutung.
+- `.github/workflows/deploy.yml` Zeilen 50–53, 148–151 UND `.github/workflows/update-building-data.yml` Zeile 43–46 gelesen: beide pinnen unabhängig voneinander `python-version: "3.9"` über `actions/setup-python@v5` — zwei getrennte Fundstellen, nicht eine.
+- `deploy/deploy.sh` vollständig gelesen: Zeile 71 installiert nur `pip install -r requirements.txt` in das **bestehende** `$VENV_DIR` — bestätigt, dass der normale CI/CD-Auto-Deploy-Pfad die Python-Interpreter-Version NICHT mitwechselt; ein Versionssprung erfordert einen zusätzlichen, gezielten Schritt (Re-Lauf von `setup_server.sh`-Teilen oder gleichwertig) gegen den bereits laufenden Server.
+- `deploy/deploy.sh` Zeilen 92–112 gelesen: bestehender Rollback-Automatismus macht bei rotem Health-Check ausschließlich `git checkout $PREV_COMMIT` (Code) + Service-Neustart — **kein** Zurücksetzen der venv/Python-Version. Widerlegt die stille Annahme „Rollback ist bereits abgesichert": der bestehende Automatismus deckt einen Python-Versionswechsel nicht ab, weil er nur für reine Code-Änderungen gebaut wurde.
+- Echter `pip install`-Test (Cloud-Sandbox mit Internet, nicht die Geräte-Brücke) unter frisch aufgesetztem Python 3.12.3: komplette `requirements.txt` inkl. aller vier TASK-104-Zielversionen (Pillow 12.3.0, python-multipart 0.0.20, python-dotenv 1.2.2, pytest 9.0.3) installiert **ohne Konflikt** — 20/20 Pakete erfolgreich. Bestätigt Rule 1.
+- Dabei entdeckt (nicht vermutet): `pandas>=2.0.0` (kein Obergrenze in `requirements.txt`) löst unter Python 3.12 auf **3.0.5** auf; das aktuell unter Python 3.9 installierte, im Mount vorgefundene venv hat **2.3.3** installiert (`backend/venv/lib/python3.9/site-packages/pandas-2.3.3.dist-info`). Realer, durch den Runtime-Sprung ausgelöster ungeplanter Major-Versionssprung einer fünften Bibliothek, zusätzlich zu den vier eigentlichen Zielpaketen.
+- `deploy/setup_server.sh` Kommentarzeile 80 gelesen: „Ubuntu 26.04 hat Python 3.14 als Standard […] deshalb explizit 3.12 verwenden" — widerspricht dem in Kopfzeile 3 und `DEPLOYMENT-GUIDE.md` Zeile 181 dokumentierten „Ubuntu 22.04". Auf echtem, unverändertem Ubuntu 22.04 (Jammy) ist `python3.12` nicht ohne Zusatz-Repository (z. B. deadsnakes-PPA) über die Standard-`apt`-Quellen installierbar — das Skript fügt keine PPA hinzu. Es ist unklar, ob das Skript je gegen ein frisches 22.04-Image getestet wurde oder ob der reale Server inzwischen auf einer neueren, nicht dokumentierten Ubuntu-Version läuft.
+- Historischer Präzedenzfall real verifiziert (nicht neu, aber für dieses Pre-Mortem hochrelevant): TASK-83, Release `v1.22.42`, GitHub-Actions-Run #253 — CI-Runner lief unter Python 3.9.25, eine vorherige Verifikation lief unter Python 3.11; ein `asyncio.Semaphore(1)`-Konstruktionsmuster verhielt sich zwischen den beiden Versionen unterschiedlich und blockierte den Deploy (Gate griff korrekt, kein Prod-Schaden) — echter Beleg dafür, dass Python-Versionsunterschiede zwischen Verifikations- und Zielumgebung bei diesem Projekt bereits einmal einen realen, wenn auch abgefangenen, Fehlschlag verursacht haben.
+
+**Versagensszenarien:**
+
+💀 **Szenario 1 — Prod-venv-Wechsel schlägt mitten im Umbau fehl → Dienst bleibt down.**
+Auslöser: In-Place-Überschreiben des bestehenden venv statt Parallelaufbau.
+Frühwarnung: Health-Check nach dem Wechsel rot.
+Gegenmaßnahme: Neues venv unter eigenem Pfad parallel aufbauen, systemd-Unit-Verweis (`__VENV_DIR__`-Ersetzungsmuster existiert bereits in `setup_server.sh`) erst nach grünem Health-Check + vollem Regressionstest umbiegen, altes venv als Fallback stehen lassen → eigenes AK.
+
+💀 **Szenario 2 — `apt-get install python3.12` scheitert auf dem echten Server, weil Ubuntu 22.04 dieses Paket nicht ohne Zusatz-Repository anbietet.**
+Auslöser: Diskrepanz zwischen dokumentierter Server-Version (22.04) und Skript-Kommentar (26.04), keine PPA im Skript.
+Frühwarnung: `apt-cache policy python3.12` vorab auf dem echten Server geprüft.
+Gegenmaßnahme: Vor jeder Prod-Umsetzung reale Server-Version + Paketverfügbarkeit von Stephan verifizieren lassen (`lsb_release -a`, `apt-cache policy python3.12`) → eigenes AK.
+
+💀 **Szenario 3 — `pandas` springt unbeabsichtigt von 2.x auf 3.x mit.**
+Auslöser: echter, oben dokumentierter pip-Install-Fund (2.3.3 vs. 3.0.5).
+Frühwarnung: `pip list` nach der Installation gegen die Vorher-Liste diffen.
+Gegenmaßnahme: `requirements.txt` bekommt beim Bump eine explizite Obergrenze für `pandas` (`<3.0.0`) → eigenes AK.
+
+💀 **Szenario 4 — CI und Prod driften auseinander, weil nur eine der beiden Workflow-Dateien aktualisiert wird.**
+Auslöser: zwei getrennte, unabhängige `python-version: "3.9"`-Pins in `deploy.yml` UND `update-building-data.yml`; historischer Präzedenzfall TASK-83 zeigt, dass genau diese Art Versions-Drift real zu einem CI-Fehlschlag geführt hat.
+Frühwarnung: Fundstellen-Sweep (oben) listet beide Dateien namentlich.
+Gegenmaßnahme: beide Workflow-Dateien im selben Schritt ändern → eigenes AK.
+
+💀 **Szenario 5 — Stephans lokale Mac-Entwicklungsumgebung bleibt auf Python 3.9, während CI/Prod bereits gewechselt sind.**
+Auslöser: Reihenfolge-Entscheidung (Frage 2) offen; lokales venv unter `backend/venv/lib/python3.9/` bereits mehrfach als eigenständige Fehlerquelle dokumentiert (venv-Symlink-Problem in den TASK-104-Zwischenständen).
+Frühwarnung: `backend/venv/bin/python3 --version` vor jedem lokalen Testlauf prüfen.
+Gegenmaßnahme: lokales Mac-venv im selben Zug wie CI neu mit Zielversion aufbauen (altes venv umbenennen statt löschen) → eigenes AK.
+
+**Zusammenspiel bestehender Bausteine:** `setup_server.sh` legt das Prod-venv einmalig mit fester Python-Version an; `deploy.sh` installiert bei jedem Push nur Pakete in dieses bestehende venv, wechselt aber nie die Interpreter-Version selbst; die systemd-Units (`fotoalert.service`, `fotoalert-precompute.service`) referenzieren den venv-Pfad nur indirekt über einen bei der Ersteinrichtung einmalig ersetzten Platzhalter (`__VENV_DIR__`). Ein Python-Versionssprung auf dem laufenden Server ist damit **kein automatischer Nebeneffekt eines normalen Releases**, sondern erfordert einen bewusst separaten, manuell angestoßenen Schritt — der bestehende Auto-Rollback in `deploy.sh` (nur `git checkout`) deckt diesen Schritt nicht ab (siehe Code-Verifikation oben).
+
+**Zwei Pflicht-Checkfragen:**
+- E2E-/Filter-/datenbezogenes Ticket? Nein, kein Frontend-Filter-Bezug — nicht anwendbar.
+- Pre-Mortem empfiehlt eine „sicherere" Option (B, gestuft) — dasselbe Risiko erneut gegen Option B geprüft? Ja: Auch bei gestufter Reihenfolge bleiben Szenario 1–3 (Prod-Wechsel selbst, apt-Verfügbarkeit, pandas-Pin) unverändert bestehen, weil sie den Prod-Schritt selbst betreffen, unabhängig davon, wann er erfolgt — Option B reduziert nur das Risiko aus Szenario 4/5 (Environment-Drift), nicht 1–3. Alle fünf Szenarien fließen deshalb unabhängig von der gewählten Reihenfolge in die Akzeptanzkriterien ein.
+
+---
+
+### Architektur-Analyse
+
+**Betroffene Dateien (wirklich gelesen, nicht überflogen):**
+- `backend/requirements.txt` — die vier TASK-104-Zielpakete + `pandas`-Obergrenze.
+- `.github/workflows/deploy.yml` (zwei `python-version: "3.9"`-Stellen, Zeilen 50–53 + 148–151) und `.github/workflows/update-building-data.yml` (Zeile 43–46) — beide CI-Pipelines.
+- `.forgejo/workflows/deploy.yml` — laut TASK-80 inaktive Kopie, nicht im Scope, aber als Fundstelle dokumentiert.
+- `deploy/setup_server.sh` (Zeilen 36–37, 79–84) — Ziel-Python-Version + apt-Pakete für Neuaufbau; Kommentar-Diskrepanz Ubuntu-Version (Zeile 3 vs. 80).
+- `deploy/deploy.sh` (Zeile 71, Zeilen 92–112) — bestätigt: kein automatischer Versionswechsel, bestehender Rollback deckt nur Code ab.
+- `deploy/DEPLOYMENT-GUIDE.md` (Zeile 181) — dokumentierte Server-Version.
+- `CLAUDE.md` §5 (Zeile 103) — harte Projektregel, muss nach Umsetzung aktualisiert werden.
+- 59 Dateien unter `backend/` mit `from __future__ import annotations` und 38 mit `Optional[`-Konvention — werden durch einen Python-Sprung NICHT beschädigt (postponed evaluation of annotations funktioniert unter jeder neueren Version weiter), sind aber ein Beleg für die Größe der bestehenden 3.9-Konvention; keine Änderung an diesen Dateien selbst nötig oder im Scope dieses Tickets.
+
+**Designer-Check:** Nicht visuell — kein UI-Element, keine Karten-/Overlay-Änderung, kein App-Screenshot betroffen. Übersprungen.
+
+---
+
+### Implementierungsoptionen + Empfehlung
+
+**Option A — Gestufter Sprung auf Python 3.12, zuerst CI + lokal verifizieren, dann Prod mit Parallel-venv-Strategie (empfohlen)**
+- Vorgehen: (1) `requirements.txt` auf die vier reparierten Versionen + `pandas<3.0.0`-Obergrenze anheben. (2) Beide GitHub-Workflow-Dateien im selben Schritt von `"3.9"` auf `"3.12"` ändern. (3) Stephans lokales Mac-venv parallel neu mit 3.12 aufbauen (altes venv umbenennen, nicht löschen). (4) Volle Backend-Testsuite lokal + im echten CI-Lauf grün bekommen. (5) Erst danach, nach Klärung von Pre-Mortem-Szenario 2 (reale Server-/Ubuntu-Version + apt-Verfügbarkeit): neues Prod-venv parallel unter neuem Pfad aufbauen, erst nach grünem Health-Check + vollem Regressionstest den systemd-Unit-Verweis umbiegen, altes venv als Fallback erhalten. (6) `CLAUDE.md` §5 aktualisieren.
+- Betroffene Dateien: siehe Architektur-Analyse.
+- Vorteile: Fehler werden lokal/CI entdeckt, bevor Prod betroffen ist; schließt die real gefundene Rollback-Lücke (Szenario 1), statt sie zu riskieren; volle Kontrolle über Reihenfolge.
+- Nachteile/Risiken: mehr Einzelschritte, die eigentlichen Sicherheitslücken bleiben bis zum letzten Schritt offen; erfordert Stephans manuellen Eingriff auf dem echten Server (kein vorhandener Automatismus für einen Interpreter-Wechsel).
+- Aufwand: mittel bis groß.
+
+**Option B — Direkter Sprung, Prod im selben Release-Zyklus mitgezogen**
+- Vorgehen: requirements.txt + beide CI-Workflows + Prod-venv in einem zusammenhängenden Release ändern.
+- Vorteile: schneller abgeschlossen, ein Release-Zyklus statt zwei.
+- Nachteile/Risiken: kombiniert alle fünf Pre-Mortem-Szenarien ungefiltert in einem einzigen, sofort live wirksamen Schritt; kein vorheriger Kompatibilitätsnachweis vor dem Prod-Wechsel; widerspricht der in TASK-104 selbst etablierten Konvention (AK5: Breaking-Change-Migrationen vorab zurückmelden statt durchziehen).
+- Aufwand: mittel (bei höherem Risiko).
+
+**Option C — Nur das eine noch 3.9-kompatible Teil-Update einspielen, Runtime-Sprung ganz zurückstellen**
+- Vorgehen: kein Python-Wechsel; nur `python-multipart` 0.0.9 → 0.0.20 (letzte 3.9-kompatible Version) einspielen, die übrigen drei Pakete bleiben auf ihrer laut TASK-104 verwundbaren Version.
+- Vorteile: kein Infrastruktur-Risiko, sofort umsetzbar.
+- Nachteile/Risiken: schließt nur 1 von 6 verbleibenden `python-multipart`-Lücken und lässt `Pillow` (höchste gemeldete Lückenzahl, „Stephans ursprünglicher Verdacht") komplett ungefixt, weil dafür laut TASK-104-Recherche **kein** 3.9-kompatibler Fix existiert — löst das eigentliche, dringendste Problem nicht, verschiebt es nur.
+- Aufwand: klein — bei geringstem Nutzen.
+
+✅ **Empfehlung: Option A.** Löst tatsächlich alle vier blockierten Pakete (im Gegensatz zu C), begrenzt das reale, dokumentierte Risiko aus dem Pre-Mortem durch eine gestufte Reihenfolge mit Parallel-venv-Fallback (im Gegensatz zu B) und führt die bereits im Repo vorbereitete, aber noch nicht angewendete `python3.12`-Weichenstellung in `setup_server.sh` konsequent zu Ende, statt eine zweite, konkurrierende Zielversion (3.10/3.11) einzuführen.
+
+**Offene Grenzfall-Wahlfragen (aus Example Mapping, hier erneut vorgelegt):**
+❓ Frage 1 (Zielversion 3.10 / 3.11 / **3.12 empfohlen**) — siehe oben.
+❓ Frage 2 (Reihenfolge gestuft **(Option A, empfohlen)** vs. direkt (Option B)) — siehe oben.
+❓ Frage 3 (alle vier Pakete umsetzen **(Option A, empfohlen)** vs. nur Teil-Update (Option C)) — siehe oben.
+
+---
+
+### 🚦 Ampel-Ergebnis
+
+🔴 **Rot — braucht Stephans Entscheidung:**
+- **Frage 2 (Ampel-Kriterium 2 — Scope-Grenze):** Der Eingriff bleibt nicht innerhalb des Tickets, sondern verändert Produktions-Runtime, beide CI-Workflow-Dateien, Stephans lokale Entwicklungsumgebung und eine als harte Projektregel in `CLAUDE.md` §5 verankerte, projektweite Aussage — mit Wirkung auf mind. 59 Dateien, die explizit auf der bisherigen Python-3.9-Konvention aufbauen.
+- **Frage 4 (Ampel-Kriterium 4 — Pre-Mortem-Risiko):** Das Pre-Mortem fand reales, teils bereits historisch eingetretenes Risiko — den dokumentierten TASK-83-CI-Fehlschlag (v1.22.42, GitHub-Actions-Run #253) durch exakt diesen Python-Versionsunterschied, eine verifizierte Rollback-Lücke im bestehenden `deploy.sh`-Automatismus (deckt nur Code, nicht die Python-Runtime ab) sowie eine ungeklärte Diskrepanz zwischen dokumentierter (22.04) und im Skript erwähnter (26.04) Ubuntu-Version des echten Servers.
+
+Zusätzlich fehlt bei allen drei offenen Grenzfall-Fragen (Zielversion, Reihenfolge, Paket-Umfang) noch Stephans explizite Wahl — auch wenn die Empfehlung (3.12, gestuft, alle vier Pakete) in jedem Fall klar begründet ist.
+
+---
+
+### Analyse & Planung
+
+- [x] Example Mapping durchgeführt
+- [x] Fundstellen-Sweep: „Python 3.9" (23 Treffer BACKLOG.md), `from __future__ import annotations` (59 Dateien), `Optional[` (38 Dateien), plus CLAUDE.md/CI-Workflows/Deploy-Skripte namentlich geprüft
+- [x] Zustands-Check: Warte-/Leer-/Fehlerfall je Kernschritt dokumentiert (kein Nutzer-sichtbarer Wartezustand bei Parallel-venv-Strategie, Leerzustand nicht relevant, Fehlerfall über Rollback-AK abgesichert)
+- [x] Pre-Mortem durchgeführt (5 Szenarien, echte Code-Verifikation inkl. echtem pip-Install-Test unter Python 3.12.3)
+- [x] Architektur analysiert: `backend/requirements.txt`, `.github/workflows/deploy.yml`, `.github/workflows/update-building-data.yml`, `deploy/setup_server.sh`, `deploy/deploy.sh`, `deploy/DEPLOYMENT-GUIDE.md`, `CLAUDE.md` §5
+- [x] Designer-Check: visuell? → nein, übersprungen
+- [x] Implementierungsoptionen: A (gestuft, empfohlen) / B (direkt) / C (Teil-Update, ungenügend)
+- [x] Empfehlung: Option A — Zielversion 3.12, gestufte Reihenfolge (CI+lokal zuerst, dann Prod mit Parallel-venv)
+- [x] AK-Qualitäts-Check durchgeführt (Schritt 6c): 8 AKs auf 6 Dimensionen geprüft, alle vier Negativ-/Randfall-Kategorien mit Trigger explizit adressiert (Rollback, Beobachtbarkeit, Grenzwerte, Berechtigungen als „nicht relevant" begründet), Herkunft jedes AK auf Pre-Mortem-Szenario oder Frage zurückverfolgt — Details siehe eigener Abschnitt unten
+
+---
+
+### Akzeptanzkriterien
+
+- [x] **AK1:** Nach dem Sprung installieren sich alle bisher verwendeten Software-Bausteine (die komplette Abhängigkeitsliste des Backends) ohne Fehlermeldung unter der neuen Python-Version — inklusive der vier ursprünglich blockierten (Bildverarbeitung, Datei-Upload-Hilfsbibliothek, Umgebungsvariablen-Hilfsbibliothek, Testwerkzeug). *(Herkunft: Pre-Mortem Code-Verifikation, echter pip-Install-Test bestanden.)*
+- [x] **AK2:** Die komplette automatisierte Backend-Testsuite läuft nach dem Sprung durch, ohne dass neue, durch den Versionswechsel verursachte Fehlschläge auftreten (bereits bekannte, unabhängige Fehlschläge zählen nicht als Regression, wie bereits in TASK-104 dokumentiert). *(Herkunft: bestehende Projektkonvention, TASK-104 AK1/AK3.)*
+- [ ] **AK3 Edge Case:** Falls beim Umbau des Produktionsservers ein Fehler auftritt (App startet nicht, Gesundheits-Check schlägt fehl), lässt sich die alte, funktionierende Umgebung ohne Datenverlust und ohne manuellen Server-Zugriff über den bereits vorhandenen Automatismus hinaus wiederherstellen. *(Herkunft: Pre-Mortem Szenario 1, verifizierte Rollback-Lücke im bestehenden `deploy.sh`.)*
+- [ ] **AK4:** Sowohl der automatische Prüflauf (beide GitHub-Workflows) als auch Stephans eigener Rechner als auch der Produktionsserver verwenden danach dieselbe Python-Version — keiner der drei Orte bleibt versehentlich auf der alten Version zurück. *(Herkunft: Pre-Mortem Szenario 4/5, realer TASK-83-Präzedenzfall.)*
+- [ ] **AK5:** Die im Projekt dokumentierte, harte Regel „Server läuft Python 3.9" wird nach dem Sprung auf die neue, tatsächlich verwendete Version aktualisiert. *(Herkunft: Fundstellen-Sweep, CLAUDE.md §5.)*
+- [x] **AK6 Edge Case:** Eine bereits vorhandene, bisher unbegrenzte Versionsspanne einer Datenverarbeitungs-Bibliothek (aktuell „ab Version 2, ohne Obergrenze") wird beim Sprung nicht ungeprüft mit auf eine neue Hauptversion (3) gezogen, sondern bewusst auf die bisherige Hauptversion begrenzt. *(Herkunft: Pre-Mortem Szenario 3, echter Fund: pandas löst unter der neuen Version auf 3.0.5 statt der aktuell installierten 2.3.3 auf.)*
+- [ ] **AK7:** Vor der Umsetzung auf dem echten Produktionsserver ist geklärt (nicht nur angenommen), welche Betriebssystem-Version dort tatsächlich läuft und ob die vorgesehene neue Python-Version dort ohne ein zusätzliches Software-Verzeichnis installierbar ist. *(Herkunft: Pre-Mortem Szenario 2, Diskrepanz Dokumentation „Ubuntu 22.04" vs. Skript-Kommentar „Ubuntu 26.04".)*
+- [ ] **AK8:** Von den vier ursprünglich blockierten Software-Bausteinen wird für jeden einzeln dokumentiert, ob die zugehörige Sicherheitslücke damit vollständig oder nur teilweise geschlossen ist — kein Baustein gilt stillschweigend als „erledigt", wenn das nicht zutrifft (z. B. bei der Datei-Upload-Hilfsbibliothek, deren letzte 3.9-kompatible Version laut TASK-104-Recherche nur 1 von 7 gemeldeten Lücken schließt — die volle Reparatur braucht ohnehin den Runtime-Sprung). *(Herkunft: bestehende Projektkonvention, TASK-104 AK4.)*
+
+**🔍 AK-Qualitäts-Check (Schritt 6c):**
+
+*Sechs Dimensionen:*
+1. **Granularität:** Jedes AK prüft genau ein eigenständiges Verhalten; AK4 (Versionsgleichheit CI/lokal/Prod) wurde bewusst NICHT mit AK5 (CLAUDE.md-Textänderung) zusammengelegt, da beide unabhängig voneinander scheitern können.
+2. **Polarität:** AK1 (positiver Installationserfolg) hat mit AK6/AK8 je ein Negativ-/Grenzfall-Gegenstück (nicht ungeprüft mitziehen / nicht stillschweigend als erledigt gelten); AK2 (Testsuite grün) hat mit AK3 (Fehlerfall Rollback) sein Gegenstück.
+3. **Messbarkeit:** Alle acht AKs in Alltagssprache über App-/Betriebs-Wirkung formuliert, keine Funktions- oder Variablennamen als Entscheidungsgrundlage (Ausnahme: `pandas`/„Datenverarbeitungs-Bibliothek" in AK6 bewusst umschrieben) — beim erneuten Durchgang kein technischer Begriff gefunden, der sich eingeschlichen hätte.
+4. **Vier-Kategorien-Abdeckung:** Funktional (AK1/AK2/AK4/AK8) ✓; Nicht-funktional/Sicherheit (AK8 — Lücken-Status je Paket) ✓, Performance/Skalierbarkeit/Zugänglichkeit nicht relevant (reines Infrastruktur-Ticket ohne UI/Last-Bezug); Architektur/Rückwärtskompatibilität (AK6 — pandas-Obergrenze verhindert ungeplanten Breaking Change) ✓; Sonstige/Betriebsübergabe (AK5 — Projektdoku aktualisiert, AK7 — Server-Voraussetzung geklärt) ✓.
+5. **Testbarkeit ohne Rückfrage:** Für AK4/AK5/AK6 real als pytest-Fälle geschrieben und gegen den aktuellen Code-Stand ausgeführt (siehe Testplan) — alle drei liefern den erwarteten Rot-Nachweis, bestätigt eindeutige Testbarkeit ohne Rückfrage.
+6. **Herkunftsnachvollziehbarkeit:** Jedes AK trägt oben einen expliziten Herkunftsvermerk (Pre-Mortem-Szenario oder bestehende Projektkonvention).
+
+*Negativ-/Randfall-Checkliste:*
+| Kategorie | Ergebnis |
+|---|---|
+| Grenzwerte | nicht relevant — kein numerischer Schwellwert im Scope |
+| Ungültige/fehlende Eingaben | AK1 deckt den Fall „Installation schlägt fehl" implizit über den Erfolgsnachweis ab |
+| Nebenläufigkeit | nicht relevant — kein gleichzeitiger Mehrnutzer-Schreibzugriff betroffen |
+| Verhalten unter Lastgrenzen | nicht relevant — kein Last-/Performance-Bezug |
+| Leerer/übervoller Zustand | bereits im Zustands-Check (Schritt 1b) behandelt, hier nur bestätigt: nicht relevant |
+| Berechtigungen/Zugriffsschutz | nicht relevant — keine Rollen-/Auth-Änderung |
+| Abwärtskompatibilität | AK6 (pandas-Obergrenze) deckt den einzigen real gefundenen Abwärtskompatibilitäts-Risikofall ab |
+| Rollback-/Wiederanlauffähigkeit | AK3, bereits ausformuliert — nur bestätigt, nicht dupliziert |
+| Beobachtbarkeit im Fehlerfall | AK7 deckt Vorab-Beobachtbarkeit ab (Server-Voraussetzung klären, bevor blind losgelegt wird); der bestehende `deploy.sh`-Health-Check-Log bleibt für den eigentlichen Fehlerfall unverändert zuständig |
+
+---
+
+### Testplan
+
+- [x] **Automatisiert (Harness):** Neue Datei `backend/tests/test_task-105.py` angelegt (Marker `offline`, `regression`, `requires_full_checkout`), deckt AK4/AK5/AK6 als datei-inhaltliche Regressionstests ab: `test_ak6_pandas_pin_has_explicit_upper_bound`, `test_ak4_both_github_workflows_pin_same_non_39_python_version`, `test_ak5_claude_md_hard_rule_updated`. **Rot-Nachweis (2026-08-13, echt durchgeführt** als äquivalentes Text-/Regex-Skript außerhalb von pytest, da im Geräte-Brücken-Sandbox kein `pytest`-Modul installierbar war — Syntax der eigentlichen Testdatei separat per `python3 -m py_compile` geprüft, fehlerfrei): alle drei Prüfungen schlagen erwartungsgemäß fehl — `pandas` hat weiterhin keine Obergrenze (`pandas>=2.0.0`), beide Workflow-Dateien pinnen weiterhin `"3.9"`, `CLAUDE.md` behauptet weiterhin „Server läuft Python 3.9". In `backend/tests/README.md` registriert (TASK-79-Konvention). AK1/AK2/AK3/AK7/AK8 sind prozess-/betriebsabhängig (echter Server-Zugriff, echter Testsuite-Lauf unter neuer Version, manuelle Server-Recherche) und bleiben manuelle Prüfpunkte — siehe unten.
+- [x] **Stufe 1 real getestet (2026-08-13, Stephans Mac):** Lokaler venv-Neuaufbau unter Python 3.12.14, `pip install -r requirements.txt` fehlerfrei (AK1 real bestätigt). Volle Backend-Testsuite: 841 Tests, 2 failed, 835 passed, 6 skipped, 1 xpassed, Laufzeit 576.42s. Beide Fehlschläge geprüft, keine Regression durch den Versionswechsel: `test_ephemeris_engine.py::test_ak6_passage_coverage[brandenburger_tor_tiergarten]` (bekannter, vorbestehender last-/timing-empfindlicher Test, identisch mit dem einzigen Fehlschlag im letzten TASK-104-Kombi-Testlauf) und `test_task-105.py::TestTask105PythonVersionMigrationConsistency::test_ak5_claude_md_hard_rule_updated` (bewusst rot, da AK5/CLAUDE.md-Aktualisierung erst in Stufe 2 erfolgt). Die beiden anderen TASK-105-eigenen Tests (AK4-Workflow-Check, AK6-pandas-Obergrenze) sind grün. 3 Tests übersprungen, weil `playwright` in der neuen lokalen venv fehlt — als unkritisch verifiziert: `deploy.yml` installiert Playwright bewusst separat nur für den CI-Job, nicht über `requirements.txt` (Zeilen 59-62); kein TASK-105-Fund, betrifft nur die lokale Testumgebung.
+- [ ] **Manuell (nach Stephans Weg-Gate-Entscheidung, unter der jeweils gewählten Option):**
+  1. `pip install -r backend/requirements.txt` unter der Zielversion lokal/CI ausführen → AK1.
+  2. `pytest tests/ -v` unter der Zielversion → AK2 (Vergleich gegen die bereits bekannten, unabhängigen Fehlschläge aus dem `cryptography`/`PyJWT`-Zwischenstand).
+  3. `lsb_release -a` + `apt-cache policy python3.12` auf dem echten Hetzner-Server ausführen und Ergebnis zurückmelden → AK7 (PFLICHT vor jedem Prod-Schritt, siehe Pre-Mortem Szenario 2).
+  4. Nach dem Prod-Wechsel: `/health`-Endpoint grün, danach gezielt einen roten Testlauf simulieren (z. B. durch einen absichtlich falschen Pfad) um den Rollback-Pfad einmal real zu beobachten → AK3.
+  5. Für jedes der vier TASK-104-Pakete den tatsächlichen Lücken-Schließungsstatus dokumentieren (vollständig/teilweise) → AK8.
+
+**Deploy-Risikofund (2026-08-13):** Push/Workflow-Dispatch JETZT würde einen echten Produktions-Deploy auslösen (kein Branch-Schutz am deploy-Job), der in `deploy.sh` Schritt 4 wegen der jetzt Python-≥3.10-pflichtigen Paketversionen gegen das bestehende Python-3.9-Server-venv fehlschlagen würde — VOR dem Health-Check-Rollback, also ohne automatische Reparatur. Push/Dispatch bleibt deshalb zurückgestellt, bis Stufe 2 (Server-Python-Umstellung) im selben Deploy-Fenster bereit ist.
+
+## Abschluss (2026-08-16)
+
+Gemeinsam mit TASK-104 released (kombinierter Commit 8db8e5d, main, GitHub-Actions-Lauf #323 komplett gruen: Frontend-Check, Backend-Tests, Deploy FotoAlert). Ueberraschender Fund waehrend der Umsetzung: Der Produktionsserver lief entgegen der bisherigen Doku bereits seit Juni 2026 auf Python 3.12 (nicht 3.9) — die urspruenglich geplante separate „Stufe-2"-Server-Migration war dadurch nicht mehr noetig. CLAUDE.md Zeile 103 wurde entsprechend korrigiert. Ein serverseitiger venv-Swap-Testversuch schlug zwischenzeitlich fehl (Shebang-Pfad-Bug in einem Migrationsskript) und wurde erfolgreich zurueckgerollt, ohne bleibenden Schaden — der Server lief am Ende auf der urspruenglichen, bereits-3.12-basierten venv weiter, keine Downtime im finalen Zustand. Beide GitHub-Workflow-Dateien (`deploy.yml`, `update-building-data.yml`) wurden auf `python-version: "3.12"` gepinnt. Live-Health-Check bestaetigt: `https://fotoalert.stephanschumann.com/health` liefert `{"status":"ok","version":"2.0.0","locations_count":172}`, Locations-Ansicht laedt echte Daten (per Chrome-Browser bestaetigt).
+
+---
+
+## Implementierung (fotoalert-impl, 2026-08-10)
+
+**(a) Fehlermeldungen:** `backend/main.py` — an den 2 echten Fundstellen (precompute-Subprozess-Fehlerpfad, manueller Sichtachsen-Refresh) liefert die Status-Abfrage jetzt nur noch eine allgemeine Meldung; der volle technische Text bleibt im Server-Protokoll erhalten. **Real getestet:** 2 neue automatisierte Tests, beide grün (`2 passed`).
+
+**(c) Upload-Größenprüfung:** `backend/main.py`, `upload_location_image()` — liest die Datei jetzt in Stücken statt auf einmal und bricht sofort ab, sobald die 20-MB-Grenze überschritten wird, bevor der Rest gelesen wird. **Real getestet:** 5 neue automatisierte Tests grün, zusätzlich 61 bestehende Tests aus verwandten Bereichen als Regressionsschutz erneut grün (0 Fehlschläge).
+
+**(d) Systemdienst-Absicherung:** Beide Dienst-Dateien (`deploy/fotoalert.service`, `deploy/fotoalert-precompute.service`) haben jetzt die für diese Art App üblichen Betriebssystem-Schutzmaßnahmen erhalten (vorher hatte der zweite Dienst gar keine). Bewusst eine etwas vorsichtigere Variante gewählt, die laut Code-Prüfung mit den tatsächlich benötigten Schreibrechten der App verträglich sein sollte — **eine echte Bestätigung auf dem Server steht aber noch aus, das kann aus dieser Arbeitsumgebung nicht geprüft werden (AK5).**
+
+**Status-Update (2026-08-10):** → **In Test**. (a)/(c) sind durch echte automatisierte Tests bestätigt. (d) braucht noch deine Bestätigung nach dem Ausrollen: einmal `systemctl daemon-reload` + Neustart beider Dienste, dann prüfen ob die App normal erreichbar ist, ein Bild-Upload funktioniert und die tägliche Vorausberechnung durchläuft.
+
+## Abschluss (2026-08-11)
+
+AK5 konnte nicht per direktem Server-Login bestätigt werden (Stephan hatte das SSH-Passwort nicht zur Hand). Stattdessen wurde das Veröffentlichungs-Protokoll des Deploys direkt geprüft (GitHub-Actions-Log, Commit `40222bd`, Lauf #316): `systemctl daemon-reload` lief fehlerfrei, `fotoalert.service` wurde neu gestartet, der eingebaute automatische Gesundheits-Check (bis zu 5 Versuche über 25s) war erfolgreich — bei einem Fehlschlag hätte das Deploy-Skript automatisch zurückgerollt, das Protokoll zeigt stattdessen "✅ Deploy erfolgreich!". Das bestätigt die Systemdienst-Härtung für den Hauptdienst unter echter Last (Neustart + Erreichbarkeitsprüfung), nicht nur einen Momentzustand. Einschränkung: Der Neustart-Befehl für den zweiten Dienst (`fotoalert-precompute`, läuft nur nach Zeitplan über einen Timer) lief ebenfalls fehlerfrei, ob der nächste geplante Lauf selbst sauber durchläuft, ist damit aber nicht zu 100% bestätigt — geringes Risiko, da reine Absicherungs-Direktiven ohne Verhaltensänderung. Stephan hat zugestimmt, das Ticket auf dieser Basis abzuschließen.
+
+---
+
+## Analyse (fotoalert-analyze, 2026-08-10)
+
+**Code-Verifikation:** Verifiziert: `release.sh` Zeilen 66–92 (Merge-Konflikt-Pre-Check, TASK-88-Kommentar, `git status --porcelain`-basiert, läuft vor den sed-Edits), `fotoalert-release`/SKILL.md ca. Zeilen 206–242 (dokumentiertes `git stash push`/Release/`git stash pop`-Muster inkl. Verweis auf `references/edge-cases.md`), `references/edge-cases.md` ca. Zeilen 43–218 (Merge-Konflikt-Behandlung beim `stash pop`, insbes. Schritt 4 „`git commit -m "merge: <kurzbeschreibung>"`“ und der `git show --stat HEAD`-Pflichtcheck aus BUG-80).
+
+**Kritische Bewertung:** Der release.sh-Check (Zeilen 66–92) und die dokumentierte Ad-hoc-Commit-Lücke in `edge-cases.md` sind **nicht dieselbe Fundstelle**, sondern zwei unterschiedliche Stellen im Ablauf. Der release.sh-Check greift nur, wenn `release.sh` **gestartet wird, während bereits** ein ungelöster Konflikt im Arbeitsverzeichnis liegt — er läuft ganz am Anfang des Skripts, vor jeder eigenen Mutation. Der reale Vorfall (US-133/v1.22.34) entstand laut Ticket-Text aber **während** eines `stash pop` — ein Schritt, der laut `fotoalert-release`-SKILL.md typischerweise **um** den `release.sh`-Aufruf herum liegt (Push vor dem Release, Pop danach). Zu dem Zeitpunkt, an dem `release.sh` seinen Pre-Check ausführt, existiert der Konflikt, der später beim Pop auftritt, noch gar nicht — der Check kann ihn strukturell nicht sehen. Der release.sh-Check ist damit eine echte, aber andere Absicherung: er schließt „Release-Start in bereits konfliktbehaftetem Arbeitsverzeichnis“ — nicht „Konflikt entsteht während des vom Skill dokumentierten Stash-Zyklus, der `release.sh` umschließt“. Genau Letzteres ist der in `edge-cases.md` dokumentierte Fall, und genau dort steht weiterhin die Ad-hoc-Message ohne Tag-Pflicht für den Fall eines gleichzeitig anstehenden Versionsbumps. → **Ticket ist teilweise gelöst, mit konkret benennbarer, noch offener Lücke in `edge-cases.md`.**
+
+**Pre-Mortem:**
+- 💀 Die Ergänzung in `edge-cases.md` wird geschrieben, aber der nächste Konflikt-Vorfall wiederholt sich trotzdem, weil die Ad-hoc-Recovery de facto von einer Ebene ausgeführt wird, die die Referenzdatei im Konfliktmoment nicht konsultiert. Gegenmaßnahme: Ergänzung an der bereits existierenden, nachweislich schon einmal konsultierten Stelle platzieren (Schritt 4 des bestehenden Abschnitts „Merge-Konflikt beim stash pop“, nicht ein neuer, separater Abschnitt) — dieselbe Stelle, die bereits für den BUG-80-Fix erfolgreich erweitert wurde.
+- 💀 Die neue Formulierung verlangt „Standard-Message + Tag, wenn Versionsbump aussteht“, aber die Erkennung „steht gerade ein Versionsbump aus?“ bleibt vage. Gegenmaßnahme: AK verlangt eine konkrete, prüfbare Erkennungsregel statt einer vagen Formulierung (AK2).
+- 💀 Bleibt Auto-Recovery (Commit+Tag) Standardverhalten statt Abbruch bevorzugt zu empfehlen, bleibt das Risiko bestehen, dass ein automatisch aufgelöster Konflikt in einer release-relevanten Datei (nicht nur PRODUCT.md, sondern z. B. `index.html`/`sw.js`) unbemerkt falschen Code committet und taggt — ein Tag ist danach nur noch mit `git tag -d`/Force-Push korrigierbar, während ein Abbruch vor jedem Commit risikofrei ist. Gegenmaßnahme: Abbruch als bevorzugte Standardreaktion dokumentieren, Auto-Recovery nur als eng definierte Ausnahme (AK3/AK4).
+
+**Akzeptanzkriterien** *(reines Dev-Tooling ohne App-Erlebnis — Effekt zeigt sich beim nächsten Release-Lauf mit Konflikt)*:
+- [ ] AK1 — In `references/edge-cases.md`, Abschnitt „Merge-Konflikt beim `stash pop`“ (bestehender Schritt 4) wird ergänzt: Ist zum Zeitpunkt des Konflikts bereits ein Versionsbump für ein laufendes Release vorbereitet, **bevorzugt der Ablauf einen sauberen Abbruch vor jedem Commit** (analog zur bereits etablierten Abbruch-Logik in `release.sh` Zeilen 66–92) statt eines automatischen Konflikt-Commits.
+- [ ] AK2 — Die Erkennungsregel „Versionsbump steht aus“ wird konkret und prüfbar formuliert (z. B. `APP_VERSION` in `web/index.html` gegen die zuletzt getaggte Version vergleichen), nicht als vage Beschreibung.
+- [ ] AK3 — Entscheidet sich Stephan/die ausführende Routine explizit gegen den Abbruch und für Auto-Recovery (z. B. weil der Konflikt nachweislich nur eine unkritische Doku-Datei wie `PRODUCT.md` betrifft), MUSS der resultierende Commit die Standard-Message `release: vX.Y.Z – <Beschreibung>` statt der bisherigen Ad-hoc-Message `merge: ...` verwenden, UND direkt im Anschluss `git tag vX.Y.Z` sowie Push von Commit und Tag ausgeführt werden.
+- [ ] AK4 — Edge Case: Betrifft der Konflikt nicht nur eine Doku-Datei, sondern eine für das Release selbst relevante Datei (`web/index.html`, `web/sw.js` oder `release.sh`), ist Auto-Recovery **nicht zulässig** — es gilt ausschließlich der saubere Abbruch, auch wenn ein Versionsbump bereits vorbereitet ist.
+- [ ] AK5 — Edge Case: `edge-cases.md` erhält an der Ergänzungsstelle einen expliziten Ein-Satz-Hinweis, dass der bestehende TASK-88-Pre-Check in `release.sh` (Zeilen 66–92) ausschließlich Konflikte abdeckt, die **vor** dem Start von `release.sh` bereits bestehen, und den hier behandelten `stash pop`-Fall (Konflikt entsteht **während** des vom `fotoalert-release`-Skill umschließenden Ablaufs) nicht abdeckt — damit künftige Leser die beiden Absicherungen nicht fälschlich für identisch halten.
+- [ ] AK6 — Die neue Formulierung wird sprachlich an das bestehende Muster des BUG-80-Zusatzes angeglichen, damit der Abschnitt als konsistente Abfolge von Pflichtprüfungen lesbar bleibt statt als lose angehängter Einzelfall.
+
+**AK-Qualitäts-Check:** Granularität (AK3 bündelt Standard-Message UND Tag+Push bewusst als ein AK, da beide untrennbar zusammengehören), Polarität (AK1↔AK3 Abbruch vs. korrekte Ausnahme, AK3↔AK4 Doku-Konflikt erlaubt vs. Code-Konflikt verbietet Auto-Recovery), Messbarkeit (alle AKs an konkreten Artefakten wie Commit-Message-Wortlaut, Tag-Vorhandensein, betroffene Datei festgemacht), Vier-Kategorien-Abdeckung (funktional AK1–AK4, Architektur/Konsistenz AK5–AK6, Performance/Sicherheit nicht relevant für dieses Doku-Ticket), Testbarkeit ohne Rückfrage (reines Dev-Tooling ohne Produktivcode-Pfad — Testplan bleibt ein gezielt nachgestellter Konfliktfall gegen AK1–AK4), Herkunftsnachvollziehbarkeit (jedes AK trägt seine Herkunft aus These-Bestätigung bzw. konkretem Pre-Mortem-Szenario).
+
+**Implementierungsoptionen:**
+(A, empfohlen) Abbruch bevorzugt, Auto-Recovery nur als eng definierte Ausnahme — Ergänzung von AK1–AK6 an der bestehenden Stelle in `references/edge-cases.md` (Schritt 4), keine Strukturänderung der Datei, ausschließlich Doku, kein Produktivcode betroffen, konsistent mit dem in `release.sh` bereits etablierten „Abbruch vor Mutation“-Prinzip, deckt beide im Ticket genannten Ziele (a) und (b) ab.
+(B) Nur Ad-hoc-Message durch Standard-Message+Tag ersetzen (nur AK3), Auto-Recovery bleibt Standard, kein Abbruch-Vorzug — kleinerer Diff, lässt aber das Risiko aus Pre-Mortem-Szenario 3 offen (automatisch aufgelöster Konflikt im Release-Träger selbst könnte weiterhin unbemerkt fehlerhaft getaggt werden) und erfüllt Ziel (a) des Tickets nicht, obwohl das Ticket es als gleichwertige Option nennt.
+
+**Ampel: 🟢 Grün** — Option A ist klar vorzuziehen, bleibt vollständig innerhalb des Tickets, ändert weder Architektur noch Produktivcode (reine Ergänzung in `edge-cases.md`), ist jederzeit verlustfrei über Git revidierbar, und das Pre-Mortem fand kein hohes Risiko, nur Doku-Hygiene-Risiken, die durch AK5/AK6 bereits adressiert sind.
+
+**Status-Update (2026-08-10):** Weg-Gate 🟢 → automatisch weiter nach **Ready for Dev**.
+
+## Implementierung (fotoalert-impl, 2026-08-10)
+
+**Umsetzung von Option A (AK1–AK6):** Kein App-Code betroffen — das Ziel dieses Tickets ist eine Doku-Ergänzung im Skill `fotoalert-release`, nicht im FotoAlert-Repo selbst. `references/edge-cases.md`, Abschnitt „Merge-Konflikt beim `stash pop`" wurde an Schritt 4 erweitert:
+- **AK1/AK4 (Abbruch bevorzugt):** Neue Fallunterscheidung vor dem Commit — ist ein Versionsbump für ein laufendes Release vorbereitet ODER ist die konfliktbehaftete Datei selbst `web/index.html`/`web/sw.js`/`release.sh`, wird nicht mehr automatisch aufgelöst/committet, sondern sauber abgebrochen und Stephan konfrontiert.
+- **AK2 (Erkennungsregel):** Konkret als Vergleich `APP_VERSION` in `web/index.html` gegen die zuletzt gepushte/getaggte Version formuliert, keine vage Beschreibung mehr.
+- **AK3 (Auto-Recovery-Ausnahme):** Bei explizitem Stephan-Wunsch trotz Doku-Konflikt jetzt Pflicht: Standard-Message `release: vX.Y.Z – <Beschreibung>` statt `merge: ...`, plus sofortiges `git tag vX.Y.Z` + Push von Commit und Tag.
+- **AK5 (Abgrenzung):** Eigener Absatz erklärt, dass der release.sh-Pre-Check (Zeilen 66–92) nur Konflikte VOR Skriptstart abdeckt, nicht den hier behandelten `stash pop`-Fall.
+- **AK6 (Konsistenz):** Neuer „Real (TASK-88): …"-Absatz im selben Stil wie der bestehende „Real (BUG-80): …"-Absatz ergänzt, damit der Abschnitt als konsistente Pflichtprüfungs-Abfolge lesbar bleibt.
+
+**Ausgeliefert:** Aktualisiertes Skill-Paket `fotoalert-release.skill` per Chat an Stephan gesendet (Claude kann Skill-Dateien in dieser Session nicht dauerhaft selbst ändern — die Installation muss Stephan im Client bestätigen, analog TASK-101).
+
+**Selbst-Verifikation gegen AK1–AK6:** Diff gegen die editierte `edge-cases.md` gelesen und Punkt für Punkt gegen jedes AK geprüft (alle 6 vorhanden, keine Auto-Test-Möglichkeit, da reine Prozess-Doku ohne Codepfad — siehe AK-Qualitäts-Check in der Analyse).
+
+**Status-Update (2026-08-10):** → **In Test** — wartet auf Stephans Bestätigung, dass das ausgelieferte Skill-Paket installiert wurde und die neue Fallunterscheidung inhaltlich passt.
+
+**Abschluss (2026-08-10):** Stephan hat die Installation des Skill-Pakets im Chat bestätigt ("Skill installiert"). Hinweis zur Grenze dieser Bestätigung: Der Inhalt der installierten Datei auf Stephans Account kann von hier aus nicht mehr automatisiert nachgeprüft werden (Skills sind in dieser Sitzung nur über einen Nur-Lese-Sitzungscache einsehbar, keine Live-Sicht auf sein Konto) -- die Bestätigung stützt sich auf seine Aussage, nicht auf einen eigenen Nachweis.
+
+---
+
+<!-- TASK-116-TEXT-ENDE -->
+<!-- TASK-116-ANHANG-ENDE -->
