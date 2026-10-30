@@ -482,6 +482,8 @@ def test_wetter_laeuft_waehrend_der_kalender_gerechnet_wird_und_der_kalender_wir
     assert not [e for e in cache if e["event_type"] == "ALT"], "alte Einträge der Orte blieben stehen"
     assert {e["id"] for e in andere} <= {e["id"] for e in cache}, "Einträge anderer Orte gingen verloren"
     assert [e["shoot_time"] for e in cache] == sorted(e["shoot_time"] for e in cache)
+    assert warte_bis(lambda: main._calendar_computed_at == "2026-10-15T12:00:00+00:00", WARTEZEIT), \
+        "der Berechnungszeitpunkt des Kalenders wurde nicht übernommen"
     assert main._calendar_computed_at == "2026-10-15T12:00:00+00:00"
     s.sperre.set()
     assert warte_bis(lambda: _info(client)["aktiv"] is False and s.beendet >= 1, WARTEZEIT)

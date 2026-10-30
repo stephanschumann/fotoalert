@@ -1,0 +1,55 @@
+# TASK-117 (AK9a/AK9b) — Feste Liste bekannter Überspring-Gründe in den Prüfblöcken Backend und
+# Browser-Tests. Gehört zu den Prüfwerkzeugen (wird nach TASK-120 eingefroren). Ein Übersprung macht den
+# Probelauf von release.sh nur dann NICHT rot, wenn Test-ID und Grund als Paar hier stehen
+# (der Grund hier muss im gemeldeten Grund enthalten sein). 0 Tests (auch: kein einziger Browser-Test
+# gelaufen, weil alle aus aufgelisteten Gründen übersprungen wurden) und fehlende Werkzeuge bleiben
+# immer rot (AK9, AK9b-Klarstellung 30.10.2026).
+# Format: <Test-ID wie bei pytest relativ zu backend/> | <Grund>
+
+# ── Dauerhaft per @pytest.mark.skip (Beleg: Marker im Testcode, nur manuell prüfbar) ──
+tests/test_bug-78.py::test_apple_maps_format_accepted_manual_only | BUG-78: Parsing ist rein clientseitig
+tests/test_us-133.py::test_map_pans_on_coordinate_field_blur_manual_only | US-133: Kartenschwenk bei Koordinaten-Eingabe ist rein clientseitig
+
+# ── Browser-Tests im Backend-Block, GitHub-Job test-backend: kein Playwright installiert ──
+# (Beleg: requirements.txt ohne playwright; BUG-100 – laufen echt im Block browser_tests bzw. nur mit
+#  Entwicklungsserver; Gründe wörtlich aus importorskip/pytest.skip im Testcode)
+tests/test_bug_85.py | could not import 'playwright': No module named 'playwright'
+tests/test_bug-80.py | could not import 'playwright': No module named 'playwright'
+tests/test_task-66.py | could not import 'playwright': No module named 'playwright'
+tests/test_bug117_menue.py::test_laeuft_bereits_hinweis_bleibt_waehrend_der_lauf_laeuft | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_bug117_menue.py::test_hinweis_verschwindet_wenn_der_lauf_beendet_ist | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_hinweis_beim_anlegen_ist_nicht_wegklickbar | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_nutzer_sieht_beim_anlegen_in_pausierter_region_keine_knoepfe | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_karte_zeigt_pausierte_orte_bei_jedem_ereignisfilter_gleich[nur] | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_karte_zeigt_pausierte_orte_bei_jedem_ereignisfilter_gleich[ausschliessen] | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_zwei_abgeschaltete_gebiete_pausieren_nicht_alles | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_browser.py::test_leeres_ergebnis_nennt_die_richtige_ursache | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_oberflaeche.py::test_menue_schalter_und_folgen | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_oberflaeche.py::test_filterzaehler_und_karte_ohne_verschwinden | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_oberflaeche.py::test_hinweis_beim_neuen_ort_host | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_oberflaeche.py::test_nutzer_ohne_menue_mit_hinweis | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+tests/test_us141_oberflaeche.py::test_alle_gebiete_pausiert_im_feed | Playwright ist nicht installiert (ausdrücklich benannte fehlende Voraussetzung)
+
+# ── Dieselben Tests im Probelauf auf dem Mac (dort ist Playwright für die Browser-Blöcke installiert;
+#    der Backend-Block läuft wie bei GitHub ohne Server: FOTOALERT_TEST_BASE_URL zeigt auf eine
+#    unerreichbare Adresse, FOTOALERT_E2E_* sind nicht gesetzt). Gründe wörtlich aus dem Testcode. ──
+tests/test_bug_85.py | erreichbar — BUG-85-Test braucht einen echten Server (Playwright/Browser-Rendering nötig)
+tests/test_bug-80.py | erreichbar — BUG-80-Layout-Test braucht einen echten Server (Playwright/Browser-Rendering nötig)
+tests/test_task-66.py | erreichbar — TASK-66-E2E-Durchläufe brauchen einen echten Server
+tests/test_bug117_menue.py::test_laeuft_bereits_hinweis_bleibt_waehrend_der_lauf_laeuft | FOTOALERT_E2E_URL / FOTOALERT_E2E_HOST_PW nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_bug117_menue.py::test_hinweis_verschwindet_wenn_der_lauf_beendet_ist | FOTOALERT_E2E_URL / FOTOALERT_E2E_HOST_PW nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_hinweis_beim_anlegen_ist_nicht_wegklickbar | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_nutzer_sieht_beim_anlegen_in_pausierter_region_keine_knoepfe | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_karte_zeigt_pausierte_orte_bei_jedem_ereignisfilter_gleich[nur] | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_karte_zeigt_pausierte_orte_bei_jedem_ereignisfilter_gleich[ausschliessen] | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_zwei_abgeschaltete_gebiete_pausieren_nicht_alles | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_browser.py::test_leeres_ergebnis_nennt_die_richtige_ursache | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_oberflaeche.py::test_menue_schalter_und_folgen | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_oberflaeche.py::test_filterzaehler_und_karte_ohne_verschwinden | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_oberflaeche.py::test_hinweis_beim_neuen_ort_host | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_oberflaeche.py::test_nutzer_ohne_menue_mit_hinweis | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+tests/test_us141_oberflaeche.py::test_alle_gebiete_pausiert_im_feed | FOTOALERT_E2E_URL nicht gesetzt (kein Entwicklungsserver angegeben)
+
+# ── Block Browser-Tests (AK9b): bei GitHub und im Probelauf mit leerem Datenbestand genauso übersprungen.
+#    Grund wörtlich aus pytest.skip in tests/test_bug-80.py (Fall „keine bewerteten Feed-Einträge“). ──
+tests/test_bug-80.py::test_bug80_header_height_stable_after_filter_change | Kein Feed-Eintrag mit ausschließbarem overall_score (scoredCount=0, maxScore=None) — Filterwechsel kann die 'Heute'-Trefferzahl in diesem Datenumfeld strukturell nicht verändern

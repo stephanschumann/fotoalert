@@ -1,0 +1,4 @@
+# TASK-117 (AK11): fest eingestellte Version des Browser-Werkzeugs — dieselbe für GitHub
+# (deploy.yml, Job test-frontend) und den Probelauf von release.sh auf dem Mac.
+# Nur für Oberflächen-Check und Browser-Tests; bewusst nicht in requirements.txt (test-backend unverändert).
+playwright==1.64.0

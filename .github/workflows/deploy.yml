@@ -56,9 +56,12 @@ jobs:
         working-directory: FotoAlert/backend
         run: pip install -r requirements.txt
 
+      # TASK-117 (AK11): feste Version aus requirements-browser.txt statt „jeweils neueste“ —
+      # dieselbe Datei nutzt der Probelauf von release.sh auf dem Mac.
       - name: Playwright Chromium installieren
+        working-directory: FotoAlert/backend
         run: |
-          pip install playwright
+          pip install -r requirements-browser.txt
           python -m playwright install chromium
 
       # BUG-79-Nachtrag (US-137-Release, 2026-09-24): dieselbe Ephemeriden-Absicherung wie
@@ -89,43 +92,13 @@ jobs:
             https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
             || { echo "❌ de421.bsp-Download fehlgeschlagen oder Timeout (90s) überschritten"; exit 1; }
 
-      - name: Dev-Server starten
-        working-directory: FotoAlert/backend
-        run: |
-          python -m uvicorn main:app --host 127.0.0.1 --port 8000 \
-            > /tmp/fotoalert-ci-server.log 2>&1 &
-          echo $! > /tmp/fotoalert-ci-server.pid
-          for i in $(seq 1 30); do
-            if curl -fsS http://localhost:8000/health >/dev/null 2>&1; then
-              echo "✅ Server bereit nach ${i}s"
-              break
-            fi
-            sleep 1
-          done
-          curl -fsS http://localhost:8000/health || \
-            { echo "❌ Server nicht bereit"; cat /tmp/fotoalert-ci-server.log; exit 1; }
-
-      - name: Frontend-Check ausführen
-        working-directory: FotoAlert/backend
-        run: |
-          python3 tests/frontend/run_frontend_check.py \
-            --base-url http://localhost:8000 \
-            --password "$FOTOALERT_USER_PASSWORD" \
-            --screenshot-root /tmp/qa-screenshots \
-            --findings-json /tmp/findings.json
-
-      # BUG-100: test_bug_85.py/test_bug-80.py/test_task-66.py beginnen mit
-      # pytest.importorskip("playwright") + einem zusätzlichen /health-Erreichbarkeits-
-      # Skip gegen BASE_URL — im test-backend-Job (kein Playwright, kein Dev-Server)
-      # wurden sie deshalb bislang lautlos SKIPPED statt real ausgeführt. Dieser Job
-      # hat Playwright bereits installiert und den Dev-Server bereits laufen (siehe
-      # oben) — gezielt nur diese drei Dateien, NICHT der breitere -m frontend-Marker
-      # (der würde 5 weitere, bereits unabhängig funktionierende Dateien zusätzlich
-      # treffen).
-      - name: Backend-Playwright-Tests ausführen
-        working-directory: FotoAlert/backend
-        run: |
-          python3 -m pytest tests/test_bug_85.py "tests/test_bug-80.py" "tests/test_task-66.py" -v
+      - name: Frontend-Check ausführen (gemeinsame Prüfliste, inkl. Backend-Playwright-Tests)
+        # TASK-117 (AK10): Dev-Server (Port 8000), Frontend-Check und die drei Backend-Playwright-
+        # Tests laufen über die gemeinsame Prüfliste — dieselbe, die der Probelauf von release.sh
+        # aufruft. Inhalt wie bisher: run_frontend_check.py, danach BUG-100 gezielt nur
+        # tests/test_bug_85.py, tests/test_bug-80.py, tests/test_task-66.py gegen den laufenden
+        # Dev-Server. Server-Log, Screenshots und Findings landen wie bisher unter /tmp.
+        run: bash FotoAlert/tools/pruefliste.sh oberflaechen_check browser_tests
 
       # TASK-97 (AK2): Bei jedem Job-Fehlschlag mehr Kontext als CI-Artefakt sichern,
       # damit ein künftiger ähnlicher Fall (wie der ungeklärte CI-Run #277 — Login-
@@ -155,6 +128,8 @@ jobs:
             /tmp/fotoalert-ci-context.txt
           if-no-files-found: ignore
 
+      # Die gemeinsame Prüfliste stoppt ihren Dev-Server selbst (auch bei Rot, TASK-117);
+      # dieser Schritt bleibt als Sicherheitsnetz.
       - name: Dev-Server stoppen
         if: always()
         run: |
@@ -211,9 +186,9 @@ jobs:
             https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de421.bsp \
             || { echo "❌ de421.bsp-Download fehlgeschlagen oder Timeout (90s) überschritten"; exit 1; }
 
-      - name: Backend-Testsuite ausführen
-        working-directory: FotoAlert/backend
-        run: python3 -m pytest tests/ -v
+      # TASK-117 (AK10): gleiche Suite (python3 -m pytest tests/ -v) über die gemeinsame Prüfliste.
+      - name: Backend-Testsuite ausführen (gemeinsame Prüfliste)
+        run: bash FotoAlert/tools/pruefliste.sh backend
 
   deploy:
     name: Deploy FotoAlert
