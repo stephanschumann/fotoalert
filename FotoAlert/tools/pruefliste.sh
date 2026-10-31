@@ -46,6 +46,14 @@ BROWSER_ANFORDERUNG="$BACKEND_DIR/requirements-browser.txt"
 PLUGIN_DIR="$SELBST_DIR/pruefliste_plugin"
 PLUGIN_PYTHONPATH="$PLUGIN_DIR${PYTHONPATH:+:$PYTHONPATH}"
 mkdir -p "$ABLAGE"
+# AK5/AK10 (TF-05a): Der Testserver für Oberflächen-Check und Browser-Tests startet wie bei GitHub mit
+# leerem Datenbestand. Die Datenablage der Entwicklungsumgebung (backend/data_dev/, nicht versioniert)
+# wird vor dem Serverstart nur dann entfernt, wenn es sie beim Start DIESES Laufs noch nicht gab – also
+# nur, was dieser Lauf selbst angelegt hat (z. B. der Backend-Block in der Prüfkopie). Gab es sie
+# schon vorher (z. B. echte Entwicklungsdaten im Projektordner), wird nie etwas gelöscht.
+SERVER_ENV="${FOTOALERT_ENV:-dev}"
+DEV_DATEN="$BACKEND_DIR/data_dev"
+if [ -e "$DEV_DATEN" ] || [ -L "$DEV_DATEN" ]; then DEV_DATEN_VORHER=1; else DEV_DATEN_VORHER=0; fi
 
 BLOECKE="$*"
 [ -z "$BLOECKE" ] && BLOECKE="backend oberflaechen_check browser_tests"
@@ -144,10 +152,44 @@ trap 'server_stoppen; exit 130' INT
 trap 'server_stoppen; exit 143' TERM
 trap 'server_stoppen; exit 129' HUP
 
+# AK5 (TF-05a): entfernt die in diesem Lauf angelegte Datenablage der Kopie, sonst nichts.
+datenbestand_leeren() {
+    if [ "$DEV_DATEN_VORHER" != 0 ]; then
+        echo "⚠️  Datenablage $DEV_DATEN gab es schon vor diesem Lauf – bleibt unangetastet"
+        return 0
+    fi
+    [ -d "$DEV_DATEN" ] && [ ! -L "$DEV_DATEN" ] || return 0
+    [ "$(cd "$DEV_DATEN" && pwd -P)" = "$(cd "$BACKEND_DIR" && pwd -P)/data_dev" ] || return 0
+    rm -rf "$DEV_DATEN"
+    echo "🧹 Datenablage der Prüfkopie geleert (in diesem Lauf angelegt): $DEV_DATEN"
+}
+
+# AK5/TF-05: Ortszahl des Testservers (eigene Orte und Korrekturen in seiner Datenbank) ins Protokoll.
+datenbestand_melden() {   # datenbestand_melden <block>
+    if [ "$SERVER_ENV" = prod ]; then DB="$BACKEND_DIR/data/fotoalert.db"; else DB="$DEV_DATEN/fotoalert.db"; fi
+    ZAHLEN="$("$PY" - "$DB" <<'PYZAEHLEN' 2>/dev/null
+import os, sqlite3, sys
+db = sys.argv[1]
+if not os.path.exists(db):
+    print("0 0")
+else:
+    c = sqlite3.connect("file:%s?mode=ro" % db, uri=True)
+    try:
+        print("%d %d" % tuple(c.execute("SELECT COUNT(*) FROM %s" % t).fetchone()[0]
+                              for t in ("custom_locations", "location_overrides")))
+    finally:
+        c.close()
+PYZAEHLEN
+)"
+    set -- "$1" ${ZAHLEN:-unbekannt unbekannt}
+    echo "PRUEFLISTE block=$1 datenbestand eigene Orte: $2 Korrekturen: $3"
+}
+
 # Eigener Testserver (leerer Datenbestand der jeweiligen Kopie, eigener Port, AK5/AK12).
 server_starten() {
     [ -n "$SERVER_PID" ] && return 0
-    ( cd "$BACKEND_DIR" && FOTOALERT_ENV="${FOTOALERT_ENV:-dev}" \
+    datenbestand_leeren
+    ( cd "$BACKEND_DIR" && FOTOALERT_ENV="$SERVER_ENV" \
         FOTOALERT_NO_BACKGROUND="${FOTOALERT_NO_BACKGROUND:-1}" \
         exec "$PY" -m uvicorn main:app --host 127.0.0.1 --port "$PORT" ) > "$SERVER_LOG" 2>&1 &
     SERVER_PID=$!
@@ -155,6 +197,7 @@ server_starten() {
     for i in $(seq 1 30); do
         if curl -fsS "$BASIS_URL/health" >/dev/null 2>&1; then
             echo "✅ Testserver bereit nach ${i}s (Port $PORT)"
+            datenbestand_melden "$B"
             return 0
         fi
         kill -0 "$SERVER_PID" 2>/dev/null || break

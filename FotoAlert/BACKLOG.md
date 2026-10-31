@@ -9000,6 +9000,7 @@ Der heutige Release-Befehl lädt hoch, ohne vorher irgendetwas zu prüfen, und n
 | TF-03 | AK3 | *Nicht mitgehende rote Testdatei liegt im Arbeitsordner* → *Release starten* → *Probelauf grün*, Datei nicht in der gesehenen Dateiliste | Übungsablage + protokollierende Platzhalter-Prüfliste |
 | TF-04 | AK4 | *Mitgehende rote Testdatei* → *Release starten* → *Probelauf rot*, *nichts auf GitHub angekommen* | wie TF-03 |
 | TF-05 | AK5 | *Entwicklungsdaten mit 319 Orten vorhanden* → *Release starten* → *Probelauf sieht leeren Datenbestand*; *Entwicklungsdaten unverändert* | Mac, echte Prüfliste; Prüfsumme der Entwicklungsdatenbank vorher = nachher; Ortszahl im Probelauf protokolliert = 0 |
+| TF-05a | AK5, AK10 | *Backend-Block hat in derselben sauberen Kopie Daten angelegt* → *Oberflächen-Check und Browser-Tests laufen* → *Testserver sieht leeren Datenbestand (0 eigene Orte, 0 Korrekturen) wie bei GitHub*, *Ortszahl steht im Protokoll* | Übungsablage mit echter Prüfliste; Befund aus Done-Gate 30.10., von Stephan am 31.10. als in TASK-117 zu beheben entschieden |
 | TF-06 | AK6 | *Prüfliste meldet rot* → *Release starten* → *nichts auf GitHub angekommen* | Übungsablage, Platzhalter „rot"; Stand des Wegwerf-GitHub vorher = nachher |
 | TF-07 | AK7 | *Prüfliste meldet rot im Block Oberflächen-Check, Test X* → *Release starten* → *Meldung nennt Block, Test X und Protokollpfad*; Protokoll existiert dort | Übungsablage, Platzhalter „rot mit Block/Testname" |
 | TF-08 | AK8 | *Prüfliste rot* → *Release starten* → *Versionsnummer alt, nichts eingecheckt* → *Prüfliste grün* → *Release starten* → *Version genau +1* | Übungsablage, Platzhalter umschaltbar |
@@ -9117,6 +9118,8 @@ Betroffen: `FotoAlert/release.sh` (Ablauf), `.github/workflows/deploy.yml` (beid
   - `backend/tests/task117_adapter.py` — `99812378f3c526ea9d6096548683dcebe28aa96ca4191cd2011acef7f8da4fa3`
   - `backend/tests/test_task117_ak9a_uebersprungen.py` — `f7df6cd9d4ba0261d2446de5d9de84c94ee9b3e8a6b3e59e1cb8da6b1ff41e2e` (neu seit 2026-10-30; vorher `3714acd7…f77d13`. Grund: TF-09d widersprach AK9b; jetzt prüft er „nicht aufgelisteter Browser-Übersprung bleibt rot“. **Ausdrücklich von Stephan freigegeben am 2026-10-30.**)
   - `backend/tests/test_task117_ak9b_browser_uebersprungen.py` — `299d98476dd649c570ba508598ba589c36242ade6c6ccb5bb1bcda7682417bd9` (neu für AK9b inkl. TF-10e „Browser-Block ohne gelaufenen Test = 0 Tests = rot“, Klarstellung Stephan 2026-10-30; Modus T bestätigt 2026-10-30, eingefroren)
+  - `backend/tests/test_us141_kalender_nachladen.py` — `ad03fafb83bff338022c1496305592a77a8029b80b280dd165c332d05e15a031` (Stabilisierungszeile vor Z. 487; **ausdrücklich von Stephan freigegeben am 2026-10-30**, Release-Datei von TASK-117)
+  - `backend/tests/test_task117_ak5_leerer_datenstand.py` — `94e323b171a11ab51ff6156c56b55b8f05190cafe01c6a6394f8406c6abd381e` (neu für TF-05a; Modus T bestätigt 2026-10-31, eingefroren)
 - Ausgangskopie: `_worktrees/TASK-117.ausgang/` (392 Dateien, schreibgeschützt), Prüfsummenliste `_worktrees/TASK-117.ausgang.sha256` — `e3dba0ec8aadf43bc853840ba311fb353044b1416a93a9fe3c390db7fde13ba5`. Arbeitskopie: `_worktrees/TASK-117/`.
 - Hinweis: Fingerabdruck und Ausgangskopie von Hand gebildet (TASK-120/TASK-121 noch nicht live); technisch erzwungen ist die Sperre noch nicht.
 
