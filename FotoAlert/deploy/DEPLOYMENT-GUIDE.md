@@ -388,6 +388,43 @@ ssh fotoalert@157.90.123.45
 sudo systemctl start fotoalert-precompute.service
 ```
 
+### Live-Check nach dem Veröffentlichen und automatischer Rücksprung (TASK-118)
+
+Seit TASK-118 prüft GitHub nach jeder automatischen Veröffentlichung nicht nur, ob der Server antwortet, sondern ob die App wirklich funktioniert – und springt bei einem Fehler von selbst zurück.
+
+**Der Ablauf (Job „Deploy FotoAlert“ in `.github/workflows/deploy.yml`):**
+1. **Vorab-Probe:** Der Kurztest läuft einmal gegen die *noch laufende* alte Version. Scheitert er (oder fehlt das Geheimnis, siehe unten), wird **nichts veröffentlicht**; der Lauf endet rot mit „Prüfung nicht einsatzbereit“ und nennt den gescheiterten Prüfpunkt.
+2. **Veröffentlichen** wie bisher (`deploy.sh`).
+3. **Live-Check:** Derselbe Kurztest läuft über die öffentliche Adresse, in einem frisch gestarteten Browser ohne Zwischenspeicher, *nachdem* auch die Webserver-Einstellungen übernommen sind.
+4. **Bei Rot:** automatischer Rücksprung auf die **zuletzt bestätigte** Version (nicht einfach die vorherige), danach derselbe Kurztest noch einmal gegen die zurückgeholte Version.
+5. **Meldung:** Die Zusammenfassung des Laufs nennt, welche Version zurückgenommen wurde, welcher Prüfpunkt woran scheiterte, auf welche Version zurückgesprungen wurde und ob das geklappt hat. Bildschirmfotos der gescheiterten Prüfpunkte liegen im Lauf-Artefakt „livecheck-…“.
+6. **Ein Lauf mit Rücksprung endet immer rot** – auch wenn der Rücksprung gelungen ist. So geht das Ticket nicht versehentlich auf Done. Die Mail zum roten Lauf kommt über die normalen GitHub-Benachrichtigungen.
+
+**Die sechs Prüfpunkte** (rein lesend, es werden nie Daten angelegt oder geändert; Anmeldung nur mit Gast-Rechten):
+Version (zeigt die Seite die gerade veröffentlichte App-Version?), Anmeldung, Karte (mindestens eine Ortsmarkierung), Feed (mindestens ein Eintrag, keine Fehlermeldung), Kalender (öffnet sich ohne Fehlermeldung), Programmfehler (kein Fehler aus dem eigenen FotoAlert-Code; Fehler aus fremden Quellen wie dem Kartendienst stehen nur in der Meldung). Ein gescheiterter Prüfpunkt wird genau einmal wiederholt. Die Anmeldung wird nie wiederholt – höchstens ein Versuch pro Lauf, damit die Anmeldesperre (5 Fehlversuche in 15 Minuten) nicht ausgelöst wird. Dass die Statusabfrage „degraded“ meldet (z. B. Wetterstörung) oder Kartenbilder fremder Anbieter fehlen, ist allein kein Grund für einen Rücksprung.
+
+**Das Geheimnis für den Live-Check:** Der Kurztest braucht das Gast-Passwort der echten Seite. Es steht als eigenes GitHub-Geheimnis mit dem Namen `FOTOALERT_LIVECHECK_PASSWORD` im Repository (nie in einer Datei). Nur der Live-Check benutzt es; die Geheimnisse für den Test-Server bleiben davon unberührt. Ändert sich das Gast-Passwort der echten Seite, muss dieses Geheimnis mitgeändert werden. Fehlt es, scheitert die Vorab-Probe sofort (ohne Anmeldeversuch) und es wird nicht veröffentlicht – die Meldung nennt dann nur den Namen des Geheimnisses.
+
+**Die Marke „zuletzt bestätigt“:** Auf dem Server liegt eine kleine Textdatei außerhalb der Datenbank, die sich die letzte Version merkt, deren Live-Check bestanden hat (erste Zeile = Commit). Beim allerersten Lauf ohne Marke gilt die laufende Version als bestätigt, sobald die Vorab-Probe gegen sie bestanden ist.
+```bash
+ssh fotoalert@157.90.123.45
+cat /opt/fotoalert/zuletzt_bestaetigt.txt
+```
+
+**Was der Rücksprung macht (und was nicht):** Er setzt die App-Dateien *und* den gespeicherten Stand des Servers auf die bestätigte Version zurück – ein Neustart oder ein erneutes Anstoßen ohne neuen Code bringt die kaputte Version also nicht still zurück –, stempelt den Service-Worker-Cache-Namen neu, gleicht die Webserver-Einstellungen (Caddy) an, lädt sie neu, startet die App neu und fragt den Status ab. Er setzt **nie die Datenbank** zurück und stuft keine Python-Pakete herab. Dasselbe Skript (`FotoAlert/deploy/ruecksprung.sh`) nutzt auch `deploy.sh`, wenn der Server nach dem Neustart gar nicht antwortet. Wird danach neuer Code gepusht, enthält er die zurückgenommene Version wieder und wird wie jede Veröffentlichung neu vollständig geprüft.
+
+**Wenn der Rücksprung selbst scheitert:** Der Lauf endet rot mit „Rücksprung fehlgeschlagen – manueller Eingriff nötig“ und dem letzten bekannten Zustand; es folgt kein zweiter automatischer Rücksprung. Dann von Hand eingreifen:
+```bash
+ssh fotoalert@157.90.123.45
+sudo journalctl -u fotoalert -n 100 --no-pager
+```
+
+**Manueller Rücksprung bleibt:** `rollback.sh` (siehe oben) fragt weiterhin nach und geht standardmäßig einen Commit zurück. Er ändert die Marke „zuletzt bestätigt“ nicht.
+
+**Reihenfolge-Sperre:** Zwei Veröffentlichungen laufen nie gleichzeitig; die zweite wartet, bis die erste samt Rücksprung fertig ist.
+
+**Übungs- und Brandprobe-Schalter:** Beim manuellen Anstoßen (Actions → Run workflow) gibt es zwei Schalter: „uebungsmodus“ (nichts wird veröffentlicht, der Rücksprung ist ein Platzhalter, der Kurztest läuft gegen einen Test-Server im Lauf) und „brandprobe“ (echte Veröffentlichung, der Live-Check scheitert absichtlich, damit der echte Rücksprung einmal beobachtet werden kann – nur nach Absprache). Bei jeder normalen Veröffentlichung (Push auf `main`) sind beide aus und nicht setzbar.
+
 ### Logs anschauen
 ```bash
 ssh fotoalert@157.90.123.45

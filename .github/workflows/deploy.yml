@@ -11,6 +11,20 @@
 #   FOTOALERT_USER_PASSWORD  – Test-Passwort für Playwright-Login (TASK-21)
 #   FOTOALERT_HOST_PASSWORD  – Host-Passwort für Dev-Server (TASK-21)
 #   FOTOALERT_AUTH_SECRET    – Auth-Secret für Dev-Server (TASK-21)
+#   FOTOALERT_LIVECHECK_PASSWORD – TASK-118: Gast-Passwort der ECHTEN Seite für den Live-Check nach
+#                              dem Veröffentlichen (rein lesender Kurztest). Eigenes Geheimnis, wird
+#                              nur vom Live-Check benutzt, nie die drei Test-Server-Geheimnisse oben.
+#                              Ändert sich das Gast-Passwort der echten Seite, muss dieses Geheimnis
+#                              mitgeändert werden. Fehlt es (oder ist leer), scheitert die Vorab-Probe
+#                              und es wird NICHT veröffentlicht („Prüfung nicht einsatzbereit“).
+#
+# TASK-118 – Ablauf des Jobs „deploy“:
+#   Vorab-Probe (Kurztest gegen die noch laufende Version) → Veröffentlichen → Live-Check (Kurztest
+#   über die öffentliche Adresse) → bei Rot: automatischer Rücksprung auf die zuletzt bestätigte
+#   Version → erneuter Live-Check → Meldung. Ein Lauf mit Rücksprung endet immer rot.
+#   Reihenfolge-Sperre: Veröffentlichungen laufen nacheinander (concurrency). Die Schalter
+#   „uebungsmodus“ (Teststufe 3) und „brandprobe“ (Teststufe 4) gibt es nur beim manuellen Anstoßen;
+#   bei jeder normalen Veröffentlichung (Push auf main) sind sie aus und nicht setzbar.
 
 name: Deploy to Hetzner
 
@@ -26,7 +40,17 @@ on:
     paths-ignore:
       - 'FotoAlert/backend/data/cache/building_footprints.json'
   # Manueller Trigger: in GitHub unter Actions → Run workflow
+  # TASK-118: Die beiden Schalter existieren NUR hier (beim Push auf main sind sie nie gesetzt).
   workflow_dispatch:
+    inputs:
+      uebungsmodus:
+        description: 'Übung (Teststufe 3): nichts wird veröffentlicht, Rücksprung nur als Platzhalter; der Kurztest läuft gegen einen Test-Server im Lauf'
+        type: boolean
+        default: false
+      brandprobe:
+        description: 'Brandprobe (Teststufe 4, nur nach Absprache): echte Veröffentlichung, Live-Check scheitert absichtlich → echter Rücksprung'
+        type: boolean
+        default: false
 
 jobs:
   # TASK-21: Frontend-Test-Gate — läuft VOR dem Deploy.
@@ -192,14 +216,58 @@ jobs:
 
   deploy:
     name: Deploy FotoAlert
-    runs-on: ubuntu-latest
     needs: [test-frontend, test-backend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # TASK-118 (AK30): Reihenfolge-Sperre. Zwei Veröffentlichungen laufen nie gleichzeitig; die zweite
+    # wartet, bis die erste samt Rücksprung fertig ist. GitHub hält je Gruppe höchstens einen
+    # wartenden Lauf vor (ein noch älterer wartender wird verdrängt) – das ist unschädlich, weil der
+    # Server ohnehin immer den neuesten Stand von main zieht.
+    concurrency:
+      group: fotoalert-veroeffentlichen
+      cancel-in-progress: false
+
+    env:
+      # Öffentliche Adresse, wie Nutzer sie sehen (AK5). Im Übungsmodus ersetzt der Übungs-Schritt sie.
+      LIVECHECK_ADRESSE: https://fotoalert.stephanschumann.com
+      # AK31: Schalter gibt es nur bei manuellem Anstoß; sonst immer „nein“.
+      UEBUNG: ${{ github.event_name == 'workflow_dispatch' && inputs.uebungsmodus && 'ja' || 'nein' }}
+      BRANDPROBE: ${{ github.event_name == 'workflow_dispatch' && inputs.brandprobe && 'ja' || 'nein' }}
 
     steps:
+      # Der Server zieht beim Veröffentlichen immer den neuesten Stand von main (deploy.sh) –
+      # deshalb auch hier main auschecken, damit die erwartete Version dazu passt.
       - name: Code auschecken
         uses: actions/checkout@v4.2.2
+        with:
+          ref: main
+
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Browser für den Kurztest (feste Version wie im Frontend-Check, TASK-117).
+      - name: Playwright Chromium für den Live-Check installieren
+        working-directory: FotoAlert/backend
+        run: |
+          pip install -r requirements-browser.txt
+          python -m playwright install chromium
+
+      - name: Erwartete App-Version ermitteln
+        shell: bash
+        run: |
+          VERSION=$(sed -n "s/.*const APP_VERSION = '\([^']*\)'.*/\1/p" FotoAlert/web/index.html | head -1)
+          if [ -z "$VERSION" ]; then
+            echo "::error title=Live-Check::Keine App-Version in web/index.html gefunden"
+            exit 1
+          fi
+          echo "ERWARTETE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Erwartete Version: $VERSION"
 
       - name: SSH-Key einrichten
+        if: env.UEBUNG != 'ja'
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
@@ -210,13 +278,298 @@ jobs:
           # known_hosts-Zeilen aus einem vorab vertrauenswürdig geprüften `ssh-keyscan`.
           echo "${{ secrets.SERVER_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy auf Server
+      # Nur Übungsmodus (Teststufe 3): ein Test-Server im Lauf (die Attrappe der Tests mit festen
+      # Testdaten) statt der echten Seite; der Prüf-Zugang der Attrappe ist der Wert des
+      # Live-Check-Geheimnisses (fehlt es, bekommt sie einen Zufallswert und der Kurztest scheitert
+      # wie gewünscht an „Geheimnis fehlt“).
+      - name: Übungs-Testserver starten (nur Übungsmodus)
+        if: env.UEBUNG == 'ja'
+        shell: bash
+        working-directory: FotoAlert/backend
+        env:
+          UEBUNG_GAST_PASSWORT: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
         run: |
+          [ -n "$UEBUNG_GAST_PASSWORT" ] || export UEBUNG_GAST_PASSWORT="$(openssl rand -hex 12)"
+          export UEBUNG_HOST_PASSWORT="$(openssl rand -hex 12)"
+          export UEBUNG_ADRESSDATEI="$RUNNER_TEMP/uebung_adresse.txt"
+          rm -f "$UEBUNG_ADRESSDATEI"
+          PYTHONPATH=. nohup python - > "$RUNNER_TEMP/uebung_server.log" 2>&1 <<'PY' &
+          import os, time
+          from tests.task118.attrappe import Attrappen, Lage
+          a = Attrappen(Lage(os.environ["ERWARTETE_VERSION"], os.environ["UEBUNG_GAST_PASSWORT"],
+                             os.environ["UEBUNG_HOST_PASSWORT"]))
+          open(os.environ["UEBUNG_ADRESSDATEI"], "w").write(a.adresse)
+          while True:
+              time.sleep(60)
+          PY
+          for i in $(seq 1 30); do
+            [ -s "$UEBUNG_ADRESSDATEI" ] && break
+            sleep 1
+          done
+          if [ ! -s "$UEBUNG_ADRESSDATEI" ]; then
+            echo "::error title=Übungsmodus::Test-Server ist nicht gestartet"
+            cat "$RUNNER_TEMP/uebung_server.log"
+            exit 1
+          fi
+          echo "LIVECHECK_ADRESSE=$(cat "$UEBUNG_ADRESSDATEI")" >> "$GITHUB_ENV"
+          echo "ÜBUNG: Test-Server läuft unter $(cat "$UEBUNG_ADRESSDATEI")"
+
+      # AK1–AK3: Vorab-Probe – derselbe Kurztest gegen die noch laufende (alte) Version. Scheitert
+      # sie, wird nichts veröffentlicht und der Lauf endet rot („Prüfung nicht einsatzbereit“).
+      - name: Vorab-Probe (Kurztest gegen die noch laufende Version)
+        id: vorab
+        timeout-minutes: 4
+        shell: bash
+        env:
+          FOTOALERT_LIVECHECK_PASSWORD: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
+        run: |
+          if [ -z "$(printenv FOTOALERT_LIVECHECK_PASSWORD || true)" ]; then
+            echo "::error title=Prüfung nicht einsatzbereit::Das GitHub-Geheimnis FOTOALERT_LIVECHECK_PASSWORD fehlt oder ist leer. Es wurde kein Anmeldeversuch gemacht und nichts veröffentlicht."
+            exit 1
+          fi
+          LAUFEND=$(curl -fsS --max-time 30 "$LIVECHECK_ADRESSE/" | sed -n "s/.*const APP_VERSION = '\([^']*\)'.*/\1/p" | head -1 || true)
+          if [ -z "$LAUFEND" ]; then
+            echo "::error title=Prüfung nicht einsatzbereit::Die laufende Seite ist nicht erreichbar oder zeigt keine App-Version. Nichts wurde veröffentlicht."
+            exit 1
+          fi
+          echo "Laufende Version laut Seite: $LAUFEND"
+          python FotoAlert/backend/tests/livecheck/kurztest.py \
+            --adresse "$LIVECHECK_ADRESSE" --erwartete-version "$LAUFEND" \
+            --ergebnis-ordner "$RUNNER_TEMP/livecheck/vorab"
+
+      # AK24: Gibt es noch keine Marke „zuletzt bestätigt“, gilt die jetzt laufende Version als
+      # bestätigt, weil die Vorab-Probe gegen sie bestanden ist. Das Skript kommt aus diesem
+      # Checkout (auf dem Server liegt es beim allerersten Lauf noch nicht).
+      - name: Erste Marke „zuletzt bestätigt“ setzen (nur wenn noch keine existiert)
+        id: erstmarke
+        shell: bash
+        env:
+          SSH_ZIEL: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}
+        run: |
+          if [ "$UEBUNG" = "ja" ]; then
+            echo "ÜBUNG: Platzhalter – keine Marke gesetzt"
+            exit 0
+          fi
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=30 \
+              "$SSH_ZIEL" "bash -s -- bestaetigen --nur-wenn-keine-marke" < FotoAlert/deploy/ruecksprung.sh
+
+      - name: Veröffentlichen (Deploy auf Server)
+        id: deploy
+        # Der Schritt darf rot enden, damit die Nachprüfung und die Meldung noch laufen; das
+        # Gesamtergebnis legt der letzte Schritt fest.
+        continue-on-error: true
+        shell: bash
+        run: |
+          if [ "$UEBUNG" = "ja" ]; then
+            echo "ÜBUNG: Platzhalter – es wird nichts veröffentlicht"
+            exit 0
+          fi
           ssh -i ~/.ssh/deploy_key \
               -o StrictHostKeyChecking=yes \
               -o ConnectTimeout=30 \
               "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}" \
-              "bash /opt/fotoalert/app/FotoAlert/deploy/deploy.sh"
+              "bash /opt/fotoalert/app/FotoAlert/deploy/deploy.sh" 2>&1 | tee "$RUNNER_TEMP/deploy-ausgabe.txt"
+
+      # AK5: Der Live-Check startet ohne Zutun, nachdem das Veröffentlichen (inklusive Übernahme der
+      # Webserver-Einstellungen, Schritt 7 in deploy.sh) abgeschlossen ist – frischer Browser, öffentliche Adresse.
+      - name: Live-Check (Kurztest nach dem Veröffentlichen)
+        id: live1
+        if: steps.deploy.outcome == 'success'
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: bash
+        env:
+          FOTOALERT_LIVECHECK_PASSWORD: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
+        run: |
+          date +%s > "$RUNNER_TEMP/live_start.txt"
+          sleep 5
+          ERW="$ERWARTETE_VERSION"
+          if [ "$BRANDPROBE" = "ja" ]; then
+            echo "BRANDPROBE: Live-Check scheitert absichtlich (erwartet wird eine Version, die es nicht gibt)"
+            ERW="0.0.0-brandprobe"
+          fi
+          python FotoAlert/backend/tests/livecheck/kurztest.py \
+            --adresse "$LIVECHECK_ADRESSE" --erwartete-version "$ERW" \
+            --ergebnis-ordner "$RUNNER_TEMP/livecheck/live1"
+
+      # AK23: Hat schon deploy.sh selbst zurückgesprungen (Server antwortete nicht), prüft derselbe
+      # Kurztest die zurückgeholte Version.
+      - name: Nachprüfung nach Rücksprung durch das Veröffentlichen
+        id: nachpruefung
+        if: steps.deploy.outcome == 'failure'
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: bash
+        env:
+          FOTOALERT_LIVECHECK_PASSWORD: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
+        run: |
+          date +%s > "$RUNNER_TEMP/live_start.txt"
+          AUF=$(sed -n 's/^RUECKSPRUNG_AUF_VERSION=//p' "$RUNNER_TEMP/deploy-ausgabe.txt" | tail -1)
+          if [ -z "$AUF" ] || [ "$AUF" = "unbekannt" ]; then
+            echo "Kein Rücksprung durch das Veröffentlichen erkennbar – keine Nachprüfung möglich."
+            exit 1
+          fi
+          python FotoAlert/backend/tests/livecheck/kurztest.py \
+            --adresse "$LIVECHECK_ADRESSE" --erwartete-version "$AUF" \
+            --ergebnis-ordner "$RUNNER_TEMP/livecheck/nachpruefung"
+
+      # AK15/AK16/AK17/AK18: Rücksprung auf die zuletzt BESTÄTIGTE Version, ohne Rückfrage, auf dem
+      # Server (nur die App, nie die Datenbank). Im Übungsmodus nur ein Platzhalter.
+      - name: Automatischer Rücksprung
+        id: rueck
+        if: steps.live1.outcome == 'failure'
+        continue-on-error: true
+        timeout-minutes: 4
+        shell: bash
+        env:
+          SSH_ZIEL: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}
+        run: |
+          if [ "$UEBUNG" = "ja" ]; then
+            echo "ÜBUNG: Platzhalter – kein echter Rücksprung"
+            {
+              echo "RUECKSPRUNG_ERGEBNIS=gelungen"
+              echo "RUECKSPRUNG_VON_VERSION=$ERWARTETE_VERSION"
+              echo "RUECKSPRUNG_AUF_VERSION=$ERWARTETE_VERSION"
+            } | tee "$RUNNER_TEMP/ruecksprung-ausgabe.txt"
+            exit 0
+          fi
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=30 \
+              "$SSH_ZIEL" "bash /opt/fotoalert/app/FotoAlert/deploy/ruecksprung.sh zurueck" 2>&1 \
+              | tee "$RUNNER_TEMP/ruecksprung-ausgabe.txt"
+
+      # AK19: derselbe Kurztest gegen die zurückgeholte Version.
+      - name: Live-Check nach dem Rücksprung
+        id: live2
+        if: steps.rueck.outcome == 'success'
+        continue-on-error: true
+        timeout-minutes: 3
+        shell: bash
+        env:
+          FOTOALERT_LIVECHECK_PASSWORD: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
+        run: |
+          AUF=$(sed -n 's/^RUECKSPRUNG_AUF_VERSION=//p' "$RUNNER_TEMP/ruecksprung-ausgabe.txt" | tail -1)
+          if [ -z "$AUF" ] || [ "$AUF" = "unbekannt" ]; then
+            echo "Zielversion des Rücksprungs unbekannt – kein erneuter Kurztest möglich."
+            exit 1
+          fi
+          python FotoAlert/backend/tests/livecheck/kurztest.py \
+            --adresse "$LIVECHECK_ADRESSE" --erwartete-version "$AUF" \
+            --ergebnis-ordner "$RUNNER_TEMP/livecheck/live2"
+
+      # AK13: Bestehen alle sechs Prüfpunkte, gilt die neue Version als „zuletzt bestätigt“.
+      - name: Neue Version als „zuletzt bestätigt“ vermerken
+        id: bestaetigen
+        if: steps.live1.outcome == 'success'
+        shell: bash
+        env:
+          SSH_ZIEL: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}
+        run: |
+          if [ "$UEBUNG" = "ja" ]; then
+            echo "ÜBUNG: Platzhalter – keine Marke gesetzt"
+            exit 0
+          fi
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o ConnectTimeout=30 \
+              "$SSH_ZIEL" "bash /opt/fotoalert/app/FotoAlert/deploy/ruecksprung.sh bestaetigen"
+
+      # AK25: Meldung – wer sie liest, sieht ohne Nachsehen: welche Version zurückgenommen wurde,
+      # welcher Prüfpunkt woran scheiterte, auf welche Version zurückgesprungen wurde und ob das
+      # geklappt hat. Bildschirmfotos liegen im Artefakt. Geheimnisse erscheinen nie (der Kurztest
+      # maskiert sie, GitHub zusätzlich).
+      - name: Meldung zusammenstellen
+        if: always()
+        shell: bash
+        env:
+          O_VORAB: ${{ steps.vorab.outcome }}
+          O_DEPLOY: ${{ steps.deploy.outcome }}
+          O_LIVE1: ${{ steps.live1.outcome }}
+          O_NACHPR: ${{ steps.nachpruefung.outcome }}
+          O_RUECK: ${{ steps.rueck.outcome }}
+          O_LIVE2: ${{ steps.live2.outcome }}
+          ARTEFAKT: livecheck-${{ github.run_id }}
+        run: |
+          D="$RUNNER_TEMP/livecheck"
+          gescheitert() {  # Prüfpunkte samt Grund aus einer Ergebnisdatei
+            [ -f "$D/$1/kurztest-ergebnis.txt" ] && grep -A1 '^gescheitert:' "$D/$1/kurztest-ergebnis.txt" | grep -v '^--$' | sed 's/^ *//' || true
+          }
+          rueckwert() { sed -n "s/^$2=//p" "$RUNNER_TEMP/$1" 2>/dev/null | tail -1; }
+          {
+            echo "## Live-Check nach dem Veröffentlichen (TASK-118)"
+            [ "$UEBUNG" = "ja" ] && echo "**Übungsmodus (Teststufe 3):** nichts wurde veröffentlicht, der Rücksprung ist ein Platzhalter."
+            [ "$BRANDPROBE" = "ja" ] && echo "**Brandprobe (Teststufe 4):** der Live-Check wurde absichtlich scheitern gelassen."
+            echo ""
+            echo "- Erwartete App-Version: ${ERWARTETE_VERSION:-unbekannt}"
+            if [ "$O_VORAB" = "failure" ]; then
+              echo "- **Prüfung nicht einsatzbereit** – die Vorab-Probe gegen die laufende Version ist gescheitert, es wurde nichts veröffentlicht."
+              gescheitert vorab | sed 's/^/  - /'
+            fi
+            [ "$O_DEPLOY" = "failure" ] && echo "- Das Veröffentlichen ist fehlgeschlagen (siehe Schritt „Veröffentlichen“)."
+            if [ "$O_LIVE1" = "success" ]; then echo "- Live-Check: **bestanden**, die neue Version bleibt live und gilt als zuletzt bestätigt."; fi
+            if [ "$O_LIVE1" = "failure" ]; then
+              echo "- Live-Check: **gescheitert** – zurückgenommene Version: ${ERWARTETE_VERSION:-unbekannt}"
+              gescheitert live1 | sed 's/^/  - /'
+              if [ -d "$D/live1" ] && ls "$D/live1"/*.png >/dev/null 2>&1; then echo "  - Bildschirmfoto: Artefakt ${ARTEFAKT}, Ordner live1"; fi
+            fi
+            if [ "$O_RUECK" = "success" ]; then
+              echo "- Rücksprung: **gelungen** – zurück auf Version $(rueckwert ruecksprung-ausgabe.txt RUECKSPRUNG_AUF_VERSION)"
+            elif [ "$O_RUECK" = "failure" ]; then
+              echo "- Rücksprung: **fehlgeschlagen – manueller Eingriff nötig** (letzter bekannter Zustand steht im Schritt „Automatischer Rücksprung“)"
+            fi
+            if [ "$O_LIVE2" = "success" ]; then echo "- Erneuter Live-Check gegen die zurückgeholte Version: **bestanden**"; fi
+            if [ "$O_LIVE2" = "failure" ]; then
+              echo "- Erneuter Live-Check gegen die zurückgeholte Version: **gescheitert** – Rücksprung fehlgeschlagen – manueller Eingriff nötig"
+              gescheitert live2 | sed 's/^/  - /'
+            fi
+            if [ "$O_DEPLOY" = "failure" ]; then
+              echo "- Rücksprung durch das Veröffentlichen selbst: von $(rueckwert deploy-ausgabe.txt RUECKSPRUNG_VON_VERSION) auf $(rueckwert deploy-ausgabe.txt RUECKSPRUNG_AUF_VERSION), Ergebnis: $(rueckwert deploy-ausgabe.txt RUECKSPRUNG_ERGEBNIS)"
+              [ "$O_NACHPR" = "success" ] && echo "- Nachprüfung der zurückgeholten Version: **bestanden**"
+              [ "$O_NACHPR" = "failure" ] && echo "- Nachprüfung der zurückgeholten Version: **nicht bestanden** – Rücksprung fehlgeschlagen – manueller Eingriff nötig"
+            fi
+            if [ -f "$RUNNER_TEMP/live_start.txt" ]; then
+              DAUER=$(( $(date +%s) - $(cat "$RUNNER_TEMP/live_start.txt") ))
+              echo "- Dauer von Live-Check bis Ende (Live-Check, Rücksprung, erneuter Live-Check): ${DAUER} s (Grenze 600 s)"
+              [ "$DAUER" -gt 600 ] && echo "::warning title=Live-Check dauerte zu lange::${DAUER} s statt höchstens 600 s"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnisse und Bildschirmfotos sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: livecheck-${{ github.run_id }}
+          path: ${{ runner.temp }}/livecheck/
+          if-no-files-found: ignore
+
+      # AK26: Ein Lauf mit Rücksprung endet IMMER rot – auch wenn der Rücksprung gelang –, damit
+      # das Ticket nicht auf Done geht. Die Schritte oben dürfen rot enden (continue-on-error),
+      # damit Nachprüfung und Meldung laufen; hier wird das Gesamtergebnis festgelegt.
+      - name: Ergebnis festlegen (Lauf mit Rücksprung endet immer rot)
+        if: always()
+        shell: bash
+        env:
+          O_DEPLOY: ${{ steps.deploy.outcome }}
+          O_LIVE1: ${{ steps.live1.outcome }}
+          O_RUECK: ${{ steps.rueck.outcome }}
+          O_LIVE2: ${{ steps.live2.outcome }}
+        run: |
+          ROT=0
+          if [ "$O_DEPLOY" = "failure" ]; then
+            echo "::error title=Veröffentlichen fehlgeschlagen::Das Veröffentlichen ist fehlgeschlagen; falls der Server zurückgesprungen ist, läuft die zuletzt bestätigte Version. Siehe Meldung."
+            ROT=1
+          fi
+          if [ "$O_LIVE1" = "failure" ]; then
+            echo "::error title=Live-Check gescheitert::Version ${ERWARTETE_VERSION:-unbekannt} wurde zurückgenommen bzw. der Rücksprung wurde versucht – Details in der Meldung dieses Laufs."
+            ROT=1
+          fi
+          if [ "$O_RUECK" = "failure" ] || [ "$O_LIVE2" = "failure" ]; then
+            echo "::error title=Rücksprung fehlgeschlagen::Rücksprung fehlgeschlagen – manueller Eingriff nötig"
+          fi
+          if [ "$O_RUECK" = "success" ] && [ "$O_LIVE2" = "success" ]; then
+            echo "::error title=Rücksprung gelungen::Der Rücksprung ist gelungen, der Lauf endet trotzdem rot, damit das Ticket nicht auf Done geht."
+          fi
+          [ "$O_RUECK" != "skipped" ] && ROT=1
+          [ "$O_LIVE2" = "failure" ] && ROT=1
+          exit "$ROT"
 
       - name: SSH-Key aufräumen
         if: always()

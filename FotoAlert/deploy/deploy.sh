@@ -64,7 +64,8 @@ echo ">>> web/ bereinigt."
 # ── 3. Service Worker Cache-Name aktualisieren ───────────────────────────────
 DEPLOY_TS=$(date +%Y%m%d%H%M)
 echo ">>> SW Cache-Name: fotoalert-$DEPLOY_TS"
-sed -i "s/const CACHE_NAME = 'fotoalert-[^']*'/const CACHE_NAME = 'fotoalert-$DEPLOY_TS'/" "$SW_FILE"
+sed -i.bak "s/const CACHE_NAME = 'fotoalert-[^']*'/const CACHE_NAME = 'fotoalert-$DEPLOY_TS'/" "$SW_FILE"
+rm -f "$SW_FILE.bak"
 
 # ── 4. Python-Dependencies prüfen und aktualisieren ─────────────────────────
 echo ">>> Dependencies prüfen..."
@@ -91,25 +92,14 @@ done
 
 if [ "$HTTP_STATUS" != "200" ]; then
     echo "❌ Health-Check fehlgeschlagen (HTTP $HTTP_STATUS) – Rollback wird eingeleitet..."
-    git checkout "$PREV_COMMIT" -- .
-    git checkout "$PREV_COMMIT" -- FotoAlert/web/sw.js 2>/dev/null || true
-    sudo systemctl restart fotoalert.service
-
-    # Rollback-Health-Check ebenfalls mit Retry-Loop (max 15s)
-    ROLLBACK_STATUS="000"
-    for i in 1 2 3; do
-        sleep 5
-        ROLLBACK_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
-        if [ "$ROLLBACK_STATUS" = "200" ]; then break; fi
-        echo "    Rollback-Versuch $i: HTTP $ROLLBACK_STATUS – warte..."
-    done
-
-    if [ "$ROLLBACK_STATUS" = "200" ]; then
-        echo "⚠️  Rollback erfolgreich auf $PREV_COMMIT"
-    else
-        echo "❌ Rollback ebenfalls fehlgeschlagen! Manueller Eingriff nötig."
-        echo "   journalctl -u fotoalert -n 100"
-    fi
+    # TASK-118: Rücksprung über dieselbe Mechanik wie der automatische Rücksprung nach rotem
+    # Live-Check (ruecksprung.sh): zurück auf die zuletzt BESTÄTIGTE Version (nicht einfach den
+    # Vorgänger), gespeicherter Stand des Servers wird mitgezogen, Webserver-Einstellungen und
+    # Service-Worker-Datei werden mit zurückgesetzt. Gibt es noch keine Marke „zuletzt bestätigt“,
+    # gilt wie bisher der Stand vor dieser Veröffentlichung (FOTOALERT_RUECKFALL_COMMIT).
+    # Scheitert der Rücksprung, meldet ruecksprung.sh „Rücksprung fehlgeschlagen – manueller
+    # Eingriff nötig“; ein weiterer Rücksprung folgt nie.
+    FOTOALERT_RUECKFALL_COMMIT="$PREV_COMMIT" bash "$DEPLOY_DIR/ruecksprung.sh" zurueck || true
     exit 1
 fi
 
