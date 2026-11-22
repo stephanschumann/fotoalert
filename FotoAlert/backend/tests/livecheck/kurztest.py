@@ -19,6 +19,9 @@ Regeln (Ticket TASK-118):
   - Rein lesend: Anfragen, die Daten ändern, stellt dieser Test nie; die einzige Ausnahme ist das
     Anmelden mit Gast-Rechten (AK14).
   - Höchstens ein Anmeldeversuch beim Server pro Lauf, nie ein zweiter nach einer Ablehnung (AK4).
+  - Vor dem ersten Prüfpunkt wartet der Kurztest (Bereitschaftsphase, höchstens T_BEREITSCHAFT_S), bis
+    die Startseite antwortet — direkt nach einem Dienst-Neustart ist die echte Seite oft kurz stumm.
+    Antwortet sie nie, scheitert der Prüfpunkt Version wie bisher mit „Seite nicht erreichbar“.
   - Jeder andere gescheiterte Prüfpunkt wird genau einmal wiederholt (AK11); die Wiederholung fragt
     die Daten neu ab.
   - Fehler aus fremden Quellen (z. B. Kartendienst) lösen kein Scheitern aus, stehen aber in der
@@ -33,6 +36,8 @@ import os
 import re
 import sys
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Callable, List, Optional
 from urllib.parse import urlparse
@@ -50,13 +55,23 @@ GRUND_FALSCHE_VERSION = "falsche Version live"
 
 EXIT_OK, EXIT_GESCHEITERT, EXIT_NICHT_EINSATZBEREIT = 0, 1, 2
 
-# Wartezeiten (Millisekunden)
+# Wartezeiten (Millisekunden). Direkt nach einem Dienst-Neustart (Veröffentlichen oder Rücksprung) ist
+# die echte Seite für eine Weile langsam (große Zwischenspeicher-Dateien); die Werte sind deshalb
+# großzügig. Obergrenze: Ein Kurztest-Schritt im GitHub-Lauf darf höchstens 3 Minuten dauern
+# (timeout-minutes in deploy.yml) — Rechnung für die stumme Seite (gerechnet, nicht gemessen):
+# 5 s Pause + Bereitschaft (höchstens T_BEREITSCHAFT_S + 8 s = 98 s) + Prüfpunkt Version (2 × T_SEITE + 3 s)
+# + Bildschirmfoto (T_SEITE) ≈ 166 s im ungünstigsten Fall (gemessen mit 90 s Bereitschaft: 153,7 s).
 T_SEITE = 20000
-T_ANMELDUNG = 20000
-T_KARTE_MARKER = 7000
-T_FEED = 12000
-T_KALENDER = 12000
+T_ANMELDUNG = 30000
+T_KARTE_MARKER = 12000
+T_FEED = 25000
+T_KALENDER = 40000
 T_NACHLAUF_FEHLER = 2500   # Zeit, in der verzögerte Programmfehler noch auftauchen dürfen
+
+# Bereitschaftsphase vor dem ersten Prüfpunkt (Sekunden)
+T_BEREITSCHAFT_S = 90        # so lange wird auf die erste Antwort der Startseite gewartet
+BEREITSCHAFT_PAUSE_S = 3     # Pause zwischen zwei Abfragen
+BEREITSCHAFT_ANFRAGE_S = 8   # Wartezeit einer einzelnen Abfrage
 
 _URL_RE = re.compile(r"https?://[^\s)'\"]+")
 
@@ -138,6 +153,41 @@ def _herkunft(stack: str, eigene_origin: str) -> str:
         if f"{p.scheme}://{p.netloc}" == eigene_origin:
             return "eigen"
     return "fremd"
+
+
+def warte_auf_bereitschaft(adresse: str, bericht: Bericht) -> bool:
+    """Bereitschaftsphase (rein lesend): Fragt die Startseite wiederholt ab, bis sie antwortet.
+
+    „Antwortet“ heißt: eine HTTP-Antwort unter 500. Keine Antwort, Verbindungsfehler und 5xx (z. B.
+    Webserver läuft, App noch nicht) zählen als „noch nicht bereit“. Nach höchstens T_BEREITSCHAFT_S
+    wird aufgegeben; der Prüfpunkt Version scheitert dann wie bisher mit „Seite nicht erreichbar“.
+    Die Abfrage geht direkt (ohne Umgebungs-Proxy), wie der Browser des Kurztests auch."""
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    url = adresse.rstrip("/") + "/"
+    start = time.monotonic()
+    versuch = 0
+    while True:
+        versuch += 1
+        rest = T_BEREITSCHAFT_S - (time.monotonic() - start)
+        status: Optional[int] = None
+        try:
+            with opener.open(url, timeout=max(1.0, min(float(BEREITSCHAFT_ANFRAGE_S), rest))) as r:
+                status = r.status
+        except urllib.error.HTTPError as e:
+            status = e.code
+        except Exception:
+            status = None
+        dauer = time.monotonic() - start
+        if status is not None and status < 500:
+            if versuch > 1:
+                bericht.zeile(f"Hinweis: Die Seite antwortet erst nach {dauer:.0f} s (Versuch {versuch}); "
+                              "die Prüfpunkte beginnen jetzt.")
+            return True
+        if dauer + BEREITSCHAFT_PAUSE_S >= T_BEREITSCHAFT_S:
+            bericht.zeile(f"Hinweis: Die Seite antwortet auch nach {dauer:.0f} s nicht "
+                          f"({'keine Antwort' if status is None else 'HTTP ' + str(status)}).")
+            return False
+        time.sleep(BEREITSCHAFT_PAUSE_S)
 
 
 class Sitzung:
@@ -446,6 +496,9 @@ def lauf(adresse: str, erwartete_version: str, ordner: Path) -> int:
             context.add_init_script(_INIT_SKRIPT)
             page = context.new_page()
             s = Sitzung(page, context, adresse)
+
+            # 0 Bereitschaft: erst warten, bis die Seite (z. B. nach einem Dienst-Neustart) antwortet
+            warte_auf_bereitschaft(adresse, bericht)
 
             # 1 Version
             mit_wiederholung(bericht, s, PP_VERSION,
