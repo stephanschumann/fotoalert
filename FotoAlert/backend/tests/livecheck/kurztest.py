@@ -22,6 +22,11 @@ Regeln (Ticket TASK-118):
   - Vor dem ersten Prüfpunkt wartet der Kurztest (Bereitschaftsphase, höchstens T_BEREITSCHAFT_S), bis
     die Startseite antwortet — direkt nach einem Dienst-Neustart ist die echte Seite oft kurz stumm.
     Antwortet sie nie, scheitert der Prüfpunkt Version wie bisher mit „Seite nicht erreichbar“.
+  - Danach, nur wenn die Seite bereit ist, wärmt der Kurztest den Kalender vor (Vorwärm-Phase,
+    warte_auf_kalender_vorwaermen): ein einziger lesender GET auf /calendar für den aktuellen Monat,
+    Körper vollständig gelesen, damit der Server fertig rechnet und zwischenspeichert (nach einem
+    Neustart rechnet er den Monat sonst live, ~30 s, im Browser-Prüfpunkt zu langsam). Die Vorwärm-Phase
+    setzt NIE ein Ergebnis; sie schreibt nur eine Hinweiszeile. Der Prüfpunkt Kalender bleibt streng.
   - Jeder andere gescheiterte Prüfpunkt wird genau einmal wiederholt (AK11); die Wiederholung fragt
     die Daten neu ab.
   - Fehler aus fremden Quellen (z. B. Kartendienst) lösen kein Scheitern aus, stehen aber in der
@@ -31,6 +36,7 @@ Regeln (Ticket TASK-118):
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import os
 import re
@@ -38,6 +44,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 from typing import Callable, List, Optional
 from urllib.parse import urlparse
@@ -61,17 +68,37 @@ EXIT_OK, EXIT_GESCHEITERT, EXIT_NICHT_EINSATZBEREIT = 0, 1, 2
 # (timeout-minutes in deploy.yml) — Rechnung für die stumme Seite (gerechnet, nicht gemessen):
 # 5 s Pause + Bereitschaft (höchstens T_BEREITSCHAFT_S + 8 s = 98 s) + Prüfpunkt Version (2 × T_SEITE + 3 s)
 # + Bildschirmfoto (T_SEITE) ≈ 166 s im ungünstigsten Fall (gemessen mit 90 s Bereitschaft: 153,7 s).
+# Grenzen: Schritt-Limit in deploy.yml 180 s, Test-Zeitlimit (schnittstelle.py) 170 s, alle drei Schritte
+# zusammen 600 s. Vorwärm-Phase (Kalender), alles „gerechnet, nicht gemessen“:
+#  (a) stumme Seite: Die Seite wird nie bereit, die Vorwärm-Phase läuft nicht → unverändert 153,7 s
+#      (gemessen), gerechnet höchstens 166 s. Keine Verschlechterung.
+#  (b) Seite antwortet, Kalender aber kalt: Bereitschaft + Vorwärmen enden zusammen spätestens bei
+#      VORWAERM_BIS_S = 100 s nach Start (die Obergrenze T_VORWAERM_S = 60 s wird entsprechend
+#      gekürzt; bleiben weniger als VORWAERM_MIN_S = 15 s übrig, wird nicht vorgewärmt).
+#      Danach, wenn der Kalender warm ist: Browser starten/Version ≈ 5 s, Anmeldung ≈ 6 s,
+#      Willkommensfenster 4 s, Karte ≈ 5 s, Feed ≈ 5 s, Kalender ≈ 20 s (warm: 40 MB in 16–17 s am echten
+#      Server gemessen, nur das Laden), Programmfehler 2,5 s, Beenden ≈ 2 s → rund 50 s, in Summe
+#      ≈ 150 s. Kalter Server beim Vorwärmen: ~30 s Rechnen + ~17 s Übertragung ≈ 47 s < 60 s.
+#      Eng wird es, wenn die Seite erst spät antwortet (Bereitschaft nahe 90 s → Vorwärmen wird dann
+#      auf ~10 s gekürzt, entfällt) oder wenn der Prüfpunkt Kalender trotzdem einmal wiederholt werden
+#      muss (+ bis zu 2 × 40 s): dann können 170 s überschritten werden; das gilt als roter Lauf.
 T_SEITE = 20000
 T_ANMELDUNG = 30000
 T_KARTE_MARKER = 12000
 T_FEED = 25000
-T_KALENDER = 40000
+T_KALENDER = 40000   # bewusst unverändert streng: nach dem Vorwärmen ist das Laden ≈ 17–20 s
 T_NACHLAUF_FEHLER = 2500   # Zeit, in der verzögerte Programmfehler noch auftauchen dürfen
 
 # Bereitschaftsphase vor dem ersten Prüfpunkt (Sekunden)
 T_BEREITSCHAFT_S = 90        # so lange wird auf die erste Antwort der Startseite gewartet
 BEREITSCHAFT_PAUSE_S = 3     # Pause zwischen zwei Abfragen
 BEREITSCHAFT_ANFRAGE_S = 8   # Wartezeit einer einzelnen Abfrage
+
+# Vorwärm-Phase Kalender (Sekunden; nie ein Ergebnis, nur ein Hinweis im Protokoll)
+T_VORWAERM_S = 60            # Obergrenze für Antwort und vollständiges Lesen des Körpers
+VORWAERM_BIS_S = 100         # Bereitschaft + Vorwärmen enden spätestens so viele Sekunden nach Start
+VORWAERM_MIN_S = 15          # bleibt weniger Zeit, wird nicht vorgewärmt
+VORWAERM_LESE_S = 5          # Wartezeit je Lesevorgang, sobald die Antwort begonnen hat
 
 _URL_RE = re.compile(r"https?://[^\s)'\"]+")
 
@@ -188,6 +215,59 @@ def warte_auf_bereitschaft(adresse: str, bericht: Bericht) -> bool:
                           f"({'keine Antwort' if status is None else 'HTTP ' + str(status)}).")
             return False
         time.sleep(BEREITSCHAFT_PAUSE_S)
+
+
+def warte_auf_kalender_vorwaermen(adresse: str, bericht: Bericht) -> None:
+    """Vorwärm-Phase (rein lesend): Ein einziger GET auf /calendar für den aktuellen Monat.
+
+    Der Körper wird vollständig gelesen, damit der Server den Monat fertig rechnet und zwischenspeichert.
+    Monat und Jahr nimmt das Frontend (web/index.html, CalendarView: new Date().getMonth()+1 / getFullYear())
+    aus der Ortszeit des Browsers; hier ebenso aus der Ortszeit des Läufers. Ohne Anmeldung, ohne
+    Umgebungs-Proxy (wie warte_auf_bereitschaft). Setzt nie ein Ergebnis: nur eine Hinweiszeile mit
+    Dauer und Bytes oder dem Grund, warum es nicht geklappt hat. Die Bytes sind die übertragenen
+    (bei Kompression also weniger als der entpackte Körper)."""
+    jetzt_s = time.monotonic() - bericht.start
+    frei = min(float(T_VORWAERM_S), VORWAERM_BIS_S - jetzt_s)
+    if frei < VORWAERM_MIN_S:
+        bericht.zeile(f"Hinweis: Kalender nicht vorgewärmt (nur noch {max(frei, 0):.0f} s im Zeitplan).")
+        return
+    jetzt = datetime.now()
+    p = urlparse(adresse.rstrip("/"))
+    pfad = (p.path or "") + f"/calendar?month={jetzt.month}&year={jetzt.year}"
+    start = time.monotonic()
+    conn = None
+    try:
+        klasse = http.client.HTTPSConnection if p.scheme == "https" else http.client.HTTPConnection
+        conn = klasse(p.netloc, timeout=frei)
+        conn.request("GET", pfad, headers={"Accept": "application/json", "Accept-Encoding": "gzip",
+                                           "User-Agent": "fotoalert-kurztest"})
+        antwort = conn.getresponse()
+        n = 0
+        while True:
+            rest = frei - (time.monotonic() - start)
+            if rest <= 0:
+                raise TimeoutError("Obergrenze erreicht")
+            if conn.sock is not None:
+                conn.sock.settimeout(max(0.5, min(float(VORWAERM_LESE_S), rest)))
+            stueck = antwort.read(1 << 20)
+            if not stueck:
+                break
+            n += len(stueck)
+        dauer = time.monotonic() - start
+        if antwort.status >= 400:
+            bericht.zeile(f"Hinweis: Kalender-Vorwärmen: HTTP {antwort.status} nach {dauer:.1f} s ({n} Bytes).")
+        else:
+            bericht.zeile(f"Hinweis: Kalender vorgewärmt in {dauer:.1f} s ({n} Bytes, HTTP {antwort.status}).")
+    except Exception as e:  # nur ein Hinweis, nie ein Ergebnis
+        dauer = time.monotonic() - start
+        art = "Zeitüberschreitung" if isinstance(e, TimeoutError) else e.__class__.__name__
+        bericht.zeile(f"Hinweis: Kalender-Vorwärmen nicht abgeschlossen nach {dauer:.1f} s ({art}).")
+    finally:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 class Sitzung:
@@ -498,7 +578,11 @@ def lauf(adresse: str, erwartete_version: str, ordner: Path) -> int:
             s = Sitzung(page, context, adresse)
 
             # 0 Bereitschaft: erst warten, bis die Seite (z. B. nach einem Dienst-Neustart) antwortet
-            warte_auf_bereitschaft(adresse, bericht)
+            bereit = warte_auf_bereitschaft(adresse, bericht)
+
+            # 0b Kalender vorwärmen (nur lesend, nur wenn die Seite bereit ist, setzt nie ein Ergebnis)
+            if bereit:
+                warte_auf_kalender_vorwaermen(adresse, bericht)
 
             # 1 Version
             mit_wiederholung(bericht, s, PP_VERSION,
