@@ -1755,7 +1755,7 @@ function escJsAttr(s) {
 // Major  → grundlegende App-Überarbeitung (v2, v3 …)
 // Feature → neues Feature, Minor-Bump        (v1.1, v1.2 …)
 // Fix    → Bugfix, Patch-Bump               (v1.1.1, v1.1.2 …)
-const APP_VERSION = '1.26.6';
+const APP_VERSION = '1.26.7';
 
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -2449,14 +2449,22 @@ const CalendarView = {
     if (Feed.mode === 'calendar') this.render();
   },
 
-  async loadMonth(retries = 3) {
+  async loadMonth(retries = 120) {
     const m = this.month + 1;  // API: 1-basiert
     const y = this.year;
     try {
       const res = await API.get(`/calendar?month=${m}&year=${y}`);
       if (res.status === 'calculating' && retries > 0) {
+        // BUG-123: Monat wird noch berechnet — sichtbarer Hinweis, danach weiter nachfragen (bis zu 10 Min.),
+        // ohne Neuladen. render() ersetzt den Hinweis, sobald die Termine da sind.
+        const el = document.getElementById('feed-content');
+        el.innerHTML = `<div class="cal-nav"><button class="cal-nav-btn" onclick="CalendarView.prev()">‹</button><span class="cal-nav-title">${MONTHS_DE[this.month]} ${this.year}</span><button class="cal-nav-btn" onclick="CalendarView.next()">›</button></div><div class="cal-loading"><div class="spinner"></div><span>Der Kalender wird gerade berechnet, bitte kurz warten.</span></div>`;
         await new Promise(r => setTimeout(r, 5000));
         return this.loadMonth(retries - 1);
+      }
+      if (res.status === 'calculating') {
+        toast('Kalender wird noch berechnet – bitte später erneut öffnen');
+        return;
       }
       // BUG-27: Leere Responses nicht cachen — sonst bleibt der Kalender für die Session leer
       // auch wenn der Server später valide Daten liefert. Nur bei status=ok + Events cachen.

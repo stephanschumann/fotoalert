@@ -4480,7 +4480,7 @@ async def _prewarm_calendar() -> None:
     """
     d = date.today()
     try:
-        await _compute_month_all_locations(d.year, d.month)
+        await _monat_lauf_holen(d.year, d.month, 0.35)   # BUG-123: teilt sich die Rechnung mit /calendar
         logger.info("On-Demand-Kalender vorgewärmt: %d-%02d", d.year, d.month)
     except Exception as e:
         logger.error("Kalender-Pre-Warm fehlgeschlagen: %s", e)
@@ -5369,6 +5369,36 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
     return events
 
 
+# BUG-123: Sperre gegen Doppelrechnung. Gleichzeitige Abrufe (und das Vorwärmen beim Start) desselben Monats
+# teilen sich EINE laufende Rechnung, statt je eine eigene Komplettrechnung zu starten. /calendar wartet nur kurz
+# auf sie und meldet danach sofort "calculating" (statt stumm zu warten).
+_KALENDER_WARTEZEIT_S = 0.5
+_KALENDER_HINWEIS = "Der Kalender wird gerade berechnet, bitte kurz warten."
+_monat_laeufe: dict = {}   # Schlüssel (wie Monatsspeicher) -> (laufende Aufgabe, Gebiets-Stand beim Start)
+
+
+def _monat_lauf_holen(year: int, month: int, min_score: float) -> "asyncio.Future":
+    """Liefert die laufende Rechnung dieses Monats oder startet genau eine neue. Eine Rechnung, die vor einer
+    Gebiets-Umschaltung gestartet wurde, wird nicht mitbenutzt (neuer Stand -> neue Rechnung)."""
+    key = f"{year}-{month:02d}-{round(min_score, 2)}"
+    lauf = _monat_laeufe.get(key)
+    if lauf is not None and not lauf[0].done() and lauf[1] == _gebiets_version:
+        return lauf[0]
+    if key not in _ondemand_month_cache:   # nur wenn wirklich gerechnet wird (nicht bei Treffer im Monatsspeicher)
+        logger.info("BUG-123 Monatsrechnung gestartet: %s", key)   # AK-5: im Dienst-Protokoll zählbar
+    aufgabe = asyncio.ensure_future(_compute_month_all_locations(year, month, min_score))
+
+    def _fertig(t, key=key):
+        if _monat_laeufe.get(key, (None,))[0] is t:
+            _monat_laeufe.pop(key, None)
+        if not t.cancelled():
+            t.exception()   # Fehler als abgeholt markieren; wer wartet, bekommt ihn über t.result()
+
+    aufgabe.add_done_callback(_fertig)
+    _monat_laeufe[key] = (aufgabe, _gebiets_version)
+    return aufgabe
+
+
 @app.get("/calendar")
 async def get_calendar(
     location_id: Optional[str] = None,
@@ -5395,8 +5425,13 @@ async def get_calendar(
             # US-141: für einen pausierten Ort gibt es keinen Kalender (Anzeige: „pausiert“)
             events = [] if gz.ist_pausiert(loc) else await _compute_location_month(loc, year, month, min_score)
         else:
-            # Alle Locations: aus dem Monats-Cache (oder bei Bedarf einmal rechnen)
-            events = await _compute_month_all_locations(year, month, min_score)
+            # Alle Locations: aus dem Monats-Cache; sonst läuft genau eine Rechnung (BUG-123), auf die hier
+            # nur kurz gewartet wird — dauert sie länger, kommt sofort die Antwort "wird berechnet".
+            lauf = _monat_lauf_holen(year, month, min_score)
+            fertig, _ = await asyncio.wait({lauf}, timeout=_KALENDER_WARTEZEIT_S)
+            if not fertig:
+                return {"status": "calculating", "events": [], "total": 0, "message": _KALENDER_HINWEIS}
+            events = lauf.result()
         return {"status": "ok", "on_demand": True, "computed_at": None,
                 "total": len(events), "events": events}
 
