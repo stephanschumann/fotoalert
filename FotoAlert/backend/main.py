@@ -5337,6 +5337,21 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
     events: list = []
     # BUG-110: Orte zählen, damit "leer wegen Fehlern" von "echt leer" unterscheidbar ist.
     aktive = gz.aktive_orte(list(_LOCS))
+    kennung = None
+    # BUG-123 (Lauf 5, Befund A): Platte nur für einen Schwellenwert mit höchstens 2 Nachkommastellen. Der Dateischlüssel
+    # rundet auf 2 Stellen, gerechnet wird aber mit dem echten Wert; ein krummer Wert (z. B. 0.354) dürfte sonst eine
+    # Datei mit anderem Filter unter dem Schlüssel des Standardwerts ablegen, die nach dem Neustart als gültig geladen würde.
+    if _monat_platte_erlaubt() and min_score == rounded_min_score:
+        # BUG-123 (Lauf 4, Variante 2): ein früher fertig gerechneter Monat liegt auf der Platte -> laden statt rechnen.
+        kennung = await _monat_kennung_holen(aktive)
+        geladen = await _monat_von_platte(key, kennung) if kennung else None
+        if geladen is not None:
+            if version != _gebiets_version:
+                return _ohne_pausierte(geladen)   # wie beim Rechnen: bei Umschalten nichts speichern
+            _ondemand_month_cache[key] = geladen
+            while len(_ondemand_month_cache) > _ONDEMAND_MONTH_CACHE_MAX_SIZE:
+                _ondemand_month_cache.popitem(last=False)
+            return geladen
     failed_count = 0
     # US-141 (Gruppe B): der Kalender wird nur für aktive Orte gerechnet.
     for i, loc in enumerate(aktive):
@@ -5366,7 +5381,166 @@ async def _compute_month_all_locations(year: int, month: int, min_score: float =
     # TASK-86 (AK-3): Höchstgröße einhalten — ältesten Eintrag verdrängen (FIFO).
     while len(_ondemand_month_cache) > _ONDEMAND_MONTH_CACHE_MAX_SIZE:
         _ondemand_month_cache.popitem(last=False)
+    if kennung and failed_count == 0:
+        # BUG-123 (Lauf 4): nur vollständig gerechnete Monate auf die Platte; Schreiben im Hintergrund, die Antwort wartet nicht.
+        _monat_schreibaufgaben.add(asyncio.ensure_future(_monat_auf_platte(key, kennung, events)))
+        _monat_schreibaufgaben.difference_update({t for t in _monat_schreibaufgaben if t.done()})
     return events
+
+
+# BUG-123 (Lauf 4, Variante 2): ein fertig gerechneter Monat wird zusätzlich auf der Platte abgelegt und nach einem
+# Neustart daraus geladen, statt neu gerechnet. Nur im Betrieb (im Testmodus nie, siehe _monat_platte_erlaubt).
+# Format: eine Textdatei im Cache-Ordner; Zeile 1 = Kopf (Format, Schlüssel, Kennung der Datengrundlage, Anzahl),
+# danach je Zeile ein Block von höchstens _MONAT_DATEI_BLOCK Terminen. Kleine Blöcke, damit weder beim Schreiben noch
+# beim Lesen die Hauptschleife länger als einige Millisekunden angehalten wird (ein einziges json.loads über ~40 MB
+# würde sie sekundenlang sperren). Kein zweiter Gesamt-Satz im Arbeitsspeicher: geschrieben und gelesen wird blockweise.
+_MONAT_DATEI_FORMAT = 1
+_MONAT_DATEI_BLOCK = 250
+_MONAT_DATEI_ANZAHL_MAX = 3   # höchstens so viele Monatsdateien insgesamt (inkl. der des aktuellen Monats, die nie entfernt wird)
+_monat_schreibaufgaben: set = set()   # Verweise auf laufende Schreib-Aufgaben (sonst könnte sie die Speicherbereinigung vorzeitig beenden)
+_monat_schreibt: set = set()          # Schlüssel, die gerade geschrieben werden (kein zweiter Schreiber für denselben Monat)
+_rechencode_kennung: Optional[str] = None
+
+
+def _monat_platte_erlaubt() -> bool:
+    """Wie `_wetter_speicher_erlaubt()`: im Testmodus (FOTOALERT_NO_BACKGROUND=1) wird der echte Cache-Ordner nie
+    benutzt, damit ein Test weder echte Dateien schreibt noch von einer Datei aus früherem Lauf beeinflusst wird."""
+    return not (_NO_BACKGROUND and _CACHE_DIR == _WETTER_SPEICHER_STANDARDORDNER)
+
+
+def _monat_datei(key: str) -> Path:
+    return _CACHE_DIR / ("ondemand_monat_%s.jsonl" % key)
+
+
+def _monat_kennung(aktive: list) -> str:
+    """Kennung der Datengrundlage eines Monats: Rechencode (calculations/*.py, precompute.py, Rechnung je Ort) plus alle
+    Angaben der aktiven Orte. Ändert sich eines davon (Ort geändert/neu/gelöscht, Gebiet umgeschaltet, Rechencode neu),
+    passt die Kennung nicht mehr, und die Datei wird nicht benutzt. Ein Release, der nur Oberfläche oder anderen
+    Servercode ändert, lässt sie unverändert. Läuft in einem Hilfsfaden (liest Dateien)."""
+    global _rechencode_kennung
+    import hashlib
+    import inspect
+    if _rechencode_kennung is None:
+        h = hashlib.sha256()
+        basis = Path(__file__).parent
+        for p in sorted((basis / "calculations").glob("*.py")) + [basis / "precompute.py"]:
+            h.update(p.name.encode("utf-8"))
+            h.update(p.read_bytes())
+        try:
+            h.update(inspect.getsource(_compute_location_month).encode("utf-8"))
+        except (OSError, TypeError):
+            pass
+        _rechencode_kennung = h.hexdigest()
+    h = hashlib.sha256()
+    h.update(("f%d|%s|" % (_MONAT_DATEI_FORMAT, _rechencode_kennung)).encode("utf-8"))
+    for loc in sorted(aktive, key=lambda o: str(o.id)):
+        h.update(repr(loc).encode("utf-8"))
+    return h.hexdigest()
+
+
+async def _monat_kennung_holen(aktive: list) -> Optional[str]:
+    try:
+        return await asyncio.get_running_loop().run_in_executor(None, _monat_kennung, aktive)
+    except Exception as e:
+        logger.warning("BUG-123 Monatsdatei: Kennung nicht bildbar, Monat wird ohne Platte gerechnet: %s", e)
+        return None
+
+
+def _monat_datei_oeffnen(pfad: Path):
+    try:
+        return open(pfad, "r", encoding="utf-8")
+    except FileNotFoundError:
+        return None
+
+
+async def _monat_von_platte(key: str, kennung: str) -> Optional[list]:
+    """Lädt den Monat aus seiner Datei, wenn sie vollständig ist und zur Kennung passt; sonst None (dann wird gerechnet).
+    Lesen im Hilfsfaden, Parsen blockweise in der Hauptschleife (je Block wenige Millisekunden)."""
+    loop = asyncio.get_running_loop()
+    f = None
+    try:
+        f = await loop.run_in_executor(None, _monat_datei_oeffnen, _monat_datei(key))
+        if f is None:
+            return None
+        kopf = json.loads(await loop.run_in_executor(None, f.readline) or "{}")
+        if kopf.get("format") != _MONAT_DATEI_FORMAT or kopf.get("key") != key or kopf.get("kennung") != kennung:
+            logger.info("BUG-123 Monatsdatei %s passt nicht mehr zur Datengrundlage, wird neu gerechnet", key)
+            return None
+        events: list = []
+        bloecke = 0
+        while True:
+            zeile = await loop.run_in_executor(None, f.readline)
+            if not zeile:
+                break
+            events.extend(json.loads(zeile))
+            bloecke += 1
+        if bloecke != kopf.get("bloecke") or len(events) != kopf.get("anzahl"):
+            logger.warning("BUG-123 Monatsdatei %s unvollständig (%d von %s Terminen), wird neu gerechnet",
+                           key, len(events), kopf.get("anzahl"))
+            return None
+        logger.info("BUG-123 Monat %s aus Datei geladen: %d Termine", key, len(events))
+        return events
+    except Exception as e:
+        logger.warning("BUG-123 Monatsdatei %s nicht lesbar, wird neu gerechnet: %s", key, e)
+        return None
+    finally:
+        if f is not None:
+            f.close()
+
+
+def _monat_dateien_aufraeumen() -> None:
+    """Hält höchstens _MONAT_DATEI_ANZAHL_MAX Monatsdateien insgesamt und räumt alte Temp-Dateien ab. Die Datei des
+    aktuellen Monats (Ortszeit, Standardwert 0.35, wie _prewarm_calendar) wird nie gelöscht und zählt mit; der Rest
+    sind die jüngsten Dateien nach Änderungszeit (BUG-123 Lauf 5, Befund B)."""
+    jetzt = _time.time()
+    heute = date.today()
+    geschuetzt = _monat_datei("%d-%02d-0.35" % (heute.year, heute.month))
+    dateien = sorted((p for p in _CACHE_DIR.glob("ondemand_monat_*.jsonl") if p != geschuetzt),
+                     key=lambda p: p.stat().st_mtime, reverse=True)
+    for p in dateien[max(_MONAT_DATEI_ANZAHL_MAX - (1 if geschuetzt.exists() else 0), 0):]:
+        p.unlink()
+    for p in _CACHE_DIR.glob("ondemand_monat_*.jsonl.tmp-*"):
+        if jetzt - p.stat().st_mtime > 3600:
+            p.unlink()
+
+
+def _monat_datei_festschreiben(f) -> None:
+    f.flush()
+    _os.fsync(f.fileno())
+
+
+async def _monat_auf_platte(key: str, kennung: str, events: list) -> None:
+    """Schreibt einen fertigen Monat atomar (Temp-Datei, fsync, os.replace) blockweise in seine Datei. Jeder Fehler
+    (Platte voll, Rechte) wird nur protokolliert: der Kalender selbst ist davon nie betroffen."""
+    if key in _monat_schreibt:
+        return
+    _monat_schreibt.add(key)
+    loop = asyncio.get_running_loop()
+    pfad = _monat_datei(key)
+    tmp = pfad.with_name("%s.tmp-%d" % (pfad.name, _os.getpid()))
+    try:
+        n = len(events)
+        bloecke = (n + _MONAT_DATEI_BLOCK - 1) // _MONAT_DATEI_BLOCK
+        _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(tmp, "w", encoding="utf-8") as f:
+            kopf = {"format": _MONAT_DATEI_FORMAT, "key": key, "kennung": kennung, "anzahl": n, "bloecke": bloecke,
+                    "geschrieben": datetime.now(timezone.utc).isoformat()}
+            f.write(json.dumps(kopf, ensure_ascii=False) + "\n")
+            for i in range(0, n, _MONAT_DATEI_BLOCK):
+                f.write(json.dumps(events[i:i + _MONAT_DATEI_BLOCK], ensure_ascii=False, separators=(",", ":")) + "\n")
+                await asyncio.sleep(0)   # Hauptschleife nach jedem Block freigeben
+            await loop.run_in_executor(None, _monat_datei_festschreiben, f)
+        _os.replace(tmp, pfad)
+        await loop.run_in_executor(None, _monat_dateien_aufraeumen)
+        logger.info("BUG-123 Monat %s auf Platte gesichert: %d Termine, %d Bytes", key, n, pfad.stat().st_size)
+    except Exception as e:
+        logger.warning("BUG-123 Monat %s konnte nicht auf Platte gesichert werden: %s", key, e)
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+    finally:
+        _monat_schreibt.discard(key)
 
 
 # BUG-123: Sperre gegen Doppelrechnung. Gleichzeitige Abrufe (und das Vorwärmen beim Start) desselben Monats
