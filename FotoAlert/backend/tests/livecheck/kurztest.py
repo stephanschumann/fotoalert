@@ -82,12 +82,32 @@ EXIT_OK, EXIT_GESCHEITERT, EXIT_NICHT_EINSATZBEREIT = 0, 1, 2
 #      Eng wird es, wenn die Seite erst spät antwortet (Bereitschaft nahe 90 s → Vorwärmen wird dann
 #      auf ~10 s gekürzt, entfällt) oder wenn der Prüfpunkt Kalender trotzdem einmal wiederholt werden
 #      muss (+ bis zu 2 × 40 s): dann können 170 s überschritten werden; das gilt als roter Lauf.
+#  (c) Erster Start einer neuen Version ohne fertige Monatsdatei (BUG-123, AK-11): Die Seite zeigt dann den
+#      Hinweis „wird gerade berechnet“. Läuft das Warten im ersten Versuch des Prüfpunkts Kalender in die
+#      Zeitüberschreitung und steht dieser Hinweis noch auf der Seite, wartet der Test weiter, insgesamt bis
+#      T_KALENDER_BERECHNUNG_MS = 240 s. Rechnung für diesen Fall (gerechnet, nicht gemessen):
+#      5 s Pause + Bereitschaft (bis ca. 98 s) + Version/Anmeldung/Karte/Feed ≈ 30 s + Kalender 40 s
+#      + bis zu 6 s Suche nach dem Hinweis (liegen NICHT innerhalb der 240 s) + weitere 200 s
+#      (T_KALENDER_BERECHNUNG_MS - T_KALENDER) + Wiederholung 40 s + 10 s (Programmfehler, Beenden)
+#      ≈ 429 s, wenn alles bis zum Anschlag läuft (gerechnet, nicht gemessen). Das liegt über dem
+#      Schritt-Limit von 420 s (deploy.yml, Schritt live1, 7 Minuten): Bei voll ausgereizter Bereitschaft
+#      UND voll ausgeschöpfter Berechnungszeit reicht das Limit nicht; ohne Bereitschaftsverzug (≈ 5–10 s
+#      statt 98 s) sind es ≈ 340 s. Ohne Hinweis kommen im ersten Versuch bis zu 6 s Suchzeit zu den 40 s
+#      hinzu (ca. 46 s); in der Wiederholung wird nicht gesucht (40 s). Die 170-s-Grenze (schnittstelle.py
+#      KURZTEST_ZEITLIMIT_S) gilt für Übungsseiten ohne Hinweis unverändert: Ohne Hinweis (Fehlermeldung,
+#      Kalender hängt ohne Hinweistext) bleibt es bei 40 s (erster Versuch ca. 46 s) und in der Wiederholung
+#      bei 40 s.
 T_SEITE = 20000
 T_ANMELDUNG = 30000
 T_KARTE_MARKER = 12000
 T_FEED = 25000
 T_KALENDER = 40000   # bewusst unverändert streng: nach dem Vorwärmen ist das Laden ≈ 17–20 s
 T_NACHLAUF_FEHLER = 2500   # Zeit, in der verzögerte Programmfehler noch auftauchen dürfen
+# Erster Start einer neuen Version ohne fertige Monatsdatei (BUG-123, AK-11): Die Seite zeigt den Hinweis
+# „wird gerade berechnet“, der Kalender ist erst nach der ersten Monatsrechnung fertig. Die dauert nach einem
+# Neustart ohne Datei ca. 3,6 Minuten = 216 s (Messung im Dienstprotokoll über 7 Tage: 15 Rechnungen, jeweils
+# 3:33 bis 3:42 Minuten). Gesamtwartezeit des ERSTEN Versuchs, nur wenn der Hinweis noch zu sehen ist: ca. 240 s.
+T_KALENDER_BERECHNUNG_MS = 240000
 
 # Bereitschaftsphase vor dem ersten Prüfpunkt (Sekunden)
 T_BEREITSCHAFT_S = 90        # so lange wird auf die erste Antwort der Startseite gewartet
@@ -477,6 +497,50 @@ _KALENDER_BEREIT = """() => {
 }"""
 
 
+# Hinweis der Seite beim ersten Start ohne Monatsdatei (web/index.html, CalendarView.loadMonth):
+# „Der Kalender wird gerade berechnet, bitte kurz warten.“ mit Ladesymbol, im Bereich #feed-content.
+# Das übliche Laden („Jahreskalender wird geladen…“) und Fehlermeldungen enthalten diesen Satz nicht.
+HINWEIS_BERECHNUNG = "wird gerade berechnet"
+
+
+# Erkennung des Hinweises nicht als Momentaufnahme: nach der Zeitüberschreitung bis zu HINWEIS_SUCHE_S lang
+# alle HINWEIS_SUCHE_TAKT_MS erneut prüfen (Ausnahmen in evaluate und ein fehlendes #feed-content zählen
+# nur für diese eine Prüfung als „nicht gesehen“).
+HINWEIS_SUCHE_S = 6
+HINWEIS_SUCHE_TAKT_MS = 500
+
+
+def _hinweis_lesen(page):
+    """Liefert (Text von #feed-content, Name der Ausnahmeklasse oder None)."""
+    try:
+        text = page.evaluate("() => (document.querySelector('#feed-content') || {}).innerText || ''")
+    except Exception as e:
+        return "", e.__class__.__name__
+    return (text if isinstance(text, str) else ""), None
+
+
+def _zeigt_berechnungshinweis(page, bericht: Bericht, t0: float) -> bool:
+    ende = time.monotonic() + HINWEIS_SUCHE_S
+    text, ausnahme = "", None
+    while True:
+        text, ausnahme = _hinweis_lesen(page)
+        if HINWEIS_BERECHNUNG in text:
+            return True
+        if time.monotonic() >= ende:
+            break
+        page.wait_for_timeout(HINWEIS_SUCHE_TAKT_MS)
+    # Nur zur Erklärung, ohne Einfluss auf das Ergebnis (bericht.zeile maskiert Geheimnisse).
+    dauer = time.monotonic() - t0
+    if ausnahme:
+        bericht.zeile(f"Hinweis: Berechnungshinweis nicht prüfbar nach {dauer:.0f} s "
+                      f"(Ausnahme in evaluate: {ausnahme}).")
+    else:
+        anfang = " ".join(text.split())[:80]
+        bericht.zeile(f"Hinweis: Kein Berechnungshinweis sichtbar nach {dauer:.0f} s "
+                      f"(Seitentext beginnt mit: {anfang}).")
+    return False
+
+
 def pruefe_kalender(s: Sitzung, bericht: Bericht, versuch: int) -> Optional[str]:
     page = s.page
     t0 = time.monotonic()
@@ -487,7 +551,22 @@ def pruefe_kalender(s: Sitzung, bericht: Bericht, versuch: int) -> Optional[str]
             page.evaluate("() => { try { CalendarView._monthCache.clear(); } catch (e) {} }")   # Daten neu abfragen
             page.evaluate("() => Feed.setMode('feed')")
         page.click("#fmb-calendar")
-        page.wait_for_function(_KALENDER_BEREIT, timeout=T_KALENDER)
+        try:
+            page.wait_for_function(_KALENDER_BEREIT, timeout=T_KALENDER)
+        except Exception:
+            # Nur im ersten Versuch und nur, wenn die Seite noch den Hinweis „wird gerade berechnet“ zeigt:
+            # weiterwarten bis zur Gesamtzeit T_KALENDER_BERECHNUNG_MS (BUG-123, AK-11). Sonst bleibt es
+            # bei der Zeitüberschreitung nach T_KALENDER (Fehlermeldung, hängender Kalender ohne Hinweis, Wiederholung).
+            if versuch != 1 or not _zeigt_berechnungshinweis(page, bericht, t0):
+                raise
+            try:
+                page.wait_for_function(_KALENDER_BEREIT, timeout=T_KALENDER_BERECHNUNG_MS - T_KALENDER)
+            except Exception:
+                bericht.zeile(f"Hinweis: Der Kalender zeigte „wird gerade berechnet“ und war nach "
+                              f"{time.monotonic() - t0:.0f} s noch nicht fertig.")
+                raise
+            bericht.zeile(f"Hinweis: Der Kalender zeigte „wird gerade berechnet“ und war nach "
+                          f"{time.monotonic() - t0:.0f} s fertig.")
     except Exception as e:
         return f"Der Kalender öffnet sich nicht ({e.__class__.__name__})"
     page.wait_for_timeout(500)

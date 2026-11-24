@@ -376,7 +376,7 @@ jobs:
         id: live1
         if: steps.deploy.outcome == 'success'
         continue-on-error: true
-        timeout-minutes: 3
+        timeout-minutes: 7
         shell: bash
         env:
           FOTOALERT_LIVECHECK_PASSWORD: ${{ secrets.FOTOALERT_LIVECHECK_PASSWORD }}
